@@ -2,7 +2,8 @@
 # and include sub-projects here.
 #
 
-cmake_minimum_required(VERSION 3.26)
+# installed CMake version on ReadTheDocs is 3.22 (September 2024)
+cmake_minimum_required(VERSION 3.22)
 
 include(CMakePrintHelpers)
 
