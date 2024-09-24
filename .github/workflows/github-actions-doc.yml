@@ -65,7 +65,7 @@ jobs:
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install numpy pandas larray cython pytest sphinx numpydoc nbsphinx sphinx_rtd_theme myst-parser
+              conda install "numpy<2.0" pandas larray cython mypy pandoc ipython ipykernel numpydoc nbsphinx sphinx_rtd_theme myst-parser scikit-build-core pytest
           - name: Check installed Python packages
             run: conda list
           - name: Print preset config
