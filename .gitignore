@@ -325,6 +325,7 @@ paket-files/
 __pycache__/
 *.pyc
 *.pyd
+/dist
 pyproject.toml
 **/*.whl
 archives/pyiode_nanobind/iode/tests/data
