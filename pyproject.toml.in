@@ -36,6 +36,10 @@ minimum-version = "0.7"
 # Verbose printout when building.
 cmake.verbose = true
 
+# The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
+# possible options.
+logging.level = "DEBUG"
+
 # A list of args to pass to CMake when configuring the project. Setting this in
 # config or envvar will override toml.
 cmake.args = ["-G", "Ninja", "-D", "CMAKE_BUILD_TYPE=Release"]
@@ -55,10 +59,6 @@ wheel.packages = ["pyiode/iode"]
 # override this behavior
 sdist.include = ["iode.msg", "**/*.pyi", "data"]
 # sdist.exclude = []
-
-# The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
-# possible options.
-logging.level = "DEBUG"
 
 # The build directory. Defaults to a temporary directory, but can be set.
 build-dir = "./out/build/python/{wheel_tag}"
