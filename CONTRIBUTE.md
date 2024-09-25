@@ -168,7 +168,9 @@ The, to install the wheel file, type:
 root_dir_iode> pip install <iode-wheel-file>.whl
 ```
 
-# Python API - stub files
+# Python API
+
+## stub files
 
 To help IDE like PyCharm to understand the Python API of `iode`, 
 stub files *.pyi must be generated and added to installed package.
@@ -177,6 +179,83 @@ The stub files are generated using the tool `stubgen` from the package `mypy`.
 They are automatically generated when the CMake target `iode_python` is built.
 
 See pyiode/CMakeLists.txt and generate_stub_files.py for more details.
+
+## Generating distribution archives
+
+To create a source distribution (SDist) of the Python API, you have to first install 
+the `build` package:
+```bash
+root_dir_iode> conda install build
+```
+
+To create the [SDist tarfile](https://scikit-build-core.readthedocs.io/en/latest/build.html#sdist) 
+(with all the code required to build the project, along with a little bit of metadata), type:
+```bash
+root_dir_iode> python -m build --sdist
+```
+
+Then, to create the [Wheel file](https://scikit-build-core.readthedocs.io/en/latest/build.html#wheel) (a ZIP file containing the compiled Python package), type:
+```bash
+root_dir_iode> python -m build --wheel
+```
+
+You can combine the two above process by typing:
+```bash
+root_dir_iode> python -m build --sdist --wheel
+```
+
+## Uploading the distribution archives to TestPyPI
+
+See explanation [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives).
+
+The first thing you'll need to do is register an account on [TestPyPI](https://test.pypi.org/account/register/). 
+For more details, see [Using TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/).
+
+To securely upload your project, you'll need a PyPI [API token](https://test.pypi.org/help/#apitoken). 
+Create one at https://test.pypi.org/manage/account/#api-tokens, setting the "Scope" to "Entire account". 
+Don't close the page until you have copied and saved the token — you won't see that token again.
+
+Now that you are registered, you can use twine to upload the distribution packages.
+To install the `twine` package, type:
+```bash
+root_dir_iode> conda install twine
+```
+
+Once installed, run Twine to upload all of the archives under dist:
+```bash
+root_dir_iode> twine upload --repository testpypi dist/*
+```
+You will be prompted for a username and password. For the username, use `__token__`. 
+For the password, use the token value, including the `pypi-` prefix.
+
+```bash
+Uploading distributions to https://test.pypi.org/legacy/
+Enter your username: __token__
+Uploading example_package_YOUR_USERNAME_HERE-0.0.1-py3-none-any.whl
+100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.2/8.2 kB • 00:01 • ?
+Uploading example_package_YOUR_USERNAME_HERE-0.0.1.tar.gz
+100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.8/6.8 kB • 00:00 • ?
+```
+
+You can use pip to install your package and verify that it works
+```bash
+root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps example-package-YOUR-USERNAME-HERE
+```
+
+## Uploading the distribution archives to PyPI
+
+See explanation [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/#next-steps).
+
+1. Register an account on https://pypi.org.
+2. Use 
+```bash
+root_dir_iode> twine upload dist/* 
+```
+to upload your package and enter your credentials for the account you registered on PyPI.
+3. Install your package from the PyPI using 
+```bash
+root_dir_iode> pip install [your-package].
+```
 
 # GUI (Python)
 Before to work on any issue related to the GUI (Python), you have to build the CMake target `ui_to_py`. 
