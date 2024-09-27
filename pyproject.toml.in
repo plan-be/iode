@@ -17,8 +17,20 @@ authors = [
     { name = "Yannick Van den Abbeel", email = "yvda@plan.be" },
 ]
 classifiers = [
-    "License :: GPLv3",
+    'Development Status :: 4 - Beta',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Operating System :: Microsoft :: Windows',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Libraries',
 ]
+
 
 # runtime dependency specification
 dependencies = [ "numpy<2.0", "pandas" ]
