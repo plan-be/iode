@@ -6,7 +6,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "iode"
-version = "${CMAKE_PROJECT_VERSION}"
+version = "${IODE_PYTHON_VERSION}"
 description = ""
 readme = "README.md"
 requires-python = ">=3.9"

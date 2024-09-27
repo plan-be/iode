@@ -66,7 +66,7 @@ def _cpp_char_string_map_to_py(map[char, string] c_map) -> Dict[str, str]:
 
 # VERSION
 # -------
-__version__ = "${CMAKE_PROJECT_VERSION}"
+__version__ = "${IODE_PYTHON_VERSION}"
 
 
 # IODE CONSTANTS
