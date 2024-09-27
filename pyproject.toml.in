@@ -11,10 +11,10 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    { name = "Jean-Marc Paul", email = "jmarc.paul@gmail.com" },
-    { name = "Geert Bryon", email = "gb@plan.be" },
     { name = "Alix Damman", email = "ald@plan.be" },
     { name = "Yannick Van den Abbeel", email = "yvda@plan.be" },
+    { name = "Jean-Marc Paul", email = "jmarc.paul@gmail.com" },
+    { name = "Geert Bryon", email = "gb@plan.be" },
 ]
 classifiers = [
     'Development Status :: 4 - Beta',
