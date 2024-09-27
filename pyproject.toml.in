@@ -5,7 +5,9 @@ requires = [ "scikit-build-core >=0.4.3", "numpy", "cython>=3.0", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "iode"
+# NOTE: the name of the package is "pyiode" but the name of the module is "iode"
+#       The name "iode" was already used in PyPI
+name = "pyiode"
 version = "${IODE_PYTHON_VERSION}"
 description = ""
 readme = "README.md"
