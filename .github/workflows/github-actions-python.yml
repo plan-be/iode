@@ -109,7 +109,7 @@ jobs:
           - name: Install iode package
             shell: bash -el {0}
             run: | 
-              filename=$(ls iode*.whl) 
+              filename=$(ls pyiode*.whl) 
               echo $filename 
               pip install $filename
           - name: Test iode Python
@@ -121,5 +121,5 @@ jobs:
             uses: actions/upload-artifact@v3
             with:
               name: iode-python
-              path: "${{ github.workspace }}/iode*.whl"
+              path: "${{ github.workspace }}/pyiode*.whl"
               if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
