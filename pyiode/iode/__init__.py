@@ -3,7 +3,7 @@ from pathlib import Path
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
-from .iode_python import (__version__, NA, is_NA, 
+from .iode_python import (__version__, NA, is_NA, _IODE_DEFAULT_DATABASE_FILENAME, 
                           IodeTypes, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 

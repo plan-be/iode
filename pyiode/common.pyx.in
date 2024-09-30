@@ -12,7 +12,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.map cimport map
 
-from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
+from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS, I_DEFAULT_FILENAME
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
 from pyiode.common cimport (IodeDatabaseType, IodeEquationMethod, 
@@ -72,6 +72,8 @@ __version__ = "${IODE_PYTHON_VERSION}"
 # IODE CONSTANTS
 # --------------
 NA: float = IODE_NAN
+
+_IODE_DEFAULT_DATABASE_FILENAME: str = I_DEFAULT_FILENAME.decode('utf-8')
 
 
 # IODE ENUMS
