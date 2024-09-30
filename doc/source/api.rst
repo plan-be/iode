@@ -391,26 +391,6 @@ PRINT
 OTHER LIBRARIES
 ***************
 
-======
-PANDAS
-======
-
-.. autosummary::
-   :toctree: _generated
-
-   df_to_ws
-   ws_to_df
-
-======
-LARRAY
-======
-
-.. autosummary::
-   :toctree: _generated
-
-   larray_to_ws
-   ws_to_larray
-
 
 *************
 MISCELLANEOUS
@@ -475,6 +455,12 @@ DEPRECATED
    ws_clear_var
    ws_load_var
    ws_save_var
+
+   df_to_ws
+   ws_to_df
+
+   larray_to_ws
+   ws_to_larray
 
    delete_cmt
    get_cmt
