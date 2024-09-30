@@ -6,6 +6,7 @@ from libcpp.map cimport map
 cdef extern from "api/iode.h":
     cdef double IODE_NAN
     cdef int IODE_NB_TYPES
+    cdef char* I_DEFAULT_FILENAME
 
     cdef enum IodeDatabaseType:
         COMMENTS,
