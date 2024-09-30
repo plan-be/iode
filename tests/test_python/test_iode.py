@@ -6,6 +6,8 @@
 # Unit tests for iode.pyd
 
 import iode
+from iode import *
+
 import pytest
 import numpy as np
 import pandas as pd
@@ -20,7 +22,7 @@ IODE_OUTPUT_DIR = (Path(__file__).parent.parent / "output").absolute()
 IODE_VERBOSE = 1
 
 if not IODE_OUTPUT_DIR.exists():
-    IODE_OUTPUT_DIR.mkdir()
+    IODE_OUTPUT_DIR.mkdir() 
 
 # Equations
 # ---------

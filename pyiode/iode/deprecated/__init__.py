@@ -33,7 +33,7 @@ from .report import report_exec, reportline_exec
 
 # compatibility with other libraries
 from .compat_pandas import df_to_ws, ws_to_df
-from .compat_larray import larray_to_ws, ws_to_larray, ws_sample_to_larray_axis
+from .compat_larray import larray_to_ws, ws_to_larray, ws_load_var_to_larray, ws_sample_to_larray_axis
 
 
 _deprecated = [
