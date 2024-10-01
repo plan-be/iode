@@ -18,6 +18,14 @@ def _build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     Interactive commands (which open something in the GUI) starts with the character '#'.
     Non interactive commands starts with the character '$'.
 
+    Parameters
+    ----------
+    group: int
+        'group' is used to defined groups for the color highlighting.
+        Possible values are either 0 or 1.
+    gui: bool, optional
+        False: for the console, True: for the GUI
+
     Notes
     -----
     See b_rep_syntax.c (C API) for the list
@@ -25,6 +33,18 @@ def _build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     Warnings
     --------
     Intended to be used only for building the GUI, not called by users
+
+    Examples
+    --------
+    >>> from iode import _build_command_functions_list
+    >>> _build_command_functions_list(0, False)     # doctest: +ELLIPSIS
+    ['$label', '$goto', '$ask', ..., '$next', '$procdef', '$procexec']
+    >>> _build_command_functions_list(0, True)      # doctest: +ELLIPSIS
+    ['#label', '#goto', '#ask', ..., '#next', '#procdef', '#procexec']
+    >>> _build_command_functions_list(1, False)     # doctest: +ELLIPSIS
+    ['$FileImportVar', '$FileImportCmt', '$FileDelete', ..., '$CsvDec', '$CsvNaN', '$CsvAxes']
+    >>> _build_command_functions_list(1, True)      # doctest: +ELLIPSIS
+    ['#FileImportVar', '#FileImportCmt', '#WsSample', ..., '#ReportExec', '#ReportEdit', '#ReportPrompt']
     """
     return[name.decode() for name in build_command_functions_list(group, <bint>gui)]
 
@@ -39,6 +59,12 @@ def _build_report_functions_list() -> List[str]:
     Warnings
     --------
     Intended to be used only for building the GUI, not called by users
+
+    Examples
+    --------
+    >>> from iode import _build_report_functions_list
+    >>> _build_report_functions_list()          # doctest: +ELLIPSIS
+    ['@upper', '@date', '@time', '@lower', ..., '@mkdir', '@rmdir', '@void', '@version']
     """
     return[name.decode() for name in build_report_functions_list()]
 
@@ -53,6 +79,11 @@ def _build_lec_functions_list() -> List[str]:
     Warnings
     --------
     Intended to be used only for building the GUI, not called by users
+    Examples
+    --------
+    >>> from iode import _build_lec_functions_list
+    >>> _build_lec_functions_list()         # doctest: +ELLIPSIS
+    ['abs', 'acf', 'acos', 'and', ..., 'urandom', 'var', 'vmax', 'vmin']
     """
     return[name.decode() for name in build_lec_functions_list()]
 
