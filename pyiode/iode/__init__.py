@@ -25,6 +25,7 @@ from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables
 
 # Reports
 from .iode_python import execute_report, execute_command
+from .iode_python import _build_command_functions_list, _build_report_functions_list, _build_lec_functions_list
 
 # Printing
 from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
