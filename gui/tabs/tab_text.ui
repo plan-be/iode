@@ -28,7 +28,7 @@
    <widget class="IodeTextEditor" name="editor"/>
    <widget class="IodeTextEditor" name="editor_2"/>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>9</x>
@@ -68,7 +68,7 @@
   <customwidget>
    <class>IodeTextEditor</class>
    <extends>QPlainTextEdit</extends>
-   <header>text_edit\text_editor.h</header>
+   <header>text_edit/text_editor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
