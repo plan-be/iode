@@ -58,6 +58,13 @@ def test_cython_iode():
     iode.__test__['_iode_msg_path'] = _iode_msg_path.__doc__
     iode.__test__['_print_error_msg'] = _print_error_msg.__doc__
 
+    from iode.iode_python import _build_command_functions_list
+    iode.__test__['_build_command_functions_list'] = _build_command_functions_list.__doc__
+    from iode.iode_python import _build_report_functions_list
+    iode.__test__['_build_report_functions_list'] = _build_report_functions_list.__doc__
+    from iode.iode_python import _build_lec_functions_list
+    iode.__test__['_build_lec_functions_list'] = _build_lec_functions_list.__doc__
+
     iode.suppress_msgs()
 
     # run doctests
