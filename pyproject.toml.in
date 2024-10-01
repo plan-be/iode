@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 # NOTE: the name of the package is "pyiode" but the name of the module is "iode"
 #       The name "iode" was already used in PyPI
 name = "pyiode"
-version = "${IODE_PYTHON_VERSION}"
+version = "${CMAKE_PROJECT_VERSION}"
 description = ""
 readme = "README.md"
 requires-python = ">=3.10"
