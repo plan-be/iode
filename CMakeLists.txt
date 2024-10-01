@@ -38,8 +38,6 @@ set(PYTHON_API_URL "https://iode.readthedocs.io/en/latest/api.html")
 set(CHANGELOG_URL "https://iode.readthedocs.io/en/latest/changes.html")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 
-set(IODE_PYTHON_VERSION "0.0.1")
-
 set(CMAKE_INSTALL_MESSAGE ALWAYS)
 
 # -- resources directory --

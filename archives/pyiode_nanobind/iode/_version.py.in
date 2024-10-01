@@ -1,1 +1,1 @@
-__version__ = "${IODE_PYTHON_VERSION}"
+__version__ = "${CMAKE_PROJECT_VERSION}"
