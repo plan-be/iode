@@ -12,17 +12,12 @@ on:
 
 jobs:
     # see https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow 
-    build_python:
-      uses: ./.github/workflows/github-actions-python.yml 
-      with:
-        build-config: ${{ inputs.build-config }}
-
     build_doc:
       uses: ./.github/workflows/github-actions-doc.yml
 
     build_nsis:
         name: Build installer using NSIS
-        needs: [build_python, build_doc]
+        needs: [build_doc]
         strategy:
           matrix:
             os: [windows-latest]
@@ -43,42 +38,6 @@ jobs:
           - name: Checkout repository code
             uses: actions/checkout@v2
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-    
-          - name: Restore Python 3.9 binding files for IODE
-            uses: actions/download-artifact@v4
-            with:
-              name: iode-python-39
-              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39    
-          - name: check for Python 3.9 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39
-    
-          - name: Restore Python 3.10 binding files for IODE
-            uses: actions/download-artifact@v4
-            with:
-              name: iode-python-310
-              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
-          - name: check for Python 3.10 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
-    
-          - name: Restore Python 3.11 binding files for IODE
-            uses: actions/download-artifact@v4
-            with:
-              name: iode-python-311
-              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py311
-          - name: check for Python 3.11 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py311
-    
-          - name: Group iode.pyd files into a Zip file
-            run: tar -cvf python_iode.zip ./py39/iode.pyd ./py310/iode.pyd ./py311/iode.pyd
-            working-directory: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode
-
-          - name: Upload Python Zip file
-            if: ${{ success() }}
-            uses: actions/upload-artifact@v3
-            with:
-              name: iode-python
-              path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/python_iode.zip"
-              if-no-files-found: error
 
           - name: Restore Documentation Files
             uses: actions/download-artifact@v4
