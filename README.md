@@ -20,4 +20,4 @@ functionalities required for the construction and the handling of econometric mo
 https://iode.readthedocs.io/en/latest/index.html
 
 ## Support
-iode@plan.be
+"Alix Damman" <ald@plan.be>, "Yannick Van den Abbeel" <yvda@plan.be>
