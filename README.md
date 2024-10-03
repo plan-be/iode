@@ -3,7 +3,7 @@
 `IODE` is the French acronym for `Intégrateur d'Outils de Développements Économétriques` (Integrated Tools for Econometric Developments).
 
 Originally designed at the `Federal Planning Bureau` in Brussels by econometricians and mathematicians, this software integrates all the 
-functionalities required for the construction and the handling of economectric models and for the management of statistical series.
+functionalities required for the construction and the handling of econometric models and for the management of statistical series.
 
 ## Main functionalities :
 
