@@ -1,11 +1,12 @@
-Version7.0-beta.7
-=================
+Version 7.0.0
+=============
 
 In development
 
 New Features 
 ------------
 
+  * (PYTHON) release of the first Python iodeapi package (version 7.0.0) 
 
 Improvements
 ------------
@@ -19,7 +20,3 @@ Fixed Bugs
   * (GUI) Fixed shortcut CTRL + ALT + F2/F3 not showing equations/identities corresponding to 
           exogenous variables in an equation/identity (#603) 
   * (GUI) Fixed CTRL + F4 not working in tabs representing an Iode database (#609)
-
-Miscellaneous
--------------
-
