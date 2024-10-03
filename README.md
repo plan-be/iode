@@ -16,8 +16,8 @@ functionalities required for the construction and the handling of econometric mo
  - scripting language
  - export of tables and graphs towards word processors and numerous file formats
 
-## Public Website
-https://iode.plan.be (documentation, downloads, whish list, ...)
+## Documentation
+https://iode.readthedocs.io/en/latest/index.html
 
 ## Support
 iode@plan.be
