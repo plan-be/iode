@@ -239,7 +239,7 @@ Uploading example_package_YOUR_USERNAME_HERE-0.0.1.tar.gz
 
 You can use pip to install your package and verify that it works
 ```bash
-root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps example-package-YOUR-USERNAME-HERE
+root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps <project_name_from_pyproject.toml>
 ```
 
 ## Uploading the distribution archives to PyPI
@@ -254,7 +254,7 @@ root_dir_iode> twine upload dist/*
 to upload your package and enter your credentials for the account you registered on PyPI.
 3. Install your package from the PyPI using 
 ```bash
-root_dir_iode> pip install [your-package].
+root_dir_iode> pip install <project_name_from_pyproject.toml>
 ```
 
 # GUI (Python)
