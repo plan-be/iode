@@ -7,69 +7,102 @@ import iode
 import doctest
 import inspect
 import logging
+from typing import List, Any
 
 
-def test_cython_iode():
+# https://docs.python.org/3.11/library/inspect.html#inspect.getmembers
+# If the optional predicate argument - which will be called with the value object of each 
+# member - is supplied, only members for which the predicate returns a true value are included.
+def run_doctests(items: List[str]=None, verbose: bool=False, raise_on_error: bool=False):
+    if items is not None:
+        def predicate(value: Any) -> bool:
+            # WARNING: Python functions defined in a Cython pyx file are of type '_cython_xxx.cython_function_or_method'.
+            #          This type is not recognizable by inspect.isfunction() or inspect.isclass() but 
+            #          returns True if inspect.isroutine() is used
+            return (inspect.isfunction(value) or inspect.isroutine(value) or inspect.isclass(value)) \
+                    and value.__name__ in items
+
+        iode.__test__ = {}
+        for name, value in inspect.getmembers(iode, predicate=predicate):
+            if inspect.isclass(value):
+                for name_, value_ in inspect.getmembers(value):
+                    doc = inspect.getdoc(value_)
+                    if doc is not None:
+                        iode.__test__[f'{name}.{name_}'] = doc                 
+            doc = inspect.getdoc(value)
+            if doc is not None:
+                iode.__test__[name] = doc
+
+    # run doctests
+    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
+    assert failure_count == 0
+    for name in iode.__test__:
+        logging.info(f"tested function/method: '{name}'")
+    logging.info(f"number of tests run: {test_count}")
+
+
+def test_iode_time():
+    run_doctests(items=['Period', 'Sample'])
+
+
+def test_iode_objects():
+    run_doctests(items=['Equation', 'Scalar', 'Table', 'split_list'])
+
+
+def test_iode_table_line_cell():
     iode.__test__ = {}
-    for name, value in inspect.getmembers(iode):
-        if "Database" in type(value).__name__:
-            value = type(value)
-        if name != "Path" and inspect.isclass(value):
-            for name_, value_ in inspect.getmembers(value):
-                doc = inspect.getdoc(value_)
-                if doc is not None:
-                    iode.__test__[f'{name}.{name_}'] = doc                 
-        doc = inspect.getdoc(value)
-        if doc is not None:
-            iode.__test__[name] = doc
-
     from iode.iode_python import TableLine
     for name_, value_ in inspect.getmembers(TableLine):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'TableLine.{name_}'] = doc 
-
     from iode.iode_python import TableCell
     for name_, value_ in inspect.getmembers(TableCell):
         doc = inspect.getdoc(value_)
         if doc is not None:
-            iode.__test__[f'TableCell.{name_}'] = doc 
+            iode.__test__[f'TableCell.{name_}'] = doc
+    run_doctests()
 
+
+def test_iode_computed_table():
+    iode.__test__ = {}
     from iode.iode_python import ComputedTable
     for name_, value_ in inspect.getmembers(ComputedTable):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
+    run_doctests()
 
-    from iode.iode_python import EditAndEstimateEquations
-    for name_, value_ in inspect.getmembers(EditAndEstimateEquations):
-        doc = inspect.getdoc(value_)
-        if doc is not None:
-            iode.__test__[f'EditAndEstimateEquations.{name_}'] = doc 
 
-    from iode.util import table2str
-    iode.__test__['table2str'] = table2str.__doc__
+def test_iode_databases():
+    run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables'])
 
-    from iode.util import _check_filepath, _get_iode_file_type
-    iode.__test__['_check_filepath'] = _check_filepath.__doc__
-    iode.__test__['_get_iode_file_type'] = _get_iode_file_type.__doc__
-    
-    from iode.iode_python import _iode_msg_path, _print_error_msg
-    iode.__test__['_iode_msg_path'] = _iode_msg_path.__doc__
-    iode.__test__['_print_error_msg'] = _print_error_msg.__doc__
 
-    from iode.iode_python import _build_command_functions_list
-    iode.__test__['_build_command_functions_list'] = _build_command_functions_list.__doc__
-    from iode.iode_python import _build_report_functions_list
-    iode.__test__['_build_report_functions_list'] = _build_report_functions_list.__doc__
-    from iode.iode_python import _build_lec_functions_list
-    iode.__test__['_build_lec_functions_list'] = _build_lec_functions_list.__doc__
+def test_iode_execute():
+    run_doctests(items=['execute_report', 'execute_command', 'execute_lec'])
 
+
+def test_iode_writing():
+    run_doctests(items=['w_close', 'w_dest', 'w_flush', 'w_print', 'w_print_cmd', 'w_print_enum', 
+                        'w_print_par', 'w_print_pg_footer', 'w_print_pg_header', 'w_print_tit'])
+
+
+def test_iode_simulation_estimation():
+    run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'])
+
+
+def test_iode_edit_and_estimate_equations():
     iode.suppress_msgs()
+    run_doctests(items=['EditAndEstimateEquations'])
+    iode.reset_msgs()
 
-    # run doctests
-    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
-    assert failure_count == 0
-    assert test_count > 0
-    for name in iode.__test__:
-        logging.info(f"tested function/method: '{name}'")
+
+def test_iode_messages():
+    run_doctests(items=['add_error_msg', 'clear_error_msgs', 'display_error_msgs', 
+                        'reset_msgs', 'suppress_msgs'])
+
+
+def test_iode_miscellaneous():
+    run_doctests(items=['table2str', '_check_filepath', '_get_iode_file_type', 
+                        '_iode_msg_path', '_print_error_msg', '_build_command_functions_list', 
+                        '_build_report_functions_list', '_build_lec_functions_list'])
