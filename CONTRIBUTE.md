@@ -3,11 +3,10 @@
 - Required tools:
   - **Windows**:
     - Compiler **MSVC 2022**.
-    - [Chocolatey](https://chocolatey.org/install) (*) -> C/C++ package manager.
     - [CMake](https://cmake.org/download) (>= 3.20) (*) -> controls the software compilation process.
     - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
-    <br> Can be installed using choco:
-      > choco install ninja
+    <br> Can be installed using [winget](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages#windows) on Windows:
+      > winget install Ninja-build.Ninja
     - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
     - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
     - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
