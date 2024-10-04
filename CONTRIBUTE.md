@@ -39,6 +39,8 @@
    - nbsphinx
    - sphinx_rtd_theme
    - myst-parser
+   - build
+   - twine
 
 **note**: to install `pyqt6`, you have to do it via `pip`:
 ```bash
