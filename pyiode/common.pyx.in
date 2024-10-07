@@ -72,6 +72,7 @@ __version__ = "${CMAKE_PROJECT_VERSION}"
 # IODE CONSTANTS
 # --------------
 NA: float = IODE_NAN
+NAN_REP: str = "--"
 
 _IODE_DEFAULT_DATABASE_FILENAME: str = I_DEFAULT_FILENAME.decode('utf-8')
 

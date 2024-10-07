@@ -49,6 +49,7 @@ ODE_assign_super_PYIODE()
 include "common.pyx"
 include "util.pyx"
 include "lec.pyx"
+include "iode_database/extra_files.pyx"
 
 include "time/period.pyx"
 include "time/sample.pyx"

@@ -2,7 +2,7 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.objects.table cimport CTable 
+from pyiode.objects.table cimport CTable
 from pyiode.computed_table.computed_table cimport CComputedTable
 
 
@@ -71,11 +71,9 @@ cdef class ComputedTable:
     <BLANKLINE>
     """
     cdef CComputedTable* c_computed_table
-    cdef int nb_decimals
 
     def __cinit__(self):
         self.c_computed_table = NULL
-        self.nb_decimals = 0
 
     def __init__(self):
         # Prevent accidental instantiation from normal Python code
@@ -90,8 +88,7 @@ cdef class ComputedTable:
     cdef ComputedTable initialize(CTable* c_table, string generalized_sample, int nb_decimals):
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef ComputedTable wrapper = ComputedTable.__new__(ComputedTable)
-        wrapper.c_computed_table = new CComputedTable(c_table, generalized_sample)
-        wrapper.nb_decimals = nb_decimals
+        wrapper.c_computed_table = new CComputedTable(c_table, generalized_sample, nb_decimals)
         return wrapper
 
     @property
@@ -130,15 +127,13 @@ cdef class ComputedTable:
         Stock de capital                 | 8083.5517 | 8359.8908 | 8647.9354 | 8910.3393 | 9175.8106 | 9468.8865
         Intensité de capital             |    0.5032 |    0.4896 |    0.4758 |    0.4623 |    0.4481 |    0.4349
         Productivité totale des facteurs |    0.9938 |    1.0037 |    1.0137 |    1.0239 |    1.0341 |    1.0445
-        <BLANKLINE>    
+        <BLANKLINE>
         """
-        return self.nb_decimals
+        return self.c_computed_table.get_nb_decimals()
 
     @nb_decimals.setter
     def nb_decimals(self, value: int):
-        if not isinstance(value, int):
-            raise TypeError(f"'nb_decimals': Expected value of type 'int'. Got value of type {type(value).__name__} instead")
-        self.nb_decimals = value
+        self.c_computed_table.set_nb_decimals(value)
 
     @property
     def nb_lines(self) -> int:
@@ -562,7 +557,8 @@ cdef class ComputedTable:
         if pd is None:
             raise RuntimeError("pandas library not found")
 
-        data = [[self.c_computed_table.get_value(i, j, -1) for j in range(self.nb_columns)] 
+        # get data from the C++ computed table
+        data = [[self.c_computed_table.get_value(i, j, <bint>True) for j in range(self.nb_columns)] 
                 for i in range(self.nb_lines)]
         df = DataFrame(index=self.lines, columns=self.columns, data=data)
         # replace IODE NaN values by numpy or pandas values
@@ -608,6 +604,100 @@ cdef class ComputedTable:
 
         df = self.to_frame()
         return la.from_frame(df)
+
+    def print_to_file(self, destination_file: Union[str, Path], format: str=None):
+        """
+        Print the present computed table to a file.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+        - 'D' (DUMMY file)
+
+        If argument `format` is null (default), the A2M format will be used
+        to print the output.
+
+        If the filename does not contain an extension, it is automatically
+        added based on the format.
+
+        Parameters
+        ----------
+        destination_file: str or Path 
+            The destination file for printing
+        format: str, optional
+            The format of the output file. Deduced from the extension if not provided.
+            If destination_file has no extension and format is None, the A2M format is used.
+            
+        Examples
+        --------
+        >>> from pathlib import Path
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables, variables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+        >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+           line title \ period[file]     |    10    | 10/09 |    11    | 11/10 | ... |    14    | 14/13
+        -------------------------------------------------------------------------...--------------------
+        Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 | ... |  7460.12 |  2.16
+        Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | ... | 12263.95 |  2.41
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 | ... |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 | ... |     1.14 |  1.00
+        <BLANKLINE>
+        >>> computed_table.print_to_file(tmp_dir / "computed_table_2_periods.csv")
+        >>> with open(tmp_dir / "computed_table_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        ...     print(f.read())
+        "Déterminants de l'output potentiel"
+        <BLANKLINE>
+        " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
+        <BLANKLINE>
+        "Output potentiel","6936.11","1.74",...,"7460.12","2.16",       
+        "Stock de capital","11293.85","2.82",...,"12263.95","2.41",  
+        "Intensité de capital","0.39","-2.17",...,"0.36","-1.90",
+        "Productivité totale des facteurs","1.10","1.00",...,"1.14","1.00",      
+        <BLANKLINE>
+
+        >>> extra_files = Path(SAMPLE_DATA_DIR) / "ref.av"
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=extra_files)
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+           line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
+        -----------------------------------------------------------------------------------
+        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |  149.20
+        Stock de capital                 |  225.88 |  230.50 |  234.74 |  239.51 |  245.28
+        Intensité de capital             |    0.01 |    0.01 |    0.01 |    0.01 |    0.01
+        Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
+        <BLANKLINE>
+        >>> computed_table.print_to_file(tmp_dir / "computed_table_2_files.csv")    
+        >>> with open(tmp_dir / "computed_table_2_files.csv", "r") as f:
+        ...     print(f.read())
+        "Déterminants de l'output potentiel"
+        <BLANKLINE>
+        " ","10[1-2]","11[1-2]","12[1-2]","13[1-2]","14[1-2]",
+        <BLANKLINE>
+        "Output potentiel","138.72","140.91","143.23","146.05","149.20",
+        "Stock de capital","225.88","230.50","234.74","239.51","245.28",
+        "Intensité de capital","0.01","0.01","0.01","0.01","0.01",
+        "Productivité totale des facteurs","0.02","0.02","0.02","0.02","0.02",
+        <BLANKLINE>
+        """
+        cdef char c_format = b'\0'
+        if format is not None:
+            if not len(format):
+                raise ValueError("format must be a non-empty char")
+            c_format = format.encode('utf-8')[0]
+
+        if isinstance(destination_file, str):
+            if not len(destination_file):
+                raise ValueError("'destination_file' must be a non-empty string or a Path object.")
+            destination_file = Path(destination_file)
+        if destination_file.suffix:
+            c_format = destination_file.suffix.encode('utf-8')[1]
+        destination_file = str(destination_file.resolve())
+
+        self.c_computed_table.print_to_file(destination_file.encode('utf-8'), c_format)
 
     def _unfold_key(self, key: Tuple[Union[int, str], Union[int, str]]) -> Tuple[int, int]:
         if not isinstance(key, tuple) and len(key) == 2:
@@ -698,7 +788,7 @@ cdef class ComputedTable:
         0.9975986300775119
         """
         row, column = self._unfold_key(key)
-        return self.c_computed_table.get_value(row, column, -1)
+        return self.c_computed_table.get_value(row, column, <bint>True)
 
     def __setitem__(self, key: Tuple[Union[int, str], Union[int, str]], value: float):
         """
@@ -828,11 +918,14 @@ cdef class ComputedTable:
         upper_left_corner = upper_left_corner.center(max_length)
         line_names = [line_name.ljust(max_length) for line_name in line_names]
 
+        def cell_value_to_str(i: int, j: int) -> str:
+            value = self.c_computed_table.get_value(i, j, <bint>True)
+            return f"{value:.{self.nb_decimals}f}"  if value > IODE_NAN else NAN_REP
+
         data = []
         column_names = []
         for j, column_name in enumerate(self.columns):
-            column_data = [f"{self.c_computed_table.get_value(i, j, -1):.{self.nb_decimals}f}" 
-                           for i in range(self.nb_lines)]
+            column_data = [cell_value_to_str(i, j) for i in range(self.nb_lines)]
             max_length = max([len(column_name)] + [len(value) for value in column_data])
             column_names += [column_name.center(max_length)]
             data += [[value.rjust(max_length) for value in column_data]]

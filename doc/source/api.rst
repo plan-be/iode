@@ -130,6 +130,7 @@ Tables
    :toctree: _generated
 
    Tables
+   Tables.print_to_file
 
 =========
 Variables
@@ -157,6 +158,15 @@ Variables
    Variables.to_frame
    Variables.from_array
    Variables.to_array
+
+=============
+Miscellaneous
+=============
+
+.. autosummary::
+   :toctree: _generated
+
+   load_extra_files
 
 ************
 IODE OBJECTS
@@ -284,6 +294,7 @@ COMPUTED TABLE
    ComputedTable.to_frame
    ComputedTable.__getitem__
    ComputedTable.__setitem__
+   ComputedTable.print_to_file
 
 ****
 TIME

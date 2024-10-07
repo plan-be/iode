@@ -196,7 +196,8 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
         int add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
                 bool files=False, bool date=False) except +
         void update(string& name, CTable& table) except +
-    
+        void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, char format_)
+
     size_t hash_value(KDBTables&) except +
 
     # Define the global Tables instance

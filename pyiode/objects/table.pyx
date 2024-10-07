@@ -17,8 +17,8 @@ from pyiode.common cimport TableGraphGrid as CTableGraphGrid
 from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
-from pyiode.iode_database.cpp_api_database cimport load_reference_kdb
 
+from iode.util import _check_filepath
 
 # TableCell wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
@@ -1109,8 +1109,11 @@ cdef class Table:
     @language.setter
     def language(self, value: Union[TableLang, str]):
         if isinstance(value, str):
-            value = value.upper()
-            value = TableLang[value]
+            upper_str = value.upper()
+            if upper_str not in TableLang.__members__:
+                raise ValueError(f"'language': Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(TableLang.__members__.keys())}. ")
+            value = TableLang[upper_str]
         value = int(value)
         self.c_table.set_language(<CTableLang>value)
 
@@ -1531,7 +1534,8 @@ cdef class Table:
             else:
                 self.insert(row, line_type)
 
-    def compute(self, generalized_sample: str, extra_files: Union[str, List[str]] = None, nb_decimals: int = 2) -> ComputedTable:
+    def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]] = None, 
+                nb_decimals: int = 2) -> ComputedTable:
         """
         Compute the values corresponding to LEC expressions in cells.
         
@@ -1613,7 +1617,7 @@ cdef class Table:
         ----------
         generalized_sample: str
             Generalized sample (see above).
-        extra_files: str or list(str), optional
+        extra_files: str or Path or list(str) or list(Path), optional
             (List of) extra file(s) referenced in the generalized sample.
             Maximum 4 files can be passed as argument.
             The file [1] always refers to the current workspace. 
@@ -1629,6 +1633,7 @@ cdef class Table:
 
         Examples
         --------
+        >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
@@ -1652,6 +1657,7 @@ cdef class Table:
         graph_axis: 'VALUES'
         graph_alignment: 'LEFT'
         <BLANKLINE>
+
         >>> # simple time series (current workspace) - 6 observations - 4 decimals
         >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
@@ -1662,6 +1668,7 @@ cdef class Table:
         Intensité de capital             |    0.5032 |    0.4896 |    0.4758 |    0.4623 |    0.4481 |    0.4349
         Productivité totale des facteurs |    0.9938 |    1.0037 |    1.0137 |    1.0239 |    1.0341 |    1.0445
         <BLANKLINE>
+
         >>> # two time series (current workspace) - 5 observations - 2 decimals (default)
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
@@ -1672,8 +1679,10 @@ cdef class Table:
         Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
+
         >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> sample_data_dir = Path(SAMPLE_DATA_DIR)
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=sample_data_dir/"ref.av")
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |  10[1]   |  10[2]   |  11[1]   |  11[2]   |  12[1]   |  12[2]   |  13[1]   |  13[2]   |  14[1]   |  14[2]    
         ----------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -1682,19 +1691,28 @@ cdef class Table:
         Intensité de capital             |     0.39 |     0.38 |     0.38 |     0.37 |     0.37 |     0.36 |     0.36 |     0.36 |     0.36 |     0.35  
         Productivité totale des facteurs |     1.10 |     1.08 |     1.11 |     1.09 |     1.12 |     1.10 |     1.13 |     1.11 |     1.14 |     1.12  
         <BLANKLINE>
+        >>> computed_table.files            # doctest: +ELLIPSIS
+        ['...ref.av']
+
+        >>> # simple time series (current workspace + 4 extra files) - 5 observations - 2 decimals (default)
+        >>> extra_files = [sample_data_dir / "ref.av", sample_data_dir / "fun.av", 
+        ...                sample_data_dir / "fun2.av", sample_data_dir / "a.var"]
+        >>> computed_table = tables["C8_1"].compute("2010[1;2;3;4;5]:1", extra_files=extra_files)
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+           line title \ period[file]     |  10[1]   |  10[2]   |  10[3]   |  10[4]   | 10[5]         
+        -------------------------------------------------------------------------------------
+        Output potentiel                 |  6936.11 |  6797.39 |  6936.11 |  6936.11 |   --
+        Stock de capital                 | 11293.85 | 11067.97 | 11293.85 | 11293.85 |   --
+        Intensité de capital             |     0.39 |     0.38 |     0.39 |     0.39 |   --
+        Productivité totale des facteurs |     1.10 |     1.08 |     1.10 |     1.10 |   --
+        <BLANKLINE>
+        >>> [Path(filepath).name for filepath in computed_table.files]
+        ['fun.var', 'ref.av', 'fun.av', 'fun2.av', 'a.var']
         """
         if not generalized_sample:
             raise ValueError("'generalized_sample' must not be empty")
-
         if extra_files is not None:
-            if isinstance(extra_files, str):
-                extra_files = [extra_file.strip() for extra_file in extra_files.split(';')]
-            for i, extra_file in enumerate(extra_files):
-                if not isinstance(extra_file, str):
-                    raise TypeError(f"'extra_files': Expected value of type str or list of str. "
-                                    f"Got value of type {type(extra_files).__name__} instead")
-                load_reference_kdb(i + 2, IodeDatabaseType.VARIABLES, extra_file.encode())
-
+            load_extra_files(extra_files)
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def __len__(self) -> int:
