@@ -495,3 +495,32 @@ TEST_F(ComputedTableTest, EditTable)
     // 7) trying to modify a cell value by passing a NaN value
     EXPECT_THROW(table_simple.set_value(1, 5, IODE_NAN), IodeException);
 }
+
+TEST_F(ComputedTableTest, InitializePrinting)
+{
+    std::string gsample;
+    std::string table_name = "C8_1";
+    Table ref_table = kdb_tbl->get(table_name); 
+
+    // simple time series (current workspace + one extra file) - 5 observations
+    gsample = "2010[1-2]:5";
+    ComputedTable table_simple(&ref_table, gsample, 8);
+    table_simple.initialize_printing("file.html", 'H');
+    EXPECT_EQ(table_simple.get_destination_file(), "file.html");
+
+    // extension is automatically added based on the format
+    table_simple.initialize_printing("file", 'C');
+    EXPECT_EQ(table_simple.get_destination_file(), "file.csv");
+
+    // wrong extension -> if filepath is given with an extension, 
+    //                    the argument 'format' is ignored
+    table_simple.initialize_printing("file.csv", 'R');
+    EXPECT_EQ(table_simple.get_destination_file(), "file.csv");
+
+    // no extension + no format given -> default to A2M format
+    table_simple.initialize_printing("file");
+    EXPECT_EQ(table_simple.get_destination_file(), "file.a2m");
+
+    // invalid format
+    EXPECT_THROW(table_simple.initialize_printing("file", 'Z'), std::invalid_argument);
+}
