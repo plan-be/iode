@@ -349,3 +349,64 @@ void ComputedTable::set_value(const int line, const int col, const double value,
    // recompute all values of the ComputedTable table
    compute_values();
 }
+
+void ComputedTable::initialize_printing(const std::string& destination_file, const char format)
+{
+    int res;
+
+    // set output file
+    // output_file = "<filepath> <format>"
+    // if windows printer -> output_file = ""
+    // see C_FilePrintFile() from sb_file.c from the old GUI
+    if(destination_file.empty())
+        throw std::invalid_argument("Cannot initialize printing. Destination file is empty.");
+
+    if(format == '\0')
+        res = B_PrintDest(to_char_array(destination_file));
+    else
+    {
+        char upper_format = toupper(format);
+        if (ALLOWED_FORMATS.find(upper_format) == std::string::npos)
+            throw std::invalid_argument(std::string("Cannot initialize printing. Invalid format.\n") + 
+                "Possible formats are: " + ALLOWED_FORMATS);
+        std::string arg = destination_file + " " + upper_format;
+        res = B_PrintDest(arg.data());
+    }   
+
+    if(res < 0)
+    {
+        std::string msg = "Cannot initialize printing.\n";
+        msg += "Invalid value for 'destination_file' or 'format' argument.\n";
+        msg += get_last_error();
+        throw std::invalid_argument(msg);
+    }
+        
+    // set number of decimals to print
+    std::string str_nb_decimals = std::to_string(nb_decimals);
+    res = B_PrintNbDec(str_nb_decimals.data());
+    if(res < 0)
+    {
+        std::string msg = "Cannot initialize printing.\n";
+        msg += "Invalid value for 'nb_decimals' argument.\n";
+        msg += get_last_error();
+        throw std::invalid_argument(msg);
+    }
+
+    // set language
+    std::string language = ref_table->get_language();
+    if(language.empty())
+        throw std::invalid_argument("Cannot initialize printing. Language is empty.");
+
+    char tlang[2];
+    tlang[0] = language[0];
+    tlang[1] = 0;
+    
+    res = B_PrintLang(tlang);
+    if(res < 0)
+    {
+        std::string msg = "Cannot initialize printing.\n";
+        msg += "Invalid value for 'language' argument.\n";
+        msg += get_last_error();
+        throw std::invalid_argument(msg);
+    }
+}

@@ -21,6 +21,8 @@
 //           - replaced FILS and COLS structures by std::vector
 //           - rewrite T_prep_cls(), T_prep_smpl() and T_find_files() in C++
 
+const static std::string ALLOWED_FORMATS = "HMRCD";
+
 /**
  * @brief The present class represents the output table resulting from the compilation 
  *        of a generalized sample given a reference table.
@@ -209,4 +211,30 @@ public:
      * @note see the VT_edit() function from o_vt.c from the old GUI
      */
     void set_value(const int line, const int col, const double value, bool check_if_editable = true);
+    
+    // NOTE: made it public to be callable from the Cython wrapper
+    /**
+     * @brief Initialize C API parameters for printing.
+     * Argument `format` must be in the list:
+     *   - 'H' (HTML file)
+     *   - 'M' (MIF file)
+     *   - 'R' (RTF file)
+     *   - 'C' (CSV file)
+     *   - 'D' (DUMMY file)
+     * 
+     * If argument `format` is null (default), the A2M format will be used 
+     * to print the output.
+     * 
+     * If the filename does not contain an extension, it is automatically 
+     * added based on the format.
+     * 
+     * @param destination_file 
+     * @param format 
+     */
+    void initialize_printing(const std::string& destination_file, const char format = '\0');
+
+    std::string get_destination_file() const
+    {
+        return std::string(W_filename);
+    }
 };
