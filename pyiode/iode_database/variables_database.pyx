@@ -275,9 +275,6 @@ cdef class Variables(_AbstractDatabase):
                 # wrong type for periods_
                 raise TypeError(f"variables[names, periods]: 'periods' must represent either a period (str), a list of periods "
                                 f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
-
-        # wrong key
-        raise ValueError(f"variables[...]: Expected ['names'] or ['names', 'periods'] as arguments. Got '{key}' instead.")     
         
     def _get_variable(self, name: str, periods_: Union[str, List[str]]) -> Union[float, List[float]]: 
         # periods_ represents all periods

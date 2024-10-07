@@ -46,7 +46,9 @@ def test_iode_time():
 
 
 def test_iode_objects():
+    iode.suppress_msgs()
     run_doctests(items=['Equation', 'Scalar', 'Table', 'split_list'])
+    iode.reset_msgs()
 
 
 def test_iode_table_line_cell():
@@ -71,11 +73,15 @@ def test_iode_computed_table():
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
+    iode.suppress_msgs()
     run_doctests()
+    iode.reset_msgs()
 
 
 def test_iode_databases():
+    iode.suppress_msgs()
     run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables'])
+    iode.reset_msgs()
 
 
 def test_iode_execute():
@@ -88,7 +94,9 @@ def test_iode_writing():
 
 
 def test_iode_simulation_estimation():
+    iode.suppress_msgs()
     run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'])
+    iode.reset_msgs()
 
 
 def test_iode_edit_and_estimate_equations():

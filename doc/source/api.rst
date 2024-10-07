@@ -278,12 +278,14 @@ COMPUTED TABLE
    ComputedTable.sample
    ComputedTable.nb_periods
    ComputedTable.title
+   ComputedTable.destination_file
 
    ComputedTable.is_editable
    ComputedTable.to_array
    ComputedTable.to_frame
    ComputedTable.__getitem__
    ComputedTable.__setitem__
+   ComputedTable.print_to_file
 
 ****
 TIME
