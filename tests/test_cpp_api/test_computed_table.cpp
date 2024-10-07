@@ -524,3 +524,74 @@ TEST_F(ComputedTableTest, InitializePrinting)
     // invalid format
     EXPECT_THROW(table_simple.initialize_printing("file", 'Z'), std::invalid_argument);
 }
+
+TEST_F(ComputedTableTest, PrintToFile)
+{
+    // WARNING: B_PrintTable() resets K_RWS (reference files)
+
+    int res;
+    std::string arg;
+    std::string gsample;
+    std::string table_name = "C8_1";
+    Table ref_table = kdb_tbl->get(table_name); 
+
+    // simple time series (current workspace) - 10 observations
+    gsample = "2000:10";
+    ComputedTable table_simple(&ref_table, gsample);
+    // ---- CSV format ----
+    table_simple.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_simple.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    // ---- HTML format ----
+    table_simple.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_simple.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+
+    // two time series (current workspace) - 5 observations
+    gsample = "(2010;2010/2009):5";
+    ComputedTable table_grt(&ref_table, gsample);
+    // ---- CSV format ----
+    table_grt.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_grt.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    // ---- HTML format ----
+    table_grt.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_grt.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+
+    // simple time series (current workspace + one extra file) - 5 observations
+    gsample = "2010[1-2]:5";
+    ComputedTable table_2_files(&ref_table, gsample, 8);
+    // ---- CSV format ----
+    table_2_files.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);   
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_2_files.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    // ---- HTML format ----
+    table_2_files.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);   
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_2_files.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+}
