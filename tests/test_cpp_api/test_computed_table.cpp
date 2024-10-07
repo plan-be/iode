@@ -167,6 +167,10 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(round(values[0] * 100) / 100, 1.1);
     values = graph_2_files.get_series_values(3, 1);
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 1.1);
+
+    // wrong number of decimals (must in range [0, 99])
+    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, -1), std::invalid_argument);
+    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, 100), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, BuildFromVariables)
@@ -290,6 +294,10 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(round(values[0] * 100) / 100, 11293.85);
     values = graph_2_files.get_series_values(3, 1);
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 11502.05);
+
+    // wrong number of decimals (must in range [0, 99])
+    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, -1), std::invalid_argument);
+    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, 100), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, EditTable)
