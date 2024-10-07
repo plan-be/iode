@@ -7,13 +7,15 @@ import iode
 import doctest
 import inspect
 import logging
+import pytest
+from pathlib import Path
 from typing import List, Any
 
 
 # https://docs.python.org/3.11/library/inspect.html#inspect.getmembers
 # If the optional predicate argument - which will be called with the value object of each 
 # member - is supplied, only members for which the predicate returns a true value are included.
-def run_doctests(items: List[str]=None, verbose: bool=False, raise_on_error: bool=False):
+def run_doctests(items: List[str]=None, tmp_dir: Path=None, verbose: bool=False, raise_on_error: bool=False):
     if items is not None:
         def predicate(value: Any) -> bool:
             # WARNING: Python functions defined in a Cython pyx file are of type '_cython_xxx.cython_function_or_method'.
@@ -34,7 +36,7 @@ def run_doctests(items: List[str]=None, verbose: bool=False, raise_on_error: boo
                 iode.__test__[name] = doc
 
     # run doctests
-    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
+    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode, "tmp_dir": tmp_dir})
     assert failure_count == 0
     for name in iode.__test__:
         logging.info(f"tested function/method: '{name}'")
@@ -45,8 +47,10 @@ def test_iode_time():
     run_doctests(items=['Period', 'Sample'])
 
 
-def test_iode_objects():
-    run_doctests(items=['Equation', 'Scalar', 'Table', 'split_list'])
+def test_iode_objects(tmp_path):
+    iode.suppress_msgs()
+    run_doctests(items=['Equation', 'Scalar', 'Table', 'split_list'], tmp_dir=tmp_path)
+    iode.reset_msgs()
 
 
 def test_iode_table_line_cell():
@@ -64,36 +68,43 @@ def test_iode_table_line_cell():
     run_doctests()
 
 
-def test_iode_computed_table():
+def test_iode_computed_table(tmp_path):
     iode.__test__ = {}
     from iode.iode_python import ComputedTable
     for name_, value_ in inspect.getmembers(ComputedTable):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
-    run_doctests()
+    iode.suppress_msgs()
+    run_doctests(tmp_dir=tmp_path)
+    iode.reset_msgs()
 
 
-def test_iode_databases():
-    run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables'])
+def test_iode_databases(tmp_path):
+    iode.suppress_msgs()
+    run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 
+                        'Variables', 'load_extra_files'], tmp_dir=tmp_path)
+    iode.reset_msgs()
 
 
-def test_iode_execute():
-    run_doctests(items=['execute_report', 'execute_command', 'execute_lec'])
+def test_iode_execute(tmp_path):
+    run_doctests(items=['execute_report', 'execute_command', 'execute_lec'], tmp_dir=tmp_path)
 
 
-def test_iode_writing():
+def test_iode_writing(tmp_path):
     run_doctests(items=['w_close', 'w_dest', 'w_flush', 'w_print', 'w_print_cmd', 'w_print_enum', 
                         'w_print_par', 'w_print_pg_footer', 'w_print_pg_header', 'w_print_tit'])
 
 
-def test_iode_simulation_estimation():
-    run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'])
-
-
-def test_iode_edit_and_estimate_equations():
+def test_iode_simulation_estimation(tmp_path):
     iode.suppress_msgs()
-    run_doctests(items=['EditAndEstimateEquations'])
+    run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'], tmp_dir=tmp_path)
+    iode.reset_msgs()
+
+
+def test_iode_edit_and_estimate_equations(tmp_path):
+    iode.suppress_msgs()
+    run_doctests(items=['EditAndEstimateEquations'], tmp_dir=tmp_path)
     iode.reset_msgs()
 
 

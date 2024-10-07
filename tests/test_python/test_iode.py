@@ -9,6 +9,7 @@ import iode
 from iode import *
 
 import pytest
+import re
 import numpy as np
 import pandas as pd
 import larray as la
@@ -49,6 +50,38 @@ def test_print_equation():
                       "         date = 12-06-1998)")
     assert str(eq_ACAF) == string_eq_ACAF
 
+# Tables
+# ------
+
+def test_table_language():
+    table = iode.Table()
+    # wrong value for languague
+    with pytest.raises(ValueError, match=r"'language': Invalid value 'Spanish'. Expected one of ENGLISH, DUTCH, FRENCH."):
+        table.language = "Spanish"
+
+def test_computed_table_extra_files():
+    iode.tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # too long list of files
+    sample_dir = Path(SAMPLE_DATA_DIR)
+    extra_files = [sample_dir / "fun.av", sample_dir / "fun2.av", 
+                   sample_dir / "ref.av", sample_dir / "a.var", sample_dir / "b.var"]
+    with pytest.raises(ValueError, match=r"The number of extra files cannot exceed 4"):
+        computed_table = iode.tables["C8_1"].compute("2010[1;2]:5", extra_files=extra_files)
+
+    # file does not exist
+    extra_files = "file_which_not_exists.var"
+    with pytest.raises(ValueError, match=fr"Cannot run 'load'\.\nThe file '.*{re.escape(extra_files)}' does not exist"):
+        computed_table = iode.tables["C8_1"].compute("2010[1;2]:5", extra_files=extra_files)
+
+def test_computed_table_nb_decimals():
+    iode.tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # nb decimals must be in range [0, 99]
+    with pytest.raises(ValueError, match=r"nb_decimals must be between 0 and 99"):
+        computed_table = iode.tables["C8_1"].compute("2010[1;2]:5", nb_decimals=-1)
 
 # Variables
 # ---------

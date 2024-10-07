@@ -22,6 +22,7 @@ from .util import split_list
 # IODE databases
 from .iode_python import comments, equations, identities, lists, scalars, tables, variables
 from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
+from .iode_python import load_extra_files
 
 # Reports
 from .iode_python import execute_report, execute_command
@@ -60,6 +61,7 @@ __all__ = [
     # IODE databases
     'comments', 'equations', 'identities', 'lists', 'scalars', 'tables', 'variables', 
     'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables', 
+    'load_extra_files', 
 
     # Reports
     'execute_report', 'execute_command', 
