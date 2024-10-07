@@ -50,7 +50,8 @@ protected:
     Sample*      sample;
     int          nb_decimals;
 
-    COLS*        columns;
+    int   dim; 
+    COLS* columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
     std::vector<std::string> line_names;
@@ -237,4 +238,26 @@ public:
     {
         return std::string(W_filename);
     }
+
+    /**
+     * @brief Print the present computed table to a file.
+     * Argument `format` must be in the list:
+     *   - 'H' (HTML file)
+     *   - 'M' (MIF file)
+     *   - 'R' (RTF file)
+     *   - 'C' (CSV file)
+     *   - 'D' (DUMMY file)
+     * 
+     * If argument `format` is null (default), the A2M format will be used 
+     * to print the output.
+     * 
+     * If the filename does not contain an extension, it is automatically 
+     * added based on the format.
+     * 
+     * @param destination_file 
+     * @param format 
+     */
+    void print_to_file(const std::string& destination_file, const char format = '\0', 
+                       const bool flush_and_close=true);
+
 };

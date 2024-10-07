@@ -49,7 +49,7 @@ void ComputedTable::initialize()
     sample = new Sample(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
-    int dim = COL_resize(ref_table, columns);
+    dim = COL_resize(ref_table, columns);
     if(dim == 0) 
         throw std::runtime_error(error_msg);
 
@@ -408,5 +408,70 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
         msg += "Invalid value for 'language' argument.\n";
         msg += get_last_error();
         throw std::invalid_argument(msg);
+    }
+}
+
+// TODO ALD: skip T_print_tbl() to bypass A2M format and write our own function to print 
+//           the table in a HTML, CSV, RTF, ... file
+void ComputedTable::print_to_file(const std::string& destination_file, const char format, 
+    const bool flush_and_close)
+{
+    int res;
+
+    initialize_printing(destination_file, format);
+
+    // Anciennement
+    // B_PrintRtfTopic(T_get_title(tbl));
+    // Nouveau JMP 18/04/2022
+    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(ref_table));
+    //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
+    
+    res = T_begin_tbl(dim, columns);
+    if(res != 0) 
+        throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
+
+    W_printf(".ttitle %s\n", T_get_title(ref_table));  /* JMP 27-02-98 */
+
+    TableLine* line;
+    bool first_title = true;
+    for(int i = 0; i < ref_table->nb_lines(); i++) 
+    {
+        line = ref_table->get_line(i);
+
+        switch(line->get_line_type()) {
+            case TABLE_LINE_SEP:
+                W_printf(".tl\n");
+                break;
+            case TABLE_LINE_TITLE:
+                // 1st title has already been printed by W_printf(".ttitle %s\n", ...) above
+                if(first_title)
+                {
+                    first_title = false;
+                    break;
+                }
+                T_print_cell((TCELL *) line->tl_val, NULL, dim);
+                W_printf("\n");
+                break;
+            case TABLE_LINE_DATE  :
+                T_print_date(dim);
+                break;
+            case TABLE_LINE_MODE  :
+                T_print_mode(columns, dim);
+                break;
+            case TABLE_LINE_FILES :
+                T_print_files(columns, dim);
+                break;
+            case TABLE_LINE_CELL  :
+                res = T_print_line(ref_table, i, columns);
+                if(res != 0)
+                    throw std::runtime_error("Couldn't print table. Couldn't print line " + std::to_string(i));
+        }
+    }
+    T_end_tbl();
+
+    if(flush_and_close)
+    {
+        W_flush();
+        W_close();
     }
 }
