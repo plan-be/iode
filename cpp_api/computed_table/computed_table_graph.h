@@ -8,8 +8,10 @@ class ComputedTableGraph: public ComputedTable
     int nb_decimals;
 
 public:
-    ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample);
-    ComputedTableGraph(Table* ref_table, const std::string& gsample);
+    ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample, 
+        const int nb_decimals = 8);
+    ComputedTableGraph(Table* ref_table, const std::string& gsample, 
+        const int nb_decimals = 8);
 
     std::vector<Period> get_series_periods();
 
