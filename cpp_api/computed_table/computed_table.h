@@ -46,6 +46,8 @@ protected:
     Table*       ref_table;
     std::string  gsample;
     Sample*      sample;
+    int          nb_decimals;
+
     COLS*        columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
@@ -95,9 +97,21 @@ private:
             const std::string& var_name, const double value, const int period_pos);
 
 public:
-    ComputedTable(const std::string& ref_table_name, const std::string& gsample);
-    ComputedTable(Table* ref_table, const std::string& gsample);
+    ComputedTable(const std::string& ref_table_name, const std::string& gsample, const int nb_decimals = 2);
+    ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals = 2);
     ~ComputedTable();
+
+    int get_nb_decimals() const
+    {
+        return nb_decimals;
+    }
+
+    void set_nb_decimals(const int nb_decimals)
+    {
+        if (nb_decimals < 0 || nb_decimals > 99)
+           throw std::invalid_argument("nb_decimals must be between 0 and 99");
+        this->nb_decimals = nb_decimals;
+    }
 
     int get_nb_lines() const
     {
@@ -155,7 +169,7 @@ public:
         return column_names.at(col);
     }
 
-    double get_value(const int line, const int col, const int nb_decimals=2) const
+    double get_value(const int line, const int col) const
     {
         if(line >= line_names.size()) 
             throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 

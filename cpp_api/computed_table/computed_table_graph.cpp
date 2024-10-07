@@ -1,13 +1,13 @@
 #include "computed_table_graph.h"
 
 
-ComputedTableGraph::ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample) :
-    ComputedTable(ref_table_name, gsample), nb_decimals(8)
+ComputedTableGraph::ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample, 
+    const int nb_decimals) :ComputedTable(ref_table_name, gsample, nb_decimals)
 {
 }
 
-ComputedTableGraph::ComputedTableGraph(Table* ref_table, const std::string& gsample) : 
-    ComputedTable(ref_table, gsample), nb_decimals(8)
+ComputedTableGraph::ComputedTableGraph(Table* ref_table, const std::string& gsample, 
+    const int nb_decimals) : ComputedTable(ref_table, gsample, nb_decimals)
 {
 }
 
@@ -81,7 +81,7 @@ std::vector<double> ComputedTableGraph::get_series_values(const int row, const i
         if(pos == fileop)
         {
             period_pos = Period(column.cl_per[0]).difference(sample->start_period());
-            y[period_pos] = get_value(row, col_val, nb_decimals);
+            y[period_pos] = get_value(row, col_val);
         }
         col_val++;
     }

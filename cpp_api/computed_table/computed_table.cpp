@@ -141,17 +141,21 @@ void ComputedTable::initialize()
     compute_values();
 }
 
-ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample) : gsample(gsample)
+ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample, 
+    const int nb_decimals) : gsample(gsample)
 {
     ref_table = Tables.get(ref_table_name);
+    set_nb_decimals(nb_decimals);
     initialize();
 }
 
-ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample) : gsample(gsample)
+ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals) 
+    : gsample(gsample)
 {
     if(!ref_table)
         throw std::runtime_error("Cannot compute table. Table is null.");
     this->ref_table = new Table(*ref_table);
+    set_nb_decimals(nb_decimals);
     initialize();
 }
 
