@@ -9,8 +9,8 @@
  *  List of functions 
  *  -----------------
  *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL
- *      void T_fmt_val(char* buf, double val, int lg, int nd)    Formats a double value
- *      void T_print_val(double val)                             Prints a double value using W_printf()
+ *      void T_fmt_val(char* buf, double val, int lg, int nd)       Formats a double value
+ *      void T_print_val(double val)                                Prints a double value using W_printf()
  *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
@@ -106,7 +106,7 @@ void T_print_val(double val)
  *  
  */
  
-static void T_print_string(COL* cl, char* string)
+void T_print_string(COL* cl, char* string)
 {
     char   *ptr = NULL;
     char    *COL_text();
@@ -214,7 +214,7 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
  *  
  */
 
-static int T_print_line(TBL* tbl, int i, COLS* cls)
+int T_print_line(TBL* tbl, int i, COLS* cls)
 {
     int     j, d;
     TLINE   *line = T_L(tbl) + i;
@@ -286,7 +286,7 @@ char **T_find_files(COLS* cls)
  *  
  */
  
-static void T_print_files(COLS* cls, int dim)
+void T_print_files(COLS* cls, int dim)
 {
     int     i;
 
@@ -308,7 +308,7 @@ static void T_print_files(COLS* cls, int dim)
  *  
  */
 
-static void T_print_mode(COLS* cls, int dim)
+void T_print_mode(COLS* cls, int dim)
 {
     int    i;
     extern char *KLG_OPERS_TEXTS[][3];
@@ -329,7 +329,7 @@ static void T_print_mode(COLS* cls, int dim)
  *  
  */
 
-static void T_print_date(int dim)
+void T_print_date(int dim)
 {
     long    SCR_current_date();
     char    date[11];
@@ -350,7 +350,7 @@ static void T_print_date(int dim)
  *  
  */
  
-static int T_begin_tbl(int dim, COLS* cls)
+int T_begin_tbl(int dim, COLS* cls)
 {
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size(KT_names);
@@ -371,7 +371,7 @@ static int T_begin_tbl(int dim, COLS* cls)
  *  Prints a table footer in A2M and frees the temporary allocated variables. 
  */
 
-static void T_end_tbl()
+void T_end_tbl()
 {
     W_printf(".te \n");
     SCR_free_tbl(KT_names);
