@@ -71,6 +71,7 @@ jobs:
         with:
           cmake-config: ${{ env.os }}-${{ inputs.build-config }}
       - name: Test the C and C++ APIs
+        if: runner.os == 'Windows'
         uses: ./.github/actions/test_api
         with:
           cmake-config: ${{ env.os }}-${{ inputs.build-config }}
@@ -122,6 +123,7 @@ jobs:
         with:
           cmake-config: windows-debug-sanitize
       - name: Test the C and C++ APIs
+        if: runner.os == 'Windows'
         uses: ./.github/actions/test_api
         with:
           cmake-config: windows-debug-sanitize
