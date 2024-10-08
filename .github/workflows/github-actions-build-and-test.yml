@@ -85,6 +85,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    # see https://docs.github.com/en/actions/learn-github-actions/expressions#example 
+    env:
+      os: ${{ matrix.os == 'windows-latest' && 'windows' || 'linux' }}
+
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v2
@@ -107,7 +111,7 @@ jobs:
           arch: x64
       - name: Print preset config
         shell: bash
-        run: echo "windows-debug-sanitize"
+        run: echo "${{ env.os }}-${{ inputs.build-config }}-sanitize"
       - name: Configure CMake
         shell: bash
         # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -117,14 +121,14 @@ jobs:
         #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
         run: | 
           cmake --version
-          cmake --preset windows-debug-sanitize
+          cmake --preset ${{ env.os }}-${{ inputs.build-config }}-sanitize
       - name: Build the SCR4, C and C++ API libs
         uses: ./.github/actions/build_api
         with:
-          cmake-config: windows-debug-sanitize
+          cmake-config: ${{ env.os }}-${{ inputs.build-config }}-sanitize
       - name: Test the C and C++ APIs
         if: runner.os == 'Windows'
         uses: ./.github/actions/test_api
         with:
-          cmake-config: windows-debug-sanitize
+          cmake-config: ${{ env.os }}-${{ inputs.build-config }}-sanitize
       - run: echo "This job's status is ${{ job.status }}."
