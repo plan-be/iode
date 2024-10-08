@@ -1642,23 +1642,25 @@ extern KDB *KI_exec(KDB *,KDB *,int ,char **,KDB *,int ,char **,SAMPLE *);
 extern int K_LANG;      // Current language
 
 /* k_print.c */
-extern  int K_NBDEC;
+extern int K_NBDEC;
+extern int KT_CUR_TOPIC;
+extern int KT_CUR_LEVEL;
 extern int T_prep_cls(TBL *,char *,COLS **);
 extern int T_print_tbl(TBL *,char *);
-//extern int T_print_line(TBL *,int ,COLS *);
-//extern int T_print_cell(TCELL *,COL *,int );
+extern int T_print_line(TBL *,int ,COLS *);
+extern void T_print_cell(TCELL *,COL *,int );
 extern void T_fmt_val(char *,double ,int ,int );
 extern void T_print_val(double );
-//extern void T_print_string(COL *,char *);
+extern void T_print_string(COL *,char *);
 extern void T_open_cell(int ,int ,int );
 extern void T_open_attr(int );
 extern void T_close_attr(int );
 extern char **T_find_files(COLS *);
-//extern void T_print_files(COLS *,int );
-//extern void T_print_mode(COLS *,int );
-//extern void T_print_date(int );
-//extern int T_begin_tbl(int ,COLS *);
-//extern void T_end_tbl(void);
+extern void T_print_files(COLS *,int );
+extern void T_print_mode(COLS *,int );
+extern void T_print_date(int );
+extern int T_begin_tbl(int ,COLS *);
+extern void T_end_tbl(void);
 
 /* k_graph.c */
 /* New auto extraction 1/10/2021 */
