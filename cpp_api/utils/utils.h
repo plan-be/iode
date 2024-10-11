@@ -421,7 +421,7 @@ inline char** vector_to_double_char(const std::vector<std::string>& vec)
         c_table[i] = new char[len + 1];
 
         // Copy the string to the C-style array
-        std::strcpy(c_table[i], vec[i].c_str());
+        strcpy(c_table[i], vec[i].c_str());
     }
 
     // null terminated table
