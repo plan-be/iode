@@ -547,6 +547,112 @@ TEST_F(KDBTablesTest, Search)
     EXPECT_EQ(objs_list.size(), 0);
 }
 
+TEST_F(KDBTablesTest, PrintToFile)
+{
+    // WARNING: B_PrintTable() resets K_RWS (reference files)
+
+    int res;
+    std::string arg;
+    std::string gsample;
+    std::string names = "C8_1 C8_2 C8_3 C8_4";
+
+    // slightly modify variables
+    std::string ref_file = input_test_dir + "ref.av";
+    double value;
+    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBVariables* kdb_ref = Variables.subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
+    for(int t=0; t < kdb_ref->get_nb_periods(); t++)
+    {
+        for(const std::string& name: kdb_ref->get_names())
+        {
+            value = kdb_ref->get_var(name, t) * 0.98;
+            kdb_ref->set_var(name, t, value);
+        }
+    }
+    kdb_ref->save(ref_file);
+    delete kdb_ref;
+
+    // simple time series (current workspace) - 10 observations
+    gsample = "2000:10";
+
+    // ---- CSV format ----
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+
+    // ---- HTML format ----
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+
+    // two time series (current workspace) - 5 observations
+    gsample = "(2010;2010/2009):5";
+
+    // ---- CSV format ----
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+
+    // ---- HTML format ----
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+
+    // simple time series (current workspace + one extra file) - 5 observations
+    gsample = "2010[1-2]:5";
+
+    // ---- CSV format ----
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
+    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+
+    // ---- HTML format ----
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + names;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    
+    load_reference_kdb(2, VARIABLES, ref_file);
+    Tables.print_to_file(output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
+    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+}
+
 TEST_F(KDBTablesTest, Hash)
 {
     std::size_t hash_val = hash_value(Tables);
