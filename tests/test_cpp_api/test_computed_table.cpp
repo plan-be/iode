@@ -59,8 +59,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_by_name(table_name, gsample);       // passing table name 
-    ComputedTable table_simple(&ref_table, gsample);        // passing table pointer
+    ComputedTable table_simple(&ref_table, gsample);
     EXPECT_EQ(table_simple.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_simple.get_nb_columns(), 10);
     EXPECT_EQ(table_simple.get_nb_files(), 1);
@@ -169,8 +168,8 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 1.1);
 
     // wrong number of decimals (must in range [0, 99])
-    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, -1), std::invalid_argument);
-    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, 100), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(&ref_table, gsample, -1), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(&ref_table, gsample, 100), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, BuildFromVariables)
@@ -296,8 +295,8 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 11502.05);
 
     // wrong number of decimals (must in range [0, 99])
-    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, -1), std::invalid_argument);
-    EXPECT_THROW(ComputedTableGraph(&ref_table, gsample, 100), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(&ref_table, gsample, -1), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(&ref_table, gsample, 100), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, EditTable)
@@ -498,31 +497,24 @@ TEST_F(ComputedTableTest, EditTable)
 
 TEST_F(ComputedTableTest, InitializePrinting)
 {
-    std::string gsample;
-    std::string table_name = "C8_1";
-    Table ref_table = kdb_tbl->get(table_name); 
-
-    // simple time series (current workspace + one extra file) - 5 observations
-    gsample = "2010[1-2]:5";
-    ComputedTable table_simple(&ref_table, gsample, 8);
-    table_simple.initialize_printing("file.html", 'H');
-    EXPECT_EQ(table_simple.get_destination_file(), "file.html");
+    ComputedTable::initialize_printing("file.html", 'H');
+    EXPECT_EQ(ComputedTable::get_destination_file(), "file.html");
 
     // extension is automatically added based on the format
-    table_simple.initialize_printing("file", 'C');
-    EXPECT_EQ(table_simple.get_destination_file(), "file.csv");
+    ComputedTable::initialize_printing("file", 'C');
+    EXPECT_EQ(ComputedTable::get_destination_file(), "file.csv");
 
     // wrong extension -> if filepath is given with an extension, 
     //                    the argument 'format' is ignored
-    table_simple.initialize_printing("file.csv", 'R');
-    EXPECT_EQ(table_simple.get_destination_file(), "file.csv");
+    ComputedTable::initialize_printing("file.csv", 'R');
+    EXPECT_EQ(ComputedTable::get_destination_file(), "file.csv");
 
     // no extension + no format given -> default to A2M format
-    table_simple.initialize_printing("file");
-    EXPECT_EQ(table_simple.get_destination_file(), "file.a2m");
+    ComputedTable::initialize_printing("file");
+    EXPECT_EQ(ComputedTable::get_destination_file(), "file.a2m");
 
     // invalid format
-    EXPECT_THROW(table_simple.initialize_printing("file", 'Z'), std::invalid_argument);
+    EXPECT_THROW(ComputedTable::initialize_printing("file", 'Z'), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, PrintToFile)
@@ -537,17 +529,24 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
-    ComputedTable table_simple(&ref_table, gsample);
+    ComputedTable table_simple(&ref_table, gsample, 4);
+
     // ---- CSV format ----
-    table_simple.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
+
     load_reference_kdb(2, VARIABLES, ref_file);
     table_simple.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    
     // ---- HTML format ----
-    table_simple.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
@@ -557,40 +556,56 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
-    ComputedTable table_grt(&ref_table, gsample);
+    ComputedTable table_grt(&ref_table, gsample, 4);
+
     // ---- CSV format ----
-    table_grt.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
+
     load_reference_kdb(2, VARIABLES, ref_file);
     table_grt.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+
     // ---- HTML format ----
-    table_grt.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
+
     load_reference_kdb(2, VARIABLES, ref_file);
     table_grt.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
 
     // simple time series (current workspace + one extra file) - 5 observations
     gsample = "2010[1-2]:5";
-    ComputedTable table_2_files(&ref_table, gsample, 8);
+    ComputedTable table_2_files(&ref_table, gsample, 4);
+
     // ---- CSV format ----
-    table_2_files.initialize_printing(output_test_dir + "c_api_file.csv", 'C');
+    arg = output_test_dir + "c_api_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
-    EXPECT_EQ(res, 0);   
+    EXPECT_EQ(res, 0);
+
     load_reference_kdb(2, VARIABLES, ref_file);
     table_2_files.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+
     // ---- HTML format ----
-    table_2_files.initialize_printing(output_test_dir + "c_api_file.html", 'H');
+    arg = output_test_dir + "c_api_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
-    EXPECT_EQ(res, 0);   
+    EXPECT_EQ(res, 0);
+
     load_reference_kdb(2, VARIABLES, ref_file);
     table_2_files.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
