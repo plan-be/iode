@@ -5,7 +5,6 @@
 #include "cpp_api/utils/iode_exceptions.h"
 #include "cpp_api/time/sample.h"
 #include "cpp_api/objects/table.h"
-#include "cpp_api/KDB/kdb_tables.h"
 #include "cpp_api/KDB/kdb_variables.h"
 
 
@@ -100,7 +99,6 @@ private:
             const std::string& var_name, const double value, const int period_pos);
 
 public:
-    ComputedTable(const std::string& ref_table_name, const std::string& gsample, const int nb_decimals = 2);
     ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals = 2);
     ~ComputedTable();
 
@@ -172,7 +170,7 @@ public:
         return column_names.at(col);
     }
 
-    double get_value(const int line, const int col) const
+    double get_value(const int line, const int col, const bool full_precision = false) const
     {
         if(line >= line_names.size()) 
             throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 
@@ -181,7 +179,7 @@ public:
             throw IodeExceptionFunction("Cannot access column " + std::to_string(col) + 
             " since the table has " + std::to_string(column_names.size()) + " columns.");
         double value = values.at(line).at(col);
-        if(nb_decimals >= 0)
+        if(!full_precision)
         {
             double power = pow(10, nb_decimals);
             value = round(value * power) / power;
@@ -213,7 +211,6 @@ public:
      */
     void set_value(const int line, const int col, const double value, bool check_if_editable = true);
     
-    // NOTE: made it public to be callable from the Cython wrapper
     /**
      * @brief Initialize C API parameters for printing.
      * Argument `format` must be in the list:
@@ -232,12 +229,24 @@ public:
      * @param destination_file 
      * @param format 
      */
-    void initialize_printing(const std::string& destination_file, const char format = '\0');
+    static void initialize_printing(const std::string& destination_file, const char format = '\0');
 
-    std::string get_destination_file() const
+    static void finalize_printing()
+    {
+        W_flush();
+        W_close();
+    }
+
+    static std::string get_destination_file()
     {
         return std::string(W_filename);
     }
+
+    /**
+     * @brief Print the present computed table to a file.
+     * Version without argument is dedicated to be called from KDBTables::print_to_file()
+     */
+    void print_to_file();
 
     /**
      * @brief Print the present computed table to a file.
@@ -257,7 +266,5 @@ public:
      * @param destination_file 
      * @param format 
      */
-    void print_to_file(const std::string& destination_file, const char format = '\0', 
-                       const bool flush_and_close=true);
-
+    void print_to_file(const std::string& destination_file, const char format = '\0');
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "cpp_api/objects/table.h"
+#include "cpp_api/computed_table/computed_table.h"
 #include "kdb_template.h"
 
 
@@ -49,6 +50,28 @@ public:
 
     int add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, 
         bool mode = false, bool files = false, bool date = false);
+
+    /**
+     * @brief Compute and print a list of tables to a file.
+     * Argument `format` must be in the list:
+     *   - 'H' (HTML file)
+     *   - 'M' (MIF file)
+     *   - 'R' (RTF file)
+     *   - 'C' (CSV file)
+     *   - 'D' (DUMMY file)
+     * 
+     * If argument `format` is null (default), the A2M format will be used 
+     * to print the output.
+     * 
+     * If the filename does not contain an extension, it is automatically 
+     * added based on the format.
+     * 
+     * @param destination_file 
+     * @param names
+     * @param format 
+     */
+    void print_to_file(const std::string& destination_file, const std::string& gsample, 
+        const std::string& names, const int nb_decimals, const char format = '\0');
 };
 
 
