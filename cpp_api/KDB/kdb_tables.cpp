@@ -65,3 +65,23 @@ int KDBTables::add(const std::string& name, const int nbColumns, const std::stri
 	Table table(nbColumns, def, lecs, mode, files, date);
 	return KDBTemplate::add(name, static_cast<TBL*>(&table));
 }
+
+void KDBTables::print_to_file(const std::string& destination_file, const std::string& gsample, 
+	const std::string& names, const int nb_decimals, const char format)
+{
+	ComputedTable::initialize_printing(destination_file, format);
+
+	Table* table;
+	ComputedTable* computed_table;
+	std::vector<std::string> v_names = get_names(names);
+	for(const std::string& name : v_names)
+	{
+		table = get(name);
+		computed_table = new ComputedTable(table, gsample, nb_decimals);
+		computed_table->print_to_file();
+		delete computed_table;
+		delete table;
+	}
+
+	ComputedTable::finalize_printing();
+}

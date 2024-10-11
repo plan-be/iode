@@ -141,14 +141,6 @@ void ComputedTable::initialize()
     compute_values();
 }
 
-ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample, 
-    const int nb_decimals) : gsample(gsample)
-{
-    ref_table = Tables.get(ref_table_name);
-    set_nb_decimals(nb_decimals);
-    initialize();
-}
-
 ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals) 
     : gsample(gsample)
 {
@@ -380,7 +372,12 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
         msg += get_last_error();
         throw std::invalid_argument(msg);
     }
-        
+}
+
+void ComputedTable::print_to_file()
+{
+    int res;
+
     // set number of decimals to print
     std::string str_nb_decimals = std::to_string(nb_decimals);
     res = B_PrintNbDec(str_nb_decimals.data());
@@ -409,16 +406,6 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
         msg += get_last_error();
         throw std::invalid_argument(msg);
     }
-}
-
-// TODO ALD: skip T_print_tbl() to bypass A2M format and write our own function to print 
-//           the table in a HTML, CSV, RTF, ... file
-void ComputedTable::print_to_file(const std::string& destination_file, const char format, 
-    const bool flush_and_close)
-{
-    int res;
-
-    initialize_printing(destination_file, format);
 
     // Anciennement
     // B_PrintRtfTopic(T_get_title(tbl));
@@ -468,10 +455,11 @@ void ComputedTable::print_to_file(const std::string& destination_file, const cha
         }
     }
     T_end_tbl();
+}
 
-    if(flush_and_close)
-    {
-        W_flush();
-        W_close();
-    }
+void ComputedTable::print_to_file(const std::string& destination_file, const char format)
+{
+    initialize_printing(destination_file, format);
+    print_to_file();
+    finalize_printing();
 }
