@@ -167,13 +167,13 @@ struct std::hash<EQ>
         // need to wrap with std::string() because hash_value() and
         // hash_combine() only compare pointer addresses when applied 
         // on char* arrays
-        hash_combine<std::string_view>(seed, std::string_view(eq.endo, std::strlen(eq.endo)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.lec, std::strlen(eq.lec)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.endo, strlen(eq.endo)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.lec, strlen(eq.lec)));
         hash_combine<char>(seed, eq.method);
         hash_combine<SAMPLE>(seed, eq.smpl);
-        hash_combine<std::string_view>(seed, std::string_view(eq.cmt, std::strlen(eq.cmt)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.blk, std::strlen(eq.blk)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.instr, std::strlen(eq.instr)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.cmt, strlen(eq.cmt)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.blk, strlen(eq.blk)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.instr, strlen(eq.instr)));
 
         return seed;
     }

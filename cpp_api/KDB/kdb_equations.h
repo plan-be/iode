@@ -62,7 +62,7 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     for(int pos=0; pos < kdb->k_nb; pos++)
     {
         char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, std::strlen(o_name)));
+        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
         hash_combine<EQ>(seed, *KEVAL(kdb, pos));
     }
     return seed;
