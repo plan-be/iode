@@ -8,7 +8,9 @@ ComputedTableModel::ComputedTableModel(const QString& refTable, const QString& g
     if(!variables.isEmpty())
         Tables.add(refTable.toStdString(), 2, "", variables.toStdString(), false, false, false);
 
-    table = new ComputedTable(refTable.toStdString(), gsample.toStdString());
+	Table* table_obj = Tables.get(refTable.toStdString());
+    table = new ComputedTable(table_obj, gsample.toStdString());
+	delete table_obj;
 }
 
 ComputedTableModel::~ComputedTableModel()

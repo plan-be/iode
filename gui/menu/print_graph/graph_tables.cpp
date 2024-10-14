@@ -69,12 +69,15 @@ void MenuGraphTables::display()
         if(!file_4.empty()) load_reference_kdb(4, VARIABLES, file_4);
         if(!file_5.empty()) load_reference_kdb(5, VARIABLES, file_5);
 
+        Table* table_obj;
         MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
         foreach(const QString& tableName, qTablesList)
         {
-            ComputedTableGraph* gSampleGraph = new ComputedTableGraph(tableName.toStdString(), gsample);
+            table_obj = Tables.get(tableName.toStdString());
+            ComputedTableGraph* gSampleGraph = new ComputedTableGraph(table_obj, gsample);
             PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
             main_window->appendPlot(plotDialog);
+            delete table_obj;
         }
     }
     catch (const std::exception& e)
