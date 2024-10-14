@@ -55,9 +55,11 @@ void TablesView::plot()
 
 		// computes the tables and generates the associated graph
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-		ComputedTableGraph* gSampleGraph = new ComputedTableGraph(tableName.toStdString(), gsample.toStdString());
+		Table* table = Tables.get(tableName.toStdString());
+		ComputedTableGraph* gSampleGraph = new ComputedTableGraph(table, gsample.toStdString());
 		PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
 		main_window->appendPlot(plotDialog);
+		delete table;
 	}
     catch (const std::exception& e)
     {
