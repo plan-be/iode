@@ -99,7 +99,7 @@ where `<target>` is one the item in the list below:
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`         -> Graphical user interface (GUI) based on Qt (C++)
-- `ui_to_py`         -> Generates Python GUI scripts from Qt Designer files *.ui
+- `iode_gui_python`  -> Generates Python GUI scripts from Qt Designer files *.ui + Qt resource file *.qrc
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
@@ -255,8 +255,8 @@ root_dir_iode> pip install <project_name_from_pyproject.toml>
 ```
 
 # GUI (Python)
-Before to work on any issue related to the GUI (Python), you have to build the CMake target `ui_to_py`. 
-This target will generate the Python scripts from the Qt Designer files *.ui. 
+Before to work on any issue related to the GUI (Python), you have to build the CMake target `iode_gui_python`. 
+This target will generate the Python scripts from the Qt Designer files *.ui and the Qt resource files *.qrc. 
 
 # Working On An Issue
 
