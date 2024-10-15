@@ -4,6 +4,8 @@ from PySide6.QtGui import QDesktopServices, QCloseEvent
 
 from utils import URL_MANUAL
 
+RUN_REPORTS_FROM_PROJECT_DIR = "run_reports_from_project_dir"
+
 
 class ProjectSettings:
     project_settings: QSettings = None
