@@ -457,6 +457,7 @@ generate_stub_files.py
 
 # GUI
 /gui/utils.py
+/gui/*resource*.py
 /gui/**/ui_*.py
 
 # NSIS
