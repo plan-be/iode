@@ -6,10 +6,12 @@ if(SKBUILD)
 else()
 
 # Find PyUIC6
-find_program(PYUIC6_EXECUTABLE pyuic6)
+find_program(PYUIC6_EXECUTABLE pyside6-uic)
 
 # Check if PyUIC6 is found
 if(PYUIC6_EXECUTABLE)  
+    cmake_print_variables(PYUIC6_EXECUTABLE)
+
     # Get all .ui files in the current directory and subdirectories
     file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
 
@@ -39,7 +41,7 @@ if(PYUIC6_EXECUTABLE)
 
     message(STATUS "New target ui_to_py enabled")
 else()
-    message(WARNING "pyuic6 not found. Please install PyQt6.")
+    message(WARNING "pyside6-uic not found. Please install PySide6.")
 endif()
 
 configure_file(

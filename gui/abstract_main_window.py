@@ -1,5 +1,5 @@
-from PyQt6.QtCore import Qt, QSettings, pyqtSlot
-from PyQt6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
+from PySide6.QtCore import Qt, QSettings, Slot
+from PySide6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
 
 from text_edit.completer import IodeCompleter
 from plot.plot import PlotDialog
@@ -40,17 +40,17 @@ class AbstractMainWindow(QMainWindow):
     def iode_command(self) -> QLineEdit:
         raise NotImplementedError()
 
-    @pyqtSlot(QDialog)
+    @Slot(QDialog)
     def append_dialog(self, dialog: QDialog):
         dialog.open()
         self.dialogs.append(dialog)
 
-    @pyqtSlot(PlotDialog)
+    @Slot(PlotDialog)
     def append_plot(self, dialog: PlotDialog):
         dialog.plot()
         self.dialogs.append(dialog)
 
-    @pyqtSlot()
-    @pyqtSlot(IodeTypes)
+    @Slot()
+    @Slot(IodeTypes)
     def update_tab_and_completer(self, iode_type: IodeTypes = None):
         raise NotImplementedError()

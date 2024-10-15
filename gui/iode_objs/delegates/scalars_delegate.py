@@ -1,9 +1,9 @@
 from base_delegate import BaseDelegate
 from util.double_validator import IodeDoubleValidator
 
-from PyQt6.QtCore import QModelIndex
-from PyQt6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
-from PyQt6.QtGui import QDoubleValidator
+from PySide6.QtCore import QModelIndex
+from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
+from PySide6.QtGui import QDoubleValidator
 
 from iode import IodeTypes
 

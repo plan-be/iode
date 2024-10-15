@@ -28,7 +28,7 @@
    - mypy
    - *(nanobind)*
    - scikit-build-core
-   - pyqt6
+   - pyside6
    - pytest
    - numpy
    - pandas
@@ -41,11 +41,7 @@
    - build
    - twine
 
-**note**: to install `pyqt6`, you have to do it via `pip`:
-```bash
-pip install pyqt6
-```
-To install `larray`, you have to run:
+**note**: To install `larray`, you have to run:
 ```bash
 conda install -c larray-project larray
 ```

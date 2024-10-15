@@ -1,16 +1,13 @@
-from PyQt6.QtCore import Qt, QDir, QSettings, QFileInfo, QVariant, pyqtSlot
-from PyQt6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QTextEdit, QLineEdit
+from PySide6.QtCore import Qt, QDir, QSettings, QFileInfo, Slot
+from PySide6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QTextEdit, QLineEdit
 
 from iode import IodeTypes, variables
 from typing import List
 
 from utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
                    ORGANIZATION_NAME, URL_HOMEPAGE, URL_CHANGELOG, URL_PYTHON_API, 
-                   URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY, 
-                   flatten_enum_namespaces)
-
-flatten_enum_namespaces(QMainWindow)
+                   URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY)
 
 from abstract_main_window import AbstractMainWindow
 from settings import ProjectSettings
@@ -281,8 +278,8 @@ class MainWindow(AbstractMainWindow):
         if answer == QMessageBox.StandardButton.Discard: 
             event.ignore()
         else:
-            self.user_settings.setValue("project_path", QVariant(self.project_path))
-            self.user_settings.setValue("font_family", QVariant(self.font_family))
+            self.user_settings.setValue("project_path", self.project_path)
+            self.user_settings.setValue("font_family", self.font_family)
 
             for dialog in self.dialogs: 
                 dialog.close()
@@ -311,12 +308,12 @@ class MainWindow(AbstractMainWindow):
 
     # ==== slot methods ====
 
-    @pyqtSlot(bool)
+    @Slot(bool)
     def compute_hash(self, value: bool):
         self.ui.tabWidget_IODE_objs.compute_hash(value)
 
-    @pyqtSlot()
-    @pyqtSlot(IodeTypes)
+    @Slot()
+    @Slot(IodeTypes)
     def update_tab_and_completer(self, iode_type: IodeTypes = None):
         """
         Update the tab(s) and the completer based on the iode_type.
@@ -339,7 +336,7 @@ class MainWindow(AbstractMainWindow):
 
     # File Menu
 
-    @pyqtSlot()
+    @Slot()
     def create_new_project(self):
         # ask to save all current tabs content before to switch
         if self.project_path:
@@ -352,7 +349,7 @@ class MainWindow(AbstractMainWindow):
             newProjectPath = dialog.get_path_new_project()
             self.open_directory(newProjectPath)
 
-    @pyqtSlot()
+    @Slot()
     def open_project(self):
         # ask to save all current tabs content before to switch
         if self.project_path:
@@ -370,7 +367,7 @@ class MainWindow(AbstractMainWindow):
         self.project_path = dir
         self.open_directory(self.project_path)
 
-    @pyqtSlot()
+    @Slot()
     def open_recent_project(self):
         action = self.sender()
         if action:
@@ -386,15 +383,15 @@ class MainWindow(AbstractMainWindow):
                 self.recent_projects.remove(project_path)
                 self.user_settings.setValue("recent_projects", self.recent_projects)
 
-    @pyqtSlot()
+    @Slot()
     def save_current_tab(self):
         self.ui.tabWidget_IODE_objs.save_tab()
 
-    @pyqtSlot()
+    @Slot()
     def save_all_tabs(self):
         self.ui.tabWidget_IODE_objs.save_all_tabs()
 
-    @pyqtSlot()
+    @Slot()
     def open_import_comments_dialog(self):
         self.compute_hash(True)
 
@@ -403,7 +400,7 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filter(IodeTypes.COMMENTS)
             self.update_tab_and_completer(IodeTypes.COMMENTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_import_variables_dialog(self):
         self.compute_hash(True)
 
@@ -412,19 +409,19 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
             self.update_tab_and_completer(IodeTypes.VARIABLES)
 
-    @pyqtSlot()
+    @Slot()
     def open_export_dialog(self):
         dialog = MenuFileExport(self)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_settings(self):
         dialog = MenuFileSettings(self)
         dialog.exec()
 
     # Workspace Menu
 
-    @pyqtSlot()
+    @Slot()
     def clear_workspace(self):
         answer = QMessageBox.warning(self, "WARNING", "Are you sure to clear the whole workspace?", 
                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
@@ -434,7 +431,7 @@ class MainWindow(AbstractMainWindow):
             self.ui.tabWidget_IODE_objs.clear_workspace()
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_copy_into_workspace_dialog(self):
         self.compute_hash(True)
         dialog = MenuWorkspaceCopyInto(self)
@@ -442,7 +439,7 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filters()
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_merge_into_workspace_dialog(self):
         self.compute_hash(True)
         dialog = MenuWorkspaceMergeInto(self)
@@ -450,12 +447,12 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filters()
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_change_workspace_descriptions_dialog(self):
         dialog = MenuWorkspaceDescribe(self)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_change_variables_sample_dialog(self):
         self.compute_hash(True)
         try:
@@ -468,7 +465,7 @@ class MainWindow(AbstractMainWindow):
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
 
-    @pyqtSlot()
+    @Slot()
     def open_extrapolate_variables_dialog(self):
         self.compute_hash(True)
 
@@ -477,7 +474,7 @@ class MainWindow(AbstractMainWindow):
             self.ui.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
             self.update_tab_and_completer(IodeTypes.VARIABLES)
 
-    @pyqtSlot()
+    @Slot()
     def open_high_to_low_dialog(self):
         self._check_vars_sample()
         self.compute_hash(True)
@@ -487,7 +484,7 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
             self.update_tab_and_completer(IodeTypes.VARIABLES)
 
-    @pyqtSlot()
+    @Slot()
     def open_low_to_high_dialog(self):
         self._check_vars_sample()
         self.compute_hash(True)
@@ -497,7 +494,7 @@ class MainWindow(AbstractMainWindow):
             self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
             self.update_tab_and_completer(IodeTypes.VARIABLES)
 
-    @pyqtSlot()
+    @Slot()
     def open_seasonal_adjustment_dialog(self):
         self.compute_hash(True)
 
@@ -505,7 +502,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_trend_correction_dialog(self):
         self.compute_hash(True)
 
@@ -515,7 +512,7 @@ class MainWindow(AbstractMainWindow):
 
     # Data Menu
 
-    @pyqtSlot()
+    @Slot()
     def open_sort_and_calculus_dialog(self):
         self.compute_hash(True)
 
@@ -523,7 +520,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_list_calculus_dialog(self):
         self.compute_hash(True)
 
@@ -531,7 +528,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_file_contents_dialog(self):
         self.compute_hash(True)
 
@@ -539,7 +536,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_file_compare_dialog(self):
         self.compute_hash(True)
 
@@ -547,7 +544,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_search_text_dialog(self):
         self.compute_hash(True)
 
@@ -555,7 +552,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_scan_objects_dialog(self):
         self.compute_hash(True)
 
@@ -563,14 +560,14 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer(IodeTypes.LISTS)
 
-    @pyqtSlot()
+    @Slot()
     def open_edit_tables_variables_dialog(self):
         self.compute_hash(True)
 
         dialog = MenuDataEditTables(self)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_duplicate_objects_dialog(self):
         self.compute_hash(True)
 
@@ -580,7 +577,7 @@ class MainWindow(AbstractMainWindow):
 
     # Compute Menu
 
-    @pyqtSlot()
+    @Slot()
     def open_compute_identities_dialog(self):
         self.compute_hash(True)
 
@@ -593,7 +590,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_compute_simulation_dialog(self):
         self.compute_hash(True)
 
@@ -601,7 +598,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_compute_model_dialog(self):
         self.compute_hash(True)
 
@@ -609,7 +606,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_compute_scc_decomposition_dialog(self):
         self.compute_hash(True)
 
@@ -617,7 +614,7 @@ class MainWindow(AbstractMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.update_tab_and_completer()
 
-    @pyqtSlot()
+    @Slot()
     def open_compute_scc_simulation_dialog(self):
         self.compute_hash(True)
 
@@ -627,33 +624,33 @@ class MainWindow(AbstractMainWindow):
 
     # Print/Graph Menu
 
-    @pyqtSlot()
+    @Slot()
     def open_print_tables_dialog(self):
         dialog = MenuPrintTables(self)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_print_variables_dialog(self):
         dialog = MenuPrintVariables(self)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_print_objects_definitions_dialog(self):
         QMessageBox.warning(self, "WARNING", "Object Definitions not yet implemented")
 
-    @pyqtSlot()
+    @Slot()
     def open_graphs_tables_dialog(self):
         dialog = MenuGraphTables(self)
         dialog.new_plot.connect(self.append_dialog)
         dialog.exec()
 
-    @pyqtSlot()
+    @Slot()
     def open_graphs_variables_dialog(self):
         dialog = MenuGraphVariables(self)
         dialog.new_plot.connect(self.append_dialog)
         dialog.exec()
 
-    @pyqtSlot(list, str, str)
+    @Slot(list, str, str)
     def open_graphs_variables_dialog_from_vars_view(self, variable_names: List[str], from_period: str, to_period: str):
         dialog = MenuGraphVariables(self)
         dialog.variables_names = variable_names
@@ -664,7 +661,7 @@ class MainWindow(AbstractMainWindow):
 
     # Help Menu
 
-    @pyqtSlot()
+    @Slot()
     def about(self):
         msg = f"""
 <style>
@@ -693,22 +690,22 @@ class MainWindow(AbstractMainWindow):
 """
         QMessageBox.about(self, "About IODE", msg)
  
-    @pyqtSlot()
+    @Slot()
     def open_release_notes(self):
         QDesktopServices.openUrl(URL_CHANGELOG)
 
-    @pyqtSlot()
+    @Slot()
     def open_python_api(self):
         QDesktopServices.openUrl(URL_PYTHON_API)
 
-    @pyqtSlot()
+    @Slot()
     def open_iode_home(self):
         QDesktopServices.openUrl(URL_HOMEPAGE)
 
-    @pyqtSlot()
+    @Slot()
     def open_iode_manual(self):
         QDesktopServices.openUrl(URL_MANUAL)
 
-    @pyqtSlot()
+    @Slot()
     def display_keyboard_shortcuts(self):
         QDesktopServices.openUrl(URL_SHORTCUTS)

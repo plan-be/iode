@@ -1,7 +1,7 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QSplashScreen
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import QLocale
+from PySide6.QtWidgets import QApplication, QSplashScreen
+from PySide6.QtGui import QPixmap
+from PySide6.QtCore import QLocale
 
 from utils import ORGANIZATION_NAME
 from main_window import MainWindow
