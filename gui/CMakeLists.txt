@@ -7,10 +7,20 @@ else()
 
 # Find PyUIC6
 find_program(PYUIC6_EXECUTABLE pyside6-uic)
+# Find PyRCC6
+find_program(PYRCC6_EXECUTABLE pyside6-rcc)
 
-# Check if PyUIC6 is found
-if(PYUIC6_EXECUTABLE)  
+set(RESOURCE_FILENAME "iode_resource")
+set(RC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.rc")
+set(QRC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.qrc")
+
+set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
+set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PY_RESOURCE_FILENAME}.py")
+
+# Check if PyUIC6 and PyRCC6 are found
+if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
     cmake_print_variables(PYUIC6_EXECUTABLE)
+    cmake_print_variables(PYRCC6_EXECUTABLE)
 
     # Get all .ui files in the current directory and subdirectories
     file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
@@ -32,16 +42,23 @@ if(PYUIC6_EXECUTABLE)
         # Add the .py file to the list of sources
         list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
     endforeach()
-    
-    # remove previously generated Python file if it exists
-    file(REMOVE ${GENERATED_FILES_FROM_UI})
+
+    # See Qt Resource System
+    add_custom_command(
+        OUTPUT ${PY_RESOURCE_FILE}
+        COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
+        DEPENDS ${QRC_RESOURCE_FILE}
+    )
+
+    # remove previously generated Python files if they exist
+    file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
     # Create a custom target that depends on all the .py files
-    add_custom_target(ui_to_py ALL DEPENDS ${GENERATED_FILES_FROM_UI})
+    add_custom_target(iode_gui_python ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
-    message(STATUS "New target ui_to_py enabled")
+    message(STATUS "New target iode_gui_python enabled")
 else()
-    message(WARNING "pyside6-uic not found. Please install PySide6.")
+    message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PyQt6.")
 endif()
 
 configure_file(
@@ -250,9 +267,7 @@ set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_TEXT_EDI
                         ${GUI_MAIN_WIDGETS} ${GUI_MENUS} ${GUI_MAIN}
 )
 
-set(APP_ICON_WINDOWS "${IODE_RESOUCES_DIR}/iode.rc")
-
-qt_add_executable(${IODE_GUI_TARGET} ${IODE_RESOUCES_DIR}/iode_resource.qrc ${APP_ICON_WINDOWS} MANUAL_FINALIZATION ${PROJECT_SOURCES})
+qt_add_executable(${IODE_GUI_TARGET} ${QRC_RESOURCE_FILE} ${RC_RESOURCE_FILE} MANUAL_FINALIZATION ${PROJECT_SOURCES})
 target_link_libraries(${IODE_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iode_cpp_api)
 # By calling target_include_directories, we make sure that the absolute path to 
 # the gui directory is automatically added as an include path to the ${IODE_GUI_TARGET} target.

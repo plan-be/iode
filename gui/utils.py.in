@@ -1,4 +1,5 @@
 from PySide6.QtCore import QUrl, QDir
+import ${PY_RESOURCE_FILENAME}
 
 IODE_VERSION = "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
 IODE_VERSION_MAJOR = ${PROJECT_VERSION_MAJOR}
