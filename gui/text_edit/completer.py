@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QCompleter, QWidget
+from PySide6.QtWidgets import QCompleter, QWidget
 
 from iode import IodeTypes
 

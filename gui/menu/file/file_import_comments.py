@@ -1,5 +1,5 @@
 
-from PyQt6.QtWidgets import QDialog, QWidget
+from PySide6.QtWidgets import QDialog, QWidget
 
 
 class MenuFileImportComments(QDialog):

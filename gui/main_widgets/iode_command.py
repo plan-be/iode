@@ -1,10 +1,10 @@
-from PyQt6.QtCore import pyqtSlot, pyqtSignal
-from PyQt6.QtWidgets import QLineEdit, QTextEdit, QCompleter
+from PySide6.QtCore import Slot, Signal
+from PySide6.QtWidgets import QLineEdit, QTextEdit, QCompleter
 
 
 class IodeCommandLine(QLineEdit):
     
-    ask_compute_hash = pyqtSignal(bool)
+    ask_compute_hash = Signal(bool)
 
     def __init__(self, parent=None):
         super(IodeCommandLine, self).__init__(parent)
@@ -14,6 +14,6 @@ class IodeCommandLine(QLineEdit):
         self.output = output
         self.command_completer = command_completer
 
-    @pyqtSlot()
+    @Slot()
     def run_command(self):
         pass

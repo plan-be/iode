@@ -1,6 +1,6 @@
-from PyQt6.QtCore import Qt, QSettings, QDir, pyqtSlot
-from PyQt6.QtWidgets import QWidget, QDialog
-from PyQt6.QtGui import QDesktopServices, QCloseEvent
+from PySide6.QtCore import Qt, QSettings, QDir, Slot
+from PySide6.QtWidgets import QWidget, QDialog
+from PySide6.QtGui import QDesktopServices, QCloseEvent
 
 from utils import URL_MANUAL
 

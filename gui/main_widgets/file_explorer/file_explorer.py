@@ -3,11 +3,11 @@ import shutil
 from typing import List, Tuple
 from pathlib import Path
 
-from PyQt6.QtCore import (QModelIndex, QPersistentModelIndex, QDir, QFile, QFileInfo, 
-                          QPoint, Qt, QProcess, QUrl, pyqtSignal, pyqtSlot)
-from PyQt6.QtGui import (QAction, QKeySequence, QShortcut, QFileSystemModel, 
-                         QDesktopServices, QCloseEvent, QDragMoveEvent, QDropEvent)
-from PyQt6.QtWidgets import QTreeView, QMenu, QMessageBox, QApplication
+from PySide6.QtCore import (QModelIndex, QPersistentModelIndex, QDir, QFile, QFileInfo, 
+                            QPoint, Qt, QProcess, QUrl, Signal, Slot)
+from PySide6.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices, 
+                           QCloseEvent, QDragMoveEvent, QDropEvent)
+from PySide6.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
 
 from settings import ProjectSettings
 from main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
@@ -40,7 +40,7 @@ class IodeFileExplorer(QTreeView):
     - It is possible to move files and/or directories inside the project tree via drag and drop.
     """
 
-    fileMoved = pyqtSignal(str, str)
+    fileMoved = Signal(str, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -418,7 +418,7 @@ class IodeFileExplorer(QTreeView):
         self.show()
 
     # override method of QTreeView
-    @pyqtSlot(QDragMoveEvent)
+    @Slot(QDragMoveEvent)
     def dragMoveEvent(self, event: QDragMoveEvent):
         try:
             # Check if the event has text data and if the mouse is over the widget
@@ -434,7 +434,7 @@ class IodeFileExplorer(QTreeView):
             event.ignore()
 
     # override method of QTreeView
-    @pyqtSlot(QDropEvent)
+    @Slot(QDropEvent)
     def dropEvent(self, event: QDropEvent):
         # Check if the event has text data
         if event.mimeData().hasText():
@@ -470,7 +470,7 @@ class IodeFileExplorer(QTreeView):
             event.ignore()
 
     # override method of QTreeView
-    @pyqtSlot(QPoint)
+    @Slot(QPoint)
     def onCustomContextMenu(self, point: QPoint):
         """
         Pops up either directory or file context menu depending on the item selected.
@@ -493,7 +493,7 @@ class IodeFileExplorer(QTreeView):
 
         context_menu_current.exec(global_point)
 
-    @pyqtSlot(QModelIndex)
+    @Slot(QModelIndex)
     def _open_file(self, index: QModelIndex):
         """
         Function called when the user double clicked on a item in the tree (= file explorer) view.
@@ -514,7 +514,7 @@ class IodeFileExplorer(QTreeView):
             QMessageBox.warning(self, "WARNING", "An error occurred while trying to "
                                 f"open a file: {str(e)}") 
 
-    @pyqtSlot(str, bool)
+    @Slot(str, bool)
     def file_content_modified(self, filepath: str, modified: bool):
         """
         Set item in color when a user modifies the content of the associated database
@@ -534,7 +534,7 @@ class IodeFileExplorer(QTreeView):
 
         self.viewport().repaint()
 
-    @pyqtSlot()
+    @Slot()
     def create_file(self):
         """
         Create a new file.
@@ -556,7 +556,7 @@ class IodeFileExplorer(QTreeView):
             QMessageBox.warning(self, "WARNING", "An error occurred while trying to "
                                 f"create a file: {str(e)}") 
 
-    @pyqtSlot()
+    @Slot()
     def create_dir(self):
         """
         Create a new sub directory.
@@ -576,7 +576,7 @@ class IodeFileExplorer(QTreeView):
             QMessageBox.warning(self, "WARNING", "An error occurred while trying to "
                                 f"create a directory: {str(e)}")            
 
-    @pyqtSlot()
+    @Slot()
     def absolute_path(self):
         """
         Copy the absolute path of the selected path to the selected file.
@@ -587,7 +587,7 @@ class IodeFileExplorer(QTreeView):
         clipboard.setText(abs_path)
         self._cleanup_slot()
 
-    @pyqtSlot()
+    @Slot()
     def relative_path(self):
         """
         Copy the relative path of the selected path to the selected file.
@@ -598,7 +598,7 @@ class IodeFileExplorer(QTreeView):
         clipboard.setText(rel_path)
         self._cleanup_slot()
 
-    @pyqtSlot()
+    @Slot()
     def reveal_in_folder(self):
         """
         Open an OS file explorer and highlight the selected file.
@@ -626,7 +626,7 @@ class IodeFileExplorer(QTreeView):
         self.selectionModel().clearSelection()
         self._cleanup_slot()
 
-    @pyqtSlot()
+    @Slot()
     def cut(self):
         """
         Cut file or directory.
@@ -639,7 +639,7 @@ class IodeFileExplorer(QTreeView):
             QMessageBox.warning(self, "WARNING", "An error occurred while trying to cut "
                                 f"and paste file or directory: {str(e)}")
 
-    @pyqtSlot()
+    @Slot()
     def copy(self):
         """
         Copy file or directory.
@@ -652,7 +652,7 @@ class IodeFileExplorer(QTreeView):
             QMessageBox.warning(self, "WARNING", "An error occurred while trying to "
                                 f"copy/paste file or directory: {str(e)}")
 
-    @pyqtSlot()
+    @Slot()
     def paste(self):
         """
         Paste file or directory.
@@ -700,7 +700,7 @@ class IodeFileExplorer(QTreeView):
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"An error occurred while pasting file or directory: {str(e)}")
 
-    @pyqtSlot()
+    @Slot()
     def rename(self):
         """
         Rename file or directory.
@@ -722,7 +722,7 @@ class IodeFileExplorer(QTreeView):
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"An error occurred while renaming file or directory: {str(e)}")
     
-    @pyqtSlot()
+    @Slot()
     def remove(self):
         """
         Delete file or directory.
@@ -775,7 +775,7 @@ class IodeFileExplorer(QTreeView):
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"An error occurred while removing file or directory: {str(e)}")
 
-    @pyqtSlot(bool)
+    @Slot(bool)
     def open_files(self, force_as_text: bool = False):
         """
         Function called when the user double clicks on a item in the tree (= file explorer) view.
@@ -794,7 +794,7 @@ class IodeFileExplorer(QTreeView):
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"An error occurred while opening file(s): {str(e)}")
 
-    @pyqtSlot()
+    @Slot()
     def cancel(self):
         """
         Deselects all items + clear Clipboard.
