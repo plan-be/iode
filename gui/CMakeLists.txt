@@ -58,7 +58,7 @@ if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)
 
     message(STATUS "New target iode_gui_python enabled")
 else()
-    message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PyQt6.")
+    message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
 endif()
 
 configure_file(
