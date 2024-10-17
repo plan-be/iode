@@ -9,6 +9,7 @@ from cython.operator cimport dereference
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
+from iode.iode_python import format_lec_string
 
 
 # Equation wrapper class
@@ -115,6 +116,7 @@ cdef class Equation:
         wrapper.c_equation = ptr
         wrapper.ptr_owner = owner
         return wrapper
+
 
     def get_formated_date(self, format: str = "dd-mm-yyyy") -> str:
         """
@@ -329,7 +331,7 @@ cdef class Equation:
 
         >>> eq_ACAF = equations["ACAF"]
         >>> eq_ACAF.lec
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n                  acaf4*(TIME=1995)'
 
         >>> # create scalars
         >>> scalars["acaf1"] = 0., 1.
@@ -394,8 +396,10 @@ cdef class Equation:
         ... 
         ValueError: Cannot set LEC '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAF'
         """
-        return self.c_equation.get_lec().decode()
-    
+
+        lec_definition = self.c_equation.get_lec().decode()
+        return format_lec_string(lec_definition)
+
     @lec.setter
     def lec(self, value: str):
         value = value.strip()
@@ -631,7 +635,8 @@ cdef class Equation:
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                         acaf4*(TIME=1995)',
                 method = 'LSQ',
                 from_period = '1980Y1',
                 to_period = '1996Y1',
@@ -649,7 +654,7 @@ cdef class Equation:
                          stdev = 0.0042699},
                 date = '12-06-1998')
         >>> equations["ACAF"]._as_tuple()         # doctest: +NORMALIZE_WHITESPACE
-        ('ACAF', '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
+        ('ACAF', '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n                  acaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
         1.0, 2.329345941543579, 32.273193359375, 83.80752563476562, 0.008184665814042091, 0.8217613697052002, 
         0.7962986826896667, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 0.004269900266081095, 
         '12-06-1998')
@@ -665,10 +670,12 @@ cdef class Equation:
     def __str__(self) -> str:
         sample = self.sample
         tests = self.tests
-        indent = " " * len("Equation(")
+        indent_eq = " " * len("Equation(")
+        indent_lec = " " * len("lec = ")
+        lec = self.lec.replace('\n', '\n' + indent_eq + indent_lec)
 
         s = [f"endogenous = {self.endogenous}"]
-        s += [f"lec = {self.lec}"]
+        s += [f"lec = {lec}"]
         s += [f"method = {self.method}"]
         if len(sample):
             s+= [f"sample = {sample}"]
@@ -680,20 +687,22 @@ cdef class Equation:
             s += [f"instruments = {self.instruments}"]
         if tests['corr'] > 0.0:
             indent_tests = " " * len("tests = ")
-            s += ["tests = " + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+            s += ["tests = " + f",\n{indent_eq}{indent_tests}".join(f"{key} = {value:g}" 
                                 for key, value in self.tests.items())]
         if self.date:
             s += [f"date = {self.date}"]
 
-        return "Equation(" + f",\n{indent}".join(s) + ")"
+        return "Equation(" + f",\n{indent_eq}".join(s) + ")"
 
     def __repr__(self) -> str:
         sample = self.sample
         tests = self.tests
-        indent = " " * len("Equation(")
+        indent_eq = " " * len("Equation(")
+        indent_lec = " " * len("lec = ")
+        lec = self.lec.replace('\n', '\n' + indent_eq + indent_lec)
 
         s = [f"endogenous = {repr(self.endogenous)}"]
-        s += [f"lec = {repr(self.lec)}"]
+        s += [f"lec = \'{lec}\'"]                   # add \' to emulate repr behavior & compatibility pytests
         s += [f"method = {repr(self.method)}"]
         if len(sample):
             s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
@@ -705,12 +714,12 @@ cdef class Equation:
             s += [f"instruments = {repr(self.instruments)}"]
         if tests['corr'] > 0.0:
             indent_tests = " " * len("tests = {")
-            s += ["tests = {" + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+            s += ["tests = {" + f",\n{indent_eq}{indent_tests}".join(f"{key} = {value:g}" 
                                 for key, value in self.tests.items()) + "}"]
         if self.date:
             s += [f"date = {repr(self.date)}"]
 
-        return "Equation(" + f",\n{indent}".join(s) + ")" 
+        return "Equation(" + f",\n{indent_eq}".join(s) + ")" 
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))
