@@ -27,6 +27,7 @@ WORKSPACE
    :template: database_methods.rst
 
    Database.names
+   Database.iode_type
    Database.filename
    Database.description
 
