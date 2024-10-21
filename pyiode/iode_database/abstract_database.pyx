@@ -171,6 +171,26 @@ cdef class _AbstractDatabase:
         return self._subset('*', copy=True)
 
     @property
+    def iode_type(self) -> IodeTypes:
+        r"""
+        Return the object type of the current database.
+
+        Returns
+        -------
+        IodeTypes
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.iode_type
+        <IodeTypes.COMMENTS: 0>
+        """
+        int_iode_type: int = self.abstract_db_ptr.get_iode_type()
+        return IodeTypes(int_iode_type)
+
+    @property
     def filename(self) -> str:
         r"""
         Return the filepath associated with the current database.
