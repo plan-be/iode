@@ -621,7 +621,7 @@ cdef class Simulation:
         >>> equations["UY"].lec
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> identities["XNATY"]
-        'grt NATY'
+        Identity('grt NATY')
         >>> # endogenous variable
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
@@ -722,7 +722,7 @@ cdef class Simulation:
 
         >>> # endogenous variable
         >>> identities["XNATY"]
-        'grt NATY'
+        Identity('grt NATY')
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
 
@@ -881,7 +881,7 @@ cdef class Simulation:
         [0.0, 0.0, ..., 0.0, 0.0]
         >>> # endogenous variable
         >>> identities["XNATY"]
-        'grt NATY'
+        Identity('grt NATY')
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
         

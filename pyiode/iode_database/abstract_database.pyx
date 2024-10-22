@@ -864,7 +864,7 @@ cdef class _AbstractDatabase:
 
         >>> from iode import equations
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> # a) get one Equation
+        >>> # a) get one equation
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                  lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
@@ -898,9 +898,9 @@ cdef class _AbstractDatabase:
 
         >>> from iode import identities
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> # a) get one identities
+        >>> # a) get one Identity
         >>> identities["AOUC"]
-        '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
         >>> # b) get a subset of the Identities database using a pattern
         >>> identities_subset = identities["X*"]
         >>> identities_subset.names
@@ -914,7 +914,7 @@ cdef class _AbstractDatabase:
 
         >>> from iode import lists
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> # a) get one lists
+        >>> # a) get one list
         >>> lists["ENVI"]
         ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']
         >>> # b) get a subset of the Lists database using a pattern
@@ -930,7 +930,7 @@ cdef class _AbstractDatabase:
 
         >>> from iode import scalars
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> # a) get one scalars
+        >>> # a) get one scalar
         >>> acaf1 = scalars["acaf1"]
         >>> acaf1
         Scalar(0.0157684, 1, 0.00136871)
@@ -953,7 +953,7 @@ cdef class _AbstractDatabase:
 
         >>> from iode import tables
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> # a) get one tables
+        >>> # a) get one table
         >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
@@ -1257,14 +1257,14 @@ cdef class _AbstractDatabase:
         >>> # a) add one identity
         >>> identities["BDY"] = "YN - YK"
         >>> identities["BDY"]
-        'YN - YK'
+        Identity('YN - YK')
 
         >>> # b) update one identity
         >>> identities["AOUC"]
-        '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
         >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
         >>> identities["AOUC"]
-        '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+        Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]')
 
         >>> # c) working on a subset
         >>> # 1) get subset
@@ -1274,19 +1274,19 @@ cdef class _AbstractDatabase:
         >>> # 2) add an identity to the subset 
         >>> identities_subset["XDPU"] = "grt DPU"
         >>> identities_subset["XDPU"]
-        'grt DPU'
+        Identity('grt DPU')
         >>> # --> new identity also appears in the global workspace
         >>> "XDPU" in identities
         True
         >>> identities["XDPU"]
-        'grt DPU'
+        Identity('grt DPU')
         >>> # 3) update an identity in the subset
         >>> identities_subset["XDPU"] = "0"
         >>> identities_subset["XDPU"]
-        '0'
+        Identity('0')
         >>> # --> identity is also updated in the global workspace
         >>> identities["XDPU"]
-        '0'
+        Identity('0')
 
         Lists
 
