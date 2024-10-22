@@ -106,16 +106,21 @@ cdef class Identities(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        return self.database_ptr.get_lec(key.encode()).decode()
+        cdef CIdentity* c_identity = self.database_ptr.get(key.encode())
+        # self.database_ptr.get() does not allocate a new C++ Identity instance
+        py_identity = Identity._from_ptr(c_identity, <bint>False) 
+        return py_identity
 
     def _set_object(self, key, value):
         if not isinstance(key, str):
             raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for the name " + 
                             f"but got name value of type {type(key).__name__}")
         key = key.strip()
-        if not isinstance(value, str):
+        if not isinstance(value, (str, Identity)):
             raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for {key} " + 
                             f"but got value of type {type(value).__name__}")
+        if isinstance(value, Identity):
+            value = str(value)
         value = value.strip()
         if self.database_ptr.contains(key.encode()):
             self.database_ptr.update(key.encode(), value.encode())
@@ -162,9 +167,9 @@ cdef class Identities(_AbstractDatabase):
         >>> sample
         '1960Y1:2015Y1'
         >>> identities["GAP_"]
-        '100*((QAF_/Q_F)-1)'
+        Identity('100*((QAF_/Q_F)-1)')
         >>> identities["GAP2"]
-        '100*(QAFF_/(Q_F+Q_I))'
+        Identity('100*(QAFF_/(Q_F+Q_I))')
         >>> # reset variables GAP_ and GAP2
         >>> variables["GAP_"] = 0.
         >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
@@ -307,9 +312,9 @@ cdef class Identities(_AbstractDatabase):
         >>> identities.names             # doctest: +ELLIPSIS
         ['CONST', 'DER_LOG_T', 'EXP_T', 'GRT_T', 'LOG_T', 'MAVG_T']
         >>> identities["LOG_T"]
-        'ln t'
+        Identity('ln t')
         >>> identities["DER_LOG_T"]
-        'd(ln t)'
+        Identity('d(ln t)')
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
@@ -342,11 +347,11 @@ cdef class Identities(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['AOUC', 'AOUC_', 'FLGR', ..., 'XW', 'Y', 'YSEFPR', 'YSFICR']
         >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        Identity('100*((QAF_/Q_F)-1)')
         >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        '100*((QAF_/Q_F)-1)'
         >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
-        'grt TFPFHP_'
+        Identity('grt TFPFHP_')
         >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
         'grt TFPFHP_'
 
@@ -358,11 +363,11 @@ cdef class Identities(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['AOUC_', 'GAP_', 'XEX', 'XNATY', ..., 'XTFP', 'XW']
         >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        Identity('100*((QAF_/Q_F)-1)')
         >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        '100*((QAF_/Q_F)-1)'
         >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
-        'grt TFPFHP_'
+        Identity('grt TFPFHP_')
         >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
         'grt TFPFHP_'
         """
@@ -399,11 +404,11 @@ cdef class Identities(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['AOUC', 'AOUC_', 'FLGR', ..., 'XW', 'Y', 'YSEFPR', 'YSFICR']
         >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        Identity('100*((QAF_/Q_F)-1)')
         >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        '100*((QAF_/Q_F)-1)'
         >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
-        'grt TFPFHP_'
+        Identity('grt TFPFHP_')
         >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
         'grt TFPFHP_'
 
@@ -415,18 +420,18 @@ cdef class Identities(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['AOUC_', 'GAP_', 'XEX', 'XNATY', ..., 'XTFP', 'XW']
         >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        Identity('100*((QAF_/Q_F)-1)')
         >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
-        '100*((QAF_/Q_F)-1)' 
+        '100*((QAF_/Q_F)-1)'
         >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
-        'grt TFPFHP_'
+        Identity('grt TFPFHP_')
         >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
         'grt TFPFHP_'
         """
         return self.to_series()
 
     def _str_table(self, names: List[str]) -> str:
-        columns = {"name": names, "identities": [join_lines(self._get_object(name)) for name in names]}
+        columns = {"name": names, "identities": [join_lines(str(self._get_object(name))) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "identities": JUSTIFY.LEFT})
 
     def __hash__(self) -> int:

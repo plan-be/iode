@@ -197,6 +197,18 @@ EQUATION
    Equation.split_equation
    Equation.estimate
 
+========
+IDENTITY
+========
+
+.. autosummary::
+   :toctree: _generated
+
+   Identity
+
+   Identity.coefficients
+   Identity.variables  
+
 ====
 LIST
 ====

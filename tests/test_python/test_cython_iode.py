@@ -49,7 +49,7 @@ def test_iode_time():
 
 def test_iode_objects(tmp_path):
     iode.suppress_msgs()
-    run_doctests(items=['Equation', 'Scalar', 'Table', 'split_list'], tmp_dir=tmp_path)
+    run_doctests(items=['Equation', 'Identity', 'Scalar', 'Table', 'split_list'], tmp_dir=tmp_path)
     iode.reset_msgs()
 
 

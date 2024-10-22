@@ -55,6 +55,7 @@ include "time/period.pyx"
 include "time/sample.pyx"
 
 include "objects/equation.pyx"
+include "objects/identity.pyx"
 include "objects/scalar.pyx"
 include "objects/table.pyx"
 

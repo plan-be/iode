@@ -12,6 +12,7 @@ from pyiode.common cimport (IodeDatabaseType, IodeFileType, TableLang, IodeEquat
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
+from pyiode.objects.identity cimport CIdentity
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.table cimport CTable
 
@@ -126,10 +127,11 @@ cdef extern from "cpp_api/KDB/kdb_identities.h":
 
         # Public methods
         KDBIdentities* subset(string& pattern, bool deep_copy) except +
-        string get_lec(string& name) except +
-        string copy(string& name) except +
+        CIdentity* get(string& name) except +
+        CIdentity* copy(string& name) except +
         int add(string& name, string& identity_lec) except +
         void update(string& name, string& identity_lec) except +
+        string get_lec(string& name) except +
         void execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bint trace) except +
 
