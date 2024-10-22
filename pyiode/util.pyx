@@ -55,6 +55,26 @@ def version() -> str:
     "Return the Iode version."
     return _pystr(IodeVersion())
 
+def format_lec_string(lec_definition: str) -> str:
+    """
+    Format the LEC string by aligning it symmetrically around ':=' and indenting (potential) multi-lines.
+
+    Parameters
+    ----------
+    lec_definition: str
+        The LEC string to format.
+
+    Returns
+    -------
+    str
+        The formatted LEC string.
+    """
+    left_side, right_side = [part.strip() for part in lec_definition.split(':=')]
+    lec_indent = ' ' * (len(left_side) + len(' := '))
+    formatted_right_side = right_side.replace('\n', f'\n{lec_indent}')
+    formatted_lec_definition = f"{left_side} := {formatted_right_side}"
+        
+    return formatted_lec_definition
 
 # Conversions python-C strings
 # ----------------------------

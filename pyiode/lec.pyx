@@ -34,7 +34,7 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
     >>> equations["ACAF"].lec       # doctest: +NORMALIZE_WHITESPACE
-    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\\nacaf4*(TIME=1995)'
+    '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\\n                                 acaf4*(TIME=1995)'
     >>> variables["ACAF", "2000Y1"]
     10.046610792200543
     >>> lec = "(acaf1 + acaf2 * GOSF[-1] + acaf4*(TIME=1995)) * VAF[-1]"

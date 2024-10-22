@@ -50,16 +50,16 @@ cdef class Equations(_AbstractDatabase):
     filename: ...\tests\data\fun.eqs
     <BLANKLINE>
      name                                                    lec                                                method      sample      block    fstat      r2adj     dw     loglik    date
-    ACAF        (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                                           LSQ  1980Y1:1996Y1    ACAF   32.2732     0.7963  2.3293  83.8075 12-06-1998
+    ACAF        (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                                          LSQ  1980Y1:1996Y1    ACAF   32.2732     0.7963  2.3293  83.8075 12-06-1998
     ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ              :    ACAG    0.0000     0.0000  0.0000   0.0000
-    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ              :    AOUC    0.0000     0.0000  0.0000   0.0000
-    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ              :   BENEF    0.0000     0.0000  0.0000   0.0000
-    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ              :     BQY    0.0000     0.0000  0.0000   0.0000
+    AOUC        AOUC := ((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                   LSQ              :    AOUC    0.0000     0.0000  0.0000   0.0000
+    BENEF       d BENEF := d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)    LSQ              :   BENEF    0.0000     0.0000  0.0000   0.0000
+    BQY         BQY := (YK+YN)/PBBP                                                                                LSQ              :     BQY    0.0000     0.0000  0.0000   0.0000
     ...         ...                                                                                                ...            ...     ...       ...        ...     ...      ...        ...
-    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ              :    YSSF    0.0000     0.0000  0.0000   0.0000
+    YSSF        dln YSSF := dln WBF_                                                                               LSQ              :    YSSF    0.0000     0.0000  0.0000   0.0000
     YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ              :    YSSG    0.0000     0.0000  0.0000   0.0000
-    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ              :      ZF    0.0000     0.0000  0.0000   0.0000
-    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ              :      ZJ    0.0000     0.0000  0.0000   0.0000
+    ZF          grt ZF := grt PC+ZX-0.05*grt PME                                                                   LSQ              :      ZF    0.0000     0.0000  0.0000   0.0000
+    ZJ          grt ZJ := grt PC +ZX-0.05*grt PME                                                                  LSQ              :      ZJ    0.0000     0.0000  0.0000   0.0000
     ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ              :    ZZF_    0.0000     0.0000  0.0000   0.0000
     <BLANKLINE>
     """
@@ -236,9 +236,9 @@ cdef class Equations(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> equations["ACAF"].lec
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n                  acaf4*(TIME=1995)'
         >>> equations["DPUH"].lec
-        'dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC'
+        'dln (DPUH/DPUHO) := dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC'
 
         >>> # create scalars
         >>> scalars["acaf1"] = 0., 1.
@@ -559,7 +559,8 @@ cdef class Equations(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'YSSG', 'ZF', 'ZJ', 'ZZF_']
         >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
@@ -577,7 +578,7 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        lec            (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n     ...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
         comment
@@ -598,12 +599,12 @@ cdef class Equations(_AbstractDatabase):
         Name: ACAF, dtype: object  
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'YDH_',
-                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 lec = 'grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        lec            grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+D...
         method                                                       LSQ
         sample                                                         :
         comment
@@ -632,7 +633,8 @@ cdef class Equations(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
         >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
@@ -650,7 +652,7 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        lec            (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n     ...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
         comment
@@ -671,12 +673,12 @@ cdef class Equations(_AbstractDatabase):
         Name: ACAF, dtype: object
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'YDH_',
-                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 lec = 'grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        lec            grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+D...
         method                                                       LSQ
         sample                                                         :
         comment
@@ -733,7 +735,8 @@ cdef class Equations(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'YSSG', 'ZF', 'ZJ', 'ZZF_']
         >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
@@ -751,7 +754,7 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        lec            (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n     ...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
         comment
@@ -772,12 +775,12 @@ cdef class Equations(_AbstractDatabase):
         Name: ACAF, dtype: object  
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'YDH_',
-                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 lec = 'grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        lec            grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+D...
         method                                                       LSQ
         sample                                                         :
         comment
@@ -806,7 +809,8 @@ cdef class Equations(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
         >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
@@ -824,7 +828,7 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        lec            (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n     ...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
         comment
@@ -845,12 +849,12 @@ cdef class Equations(_AbstractDatabase):
         Name: ACAF, dtype: object
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'YDH_',
-                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 lec = 'grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        lec            grt YDH_ := grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+D...
         method                                                       LSQ
         sample                                                         :
         comment

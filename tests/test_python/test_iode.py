@@ -32,7 +32,8 @@ def test_print_equation():
     iode.equations.load(f"{iode.SAMPLE_DATA_DIR}/fun.eqs")
     eq_ACAF = iode.equations["ACAF"]
     string_eq_ACAF = ("Equation(endogenous = ACAF,\n"
-                      "         lec = (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995),\n"
+                      "         lec = (ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n"
+                      "                                 acaf4*(TIME=1995),\n"
                       "         method = LSQ,\n"
                       "         sample = 1980Y1:1996Y1,\n"
                       "         block = ACAF,\n"
