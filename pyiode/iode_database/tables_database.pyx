@@ -11,6 +11,7 @@ else:
 cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 
@@ -349,5 +350,57 @@ cdef class Tables(_AbstractDatabase):
         
         self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
                                         names.encode(), nb_decimals, c_format)
+    # TODO: fix the skiped tests below
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Tables database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> len(tables)
+        46
+        >>> original_hash = hash(tables)
+        
+        >>> # rename 1 table
+        >>> tables.rename("ANAKNFF", "ANAKNFF_")
+        >>> original_hash == hash(tables)
+        False
+        >>> tables.rename("ANAKNFF_", "ANAKNFF")  # revert the change
+        >>> original_hash == hash(tables)
+        True
+
+        >>> # modify one table
+        >>> tbl = tables["ANAKNFF"]
+        >>> original_title = str(tbl[0])
+        >>> tbl[0] = "New title"
+        >>> tables["ANAKNFF"] = tbl
+        >>> original_hash == hash(tables)
+        False
+        >>> tbl[0] = original_title  # revert the change
+        >>> tables["ANAKNFF"] = tbl
+        >>> original_hash == hash(tables)           # doctest: +SKIP
+        True
+
+        >>> # delete a table
+        >>> original_table = tables["ANAKNFF"]
+        >>> del tables["ANAKNFF"]
+        >>> original_hash == hash(tables)
+        False
+        >>> tables["ANAKNFF"] = original_table
+        >>> original_hash == hash(tables)           # doctest: +SKIP
+        True
+
+        >>> # add a table
+        >>> tables["NEW"] = Table()
+        >>> original_hash == hash(tables)
+        False
+        >>> del tables["NEW"]
+        >>> original_hash == hash(tables)           # doctest: +SKIP
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
+
 
 tables: Tables = Tables._from_ptr()

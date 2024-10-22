@@ -10,6 +10,7 @@ else:
 cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -883,5 +884,49 @@ cdef class Equations(_AbstractDatabase):
         columns = {"name": names, "lec": data[0], "method": data[1], "sample": data[2], "block": data[3], 
                    "fstat": data[4], "r2adj": data[5], "dw": data[6], "loglik": data[7], "date": data[8]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lec": JUSTIFY.LEFT})
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Equations database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> len(equations)
+        274
+        >>> original_hash = hash(equations)
+
+        >>> # modify one equation
+        >>> eq = equations["ACAF"]
+        >>> original_lec = eq.lec
+        >>> eq.lec = "ACAF := 1"
+        >>> equations["ACAF"] = eq
+        >>> original_hash == hash(equations)
+        False
+        >>> eq.lec = original_lec  # revert the change
+        >>> equations["ACAF"] = eq
+        >>> original_hash == hash(equations)
+        True
+
+        >>> # delete a equation
+        >>> original_eq = equations["ACAF"]
+        >>> del equations["ACAF"]
+        >>> original_hash == hash(equations)
+        False
+        >>> equations["ACAF"] = original_eq
+        >>> original_hash == hash(equations)
+        True
+
+        >>> # add a equation
+        >>> equations["NEW"] = "NEW := 0"
+        >>> original_hash == hash(equations)
+        False
+        >>> del equations["NEW"]
+        >>> original_hash == hash(equations)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
+
 
 equations: Equations = Equations._from_ptr()

@@ -13,7 +13,9 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from cython.operator cimport dereference
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -1564,5 +1566,54 @@ cdef class Variables(_AbstractDatabase):
         for t, period in enumerate(self.periods):
             columns[period] = [self.database_ptr.get_var(<string>name.encode(), <int>t, self.mode_) for name in names]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Variables database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(variables)
+        394
+        >>> original_hash = hash(variables)
+        
+        >>> # rename 1 variable
+        >>> variables.rename("ACAF", "ACAF_")
+        >>> original_hash == hash(variables)
+        False
+        >>> variables.rename("ACAF_", "ACAF")  # revert the change
+        >>> original_hash == hash(variables)
+        True
+
+        >>> # modify one variable
+        >>> original_variable = variables["ACAF"]
+        >>> variables["ACAF"] = 0.0
+        >>> original_hash == hash(variables)
+        False
+        >>> variables["ACAF"] = original_variable  # revert the change
+        >>> original_hash == hash(variables)
+        True
+
+        >>> # delete a variable
+        >>> original_variable = variables["ACAF"]
+        >>> del variables["ACAF"]
+        >>> original_hash == hash(variables)
+        False
+        >>> variables["ACAF"] = original_variable
+        >>> original_hash == hash(variables)
+        True
+
+        >>> # add a variable
+        >>> variables["NEW"] = 0.0
+        >>> original_hash == hash(variables)
+        False
+        >>> del variables["NEW"]
+        >>> original_hash == hash(variables)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
+
 
 variables: Variables = Variables._from_ptr()

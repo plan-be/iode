@@ -8,6 +8,8 @@ else:
     Self = Any
 
 cimport cython
+from cython.operator cimport dereference
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBIdentities as CKDBIdentities
 from pyiode.iode_database.cpp_api_database cimport Identities as cpp_global_identities
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -426,6 +428,54 @@ cdef class Identities(_AbstractDatabase):
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names, "identities": [join_lines(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "identities": JUSTIFY.LEFT})
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Identities database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> len(identities)
+        48
+        >>> original_hash = hash(identities)
+        
+        >>> # rename 1 identity
+        >>> identities.rename("FLGR", "FLGR_")
+        >>> original_hash == hash(identities)
+        False
+        >>> identities.rename("FLGR_", "FLGR")  # revert the change
+        >>> original_hash == hash(identities)
+        True
+
+        >>> # modify one identity
+        >>> original_lec = identities["FLGR"]
+        >>> identities["FLGR"] = "1"
+        >>> original_hash == hash(identities)
+        False
+        >>> identities["FLGR"] = original_lec  # revert the change
+        >>> original_hash == hash(identities)
+        True
+
+        >>> # delete a identity
+        >>> original_identity = identities["FLGR"]
+        >>> del identities["FLGR"]
+        >>> original_hash == hash(identities)
+        False
+        >>> identities["FLGR"] = original_identity
+        >>> original_hash == hash(identities)
+        True
+
+        >>> # add a identity
+        >>> identities["NEW"] = "1"
+        >>> original_hash == hash(identities)
+        False
+        >>> del identities["NEW"]
+        >>> original_hash == hash(identities)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
 
 
 identities: Identities = Identities._from_ptr()
