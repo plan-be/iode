@@ -584,16 +584,16 @@ cdef class Equations(_AbstractDatabase):
         instruments
         block                                                       ACAF
         corr                                                         1.0
-        stdev                                                   2.329346
-        meany                                                  32.273193
-        ssres                                                  83.807526
-        stderr                                                  0.008185
-        stderrp                                                 0.821761
-        fstat                                                   0.796299
-        r2                                                      0.000052
-        r2adj                                                   0.001927
-        dw                                                     23.545813
-        loglik                                                   0.00427
+        stdev                                                    0.00427
+        meany                                                   0.008185
+        ssres                                                   0.000052
+        stderr                                                  0.001927
+        stderrp                                                23.545813
+        fstat                                                  32.273193
+        r2                                                      0.821761
+        r2adj                                                   0.796299
+        dw                                                      2.329346
+        loglik                                                 83.807526
         date                                                  12-06-1998
         Name: ACAF, dtype: object  
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
@@ -657,16 +657,16 @@ cdef class Equations(_AbstractDatabase):
         instruments
         block                                                       ACAF
         corr                                                         1.0
-        stdev                                                   2.329346
-        meany                                                  32.273193
-        ssres                                                  83.807526
-        stderr                                                  0.008185
-        stderrp                                                 0.821761
-        fstat                                                   0.796299
-        r2                                                      0.000052
-        r2adj                                                   0.001927
-        dw                                                     23.545813
-        loglik                                                   0.00427
+        stdev                                                    0.00427
+        meany                                                   0.008185
+        ssres                                                   0.000052
+        stderr                                                  0.001927
+        stderrp                                                23.545813
+        fstat                                                  32.273193
+        r2                                                      0.821761
+        r2adj                                                   0.796299
+        dw                                                      2.329346
+        loglik                                                 83.807526
         date                                                  12-06-1998
         Name: ACAF, dtype: object
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
@@ -758,16 +758,16 @@ cdef class Equations(_AbstractDatabase):
         instruments
         block                                                       ACAF
         corr                                                         1.0
-        stdev                                                   2.329346
-        meany                                                  32.273193
-        ssres                                                  83.807526
-        stderr                                                  0.008185
-        stderrp                                                 0.821761
-        fstat                                                   0.796299
-        r2                                                      0.000052
-        r2adj                                                   0.001927
-        dw                                                     23.545813
-        loglik                                                   0.00427
+        stdev                                                    0.00427
+        meany                                                   0.008185
+        ssres                                                   0.000052
+        stderr                                                  0.001927
+        stderrp                                                23.545813
+        fstat                                                  32.273193
+        r2                                                      0.821761
+        r2adj                                                   0.796299
+        dw                                                      2.329346
+        loglik                                                 83.807526
         date                                                  12-06-1998
         Name: ACAF, dtype: object  
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
@@ -831,16 +831,16 @@ cdef class Equations(_AbstractDatabase):
         instruments
         block                                                       ACAF
         corr                                                         1.0
-        stdev                                                   2.329346
-        meany                                                  32.273193
-        ssres                                                  83.807526
-        stderr                                                  0.008185
-        stderrp                                                 0.821761
-        fstat                                                   0.796299
-        r2                                                      0.000052
-        r2adj                                                   0.001927
-        dw                                                     23.545813
-        loglik                                                   0.00427
+        stdev                                                    0.00427
+        meany                                                   0.008185
+        ssres                                                   0.000052
+        stderr                                                  0.001927
+        stderrp                                                23.545813
+        fstat                                                  32.273193
+        r2                                                      0.821761
+        r2adj                                                   0.796299
+        dw                                                      2.329346
+        loglik                                                 83.807526
         date                                                  12-06-1998
         Name: ACAF, dtype: object
         >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE

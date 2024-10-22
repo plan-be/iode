@@ -104,6 +104,23 @@ cdef class Identity:
     def __eq__(self, other: Identity) -> bool:
         return self.c_identity == other.c_identity
 
+    def __copy__ (self) -> Identity:
+        """
+        Return a copy of the current Identity.
+
+        Examples
+        --------
+        >>> import copy
+        >>> from iode import Identity
+        >>> idt = Identity("FLG/VBBP")
+        >>> idt
+        Identity('FLG/VBBP')
+        >>> copied_idt = copy.copy(idt)
+        >>> copied_idt
+        Identity('FLG/VBBP')
+        """
+        return Identity(str(self))
+
     def __str__(self) -> str:
         return self.c_identity.get_lec().decode("utf-8")
 
