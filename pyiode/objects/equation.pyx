@@ -650,17 +650,76 @@ cdef class Equation:
                 date = '12-06-1998')
         >>> equations["ACAF"]._as_tuple()         # doctest: +NORMALIZE_WHITESPACE
         ('ACAF', '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
-        1.0, 2.329345941543579, 32.273193359375, 83.80752563476562, 0.008184665814042091, 0.8217613697052002, 
-        0.7962986826896667, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 0.004269900266081095, 
-        '12-06-1998')
+        1.0, 0.004269900266081095, 0.008184665814042091, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 
+        32.273193359375, 0.8217613697052002, 0.7962986826896667, 2.329345941543579, 83.80752563476562, '12-06-1998')
         """
+        tests = [self.c_equation.tests[i] for i in range(len(EqTest))]
         return self.endogenous, self.lec, self.method, str(self.sample), self.comment, self.instruments, \
-               self.block, *list(self.tests.values()), self.date
+               self.block, *tests, self.date
 
     # Special methods
 
     def __eq__(self, other: Equation) -> bool:
         return self.c_equation == other.c_equation
+
+    def __copy__(self) -> Equation:
+        r"""
+        Return a copy of the current Equation.
+
+        Examples
+        --------
+        >>> import copy
+        >>> from iode import SAMPLE_DATA_DIR, equations, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                         dw = 2.32935,
+                         fstat = 32.2732,
+                         loglik = 83.8075,
+                         meany = 0.00818467,
+                         r2 = 0.821761,
+                         r2adj = 0.796299,
+                         ssres = 5.19945e-05,
+                         stderr = 0.00192715,
+                         stderrp = 23.5458,
+                         stdev = 0.0042699},
+                date = '12-06-1998')
+        >>> copied_eq = copy.copy(equations["ACAF"])
+        >>> copied_eq                   # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                         dw = 2.32935,
+                         fstat = 32.2732,
+                         loglik = 83.8075,
+                         meany = 0.00818467,
+                         r2 = 0.821761,
+                         r2adj = 0.796299,
+                         ssres = 5.19945e-05,
+                         stderr = 0.00192715,
+                         stderrp = 23.5458,
+                         stdev = 0.0042699},
+                date = '12-06-1998')
+        """
+        from_period = self.sample.start
+        to_period = self.sample.end
+        tests = [self.c_equation.tests[i] for i in range(len(EqTest))]
+        copied_eq = Equation(self.endogenous, self.lec, self.method, from_period, to_period, 
+                             self.comment, self.instruments, self.block)
+        copied_eq._set_tests(tests)
+        copied_eq._set_date(self.date)
+        return copied_eq
 
     def __str__(self) -> str:
         sample = self.sample

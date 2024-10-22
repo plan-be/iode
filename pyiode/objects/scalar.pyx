@@ -120,6 +120,25 @@ cdef class Scalar:
     def __eq__(self, other: Scalar) -> bool:
         return self.c_scalar == other.c_scalar
 
+    def __copy__ (self) -> Scalar:
+        """
+        Return a copy of the current Scalar.
+
+        Examples
+        --------
+        >>> import copy
+        >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars["acaf1"]
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> copied_scl = copy.copy(scalars["acaf1"])
+        >>> copied_scl
+        Scalar(0.0157684, 1, 0.00136871)
+        """
+        copied_scl = Scalar(self.value, self.relax)
+        copied_scl.c_scalar.std = self.c_scalar.std
+        return copied_scl
+
     def __str__(self) -> str:
         return f"Scalar({_iode_number_to_str(self.value)}, {_iode_number_to_str(self.relax)}, {_iode_number_to_str(self.std)})"
 

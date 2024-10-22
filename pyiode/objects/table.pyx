@@ -2124,6 +2124,60 @@ cdef class Table:
                 self.__iadd__(line_type)
         return self
 
+    def __copy__(self) -> Table:
+        r"""
+        Return a copy of the current Table.
+
+        Examples
+        --------
+        >>> import copy
+        >>> from iode import SAMPLE_DATA_DIR, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  |                                    |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> copied_tbl = copy.copy(tables["C8_1"])
+        >>> copied_tbl              # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  | ""                                 |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        """
+        copied_tbl = Table()
+        del copied_tbl.c_table
+        copied_tbl.c_table = new CTable(dereference(self.c_table))
+        return copied_tbl
+
     def __str__(self) -> str:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
