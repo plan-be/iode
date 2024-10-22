@@ -8,6 +8,8 @@ else:
     Self = Any
 
 cimport cython
+from cython.operator cimport dereference
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBComments as CKDBComments
 from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_comments
 
@@ -292,5 +294,52 @@ cdef class Comments(_AbstractDatabase):
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "comments": JUSTIFY.LEFT})
 
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Comments database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
+        317
+        >>> original_hash = hash(comments)
+        
+        >>> # rename 1 comment
+        >>> comments.rename("ACAF", "ACAF_")
+        >>> original_hash == hash(comments)
+        False
+        >>> comments.rename("ACAF_", "ACAF")  # revert the change
+        >>> original_hash == hash(comments)
+        True
+
+        >>> # modify one comment
+        >>> original_comment = comments["ACAF"]
+        >>> comments["ACAF"] = "modified comment"
+        >>> original_hash == hash(comments)
+        False
+        >>> comments["ACAF"] = original_comment  # revert the change
+        >>> original_hash == hash(comments)
+        True
+
+        >>> # delete a comment
+        >>> original_comment = comments["ACAF"]
+        >>> del comments["ACAF"]
+        >>> original_hash == hash(comments)
+        False
+        >>> comments["ACAF"] = original_comment
+        >>> original_hash == hash(comments)
+        True
+
+        >>> # add a comment
+        >>> comments["NEW"] = "new comment"
+        >>> original_hash == hash(comments)
+        False
+        >>> del comments["NEW"]
+        >>> original_hash == hash(comments)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
 
 comments: Comments = Comments._from_ptr()

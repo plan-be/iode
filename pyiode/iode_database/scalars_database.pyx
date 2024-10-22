@@ -8,6 +8,8 @@ else:
     Self = Any
 
 cimport cython
+from cython.operator cimport dereference
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 from pyiode.iode_database.cpp_api_database cimport Scalars as cpp_global_scalars
 
@@ -453,6 +455,54 @@ cdef class Scalars(_AbstractDatabase):
         data = [list(row) for row in zip(*data)]
         columns = {"name": data[0], "value": data[1], "relax": data[2], "std": data[3]}
         return table2str(columns, max_lines=10, precision=4, justify_funcs={"name": JUSTIFY.LEFT})
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Scalars database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, scalars
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> len(scalars)
+        161
+        >>> original_hash = hash(scalars)
+        
+        >>> # rename 1 scalar
+        >>> scalars.rename("acaf1", "acaf1_")
+        >>> original_hash == hash(scalars)
+        False
+        >>> scalars.rename("acaf1_", "acaf1")  # revert the change
+        >>> original_hash == hash(scalars)
+        True
+
+        >>> # modify one scalar
+        >>> original_value = scalars["acaf1"].value
+        >>> scalars["acaf1"] = 0.02
+        >>> original_hash == hash(scalars)
+        False
+        >>> scalars["acaf1"].value = original_value  # revert the change
+        >>> original_hash == hash(scalars)
+        True
+
+        >>> # delete a scalar
+        >>> original_scalar = scalars["acaf1"]
+        >>> del scalars["acaf1"]
+        >>> original_hash == hash(scalars)
+        False
+        >>> scalars["acaf1"] = original_scalar
+        >>> original_hash == hash(scalars)
+        True
+
+        >>> # add a scalar
+        >>> scalars["new_scalar"] = (0.9, 1.0)
+        >>> original_hash == hash(scalars)
+        False
+        >>> del scalars["new_scalar"]
+        >>> original_hash == hash(scalars)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
 
 
 scalars: Scalars = Scalars._from_ptr()

@@ -10,6 +10,8 @@ else:
 from iode.util import split_list
 
 cimport cython
+from cython.operator cimport dereference
+from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBLists as CKDBLists
 from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
 
@@ -348,6 +350,54 @@ cdef class Lists(_AbstractDatabase):
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names, "lists": ['; '.join(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lists": JUSTIFY.LEFT})
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the current Lists database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, lists
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> len(lists)
+        17
+        >>> original_hash = hash(lists)
+        
+        >>> # rename 1 IODE list
+        >>> lists.rename("COPY", "COPY_")
+        >>> original_hash == hash(lists)
+        False
+        >>> lists.rename("COPY_", "COPY")  # revert the change
+        >>> original_hash == hash(lists)
+        True
+
+        >>> # modify one IODE list
+        >>> original_list = lists["COPY"]
+        >>> lists["COPY"] = "$COPY0 $COPY1"
+        >>> original_hash == hash(lists)
+        False
+        >>> lists["COPY"] = original_list  # revert the change
+        >>> original_hash == hash(lists)
+        True
+
+        >>> # delete a IODE list
+        >>> original_list = lists["COPY"]
+        >>> del lists["COPY"]
+        >>> original_hash == hash(lists)
+        False
+        >>> lists["COPY"] = original_list
+        >>> original_hash == hash(lists)
+        True
+
+        >>> # add a IODE list
+        >>> lists["NEW"] = "$COPY0"
+        >>> original_hash == hash(lists)
+        False
+        >>> del lists["NEW"]
+        >>> original_hash == hash(lists)
+        True
+        """
+        return hash_value(dereference(self.database_ptr))
 
 
 lists: Lists = Lists._from_ptr()
