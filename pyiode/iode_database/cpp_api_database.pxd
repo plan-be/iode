@@ -18,6 +18,30 @@ from pyiode.objects.table cimport CTable
 
 
 cdef extern from "api/iode.h":
+    ctypedef unsigned long SWHDL
+    ctypedef char OFNAME[64]
+    ctypedef char FNAME[512]
+    ctypedef char ONAME[21]
+
+    cdef struct KOBJ:
+        SWHDL o_val
+        ONAME o_name
+        char o_pad[3]
+
+    cdef struct KDB:
+        KOBJ *k_objs
+        long k_nb
+        short k_type
+        short k_mode
+        char k_arch[32]
+        char k_magic[32]
+        OFNAME k_oname
+        char k_desc[64]
+        char k_data[64]
+        char k_compressed
+        char k_reserved[59]
+        char *k_nameptr
+
     cdef double  *IodeGetVector(char *name, int *lg)
     cdef int     IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
     cdef int     IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)

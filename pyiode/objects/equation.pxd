@@ -7,8 +7,37 @@ from libcpp.pair cimport pair
 from libcpp cimport bool
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
-from pyiode.time.sample cimport CSample
+from pyiode.time.sample cimport CSample, SAMPLE
+from pyiode.iode_database.cpp_api_database cimport KDB
 
+cdef extern from "api/iode.h":
+    ctypedef char ONAME[21]
+
+    cdef struct LNAME:
+        ONAME name
+        char  pad[3]
+        long  pos
+
+    cdef struct CLEC:
+        long tot_lg
+        long exec_lg
+        short nb_names
+        char dupendo
+        char pad
+        LNAME lnames[1]
+
+    cdef struct EQ:
+        char* endo
+        char* lec
+        CLEC* clec
+        char solved
+        char method
+        SAMPLE smpl
+        char* cmt
+        char* blk
+        char* instr
+        long date
+        float tests[20]
 
 cdef extern from "cpp_api/objects/equation.h":
 

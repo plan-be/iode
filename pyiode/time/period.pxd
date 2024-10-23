@@ -1,6 +1,13 @@
 from libcpp.string cimport string
 from libcpp cimport bool
 
+cdef extern from "api/iode.h":
+    cdef struct PERIOD:
+        long p_y
+        long p_s
+        char p_p
+        char p_pad[3]
+
 # declare C++ Period class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
 cdef extern from "time/period.h":

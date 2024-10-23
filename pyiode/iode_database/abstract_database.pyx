@@ -1175,7 +1175,7 @@ cdef class _AbstractDatabase:
                           stderrp = 23.5458,
                           stdev = 0.0042699},
                  date = '12-06-1998')
-        >>> # upate block and sample of a block of equations to estimation (dictionary)
+        >>> # update block and sample of a block of equations to estimation (dictionary)
         >>> estim_sample = "2000Y1:2010Y1"
         >>> block = "ACAF; ACAG; AOUC"
         >>> for eq_name in block.split(';'):
@@ -1184,14 +1184,12 @@ cdef class _AbstractDatabase:
         ('2000Y1:2010Y1', '2000Y1:2010Y1', '2000Y1:2010Y1')
         >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
-        >>> # upate sample and block (Equation objects)
-        >>> eq_ACAF = equations["ACAF"]
-        >>> eq_ACAF.lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
-        >>> eq_ACAF.method = EqMethod.MAX_LIKELIHOOD
+        >>> # update lec, method, sample and block
+        >>> equations["ACAF"].lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> equations["ACAF"].method = EqMethod.MAX_LIKELIHOOD
         >>> # new equation sample is from 1990Y1 to the last year of Variables
-        >>> eq_ACAF.sample = "1990Y1:"
-        >>> eq_ACAF.block = "ACAF"
-        >>> equations["ACAF"] = eq_ACAF
+        >>> equations["ACAF"].sample = "1990Y1:"
+        >>> equations["ACAF"].block = "ACAF"
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                  lec = '(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
@@ -1362,7 +1360,7 @@ cdef class _AbstractDatabase:
         >>> scalars["acaf1"] = 0.8
         >>> scalars["acaf1"]
         Scalar(0.8, 1, 0.00136871)
-        >>> # upate value and relax (tuple)
+        >>> # update value and relax (tuple)
         >>> scalars["acaf2"] = 0.8, 0.9
         >>> scalars["acaf2"]
         Scalar(0.8, 0.9, na)
@@ -1370,11 +1368,11 @@ cdef class _AbstractDatabase:
         >>> scalars["acaf2"] = (0.7, 0.8)
         >>> scalars["acaf2"]
         Scalar(0.7, 0.8, na)
-        >>> # upate value and relax (dictionary)
+        >>> # update value and relax (dictionary)
         >>> scalars["acaf3"] = {"relax": 0.9, "value": 0.8}
         >>> scalars["acaf3"]
         Scalar(0.8, 0.9, 0.87301)
-        >>> # upate value and/or relax (Scalar object)
+        >>> # update value and/or relax (Scalar object)
         >>> acaf4 = scalars["acaf4"]
         >>> acaf4
         Scalar(-0.00850518, 1, 0.0020833)
