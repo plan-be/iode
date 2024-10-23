@@ -1487,8 +1487,7 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
 
         >>> # b) -------- update table --------
-        >>> table = tables["TABLE_CELL_LECS"]
-        >>> table                   # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
@@ -1517,45 +1516,43 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
 
         >>> # set graph axis type
-        >>> table.graph_axis = TableGraphAxis.SEMILOG
+        >>> tables["TABLE_CELL_LECS"].graph_axis = TableGraphAxis.SEMILOG
         >>> # print first line
-        >>> table[0]
+        >>> tables["TABLE_CELL_LECS"][0]
         New Table
         >>> # print last line
-        >>> table[-1]
+        >>> tables["TABLE_CELL_LECS"][-1]
         <DATE>
         >>> # delete last line
-        >>> del table[-1]
+        >>> del tables["TABLE_CELL_LECS"][-1]
         >>> # get index of line containing YSSG+COTRES
-        >>> index = table.index("YSSG+COTRES")
+        >>> index = tables["TABLE_CELL_LECS"].index("YSSG+COTRES")
         >>> index
         9
-        >>> table[index]
+        >>> tables["TABLE_CELL_LECS"][index]
         ('"YSSG+COTRES:"', 'YSSG+COTRES')
         >>> # get line type
-        >>> table[index].line_type
+        >>> tables["TABLE_CELL_LECS"][index].line_type
         'CELL'
         >>> # get line graph type
-        >>> table[index].graph_type
+        >>> tables["TABLE_CELL_LECS"][index].graph_type
         'LINE'
         >>> # know if axis is left
-        >>> table[index].axis_left
+        >>> tables["TABLE_CELL_LECS"][index].axis_left
         True
         >>> # update cells
         >>> # double quotes "    -> STRING cell
         >>> # no double quotes   -> LEC cell
-        >>> table[index] = ('"YSSG:"', 'YSSG')
-        >>> table[index]
+        >>> tables["TABLE_CELL_LECS"][index] = ('"YSSG:"', 'YSSG')
+        >>> tables["TABLE_CELL_LECS"][index]
         ('"YSSG:"', 'YSSG')
         >>> # insert a new title line surrounded by two separator lines
-        >>> table.insert(index + 1, '-')
-        >>> table.insert(index + 2, "New Title")
-        >>> table.insert(index + 3, '-')
+        >>> tables["TABLE_CELL_LECS"].insert(index + 1, '-')
+        >>> tables["TABLE_CELL_LECS"].insert(index + 2, "New Title")
+        >>> tables["TABLE_CELL_LECS"].insert(index + 3, '-')
         >>> # append a new sepatator line
-        >>> table += '-'
+        >>> tables["TABLE_CELL_LECS"] += '-'
 
-        >>> # warning: do not forget to actually update the IODE Table database  
-        >>> tables["TABLE_CELL_LECS"] = table
         >>> tables["TABLE_CELL_LECS"]                # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1       |
         TITLE |  "New Table"
