@@ -112,7 +112,7 @@ cdef class Equations(_AbstractDatabase):
     def _get_object(self, key: str):
         key = key.strip()
         cdef CEquation* c_eq = self.database_ptr.get(key.encode())
-        py_eq = Equation._from_ptr(c_eq, <bint>True) 
+        py_eq = Equation._from_ptr(c_eq, <bint>True, self.database_ptr) 
         return py_eq
 
     def _set_object(self, key: str, value):
