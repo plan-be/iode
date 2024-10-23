@@ -2,8 +2,14 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from time.period cimport CPeriod
+from time.period cimport CPeriod, PERIOD
 
+cdef extern from "api/iode.h":
+    cdef struct SAMPLE:
+        PERIOD s_p1
+        PERIOD s_p2
+        short s_nb
+        char s_pad[2]
 
 # declare C++ Sample class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
