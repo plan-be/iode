@@ -7,8 +7,10 @@ from libcpp.map cimport map
 from libcpp.string cimport string
 from cython.operator cimport dereference
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
+from pyiode.objects.equation cimport EQ
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 
 
 # Equation wrapper class
@@ -81,9 +83,11 @@ cdef class Equation:
     """
     cdef bint ptr_owner
     cdef CEquation* c_equation
+    cdef CKDBEquations* c_database
 
     def __cinit__(self):
         self.ptr_owner = False
+        self.c_database = NULL
         self.c_equation = NULL
 
     def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str] = EqMethod.LSQ, 
@@ -95,6 +99,7 @@ cdef class Equation:
             to_period = str(to_period)
 
         self.ptr_owner = <bint>True
+        self.c_database = NULL
         self.c_equation = new CEquation(endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
                                         to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
         self.method = method
@@ -103,16 +108,18 @@ cdef class Equation:
         if self.ptr_owner and self.c_equation is not NULL:
             del self.c_equation
             self.c_equation = NULL
+            self.c_database = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Equation _from_ptr(CEquation* ptr, bint owner=False):
+    cdef Equation _from_ptr(CEquation* ptr, bint owner=False, CKDBEquations* c_database=NULL):
         """
         Factory function to create Equation objects from a given CEquation pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Equation wrapper = Equation.__new__(Equation)
         wrapper.c_equation = ptr
+        wrapper.c_database = c_database
         wrapper.ptr_owner = owner
         return wrapper
 
@@ -360,6 +367,11 @@ cdef class Equation:
         
         cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
 
+    cdef void update_global_database(self):
+        if self.c_database is not NULL:
+            self.c_database.update(<string>(self.endogenous.encode("utf-8")), 
+                                   dereference(self.c_equation))
+
     # Attributes access
 
     @property
@@ -400,6 +412,7 @@ cdef class Equation:
     def lec(self, value: str):
         value = value.strip()
         self.c_equation.set_lec(value.encode())
+        self.update_global_database()
 
     @property
     def method(self) -> str:
@@ -443,6 +456,7 @@ cdef class Equation:
                 value = EqMethod[value]
         value = int(value)
         self.c_equation.set_method(<IodeEquationMethod>(value))
+        self.update_global_database()
 
     @property
     def sample(self) -> Sample:
@@ -502,6 +516,7 @@ cdef class Equation:
         from_period, to_period = value.split(':')
 
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
+        self.update_global_database()
 
     @property
     def comment(self) -> str:
@@ -510,6 +525,7 @@ cdef class Equation:
     @comment.setter
     def comment(self, value: str):
         self.c_equation.set_comment(value.encode())
+        self.update_global_database()
 
     @property
     def instruments(self) -> Union[str, List[str]]:
@@ -531,6 +547,7 @@ cdef class Equation:
         if not isinstance(value, str):
             value = ';'.join(value)
         self.c_equation.set_instruments(value.encode())
+        self.update_global_database()
 
     @property
     def block(self) -> str:
@@ -541,6 +558,7 @@ cdef class Equation:
         if not isinstance(value, str):
             value = ';'.join(value)
         self.c_equation.set_block(value.encode())
+        self.update_global_database()
 
     @property
     def tests(self) -> Dict[str, float]:
@@ -592,6 +610,7 @@ cdef class Equation:
                              f"Expected vector of size {len(EqTest)} but got vector of size {len(tests)}.")
         for i, value in enumerate(tests):
             self.c_equation.set_test(<IodeEquationTest>i, value)
+        self.update_global_database()
 
     def _set_date(self, value: str, format: str = "dd-mm-yyyy"):
         r"""
@@ -622,6 +641,7 @@ cdef class Equation:
             self.c_equation.reset_date()
         else:    
             self.c_equation.set_date(value.encode(), format.encode())
+        self.update_global_database()
 
     def _as_tuple(self):
         r"""
