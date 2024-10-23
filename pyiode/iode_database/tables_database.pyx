@@ -108,7 +108,7 @@ cdef class Tables(_AbstractDatabase):
     def _get_object(self, key: str):
         key = key.strip()
         cdef CTable* c_table = self.database_ptr.get(key.encode())
-        py_table = Table._from_ptr(c_table, <bint>True) 
+        py_table = Table._from_ptr(c_table, <bint>True, key.encode(), self.database_ptr) 
         return py_table
 
     def _set_object(self, key, value):

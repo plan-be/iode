@@ -17,6 +17,7 @@ from pyiode.common cimport TableGraphGrid as CTableGraphGrid
 from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
+from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 
 from iode.util import _check_filepath
 
@@ -247,6 +248,7 @@ cdef class TableCell:
             value = TableCellAlign[value]
         value = int(value)
         self.c_cell.set_align(<CTableCellAlign>value)
+        self.py_parent_table.update_global_database()
 
     @property
     def bold(self) -> bool:
@@ -276,6 +278,7 @@ cdef class TableCell:
     def bold(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_bold(<bint>value)
+            self.py_parent_table.update_global_database()
 
     @property
     def italic(self) -> bool:
@@ -305,6 +308,7 @@ cdef class TableCell:
     def italic(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_italic(<bint>value)
+            self.py_parent_table.update_global_database()
 
     @property
     def underline(self) -> bool:
@@ -334,6 +338,7 @@ cdef class TableCell:
     def underline(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_underline(<bint>value)
+            self.py_parent_table.update_global_database()
 
     @property
     def variables(self) -> List[str]:
@@ -585,6 +590,7 @@ cdef class TableLine:
             value = TableGraphType[value]
         value = int(value)
         self.c_line.set_line_graph(<CTableGraphType>value)
+        self.py_parent_table.update_global_database()
 
     @property
     def axis_left(self) -> bool:
@@ -634,6 +640,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         self.c_line.set_line_axis(<bint>value)
+        self.py_parent_table.update_global_database()
 
     def __len__(self) -> int:
         return self.nb_columns
@@ -752,6 +759,7 @@ cdef class TableLine:
             raise TypeError(f"Expected value of type str or TableCell. Got value of type {type(value).__name__} instead.")
         c_cell = self.c_line.get_cell(row, self.nb_columns)
         c_cell.set_content(value.encode())
+        self.py_parent_table.update_global_database()
         
     def __delitem__(self, index):
         raise RuntimeError("A Table cell cannot be deleted")
@@ -1012,10 +1020,14 @@ cdef class Table:
     <BLANKLINE>
     """
     cdef bint ptr_owner
+    cdef CKDBTables* c_database
+    cdef string c_table_name
     cdef CTable* c_table
 
     def __cinit__(self):
         self.ptr_owner = False
+        self.c_database = NULL
+        self.c_table_name = b''
         self.c_table = NULL
 
     def __init__(self, nb_columns: int = 2, table_title: str = "", lecs_or_vars: Union[str, List[str]] = None, 
@@ -1066,24 +1078,35 @@ cdef class Table:
                 cpp_lecs.push_back(lec.encode())
 
             self.c_table = new CTable(nb_columns, <string>table_title.encode(), cpp_lines_titles, cpp_lecs, <bint>mode, <bint>files, <bint>date)
+        
+        self.c_table_name = b''
+        self.c_database = NULL
         self.ptr_owner = <bint>True
 
     def __dealloc__(self):
         if self.ptr_owner and self.c_table is not NULL:
             del self.c_table
+            self.c_database = NULL
+            self.c_table_name = b''
             self.c_table = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Table _from_ptr(CTable* ptr, bint owner=False):
+    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b'', CKDBTables* c_database_ptr=NULL):
         """
         Factory function to create Table objects from a given CTable pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Table wrapper = Table.__new__(Table)
         wrapper.c_table = ptr
+        wrapper.c_database = c_database_ptr
+        wrapper.c_table_name = b_table_name
         wrapper.ptr_owner = owner
         return wrapper
+
+    def update_global_database(self):
+        if self.c_database is not NULL and self.c_table is not NULL:
+            self.c_database.update(self.c_table_name, dereference(self.c_table))
 
     @property
     def nb_lines(self) -> int:
@@ -1128,6 +1151,7 @@ cdef class Table:
             value = TableLang[upper_str]
         value = int(value)
         self.c_table.set_language(<CTableLang>value)
+        self.update_global_database()
 
     @property
     def ymin(self) -> float:
@@ -1193,6 +1217,7 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridx(<CTableGraphGrid>value)
+        self.update_global_database()
 
     @property
     def gridy(self) -> str:
@@ -1230,6 +1255,7 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridy(<CTableGraphGrid>value)
+        self.update_global_database()
 
     @property
     def graph_axis(self) -> str:
@@ -1268,6 +1294,7 @@ cdef class Table:
             value = TableGraphAxis[value]
         value = int(value)
         self.c_table.set_graph_axis(<CTableGraphAxis>value)
+        self.update_global_database()
 
     @property
     def graph_alignment(self) -> str:
@@ -1301,6 +1328,7 @@ cdef class Table:
             value = TableGraphAlign[value]
         value = int(value)
         self.c_table.set_graph_alignment(<CTableGraphAlign>value)
+        self.update_global_database()
 
     @property
     def box(self) -> bool:
@@ -1545,6 +1573,8 @@ cdef class Table:
                 self.insert(row, str(value))
             else:
                 self.insert(row, line_type)
+        
+        self.update_global_database()
 
     def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]] = None, 
                 nb_decimals: int = 2) -> ComputedTable:
@@ -1950,6 +1980,8 @@ cdef class Table:
         else:
             warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
     
+        self.update_global_database()
+
     def __delitem__(self, index: int):
         """
         Delete the line at the given index
@@ -2019,6 +2051,7 @@ cdef class Table:
         """
         row = self._get_row_from_index(index)
         self.c_table.delete_line(row)
+        self.update_global_database()
 
     def __iadd__(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]):
         """
@@ -2134,6 +2167,8 @@ cdef class Table:
                 self.__iadd__(str(value))
             else:
                 self.__iadd__(line_type)
+
+        self.update_global_database()
         return self
 
     def __copy__(self) -> Table:
