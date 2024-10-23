@@ -220,7 +220,7 @@ class MainWindow(AbstractMainWindow):
         self.ui.treeView_file_explorer.update_project_dir(project_dir, onStartup)
         
         # (re)open tabs
-        self.ui.tabWidget_IODE_objs.setup()
+        self.ui.tabWidget_IODE_objs.setup(self)
 
         # add directory path to list of recently opened projects (= directories)
         self._add_project_path_to_list(project_dir)
