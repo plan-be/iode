@@ -479,6 +479,7 @@ generate_stub_files.py
 # TESTS
 /tests/**/*.ini
 /tests/output
+/tests/sandbox
 /tests/cli/ex.ansi.*
 /tests/cli/ex.oem.*
 /tests/cli/test*.csv
