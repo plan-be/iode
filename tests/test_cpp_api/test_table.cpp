@@ -168,6 +168,35 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(c_hash, cpp_hash);
 }
 
+TEST_F(TablesTest, CopyConstructor)
+{
+    int nb_columns = table->nb_columns();
+    KDBVariables kdb_var(input_test_dir + "fun.var");
+
+    Table copied_table(*table);
+    ASSERT_TRUE(table_equal(*table, copied_table));
+
+    TableLine* line0 = table->get_line(0);
+    TableLine copied_line0(*line0, nb_columns);
+    ASSERT_TRUE(line0->equals(copied_line0, nb_columns));
+    copied_line0.free(nb_columns);    
+
+    TableLine* line5 = table->get_line(5);
+    TableLine copied_line5(*line5, nb_columns);
+    ASSERT_TRUE(line5->equals(copied_line5, nb_columns));
+    copied_line5.free(nb_columns);
+
+    TableCell* cell0 = line5->get_cell(0, nb_columns);
+    TableCell copied_cell0(*cell0);
+    ASSERT_EQ(*cell0, copied_cell0);
+    copied_cell0.free();
+ 
+    TableCell* cell1 = line5->get_cell(1, nb_columns);
+    TableCell copied_cell1(*cell1);
+    ASSERT_EQ(*cell1, copied_cell1);
+    copied_cell1.free();
+}
+
 TEST_F(TablesTest, Dimension)
 {
     EXPECT_EQ(table->nb_lines(), 31);
