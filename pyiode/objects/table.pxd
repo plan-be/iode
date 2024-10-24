@@ -15,6 +15,8 @@ cdef extern from "cpp_api/objects/table.h":
         CTableCell(TableCellType cell_type, string content,
                    TableCellAlign align=TableCellAlign.TABLE_CELL_LEFT,
                    bint bold=False, bint italic=False, bint underline=False) except +
+        # Copy constructor
+        CTableCell(CTableCell& other) except +
 
         # Methods
         void free() except +
@@ -49,6 +51,8 @@ cdef extern from "cpp_api/objects/table.h":
     cdef cppclass CTableLine "TableLine":
         # Constructor
         CTableLine(TableLineType line_type, TableGraphType graph_type, bint axis_left) except +
+        # Copy constructor
+        CTableLine(CTableLine& other, int nb_cells) except +
 
         # Getters and Setters
         TableLineType get_line_type()

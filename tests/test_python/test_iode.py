@@ -59,6 +59,27 @@ def test_table_language():
     with pytest.raises(ValueError, match=r"'language': Invalid value 'Spanish'. Expected one of ENGLISH, DUTCH, FRENCH."):
         table.language = "Spanish"
 
+def test_table_content():
+    iode.tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    # specify list of line titles and list of LEC expressions
+    lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
+    lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
+    tables["TABLE_CELL_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
+                                "lines_titles": lines_titles, "mode": True, "files": True, "date": True}
+    
+    assert str(tables["TABLE_CELL_LECS"][0]) == "New Table"
+    index = tables["TABLE_CELL_LECS"].index("YSSG+COTRES")
+    assert str(tables["TABLE_CELL_LECS"][index]) == "('\"YSSG+COTRES:\"', 'YSSG+COTRES')"
+    assert str(tables["TABLE_CELL_LECS"][index][0]) == '"YSSG+COTRES:"'
+    assert str(tables["TABLE_CELL_LECS"][index][1]) == 'YSSG+COTRES'
+    
+    table = tables["TABLE_CELL_LECS"]
+    assert str(table[0]) == "New Table"
+    index = table.index("YSSG+COTRES")
+    assert str(table[index]) == "('\"YSSG+COTRES:\"', 'YSSG+COTRES')"
+    assert str(table[index][0]) == '"YSSG+COTRES:"'
+    assert str(table[index][1]) == 'YSSG+COTRES'
+
 def test_computed_table_extra_files():
     iode.tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")

@@ -1414,7 +1414,7 @@ cdef class _AbstractDatabase:
         >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
         >>> tables["TABLE_CELL_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
-        ...                         "lines_titles": lines_titles, "mode": True, "files": True, "date": True}  
+        ...                              "lines_titles": lines_titles, "mode": True, "files": True, "date": True}  
         >>> tables["TABLE_CELL_LECS"]         # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
@@ -1518,6 +1518,9 @@ cdef class _AbstractDatabase:
 
         >>> # set graph axis type
         >>> table.graph_axis = TableGraphAxis.SEMILOG
+        >>> # print first line
+        >>> table[0]
+        New Table
         >>> # print last line
         >>> table[-1]
         <DATE>
@@ -1525,6 +1528,8 @@ cdef class _AbstractDatabase:
         >>> del table[-1]
         >>> # get index of line containing YSSG+COTRES
         >>> index = table.index("YSSG+COTRES")
+        >>> index
+        9
         >>> table[index]
         ('"YSSG+COTRES:"', 'YSSG+COTRES')
         >>> # get line type
@@ -1538,7 +1543,7 @@ cdef class _AbstractDatabase:
         True
         >>> # update cells
         >>> # double quotes "    -> STRING cell
-        >>> # no double quotes " -> LEC cell
+        >>> # no double quotes   -> LEC cell
         >>> table[index] = ('"YSSG:"', 'YSSG')
         >>> table[index]
         ('"YSSG:"', 'YSSG')

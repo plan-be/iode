@@ -155,6 +155,10 @@ cdef class TableCell:
     """
     cdef CTableCell* c_cell
     cdef int nb_columns
+    # Need a reference to the Python instance of the parent table to prevent Table.__dealloc__() 
+    # to be called when trying to update a line or a cell using the syntax 
+    # tables[table_name][line_number]([cell_number]) = ...
+    cdef object py_parent_table
 
     def __init__(self):
         # Prevent accidental instantiation from normal Python code
@@ -164,13 +168,14 @@ cdef class TableCell:
     def __cinit__(self):
         self.c_cell = NULL
         self.nb_columns = 0
+        self.py_parent_table = None
 
     def __dealloc__(self):
         pass
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef TableCell from_ptr(CTableCell* c_cell_ptr, int nb_columns):
+    cdef TableCell from_ptr(CTableCell* c_cell_ptr, int nb_columns, py_parent_table):
         """
         Factory function to create TableCell objects from given CTableCell pointer.
         """
@@ -178,6 +183,7 @@ cdef class TableCell:
         cdef TableCell wrapper = TableCell.__new__(TableCell)
         wrapper.c_cell = c_cell_ptr
         wrapper.nb_columns = nb_columns
+        wrapper.py_parent_table = py_parent_table
         return wrapper
 
     @property
@@ -446,6 +452,10 @@ cdef class TableLine:
     """
     cdef CTableLine* c_line
     cdef int nb_columns
+    # Need a reference to the Python instance of the parent table to prevent Table.__dealloc__() 
+    # to be called when trying to update a line or a cell using the syntax 
+    # tables[table_name][line_number]([cell_number]) = ...
+    cdef object py_parent_table
 
     def __init__(self):
         # Prevent accidental instantiation from normal Python code
@@ -455,13 +465,14 @@ cdef class TableLine:
     def __cinit__(self):
         self.c_line = NULL
         self.nb_columns = 0
+        self.py_parent_table = None
 
     def __dealloc__(self):
         pass
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef TableLine from_ptr(CTableLine* c_line_ptr, int nb_columns):
+    cdef TableLine from_ptr(CTableLine* c_line_ptr, int nb_columns, py_parent_table):
         """
         Factory function to create TableLine objects from given CTableLine pointer.
         """
@@ -469,6 +480,7 @@ cdef class TableLine:
         cdef TableLine wrapper = TableLine.__new__(TableLine)
         wrapper.c_line = c_line_ptr
         wrapper.nb_columns = nb_columns
+        wrapper.py_parent_table = py_parent_table
         return wrapper
 
     @property
@@ -683,7 +695,7 @@ cdef class TableLine:
 
         row = self._get_row_from_index(index)
         c_cell = self.c_line.get_cell(row, self.nb_columns)
-        return TableCell.from_ptr(c_cell, self.nb_columns)
+        return TableCell.from_ptr(c_cell, self.nb_columns, self.py_parent_table)
 
     def __setitem__(self, index, value):
         r"""
@@ -1817,7 +1829,7 @@ cdef class Table:
 
         row = self._get_row_from_index(index)
         c_line = self.c_table.get_line(row)
-        return TableLine.from_ptr(c_line, self.c_table.nb_columns())
+        return TableLine.from_ptr(c_line, self.c_table.nb_columns(), self)
     
     def __setitem__(self, index: int, value: Union[str, List[str], Tuple[str], TableLine]):
         """
