@@ -29,6 +29,12 @@ TableCell::TableCell(const TableCellType cell_type, const std::string& content, 
 	set_underline(underline);
 }
 
+TableCell::TableCell(const TableCell& other)
+{
+	this->tc_val = NULL;
+	copy_cell(this, &other);
+}
+
 TableCell::~TableCell() {}
 
 void TableCell::free()
@@ -178,18 +184,18 @@ bool TableCell::operator==(const TableCell& other) const
 
 // ================ LINE ================
 
-void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src)
+void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src)
 {
 	unsigned char* cell_src_content;
-	TCELL* cells_dest = (TCELL*)c_cell_dest->tl_val;
-	TCELL* cells_src = (TCELL*)c_cell_src->tl_val;
+	TCELL* cells_dest = (TCELL*)c_line_dest->tl_val;
+	TCELL* cells_src = (TCELL*)c_line_src->tl_val;
 
-	c_cell_dest->tl_type = c_cell_src->tl_type;
-	c_cell_dest->tl_axis = c_cell_src->tl_axis;
-	c_cell_dest->tl_graph = c_cell_src->tl_graph;
-	c_cell_dest->tl_pbyte = c_cell_src->tl_pbyte;
+	c_line_dest->tl_type = c_line_src->tl_type;
+	c_line_dest->tl_axis = c_line_src->tl_axis;
+	c_line_dest->tl_graph = c_line_src->tl_graph;
+	c_line_dest->tl_pbyte = c_line_src->tl_pbyte;
 
-	switch (c_cell_src->tl_type)
+	switch (c_line_src->tl_type)
 	{
 	case TABLE_LINE_TITLE:
 		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
@@ -211,6 +217,29 @@ TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_t
 	set_line_graph(graph_type);
 	this->tl_pbyte = 0;
 	set_line_axis(axis_left);
+}
+
+TableLine::TableLine(const TableLine& other, const int nb_cells)
+{
+	TCELL* cells;
+
+	this->tl_val = NULL;
+	switch (other.tl_type)
+	{
+	case TABLE_LINE_TITLE:
+		this->tl_val = SW_nalloc(sizeof(TCELL));
+		break;
+	case TABLE_LINE_CELL:
+		this->tl_val = SW_nalloc(nb_cells * sizeof(TCELL));
+		cells = (TCELL*) this->tl_val;
+		for (int col = 0; col < nb_cells; col++)
+			cells[col].tc_val = NULL;
+		break;
+	default:
+		break;
+	}
+	
+	copy_line(nb_cells, this, &other);
 }
 
 TableLine::~TableLine() {}
