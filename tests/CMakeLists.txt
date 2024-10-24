@@ -8,7 +8,3 @@ if(NOT SKBUILD)
 endif()
 
 add_subdirectory(test_python)
-
-if(NOT SKBUILD)
-    add_subdirectory(sandbox)
-endif()
