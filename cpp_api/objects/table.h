@@ -45,6 +45,8 @@ struct TableCell: public TCELL
 	TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align = TableCellAlign::TABLE_CELL_LEFT, 
 		const bool bold = false, const bool italic = false, const bool underline = false);
 
+	TableCell(const TableCell& other);
+
 	// WARNING: a table cell must be deleted (freed) from a Table instance
 	~TableCell();
 
@@ -93,6 +95,8 @@ struct TableLine: public TLINE
 {
 	TableLine(const TableLineType line_type, const TableGraphType graph_type = TableGraphType::TABLE_GRAPH_LINE, 
 		const bool axis_left = true);
+
+	TableLine(const TableLine& other, const int nb_cells);
 
 	// WARNING: a table line must be deleted (freed) from a Table instance
 	~TableLine();
