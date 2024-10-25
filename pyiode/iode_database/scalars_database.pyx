@@ -162,6 +162,179 @@ cdef class Scalars(_AbstractDatabase):
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
             self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
 
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[Scalar, Scalars]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import scalars
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+
+        >>> # a) get one scalar
+        >>> acaf1 = scalars["acaf1"]
+        >>> acaf1
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> acaf1.value
+        0.01576840691268444
+        >>> acaf1.relax
+        1.0
+        >>> acaf1.std
+        0.0013687137980014086
+
+        >>> # b) get a subset of the Scalars database using a pattern
+        >>> scalars_subset = scalars["a*"]
+        >>> scalars_subset.names
+        ['acaf1', 'acaf2', 'acaf3', 'acaf4']
+
+        >>> # c) get a subset of the Scalars database using a list of names
+        >>> scalars_subset = scalars[["acaf1", "acaf4", "dpuh_1", "dpuh_2"]]
+        >>> scalars_subset.names
+        ['acaf1', 'acaf4', 'dpuh_1', 'dpuh_2']
+        """
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: Union[str, List[str]], value: Union[float, Tuple[float, float], Scalar, Dict[str, Any], 
+                                                        List[Union[float, Tuple[float, float], Scalar, Dict[str, Any]]]]):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: float or tuple(float, float) Scalar or dict(str, ...) or list of any of those
+            If float, then it is interpreted as the value of the scalar.
+            If tuple of two float, then it is interpreted as the value and relax of the scalar.
+            If dictionary, then it is interpreted as the values of the attributes value and relax of the scalar to update or add.
+            The standard deviation is computed during the estimation process and cannot be modified manually.
+            If Scalar, then it is used to update an existing scalar or to create a new scalar if it does not exist yet.
+
+        See Also
+        --------
+        iode.Scalar
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import scalars
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        
+        >>> # a) -------- add one scalar -------- 
+        >>> # 1. default relax to 1.0
+        >>> scalars["a0"] = 0.1
+        >>> scalars["a0"]
+        Scalar(0.1, 1, na)
+        >>> # 2. value + relax
+        >>> scalars["a1"] = 0.1, 0.9
+        >>> scalars["a1"]
+        Scalar(0.1, 0.9, na)
+
+        >>> # b) -------- update one scalar --------
+        >>> scalars["acaf1"]
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> # only update the value
+        >>> scalars["acaf1"] = 0.8
+        >>> scalars["acaf1"]
+        Scalar(0.8, 1, 0.00136871)
+        >>> # update value and relax (tuple)
+        >>> scalars["acaf2"] = 0.8, 0.9
+        >>> scalars["acaf2"]
+        Scalar(0.8, 0.9, na)
+        >>> # update value and relax (list)
+        >>> scalars["acaf2"] = (0.7, 0.8)
+        >>> scalars["acaf2"]
+        Scalar(0.7, 0.8, na)
+        >>> # update value and relax (dictionary)
+        >>> scalars["acaf3"] = {"relax": 0.9, "value": 0.8}
+        >>> scalars["acaf3"]
+        Scalar(0.8, 0.9, 0.87301)
+        >>> # update value and/or relax (Scalar object)
+        >>> # NOTE: the standard deviation (std) cannot be changed manually
+        >>> scalars["acaf4"]
+        Scalar(-0.00850518, 1, 0.0020833)
+        >>> scalars["acaf4"].value = 0.8
+        >>> scalars["acaf4"].relax = 0.9
+        >>> scalars["acaf4"]
+        Scalar(0.8, 0.9, 0.0020833)
+
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> scalars_subset = scalars["a*"]
+        >>> scalars_subset.names
+        ['a0', 'a1', 'acaf1', 'acaf2', 'acaf3', 'acaf4']
+        >>> # 2) add a scalar to the subset 
+        >>> scalars_subset["acaf0"] = 1.0, 1.0
+        >>> scalars_subset["acaf0"]
+        Scalar(1, 1, na)
+        >>> # --> new scalar also appears in the global workspace
+        >>> "acaf0" in scalars
+        True
+        >>> scalars["acaf0"]
+        Scalar(1, 1, na)
+        >>> # 3) update a scalar in the subset
+        >>> scalars_subset["acaf0"] = 0.1
+        >>> scalars_subset["acaf0"]
+        Scalar(0.1, 1, na)
+        >>> # --> scalar is also updated in the global workspace
+        >>> scalars["acaf0"]
+        Scalar(0.1, 1, na)
+        """
+        super().__setitem__(key, value)
+
     def from_series(self, s: Series):
         r"""
         Copy the pandas Series `s` into the IODE Scalars database.

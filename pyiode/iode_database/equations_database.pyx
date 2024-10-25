@@ -176,6 +176,250 @@ cdef class Equations(_AbstractDatabase):
             c_equation = (<Equation>equation).c_equation
             self.database_ptr.add(key.encode(), dereference(c_equation))
 
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Equations]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+
+        >>> # a) get one equation
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+
+        >>> # b) get a subset of the Equations database using a pattern
+        >>> equations_subset = equations["A*"]
+        >>> equations_subset.names
+        ['ACAF', 'ACAG', 'AOUC']
+
+        >>> # c) get a subset of the Equations database using a list of names
+        >>> equations_subset = equations[["ACAF", "AOUC", "BQY", "BVY"]]
+        >>> equations_subset.names
+        ['ACAF', 'AOUC', 'BQY', 'BVY']
+        """
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: Union[str, List[str]], value: Union[str, Equation, Dict[str, Any], List[Union[str, Equation, Dict[str, Any]]]]):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: str or Equation or dict(str, ...) or list of any of those
+            If str, then it is interpreted as the LEC of the equation.
+            If dictionary, then it is interpreted as the values of the attributes of the equation to update or add. 
+            The key 'endogenous' is added automatically and does not need to be specified.
+            If Equation, then it is used to update an existing equation or to create a new equation if it does not exist yet.
+        
+        See Also
+        --------
+        iode.Equation
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import equations, EqMethod
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        
+        >>> # a) add one equation
+        >>> equations["BDY"] = "BDY := YN - YK"
+        >>> equations["BDY"]                    # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'BDY',
+                 lec = 'BDY := YN - YK',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        
+        >>> # b) update one equation        
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> # update only the LEC
+        >>> equations["ACAF"] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> # update block and sample of a block of equations to estimation (dictionary)
+        >>> estim_sample = "2000Y1:2010Y1"
+        >>> block = "ACAF; ACAG; AOUC"
+        >>> for eq_name in block.split(';'):
+        ...     equations[eq_name] = {"sample": estim_sample, "block": block}
+        >>> (equations["ACAF"].sample, equations["ACAG"].sample, equations["AOUC"].sample)
+        ('2000Y1:2010Y1', '2000Y1:2010Y1', '2000Y1:2010Y1')
+        >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
+        ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
+        >>> # update lec, method, sample and block
+        >>> equations["ACAF"].lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> equations["ACAF"].method = EqMethod.MAX_LIKELIHOOD
+        >>> # new equation sample is from 1990Y1 to the last year of Variables
+        >>> equations["ACAF"].sample = "1990Y1:"
+        >>> equations["ACAF"].block = "ACAF"
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'MAX_LIKELIHOOD',
+                 from_period = '1990Y1',
+                 to_period = '2015Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> equations_subset = equations["A*"]
+        >>> equations_subset.names
+        ['ACAF', 'ACAG', 'AOUC']
+        >>> # 2) add a equation to the subset 
+        >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]"
+        >>> equations_subset["AOUC_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        >>> # --> new equation also appears in the global workspace
+        >>> "AOUC_" in equations
+        True
+        >>> equations["AOUC_"]                      # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        >>> # 3) update a equation in the subset
+        >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]"
+        >>> equations_subset["AOUC_"]           # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        >>> # --> equation is also updated in the global workspace
+        >>> equations["AOUC_"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')  
+        """
+        super().__setitem__(key, value)
+
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None):
         r"""
         Estimate an equation or a block of equations.
