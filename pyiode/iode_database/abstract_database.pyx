@@ -1373,13 +1373,11 @@ cdef class _AbstractDatabase:
         >>> scalars["acaf3"]
         Scalar(0.8, 0.9, 0.87301)
         >>> # update value and/or relax (Scalar object)
-        >>> acaf4 = scalars["acaf4"]
-        >>> acaf4
+        >>> # NOTE: the standard deviation (std) cannot be changed manually
+        >>> scalars["acaf4"]
         Scalar(-0.00850518, 1, 0.0020833)
-        >>> acaf4.value = 0.8
-        >>> acaf4.relax = 0.9
-        >>> # WARNING: the standard deviation (std) cannot be changed manually
-        >>> scalars["acaf4"] = acaf4
+        >>> scalars["acaf4"].value = 0.8
+        >>> scalars["acaf4"].relax = 0.9
         >>> scalars["acaf4"]
         Scalar(0.8, 0.9, 0.0020833)
 
