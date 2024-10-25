@@ -11,50 +11,6 @@ API Reference
 WORKSPACE
 *********
 
-.. note::
-   Below, **Database** represents either:
-
-   * **Comments**
-   * **Equations**
-   * **Identities**
-   * **Lists**
-   * **Scalars**
-   * **Tables**
-   * **Variables**
-
-.. autosummary::
-   :toctree: _generated
-   :template: database_methods.rst
-
-   Database.names
-   Database.iode_type
-   Database.filename
-   Database.description
-
-   Database.load
-   Database.save
-   Database.clear
-
-   Database.is_subset
-   Database.is_copy_subset
-   Database.copy
-
-   Database.get_names
-   Database.rename
-
-   Database.__len__
-   Database.__contains__
-   Database.__iter__
-   Database.__getitem__
-   Database.__setitem__
-   Database.__delitem__
-
-   Database.search
-
-   Database.copy_from
-   Database.merge
-   Database.merge_from
-
 ========
 Comments
 ========
@@ -62,9 +18,42 @@ Comments
 .. autosummary::
    :toctree: _generated
 
-   Comments 
-   Comments.series
+   Comments
 
+   Comments.names
+   Comments.iode_type
+   Comments.filename
+   Comments.description
+
+   Comments.load
+   Comments.save
+   Comments.clear
+   Comments.copy
+
+   Comments.get_names
+   Comments.rename
+   Comments.search
+
+   Comments.__len__
+   Comments.__contains__
+   Comments.__iter__
+   Comments.__getitem__
+   Comments.__setitem__
+   Comments.__delitem__
+
+   Comments.copy_from
+   Comments.merge
+   Comments.merge_from
+
+   Comments.is_subset
+   Comments.is_copy_subset
+
+Properties and methods specific to Comments
+
+.. autosummary::
+   :toctree: _generated
+
+   Comments.series
    Comments.from_series
    Comments.to_series
 
@@ -76,11 +65,45 @@ Equations
    :toctree: _generated
 
    Equations
-   Equations.df
 
-   Equations.estimate 
+   Equations.names
+   Equations.iode_type
+   Equations.filename
+   Equations.description
+
+   Equations.load
+   Equations.save
+   Equations.clear
+   Equations.copy
+
+   Equations.search
+   Equations.get_names
+   Equations.rename
+
+   Equations.__len__
+   Equations.__contains__
+   Equations.__iter__
+   Equations.__getitem__
+   Equations.__setitem__
+   Equations.__delitem__
+
+   Equations.copy_from
+   Equations.merge
+   Equations.merge_from 
+
+   Equations.is_subset
+   Equations.is_copy_subset
+
+Properties and methods specific to Equations
+
+.. autosummary::
+   :toctree: _generated
+
+   Equations.df
    Equations.from_frame
    Equations.to_frame
+
+   Equations.estimate
 
 ==========
 Identities
@@ -90,11 +113,45 @@ Identities
    :toctree: _generated
 
    Identities
-   Identities.series
 
-   Identities.execute
+   Identities.names
+   Identities.iode_type
+   Identities.filename
+   Identities.description
+
+   Identities.load
+   Identities.save
+   Identities.clear
+   Identities.copy
+
+   Identities.search
+   Identities.get_names
+   Identities.rename
+
+   Identities.__len__
+   Identities.__contains__
+   Identities.__iter__
+   Identities.__getitem__
+   Identities.__setitem__
+   Identities.__delitem__
+
+   Identities.copy_from
+   Identities.merge
+   Identities.merge_from
+
+   Identities.is_subset
+   Identities.is_copy_subset
+
+Properties and methods specific to Identities
+
+.. autosummary::
+   :toctree: _generated
+
+   Identities.series
    Identities.from_series
    Identities.to_series
+
+   Identities.execute
 
 =====
 Lists
@@ -104,8 +161,41 @@ Lists
    :toctree: _generated
 
    Lists
-   Lists.series
 
+   Lists.names
+   Lists.iode_type
+   Lists.filename
+   Lists.description
+
+   Lists.load
+   Lists.save
+   Lists.clear
+   Lists.copy
+
+   Lists.search
+   Lists.get_names
+   Lists.rename
+
+   Lists.__len__
+   Lists.__contains__
+   Lists.__iter__
+   Lists.__getitem__
+   Lists.__setitem__
+   Lists.__delitem__
+
+   Lists.copy_from
+   Lists.merge
+   Lists.merge_from
+
+   Lists.is_subset
+   Lists.is_copy_subset
+
+Properties and methods specific to Lists
+
+.. autosummary::
+   :toctree: _generated
+
+   Lists.series
    Lists.from_series
    Lists.to_series
 
@@ -117,8 +207,41 @@ Scalars
    :toctree: _generated
 
    Scalars
-   Scalars.df
 
+   Scalars.names
+   Scalars.iode_type
+   Scalars.filename
+   Scalars.description
+
+   Scalars.load
+   Scalars.save
+   Scalars.clear
+   Scalars.copy
+
+   Scalars.search
+   Scalars.get_names
+   Scalars.rename
+
+   Scalars.__len__
+   Scalars.__contains__
+   Scalars.__iter__
+   Scalars.__getitem__
+   Scalars.__setitem__
+   Scalars.__delitem__
+
+   Scalars.copy_from
+   Scalars.merge
+   Scalars.merge_from
+
+   Scalars.is_subset
+   Scalars.is_copy_subset
+
+Properties and methods specific to Scalars
+
+.. autosummary::
+   :toctree: _generated
+
+   Scalars.df
    Scalars.from_series
    Scalars.from_frame
    Scalars.to_frame
@@ -131,6 +254,40 @@ Tables
    :toctree: _generated
 
    Tables
+
+   Tables.names
+   Tables.iode_type
+   Tables.filename
+   Tables.description
+
+   Tables.load
+   Tables.save
+   Tables.clear
+   Tables.copy
+
+   Tables.search
+   Tables.get_names
+   Tables.rename
+
+   Tables.__len__
+   Tables.__contains__
+   Tables.__iter__
+   Tables.__getitem__
+   Tables.__setitem__
+   Tables.__delitem__
+
+   Tables.copy_from
+   Tables.merge
+   Tables.merge_from
+
+   Tables.is_subset
+   Tables.is_copy_subset
+
+Properties and methods specific to Tables
+
+.. autosummary::
+   :toctree: _generated
+
    Tables.print_to_file
 
 =========
@@ -142,19 +299,53 @@ Variables
 
    Variables
 
+   Variables.names
+   Variables.iode_type
+   Variables.filename
+   Variables.description
+
+   Variables.load
+   Variables.save
+   Variables.clear
+   Variables.copy
+
+   Variables.search
+   Variables.get_names
+   Variables.rename
+
+   Variables.__len__
+   Variables.__contains__
+   Variables.__iter__
+   Variables.__getitem__
+   Variables.__setitem__
+   Variables.__delitem__
+
+   Variables.copy_from
+   Variables.merge
+   Variables.merge_from
+
+   Variables.is_subset
+   Variables.is_copy_subset
+
+Properties and methods specific to Variables
+
+.. autosummary::
+   :toctree: _generated
+
    Variables.mode
    Variables.sample
    Variables.nb_periods
    Variables.periods
    Variables.periods_as_float
-   Variables.df
-   
+
    Variables.periods_subset
    Variables.low_to_high
    Variables.high_to_low
    Variables.extrapolate
    Variables.seasonal_adjustment
    Variables.trend_correction
+
+   Variables.df
    Variables.from_frame
    Variables.to_frame
    Variables.from_array
