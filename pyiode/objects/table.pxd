@@ -6,6 +6,44 @@ from libcpp.vector cimport vector
 from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
+cdef extern from "api/iode.h":
+    # Define the TCELL structure
+    cdef struct TCELL:
+        char* tc_val
+        char  tc_type
+        char  tc_attr
+        char  tc_pad[2]
+
+    # Define the TLINE structure
+    cdef struct TLINE:
+        char*         tl_val
+        char          tl_type
+        char          tl_graph
+        unsigned char tl_axis
+        unsigned char tl_pbyte
+        char          tl_pad[1]
+
+    # Define the TBL structure
+    cdef struct TBL:
+        short  t_lang
+        short  t_free
+        short  t_nc
+        short  t_nl
+        TLINE  t_div
+        TLINE* t_line
+        float  t_zmin
+        float  t_zmax
+        float  t_ymin
+        float  t_ymax
+        char   t_attr
+        char   t_box
+        char   t_shadow
+        char   t_gridx
+        char   t_gridy
+        char   t_axis
+        char   t_align
+        char   t_pad[13]
+
 
 cdef extern from "cpp_api/objects/table.h":
 
