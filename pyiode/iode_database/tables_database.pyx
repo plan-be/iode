@@ -141,6 +141,428 @@ cdef class Tables(_AbstractDatabase):
             c_table = (<Table>table).c_table
             self.database_ptr.add(<string>(key.encode()), dereference(c_table))
 
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Tables]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+
+        >>> # a) get one table
+        >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                                          1 |                                    PC_*40.34
+        TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
+        ----- | ---------------------------------------------------------------------------------------------------------
+        CELL  |                                                            |                     "#S"
+        CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
+        CELL  | "   Masse salariale totale"                                |                                         WBU_
+        CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
+        CELL  | "   Surplus brut d'exploitation"                           |                                        GOSH_
+        CELL  | "   Revenu net de la propriété"                            |                                          IDH
+        CELL  | "Cotisations sociales et impôts"                           |                                  SSF+SSH+DTH
+        CELL  | "   Cotisations patronales"                                |                                          SSF
+        CELL  | "   Cotisations personnelles"                              |                                          SSH
+        CELL  | "IPP"                                                      |                                          DTH
+        CELL  | "Prestations sociales "                                    |                                     SBH+OCUH
+        CELL  | "   Sécurité sociale"                                      |                                          SBH
+        CELL  | "   Diverses prestations"                                  |                                         OCUH
+        CELL  | "Total"                                                    | (WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)
+        ----- | ---------------------------------------------------------------------------------------------------------
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # b) get a subset of the Tables database using a pattern
+        >>> tables_subset = tables["C8_*"]
+        >>> tables_subset.names
+        ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
+
+        >>> # c) get a subset of the Tables database using a list of names
+        >>> tables_subset = tables[["C8_1", "C8_2", "C8_4", "C8_5", "C8_7"]]
+        >>> tables_subset.names
+        ['C8_1', 'C8_2', 'C8_4', 'C8_5', 'C8_7']
+        """
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: Union[str, List[str]], value: Union[int, Tuple[...], Dict[str, Any], Table, 
+                                                        List[Union[int, Tuple[...], Dict[str, Any], Table]]]):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: int, tuple(...), dict(str, ...), Table or list of any of those
+            If int, then it is interpreted as the number of columns to create a new empty table.
+            If tuple or dictionary, it is forwarded to the Table constructor to create a new table.
+            If Table, then it is used to update an existing table or to create a new table if it does not exist yet.
+
+        See Also
+        --------
+        iode.Table
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables, Table, comments, TableGraphAxis
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        
+        >>> # a) -------- new table --------
+        >>> # 1. specify list of line titles and list of LEC expressions
+        >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
+        >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
+        >>> tables["TABLE_CELL_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
+        ...                              "lines_titles": lines_titles, "mode": True, "files": True, "date": True} 
+        >>> tables["TABLE_CELL_LECS"]         # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1              |
+        TITLE |         "New Table"
+        ----- | ----------------------------
+        CELL  | ""             |     "#S"
+        ----- | ----------------------------
+        CELL  | "GOSG:"        |        GOSG
+        CELL  | "YDTG:"        |        YDTG
+        CELL  | "DTH:"         |         DTH
+        CELL  | "DTF:"         |         DTF
+        CELL  | "IT:"          |          IT
+        CELL  | "YSSG+COTRES:" | YSSG+COTRES
+        CELL  | "RIDG:"        |        RIDG
+        CELL  | "OCUG:"        |        OCUG
+        ----- | ----------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 16
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # 2. specify list of variables
+        >>> vars_list = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", "$ENVI"]
+        >>> tables["TABLE_VARS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": vars_list, 
+        ...                         "mode": True, "files": True, "date": True}
+        >>> tables["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                                    |
+        TITLE |                                  "New Table"
+        ----- | ------------------------------------------------------------------------------
+        CELL  | ""                                                                   |   "#S"
+        ----- | ------------------------------------------------------------------------------
+        CELL  | "Bruto exploitatie-overschot: overheid (= afschrijvingen)."          |    GOSG
+        CELL  | "Overheid: geïnde indirecte belastingen."                            |    YDTG
+        CELL  | "Totale overheid: directe belasting van de gezinnen."                |     DTH
+        CELL  | "Totale overheid: directe vennootschapsbelasting."                   |     DTF
+        CELL  | "Totale indirecte belastingen."                                      |      IT
+        CELL  | "Globale overheid: ontvangen sociale zekerheidsbijdragen."           |    YSSG
+        CELL  | "Cotisation de responsabilisation."                                  |  COTRES
+        CELL  | "Overheid: inkomen uit vermogen."                                    |    RIDG
+        CELL  | "Globale overheid: saldo van de ontvangen lopendeoverdrachten."      |    OCUG
+        CELL  | "Wisselkoers van de USD t.o.v. de BEF (jaargemiddelde)."             |      EX
+        CELL  | "Index wereldprijs - invoer van niet-energieprodukten, inUSD."       |   PWMAB
+        CELL  | "Index wereldprijs - invoer van diensten, in USD."                   |    PWMS
+        CELL  | "Index wereldprijs - uitvoer van niet-energieprodukten, inUSD."      |   PWXAB
+        CELL  | "Index wereldprijs - uitvoer van diensten, in USD."                  |    PWXS
+        CELL  | "Indicator van het volume van de wereldvraag naar goederen,1985=1."  |   QWXAB
+        CELL  | "Indicator van het volume van de wereldvraag naar diensten,1985=1."  |    QWXS
+        CELL  | "Brent olieprijs (USD per barrel)."                                  |    POIL
+        CELL  | "Totale beroepsbevolking (jaargemiddelde)."                          |    NATY
+        CELL  | "TFPFHP_"                                                            | TFPFHP_
+        ----- | ------------------------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 27
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # b) -------- update table --------
+        >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1              |
+        TITLE |         "New Table"
+        ----- | ----------------------------
+        CELL  | ""             |     "#S"
+        ----- | ----------------------------
+        CELL  | "GOSG:"        |        GOSG
+        CELL  | "YDTG:"        |        YDTG
+        CELL  | "DTH:"         |         DTH
+        CELL  | "DTF:"         |         DTF
+        CELL  | "IT:"          |          IT
+        CELL  | "YSSG+COTRES:" | YSSG+COTRES
+        CELL  | "RIDG:"        |        RIDG
+        CELL  | "OCUG:"        |        OCUG
+        ----- | ----------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 16
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # set graph axis type
+        >>> tables["TABLE_CELL_LECS"].graph_axis = TableGraphAxis.SEMILOG
+        >>> # print first line
+        >>> tables["TABLE_CELL_LECS"][0]
+        New Table
+        >>> # print last line
+        >>> tables["TABLE_CELL_LECS"][-1]
+        <DATE>
+        >>> # delete last line
+        >>> del tables["TABLE_CELL_LECS"][-1]
+        >>> # get index of line containing YSSG+COTRES
+        >>> index = tables["TABLE_CELL_LECS"].index("YSSG+COTRES")
+        >>> index
+        9
+        >>> tables["TABLE_CELL_LECS"][index]
+        ('"YSSG+COTRES:"', 'YSSG+COTRES')
+        >>> # get line type
+        >>> tables["TABLE_CELL_LECS"][index].line_type
+        'CELL'
+        >>> # get line graph type
+        >>> tables["TABLE_CELL_LECS"][index].graph_type
+        'LINE'
+        >>> # know if axis is left
+        >>> tables["TABLE_CELL_LECS"][index].axis_left
+        True
+        >>> # update cells
+        >>> # double quotes "    -> STRING cell
+        >>> # no double quotes   -> LEC cell
+        >>> tables["TABLE_CELL_LECS"][index] = ('"YSSG:"', 'YSSG')
+        >>> tables["TABLE_CELL_LECS"][index]
+        ('"YSSG:"', 'YSSG')
+        >>> # insert a new title line surrounded by two separator lines
+        >>> tables["TABLE_CELL_LECS"].insert(index + 1, '-')
+        >>> tables["TABLE_CELL_LECS"].insert(index + 2, "New Title")
+        >>> tables["TABLE_CELL_LECS"].insert(index + 3, '-')
+        >>> # append a new sepatator line
+        >>> tables["TABLE_CELL_LECS"] += '-'
+
+        >>> tables["TABLE_CELL_LECS"]                # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1       |
+        TITLE |  "New Table"
+        ----- | --------------
+        CELL  | ""      | "#S"
+        ----- | --------------
+        CELL  | "GOSG:" | GOSG
+        CELL  | "YDTG:" | YDTG
+        CELL  | "DTH:"  |  DTH
+        CELL  | "DTF:"  |  DTF
+        CELL  | "IT:"   |   IT
+        CELL  | "YSSG:" | YSSG
+        ----- | --------------
+        TITLE |  "New Title"
+        ----- | --------------
+        CELL  | "RIDG:" | RIDG
+        CELL  | "OCUG:" | OCUG
+        ----- | --------------
+        MODE  |
+        FILES |
+        ----- | --------------
+        <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'SEMILOG'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> tables_subset = tables["C8_*"]
+        >>> tables_subset.names
+        ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
+        >>> # 2) add a table to the subset 
+        >>> vars_list = ["XNATY", "XPOIL", "XPWMAB", "XPWXAB"]
+        >>> tables_subset["X_GRT"] = {"nb_columns": 2, "table_title": "Croissance", "lecs_or_vars": vars_list, 
+        ...                           "mode": True, "files": True, "date": True}  
+        >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 12
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # --> new table also appears in the global workspace
+        >>> "X_GRT" in tables
+        True
+        >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 12
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # 3) update a table in the subset
+        >>> table_x_grt = tables_subset["X_GRT"]
+        >>> index = table_x_grt.index("XPWXAB")
+        >>> table_x_grt.insert(index + 1, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
+        >>> # warning: do not forget to actually update the IODE Table subset
+        >>> tables_subset["X_GRT"] = table_x_grt
+        >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        CELL  | "Croissance des marchés pertinents"                     | XQWXSS
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 13
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # --> table is also updated in the global workspace
+        >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        CELL  | "Croissance des marchés pertinents"                     | XQWXSS
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 13
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        """
+        super().__setitem__(key, value)
+
     def _str_table(self, names: List[str]) -> str:
         titles = [join_lines(self.database_ptr.get_title(name.encode()).decode()) for name in names]
         columns = {"name": names, "table titles": titles}

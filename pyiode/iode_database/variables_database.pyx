@@ -22,6 +22,10 @@ from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_varia
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 
+KeyName = Union[str, List[str]]
+KeyPeriod = Union[None, str, List[str], slice]
+KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
+
 
 cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):
     '''
@@ -223,7 +227,7 @@ cdef class Variables(_AbstractDatabase):
         subset_db.mode_ = IodeVarMode.VAR_MODE_LEVEL
         return subset_db
 
-    def _unfold_key(self, key) -> Tuple[Union[str, List[str]], Optional[str, Tuple[int, int], List[str]]]:
+    def _unfold_key(self, key: KeyVariable) -> Tuple[KeyName, Optional[str, Tuple[int, int], List[str]]]:
         cdef CSample* c_sample
 
         # no selection on periods
@@ -297,7 +301,84 @@ cdef class Variables(_AbstractDatabase):
                             f"Got value of type {type(periods_).__name__} instead.")
 
     # overriden for Variables
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Union[float, List[float], Variables]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample
+        '1960Y1:2015Y1'
+
+        >>> # -------- a) get one Variable --------
+        >>> # get the variable values for the whole sample
+        >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        >>> # get the variable value for a specific period
+        >>> variables["ACAF", "1990Y1"]
+        23.771
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> # same as above but with the colon ':' inside the periods range string
+        >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+
+        >>> # b) -------- get a subset of the Variables database using a pattern --------
+        >>> variables_subset = variables["A*"]
+        >>> variables_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # get the variable values for a specific period
+        >>> variables["A*", "1990Y1"]
+        [23.771, -28.1721855713507, 1.0, 0.9373591502749314, 1.0]
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> variables["A*", "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
+        [[23.771, 26.240999, 30.159, ..., 1.2031082, 1.3429699656745855, 1.3386028553645442]]
+
+        >>> # c) -------- get a subset of the Variables database using a list of names --------
+        >>> variables_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
+        >>> variables_subset.names
+        ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
+        >>> # get the variable values for a specific period
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]
+        [23.771, -28.1721855713507, 1.0, -34.099998, -34.099997]
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
+        [[23.771, 26.240999, 30.159, ..., 140.73978, 144.8587818455608, 150.05335230584103]]
+        """
         names, periods_ = self._unfold_key(key)
         # names represents a single Variable
         if len(names) == 1:
@@ -407,6 +488,138 @@ cdef class Variables(_AbstractDatabase):
 
     # overriden for Variables
     def __setitem__(self, key, value):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: int, float, tuple(int, float), list(int, float), str or list of any of those
+            If int, the value is first converted to a float and then used for all periods.
+            If float, the value is used for all periods.
+            If tuple or list, the number of elements must be equal to the number of periods. 
+            Each element is then used for the corresponding period.
+            If str, the value is interpreted as a LEC expression and is evaluated for each period.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        
+        >>> # a) -------- add one variable --------
+        >>> # 1) same value for all periods
+        >>> variables["A0"] = NA
+        >>> variables["A0"]                     # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 2) vector (list) containing a specific value for each period
+        >>> variables["A1"] = list(range(variables.nb_periods))
+        >>> variables["A1"]                     # doctest: +ELLIPSIS 
+        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        >>> # 3) LEC expression
+        >>> variables["A2"] = "t + 10"
+        >>> variables["A2"]                     # doctest: +ELLIPSIS 
+        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+
+        >>> # b) -------- update one variable --------
+        >>> # 1) update all values of a Variable
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        >>> # 1.I) same value for all periods
+        >>> variables["ACAF"] = NA
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 1.II) vector (list) containing a specific value for each period
+        >>> variables["ACAF"] = list(range(variables.nb_periods))
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        >>> # 1.III) LEC expression
+        >>> variables["ACAF"] = "t + 10"
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+
+        >>> # 2) set one value of a Variable for a specific period
+        >>> variables["ACAG", "1990Y1"]
+        -28.1721855713507
+        >>> variables["ACAG", "1990Y1"] = -28.2
+        >>> variables["ACAG", "1990Y1"]
+        -28.2
+
+        >>> # 3) set the variable values for range of periods 
+        >>> # 3.I) using a Python slice
+        >>> # 3.I.a) variable(periods) = same value for all periods
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = 0.0
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, 0.0, 0.0, 0.0, 0.0]
+        >>> # 3.I.b) variable(periods) = vector (list) containing a specific value for each period
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, 1.0, 2.0, 3.0, 4.0]
+        >>> # 3.I.c) variable(periods) = LEC expression
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
+        [41.0, 42.0, 43.0, 44.0, 45.0]
+
+        >>> # 3.II) same as above but with the colon ':' inside the periods range string
+        >>> # 3.II.a) variable(periods) = same value for all periods
+        >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
+        >>> variables["ACAF", "1991Y1:1995Y1"]
+        [0.0, 0.0, 0.0, 0.0, 0.0]
+        >>> # 3.II.b) variable(periods) = vector (list) containing a specific value for each period
+        >>> variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, -1.0, -2.0, -3.0, -4.0]
+        >>> # 3.II.c) variable(periods) = LEC expression
+        >>> variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
+        >>> variables["ACAF", "1991Y1:1995Y1"]
+        [21.0, 22.0, 23.0, 24.0, 25.0]
+
+        >>> # c) -------- working on a subset --------
+        >>> # 1) get subset
+        >>> variables_subset = variables["A*"]
+        >>> variables_subset.names
+        ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # 2) add a variable to the subset 
+        >>> from iode import NA
+        >>> variables_subset["A3"] = NA
+        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # --> new variable also appears in the global workspace
+        >>> "A3" in variables
+        True
+        >>> variables["A3"]                     # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 3) update a variable in the subset
+        >>> variables_subset["A3"] = 0.0
+        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
+        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> # --> variable is also updated in the global workspace
+        >>> variables["A3"]                     # doctest: +ELLIPSIS 
+        [0.0, 0.0, ..., 0.0, 0.0]
+        """
         names, periods_ = self._unfold_key(key)
         # update/add a single Variable
         if len(names) == 1:

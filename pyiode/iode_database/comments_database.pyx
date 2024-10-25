@@ -123,6 +123,137 @@ cdef class Comments(_AbstractDatabase):
         else:
             self.database_ptr.add(key.encode(), value.encode())
 
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Comments]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+
+        >>> # a) get one Comment
+        >>> comments["ACAF"]
+        'Ondernemingen: ontvangen kapitaaloverdrachten.'
+
+        >>> # b) get a subset of the Comments database using a pattern
+        >>> comments_subset = comments["A*"]
+        >>> comments_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        
+        >>> # c) get a subset of the Comments database using a list of names
+        >>> comments_subset = comments[["ACAF", "AOUC", "BQY", "BVY"]]
+        >>> comments_subset.names
+        ['ACAF', 'AOUC', 'BQY', 'BVY']
+        """
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: Union[str, List[str]], value: Union[str, List[str]]):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: str or list(str)
+            (new) comment value(s).
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        
+        >>> # a) add one comment
+        >>> comments["BDY"] = "Difference net incomes (YN - YK)"
+        >>> comments["BDY"]
+        'Difference net incomes (YN - YK)'
+
+        >>> # b) update one comment
+        >>> comments["ACAF"]
+        'Ondernemingen: ontvangen kapitaaloverdrachten.'
+        >>> comments["ACAF"] = "New Value"
+        >>> comments["ACAF"]
+        'New Value'
+
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> comments_subset = comments["A*"]
+        >>> comments_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> # 2) add a comment to the subset 
+        >>> comments_subset["A0"] = "New Comment"
+        >>> comments_subset["A0"]
+        'New Comment'
+        >>> # --> new comment also appears in the global workspace
+        >>> "A0" in comments
+        True
+        >>> comments["A0"]
+        'New Comment'
+        >>> # 3) update a comment in the subset
+        >>> comments_subset["A0"] = "Updated Comment"
+        >>> comments_subset["A0"]
+        'Updated Comment'
+        >>> # --> comment is also updated in the global workspace
+        >>> comments["A0"]
+        'Updated Comment'
+        """
+        super().__setitem__(key, value)
+
     def from_series(self, s: Series):
         r"""
         Copy the pandas Series `s` into the IODE Comments database.

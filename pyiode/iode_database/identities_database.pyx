@@ -127,6 +127,137 @@ cdef class Identities(_AbstractDatabase):
         else:
             self.database_ptr.add(key.encode(), value.encode())
 
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Identities]:
+        r"""
+        Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+
+        >>> # a) get one Identity
+        >>> identities["AOUC"]
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
+
+        >>> # b) get a subset of the Identities database using a pattern
+        >>> identities_subset = identities["X*"]
+        >>> identities_subset.names
+        ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
+
+        >>> # c) get a subset of the Identities database using a list of names
+        >>> identities_subset = identities[["XEX", "XPWMAB", "XPWMS", "XQWXS", "XTFP"]]
+        >>> identities_subset.names
+        ['XEX', 'XPWMAB', 'XPWMS', 'XQWXS', 'XTFP']
+        """
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: Union[str, List[str]], value: Union[str, Identity, List[Union[str, Identity]]]):
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
+        value: str, Identity, list(str) or list(Identity)
+            (new) identity value(s).
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        
+        >>> # a) add one identity
+        >>> identities["BDY"] = "YN - YK"
+        >>> identities["BDY"]
+        Identity('YN - YK')
+
+        >>> # b) update one identity
+        >>> identities["AOUC"]
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
+        >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+        >>> identities["AOUC"]
+        Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]')
+
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> identities_subset = identities["X*"]
+        >>> identities_subset.names
+        ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
+        >>> # 2) add an identity to the subset 
+        >>> identities_subset["XDPU"] = "grt DPU"
+        >>> identities_subset["XDPU"]
+        Identity('grt DPU')
+        >>> # --> new identity also appears in the global workspace
+        >>> "XDPU" in identities
+        True
+        >>> identities["XDPU"]
+        Identity('grt DPU')
+        >>> # 3) update an identity in the subset
+        >>> identities_subset["XDPU"] = "0"
+        >>> identities_subset["XDPU"]
+        Identity('0')
+        >>> # --> identity is also updated in the global workspace
+        >>> identities["XDPU"]
+        Identity('0')
+        """
+        super().__setitem__(key, value)
+
     def execute(self, identities: Union[str, List[str]] = None, from_period: Union[str, Period] = None, 
         to_period: Union[str, Period] = None, var_files: Union[str, List[str]] = None, 
         scalar_files: Union[str, List[str]] = None, trace: bool = False):
