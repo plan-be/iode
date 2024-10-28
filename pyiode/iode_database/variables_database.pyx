@@ -602,8 +602,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables_subset = variables["A*"]
         >>> variables_subset.names
         ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
-        >>> # 2) add a variable to the subset 
-        >>> from iode import NA
+        >>> # 2) add a variable to the subset
         >>> variables_subset["A3"] = NA
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
