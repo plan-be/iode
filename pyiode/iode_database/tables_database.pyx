@@ -509,8 +509,6 @@ cdef class Tables(_AbstractDatabase):
         >>> table_x_grt = tables_subset["X_GRT"]
         >>> index = table_x_grt.index("XPWXAB")
         >>> table_x_grt.insert(index + 1, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
-        >>> # warning: do not forget to actually update the IODE Table subset
-        >>> tables_subset["X_GRT"] = table_x_grt
         >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
