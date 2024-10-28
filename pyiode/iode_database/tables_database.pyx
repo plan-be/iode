@@ -143,7 +143,7 @@ cdef class Tables(_AbstractDatabase):
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Tables]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) table(s) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -168,12 +168,12 @@ cdef class Tables(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the table(s) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single table or a subset of the database.
 
         Examples
         --------
@@ -228,7 +228,7 @@ cdef class Tables(_AbstractDatabase):
     def __setitem__(self, key: Union[str, List[str]], value: Union[int, Tuple[...], Dict[str, Any], Table, 
                                                         List[Union[int, Tuple[...], Dict[str, Any], Table]]]):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) table(s) referenced by `key` from/to the Tables database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -253,7 +253,7 @@ cdef class Tables(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the table(s) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: int, tuple(...), dict(str, ...), Table or list of any of those
@@ -562,6 +562,56 @@ cdef class Tables(_AbstractDatabase):
         <BLANKLINE>
         """
         super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Remove the (subset of) table(s) referenced by `key` from the Tables database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the table(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+
+        >>> # a) delete one table
+        >>> tables.get_names("G*")
+        ['GAP', 'GDP', 'GFR', 'GFRLEVEL', 'GFRPC', 'GROWTH']
+        >>> del tables["GFRLEVEL"]
+        >>> tables.get_names("G*")
+        ['GAP', 'GDP', 'GFR', 'GFRPC', 'GROWTH']
+
+        >>> # b) delete several tables at once using a pattern
+        >>> del tables["G*"]
+        >>> tables.get_names("G*")
+        []
+
+        >>> # c) delete several tables at once using a list of names
+        >>> tables.get_names("C8_?")
+        ['C8_1', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
+        >>> del tables[["C8_1", "C8_3", "C8_5", "C8_7", "C8_9"]]
+        >>> tables.get_names("C8_?")
+        ['C8_2', 'C8_4', 'C8_6', 'C8_8']
+
+        >>> # delete one table from a subset of the global database
+        >>> tables_subset = tables["M*"]
+        >>> tables_subset.names
+        ['MULT1FR', 'MULT1RESU', 'MULT2FR', 'MULT2RESU']
+        >>> del tables_subset["MULT2RESU"]
+        >>> tables_subset.names
+        ['MULT1FR', 'MULT1RESU', 'MULT2FR']
+        >>> # NOTE: the table has also been deleted from the global database
+        >>> "MULT2RESU" in tables
+        False
+        >>> tables.get_names("M*")
+        ['MULT1FR', 'MULT1RESU', 'MULT2FR']
+        """
+        super().__delitem__(key)
 
     def _str_table(self, names: List[str]) -> str:
         titles = [join_lines(self.database_ptr.get_title(name.encode()).decode()) for name in names]

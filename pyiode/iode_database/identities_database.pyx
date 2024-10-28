@@ -129,7 +129,7 @@ cdef class Identities(_AbstractDatabase):
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Identities]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) identity(ies) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -154,12 +154,12 @@ cdef class Identities(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the identity(ies) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single identity or a subset of the database.
 
         Examples
         --------
@@ -185,7 +185,7 @@ cdef class Identities(_AbstractDatabase):
 
     def __setitem__(self, key: Union[str, List[str]], value: Union[str, Identity, List[Union[str, Identity]]]):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) identity(ies) referenced by `key` from/to the Identities database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -210,7 +210,7 @@ cdef class Identities(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the identity(ies) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str, Identity, list(str) or list(Identity)
@@ -257,6 +257,56 @@ cdef class Identities(_AbstractDatabase):
         Identity('0')
         """
         super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Remove the (subset of) identity(ies) referenced by `key` from the Identities database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the identity(ies) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+
+        >>> # a) delete one identity
+        >>> identities.get_names("W*")
+        ['W', 'WBGR', 'WCRH', 'WMINR', 'WO']
+        >>> del identities["W"]
+        >>> identities.get_names("W*")
+        ['WBGR', 'WCRH', 'WMINR', 'WO']
+
+        >>> # b) delete several identities at once using a pattern
+        >>> del identities["W*"]
+        >>> identities.get_names("W*")
+        []
+
+        >>> # c) delete several identities at once using a list of names
+        >>> identities.get_names("XP*")
+        ['XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS']
+        >>> del identities[["XPOIL", "XPWXS"]]
+        >>> identities.get_names("XP*")
+        ['XPWMAB', 'XPWMS', 'XPWXAB']
+
+        >>> # delete one identity from a subset of the global database
+        >>> identities_subset = identities["Y*"]
+        >>> identities_subset.names
+        ['Y', 'YSEFPR', 'YSFICR']
+        >>> del identities_subset["Y"]
+        >>> identities_subset.names
+        ['YSEFPR', 'YSFICR']
+        >>> # NOTE: the identity has also been deleted from the global database
+        >>> "Y" in identities
+        False
+        >>> identities.get_names("Y*")
+        ['YSEFPR', 'YSFICR']
+        """
+        super().__delitem__(key)
 
     def execute(self, identities: Union[str, List[str]] = None, from_period: Union[str, Period] = None, 
         to_period: Union[str, Period] = None, var_files: Union[str, List[str]] = None, 
