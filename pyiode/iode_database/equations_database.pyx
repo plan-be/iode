@@ -178,7 +178,7 @@ cdef class Equations(_AbstractDatabase):
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Equations]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) equation(s) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -203,12 +203,12 @@ cdef class Equations(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the equation(s) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single equation or a subset of the database.
 
         Examples
         --------
@@ -251,7 +251,7 @@ cdef class Equations(_AbstractDatabase):
 
     def __setitem__(self, key: Union[str, List[str]], value: Union[str, Equation, Dict[str, Any], List[Union[str, Equation, Dict[str, Any]]]]):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) equation(s) referenced by `key` from/to the Equations database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -276,7 +276,7 @@ cdef class Equations(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the equation(s) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or Equation or dict(str, ...) or list of any of those
@@ -419,6 +419,56 @@ cdef class Equations(_AbstractDatabase):
                  to_period = '2015Y1')  
         """
         super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Remove the (subset of) equation(s) referenced by `key` from the Equations database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the equation(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+
+        >>> # a) delete one equation
+        >>> equations.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC']
+        >>> del equations["ACAF"]
+        >>> equations.get_names("A*")
+        ['ACAG', 'AOUC']
+
+        >>> # b) delete several equations at once using a pattern
+        >>> del equations["A*"]
+        >>> equations.get_names("A*")
+        []
+
+        >>> # c) delete several equations at once using a list of names
+        >>> equations.get_names("B*")
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> del equations[["BENEF", "BQY"]]
+        >>> equations.get_names("B*")
+        ['BRUGP', 'BVY']
+
+        >>> # delete one equation from a subset of the global database
+        >>> equations_subset = equations["D*"]
+        >>> equations_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
+        >>> del equations_subset["DPUGO"]
+        >>> equations_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
+        >>> # NOTE: the equation has also been deleted from the global database
+        >>> "DPUGO" in equations
+        False
+        >>> equations.get_names("D*")
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
+        """
+        super().__delitem__(key)
 
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None):
         r"""

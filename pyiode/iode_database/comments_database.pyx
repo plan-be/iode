@@ -125,7 +125,7 @@ cdef class Comments(_AbstractDatabase):
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Comments]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) comment(s) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -150,12 +150,12 @@ cdef class Comments(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the comment(s) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single comment or a subset of the database.
 
         Examples
         --------
@@ -181,7 +181,7 @@ cdef class Comments(_AbstractDatabase):
 
     def __setitem__(self, key: Union[str, List[str]], value: Union[str, List[str]]):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) comment(s) referenced by `key` from/to the Comments database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -206,7 +206,7 @@ cdef class Comments(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the comment(s) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or list(str)
@@ -253,6 +253,56 @@ cdef class Comments(_AbstractDatabase):
         'Updated Comment'
         """
         super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Remove the (subset of) comment(s) referenced by `key` from the Comments database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the comment(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+
+        >>> # a) delete one comment
+        >>> comments.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> del comments["ACAF"]
+        >>> comments.get_names("A*")
+        ['ACAG', 'AOUC', 'AQC']
+
+        >>> # b) delete several comments at once using a pattern
+        >>> del comments["A*"]
+        >>> comments.get_names("A*")
+        []
+
+        >>> # c) delete several comments at once using a list of names
+        >>> comments.get_names("B*")
+        ['BENEF', 'BENEF_', 'BQY', 'BVY']
+        >>> del comments[["BENEF", "BQY"]]
+        >>> comments.get_names("B*")
+        ['BENEF_', 'BVY']
+
+        >>> # delete one comment from a subset of the global database
+        >>> comments_subset = comments["D*"]
+        >>> comments_subset.names
+        ['DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> del comments_subset["DPUGO"]
+        >>> comments_subset.names
+        ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> # NOTE: the comment has also been deleted from the global database
+        >>> "DPUGO" in comments
+        False
+        >>> comments.get_names("D*")
+        ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        """
+        super().__delitem__(key)
 
     def from_series(self, s: Series):
         r"""

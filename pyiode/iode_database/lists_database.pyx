@@ -173,7 +173,7 @@ cdef class Lists(_AbstractDatabase):
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Lists]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) IODE list(s) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -198,12 +198,12 @@ cdef class Lists(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the IODE list(s) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single IODE list or a subset of the database.
 
         Examples
         --------
@@ -229,7 +229,7 @@ cdef class Lists(_AbstractDatabase):
 
     def __setitem__(self, key: Union[str, List[str]], value: Union[str, List[str]]):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) IODE list(s) referenced by `key` from/to the Lists database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -254,7 +254,7 @@ cdef class Lists(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the IODE list(s) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or list(str)
@@ -316,6 +316,56 @@ cdef class Lists(_AbstractDatabase):
         ['EX', 'EXC', 'EXCC', 'EXCCR']
         """
         super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Remove the (subset of) IODE list(s) referenced by `key` from the Lists database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the IODE list(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import lists
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+
+        >>> # a) delete one IODE list
+        >>> lists.get_names("C*")
+        ['COPY', 'COPY0', 'COPY1']
+        >>> del lists["COPY"]
+        >>> lists.get_names("C*")
+        ['COPY0', 'COPY1']
+
+        >>> # b) delete several lists at once using a pattern
+        >>> del lists["C*"]
+        >>> lists.get_names("C*")
+        []
+
+        >>> # c) delete several lists at once using a list of names
+        >>> lists.get_names("T*")
+        ['TOTAL', 'TOTAL0', 'TOTAL1']
+        >>> del lists[["TOTAL", "TOTAL0"]]
+        >>> lists.get_names("T*")
+        ['TOTAL1']
+
+        >>> # delete one IODE list from a subset of the global database
+        >>> lists_subset = lists["E*"]
+        >>> lists_subset.names
+        ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
+        >>> del lists_subset["ENVI"]
+        >>> lists_subset.names
+        ['ENDO', 'ENDO0', 'ENDO1']
+        >>> # NOTE: the IODE list has also been deleted from the global database
+        >>> "ENVI" in lists
+        False
+        >>> lists.get_names("E*")
+        ['ENDO', 'ENDO0', 'ENDO1']
+        """
+        super().__delitem__(key)
 
     def from_series(self, s: Series):
         r"""

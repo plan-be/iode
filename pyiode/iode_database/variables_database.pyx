@@ -303,7 +303,7 @@ cdef class Variables(_AbstractDatabase):
     # overriden for Variables
     def __getitem__(self, key) -> Union[float, List[float], Variables]:
         r"""
-        Return the (subset of) IODE object(s) referenced by `key`.
+        Return the (subset of) variable(s) referenced by `key`.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -328,12 +328,12 @@ cdef class Variables(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to get.
+            (the list of) name(s) of the variable(s) to get.
             The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
-        Single IODE object or a subset of the database.
+        Single variable or a subset of the database.
 
         Examples
         --------
@@ -489,7 +489,7 @@ cdef class Variables(_AbstractDatabase):
     # overriden for Variables
     def __setitem__(self, key, value):
         r"""
-        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
+        Update/add a (subset of) variable(s) referenced by `key` from/to the Variables database.
 
         The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
         or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
@@ -514,7 +514,7 @@ cdef class Variables(_AbstractDatabase):
         Parameters
         ----------
         key: str or list(str)
-            (the list of) name(s) of the IODE object(s) to update/add.
+            (the list of) name(s) of the variable(s) to update/add.
             The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: int, float, tuple(int, float), list(int, float), str or list of any of those
@@ -638,6 +638,53 @@ cdef class Variables(_AbstractDatabase):
 
     # overriden for Variables
     def __delitem__(self, key):
+        """
+        Remove the (subset of) variable(s) referenced by `key` from the Variables database.
+
+        Parameters
+        ----------
+        key: str or list(str)
+            (list of) name(s) of the variable(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+        >>> # a) delete one variable
+        >>> variables.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> del variables["ACAF"]
+        >>> variables.get_names("A*")
+        ['ACAG', 'AOUC', 'AOUC_', 'AQC']
+
+        >>> # b) delete several variables at once using a pattern
+        >>> del variables["A*"]
+        >>> variables.get_names("A*")
+        []
+
+        >>> # c) delete several variables at once using a list of names
+        >>> variables.get_names("B*")
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> del variables[["BENEF", "BQY"]]
+        >>> variables.get_names("B*")
+        ['BRUGP', 'BVY']
+
+        >>> # delete one variable from a subset of the global database
+        >>> variables_subset = variables["D*"]
+        >>> variables_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> del variables_subset["DPUGO"]
+        >>> variables_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> # NOTE: the variable has also been deleted from the global database
+        >>> "DPUGO" in variables
+        False
+        >>> variables.get_names("D*")
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        """
         names, periods_ = self._unfold_key(key)
         # names represents a single Variable
         if len(names) == 1:
