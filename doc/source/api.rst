@@ -602,11 +602,6 @@ PRINT
    w_print_pg_footer
 
 
-***************
-OTHER LIBRARIES
-***************
-
-
 *************
 MISCELLANEOUS
 *************
