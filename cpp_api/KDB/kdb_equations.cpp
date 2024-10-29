@@ -53,6 +53,15 @@ int KDBEquations::add(const std::string& name, const std::string& lec, const std
     return pos;
 }
 
+void KDBEquations::update(const int pos, const Equation& obj)
+{
+    std::string name = get_name(pos);
+    char* c_name = to_char_array(name);
+
+    Equation eq(obj);
+    KDBTemplate::update(name, static_cast<EQ*>(&eq), c_name);
+}
+
 void KDBEquations::update(const std::string& name, const Equation& obj)
 {
     char* c_name = to_char_array(name);
