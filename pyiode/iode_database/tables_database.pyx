@@ -107,7 +107,7 @@ cdef class Tables(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        cdef CTable* c_table = self.database_ptr.get(key.encode())
+        cdef CTable* c_table = self.database_ptr.get(<string>(key.encode()))
         py_table = Table._from_ptr(c_table, <bint>True, key.encode(), self.database_ptr) 
         return py_table
 
@@ -612,7 +612,7 @@ cdef class Tables(_AbstractDatabase):
         super().__delitem__(key)
 
     def _str_table(self, names: List[str]) -> str:
-        titles = [join_lines(self.database_ptr.get_title(name.encode()).decode()) for name in names]
+        titles = [join_lines(self.database_ptr.get_title(<string>(name.encode())).decode()) for name in names]
         columns = {"name": names, "table titles": titles}
         return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 

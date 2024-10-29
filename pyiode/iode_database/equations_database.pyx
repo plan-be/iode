@@ -111,7 +111,7 @@ cdef class Equations(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        cdef CEquation* c_eq = self.database_ptr.get(key.encode())
+        cdef CEquation* c_eq = self.database_ptr.get(<string>(key.encode()))
         py_eq = Equation._from_ptr(c_eq, <bint>True, self.database_ptr) 
         return py_eq
 
@@ -154,7 +154,7 @@ cdef class Equations(_AbstractDatabase):
                 raise TypeError(f"Update equation '{key}': Expected input to be of type str or dict or Equation. "
                                 f"Got value of type {type(value).__name__}")
             c_equation = (<Equation>equation).c_equation
-            self.database_ptr.update(key.encode(), dereference(c_equation))
+            self.database_ptr.update(<string>(key.encode()), dereference(c_equation))
         # add a new equation
         else:
             if isinstance(value, str):

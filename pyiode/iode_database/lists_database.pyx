@@ -154,7 +154,7 @@ cdef class Lists(_AbstractDatabase):
 
     def _get_object(self, key: str) -> List[str]:
         key = key.strip()
-        str_list = self.database_ptr.get(key.encode()).decode()
+        str_list = self.database_ptr.get(<string>(key.encode())).decode()
         return split_list(str_list)
 
     def _set_object(self, key: str, value: Union[str, List[str]]):
@@ -167,7 +167,7 @@ cdef class Lists(_AbstractDatabase):
         # normalize the IODE list
         value = ';'.join(value)
         if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(key.encode(), value.encode())
+            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
         else:
             self.database_ptr.add(key.encode(), value.encode())
 

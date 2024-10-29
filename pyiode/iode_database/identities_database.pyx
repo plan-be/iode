@@ -106,7 +106,7 @@ cdef class Identities(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        cdef CIdentity* c_identity = self.database_ptr.get(key.encode())
+        cdef CIdentity* c_identity = self.database_ptr.get(<string>(key.encode()))
         # self.database_ptr.get() does not allocate a new C++ Identity instance
         py_identity = Identity._from_ptr(c_identity, <bint>False) 
         return py_identity
@@ -123,7 +123,7 @@ cdef class Identities(_AbstractDatabase):
             value = str(value)
         value = value.strip()
         if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(key.encode(), value.encode())
+            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
         else:
             self.database_ptr.add(key.encode(), value.encode())
 
