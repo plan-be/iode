@@ -237,6 +237,56 @@ cdef class _AbstractDatabase:
     def description(self, value: str):
         self.abstract_db_ptr.set_description(value.encode())
 
+    def get_position(self, name: str) -> int:
+        """
+        Return the position of the IODE object with name `name` in the database.
+
+        Parameters
+        ----------
+        name: str
+            Name of the IODE object to search for in the database.
+        
+        Returns
+        -------
+        int
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.get_position("ACAF")
+        0
+        """
+        if name not in self:
+            raise KeyError(f"'{name}' is not in the database.")
+        return self.abstract_db_ptr.get_position(name.encode())
+
+    def get_name(self, pos: int) -> str:
+        """
+        Return the name of the IODE object at position `pos` in the database.
+
+        Parameters
+        ----------
+        pos: int
+           Position of the object in the database.
+
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.get_name(0)
+        'ACAF'
+        """
+        if not (0 <= pos < len(self)):
+            raise IndexError(f"Index {pos} is out of bounds for database of size {len(self)}")
+        return self.abstract_db_ptr.get_name(pos).decode()
+
     def get_names(self, pattern: Union[str, List[str]]="") -> List[str]:
         """
         Returns the list of objects names given a pattern.
