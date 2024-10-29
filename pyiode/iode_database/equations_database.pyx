@@ -109,6 +109,33 @@ cdef class Equations(_AbstractDatabase):
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
+    def get_lec(self, key: Union[str, int]) -> str:
+        r"""
+        Get the LEC of an equation in the database.
+
+        Parameters
+        ----------
+        key : str or int
+            Name or index of the equation in the database.
+
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.get_lec("ACAF")   # doctest: +NORMALIZE_WHITESPACE
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        >>> equations.get_lec(0)       # doctest: +NORMALIZE_WHITESPACE
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        """
+        if isinstance(key, int):
+            return self.database_ptr.get_lec(<int>key).decode()
+        else:
+            return self.database_ptr.get_lec(<string>(key.encode())).decode()
+
     def _get_object(self, key: str):
         key = key.strip()
         cdef CEquation* c_eq = self.database_ptr.get(<string>(key.encode()))
