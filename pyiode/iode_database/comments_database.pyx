@@ -105,23 +105,48 @@ cdef class Comments(_AbstractDatabase):
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
-    def _get_object(self, key: str):
-        key = key.strip()
-        return self.database_ptr.get(<string>(key.encode())).decode()
+    @property
+    def i(self) -> PositionalIndexer:
+        r"""
+        Allow to select the ith comment in the database.
 
-    def _set_object(self, key, value):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set comment '{key}'.\nExpected a string value for the name " + 
-                            f"but got name value of type {type(key).__name__}")
-        key = key.strip()
-        if not isinstance(value, str):
-            raise TypeError(f"Cannot set comment '{key}'.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(value).__name__}")
-        value = value.strip()
-        if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+        Examples
+        --------
+        >>> from iode import comments, SAMPLE_DATA_DIR
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> # get the first comment
+        >>> comments.i[0]
+        'Ondernemingen: ontvangen kapitaaloverdrachten.'
+        >>> # get the last comment
+        >>> comments.i[-1]
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        >>> # update first comment
+        >>> comments.i[0] = 'New Comment'
+        >>> comments.i[0]
+        'New Comment'
+        >>> # update last comment
+        >>> comments.i[-1] = 'New Comment'
+        >>> comments.i[-1]
+        'New Comment'
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]):
+        if isinstance(key, int):
+            return self.database_ptr.get(<int>key).decode()
         else:
-            self.database_ptr.add(key.encode(), value.encode())
+            key = key.strip()
+            return self.database_ptr.get(<string>(key.encode())).decode()
+
+    def _set_object(self, key: Union[str, int], value: str):
+        value = value.strip()
+        if isinstance(key, int):
+            self.database_ptr.update(<int>key, <string>(value.encode()))
+        else:
+            if self.database_ptr.contains(key.encode()):
+                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+            else:
+                self.database_ptr.add(key.encode(), value.encode())
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Comments]:
         r"""

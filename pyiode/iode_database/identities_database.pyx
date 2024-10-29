@@ -104,28 +104,57 @@ cdef class Identities(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: str):
-        key = key.strip()
-        cdef CIdentity* c_identity = self.database_ptr.get(<string>(key.encode()))
+    @property
+    def i(self) -> PositionalIndexer:
+        """
+        Allow to select the ith identity in the database.
+
+        Examples
+        --------
+        >>> from iode import identities, SAMPLE_DATA_DIR
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> # get the first identity
+        >>> identities.i[0]
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
+        >>> # get the last identity
+        >>> identities.i[-1]
+        Identity('YSFIC/(TWGP*ZJ)')
+        >>> # update first identity
+        >>> identities.i[0] = 't'
+        >>> identities.i[0]
+        Identity('t')
+        >>> # update last identity
+        >>> identities.i[-1] = 't'
+        >>> identities.i[-1]
+        Identity('t')
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]):
+        cdef CIdentity* c_identity
+        if isinstance(key, int):
+            c_identity = self.database_ptr.get(<int>key)
+        else:
+            key  = key.strip()
+            c_identity = self.database_ptr.get(<string>(key.encode()))
+        
         # self.database_ptr.get() does not allocate a new C++ Identity instance
         py_identity = Identity._from_ptr(c_identity, <bint>False) 
         return py_identity
 
-    def _set_object(self, key, value):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for the name " + 
-                            f"but got name value of type {type(key).__name__}")
-        key = key.strip()
-        if not isinstance(value, (str, Identity)):
-            raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(value).__name__}")
+    def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
         if isinstance(value, Identity):
             value = str(value)
         value = value.strip()
-        if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+
+        if isinstance(key, int):
+            self.database_ptr.update(<int>key, <string>(value.encode()))
         else:
-            self.database_ptr.add(key.encode(), value.encode())
+            key = key.strip()
+            if self.database_ptr.contains(key.encode()):
+                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+            else:
+                self.database_ptr.add(key.encode(), value.encode())
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Identities]:
         r"""

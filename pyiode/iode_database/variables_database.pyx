@@ -126,6 +126,35 @@ def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
     return data
 
 
+class VarPositionalIndexer:
+    def __init__(self, database):
+        self.database = database
+    
+    def _check_index(self, index: Union[int, Tuple[int, int]]) -> Tuple[int, int]:
+        if isinstance(index, int):
+            pos, t = index, None
+        if isinstance(index, tuple):
+            pos, t = index
+        if pos < 0:
+            pos += len(self.database)
+        if not (0 <= pos < len(self.database)):
+            raise IndexError(f"Index {pos} out of range")
+        if t is not None: 
+            if t < 0:
+                t += self.database.nb_periods
+            if not (0 <= t < self.database.nb_periods):
+                raise IndexError(f"Period index {t} out of range")
+        return pos, t
+
+    def __getitem__(self, index: Union[int, Tuple[int, int]]):
+        pos, t = self._check_index(index)
+        return self.database._get_variable(pos, t)
+    
+    def __setitem__(self, index: Union[int, Tuple[int, int]], value):
+        pos, t = self._check_index(index)
+        self.database._set_object(pos, value, t)
+
+
 @cython.final
 cdef class Variables(_AbstractDatabase):
     r"""
@@ -281,23 +310,67 @@ cdef class Variables(_AbstractDatabase):
                 # wrong type for periods_
                 raise TypeError(f"variables[names, periods]: 'periods' must represent either a period (str), a list of periods "
                                 f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
-        
-    def _get_variable(self, name: str, periods_: Union[str, List[str]]) -> Union[float, List[float]]: 
+
+    @property
+    def i(self) -> VarPositionalIndexer:
+        """
+        Allow to select the ith variable in the database.
+
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> # get the value of the first period of the first variable
+        >>> variables.i[0, 0]
+        -2e+37
+        >>> # get the value of the last period of the last variable
+        >>> variables.i[-1, -1]
+        0.68840039
+        >>> # update the value of the first period of the first variable
+        >>> variables.i[0, 0] = 3.0
+        >>> variables.i[0, 0]
+        3.0
+        >>> # update the value of the last period of the last variable
+        >>> variables.i[-1, -1] = 3.0
+        >>> variables.i[-1, -1]
+        3.0
+        """
+        return VarPositionalIndexer(self)
+
+    def _get_variable(self, key: Union[str, int], periods_: Union[str, int, List[str]]) -> Union[float, List[float]]: 
         # periods_ represents all periods
         if periods_ is None:
-            return self.database_ptr.get(<string>(name.encode()))     
+            if isinstance(key, int):
+                return self.database_ptr.get(<int>key)
+            else:
+                return self.database_ptr.get(<string>(key.encode()))     
         # periods_ represents a unique period 
         elif isinstance(periods_, str):
-            return self.database_ptr.get_var(<string>(name.encode()), <string>periods_.encode(), self.mode_)
+            if isinstance(key, int):
+                raise TypeError("variables[key, period]: 'key' must be of type str when 'period' is of type str.")
+            else:
+                return self.database_ptr.get_var(<string>(key.encode()), <string>periods_.encode(), self.mode_)
+        # periods_ represents a unique period 
+        elif isinstance(periods_, int):
+            if isinstance(key, int):
+                return self.database_ptr.get_var(<int>key, <int>periods_, self.mode_)
+            else:
+                return self.database_ptr.get_var(<string>(key.encode()), <int>periods_, self.mode_)
         # periods_ represents a contiguous range of periods
         elif isinstance(periods_, tuple):
             t_first, t_last = periods_
-            return [self.database_ptr.get_var(<string>(name.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+            if isinstance(key, int):
+                return [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
+            else:
+                return [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
         # periods_ represents a range/list of periods
         elif isinstance(periods_, list):
-            return [self.database_ptr.get_var(<string>(name.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
+            if isinstance(key, int):
+                raise TypeError("variables[key, periods]: 'key' must be of type str when 'periods' is of type list.")
+            else:
+                return [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
         else:
-            raise TypeError("Wrong selection of periods. Expected None or value of type str or list(str). "
+            raise TypeError("Wrong selection of periods. Expected None or value of type str, int, or list(str). "
                             f"Got value of type {type(periods_).__name__} instead.")
 
     # overriden for Variables
@@ -426,65 +499,84 @@ cdef class Variables(_AbstractDatabase):
             cpp_values = [<double>value_ for value_ in values]
             self.database_ptr.add(<string>(name.encode()), cpp_values)
 
-    def _update(self, name: str, values: Union[str, float, List[float]]):
+    def _update(self, key: Union[str, int], values: Union[str, float, List[float]]):
         cdef vector[double] cpp_values
-
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
 
         # raise an error if values is a vector and len(values) != self.nb_periods
         values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
-            self.database_ptr.update(<string>(name.encode()), <string>values.encode())
+            if isinstance(key, int):
+                self.database_ptr.update(<int>key, <string>values.encode())
+            else:
+                self.database_ptr.update(<string>(key.encode()), <string>values.encode())
         # values is a vector of float
         else:
             cpp_values = [<double>value_ for value_ in values]
-            self.database_ptr.update(<string>(name.encode()), cpp_values)
+            if isinstance(key, int):
+                self.database_ptr.update(<int>key, cpp_values)
+            else:
+                self.database_ptr.update(<string>(key.encode()), cpp_values)
 
-    def _set_object(self, name: str, values: Any, periods_: Optional[str, Tuple[int, int], List[str]]):
+    def _set_object(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
 
-        name = name.strip()
+        if isinstance(key, str):
+            key = key.strip()
         
         # new Variable -> raise an error if values is a vector and len(values) != self.nb_periods
-        if name not in self:
-            self._add(name, values)
+        if isinstance(key, str) and key not in self:
+            self._add(key, values)
         # update a Variable
         else:
             # update values for the whole sample
             # raise an error if values is a vector and len(values) != self.nb_periods
             if periods_ is None:
-                self._update(name, values)
+                self._update(key, values)
             # update the value for only one period 
-            elif isinstance(periods_, str):
+            elif isinstance(periods_, (str, int)):
+                if isinstance(key, int) and isinstance(periods_, str):
+                    raise TypeError("variables[key, period] = value: Expected 'key' to be a string.")
+                if isinstance(key, str) and isinstance(periods_, int):
+                    raise TypeError("variables[key, period] = value: Expected 'period' to be a string.")
                 value = values
                 if isinstance(value, int):
                     value = float(value)
                 if not isinstance(value, float):
                     raise TypeError("variables[key] = value: Expected 'value' to be a float. "
                                     f"Got 'value' of type {type(value).__name__}")
-                self.database_ptr.set_var(<string>(name.encode()), <string>periods_.encode(), <double>value, self.mode_)
+                if isinstance(key, int):
+                    self.database_ptr.set_var(<int>key, <int>periods_, <double>value, self.mode_)
+                else:
+                    self.database_ptr.set_var(<string>(key.encode()), <string>periods_.encode(), <double>value, self.mode_)
             # update values for a contiguous range of periods
             elif isinstance(periods_, tuple):
                 first_period, last_period = periods_
                 nb_periods = last_period - first_period + 1
                 # values is a LEC expression
                 if isinstance(values, str):
-                    self.database_ptr.update(<string>(name.encode()), <string>values.encode(), <int>first_period, <int>last_period)
+                    if isinstance(key, int):
+                        self.database_ptr.update(<int>(key), <string>values.encode(), <int>first_period, <int>last_period) 
+                    else:   
+                        self.database_ptr.update(<string>(key.encode()), <string>values.encode(), <int>first_period, <int>last_period)
                 else:
                     values = self._convert_values(values, nb_periods)
                     cpp_values = [<double>value for value in values]
-                    self.database_ptr.update(<string>(name.encode()), cpp_values, <int>first_period, <int>last_period)
+                    if isinstance(key, int):
+                        self.database_ptr.update(<int>(key), cpp_values, <int>first_period, <int>last_period)
+                    else:
+                        self.database_ptr.update(<string>(key.encode()), cpp_values, <int>first_period, <int>last_period)
             # update values for a list of periods
             else:
+                if isinstance(key, int):
+                    raise TypeError("variables[key, periods] = lec where 'key' is an integer is not implemented.")
                 if isinstance(values, str):
                     raise NotImplementedError(f"Case variables[key, periods] = lec where '{periods_}' does not represents "
                                               "a contiguous range of periods is not implemented")
                 else:
                     values = self._convert_values(values, len(periods_))
                     for period, value in zip(periods_, values):
-                        self.database_ptr.set_var(<string>(name.encode()), <string>period.encode(), <double>value, self.mode_)
+                        self.database_ptr.set_var(<string>(key.encode()), <string>period.encode(), <double>value, self.mode_)
 
     # overriden for Variables
     def __setitem__(self, key, value):

@@ -105,24 +105,52 @@ cdef class Scalars(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: str):
-        key = key.strip()
-        cdef CScalar* c_scalar = self.database_ptr.get(<string>(key.encode()))
+    @property
+    def i(self) -> PositionalIndexer:
+        """
+        Allow to select the ith scalar in the database.
+
+        Examples
+        --------
+        >>> from iode import scalars, SAMPLE_DATA_DIR
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> # get the first scalar
+        >>> scalars.i[0]
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> # get the last scalar
+        >>> scalars.i[-1]
+        Scalar(-7.27124, 1, 2.6764)
+        >>> # update first scalar
+        >>> scalars.i[0] = 0.02
+        >>> scalars.i[0]
+        Scalar(0.02, 1, 0.00136871)
+        >>> # update last scalar
+        >>> scalars.i[-1] = -7.3, 0.5
+        >>> scalars.i[-1]
+        Scalar(-7.3, 0.5, na)
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]):
+        cdef CScalar* c_scalar
+        if isinstance(key, int):
+            c_scalar = self.database_ptr.get(<int>key)
+        else:
+            key = key.strip()
+            c_scalar = self.database_ptr.get(<string>(key.encode()))
         # self.database_ptr.get() does not allocate a new C++ Scalar instance
         py_scalar = Scalar._from_ptr(c_scalar, <bint>False) 
         return py_scalar
 
-    def _set_object(self, key, value):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
-        key = key.strip()
+    def _set_object(self, key: Union[str, int], value):
+        if isinstance(key, str):
+            key = key.strip()
         
         if isinstance(value, int):
             value = float(value) 
 
-        if self.database_ptr.contains(key.encode()):
-            # update exisiting scalar
+        if isinstance(key, int) or self.database_ptr.contains(key.encode()):
+            # update existing scalar
             if isinstance(value, float):
                 scalar = self._get_object(key)
                 scalar.value = value
@@ -143,7 +171,10 @@ cdef class Scalars(_AbstractDatabase):
             else:
                 raise TypeError(f"Update scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
-            self.database_ptr.update(<string>(key.encode()), scalar.value, scalar.relax, scalar.std)
+            if isinstance(key, int):
+                self.database_ptr.update(<int>key, <double>scalar.value, <double>scalar.relax, <double>scalar.std)
+            else:    
+                self.database_ptr.update(<string>(key.encode()), <double>scalar.value, <double>scalar.relax, <double>scalar.std)
         else:
             # add a new scalar
             if isinstance(value, float):

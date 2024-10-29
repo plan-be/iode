@@ -40,6 +40,7 @@ Comments
    Comments.__getitem__
    Comments.__setitem__
    Comments.__delitem__
+   Comments.i
 
    Comments.copy_from
    Comments.merge
@@ -86,6 +87,7 @@ Equations
    Equations.__getitem__
    Equations.__setitem__
    Equations.__delitem__
+   Equations.i
 
    Equations.copy_from
    Equations.merge
@@ -134,6 +136,7 @@ Identities
    Identities.__getitem__
    Identities.__setitem__
    Identities.__delitem__
+   Identities.i
 
    Identities.copy_from
    Identities.merge
@@ -182,6 +185,7 @@ Lists
    Lists.__getitem__
    Lists.__setitem__
    Lists.__delitem__
+   Lists.i
 
    Lists.copy_from
    Lists.merge
@@ -228,6 +232,7 @@ Scalars
    Scalars.__getitem__
    Scalars.__setitem__
    Scalars.__delitem__
+   Scalars.i
 
    Scalars.copy_from
    Scalars.merge
@@ -275,6 +280,7 @@ Tables
    Tables.__getitem__
    Tables.__setitem__
    Tables.__delitem__
+   Tables.i
 
    Tables.copy_from
    Tables.merge
@@ -319,6 +325,7 @@ Variables
    Variables.__getitem__
    Variables.__setitem__
    Variables.__delitem__
+   Variables.i
 
    Variables.copy_from
    Variables.merge
