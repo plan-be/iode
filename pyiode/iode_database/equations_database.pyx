@@ -136,18 +136,93 @@ cdef class Equations(_AbstractDatabase):
         else:
             return self.database_ptr.get_lec(<string>(key.encode())).decode()
 
-    def _get_object(self, key: str):
-        key = key.strip()
-        cdef CEquation* c_eq = self.database_ptr.get(<string>(key.encode()))
+    @property
+    def i(self) -> PositionalIndexer:
+        r"""
+        Allow to select the ith equation in the database.
+
+        Examples
+        --------
+        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> # get the first equation
+        >>> equations.i[0]              # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                        dw = 2.32935,
+                        fstat = 32.2732,
+                        loglik = 83.8075,
+                        meany = 0.00818467,
+                        r2 = 0.821761,
+                        r2adj = 0.796299,
+                        ssres = 5.19945e-05,
+                        stderr = 0.00192715,
+                        stderrp = 23.5458,
+                        stdev = 0.0042699},
+                date = '12-06-1998')
+        >>> # get the last equation
+        >>> equations.i[-1]             # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ZZF_',
+                lec = 'ZZF_ := ZZF_[-1]',
+                method = 'LSQ',
+                comment = ' ',
+                block = 'ZZF_')
+        >>> # update first equation
+        >>> equations.i[0] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4*(TIME=1995)"
+        >>> equations.i[0]              # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                        dw = 2.32935,
+                        fstat = 32.2732,
+                        loglik = 83.8075,
+                        meany = 0.00818467,
+                        r2 = 0.821761,
+                        r2adj = 0.796299,
+                        ssres = 5.19945e-05,
+                        stderr = 0.00192715,
+                        stderrp = 23.5458,
+                        stdev = 0.0042699},
+                date = '12-06-1998')
+        >>> # update last equation
+        >>> equations.i[-1] = "ZZF_ := ZZF_[-1] + 1"
+        >>> equations.i[-1]             # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ZZF_',
+                lec = 'ZZF_ := ZZF_[-1] + 1',
+                method = 'LSQ',
+                comment = ' ',
+                block = 'ZZF_')
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]):
+        cdef CEquation* c_eq
+        if isinstance(key, int):
+            c_eq = self.database_ptr.get(<int>key)
+        else:
+            key = key.strip()
+            c_eq = self.database_ptr.get(<string>(key.encode()))
+        
         py_eq = Equation._from_ptr(c_eq, <bint>True, self.database_ptr) 
         return py_eq
 
-    def _set_object(self, key: str, value):
+    def _set_object(self, key: Union[str, int], value):
         cdef CEquation* c_equation
-        key = key.strip()
+
+        if isinstance(key, str):
+            key = key.strip()
 
         # update existing equation
-        if self.database_ptr.contains(key.encode()):
+        if isinstance(key, int) or self.database_ptr.contains(key.encode()):
             if isinstance(value, str):
                 equation = self._get_object(key)
                 equation.lec = value
@@ -181,7 +256,10 @@ cdef class Equations(_AbstractDatabase):
                 raise TypeError(f"Update equation '{key}': Expected input to be of type str or dict or Equation. "
                                 f"Got value of type {type(value).__name__}")
             c_equation = (<Equation>equation).c_equation
-            self.database_ptr.update(<string>(key.encode()), dereference(c_equation))
+            if isinstance(key, int):
+                self.database_ptr.update(<int>key, dereference(c_equation))
+            else:
+                self.database_ptr.update(<string>(key.encode()), dereference(c_equation))
         # add a new equation
         else:
             if isinstance(value, str):

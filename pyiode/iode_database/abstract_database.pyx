@@ -23,6 +23,25 @@ from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 #          - protected Pythod methods start with _ and are inherited in the derived class 
 #            (and so can be overidde)
 
+class PositionalIndexer:
+    def __init__(self, database):
+        self.database = database
+    
+    def _check_index(self, index: int) -> int:
+        if index < 0:
+            index += len(self.database)
+        if not (0 <= index < len(self.database)):
+            raise IndexError(f"Index {index} out of range")
+        return index
+
+    def __getitem__(self, index: int):
+        index = self._check_index(index)
+        return self.database._get_object(index)
+    
+    def __setitem__(self, index: int, value):
+        index = self._check_index(index)
+        self.database._set_object(index, value)
+
 
 # Define the Python wrapper class for KDBAbstract
 cdef class _AbstractDatabase:
@@ -853,6 +872,11 @@ cdef class _AbstractDatabase:
         raise NotImplementedError()
 
     def _subset(self, pattern: str, copy: bool) -> Self:
+        raise NotImplementedError()
+
+    # needs to be overriden for Variables
+    @property
+    def i(self) -> PositionalIndexer:
         raise NotImplementedError()
 
     # needs to be overriden for Variables

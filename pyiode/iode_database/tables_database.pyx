@@ -132,26 +132,159 @@ cdef class Tables(_AbstractDatabase):
         else:
             return self.database_ptr.get_title(<string>(key.encode())).decode()
 
-    def _get_object(self, key: str):
-        key = key.strip()
-        cdef CTable* c_table = self.database_ptr.get(<string>(key.encode()))
-        py_table = Table._from_ptr(c_table, <bint>True, key.encode(), self.database_ptr) 
+    @property
+    def i(self) -> PositionalIndexer:
+        """
+        Allow to select the ith table in the database.
+
+        Examples
+        --------
+        >>> from iode import tables, SAMPLE_DATA_DIR, TableLineType
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> # get the first table
+        >>> tables.i[0]                 # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                  1 |
+        TITLE |                "Déterminants de la croissance de K"
+        ----- | ------------------------------------------------------------------
+        CELL  |                                    |              "#s"
+        ----- | ------------------------------------------------------------------
+        CELL  | "Croissance de K "                 |                      dln KNFF
+        CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
+        CELL  | "Rentabilité "                     |          knf2*ln mavg(3,RENT)
+        CELL  | "Croissance anticipée de l'output" | 0.416*mavg(4,dln QAFF_)+0.023
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # get the last table
+        >>> tables.i[-1]                # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                                          1 |                                    PC_*40.34
+        TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"                      
+        ----- | ---------------------------------------------------------------------------------------------------------
+        CELL  |                                                            |                     "#S"                    
+        CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
+        CELL  | "   Masse salariale totale"                                |                                         WBU_
+        CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
+        CELL  | "   Surplus brut d'exploitation"                           |                                        GOSH_
+        CELL  | "   Revenu net de la propriété"                            |                                          IDH
+        CELL  | "Cotisations sociales et impôts"                           |                                  SSF+SSH+DTH
+        CELL  | "   Cotisations patronales"                                |                                          SSF
+        CELL  | "   Cotisations personnelles"                              |                                          SSH
+        CELL  | "IPP"                                                      |                                          DTH
+        CELL  | "Prestations sociales "                                    |                                     SBH+OCUH
+        CELL  | "   Sécurité sociale"                                      |                                          SBH
+        CELL  | "   Diverses prestations"                                  |                                         OCUH
+        CELL  | "Total"                                                    | (WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)
+        ----- | ---------------------------------------------------------------------------------------------------------
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # update first table
+        >>> table = tables.i[0]
+        >>> table += '-'
+        >>> table += TableLineType.DATE
+        >>> tables.i[0] = table
+        >>> tables.i[0]                 # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                  1 |
+        TITLE |                "Déterminants de la croissance de K"
+        ----- | ------------------------------------------------------------------
+        CELL  | ""                                 |              "#s"
+        ----- | ------------------------------------------------------------------
+        CELL  | "Croissance de K "                 |                      dln KNFF
+        CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
+        CELL  | "Rentabilité "                     |          knf2*ln mavg(3,RENT)
+        CELL  | "Croissance anticipée de l'output" | 0.416*mavg(4,dln QAFF_)+0.023
+        ----- | ------------------------------------------------------------------
+        DATE  |
+        <BLANKLINE>
+        nb lines: 10
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # update last table
+        >>> table = tables.i[-1]
+        >>> table += TableLineType.MODE
+        >>> tables.i[-1] = table
+        >>> tables.i[-1]                # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                                          1 |                                    PC_*40.34
+        TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"                             
+        ----- | ---------------------------------------------------------------------------------------------------------
+        CELL  | ""                                                         |                     "#S"                    
+        CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
+        CELL  | "   Masse salariale totale"                                |                                         WBU_
+        CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
+        CELL  | "   Surplus brut d'exploitation"                           |                                        GOSH_
+        CELL  | "   Revenu net de la propriété"                            |                                          IDH
+        CELL  | "Cotisations sociales et impôts"                           |                                  SSF+SSH+DTH
+        CELL  | "   Cotisations patronales"                                |                                          SSF
+        CELL  | "   Cotisations personnelles"                              |                                          SSH
+        CELL  | "IPP"                                                      |                                          DTH
+        CELL  | "Prestations sociales "                                    |                                     SBH+OCUH
+        CELL  | "   Sécurité sociale"                                      |                                          SBH
+        CELL  | "   Diverses prestations"                                  |                                         OCUH
+        CELL  | "Total"                                                    | (WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)
+        ----- | ---------------------------------------------------------------------------------------------------------
+        FILES |
+        DATE  |
+        MODE  |
+        <BLANKLINE>
+        nb lines: 20
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]):
+        cdef CTable* c_table
+        if isinstance(key, int):
+            c_table = self.database_ptr.get(<int>key)
+            name = self.get_name(<int>key)
+        else:
+            key = key.strip()
+            c_table = self.database_ptr.get(<string>(key.encode()))
+            name = key
+
+        py_table = Table._from_ptr(c_table, <bint>True, name.encode(), self.database_ptr) 
         return py_table
 
-    def _set_object(self, key, value):
+    def _set_object(self, key: Union[str, int], value):
         cdef CTable* c_table
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
-        key = key.strip()
 
-        if self.database_ptr.contains(key.encode()):
+        if isinstance(key, str):
+            key = key.strip()
+
+        if isinstance(key, int) or self.database_ptr.contains(key.encode()):
             # update existing table
             if not isinstance(value, Table):
                 raise TypeError(f"Update table '{key}': Expected input of type 'Table'. "
                                 f"Got value of type {type(value).__name__} instead")
             c_table = (<Table>value).c_table
-            self.database_ptr.update(<string>(key.encode()), dereference(c_table))
+            if isinstance(key, int):
+                self.database_ptr.update(<int>key, dereference(c_table))
+            else:
+                self.database_ptr.update(<string>(key.encode()), dereference(c_table))
         else:
             # add a new table
             if isinstance(value, int):

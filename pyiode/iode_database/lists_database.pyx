@@ -152,13 +152,41 @@ cdef class Lists(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: str) -> List[str]:
-        key = key.strip()
-        str_list = self.database_ptr.get(<string>(key.encode())).decode()
+    @property
+    def i(self) -> PositionalIndexer:
+        """
+        Allow to select the ith list in the database.
+
+        Examples
+        --------
+        >>> from iode import lists, SAMPLE_DATA_DIR
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> # get the first list
+        >>> lists.i[0]
+        ['$COPY0', '$COPY1', '']
+        >>> # get the last list
+        >>> lists.i[-1]
+        ['ZKF']
+        >>> # update first list
+        >>> lists.i[0] = ['ACAF', 'ACAG', 'AOUC']
+        >>> lists.i[0]
+        ['ACAF', 'ACAG', 'AOUC']
+        >>> # update last list
+        >>> lists.i[-1] = ['ACAF', 'ACAG', 'AOUC']
+        >>> lists.i[-1]
+        ['ACAF', 'ACAG', 'AOUC']
+        """
+        return PositionalIndexer(self)
+
+    def _get_object(self, key: Union[str, int]) -> List[str]:
+        if isinstance(key, int):
+            str_list = self.database_ptr.get(<int>key).decode()
+        else:
+            key = key.strip()
+            str_list = self.database_ptr.get(<string>(key.encode())).decode()
         return split_list(str_list)
 
-    def _set_object(self, key: str, value: Union[str, List[str]]):
-        key = key.strip()
+    def _set_object(self, key: Union[str, int], value: Union[str, List[str]]):
         if isinstance(value, str):
             value = value.strip()
             value = split_list(value)
@@ -166,10 +194,15 @@ cdef class Lists(_AbstractDatabase):
             value = [item.strip() for item in value]
         # normalize the IODE list
         value = ';'.join(value)
-        if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+
+        if isinstance(key, int):
+            self.database_ptr.update(<int>key, <string>(value.encode()))
         else:
-            self.database_ptr.add(key.encode(), value.encode())
+            key = key.strip()
+            if self.database_ptr.contains(key.encode()):
+                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
+            else:
+                self.database_ptr.add(key.encode(), value.encode())
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Lists]:
         r"""
