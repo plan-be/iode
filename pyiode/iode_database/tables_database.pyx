@@ -105,6 +105,33 @@ cdef class Tables(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
+    def get_title(self, key: Union[str, int]) -> str:
+        """
+        Get the title of a table from its name or index.
+
+        Parameters
+        ----------
+        key: str or int
+           Name or index of the table to get the title from.
+        
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import tables, SAMPLE_DATA_DIR
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.get_title("ANAKNFF")
+        'Déterminants de la croissance de K'
+        >>> tables.get_title(0)
+        'Déterminants de la croissance de K'
+        """
+        if isinstance(key, int):
+            return self.database_ptr.get_title(<int>key).decode()
+        else:
+            return self.database_ptr.get_title(<string>(key.encode())).decode()
+
     def _get_object(self, key: str):
         key = key.strip()
         cdef CTable* c_table = self.database_ptr.get(<string>(key.encode()))
