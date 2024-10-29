@@ -107,7 +107,7 @@ cdef class Comments(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        return self.database_ptr.get(key.encode()).decode()
+        return self.database_ptr.get(<string>(key.encode())).decode()
 
     def _set_object(self, key, value):
         if not isinstance(key, str):
@@ -119,7 +119,7 @@ cdef class Comments(_AbstractDatabase):
                             f"but got value of type {type(value).__name__}")
         value = value.strip()
         if self.database_ptr.contains(key.encode()):
-            self.database_ptr.update(key.encode(), value.encode())
+            self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
         else:
             self.database_ptr.add(key.encode(), value.encode())
 

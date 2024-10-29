@@ -107,7 +107,7 @@ cdef class Scalars(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-        cdef CScalar* c_scalar = self.database_ptr.get(key.encode())
+        cdef CScalar* c_scalar = self.database_ptr.get(<string>(key.encode()))
         # self.database_ptr.get() does not allocate a new C++ Scalar instance
         py_scalar = Scalar._from_ptr(c_scalar, <bint>False) 
         return py_scalar
@@ -143,7 +143,7 @@ cdef class Scalars(_AbstractDatabase):
             else:
                 raise TypeError(f"Update scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
-            self.database_ptr.update(key.encode(), scalar.value, scalar.relax, scalar.std)
+            self.database_ptr.update(<string>(key.encode()), scalar.value, scalar.relax, scalar.std)
         else:
             # add a new scalar
             if isinstance(value, float):

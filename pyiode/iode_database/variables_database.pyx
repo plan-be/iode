@@ -285,17 +285,17 @@ cdef class Variables(_AbstractDatabase):
     def _get_variable(self, name: str, periods_: Union[str, List[str]]) -> Union[float, List[float]]: 
         # periods_ represents all periods
         if periods_ is None:
-            return self.database_ptr.get(name.encode())     
+            return self.database_ptr.get(<string>(name.encode()))     
         # periods_ represents a unique period 
         elif isinstance(periods_, str):
-            return self.database_ptr.get_var(<string>name.encode(), <string>periods_.encode(), self.mode_)
+            return self.database_ptr.get_var(<string>(name.encode()), <string>periods_.encode(), self.mode_)
         # periods_ represents a contiguous range of periods
         elif isinstance(periods_, tuple):
             t_first, t_last = periods_
-            return [self.database_ptr.get_var(<string>name.encode(), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+            return [self.database_ptr.get_var(<string>(name.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
         # periods_ represents a range/list of periods
         elif isinstance(periods_, list):
-            return [self.database_ptr.get_var(<string>name.encode(), <string>period_.encode(), self.mode_) for period_ in periods_]
+            return [self.database_ptr.get_var(<string>(name.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
         else:
             raise TypeError("Wrong selection of periods. Expected None or value of type str or list(str). "
                             f"Got value of type {type(periods_).__name__} instead.")
@@ -420,11 +420,11 @@ cdef class Variables(_AbstractDatabase):
         values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
-            self.database_ptr.add(<string>name.encode(), <string>values.encode())
+            self.database_ptr.add(<string>(name.encode()), <string>values.encode())
         # values is a vector of float
         else:
             cpp_values = [<double>value_ for value_ in values]
-            self.database_ptr.add(<string>name.encode(), cpp_values)
+            self.database_ptr.add(<string>(name.encode()), cpp_values)
 
     def _update(self, name: str, values: Union[str, float, List[float]]):
         cdef vector[double] cpp_values
@@ -436,11 +436,11 @@ cdef class Variables(_AbstractDatabase):
         values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
-            self.database_ptr.update(<string>name.encode(), <string>values.encode())
+            self.database_ptr.update(<string>(name.encode()), <string>values.encode())
         # values is a vector of float
         else:
             cpp_values = [<double>value_ for value_ in values]
-            self.database_ptr.update(<string>name.encode(), cpp_values)
+            self.database_ptr.update(<string>(name.encode()), cpp_values)
 
     def _set_object(self, name: str, values: Any, periods_: Optional[str, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
@@ -464,18 +464,18 @@ cdef class Variables(_AbstractDatabase):
                 if not isinstance(value, float):
                     raise TypeError("variables[key] = value: Expected 'value' to be a float. "
                                     f"Got 'value' of type {type(value).__name__}")
-                self.database_ptr.set_var(<string>name.encode(), <string>periods_.encode(), <double>value, self.mode_)
+                self.database_ptr.set_var(<string>(name.encode()), <string>periods_.encode(), <double>value, self.mode_)
             # update values for a contiguous range of periods
             elif isinstance(periods_, tuple):
                 first_period, last_period = periods_
                 nb_periods = last_period - first_period + 1
                 # values is a LEC expression
                 if isinstance(values, str):
-                    self.database_ptr.update(<string>name.encode(), <string>values.encode(), <int>first_period, <int>last_period)
+                    self.database_ptr.update(<string>(name.encode()), <string>values.encode(), <int>first_period, <int>last_period)
                 else:
                     values = self._convert_values(values, nb_periods)
                     cpp_values = [<double>value for value in values]
-                    self.database_ptr.update(<string>name.encode(), cpp_values, <int>first_period, <int>last_period)
+                    self.database_ptr.update(<string>(name.encode()), cpp_values, <int>first_period, <int>last_period)
             # update values for a list of periods
             else:
                 if isinstance(values, str):
@@ -484,7 +484,7 @@ cdef class Variables(_AbstractDatabase):
                 else:
                     values = self._convert_values(values, len(periods_))
                     for period, value in zip(periods_, values):
-                        self.database_ptr.set_var(<string>name.encode(), <string>period.encode(), <double>value, self.mode_)
+                        self.database_ptr.set_var(<string>(name.encode()), <string>period.encode(), <double>value, self.mode_)
 
     # overriden for Variables
     def __setitem__(self, key, value):
@@ -1823,7 +1823,7 @@ cdef class Variables(_AbstractDatabase):
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names}
         for t, period in enumerate(self.periods):
-            columns[period] = [self.database_ptr.get_var(<string>name.encode(), <int>t, self.mode_) for name in names]
+            columns[period] = [self.database_ptr.get_var(<string>(name.encode()), <int>t, self.mode_) for name in names]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
     def __hash__(self) -> int:
