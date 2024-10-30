@@ -51,6 +51,23 @@ class AbstractMainWindow(QMainWindow):
         self.dialogs.append(dialog)
 
     @Slot()
+    def open_compute_identities_dialog(self):
+        raise NotImplementedError()
+
+    @Slot()
+    def open_graphs_variables_dialog(self):
+        raise NotImplementedError()
+
+    @Slot(list, str, str)
+    def open_graphs_variables_dialog_from_vars_view(self, variable_names: List[str], 
+                                                    from_period: str, to_period: str):
+        raise NotImplementedError()
+
+    @Slot(bool)
+    def compute_hash(self, value: bool):
+        raise NotImplementedError()
+
+    @Slot()
     @Slot(IodeTypes)
     def update_tab_and_completer(self, iode_type: IodeTypes = None):
         raise NotImplementedError()

@@ -651,7 +651,8 @@ class MainWindow(AbstractMainWindow):
         dialog.exec()
 
     @Slot(list, str, str)
-    def open_graphs_variables_dialog_from_vars_view(self, variable_names: List[str], from_period: str, to_period: str):
+    def open_graphs_variables_dialog_from_vars_view(self, variable_names: List[str], 
+                                                    from_period: str, to_period: str):
         dialog = MenuGraphVariables(self)
         dialog.variables_names = variable_names
         dialog.from_period = from_period
