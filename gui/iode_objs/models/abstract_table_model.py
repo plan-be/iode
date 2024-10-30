@@ -131,7 +131,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         if not index.isValid():
             return Qt.ItemFlag.ItemIsEnabled
-        return QAbstractTableModel.flags(index) | Qt.ItemFlag.ItemIsEditable
+        return super().flags(index) | Qt.ItemFlag.ItemIsEditable
 
     # override QAbstractTableModel method
     def headerData(self, section: int, orientation: Qt.Orientation, role: int=Qt.ItemDataRole.DisplayRole) -> Any:
