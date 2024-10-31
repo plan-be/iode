@@ -3,7 +3,7 @@ from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
 from PySide6.QtWidgets import QTextEdit
 
 from typing import List
-from iode import build_command_functions_list
+from iode.reports import build_command_functions_list
 
 
 class HighlightingRule():

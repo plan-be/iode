@@ -2,8 +2,8 @@ from PySide6.QtCore import QStringListModel, QKeyCombination, Qt, Slot
 from PySide6.QtWidgets import QCompleter, QPlainTextEdit, QLineEdit
 from PySide6.QtGui import QKeyEvent, QTextCursor
 
-from iode import (IodeTypes, comments, equations, identities, lists, scalars, tables, variables, 
-                  build_command_functions_list, build_report_functions_list, build_lec_functions_list)
+from iode import IodeTypes, comments, equations, identities, lists, scalars, tables, variables
+from iode.reports import build_command_functions_list, build_report_functions_list, build_lec_functions_list
 from typing import Union, List, Set, Any
 
 
