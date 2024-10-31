@@ -113,7 +113,13 @@ def test_iode_messages():
                         'reset_msgs', 'suppress_msgs'])
 
 
-def test_iode_miscellaneous():
-    run_doctests(items=['table2str', 'check_filepath', 'get_iode_file_type', 
-                        'iode_msg_path', 'print_error_msg', 'build_command_functions_list', 
-                        'build_report_functions_list', 'build_lec_functions_list'])
+def test_iode_miscellaneous(tmp_path):
+    from iode.reports import (build_command_functions_list, build_report_functions_list, 
+                              build_lec_functions_list)
+
+    iode.__test__ = {}
+    iode.__test__['build_command_functions_list'] = build_command_functions_list.__doc__ 
+    iode.__test__['build_report_functions_list'] = build_report_functions_list.__doc__ 
+    iode.__test__['build_lec_functions_list'] = build_lec_functions_list.__doc__
+ 
+    run_doctests(tmp_dir=tmp_path)

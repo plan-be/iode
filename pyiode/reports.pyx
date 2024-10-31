@@ -3,7 +3,9 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.reports cimport build_command_functions_list, build_report_functions_list, build_lec_functions_list
+from pyiode.reports cimport build_command_functions_list as cpp_build_command_functions_list
+from pyiode.reports cimport build_report_functions_list as cpp_build_report_functions_list
+from pyiode.reports cimport build_lec_functions_list as cpp_build_lec_functions_list
 from pyiode.reports cimport execute_report as cpp_execute_report 
 from pyiode.reports cimport execute_report_line as cpp_execute_report_line
 
@@ -36,7 +38,7 @@ def build_command_functions_list(group: int, gui: bool=False) -> List[str]:
 
     Examples
     --------
-    >>> from iode import build_command_functions_list
+    >>> from iode.reports import build_command_functions_list
     >>> build_command_functions_list(0, False)     # doctest: +ELLIPSIS
     ['$label', '$goto', '$ask', ..., '$next', '$procdef', '$procexec']
     >>> build_command_functions_list(0, True)      # doctest: +ELLIPSIS
@@ -46,7 +48,7 @@ def build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     >>> build_command_functions_list(1, True)      # doctest: +ELLIPSIS
     ['#FileImportVar', '#FileImportCmt', '#WsSample', ..., '#ReportExec', '#ReportEdit', '#ReportPrompt']
     """
-    return[name.decode() for name in build_command_functions_list(group, <bint>gui)]
+    return[name.decode() for name in cpp_build_command_functions_list(group, <bint>gui)]
 
 def build_report_functions_list() -> List[str]:
     """
@@ -62,11 +64,11 @@ def build_report_functions_list() -> List[str]:
 
     Examples
     --------
-    >>> from iode import build_report_functions_list
+    >>> from iode.reports import build_report_functions_list
     >>> build_report_functions_list()          # doctest: +ELLIPSIS
     ['@upper', '@date', '@time', '@lower', ..., '@mkdir', '@rmdir', '@void', '@version']
     """
-    return[name.decode() for name in build_report_functions_list()]
+    return[name.decode() for name in cpp_build_report_functions_list()]
 
 def build_lec_functions_list() -> List[str]:
     """
@@ -81,11 +83,11 @@ def build_lec_functions_list() -> List[str]:
     Intended to be used only for building the GUI, not called by users
     Examples
     --------
-    >>> from iode import build_lec_functions_list
+    >>> from iode.reports import build_lec_functions_list
     >>> build_lec_functions_list()         # doctest: +ELLIPSIS
     ['abs', 'acf', 'acos', 'and', ..., 'urandom', 'var', 'vmax', 'vmin']
     """
-    return[name.decode() for name in build_lec_functions_list()]
+    return[name.decode() for name in cpp_build_lec_functions_list()]
 
 
 # functions to be called by the users
