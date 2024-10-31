@@ -1,4 +1,4 @@
-from base_delegate import BaseDelegate
+from .base_delegate import BaseDelegate
 
 from iode import IodeTypes
 
