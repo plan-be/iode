@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Union, List
 
 
-def _build_command_functions_list(group: int, gui: bool=False) -> List[str]:
+def build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     """
     Setup the IODE $/#-functions (i.e. IODE commands).
 
@@ -36,19 +36,19 @@ def _build_command_functions_list(group: int, gui: bool=False) -> List[str]:
 
     Examples
     --------
-    >>> from iode import _build_command_functions_list
-    >>> _build_command_functions_list(0, False)     # doctest: +ELLIPSIS
+    >>> from iode import build_command_functions_list
+    >>> build_command_functions_list(0, False)     # doctest: +ELLIPSIS
     ['$label', '$goto', '$ask', ..., '$next', '$procdef', '$procexec']
-    >>> _build_command_functions_list(0, True)      # doctest: +ELLIPSIS
+    >>> build_command_functions_list(0, True)      # doctest: +ELLIPSIS
     ['#label', '#goto', '#ask', ..., '#next', '#procdef', '#procexec']
-    >>> _build_command_functions_list(1, False)     # doctest: +ELLIPSIS
+    >>> build_command_functions_list(1, False)     # doctest: +ELLIPSIS
     ['$FileImportVar', '$FileImportCmt', '$FileDelete', ..., '$CsvDec', '$CsvNaN', '$CsvAxes']
-    >>> _build_command_functions_list(1, True)      # doctest: +ELLIPSIS
+    >>> build_command_functions_list(1, True)      # doctest: +ELLIPSIS
     ['#FileImportVar', '#FileImportCmt', '#WsSample', ..., '#ReportExec', '#ReportEdit', '#ReportPrompt']
     """
     return[name.decode() for name in build_command_functions_list(group, <bint>gui)]
 
-def _build_report_functions_list() -> List[str]:
+def build_report_functions_list() -> List[str]:
     """
     Setup the @-functions (i.e. the IODE functions)
 
@@ -62,13 +62,13 @@ def _build_report_functions_list() -> List[str]:
 
     Examples
     --------
-    >>> from iode import _build_report_functions_list
-    >>> _build_report_functions_list()          # doctest: +ELLIPSIS
+    >>> from iode import build_report_functions_list
+    >>> build_report_functions_list()          # doctest: +ELLIPSIS
     ['@upper', '@date', '@time', '@lower', ..., '@mkdir', '@rmdir', '@void', '@version']
     """
     return[name.decode() for name in build_report_functions_list()]
 
-def _build_lec_functions_list() -> List[str]:
+def build_lec_functions_list() -> List[str]:
     """
     Set the list of functions available in LEC expression.
 
@@ -81,8 +81,8 @@ def _build_lec_functions_list() -> List[str]:
     Intended to be used only for building the GUI, not called by users
     Examples
     --------
-    >>> from iode import _build_lec_functions_list
-    >>> _build_lec_functions_list()         # doctest: +ELLIPSIS
+    >>> from iode import build_lec_functions_list
+    >>> build_lec_functions_list()         # doctest: +ELLIPSIS
     ['abs', 'acf', 'acos', 'and', ..., 'urandom', 'var', 'vmax', 'vmin']
     """
     return[name.decode() for name in build_lec_functions_list()]

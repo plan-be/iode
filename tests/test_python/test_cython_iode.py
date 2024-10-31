@@ -115,5 +115,5 @@ def test_iode_messages():
 
 def test_iode_miscellaneous():
     run_doctests(items=['table2str', '_check_filepath', '_get_iode_file_type', 
-                        '_iode_msg_path', '_print_error_msg', '_build_command_functions_list', 
-                        '_build_report_functions_list', '_build_lec_functions_list'])
+                        '_iode_msg_path', '_print_error_msg', 'build_command_functions_list', 
+                        'build_report_functions_list', 'build_lec_functions_list'])

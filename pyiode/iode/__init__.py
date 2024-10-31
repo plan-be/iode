@@ -26,7 +26,7 @@ from .iode_python import load_extra_files
 
 # Reports
 from .iode_python import execute_report, execute_command
-from .iode_python import _build_command_functions_list, _build_report_functions_list, _build_lec_functions_list
+from .iode_python import build_command_functions_list, build_report_functions_list, build_lec_functions_list
 
 # Printing
 from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
@@ -83,8 +83,8 @@ __all__ = [
 
 # ==== ONLY FOR GUI ====
 from .util import table2str, _check_filepath, _get_iode_file_type
-from .iode_python import (_iode_msg_path, _print_error_msg, _build_command_functions_list, 
-                          _build_report_functions_list, _build_lec_functions_list)
+from .iode_python import (_iode_msg_path, _print_error_msg, build_command_functions_list, 
+                          build_report_functions_list, build_lec_functions_list)
 from .iode_python import EditAndEstimateEquations
 
 # ==== DEPRECATED API ====
