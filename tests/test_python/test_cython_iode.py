@@ -116,7 +116,8 @@ def test_iode_messages():
 def test_iode_miscellaneous(tmp_path):
     from iode.reports import (build_command_functions_list, build_report_functions_list, 
                               build_lec_functions_list)
-    from iode.util import table2str, check_filepath, get_iode_file_type
+    from iode.util import (table2str, check_filepath, get_iode_file_type, iode_msg_path, 
+                           print_error_msg)
 
     iode.__test__ = {}
     iode.__test__['build_command_functions_list'] = build_command_functions_list.__doc__ 
@@ -125,5 +126,7 @@ def test_iode_miscellaneous(tmp_path):
     iode.__test__['table2str'] = table2str.__doc__
     iode.__test__['check_filepath'] = check_filepath.__doc__
     iode.__test__['get_iode_file_type'] = get_iode_file_type.__doc__
-    
+    iode.__test__['iode_msg_path'] = iode_msg_path.__doc__
+    iode.__test__['print_error_msg'] = print_error_msg.__doc__
+
     run_doctests(tmp_dir=tmp_path)
