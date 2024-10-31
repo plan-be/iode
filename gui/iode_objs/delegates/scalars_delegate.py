@@ -1,4 +1,4 @@
-from base_delegate import BaseDelegate
+from .base_delegate import BaseDelegate
 from util.double_validator import IodeDoubleValidator
 
 from PySide6.QtCore import QModelIndex
