@@ -11,7 +11,7 @@ from .iode_python import (__version__, NA, is_NA, _IODE_DEFAULT_DATABASE_FILENAM
                           IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, FileType, IODE_FILE_TYPES)
 
 # time
-from .iode_python import Period, Sample, periodicities
+from .iode_python import Period, Sample, PERIODICITY_LIST
 
 # IODE objects
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
@@ -54,7 +54,7 @@ __all__ = [
     'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
 
     # time
-    'Period', 'Sample', 'periodicities',
+    'Period', 'Sample', 'PERIODICITY_LIST',
 
     #IODE objects
     'Equation', 'Identity', 'Scalar', 'Table', 'split_list', 

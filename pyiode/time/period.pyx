@@ -4,8 +4,10 @@ from typing import Union, Tuple
 from libcpp.string cimport string
 from time.period cimport CPeriod
 
+from typing import List
 
-periodicities = ["Y", "S", "Q", "M", "W", "D"]
+
+PERIODICITY_LIST: List[str] = ["Y", "S", "Q", "M", "W", "D"]
 
 
 # Period wrapper class
@@ -88,7 +90,7 @@ cdef class Period:
         def check_periodicity(value: str) -> int:
             if len(value) != 1:
                 raise ValueError("'periodicity': Expected string of length 1")
-            if value not in periodicities:
+            if value not in PERIODICITY_LIST:
                 raise ValueError(f"Wrong periodicity. Valid periodicity are: 'Y', 'S', 'Q', 'M', 'W' or 'D'")
             return value.encode()[0]
 
