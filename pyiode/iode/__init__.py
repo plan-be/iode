@@ -81,7 +81,6 @@ __all__ = [
 ]
 
 # ==== ONLY FOR GUI ====
-from .iode_python import (iode_msg_path, print_error_msg)
 from .iode_python import EditAndEstimateEquations
 
 # ==== DEPRECATED API ====
