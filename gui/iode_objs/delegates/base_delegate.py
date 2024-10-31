@@ -3,7 +3,6 @@ from PySide6.QtWidgets import (QStyledItemDelegate, QLineEdit, QPlainTextEdit,
 from PySide6.QtCore import Qt, QEvent, QObject, QModelIndex, QAbstractItemModel
 from PySide6.QtGui import QKeyEvent
 
-from util.double_validator import DoubleValidator
 from iode import IodeTypes
 
 
