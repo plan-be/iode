@@ -3,7 +3,7 @@ from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
 from PySide6.QtWidgets import QTextEdit
 
 from typing import List
-from iode import _build_command_functions_list
+from iode import build_command_functions_list
 
 
 class HighlightingRule():
@@ -67,12 +67,12 @@ class IodeHighlighter(QSyntaxHighlighter):
             color (QColor): The color to apply to the command.
         """
         # $-functions
-        for func in _build_command_functions_list(group):
+        for func in build_command_functions_list(group):
             q_func = r"[$]!?\b" + func[1:] + r"\b"
             self._add_rule(q_func, color)
 
         # #-functions
-        for func in _build_command_functions_list(group, True):
+        for func in build_command_functions_list(group, True):
             q_func = r"[#]!?\b" + func[1:] + r"\b"
             self._add_rule(q_func, color)
 

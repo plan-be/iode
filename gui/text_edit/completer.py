@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QCompleter, QPlainTextEdit, QLineEdit
 from PySide6.QtGui import QKeyEvent, QTextCursor
 
 from iode import (IodeTypes, comments, equations, identities, lists, scalars, tables, variables, 
-                  _build_command_functions_list, _build_report_functions_list, _build_lec_functions_list)
+                  build_command_functions_list, build_report_functions_list, build_lec_functions_list)
 from typing import Union, List, Set, Any
 
 
@@ -30,7 +30,7 @@ class IodeCompleter(QCompleter):
         self.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
 
         self.report_commands_list: List[str] = self._build_report_commands_list()
-        self.lec_functions_list: List[str] = self._build_lec_functions_list()
+        self.lec_functions_list: List[str] = self.build_lec_functions_list()
         self.iode_databases: List[Any] = [comments, equations, identities, lists, 
                                           scalars, tables, variables] 
         self.iode_types_handled: Set[int] = set()
@@ -69,24 +69,24 @@ class IodeCompleter(QCompleter):
         """
         report_commands_list: List[str] = []
 
-        func_list = _build_command_functions_list(-1)
+        func_list = build_command_functions_list(-1)
         report_commands_list.extend(func_list)
 
-        func_list = _build_command_functions_list(-1, True)
+        func_list = build_command_functions_list(-1, True)
         report_commands_list.extend(func_list)
 
-        func_list = _build_report_functions_list()
+        func_list = build_report_functions_list()
         report_commands_list.extend(func_list)
 
         report_commands_list.sort()
         return report_commands_list
 
-    def _build_lec_functions_list(self) -> List[str]:
+    def build_lec_functions_list(self) -> List[str]:
         """
         Builds the list of LEC functions.
         """
         lec_functions_list: List[str] = []
-        func_list = _build_lec_functions_list()
+        func_list = build_lec_functions_list()
         lec_functions_list.extend(func_list)
 
         lec_functions_list.sort()
