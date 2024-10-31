@@ -140,7 +140,7 @@ cdef class Scalar:
         return copied_scl
 
     def __str__(self) -> str:
-        return f"Scalar({_iode_number_to_str(self.value)}, {_iode_number_to_str(self.relax)}, {_iode_number_to_str(self.std)})"
+        return f"Scalar({iode_number_to_str(self.value)}, {iode_number_to_str(self.relax)}, {iode_number_to_str(self.std)})"
 
     def __repr__(self) -> str:
         return str(self)
