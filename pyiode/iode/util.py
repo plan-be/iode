@@ -471,7 +471,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     return str(p_filepath)
 
 
-def _get_iode_file_type(filepath: str) -> IodeFileType:
+def get_iode_file_type(filepath: str) -> IodeFileType:
     r"""
     Return the IODE file type of a filepath. The filepath can be a relative or an absolute path.
 
@@ -489,113 +489,113 @@ def _get_iode_file_type(filepath: str) -> IodeFileType:
     --------
     >>> from pathlib import Path
     >>> from iode import IodeFileType, SAMPLE_DATA_DIR
-    >>> from iode.util import _get_iode_file_type
+    >>> from iode.util import get_iode_file_type
 
     >>> filename = ""
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_ANY: 32>
     >>> filename = "ws"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_ANY: 32>
 
-    >>> _get_iode_file_type(SAMPLE_DATA_DIR)
+    >>> get_iode_file_type(SAMPLE_DATA_DIR)
     <IodeFileType.DIRECTORY: 33>
 
     >>> filename = "fun.cmt"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_COMMENTS: 0>
     >>> filename = "fun.ac"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_COMMENTS: 0>
 
     >>> filename = "fun.eqs"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_EQUATIONS: 1>
     >>> filename = "fun.ae"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_EQUATIONS: 1>
 
     >>> filename = "fun.idt"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_IDENTITIES: 2>
     >>> filename = "fun.ai"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_IDENTITIES: 2>
 
     >>> filename = "fun.lst"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_LISTS: 3>
     >>> filename = "fun.al"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_LISTS: 3>
 
     >>> filename = "fun.scl"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_SCALARS: 4>
     >>> filename = "fun.as"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_SCALARS: 4>
 
     >>> filename = "fun.tbl"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_TABLES: 5>
     >>> filename = "fun.at"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_TABLES: 5>
 
     >>> filename = "fun.var"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_VARIABLES: 6>
     >>> filename = "fun.av"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_VARIABLES: 6>
 
     >>> filename = "fun.rep"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_REP: 16>
     
     >>> filename = "fun.log"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_LOG: 30>
 
     >>> filename = "fun.ini"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_SETTINGS: 31>
 
     >>> filename = "fun.txt"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_TXT: 25>
 
     >>> filename = "fun.a2m"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_A2M: 17>
 
     >>> filename = "fun.agl"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_AGL: 18>
 
     >>> filename = "fun.prf"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_PRF: 19>
 
     >>> filename = "fun.dif"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_DIF: 20>
 
     >>> filename = "fun.mif"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_MIF: 21>
 
     >>> filename = "fun.rtf"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_RTF: 22>
 
     >>> filename = "fun.asc"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_AAS: 24>
 
     >>> filename = "fun.ref"
-    >>> _get_iode_file_type(filename)
+    >>> get_iode_file_type(filename)
     <IodeFileType.FILE_REF: 29>
     """
     if not filepath:
