@@ -93,7 +93,7 @@ def reset_msgs():
     IodeResetMsgs()
 
 
-def _iode_msg_path() -> str:
+def iode_msg_path() -> str:
     '''Return the path to the iode.msg file.
     
     Returns
@@ -103,8 +103,8 @@ def _iode_msg_path() -> str:
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode.iode_python import _iode_msg_path
-    >>> iode_msg_path = Path(_iode_msg_path())
+    >>> from iode.iode_python import iode_msg_path
+    >>> iode_msg_path = Path(iode_msg_path())
     >>> iode_msg_path.exists()
     True
     >>> iode_msg_path.name
