@@ -19,7 +19,7 @@ from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 
-from iode.util import _check_filepath
+from iode.util import check_filepath
 
 # TableCell wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
