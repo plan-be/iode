@@ -116,7 +116,7 @@ def iode_msg_path() -> str:
     return iode_msg_path.decode("cp850")
 
 
-def _print_error_msg(error_code: int) -> str:
+def print_error_msg(error_code: int) -> str:
     '''Print an error message corresponding to an error code.
        See error codes and error messages in the iode.msg file.
 
@@ -131,8 +131,8 @@ def _print_error_msg(error_code: int) -> str:
 
     Examples
     --------
-    >>> from iode.iode_python import _print_error_msg
-    >>> _print_error_msg(16)
+    >>> from iode.iode_python import print_error_msg
+    >>> print_error_msg(16)
     ' Sample modified'
     '''
     return B_msg(error_code).decode("cp850")

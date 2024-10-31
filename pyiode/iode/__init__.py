@@ -83,7 +83,7 @@ __all__ = [
 
 # ==== ONLY FOR GUI ====
 from .util import table2str, check_filepath, get_iode_file_type
-from .iode_python import (iode_msg_path, _print_error_msg, build_command_functions_list, 
+from .iode_python import (iode_msg_path, print_error_msg, build_command_functions_list, 
                           build_report_functions_list, build_lec_functions_list)
 from .iode_python import EditAndEstimateEquations
 
