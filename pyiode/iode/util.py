@@ -307,7 +307,7 @@ def table2str(columns: Dict[str, List[str]], sep: str = '\t', justify_funcs: Dic
     return s
 
 
-def _check_file(filepath: str, file_must_exist: bool = False) -> Path:
+def check_file(filepath: str, file_must_exist: bool = False) -> Path:
     """
     This function checks if the parent directory of the 'filepath' exists and 
     returns its absolute path.
@@ -334,7 +334,7 @@ def _check_file(filepath: str, file_must_exist: bool = False) -> Path:
     return p_filepath
 
 
-def _check_file_exists(filepath: str) -> Path:
+def check_file_exists(filepath: str) -> Path:
     """
     This function checks if the 'filepath' exists and returns its absolute path.
     """
@@ -432,7 +432,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     >>> Path(checked_filepath).parent.name
     'data'
     """
-    p_filepath: Path = _check_file(filepath, False)
+    p_filepath: Path = check_file(filepath, False)
 
     # check or add extension
     if p_filepath.suffix:
