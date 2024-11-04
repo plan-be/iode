@@ -418,12 +418,12 @@ class IodeAbstractTableView(QTableView):
     @Slot()
     def new_obj(self):
         """Creates a new object."""
-        self.open_edit_dialog()
+        self.open_add_dialog()
 
     @Slot()
     def edit_obj(self):
         """Edits the selected object."""
-        self.open_add_dialog()
+        self.open_edit_dialog()
 
     @Slot(str)
     def new_object_inserted(self, name: str):
