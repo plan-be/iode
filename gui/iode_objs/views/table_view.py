@@ -14,6 +14,9 @@ from iode_objs.delegates.scalars_delegate import ScalarsDelegate
 from iode_objs.delegates.tables_delegate import TablesDelegate
 from iode_objs.delegates.variables_delegate import VariablesDelegate
 
+from iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
+                                      AddScalarDialog, AddTableDialog, AddVariableDialog)
+
 from iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_objs.models.table_model import IdentitiesModel
 from iode_objs.models.table_model import VariablesModel
@@ -40,7 +43,7 @@ class CommentsView(IodeAbstractTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddCommentDialog(model.displayed_database, self)
+        return AddCommentDialog(model.displayed_database, self)
 
 
 class EquationsView(IodeAbstractTableView):
@@ -60,8 +63,12 @@ class EquationsView(IodeAbstractTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddEquationDialog(model.displayed_database, self)
-    
+        # dialog: EditEquationDialog = EditEquationDialog("", model.displayed_database, self)
+        # dialog.new_object_inserted.connect(self.new_object_inserted)
+		# dialog.database_modified.connect(self.database_modified)
+		# dialog.database_modified.connect(self.update_filter)
+        # return dialog
+
     @Slot()
     def update_filter(self):
         model: IodeAbstractTableModel = self.model()
@@ -97,7 +104,7 @@ class IdentitiesView(IodeAbstractTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddIdentityDialog(model.displayed_database, self)
+        return AddIdentityDialog(model.displayed_database, self)
 
     @Slot()
     def execute_current_identity(self):
@@ -133,7 +140,7 @@ class ListsView(IodeAbstractTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddListDialog(model.displayed_database, self)
+        return AddListDialog(model.displayed_database, self)
 
 
 class ScalarsView(IodeAbstractTableView, NumericalTableView):
@@ -153,7 +160,7 @@ class ScalarsView(IodeAbstractTableView, NumericalTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddScalarDialog(model.displayed_database, self)
+        return AddScalarDialog(model.displayed_database, self)
 
     # override QTableView method
     @Slot(QContextMenuEvent)
@@ -186,7 +193,7 @@ class TablesView(IodeAbstractTableView):
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # return AddTableDialog(model.displayed_database, self)
+        return AddTableDialog(model.displayed_database, self)
 
     @Slot()
     def display(self):
@@ -314,7 +321,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
         if not self.check_global_sample():
             return None
         model: IodeAbstractTableModel = self.model()
-        # return AddVariableDialog(model.displayed_database, self)
+        return AddVariableDialog(model.displayed_database, self)
 
     # override QTableView method
     @Slot(QContextMenuEvent)
