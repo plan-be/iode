@@ -16,6 +16,8 @@ from iode_objs.delegates.variables_delegate import VariablesDelegate
 
 from iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
                                       AddScalarDialog, AddTableDialog, AddVariableDialog)
+from iode_objs.edit.edit_iode_obj import (EditCommentDialog, EditIdentityDialog, 
+                                          EditListDialog)
 
 from iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_objs.models.table_model import IdentitiesModel
@@ -38,8 +40,8 @@ class CommentsView(IodeAbstractTableView):
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditCommentDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        self.edit_dialog = EditCommentDialog(obj_name, model.displayed_database, self)
+        self.edit_dialog.database_modified.connect(self.database_modified)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
@@ -65,8 +67,8 @@ class EquationsView(IodeAbstractTableView):
         model: IodeAbstractTableModel = self.model()
         # dialog: EditEquationDialog = EditEquationDialog("", model.displayed_database, self)
         # dialog.new_object_inserted.connect(self.new_object_inserted)
-		# dialog.database_modified.connect(self.database_modified)
-		# dialog.database_modified.connect(self.update_filter)
+        # dialog.database_modified.connect(self.database_modified)
+        # dialog.database_modified.connect(self.update_filter)
         # return dialog
 
     @Slot()
@@ -99,8 +101,8 @@ class IdentitiesView(IodeAbstractTableView):
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditIdentityDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        self.edit_dialog = EditIdentityDialog(obj_name, model.displayed_database, self)
+        self.edit_dialog.database_modified.connect(self.database_modified)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
@@ -135,8 +137,8 @@ class ListsView(IodeAbstractTableView):
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditListDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        self.edit_dialog = EditListDialog(obj_name, model.displayed_database, self)
+        self.edit_dialog.database_modified.connect(self.database_modified)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
@@ -154,9 +156,7 @@ class ScalarsView(IodeAbstractTableView, NumericalTableView):
         self.verticalHeader().setStretchLastSection(False)
 
     def _open_edit_dialog(self, obj_name: str):
-        model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditScalarDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        pass
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
@@ -313,9 +313,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
         self.context_menu.addAction(action)
 
     def _open_edit_dialog(self, obj_name: str):
-        model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditVariableDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        pass
 
     def _open_add_dialog(self) -> QDialog:
         if not self.check_global_sample():
