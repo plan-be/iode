@@ -459,7 +459,7 @@ class IodeAbstractTableView(QTableView):
         self.dump_table_in_document()
         dialog.exec()
 
-    def _open_edit_dialog(self, obj_name: str) -> QDialog:
+    def _open_edit_dialog(self, obj_name: str):
         raise NotImplementedError()
 
     @Slot()
@@ -475,8 +475,9 @@ class IodeAbstractTableView(QTableView):
         if self.edit_dialog:
             self.edit_dialog.close()
 
-        self.edit_dialog = self._open_edit_dialog(obj_name)
-        self.edit_dialog.show()
+        self._open_edit_dialog(obj_name)
+        if self.edit_dialog:
+            self.edit_dialog.show()
 
     def _open_add_dialog(self) -> QDialog:
         raise NotImplementedError()
