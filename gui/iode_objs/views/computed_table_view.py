@@ -7,8 +7,9 @@ from .numerical_view import NumericalTableView
 
 class ComputedTableView(QTableView, NumericalTableView):
     def __init__(self, parent=None):
-        QTableView.__init__(parent)
-        NumericalTableView.__init__(False)
+        QTableView.__init__(self, parent)
+        NumericalTableView.__init__(self)
+        NumericalTableView.setup(self, allow_to_paste=False)
 
     # override QTableView method
     @Slot(QContextMenuEvent)
