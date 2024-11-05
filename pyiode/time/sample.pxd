@@ -16,7 +16,7 @@ cdef extern from "api/iode.h":
 cdef extern from "cpp_api/time/sample.h":
     cdef cppclass CSample "Sample":
         CSample(const CSample& sample) except +
-        CSample(const string, const string) except +
+        CSample(const string&, const string&) except +
         CPeriod start_period()
         CPeriod end_period()
         int nb_periods()

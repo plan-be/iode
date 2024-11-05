@@ -31,6 +31,15 @@ cdef class Sample:
     """
     A sample represents the series of sub periods attached to the IODE variables or to the estimation process.
 
+    Parameters
+    ----------
+    start_period: str or Period
+    	First period of the sample.
+    	If str, it must be a valid period string (e.g. '1960Y1').
+    end_period: str or Period
+    	Last period of the sample.
+        If str, it must be a valid period string (e.g. '2015Y1').
+
     Attributes
     ----------
     start: str
@@ -42,18 +51,29 @@ cdef class Sample:
 
     Examples
     --------
-    >>> from iode import variables, SAMPLE_DATA_DIR
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    >>> variables.sample
-    '1960Y1:2015Y1'
+    >>> from iode import Sample
+    >>> Sample("1982Y1", "2020Y1")
+    Sample("1982Y1:2020Y1")
+    >>> Sample("1982Y1:2020Y1")
+    Sample("1982Y1:2020Y1")
     """
     cdef bint ptr_owner
     cdef CSample* c_sample
 
-    def __init__(self):
-        # Prevent accidental instantiation from normal Python code
-        # since we cannot pass a struct pointer into a Python constructor.
-        raise TypeError("This class cannot be instantiated directly.")
+    def __init__(self, start_period: Union[str, Period], end_period: Union[str, Period]=None):
+        if isinstance(start_period, Period):
+            start_period = str(start_period)
+        if end_period is not None and isinstance(end_period, Period):
+            end_period = str(end_period)
+        
+        if end_period is None: 
+            if ':' not in start_period:
+                raise ValueError("When only one parameter is passed to Sample(), it is considered as "
+                                 "a string representation of the desired sample and must include a colon ':'")
+            start_period, end_period = start_period.split(':')
+
+        self.ptr_owner = True
+        self.c_sample = new CSample(start_period.encode(), end_period.encode())
 
     def __cinit__(self):
         self.ptr_owner = False
@@ -156,14 +176,14 @@ cdef class Sample:
         >>> from iode import variables, SAMPLE_DATA_DIR
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables_2 = variables.copy()
         >>> variables_2.sample = "2000Y1:2040Y1"
         >>> variables_2.sample
-        '2000Y1:2040Y1'
+        Sample("2000Y1:2040Y1")
         >>> sample_intersec = variables.sample.intersection(variables_2.sample)
         >>> sample_intersec
-        '2000Y1:2015Y1'
+        Sample("2000Y1:2015Y1")
         """
         if self.c_sample is NULL:
             raise RuntimeError("'sample' is not defined")
@@ -177,25 +197,25 @@ cdef class Sample:
     @property
     def start(self) -> Period:
         if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
+            warnings.warn("'sample' is not defined")
             return None
         else:
             c_period = self.c_sample.start_period()
-            return Period(c_period.to_string().decode())
+            return Period(c_period.to_string().decode()) if c_period.p_y > 0 else None
 
     @property
     def end(self) -> Period:
         if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
+            warnings.warn("'sample' is not defined")
             return None
         else:
             c_period = self.c_sample.end_period()
-            return Period(c_period.to_string().decode())
+            return Period(c_period.to_string().decode()) if c_period.p_y > 0 else None
 
     @property
     def nb_periods(self) -> int:
         if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
+            warnings.warn("'sample' is not defined")
             return 0
         else:
             return self.c_sample.nb_periods()
@@ -204,31 +224,31 @@ cdef class Sample:
 
     def __len__(self) -> int:
         if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
+            warnings.warn("'sample' is not defined")
             return 0
         else:
             return self.c_sample.nb_periods()
 
     def __eq__(self, other: Sample) -> bool:
         if self.c_sample is NULL:
-            warnings.warns("'sample' in 'sample == other' is not defined")
+            warnings.warn("'sample' in 'sample == other' is not defined")
             return False
         elif other.c_sample is NULL:
-            warnings.warns("other sample in 'sample == other' is not defined")
+            warnings.warn("other sample in 'sample == other' is not defined")
             return False
         else:
             return self.c_sample == other.c_sample
 
     def __str__(self) -> str:
-        if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
-            return ''
+        if self.c_sample is NULL or (self.start is None and self.end is None):
+            warnings.warn("'sample' is not defined")
+            return str(None)
         else:
-            return self.c_sample.to_string().decode()
+            return f"{self.start}:{self.end}"
 
     def __repr__(self) -> str:
-        if self.c_sample is NULL:
-            warnings.warns("'sample' is not defined")
-            return ''
+        if self.c_sample is NULL or (self.start is None and self.end is None):
+            warnings.warn("'sample' is not defined")
+            return str(None)
         else:
-            return repr(str(self))
+            return f'Sample("{self.start}:{self.end}")'

@@ -474,35 +474,35 @@ cdef class Equation:
         >>> variables.clear()
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF.sample
-        ':'
+        None
 
         >>> # set Variables sample
         >>> variables.sample = "1960Y1:2015Y1"
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
 
         >>> # specify starting and ending periods
         >>> eq_ACAF.sample = "1980Y1:2000Y1"
         >>> eq_ACAF.sample
-        '1980Y1:2000Y1'
+        Sample("1980Y1:2000Y1")
 
         >>> # specify only the starting period 
         >>> # -> ending period = ending period of the Variables sample
         >>> eq_ACAF.sample = "1990Y1:"
         >>> eq_ACAF.sample
-        '1990Y1:2015Y1'
+        Sample("1990Y1:2015Y1")
 
         >>> # specify only the ending period 
         >>> # -> starting period = starting period of the Variables sample
         >>> eq_ACAF.sample = ":2010Y1"
         >>> eq_ACAF.sample
-        '1960Y1:2010Y1'
+        Sample("1960Y1:2010Y1")
 
         >>> # specify nothing
         >>> # new equation sample = Variables sample
         >>> eq_ACAF.sample = ":"
         >>> eq_ACAF.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         """
         cdef CSample sample = self.c_equation.get_sample()
         return Sample._from_ptr(new CSample(sample), <bint>True)

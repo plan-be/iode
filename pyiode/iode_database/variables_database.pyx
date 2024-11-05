@@ -414,7 +414,7 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables, NA
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
 
         >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
@@ -849,7 +849,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.names
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
-        '1960Y1:1970Y1'
+        Sample("1960Y1:1970Y1")
         >>> variables["VLA_00"]
         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         >>> variables["BXL_02"]
@@ -909,7 +909,7 @@ cdef class Variables(_AbstractDatabase):
         >>> len(variables)
         394
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.nb_periods
         56
 
@@ -1042,7 +1042,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.names
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
-        '1960Y1:1970Y1'
+        Sample("1960Y1:1970Y1")
         >>> variables["VLA_00"]
         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         >>> variables["BXL_02"]
@@ -1099,7 +1099,7 @@ cdef class Variables(_AbstractDatabase):
         >>> len(variables)
         394
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.nb_periods
         56
 
@@ -1210,25 +1210,25 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
 
         >>> # update sample by passing a string
         >>> variables.sample = '1970Y1:2020Y1'
         >>> variables.sample
-        '1970Y1:2020Y1'
+        Sample("1970Y1:2020Y1")
         >>> # start or end period are optional
         >>> variables.sample = ':2010Y1'
         >>> variables.sample
-        '1970Y1:2010Y1'
+        Sample("1970Y1:2010Y1")
         >>> variables.sample = '1980Y1:'
         >>> variables.sample
-        '1980Y1:2010Y1'
+        Sample("1980Y1:2010Y1")
 
         >>> # update sample by passing a start period and 
         >>> # an end period separated by a comma
         >>> variables.sample = '1980Y1', '2010Y1'
         >>> variables.sample
-        '1980Y1:2010Y1'
+        Sample("1980Y1:2010Y1")
         """
         cdef CSample* c_sample = self.database_ptr.get_sample()
         return Sample._from_ptr(c_sample, <bint>False)
@@ -1267,7 +1267,7 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.nb_periods
         56
         """
@@ -1288,7 +1288,7 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.periods       # doctest: +ELLIPSIS 
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         """
@@ -1309,7 +1309,7 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.periods_as_float          # doctest: +ELLIPSIS 
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
@@ -1341,7 +1341,7 @@ cdef class Variables(_AbstractDatabase):
         >>> len(variables)
         394
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.nb_periods
         56
 
@@ -1432,7 +1432,7 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> variables.periods_subset("1990Y1", "2000Y1")                    # doctest: +ELLIPSIS
         ['1990Y1', '1991Y1', ..., '1999Y1', '2000Y1']
         >>> variables.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS

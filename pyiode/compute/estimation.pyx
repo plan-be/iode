@@ -302,15 +302,15 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
 
         >>> from iode.iode_python import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations()
         >>> estimation.sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> estimation.sample = "1980Y1:1996Y1"
         >>> estimation.sample
-        '1980Y1:1996Y1'
+        Sample("1980Y1:1996Y1")
         """
         cdef CSample* c_sample = self.c_estimation_ptr.get_sample()
         return Sample._from_ptr(c_sample, <bint>False)
