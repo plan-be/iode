@@ -775,7 +775,7 @@ cdef class Equation:
         s += [f"lec = {repr(self.lec)}"]
         s += [f"method = {repr(self.method)}"]
         if len(sample):
-            s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
+            s+= [f"from_period = '{sample.start}'", f"to_period = '{sample.end}'"]
         if self.comment:
             s += [f"comment = {repr(self.comment)}"]
         if self.block:
