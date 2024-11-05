@@ -51,16 +51,16 @@ cdef class Equations(_AbstractDatabase):
     <BLANKLINE>
      name                                                    lec                                                method      sample      block    fstat      r2adj     dw     loglik    date
     ACAF        (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                                           LSQ  1980Y1:1996Y1    ACAF   32.2732     0.7963  2.3293  83.8075 12-06-1998
-    ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ              :    ACAG    0.0000     0.0000  0.0000   0.0000
-    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ              :    AOUC    0.0000     0.0000  0.0000   0.0000
-    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ              :   BENEF    0.0000     0.0000  0.0000   0.0000
-    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ              :     BQY    0.0000     0.0000  0.0000   0.0000
+    ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ           None    ACAG    0.0000     0.0000  0.0000   0.0000
+    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ           None    AOUC    0.0000     0.0000  0.0000   0.0000
+    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ           None   BENEF    0.0000     0.0000  0.0000   0.0000
+    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ           None     BQY    0.0000     0.0000  0.0000   0.0000
     ...         ...                                                                                                ...            ...     ...       ...        ...     ...      ...        ...
-    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ              :    YSSF    0.0000     0.0000  0.0000   0.0000
-    YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ              :    YSSG    0.0000     0.0000  0.0000   0.0000
-    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ              :      ZF    0.0000     0.0000  0.0000   0.0000
-    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ              :      ZJ    0.0000     0.0000  0.0000   0.0000
-    ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ              :    ZZF_    0.0000     0.0000  0.0000   0.0000
+    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ           None    YSSF    0.0000     0.0000  0.0000   0.0000
+    YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ           None    YSSG    0.0000     0.0000  0.0000   0.0000
+    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ           None      ZF    0.0000     0.0000  0.0000   0.0000
+    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ           None      ZJ    0.0000     0.0000  0.0000   0.0000
+    ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ           None    ZZF_    0.0000     0.0000  0.0000   0.0000
     <BLANKLINE>
     """
     cdef bint ptr_owner
@@ -456,7 +456,7 @@ cdef class Equations(_AbstractDatabase):
         >>> for eq_name in block.split(';'):
         ...     equations[eq_name] = {"sample": estim_sample, "block": block}
         >>> (equations["ACAF"].sample, equations["ACAG"].sample, equations["AOUC"].sample)
-        ('2000Y1:2010Y1', '2000Y1:2010Y1', '2000Y1:2010Y1')
+        (Sample("2000Y1:2010Y1"), Sample("2000Y1:2010Y1"), Sample("2000Y1:2010Y1"))
         >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
         >>> # update lec, method, sample and block
@@ -1004,7 +1004,7 @@ cdef class Equations(_AbstractDatabase):
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                                         :
+        sample                                                      None
         comment
         instruments
         block                                                       YDH_
@@ -1077,7 +1077,7 @@ cdef class Equations(_AbstractDatabase):
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                                         :
+        sample                                                      None
         comment
         instruments
         block                                                       YDH_
@@ -1178,7 +1178,7 @@ cdef class Equations(_AbstractDatabase):
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                                         :
+        sample                                                      None
         comment
         instruments
         block                                                       YDH_
@@ -1251,7 +1251,7 @@ cdef class Equations(_AbstractDatabase):
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                                         :
+        sample                                                      None
         comment
         instruments
         block                                                       YDH_

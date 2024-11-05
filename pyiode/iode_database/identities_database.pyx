@@ -375,7 +375,7 @@ cdef class Identities(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> sample = variables.sample
         >>> sample
-        '1960Y1:2015Y1'
+        Sample("1960Y1:2015Y1")
         >>> identities["GAP_"]
         Identity('100*((QAF_/Q_F)-1)')
         >>> identities["GAP2"]
@@ -406,7 +406,7 @@ cdef class Identities(_AbstractDatabase):
 
         >>> # compute GAP_ and GAP2 assuming Variables are not already loaded
         >>> variables.clear()
-        >>> variables.sample = '1960Y1:2015Y1'
+        >>> variables.sample = "1960Y1:2015Y1"
         >>> variables.names
         []
         >>> # setting the var_files argument will fetch the required values of 
