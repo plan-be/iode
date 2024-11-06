@@ -20,7 +20,7 @@
 
 # distutils: language = c++
 from pathlib import Path
-from iode_python cimport cpp_iode_init, ODE_assign_super_PYIODE
+from iode_cython cimport cpp_iode_init, ODE_assign_super_PYIODE
 
 # MAIN
 # ----

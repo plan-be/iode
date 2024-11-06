@@ -17,10 +17,10 @@ import sys
 import iode
 print(f"iode: {iode.__version__}, {iode.__file__}")
 
-iode.Database = iode.iode_python._AbstractDatabase
-iode.TableLine = iode.iode_python.TableLine
-iode.TableCell = iode.iode_python.TableCell
-iode.ComputedTable = iode.iode_python.ComputedTable
+iode.Database = iode.iode_cython._AbstractDatabase
+iode.TableLine = iode.iode_cython.TableLine
+iode.TableCell = iode.iode_cython.TableCell
+iode.ComputedTable = iode.iode_cython.ComputedTable
 
 
 # -- Project information -----------------------------------------------------

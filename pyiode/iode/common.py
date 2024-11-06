@@ -1,4 +1,4 @@
-from .iode_python import IodeType, IodeFileType, TableLang, EqMethod, EqTest, _get_file_types
+from .iode_cython import IodeType, IodeFileType, TableLang, EqMethod, EqTest, _get_file_types
 
 from typing import List, Tuple
 

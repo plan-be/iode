@@ -103,7 +103,7 @@ def iode_msg_path() -> str:
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode.iode_python import iode_msg_path
+    >>> from iode.iode_cython import iode_msg_path
     >>> iode_msg_path = Path(iode_msg_path())
     >>> iode_msg_path.exists()
     True
@@ -131,7 +131,7 @@ def print_error_msg(error_code: int) -> str:
 
     Examples
     --------
-    >>> from iode.iode_python import print_error_msg
+    >>> from iode.iode_cython import print_error_msg
     >>> print_error_msg(16)
     ' Sample modified'
     '''

@@ -5,7 +5,7 @@ from textwrap import wrap
 
 from typing import List, Dict, Any
 
-from iode.iode_python import (is_NA, IodeFileType, IodeType, IODE_DEFAULT_DATABASE_FILENAME, 
+from iode.iode_cython import (is_NA, IodeFileType, IodeType, IODE_DEFAULT_DATABASE_FILENAME, 
                               iode_msg_path, print_error_msg)
 from .common import IODE_FILE_TYPES, FileType
 
