@@ -8,7 +8,7 @@ cdef extern from "api/iode.h":
     cdef int IODE_NB_TYPES
     cdef char* I_DEFAULT_FILENAME
 
-    cdef enum IodeDatabaseType:
+    cdef enum IodeTypes:
         COMMENTS,
         EQUATIONS,
         IDENTITIES,
