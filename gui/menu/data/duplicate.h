@@ -13,7 +13,7 @@ class MenuDataDuplicateObj : public IodeSettingsDialog, public Ui::MenuDataDupli
 {
     Q_OBJECT
 
-    WrapperComboBox*    wComboIodeTypes;
+    WrapperComboBox*    wComboIodeType;
     WrapperQLineEdit*   wObjName;
     WrapperQLineEdit*   wDupObjName;
 

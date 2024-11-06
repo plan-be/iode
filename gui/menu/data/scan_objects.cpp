@@ -10,13 +10,13 @@ MenuDataScanObjects::MenuDataScanObjects(QWidget* parent)
     textEdit_lists_to_scan->setCompleter(completer);
     comboBox_iode_types->setCurrentIndex(0);
 
-    QStringList listIodeTypes;
-    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
+    QStringList listIodeType;
+    for(const std::string& iode_type : v_iode_types) listIodeType << QString::fromStdString(iode_type);
 
-    wComboIodeTypes = new WrapperComboBox(label_objs_to_scan->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wComboIodeType = new WrapperComboBox(label_objs_to_scan->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeType);
     wListsToScan = new WrapperQPlainTextEdit(label_lists_to_scan->text(), *textEdit_lists_to_scan, OPTIONAL_FIELD);
 
-    mapFields["IodeType"]    = wComboIodeTypes;
+    mapFields["IodeType"]    = wComboIodeType;
     mapFields["ListsToScan"] = wListsToScan;
 
     connect(comboBox_iode_types, &QComboBox::currentIndexChanged, textEdit_lists_to_scan, &IodeAutoCompleteTextEdit::setIodeType);
@@ -27,7 +27,7 @@ MenuDataScanObjects::MenuDataScanObjects(QWidget* parent)
 
 MenuDataScanObjects::~MenuDataScanObjects()
 {
-    delete wComboIodeTypes;
+    delete wComboIodeType;
     delete wListsToScan;
 
     delete completer;
@@ -39,7 +39,7 @@ void MenuDataScanObjects::scan()
 {
     try
     {
-        int iode_type = wComboIodeTypes->extractAndVerify();
+        int iode_type = wComboIodeType->extractAndVerify();
         std::string list_to_scan = wListsToScan->extractAndVerify().toStdString();
 
         int res = B_DataScan(list_to_scan.data(), iode_type);

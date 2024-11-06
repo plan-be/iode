@@ -166,10 +166,10 @@ public:
 class WrapperIodeNameEdit : public TemplateWrapper<QLineEdit, QString>
 {
 private:
-    IodeTypes iodeType;
+    IodeType iodeType;
 
 public:
-    WrapperIodeNameEdit(const QString name, QLineEdit& qfield, const IodeTypes iodeType, const EnumItemType type) : TemplateWrapper(name, qfield, type), iodeType(iodeType) {};
+    WrapperIodeNameEdit(const QString name, QLineEdit& qfield, const IodeType iodeType, const EnumItemType type) : TemplateWrapper(name, qfield, type), iodeType(iodeType) {};
 
     QVariant getQValue()
     {

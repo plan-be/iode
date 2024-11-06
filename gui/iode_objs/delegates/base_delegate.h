@@ -16,11 +16,11 @@ class BaseDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 
-	IodeTypes iodeType;
+	IodeType iodeType;
 	bool lineEdit;
 
 public:
-	BaseDelegate(IodeTypes iodeType, QObject* parent = nullptr) : QStyledItemDelegate(parent), iodeType(iodeType) 
+	BaseDelegate(IodeType iodeType, QObject* parent = nullptr) : QStyledItemDelegate(parent), iodeType(iodeType) 
 	{
 		lineEdit = iodeType == SCALARS || iodeType == VARIABLES;
 	}

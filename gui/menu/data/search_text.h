@@ -14,7 +14,7 @@ class MenuDataSearchText : public IodeSettingsDialog, public Ui::MenuDataSearchT
 
     WrapperQLineEdit* wText;
     WrapperQLineEdit* wSaveList;
-    WrapperComboBox*  wComboIodeTypes;
+    WrapperComboBox*  wComboIodeType;
     WrapperCheckBox*  wWholeWord;
     WrapperCheckBox*  wExactCase;
     WrapperCheckBox*  wSearchInNames;

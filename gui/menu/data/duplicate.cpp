@@ -10,14 +10,14 @@ MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
     lineEdit_obj_name->setCompleter(completer);
     comboBox_iode_types->setCurrentIndex(0);
 
-    QStringList listIodeTypes;
-    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
+    QStringList listIodeType;
+    for(const std::string& iode_type : v_iode_types) listIodeType << QString::fromStdString(iode_type);
 
-    wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wComboIodeType = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeType);
     wObjName = new WrapperQLineEdit(label_obj_name->text(), *lineEdit_obj_name, REQUIRED_FIELD);
     wDupObjName = new WrapperQLineEdit(label_dup_obj_name->text(), *lineEdit_dup_obj_name, REQUIRED_FIELD);
 
-    mapFields["IodeTypes"]  = wComboIodeTypes;
+    mapFields["IodeType"]  = wComboIodeType;
     mapFields["ObjName"]    = wObjName;
     mapFields["DupObjName"] = wDupObjName;
 
@@ -29,7 +29,7 @@ MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
 
 MenuDataDuplicateObj::~MenuDataDuplicateObj()
 {
-    delete wComboIodeTypes;
+    delete wComboIodeType;
     delete wObjName;
     delete wDupObjName;
 
@@ -40,7 +40,7 @@ void MenuDataDuplicateObj::duplicate()
 {
     try
     {
-        int iode_type = wComboIodeTypes->extractAndVerify();
+        int iode_type = wComboIodeType->extractAndVerify();
         std::string obj_name = wObjName->extractAndVerify().toStdString();
         std::string dup_obj_name = wDupObjName->extractAndVerify().toStdString();
 

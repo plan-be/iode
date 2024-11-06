@@ -250,7 +250,7 @@ int gui_IdtExecute_super()
 int gui_EqsEstimate_super()
 {
 	IodeTabWidget* tab_widget = static_cast<IodeTabWidget*>(get_tabs_widget_ptr());
-	tab_widget->openEditDialog(IodeTypes::EQUATIONS);
+	tab_widget->openEditDialog(IodeType::EQUATIONS);
 	return 0;
 }
 
