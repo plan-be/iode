@@ -7,8 +7,10 @@ from .iode_python import (__version__, NA, is_NA,
                           IodeTypes, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
-                          ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt, EQ_TEST_NAMES, IODE_DATABASE_TYPE_NAMES, 
-                          IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, FileType, IODE_FILE_TYPES)
+                          ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt)
+
+from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, 
+                     EQ_TEST_NAMES, IODE_FILE_TYPES)
 
 # time
 from .iode_python import Period, Sample, PERIODICITY_LIST
@@ -39,7 +41,7 @@ from .iode_python import execute_lec
 
 # miscellaneous
 from .iode_python import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
-
+from .common import FileType
 
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 

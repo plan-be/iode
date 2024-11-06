@@ -16,6 +16,8 @@ from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equat
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 
+from .common import EQ_TEST_NAMES
+
 EquationInput = Union[str, Dict[str, Any], Equation]
 
 

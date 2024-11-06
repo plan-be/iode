@@ -6,8 +6,8 @@ from textwrap import wrap
 from typing import List, Dict, Any
 
 from iode.iode_python import (is_NA, IodeFileType, IodeTypes, IODE_DEFAULT_DATABASE_FILENAME, 
-                              IODE_FILE_TYPES, FileType, iode_msg_path, print_error_msg)
-
+                              iode_msg_path, print_error_msg)
+from .common import IODE_FILE_TYPES, FileType
 
 _list_separator = r",;\s"
 
