@@ -55,12 +55,12 @@ def test_iode_objects(tmp_path):
 
 def test_iode_table_line_cell():
     iode.__test__ = {}
-    from iode.iode_python import TableLine
+    from iode.iode_cython import TableLine
     for name_, value_ in inspect.getmembers(TableLine):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'TableLine.{name_}'] = doc 
-    from iode.iode_python import TableCell
+    from iode.iode_cython import TableCell
     for name_, value_ in inspect.getmembers(TableCell):
         doc = inspect.getdoc(value_)
         if doc is not None:
@@ -70,7 +70,7 @@ def test_iode_table_line_cell():
 
 def test_iode_computed_table(tmp_path):
     iode.__test__ = {}
-    from iode.iode_python import ComputedTable
+    from iode.iode_cython import ComputedTable
     for name_, value_ in inspect.getmembers(ComputedTable):
         doc = inspect.getdoc(value_)
         if doc is not None:

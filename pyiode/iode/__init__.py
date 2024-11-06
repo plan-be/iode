@@ -3,7 +3,7 @@ from pathlib import Path
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
-from .iode_python import (__version__, NA, is_NA, 
+from .iode_cython import (__version__, NA, is_NA, 
                           IodeType, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
@@ -13,34 +13,34 @@ from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUA
                      EQ_TEST_NAMES, IODE_FILE_TYPES)
 
 # time
-from .iode_python import Period, Sample, PERIODICITY_LIST
+from .iode_cython import Period, Sample, PERIODICITY_LIST
 
 # IODE objects
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
-from .iode_python import Equation, Identity, Scalar, Table
+from .iode_cython import Equation, Identity, Scalar, Table
 from .util import split_list
 
 # IODE databases
-from .iode_python import comments, equations, identities, lists, scalars, tables, variables
-from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
-from .iode_python import load_extra_files
+from .iode_cython import comments, equations, identities, lists, scalars, tables, variables
+from .iode_cython import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
+from .iode_cython import load_extra_files
 
 # Reports
-from .iode_python import execute_report, execute_command
+from .iode_cython import execute_report, execute_command
 
 # Printing
-from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
+from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
                           w_print_pg_footer, w_print_pg_header, w_print_tit)
 
 # Estimation - Simulation
-from .iode_python import Simulation, EditAndEstimateEquations, dynamic_adjustment, dickey_fuller_test 
+from .iode_cython import Simulation, EditAndEstimateEquations, dynamic_adjustment, dickey_fuller_test 
 
 # lec
-from .iode_python import execute_lec
+from .iode_cython import execute_lec
 
 # miscellaneous
-from .iode_python import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
+from .iode_cython import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 from .common import FileType
 
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.

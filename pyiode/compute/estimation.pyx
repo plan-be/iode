@@ -304,7 +304,7 @@ cdef class EditAndEstimateEquations:
         >>> variables.sample
         Sample("1960Y1:2015Y1")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations()
         >>> estimation.sample
         Sample("1960Y1:2015Y1")
@@ -380,7 +380,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
 
         >>> # ====== block = ACAF;DPUH ======
@@ -561,7 +561,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         
@@ -607,7 +607,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.instruments
@@ -685,7 +685,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.block
@@ -723,7 +723,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.block
@@ -761,7 +761,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.block
@@ -806,7 +806,7 @@ cdef class EditAndEstimateEquations:
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.block
@@ -852,7 +852,7 @@ cdef class EditAndEstimateEquations:
         >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.estimate()
@@ -891,7 +891,7 @@ cdef class EditAndEstimateEquations:
         >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.estimate()
@@ -926,7 +926,7 @@ cdef class EditAndEstimateEquations:
         >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.estimate()
@@ -961,7 +961,7 @@ cdef class EditAndEstimateEquations:
         >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.estimate()
@@ -1001,7 +1001,7 @@ cdef class EditAndEstimateEquations:
         >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
-        >>> from iode.iode_python import EditAndEstimateEquations
+        >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> estimation.block

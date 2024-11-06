@@ -24,8 +24,8 @@ if(Python_FOUND)
     file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
          FILES_MATCHING PATTERN "*.py")
 
-    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
-      file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp")
+      file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp")
     endif()
 
     # WARNING: 
@@ -48,36 +48,36 @@ if(Python_FOUND)
     #          In Python, when running 'import xxx', Python will look for a function named PyInit_xxx
     #          in the xxx.pyd file. By default, Cython will use the name of the compiled .pyx file to generate 
     #          the PyInit_xxx function. This behavior is override by the --module-name option. 
-    add_custom_command(OUTPUT iode_python.cpp
-                      DEPENDS iode_python.pyx s_pyiode.cpp
+    add_custom_command(OUTPUT iode_cython.cpp
+                      DEPENDS iode_cython.pyx s_pyiode.cpp
                       VERBATIM
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/s_pyiode.cpp ${CMAKE_CURRENT_BINARY_DIR}/s_pyiode.cpp
-                      COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx -3 --verbose --cplus 
-                      --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_python
+                      COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_cython.pyx -3 --verbose --cplus 
+                      --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_cython
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
-                      --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp)
+                      --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
 
-    python_add_library(iode_python MODULE ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp WITH_SOABI)
+    python_add_library(iode_cython MODULE ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp WITH_SOABI)
 
-    target_link_libraries(iode_python PRIVATE iode_cpp_api Python::NumPy)
-    target_include_directories(iode_python PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
-    target_compile_definitions(iode_python PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
+    target_link_libraries(iode_cython PRIVATE iode_cpp_api Python::NumPy)
+    target_include_directories(iode_cython PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
+    target_compile_definitions(iode_cython PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
 
     # Add a custom command that runs the Python script to generate stub files 
-    # after the iode_python target is built
-    add_custom_command(TARGET iode_python POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_python> ${CMAKE_CURRENT_BINARY_DIR}/iode
+    # after the iode_cython target is built
+    add_custom_command(TARGET iode_cython POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_BINARY_DIR}/iode
         COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
     
-    install(TARGETS iode_python LIBRARY DESTINATION iode)
+    install(TARGETS iode_cython LIBRARY DESTINATION iode)
   else()
     message(CHECK_FAIL "Cython not found")
   endif()
 
-  if(TARGET iode_python)
-    message(STATUS "\nNew target iode_python enabled\n")
+  if(TARGET iode_cython)
+    message(STATUS "\nNew target iode_cython enabled\n")
   else()
-    message(WARNING "Could not create the target iode_python\n")
+    message(WARNING "Could not create the target iode_cython\n")
   endif()
 else()
   message(WARNING "Python not found")

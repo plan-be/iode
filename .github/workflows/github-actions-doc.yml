@@ -91,7 +91,7 @@ jobs:
             with:
               cmake-config: ${{ env.build-config }}
           - name: Build Python IODE (Cython)
-            run: cmake --build --verbose --preset ${{ env.build-config }} --target iode_python
+            run: cmake --build --verbose --preset ${{ env.build-config }} --target iode_cython
           - name: Build User documentation (Sphinx)
             run: cmake --build --verbose --preset ${{ env.build-config }} --target iode_doc
           - name: Build Keyboard Shortcuts PDF

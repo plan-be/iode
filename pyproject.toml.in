@@ -60,7 +60,7 @@ cmake.args = ["-G", "Ninja", "-D", "CMAKE_BUILD_TYPE=Release"]
 
 # The build targets to use when building the project. Empty builds the default
 # target.
-cmake.targets = ["iode_python"]
+cmake.targets = ["iode_cython"]
 
 # The wheel will automatically look for Python packages at src/<package_name>, 
 # python/<package_name>, and <package_name>, in that order. 

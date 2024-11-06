@@ -173,7 +173,7 @@ To help IDE like PyCharm to understand the Python API of `iode`,
 stub files *.pyi must be generated and added to installed package.
 
 The stub files are generated using the tool `stubgen` from the package `mypy`.
-They are automatically generated when the CMake target `iode_python` is built.
+They are automatically generated when the CMake target `iode_cython` is built.
 
 See pyiode/CMakeLists.txt and generate_stub_files.py for more details.
 

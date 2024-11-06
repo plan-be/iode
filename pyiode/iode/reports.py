@@ -1,1 +1,1 @@
-from .iode_python import build_command_functions_list, build_report_functions_list, build_lec_functions_list
+from .iode_cython import build_command_functions_list, build_report_functions_list, build_lec_functions_list

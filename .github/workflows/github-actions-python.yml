@@ -100,9 +100,9 @@ jobs:
             run: | 
               cmake --version
               cmake --preset ${{ env.os }}-${{ inputs.build-config }}
-          - name: Build target iode_python before pip wheel to make sure it compiles
+          - name: Build target iode_cython before pip wheel to make sure it compiles
             shell: bash -el {0}
-            run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_python
+            run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cython
           - name: Build iode wheel file
             shell: bash -el {0}
             run: pip wheel --verbose .
