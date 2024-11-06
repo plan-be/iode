@@ -12,11 +12,11 @@ const std::map<char, std::string> mLowToHigh =
 /**
  * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
  * 
- * @param iodeType IodeTypes type of Iode object.
+ * @param iodeType IodeType type of Iode object.
  * 
  * @return bool Wether or not K_WS corresponding to iodeType is empty.
  */
-bool is_global_database_loaded(const IodeTypes iodeType);
+bool is_global_database_loaded(const IodeType iodeType);
 
 // NOTE: remove function below -> IodeContents()
 void set_kdb_filename(KDB* kdb, const std::string& filename);
@@ -29,7 +29,7 @@ void set_kdb_filename(KDB* kdb, const std::string& filename);
  * @param pattern 
  * @return std::vector<std::string>
  */
-std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeTypes iode_type, const std::string& pattern);
+std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iode_type, const std::string& pattern);
 
 /**
  * @brief import comments from file.

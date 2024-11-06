@@ -1,7 +1,7 @@
 #include "kdb_reference.h"
 
 
-void load_reference_kdb(const int ref, IodeTypes iode_type, std::string& filepath)
+void load_reference_kdb(const int ref, IodeType iode_type, std::string& filepath)
 {
     if(ref < 2 || ref > 5) 
         throw std::invalid_argument("Cannot load file '" + filepath + "'.\n" + 
@@ -18,7 +18,7 @@ void load_reference_kdb(const int ref, IodeTypes iode_type, std::string& filepat
     K_RWS[iode_type][ref - 1] = kdb;
 }
 
-void clear_reference_kdb(const int ref, IodeTypes iode_type)
+void clear_reference_kdb(const int ref, IodeType iode_type)
 {
     K_free(K_RWS[iode_type][ref - 1]);
     K_RWS[iode_type][ref - 1] = NULL;
@@ -28,5 +28,5 @@ void clear_all_reference_kdbs()
 {
     for(int iode_type = COMMENTS; iode_type <= VARIABLES; iode_type++)
         for(int ref = 2; ref <= 5; ref++)
-            clear_reference_kdb(ref, (IodeTypes) iode_type);
+            clear_reference_kdb(ref, (IodeType) iode_type);
 }
