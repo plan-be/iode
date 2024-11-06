@@ -33,7 +33,7 @@ protected:
     }
 
 public:
-    KDBTemplate(const IodeTypes iode_type, const std::string& filepath) : 
+    KDBTemplate(const IodeType iode_type, const std::string& filepath) : 
         KDBAbstract(iode_type, filepath) {}
 
     //  Create + Update + Get + Copy methods
