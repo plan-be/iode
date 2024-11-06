@@ -13,7 +13,7 @@ class MenuDataScanObjects : public IodeSettingsDialog, public Ui::MenuDataScanOb
 {
     Q_OBJECT
 
-    WrapperComboBox*       wComboIodeTypes;
+    WrapperComboBox*       wComboIodeType;
     WrapperQPlainTextEdit* wListsToScan;
 
     IodeCompleter* completer;

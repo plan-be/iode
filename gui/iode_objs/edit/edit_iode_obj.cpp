@@ -1,7 +1,7 @@
 #include "edit_iode_obj.h"
 
 
-EditObjectDialog::EditObjectDialog(const IodeTypes iodeType, const QString& name, QWidget* parent) : 
+EditObjectDialog::EditObjectDialog(const IodeType iodeType, const QString& name, QWidget* parent) : 
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
     iodeType(iodeType), name(name.toStdString()), completer(nullptr)
 {

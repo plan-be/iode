@@ -78,7 +78,7 @@ public slots:
 	 * @param name 
 	 * @param other_type 
 	 */
-	virtual QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeTypes other_type) = 0;
+	virtual QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeType other_type) = 0;
 
 	/**
 	 * @brief get the list of all related objects of type other_type.
@@ -86,7 +86,7 @@ public slots:
 	 * @param name 
 	 * @param other_type 
 	 */
-	virtual QStringList getRelatedObjs(const QString& name, const IodeTypes other_type) = 0;
+	virtual QStringList getRelatedObjs(const QString& name, const IodeType other_type) = 0;
 };
 
 
@@ -196,9 +196,9 @@ public:
 		return false; 
 	}
 
-	QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeTypes other_type) override;
+	QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeType other_type) override;
 
-	QStringList getRelatedObjs(const QString& name, const IodeTypes other_type) override;
+	QStringList getRelatedObjs(const QString& name, const IodeType other_type) override;
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
@@ -268,7 +268,7 @@ private:
 		return filePath;
 	}
 
-	QStringList getSameNameObj(const QString& name, const IodeTypes other_type)
+	QStringList getSameNameObj(const QString& name, const IodeType other_type)
 	{
 		QStringList list;
 		int this_type = database->get_iode_type();

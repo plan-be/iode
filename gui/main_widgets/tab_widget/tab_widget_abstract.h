@@ -189,17 +189,17 @@ public:
      * 
      * @param iodeType 
      */
-    virtual void openAddDialog(const IodeTypes iodeType) = 0;
+    virtual void openAddDialog(const IodeType iodeType) = 0;
 
     /**
      * @brief To be called from executed command lines or IODE reports
      * 
      * @param iodeType 
      */
-    virtual void openEditDialog(const IodeTypes iodeType) = 0;
+    virtual void openEditDialog(const IodeType iodeType) = 0;
 
 protected:
-    virtual int getIodeObjTabIndex(const IodeTypes iodeType) const = 0;
+    virtual int getIodeObjTabIndex(const IodeType iodeType) const = 0;
 
     /**
      * @brief update the paths (to directories and files) registered in the file system watcher.
@@ -302,7 +302,7 @@ public slots:
      * @param iodeType 
      * @param modified 
      */
-    virtual void tabDatabaseModified(const IodeTypes iodeType, const bool modified) = 0;
+    virtual void tabDatabaseModified(const IodeType iodeType, const bool modified) = 0;
 
     /**
      * @brief popup a new dialog box containing the list of passed objects.
@@ -310,7 +310,7 @@ public slots:
      * @param iodeType 
      * @param objNames 
      */
-    virtual void showObjectsList(IodeTypes iodeType, const QStringList& objNames) = 0;
+    virtual void showObjectsList(IodeType iodeType, const QStringList& objNames) = 0;
 
     /**
      * @brief compute the hash of each database before/after executing 

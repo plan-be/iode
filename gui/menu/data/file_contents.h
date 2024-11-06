@@ -13,7 +13,7 @@ class MenuDataFileContents : public IodeSettingsDialog, public Ui::MenuDataFileC
     Q_OBJECT
 
     WrapperQLineEdit*   wSearch;
-    WrapperComboBox*    wComboIodeTypes;
+    WrapperComboBox*    wComboIodeType;
     WrapperFileChooser* wInputFile;
     WrapperQLineEdit*   wSaveList;
     WrapperQTextEdit*   wResult;

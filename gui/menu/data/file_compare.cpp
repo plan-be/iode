@@ -6,10 +6,10 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
 {
     setupUi(this);
 
-    QStringList listIodeTypes;
-    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
+    QStringList listIodeType;
+    for(const std::string& iode_type : v_iode_types) listIodeType << QString::fromStdString(iode_type);
 
-    wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wComboIodeType = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeType);
     wThreshold = new WrapperQLineEdit(label_threshold->text(), *lineEdit_threshold, OPTIONAL_FIELD);
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, FILE_COMMENTS, EXISTING_FILE);
     wResultWSOnly = new WrapperQLineEdit(label_list_ws_only->text(), *lineEdit_list_ws_only, REQUIRED_FIELD);
@@ -17,7 +17,7 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
     wResultBothEqual = new WrapperQLineEdit(label_list_both_equal->text(), *lineEdit_list_both_equal, REQUIRED_FIELD);
     wResultBothDifferent = new WrapperQLineEdit(label_list_both_different->text(), *lineEdit_list_both_different, REQUIRED_FIELD);
 
-    mapFields["IodeTypes"]           = wComboIodeTypes;
+    mapFields["IodeType"]           = wComboIodeType;
     mapFields["Threshold"]           = wThreshold;
     mapFields["InputFile"]           = wInputFile;
     mapFields["ResultWSOnly"]        = wResultWSOnly;
@@ -28,8 +28,8 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
     wThreshold->getQField().setValidator(new QDoubleValidator(&wThreshold->getQField()));
     updateThreshold(COMMENTS);
 
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateThreshold);
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateFileChooser);
+    connect(&wComboIodeType->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateThreshold);
+    connect(&wComboIodeType->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateFileChooser);
 
     className = "MENU_DATA_FILE_COMPARE";
     loadSettings();
@@ -37,7 +37,7 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
 
 MenuDataFileCompare::~MenuDataFileCompare()
 {
-    delete wComboIodeTypes;
+    delete wComboIodeType;
     delete wThreshold;
     delete wInputFile;
     delete wResultWSOnly;
@@ -53,7 +53,7 @@ void MenuDataFileCompare::compare()
 {
     try
     {
-        int iode_type = wComboIodeTypes->extractAndVerify();
+        int iode_type = wComboIodeType->extractAndVerify();
         std::string threshold = wThreshold->extractAndVerify().toStdString();
         std::string input_file = wInputFile->extractAndVerify().toStdString();
         std::string list_ws_ony = wResultWSOnly->extractAndVerify().toStdString();

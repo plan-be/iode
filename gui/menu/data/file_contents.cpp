@@ -6,21 +6,21 @@ MenuDataFileContents::MenuDataFileContents(QWidget* parent)
 {
     setupUi(this);
 
-    QStringList listIodeTypes;
-    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
+    QStringList listIodeType;
+    for(const std::string& iode_type : v_iode_types) listIodeType << QString::fromStdString(iode_type);
 
     wSearch = new WrapperQLineEdit(label_search->text(), *lineEdit_search, REQUIRED_FIELD);
-    wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wComboIodeType = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeType);
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, FILE_COMMENTS, EXISTING_FILE);
     wSaveList = new WrapperQLineEdit(label_save_list->text(), *lineEdit_save_list, REQUIRED_FIELD);
     wResult = new WrapperQTextEdit(label_result->text(), *textEdit_result, OPTIONAL_FIELD);
 
     mapFields["Search"]    = wSearch;
-    mapFields["IodeTypes"] = wComboIodeTypes;
+    mapFields["IodeType"] = wComboIodeType;
     mapFields["InputFile"] = wInputFile;
     mapFields["SaveList"]  = wSaveList;
 
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileContents::updateFileChooser);
+    connect(&wComboIodeType->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileContents::updateFileChooser);
 
     className = "MENU_DATA_FILE_CONTENTS";
     loadSettings();
@@ -29,7 +29,7 @@ MenuDataFileContents::MenuDataFileContents(QWidget* parent)
 MenuDataFileContents::~MenuDataFileContents()
 {
     delete wSearch;
-    delete wComboIodeTypes;
+    delete wComboIodeType;
     delete wInputFile;
     delete wSaveList;
     delete wResult;
@@ -43,7 +43,7 @@ void MenuDataFileContents::search()
     try
     {
         std::string pattern = wSearch->extractAndVerify().toStdString();
-        int iode_type = wComboIodeTypes->extractAndVerify();
+        int iode_type = wComboIodeType->extractAndVerify();
         std::string input_file = wInputFile->extractAndVerify().toStdString();
         std::string save_list = wSaveList->extractAndVerify().toStdString();
 

@@ -13,7 +13,7 @@ class MenuDataFileCompare : public IodeSettingsDialog, public Ui::MenuDataFileCo
 {
     Q_OBJECT
 
-    WrapperComboBox*    wComboIodeTypes;
+    WrapperComboBox*    wComboIodeType;
     WrapperQLineEdit*   wThreshold;
     WrapperFileChooser* wInputFile;
     WrapperQLineEdit*   wResultWSOnly;

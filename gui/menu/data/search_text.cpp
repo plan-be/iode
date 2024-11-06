@@ -5,12 +5,12 @@ MenuDataSearchText::MenuDataSearchText(QWidget* parent)
 {
     setupUi(this);
 
-    QStringList listIodeTypes;
-    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
+    QStringList listIodeType;
+    for(const std::string& iode_type : v_iode_types) listIodeType << QString::fromStdString(iode_type);
 
     wText = new WrapperQLineEdit(label_text->text(), *lineEdit_text, REQUIRED_FIELD);
     wSaveList = new WrapperQLineEdit(label_save_list->text(), *lineEdit_save_list, REQUIRED_FIELD);
-    wComboIodeTypes = new WrapperComboBox(label_objs_to_scan->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wComboIodeType = new WrapperComboBox(label_objs_to_scan->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeType);
     wWholeWord = new WrapperCheckBox(checkBox_whole_word->text(), *checkBox_whole_word, REQUIRED_FIELD);
     wExactCase = new WrapperCheckBox(checkBox_exact_case->text(), *checkBox_exact_case, REQUIRED_FIELD);
     wSearchInNames = new WrapperCheckBox(checkBox_search_names->text(), *checkBox_search_names, REQUIRED_FIELD);
@@ -20,7 +20,7 @@ MenuDataSearchText::MenuDataSearchText(QWidget* parent)
 
     mapFields["Text"]      = wText;
     mapFields["SaveList"]  = wSaveList;
-    mapFields["IodeType"]  = wComboIodeTypes;
+    mapFields["IodeType"]  = wComboIodeType;
     mapFields["WholeWord"] = wWholeWord;
     mapFields["ExactCase"] = wExactCase;
     mapFields["SearchInNames"] = wSearchInNames;
@@ -35,7 +35,7 @@ MenuDataSearchText::~MenuDataSearchText()
 {
     delete wText;
     delete wSaveList;
-    delete wComboIodeTypes;
+    delete wComboIodeType;
     delete wWholeWord;
     delete wExactCase;
     delete wSearchInNames;
@@ -52,7 +52,7 @@ void MenuDataSearchText::search()
     {
         std::string text = wText->extractAndVerify().toStdString();
         std::string save_list = wSaveList->extractAndVerify().toStdString();
-        int iode_type = wComboIodeTypes->extractAndVerify();
+        int iode_type = wComboIodeType->extractAndVerify();
         bool whole_word = wWholeWord->extractAndVerify();
         bool exact_case = wExactCase->extractAndVerify();
         bool search_in_names = wSearchInNames->extractAndVerify();

@@ -1,7 +1,7 @@
 #include "abstract_table_view.h"
 
 
-IodeAbstractTableView::IodeAbstractTableView(IodeTypes iodeType, BaseDelegate* delegate, QWidget* parent) 
+IodeAbstractTableView::IodeAbstractTableView(IodeType iodeType, BaseDelegate* delegate, QWidget* parent) 
 	: QTableView(parent), iodeType(iodeType), delegate(delegate) 
 {
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
