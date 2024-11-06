@@ -98,7 +98,7 @@ jobs:
             run: cmake --build --verbose --preset ${{ env.build-config }} --target keyboard_shortcuts
           - name: Upload documentation files
             if: ${{ success() }}
-            uses: actions/upload-artifact@v3
+            uses: actions/upload-artifact@v4
             with:
               name: iode-doc
               path: | 
