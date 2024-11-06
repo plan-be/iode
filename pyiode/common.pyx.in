@@ -15,11 +15,12 @@ from libcpp.map cimport map
 from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS, I_DEFAULT_FILENAME
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
-from pyiode.common cimport (IodeDatabaseType, IodeEquationMethod, 
-                            IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
+from pyiode.common cimport (IodeEquationMethod, IodeEquationTest, 
+                            IodeLowToHigh, IodeHighToLow, 
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, IodeAdjustmentMethod)
-from pyiode.common cimport IodeFileType as CIodeFileType 
+from pyiode.common cimport IodeTypes as CIodeTypes
+from pyiode.common cimport IodeFileType as CIodeFileType
 from pyiode.common cimport TableLang as CTableLang
 from pyiode.common cimport TableCellType as CTableCellType 
 from pyiode.common cimport TableCellFont as CTableCellFont
@@ -81,15 +82,15 @@ IODE_DEFAULT_DATABASE_FILENAME: str = I_DEFAULT_FILENAME.decode('utf-8')
 # ----------
 
 class IodeTypes(IntEnum):
-    COMMENTS = IodeDatabaseType.COMMENTS
-    EQUATIONS = IodeDatabaseType.EQUATIONS
-    IDENTITIES = IodeDatabaseType.IDENTITIES
-    LISTS = IodeDatabaseType.LISTS
-    SCALARS = IodeDatabaseType.SCALARS
-    TABLES = IodeDatabaseType.TABLES
-    VARIABLES = IodeDatabaseType.VARIABLES
+    COMMENTS = CIodeTypes.COMMENTS
+    EQUATIONS = CIodeTypes.EQUATIONS
+    IDENTITIES = CIodeTypes.IDENTITIES
+    LISTS = CIodeTypes.LISTS
+    SCALARS = CIodeTypes.SCALARS
+    TABLES = CIodeTypes.TABLES
+    VARIABLES = CIodeTypes.VARIABLES
 
-IODE_DATABASE_TYPE_NAMES: List[str] = [name.title() for name in IodeTypes._member_names_]
+IODE_DATABASE_TYPE_NAMES: List[str] = [item.name.title() for item in IodeTypes]
 
 class IodeFileType(IntEnum):
     FILE_COMMENTS = CIodeFileType.FILE_COMMENTS
