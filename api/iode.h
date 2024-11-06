@@ -146,7 +146,7 @@ const static char NAN_REP[3] = "--";
 
 /******************************* ENUMS **********************************/
 
-enum IodeTypes
+enum IodeType
 {
     COMMENTS,
     EQUATIONS,
