@@ -28,7 +28,7 @@ class IodeAbstractTableView : public QTableView
 	Q_OBJECT
 
 protected:
-	IodeDatabaseType iodeType;
+	IodeTypes iodeType;
 	BaseDelegate* delegate;
 	QLineEdit* filterLineEdit;
 
@@ -61,10 +61,10 @@ protected:
 
 signals:
 	void databaseModified();
-	void showObjsRequest(IodeDatabaseType other_type, const QStringList& objNames);
+	void showObjsRequest(IodeTypes other_type, const QStringList& objNames);
 
 public:
-	IodeAbstractTableView(IodeDatabaseType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
+	IodeAbstractTableView(IodeTypes iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
 	~IodeAbstractTableView();
 
 	virtual void setup() {}
@@ -292,7 +292,7 @@ public slots:
 	 * 
 	 * @param iode_type 
 	 */
-	void showSameNameObjOrObjsFromClec(const IodeDatabaseType other_type)
+	void showSameNameObjOrObjsFromClec(const IodeTypes other_type)
 	{
 		// get the selected object
 		QModelIndexList selection = this->selectionModel()->selectedRows();
@@ -315,7 +315,7 @@ public slots:
 	 * 
 	 * @param iode_type 
 	 */
-	void showRelatedObjs(const IodeDatabaseType other_type)
+	void showRelatedObjs(const IodeTypes other_type)
 	{
 		// get the selected object
 		QModelIndexList selection = this->selectedIndexes();
