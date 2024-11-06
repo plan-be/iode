@@ -1,9 +1,9 @@
-from .iode_python import IodeTypes, IodeFileType, TableLang, EqMethod, EqTest, _get_file_types
+from .iode_python import IodeType, IodeFileType, TableLang, EqMethod, EqTest, _get_file_types
 
 from typing import List, Tuple
 
 
-IODE_DATABASE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeTypes]
+IODE_DATABASE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeType]
 
 IODE_FILE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeFileType]
 

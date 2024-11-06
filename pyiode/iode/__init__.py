@@ -4,7 +4,7 @@ SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
 from .iode_python import (__version__, NA, is_NA, 
-                          IodeTypes, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
+                          IodeType, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
                           ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt)
@@ -48,7 +48,7 @@ from .common import FileType
 __all__ = [
     # Constants
     'SAMPLE_DATA_DIR', 'NA', 'is_NA', 
-    'IodeTypes', 'IodeFileType', 'TableLang', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
+    'IodeType', 'IodeFileType', 'TableLang', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
     'TableLineType', 'TableGraphType', 'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 
     'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
     'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
