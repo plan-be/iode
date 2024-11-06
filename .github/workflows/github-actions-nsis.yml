@@ -96,7 +96,7 @@ jobs:
 
           - name: Upload CLI
             if: ${{ success() }}
-            uses: actions/upload-artifact@v3
+            uses: actions/upload-artifact@v4
             with:
               name: iode-cli
               path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/cli/*.exe"
@@ -110,7 +110,7 @@ jobs:
 
           - name: Upload Windows Installer and Updater
             if: ${{ success() }}
-            uses: actions/upload-artifact@v3
+            uses: actions/upload-artifact@v4
             with:
               name: iode-nsis
               path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/nsis/*.exe"
