@@ -101,5 +101,8 @@ jobs:
             uses: actions/upload-artifact@v3
             with:
               name: iode-doc
-              path: "${{ github.workspace }}/doc/build/"
+              path: | 
+                "${{ github.workspace }}/doc/build/iode.chm"
+                "${{ github.workspace }}/doc/build/iode.pdf"
+                "${{ github.workspace }}/doc/build/keyboard_shortcuts.pdf"
               if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
