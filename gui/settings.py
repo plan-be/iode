@@ -4,6 +4,10 @@ from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QChec
                                QPlainTextEdit)
 from PySide6.QtGui import QDesktopServices, QCloseEvent
 
+from util.widgets.file_chooser import IodeFileChooser
+from util.widgets.sample_edit import IodeSampleEdit
+
+
 import re
 from utils import URL_MANUAL
 
@@ -24,7 +28,6 @@ class ProjectSettings:
         return cls.project_settings
 
 
-# TODO: uncomment elif below when IodeFileChooser and IodeSampleEdit are implemented
 class MenuItemSettings(QDialog):
     def __init__(self, parent: QWidget=None) -> None:
         super().__init__(parent)
@@ -84,10 +87,10 @@ class MenuItemSettings(QDialog):
                 attr_value.setText(project_settings.value(attr_name, type=str))
             elif isinstance(attr_value, QPlainTextEdit):
                 attr_value.setPlainText(project_settings.value(attr_name, type=str))
-            # elif isinstance(attr_value, IodeFileChooser):
-            #     attr_value.filepath = project_settings.value(attr_name, type=str)
-            # elif isinstance(attr_value, IodeSampleEdit):
-            #     attr_value.setText(project_settings.value(attr_name, type=str))
+            elif isinstance(attr_value, IodeFileChooser):
+                attr_value.filepath = project_settings.value(attr_name, type=str)
+            elif isinstance(attr_value, IodeSampleEdit):
+                attr_value.setText(project_settings.value(attr_name, type=str))
 
         project_settings.endGroup()
         project_settings.endGroup()
@@ -112,10 +115,10 @@ class MenuItemSettings(QDialog):
                 project_settings.setValue(attr_name, attr_value.text())
             elif isinstance(attr_value, QPlainTextEdit):
                 project_settings.setValue(attr_name, attr_value.toPlainText())
-            # elif isinstance(attr_value, IodeFileChooser):
-            #     project_settings.setValue(attr_name, attr_value.filepath)
-            # elif isinstance(attr_value, IodeSampleEdit):
-            #     project_settings.text(attr_name, attr_value.
+            elif isinstance(attr_value, IodeFileChooser):
+                project_settings.setValue(attr_name, attr_value.filepath)
+            elif isinstance(attr_value, IodeSampleEdit):
+                project_settings.setValue(attr_name, attr_value.text())
 
         project_settings.endGroup()
         project_settings.endGroup()
