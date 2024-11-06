@@ -3,10 +3,10 @@ from PySide6.QtCore import Qt, Slot
 
 from .ui_file_settings import Ui_MenuFileSettings
 from print.file_print_preferences import FilePrintPreferences
-from settings import MenuItemSettings
+from settings import MixinSettingsDialog
 
 
-class MenuFileSettings(MenuItemSettings):
+class MenuFileSettings(MixinSettingsDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 

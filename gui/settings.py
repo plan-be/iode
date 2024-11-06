@@ -28,7 +28,7 @@ class ProjectSettings:
         return cls.project_settings
 
 
-class MenuItemSettings(QDialog):
+class MixinSettingsDialog(QDialog):
     def __init__(self, parent: QWidget=None) -> None:
         super().__init__(parent)
         self.ui_obj = None
