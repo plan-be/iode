@@ -90,8 +90,6 @@ class IodeTypes(IntEnum):
     TABLES = CIodeTypes.TABLES
     VARIABLES = CIodeTypes.VARIABLES
 
-IODE_DATABASE_TYPE_NAMES: List[str] = [item.name.title() for item in IodeTypes]
-
 class IodeFileType(IntEnum):
     FILE_COMMENTS = CIodeFileType.FILE_COMMENTS
     FILE_EQUATIONS = CIodeFileType.FILE_EQUATIONS
@@ -118,14 +116,10 @@ class IodeFileType(IntEnum):
     FILE_ANY = CIodeFileType.FILE_ANY
     DIRECTORY = CIodeFileType.DIRECTORY
 
-IODE_FILE_TYPE_NAMES: List[str] = [name.title() for name in IodeFileType._member_names_]
-
 class TableLang(IntEnum):
     ENGLISH = CTableLang.TABLE_ENGLISH
     DUTCH = CTableLang.TABLE_DUTCH
     FRENCH = CTableLang.TABLE_FRENCH
-
-IODE_LANGUAGES_LIST: List[str] = [name.title() for name in TableLang._member_names_]
 
 class EqMethod(IntEnum):
     LSQ = 0
@@ -133,8 +127,6 @@ class EqMethod(IntEnum):
     INSTRUMENTAL = 2
     GLS = 3
     MAX_LIKELIHOOD = 4
-
-EQUATION_METHODS_LIST: List[str] = [name.title() for name in EqMethod._member_names_]
 
 class EqTest(IntEnum):
     CORR = IodeEquationTest.EQ_CORR
@@ -148,8 +140,6 @@ class EqTest(IntEnum):
     R2ADJ = IodeEquationTest.EQ_R2ADJ
     DW = IodeEquationTest.EQ_DW
     LOGLIK = IodeEquationTest.EQ_LOGLIK
-
-EQ_TEST_NAMES: Tuple[str, ...] = tuple(member.name.lower() for member in EqTest)
 
 class TableCellType(IntEnum):
     LEC = CTableCellType.TABLE_CELL_LEC
@@ -250,26 +240,6 @@ class WriteFileExt(IntEnum):
 # Miscellaneous
 # -------------
 
-class FileType:
-    def __init__(self, name: str, extensions: List[str]):
-        self._name: str = name
-        self._extensions: List[str] = extensions
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def extensions(self) -> List[str]:
-        return self._extensions
-
-    def __str__(self) -> str:
-        return f"name='{self.name}', extensions={self.extensions}"
-
-    def __repr__(self) -> str:
-       return f"FileType(name='{self.name}', extensions={self.extensions})"
-
-
 def _get_file_types() -> List[str, List[str]]:
     """Returns a list of tuples containing the name and extensions of each file type."""
     cdef size_t i
@@ -281,6 +251,3 @@ def _get_file_types() -> List[str, List[str]]:
         extensions: List[str] = [ext.decode('utf-8') for ext in file_type.v_ext]
         py_file_types_list.append((name, extensions))
     return py_file_types_list
-
-
-IODE_FILE_TYPES: List[FileType] = [FileType(name, extensions) for name, extensions in _get_file_types()]
