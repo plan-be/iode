@@ -26,7 +26,7 @@ class IodeTabWidget: public IodeAbstractTabWidget
     QVector<AbstractIodeObjectWidget*> tabIodeObjects;
 
 protected:
-    int getIodeObjTabIndex(const IodeDatabaseType iodeType) const override
+    int getIodeObjTabIndex(const IodeTypes iodeType) const override
     {
         int index; 
 
@@ -61,7 +61,7 @@ protected:
         return index;
     }
 
-    AbstractIodeObjectWidget* getIodeObjTab(const IodeDatabaseType iodeType)
+    AbstractIodeObjectWidget* getIodeObjTab(const IodeTypes iodeType)
     {
         int index = getIodeObjTabIndex(iodeType);
         if(index < 0)
@@ -80,7 +80,7 @@ public:
 
     void setup() override;
 
-    int updateObjectTab(const IodeDatabaseType iodeType);
+    int updateObjectTab(const IodeTypes iodeType);
 
     int loadFile(const QString& filepath, const bool displayTab=true, bool forceOverwrite=false, 
         const int moveToPosition=-1, const bool forceAsText=false) override;
@@ -95,7 +95,7 @@ public:
      * 
      * @param iodeType 
      */
-    void resetFilter(const IodeDatabaseType iodeType);
+    void resetFilter(const IodeTypes iodeType);
 
     /**
      * @brief clear all global KDBs and update all KDB tabs.
@@ -110,11 +110,11 @@ public:
      * 
      * @return QStringList 
      */
-    QStringList getSelectedObjectsNames(const IodeDatabaseType iodeType);
+    QStringList getSelectedObjectsNames(const IodeTypes iodeType);
 
-    void openAddDialog(const IodeDatabaseType iodeType) override;
+    void openAddDialog(const IodeTypes iodeType) override;
 
-    void openEditDialog(const IodeDatabaseType iodeType) override;
+    void openEditDialog(const IodeTypes iodeType) override;
 
 public slots:
     void tabTextModified(const QString& filepath, const bool modified)
@@ -142,7 +142,7 @@ public slots:
         }
     }
 
-    void tabDatabaseModified(const IodeDatabaseType iodeType, const bool modified)
+    void tabDatabaseModified(const IodeTypes iodeType, const bool modified)
     {
         try
         {
@@ -195,5 +195,5 @@ public slots:
 
     void clearTab() override;
 
-    void showObjectsList(IodeDatabaseType iodeType, const QStringList& objNames) override;
+    void showObjectsList(IodeTypes iodeType, const QStringList& objNames) override;
 };
