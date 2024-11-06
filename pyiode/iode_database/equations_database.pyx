@@ -917,7 +917,7 @@ cdef class Equations(_AbstractDatabase):
                                          f"its endogenous variable name '{args['endogenous']}'")
                     del args['endogenous']
                 sample = args.pop('sample', '')
-                if not sample:
+                if ':' not in sample:
                     from_period, to_period = '', ''
                 else:
                     from_period, to_period = sample.split(":")
