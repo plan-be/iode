@@ -6,7 +6,7 @@ from numerical_table_model import IodeNumericalTableModel
 from utils import NAN_REP  
 
 from iode import tables, Table
-from iode.iode_python import ComputedTable
+from iode.iode_cython import ComputedTable
 
 
 class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
