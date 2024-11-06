@@ -1,6 +1,6 @@
 from .base_delegate import BaseDelegate
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class TablesDelegate(BaseDelegate):
@@ -14,4 +14,4 @@ class TablesDelegate(BaseDelegate):
 
         :param parent: The parent object of this delegate.
         """
-        super().__init__(IodeTypes.TABLES, parent)
+        super().__init__(IodeType.TABLES, parent)

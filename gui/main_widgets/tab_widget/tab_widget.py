@@ -2,7 +2,7 @@ from PySide6.QtCore import Slot, Signal
 from PySide6.QtWidgets import QTabWidget, QDialog
 
 from typing import List
-from iode import IodeTypes
+from iode import IodeType
 
 
 class IodeTabWidget(QTabWidget):
@@ -39,17 +39,17 @@ class IodeTabWidget(QTabWidget):
         pass
 
     @Slot()
-    @Slot(IodeTypes)
-    def update_object_tab(self, iode_type: IodeTypes = None) -> None:
+    @Slot(IodeType)
+    def update_object_tab(self, iode_type: IodeType = None) -> None:
         pass
 
     @Slot()
-    @Slot(IodeTypes)
-    def reset_filter(self, iode_type: IodeTypes = None) -> None:
+    @Slot(IodeType)
+    def reset_filter(self, iode_type: IodeType = None) -> None:
         pass
 
-    @Slot(IodeTypes)
-    def get_selected_objects_names(self, iode_type: IodeTypes) -> List[str]:
+    @Slot(IodeType)
+    def get_selected_objects_names(self, iode_type: IodeType) -> List[str]:
         pass
 
     @Slot(str, str)

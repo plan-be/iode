@@ -27,12 +27,12 @@ from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView
 
 from pathlib import Path
-from iode import IodeTypes, tables, variables, Table
+from iode import IodeType, tables, variables, Table
 
 
 class CommentsView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeTypes.COMMENTS, CommentsDelegate(parent), parent)
+        super().__init__(IodeType.COMMENTS, CommentsDelegate(parent), parent)
         
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -50,7 +50,7 @@ class CommentsView(IodeAbstractTableView):
 
 class EquationsView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeTypes.COMMENTS, EquationsDelegate(parent), parent)
+        super().__init__(IodeType.COMMENTS, EquationsDelegate(parent), parent)
     
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -80,7 +80,7 @@ class EquationsView(IodeAbstractTableView):
 
 class IdentitiesView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeTypes.COMMENTS, IdentitiesDelegate(parent), parent)
+        super().__init__(IodeType.COMMENTS, IdentitiesDelegate(parent), parent)
 
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -129,7 +129,7 @@ class IdentitiesView(IodeAbstractTableView):
 
 class ListsView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeTypes.COMMENTS, ListsDelegate(parent), parent)
+        super().__init__(IodeType.COMMENTS, ListsDelegate(parent), parent)
     
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -147,7 +147,7 @@ class ListsView(IodeAbstractTableView):
 
 class ScalarsView(IodeAbstractTableView, NumericalTableView):
     def __init__(self, parent=None):
-        IodeAbstractTableView.__init__(self, IodeTypes.COMMENTS, ScalarsDelegate(parent), parent)
+        IodeAbstractTableView.__init__(self, IodeType.COMMENTS, ScalarsDelegate(parent), parent)
         NumericalTableView.__init__(self)
         NumericalTableView.setup(self, allow_to_paste=False)
 
@@ -171,7 +171,7 @@ class ScalarsView(IodeAbstractTableView, NumericalTableView):
 
 class TablesView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeTypes.COMMENTS, TablesDelegate(parent), parent)
+        super().__init__(IodeType.COMMENTS, TablesDelegate(parent), parent)
 
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -254,7 +254,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
     new_graph_dialog = Signal(list, str, str)
     
     def __init__(self, parent=None):
-        IodeAbstractTableView.__init__(self, IodeTypes.COMMENTS, VariablesDelegate(parent), parent)
+        IodeAbstractTableView.__init__(self, IodeType.COMMENTS, VariablesDelegate(parent), parent)
         NumericalTableView.__init__(self)
 
         # ---- keyboard shortcuts ----

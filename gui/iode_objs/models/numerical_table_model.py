@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from utils import NAN_REP, MAX_PRECISION_NUMBERS
 
 from typing import List, Any
-from iode import IodeTypes, is_NA
+from iode import IodeType, is_NA
 
 
 class IodeNumericalTableModel:

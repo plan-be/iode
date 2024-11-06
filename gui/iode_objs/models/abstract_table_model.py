@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (QMessageBox, QDialog, QVBoxLayout, QLabel, QFileD
 
 from typing import List, Union, Any
 from pathlib import Path
-from iode import (IodeTypes, IodeFileType, FileType, IODE_FILE_TYPES, Equation, Identity, 
+from iode import (IodeType, IodeFileType, FileType, IODE_FILE_TYPES, Equation, Identity, 
                   comments, equations, identities, lists, scalars, tables, variables) 
 from iode.util import IODE_DEFAULT_DATABASE_FILENAME, check_filepath
 
@@ -27,7 +27,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
     database_modified = Signal()
     object_removed = Signal(str)
 
-    def __init__(self, column_names: List[str], iode_type: IodeTypes, database=None, parent=None):
+    def __init__(self, column_names: List[str], iode_type: IodeType, database=None, parent=None):
         """
         Initializes the IodeAbstractTableModel with the given column names.
 
@@ -35,26 +35,26 @@ class IodeAbstractTableModel(QAbstractTableModel):
         :param parent: The parent object.
         """
         super().__init__(parent)
-        self.iode_type: IodeTypes = iode_type
+        self.iode_type: IodeType = iode_type
         self.column_names: List[str] = column_names
         if database is not None:
             self._database = database
             if self._database.iode_type != self.iode_type:
                 QMessageBox.warning(None, "Error", "The database type does not match the model type.")
                 self._database = None
-        elif self.iode_type == IodeTypes.COMMENTS:
+        elif self.iode_type == IodeType.COMMENTS:
             self._database = comments
-        elif self.iode_type == IodeTypes.EQUATIONS:
+        elif self.iode_type == IodeType.EQUATIONS:
             self._database = equations
-        elif self.iode_type == IodeTypes.IDENTITIES:
+        elif self.iode_type == IodeType.IDENTITIES:
             self._database = identities
-        elif self.iode_type == IodeTypes.LISTS:
+        elif self.iode_type == IodeType.LISTS:
             self._database = lists
-        elif self.iode_type == IodeTypes.SCALARS:
+        elif self.iode_type == IodeType.SCALARS:
             self._database = scalars
-        elif self.iode_type == IodeTypes.TABLES:
+        elif self.iode_type == IodeType.TABLES:
             self._database = tables
-        elif self.iode_type == IodeTypes.VARIABLES:
+        elif self.iode_type == IodeType.VARIABLES:
             self._database = variables
         else:
             QMessageBox.warning(None, "Error", f"Unknown IODE types {self.iode_type}")
@@ -271,7 +271,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         :param force_overwrite: If True, the database is overwritten if it already exists.
         :return: True if the database was loaded successfully, False otherwise.
         """
-        iode_type: IodeTypes = self._database.iode_type
+        iode_type: IodeType = self._database.iode_type
         iode_file_type: IodeFileType = IodeFileType(int(iode_type))
 
         try:
@@ -317,7 +317,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if not len(self._database):
             return ""
 
-        iode_type: IodeTypes = self._database.iode_type
+        iode_type: IodeType = self._database.iode_type
         iode_file_type: IodeFileType = IodeFileType(int(iode_type))
 
         # if not provided as argument, get path to the file associated with KDB of objects of type iode_type
@@ -448,7 +448,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         :param project_dir: The directory of the project.
         :return: The filepath provided by the user.
         """
-        iode_type: IodeTypes = self._database.iode_type
+        iode_type: IodeType = self._database.iode_type
         str_iode_type = str[iode_type]
         file_type: FileType = IODE_FILE_TYPES[iode_type]
 
@@ -516,8 +516,8 @@ class IodeAbstractTableModel(QAbstractTableModel):
                 if not silent:
                     QMessageBox.warning(None, "WARNING", str(e))
 
-    @Slot(str, IodeTypes)
-    def get_same_name_obj_or_objs_from_CLEC(self, name: str, other_type: IodeTypes) -> List[str]:
+    @Slot(str, IodeType)
+    def get_same_name_obj_or_objs_from_CLEC(self, name: str, other_type: IodeType) -> List[str]:
         """
         Returns the list of scalars or variables listed in the CLEC structure or 
         the object of the same name.
@@ -528,44 +528,44 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if not len(self._database):
             return []
 
-        this_type: IodeTypes = self._database.iode_type
+        this_type: IodeType = self._database.iode_type
 
         if this_type == other_type:
             return [name]
 
-        if other_type == IodeTypes.COMMENTS and name in comments:
+        if other_type == IodeType.COMMENTS and name in comments:
             return [name]
-        elif other_type == IodeTypes.EQUATIONS and name in equations:
+        elif other_type == IodeType.EQUATIONS and name in equations:
             return [name]
-        elif other_type == IodeTypes.IDENTITIES and name in identities:
+        elif other_type == IodeType.IDENTITIES and name in identities:
             return [name]
-        elif other_type == IodeTypes.LISTS and name in lists:
+        elif other_type == IodeType.LISTS and name in lists:
             return [name]
-        elif other_type == IodeTypes.SCALARS:
+        elif other_type == IodeType.SCALARS:
             obj_names = [name] if name in scalars else []
-            if this_type == IodeTypes.EQUATIONS:
+            if this_type == IodeType.EQUATIONS:
                 eq: Equation = equations[name]
                 obj_names += eq.coefficients
-            elif this_type == IodeTypes.IDENTITIES:
+            elif this_type == IodeType.IDENTITIES:
                 idt: Identity = identities[name]
                 obj_names += idt.coefficients
             return obj_names
-        elif other_type == IodeTypes.TABLES and name in tables:
+        elif other_type == IodeType.TABLES and name in tables:
             return [name]
-        elif other_type == IodeTypes.VARIABLES:
+        elif other_type == IodeType.VARIABLES:
             obj_names = [name] if name in variables else []
-            if this_type == IodeTypes.EQUATIONS:
+            if this_type == IodeType.EQUATIONS:
                 eq: Equation = equations[name]
                 obj_names += eq.variables
-            elif this_type == IodeTypes.IDENTITIES:
+            elif this_type == IodeType.IDENTITIES:
                 idt: Identity = identities[name]
                 obj_names += idt.variables
             return obj_names
         else:
             return []
 
-    @Slot(str, IodeTypes)
-    def get_related_objs(self, name: str, other_type: IodeTypes) -> List[str]:
+    @Slot(str, IodeType)
+    def get_related_objs(self, name: str, other_type: IodeType) -> List[str]:
         """
         Returns a list of all related objects of type other_type.
 
@@ -575,17 +575,17 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if not len(self._database):
             return []
 
-        if other_type == IodeTypes.COMMENTS:
+        if other_type == IodeType.COMMENTS:
             return comments.search(name)
-        elif other_type == IodeTypes.EQUATIONS:
+        elif other_type == IodeType.EQUATIONS:
             return equations.search(name)
-        elif other_type == IodeTypes.IDENTITIES:
+        elif other_type == IodeType.IDENTITIES:
             return identities.search(name)
-        elif other_type == IodeTypes.LISTS:
+        elif other_type == IodeType.LISTS:
             return lists.search(name)
-        elif other_type == IodeTypes.SCALARS:
+        elif other_type == IodeType.SCALARS:
             return scalars.search(name)
-        elif other_type == IodeTypes.TABLES:
+        elif other_type == IodeType.TABLES:
             return tables.search(name)
-        elif other_type == IodeTypes.VARIABLES:
+        elif other_type == IodeType.VARIABLES:
             return variables.search(name)

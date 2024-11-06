@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt, QDir, QSettings, QFileInfo, Slot
 from PySide6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QTextEdit, QLineEdit
 
-from iode import IodeTypes, variables
+from iode import IodeType, variables
 from typing import List
 
 from utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
@@ -302,7 +302,7 @@ class MainWindow(AbstractMainWindow):
                     dialog = EditIodeSampleDialog(self)
                     if dialog.exec() == QDialog.DialogCode.Accepted:
                         variables.set_sample(dialog.from_period, dialog.to_period)
-                    self.update_tab_and_completer(IodeTypes.VARIABLES)
+                    self.update_tab_and_completer(IodeType.VARIABLES)
                 except Exception as e:
                     QMessageBox.warning(None, "WARNING", str(e))
 
@@ -313,8 +313,8 @@ class MainWindow(AbstractMainWindow):
         self.ui.tabWidget_IODE_objs.compute_hash(value)
 
     @Slot()
-    @Slot(IodeTypes)
-    def update_tab_and_completer(self, iode_type: IodeTypes = None):
+    @Slot(IodeType)
+    def update_tab_and_completer(self, iode_type: IodeType = None):
         """
         Update the tab(s) and the completer based on the iode_type.
 
@@ -325,7 +325,7 @@ class MainWindow(AbstractMainWindow):
             index = self.ui.tabWidget_IODE_objs.update_object_tab(iode_type)
         else:
             index = None
-            for iode_type in IodeTypes:
+            for iode_type in IodeType:
                 self.ui.tabWidget_IODE_objs.update_object_tab(iode_type)
 
         # update the list of Iode object names available for autocomplete
@@ -397,8 +397,8 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuFileImportComments(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeTypes.COMMENTS)
-            self.update_tab_and_completer(IodeTypes.COMMENTS)
+            self.tabWidget_IODE_objs.reset_filter(IodeType.COMMENTS)
+            self.update_tab_and_completer(IodeType.COMMENTS)
 
     @Slot()
     def open_import_variables_dialog(self):
@@ -406,8 +406,8 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuFileImportVariables(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
-            self.update_tab_and_completer(IodeTypes.VARIABLES)
+            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
     def open_export_dialog(self):
@@ -461,7 +461,7 @@ class MainWindow(AbstractMainWindow):
                 from_period = dialog.from_period
                 to_period = dialog.to_period
                 variables.set_sample(from_period, to_period)
-                self.update_tab_and_completer(IodeTypes.VARIABLES)
+                self.update_tab_and_completer(IodeType.VARIABLES)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
 
@@ -471,8 +471,8 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuWorkspaceExtrapolateVariables(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.ui.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
-            self.update_tab_and_completer(IodeTypes.VARIABLES)
+            self.ui.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
     def open_high_to_low_dialog(self):
@@ -481,8 +481,8 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuWorkspaceHighToLow(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
-            self.update_tab_and_completer(IodeTypes.VARIABLES)
+            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
     def open_low_to_high_dialog(self):
@@ -491,8 +491,8 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuWorkspaceLowToHigh(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeTypes.VARIABLES)
-            self.update_tab_and_completer(IodeTypes.VARIABLES)
+            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
     def open_seasonal_adjustment_dialog(self):
@@ -518,7 +518,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataSortExpandList(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_list_calculus_dialog(self):
@@ -526,7 +526,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataListCalculus(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_file_contents_dialog(self):
@@ -534,7 +534,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataFileContents(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_file_compare_dialog(self):
@@ -542,7 +542,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataFileCompare(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_search_text_dialog(self):
@@ -550,7 +550,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataSearchText(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_scan_objects_dialog(self):
@@ -558,7 +558,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataScanObjects(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     @Slot()
     def open_edit_tables_variables_dialog(self):
@@ -573,7 +573,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuDataDuplicateObj(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.update_tab_and_completer(IodeTypes.LISTS)
+            self.update_tab_and_completer(IodeType.LISTS)
 
     # Compute Menu
 
@@ -583,7 +583,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuComputeIdentities(self)
 
-        identities = self.ui.tabWidget_IODE_objs.get_selected_objects_names(IodeTypes.IDENTITIES)
+        identities = self.ui.tabWidget_IODE_objs.get_selected_objects_names(IodeType.IDENTITIES)
         if len(identities):
             dialog.identities_names = identities
 

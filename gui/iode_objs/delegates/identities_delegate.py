@@ -1,6 +1,6 @@
 from .base_delegate import BaseDelegate
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class IdentitiesDelegate(BaseDelegate):
@@ -14,4 +14,4 @@ class IdentitiesDelegate(BaseDelegate):
         Initializes the IdentitiesDelegate object.
         Calls the constructor of the BaseDelegate class with the IDENTITIES constant.
         """
-        super().__init__(IodeTypes.IDENTITIES, parent)
+        super().__init__(IodeType.IDENTITIES, parent)

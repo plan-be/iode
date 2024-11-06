@@ -2,7 +2,7 @@ from PySide6.QtCore import QStringListModel, QKeyCombination, Qt, Slot
 from PySide6.QtWidgets import QCompleter, QLineEdit
 from PySide6.QtGui import QKeyEvent, QTextCursor
 
-from iode import IodeTypes, comments, equations, identities, lists, scalars, tables, variables
+from iode import IodeType, comments, equations, identities, lists, scalars, tables, variables
 from iode.reports import build_command_functions_list, build_report_functions_list, build_lec_functions_list
 from typing import Union, List, Set, Any
 
@@ -13,7 +13,7 @@ class IodeCompleter(QCompleter):
     """
 
     def __init__(self, report_commands: bool=True, lec_functions: bool=False, 
-                 iode_types: Union[IodeTypes, List[IodeTypes]]=None, parent=None):
+                 iode_types: Union[IodeType, List[IodeType]]=None, parent=None):
         """
         Initializes the IodeCompleter.
 
@@ -92,7 +92,7 @@ class IodeCompleter(QCompleter):
         lec_functions_list.sort()
         return lec_functions_list
 
-    def handle_iode_type(self, iode_type: IodeTypes, update_model: bool=True):
+    def handle_iode_type(self, iode_type: IodeType, update_model: bool=True):
         self.iode_types_handled.add(int(iode_type))
         if update_model:
             self.update_iode_objects_list_names()
@@ -224,7 +224,7 @@ class IodeWidgetWithCompleter():
     def insert_completion(self, completion: str):
         raise NotImplementedError()
     
-    def handle_iode_type(self, iode_type: IodeTypes):
+    def handle_iode_type(self, iode_type: IodeType):
         """
         Sets the iode type for the completer.
         """

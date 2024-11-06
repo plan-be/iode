@@ -5,7 +5,7 @@ from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
 from PySide6.QtGui import QDoubleValidator
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class ScalarsDelegate(BaseDelegate):
@@ -19,7 +19,7 @@ class ScalarsDelegate(BaseDelegate):
 
         :param parent: The parent object of this ScalarsDelegate instance.
         """
-        super().__init__(IodeTypes.SCALARS, parent)
+        super().__init__(IodeType.SCALARS, parent)
 
     # override BaseDelegate method
     def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex):

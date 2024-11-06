@@ -1,6 +1,6 @@
 from .base_delegate import BaseDelegate
 
-from iode import IodeTypes
+from iode import IodeType
 
 class CommentsDelegate(BaseDelegate):
     """
@@ -16,4 +16,4 @@ class CommentsDelegate(BaseDelegate):
 
         :param parent: The parent object of this CommentsDelegate instance.
         """
-        super().__init__(IodeTypes.COMMENTS, parent)
+        super().__init__(IodeType.COMMENTS, parent)

@@ -6,7 +6,7 @@ from plot.plot import PlotDialog
 from utils import DEFAULT_FONT_FAMILY
 
 from typing import List
-from iode import IodeTypes
+from iode import IodeType
 
 
 class AbstractMainWindow(QMainWindow):
@@ -68,6 +68,6 @@ class AbstractMainWindow(QMainWindow):
         raise NotImplementedError()
 
     @Slot()
-    @Slot(IodeTypes)
-    def update_tab_and_completer(self, iode_type: IodeTypes = None):
+    @Slot(IodeType)
+    def update_tab_and_completer(self, iode_type: IodeType = None):
         raise NotImplementedError()
