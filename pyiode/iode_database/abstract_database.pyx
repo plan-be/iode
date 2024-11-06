@@ -14,7 +14,7 @@ else:
 from iode.util import join_lines, table2str, JUSTIFY
 
 from cython.operator cimport dereference
-from pyiode.common cimport IodeTypes
+from pyiode.common cimport IodeType
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 
 
@@ -190,13 +190,13 @@ cdef class _AbstractDatabase:
         return self._subset('*', copy=True)
 
     @property
-    def iode_type(self) -> IodeTypes:
+    def iode_type(self) -> IodeType:
         r"""
         Return the object type of the current database.
 
         Returns
         -------
-        IodeTypes
+        IodeType
 
         Examples
         --------
@@ -204,10 +204,10 @@ cdef class _AbstractDatabase:
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.iode_type
-        <IodeTypes.COMMENTS: 0>
+        <IodeType.COMMENTS: 0>
         """
         int_iode_type: int = self.abstract_db_ptr.get_iode_type()
-        return IodeTypes(int_iode_type)
+        return IodeType(int_iode_type)
 
     @property
     def filename(self) -> str:
@@ -400,7 +400,7 @@ cdef class _AbstractDatabase:
         >>> comments["ACCAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         """
-        if self.abstract_db_ptr.get_iode_type() == IodeTypes.EQUATIONS:
+        if self.abstract_db_ptr.get_iode_type() == IodeType.EQUATIONS:
             warnings.warn("Renaming an Equation is not allowed")
         else:
             new_pos = self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())

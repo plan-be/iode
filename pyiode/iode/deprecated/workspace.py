@@ -1,24 +1,24 @@
 import warnings
 from typing import Union, List, Any
 
-from iode import (IodeTypes, comments, equations, identities, lists, scalars, tables, variables, 
+from iode import (IodeType, comments, equations, identities, lists, scalars, tables, variables, 
                   LowToHighType, LowToHighMethod, HighToLowType)
 
 
-def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = IodeTypes.VARIABLES) -> List[str]:
-    if obj_type == IodeTypes.COMMENTS:
+def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = IodeType.VARIABLES) -> List[str]:
+    if obj_type == IodeType.COMMENTS:
         return ws_content_cmt(pattern)
-    elif obj_type == IodeTypes.EQUATIONS:
+    elif obj_type == IodeType.EQUATIONS:
         return ws_content_eqs(pattern)
-    elif obj_type == IodeTypes.IDENTITIES:
+    elif obj_type == IodeType.IDENTITIES:
         return ws_content_idt(pattern)
-    elif obj_type == IodeTypes.LISTS:
+    elif obj_type == IodeType.LISTS:
         return ws_content_lst(pattern)
-    elif obj_type == IodeTypes.SCALARS:
+    elif obj_type == IodeType.SCALARS:
         return ws_content_scl(pattern)
-    elif obj_type == IodeTypes.TABLES:
+    elif obj_type == IodeType.TABLES:
         return ws_content_tbl(pattern)
-    elif obj_type == IodeTypes.VARIABLES:
+    elif obj_type == IodeType.VARIABLES:
         return ws_content_var(pattern)
     else:
         raise ValueError(f"IODE type {obj_type} is invalid")
@@ -76,19 +76,19 @@ def ws_clear_all():
 
 def ws_clear(filetype: int):
     '''Clear WS of the given filetype (COMMENTS..VARIABLES)'''
-    if filetype == IodeTypes.COMMENTS:
+    if filetype == IodeType.COMMENTS:
         ws_clear_cmt()
-    elif filetype == IodeTypes.EQUATIONS:
+    elif filetype == IodeType.EQUATIONS:
         ws_clear_eqs()
-    elif filetype == IodeTypes.IDENTITIES:
+    elif filetype == IodeType.IDENTITIES:
         ws_clear_idt()
-    elif filetype == IodeTypes.LISTS:
+    elif filetype == IodeType.LISTS:
         ws_clear_lst()
-    elif filetype == IodeTypes.SCALARS:
+    elif filetype == IodeType.SCALARS:
         ws_clear_scl()
-    elif filetype == IodeTypes.TABLES:
+    elif filetype == IodeType.TABLES:
         ws_clear_tbl()
-    elif filetype == IodeTypes.VARIABLES:
+    elif filetype == IodeType.VARIABLES:
         ws_clear_var()
     else:
         raise ValueError(f"IODE type {filetype} is invalid")
@@ -133,19 +133,19 @@ def ws_clear_var():
 
 def ws_load(filename: str, filetype: int) -> Any:
     '''Load an IODE file and return the number of read objects'''
-    if filetype == IodeTypes.COMMENTS:
+    if filetype == IodeType.COMMENTS:
         ws_load_cmt(filename)
-    elif filetype == IodeTypes.EQUATIONS:
+    elif filetype == IodeType.EQUATIONS:
         ws_load_eqs(filename)
-    elif filetype == IodeTypes.IDENTITIES:
+    elif filetype == IodeType.IDENTITIES:
         ws_load_idt(filename)
-    elif filetype == IodeTypes.LISTS:
+    elif filetype == IodeType.LISTS:
         ws_load_lst(filename)
-    elif filetype == IodeTypes.SCALARS:
+    elif filetype == IodeType.SCALARS:
         ws_load_scl(filename)
-    elif filetype == IodeTypes.TABLES:
+    elif filetype == IodeType.TABLES:
         ws_load_tbl(filename)
-    elif filetype == IodeTypes.VARIABLES:
+    elif filetype == IodeType.VARIABLES:
         ws_load_var(filename)
     else:
         raise ValueError(f"IODE type {filetype} is invalid") 
@@ -190,19 +190,19 @@ def ws_load_var(filename: str) -> int:
 
 def ws_save(filename: str, filetype: int):
     '''Save the current IODE workspace of a given type'''
-    if filetype == IodeTypes.COMMENTS:
+    if filetype == IodeType.COMMENTS:
         ws_save_cmt(filename)
-    elif filetype == IodeTypes.EQUATIONS:
+    elif filetype == IodeType.EQUATIONS:
         ws_save_eqs(filename)
-    elif filetype == IodeTypes.IDENTITIES:
+    elif filetype == IodeType.IDENTITIES:
         ws_save_idt(filename)
-    elif filetype == IodeTypes.LISTS:
+    elif filetype == IodeType.LISTS:
         ws_save_lst(filename)
-    elif filetype == IodeTypes.SCALARS:
+    elif filetype == IodeType.SCALARS:
         ws_save_scl(filename)
-    elif filetype == IodeTypes.TABLES:
+    elif filetype == IodeType.TABLES:
         ws_save_tbl(filename)
-    elif filetype == IodeTypes.VARIABLES:
+    elif filetype == IodeType.VARIABLES:
         ws_save_var(filename)
     else:
         raise ValueError(f"IODE type {filetype} is invalid") 

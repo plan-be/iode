@@ -38,5 +38,5 @@ def load_extra_files(extra_files: Union[str, Path, List[Union[str, Path]]]) -> L
         raise TypeError("'extra_files' must be a string, a path or a list of strings or paths")
     extra_files = [Path(extra_file) for extra_file in extra_files]
     for i, extra_file in enumerate(extra_files):
-        load_reference_kdb(i + 2, IodeTypes.VARIABLES, str(extra_file).encode())
+        load_reference_kdb(i + 2, IodeType.VARIABLES, str(extra_file).encode())
     return extra_files

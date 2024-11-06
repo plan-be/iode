@@ -4,7 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport (IodeTypes, IodeFileType, TableLang, IodeEquationMethod, 
+from pyiode.common cimport (IodeType, IodeFileType, TableLang, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType, 
@@ -63,8 +63,8 @@ cdef extern from "cpp_api/KDB/kdb_global.h":
     void high_to_low(IodeHighToLow type_, string& filepath, string& var_list) except +
 
 cdef extern from "cpp_api/KDB/kdb_reference.h":
-    void load_reference_kdb(int index, IodeTypes iode_type, string& filepath) except +
-    void clear_reference_kdb(int index, IodeTypes iode_type) except +
+    void load_reference_kdb(int index, IodeType iode_type, string& filepath) except +
+    void clear_reference_kdb(int index, IodeType iode_type) except +
     void clear_all_reference_kdbs() except +
 
 cdef extern from "cpp_api/compute/simulation.h":
