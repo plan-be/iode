@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QStyledItemDelegate, QLineEdit, QPlainTextEdit,
 from PySide6.QtCore import Qt, QEvent, QObject, QModelIndex, QAbstractItemModel
 from PySide6.QtGui import QKeyEvent
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class BaseDelegate(QStyledItemDelegate):
@@ -11,16 +11,16 @@ class BaseDelegate(QStyledItemDelegate):
     A base delegate class for handling item data in a model.
     """
 
-    def __init__(self, iode_type: IodeTypes, parent=None):
+    def __init__(self, iode_type: IodeType, parent=None):
         """
-        Initializes the BaseDelegate with the given IodeTypes and parent.
+        Initializes the BaseDelegate with the given IodeType and parent.
 
-        :param iode_type: The IodeTypes to use.
+        :param iode_type: The IodeType to use.
         :param parent: The parent object.
         """
         super().__init__(parent)
-        self.iode_type: IodeTypes = iode_type
-        self.lineEdit: bool = iode_type == IodeTypes.SCALARS or iode_type == IodeTypes.VARIABLES
+        self.iode_type: IodeType = iode_type
+        self.lineEdit: bool = iode_type == IodeType.SCALARS or iode_type == IodeType.VARIABLES
 
     # override QStyledItemDelegate method
     def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex):

@@ -10,7 +10,7 @@ from .ui_edit_iode_obj import Ui_EditObjectDialog
 
 from typing import Any
 from enum import Enum
-from iode import (IodeTypes, IODE_DATABASE_TYPE_NAMES, comments, identities, lists, 
+from iode import (IodeType, IODE_DATABASE_TYPE_NAMES, comments, identities, lists, 
                   scalars, tables, variables, Table, TableLineType)
 
 
@@ -99,7 +99,7 @@ class EditIdentityDialog(AbstractEditObjDialog):
         self.ui.textEdit_content.setPlainText(self.previous_value)
 
         completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeTypes.SCALARS, IodeTypes.VARIABLES])
+                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
         self.ui.textEdit_content.completer = completer
 
     @Slot()
@@ -123,7 +123,7 @@ class EditListDialog(AbstractEditObjDialog):
         self.ui.textEdit_content.setPlainText(self.previous_value)
 
         completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeTypes.SCALARS, IodeTypes.VARIABLES])
+                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
         self.ui.textEdit_content.completer = completer
 
     @Slot()

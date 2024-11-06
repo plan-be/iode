@@ -5,13 +5,13 @@ from .numerical_table_model import IodeNumericalTableModel
 from utils import MAX_PRECISION_NUMBERS, NAN_REP
 
 from typing import List, Any
-from iode import (IodeTypes, VarsMode, comments, equations, identities, lists, 
+from iode import (IodeType, VarsMode, comments, equations, identities, lists, 
                   scalars, tables, variables, Scalar, Table, NA, is_NA)
 
 
 class CommentsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
-        super().__init__(["Comment"], IodeTypes.COMMENTS, comments, parent)
+        super().__init__(["Comment"], IodeType.COMMENTS, comments, parent)
 
     def data_cell(self, row: int, col: int) -> str:
         try:
@@ -31,7 +31,7 @@ class CommentsModel(IodeAbstractTableModel):
 
 class EquationsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
-        super().__init__(["Equation"], IodeTypes.EQUATIONS, equations, parent)
+        super().__init__(["Equation"], IodeType.EQUATIONS, equations, parent)
 
     def data_cell(self, row: int, col: int) -> str:
         try:
@@ -52,7 +52,7 @@ class EquationsModel(IodeAbstractTableModel):
 
 class IdentitiesModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
-        super().__init__(["Identity"], IodeTypes.IDENTITIES, identities, parent)
+        super().__init__(["Identity"], IodeType.IDENTITIES, identities, parent)
 
     def data_cell(self, row: int, col: int) -> str:
         try:
@@ -81,7 +81,7 @@ class IdentitiesModel(IodeAbstractTableModel):
 
 class ListsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
-        super().__init__(["List"], IodeTypes.LISTS, lists, parent)
+        super().__init__(["List"], IodeType.LISTS, lists, parent)
 
     def data_cell(self, row: int, col: int) -> str:
         try:
@@ -101,7 +101,7 @@ class ListsModel(IodeAbstractTableModel):
 
 class ScalarsModel(IodeAbstractTableModel, IodeNumericalTableModel):
     def __init__(self, precision: int=2, format: str='f', parent: QObject = None):
-        IodeAbstractTableModel.__init__(self, ["Value", "Relax", "Std", "T-Stat"], IodeTypes.SCALARS, scalars, parent)
+        IodeAbstractTableModel.__init__(self, ["Value", "Relax", "Std", "T-Stat"], IodeType.SCALARS, scalars, parent)
         IodeNumericalTableModel.__init__(self, precision, format)
 
     def data_cell(self, row: int, col: int) -> str:
@@ -145,7 +145,7 @@ class ScalarsModel(IodeAbstractTableModel, IodeNumericalTableModel):
 
 class TablesModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
-        super().__init__(["Table"], IodeTypes.TABLES, tables, parent)
+        super().__init__(["Table"], IodeType.TABLES, tables, parent)
 
     def data_cell(self, row: int, col: int) -> str:
         try:
@@ -168,7 +168,7 @@ class TablesModel(IodeAbstractTableModel):
 class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
     def __init__(self, precision: int=2, format: str='f', mode: VarsMode = VarsMode.LEVEL, 
                  parent: QObject = None):
-        IodeAbstractTableModel.__init__(self, [], IodeTypes.VARIABLES, variables, parent)
+        IodeAbstractTableModel.__init__(self, [], IodeType.VARIABLES, variables, parent)
         IodeNumericalTableModel.__init__(self, precision, format)
         self.set_mode(mode)
 

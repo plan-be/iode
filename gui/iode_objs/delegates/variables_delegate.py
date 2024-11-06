@@ -4,7 +4,7 @@ from util.double_validator import IodeDoubleValidator
 from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class VariablesDelegate(BaseDelegate):
@@ -21,7 +21,7 @@ class VariablesDelegate(BaseDelegate):
 
         :param parent: The parent object of this VariablesDelegate instance.
         """
-        super().__init__(IodeTypes.VARIABLES, parent)
+        super().__init__(IodeType.VARIABLES, parent)
 
     # override BaseDelegate method
     def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex):

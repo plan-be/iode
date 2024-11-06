@@ -10,7 +10,7 @@ from iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_objs.delegates.base_delegate import BaseDelegate
 from iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
-from iode import IodeTypes, variables
+from iode import IodeType, variables
 # TODO : add MAX_LENGTH_NAME (= K_MAX_NAME) to the Python iode package
 MAX_LENGTH_NAME = 20
 
@@ -23,12 +23,12 @@ class IodeAbstractTableView(QTableView):
     such as filtering, printing, and handling of object names.
     """
     database_modified = Signal()
-    show_objs_request = Signal(IodeTypes, list)
+    show_objs_request = Signal(IodeType, list)
 
-    def __init__(self, iode_type: IodeTypes, delegate: BaseDelegate, parent=None):
+    def __init__(self, iode_type: IodeType, delegate: BaseDelegate, parent=None):
         super().__init__(parent)
 
-        self.iode_type: IodeTypes = iode_type
+        self.iode_type: IodeType = iode_type
         self.delegate: BaseDelegate = delegate
         self.edit_dialog: QDialog = None
         self.main_window: AbstractMainWindow = None
@@ -85,9 +85,9 @@ class IodeAbstractTableView(QTableView):
 
         # for editing IODE object names
         self.object_name_edit: QLineEdit = QLineEdit(self)
-        if self.iode_type == IodeTypes.COMMENTS:
+        if self.iode_type == IodeType.COMMENTS:
             accepted_letters = "A-Za-z"  
-        elif self.iode_type == IodeTypes.SCALARS:
+        elif self.iode_type == IodeType.SCALARS:
             accepted_letters = "a-z"
         else:
             accepted_letters = "A-Z"
@@ -124,13 +124,13 @@ class IodeAbstractTableView(QTableView):
         self.vars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.scalars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
-        self.same_cmt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.COMMENTS))
-        self.same_eq_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.EQUATIONS))
-        self.same_idt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.IDENTITIES))
-        self.same_lst_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.LISTS))
-        self.same_tbl_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.TABLES))
-        self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.VARIABLES))
-        self.scalars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeTypes.SCALARS))
+        self.same_cmt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.COMMENTS))
+        self.same_eq_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.EQUATIONS))
+        self.same_idt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.IDENTITIES))
+        self.same_lst_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.LISTS))
+        self.same_tbl_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.TABLES))
+        self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.VARIABLES))
+        self.scalars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.SCALARS))
 
         # get list of related objects
         self.related_cmt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F1), self)
@@ -149,13 +149,13 @@ class IodeAbstractTableView(QTableView):
         self.related_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_var_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
-        self.related_cmt_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.COMMENTS))
-        self.related_eq_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.EQUATIONS))
-        self.related_idt_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.IDENTITIES))
-        self.related_lst_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.LISTS))
-        self.related_scl_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.SCALARS))
-        self.related_tbl_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.TABLES))
-        self.related_var_shortcut.activated.connect(lambda: self.show_related_objs(IodeTypes.VARIABLES))
+        self.related_cmt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.COMMENTS))
+        self.related_eq_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.EQUATIONS))
+        self.related_idt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.IDENTITIES))
+        self.related_lst_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.LISTS))
+        self.related_scl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.SCALARS))
+        self.related_tbl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.TABLES))
+        self.related_var_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.VARIABLES))
 
     def setup(self, main_window: AbstractMainWindow):
         """
@@ -194,7 +194,7 @@ class IodeAbstractTableView(QTableView):
         height = self.horizontalHeader().height()
         for i in range(self.model().rowCount()):
             height += self.rowHeight(i)
-        if self.iode_type == IodeTypes.VARIABLES:
+        if self.iode_type == IodeType.VARIABLES:
             height += 20
         return height
 
@@ -490,8 +490,8 @@ class IodeAbstractTableView(QTableView):
         if add_dialog.exec() == QDialog.DialogCode.Accepted:
             model.reset()
 
-    @Slot(IodeTypes)
-    def show_same_name_obj_or_objs_from_CLEC(self, other_type: IodeTypes):
+    @Slot(IodeType)
+    def show_same_name_obj_or_objs_from_CLEC(self, other_type: IodeType):
         """
         Shows equations, identities, scalars or variables listed in the CLEC
         structure or the object of the same name.
@@ -511,8 +511,8 @@ class IodeAbstractTableView(QTableView):
         if list_objs is not None and len(list_objs):
             self.show_objs_request.emit(other_type, list_objs)
 
-    @Slot(IodeTypes)
-    def show_related_objs(self, other_type: IodeTypes):
+    @Slot(IodeType)
+    def show_related_objs(self, other_type: IodeType):
         """
         Shows all related objects.
 

@@ -8,7 +8,7 @@ from .ui_add_scalar import Ui_AddScalarDialog
 from .ui_add_table import Ui_AddTableDialog
 
 from utils import URL_MANUAL
-from iode import (IodeTypes, Table, comments, identities, lists, scalars, 
+from iode import (IodeType, Table, comments, identities, lists, scalars, 
                   tables, variables)
 
 
@@ -55,7 +55,7 @@ class AbstractAddDialog(QDialog):
 class AddCommentDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, comments, parent)
-        assert database.iode_type == IodeTypes.COMMENTS
+        assert database.iode_type == IodeType.COMMENTS
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
 
@@ -69,7 +69,7 @@ class AddCommentDialog(AbstractAddDialog):
 class AddIdentityDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, identities, parent)
-        assert database.iode_type == IodeTypes.IDENTITIES
+        assert database.iode_type == IodeType.IDENTITIES
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
 
@@ -83,7 +83,7 @@ class AddIdentityDialog(AbstractAddDialog):
 class AddListDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, lists, parent)
-        assert database.iode_type == IodeTypes.LISTS
+        assert database.iode_type == IodeType.LISTS
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
 
@@ -97,7 +97,7 @@ class AddListDialog(AbstractAddDialog):
 class AddScalarDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, scalars, parent)
-        assert database.iode_type == IodeTypes.SCALARS
+        assert database.iode_type == IodeType.SCALARS
         self.ui = Ui_AddScalarDialog()
         self.ui.setupUi(self)
         self.ui.lineEdit_value.setValidator(QDoubleValidator(parent));
@@ -113,11 +113,11 @@ class AddScalarDialog(AbstractAddDialog):
 class AddTableDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, tables, parent)
-        assert database.iode_type == IodeTypes.TABLES
+        assert database.iode_type == IodeType.TABLES
         self.ui = Ui_AddTableDialog()
         self.ui.setupUi(self)
         completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeTypes.SCALARS, IodeTypes.VARIABLES])
+                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
         self.ui.textEdit_lec.completer = completer
 
     @Slot()
@@ -137,7 +137,7 @@ class AddTableDialog(AbstractAddDialog):
 class AddVariableDialog(AbstractAddDialog):
     def __init__(self, database, parent=None):
         super().__init__(database, variables, parent)
-        assert database.iode_type == IodeTypes.VARIABLES
+        assert database.iode_type == IodeType.VARIABLES
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
 

@@ -1,6 +1,6 @@
 from .base_delegate import BaseDelegate
 
-from iode import IodeTypes
+from iode import IodeType
 
 
 class EquationsDelegate(BaseDelegate):
@@ -15,4 +15,4 @@ class EquationsDelegate(BaseDelegate):
 
         :param parent: The parent object.
         """
-        super().__init__(IodeTypes.EQUATIONS, parent)
+        super().__init__(IodeType.EQUATIONS, parent)
