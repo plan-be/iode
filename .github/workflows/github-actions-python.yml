@@ -116,10 +116,3 @@ jobs:
             if: runner.os == 'Windows'
             shell: bash -el {0}
             run: pytest
-          - name: Upload wheel file
-            if: ${{ success() && runner.os == 'Windows'}}
-            uses: actions/upload-artifact@v3
-            with:
-              name: iode-python
-              path: "${{ github.workspace }}/iodeapi*.whl"
-              if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
