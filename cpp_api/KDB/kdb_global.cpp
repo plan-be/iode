@@ -2,7 +2,7 @@
 #include "kdb_global.h"
 
 
-bool is_global_database_loaded(const IodeDatabaseType iodeType) 
+bool is_global_database_loaded(const IodeTypes iodeType) 
 { 
     if (K_WS[iodeType] == NULL) return false;
     if (K_WS[iodeType]->k_nb == 0) return false;
@@ -21,7 +21,7 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
     K_set_kdb_name(kdb, (unsigned char*) filename.c_str());
 }
 
-std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeDatabaseType iode_type, const std::string& pattern)
+std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeTypes iode_type, const std::string& pattern)
 {
     char* c_pattern = to_char_array(pattern);
     

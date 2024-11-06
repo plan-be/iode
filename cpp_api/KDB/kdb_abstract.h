@@ -30,7 +30,7 @@ protected:
     KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern);
 
 public:
-    KDBAbstract(const IodeDatabaseType iode_type, const std::string& filepath = "");
+    KDBAbstract(const IodeTypes iode_type, const std::string& filepath = "");
     
     // No copy constructor --> replaced by subset() method in derived classes
     KDBAbstract(const KDBAbstract&) = delete;
