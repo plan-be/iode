@@ -16,12 +16,14 @@ from iode_objs.delegates.variables_delegate import VariablesDelegate
 
 from iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
                                       AddScalarDialog, AddTableDialog, AddVariableDialog)
-from iode_objs.edit.edit_iode_obj import (EditCommentDialog, EditIdentityDialog, 
-                                          EditListDialog)
+from iode_objs.edit.edit_iode_obj import EditCommentDialog, EditIdentityDialog, EditListDialog
+from iode_objs.edit.edit_table import EditTableDialog
 
 from iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_objs.models.table_model import IdentitiesModel
 from iode_objs.models.table_model import VariablesModel
+
+from plot.plot_table import PlotTableDialog
 
 from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView
@@ -188,8 +190,8 @@ class TablesView(IodeAbstractTableView):
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditTableDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
+        self.edit_dialog = EditTableDialog(obj_name, model.displayed_database, self.main_window, self)
+        self.edit_dialog.database_modified.connect(self.database_modified)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
@@ -241,10 +243,10 @@ class TablesView(IodeAbstractTableView):
             generalized_sample = f"{sample.start}:{sample.nb_periods}"
 
             # computes the tables and generates the associated graph
-            table = tables[table_name]
-            # computed_table_graph = ComputedTableGraph(table, generalized_sample)
-            # plot_dialog = PlotTableDialog(computed_table_graph)
-            # self.main_window.append_plot(plot_dialog)
+            table: Table = tables[table_name]
+            computed_table_graph = table.compute(generalized_sample, nb_decimals=16)
+            plot_dialog = PlotTableDialog(computed_table_graph)
+            self.main_window.append_plot(plot_dialog)
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"Could not compute table {table_name}:\n{str(e)}")
             return
@@ -327,7 +329,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
         self.popup_context_menu(event)
         event.accept()
 
-    # override AbstracTableView method
+    # override AbstractTableView method
     @Slot()
     def print(self):
         try:
@@ -340,6 +342,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
                 filepath = model.filepath
                 output_file = Path(filepath).with_suffix("")
 
+                # TODO: implement PrintFileDialog
                 # Ask the user to set the output file and format
                 # dialog = PrintFileDialog(self, output_file)
                 # if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -390,6 +393,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
             to_period = periods[-1]
             vars_sample = variables.sample
 
+            # TODO: implement PlotVariablesDialog 
             # plot_dialog = PlotVariablesDialog()
             # plot_dialog.set_periods(vars_sample, from_period, to_period)
             # for var_name in variable_names:
