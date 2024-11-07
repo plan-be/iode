@@ -449,6 +449,7 @@ TABLE
    Table.box
    Table.shadow
    
+   Table.divider
    Table.compute
    Table.index
    Table.insert
@@ -463,9 +464,13 @@ TABLE
 
    TableLine
 
+   TableLine.line_type
    TableLine.axis_left
    TableLine.graph_type
-   TableLine.line_type
+   TableLine.__len__
+   TableLine.__getitem__
+   TableLine.__setitem__
+   TableLine.__delitem__
 
 .. autosummary::
    :toctree: _generated
