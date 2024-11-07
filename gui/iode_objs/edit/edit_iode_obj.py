@@ -1,17 +1,14 @@
-from PySide6.QtCore import Qt, Signal, Slot, QModelIndex
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QDialog, QPlainTextEdit, QMessageBox
 from PySide6.QtGui import QDesktopServices, QShortcut, QKeySequence
 
 
 from utils import URL_MANUAL
-from abstract_main_window import AbstractMainWindow
 from text_edit.completer import IodeCompleter
 from .ui_edit_iode_obj import Ui_EditObjectDialog
 
 from typing import Any
-from enum import Enum
-from iode import (IodeType, IODE_DATABASE_TYPE_NAMES, comments, identities, lists, 
-                  scalars, tables, variables, Table, TableLineType)
+from iode import IodeType, IODE_DATABASE_TYPE_NAMES, comments, identities, lists
 
 
 class AbstractEditObjDialog(QDialog):
@@ -38,8 +35,8 @@ class AbstractEditObjDialog(QDialog):
                 self.accept()
                 return
 
-            # user changed the name when editing but an IODE object with the same name already exist 
-            # in the global database
+            # user changed the name when editing the object but another object with the same name already 
+            # exists in the global database
             if name != self.previous_name and name in self._global_database:
                 res = QMessageBox.question(None, "WARNING", f"{name} already exists. Replace it ?", 
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
