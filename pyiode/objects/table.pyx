@@ -643,7 +643,14 @@ cdef class TableLine:
         self.py_parent_table.update_global_database()
 
     def __len__(self) -> int:
-        return self.nb_columns
+        if self.c_line is NULL:
+            return 0
+        if self.line_type == TableLineType.TITLE:
+            return 1
+        elif self.line_type == TableLineType.CELL:
+            return self.nb_columns
+        else:
+            return 0
 
     def _get_row_from_index(self, index: int) -> int:
         if not (-self.nb_columns < index < self.nb_columns):
@@ -1351,6 +1358,55 @@ cdef class Table:
     @shadow.setter
     def shadow(self, value: bool):
         warnings.warn("'shadow' is not yet implemented")
+
+    @property
+    def divider(self) -> TableLine:
+        """
+        Returns the divider line of the table. 
+        The value of each cell of the divider line is applied to the whole corresponding column as a global divider value.  
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                                          1 |                                    PC_*40.34
+        TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
+        ----- | ---------------------------------------------------------------------------------------------------------
+        CELL  |                                                            |                     "#S"
+        CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
+        CELL  | "   Masse salariale totale"                                |                                         WBU_
+        CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
+        CELL  | "   Surplus brut d'exploitation"                           |                                        GOSH_
+        CELL  | "   Revenu net de la propriété"                            |                                          IDH
+        CELL  | "Cotisations sociales et impôts"                           |                                  SSF+SSH+DTH
+        CELL  | "   Cotisations patronales"                                |                                          SSF
+        CELL  | "   Cotisations personnelles"                              |                                          SSH
+        CELL  | "IPP"                                                      |                                          DTH
+        CELL  | "Prestations sociales "                                    |                                     SBH+OCUH
+        CELL  | "   Sécurité sociale"                                      |                                          SBH
+        CELL  | "   Diverses prestations"                                  |                                         OCUH
+        CELL  | "Total"                                                    | (WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)
+        ----- | ---------------------------------------------------------------------------------------------------------
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> tables["YDH"].divider
+        ('1', 'PC_*40.34')
+        """
+        cdef CTableLine* c_line
+        c_line = self.c_table.get_divider_line()
+        return TableLine.from_ptr(c_line, self.c_table.nb_columns(), self)
 
     def _get_row_from_index(self, index: int) -> int:
         if not (-len(self) < index < len(self)):
