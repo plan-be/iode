@@ -103,6 +103,11 @@ def test_iode_simulation_estimation(tmp_path):
 
 
 def test_iode_edit_and_estimate_equations(tmp_path):
+    from iode.util import EditAndEstimateEquations
+
+    iode.__test__ = {}
+    iode.__test__['EditAndEstimateEquations'] = EditAndEstimateEquations.__doc__
+
     iode.suppress_msgs()
     run_doctests(items=['EditAndEstimateEquations'], tmp_dir=tmp_path)
     iode.reset_msgs()
