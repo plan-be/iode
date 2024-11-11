@@ -109,7 +109,7 @@ jobs:
           - name: Install iode package
             shell: bash -el {0}
             run: | 
-              filename=$(ls iodeapi*.whl) 
+              filename=$(ls iode*.whl) 
               echo $filename 
               pip install $filename
           - name: Test iode Python
