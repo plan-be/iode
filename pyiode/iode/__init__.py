@@ -34,7 +34,7 @@ from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_prin
                           w_print_pg_footer, w_print_pg_header, w_print_tit)
 
 # Estimation - Simulation
-from .iode_cython import Simulation, EditAndEstimateEquations, dynamic_adjustment, dickey_fuller_test 
+from .iode_cython import Simulation, dynamic_adjustment, dickey_fuller_test 
 
 # lec
 from .iode_cython import execute_lec
@@ -73,7 +73,7 @@ __all__ = [
     'w_print_pg_header', 'w_print_tit', 
 
     # Estimation - Simulation
-    'Simulation', 'EditAndEstimateEquations', 'dynamic_adjustment', 'dickey_fuller_test', 
+    'Simulation', 'dynamic_adjustment', 'dickey_fuller_test', 
 
     # lec
     'execute_lec', 
