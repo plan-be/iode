@@ -118,9 +118,11 @@ cdef class _AbstractDatabase:
 
     def copy(self) -> Self:
         """
-        Create a *copy* of an IODE database. 
-        Any change made on the *copied database* will **NOT** 
-        modify the corresponding the global IODE database.
+        Create a new database instance in which each object is a *copy* of the original object 
+        from the global IODE database. Any change made to the *copied database* (*subset*) will 
+        not be applied to the global workspace. This can be useful for example if you want to 
+        save previous values of scalars before estimating an equation or a block of equations and 
+        then restore the original values if the estimated values are not satisfying.
 
         Returns
         -------
