@@ -17,6 +17,7 @@ from iode_objs.delegates.variables_delegate import VariablesDelegate
 from iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
                                       AddScalarDialog, AddTableDialog, AddVariableDialog)
 from iode_objs.edit.edit_iode_obj import EditCommentDialog, EditIdentityDialog, EditListDialog
+from iode_objs.edit.edit_equation import EditEquationDialog
 from iode_objs.edit.edit_table import EditTableDialog
 
 from iode_objs.models.abstract_table_model import IodeAbstractTableModel
@@ -60,18 +61,18 @@ class EquationsView(IodeAbstractTableView):
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
-        # self.edit_dialog = EditEquationDialog(obj_name, model.displayed_database, self)
-        # self.edit_dialog.database_modified.connect(self.database_modified)
-        # self.edit_dialog.database_modified.connect(self.update_filter)
-        # self.edit_dialog.new_object_inserted.connect(self.new_object_inserted)
+        self.edit_dialog = EditEquationDialog(obj_name, model.displayed_database, self.main_window, self)
+        self.edit_dialog.database_modified.connect(self.database_modified)
+        self.edit_dialog.database_modified.connect(self.update_filter)
+        self.edit_dialog.new_object_inserted.connect(self.new_object_inserted)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        # dialog: EditEquationDialog = EditEquationDialog("", model.displayed_database, self)
-        # dialog.new_object_inserted.connect(self.new_object_inserted)
-        # dialog.database_modified.connect(self.database_modified)
-        # dialog.database_modified.connect(self.update_filter)
-        # return dialog
+        dialog: EditEquationDialog = EditEquationDialog("", model.displayed_database, self.main_window, self)
+        dialog.new_object_inserted.connect(self.new_object_inserted)
+        dialog.database_modified.connect(self.database_modified)
+        dialog.database_modified.connect(self.update_filter)
+        return dialog
 
     @Slot()
     def update_filter(self):
