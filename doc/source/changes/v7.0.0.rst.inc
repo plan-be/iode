@@ -6,7 +6,7 @@ In development
 New Features 
 ------------
 
-  * (PYTHON) release of the first Python iodeapi package (version 7.0.0) 
+  * (PYTHON) release of the first Python iode-python package (version 7.0.0) 
 
 Improvements
 ------------
