@@ -5,9 +5,7 @@ requires = [ "scikit-build-core >=0.4.3", "numpy", "cython>=3.0", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
-# NOTE: The name of the package is "iode-python" but the name of the module is "iode"
-#       The name "iode" was already used in PyPI
-name = "iode-python"
+name = "iode"
 version = "${CMAKE_PROJECT_VERSION}"
 description = ""
 readme = "README.md"
