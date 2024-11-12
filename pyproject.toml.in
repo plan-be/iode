@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "iode"
 version = "${CMAKE_PROJECT_VERSION}"
-description = ""
+description = "IODE is a package dedicated to econometric models and to the management of statistical series."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
