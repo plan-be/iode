@@ -16,8 +16,6 @@ from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equat
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 
-from .common import EQ_TEST_NAMES
-
 EquationInput = Union[str, Dict[str, Any], Equation]
 
 
@@ -925,7 +923,7 @@ cdef class Equations(_AbstractDatabase):
                 args["to_period"] = to_period
                 # date and tests cannot be set by the users
                 date = args.pop('date', '')
-                test_values = [args.pop(test_name, 0.0) for test_name in EQ_TEST_NAMES]
+                test_values = [args.pop(test_name, 0.0) for test_name in test_names]
 
                 equation = Equation(endogenous, **args)
                 equation._set_tests(test_values)
@@ -1100,8 +1098,9 @@ cdef class Equations(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
+        test_names = [member.name.lower() for member in EqTest]
         dtype = {"lec": str, "method": str, "sample": str, "comment": str, "instruments": str, "block": str}
-        dtype.update({test_name: float for test_name in EQ_TEST_NAMES})
+        dtype.update({test_name: float for test_name in test_names})
         dtype.update({"date": str})
         # note: [:1] to skip endogenous value which is the same as name
         data = {name: self._get_object(name)._as_tuple()[1:] for name in self.names}

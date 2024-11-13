@@ -11,8 +11,10 @@ IODE_LANGUAGES_LIST: List[str] = [member.name.title() for member in TableLang]
 
 EQUATION_METHODS_LIST: List[str] = [member.name.title() for member in EqMethod]
 
-EQ_TEST_NAMES: Tuple[str, ...] = tuple(member.name.lower() for member in EqTest)
-
+EQ_TEST_NAMES: Tuple[str, ...] = ("Correlation", "St dev of residuals",
+                                  "Mean of YOBS", "∑ Residuals²", "Standard error",
+                                  "Standard error in %", "F-stat", "R²",
+                                  "R² adjusted", "Durbin-Watson", "Log Likelihood")
 
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
