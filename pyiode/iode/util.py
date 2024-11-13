@@ -11,7 +11,8 @@ from .common import IODE_FILE_TYPES
 # import constants, functions and classes hidden from users but maybe useful for developers
 # (for the GUI for example)
 from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, iode_msg_path, print_error_msg, 
-                              TableLine, TableCell, ComputedTable, EditAndEstimateEquations)
+                              TableLine, TableCell, ComputedTable, EditAndEstimateEquations, 
+                              CorrelationMatrix)
 from .common import FileType
 
 _list_separator = r",;\s"
