@@ -100,8 +100,8 @@ class ListsModel(IodeAbstractTableModel):
 
 
 class ScalarsModel(IodeAbstractTableModel, IodeNumericalTableModel):
-    def __init__(self, precision: int=2, format: str='f', parent: QObject = None):
-        IodeAbstractTableModel.__init__(self, ["Value", "Relax", "Std", "T-Stat"], IodeType.SCALARS, scalars, parent)
+    def __init__(self, precision: int=2, format: str='f', scalars_db=scalars, parent: QObject = None):
+        IodeAbstractTableModel.__init__(self, ["Value", "Relax", "Std", "T-Stat"], IodeType.SCALARS, scalars_db, parent)
         IodeNumericalTableModel.__init__(self, precision, format)
 
     def data_cell(self, row: int, col: int) -> str:
