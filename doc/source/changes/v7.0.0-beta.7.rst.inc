@@ -1,5 +1,5 @@
-Version 7.0.0
-=============
+Version 7.0.0-beta.7
+====================
 
 In development
 
