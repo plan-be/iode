@@ -29,6 +29,24 @@ jobs:
           name: iode-cli
           path: ${{ github.workspace }}/assets
 
+      - name: Restore Python 3.10 Wheel Files
+        uses: actions/download-artifact@v4
+        with:
+          name: iode-python-3.10
+          path: ${{ github.workspace }}/assets
+
+      - name: Restore Python 3.11 Wheel Files
+        uses: actions/download-artifact@v4
+        with:
+          name: iode-python-3.11
+          path: ${{ github.workspace }}/assets
+
+      - name: Restore Python 3.12 Wheel Files
+        uses: actions/download-artifact@v4
+        with:
+          name: iode-python-3.12
+          path: ${{ github.workspace }}/assets
+
       - name: Restore Windows Installer and Updater
         uses: actions/download-artifact@v4
         with:
