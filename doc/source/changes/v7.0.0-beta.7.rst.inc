@@ -1,12 +1,12 @@
 Version 7.0.0-beta.7
 ====================
 
-In development
+Released on 21/11/2024
 
 New Features 
 ------------
 
-  * (PYTHON) release of the first Python iode package (version 7.0.0) 
+  * (PYTHON) release of the new Python package *iode* (version 7.0.0) 
 
 Improvements
 ------------
