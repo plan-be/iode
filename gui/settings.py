@@ -9,6 +9,7 @@ from util.widgets.sample_edit import IodeSampleEdit
 
 
 import re
+from typing import Any
 from utils import URL_MANUAL
 
 RUN_REPORTS_FROM_PROJECT_DIR = "run_reports_from_project_dir"
@@ -28,15 +29,8 @@ class ProjectSettings:
         return cls.project_settings
 
 
-class MixinSettingsDialog(QDialog):
-    def __init__(self, parent: QWidget=None) -> None:
-        super().__init__(parent)
-        self.ui_obj = None
-
-    def prepare_settings(self, ui_obj) -> None:
-        self.ui_obj = ui_obj
-
-        menu_class_name = ui_obj.__class__.__name__
+def class_name_to_settings_group_name(object: Any) -> str:
+        menu_class_name: str = object.__class__.__name__
         # remove the Ui_ part of the class name
         menu_class_name = menu_class_name.replace("Ui_", "")
         # CamelCase -> snake_case
@@ -45,7 +39,18 @@ class MixinSettingsDialog(QDialog):
         # b) use a regular expression to find all uppercase letters that are followed by a lowercase letter
         menu_class_name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', menu_class_name)
         # Convert the string to uppercase
-        self.menu_class_name = menu_class_name.upper()
+        return menu_class_name.upper()
+
+
+class MixinSettingsDialog(QDialog):
+    def __init__(self, parent: QWidget=None) -> None:
+        super().__init__(parent)
+        self.ui_obj = None
+        self.menu_class_name: str = None
+
+    def prepare_settings(self, ui_obj) -> None:
+        self.ui_obj = ui_obj
+        self.menu_class_name = class_name_to_settings_group_name(ui_obj)
 
     # override QDialog method
     @Slot()
