@@ -108,7 +108,7 @@ class MainWindow(AbstractMainWindow):
 
         # ---- iode commands line ----
         # setup the line widget to execute IODE commands
-        self.ui.lineEdit_iode_command.setup(self.ui.textEdit_output, self.completer)
+        self.ui.lineEdit_iode_command.setup(self)
 
         # ---- shortcuts ----
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
