@@ -15,9 +15,14 @@ jobs:
     build_doc:
       uses: ./.github/workflows/github-actions-doc.yml
 
+    build_python:
+      uses: ./.github/workflows/github-actions-python.yml
+      with:
+        build-config: release
+
     build_nsis:
         name: Build installer using NSIS
-        needs: [build_doc]
+        needs: [build_doc, build_python]
         strategy:
           matrix:
             os: [windows-latest]
