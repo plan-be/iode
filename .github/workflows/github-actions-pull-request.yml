@@ -9,16 +9,10 @@ jobs:
   # see https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow 
   build_and_test:
     if: |
-      !contains(github.head_ref, 'doc') && !contains(github.head_ref, 'cli') &&
-      !contains(github.head_ref, 'python') && !contains(github.head_ref, 'gui') && 
-      !contains(github.head_ref, 'nsis') && !contains(github.head_ref, 'release')
+      !contains(github.head_ref, 'doc') && !contains(github.head_ref, 'python') && 
+      !contains(github.head_ref, 'gui') && !contains(github.head_ref, 'nsis') && 
+      !contains(github.head_ref, 'release')
     uses: ./.github/workflows/github-actions-build-and-test.yml 
-    with:
-      build-config: debug
-
-  build_cli:
-    if: contains(github.head_ref, 'cli')
-    uses: ./.github/workflows/github-actions-cli.yml 
     with:
       build-config: debug
 

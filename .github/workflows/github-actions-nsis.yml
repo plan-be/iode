@@ -90,18 +90,7 @@ jobs:
             uses: ./.github/actions/test_api
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
-    
-          - name: Build CLI
-            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iodecmd
-
-          - name: Upload CLI
-            if: ${{ success() }}
-            uses: actions/upload-artifact@v4
-            with:
-              name: iode-cli
-              path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/cli/*.exe"
-              if-no-files-found: error 
-            
+          
           - name: Build the GUI
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_gui 
     
