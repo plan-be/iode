@@ -125,8 +125,6 @@ Section "IODE ${VERSION} executable" SecInstall
   
   ;-- List of files to install --
 
-  ;CLI executable
-  File "<CLI DIR>\${EXE_CLI}" 
   ;GUI executable file
   File "<QT DIR>\${EXE_GUI}"
   ;Qt DLL
@@ -243,8 +241,6 @@ Section "Uninstall" SecUninstall
   !verbose push
   !verbose 4
 
-  ;CLI executable file
-  Delete "$INSTDIR\${EXE_CLI}"
   ;GUI executable file
   Delete "$INSTDIR\${EXE_GUI}"
   ;Qt DLL
