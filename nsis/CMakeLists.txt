@@ -43,17 +43,6 @@ cmake_path(RELATIVE_PATH RELATIVE_DIR BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 
 message(STATUS "List of files to be installed:\n")
 
-# CLI executable file
-message(STATUS "CLI executable file:")
-message(STATUS "\t${RELATIVE_DIR}\\cli\\${IODE_CLI_TARGET}.exe")
-
-set(CLI_DIR "${RELATIVE_DIR}\\cli")
-file(READ "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
-string(REPLACE "<CLI DIR>" ${CLI_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
-
-set(CLI_EXE_FILE "${CMAKE_BINARY_DIR}/cli/${IODE_CLI_TARGET}.exe")
-
 # GUI executable file
 message(STATUS "GUI executable file:")
 message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_GUI_TARGET}.exe")
