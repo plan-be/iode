@@ -13,12 +13,10 @@ on:
 jobs:
     build_cli:
         name: Build IODE CLI
-        strategy:
-          matrix:
-            os: [windows-latest, ubuntu-latest]
-    
-        runs-on: ${{ matrix.os }}
-    
+        runs-on: windows-latest
+        env:
+          os: windows
+
         steps:
           - name: Checkout repository code
             uses: actions/checkout@v2
