@@ -23,12 +23,6 @@ jobs:
       - name: Create assets dir
         run: mkdir assets
 
-      - name: Restore CLI
-        uses: actions/download-artifact@v4
-        with:
-          name: iode-cli
-          path: ${{ github.workspace }}/assets
-
       - name: Restore Python 3.10 Wheel Files
         uses: actions/download-artifact@v4
         with:
