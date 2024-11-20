@@ -49,9 +49,9 @@ if(Python_FOUND)
     #          in the xxx.pyd file. By default, Cython will use the name of the compiled .pyx file to generate 
     #          the PyInit_xxx function. This behavior is override by the --module-name option. 
     add_custom_command(OUTPUT iode_cython.cpp
-                      DEPENDS iode_cython.pyx s_pyiode.cpp
+                      DEPENDS iode_cython.pyx cli.cpp
                       VERBATIM
-                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/s_pyiode.cpp ${CMAKE_CURRENT_BINARY_DIR}/s_pyiode.cpp
+                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cli.cpp ${CMAKE_CURRENT_BINARY_DIR}/cli.cpp
                       COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_cython.pyx -3 --verbose --cplus 
                       --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_cython
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
