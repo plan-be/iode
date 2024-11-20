@@ -57,6 +57,6 @@ jobs:
             fail_on_unmatched_files: true
             generate_release_notes: false
             prerelease: true
-            body_path: ${{ github.workspace }}/doc/changelog/versions/${{github.ref_name}}.rst.inc
+            body_path: ${{ github.workspace }}/doc/source/changes/${{github.ref_name}}.rst.inc
             files: |
                 ${{ github.workspace }}/assets/*
