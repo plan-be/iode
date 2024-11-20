@@ -36,5 +36,5 @@ cdef extern from "cpp_api/iode_cpp_api.h":
     cdef void   cpp_iode_init(string)
 
 cdef extern from "cli.cpp":
-    cdef int   ODE_assign_super_PYIODE()
+    cdef int   python_assign_super()
     cdef int   free_tbl(char** tbl)
