@@ -47,8 +47,11 @@ class IodeReportEditor(IodeTextEditor):
         """
         current_project_dir = QDir.currentPath()
         project_settings = ProjectSettings.project_settings
-        run_from_project_dir = project_settings.value(RUN_REPORTS_FROM_PROJECT_DIR, 
-                                                      defaultValue=True, type=bool)
+        if project_settings:
+            run_from_project_dir = project_settings.value(RUN_REPORTS_FROM_PROJECT_DIR, 
+                                                          defaultValue=True, type=bool)
+        else:
+            run_from_project_dir = True
 
         if not isinstance(parameters, str) and not all(isinstance(p, str) for p in parameters):
             raise ValueError("'parameters' must be a string or a list of strings")
@@ -64,7 +67,7 @@ class IodeReportEditor(IodeTextEditor):
 
             # set IODE global variables nb_decimals and language
             execute_command(f"$PrintNbDec  {nb_decimals}")
-            execute_command(f"$PrintLang  {str(language).title()}")
+            execute_command(f"$PrintLang  {language.name.title()}")
 
             # updates current directory execution (chdir)
             if not run_from_project_dir:
