@@ -105,7 +105,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         Returns the file path associated with the database.
         """
-        return self._database.filename()
+        return self._database.filename
 
     @property
     def filter_active(self) -> bool:
@@ -279,8 +279,8 @@ class IodeAbstractTableModel(QAbstractTableModel):
             filepath = check_filepath(filepath, iode_file_type, file_must_exist=True)
 
             if not force_overwrite and len(self._database) > 0:
-                answer = QMessageBox.warning(None, "WARNING", f"There are {str(iode_type)} already loaded. "
-                                             f"Would like to override {str(iode_type)} ?",
+                answer = QMessageBox.warning(None, "WARNING", f"There are {iode_type.name} already loaded. "
+                                             f"Would like to override {iode_type.name} ?",
                                              QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
                                              QMessageBox.StandardButton.Yes)
                 if answer == QMessageBox.StandardButton.No:
