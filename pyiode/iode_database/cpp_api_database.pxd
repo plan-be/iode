@@ -82,6 +82,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         int get_position(string& name)
 
         string get_filename() const
+        void set_filename(string& filename) except +
 
         string get_description() const
         void set_description(string& description) except +
