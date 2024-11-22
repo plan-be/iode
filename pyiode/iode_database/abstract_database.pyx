@@ -227,11 +227,19 @@ cdef class _AbstractDatabase:
         >>> from pathlib import Path
         >>> from os.path import relpath
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> filepath = comments.filename
-        >>> Path(filepath).name
+        >>> filename = comments.filename
+        >>> Path(filename).name
         'fun.cmt'
+        >>> comments.filename = "new_filename.cmt"
+        >>> filename = comments.filename
+        >>> Path(filename).name
+        'new_filename.cmt'
         """
         return self.abstract_db_ptr.get_filename().decode()
+
+    @filename.setter
+    def filename(self, value: str):
+        self.abstract_db_ptr.set_filename(value.encode())
 
     @property
     def description(self) -> str:
