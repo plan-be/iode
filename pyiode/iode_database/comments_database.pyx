@@ -176,7 +176,7 @@ cdef class Comments(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the comment(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of comments to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -232,7 +232,7 @@ cdef class Comments(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the comment(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of comments to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or list(str)
             (new) comment value(s).
@@ -328,6 +328,45 @@ cdef class Comments(_AbstractDatabase):
         ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         """
         super().__delitem__(key)
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) comments from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied comments are read.
+        names: str or list(str)
+            list of comments to copy from the input file(s).
+            Defaults to load all comments from the input file(s). 
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
+        317
+
+        >>> # delete all comments with a name starting with 'A'
+        >>> comments.remove("A*")
+        >>> comments.get_names("A*")
+        []
+
+        >>> # load all comments with a name starting with 'A'
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
+        >>> comments.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+
+        >>> comments.clear()
+        >>> # load all comments
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
+        317
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def from_series(self, s: Series):
         r"""

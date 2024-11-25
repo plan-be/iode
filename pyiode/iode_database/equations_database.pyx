@@ -309,7 +309,7 @@ cdef class Equations(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the equation(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of equations to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -382,7 +382,7 @@ cdef class Equations(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the equation(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of equations to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or Equation or dict(str, ...) or list of any of those
             If str, then it is interpreted as the LEC of the equation.
@@ -699,6 +699,22 @@ cdef class Equations(_AbstractDatabase):
             list_eqs = ';'.join(list_eqs)
         
         cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) equations from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied equations are read.
+        names: str or list(str)
+            list of equations to copy from the input file(s).
+            Defaults to load all equations from the input file(s). 
+        
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def from_series(self, s: Series):
         r"""

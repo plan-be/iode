@@ -517,59 +517,24 @@ cdef class _AbstractDatabase:
         cdef CKDBAbstract* other_db_ptr = (<_AbstractDatabase>other).abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
-    def copy_from(self, input_files: Union[str, List[str]], objects_names: Union[str, List[str]]='*'):
-        """
-        Copy (a subset of) objects from the input file(s) 'input_files' into the current database.
-
-        Parameters
-        ----------
-        input_file: str or list(str)
-            file(s) from which the copied objects are read.
-        objects_names: str or list(str)
-            list of objects to copy from the input file(s).
-            Defaults to load all objects from the input file(s). 
-        
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(comments)
-        317
-        >>> # delete all comments with a name starting with 'A'
-        >>> comments.remove("A*")
-        >>> comments.get_names("A*")
-        []
-
-        >>> # load all comments with a name starting with 'A'
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
-        >>> comments.get_names("A*")
-        ['ACAF', 'ACAG', 'AOUC', 'AQC']
-
-        >>> comments.clear()
-        >>> # load all comments
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(comments)
-        317
-        """
+    def _copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]) -> Tuple[str, str]:
         if isinstance(input_files, str):
             input_files = input_files.split(';')
-        if isinstance(input_files, Iterable) and all(isinstance(item, str) for item in input_files):
+        if isinstance(input_files, Iterable): 
+            if not all(isinstance(item, str) for item in input_files):
+                raise TypeError("'input_files': expected value of type str or list(str). "
+                                "At least one of the item of 'input_files' is not of type str")
             # convert all relative path to absolute path
             input_files = [str(Path(filepath).resolve()) for filepath in input_files]
             input_files = ';'.join(input_files)
-        if not isinstance(input_files, str):
-            raise TypeError(f"'input_files': Expected value of type string. Got value of type {type(input_files).__name__}")
 
-        if isinstance(objects_names, str):
-            pass
-        elif isinstance(objects_names, Iterable) and all(isinstance(name, str) for name in objects_names):
-            objects_names = " ".join(objects_names)
-        else:
-            raise TypeError("'objects_names': Expected value of type string or list of strings. " + 
-                "Got value of type {type(objects_names).__name__}")
+        if not isinstance(names, str) and isinstance(names, Iterable): 
+            if not all(isinstance(name, str) for name in names):
+                raise TypeError("'names': expected value of type str or list(str). "
+                                "At least one of the item of 'names' is not of type str")
+            names = ";".join(names)
 
-        self.abstract_db_ptr.copy_from(input_files.encode(), objects_names.encode())
+        return input_files, names
 
     def merge_from(self, input_file: str):
         """

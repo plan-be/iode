@@ -184,7 +184,7 @@ cdef class Identities(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the identity(ies) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of identities to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -240,7 +240,7 @@ cdef class Identities(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the identity(ies) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of identities to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str, Identity, list(str) or list(Identity)
             (new) identity value(s).
@@ -336,6 +336,21 @@ cdef class Identities(_AbstractDatabase):
         ['YSEFPR', 'YSFICR']
         """
         super().__delitem__(key)
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) identities from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied identities are read.
+        names: str or list(str)
+            list of identities to copy from the input file(s).
+            Defaults to load all identities from the input file(s). 
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def execute(self, identities: Union[str, List[str]] = None, from_period: Union[str, Period] = None, 
         to_period: Union[str, Period] = None, var_files: Union[str, List[str]] = None, 

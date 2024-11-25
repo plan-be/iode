@@ -221,7 +221,7 @@ cdef class Scalars(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the scalar(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of scalars to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -285,7 +285,7 @@ cdef class Scalars(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the scalar(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of scalars to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: float or tuple(float, float) Scalar or dict(str, ...) or list of any of those
             If float, then it is interpreted as the value of the scalar.
@@ -415,6 +415,21 @@ cdef class Scalars(_AbstractDatabase):
         ['zkf1', 'zkf3']
         """
         super().__delitem__(key)
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) scalars from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied scalars are read.
+        names: str or list(str)
+            list of scalars to copy from the input file(s).
+            Defaults to load all scalars from the input file(s). 
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def from_series(self, s: Series):
         r"""

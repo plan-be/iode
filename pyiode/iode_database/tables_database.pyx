@@ -329,7 +329,7 @@ cdef class Tables(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the table(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of tables to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -414,7 +414,7 @@ cdef class Tables(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the table(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of tables to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: int, tuple(...), dict(str, ...), Table or list of any of those
             If int, then it is interpreted as the number of columns to create a new empty table.
@@ -770,6 +770,21 @@ cdef class Tables(_AbstractDatabase):
         ['MULT1FR', 'MULT1RESU', 'MULT2FR']
         """
         super().__delitem__(key)
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) tables from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied tables are read.
+        names: str or list(str)
+            list of tables to copy from the input file(s).
+            Defaults to load all tables from the input file(s). 
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def _str_table(self, names: List[str]) -> str:
         titles = [join_lines(self.database_ptr.get_title(<string>(name.encode())).decode()) for name in names]
