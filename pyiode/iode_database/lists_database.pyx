@@ -232,7 +232,7 @@ cdef class Lists(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the IODE list(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of lists to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -288,7 +288,7 @@ cdef class Lists(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the IODE list(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of lists to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: str or list(str)
             (new) IODE list value(s).
@@ -399,6 +399,21 @@ cdef class Lists(_AbstractDatabase):
         ['ENDO', 'ENDO0', 'ENDO1']
         """
         super().__delitem__(key)
+
+    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) lists from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied lists are read.
+        names: str or list(str)
+            list of lists to copy from the input file(s).
+            Defaults to load all lists from the input file(s). 
+        """
+        input_files, names = self._copy_from(input_files, names)
+        self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def from_series(self, s: Series):
         r"""

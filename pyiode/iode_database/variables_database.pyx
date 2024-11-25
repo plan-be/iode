@@ -40,7 +40,7 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
     """
     Create an numpy array from the content of an IODE variable (KV_WS[name]). 
     The ndarray data may be either a newly allocated vector, or may point to the IODE memory.
-    Be aware that IODE data can be relocated in memory when creating new objects.
+    Be aware that IODE data can be relocated in memory when creating new variables.
 
     Parameters
     ----------
@@ -402,7 +402,7 @@ cdef class Variables(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the variable(s) to get.
-            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+            The list of variables to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -607,7 +607,7 @@ cdef class Variables(_AbstractDatabase):
         ----------
         key: str or list(str)
             (the list of) name(s) of the variable(s) to update/add.
-            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            The list of variables to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
         value: int, float, tuple(int, float), list(int, float), str or list of any of those
             If int, the value is first converted to a float and then used for all periods.
@@ -723,7 +723,7 @@ cdef class Variables(_AbstractDatabase):
             if len(names) != len(values):
                 raise ValueError(f"Cannot add/update Variables for the selection key '{key}'.\n"
                                 f"{len(values)} values has been passed while the selection key '{key}' "
-                                f"represents {len(names)} objects.")
+                                f"represents {len(names)} variables.")
             for name, value in zip(names, values):
                 self._set_object(name, value, periods_) 
 
@@ -1456,6 +1456,40 @@ cdef class Variables(_AbstractDatabase):
             return [cpp_period.decode() for cpp_period in 
                     self.database_ptr.get_list_periods(from_period.encode(), to_period.encode())]
         
+    def copy_from(self, input_files: Union[str, List[str]], from_period: Union[str, Period]=None, 
+                  to_period: Union[str, Period]=None, names: Union[str, List[str]]='*'):
+        """
+        Copy (a subset of) variables from the input file(s) 'input_files' into the current database.
+
+        Parameters
+        ----------
+        input_file: str or list(str)
+            file(s) from which the copied variables are read.
+        from_period: str or Period, optional
+            start period for copying the variables values.
+        to_period: str or Period, optional
+            end period for copying the variables values.
+        names: str or list(str), optional
+            list of variables to copy from the input file(s).
+            Defaults to load all variables from the input file(s). 
+        """
+        input_files, names = self._copy_from(input_files, names)
+
+        if from_period is None or to_period is None:
+            sample = self.sample
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        self.database_ptr.copy_from(input_files.encode(), from_period.encode(), to_period.encode(), 
+                                    names.encode())
+
     def low_to_high(self, type_of_series: Union[LowToHighType, str], method: Union[LowToHighMethod, str], 
                     filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
