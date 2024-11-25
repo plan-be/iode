@@ -75,11 +75,15 @@ class MixinSettingsDialog(QDialog):
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
+        
+        dict_ui = vars(self.ui_obj)
+        if not dict_ui:
+            return
 
         project_settings.beginGroup("MENU")
         project_settings.beginGroup(self.menu_class_name)
 
-        for attr_name, attr_value in vars(self.ui_obj).items():
+        for attr_name, attr_value in dict_ui.items():
             if isinstance(attr_value, (QComboBox, QFontComboBox)):
                 attr_value.setCurrentIndex(project_settings.value(attr_name, type=int))
             elif isinstance(attr_value, (QCheckBox, QRadioButton)):
@@ -106,10 +110,14 @@ class MixinSettingsDialog(QDialog):
         if not project_settings:
             return
 
+        dict_ui = vars(self.ui_obj)
+        if not dict_ui:
+            return
+
         project_settings.beginGroup("MENU")
         project_settings.beginGroup(self.menu_class_name)
 
-        for attr_name, attr_value in vars(self.ui_obj).items():
+        for attr_name, attr_value in dict_ui.items():
             if isinstance(attr_value, (QComboBox, QFontComboBox)):
                 project_settings.setValue(attr_name, attr_value.currentIndex())
             elif isinstance(attr_value, (QCheckBox, QRadioButton)):
