@@ -461,7 +461,7 @@ class MainWindow(AbstractMainWindow):
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 from_period = dialog.from_period
                 to_period = dialog.to_period
-                variables.set_sample(from_period, to_period)
+                variables.sample = f"{from_period}:{to_period}"
                 self.update_tab_and_completer(IodeType.VARIABLES)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
