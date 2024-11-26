@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QPlainTextEdit
-from PySide6.QtGui import QKeyEvent
+from PySide6.QtGui import QKeyEvent, QTextCursor
 
 from .completer import IodeWidgetWithCompleter
 
@@ -35,3 +35,35 @@ class IodeAutoCompleteTextEdit(QPlainTextEdit, IodeWidgetWithCompleter):
 
         # set cursor after introduced function or Iode object name
         self.setTextCursor(tc)
+
+    def _text_under_cursor(self) -> str:
+        tc = self.textCursor()
+        pos = tc.position()
+
+        # select the whole line
+        tc.select(QTextCursor.SelectionType.BlockUnderCursor)
+        block = tc.selectedText().strip('\u2029')
+
+        # line is empty
+        if not len(block):
+            return ''
+
+        # NOTE: tc.select move the cursor to the end of the selection.
+        #       we need to move it back to its original position
+        tc.setPosition(pos)
+
+        # selects the "word" under cursor
+        # NOTE: tc.select(QTextCursor::WordUnderCursor) selects only
+        #       alpha characters (i.e. the selection will not include
+        #       characters such as $, # and @)
+        tc.select(QTextCursor.SelectionType.WordUnderCursor)
+        word = tc.selectedText()
+
+        # NOTE: we need to add the lines below because we need to know
+        #       if there is a character $, # or @ before the "word"
+        tc.movePosition(QTextCursor.MoveOperation.StartOfWord)
+        pos = tc.positionInBlock()
+        ch = block[pos - 1] if pos > 0 else ''
+        completion_prefix = f"{ch}{word}" if ch in self.iode_func_prefixes else word
+
+        return completion_prefix
