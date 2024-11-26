@@ -195,6 +195,9 @@ class IodeWidgetWithCompleter():
     def insert_completion(self, completion: str):
         raise NotImplementedError()
     
+    def reset_iode_types(self):
+        self._completer.reset_iode_types()
+
     def handle_iode_type(self, iode_type: IodeType):
         """
         Sets the iode type for the completer.
