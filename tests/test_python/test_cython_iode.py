@@ -83,7 +83,7 @@ def test_iode_computed_table(tmp_path):
 def test_iode_databases(tmp_path):
     iode.suppress_msgs()
     run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 
-                        'Variables', 'load_extra_files'], tmp_dir=tmp_path)
+                        'Variables', 'load_extra_files', 'reset_extra_files'], tmp_dir=tmp_path)
     iode.reset_msgs()
 
 
