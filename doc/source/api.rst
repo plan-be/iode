@@ -366,6 +366,7 @@ Miscellaneous
    :toctree: _generated
 
    load_extra_files
+   reset_extra_files
 
 ************
 IODE OBJECTS
