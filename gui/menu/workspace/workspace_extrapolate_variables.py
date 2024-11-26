@@ -23,6 +23,8 @@ class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
         v_simulation_initialization_names = [v.name.upper() for v in self.v_simulation_initialization]
         self.ui.comboBox_method.addItems(v_simulation_initialization_names)
 
+        self.load_settings()
+
     @Slot()
     def extrapolate_variables(self):
         try:

@@ -22,6 +22,8 @@ class MenuWorkspaceLowToHigh(MixinSettingsDialog):
         self.ui.fileChooser_input_file.enum_file_type = IodeFileType.FILE_VARIABLES
         self.ui.fileChooser_input_file.enum_file_mode = EnumFileMode.EXISTING_FILE
 
+        self.load_settings()
+
     @Slot()
     def slot_low_to_high(self):
         try:

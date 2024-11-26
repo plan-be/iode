@@ -22,6 +22,8 @@ class MenuWorkspaceMergeInto(MixinSettingsDialog):
         self.ui.comboBox_object_type.addItems(v_iode_type_names)    
         self.ui.comboBox_object_type.currentIndexChanged.connect(self.update_file_chooser)
 
+        self.load_settings()
+
     @Slot()
     def merge_into_workspace(self):
         try:
