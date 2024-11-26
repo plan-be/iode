@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, QObject, Slot
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QMessageBox
 
-from numerical_table_model import IodeNumericalTableModel  
+from .numerical_table_model import IodeNumericalTableModel  
 from utils import NAN_REP  
 
 from iode import tables, Table
@@ -12,8 +12,8 @@ from iode.iode_cython import ComputedTable
 class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
     def __init__(self, table_name: str, generalized_sample: str, nb_decimals: int, 
                  variables: str=None, parent: QObject=None):
-        QAbstractTableModel.__init__(parent)
-        IodeNumericalTableModel.__init__(nb_decimals)
+        QAbstractTableModel.__init__(self, parent)
+        IodeNumericalTableModel.__init__(self, precision=nb_decimals)
         self.table_name: str = table_name
         self.variables: str = variables
         if variables is not None and variables != "":
@@ -49,7 +49,7 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
         else: 
             flag = Qt.ItemFlag.NoItemFlags
         
-        return QAbstractTableModel.flags(index) | flag
+        return QAbstractTableModel.flags(self, index) | flag
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole):
         if role != Qt.ItemDataRole.DisplayRole:
@@ -70,7 +70,7 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
         if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
             return self.value_to_string(self.computed_table[index.row(), index.column()])
 
-        return ""
+        return None
 
     def setData(self, index: QModelIndex, value: str, role: int):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
