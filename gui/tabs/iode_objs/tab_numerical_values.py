@@ -4,8 +4,9 @@ from PySide6.QtWidgets import QLabel, QSpinBox, QCheckBox, QHBoxLayout
 
 from utils import MAX_PRECISION_NUMBERS
 from iode_objs.models.table_model import ScalarsModel, VariablesModel
+from iode_objs.models.computed_table_model import ComputedTableModel
 from iode_objs.views.table_view import ScalarsView, VariablesView
-
+from iode_objs.views.computed_table_view import ComputedTableView
 
 from typing import List, Union
 
@@ -18,8 +19,8 @@ class NumericalWidget:
     COLUMN_SIZE_STEP = 10
 
     def __init__(self):
-        self.table_model: Union[ScalarsModel, VariablesModel] = None
-        self.table_view: Union[ScalarsView, VariablesView] = None
+        self.table_model: Union[ScalarsModel, VariablesModel, ComputedTableModel] = None
+        self.table_view: Union[ScalarsView, VariablesView, ComputedTableView] = None
 
         self.bottom_layout: QHBoxLayout = None
 
@@ -33,10 +34,10 @@ class NumericalWidget:
 
         self.checkbox_scientific: QCheckBox = QCheckBox("Scientific")
         self.checkbox_scientific.setChecked(False)
-        self.checkbox_scientific.stateChanged.connect(self.format_number)
+        self.checkbox_scientific.checkStateChanged.connect(self.format_number)
 
-    def set_model_and_view(self, table_model: Union[ScalarsModel, VariablesModel], 
-                           table_view: Union[ScalarsView, VariablesView]):
+    def set_model_and_view(self, table_model: Union[ScalarsModel, VariablesModel, ComputedTableModel], 
+                           table_view: Union[ScalarsView, VariablesView, ComputedTableView]):
         # need to do some initializations here instead of in the __init__() method above to avoid the error message:
         # RuntimeError: '__init__' method of object's base class (ScalarsWidget/VariablesWidget) not called
         # when running ScalarsWidget/VariablesWidget.__init__()
@@ -44,8 +45,11 @@ class NumericalWidget:
         self.table_view = table_view
 
         self.bottom_layout = QHBoxLayout(self)
-        iode_type_name = str(self.table_model.iode_type).lower()
-        self.bottom_layout.setObjectName(f"bottom_layout_{iode_type_name}")
+        if isinstance(self.table_model, ComputedTableModel):
+            self.bottom_layout.setObjectName(f"bottom_layout_computed_table")
+        else:
+            iode_type_name = str(self.table_model.iode_type).lower()
+            self.bottom_layout.setObjectName(f"bottom_layout_{iode_type_name}")
 
         self.bottom_layout.addWidget(self.label_precision, Qt.AlignmentFlag.AlignLeft)
         self.bottom_layout.addWidget(self.spinBox_precision, Qt.AlignmentFlag.AlignLeft)
@@ -63,8 +67,6 @@ class NumericalWidget:
         self.shortcut_decrease_column_size.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_resize_to_contents.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
-        self.spinBox_precision.valueChanged.connect(self.update_precision)
-        self.checkbox_scientific.stateChanged.connect(self.format_number)
         self.shortcut_precision_plus.activated.connect(lambda: self.spinBox_precision.stepUp())
         self.shortcut_precision_minus.activated.connect(lambda: self.spinBox_precision.stepDown())
         self.shortcut_increase_column_size.activated.connect(self.increase_column_size)
