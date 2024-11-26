@@ -15,6 +15,7 @@ class MenuWorkspaceDescribe(MixinSettingsDialog):
         self.ui = Ui_MenuWorkspaceDescribe()
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
+        self.load_settings()
 
     @Slot()
     def update_descriptions(self):
