@@ -344,6 +344,7 @@ Properties and methods specific to Variables
    Variables.nb_periods
    Variables.periods
    Variables.periods_as_float
+   Variables.threshold
 
    Variables.periods_subset
    Variables.low_to_high

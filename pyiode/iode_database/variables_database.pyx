@@ -16,6 +16,8 @@ from libcpp.vector cimport vector
 from cython.operator cimport dereference
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.iode_database.cpp_api_database cimport hash_value
+from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
+from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -1314,6 +1316,47 @@ cdef class Variables(_AbstractDatabase):
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
         return self.database_ptr.get_list_periods_as_float(bytes(), bytes())
+
+    @property
+    def threshold(self) -> float:
+        r"""
+        Threshold under which the difference between 2 variables are considered equal.
+        
+        The comparison test is:
+        .. math::
+
+           \begin{cases} 
+           \frac{x_1 - x_2}{x_1} < \epsilon, & \text{if } x_1 \neq 0 \\
+           |x_2| < \epsilon, & \text{otherwise}
+           \end{cases}
+
+        where :math:`x_1` and :math:`x_2` are the values of the variables to compare 
+        and :math:`\epsilon` is the threshold value.
+
+        Parameters
+        ----------
+        value: float
+        	New threshold value.
+            Default value is 1e-7.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.threshold
+        1e-07
+        >>> variables.threshold = 1e-5
+        >>> variables.threshold
+        1e-05
+        """
+        return K_CMP_EPS
+
+    @threshold.setter
+    def threshold(self, value: float):
+        res = B_DataCompareEps(str(value).encode())
+        if res != 0:
+            raise ValueError(f"threshold: Invalid value '{value}'.")
 
     @property
     def df(self) -> DataFrame:

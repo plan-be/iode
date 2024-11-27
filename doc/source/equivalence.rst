@@ -268,7 +268,7 @@ Below *workspace* must be replaced by either:
     | ``datalistsort``     | ``lst = split_list(lists[listname]))``   --> See :func:`split_list`                                                            |
     |                      | ``lists[sorted_listname] = sorted(lst)``                                                                                       |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datacompareEps``   | Not Yet Implemented                                                                                                            |
+    | ``datacompareEps``   | ``variables.threshold = value`` --> See :meth:`Variables.threshold`                                                            |                                                                                                           |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datacompareXxx``   | Not Yet Implemented                                                                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
