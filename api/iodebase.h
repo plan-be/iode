@@ -114,6 +114,7 @@ extern int     ODE_end(const int st);
 extern void    IODE_assign_super_API(void);
 
 /* k_cmp.c */
+extern double K_CMP_EPS;
 extern int K_cmp(char *,KDB *,KDB *);
 
 /* k_lec.c */

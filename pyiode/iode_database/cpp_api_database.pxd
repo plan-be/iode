@@ -23,6 +23,10 @@ cdef extern from "api/iode.h":
     ctypedef char FNAME[512]
     ctypedef char ONAME[21]
 
+    double K_CMP_EPS
+
+    int B_DataCompareEps(char* arg)
+
     cdef struct KOBJ:
         SWHDL o_val
         ONAME o_name
