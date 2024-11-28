@@ -10,12 +10,17 @@ else:
     Self = Any
 
 cimport cython
-cimport numpy as np
+from numpy.math cimport NAN as C_NAN
+
+from libc.stdlib cimport malloc, free
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from cython.operator cimport dereference
+
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
+from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport hash_value
+from pyiode.iode_database.cpp_api_database cimport IODE_NAN
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -27,53 +32,33 @@ KeyPeriod = Union[None, str, List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
 
 
+cdef inline _create_numpy_array(double* c_array, int size):
+    """Create a Numpy array from a C array of floats."""
+    cdef double NA = IODE_NAN * (1.0 - 1.e-10)
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] numpy_array
+    cdef cnp.npy_intp dimensions[1]
+    dimensions[0] = <cnp.npy_intp> size
+
+    # Create a Numpy array from the C array
+    numpy_array = cnp.PyArray_SimpleNewFromData(1, dimensions, cnp.NPY_FLOAT64, <void*> c_array)
+
+    # Set the base object of the Numpy array to NULL to prevent the Python garbage collector
+    # from trying to free the memory allocated by malloc.
+    cnp.PyArray_SetBaseObject(numpy_array, None)
+
+    # Replace IODE NA by Numpy NaN
+    for i in range(size):
+        if numpy_array[i] <= NA:
+            numpy_array[i] = C_NAN
+
+    return numpy_array
+
 cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):
     '''
     Calls C API fonction IodeCalcSamplePosition() to determine which elements of array to copy into KV_WS and 
     at which position in the KV_WS sample.
     '''
     IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), la_pos, ws_pos, lg)
-
-# TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
-#             - rewrite this function to be based on the C++ API
-cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
-    """
-    Create an numpy array from the content of an IODE variable (KV_WS[name]). 
-    The ndarray data may be either a newly allocated vector, or may point to the IODE memory.
-    Be aware that IODE data can be relocated in memory when creating new variables.
-
-    Parameters
-    ----------
-    name: C char* 
-        Name of the IODE variable to read 
-    copy: bool, optional
-        if True, a pointer to the IODE data is placed in the resulting ndarray.
-        if False, the data is allocated.
-
-    Returns
-    -------
-    out: ndarray 
-        1-dim numpy array containing the values of variables[name]
-    """  
-    cdef np.npy_intp shape[1]   # int of the size of a pointer (32 ou 64 bits) See https://numpy.org/doc/stable/reference/c-api/dtype.html
-    cdef int lg
-    cdef double *data_ptr = IodeGetVector(name, &lg)
-    
-    shape[0] = <np.npy_intp> lg  # vector length
-    if data_ptr != NULL:
-        # Create an array wrapper around data_ptr 
-        # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
-        vararray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data_ptr) # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
-        
-        if(copy):
-            # Duplicates if inmemory == 0 (?) => ch³anges to vararray will NOT modify KV_WS
-            vararray = vararray.copy()
-        vararray[vararray < -1.0e37] = np.nan
-    else:
-        vararray = np.ndarray(lg, dtype='double')        
-        #vararray.fill(0)        
-        vararray.fill(np.nan)
-    return vararray
 
 # TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
 #             - rewrite this function to be based on the C++ API
@@ -96,34 +81,25 @@ def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[s
     data = np.nan_to_num(data, nan=NA)
 
     # copy each line of array into KV_WS on the time intersection of df and KV_WS
-    # values = <double*>np.PyArray_DATA(df[vars_names[0]].data)
+    # values = <double*>cnp.PyArray_DATA(df[vars_names[0]].data)
     if np.issubdtype(data.dtype, np.floating):
         if data.data.c_contiguous:
             for name, row_data in zip(vars_names, data):
                 # Save the vector of doubles in KV_WS
-                values = < double * > np.PyArray_DATA(row_data)
+                values = < double * > cnp.PyArray_DATA(row_data)
                 IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
         else:
             for name, row_data in zip(vars_names, data):
                 row_data = row_data.copy()  # copy if non contiguous
                 # Save the vector of doubles in KV_WS
-                values = < double * > np.PyArray_DATA(row_data)
+                values = < double * > cnp.PyArray_DATA(row_data)
                 IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
     else:
         for name, row_data in zip(vars_names, data):
             row_data = row_data.astype("double") # astype creates a copy
             # Save the vector of doubles in KV_WS
-            values = <double*>np.PyArray_DATA(row_data)
+            values = <double*>cnp.PyArray_DATA(row_data)
             IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-
-def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
-    # Copy values from the IODE Variables database to a Numpy 2D array
-    data = np.empty((len(vars_list), nb_periods), dtype=np.float64)
-    for i, name in enumerate(vars_list):
-        # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
-        # data[i] = [cpp_values_ptr[t] for t in range(0, nb_periods_)]
-        data[i] = _iodevar_to_ndarray(_cstr(name), False)
-    return data
 
 
 class VarPositionalIndexer:
@@ -152,7 +128,7 @@ class VarPositionalIndexer:
     
     def __setitem__(self, index: Union[int, Tuple[int, int]], value):
         pos, t = self._check_index(index)
-        self.database._set_object(pos, value, t)
+        self.database._set_variable(pos, value, t)
 
 
 @cython.final
@@ -337,44 +313,77 @@ cdef class Variables(_AbstractDatabase):
         """
         return VarPositionalIndexer(self)
 
-    def _get_variable(self, key: Union[str, int], periods_: Union[str, int, List[str]]) -> Union[float, List[float]]: 
+    def _get_variable(self, key: Union[str, int], periods_: Union[str, int, Tuple[int, int], List[str]]) -> Union[float, np.ndarray]: 
+        cdef double* c_array = NULL
+        cdef var_pos
+        cdef period_pos
+        cdef int nb_periods = self.database_ptr.get_nb_periods()
+        cdef CSample* c_sample = self.database_ptr.get_sample()
+
+        if c_sample is NULL:
+            raise RuntimeError("The database has not been initialized yet. Empty sample.")
+
+        if isinstance(key, int):
+            var_pos = key
+        else:
+            key = key.strip()
+            var_pos = self.database_ptr.get_position(key.encode())
+
         # periods_ represents all periods
         if periods_ is None:
-            if isinstance(key, int):
-                return self.database_ptr.get(<int>key)
-            else:
-                return self.database_ptr.get(<string>(key.encode()))     
+            size = nb_periods
+            c_array = <double*> malloc(sizeof(double) * nb_periods) 
+            for t in range(nb_periods):
+                c_array[t] = self.database_ptr.get_var(var_pos, t, self.mode_) 
         # periods_ represents a unique period 
-        elif isinstance(periods_, str):
-            if isinstance(key, int):
-                raise TypeError("variables[key, period]: 'key' must be of type str when 'period' is of type str.")
+        elif isinstance(periods_, (str, int)):
+            if isinstance(periods_, str):
+                period_pos = c_sample.get_period_position(<string>periods_.encode())
             else:
-                return self.database_ptr.get_var(<string>(key.encode()), <string>periods_.encode(), self.mode_)
-        # periods_ represents a unique period 
-        elif isinstance(periods_, int):
-            if isinstance(key, int):
-                return self.database_ptr.get_var(<int>key, <int>periods_, self.mode_)
-            else:
-                return self.database_ptr.get_var(<string>(key.encode()), <int>periods_, self.mode_)
+                period_pos = periods_
+            if not 0 <= period_pos < nb_periods:
+                raise ValueError(f"Invalid period '{periods_}'")
+            return self.database_ptr.get_var(var_pos, period_pos, self.mode_)
         # periods_ represents a contiguous range of periods
         elif isinstance(periods_, tuple):
-            t_first, t_last = periods_
-            if isinstance(key, int):
-                return [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
-            else:
-                return [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+            start_period, end_period = periods_
+            if end_period == 0 or end_period >= nb_periods:
+                end_period = nb_periods - 1
+            size = end_period - start_period + 1
+            if size <= 0:
+                str_start_period = self.database_ptr.get_period(<int>start_period).decode()
+                str_end_period = self.database_ptr.get_period(<int>end_period).decode()
+                raise ValueError(f"Invalid period range '{str_start_period}:{str_end_period}'")
+            c_array = <double*> malloc(sizeof(double) * size) 
+            for t in range(start_period, end_period+1):
+                c_array[t - start_period] = self.database_ptr.get_var(var_pos, t, self.mode_) 
         # periods_ represents a range/list of periods
         elif isinstance(periods_, list):
             if isinstance(key, int):
                 raise TypeError("variables[key, periods]: 'key' must be of type str when 'periods' is of type list.")
             else:
-                return [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
+                size = len(periods_)
+                c_array = <double*> malloc(sizeof(double) * size) 
+                for i, period in enumerate(periods_):
+                    period_pos = c_sample.get_period_position(<string>period.encode())
+                    c_array[i] = self.database_ptr.get_var(var_pos, period_pos, self.mode_)
         else:
             raise TypeError("Wrong selection of periods. Expected None or value of type str, int, or list(str). "
                             f"Got value of type {type(periods_).__name__} instead.")
+        np_var_array = _create_numpy_array(c_array, size)
+        if c_array is not NULL:
+            free(c_array)
+        return np_var_array
+
+    def _ws_to_numpy_array(self, vars_list: List[str], nb_periods: int) -> np.ndarray:
+        # Copy values from the IODE Variables database to a Numpy 2D array
+        data = np.empty((len(vars_list), nb_periods), dtype=np.float64)
+        for i, name in enumerate(vars_list):
+            data[i] = self._get_variable(name, None)
+        return data
 
     # overriden for Variables
-    def __getitem__(self, key) -> Union[float, List[float], Variables]:
+    def __getitem__(self, key) -> Union[float, np.ndarray, Variables]:
         r"""
         Return the (subset of) variable(s) referenced by `key`.
 
@@ -419,16 +428,33 @@ cdef class Variables(_AbstractDatabase):
         >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
         >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        array([         nan,          nan,          nan,          nan,
+                        nan,          nan,          nan,          nan,
+                        nan,          nan,   1.2130001 ,   5.2020001 ,
+                 9.184     ,   8.0790005 ,  11.332     ,  13.518001  ,
+                15.784     ,  16.544001  ,  21.489     ,  20.281     ,
+                21.277     ,  32.417999  ,  24.446999  ,  27.025002  ,
+                24.504     ,  27.560999  ,  25.542     ,  27.499001  ,
+                25.353001  ,  17.165001  ,  23.771     ,  26.240999  ,
+                30.159     ,  34.661999  ,   8.1610022 , -13.130997  ,
+                32.171001  ,  39.935799  ,  29.645657  ,  13.53040492,
+                10.04661079,   2.86792274,  -0.92921251,  -6.09156499,
+               -14.58209446, -26.53878957, -28.98728798, -33.37842578,
+               -38.40951778, -37.46350964, -37.82742883, -44.54479263,
+               -55.55928982, -68.89465432, -83.34062511, -96.41041983])
         >>> # get the variable value for a specific period
         >>> variables["ACAF", "1990Y1"]
         23.771
         >>> # get the variable values for range of periods (using a Python slice)
         >>> variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
-        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        array([ 23.771     ,  26.240999  ,  30.159     ,  34.661999  ,
+                 8.1610022 , -13.130997  ,  32.171001  ,  39.935799  ,
+                29.645657  ,  13.53040492,  10.04661079])
         >>> # same as above but with the colon ':' inside the periods range string
         >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
-        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        array([ 23.771     ,  26.240999  ,  30.159     ,  34.661999  ,
+                 8.1610022 , -13.130997  ,  32.171001  ,  39.935799  ,
+                29.645657  ,  13.53040492,  10.04661079])
 
         >>> # b) -------- get a subset of the Variables database using a pattern --------
         >>> variables_subset = variables["A*"]
@@ -436,10 +462,24 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> # get the variable values for a specific period
         >>> variables["A*", "1990Y1"]
-        [23.771, -28.1721855713507, 1.0, 0.9373591502749314, 1.0]
+        array([ 23.771     , -28.17218557,   1.        ,   0.93735915,   1.        ])
         >>> # get the variable values for range of periods (using a Python slice)
         >>> variables["A*", "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
-        [[23.771, 26.240999, 30.159, ..., 1.2031082, 1.3429699656745855, 1.3386028553645442]]
+        array([[ 23.771     ,  26.240999  ,  30.159     ,  34.661999  ,
+                  8.1610022 , -13.130997  ,  32.171001  ,  39.935799  ,
+                 29.645657  ,  13.53040492,  10.04661079],
+               [-28.17218557, -30.934     , -40.285999  , -43.157997  ,
+                -16.029003  , -41.845993  , -40.237     , -32.93      ,
+                -38.345695  , -39.85817413, -41.53478657],
+               [  1.        ,   1.02443339,   1.0314501 ,   1.03091768,
+                  1.04628419,   1.0498914 ,   1.05368175,   1.0798151 ,
+                  1.08976062,   1.10803581,   1.11623762],
+               [  0.93735915,   0.96466659,   0.97403904,   0.97881286,
+                  0.98955638,   0.99526324,   1.00320369,   1.02825881,
+                  1.03849292,   1.0809661 ,   1.1019572 ],
+               [  1.        ,   1.0628064 ,   1.1102825 ,   1.1532652 ,
+                  1.1571276 ,   1.1616869 ,   1.1580297 ,   1.201328  ,
+                  1.2031082 ,   1.34296997,   1.33860286]])
 
         >>> # c) -------- get a subset of the Variables database using a list of names --------
         >>> variables_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
@@ -447,21 +487,49 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
         >>> # get the variable values for a specific period
         >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]
-        [23.771, -28.1721855713507, 1.0, -34.099998, -34.099997]
+        array([ 23.771     , -28.17218557,   1.        , -34.099998  , -34.099997  ])
         >>> # get the variable values for range of periods (using a Python slice)
         >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
-        [[23.771, 26.240999, 30.159, ..., 140.73978, 144.8587818455608, 150.05335230584103]]
+        array([[  23.771     ,   26.240999  ,   30.159     ,   34.661999  ,
+                   8.1610022 ,  -13.130997  ,   32.171001  ,   39.935799  ,
+                  29.645657  ,   13.53040492,   10.04661079],
+               [ -28.17218557,  -30.934     ,  -40.285999  ,  -43.157997  ,
+                 -16.029003  ,  -41.845993  ,  -40.237     ,  -32.93      ,
+                 -38.345695  ,  -39.85817413,  -41.53478657],
+               [   1.        ,    1.0628064 ,    1.1102825 ,    1.1532652 ,
+                   1.1571276 ,    1.1616869 ,    1.1580297 ,    1.201328  ,
+                   1.2031082 ,    1.34296997,    1.33860286],
+               [ -34.099998  ,   -1.2597286 ,  -13.746386  ,   52.161541  ,
+                  66.625153  ,   91.089355  ,  104.67634   ,  113.51928   ,
+                 116.18705   ,  117.90844709,  119.95508985],
+               [ -34.099997  ,   -1.3000031 ,  -14.699997  ,   58.100002  ,
+                  75.900002  ,  105.5       ,  123.2       ,  135.6192    ,
+                 140.73978   ,  144.85878185,  150.05335231]])
         """
         names, periods_ = self._unfold_key(key)
         # names represents a single Variable
         if len(names) == 1:
             return self._get_variable(names[0], periods_)
         # names represents a selection of Variables
-        elif periods_ is None:
-            names = ';'.join(names)
-            return self._subset(names, copy=False)
         else:
-            return [self._get_variable(name, periods_) for name in names]
+            # periods_ represents all periods
+            if periods_ is None:
+                names = ';'.join(names)
+                return self._subset(names, copy=False)
+            # periods_ represents a unique period 
+            elif isinstance(periods_, (str, int)):
+                vars_array = np.empty(len(names), dtype=np.float64)
+                for i, name in enumerate(names):
+                    vars_array[i] = self._get_variable(name, periods_)
+                return vars_array
+            # periods_ represents a range of periods (slice or list)
+            else:
+                first_var = self._get_variable(names[0], periods_)
+                vars_array = np.empty((len(names), first_var.size), dtype=np.float64)
+                vars_array[0, :] = first_var
+                for i, name in enumerate(names[1:], start=1):
+                    vars_array[i, :] = self._get_variable(name, periods_)
+                return vars_array
 
     def _convert_values(self, values, nb_periods) -> Union[str, float, List[float]]:
         # value is a LEC expression
@@ -471,11 +539,12 @@ cdef class Variables(_AbstractDatabase):
         if isinstance(values, int):
             values = float(values)
         if isinstance(values, float):
-            return values if nb_periods == 1 else [values] * nb_periods
+            value = NA if np.isnan(values) else values
+            return value if nb_periods == 1 else [value] * nb_periods
         # iterable of int/float
         if isinstance(values, Iterable) and all(isinstance(item, (int, float)) for item in values):
             if len(values) == nb_periods:
-                return [float(val) for val in values]
+                return [NA if np.isnan(value) else float(value) for value in values]
             else:
                 raise ValueError(f"variables[key] = values: Expected 'values' to be a vector of length {nb_periods} " 
                                  f"but got vector of length {len(values)}.")    
@@ -489,8 +558,6 @@ cdef class Variables(_AbstractDatabase):
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
 
-        # raise an error if values is a vector and len(values) != self.nb_periods
-        values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
             self.database_ptr.add(<string>(name.encode()), <string>values.encode())
@@ -499,73 +566,71 @@ cdef class Variables(_AbstractDatabase):
             cpp_values = [<double>value_ for value_ in values]
             self.database_ptr.add(<string>(name.encode()), cpp_values)
 
-    def _update(self, key: Union[str, int], values: Union[str, float, List[float]]):
+    def _update(self, key: int, values: Union[str, float, List[float]]):
         cdef vector[double] cpp_values
 
-        # raise an error if values is a vector and len(values) != self.nb_periods
-        values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
-            if isinstance(key, int):
-                self.database_ptr.update(<int>key, <string>values.encode())
-            else:
-                self.database_ptr.update(<string>(key.encode()), <string>values.encode())
+            self.database_ptr.update(<int>key, <string>values.encode())
         # values is a vector of float
         else:
             cpp_values = [<double>value_ for value_ in values]
-            if isinstance(key, int):
-                self.database_ptr.update(<int>key, cpp_values)
-            else:
-                self.database_ptr.update(<string>(key.encode()), cpp_values)
+            self.database_ptr.update(<int>key, cpp_values)
 
-    def _set_object(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
+    def _set_variable(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
+        cdef int var_pos
+        cdef int period_pos
+        cdef int nb_periods = self.database_ptr.get_nb_periods()
+        cdef CSample* c_sample = self.database_ptr.get_sample()
+
+        if c_sample is NULL:
+            raise RuntimeError("The database has not been initialized yet. Empty sample.")
 
         if isinstance(key, str):
             key = key.strip()
         
         # new Variable -> raise an error if values is a vector and len(values) != self.nb_periods
         if isinstance(key, str) and key not in self:
+            values = self._convert_values(values, self.nb_periods)
             self._add(key, values)
         # update a Variable
         else:
+            if isinstance(key, int):
+                var_pos = key
+            else:
+                var_pos = self.database_ptr.get_position(key.encode())
+            
             # update values for the whole sample
             # raise an error if values is a vector and len(values) != self.nb_periods
             if periods_ is None:
-                self._update(key, values)
+                values = self._convert_values(values, self.nb_periods)
+                self._update(var_pos, values)
             # update the value for only one period 
             elif isinstance(periods_, (str, int)):
-                if isinstance(key, int) and isinstance(periods_, str):
-                    raise TypeError("variables[key, period] = value: Expected 'key' to be a string.")
-                if isinstance(key, str) and isinstance(periods_, int):
-                    raise TypeError("variables[key, period] = value: Expected 'period' to be a string.")
-                value = values
-                if isinstance(value, int):
-                    value = float(value)
-                if not isinstance(value, float):
-                    raise TypeError("variables[key] = value: Expected 'value' to be a float. "
-                                    f"Got 'value' of type {type(value).__name__}")
-                if isinstance(key, int):
-                    self.database_ptr.set_var(<int>key, <int>periods_, <double>value, self.mode_)
+                if isinstance(periods_, str):
+                    period_pos = c_sample.get_period_position(<string>periods_.encode())
                 else:
-                    self.database_ptr.set_var(<string>(key.encode()), <string>periods_.encode(), <double>value, self.mode_)
+                    period_pos = periods_
+                if not 0 <= period_pos < nb_periods:    
+                    raise ValueError(f"'period' {periods_} must be a valid period name or a valid period index.") 
+                value = self._convert_values(values, 1)
+                self.database_ptr.set_var(var_pos, period_pos, <double>value, self.mode_)
             # update values for a contiguous range of periods
             elif isinstance(periods_, tuple):
                 first_period, last_period = periods_
+                if not isinstance(first_period, int) or not isinstance(last_period, int):
+                    raise TypeError("Expected int values for 'first_period' and 'last_period'")
+                if first_period > last_period:
+                    raise ValueError("'first_period' must be lower or equal to 'last_period'.")
                 nb_periods = last_period - first_period + 1
                 # values is a LEC expression
                 if isinstance(values, str):
-                    if isinstance(key, int):
-                        self.database_ptr.update(<int>(key), <string>values.encode(), <int>first_period, <int>last_period) 
-                    else:   
-                        self.database_ptr.update(<string>(key.encode()), <string>values.encode(), <int>first_period, <int>last_period)
+                    self.database_ptr.update(var_pos, <string>values.encode(), <int>first_period, <int>last_period) 
                 else:
                     values = self._convert_values(values, nb_periods)
                     cpp_values = [<double>value for value in values]
-                    if isinstance(key, int):
-                        self.database_ptr.update(<int>(key), cpp_values, <int>first_period, <int>last_period)
-                    else:
-                        self.database_ptr.update(<string>(key.encode()), cpp_values, <int>first_period, <int>last_period)
+                    self.database_ptr.update(var_pos, cpp_values, <int>first_period, <int>last_period)
             # update values for a list of periods
             else:
                 if isinstance(key, int):
@@ -576,7 +641,8 @@ cdef class Variables(_AbstractDatabase):
                 else:
                     values = self._convert_values(values, len(periods_))
                     for period, value in zip(periods_, values):
-                        self.database_ptr.set_var(<string>(key.encode()), <string>period.encode(), <double>value, self.mode_)
+                        period_pos = c_sample.get_period_position(<string>period.encode())
+                        self.database_ptr.set_var(var_pos, period_pos, <double>value, self.mode_)
 
     # overriden for Variables
     def __setitem__(self, key, value):
@@ -626,32 +692,75 @@ cdef class Variables(_AbstractDatabase):
         >>> # 1) same value for all periods
         >>> variables["A0"] = NA
         >>> variables["A0"]                     # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        array([ nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan])
         >>> # 2) vector (list) containing a specific value for each period
         >>> variables["A1"] = list(range(variables.nb_periods))
         >>> variables["A1"]                     # doctest: +ELLIPSIS 
-        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
+                11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,  21.,
+                22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,  32.,
+                33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,  43.,
+                44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,  54.,
+                55.])
         >>> # 3) LEC expression
         >>> variables["A2"] = "t + 10"
         >>> variables["A2"]                     # doctest: +ELLIPSIS 
-        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+        array([ 10.,  11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,
+                21.,  22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,
+                32.,  33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,
+                43.,  44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,
+                54.,  55.,  56.,  57.,  58.,  59.,  60.,  61.,  62.,  63.,  64.,
+                65.])
 
         >>> # b) -------- update one variable --------
         >>> # 1) update all values of a Variable
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        array([         nan,          nan,          nan,          nan,
+                        nan,          nan,          nan,          nan,
+                        nan,          nan,   1.2130001 ,   5.2020001 ,
+                 9.184     ,   8.0790005 ,  11.332     ,  13.518001  ,
+                15.784     ,  16.544001  ,  21.489     ,  20.281     ,
+                21.277     ,  32.417999  ,  24.446999  ,  27.025002  ,
+                24.504     ,  27.560999  ,  25.542     ,  27.499001  ,
+                25.353001  ,  17.165001  ,  23.771     ,  26.240999  ,
+                30.159     ,  34.661999  ,   8.1610022 , -13.130997  ,
+                32.171001  ,  39.935799  ,  29.645657  ,  13.53040492,
+                10.04661079,   2.86792274,  -0.92921251,  -6.09156499,
+               -14.58209446, -26.53878957, -28.98728798, -33.37842578,
+               -38.40951778, -37.46350964, -37.82742883, -44.54479263,
+               -55.55928982, -68.89465432, -83.34062511, -96.41041983])
         >>> # 1.I) same value for all periods
         >>> variables["ACAF"] = NA
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        array([ nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan])
         >>> # 1.II) vector (list) containing a specific value for each period
         >>> variables["ACAF"] = list(range(variables.nb_periods))
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
+                11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,  21.,
+                22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,  32.,
+                33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,  43.,
+                44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,  54.,
+                55.])
         >>> # 1.III) LEC expression
         >>> variables["ACAF"] = "t + 10"
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+        array([ 10.,  11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,
+                21.,  22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,
+                32.,  33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,
+                43.,  44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,
+                54.,  55.,  56.,  57.,  58.,  59.,  60.,  61.,  62.,  63.,  64.,
+                65.])
 
         >>> # 2) set one value of a Variable for a specific period
         >>> variables["ACAG", "1990Y1"]
@@ -665,29 +774,29 @@ cdef class Variables(_AbstractDatabase):
         >>> # 3.I.a) variable(periods) = same value for all periods
         >>> variables["ACAF", "1991Y1":"1995Y1"] = 0.0
         >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, 0.0, 0.0, 0.0, 0.0]
+        array([ 0.,  0.,  0.,  0.,  0.])
         >>> # 3.I.b) variable(periods) = vector (list) containing a specific value for each period
         >>> variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
         >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, 1.0, 2.0, 3.0, 4.0]
+        array([ 0.,  1.,  2.,  3.,  4.])
         >>> # 3.I.c) variable(periods) = LEC expression
         >>> variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
         >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [41.0, 42.0, 43.0, 44.0, 45.0]
+        array([ 41.,  42.,  43.,  44.,  45.])
 
         >>> # 3.II) same as above but with the colon ':' inside the periods range string
         >>> # 3.II.a) variable(periods) = same value for all periods
         >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
         >>> variables["ACAF", "1991Y1:1995Y1"]
-        [0.0, 0.0, 0.0, 0.0, 0.0]
+        array([ 0.,  0.,  0.,  0.,  0.])
         >>> # 3.II.b) variable(periods) = vector (list) containing a specific value for each period
         >>> variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
         >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, -1.0, -2.0, -3.0, -4.0]
+        array([ 0., -1., -2., -3., -4.])
         >>> # 3.II.c) variable(periods) = LEC expression
         >>> variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
         >>> variables["ACAF", "1991Y1:1995Y1"]
-        [21.0, 22.0, 23.0, 24.0, 25.0]
+        array([ 21.,  22.,  23.,  24.,  25.])
 
         >>> # c) -------- working on a subset --------
         >>> # 1) get subset
@@ -697,24 +806,42 @@ cdef class Variables(_AbstractDatabase):
         >>> # 2) add a variable to the subset
         >>> variables_subset["A3"] = NA
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        array([ nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan])
         >>> # --> new variable also appears in the global workspace
         >>> "A3" in variables
         True
         >>> variables["A3"]                     # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        array([ nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,
+                nan])
         >>> # 3) update a variable in the subset
         >>> variables_subset["A3"] = 0.0
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [0.0, 0.0, ..., 0.0, 0.0]
+        array([ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.])
         >>> # --> variable is also updated in the global workspace
         >>> variables["A3"]                     # doctest: +ELLIPSIS 
-        [0.0, 0.0, ..., 0.0, 0.0]
+        array([ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                0.,  0.,  0.,  0.])
         """
         names, periods_ = self._unfold_key(key)
         # update/add a single Variable
         if len(names) == 1:
-            self._set_object(names[0], value, periods_)
+            self._set_variable(names[0], value, periods_)
         # update/add several variables
         else:
             # if value is a string (LEC expression) or a numerical value -> set the same value for all Variables
@@ -725,7 +852,7 @@ cdef class Variables(_AbstractDatabase):
                                 f"{len(values)} values has been passed while the selection key '{key}' "
                                 f"represents {len(names)} variables.")
             for name, value in zip(names, values):
-                self._set_object(name, value, periods_) 
+                self._set_variable(name, value, periods_) 
 
     # overriden for Variables
     def __delitem__(self, key):
@@ -851,9 +978,9 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         Sample("1960Y1:1970Y1")
         >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+        array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.])
         >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        array([ 88.,  89.,  90.,  91.,  92.,  93.,  94.,  95.,  96.,  97.,  98.])
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
@@ -922,7 +1049,18 @@ cdef class Variables(_AbstractDatabase):
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -932,7 +1070,18 @@ cdef class Variables(_AbstractDatabase):
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
         >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ... 1.0159901, 1.0159901]
+        array([ 1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901])
         >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    1.00000
@@ -951,7 +1100,18 @@ cdef class Variables(_AbstractDatabase):
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -961,7 +1121,18 @@ cdef class Variables(_AbstractDatabase):
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
         >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        array([ 0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039])
         >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    0.6884
@@ -971,7 +1142,7 @@ cdef class Variables(_AbstractDatabase):
         2015Y1    0.6884
         Name: ZZF_, dtype: float64
         """
-        cdef np.ndarray[np.double_t, ndim = 2] data
+        cdef cnp.ndarray[cnp.double_t, ndim = 2] data
         cdef double* cpp_values_ptr
 
         if pd is None:
@@ -979,7 +1150,7 @@ cdef class Variables(_AbstractDatabase):
         
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = _ws_to_numpy_array(vars_list, len(periods_list))
+        data = self._ws_to_numpy_array(vars_list, len(periods_list))
 
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
@@ -1044,9 +1215,9 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         Sample("1960Y1:1970Y1")
         >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+        array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.])
         >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        array([ 88.,  89.,  90.,  91.,  92.,  93.,  94.,  95.,  96.,  97.,  98.])
         """
         if la is None:
             raise RuntimeError("larray library not found")
@@ -1112,12 +1283,34 @@ cdef class Variables(_AbstractDatabase):
          names [394]: 'ACAF' 'ACAG' 'AOUC' ... 'ZKFO' 'ZX' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> array["AOUC"]
         time  1960Y1  ...              2014Y1              2015Y1
                  nan  ...  1.4237139558484628  1.4608626117037322
         >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ..., 1.0159901, 1.0159901]
+        array([ 1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901])
         >>> array["ZKFO"]
         time  1960Y1  1961Y1  1962Y1  ...     2012Y1     2013Y1     2014Y1     2015Y1
                  1.0     1.0     1.0  ...  1.0159901  1.0159901  1.0159901  1.0159901
@@ -1131,12 +1324,34 @@ cdef class Variables(_AbstractDatabase):
          names [33]: 'ACAF' 'ACAG' 'AOUC' ... 'WNF_' 'YDH_' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> array["AOUC"]
         time  1960Y1  ...              2014Y1              2015Y1
                  nan  ...  1.4237139558484628  1.4608626117037322
         >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        array([ 0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039])
         >>> array["ZZF_"]
         time      1960Y1      1961Y1  ...      2013Y1      2014Y1      2015Y1
               0.68840039  0.68840039  ...  0.68840039  0.68840039  0.68840039
@@ -1146,7 +1361,7 @@ cdef class Variables(_AbstractDatabase):
 
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = _ws_to_numpy_array(vars_list, len(periods_list))
+        data = self._ws_to_numpy_array(vars_list, len(periods_list))
         
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
         time_axis = la.Axis(name=time_axis_name, labels=periods_list)
@@ -1354,17 +1569,40 @@ cdef class Variables(_AbstractDatabase):
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
         1961Y1    0.247832
+        1962Y1    0.254568
         ...
         2014Y1    1.423714
         2015Y1    1.460863
-        Name: AOUC, dtype: float64    
+        Name: AOUC, dtype: float64   
         >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ... 1.0159901, 1.0159901]
+        array([ 1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.       ,  1.       ,  1.       ,
+                1.       ,  1.       ,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901,  1.0159901,  1.0159901,  1.0159901,  1.0159901,
+                1.0159901])
         >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    1.00000
@@ -1383,17 +1621,40 @@ cdef class Variables(_AbstractDatabase):
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        array([        nan,  0.24783192,  0.25456766,  0.26379573,  0.27624285,
+                0.28580592,  0.29721309,  0.30634627,  0.30797943,  0.31703778,
+                0.33336823,  0.35592318,  0.37846615,  0.41292134,  0.4946085 ,
+                0.54713711,  0.60206004,  0.62716076,  0.64032766,  0.67017027,
+                0.73722462,  0.79401212,  0.86332326,  0.91624877,  0.97916968,
+                1.0021859 ,  0.94999215,  0.9340988 ,  0.94613933,  0.9787904 ,
+                1.        ,  1.02443339,  1.0314501 ,  1.03091768,  1.04628419,
+                1.0498914 ,  1.05368175,  1.0798151 ,  1.08976062,  1.10803581,
+                1.11623762,  1.14047639,  1.15716928,  1.17048954,  1.16767464,
+                1.1815207 ,  1.19946163,  1.21933288,  1.26280574,  1.28713178,
+                1.3071099 ,  1.32861022,  1.35553983,  1.38777697,  1.42371396,
+                1.46086261])
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
         1961Y1    0.247832
+        1962Y1    0.254568
         ...
         2014Y1    1.423714
         2015Y1    1.460863
-        Name: AOUC, dtype: float64    
+        Name: AOUC, dtype: float64   
         >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        array([ 0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039,  0.68840039,  0.68840039,  0.68840039,  0.68840039,
+                0.68840039])
         >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    0.6884
@@ -1554,43 +1815,43 @@ cdef class Variables(_AbstractDatabase):
         >>> # "stock" -> the result is a linear interpolation of the 2 surrounding source values.
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-72.50614701966526, -76.11763971671049, -79.7291324137557, -83.34062511080091]
+        array([-72.50614702, -76.11763972, -79.72913241, -83.34062511])
         >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [31.63267881532112, 31.895218819946884, 32.15775882457264, 32.4202988291984]
+        array([ 31.63267882,  31.89521882,  32.15775882,  32.42029883])
 
         Linear interpolation / flow
         
         >>> # "flow" -> the result is the source value divided by the nb of sub-periods. 
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
+        array([-20.83515628, -20.83515628, -20.83515628, -20.83515628])
         >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
+        array([ 8.10507471,  8.10507471,  8.10507471,  8.10507471])
 
         Cubic splines / stock
         
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
-        [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
+        array([-47.29841693, -50.05204123, -52.80566552, -55.55928982])
         >>> variables["ACAG", "2012Q1":"2012Q4"]
-        [29.544440560604077, 29.804280757173238, 30.064120953742403, 30.323961150311572]
+        array([ 29.54444056,  29.80428076,  30.06412095,  30.32396115])
 
         Cubic splines / flow
         
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
-        [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
+        array([-12.74842269, -13.43682876, -14.27028904, -15.10374932])
         >>> variables["ACAG", "2012Q1":"2012Q4"]
-        [7.483230672890683, 7.548190722032976, 7.6135768258069625, 7.678962929580949]
+        array([ 7.48323067,  7.54819072,  7.61357683,  7.67896293])
 
         Step / stock
         
         >>> # "stock" -> the result has the same value as the source
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-83.34062511080091, -83.34062511080091, -83.34062511080091, -83.34062511080091]
+        array([-83.34062511, -83.34062511, -83.34062511, -83.34062511])
         >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [32.4202988291984, 32.4202988291984, 32.4202988291984, 32.4202988291984]
+        array([ 32.42029883,  32.42029883,  32.42029883,  32.42029883])
 
         Step / flow
         
@@ -1598,9 +1859,9 @@ cdef class Variables(_AbstractDatabase):
         >>> # the difference between the 2 surrounding values in the source
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
+        array([-20.83515628, -20.83515628, -20.83515628, -20.83515628])
         >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
+        array([ 8.10507471,  8.10507471,  8.10507471,  8.10507471])
         """
         if isinstance(filepath, str):
             filepath = Path(filepath)
@@ -1682,25 +1943,26 @@ cdef class Variables(_AbstractDatabase):
         
         >>> variables.high_to_low(HighToLowType.LAST, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
+        array([-37.82742883, -44.54479263, -55.55928982, -68.89465432, -83.34062511])
         >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
+        array([ 7.06348224,  7.32115009,  7.58099029,  7.8425347 ,  8.10507471])
 
         Mean of year
         
         >>> variables.high_to_low(HighToLowType.MEAN, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
+        array([-37.82742883, -44.54479263, -55.55928982, -68.89465432, -83.34062511])
         >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
+        array([ 7.06348224,  7.32115009,  7.58099029,  7.8425347 ,  8.10507471])
 
         Sum
         
         >>> variables.high_to_low(HighToLowType.SUM, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-151.30971532917755, -178.1791705341729, -222.23715926887493, -275.5786172904802, -333.36250044320366]
+        array([-151.30971533, -178.17917053, -222.23715927, -275.57861729,
+               -333.36250044])
         >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [28.253928978210485, 29.284600364034908, 30.323961150311572, 31.370138810695362, 32.4202988291984]
+        array([ 28.25392898,  29.28460036,  30.32396115,  31.37013881,  32.42029883])
         """
         if isinstance(filepath, str):
             filepath = Path(filepath)
@@ -1778,49 +2040,49 @@ cdef class Variables(_AbstractDatabase):
         >>> # create ACAF
         >>> reset_ACAF()
         >>> variables["ACAF", :"2010Y1"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0, 10.0]
+        array([  0.,   1.,   2.,   3.,   4.,  nan,   6.,  nan,   8.,   9.,  10.])
 
         >>> # "TM1" (Y := Y[-1], if Y null or NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+        array([ 3.,  4.,  4.,  6.,  6.,  8.,  9.])
 
         >>> # "TM1_A" (Y := Y[-1], always)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1_A, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+        array([ 3.,  4.,  4.,  4.,  4.,  4.,  4.])
 
         >>> # "EXTRA" (Y := extrapolation, if Y null or NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        array([ 3.,  4.,  5.,  6.,  7.,  8.,  9.])
 
         >>> # "EXTRA_A" (Y := extrapolation, always)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA_A, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        array([ 3.,  4.,  5.,  6.,  7.,  8.,  9.])
 
         >>> # "ASIS" (Y unchanged)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.ASIS, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0]
+        array([  3.,   4.,  nan,   6.,  nan,   8.,   9.])
 
         >>> # "TM1_NA" (Y := Y[-1], if Y = NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1_NA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+        array([ 3.,  4.,  4.,  6.,  6.,  8.,  9.])
 
         >>> # "EXTRA_NA" (Y := extrapolation, if Y = NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA_NA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        array([ 3.,  4.,  5.,  6.,  7.,  8.,  9.])
         """
         if isinstance(method, str):
             method = method.upper()
@@ -1948,8 +2210,9 @@ cdef class Variables(_AbstractDatabase):
 
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names}
+        vars_pos = [self.database_ptr.get_position(<string>(name.encode())) for name in names]
         for t, period in enumerate(self.periods):
-            columns[period] = [self.database_ptr.get_var(<string>(name.encode()), <int>t, self.mode_) for name in names]
+            columns[period] = [self.database_ptr.get_var(var_pos, t, self.mode_) for var_pos in vars_pos]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
     def __hash__(self) -> int:
