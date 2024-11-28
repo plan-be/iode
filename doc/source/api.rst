@@ -45,6 +45,7 @@ Comments
    Comments.copy_from
    Comments.merge
    Comments.merge_from
+   Comments.compare
 
    Comments.is_subset
    Comments.is_copy_subset
@@ -92,6 +93,7 @@ Equations
    Equations.copy_from
    Equations.merge
    Equations.merge_from 
+   Equations.compare 
 
    Equations.is_subset
    Equations.is_copy_subset
@@ -141,6 +143,7 @@ Identities
    Identities.copy_from
    Identities.merge
    Identities.merge_from
+   Identities.compare
 
    Identities.is_subset
    Identities.is_copy_subset
@@ -190,6 +193,7 @@ Lists
    Lists.copy_from
    Lists.merge
    Lists.merge_from
+   Lists.compare
 
    Lists.is_subset
    Lists.is_copy_subset
@@ -237,6 +241,7 @@ Scalars
    Scalars.copy_from
    Scalars.merge
    Scalars.merge_from
+   Scalars.compare
 
    Scalars.is_subset
    Scalars.is_copy_subset
@@ -285,6 +290,7 @@ Tables
    Tables.copy_from
    Tables.merge
    Tables.merge_from
+   Tables.compare
 
    Tables.is_subset
    Tables.is_copy_subset
@@ -330,6 +336,7 @@ Variables
    Variables.copy_from
    Variables.merge
    Variables.merge_from
+   Variables.compare
 
    Variables.is_subset
    Variables.is_copy_subset
