@@ -268,9 +268,10 @@ Below *workspace* must be replaced by either:
     | ``datalistsort``     | ``lst = split_list(lists[listname]))``   --> See :func:`split_list`                                                            |
     |                      | ``lists[sorted_listname] = sorted(lst)``                                                                                       |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datacompareEps``   | ``variables.threshold = value`` --> See :meth:`Variables.threshold`                                                            |                                                                                                           |
+    | ``datacompareEps``   | ``variables.threshold = value`` --> See :meth:`Variables.threshold`                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datacompareXxx``   | Not Yet Implemented                                                                                                            |
+    | ``datacompareXxx``   | ``workspace.compare(filepath, only_in_workspace_list_name, only_in_file_list_name, `` --> See :meth:`Database.compare`         | 
+    |                      | ``                  equal_objects_list_name, different_objects_list_name)``                                                    |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datacalclst``      | ``list1, list2 = split_list(lists[list1]), split_list(lists[list2])``                                                          |
     |                      | union:        ``list(set(list1) | set(list2))``                                                                                |

@@ -25,7 +25,9 @@ cdef extern from "api/iode.h":
 
     double K_CMP_EPS
 
+    void B_display_last_error()
     int B_DataCompareEps(char* arg)
+    int B_DataCompare(char* arg, int iode_type)
 
     cdef struct KOBJ:
         SWHDL o_val

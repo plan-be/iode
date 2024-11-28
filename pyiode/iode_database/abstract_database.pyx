@@ -11,11 +11,14 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
-from iode.util import join_lines, table2str, JUSTIFY
+from iode.common import IODE_FILE_TYPES
+from iode.util import join_lines, table2str, JUSTIFY, check_filepath
 
 from cython.operator cimport dereference
 from pyiode.common cimport IodeType
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
+from pyiode.iode_database.cpp_api_database cimport B_DataCompare
+from pyiode.iode_database.cpp_api_database cimport B_display_last_error
 
 
 # WARNING: remember:
@@ -455,6 +458,115 @@ cdef class _AbstractDatabase:
         else:
             raise TypeError(f"'names': Expected value of type string or list of strings. " + 
                 "Got value of type {type(names).__name__}")
+
+    def compare(self, filepath: Union[str, Path], only_in_workspace_list_name: str=None, 
+                only_in_file_list_name: str=None, equal_objects_list_name: str=None, 
+                different_objects_list_name: str=None) -> Dict[str, List[str]]:
+        """
+        The objects of the current database are compared with those stored in the file `filepath`. 
+        
+        The result of this comparison is composed of 4 lists:
+        
+          - *only_in_workspace_list*: objects only found in the current database
+          - *only_in_file_list*: objects only found in the file `filepath`
+          - *equal_objects_list*: objects found in both with the same value
+          - *different_objects_list*: objects found in both but with a different value
+        
+        The comparison is made according to current database type.
+
+        For the IODE Variables, the comparison between two variables is made according to 
+        the threshold defined by :meth:`iode.Variables.threshold`.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to be compared with the current database
+        only_in_workspace_list_name: str, optional
+            name of the list of objects only found in the current database.
+            Defaults to "COMP_ONLY_WS_<IODE_TYPE>".
+        only_in_file_list_name: str, optional
+            name of the list of objects only found in the file `filepath`.
+            Defaults to "COMP_ONLY_FILE_<IODE_TYPE>".
+        equal_objects_list_name: str, optional
+            name of the list of objects found in both with the same value.
+             Defaults to "COMP_EQUAL_<IODE_TYPE>".
+        different_objects_list_name: str, optional
+            name of the list of objects found in both but with a different value.
+            Defaults to "COMP_DIFF_<IODE_TYPE>".
+
+        Returns
+        -------
+        dict(str, list(str))
+            dictionary containing the 4 lists of objects
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.threshold
+        1e-07
+
+        >>> # ---- create Variables file to compare with ----
+        >>> vars_other = variables.copy()
+        >>> # add two variables
+        >>> vars_other["NEW_VAR"] = 0.0
+        >>> vars_other["NEW_VAR_2"] = 0.0
+        >>> # delete two variables
+        >>> del vars_other["AOUC"]
+        >>> del vars_other["AQC"]
+        >>> # change the value of two variables (above threshold)
+        >>> vars_other["ACAF"] = np.asarray(variables["ACAF"]) + 1.e-5
+        >>> vars_other["ACAG"] = np.asarray(variables["ACAG"]) + 1.e-5
+        >>> # change the value of two variables (below threshold)
+        >>> vars_other["BENEF"] = np.asarray(variables["BENEF"]) + 1.e-8
+        >>> vars_other["BQY"] = np.asarray(variables["BQY"]) + 1.e-8
+        >>> # save the Variables file to compare with
+        >>> vars_other.save("fun_other.var")
+
+        >>> # ---- compare the current Variables database ----
+        >>> # ---- with the content of the saved file     ----
+        >>> lists_compare = variables.compare("fun_other.var")
+        >>> for name, value in lists_compare.items():           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        ...    print(f"{name}: {value}")
+        COMP_ONLY_WS_VAR: ['AOUC', 'AQC']
+        COMP_ONLY_FILE_VAR: ['NEW_VAR', 'NEW_VAR_2']
+        COMP_EQUAL_VAR: ['AOUC_', 'BENEF', 'BQY', 'BRUGP', ..., 'ZKFO', 'ZX', 'ZZF_'] 
+        COMP_DIFF_VAR: ['ACAF', 'ACAG']
+        """
+        int_iode_type: int = self.abstract_db_ptr.get_iode_type()
+        expected_file_type: IodeFileType = IodeFileType(int_iode_type)
+
+        if filepath is None:
+            raise ValueError("Missing value for the argument 'filepath'")
+        if isinstance(filepath, Path):
+            filepath = str(filepath)
+        if not len(filepath):
+            raise ValueError("'filepath' is empty")
+        filepath = check_filepath(filepath, expected_file_type, file_must_exist=True)
+
+        short_type_name = IODE_FILE_TYPES[int_iode_type].extensions[0].replace('.', '').upper()
+        if only_in_file_list_name is None:
+            only_in_workspace_list_name = f"COMP_ONLY_WS_{short_type_name}"
+        if only_in_file_list_name is None:
+            only_in_file_list_name = f"COMP_ONLY_FILE_{short_type_name}"
+        if equal_objects_list_name is None:
+            equal_objects_list_name = f"COMP_EQUAL_{short_type_name}"
+        if different_objects_list_name is None:
+            different_objects_list_name = f"COMP_DIFF_{short_type_name}"
+
+        args = f"{filepath} {only_in_workspace_list_name} {only_in_file_list_name} "
+        args += f"{equal_objects_list_name} {different_objects_list_name}"
+
+        res = B_DataCompare(args.encode(), int_iode_type)
+        if res != 0:
+            B_display_last_error()
+        
+        return {only_in_workspace_list_name: lists[only_in_workspace_list_name],
+                only_in_file_list_name: lists[only_in_file_list_name],
+                equal_objects_list_name: lists[equal_objects_list_name],
+                different_objects_list_name: lists[different_objects_list_name]}
 
     def merge(self, other: Self, overwrite: bool=True):
         f"""

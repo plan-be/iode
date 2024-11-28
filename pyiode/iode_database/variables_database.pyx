@@ -1339,6 +1339,10 @@ cdef class Variables(_AbstractDatabase):
         	New threshold value.
             Default value is 1e-7.
 
+        See Also
+        --------
+        iode.Variables.compare
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
