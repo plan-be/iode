@@ -101,7 +101,34 @@ cdef class Scalar:
 
     @property
     def value(self) -> float:
-        return self.c_scalar.val
+        """
+        >>> import numpy as np
+        >>> from iode import Scalar
+        >>> scalar = Scalar(0.9, 0.8)
+        >>> scalar
+        Scalar(0.9, 0.8, na)
+        >>> scalar.value
+        0.9
+        >>> scalar.value = 0.8
+        >>> scalar.value
+        0.8
+        >>> # Python nan are converted to IODE NA internally
+        >>> # 'scalar.value = np.nan' is equivalent to 
+        >>> # 'scalar.value = NA' 
+        >>> scalar.value = np.nan
+        >>> scalar.value
+        nan
+        >>> # The numpy isnan can be used to test if  
+        >>> # an IODE scalar value is NA or not
+        >>> np.isnan(scalar.value)   
+        True
+        >>> # Python inf are not accepted
+        >>> scalar.value = np.inf
+        Traceback (most recent call last):
+        ...
+        ValueError: Expected 'value' to be a finite number
+        """
+        return self.c_scalar.val if IODE_IS_A_NUMBER(self.c_scalar.val) else np.nan
 
     @value.setter 
     def value(self, val: float):
@@ -123,7 +150,7 @@ cdef class Scalar:
 
     @property
     def std(self) -> float:
-        return self.c_scalar.std
+        return self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
 
     # misc
 
@@ -136,9 +163,12 @@ cdef class Scalar:
         >>> from iode import Scalar
         >>> scalar = Scalar(0.9, 0.8)
         >>> scalar._as_tuple()
-        (0.9, 0.8, -2e+37)
+        (0.9, 0.8, nan)
         """
-        return self.c_scalar.val, self.c_scalar.relax, self.c_scalar.std
+        value = self.c_scalar.val if IODE_IS_A_NUMBER(self.c_scalar.val) else np.nan
+        relax = self.c_scalar.relax
+        std = self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
+        return value, relax, std
 
     # Special methods
 
