@@ -10,7 +10,6 @@ else:
     Self = Any
 
 cimport cython
-cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from cython.operator cimport dereference
@@ -57,15 +56,15 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
     out: ndarray 
         1-dim numpy array containing the values of variables[name]
     """  
-    cdef np.npy_intp shape[1]   # int of the size of a pointer (32 ou 64 bits) See https://numpy.org/doc/stable/reference/c-api/dtype.html
+    cdef cnp.npy_intp shape[1]   # int of the size of a pointer (32 ou 64 bits) See https://numpy.org/doc/stable/reference/c-api/dtype.html
     cdef int lg
     cdef double *data_ptr = IodeGetVector(name, &lg)
     
-    shape[0] = <np.npy_intp> lg  # vector length
+    shape[0] = <cnp.npy_intp> lg  # vector length
     if data_ptr != NULL:
         # Create an array wrapper around data_ptr 
         # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
-        vararray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data_ptr) # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
+        vararray = cnp.PyArray_SimpleNewFromData(1, shape, cnp.NPY_DOUBLE, data_ptr) # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
         
         if(copy):
             # Duplicates if inmemory == 0 (?) => ch³anges to vararray will NOT modify KV_WS
@@ -98,24 +97,24 @@ def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[s
     data = np.nan_to_num(data, nan=NA)
 
     # copy each line of array into KV_WS on the time intersection of df and KV_WS
-    # values = <double*>np.PyArray_DATA(df[vars_names[0]].data)
+    # values = <double*>cnp.PyArray_DATA(df[vars_names[0]].data)
     if np.issubdtype(data.dtype, np.floating):
         if data.data.c_contiguous:
             for name, row_data in zip(vars_names, data):
                 # Save the vector of doubles in KV_WS
-                values = < double * > np.PyArray_DATA(row_data)
+                values = < double * > cnp.PyArray_DATA(row_data)
                 IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
         else:
             for name, row_data in zip(vars_names, data):
                 row_data = row_data.copy()  # copy if non contiguous
                 # Save the vector of doubles in KV_WS
-                values = < double * > np.PyArray_DATA(row_data)
+                values = < double * > cnp.PyArray_DATA(row_data)
                 IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
     else:
         for name, row_data in zip(vars_names, data):
             row_data = row_data.astype("double") # astype creates a copy
             # Save the vector of doubles in KV_WS
-            values = <double*>np.PyArray_DATA(row_data)
+            values = <double*>cnp.PyArray_DATA(row_data)
             IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
 
 def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
@@ -154,7 +153,7 @@ class VarPositionalIndexer:
     
     def __setitem__(self, index: Union[int, Tuple[int, int]], value):
         pos, t = self._check_index(index)
-        self.database._set_object(pos, value, t)
+        self.database._set_variable(pos, value, t)
 
 
 @cython.final
@@ -473,11 +472,12 @@ cdef class Variables(_AbstractDatabase):
         if isinstance(values, int):
             values = float(values)
         if isinstance(values, float):
-            return values if nb_periods == 1 else [values] * nb_periods
+            value = NA if np.isnan(values) else values
+            return value if nb_periods == 1 else [value] * nb_periods
         # iterable of int/float
         if isinstance(values, Iterable) and all(isinstance(item, (int, float)) for item in values):
             if len(values) == nb_periods:
-                return [float(val) for val in values]
+                return [NA if np.isnan(value) else float(value) for value in values]
             else:
                 raise ValueError(f"variables[key] = values: Expected 'values' to be a vector of length {nb_periods} " 
                                  f"but got vector of length {len(values)}.")    
@@ -520,7 +520,7 @@ cdef class Variables(_AbstractDatabase):
             else:
                 self.database_ptr.update(<string>(key.encode()), cpp_values)
 
-    def _set_object(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
+    def _set_variable(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
 
         if isinstance(key, str):
@@ -541,12 +541,7 @@ cdef class Variables(_AbstractDatabase):
                     raise TypeError("variables[key, period] = value: Expected 'key' to be a string.")
                 if isinstance(key, str) and isinstance(periods_, int):
                     raise TypeError("variables[key, period] = value: Expected 'period' to be a string.")
-                value = values
-                if isinstance(value, int):
-                    value = float(value)
-                if not isinstance(value, float):
-                    raise TypeError("variables[key] = value: Expected 'value' to be a float. "
-                                    f"Got 'value' of type {type(value).__name__}")
+                value = self._convert_values(values, 1)
                 if isinstance(key, int):
                     self.database_ptr.set_var(<int>key, <int>periods_, <double>value, self.mode_)
                 else:
@@ -620,6 +615,7 @@ cdef class Variables(_AbstractDatabase):
 
         Examples
         --------
+        >>> import numpy as np
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
@@ -627,6 +623,10 @@ cdef class Variables(_AbstractDatabase):
         >>> # a) -------- add one variable --------
         >>> # 1) same value for all periods
         >>> variables["A0"] = NA
+        >>> variables["A0"]                     # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # or equivalently
+        >>> variables["A0"] = np.nan
         >>> variables["A0"]                     # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # 2) vector (list) containing a specific value for each period
@@ -644,6 +644,10 @@ cdef class Variables(_AbstractDatabase):
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
         >>> # 1.I) same value for all periods
         >>> variables["ACAF"] = NA
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # or equivalently
+        >>> variables["ACAF"] = np.nan
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # 1.II) vector (list) containing a specific value for each period
@@ -700,6 +704,10 @@ cdef class Variables(_AbstractDatabase):
         >>> variables_subset["A3"] = NA
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # or equivalently
+        >>> variables_subset["A3"] = np.nan
+        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # --> new variable also appears in the global workspace
         >>> "A3" in variables
         True
@@ -716,7 +724,7 @@ cdef class Variables(_AbstractDatabase):
         names, periods_ = self._unfold_key(key)
         # update/add a single Variable
         if len(names) == 1:
-            self._set_object(names[0], value, periods_)
+            self._set_variable(names[0], value, periods_)
         # update/add several variables
         else:
             # if value is a string (LEC expression) or a numerical value -> set the same value for all Variables
@@ -727,7 +735,7 @@ cdef class Variables(_AbstractDatabase):
                                 f"{len(values)} values has been passed while the selection key '{key}' "
                                 f"represents {len(names)} variables.")
             for name, value in zip(names, values):
-                self._set_object(name, value, periods_) 
+                self._set_variable(name, value, periods_) 
 
     # overriden for Variables
     def __delitem__(self, key):
@@ -973,7 +981,7 @@ cdef class Variables(_AbstractDatabase):
         2015Y1    0.6884
         Name: ZZF_, dtype: float64
         """
-        cdef np.ndarray[np.double_t, ndim = 2] data
+        cdef cnp.ndarray[cnp.double_t, ndim = 2] data
         cdef double* cpp_values_ptr
 
         if pd is None:

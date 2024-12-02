@@ -27,7 +27,15 @@ from iode_cython cimport cpp_iode_init, python_assign_super
 
 # Numpy must be initialized before we can use it safely.
 import numpy as np
-np.import_array()
+
+# "cimport" is used to import special compile-time information
+# about the numpy module (this is stored in a file numpy.pxd which is
+# distributed with Numpy).
+# Here we've used the name "cnp" to make it easier to understand what
+# comes from the cimported module and what comes from the imported module,
+# however you can use the same name for both if you wish.
+cimport numpy as cnp
+cnp.import_array()
 
 # get the path to the iode Python installation directory 
 # -> constains iode.msg file (to print errors)
