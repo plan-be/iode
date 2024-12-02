@@ -263,7 +263,7 @@ Below *workspace* must be replaced by either:
     | ``datascan``         | Not Yet Implemented                                                                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datalistXxx``      | ``names = workspace.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names``                        |
-    |                      | ``lists[listname] = names`` --> See :meth:`Database.__setitem__`                                                               |
+    |                      | ``names = workspace.get_names(pattern, filepath)``                                                                             |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datalistsort``     | ``lst = split_list(lists[listname]))``   --> See :func:`split_list`                                                            |
     |                      | ``lists[sorted_listname] = sorted(lst)``                                                                                       |

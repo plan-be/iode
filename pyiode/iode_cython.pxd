@@ -28,6 +28,7 @@ cdef extern from "api/iode.h":
     # SCR4 functions
     cdef int    SCR_free(void *ptr)
     cdef int    SCR_free_tbl(unsigned char **tbl)
+    cdef int    SCR_tbl_size(unsigned char **tbl)
 
     # constants
     cdef double IODE_NAN
