@@ -12,6 +12,7 @@ from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 from pyiode.iode_database.cpp_api_database cimport Scalars as cpp_global_scalars
+from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
 

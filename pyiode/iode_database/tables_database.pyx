@@ -14,6 +14,7 @@ from pyiode.objects.table cimport CTable
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
+from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 
 @cython.final

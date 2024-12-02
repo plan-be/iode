@@ -12,11 +12,16 @@ else:
     Self = Any
 
 from iode.common import IODE_FILE_TYPES
-from iode.util import join_lines, table2str, JUSTIFY, check_filepath
+from iode.util import join_lines, table2str, JUSTIFY, check_filepath, split_list
 
 from cython.operator cimport dereference
+from libc.string cimport strlen
+
 from pyiode.common cimport IodeType
+from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
+from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
 from pyiode.iode_database.cpp_api_database cimport B_display_last_error
 
@@ -319,9 +324,10 @@ cdef class _AbstractDatabase:
             raise IndexError(f"Index {pos} is out of bounds for database of size {len(self)}")
         return self.abstract_db_ptr.get_name(pos).decode()
 
-    def get_names(self, pattern: Union[str, List[str]]="") -> List[str]:
+    def get_names(self, pattern: Union[str, List[str]]="", filepath: Union[str, Path]=None) -> List[str]:
         """
         Returns the list of objects names given a pattern.
+        If a file is provided, search for names in the file instead of the current database.
 
         Parameters
         ----------
@@ -330,6 +336,9 @@ cdef class _AbstractDatabase:
             For example, 'A*;*_' will select all objects for which the name starts 
             with 'A' or ends with '_'.
             Return all names contained in the database by default.
+        filepath: str or Path, optional
+            Path to the file to search for names. 
+            Search in the current database by default.
 
         Returns
         -------
@@ -358,14 +367,56 @@ cdef class _AbstractDatabase:
         >>> # get the list of all names
         >>> comments.names                # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
+        >>> # search in file
+        >>> comments.clear()
+        >>> comments.get_names("A*;*_")
+        []
+        >>> comments.get_names("A*;*_", f"{SAMPLE_DATA_DIR}/fun.cmt")   # doctest: +NORMALIZE_WHITESPACE
+        ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
+        'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
+        'QAI_', 'QAT_', 'QBBPPOT_', 'QC_', 'QQMAB_', 'QS_', 
+        'Q_', 'TFPHP_', 'VAFF_', 'VAI_', 'VAT_', 'VC_', 'VS_', 
+        'WBF_', 'WBU_', 'WCF_', 'WCR1_', 'WCR2_', 'WIND_', 
+        'WNF_', 'YDH_', 'ZZ_']
         """
+        cdef int i_iode_type = self.abstract_db_ptr.get_iode_type()
+        cdef int _all = ord('*')
+        cdef KDB* kdb_ptr = NULL
+        cdef size_t length = 0
+        cdef char* c_list = NULL
+        
         if not isinstance(pattern, str) and isinstance(pattern, Iterable) and all(isinstance(item, str) for item in pattern):
             pattern = ';'.join(pattern)
-        return [name.decode() for name in self.abstract_db_ptr.get_names(pattern.encode(), <bint>True)]
+        
+        if filepath is not None:
+            if isinstance(filepath, Path):
+                filepath = str(filepath.resolve())
+            expected_file_type = IodeFileType(i_iode_type)
+            filepath = check_filepath(filepath, expected_file_type, file_must_exist=True)
+            c_list = K_expand(i_iode_type, filepath.encode(), pattern.encode(), _all)
+        else:
+            kdb_ptr = self.abstract_db_ptr.get_database()
+            if kdb_ptr is not NULL:
+                c_list = K_expand_kdb(kdb_ptr, i_iode_type, pattern.encode(), _all)  
+        
+        if c_list is NULL: 
+            raise RuntimeError(f"Could not get names using the pattern {pattern}")
+        
+        length = strlen(c_list)
+        if length == 0:
+            SCR_free(c_list)
+            return []
+
+        b_list: bytes = c_list[:length]
+        SCR_free(c_list)
+
+        py_list = split_list(b_list.decode())
+        py_list = [item for item in py_list if len(item)]
+        return py_list
 
     @property
     def names(self) -> List[str]:
-        """
+        """ing[i].decode(
         List of names of all objects in the current database.
 
         Returns

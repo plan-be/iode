@@ -25,16 +25,21 @@ cdef extern from "api/iode.h":
 
     double K_CMP_EPS
 
+    char*   KCPTR(char* name)
+    char*   KIPTR(char* name)
+    char*   KLPTR(char* name)
+    double* KVPTR(char* name)
+
     void B_display_last_error()
     int B_DataCompareEps(char* arg)
     int B_DataCompare(char* arg, int iode_type)
 
-    cdef struct KOBJ:
+    ctypedef struct KOBJ:
         SWHDL o_val
         ONAME o_name
         char o_pad[3]
 
-    cdef struct KDB:
+    ctypedef struct KDB:
         KOBJ *k_objs
         long k_nb
         short k_type
@@ -51,6 +56,17 @@ cdef extern from "api/iode.h":
     cdef double  *IodeGetVector(char *name, int *lg)
     cdef int     IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
     cdef int     IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
+
+    # k_kdb.c
+    int K_free(KDB*)
+
+    # k_objfile.c
+    KDB* K_interpret(int iode_type, char* filename)
+
+    # k_grep.c
+    char** K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int _all)
+    char*  K_expand(int iode_type, char* filepath, char* pattern, int _all)
+    char*  K_expand_kdb(KDB* kdb, int iode_type, char* pattern, int _all)
 
 
 # C++ classes
@@ -84,6 +100,8 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         bool is_local_database() const
         bool is_shallow_copy_database() const
         int count() const
+
+        KDB* get_database() except +
 
         int get_position(string& name)
 
