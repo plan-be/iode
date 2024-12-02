@@ -323,7 +323,8 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> # get the value of the first period of the first variable
         >>> variables.i[0, 0]
-        -2e+37
+        nan
+        
         >>> # get the value of the last period of the last variable
         >>> variables.i[-1, -1]
         0.68840039
@@ -339,37 +340,44 @@ cdef class Variables(_AbstractDatabase):
         return VarPositionalIndexer(self)
 
     def _get_variable(self, key: Union[str, int], periods_: Union[str, int, List[str]]) -> Union[float, List[float]]: 
+        cdef double cpp_value
+        cdef vector[double] cpp_values
         # periods_ represents all periods
         if periods_ is None:
             if isinstance(key, int):
-                return self.database_ptr.get(<int>key)
+                cpp_values = self.database_ptr.get(<int>key)
             else:
-                return self.database_ptr.get(<string>(key.encode()))     
+                cpp_values = self.database_ptr.get(<string>(key.encode()))
+            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in cpp_values]
         # periods_ represents a unique period 
         elif isinstance(periods_, str):
             if isinstance(key, int):
                 raise TypeError("variables[key, period]: 'key' must be of type str when 'period' is of type str.")
             else:
-                return self.database_ptr.get_var(<string>(key.encode()), <string>periods_.encode(), self.mode_)
+                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <string>periods_.encode(), self.mode_)
+                return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
         # periods_ represents a unique period 
         elif isinstance(periods_, int):
             if isinstance(key, int):
-                return self.database_ptr.get_var(<int>key, <int>periods_, self.mode_)
+                cpp_value = self.database_ptr.get_var(<int>key, <int>periods_, self.mode_)
             else:
-                return self.database_ptr.get_var(<string>(key.encode()), <int>periods_, self.mode_)
+                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <int>periods_, self.mode_)
+            return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
         # periods_ represents a contiguous range of periods
         elif isinstance(periods_, tuple):
             t_first, t_last = periods_
             if isinstance(key, int):
-                return [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
+                values = [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
             else:
-                return [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+                values = [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
         # periods_ represents a range/list of periods
         elif isinstance(periods_, list):
             if isinstance(key, int):
                 raise TypeError("variables[key, periods]: 'key' must be of type str when 'periods' is of type list.")
             else:
-                return [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
+                values = [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
+                return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
         else:
             raise TypeError("Wrong selection of periods. Expected None or value of type str, int, or list(str). "
                             f"Got value of type {type(periods_).__name__} instead.")
@@ -420,7 +428,7 @@ cdef class Variables(_AbstractDatabase):
         >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
         >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
         >>> # get the variable value for a specific period
         >>> variables["ACAF", "1990Y1"]
         23.771
@@ -624,11 +632,11 @@ cdef class Variables(_AbstractDatabase):
         >>> # 1) same value for all periods
         >>> variables["A0"] = NA
         >>> variables["A0"]                     # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # or equivalently
         >>> variables["A0"] = np.nan
         >>> variables["A0"]                     # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # 2) vector (list) containing a specific value for each period
         >>> variables["A1"] = list(range(variables.nb_periods))
         >>> variables["A1"]                     # doctest: +ELLIPSIS 
@@ -641,15 +649,15 @@ cdef class Variables(_AbstractDatabase):
         >>> # b) -------- update one variable --------
         >>> # 1) update all values of a Variable
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
         >>> # 1.I) same value for all periods
         >>> variables["ACAF"] = NA
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # or equivalently
         >>> variables["ACAF"] = np.nan
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # 1.II) vector (list) containing a specific value for each period
         >>> variables["ACAF"] = list(range(variables.nb_periods))
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
@@ -703,16 +711,16 @@ cdef class Variables(_AbstractDatabase):
         >>> # 2) add a variable to the subset
         >>> variables_subset["A3"] = NA
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # or equivalently
         >>> variables_subset["A3"] = np.nan
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # --> new variable also appears in the global workspace
         >>> "A3" in variables
         True
         >>> variables["A3"]                     # doctest: +ELLIPSIS 
-        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        [nan, nan, ..., nan, nan]
         >>> # 3) update a variable in the subset
         >>> variables_subset["A3"] = 0.0
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
@@ -1833,7 +1841,7 @@ cdef class Variables(_AbstractDatabase):
         >>> # create ACAF
         >>> reset_ACAF()
         >>> variables["ACAF", :"2010Y1"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0, 10.0]
+        [0.0, 1.0, 2.0, 3.0, 4.0, nan, 6.0, nan, 8.0, 9.0, 10.0]
 
         >>> # "TM1" (Y := Y[-1], if Y null or NA)
         >>> reset_ACAF()
@@ -1863,7 +1871,7 @@ cdef class Variables(_AbstractDatabase):
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.ASIS, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0]
+        [3.0, 4.0, nan, 6.0, nan, 8.0, 9.0]
 
         >>> # "TM1_NA" (Y := Y[-1], if Y = NA)
         >>> reset_ACAF()

@@ -1,5 +1,8 @@
 # distutils: language = c++
 
+import numpy as np
+
+from libcpp.vector cimport vector
 from lec cimport execute_lec as cpp_execute_lec
 
 
@@ -49,27 +52,35 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     10.046610792200543
     >>> # compute the LEC formula over the whole sample
     >>> execute_lec(lec)        # doctest: +ELLIPSIS
-    [-2e+37, 4.2884154594335815, 4.532163174288473, ..., -83.34062511080091, -96.41041982848331]
+    [nan, 4.2884154594335815, 4.532163174288473, ..., -83.34062511080091, -96.41041982848331]
     >>> variables["ACAF"]       # doctest: +ELLIPSIS
-    [-2e+37, -2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+    [nan, nan, nan, ..., -83.34062511080091, -96.41041982848331]
     """
+    cdef double c_value
+    cdef vector[double] c_values
+
     # evaluate LEC expression over the whole sample
     if period is None:
-        return cpp_execute_lec(lec.encode())
+        c_values = cpp_execute_lec(lec.encode())
+        return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
 
     if isinstance(period, int):
         if period >= 0:
-            return cpp_execute_lec(<string>lec.encode(), <int>period)
+            c_value = cpp_execute_lec(<string>lec.encode(), <int>period)
+            return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
         # evaluate LEC expression over the whole sample
         else:
-            return cpp_execute_lec(lec.encode())
+            c_values = cpp_execute_lec(lec.encode())
+            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
 
     if isinstance(period, Period):
         period = str(period)
 
     if isinstance(period, str):
         if len(period):
-            return cpp_execute_lec(<string>lec.encode(), <string>period.encode())
+            c_value = cpp_execute_lec(<string>lec.encode(), <string>period.encode())
+            return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
         # evaluate LEC expression over the whole sample
         else:
-           return cpp_execute_lec(lec.encode())
+           c_values = cpp_execute_lec(lec.encode())
+           return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
