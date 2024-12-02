@@ -483,16 +483,16 @@ cdef class _AbstractDatabase:
             path to the file to be compared with the current database
         only_in_workspace_list_name: str, optional
             name of the list of objects only found in the current database.
-            Defaults to "COMP_ONLY_WS_<IODE_TYPE>".
+            Defaults to "OLD_<IODE_TYPE>".
         only_in_file_list_name: str, optional
             name of the list of objects only found in the file `filepath`.
-            Defaults to "COMP_ONLY_FILE_<IODE_TYPE>".
+            Defaults to "NEW_<IODE_TYPE>".
         equal_objects_list_name: str, optional
             name of the list of objects found in both with the same value.
-             Defaults to "COMP_EQUAL_<IODE_TYPE>".
+             Defaults to "SAME_<IODE_TYPE>".
         different_objects_list_name: str, optional
             name of the list of objects found in both but with a different value.
-            Defaults to "COMP_DIFF_<IODE_TYPE>".
+            Defaults to "CHANGED_<IODE_TYPE>".
 
         Returns
         -------
@@ -530,10 +530,10 @@ cdef class _AbstractDatabase:
         >>> lists_compare = variables.compare("fun_other.var")
         >>> for name, value in lists_compare.items():           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         ...    print(f"{name}: {value}")
-        COMP_ONLY_WS_VAR: ['AOUC', 'AQC']
-        COMP_ONLY_FILE_VAR: ['NEW_VAR', 'NEW_VAR_2']
-        COMP_EQUAL_VAR: ['AOUC_', 'BENEF', 'BQY', 'BRUGP', ..., 'ZKFO', 'ZX', 'ZZF_'] 
-        COMP_DIFF_VAR: ['ACAF', 'ACAG']
+        OLD_VAR: ['AOUC', 'AQC']
+        NEW_VAR: ['NEW_VAR', 'NEW_VAR_2']
+        SAME_VAR: ['AOUC_', 'BENEF', 'BQY', 'BRUGP', ..., 'ZKFO', 'ZX', 'ZZF_'] 
+        CHANGED_VAR: ['ACAF', 'ACAG']
         """
         int_iode_type: int = self.abstract_db_ptr.get_iode_type()
         expected_file_type: IodeFileType = IodeFileType(int_iode_type)
@@ -548,13 +548,13 @@ cdef class _AbstractDatabase:
 
         short_type_name = IODE_FILE_TYPES[int_iode_type].extensions[0].replace('.', '').upper()
         if only_in_file_list_name is None:
-            only_in_workspace_list_name = f"COMP_ONLY_WS_{short_type_name}"
+            only_in_workspace_list_name = f"OLD_{short_type_name}"
         if only_in_file_list_name is None:
-            only_in_file_list_name = f"COMP_ONLY_FILE_{short_type_name}"
+            only_in_file_list_name = f"NEW_{short_type_name}"
         if equal_objects_list_name is None:
-            equal_objects_list_name = f"COMP_EQUAL_{short_type_name}"
+            equal_objects_list_name = f"SAME_{short_type_name}"
         if different_objects_list_name is None:
-            different_objects_list_name = f"COMP_DIFF_{short_type_name}"
+            different_objects_list_name = f"CHANGED_{short_type_name}"
 
         args = f"{filepath} {only_in_workspace_list_name} {only_in_file_list_name} "
         args += f"{equal_objects_list_name} {different_objects_list_name}"
