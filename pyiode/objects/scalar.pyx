@@ -2,10 +2,12 @@
 
 from typing import Union, Tuple, List, Optional
 
-from pyiode.util cimport IODE_IS_A_NUMBER
 from cython.operator cimport dereference
+from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.scalar cimport hash_value as hash_value_scl
+
+import numpy as np
 
 
 # Scalar wrapper class
@@ -36,6 +38,7 @@ cdef class Scalar:
 
     Examples
     --------
+    >>> import numpy as np
     >>> from iode import Scalar
     >>> # default relax
     >>> scalar = Scalar(0.9)
@@ -45,6 +48,20 @@ cdef class Scalar:
     >>> scalar = Scalar(0.9, 0.8)
     >>> scalar
     Scalar(0.9, 0.8, na)
+    >>> # Python nan are converted to IODE NA
+    >>> scalar = Scalar(np.nan)
+    >>> scalar
+    Scalar(na, 1, na)
+    >>> # Python inf are not accepted
+    >>> scalar = Scalar(np.inf)
+    Traceback (most recent call last):
+    ...
+    ValueError: Expected 'value' to be a finite number
+    >>> # relax must be between 0.0 and 1.0
+    >>> scalar = Scalar(0.9, 1.1)
+    Traceback (most recent call last):
+    ...
+    ValueError: Expected 'relax' value between 0.0 and 1.0
     """
     cdef bint ptr_owner
     cdef CScalar* c_scalar
@@ -56,6 +73,10 @@ cdef class Scalar:
     def __init__(self, value: float, relax: float = 1.0) -> Scalar:  
         if relax < 0.0 or relax > 1.0:
             raise ValueError("Expected 'relax' value between 0.0 and 1.0")   
+        if np.isinf(value):
+            raise ValueError("Expected 'value' to be a finite number")
+        if np.isnan(value):
+            value = NA
         self.ptr_owner = <bint>True 
         self.c_scalar = new CScalar(value, relax)
 
@@ -84,6 +105,10 @@ cdef class Scalar:
 
     @value.setter 
     def value(self, val: float):
+        if np.isinf(val):
+            raise ValueError("Expected 'value' to be a finite number")
+        if np.isnan(val):
+            val = NA
         self.c_scalar.val = val
     
     @property
@@ -91,10 +116,10 @@ cdef class Scalar:
         return self.c_scalar.relax
 
     @relax.setter
-    def relax(self, relax_: float):
-        if relax_ < 0.0 or relax_ > 1.0:
+    def relax(self, value: float):
+        if value < 0.0 or value > 1.0:
             raise ValueError("Expected relax value between 0.0 and 1.0")
-        self.c_scalar.relax = relax_
+        self.c_scalar.relax = value
 
     @property
     def std(self) -> float:
