@@ -338,6 +338,37 @@ cdef class Identities(_AbstractDatabase):
         """
         super().__delitem__(key)
 
+    @property
+    def coefficients(self) -> List[str]:
+        """
+        Return the list of coefficients (scalars) used in the identities of 
+        (the subset of) the database.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities["A*;N*"].coefficients
+        ['gamma2', 'gamma3', 'gamma4', 'gamma_']
+        """
+        return self._coefficients()
+    
+    @property
+    def variables(self) -> List[str]:
+        """
+        Return the list of variables used in the identities of (the subset of) the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities["A*;N*"].variables           # doctest: +ELLIPSIS
+        ['KNFFY', 'NFYH', 'PKF', 'PM', 'QAFF', ..., 'WCF', 'WCRH', 'WMIN', 'ZJ']
+        """
+        return self._variables()
+
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         """
         Copy (a subset of) identities from the input file(s) 'input_files' into the current database.

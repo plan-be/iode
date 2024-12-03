@@ -772,6 +772,37 @@ cdef class Tables(_AbstractDatabase):
         """
         super().__delitem__(key)
 
+    @property
+    def coefficients(self) -> List[str]:
+        """
+        Return the list of coefficients (scalars) used in the tables of 
+        (the subset of) the database.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables["A*"].coefficients
+        ['knf2', 'knff1']
+        """
+        return self._coefficients()
+    
+    @property
+    def variables(self) -> List[str]:
+        """
+        Return the list of variables used in the tables of (the subset of) the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables["A*"].variables
+        ['AOUC', 'GAP_', 'ITCR', 'KNFF', 'PC', 'QAFF_', 'Q_F', 'Q_I', 'RENT']
+        """
+        return self._variables()
+
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         """
         Copy (a subset of) tables from the input file(s) 'input_files' into the current database.

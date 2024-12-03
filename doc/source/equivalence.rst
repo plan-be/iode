@@ -260,7 +260,8 @@ Below *workspace* must be replaced by either:
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datasearch``       | ``workspace.search(pattern, word, case_sensitive, in_name, in_formula, in_text, list_result)`` --> See :meth:`Database.search` |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datascan``         | Not Yet Implemented                                                                                                            |
+    | ``datascan``         | ``(equations|identities|tables)[pattern].coefficients`` --> See :meth:`Equations.coefficients`                                 |
+    |                      | ``(equations|identities|tables)[pattern].variables``    --> See :meth:`Equations.variables`                                    |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datalistXxx``      | ``names = workspace.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names``                        |
     |                      | ``names = workspace.get_names(pattern, filepath)``                                                                             |

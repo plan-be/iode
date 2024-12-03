@@ -416,7 +416,7 @@ cdef class _AbstractDatabase:
 
     @property
     def names(self) -> List[str]:
-        """ing[i].decode(
+        """
         List of names of all objects in the current database.
 
         Returns
@@ -815,6 +815,37 @@ cdef class _AbstractDatabase:
         return [name_other.decode() for name_other in self.abstract_db_ptr.search(pattern.encode(), 
                 <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, 
                 list_result.encode())]
+
+    # NOTE: Only available for IODE object types containing a CLEC struct 
+    #       -> Equation, Identity and Table
+    def _coefficients(self) -> List[str]:
+        coeffs_list: List[str] = []
+        for i in range(len(self)):
+            obj = self._get_object(i)
+            coeffs_list += obj.coefficients
+        return sorted(list(set(coeffs_list)))
+
+    # NOTE: Only available for IODE object types containing a CLEC struct 
+    #       -> Equation, Identity and Table
+    def _variables(self) -> List[str]:
+        vars_list: List[str] = []
+        for i in range(len(self)):
+            obj = self._get_object(i)
+            vars_list += obj.variables
+        return sorted(list(set(vars_list)))
+
+    def _scalars(self) -> List[str]:
+        if self.iode_type == IodeType.EQUATIONS or self.iode_type == IodeType.IDENTITIES or \
+        self.iode_type == IodeType.TABLES:
+            scalars_list: List[str] = []
+            for i in range(len(self)):
+                obj = self._get_object(i)
+                scalars_list += obj.scalars
+            return sorted(list(set(scalars_list)))
+        else:
+            raise TypeError(f"'scalars' is not available for {self.iode_type.name} objects.")
+
+
 
     def _load(self, filepath: str):
         raise NotImplementedError()
