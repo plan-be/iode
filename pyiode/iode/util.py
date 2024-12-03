@@ -38,13 +38,18 @@ def split_list(list_txt: str):
     >>> well_written_list = "A;B;C;D;E;F;G;H"
     >>> split_list(well_written_list)
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    >>> badly_written_list = "  A,B C;D  E,,,F;, G;H  "
+    >>> badly_written_list = "  ,A,B C;D  E,,,F;, G;H,  "
     >>> split_list(badly_written_list)
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     """
     if not isinstance(list_txt, str):
         raise TypeError(f"Expected value of type str. Got value of type {type(list_txt).__name__} instead.")
-    return re.split(f"[{_list_separator}]+", list_txt.strip())
+    splitted_list = re.split(f"[{_list_separator}]+", list_txt.strip())
+    if splitted_list[0] == '':
+        splitted_list = splitted_list[1:]
+    if len(splitted_list) and splitted_list[-1] == '':
+        splitted_list = splitted_list[:-1]
+    return splitted_list
 
 
 def join_lines(value: str) -> str:
