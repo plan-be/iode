@@ -81,6 +81,8 @@ Equations
    Equations.search
    Equations.get_names
    Equations.rename
+   Equations.coefficients
+   Equations.variables
 
    Equations.__len__
    Equations.__contains__
@@ -131,6 +133,8 @@ Identities
    Identities.search
    Identities.get_names
    Identities.rename
+   Identities.coefficients
+   Identities.variables
 
    Identities.__len__
    Identities.__contains__
@@ -278,6 +282,8 @@ Tables
    Tables.search
    Tables.get_names
    Tables.rename
+   Tables.coefficients
+   Tables.variables
 
    Tables.__len__
    Tables.__contains__

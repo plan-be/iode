@@ -576,6 +576,37 @@ cdef class Equations(_AbstractDatabase):
         """
         super().__delitem__(key)
 
+    @property
+    def coefficients(self) -> List[str]:
+        """
+        Return the list of coefficients (scalars) used in the equations of 
+        (the subset of) the database.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations["A*"].coefficients
+        ['acaf1', 'acaf2', 'acaf4']
+        """
+        return self._coefficients()
+    
+    @property
+    def variables(self) -> List[str]:
+        """
+        Return the list of variables used in the equations of (the subset of) the database.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations["A*"].variables
+        ['ACAF', 'ACAG', 'AOUC', 'GOSF', 'PM', 'QL', 'TIME', 'VAF', 'VAFF', 'VBBP', 'VM', 'WCRH']
+        """
+        return self._variables()
+
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None):
         r"""
         Estimate an equation or a block of equations.
