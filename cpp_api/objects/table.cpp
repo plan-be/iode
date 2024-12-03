@@ -62,6 +62,12 @@ std::vector<std::string> TableCell::get_variables_from_lec()
 	return get_variables_from_clec(clec);
 }
 
+std::vector<std::string> TableCell::get_coefficients_from_lec()
+{
+	CLEC* clec = get_compiled_lec();
+	return get_scalars_from_clec(clec);
+}
+
 std::string TableCell::get_content(const bool quotes) const
 {
 	int mode = quotes ? 1 : 0;
