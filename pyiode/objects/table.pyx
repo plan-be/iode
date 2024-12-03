@@ -1389,6 +1389,139 @@ cdef class Table:
         warnings.warn("'shadow' is not yet implemented")
 
     @property
+    def coefficients(self) -> List[str]:
+        """
+        Get the list of coefficients (scalars) associated with all cells 
+        of type 'LEC' of the table.
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, tables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAKNFF"]    
+        >>> table                       # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                  1 |
+        TITLE |                "Déterminants de la croissance de K"
+        ----- | ------------------------------------------------------------------
+        CELL  |                                    |              "#s"
+        ----- | ------------------------------------------------------------------
+        CELL  | "Croissance de K "                 |                      dln KNFF
+        CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
+        CELL  | "Rentabilité "                     |          knf2*ln mavg(3,RENT)
+        CELL  | "Croissance anticipée de l'output" | 0.416*mavg(4,dln QAFF_)+0.023
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> table.coefficients
+        ['knf2', 'knff1']
+        """
+        cdef CTableLine* c_line
+        cdef CTableCell* c_cell
+
+        if self.c_table is NULL:
+            return []
+
+        py_coeffs = []
+        nb_columns = self.nb_columns
+
+        c_line = self.c_table.get_divider_line()
+        for j in range(nb_columns):
+            c_cell = c_line.get_cell(j, nb_columns)
+            cell_type = <int>(c_cell.get_type())
+            if cell_type == TableCellType.LEC and not c_cell.is_null():
+                py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
+
+        for i in range(len(self)):
+            c_line = self.c_table.get_line(i)
+            line_type = <int>(c_line.get_line_type())
+            if line_type == TableLineType.CELL:
+                for j in range(nb_columns):
+                    c_cell = c_line.get_cell(j, nb_columns)
+                    cell_type = <int>(c_cell.get_type())
+                    if cell_type == TableCellType.LEC and not c_cell.is_null():
+                        py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
+        
+        return sorted(list(set(py_coeffs)))   
+
+    @property
+    def variables(self) -> List[str]:
+        """
+        Get the list of variables associated with all cells 
+        of the type 'LEC' of the table.
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, tables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAKNFF"]    
+        >>> table                       # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                  1 |
+        TITLE |                "Déterminants de la croissance de K"
+        ----- | ------------------------------------------------------------------
+        CELL  |                                    |              "#s"
+        ----- | ------------------------------------------------------------------
+        CELL  | "Croissance de K "                 |                      dln KNFF
+        CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
+        CELL  | "Rentabilité "                     |          knf2*ln mavg(3,RENT)
+        CELL  | "Croissance anticipée de l'output" | 0.416*mavg(4,dln QAFF_)+0.023
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> table.variables
+        ['KNFF', 'QAFF_', 'Q_F', 'Q_I', 'RENT']
+        """
+        cdef CTableLine* c_line
+        cdef CTableCell* c_cell
+
+        if self.c_table is NULL:
+            return []
+
+        py_vars = []
+        nb_columns = self.nb_columns
+
+        c_line = self.c_table.get_divider_line()
+        for j in range(nb_columns):
+            c_cell = c_line.get_cell(j, nb_columns)
+            cell_type = <int>(c_cell.get_type())
+            if cell_type == TableCellType.LEC and not c_cell.is_null():
+                py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
+
+        for i in range(len(self)):
+            c_line = self.c_table.get_line(i)
+            line_type = <int>(c_line.get_line_type())
+            if line_type == TableLineType.CELL:
+                for j in range(nb_columns):
+                    c_cell = c_line.get_cell(j, nb_columns)
+                    cell_type = <int>(c_cell.get_type())
+                    if cell_type == TableCellType.LEC and not c_cell.is_null():
+                        py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
+        return sorted(list(set(py_vars)))
+
+    @property
     def divider(self) -> TableLine:
         """
         Returns the divider line of the table. 

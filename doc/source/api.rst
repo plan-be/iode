@@ -459,6 +459,8 @@ TABLE
    Table.shadow
    
    Table.divider
+   Table.coefficients
+   Table.variables
    Table.compute
    Table.index
    Table.insert
