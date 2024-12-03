@@ -42,6 +42,11 @@ void TableCell::free()
 	T_free_cell(this);
 }
 
+bool TableCell::is_null() const
+{
+	return tc_val == NULL;
+}
+
 // The table cell contains a "packed" IDT object (lec + clec) 
 // -> see T_set_lec_cell from k_tbl.c
 CLEC* TableCell::get_compiled_lec()

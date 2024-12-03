@@ -53,6 +53,8 @@ struct TableCell: public TCELL
 	// WARNING: must NOT be exposed to Python API -> called from a Table instance
 	void free();
 
+	bool is_null() const;
+
 	CLEC* get_compiled_lec();
 
 	std::string get_content(const bool quotes) const;
