@@ -268,12 +268,14 @@ Below *workspace* must be replaced by either:
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datalistsort``     | ``lists[list_name] = sorted(lists[list_name])``                                                                                |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
+    | ``datalistcount``    | ``len(lists[list_name])``                                                                                                      |
+    +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datacompareEps``   | ``variables.threshold = value`` --> See :meth:`Variables.threshold`                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datacompareXxx``   | ``workspace.compare(filepath, only_in_workspace_list_name, only_in_file_list_name, `` --> See :meth:`Database.compare`         | 
     |                      | ``                  equal_objects_list_name, different_objects_list_name)``                                                    |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datacalclst``      | ``list1, list2 = lists[list1], lists[list2]``                                                                                  |
+    | ``datacalclst``      | ``list1, list2 = lists[name_1], lists[name_2]``                                                                                |
     |                      | union:        ``list(set(list1) | set(list2))``                                                                                |
     |                      | intersection: ``list(set(list1) & set(list2))``                                                                                |
     |                      | difference:   ``list(set(list1) - set(list2))``                                                                                |
