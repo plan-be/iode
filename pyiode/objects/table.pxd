@@ -59,6 +59,8 @@ cdef extern from "cpp_api/objects/table.h":
         # Methods
         void free() except +
 
+        bint is_null()
+
         string get_content(bint quotes) except +
 
         void set_text(string& text) except +
