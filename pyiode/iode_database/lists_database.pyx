@@ -49,7 +49,7 @@ cdef class Lists(_AbstractDatabase):
     description: Modèle fun
     <BLANKLINE>
        name                                                    lists
-    COPY        $COPY0; $COPY1;
+    COPY        $COPY0; $COPY1
     COPY0       ACAF; ACAG; AOUC; AQC; BENEF; BQY; BVY; CGU; COEFON; COTRES; DPU; DPUF; DPUG; DPUGO; DPUH; DPUU;
                 DTF; DTH; DTH1; DTH1C; EXC; EXCC; FLF; FLG; GAP; GOSF; GOSG; GOSH; GOSH_; IDF; IDG; IDH; IFU; IHU;
                 IT; ITCEE; ITCR; ITD; ITEP; ITF; ITF5; ITFC; ITFGI; ITFGO; ITFQ; ITGR; ITI5R; ITIFR; ITIGR; ITM;
@@ -71,7 +71,7 @@ cdef class Lists(_AbstractDatabase):
                 QWXSS; QWXS; QXABO; QXEO; QXSO; QXTO; RIPBEO; SSF3PR; SSH3RO; SSH3RW; SSHRZW; SSRDOM; SUB; SUBR;
                 TFPFHP_; TIME; TVACEE; TWGR; ULAG; ULCPO; ULIL; ULIO; VAF_; VAIO; VATPC; VKF; VKFF; VSO; VS_O; VXKO;
                 VXNO; ZKFO; BRUGP; VK5; SSFFX
-    ENDO        $endo0; $endo1;
+    ENDO        $endo0; $endo1
     ENDO0       ACAF; ACAG; AOUC; AQC; BENEF; BQY; BVY; CGU; COEFON; COTRES; DEBT; DPU; DPUF; DPUG; DPUGO; DPUH;
                 DPUU; DTF; DTH; DTH1; DTH1C; EXC; EXCC; FLF; FLG; FLGR; GAP; GOSF; GOSG; GOSH; GOSH_; IDF; IDG; IDH;
                 IFU; IHU; IT; ITCEE; ITCR; ITD; ITEP; ITF; ITF5; ITFC; ITFGI; ITFGO; ITFQ; ITGR; ITI5R; ITIFR;
@@ -164,7 +164,7 @@ cdef class Lists(_AbstractDatabase):
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> # get the first list
         >>> lists.i[0]
-        ['$COPY0', '$COPY1', '']
+        ['$COPY0', '$COPY1']
         >>> # get the last list
         >>> lists.i[-1]
         ['ZKF']
@@ -609,28 +609,28 @@ cdef class Lists(_AbstractDatabase):
         >>> original_hash = hash(lists)
         
         >>> # rename 1 IODE list
-        >>> lists.rename("COPY", "COPY_")
+        >>> lists.rename("ENVI", "ENVI_")
         >>> original_hash == hash(lists)
         False
-        >>> lists.rename("COPY_", "COPY")  # revert the change
+        >>> lists.rename("ENVI_", "ENVI")  # revert the change
         >>> original_hash == hash(lists)
         True
 
         >>> # modify one IODE list
-        >>> original_list = lists["COPY"]
-        >>> lists["COPY"] = "$COPY0 $COPY1"
+        >>> original_list = lists["ENVI"]
+        >>> lists["ENVI"] = original_list[1:-1]
         >>> original_hash == hash(lists)
         False
-        >>> lists["COPY"] = original_list  # revert the change
+        >>> lists["ENVI"] = original_list  # revert the change
         >>> original_hash == hash(lists)
         True
 
         >>> # delete a IODE list
-        >>> original_list = lists["COPY"]
-        >>> del lists["COPY"]
+        >>> original_list = lists["ENVI"]
+        >>> del lists["ENVI"]
         >>> original_hash == hash(lists)
         False
-        >>> lists["COPY"] = original_list
+        >>> lists["ENVI"] = original_list
         >>> original_hash == hash(lists)
         True
 
