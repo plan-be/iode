@@ -341,6 +341,35 @@ cdef class TableCell:
             self.py_parent_table.update_global_database()
 
     @property
+    def coefficients(self) -> List[str]:
+        """
+        Get the list of coefficients (scalars) associated with the LEC expression 
+        of a cell of type 'LEC'.
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, tables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAKNFF"]    
+        >>> table[5]
+        ('"Output gap "', 'knff1*ln (QAFF_/(Q_F+Q_I))')
+        >>> table[5][1].coefficients
+        ['knff1']
+        """
+        if self.c_cell is NULL:
+            return
+        if self.cell_type != 'LEC':
+            warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
+            return [] 
+        return [item.decode() for item in self.c_cell.get_coefficients_from_lec()]     
+
+    @property
     def variables(self) -> List[str]:
         """
         Get the list of variables associated with the LEC expression of a cell of type 'LEC'.
@@ -355,11 +384,11 @@ cdef class TableCell:
         >>> from iode import variables, tables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tables["ANAPRIX"]    
+        >>> table = tables["ANAKNFF"]    
         >>> table[5]
-        ('"dln (PC/(1+ITCR))-dln AOUC"', '100*(dln (PC/(1+ITCR))-dln AOUC)')
+        ('"Output gap "', 'knff1*ln (QAFF_/(Q_F+Q_I))')
         >>> table[5][1].variables
-        ['PC', 'ITCR', 'AOUC']
+        ['QAFF_', 'Q_F', 'Q_I']
         """
         if self.c_cell is NULL:
             return

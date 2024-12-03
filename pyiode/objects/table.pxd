@@ -81,6 +81,7 @@ cdef extern from "cpp_api/objects/table.h":
         void set_underline(bint value) except +
 
         vector[string] get_variables_from_lec() except +
+        vector[string] get_coefficients_from_lec() except +
 
         bint operator==(const CTableCell& other) except +
 
