@@ -85,6 +85,8 @@ struct TableCell: public TCELL
 
 	std::vector<std::string> get_variables_from_lec();
 
+	std::vector<std::string> get_coefficients_from_lec();
+
 	bool operator==(const TableCell& other) const;
 };
 
