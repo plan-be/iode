@@ -491,6 +491,7 @@ TABLE
    TableCell.bold
    TableCell.italic
    TableCell.underline
+   TableCell.coefficients
    TableCell.variables
 
 ==============
