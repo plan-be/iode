@@ -92,9 +92,9 @@ class MixinSettingsDialog(QDialog):
                 attr_value.setValue(project_settings.value(attr_name, type=int))
             elif isinstance(attr_value, QDoubleSpinBox):
                 attr_value.setValue(project_settings.value(attr_name, type=float))
-            elif isinstance(attr_value, (QLineEdit, QTextEdit)):
+            elif isinstance(attr_value, QLineEdit):
                 attr_value.setText(project_settings.value(attr_name, type=str))
-            elif isinstance(attr_value, QPlainTextEdit):
+            elif isinstance(attr_value, (QTextEdit, QPlainTextEdit)):
                 attr_value.setPlainText(project_settings.value(attr_name, type=str))
             elif isinstance(attr_value, IodeFileChooser):
                 attr_value.filepath = project_settings.value(attr_name, type=str)
@@ -124,9 +124,9 @@ class MixinSettingsDialog(QDialog):
                 project_settings.setValue(attr_name, attr_value.isChecked())
             elif isinstance(attr_value, (QSpinBox, QDoubleSpinBox)):
                 project_settings.setValue(attr_name, attr_value.value())
-            elif isinstance(attr_value, (QLineEdit, QTextEdit)):
+            elif isinstance(attr_value, QLineEdit):
                 project_settings.setValue(attr_name, attr_value.text())
-            elif isinstance(attr_value, QPlainTextEdit):
+            elif isinstance(attr_value, (QTextEdit, QPlainTextEdit)):
                 project_settings.setValue(attr_name, attr_value.toPlainText())
             elif isinstance(attr_value, IodeFileChooser):
                 project_settings.setValue(attr_name, attr_value.filepath)
