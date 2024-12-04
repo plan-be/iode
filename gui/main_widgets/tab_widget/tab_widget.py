@@ -1001,14 +1001,10 @@ class IodeTabWidget(QTabWidget):
     @Slot(int)
     def save_tab_content(self, index: int) -> bool:
         """
-        saves the content of the tab at position index where index is:
-        - current tab index if method called using a shortcut
-        - index defined by the context menu if called from a context menu
-
+        saves the content of the tab at position index
         :param index: the index of the tab to save
         """
         try:
-            index = self.index_context_menu if self.index_context_menu > 0 else self.currentIndex()
             success = self._save_tab_content(index)
             self.index_context_menu = -1
             return success
@@ -1027,7 +1023,7 @@ class IodeTabWidget(QTabWidget):
         """
         success = True
         for index in range(self.count()):
-            if not self.save_tab(index):
+            if not self._save_tab_content(index):
                 success = False
         return success
 
