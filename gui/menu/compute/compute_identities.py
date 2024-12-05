@@ -58,7 +58,6 @@ class MenuComputeIdentities(MixinSettingsDialog):
 
     @Slot()
     def compute(self):
-        self.save_settings
         try:
             from_period: str = self.ui.sampleEdit_sample_from.text().strip()
             to_period: str = self.ui.sampleEdit_sample_to.text().strip()
