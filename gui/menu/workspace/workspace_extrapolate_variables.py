@@ -5,7 +5,8 @@ from settings import MixinSettingsDialog
 from .ui_workspace_extrapolate_variables import Ui_MenuWorkspaceExtrapolateVariables
 
 
-from iode import IodeType, SimulationInitialization, variables
+from iode import (IodeType, SimulationInitialization, SIMULATION_INITIALIZATION_METHODS, 
+                  variables)
 
 
 class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
@@ -20,8 +21,8 @@ class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
         self.ui.textEdit_variables_list.include_lec_functions(False)        
 
         self.v_simulation_initialization = list(SimulationInitialization)
-        v_simulation_initialization_names = [v.name.upper() for v in self.v_simulation_initialization]
-        self.ui.comboBox_method.addItems(v_simulation_initialization_names)
+        self.ui.comboBox_method.addItems(SIMULATION_INITIALIZATION_METHODS)
+        self.ui.comboBox_method.setCurrentIndex(0)
 
         self.load_settings()
 
