@@ -16,6 +16,16 @@ EQ_TEST_NAMES: Tuple[str, ...] = ("Correlation", "St dev of residuals",
                                   "Standard error in %", "F-stat", "R²",
                                   "R² adjusted", "Durbin-Watson", "Log Likelihood")
 
+SIMULATION_INITIALIZATION_METHODS: Tuple[str, ...] = (
+    "Y := Y[-1], if Y null or NA",         
+    "Y := Y[-1], always",                  
+    "Y := extrapolation, if Y null or NA", 
+    "Y := extrapolation, always",          
+    "Y unchanged",                         
+    "Y := Y[-1], if Y = NA",               
+    "Y := extrapolation, if Y = NA")
+
+
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
         self._name: str = name
