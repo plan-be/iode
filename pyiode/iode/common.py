@@ -25,6 +25,11 @@ SIMULATION_INITIALIZATION_METHODS: Tuple[str, ...] = (
     "Y := Y[-1], if Y = NA",               
     "Y := extrapolation, if Y = NA")
 
+SIMULATION_SORT_ALGORITHMS: Tuple[str, ...] = (
+    "Connex compon. decomposition",
+    "Connex compon. + Triangulation",
+    "None")
+
 
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
