@@ -4,13 +4,20 @@
 std::string dynamic_adjustment(const IodeAdjustmentMethod method, 
     const std::string& eqs, const std::string& c1, const std::string& c2)
 {
-    IodeExceptionInvalidArguments invalid("Failed to proceed dynamic adjustment");
+    std::string error_msg;
     // TODO (future) : replace content of L_split_eq() by line below
     std::size_t found = eqs.find(":=");
-    if(found == std::string::npos) invalid.add_argument("No := found in lec expression", eqs);
-    if(c1.empty()) invalid.add_argument("c1", "empty!");
-    if(method == AM_ERROR_CORRECTION_METHOD && c2.empty()) invalid.add_argument("c2", "empty!");
-    if(invalid.invalid_args()) throw invalid;
+    if(found == std::string::npos) 
+        error_msg += "Missing ':=' in the passed LEC expression: " + eqs + "\n";
+    if(c1.empty()) 
+        error_msg += "Name for the first coefficient is empty!\n";
+    if(method == AM_ERROR_CORRECTION_METHOD && c2.empty()) 
+        error_msg += "Name for the second coefficient is empty!\n";
+    if(!error_msg.empty()) 
+    {
+        error_msg = "Failed to proceed dynamic adjustment - invalid argument(s):\n" + error_msg;
+        throw std::invalid_argument(error_msg);
+    }
 
     size_t eqs_size = eqs.size() + 1;
     char* c_eqs = new char[eqs_size];
@@ -18,7 +25,8 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
     int res = E_DynamicAdjustment(method, &c_eqs, to_char_array(c1), to_char_array(c2));
     std::string adjusted_eqs(c_eqs);
     delete[] c_eqs;
-    if(res < 0) throw IodeExceptionFunction("Failed to proceed dynamic adjustment of equation \"" + eqs + "\"", "Unknown");
+    if(res < 0) 
+        throw std::runtime_error("Failed to proceed dynamic adjustment of equation \"" + eqs + "\"");
     return adjusted_eqs;
 }
 
@@ -36,12 +44,14 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     double* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
     if(!res)
     {
-        IodeExceptionFunction error("Cannot perform Unit Root (Dickey Fuller test)", "Unknown");
-        error.add_argument("LEC expression", lec);
-        error.add_argument("Drift:", drift ? "yes" : "no");
-        error.add_argument("Trend", trend ? "yes" : "no");
-        error.add_argument("Order", std::to_string(order));
-        throw error;
+        std::string is_drift = drift ? "yes" : "no";
+        std::string is_trend = trend ? "yes" : "no";
+        std::string error_msg = "Cannot perform Unit Root (Dickey Fuller test)\n";
+        error_msg += "LEC expression: " + lec + "\n";
+        error_msg += "Drift: " + is_drift + "\n";
+        error_msg += "Trend: " + is_trend + "\n";
+        error_msg += "Order: " + std::to_string(order);
+        throw std::runtime_error(error_msg);
     }
 
     int pos = 0;

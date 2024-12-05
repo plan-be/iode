@@ -78,10 +78,13 @@ void KDBIdentities::execute_identities(const Period& from, const Period& to, con
 void KDBIdentities::execute_identities(const std::string& from, const std::string& to, const std::string& identities_list, 
         const std::string& var_files, const std::string& scalar_files, const bool trace)
 {
-    IodeExceptionInvalidArguments error("Cannot execute identities");
-    if (from.empty()) error.add_argument("from", "empty");
-    if (to.empty()) error.add_argument("to", "empty");
-    if (error.invalid_args()) throw error;
+    std::string error_msg;
+    if (from.empty()) 
+        error_msg += "from_period is empty\n";
+    if (to.empty()) 
+        error_msg += "to_period is empty\n";
+    if (!error_msg.empty()) 
+        throw std::invalid_argument("Cannot execute identities:\n" + error_msg);
 
     Period period_from(from);
     Period period_to(to);

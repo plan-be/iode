@@ -133,10 +133,10 @@ public:
         {
             sample = new Sample(*from, *to);
         }
-        catch(IodeException)
+        catch(const std::exception& e)
         {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + block, 
-                "Cannot create sample with range from " + from->to_string() + " to " + to->to_string());
+            throw std::invalid_argument("Cannot estimate the (block of) equation(s) " + block + 
+                                        "\n" + std::string(e.what()));
         }
     }
     
@@ -153,10 +153,10 @@ public:
         {
             sample = new Sample(from, to);
         }
-        catch(IodeException)
+        catch(const std::exception& e)
         {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + block, 
-                "Cannot create sample with range from " + from + " to " + to);
+            throw std::invalid_argument("Cannot estimate the (block of) equation(s) " + block + 
+                                        "\n" + std::string(e.what()));
         }
     }
 

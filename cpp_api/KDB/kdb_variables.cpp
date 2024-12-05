@@ -319,10 +319,10 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	int res = KV_sample(get_database(), &sample);
 	if (res < 0) 
 	{
-		IodeExceptionFunction error("Cannot set sample", "Unknown");
-		error.add_argument("from", from.to_string());
-		error.add_argument("to  ", to.to_string());
-		throw error;
+		std::string error_msg = "Cannot set sample -> invalid \"from_period\" or \"to_period\" argument\n";
+		error_msg += "from_period: " + from.to_string() + "\n";
+		error_msg += "to_period: " + to.to_string();
+		throw std::invalid_argument(error_msg);
 	}
 }
 
@@ -419,12 +419,12 @@ void KDBVariables::extrapolate(const VariablesInitialization method, const std::
 
 	if (res < 0)
 	{
-		IodeExceptionFunction error("Cannot extrapolate variables");
-		error.add_argument("method", v_simulation_initialization[method]);
-		error.add_argument("from", from);
-		error.add_argument("to", to);
-		error.add_argument("variables_list", variables_list);
-		throw error;
+		std::string error_msg = "Cannot extrapolate variables\n";
+		error_msg += "method: " + v_simulation_initialization[method] + "\n";
+		error_msg += "from period: " + from + "\n";
+		error_msg += "to period: " + to + "\n";
+		error_msg += "variables list: " + variables_list;
+		throw std::runtime_error(error_msg);
 	}
 }
 
@@ -444,11 +444,13 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 	input_file = check_filepath(input_file, FILE_VARIABLES, "seasonal_adjustment", true);
 	args = input_file + " "; 
 
-	if (series.empty()) 
-		throw IodeExceptionFunction("Cannot run seasonal adjustment", "Passed value for the VarList argument is empty");
+	if(series.empty()) 
+		throw std::invalid_argument(std::string("Cannot run seasonal adjustment: Passed value for ") + 
+		                            "the variables list argument is empty");
 	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
-    if (SCR_tbl_size((unsigned char**) c_series) == 0) 
-		throw IodeExceptionFunction("Cannot run seasonal adjustment", "Passed value \"" + series + "\" for the VarList argument is invalid");
+    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+		throw std::invalid_argument("Cannot run seasonal adjustment: Passed value \"" + series + 
+		                            "\" for the variables list argument is invalid");
 	args += series + " ";
 
 	args += std::to_string(eps_test);
@@ -456,11 +458,11 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 	int res = B_WsSeasonAdj(to_char_array(args));
 	if (res < 0)
 	{
-		IodeExceptionFunction error("Cannot run seasonal adjustment");
-		error.add_argument("Filename", input_file);
-		error.add_argument("VarList", series);
-		error.add_argument("Eps", std::to_string(eps_test));
-		throw error;
+		std::string error_msg = "Cannot run seasonal adjustment\n";
+		error_msg += "Filename: " + input_file + "\n";
+		error_msg += "Variables list: " + series + "\n";
+		error_msg += "Epsilon: " + std::to_string(eps_test);
+		throw std::runtime_error(error_msg);
 	}
 }
 
@@ -476,21 +478,23 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 
 	args += std::to_string(lambda) + " ";
 
-	if (series.empty()) 
-		throw IodeExceptionFunction("Cannot run trend correction", "Passed value for the VarList argument is empty");
+	if(series.empty()) 
+		throw std::invalid_argument(std::string("Cannot run trend correction: Passed value for ") + 
+		                            "the variables list argument is empty");
 	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
-    if (SCR_tbl_size((unsigned char**) c_series) == 0) 
-		throw IodeExceptionFunction("Cannot run trend correction", "Passed value \"" + series + "\" for the VarList argument is invalid");
+    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+		throw std::invalid_argument("Cannot run trend correction: Passed value \"" + series + 
+		                            "\" for the variables list argument is invalid");
 	args += series;
 
 	int res = (log) ? B_WsTrend(to_char_array(args)) : B_WsTrendStd(to_char_array(args));
 	if (res < 0)
 	{
 		std::string fct_name = (log) ? "B_WsTrend" : "B_WsTrendStd";
-		IodeExceptionFunction error("Cannot run trend correction (" + fct_name + ")");
-		error.add_argument("VarFilename", input_file);
-		error.add_argument("Lambda", std::to_string(lambda));
-		error.add_argument("Series", series);
-		throw error;
+		std::string error_msg = "Cannot run trend correction (" + fct_name + ")\n";
+		error_msg += "Variables filename: " + input_file + "\n";
+		error_msg += "Lambda: " + std::to_string(lambda) + "\n";
+		error_msg += "Series: " + series;
+		throw std::runtime_error(error_msg);
 	}
 }

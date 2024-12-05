@@ -89,9 +89,9 @@ std::map<std::string, std::vector<double>> ComputedTableGraph::get_series(const 
     if(fileop < 0 || fileop >= files_ops.size())
     {
         std::string msg = "Out of range value for the argument 'fileop':\n";
-        msg += "Valid range of possible is [0, " + std::to_string(files_ops.size() - 1) + "].\n";
-        msg += "Got value " + std::to_string(fileop) + ".";
-        throw IodeExceptionFunction(msg);
+        msg += "Valid range of possible is [0, " + std::to_string(files_ops.size() - 1) + "]\n";
+        msg += "Got value " + std::to_string(fileop);
+        throw std::range_error(msg);
     }
 
     std::string name;

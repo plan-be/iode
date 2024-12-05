@@ -298,12 +298,12 @@ void ComputedTable::set_value(const int line, const int col, const double value,
 {
     // Reject NaN value
     if(!IODE_IS_A_NUMBER(value))
-        throw IodeException("A NaN value is not accepted to edit a cell of a computed table");
+        throw std::invalid_argument("An IODE NA (NaN) value is not accepted to edit a cell of a computed table");
 
     if(check_if_editable)
         if(!is_editable(line, col))
-            throw IodeException("The cell corresponding to the line\n" + line_names[line] + "\n" +
-                                "and column\n" + column_names[col] + "\ncannot be edited");
+            throw std::runtime_error("The cell corresponding to the line\n" + line_names[line] + "\n" +
+                                     "and column\n" + column_names[col] + "\ncannot be edited");
 
     int line_ref_pos = v_line_pos_in_ref_table.at(line);
     int col_pos = v_pos_in_columns_struct[col];

@@ -572,8 +572,9 @@ Table& Table::operator=(const Table& table)
 void Table::extend()
 {
 	int res = T_add_line(this);
-	if (res < 0) throw IodeExceptionFunction("Cannot extend table \"" + 
-		std::string((char*)T_get_title(this)) + "\"", "Unknown");
+	if (res < 0) 
+		throw std::runtime_error("Cannot extend table with title \"" + 
+								 std::string((char*)T_get_title(this)) + "\"");
 }
 
 std::string Table::get_language() const
@@ -657,7 +658,7 @@ TableLine* Table::insert_line(const int pos, const TableLineType line_type, cons
 	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::tc_type of cells is undefined!
 	int new_pos = T_insert_line(this, pos, line_type, where_);
 	if (new_pos < 0) 
-		throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
+		throw std::runtime_error("Cannot insert table line at position " + std::to_string(pos));
 
 	return static_cast<TableLine*>(&this->t_line[new_pos]);
 }

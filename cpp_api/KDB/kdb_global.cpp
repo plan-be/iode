@@ -74,7 +74,8 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
     }
 
     int res = B_FileImportCmt(to_char_array(args));
-    if (res < 0) throw IodeExceptionFunction(error_msg);
+    if (res < 0) 
+        throw std::runtime_error(error_msg);
 }
 
 void import_var(const std::string& input_file, const std::string& save_file, const std::string& from, const std::string& to, 
@@ -112,7 +113,8 @@ void import_var(const std::string& input_file, const std::string& save_file, con
     }
 
     int res = B_FileImportVar(to_char_array(args));
-    if (res < 0) throw IodeExceptionFunction(error_msg);
+    if (res < 0) 
+        throw std::runtime_error(error_msg);
 }
 
 void import_var(const std::string& input_file, const std::string& save_file, const Period& from, const Period& to, 
@@ -232,12 +234,13 @@ void low_to_high(const IodeLowToHigh type, const char method, const std::string&
 
     if (res < 0)
     {
-        IodeExceptionFunction error("Cannot Cannot transforms low periodicity variables into high periodicity variables");
-        error.add_argument("type", (type == LTOH_STOCK) ? "Stock" : "Flow");
-        error.add_argument("method", method_name);
-        error.add_argument("file", filepath);
-        error.add_argument("variables list", var_list);
-        throw error;
+        std::string which_type = (type == LTOH_STOCK) ? "Stock" : "Flow";
+        std::string error_msg = "Cannot Cannot transforms low periodicity variables into high periodicity variables\n";
+        error_msg += "type: " + which_type + "\n";
+        error_msg += "method: " + method_name + "\n";
+        error_msg += "file: " + filepath + "\n";
+        error_msg += "variables list: " + var_list;
+        throw std::runtime_error(error_msg);
     }
 }
 
@@ -271,10 +274,10 @@ void high_to_low(const IodeHighToLow type, const std::string& filepath, const st
 
     if (res < 0)
     {
-        IodeExceptionFunction error("Cannot transforms high periodicity variables into low periodicity variables");
-        error.add_argument("type", type_name);
-        error.add_argument("file", filepath);
-        error.add_argument("variables list", var_list);
-        throw error;
+        std::string error_msg = "Cannot transforms high periodicity variables into low periodicity variables\n";
+        error_msg += "type: " + type_name + "\n";
+        error_msg += "file: " + filepath + "\n";
+        error_msg += "variables list: " + var_list;
+        throw std::runtime_error(error_msg);
     }
 }
