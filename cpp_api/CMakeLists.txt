@@ -2,7 +2,7 @@
 message(STATUS "\n---- C++ API ----\n")
 
 set(CPP_UTILS
-    utils/utils.h     utils/iode_exceptions.h
+    utils/utils.h
     utils/super.h     utils/super.cpp
     )
 

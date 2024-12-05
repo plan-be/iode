@@ -65,7 +65,7 @@ bool Identity::operator==(const Identity& other) const
 std::vector<std::string> Identity::get_coefficients_list(const bool create_if_not_exit)
 {
     if(this->clec == NULL)
-        throw IodeException("Please compute the identity " + std::string(this->lec) + " first");
+        throw std::runtime_error("Please compute the identity " + std::string(this->lec) + " first");
 
     std::vector<std::string> coeffs = get_scalars_from_clec(this->clec);
 
@@ -89,7 +89,7 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
 std::vector<std::string> Identity::get_variables_list(const bool create_if_not_exit)
 {
     if(this->clec == NULL)
-        throw IodeException("Please compute the identity " + std::string(this->lec) + " first");
+        throw std::runtime_error("Please compute the identity " + std::string(this->lec) + " first");
 
     std::vector<std::string> vars = get_variables_from_clec(this->clec);
 
@@ -98,8 +98,8 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     {
         SAMPLE* sample = KSMPL(K_WS[VARIABLES]);
         if(sample == NULL || sample->s_nb == 0)
-            throw IodeException("Cannot return the list of variables associated with the identity " + 
-                                std::string(this->lec) +"\nThe global sample is not yet defined");
+            throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
+                                     std::string(this->lec) +"\nThe global sample is not yet defined");
 
         char* c_name;
         int nb_obs = sample->s_nb;

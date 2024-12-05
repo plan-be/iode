@@ -2,7 +2,6 @@
 
 #include "cpp_api/common.h"
 #include "cpp_api/utils/utils.h"
-#include "cpp_api/utils/iode_exceptions.h"
 #include "cpp_api/time/sample.h"
 #include "cpp_api/objects/table.h"
 #include "cpp_api/KDB/kdb_variables.h"
@@ -157,27 +156,27 @@ public:
     std::string get_line_name(const int line) const
     {
         if(line >= line_names.size()) 
-            throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 
-            " since the table has " + std::to_string(line_names.size()) + " lines.");
+            throw std::runtime_error("Cannot access line " + std::to_string(line) + 
+            " since the table has " + std::to_string(line_names.size()) + " lines");
         return line_names.at(line);
     }
 
     std::string get_column_name(const int col) const
     {
         if(col >= column_names.size()) 
-            throw IodeExceptionFunction("Cannot access column " + std::to_string(col) + 
-            " since the table has " + std::to_string(column_names.size()) + " columns.");
+            throw std::runtime_error("Cannot access column " + std::to_string(col) + 
+            " since the table has " + std::to_string(column_names.size()) + " columns");
         return column_names.at(col);
     }
 
     double get_value(const int line, const int col, const bool full_precision = false) const
     {
         if(line >= line_names.size()) 
-            throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 
-            " since the table has " + std::to_string(line_names.size()) + " lines.");
+            throw std::runtime_error("Cannot access line " + std::to_string(line) + 
+            " since the table has " + std::to_string(line_names.size()) + " lines");
         if(col >= column_names.size()) 
-            throw IodeExceptionFunction("Cannot access column " + std::to_string(col) + 
-            " since the table has " + std::to_string(column_names.size()) + " columns.");
+            throw std::runtime_error("Cannot access column " + std::to_string(col) + 
+            " since the table has " + std::to_string(column_names.size()) + " columns");
         double value = values.at(line).at(col);
         if(!full_precision)
         {

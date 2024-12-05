@@ -49,9 +49,10 @@ void Simulation::model_compile(const std::string& list_eqs)
             SCR_free_tbl((unsigned char**) eqs);
             if (rc < 0)
             {
-                IodeExceptionFunction error("Cannot compile model", "Unknown");
-                error.add_argument("Equation List", list_eqs);
-                throw error;
+                std::string error_msg = "Could not compile the model";
+                if(!list_eqs.empty()) 
+                    error_msg += " for the equations list: " + list_eqs;
+                throw std::runtime_error(error_msg);
             }
         }
     }
@@ -63,27 +64,23 @@ void Simulation::model_compile(const std::string& list_eqs)
  */
 void Simulation::model_simulate(const std::string& from, const std::string& to, const std::string& list_eqs)
 {
-    IodeExceptionInvalidArguments error("Cannot simulate model");
-
     Sample* sample = nullptr;
     try
     {
         // throw exception if wrong parameters
         sample = new Sample(from, to);
     }
-    catch (IodeException)
+    catch(const std::exception& e)
     {
-        error.add_argument("Sample From -> To", from + " -> " + to);
+         throw std::runtime_error("Cannot simulate the model:\n" + std::string(e.what()));
     }
 
     char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
-    if (!list_eqs.empty() && c_eqs == NULL) error.add_argument("Equations list", list_eqs);
-    
-    if (error.invalid_args())
+    if (!list_eqs.empty() && c_eqs == NULL) 
     {
         if (sample) delete sample;
         if (SCR_tbl_size((unsigned char**)c_eqs) > 0) SCR_free_tbl((unsigned char**) c_eqs);
-        throw error;
+        throw std::invalid_argument("Cannot simulate the model:\nthe equations list is empty or null");
     }
 
     int rc;
@@ -99,15 +96,15 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
 
     if (rc < 0)
     {
-        IodeExceptionFunction error_func("Cannot simulate model", "Simulation did not converged.");
-        error_func.add_argument("Sample", sample->to_string());
-        error_func.add_argument("Equations list", list_eqs);
-        error_func.add_argument("Max iterations", std::to_string(get_max_nb_iterations()));
-        error_func.add_argument("Convergence threshold", std::to_string(get_convergence_threshold()));
-        error_func.add_argument("Initialization method", get_initialization_method_as_string());
-        error_func.add_argument("Sort algorithm", get_sort_algorithm_as_string());
+        std::string error_msg = "Cannot simulate the model - the simulation did not converged.\n";
+        error_msg += "Sample: " + sample->to_string() + "\n";
+        error_msg += "Equations list: " + list_eqs + "\n";
+        error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
+        error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
+        error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
+        error_msg += "Sort algorithm: " + get_sort_algorithm_as_string();
         delete sample;
-        throw error_func;
+        throw std::runtime_error(error_msg);
     }
 
     delete sample;
@@ -118,24 +115,28 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
  */
 void Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
 {
-    IodeExceptionInvalidArguments error("Cannot calculate SCC");
+    std::string error_msg;
 
     // result list names
-    if (pre_name.empty())   error.add_argument("Pre-recursive list name", "empty");
-    if (inter_name.empty()) error.add_argument("Recursive list name", "empty");
-    if (post_name.empty())  error.add_argument("Post-recursive list name", "empty");
+    if (pre_name.empty())   
+        error_msg += "Pre-recursive list name is empty\n";
+    if (inter_name.empty()) 
+        error_msg += "Recursive list name is empty\n";
+    if (post_name.empty())  
+        error_msg += "Post-recursive list name is empty\n";
 
     char* c_pre = to_char_array(pre_name);
     char* c_inter = to_char_array(inter_name);
     char* c_post = to_char_array(post_name);
 
     char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
-    if (!list_eqs.empty() && c_eqs == NULL) error.add_argument("Equations list", list_eqs);
+    if (!list_eqs.empty() && c_eqs == NULL) 
+        error_msg += "Equations list is empty or null\n";
 
-    if (error.invalid_args())
+    if(!error_msg.empty())
     {
         if (SCR_tbl_size((unsigned char**)c_eqs) > 0) SCR_free_tbl((unsigned char**)c_eqs);
-        throw error;
+        throw std::invalid_argument("Cannot calculate SCC:\n" + error_msg);
     }
 
     int rc;
@@ -155,13 +156,13 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     
     if (rc < 0)
     {
-        IodeExceptionFunction error_func("Cannot calculate SCC", "Unknown");
-        error_func.add_argument("Pre-recursive list name", pre_name);
-        error_func.add_argument("Recursive list name", inter_name);
-        error_func.add_argument("Post-recursive list name", post_name);
-        error_func.add_argument("Equations list", list_eqs);
-        error_func.add_argument("Nb passes", std::to_string(get_nb_passes()));
-        throw error_func;
+        std::string error_msg = "Could not calculate SCC\n";
+        error_msg += "Pre-recursive list name: " + pre_name + "\n";
+        error_msg += "Recursive list name: " + inter_name + "\n";
+        error_msg += "Post-recursive list name: " + post_name + "\n";
+        error_msg += "Equations list: " + list_eqs + "\n";
+        error_msg += "Nb passes: " + std::to_string(get_nb_passes());
+        throw std::runtime_error(error_msg);
     }
 }
 
@@ -174,28 +175,29 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
  */
 void Simulation::model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
 {
-    IodeExceptionInvalidArguments error("Cannot simulate SCC");
-
     Sample* sample = nullptr;
     try
     {
         // throw exception if wrong parameters
         sample = new Sample(from, to);
     }
-    catch (IodeException)
+    catch(const std::exception& e)
     {
-        error.add_argument("Sample From -> To", from + " -> " + to);
+        throw std::runtime_error("Cannot simulate SCC" + std::string(e.what()));
     }
 
     // result list names
-    if (!Lists.contains(pre_name))   error.add_argument("Pre-recursive list not found! ", pre_name);
-    if (!Lists.contains(inter_name)) error.add_argument("Recursive list not found! ", inter_name);
-    if (!Lists.contains(post_name))  error.add_argument("Post-recursive list not found! ", post_name);
-
-    if (error.invalid_args())
+    std::string error_msg;
+    if(!Lists.contains(pre_name))   
+        error_msg += "Pre-recursive list \"" + pre_name + "\" not found!\n";
+    if(!Lists.contains(inter_name)) 
+        error_msg += "Recursive list \"" + inter_name + "\" not found!\n";
+    if(!Lists.contains(post_name))  
+        error_msg += "Post-recursive list \"" + post_name + "\" not found!\n";
+    if(!error_msg.empty())
     {
         if (sample) delete sample;
-        throw error;
+        throw std::invalid_argument("Cannot simulate SCC:\n" + error_msg);
     }
 
     std::string list_pre = Lists.get(pre_name);
@@ -220,18 +222,18 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
 
     if (rc < 0)
     {
-        IodeExceptionFunction error_func("simulate SCC", "Unknown");
-        error_func.add_argument("Sample", sample->to_string());
-        error_func.add_argument("Pre-recursive list name", pre_name);
-        error_func.add_argument("Recursive list name", inter_name);
-        error_func.add_argument("Post-recursive list name", post_name);
-        error_func.add_argument("Equations list", list_eqs);
-        error_func.add_argument("Max iterations", std::to_string(get_max_nb_iterations()));
-        error_func.add_argument("Convergence threshold", std::to_string(get_convergence_threshold()));
-        error_func.add_argument("Initialization method", get_initialization_method_as_string());
-        error_func.add_argument("Sort algorithm", get_sort_algorithm_as_string());
+        std::string error_msg = "Could not simulate SCC\n";
+        error_msg += "Sample: " + sample->to_string() + "\n";
+        error_msg += "Equations list: " + list_eqs + "\n";
+        error_msg += "Pre-recursive list name: " + pre_name + "\n";
+        error_msg += "Recursive list name: " + inter_name + "\n";
+        error_msg += "Post-recursive list name: " + post_name + "\n";
+        error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
+        error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
+        error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
+        error_msg += "Sort algorithm: ", get_sort_algorithm_as_string();
         delete sample;
-        throw error_func;
+        throw std::runtime_error(error_msg);
     }
     delete sample;
 }

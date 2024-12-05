@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include "cpp_api/common.h"
 #include "cpp_api/utils/utils.h"
-#include "cpp_api/utils/iode_exceptions.h"
 
 
 const static std::string periodicities = "YSQMWD";

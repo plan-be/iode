@@ -2,7 +2,6 @@
 
 #include "cpp_api/common.h"
 #include "cpp_api/utils/utils.h"
-#include "cpp_api/utils/iode_exceptions.h"
 #include <stdexcept>
 
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cpp_api/common.h"
-#include "iode_exceptions.h"
 #include "super.h"
 
 #include <regex>
@@ -198,18 +197,20 @@ static IodeRegexName get_regex_name(const int type)
 
 inline void check_name(const std::string name, const int type)
 {
-    std::string msg = "name " + name + " as " + v_iode_types[type];
+    std::string msg = "name \"" + name + "\" as " + v_iode_types[type];
 
-    if (name.empty()) throw IodeExceptionFunction("Cannot accept " + msg, "Empty name");
+    if(name.empty()) 
+        throw std::invalid_argument("Cannot accept " + msg + ": Empty name");
 
-    if (name.size() > K_MAX_NAME) throw IodeExceptionFunction("Cannot accept " + msg,  
+    if(name.size() > K_MAX_NAME) 
+        throw std::invalid_argument("Cannot accept " + msg + ": " + 
         "Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + 
-        " = " + std::to_string(name.size()) + " characters.");
+        " = " + std::to_string(name.size()) + " characters");
 
     IodeRegexName nre = get_regex_name(type);
-    if (!regex_match(name, std::regex(nre.regex))) throw IodeExceptionFunction("Cannot accept " + msg, 
-        v_iode_types[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + 
-        name + " is invalid.");
+    if(!regex_match(name, std::regex(nre.regex))) 
+        throw std::invalid_argument("Cannot accept " + msg + ": " + 
+        v_iode_types[type] + " name must only contains " + nre.type + " letters, digits and underscore");
 }
 
 inline IodeFileType get_iode_file_type(const std::string& filepath)
