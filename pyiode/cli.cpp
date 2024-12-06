@@ -1,16 +1,5 @@
 #pragma once
-#include "api/iode.h"
-
-// Function to always call when importing iode 
-void ODE_assign_super_PYIODE() 
-{
-   // IODE_assign_super_API(); // Not needed because already called by IodeInit(char*)
-   //A2mMessage_super    = A2mMessage_super_PYIODE;
-   //kconfirm_super      = kconfirm_super_PYIODE;
-} 
-
 #include <istream>
-
 #include "api/iode.h"
 #include "cpp_api/iode_cpp_api.h"
 
@@ -19,8 +8,6 @@ void ODE_assign_super_PYIODE()
 extern "C" long SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes 
 extern "C" int SCR_ALLOC_DOC;           // Log the remaining allocations    
 extern "C" char *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
-
-const static std::string s_yes = "OoYyJj1";
 
 
 // Function used by A2M HTML generator (does not work in 64bits)
@@ -33,13 +20,6 @@ int free_tbl(char** tbl)
 {
     return SCR_free_tbl((unsigned char**) tbl);
 }
-
-void python_assign_super() 
-{
-   // IODE_assign_super_API(); // Not needed because already called by IodeInit(char*)
-   //A2mMessage_super    = A2mMessage_super_PYIODE;
-   //kconfirm_super      = kconfirm_super_PYIODE;
-} 
 
 /**
  *  Function that supersedes the standard scr4 function A2mMessage() in the context 
@@ -64,6 +44,7 @@ void A2mMessage_super_CLI(char* msg)
  */
 int kconfirm_super_CLI(const char* fmt)
 {
+    std::string s_yes = "OoYyJj1";
     std::cout << std::string(fmt) << std::endl;
 
     std::string answer;

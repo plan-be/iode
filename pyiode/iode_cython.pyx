@@ -20,7 +20,7 @@
 
 # distutils: language = c++
 from pathlib import Path
-from iode_cython cimport cpp_iode_init, python_assign_super
+from iode_cython cimport cpp_iode_init
 
 # MAIN
 # ----
@@ -45,7 +45,8 @@ installation_dir = str((Path(__file__).parent).resolve())
 # assign 'super' functions
 cpp_iode_init(installation_dir.encode('utf-8'))
 
-# Super fns could be replaced here (optional)
+# Super fns could be replaced here
+include "super.pyx"
 python_assign_super() 
 
 # PYIODE API
