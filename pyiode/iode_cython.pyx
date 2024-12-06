@@ -85,3 +85,4 @@ include "compute/simulation.pyx"
 
 include "reports.pyx"
 include "wrt.pyx"
+include "tests/tests.pyx"
