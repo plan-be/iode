@@ -397,11 +397,11 @@ TEST_F(EstimationTest, DynamicAdjustment)
     // not valid LEC expression (missing :=)
     std::string not_eqs = eqs;
     not_eqs.replace(not_eqs.find(":="), 2, "==");
-    EXPECT_THROW(dynamic_adjustment(AM_PARTIAL_ADJUSTMENT, not_eqs, c1, c2), IodeExceptionInvalidArguments);
+    EXPECT_THROW(dynamic_adjustment(AM_PARTIAL_ADJUSTMENT, not_eqs, c1, c2), std::invalid_argument);
     // c1 empty
-    EXPECT_THROW(dynamic_adjustment(AM_PARTIAL_ADJUSTMENT, eqs, "", c2), IodeExceptionInvalidArguments);
+    EXPECT_THROW(dynamic_adjustment(AM_PARTIAL_ADJUSTMENT, eqs, "", c2), std::invalid_argument);
     // c2 empty in case of Error Correction Method
-    EXPECT_THROW(dynamic_adjustment(AM_ERROR_CORRECTION_METHOD, eqs, c1, ""), IodeExceptionInvalidArguments);
+    EXPECT_THROW(dynamic_adjustment(AM_ERROR_CORRECTION_METHOD, eqs, c1, ""), std::invalid_argument);
 }
 
 // TODO : fix E_UnitRoot() 
@@ -417,7 +417,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
     Scalar* scl_order_0;
 
     // Unknown variable
-    EXPECT_THROW(dickey_fuller_test("XORGLUB", drift, trend, order), IodeExceptionFunction);
+    EXPECT_THROW(dickey_fuller_test("XORGLUB", drift, trend, order), std::runtime_error);
 
     // no drift, no trend
     drift = false;
