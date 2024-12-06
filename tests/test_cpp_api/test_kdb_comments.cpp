@@ -91,6 +91,7 @@ TEST_F(KDBCommentsTest, Rename)
     int new_pos;
     std::string old_name;
     std::string new_name;
+    std::string error_msg;
 
     // rename
     old_name = Comments.get_name(0);
@@ -100,14 +101,25 @@ TEST_F(KDBCommentsTest, Rename)
 
     // expect errors 
     old_name = Comments.get_name(2);
+
     // - too long name
-    EXPECT_THROW(Comments.rename(old_name, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), IodeExceptionFunction);
+    error_msg = "Cannot accept name \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\" as Comment: ";
+    error_msg += "Iode names cannot exceed 20 characters. ABCDEFGHIJKLMNOPQRSTUVWXYZ = 26 characters";
+    EXPECT_THROW(Comments.rename(old_name, error_msg), std::invalid_argument);
+    
     // - name starting with a umber
-    EXPECT_THROW(Comments.rename(old_name, "1_NEW_NAME"), IodeExceptionFunction);
+    error_msg = "Cannot accept name \"1_NEW_NAME\" as Comment: Comment name must only ";
+    error_msg += "contains capital or lowercase letters, digits and underscore";
+    EXPECT_THROW(Comments.rename(old_name, error_msg), std::invalid_argument);
+    
     // - name using forbidden special characters
-    EXPECT_THROW(Comments.rename(old_name, "NËW_N@ME"), IodeExceptionFunction);
+    error_msg = "Cannot accept name \"NËW_N@ME\" as Comment: Comment name must only ";
+    error_msg += "contains capital or lowercase letters, digits and underscore";
+    EXPECT_THROW(Comments.rename(old_name, error_msg), std::invalid_argument);
+    
     // - old name does not exists
     EXPECT_THROW(Comments.rename("EMPTY", "NEW_NAME"), std::invalid_argument);
+    
     // - new name already exists
     new_name = Comments.get_name(3);
     EXPECT_THROW(Comments.rename(old_name, new_name), std::invalid_argument);
@@ -190,11 +202,11 @@ TEST_F(KDBCommentsTest, CreateRemove)
     // expect errors 
     std::string old_name = Comments.get_name(2);
     // - too long name
-    EXPECT_THROW(Comments.add("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new_comment), IodeExceptionFunction);
+    EXPECT_THROW(Comments.add("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new_comment), std::invalid_argument);
     // - name starting with a umber
-    EXPECT_THROW(Comments.add("1_NEW_NAME", new_comment), IodeExceptionFunction);
+    EXPECT_THROW(Comments.add("1_NEW_NAME", new_comment), std::invalid_argument);
     // - name using forbidden special characters
-    EXPECT_THROW(Comments.add("N�W_N@ME", new_comment), IodeExceptionFunction);
+    EXPECT_THROW(Comments.add("N�W_N@ME", new_comment), std::invalid_argument);
     // - name already exists
     name = Comments.get_name(3);
     EXPECT_THROW(Comments.add(name, new_comment), std::invalid_argument);

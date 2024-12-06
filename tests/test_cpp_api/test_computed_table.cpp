@@ -486,13 +486,13 @@ TEST_F(ComputedTableTest, EditTable)
     EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
 
     // 5) trying to modify a cell value for which there is no reference of any variable
-    EXPECT_THROW(table_simple.set_value(6, 5, 4.0 + log(10)), IodeException);
+    EXPECT_THROW(table_simple.set_value(6, 5, 4.0 + log(10)), std::runtime_error);
 
     // 6) trying to modify a cell value for which the corresponding formula starts with "0+"
-    EXPECT_THROW(table_simple.set_value(7, 5, KNFF * 0.9), IodeException);
+    EXPECT_THROW(table_simple.set_value(7, 5, KNFF * 0.9), std::runtime_error);
 
     // 7) trying to modify a cell value by passing a NaN value
-    EXPECT_THROW(table_simple.set_value(1, 5, IODE_NAN), IodeException);
+    EXPECT_THROW(table_simple.set_value(1, 5, IODE_NAN), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, InitializePrinting)

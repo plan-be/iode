@@ -60,13 +60,13 @@ TEST_F(SimulationTest, Simulation)
 
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate("2000U1", to), std::invalid_argument);
+    EXPECT_THROW(sim.model_simulate("2000U1", to), std::runtime_error);
     // invalid list of equations
-    EXPECT_THROW(sim.model_simulate(from, to, "$UNKNOWN_LIST"), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_simulate(from, to, "$UNKNOWN_LIST"), std::invalid_argument);
 
     // Test simulation: divergence
     KSIM_MAXIT = 2;
-    EXPECT_THROW(sim.model_simulate(from, to), IodeExceptionFunction);
+    EXPECT_THROW(sim.model_simulate(from, to), std::runtime_error);
 
     // Check _PRE list after simulation (prolog)
     std::string lst_pre = Lists.get("_PRE");
@@ -108,9 +108,9 @@ TEST_F(SimulationTest, CalculateSCC)
 {
     // Invalid arguments
     // PRE list name empty
-    EXPECT_THROW(sim.model_calculate_SCC(10, ""), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_calculate_SCC(10, ""), std::invalid_argument);
     // invalid list of equations
-    EXPECT_THROW(sim.model_calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST"), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST"), std::invalid_argument);
 
     // SCC decomposition
     sim.model_calculate_SCC(10);
@@ -146,9 +146,9 @@ TEST_F(SimulationTest, SimulateSCC)
 {
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate_SCC("2000U1", to), std::invalid_argument);
+    EXPECT_THROW(sim.model_simulate_SCC("2000U1", to), std::runtime_error);
     // invalid pre-recursive list
-    EXPECT_THROW(sim.model_simulate_SCC(from, to, "UNKNOWN_LIST"), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_simulate_SCC(from, to, "UNKNOWN_LIST"), std::invalid_argument);
 
     // SCC decomposition
     sim.model_calculate_SCC(10);
