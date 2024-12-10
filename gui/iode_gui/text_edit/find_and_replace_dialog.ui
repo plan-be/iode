@@ -84,7 +84,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/iode_resource.qrc">
+      <iconset resource="../iode_gui/iode_resource.qrc">
        <normaloff>:/icons/replace.ico</normaloff>:/icons/replace.ico</iconset>
      </property>
      <property name="shortcut">
@@ -122,7 +122,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/iode_resource.qrc">
+      <iconset resource="../iode_gui/iode_resource.qrc">
        <normaloff>:/icons/replace_all.ico</normaloff>:/icons/replace_all.ico</iconset>
      </property>
      <property name="shortcut">
@@ -185,7 +185,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/iode_resource.qrc">
+      <iconset resource="../iode_gui/iode_resource.qrc">
        <normaloff>:/icons/arrow_down.ico</normaloff>:/icons/arrow_down.ico</iconset>
      </property>
      <property name="shortcut">
@@ -248,7 +248,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/iode_resource.qrc">
+      <iconset resource="../iode_gui/iode_resource.qrc">
        <normaloff>:/icons/arrow_up.ico</normaloff>:/icons/arrow_up.ico</iconset>
      </property>
      <property name="shortcut">
@@ -262,7 +262,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../resources/iode_resource.qrc"/>
+  <include location="../iode_gui/iode_resource.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -4,7 +4,7 @@ from PySide6.QtGui import QDesktopServices, QShortcut, QKeySequence
 
 
 from iode_gui.utils import URL_MANUAL
-from text_edit.completer import IodeCompleter
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_edit_iode_obj import Ui_EditObjectDialog
 
 from typing import Any

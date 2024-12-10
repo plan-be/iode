@@ -1,0 +1,3 @@
+__version__ = "${CMAKE_PROJECT_VERSION}"
+
+from iode_gui.main import main

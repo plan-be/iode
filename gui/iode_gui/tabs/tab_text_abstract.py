@@ -3,7 +3,7 @@ from PySide6.QtCore import Signal, Slot, Qt, QFileInfo, QTextStream
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from tabs.tab_abstract import IodeAbstractWidget
+from iode_gui.tabs.tab_abstract import IodeAbstractWidget
 
 from typing import Optional
 from iode import IodeFileType

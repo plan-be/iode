@@ -300,12 +300,12 @@ all equations)</string>
   <customwidget>
    <class>IodeSampleEdit</class>
    <extends>QLineEdit</extends>
-   <header>util/widgets/sample_edit.h</header>
+   <header>iode_gui/util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
    <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header>text_edit/complete_text_edit.h</header>
+   <header>iode_gui/text_edit/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

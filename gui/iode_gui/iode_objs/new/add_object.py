@@ -2,7 +2,7 @@ from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtGui import QDesktopServices, QDoubleValidator
 
-from text_edit.completer import IodeCompleter
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_add_object import Ui_AddObjectDialog
 from .ui_add_scalar import Ui_AddScalarDialog
 from .ui_add_table import Ui_AddTableDialog

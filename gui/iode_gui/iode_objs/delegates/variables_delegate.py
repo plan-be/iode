@@ -1,5 +1,5 @@
 from .base_delegate import BaseDelegate
-from util.double_validator import IodeDoubleValidator
+from iode_gui.util.double_validator import IodeDoubleValidator
 
 from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem

@@ -4,9 +4,9 @@ from PySide6.QtWidgets import (QLabel, QComboBox, QHBoxLayout, QVBoxLayout,
 from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import ProjectSettings
-from tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
-from tabs.iode_objs.tab_numerical_values import NumericalWidget
-from iode_objs.models.table_model import  VariablesModel
+from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
+from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget
+from iode_gui.iode_objs.models.table_model import  VariablesModel
 
 from iode import IodeType, VarsMode
 

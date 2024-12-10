@@ -3,7 +3,7 @@ from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtCore import Qt
 
 from .ui_estimation_coefs import Ui_EstimationCoefsDialog
-from iode_objs.models.table_model import ScalarsModel
+from iode_gui.iode_objs.models.table_model import ScalarsModel
 
 from iode.util import EditAndEstimateEquations
 

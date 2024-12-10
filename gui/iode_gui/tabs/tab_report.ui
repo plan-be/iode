@@ -155,7 +155,7 @@
   <customwidget>
    <class>IodeReportEditor</class>
    <extends>QPlainTextEdit</extends>
-   <header>text_edit/report_editor.h</header>
+   <header>iode_gui/text_edit/report_editor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,10 +1,11 @@
 import sys
-from PySide6.QtWidgets import QApplication, QSplashScreen
+from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import QLocale
 
 from iode_gui.utils import ORGANIZATION_NAME
 from iode_gui.main_window import MainWindow
+
 
 def main():
     app = QApplication(sys.argv)

@@ -3,9 +3,9 @@ from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from PySide6.QtCore import Slot
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from tabs.tab_text_abstract import AbstractTextWidget
-from text_edit.text_editor import IodeTextEditor
-from tabs.ui_tab_text import Ui_TextWidget
+from iode_gui.tabs.tab_text_abstract import AbstractTextWidget
+from iode_gui.text_edit.text_editor import IodeTextEditor
+from iode_gui.tabs.ui_tab_text import Ui_TextWidget
 from iode_gui.utils import SHOW_IN_TEXT_TAB_EXTENSIONS_LIST
 
 from iode import IodeFileType

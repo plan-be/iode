@@ -2,7 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
-from util.widgets.file_chooser import EnumFileMode
+from iode_gui.util.widgets.file_chooser import EnumFileMode
 from .ui_workspace_high_to_low import Ui_MenuWorkspaceHighToLow
 
 from iode import IodeFileType, variables, HighToLowType

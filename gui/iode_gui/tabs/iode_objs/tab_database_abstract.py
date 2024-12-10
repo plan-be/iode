@@ -4,12 +4,12 @@ from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter,
 from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from tabs.tab_abstract import IodeAbstractWidget
-from iode_objs.models.abstract_table_model import IodeAbstractTableModel
-from iode_objs.models.table_model import (CommentsModel , EquationsModel , IdentitiesModel , 
+from iode_gui.tabs.tab_abstract import IodeAbstractWidget
+from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
+from iode_gui.iode_objs.models.table_model import (CommentsModel , EquationsModel , IdentitiesModel , 
                                           ListsModel , ScalarsModel , TablesModel , VariablesModel)
-from iode_objs.views.abstract_table_view import IodeAbstractTableView
-from iode_objs.views.table_view import (CommentsView , EquationsView , IdentitiesView , 
+from iode_gui.iode_objs.views.abstract_table_view import IodeAbstractTableView
+from iode_gui.iode_objs.views.table_view import (CommentsView , EquationsView , IdentitiesView , 
                                         ListsView , ScalarsView , TablesView , VariablesView)
 
 from typing import List

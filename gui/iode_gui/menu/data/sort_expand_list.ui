@@ -118,7 +118,7 @@
   <customwidget>
    <class>IodeAutoCompleteLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>text_edit/complete_line_edit.h</header>
+   <header>iode_gui/text_edit/complete_line_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

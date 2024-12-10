@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt, QSettings, Slot
 from PySide6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
 
-from text_edit.completer import IodeCompleter
-from plot.plot import PlotDialog
+from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.plot.plot import PlotDialog
 from iode_gui.utils import DEFAULT_FONT_FAMILY
 
 from typing import List

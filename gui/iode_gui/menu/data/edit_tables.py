@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QCloseEvent
 
 from iode_gui.settings import MixinSettingsDialog
-from tabs.iode_objs.tab_computed_table import ComputedTableNumericalDialog
+from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableNumericalDialog
 from .ui_edit_tables import Ui_MenuDataEditTables
 
 from typing import List

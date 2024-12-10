@@ -7,9 +7,9 @@ from iode import IodeFileType, TableLang
 from iode_gui.utils import IODE_REPORT_EXTENSION
 from iode_gui.settings import ProjectSettings
 from iode_gui.abstract_main_window import AbstractMainWindow
-from text_edit.report_editor import IodeReportEditor
-from tabs.tab_text_abstract import AbstractTextWidget
-from tabs.ui_tab_report import Ui_ReportWidget
+from iode_gui.text_edit.report_editor import IodeReportEditor
+from iode_gui.tabs.tab_text_abstract import AbstractTextWidget
+from iode_gui.tabs.ui_tab_report import Ui_ReportWidget
 
 
 class ReportWidget(AbstractTextWidget):

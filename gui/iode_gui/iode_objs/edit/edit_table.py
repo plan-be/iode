@@ -6,7 +6,7 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from .edit_iode_obj import AbstractEditObjDialog
 from .edit_table_model import EditTableModel
 from .ui_edit_table import Ui_EditTableDialog
-from plot.plot_table import PlotTableDialog
+from iode_gui.plot.plot_table import PlotTableDialog
 
 from enum import Enum
 from iode import tables, variables, TableLineType

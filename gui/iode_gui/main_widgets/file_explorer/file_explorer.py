@@ -10,9 +10,9 @@ from PySide6.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices,
 from PySide6.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
 
 from iode_gui.settings import ProjectSettings
-from main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
-from main_widgets.file_explorer.file_delegate import FileDelegate
-from main_widgets.tab_widget.tab_widget import IodeTabWidget
+from iode_gui.main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
+from iode_gui.main_widgets.file_explorer.file_delegate import FileDelegate
+from iode_gui.main_widgets.tab_widget.tab_widget import IodeTabWidget
 
 
 class IodeFileExplorer(QTreeView):

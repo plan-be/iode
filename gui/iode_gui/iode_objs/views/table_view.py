@@ -6,25 +6,25 @@ from PySide6.QtPrintSupport import QPrintPreviewDialog
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings, PRINT_DESTINATION
 
-from iode_objs.delegates.comments_delegate import CommentsDelegate
-from iode_objs.delegates.equations_delegate import EquationsDelegate
-from iode_objs.delegates.identities_delegate import IdentitiesDelegate
-from iode_objs.delegates.lists_delegate import ListsDelegate
-from iode_objs.delegates.scalars_delegate import ScalarsDelegate
-from iode_objs.delegates.tables_delegate import TablesDelegate
-from iode_objs.delegates.variables_delegate import VariablesDelegate
+from iode_gui.iode_objs.delegates.comments_delegate import CommentsDelegate
+from iode_gui.iode_objs.delegates.equations_delegate import EquationsDelegate
+from iode_gui.iode_objs.delegates.identities_delegate import IdentitiesDelegate
+from iode_gui.iode_objs.delegates.lists_delegate import ListsDelegate
+from iode_gui.iode_objs.delegates.scalars_delegate import ScalarsDelegate
+from iode_gui.iode_objs.delegates.tables_delegate import TablesDelegate
+from iode_gui.iode_objs.delegates.variables_delegate import VariablesDelegate
 
-from iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
+from iode_gui.iode_objs.new.add_object import (AddCommentDialog, AddIdentityDialog, AddListDialog, 
                                       AddScalarDialog, AddTableDialog, AddVariableDialog)
-from iode_objs.edit.edit_iode_obj import EditCommentDialog, EditIdentityDialog, EditListDialog
-from iode_objs.edit.edit_equation import EditEquationDialog
-from iode_objs.edit.edit_table import EditTableDialog
+from iode_gui.iode_objs.edit.edit_iode_obj import EditCommentDialog, EditIdentityDialog, EditListDialog
+from iode_gui.iode_objs.edit.edit_equation import EditEquationDialog
+from iode_gui.iode_objs.edit.edit_table import EditTableDialog
 
-from iode_objs.models.abstract_table_model import IodeAbstractTableModel
-from iode_objs.models.table_model import IdentitiesModel
-from iode_objs.models.table_model import VariablesModel
+from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
+from iode_gui.iode_objs.models.table_model import IdentitiesModel
+from iode_gui.iode_objs.models.table_model import VariablesModel
 
-from plot.plot_table import PlotTableDialog
+from iode_gui.plot.plot_table import PlotTableDialog
 
 from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView

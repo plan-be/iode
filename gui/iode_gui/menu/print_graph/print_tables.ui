@@ -311,7 +311,7 @@
   <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header>util/widgets/file_chooser.h</header>
+   <header>iode_gui/util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>
@@ -320,7 +320,7 @@
   <customwidget>
    <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header>text_edit/complete_text_edit.h</header>
+   <header>iode_gui/text_edit/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -280,7 +280,7 @@ add_subdirectory ("cpp_api")
 
 # ---- executables ----
 
-set(IODE_GUI_TARGET iode_gui)
+set(IODE_CPP_GUI_TARGET iode_gui)
 add_subdirectory ("gui")
 
 # ---- python ----
@@ -298,7 +298,7 @@ if(NOT SKBUILD)
 endif()
 
 # -- nsis installer --
-if(TARGET ${IODE_GUI_TARGET})
+if(TARGET ${IODE_CPP_GUI_TARGET})
   add_subdirectory("nsis")
 endif()
 
