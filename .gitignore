@@ -439,6 +439,7 @@ generate_stub_files.py
 /pyiode/common.pyx
 /pyiode/iode/tests
 /pyiode/iode/iode.msg
+/pyiode/dist
 
 /pyiode/**/*.cmt
 /pyiode/**/*.eqs
