@@ -4,8 +4,8 @@ from PySide6.QtGui import (QKeySequence, QAction, QShortcut, QContextMenuEvent,
                            QClipboard, QGuiApplication)
 
 from iode_gui.utils import NAN_REP
-from iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
-from iode_objs.models.abstract_table_model import IodeAbstractTableModel
+from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
+from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
 
 from typing import List, Tuple
 from iode import variables, Sample

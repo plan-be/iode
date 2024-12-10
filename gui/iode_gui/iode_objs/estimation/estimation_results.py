@@ -9,7 +9,7 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.utils import URL_MANUAL
 from .correlation_matrix_model import CorrelationMatrixModel
 from .tests_eqs_model import TestsEqsModel
-from iode_objs.models.table_model import ScalarsModel
+from iode_gui.iode_objs.models.table_model import ScalarsModel
 from .ui_estimation_results import Ui_EstimationResultsDialog
 
 from typing import List, Dict

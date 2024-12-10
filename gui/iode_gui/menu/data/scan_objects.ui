@@ -142,7 +142,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <customwidget>
    <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header>text_edit/complete_text_edit.h</header>
+   <header>iode_gui/text_edit/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

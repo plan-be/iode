@@ -26,7 +26,7 @@
    <string>IODE</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/iode_resource.qrc">
+   <iconset resource="../iode_gui/iode_resource.qrc">
     <normaloff>:/images/iode_icon.png</normaloff>:/images/iode_icon.png</iconset>
   </property>
   <property name="statusTip">
@@ -713,25 +713,25 @@
   <customwidget>
    <class>IodeTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>main_widgets/tab_widget/tab_widget.h</header>
+   <header>iode_gui/main_widgets/tab_widget/tab_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>IodeFileExplorer</class>
    <extends>QTreeView</extends>
-   <header>main_widgets/file_explorer/file_explorer.h</header>
+   <header>iode_gui/main_widgets/file_explorer/file_explorer.h</header>
   </customwidget>
   <customwidget>
    <class>IodeCommandLine</class>
    <extends>QLineEdit</extends>
-   <header location="global">main_widgets/iode_command.h</header>
+   <header location="global">iode_gui/main_widgets/iode_command.h</header>
    <slots>
     <slot>run_command()</slot>
    </slots>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/iode_resource.qrc"/>
+  <include location="../iode_gui/iode_resource.qrc"/>
  </resources>
  <connections>
   <connection>

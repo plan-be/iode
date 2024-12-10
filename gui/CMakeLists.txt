@@ -1,71 +1,107 @@
 
 message(STATUS "\n---- GUI (QT) ----\n")
 
-if(SKBUILD)
-	message(STATUS "Skip target ${IODE_GUI_TARGET}\n")
-else()
+if(Python_FOUND)
+    # Find PyUIC6
+    find_program(PYUIC6_EXECUTABLE pyside6-uic)
+    # Find PyRCC6
+    find_program(PYRCC6_EXECUTABLE pyside6-rcc)
 
-# Find PyUIC6
-find_program(PYUIC6_EXECUTABLE pyside6-uic)
-# Find PyRCC6
-find_program(PYRCC6_EXECUTABLE pyside6-rcc)
+    set(RESOURCE_FILENAME "iode_resource")
+    set(RC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.rc")
+    set(QRC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.qrc")
 
-set(RESOURCE_FILENAME "iode_resource")
-set(RC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.rc")
-set(QRC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.qrc")
+    set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
+    set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAME}.py")
 
-set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
-set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PY_RESOURCE_FILENAME}.py")
+    # Check if PyUIC6 and PyRCC6 are found
+    if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
+        cmake_print_variables(PYUIC6_EXECUTABLE)
+        cmake_print_variables(PYRCC6_EXECUTABLE)
 
-# Check if PyUIC6 and PyRCC6 are found
-if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
-    cmake_print_variables(PYUIC6_EXECUTABLE)
-    cmake_print_variables(PYRCC6_EXECUTABLE)
+        # Get all .ui files in the current directory and subdirectories
+        file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
 
-    # Get all .ui files in the current directory and subdirectories
-    file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
+        # Create a custom command for each .ui file
+        foreach(UI_FILE ${UI_FILES})
+            # Get the output .py file path
+            get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
+            get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
+            set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
 
-    # Create a custom command for each .ui file
-    foreach(UI_FILE ${UI_FILES})
-        # Get the output .py file path
-        get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
-        get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
-        set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
+            # Add a custom command to convert the .ui file to a .py file
+            add_custom_command(
+                OUTPUT ${PY_FILE}
+                COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE} --absolute-imports
+                DEPENDS ${UI_FILE}
+                )
+                
+            # Add the .py file to the list of sources
+            list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
+        endforeach()
 
-        # Add a custom command to convert the .ui file to a .py file
+        # See Qt Resource System
         add_custom_command(
-            OUTPUT ${PY_FILE}
-            COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE}
-            DEPENDS ${UI_FILE}
-            )
-            
-        # Add the .py file to the list of sources
-        list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
-    endforeach()
+            OUTPUT ${PY_RESOURCE_FILE}
+            COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
+            DEPENDS ${QRC_RESOURCE_FILE}
+        )
 
-    # See Qt Resource System
-    add_custom_command(
-        OUTPUT ${PY_RESOURCE_FILE}
-        COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
-        DEPENDS ${QRC_RESOURCE_FILE}
-    )
+        # remove previously generated Python files if they exist
+        file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
-    # remove previously generated Python files if they exist
-    file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
+        # Create a custom target that depends on all the .py files
+        add_custom_target(iode_generate_ui_python_files ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
-    # Create a custom target that depends on all the .py files
-    add_custom_target(iode_gui_python ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
+        message(STATUS "New target iode_generate_ui_python_files enabled")
+    else()
+        message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
+    endif()
 
-    message(STATUS "New target iode_gui_python enabled")
+    message(CHECK_START "Search for Cython")
+    find_program(CYTHON "cython")
+    if(CYTHON)
+        message(CHECK_PASS "found")
+        message(STATUS "\nSet up target for iode Python package\n")
+        cmake_print_variables(CYTHON)
+
+        set(IODE_PACKAGE_NAME "iode-gui")
+        set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
+        set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
+        set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
+        set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
+        set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
+        set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
+        set(IODE_PACKAGE_SDIST_INCLUDE "")
+        set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
+        
+        # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
+        # Each variable reference will be replaced with the current value of the variable, or the empty string 
+        # if the variable is not defined.
+        # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
+        configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
+
+        # copy all Python files to binary directory
+        file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
+             FILES_MATCHING PATTERN "*.py")
+    else()
+        message(CHECK_FAIL "Cython not found")
+    endif()
+
+  if(TARGET ${IODE_PACKAGE_CMAKE_TARGET})
+    message(STATUS "\nNew target ${IODE_PACKAGE_CMAKE_TARGET} enabled\n")
+  else()
+    message(WARNING "Could not create the target ${IODE_PACKAGE_CMAKE_TARGET}\n")
+  endif()
 else()
-    message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
+  message(WARNING "Python not found")
 endif()
 
-configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py.in
-      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py
-  )
-
+if(SKBUILD)
+	message(STATUS "Skip target ${IODE_CPP_GUI_TARGET}\n")
+else()
 
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
 
@@ -267,31 +303,31 @@ set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_TEXT_EDI
                         ${GUI_MAIN_WIDGETS} ${GUI_MENUS} ${GUI_MAIN}
 )
 
-qt_add_executable(${IODE_GUI_TARGET} ${QRC_RESOURCE_FILE} ${RC_RESOURCE_FILE} MANUAL_FINALIZATION ${PROJECT_SOURCES})
-target_link_libraries(${IODE_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iode_cpp_api)
+qt_add_executable(${IODE_CPP_GUI_TARGET} ${QRC_RESOURCE_FILE} ${RC_RESOURCE_FILE} MANUAL_FINALIZATION ${PROJECT_SOURCES})
+target_link_libraries(${IODE_CPP_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iode_cpp_api)
 # By calling target_include_directories, we make sure that the absolute path to 
-# the gui directory is automatically added as an include path to the ${IODE_GUI_TARGET} target.
+# the gui directory is automatically added as an include path to the ${IODE_CPP_GUI_TARGET} target.
 # Required to use the custom widgets in UI files
-target_include_directories(${IODE_GUI_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${IODE_CPP_GUI_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # disable warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${IODE_GUI_TARGET} PRIVATE /W0)
+    target_compile_options(${IODE_CPP_GUI_TARGET} PRIVATE /W0)
 endif()
 
-set_target_properties(${IODE_GUI_TARGET} PROPERTIES
+set_target_properties(${IODE_CPP_GUI_TARGET} PROPERTIES
     WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
 )
 
-qt_finalize_executable(${IODE_GUI_TARGET})
+qt_finalize_executable(${IODE_CPP_GUI_TARGET})
 
 # copy user documentation to the final build directory
-add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:${IODE_GUI_TARGET}>/doc)
+add_custom_command(TARGET ${IODE_CPP_GUI_TARGET} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:${IODE_CPP_GUI_TARGET}>/doc)
 # copy iode.msg to the final build directory
-add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/iode.msg $<TARGET_FILE_DIR:${IODE_GUI_TARGET}>/iode.msg)
+add_custom_command(TARGET ${IODE_CPP_GUI_TARGET} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/iode.msg $<TARGET_FILE_DIR:${IODE_CPP_GUI_TARGET}>/iode.msg)
 
 if(WIN32)
     # If Windows: Need to copy Qt DLLs in the same directory as generated executable
@@ -307,17 +343,17 @@ if(WIN32)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_BIN_DIR}")
 
     # Run windeployqt immediately after build
-    add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
+    add_custom_command(TARGET ${IODE_CPP_GUI_TARGET} POST_BUILD
         COMMAND "${WINDEPLOYQT_ENV_SETUP}" && "${WINDEPLOYQT_EXECUTABLE}" 
             --list target 
             --no-quick-import
             --no-translations
             --verbose 1 
-            "$<TARGET_FILE:${IODE_GUI_TARGET}>"
+            "$<TARGET_FILE:${IODE_CPP_GUI_TARGET}>"
         COMMENT "Running windeployqt..."
     )
 
-message(STATUS "New target ${IODE_GUI_TARGET} enabled")
+message(STATUS "New target ${IODE_CPP_GUI_TARGET} enabled")
 
 endif()
 

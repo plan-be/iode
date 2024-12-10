@@ -246,7 +246,7 @@
   <customwidget>
    <class>EditTableView</class>
    <extends>QTableView</extends>
-   <header>iode_objs/edit/edit_table_view.h</header>
+   <header>iode_gui/iode_objs/edit/edit_table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt, Slot
 
 from .ui_file_settings import Ui_MenuFileSettings
-from print.file_print_preferences import FilePrintPreferences
+from iode_gui.print.file_print_preferences import FilePrintPreferences
 from iode_gui.settings import MixinSettingsDialog
 
 

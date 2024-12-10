@@ -13,42 +13,42 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
-from menu.file.file_new_project import MenuFileNewProject
-from menu.file.file_import_comments import MenuFileImportComments
-from menu.file.file_import_variables import MenuFileImportVariables
-from menu.file.file_export import MenuFileExport
-from menu.file.file_settings import MenuFileSettings
+from iode_gui.menu.file.file_new_project import MenuFileNewProject
+from iode_gui.menu.file.file_import_comments import MenuFileImportComments
+from iode_gui.menu.file.file_import_variables import MenuFileImportVariables
+from iode_gui.menu.file.file_export import MenuFileExport
+from iode_gui.menu.file.file_settings import MenuFileSettings
 
-from menu.workspace.workspace_copy_into import MenuWorkspaceCopyInto
-from menu.workspace.workspace_merge_into import MenuWorkspaceMergeInto
-from menu.workspace.workspace_describe import MenuWorkspaceDescribe
-from menu.workspace.workspace_extrapolate_variables import MenuWorkspaceExtrapolateVariables
-from menu.workspace.workspace_high_to_low import MenuWorkspaceHighToLow
-from menu.workspace.workspace_low_to_high import MenuWorkspaceLowToHigh
-from menu.workspace.workspace_seasonal_adjustment import MenuWorkspaceSeasonalAdjustment
-from menu.workspace.workspace_trend_correction import MenuWorkspaceTrendCorrection
+from iode_gui.menu.workspace.workspace_copy_into import MenuWorkspaceCopyInto
+from iode_gui.menu.workspace.workspace_merge_into import MenuWorkspaceMergeInto
+from iode_gui.menu.workspace.workspace_describe import MenuWorkspaceDescribe
+from iode_gui.menu.workspace.workspace_extrapolate_variables import MenuWorkspaceExtrapolateVariables
+from iode_gui.menu.workspace.workspace_high_to_low import MenuWorkspaceHighToLow
+from iode_gui.menu.workspace.workspace_low_to_high import MenuWorkspaceLowToHigh
+from iode_gui.menu.workspace.workspace_seasonal_adjustment import MenuWorkspaceSeasonalAdjustment
+from iode_gui.menu.workspace.workspace_trend_correction import MenuWorkspaceTrendCorrection
 
-from menu.data.sort_expand_list import MenuDataSortExpandList
-from menu.data.list_calculus import MenuDataListCalculus
-from menu.data.file_contents import MenuDataFileContents
-from menu.data.file_compare import MenuDataFileCompare
-from menu.data.search_text import MenuDataSearchText
-from menu.data.scan_objects import MenuDataScanObjects
-from menu.data.edit_tables import MenuDataEditTables
-from menu.data.duplicate import MenuDataDuplicateObj
+from iode_gui.menu.data.sort_expand_list import MenuDataSortExpandList
+from iode_gui.menu.data.list_calculus import MenuDataListCalculus
+from iode_gui.menu.data.file_contents import MenuDataFileContents
+from iode_gui.menu.data.file_compare import MenuDataFileCompare
+from iode_gui.menu.data.search_text import MenuDataSearchText
+from iode_gui.menu.data.scan_objects import MenuDataScanObjects
+from iode_gui.menu.data.edit_tables import MenuDataEditTables
+from iode_gui.menu.data.duplicate import MenuDataDuplicateObj
 
-from menu.compute.compute_identities import MenuComputeIdentities
-from menu.compute.compute_simulation import MenuComputeSimulation
-from menu.compute.compute_model import MenuComputeModel
-from menu.compute.compute_scc_decomposition import MenuComputeSCCDecomposition
-from menu.compute.compute_scc_simulation import MenuComputeSCCSimulation
+from iode_gui.menu.compute.compute_identities import MenuComputeIdentities
+from iode_gui.menu.compute.compute_simulation import MenuComputeSimulation
+from iode_gui.menu.compute.compute_model import MenuComputeModel
+from iode_gui.menu.compute.compute_scc_decomposition import MenuComputeSCCDecomposition
+from iode_gui.menu.compute.compute_scc_simulation import MenuComputeSCCSimulation
 
-from menu.print_graph.print_tables import MenuPrintTables
-from menu.print_graph.print_variables import MenuPrintVariables
-from menu.print_graph.graph_tables import MenuGraphTables
-from menu.print_graph.graph_variables import MenuGraphVariables
+from iode_gui.menu.print_graph.print_tables import MenuPrintTables
+from iode_gui.menu.print_graph.print_variables import MenuPrintVariables
+from iode_gui.menu.print_graph.graph_tables import MenuGraphTables
+from iode_gui.menu.print_graph.graph_variables import MenuGraphVariables
 
-from ui_main_window import Ui_MainWindow
+from iode_gui.ui_main_window import Ui_MainWindow
 
 
 class MainWindow(AbstractMainWindow):

@@ -460,8 +460,10 @@ generate_stub_files.py
 /gui/utils.py
 /gui/*resource*.py
 /gui/**/ui_*.py
+/gui/iode_gui/__init__.py
 /gui/iode_gui/utils.py
 /gui/iode_gui/*resource*.py
+/gui/dist
 
 # NSIS
 /nsis/*.nsh

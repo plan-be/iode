@@ -5,8 +5,8 @@ from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QChec
 from PySide6.QtGui import QDesktopServices, QCloseEvent
 
 from iode_gui.utils import URL_MANUAL
-from util.widgets.file_chooser import IodeFileChooser
-from util.widgets.sample_edit import IodeSampleEdit
+from iode_gui.util.widgets.file_chooser import IodeFileChooser
+from iode_gui.util.widgets.sample_edit import IodeSampleEdit
 
 
 import re

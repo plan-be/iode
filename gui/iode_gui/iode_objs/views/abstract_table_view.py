@@ -6,9 +6,9 @@ from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSiz
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_objs.models.abstract_table_model import IodeAbstractTableModel
-from iode_objs.delegates.base_delegate import BaseDelegate
-from iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
+from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
+from iode_gui.iode_objs.delegates.base_delegate import BaseDelegate
+from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
 from iode import IodeType, variables
 # TODO : add MAX_LENGTH_NAME (= K_MAX_NAME) to the Python iode package

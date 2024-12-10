@@ -4,7 +4,7 @@ from PySide6.QtGui import QKeyEvent
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings, class_name_to_settings_group_name
-from text_edit.complete_line_edit import IodeAutoCompleteLineEdit
+from iode_gui.text_edit.complete_line_edit import IodeAutoCompleteLineEdit
 
 from typing import List
 from iode import execute_command

@@ -3,10 +3,10 @@ from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import QLabel, QSpinBox, QCheckBox, QHBoxLayout
 
 from iode_gui.utils import MAX_PRECISION_NUMBERS
-from iode_objs.models.table_model import ScalarsModel, VariablesModel
-from iode_objs.models.computed_table_model import ComputedTableModel
-from iode_objs.views.table_view import ScalarsView, VariablesView
-from iode_objs.views.computed_table_view import ComputedTableView
+from iode_gui.iode_objs.models.table_model import ScalarsModel, VariablesModel
+from iode_gui.iode_objs.models.computed_table_model import ComputedTableModel
+from iode_gui.iode_objs.views.table_view import ScalarsView, VariablesView
+from iode_gui.iode_objs.views.computed_table_view import ComputedTableView
 
 from typing import List, Union
 

@@ -11,12 +11,12 @@ from typing import List, Union, Optional
 
 from iode_gui.settings import ProjectSettings
 from iode_gui.abstract_main_window import AbstractMainWindow
-from tabs.tab_abstract import IodeAbstractWidget
-from tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
-from tabs.iode_objs.tab_database import (CommentsWidget, EquationsWidget, IdentitiesWidget, 
+from iode_gui.tabs.tab_abstract import IodeAbstractWidget
+from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
+from iode_gui.tabs.iode_objs.tab_database import (CommentsWidget, EquationsWidget, IdentitiesWidget, 
                                          ListsWidget, ScalarsWidget, TablesWidget, VariablesWidget)
-from tabs.tab_text import TextWidget
-from tabs.tab_report import ReportWidget
+from iode_gui.tabs.tab_text import TextWidget
+from iode_gui.tabs.tab_report import ReportWidget
 from iode_gui.utils import SHOW_IN_TEXT_TAB_EXTENSIONS_LIST
 
 from iode import IodeType, IodeFileType, IODE_FILE_TYPES, IODE_DATABASE_TYPE_NAMES

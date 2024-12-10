@@ -45,14 +45,14 @@ message(STATUS "List of files to be installed:\n")
 
 # GUI executable file
 message(STATUS "GUI executable file:")
-message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_GUI_TARGET}.exe")
+message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_CPP_GUI_TARGET}.exe")
 
 set(QT_DIR "${RELATIVE_DIR}\\gui")
 file(READ "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
 string(REPLACE "<QT DIR>" ${QT_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
 
-set(GUI_EXE_FILE "${CMAKE_BINARY_DIR}/gui/${IODE_GUI_TARGET}.exe")
+set(GUI_EXE_FILE "${CMAKE_BINARY_DIR}/gui/${IODE_CPP_GUI_TARGET}.exe")
 
 # user documentation
 message(STATUS "User doc:")
@@ -136,6 +136,6 @@ ADD_CUSTOM_TARGET(nsis_windows_updater
   DEPENDS ${IODE_NSIS_UPDATE_SCRIPT} ${CLI_EXE_FILE} ${GUI_EXE_FILE} ${PYTHON_FILES})
 
 ADD_CUSTOM_TARGET(nsis ALL) # Entry point of execution.
-ADD_DEPENDENCIES(nsis ${IODE_GUI_TARGET})
+ADD_DEPENDENCIES(nsis ${IODE_CPP_GUI_TARGET})
 ADD_DEPENDENCIES(nsis nsis_windows_installer)
 ADD_DEPENDENCIES(nsis nsis_windows_updater)

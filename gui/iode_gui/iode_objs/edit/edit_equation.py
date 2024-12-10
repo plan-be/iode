@@ -4,11 +4,11 @@ from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_objs.estimation.estimation_coefs import EstimationCoefsDialog
-from iode_objs.estimation.estimation_results import EstimationResultsDialog
-from iode_objs.misc.unit_root import UnitRootDialog
-from iode_objs.misc.dyn_adjustment import DynAdjustmentDialog
-from text_edit.completer import IodeCompleter
+from iode_gui.iode_objs.estimation.estimation_coefs import EstimationCoefsDialog
+from iode_gui.iode_objs.estimation.estimation_results import EstimationResultsDialog
+from iode_gui.iode_objs.misc.unit_root import UnitRootDialog
+from iode_gui.iode_objs.misc.dyn_adjustment import DynAdjustmentDialog
+from iode_gui.text_edit.completer import IodeCompleter
 
 from .ui_edit_equation import Ui_EditEquationDialog
 
