@@ -1,0 +1,59 @@
+# Testing IODE commands opening a dialog box
+# ------------------------------------------
+
+$debug 1
+
+$define input_dir .
+$define output_dir .
+
+# Define output destination
+# -------------------------
+$PrintDest %output_dir%\test_gui_commands.a2m A2M
+
+#PrintObjDefTbl
+
+#PrintGr
+#ViewGr
+#PrintTbl
+#ViewTbl
+#ViewByTbl
+
+#DataSearchTbl
+#DataDuplicateTbl
+#DataListTbl
+#DataCompareTbl
+#DataCalcLst
+#DataListSort
+#DataDisplayGraph
+#DataScanTbl
+
+#StatUnitRoot
+
+#WsLoad
+#WsSave
+#WsMerge
+#WsDescr
+#WsCopy
+#WsClear
+#WsSample
+#WsExtrapolate
+
+#WsHtoLLast
+#WsHtoLSum
+#WsHtoLMean
+
+#WsLtoHFlow
+#WsLtoHStock
+
+#WsSeasonAdj
+#WsTrend
+
+#ModelSimulate
+#ModelCompile
+
+#IdtExecute
+
+#EqsEstimate
+
+#FileImportVar
+#FileImportCmt
