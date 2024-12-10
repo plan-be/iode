@@ -5,10 +5,10 @@ requires = [ "scikit-build-core >=0.4.3", "numpy", "cython>=3.0", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "iode"
+name = "${IODE_PACKAGE_NAME}"
 version = "${CMAKE_PROJECT_VERSION}"
-description = "IODE is a package dedicated to econometric models and to the management of statistical series."
-readme = "README.md"
+description = "${IODE_PACKAGE_DESCRIPTION}"
+readme = "../README.md"
 requires-python = ">=3.10"
 authors = [
     { name = "Alix Damman", email = "ald@plan.be" },
@@ -33,10 +33,10 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy<2.0", "pandas" ]
+dependencies = [ ${IODE_PACKAGE_DEPENDENCIES} ]
 
 [project.scripts]
-iodecmd = "iode.cli:main"
+${IODE_PACKAGE_SCRIPT}
 
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
@@ -51,46 +51,51 @@ minimum-version = "0.7"
 # Verbose printout when building.
 cmake.verbose = true
 
-# The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
-# possible options.
+# The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are possible options.
 logging.level = "DEBUG"
+
+cmake.build-type = "Release"
+cmake.define.CMAKE_BUILD_TYPE = "Release"
+
+cmake.source-dir = ".."
 
 # A list of args to pass to CMake when configuring the project. Setting this in
 # config or envvar will override toml.
-cmake.args = ["-G", "Ninja", "-D", "CMAKE_BUILD_TYPE=Release"]
+cmake.args = ["-G", "Ninja"]
 
-# The build targets to use when building the project. Empty builds the default
-# target.
-cmake.targets = ["iode_cython"]
+# The build targets to use when building the project. Empty builds the default target.
+cmake.targets = ["${IODE_PACKAGE_CMAKE_TARGET}"]
 
 # The wheel will automatically look for Python packages at src/<package_name>, 
 # python/<package_name>, and <package_name>, in that order. 
 # If you want to list packages explicitly, you can. 
 # The final path element is the package.
-wheel.packages = ["pyiode/iode"]
+wheel.packages = ["${IODE_PACKAGE_WHEEL_PACKAGES}"]
+
+wheel.license-files = ["../LICENSE.md"]
 
 # Scikit-build-core defaults to using your .gitignore to select what to exclude from 
 # the source distribution. However, sdist.include and sdist.exclude can be used to 
 # override this behavior
-sdist.include = ["iode.msg", "**/*.pyi", "data"]
-# sdist.exclude = []
+sdist.include = [${IODE_PACKAGE_SDIST_INCLUDE}]
+sdist.exclude = [${IODE_PACKAGE_SDIST_EXCLUDE}]
 
 # The build directory. Defaults to a temporary directory, but can be set.
-build-dir = "./out/build/python/{wheel_tag}"
+build-dir = "../out/build/python/{wheel_tag}"
 
 # Build stable ABI wheels for CPython 3.12+
 wheel.py-api = "cp312"
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "--doctest-modules --doctest-continue-on-failure --durations=0 --verbose"
-testpaths = ["tests/test_python"]
-log_cli = "True"
-log_cli_level = "INFO"
-
 [tool.cibuildwheel]
 # Necessary to see build output from the actual compilation
 build-verbosity = 1
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--doctest-modules --doctest-continue-on-failure --durations=0 --verbose"
+testpaths = ["../tests/test_python"]
+log_cli = "True"
+log_cli_level = "INFO"
 
 # Run pytest to ensure that the package was correctly built
 test-command = "pytest"

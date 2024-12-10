@@ -146,22 +146,24 @@ You first have to build it and install it locally.
 In a console, go to root directory of your local `iode` project.
 Then type:
 ```bash
-root_dir_iode> pip install .
+root_dir_iode> cd pyiode
+pyiode> pip install .
 ```
 Note: you must have cython, numpy, pandas, larray, scikit-build-core and pytest installed.
 
-Finally, type `pytest` () :
+Finally, return to the root project directory and type `pytest` :
 ```bash
+pyiode> cd ..
 root_dir_iode> pytest
 ```
 
 **Note**: to only create the wheel file, type:
 ```bash
-root_dir_iode> pip wheel .
+pyiode> pip wheel .
 ```
 The, to install the wheel file, type:
 ```bash
-root_dir_iode> pip install <iode-wheel-file>.whl
+pyiode> pip install <iode-wheel-file>.whl
 ```
 
 # Python API
@@ -184,20 +186,27 @@ the `build` package:
 root_dir_iode> conda install build
 ```
 
+Then, go to the `pyiode` sub-directory:
+```bash
+root_dir_iode> cd pyiode
+pyiode>
+```
+
 To create the [SDist tarfile](https://scikit-build-core.readthedocs.io/en/latest/build.html#sdist) 
 (with all the code required to build the project, along with a little bit of metadata), type:
 ```bash
-root_dir_iode> python -m build --sdist
+
+pyiode> python -m build --sdist
 ```
 
 Then, to create the [Wheel file](https://scikit-build-core.readthedocs.io/en/latest/build.html#wheel) (a ZIP file containing the compiled Python package), type:
 ```bash
-root_dir_iode> python -m build --wheel
+pyiode> python -m build --wheel
 ```
 
 You can combine the two above process by typing:
 ```bash
-root_dir_iode> python -m build --sdist --wheel
+pyiode> python -m build --sdist --wheel
 ```
 
 ## Uploading the distribution archives to TestPyPI

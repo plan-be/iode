@@ -105,10 +105,13 @@ jobs:
             run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cython
           - name: Build iode wheel file
             shell: bash -el {0}
-            run: pip wheel --verbose .
+            run: |
+              cd pyiode 
+              pip wheel --verbose .
           - name: Install iode package
             shell: bash -el {0}
             run: | 
+              cd pyiode
               filename=$(ls iode*.whl) 
               echo $filename 
               pip install $filename
@@ -121,5 +124,5 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: iode-python-3.${{ matrix.python-minor-version }}
-              path: "${{ github.workspace }}/iode*.whl"
+              path: "${{ github.workspace }}/pyiode/iode*.whl"
               if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`

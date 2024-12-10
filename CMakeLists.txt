@@ -246,19 +246,6 @@ endif()
 
 message(STATUS " ")
 message(STATUS "=============================")
-message(STATUS "GENERATE TOML FILE FOR IODE PYTHON PACKAGE ...\n")
-
-# configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
-# Each variable reference will be replaced with the current value of the variable, or the empty string 
-# if the variable is not defined.
-# see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-configure_file(
-      ${CMAKE_SOURCE_DIR}/pyproject.toml.in
-      ${CMAKE_SOURCE_DIR}/pyproject.toml
-  )
-
-message(STATUS " ")
-message(STATUS "=============================")
 
 # ---- copy files to output build directory ----
 message(STATUS "COPY FILES TO ${CMAKE_BINARY_DIR} ...\n")
