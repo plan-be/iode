@@ -5,66 +5,126 @@ if(SKBUILD)
 	message(STATUS "Skip target ${IODE_GUI_TARGET}\n")
 else()
 
-# Find PyUIC6
-find_program(PYUIC6_EXECUTABLE pyside6-uic)
-# Find PyRCC6
-find_program(PYRCC6_EXECUTABLE pyside6-rcc)
+if(Python_FOUND)
+    # Find PyUIC6
+    find_program(PYUIC6_EXECUTABLE pyside6-uic)
+    # Find PyRCC6
+    find_program(PYRCC6_EXECUTABLE pyside6-rcc)
 
-set(RESOURCE_FILENAME "iode_resource")
-set(RC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.rc")
-set(QRC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.qrc")
+    set(RESOURCE_FILENAME "iode_resource")
+    set(RC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.rc")
+    set(QRC_RESOURCE_FILE "${IODE_RESOUCES_DIR}/${RESOURCE_FILENAME}.qrc")
 
-set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
-set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PY_RESOURCE_FILENAME}.py")
+    set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
+    set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAME}.py")
 
-# Check if PyUIC6 and PyRCC6 are found
-if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
-    cmake_print_variables(PYUIC6_EXECUTABLE)
-    cmake_print_variables(PYRCC6_EXECUTABLE)
+    # Check if PyUIC6 and PyRCC6 are found
+    if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
+        cmake_print_variables(PYUIC6_EXECUTABLE)
+        cmake_print_variables(PYRCC6_EXECUTABLE)
 
-    # Get all .ui files in the current directory and subdirectories
-    file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
+        # Get all .ui files in the current directory and subdirectories
+        file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
 
-    # Create a custom command for each .ui file
-    foreach(UI_FILE ${UI_FILES})
-        # Get the output .py file path
-        get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
-        get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
-        set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
+        # Create a custom command for each .ui file
+        foreach(UI_FILE ${UI_FILES})
+            # Get the output .py file path
+            get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
+            get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
+            set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
 
-        # Add a custom command to convert the .ui file to a .py file
+            # Add a custom command to convert the .ui file to a .py file
+            add_custom_command(
+                OUTPUT ${PY_FILE}
+                COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE}
+                DEPENDS ${UI_FILE}
+                )
+                
+            # Add the .py file to the list of sources
+            list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
+        endforeach()
+
+        # See Qt Resource System
         add_custom_command(
-            OUTPUT ${PY_FILE}
-            COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE}
-            DEPENDS ${UI_FILE}
-            )
-            
-        # Add the .py file to the list of sources
-        list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
-    endforeach()
+            OUTPUT ${PY_RESOURCE_FILE}
+            COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
+            DEPENDS ${QRC_RESOURCE_FILE}
+        )
 
-    # See Qt Resource System
-    add_custom_command(
-        OUTPUT ${PY_RESOURCE_FILE}
-        COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
-        DEPENDS ${QRC_RESOURCE_FILE}
-    )
+        # remove previously generated Python files if they exist
+        file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
-    # remove previously generated Python files if they exist
-    file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
+        # Create a custom target that depends on all the .py files
+        add_custom_target(iode_generate_ui_python_files ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
 
-    # Create a custom target that depends on all the .py files
-    add_custom_target(iode_gui_python ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
+        message(STATUS "New target iode_generate_ui_python_files enabled")
+    else()
+        message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
+    endif()
 
-    message(STATUS "New target iode_gui_python enabled")
+    message(CHECK_START "Search for Cython")
+    find_program(CYTHON "cython")
+    if(CYTHON)
+        message(CHECK_PASS "found")
+        message(STATUS "\nSet up target for iode Python package\n")
+        cmake_print_variables(CYTHON)
+
+        set(IODE_PACKAGE_NAME "iode-gui")
+        set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
+        set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
+        set(IODE_PACKAGE_SCRIPT "")
+        set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
+        set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\", \"${IODE_PACKAGE_CMAKE_TARGET}\"")
+        set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
+        set(IODE_PACKAGE_SDIST_INCLUDE "")
+        set(IODE_PACKAGE_SDIST_EXCLUDE "")
+        
+        # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
+        # Each variable reference will be replaced with the current value of the variable, or the empty string 
+        # if the variable is not defined.
+        # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
+        configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
+
+        # copy all Python files to binary directory
+        file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
+             FILES_MATCHING PATTERN "*.py")
+
+        if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp")
+            file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp")
+        endif()
+
+        add_custom_command(OUTPUT ${IODE_PACKAGE_CMAKE_TARGET}.cpp
+        DEPENDS super.pyx
+        VERBATIM
+        COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/super.pyx -3 --verbose --cplus 
+        --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name ${IODE_PACKAGE_CMAKE_TARGET}
+        --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
+        --output-file ${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp)
+
+        python_add_library(${IODE_PACKAGE_CMAKE_TARGET} MODULE ${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp WITH_SOABI)
+
+        target_link_libraries(${IODE_PACKAGE_CMAKE_TARGET} PRIVATE iode_cpp_api Python::NumPy)
+        target_include_directories(${IODE_PACKAGE_CMAKE_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
+        target_compile_definitions(${IODE_PACKAGE_CMAKE_TARGET} PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
+
+        # Add a custom command to copy the generated .pyd file in the current source directory
+        add_custom_command(TARGET ${IODE_PACKAGE_CMAKE_TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${IODE_PACKAGE_CMAKE_TARGET}> ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui)
+
+        install(TARGETS ${IODE_PACKAGE_CMAKE_TARGET} LIBRARY DESTINATION iode)
+    else()
+        message(CHECK_FAIL "Cython not found")
+    endif()
+
+  if(TARGET ${IODE_PACKAGE_CMAKE_TARGET})
+    message(STATUS "\nNew target ${IODE_PACKAGE_CMAKE_TARGET} enabled\n")
+  else()
+    message(WARNING "Could not create the target ${IODE_PACKAGE_CMAKE_TARGET}\n")
+  endif()
 else()
-    message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
+  message(WARNING "Python not found")
 endif()
-
-configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py.in
-      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py
-  )
 
 
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
