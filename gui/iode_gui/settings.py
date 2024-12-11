@@ -4,13 +4,13 @@ from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QChec
                                QPlainTextEdit)
 from PySide6.QtGui import QDesktopServices, QCloseEvent
 
+from iode_gui.utils import URL_MANUAL
 from util.widgets.file_chooser import IodeFileChooser
 from util.widgets.sample_edit import IodeSampleEdit
 
 
 import re
 from typing import Any
-from utils import URL_MANUAL
 
 RUN_REPORTS_FROM_PROJECT_DIR = "run_reports_from_project_dir"
 PRINT_DESTINATION = "print_destination"

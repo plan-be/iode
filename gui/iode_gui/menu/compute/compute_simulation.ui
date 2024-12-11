@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MenuComputeSimulation</class>
+ <widget class="QDialog" name="MenuComputeSimulation">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>620</width>
+    <height>350</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>620</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>620</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MODEL SIMULATION</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" rowspan="3">
+    <widget class="QLabel" name="label_equations_list">
+     <property name="text">
+      <string>Equations List
+
+(empty for
+all equations)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="4" colspan="6">
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_equations_list"/>
+   </item>
+   <item row="0" column="7">
+    <widget class="QPushButton" name="OKButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+     <property name="shortcut">
+      <string>F10</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="shortcut">
+      <string>Esc</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="7">
+    <widget class="QPushButton" name="helpButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Help</string>
+     </property>
+     <property name="shortcut">
+      <string>F1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7" rowspan="6">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>239</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_exchange">
+     <property name="text">
+      <string>Exchange (EN-EX)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="6">
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_exchange"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_simulation">
+     <property name="text">
+      <string>Simulation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="label_simulation_from">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="IodeSampleEdit" name="sampleEdit_sample_from">
+     <property name="toolTip">
+      <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="QLabel" name="label_simulation_to">
+     <property name="text">
+      <string>To</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="IodeSampleEdit" name="sampleEdit_sample_to">
+     <property name="toolTip">
+      <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="5">
+    <widget class="QLabel" name="label_convergence">
+     <property name="text">
+      <string>Convergence</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <widget class="QLineEdit" name="lineEdit_convergence">
+     <property name="text">
+      <string>0.001</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_max_iterations">
+     <property name="text">
+      <string>Max. Iterations</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2">
+    <widget class="QSpinBox" name="spinBox_max_iterations">
+     <property name="maximum">
+      <number>1000000</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+     <property name="displayIntegerBase">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3">
+    <widget class="QLabel" name="label_debug">
+     <property name="text">
+      <string>Debug</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4">
+    <widget class="QCheckBox" name="checkBox_debug">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="5">
+    <widget class="QLabel" name="label_relaxation">
+     <property name="text">
+      <string>Relaxation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="6">
+    <widget class="QLineEdit" name="lineEdit_relaxation">
+     <property name="text">
+      <string>1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_initialisation">
+     <property name="text">
+      <string>Initialisation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="4">
+    <widget class="QComboBox" name="comboBox_initialization">
+     <property name="minimumSize">
+      <size>
+       <width>240</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="5" colspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>159</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_sort_algorithm">
+     <property name="text">
+      <string>Sort Algorithm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="4">
+    <widget class="QComboBox" name="comboBox_sort_algorithm">
+     <property name="minimumSize">
+      <size>
+       <width>240</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="5">
+    <widget class="QLabel" name="label_passes">
+     <property name="text">
+      <string>Passes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="6">
+    <widget class="QSpinBox" name="spinBox_nb_passes">
+     <property name="value">
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>util/widgets/sample_edit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>IodeAutoCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>text_edit/complete_text_edit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>OKButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuComputeSimulation</receiver>
+   <slot>compute()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>568</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuComputeSimulation</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>568</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>helpButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuComputeSimulation</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>568</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>help()</slot>
+  <slot>compute()</slot>
+ </slots>
+</ui>

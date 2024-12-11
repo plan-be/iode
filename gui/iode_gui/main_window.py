@@ -5,13 +5,13 @@ from PySide6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QT
 from iode import IodeType, variables
 from typing import List
 
-from utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
-                   ORGANIZATION_NAME, URL_HOMEPAGE, URL_CHANGELOG, URL_PYTHON_API, 
-                   URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY)
+from iode_gui.utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
+                            ORGANIZATION_NAME, URL_HOMEPAGE, URL_CHANGELOG, URL_PYTHON_API, 
+                            URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY)
 
-from abstract_main_window import AbstractMainWindow
-from settings import ProjectSettings
-from iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
+from iode_gui.settings import ProjectSettings
+from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
 from menu.file.file_new_project import MenuFileNewProject
 from menu.file.file_import_comments import MenuFileImportComments

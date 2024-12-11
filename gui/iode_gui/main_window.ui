@@ -1,0 +1,1507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>640</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>IODE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/iode_resource.qrc">
+    <normaloff>:/images/iode_icon.png</normaloff>:/images/iode_icon.png</iconset>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>24</height>
+   </size>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="IodeTabWidget" name="tabWidget_IODE_objs">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <widget class="QMenu" name="menuRecent_Projects">
+     <property name="title">
+      <string>Recent Projects</string>
+     </property>
+    </widget>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="menuRecent_Projects"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_All"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport_Comments"/>
+    <addaction name="actionImport_Variables"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuWorkspace">
+    <property name="title">
+     <string>&amp;Workspace</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionClear_Work_Space"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopy_into_Work_Space"/>
+    <addaction name="actionMerge_into_Work_Space"/>
+    <addaction name="actionDescribe_Work_Space"/>
+    <addaction name="actionSet_Variables_Sample"/>
+    <addaction name="actionExtrapolate_Variables"/>
+    <addaction name="separator"/>
+    <addaction name="actionHigh_to_Low"/>
+    <addaction name="actionLow_to_High"/>
+    <addaction name="actionSeasonal_Adjustment"/>
+    <addaction name="actionTrend_correction"/>
+   </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>&amp;Data</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionSort_and_Expand"/>
+    <addaction name="actionList_Calculus"/>
+    <addaction name="separator"/>
+    <addaction name="actionFile_Contents"/>
+    <addaction name="actionFile_Compare"/>
+    <addaction name="separator"/>
+    <addaction name="actionSearch_Text"/>
+    <addaction name="actionScan_Objects"/>
+    <addaction name="separator"/>
+    <addaction name="actionEdit_Tables_Variables"/>
+    <addaction name="separator"/>
+    <addaction name="actionDuplicate_objects"/>
+   </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>&amp;Run</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionMODELS"/>
+    <addaction name="separator"/>
+    <addaction name="actionSimulation_Goal_Seeking"/>
+    <addaction name="actionCompile_Model"/>
+    <addaction name="separator"/>
+    <addaction name="actionSCC_Decomposition"/>
+    <addaction name="actionSCC_Simulation"/>
+    <addaction name="separator"/>
+    <addaction name="actionIDENTITIES"/>
+    <addaction name="separator"/>
+    <addaction name="actionExecute_Identities"/>
+   </widget>
+   <widget class="QMenu" name="menuPrint_Graph">
+    <property name="title">
+     <string>&amp;Print/Graph</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionPRINT"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint_View_Tables"/>
+    <addaction name="actionPrint_View_Variables"/>
+    <addaction name="actionObject_Definitions"/>
+    <addaction name="separator"/>
+    <addaction name="actionGRAPHICS"/>
+    <addaction name="separator"/>
+    <addaction name="actionGraphs_from_Tables"/>
+    <addaction name="actionGraphs_from_Variables"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionIode_Manual"/>
+    <addaction name="actionIode_Home"/>
+    <addaction name="actionIode_Python_API"/>
+    <addaction name="actionIode_Readme"/>
+    <addaction name="separator"/>
+    <addaction name="actionKeyboard_Shortcuts"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Iode"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuWorkspace"/>
+   <addaction name="menuData"/>
+   <addaction name="menuRun"/>
+   <addaction name="menuPrint_Graph"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget_file_explorer">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>178</width>
+     <height>113</height>
+    </size>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>File Explorer</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="IodeFileExplorer" name="treeView_file_explorer">
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::EditKeyPressed</set>
+       </property>
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropOverwriteMode">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::InternalMove</enum>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::MoveAction</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_command">
+   <property name="minimumSize">
+    <size>
+     <width>294</width>
+     <height>143</height>
+    </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Command</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_iode_command">
+       <property name="text">
+        <string>Report Command</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="IodeCommandLine" name="lineEdit_iode_command"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="pushButton_run_iode_command">
+       <property name="text">
+        <string>Run</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_output">
+       <property name="text">
+        <string>Output</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTextEdit" name="textEdit_output">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionImport_Comments">
+   <property name="text">
+    <string>Import Comments</string>
+   </property>
+   <property name="toolTip">
+    <string>Import files respecting certain rules to IODE</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export files respecting certain rules to IODE</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Change Print Setup</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Leave I.O.D.E application</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
+  </action>
+  <action name="actionClear_Work_Space">
+   <property name="text">
+    <string>Clear All WorkSpaces</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear current work space(s)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+D</string>
+   </property>
+  </action>
+  <action name="actionCopy_into_Work_Space">
+   <property name="text">
+    <string>Copy into Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy object list from disk into the work space</string>
+   </property>
+  </action>
+  <action name="actionMerge_into_Work_Space">
+   <property name="text">
+    <string>Merge into Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Merge file from disk into the work space</string>
+   </property>
+  </action>
+  <action name="actionDescribe_Work_Space">
+   <property name="text">
+    <string>Describe Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Change work spaces descriptions</string>
+   </property>
+  </action>
+  <action name="actionSet_Variables_Sample">
+   <property name="text">
+    <string>Set Variables Sample</string>
+   </property>
+   <property name="toolTip">
+    <string>Change current variables definition sample</string>
+   </property>
+  </action>
+  <action name="actionExtrapolate_Variables">
+   <property name="text">
+    <string>Extrapolate Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Extrapolate variables from WS</string>
+   </property>
+  </action>
+  <action name="actionHigh_to_Low">
+   <property name="text">
+    <string>High to Low</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy file with higher frequency into the work space</string>
+   </property>
+  </action>
+  <action name="actionLow_to_High">
+   <property name="text">
+    <string>Low to High</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy file with lower frequency into the work space</string>
+   </property>
+  </action>
+  <action name="actionSeasonal_Adjustment">
+   <property name="text">
+    <string>Seasonal Adjustment</string>
+   </property>
+   <property name="toolTip">
+    <string>Census II-method for Seasonal Adjustment</string>
+   </property>
+  </action>
+  <action name="actionTrend_correction">
+   <property name="text">
+    <string>Trend correction</string>
+   </property>
+   <property name="toolTip">
+    <string>Hodrick-Prescott filter for trend correction</string>
+   </property>
+  </action>
+  <action name="actionSort_and_Expand">
+   <property name="text">
+    <string>Sort and Expand</string>
+   </property>
+   <property name="toolTip">
+    <string>Expand and sort lists</string>
+   </property>
+  </action>
+  <action name="actionList_Calculus">
+   <property name="text">
+    <string>List Calculus</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute various logical operations on lists</string>
+   </property>
+  </action>
+  <action name="actionFile_Contents">
+   <property name="text">
+    <string>File Contents</string>
+   </property>
+   <property name="toolTip">
+    <string>Gives the contents of a file</string>
+   </property>
+  </action>
+  <action name="actionFile_Compare">
+   <property name="text">
+    <string>File Compare</string>
+   </property>
+   <property name="toolTip">
+    <string>Compares the contents of the WS and that of a file</string>
+   </property>
+  </action>
+  <action name="actionSearch_Text">
+   <property name="text">
+    <string>Search Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Search for a text in object definitions</string>
+   </property>
+  </action>
+  <action name="actionScan_Objects">
+   <property name="text">
+    <string>Scan Objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Scan for variables and scalars in object definitions</string>
+   </property>
+  </action>
+  <action name="actionEdit_Tables_Variables">
+   <property name="text">
+    <string>Edit Tables</string>
+   </property>
+  </action>
+  <action name="actionDuplicate_objects">
+   <property name="text">
+    <string>Duplicate objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Duplicate objects in the current work space</string>
+   </property>
+  </action>
+  <action name="actionMODELS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>MODELS</string>
+   </property>
+  </action>
+  <action name="actionSimulation_Goal_Seeking">
+   <property name="text">
+    <string>Simulation - Goal Seeking</string>
+   </property>
+   <property name="toolTip">
+    <string>Simulate a model</string>
+   </property>
+  </action>
+  <action name="actionCompile_Model">
+   <property name="text">
+    <string>Compile Model</string>
+   </property>
+   <property name="toolTip">
+    <string>Compile a set of equations</string>
+   </property>
+  </action>
+  <action name="actionSCC_Decomposition">
+   <property name="text">
+    <string>SCC Decomposition</string>
+   </property>
+   <property name="toolTip">
+    <string>SCC Decomposition and reordering</string>
+   </property>
+  </action>
+  <action name="actionSCC_Simulation">
+   <property name="text">
+    <string>SCC Simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Simulate a pre-ordered model</string>
+   </property>
+  </action>
+  <action name="actionIDENTITIES">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>IDENTITIES</string>
+   </property>
+  </action>
+  <action name="actionExecute_Identities">
+   <property name="text">
+    <string>Execute Identities</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute a set of identities and update current variables WorkSpace</string>
+   </property>
+  </action>
+  <action name="actionPRINT">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PRINT</string>
+   </property>
+  </action>
+  <action name="actionPrint_View_Tables">
+   <property name="text">
+    <string>Print/View Tables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute tables and Display or Print results</string>
+   </property>
+  </action>
+  <action name="actionPrint_View_Variables">
+   <property name="text">
+    <string>Print/View Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compare, Display or Print variables</string>
+   </property>
+  </action>
+  <action name="actionObject_Definitions">
+   <property name="text">
+    <string>Object Definitions</string>
+   </property>
+   <property name="toolTip">
+    <string>Print object definitions</string>
+   </property>
+  </action>
+  <action name="actionGRAPHICS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>GRAPHICS</string>
+   </property>
+  </action>
+  <action name="actionGraphs_from_Tables">
+   <property name="text">
+    <string>Graphs from Tables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute tables and Display or Print</string>
+   </property>
+  </action>
+  <action name="actionGraphs_from_Variables">
+   <property name="text">
+    <string>Graphs from Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Display or Print series values</string>
+   </property>
+  </action>
+  <action name="actionIode_Manual">
+   <property name="text">
+    <string>Iode Manual</string>
+   </property>
+   <property name="toolTip">
+    <string>Change Help system to HtmlHelp format</string>
+   </property>
+  </action>
+  <action name="actionIode_Home">
+   <property name="text">
+    <string>Iode Home</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to IODE Web Site</string>
+   </property>
+  </action>
+  <action name="actionIode_Readme">
+   <property name="text">
+    <string>Iode Changelog</string>
+   </property>
+   <property name="toolTip">
+    <string>Last changes in IODE</string>
+   </property>
+  </action>
+  <action name="actionAbout_Iode">
+   <property name="text">
+    <string>About Iode</string>
+   </property>
+   <property name="toolTip">
+    <string>Display introduction screen</string>
+   </property>
+  </action>
+  <action name="actionImport_Variables">
+   <property name="text">
+    <string>Import Variables</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save current tab content</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSave_All">
+   <property name="text">
+    <string>Save All Tabs</string>
+   </property>
+   <property name="toolTip">
+    <string>Save all tabs content</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>New Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+N</string>
+   </property>
+  </action>
+  <action name="actionKeyboard_Shortcuts">
+   <property name="text">
+    <string>Keyboard Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionIode_Python_API">
+   <property name="text">
+    <string>Iode Python API</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IodeTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>main_widgets/tab_widget/tab_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>IodeFileExplorer</class>
+   <extends>QTreeView</extends>
+   <header>main_widgets/file_explorer/file_explorer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>IodeCommandLine</class>
+   <extends>QLineEdit</extends>
+   <header location="global">main_widgets/iode_command.h</header>
+   <slots>
+    <slot>run_command()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/iode_resource.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAbout_Iode</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>about()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExport</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_export_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionImport_Comments</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_import_comments_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClear_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>clear_workspace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopy_into_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_copy_into_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionMerge_into_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_merge_into_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDescribe_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_change_workspace_descriptions_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSet_Variables_Sample</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_change_variables_sample_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExtrapolate_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_extrapolate_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionHigh_to_Low</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_high_to_low_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLow_to_High</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_low_to_high_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSeasonal_Adjustment</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_seasonal_adjustment_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTrend_correction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_trend_correction_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDuplicate_objects</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_duplicate_objects_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSimulation_Goal_Seeking</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_simulation_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCompile_Model</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_model_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSCC_Decomposition</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_scc_decomposition_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSCC_Simulation</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_scc_simulation_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExecute_Identities</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_identities_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_View_Tables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_tables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_View_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionObject_Definitions</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_objects_definitions_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGraphs_from_Tables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_graphs_tables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGraphs_from_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_graphs_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Readme</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_release_notes()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Home</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_iode_home()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Manual</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_iode_manual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionImport_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_import_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_Project</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_project()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>save_current_tab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_All</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>save_all_tabs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNew_Project</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>create_new_project()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_iode_command</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>update_tab_and_completer()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>875</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>926</x>
+     <y>529</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_run_iode_command</sender>
+   <signal>clicked()</signal>
+   <receiver>lineEdit_iode_command</receiver>
+   <slot>run_command()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>937</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>893</x>
+     <y>582</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionKeyboard_Shortcuts</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>display_keyboard_shortcuts()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionList_Calculus</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_list_calculus_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSort_and_Expand</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_sort_and_calculus_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFile_Contents</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_file_contents_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFile_Compare</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_file_compare_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSearch_Text</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_search_text_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionScan_Objects</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_scan_objects_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_Tables_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_edit_tables_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSettings</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_settings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Python_API</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_python_api()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>about()</slot>
+  <slot>open_import_comments_dialog()</slot>
+  <slot>clear_workspace()</slot>
+  <slot>open_copy_into_workspace_dialog()</slot>
+  <slot>open_merge_into_workspace_dialog()</slot>
+  <slot>open_change_workspace_descriptions_dialog()</slot>
+  <slot>open_change_variables_sample_dialog()</slot>
+  <slot>open_extrapolate_variables_dialog()</slot>
+  <slot>open_high_to_low_dialog()</slot>
+  <slot>open_low_to_high_dialog()</slot>
+  <slot>open_seasonal_adjustment_dialog()</slot>
+  <slot>open_trend_correction_dialog()</slot>
+  <slot>open_duplicate_objects_dialog()</slot>
+  <slot>open_compute_simulation_dialog()</slot>
+  <slot>open_compute_model_dialog()</slot>
+  <slot>open_compute_scc_decomposition_dialog()</slot>
+  <slot>open_compute_scc_simulation_dialog()</slot>
+  <slot>open_compute_identities_dialog()</slot>
+  <slot>open_edit_report_dialog()</slot>
+  <slot>open_execute_report_dialog()</slot>
+  <slot>open_execute_report_command_line_dialog()</slot>
+  <slot>open_print_tables_dialog()</slot>
+  <slot>open_print_variables_dialog()</slot>
+  <slot>open_print_objects_definitions_dialog()</slot>
+  <slot>open_graphs_tables_dialog()</slot>
+  <slot>open_graphs_variables_dialog()</slot>
+  <slot>open_release_notes()</slot>
+  <slot>open_iode_home()</slot>
+  <slot>open_iode_manual()</slot>
+  <slot>open_import_variables_dialog()</slot>
+  <slot>open_export_dialog()</slot>
+  <slot>save_project_as()</slot>
+  <slot>open_project()</slot>
+  <slot>save_current_tab()</slot>
+  <slot>save_all_tabs()</slot>
+  <slot>create_new_project()</slot>
+  <slot>update_tab_and_completer()</slot>
+  <slot>display_keyboard_shortcuts()</slot>
+  <slot>open_sort_and_calculus_dialog()</slot>
+  <slot>open_list_calculus_dialog()</slot>
+  <slot>open_file_contents_dialog()</slot>
+  <slot>open_file_compare_dialog()</slot>
+  <slot>open_search_text_dialog()</slot>
+  <slot>open_scan_objects_dialog()</slot>
+  <slot>open_edit_tables_variables_dialog()</slot>
+  <slot>open_settings()</slot>
+  <slot>open_python_api()</slot>
+ </slots>
+</ui>

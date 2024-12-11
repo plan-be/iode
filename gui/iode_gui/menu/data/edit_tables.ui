@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MenuDataEditTables</class>
+ <widget class="QDialog" name="MenuDataEditTables">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>603</width>
+    <height>165</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DISPLAY AND UPDATE VARIABLES BY TABLES</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" rowspan="4">
+    <widget class="QLabel" name="label_table_names">
+     <property name="text">
+      <string>Table Names</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="4">
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_table_names"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pushButton_display">
+     <property name="text">
+      <string>Display</string>
+     </property>
+     <property name="shortcut">
+      <string>F10</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="pushButton_cancel">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="shortcut">
+      <string>Esc</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="pushButton_help">
+     <property name="text">
+      <string>Help</string>
+     </property>
+     <property name="shortcut">
+      <string>F1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>54</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IodeAutoCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>text_edit/complete_text_edit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_display</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuDataEditTables</receiver>
+   <slot>display()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>556</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuDataEditTables</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>556</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_help</sender>
+   <signal>clicked()</signal>
+   <receiver>MenuDataEditTables</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>556</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>help()</slot>
+  <slot>display()</slot>
+ </slots>
+</ui>

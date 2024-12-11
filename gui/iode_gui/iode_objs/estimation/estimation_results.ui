@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EstimationResultsDialog</class>
+ <widget class="QDialog" name="EstimationResultsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Estimation Results</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="1">
+    <widget class="QPushButton" name="pushButton_help">
+     <property name="text">
+      <string>Help</string>
+     </property>
+     <property name="shortcut">
+      <string>F1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButton_graph_residuals">
+     <property name="text">
+      <string>Graph of Residuals</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>239</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="pushButton_print_output">
+     <property name="text">
+      <string>Print Output</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="pushButton_graph_YOBS">
+     <property name="text">
+      <string>Graph of YOBS-YEST</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="5">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_coefs">
+      <attribute name="title">
+       <string>Coefficients</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QTableView" name="tableView_coefs">
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_corr">
+      <attribute name="title">
+       <string>Correlation Matrix</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTableView" name="tableView_corr_matrix">
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_tests">
+      <attribute name="title">
+       <string>Tests By Equation</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QTableView" name="tableView_tests">
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropOverwriteMode">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ContiguousSelection</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_graph_YOBS</sender>
+   <signal>clicked()</signal>
+   <receiver>EstimationResultsDialog</receiver>
+   <slot>plot_yobs_yest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_graph_residuals</sender>
+   <signal>clicked()</signal>
+   <receiver>EstimationResultsDialog</receiver>
+   <slot>plot_residual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_print_output</sender>
+   <signal>clicked()</signal>
+   <receiver>EstimationResultsDialog</receiver>
+   <slot>print_output()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_help</sender>
+   <signal>clicked()</signal>
+   <receiver>EstimationResultsDialog</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>167</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>plot_yobs_yest()</slot>
+  <slot>plot_residual()</slot>
+  <slot>print_graphs()</slot>
+  <slot>print_output()</slot>
+  <slot>help()</slot>
+ </slots>
+</ui>

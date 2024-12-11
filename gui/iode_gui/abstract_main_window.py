@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
 
 from text_edit.completer import IodeCompleter
 from plot.plot import PlotDialog
-from utils import DEFAULT_FONT_FAMILY
+from iode_gui.utils import DEFAULT_FONT_FAMILY
 
 from typing import List
 from iode import IodeType

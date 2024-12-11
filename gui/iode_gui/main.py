@@ -3,12 +3,12 @@ from PySide6.QtWidgets import QApplication, QSplashScreen
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import QLocale
 
-from utils import ORGANIZATION_NAME
-from main_window import MainWindow
+from iode_gui.utils import ORGANIZATION_NAME
+from iode_gui.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
-    app.setOrganizationName(ORGANIZATION_NAME)
+    # app.setOrganizationName(ORGANIZATION_NAME)
     app.setApplicationName("IODE")
 
     files_to_load = sys.argv[1:]
@@ -26,8 +26,7 @@ def main():
     main_window = MainWindow(None, files_to_load)
     main_window.show()
     splash.finish(main_window)
-    res = app.exec()
-    return res
+    app.exec()
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
