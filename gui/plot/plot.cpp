@@ -304,7 +304,7 @@ void PlotDialog::setPeriods(const Sample& sample, const QString& from, const QSt
         std::string msg = "Cannot create a plot since the starting period " + from.toStdString() + " is ";
         msg += (start_t == end_t) ? " equal to " : "after ";
         msg += "the ending period " + to.toStdString();
-        throw IodeExceptionFunction(msg);
+        throw std::runtime_error(msg);
     }
 
     nb_periods = end_t - start_t + 1;

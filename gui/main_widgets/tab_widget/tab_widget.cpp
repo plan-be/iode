@@ -503,8 +503,8 @@ void IodeTabWidget::showObjectsList(IodeType iodeType, const QStringList& objNam
         if(index < 0)
         {
             std::string type_ = v_iode_types[iodeType];
-            throw IodeException("Cannot show IODE objects of type " + type_ + "\n" +
-                + "Database of objects of type " + type_ + " not found");
+            throw std::runtime_error("Cannot show IODE objects of type " + type_ + "\n" +
+                                     "Database of objects of type " + type_ + " not found");
         }
         IodeAbstractWidget* tab = static_cast<IodeAbstractWidget*>(this->widget(index));
         connect(databaseWidget, &AbstractIodeObjectWidget::tabDatabaseModified, tab, 

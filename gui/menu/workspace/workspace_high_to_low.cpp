@@ -39,8 +39,8 @@ void MenuWorkspaceHighToLow::slot_high_to_low()
         std::string sum_series = wSum->extractAndVerify().toStdString();
 
         if(last_obs_series.empty() && mean_series.empty() && sum_series.empty()) 
-            throw IodeExceptionFunction("Cannot excute command 'high to low'", 
-                "all series last observation, mean and sum are empty!");
+            throw std::invalid_argument(std::string("Cannot execute command 'high to low'") +  
+                                        std::string("all series last observation, mean and sum are empty!"));
 
         if (!last_obs_series.empty()) high_to_low(HTOL_LAST, filepath, last_obs_series);
         if (!mean_series.empty()) high_to_low(HTOL_MEAN, filepath, mean_series);

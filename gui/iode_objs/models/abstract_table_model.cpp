@@ -207,7 +207,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 		database->save(std_filepath);
 		database->set_filename(std_filepath);
 	}
-	catch (const IodeException& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		return "";
