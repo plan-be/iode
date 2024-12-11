@@ -50,7 +50,7 @@ void MenuDataDuplicateObj::duplicate()
             Comments.add(dup_obj_name, Comments.copy(obj_name));
             break;
         case EQUATIONS:
-            throw IodeException("Cannot duplicate an equation");
+            throw std::runtime_error("Cannot duplicate an equation");
             break;     
         case IDENTITIES:
             Identities.add(dup_obj_name, Identities.copy(obj_name));

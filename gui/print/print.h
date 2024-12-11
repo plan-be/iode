@@ -103,7 +103,7 @@ inline void setNbDecimals(const int nbDecimals)
 inline void setLang(const TableLang lang)
 {
     if(lang > 2)
-        throw IodeException("Invalid language.\nExpected value 0 (English), 1 (FRENCH), 2 (DUTCH)");
+        throw std::runtime_error("Invalid language.\nExpected value 0 (English), 1 (FRENCH), 2 (DUTCH)");
 
     // set lang
     char tlang[2];
@@ -134,10 +134,10 @@ inline void setTablesFiles(const QStringList& files)
         res = B_ViewTblFile(args.toStdString().data());
         if(res < 0)
         {
-            IodeExceptionFunction error("Function B_ViewTblFile returned an error", "Unknown");
-            error.add_argument("file number", QString::number(i).toStdString());
-            error.add_argument("filepath", file.toStdString());
-            throw error;
+            std::string msg = "Function B_ViewTblFile returned an error:\n";
+            msg += "file number: " + QString::number(i).toStdString() + "\n";
+            msg += "filepath: " + file.toStdString();
+            throw std::runtime_error(msg);
         }
         i++;
     }

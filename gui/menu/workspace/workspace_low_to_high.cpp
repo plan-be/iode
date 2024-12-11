@@ -45,7 +45,8 @@ void MenuWorkspaceLowToHigh::slot_low_to_high()
         std::string flow_series = wFlowSeries->extractAndVerify().toStdString();
 
         if(stock_series.empty() && flow_series.empty()) 
-            throw IodeExceptionFunction("Cannot excute command 'low to high'", "both stock and flow series are empty!");
+            throw std::invalid_argument(std::string("Cannot execute command 'low to high': ") + 
+                                        std::string("both stock and flow series are empty!"));
 
         if (!stock_series.empty()) low_to_high(LTOH_STOCK, method, filepath, stock_series);
         if (!flow_series.empty()) low_to_high(LTOH_FLOW, method, filepath, flow_series);
