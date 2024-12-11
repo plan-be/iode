@@ -64,13 +64,13 @@ cmake.source-dir = ".."
 cmake.args = ["-G", "Ninja"]
 
 # The build targets to use when building the project. Empty builds the default target.
-cmake.targets = ["${IODE_PACKAGE_CMAKE_TARGET}"]
+cmake.targets = [ ${IODE_PACKAGE_CMAKE_TARGETS} ]
 
 # The wheel will automatically look for Python packages at src/<package_name>, 
 # python/<package_name>, and <package_name>, in that order. 
 # If you want to list packages explicitly, you can. 
 # The final path element is the package.
-wheel.packages = ["${IODE_PACKAGE_WHEEL_PACKAGES}"]
+wheel.packages = [ ${IODE_PACKAGE_WHEEL_PACKAGES} ]
 
 wheel.license-files = ["../LICENSE.md"]
 

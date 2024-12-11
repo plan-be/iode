@@ -15,13 +15,10 @@ if(Python_FOUND)
     set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\"")
     set(IODE_PACKAGE_SCRIPT "iodecmd = \"iode.cli:main\"")
     set(IODE_PACKAGE_CMAKE_TARGET "iode_cython")
-    set(IODE_PACKAGE_WHEEL_PACKAGES "./iode")
+    set(IODE_PACKAGE_CMAKE_TARGETS "\"${IODE_PACKAGE_CMAKE_TARGET}\"")
+    set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode\"")
     set(IODE_PACKAGE_SDIST_INCLUDE "\"./iode/iode.msg\", \"**/*.pyi\", \"./iode/tests/data\"")
     set(IODE_PACKAGE_SDIST_EXCLUDE "")
-
-    message(STATUS " ")
-    message(STATUS "=============================")
-    message(STATUS "GENERATE TOML FILE FOR IODE PYTHON PACKAGE ...\n")
     
     # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
     # Each variable reference will be replaced with the current value of the variable, or the empty string 
@@ -80,9 +77,9 @@ if(Python_FOUND)
 
     # Add a custom command that runs the Python script to generate stub files 
     # after the iode_cython target is built
-    # add_custom_command(TARGET iode_cython POST_BUILD
-    #     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_BINARY_DIR}/iode
-    #     COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
+    add_custom_command(TARGET ${IODE_PACKAGE_CMAKE_TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${IODE_PACKAGE_CMAKE_TARGET}> ${CMAKE_CURRENT_BINARY_DIR}/iode
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
     
     install(TARGETS ${IODE_PACKAGE_CMAKE_TARGET} LIBRARY DESTINATION iode)
   else()
