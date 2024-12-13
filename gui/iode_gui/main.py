@@ -5,7 +5,7 @@ from PySide6.QtCore import QLocale
 
 from iode_gui.utils import ORGANIZATION_NAME
 from iode_gui.main_window import MainWindow
-
+from iode_gui.super import gui_assign_super
 
 def main():
     app = QApplication(sys.argv)
@@ -25,6 +25,7 @@ def main():
     app.processEvents()
 
     main_window = MainWindow(None, files_to_load)
+    gui_assign_super(main_window)
     main_window.show()
     splash.finish(main_window)
     app.exec()
