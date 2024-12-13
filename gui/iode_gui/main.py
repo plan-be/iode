@@ -5,6 +5,12 @@ from PySide6.QtCore import QLocale
 
 from iode_gui.utils import ORGANIZATION_NAME
 from iode_gui.main_window import MainWindow
+try:
+    from iode_gui.iode_gui_super import gui_assign_super_API
+except ModuleNotFoundError as e:
+    msg = str(e)
+    def gui_assign_super_API(main_window: MainWindow):
+        QMessageBox.warning(None, "WARNING", msg)
 
 
 def main():
@@ -25,6 +31,7 @@ def main():
     app.processEvents()
 
     main_window = MainWindow(None, files_to_load)
+    gui_assign_super_API(main_window)
     main_window.show()
     splash.finish(main_window)
     app.exec()

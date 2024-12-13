@@ -70,7 +70,7 @@ if(Python_FOUND)
         set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
         set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
         set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
-        set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
+        set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\", \"${IODE_PACKAGE_CMAKE_TARGET}\"")
         set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
         set(IODE_PACKAGE_SDIST_INCLUDE "")
         set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
@@ -86,6 +86,30 @@ if(Python_FOUND)
         # copy all Python files to binary directory
         file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
              FILES_MATCHING PATTERN "*.py")
+
+        if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp")
+            file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp")
+        endif()
+ 
+        add_custom_command(OUTPUT ${IODE_PACKAGE_CMAKE_TARGET}.cpp
+        DEPENDS super.pyx
+        VERBATIM
+        COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/super.pyx -3 --verbose --cplus 
+        --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name ${IODE_PACKAGE_CMAKE_TARGET}
+        --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
+        --output-file ${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp)
+ 
+        python_add_library(${IODE_PACKAGE_CMAKE_TARGET} MODULE ${CMAKE_CURRENT_BINARY_DIR}/${IODE_PACKAGE_CMAKE_TARGET}.cpp WITH_SOABI)
+ 
+        target_link_libraries(${IODE_PACKAGE_CMAKE_TARGET} PRIVATE iode_cpp_api Python::NumPy)
+        target_include_directories(${IODE_PACKAGE_CMAKE_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
+        target_compile_definitions(${IODE_PACKAGE_CMAKE_TARGET} PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
+ 
+        # Add a custom command to copy the generated .pyd file in the current source directory
+        add_custom_command(TARGET ${IODE_PACKAGE_CMAKE_TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${IODE_PACKAGE_CMAKE_TARGET}> ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui)
+ 
+        install(TARGETS ${IODE_PACKAGE_CMAKE_TARGET} LIBRARY DESTINATION iode_gui)
     else()
         message(CHECK_FAIL "Cython not found")
     endif()
