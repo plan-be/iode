@@ -1,3 +1,11 @@
 __version__ = "${CMAKE_PROJECT_VERSION}"
 
+import iode
+try:
+    from iode_gui.iode_gui_super import gui_assign_super
+except ModuleNotFoundError as e:
+    msg = str(e)
+    def gui_assign_super(main_window: MainWindow):
+        QMessageBox.warning(None, "WARNING", msg)
+
 from iode_gui.main import main
