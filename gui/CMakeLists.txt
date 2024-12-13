@@ -5,7 +5,6 @@ set(IODE_PACKAGE_NAME "iode-gui")
 set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
 set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
 set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
-set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
 set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
 set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
 set(IODE_PACKAGE_SDIST_INCLUDE "")
@@ -16,8 +15,6 @@ set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 
 if(Python_FOUND)
     # Find PyUIC6
@@ -31,6 +28,9 @@ if(Python_FOUND)
 
     set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
     set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAME}.py")
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 
     # Check if PyUIC6 and PyRCC6 are found
     if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
@@ -75,26 +75,6 @@ if(Python_FOUND)
     else()
         message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
     endif()
-
-    message(CHECK_START "Search for Cython")
-    find_program(CYTHON "cython")
-    if(CYTHON)
-        message(CHECK_PASS "found")
-        message(STATUS "\nSet up target for iode Python package\n")
-        cmake_print_variables(CYTHON)
-
-        # copy all Python files to binary directory
-        file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
-             FILES_MATCHING PATTERN "*.py")
-    else()
-        message(CHECK_FAIL "Cython not found")
-    endif()
-
-  if(TARGET ${IODE_PACKAGE_CMAKE_TARGET})
-    message(STATUS "\nNew target ${IODE_PACKAGE_CMAKE_TARGET} enabled\n")
-  else()
-    message(WARNING "Could not create the target ${IODE_PACKAGE_CMAKE_TARGET}\n")
-  endif()
 else()
   message(WARNING "Python not found")
 endif()
