@@ -9,7 +9,7 @@ from iode_gui.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
-    # app.setOrganizationName(ORGANIZATION_NAME)
+    app.setOrganizationName(ORGANIZATION_NAME)
     app.setApplicationName("IODE")
 
     files_to_load = sys.argv[1:]
