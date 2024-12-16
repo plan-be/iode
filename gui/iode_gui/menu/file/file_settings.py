@@ -27,6 +27,12 @@ class MenuFileSettings(MixinSettingsDialog):
 
     def show_print_tab(self):
         """
+        Switches the tab widget to the 'print' tab.
+        """
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_print)
+
+    def show_reports_tab(self):
+        """
         Switches the tab widget to the 'reports' tab.
         """
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
