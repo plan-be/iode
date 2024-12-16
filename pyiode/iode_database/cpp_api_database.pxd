@@ -268,7 +268,8 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
                 bool files=False, bool date=False) except +
         void update(int pos, CTable& table) except +
         void update(string& name, CTable& table) except +
-        void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, char format_)
+        void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
+                           char format_) except +
 
     size_t hash_value(KDBTables&) except +
 
