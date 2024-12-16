@@ -5,28 +5,31 @@ from PySide6.QtWidgets import QMessageBox
 from .numerical_table_model import IodeNumericalTableModel  
 from iode_gui.utils import NAN_REP  
 
-from iode import tables, Table
+from typing import List, Union
+from iode import tables, Table, split_list
 from iode.iode_cython import ComputedTable
 
 
 class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
     def __init__(self, table_name: str, generalized_sample: str, nb_decimals: int, 
-                 variables: str=None, parent: QObject=None):
+                 variables: Union[str, List[str]]=None, parent: QObject=None):
         QAbstractTableModel.__init__(self, parent)
         IodeNumericalTableModel.__init__(self, precision=nb_decimals)
         self.table_name: str = table_name
-        self.variables: str = variables
-        if variables is not None and variables != "":
-            tables[table_name] = Table(table_name, 2, "", variables, False, False, False)
+        if isinstance(variables, str):
+            variables = split_list(variables)
+        self.variables: List[str] = variables
+        if variables is not None and len(variables):
+            tables[table_name] = Table(2, "_VARIABLES_", variables, mode=False, files=False, date=False)
 
         table: Table = tables[table_name]
-        self.computed_table: ComputedTable = table.compute(generalized_sample, variables, self.precision)
+        self.computed_table: ComputedTable = table.compute(generalized_sample, nb_decimals=self.precision)
         self.destroyed.connect(self.maybe_remove_table)
         self.precision_changed.connect(self.update_nb_decimals)
 
     @Slot()
     def maybe_remove_table(self):
-        if self.variables is not None and self.variables != "":
+        if self.table_name in tables:
             del tables[self.table_name]
 
     @Slot()
