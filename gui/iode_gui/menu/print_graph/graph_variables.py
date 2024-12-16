@@ -1,7 +1,137 @@
+from PySide6.QtCore import Slot, Signal
+from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
+from PySide6.QtGui import QDoubleValidator
 
-from PySide6.QtWidgets import QDialog, QWidget
+from iode_gui.settings import MixinSettingsDialog
+from iode_gui.plot.plot_vars import PlotVariablesDialog
+from iode_gui.menu.file.file_settings import MenuFileSettings
+from .ui_graph_variables import Ui_MenuGraphVariables
+
+from typing import List, Union
+import numpy as np
+import pandas as pd
+from iode import (IodeType, TableLang, VarsMode, TableGraphType, Variables, 
+                  TableGraphGrid, Period, Sample, variables, reset_extra_files)
 
 
-class MenuGraphVariables(QDialog):
-    def __init__(self, parent: QWidget = None) -> None:
+class MenuGraphVariables(MixinSettingsDialog):
+    new_plot = Signal(QDialog)
+
+    def __init__(self, parent: QWidget=None):
         super().__init__(parent)
+        self.ui = Ui_MenuGraphVariables()
+        self.ui.setupUi(self)
+        self.prepare_settings(self.ui)
+
+        self.ui.textEdit_variables.handle_iode_type(IodeType.VARIABLES)        
+        self.ui.textEdit_variables.include_iode_command(False)       
+        self.ui.textEdit_variables.include_lec_functions(False)
+
+        self.v_variable_modes = list(VarsMode)
+        v_variable_modes_names = [item.name.replace("_" , " ").title() for item in self.v_variable_modes]
+        self.ui.comboBox_x_axis_type.addItems(v_variable_modes_names)
+        self.ui.comboBox_x_axis_type.setCurrentIndex(0)
+
+        self.v_chart_types = list(TableGraphType)
+        v_chart_type_names = [chart_type.name.title() for chart_type in self.v_chart_types]
+        self.ui.comboBox_chart_type.addItems(v_chart_type_names)
+        self.ui.comboBox_chart_type.setCurrentIndex(0)
+
+        self.v_chart_axis_ticks = list(TableGraphGrid)
+        v_chart_axis_thicks = [axis_ticks.name.title() for axis_ticks in self.v_chart_axis_ticks]
+        self.ui.comboBox_X_ticks.addItems(v_chart_axis_thicks)
+        self.ui.comboBox_Y_ticks.addItems(v_chart_axis_thicks)
+        self.ui.comboBox_X_ticks.setCurrentIndex(0)
+        self.ui.comboBox_Y_ticks.setCurrentIndex(0)
+
+        self.v_table_langs = list(TableLang)
+        v_table_lang_names = [iode_type.name.title() for iode_type in self.v_table_langs]
+        self.ui.comboBox_language.addItems(v_table_lang_names)
+        self.ui.comboBox_language.setCurrentIndex(0)
+
+        self.ui.lineEdit_min_Y.setValidator(QDoubleValidator(self.ui.lineEdit_min_Y))
+        self.ui.lineEdit_max_Y.setValidator(QDoubleValidator(self.ui.lineEdit_max_Y))
+
+        self.load_settings()
+
+    def _free_extra_files(self):
+        reset_extra_files()
+
+    @property
+    def variables_names(self) -> str:
+        return self.ui.textEdit_variables.toPlainText().strip()
+
+    @variables_names.setter
+    def variables_names(self, names: Union[str, List[str]]):
+        if not isinstance(names, str):
+            names = ";".join(names)
+        self.ui.textEdit_variables.setPlainText(names)
+
+    @property
+    def from_period(self) -> str:
+        return self.ui.sampleEdit_sample_from.text()
+    
+    @from_period.setter
+    def from_period(self, value: Union[str, Period]):
+        if isinstance(value, Period):
+            value = str(value)
+        self.ui.sampleEdit_sample_from.setText(value)
+
+    @property
+    def to_period(self) -> str:
+        return self.ui.sampleEdit_sample_to.text()
+    
+    @to_period.setter
+    def to_period(self, value: Union[str, Period]):
+        if isinstance(value, Period):
+            value = str(value)
+        self.ui.sampleEdit_sample_to.setText(value)
+
+    @Slot()
+    def display(self):
+        try:
+            i_table_lang = self.ui.comboBox_language.currentIndex()
+            table_lang: TableLang = self.v_table_langs[i_table_lang]
+            pattern_var_names: str = self.ui.textEdit_variables.toPlainText().strip()
+            from_period: str = self.ui.sampleEdit_sample_from.text().strip()
+            to_period: str = self.ui.sampleEdit_sample_to.text().strip()
+            # raise an error if from_period and/or to_period is/are invalid
+            sample = Sample(from_period, to_period)
+            periods: List[float] = sample.get_period_list(astype=float)
+            from_period = str(sample.start)
+            to_period = str(sample.end)
+
+            if from_period == to_period:
+                raise RuntimeError("Please select more than 1 period to plot")
+
+            i_chart_type: int = self.ui.comboBox_chart_type.currentIndex()
+            chart_type: TableGraphType = self.v_chart_types[i_chart_type]
+            i_var_mode: int = self.ui.comboBox_x_axis_type.currentIndex()
+            var_mode: VarsMode = self.v_variable_modes[i_var_mode]
+            log_scale: bool = self.ui.checkBox_log_scale.isChecked()
+            i_grid: int = self.ui.comboBox_X_ticks.currentIndex()
+            grid: TableGraphGrid = self.v_chart_axis_ticks[i_grid]
+
+            y_min = float(self.ui.lineEdit_min_Y.text()) if self.ui.lineEdit_min_Y.text() else None
+            y_max = float(self.ui.lineEdit_max_Y.text()) if self.ui.lineEdit_max_Y.text() else None
+
+            data = {var_name: variables[var_name, f"{from_period}:{to_period}"] 
+                    for var_name in variables.get_names(pattern_var_names)}
+            plot_dialog = PlotVariablesDialog(periods, data, chart_type, grid, var_mode, log_scale, 
+                                              y_min, y_max, title="VARIABLES")
+            self.new_plot.emit(plot_dialog)
+        except Exception as e:
+            QMessageBox.warning(self, "WARNING", f"Failed to plot variables '{pattern_var_names}':\n" + str(e))
+
+    @Slot()
+    def apply(self):
+        QMessageBox.warning(self, "WARNING", "Apply is not yet implemented");
+
+    @Slot()
+    def setup(self):
+        try:       
+            dialog = MenuFileSettings(self)
+            dialog.show_print_tab()
+            dialog.exec()
+        except Exception as e:
+            QMessageBox.warning(self, "WARNING", str(e))
