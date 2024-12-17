@@ -30,6 +30,13 @@ SIMULATION_SORT_ALGORITHMS: Tuple[str, ...] = (
     "Connex compon. + Triangulation",
     "None")
 
+PRINT_FORMATS: Tuple[str, ...] = (
+    "A2M file (IODE ...)", 
+    "RTF file (Word, ...)", 
+    "HTML file (Internet)",
+    "MIF file (Frame Maker)", 
+    "CSV file (Excel, ....)", 
+    "No format")
 
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
