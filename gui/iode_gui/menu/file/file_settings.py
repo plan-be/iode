@@ -1,9 +1,10 @@
+from PySide6.QtCore import Qt, Slot, QSettings
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt, Slot
 
-from .ui_file_settings import Ui_MenuFileSettings
 from iode_gui.print.file_print_preferences import FilePrintPreferences
-from iode_gui.settings import MixinSettingsDialog
+from iode_gui.settings import (ProjectSettings, MixinSettingsDialog, 
+                               PRINT_DESTINATION, RUN_REPORTS_FROM_PROJECT_DIR)
+from .ui_file_settings import Ui_MenuFileSettings
 
 
 class MenuFileSettings(MixinSettingsDialog):
@@ -42,6 +43,12 @@ class MenuFileSettings(MixinSettingsDialog):
         """
         Applies the changes made in the settings.
         """
+        project_settings: QSettings = ProjectSettings.project_settings
+        if project_settings is not None:
+            print_to_file: bool = self.ui.comboBox_print_dest.currentText() == "File"
+            project_settings.setValue(PRINT_DESTINATION, print_to_file)
+            project_settings.setValue(RUN_REPORTS_FROM_PROJECT_DIR, 
+                                      self.ui.radioButton_run_from_project_dir.isChecked())
         self.accept()
 
     @Slot()
