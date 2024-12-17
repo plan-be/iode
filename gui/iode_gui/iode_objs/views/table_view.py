@@ -25,12 +25,13 @@ from iode_gui.iode_objs.models.table_model import IdentitiesModel
 from iode_gui.iode_objs.models.table_model import VariablesModel
 
 from iode_gui.plot.plot_table import PlotTableDialog
+from iode_gui.plot.plot_vars import PlotVariablesDialog
 
 from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView
 
 from pathlib import Path
-from iode import IodeType, tables, variables, Table
+from iode import IodeType, tables, variables, Table, Sample
 
 
 class CommentsView(IodeAbstractTableView):
@@ -392,15 +393,16 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
             periods = self._extract_periods()
             from_period = periods[0]
             to_period = periods[-1]
-            vars_sample = variables.sample
+            vars_sample = Sample(from_period, to_period)
 
-            # TODO: implement PlotVariablesDialog 
-            # plot_dialog = PlotVariablesDialog()
-            # plot_dialog.set_periods(vars_sample, from_period, to_period)
-            # for var_name in variable_names:
-            #     plot_dialog.add_series(var_name)
-            # plot_dialog.plot()
-            # self.new_plot.emit(plot_dialog)
+            if from_period == to_period:
+                raise RuntimeError("Please select more than 1 period to make a plot")
+
+            periods_as_float = vars_sample.get_period_list(astype=float)
+            data = {var_name: variables[var_name, f"{from_period}:{to_period}"] 
+                    for var_name in variable_names}
+            plot_dialog = PlotVariablesDialog(periods_as_float, data, title="VARIABLES SUBSET")
+            self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
 

@@ -10,6 +10,7 @@ from iode_gui.utils import URL_MANUAL
 from .correlation_matrix_model import CorrelationMatrixModel
 from .tests_eqs_model import TestsEqsModel
 from iode_gui.iode_objs.models.table_model import ScalarsModel
+from iode_gui.plot.plot_vars import PlotVariablesDialog
 from .ui_estimation_results import Ui_EstimationResultsDialog
 
 from typing import List, Dict
@@ -156,39 +157,16 @@ class EstimationResultsDialog(QDialog):
             # Split the equation
             lhs, _ = current_eq.split_equation()
 
-            # create a new local Variables database
-            variables_db = variables[""].copy()
-
-            # get estimation sample
+            # get estimation sample + list of periods
             sample: Sample = self.edit_est_eqs.sample
+            periods = sample.get_period_list(astype=float)
 
-            # Set the sample for the local variables database
-            variables_db.sample = str(sample)
-
-            # Create a new plot dialog
-            plot_dialog = PlotVariablesDialog(variables_db)
-
-            # Set the title
+            # Observed + Fitted values
             title = f"Equation {eq_name} : observed and fitted values"
-            plot_dialog.set_title(title)
-
-            # Set the periods for the plot
-            plot_dialog.set_periods(sample)
-
-            # Observed values
-            values: List[float] = self.edit_est_eqs.get_observed_values(eq_name)
-            variables_db["OBSERVED"] = values
-            plot_dialog.add_series("OBSERVED", f"{lhs} : observed")
-
-            # Fitted values
-            values: List[float] = self.edit_est_eqs.get_fitted_values(eq_name)
-            variables_db["FITTED"] = values
-            plot_dialog.add_series("FITTED", f"{lhs} : fitted")
-
-            # Set legend and plot
-            plot_dialog.plot()
-
-            # Emit new plot
+            observed: List[float] = self.edit_est_eqs.get_observed_values(eq_name)
+            fitted: List[float] = self.edit_est_eqs.get_fitted_values(eq_name)
+            data = {f"{lhs} : observed": observed, f"{lhs} : fitted": fitted}
+            plot_dialog = PlotVariablesDialog(periods, data, title=title)
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
@@ -207,34 +185,15 @@ class EstimationResultsDialog(QDialog):
             # Split the equation
             lhs, _ = current_eq.split_equation()
 
-            # create a new local Variables database
-            variables_db = variables[""].copy()
-
-            # get estimation sample
+            # get estimation sample + list of periods
             sample: Sample = self.edit_est_eqs.sample
-
-            # Set the sample for the local variables database
-            variables_db.sample = str(sample)
-
-            # Create a new plot dialog
-            plot_dialog = PlotVariablesDialog(variables_db)
-
-            # Set the title
-            title = f"Equation {eq_name}: residuals"
-            plot_dialog.set_title(title)
-
-            # Set the periods for the plot
-            plot_dialog.set_periods(sample)
+            periods = sample.get_period_list(astype=float)
 
             # Residual values
+            title = f"Equation {eq_name}: residuals"
             values: List[float] = self.edit_est_eqs.get_residual_values(eq_name)
-            variables_db["RESIDUALS"] = values
-            plot_dialog.add_series("RESIDUALS", f"{lhs} : observed")
-
-            # Set legend and plot
-            plot_dialog.plot()
-
-            # Emit new plot
+            data = {f"{lhs} : observed": values}
+            plot_dialog = PlotVariablesDialog(periods, data, title=title)
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
