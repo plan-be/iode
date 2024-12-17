@@ -10,7 +10,8 @@ from .iode_cython import (__version__, NA, is_NA,
                           ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt)
 
 from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, 
-                     EQ_TEST_NAMES, IODE_FILE_TYPES, SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS)
+                     EQ_TEST_NAMES, IODE_FILE_TYPES, SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
+                     PRINT_FORMATS)
 
 # time
 from .iode_cython import Period, Sample, PERIODICITY_LIST
@@ -53,7 +54,7 @@ __all__ = [
     'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
     'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
     'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
-    'SIMULATION_INITIALIZATION_METHODS', 'SIMULATION_SORT_ALGORITHMS', 
+    'SIMULATION_INITIALIZATION_METHODS', 'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 
 
     # time
     'Period', 'Sample', 'PERIODICITY_LIST',
