@@ -24,6 +24,7 @@ from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableMode
 from iode_gui.iode_objs.models.table_model import IdentitiesModel
 from iode_gui.iode_objs.models.table_model import VariablesModel
 
+from iode_gui.print.print_file_dialog import PrintFileDialog
 from iode_gui.plot.plot_table import PlotTableDialog
 from iode_gui.plot.plot_vars import PlotVariablesDialog
 
@@ -344,15 +345,13 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
                 filepath = model.filepath
                 output_file = Path(filepath).with_suffix("")
 
-                # TODO: implement PrintFileDialog
                 # Ask the user to set the output file and format
-                # dialog = PrintFileDialog(self, output_file)
-                # if dialog.exec() == QDialog.DialogCode.Accepted:
-                #     output_file = dialog.output_file
-                #     _format = dialog.format
-                # else:
-                #     return
-                _format = 'D'
+                dialog = PrintFileDialog(output_file, 'D', self)
+                if dialog.exec() == QDialog.DialogCode.Accepted:
+                    output_file = dialog.output_file
+                    _format = dialog.file_format
+                else:
+                    return
 
                 # Set the number of decimals and the language
                 nb_decimals = model.precision

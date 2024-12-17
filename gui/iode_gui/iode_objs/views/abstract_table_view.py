@@ -369,7 +369,7 @@ class IodeAbstractTableView(QTableView):
     @Slot()
     def render_for_printing(self):
         """Renders the document for printing."""
-        self.document.print(self.printer)
+        self.document.print_(self.printer)
 
     @Slot()
     def remove_objects(self):
