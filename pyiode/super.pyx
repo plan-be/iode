@@ -8,6 +8,8 @@ from pyiode.super cimport kmsg_super
 from pyiode.super cimport kconfirm_super
 from pyiode.super cimport kpanic_super
 
+# https://cython.readthedocs.io/en/stable/src/userguide/language_basics.html#function-pointers
+
 
 cdef void c_error_super(const int level, const char* msg):
     cdef bytes b_msg = msg
@@ -16,13 +18,19 @@ cdef void c_error_super(const int level, const char* msg):
     else:
         raise RuntimeError(b_msg.decode())
 
+kerror_super   = c_error_super
+
 cdef void c_warning_super(const char* msg):
     cdef bytes b_msg = msg
     warnings.warn(b_msg.decode())
 
+kwarning_super = c_warning_super
+
 cdef void c_msg_super(const char* msg):
     cdef bytes b_msg = msg
     print(b_msg.decode())
+
+kmsg_super     = c_msg_super
 
 cdef int c_confirm_super(const char* msg):
     cdef bytes b_msg = msg
@@ -32,6 +40,8 @@ cdef int c_confirm_super(const char* msg):
     answer = answer[0]
     return 0 if answer in "OoYyJj1" else 1
 
+kconfirm_super = c_confirm_super
+
 cdef void c_panic_super():
     msg = "SWAP PANIC!\n"
     msg += "Attempting to save Data saved in ws.*files\n"
@@ -40,9 +50,4 @@ cdef void c_panic_super():
     K_end_ws(1)
     sys.exit(msg)
 
-def python_assign_super():
-    kerror_super   = c_error_super
-    kwarning_super = c_warning_super
-    kmsg_super     = c_msg_super
-    kconfirm_super = c_confirm_super
-    kpanic_super   = c_panic_super
+kpanic_super   = c_panic_super
