@@ -7,7 +7,7 @@ from lec cimport execute_lec as cpp_execute_lec
 
 
 def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, List[float]]:
-    """
+    r"""
     Compute a LEC formula using the current Variables and Scalars databases.
     The formula may be evaluate at a specific period or on the whole sample 
     (no value for *period* is passed).
@@ -32,12 +32,18 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     --------
     >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import execute_lec, equations, scalars, variables
-    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS
+    Loading .../fun.eqs
+    274 objects loaded
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS
+    Loading .../fun.scl
+    161 objects loaded
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS
+    Loading .../fun.var
+    394 objects loaded
 
     >>> equations["ACAF"].lec       # doctest: +NORMALIZE_WHITESPACE
-    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\\nacaf4*(TIME=1995)'
+    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
     >>> variables["ACAF", "2000Y1"]
     10.046610792200543
     >>> lec = "(acaf1 + acaf2 * GOSF[-1] + acaf4*(TIME=1995)) * VAF[-1]"

@@ -18,9 +18,13 @@ cdef class ComputedTable:
     --------
     >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import Table, tables, variables
-    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.tbl
+    46 objects loaded 
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.var
+    394 objects loaded
+    >>> tables["C8_1"]                                      # doctest: +NORMALIZE_WHITESPACE
     DIVIS | 1                                  |
     TITLE |      "Déterminants de l'output potentiel"
     ----- | ---------------------------------------------
@@ -104,8 +108,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations - 2 decimals (default)
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -144,8 +152,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -173,8 +185,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -202,8 +218,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # two time series (current workspace) - 5 observations
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
@@ -231,8 +251,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # two time series (current workspace) - 5 observations
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
@@ -261,11 +285,18 @@ cdef class ComputedTable:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -295,11 +326,18 @@ cdef class ComputedTable:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -329,11 +367,18 @@ cdef class ComputedTable:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -362,8 +407,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # two time series (current workspace) - 5 observations
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
@@ -391,8 +440,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # two time series (current workspace) - 5 observations
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
@@ -421,8 +474,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -457,8 +514,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> title = "Example Table"
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
@@ -488,7 +549,10 @@ cdef class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
@@ -530,8 +594,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -575,8 +643,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
@@ -635,8 +707,12 @@ cdef class ComputedTable:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
@@ -661,7 +737,10 @@ cdef class ComputedTable:
         <BLANKLINE>
 
         >>> extra_files = Path(SAMPLE_DATA_DIR) / "ref.av"
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=extra_files)
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=extra_files)     # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
         -----------------------------------------------------------------------------------
@@ -735,8 +814,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> title = "Example Table"
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
@@ -766,7 +849,10 @@ cdef class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
@@ -819,8 +905,12 @@ cdef class ComputedTable:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> title = "Example Table"
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
@@ -850,7 +940,10 @@ cdef class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------

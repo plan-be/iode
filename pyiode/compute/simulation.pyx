@@ -114,9 +114,15 @@ cdef class Simulation:
     --------
     >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables 
     >>> from iode import Simulation
-    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.eqs
+    274 objects loaded 
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.scl
+    161 objects loaded 
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.var
+    394 objects loaded
 
     >>> simu = Simulation()
     >>> simu.convergence_threshold
@@ -504,17 +510,37 @@ cdef class Simulation:
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
         >>> from iode import Simulation
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> simu = Simulation()
         >>> # force IODE to create the three list _PRE, _INTER and _POST 
         >>> # when the method model_simulate is called 
         >>> simu.debug = True
-        >>> simu.model_simulate("2000Y1", "2015Y1");
-
+        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =   0.6558 - cpu=...ms
+        2000Y1: 2 iters - error =   0.1684 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5237 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error = 0.002907 - cpu=...ms
+        2015Y1: 20 iters - error = 0.001537 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
@@ -613,10 +639,18 @@ cdef class Simulation:
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, scalars, variables 
         >>> from iode import Simulation
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> equations["UY"].lec
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
@@ -631,7 +665,19 @@ cdef class Simulation:
         [0.0, 0.0, ..., 0.0, 0.0]
 
         >>> simu = Simulation()
-        >>> simu.model_simulate("2000Y1", "2015Y1")
+        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =    1.342 - cpu=...ms
+        2000Y1: 2 iters - error =   0.4115 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5272 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error =  0.00267 - cpu=...ms
+        2015Y1: 20 iters - error =  0.00141 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
         >>> # endogenous variable (unchanged)
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
@@ -644,7 +690,19 @@ cdef class Simulation:
         >>> # update endogenous variable (now UY)
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
-        >>> simu.model_simulate("2000Y1", "2015Y1")
+        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 30 - #INTER 204 - #POST 40
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =  0.09305 - cpu=...ms
+        2000Y1: 2 iters - error = 0.001205 - cpu=...ms
+        2000Y1: 3 iters - error =  0.00138 - cpu=...ms
+        ...
+        2015Y1: 23 iters - error = 0.001306 - cpu=...ms
+        2015Y1: 24 iters - error = 0.001463 - cpu=...ms
+        2015Y1: 25 iters - error = 0.0007763 - cpu=...ms
         >>> # exogeneous variable (now XNATY)
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.3508274950028535, 0.6702440874066322, 0.5092369210188463, ..., -0.19926923081414763]
@@ -706,30 +764,52 @@ cdef class Simulation:
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
         >>> from iode import Simulation
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # exogeneous variable 
         >>> equations["UY"].lec
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> # reset values
         >>> variables["UY", "2000Y1:2015Y1"] = 0.0
-        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS
+        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS
         [0.0, 0.0, ..., 0.0, 0.0]
 
         >>> # endogenous variable
         >>> identities["XNATY"]
         Identity('grt NATY')
-        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
+        >>> variables["XNATY", "2000Y1:2015Y1"]         # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
 
         >>> # simulate the model (no reordering)
         >>> simu = Simulation()
-        >>> simu.model_simulate("2000Y1", "2015Y1")
-        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS
+        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =    1.342 - cpu=...ms
+        2000Y1: 2 iters - error =   0.4115 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5272 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error =  0.00267 - cpu=...ms
+        2015Y1: 20 iters - error =  0.00141 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS
         [624.1781881798956, 645.0542977503601, 661.6074127102179, ..., 525.1258272992568]
         """
         if isinstance(from_period, Period):
@@ -777,14 +857,26 @@ cdef class Simulation:
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
         >>> from iode import Simulation
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> simu = Simulation()
-        >>> simu.model_calculate_SCC(10);
-
+        >>> simu.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Pseudo-linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
@@ -847,16 +939,31 @@ cdef class Simulation:
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
         >>> from iode import Simulation
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> simu = Simulation()
 
         Step 1 - Compute the Strongly Connex Components (SCC) decomposition
 
-        >>> simu.model_calculate_SCC(10);
+        >>> simu.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Pseudo-linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
@@ -877,7 +984,7 @@ cdef class Simulation:
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> # reset values
         >>> variables["UY", "2000Y1:2015Y1"] = 0.0
-        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS
+        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS
         [0.0, 0.0, ..., 0.0, 0.0]
         >>> # endogenous variable
         >>> identities["XNATY"]
@@ -885,9 +992,16 @@ cdef class Simulation:
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
         [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
         
-        >>> simu.model_simulate_SCC("2000Y1", "2015Y1")
-
-        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS
+        >>> simu.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        2000Y1: 1 iters - error =   0.3155 - cpu=...ms
+        2000Y1: 2 iters - error =    1.953 - cpu=...ms
+        2000Y1: 3 iters - error =   0.2335 - cpu=...ms
+        ...
+        2015Y1: 10 iters - error =  0.01144 - cpu=...ms
+        2015Y1: 11 iters - error = 0.006679 - cpu=...ms
+        2015Y1: 12 iters - error = 0.0003485 - cpu=...ms
+        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS
         [624.1822680369564, 645.0533712662168, 661.5778936891761, ..., 525.2940777398553]
         """
         if isinstance(from_period, Period):

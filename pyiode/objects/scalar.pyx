@@ -183,7 +183,9 @@ cdef class Scalar:
         --------
         >>> import copy
         >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         >>> scalars["acaf1"]
         Scalar(0.0157684, 1, 0.00136871)
         >>> copied_scl = copy.copy(scalars["acaf1"])

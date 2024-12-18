@@ -132,6 +132,7 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
 
     >>> # execute report
     >>> execute_report("create_var.rep", ["A", "B", "C", "D"])
+    Saving test_var.av
 
     >>> # check content of file test_var.av
     >>> with open("test_var.av", "r") as f:         # doctest: +NORMALIZE_WHITESPACE
@@ -180,6 +181,7 @@ def execute_command(command: Union[str, List[str]]):
     >>> execute_command("$DataCalcVar C A/B")
     >>> execute_command("$DataCalcVar D grt A")
     >>> execute_command("$WsSaveVar test_var.av")
+    Saving test_var.av
 
     >>> # check content of file test_var.av
     >>> with open("test_var.av", "r") as f:         # doctest: +NORMALIZE_WHITESPACE

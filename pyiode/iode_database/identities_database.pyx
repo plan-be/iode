@@ -38,10 +38,12 @@ cdef class Identities(_AbstractDatabase):
     Examples
     --------
     >>> from iode import identities, SAMPLE_DATA_DIR
-    >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.idt
+    48 objects loaded 
     >>> len(identities)
     48
-    >>> identities              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> identities                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Identities
     nb identities: 48
     filename: ...\tests\data\fun.idt
@@ -113,7 +115,9 @@ cdef class Identities(_AbstractDatabase):
         Examples
         --------
         >>> from iode import identities, SAMPLE_DATA_DIR
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         >>> # get the first identity
         >>> identities.i[0]
         Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
@@ -195,7 +199,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
 
         >>> # a) get one Identity
         >>> identities["AOUC"]
@@ -250,7 +256,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         
         >>> # a) add one identity
         >>> identities["BDY"] = "YN - YK"
@@ -302,7 +310,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
 
         >>> # a) delete one identity
         >>> identities.get_names("W*")
@@ -348,7 +358,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         >>> identities["A*;N*"].coefficients
         ['gamma2', 'gamma3', 'gamma4', 'gamma_']
         """
@@ -363,8 +375,10 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> identities["A*;N*"].variables           # doctest: +ELLIPSIS
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> identities["A*;N*"].variables                       # doctest: +ELLIPSIS
         ['KNFFY', 'NFYH', 'PKF', 'PM', 'QAFF', ..., 'WCF', 'WCRH', 'WMIN', 'ZJ']
         """
         return self._variables()
@@ -418,8 +432,12 @@ cdef class Identities(_AbstractDatabase):
         Examples
         --------
         >>> from iode import identities, variables, SAMPLE_DATA_DIR
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> sample = variables.sample
         >>> sample
         Sample("1960Y1:2015Y1")
@@ -592,7 +610,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, identities
         >>> import pandas as pd
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         >>> len(identities)
         48
 
@@ -649,7 +669,9 @@ cdef class Identities(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, identities
         >>> import pandas as pd
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         >>> len(identities)
         48
 
@@ -698,7 +720,9 @@ cdef class Identities(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, identities
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
         >>> len(identities)
         48
         >>> original_hash = hash(identities)

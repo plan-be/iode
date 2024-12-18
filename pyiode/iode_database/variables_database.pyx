@@ -184,7 +184,9 @@ cdef class Variables(_AbstractDatabase):
     Examples
     --------
     >>> from iode import variables, SAMPLE_DATA_DIR
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.var
+    394 objects loaded 
     >>> len(variables)
     394
     >>> variables           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -321,7 +323,9 @@ cdef class Variables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> # get the value of the first period of the first variable
         >>> variables.i[0, 0]
         nan
@@ -422,7 +426,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
 
@@ -627,7 +633,9 @@ cdef class Variables(_AbstractDatabase):
         >>> import numpy as np
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         
         >>> # a) -------- add one variable --------
         >>> # 1) same value for all periods
@@ -761,7 +769,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> # a) delete one variable
         >>> variables.get_names("A*")
@@ -924,7 +934,9 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> import pandas as pd
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> len(variables)
         394
         >>> variables.sample
@@ -1114,7 +1126,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> len(variables)
         394
         >>> variables.sample
@@ -1186,7 +1200,9 @@ cdef class Variables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, variables, VarsMode
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.mode
         'LEVEL'
         >>> variables["ACAF", "1990Y1"]
@@ -1227,7 +1243,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
 
@@ -1284,7 +1302,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables.nb_periods
@@ -1305,7 +1325,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables.periods       # doctest: +ELLIPSIS 
@@ -1326,7 +1348,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables.periods_as_float          # doctest: +ELLIPSIS 
@@ -1364,7 +1388,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.threshold
         1e-07
         >>> variables.threshold = 1e-5
@@ -1401,7 +1427,9 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> import pandas as pd
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> len(variables)
         394
         >>> variables.sample
@@ -1494,7 +1522,9 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables.periods_subset("1990Y1", "2000Y1")                    # doctest: +ELLIPSIS
@@ -2023,7 +2053,9 @@ cdef class Variables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> len(variables)
         394
         >>> original_hash = hash(variables)

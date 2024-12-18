@@ -48,9 +48,7 @@ def test_iode_time():
 
 
 def test_iode_objects(tmp_path):
-    iode.suppress_msgs()
     run_doctests(items=['Equation', 'Identity', 'Scalar', 'Table', 'split_list'], tmp_dir=tmp_path)
-    iode.reset_msgs()
 
 
 def test_iode_table_line_cell():
@@ -75,16 +73,12 @@ def test_iode_computed_table(tmp_path):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
-    iode.suppress_msgs()
     run_doctests(tmp_dir=tmp_path)
-    iode.reset_msgs()
 
 
 def test_iode_databases(tmp_path):
-    iode.suppress_msgs()
     run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 
                         'Variables', 'load_extra_files', 'reset_extra_files'], tmp_dir=tmp_path)
-    iode.reset_msgs()
 
 
 def test_iode_execute(tmp_path):
@@ -97,9 +91,7 @@ def test_iode_writing(tmp_path):
 
 
 def test_iode_simulation_estimation(tmp_path):
-    iode.suppress_msgs()
     run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'], tmp_dir=tmp_path)
-    iode.reset_msgs()
 
 
 def test_iode_edit_and_estimate_equations(tmp_path):
@@ -108,14 +100,13 @@ def test_iode_edit_and_estimate_equations(tmp_path):
     iode.__test__ = {}
     iode.__test__['EditAndEstimateEquations'] = EditAndEstimateEquations.__doc__
 
-    iode.suppress_msgs()
     run_doctests(items=['EditAndEstimateEquations'], tmp_dir=tmp_path)
-    iode.reset_msgs()
 
 
 def test_iode_messages():
     run_doctests(items=['add_error_msg', 'clear_error_msgs', 'display_error_msgs', 
                         'reset_msgs', 'suppress_msgs'])
+    iode.reset_msgs()
 
 
 def test_iode_miscellaneous(tmp_path):

@@ -179,16 +179,16 @@ def test_simulation():
 
     # value of a variable is not available on year 1960 and 
     # the lists _PRE, _INTER and _POST do not exist yet
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     assert 'Cannot simulate SCC:\nPre-recursive list "_PRE" not found!\n'
     'Recursive list "_INTER" not found!\n'
     'Post-recursive list "_POST" not found!' in str(excinfo.value)  
     
     simu.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(RuntimeError) as excinfo:
         simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
-    assert "Could not simulate SCC" in str(excinfo.value)
+    assert "PMAB : becomes unavailable at 1960Y1" in str(excinfo.value)
 
 
 # WRITE

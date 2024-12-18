@@ -42,10 +42,12 @@ cdef class Equations(_AbstractDatabase):
     Examples
     --------
     >>> from iode import equations, SAMPLE_DATA_DIR
-    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.eqs
+    274 objects loaded 
     >>> len(equations)
     274
-    >>> equations           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> equations                                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Equations
     nb equations: 274
     filename: ...\tests\data\fun.eqs
@@ -126,7 +128,9 @@ cdef class Equations(_AbstractDatabase):
         Examples
         --------
         >>> from iode import equations, SAMPLE_DATA_DIR
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> equations.get_lec("ACAF")   # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         >>> equations.get_lec(0)       # doctest: +NORMALIZE_WHITESPACE
@@ -145,7 +149,9 @@ cdef class Equations(_AbstractDatabase):
         Examples
         --------
         >>> from iode import equations, SAMPLE_DATA_DIR
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> # get the first equation
         >>> equations.i[0]              # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
@@ -320,7 +326,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
 
         >>> # a) get one equation
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
@@ -399,7 +407,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations, EqMethod
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         
         >>> # a) add one equation
         >>> equations["BDY"] = "BDY := YN - YK"
@@ -540,7 +550,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
 
         >>> # a) delete one equation
         >>> equations.get_names("A*")
@@ -586,7 +598,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> equations["A*"].coefficients
         ['acaf1', 'acaf2', 'acaf4']
         """
@@ -601,7 +615,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> equations["A*"].variables
         ['ACAF', 'ACAG', 'AOUC', 'GOSF', 'PM', 'QL', 'TIME', 'VAF', 'VAFF', 'VBBP', 'VM', 'WCRH']
         """
@@ -663,8 +679,12 @@ cdef class Equations(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> equations["ACAF"].lec
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
@@ -679,9 +699,19 @@ cdef class Equations(_AbstractDatabase):
         >>> scalars["dpuh_2"] = 0., 1.
 
         >>> # estimate an equation
-        >>> equations.estimate("1980Y1", "1996Y1", "ACAF")
+        >>> equations.estimate("1980Y1", "1996Y1", "ACAF")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 0.173205)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.16075e-09)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
         >>> # or equivalenty
-        >>> equations["ACAF"].estimate("1980Y1", "1996Y1")
+        >>> equations["ACAF"].estimate("1980Y1", "1996Y1")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 7.05003e-13)
+        <BLANKLINE>
+        Solution reached after 1 iteration(s). Creating results file ...
+        <BLANKLINE>
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136949)
         >>> scalars["acaf2"]
@@ -698,7 +728,17 @@ cdef class Equations(_AbstractDatabase):
         >>> block = "ACAF;DPUH"
         >>> for name in block.split(";"):
         ...     equations[name] = {"block": block, "method": "LSQ"}
-        >>> equations.estimate("1980Y1", "1996Y1", block)
+        >>> equations.estimate("1980Y1", "1996Y1", block)           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 0.141421)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.522e-12)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        Estimating : iteration 1 (||eps|| = 4.34603e-12)
+        <BLANKLINE>
+        Solution reached after 1 iteration(s). Creating results file ...
+        <BLANKLINE>
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136079)
         >>> scalars["acaf2"]
@@ -993,7 +1033,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
         >>> import pandas as pd
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> len(equations)
         274
 
@@ -1168,7 +1210,9 @@ cdef class Equations(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
         >>> import pandas as pd
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> len(equations)
         274
 
@@ -1340,7 +1384,9 @@ cdef class Equations(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> len(equations)
         274
         >>> original_hash = hash(equations)

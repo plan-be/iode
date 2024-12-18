@@ -39,10 +39,12 @@ cdef class Tables(_AbstractDatabase):
     Examples
     --------
     >>> from iode import tables, SAMPLE_DATA_DIR
-    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.tbl
+    46 objects loaded 
     >>> len(tables)
     46
-    >>> tables          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> tables                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Tables
     nb tables: 46
     filename: ...\tests\data\fun.tbl
@@ -122,7 +124,9 @@ cdef class Tables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import tables, SAMPLE_DATA_DIR
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> tables.get_title("ANAKNFF")
         'Déterminants de la croissance de K'
         >>> tables.get_title(0)
@@ -141,7 +145,9 @@ cdef class Tables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import tables, SAMPLE_DATA_DIR, TableLineType
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> # get the first table
         >>> tables.i[0]                 # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                  1 |
@@ -340,7 +346,9 @@ cdef class Tables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
 
         >>> # a) get one table
         >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
@@ -430,8 +438,12 @@ cdef class Tables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table, comments, TableGraphAxis
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         
         >>> # a) -------- new table --------
         >>> # 1. specify list of line titles and list of LEC expressions
@@ -736,7 +748,9 @@ cdef class Tables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
 
         >>> # a) delete one table
         >>> tables.get_names("G*")
@@ -782,7 +796,9 @@ cdef class Tables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> tables["A*"].coefficients
         ['knf2', 'knff1']
         """
@@ -797,7 +813,9 @@ cdef class Tables(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> tables["A*"].variables
         ['AOUC', 'GAP_', 'ITCR', 'KNFF', 'PC', 'QAFF_', 'Q_F', 'Q_I', 'RENT']
         """
@@ -858,8 +876,12 @@ cdef class Tables(_AbstractDatabase):
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, load_extra_files, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> tables["C8_1"]              # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
@@ -967,7 +989,10 @@ cdef class Tables(_AbstractDatabase):
         "Rentabilité","-0.01","34.56","-0.01","7.51","-0.01","0.31","-0.01","0.17","-0.01","2.46",
         <BLANKLINE>
 
-        >>> extra_files = load_extra_files(Path(SAMPLE_DATA_DIR) / "ref.av")
+        >>> extra_files = load_extra_files(Path(SAMPLE_DATA_DIR) / "ref.av")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> extra_files[0].name
         'ref.av'
         >>> tables.print_to_file(tmp_dir / "tables_2_files.csv", "2010[1-2]:5", names, 2)    
@@ -1035,7 +1060,9 @@ cdef class Tables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
         >>> len(tables)
         46
         >>> original_hash = hash(tables)

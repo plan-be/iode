@@ -121,7 +121,9 @@ cdef class TableCell:
     --------
     >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import tables, Table
-    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.tbl
+    46 objects loaded 
     >>> table = tables["ANAPRIX"]
     >>> table           # doctest: +NORMALIZE_WHITESPACE
     DIVIS | 1                            |
@@ -197,7 +199,9 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table[4]
         ('"GAP_"', 'GAP_')
@@ -228,7 +232,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, tables, Table, TableCellAlign
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table[4][0].align
         'LEFT'
@@ -264,7 +270,9 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table[4][0].bold
         False
@@ -294,7 +302,9 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table[4][0].italic
         False
@@ -324,7 +334,9 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table[4][0].underline
         False
@@ -354,8 +366,12 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, tables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAKNFF"]    
         >>> table[5]
         ('"Output gap "', 'knff1*ln (QAFF_/(Q_F+Q_I))')
@@ -382,8 +398,12 @@ cdef class TableCell:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, tables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAKNFF"]    
         >>> table[5]
         ('"Output gap "', 'knff1*ln (QAFF_/(Q_F+Q_I))')
@@ -455,7 +475,9 @@ cdef class TableLine:
     --------
     >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import tables, Table
-    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.tbl
+    46 objects loaded
     >>> table = tables["ANAPRIX"]
     >>> table           # doctest: +NORMALIZE_WHITESPACE
     DIVIS | 1                            |
@@ -531,7 +553,9 @@ cdef class TableLine:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
@@ -577,7 +601,9 @@ cdef class TableLine:
         --------
         >>> from iode import SAMPLE_DATA_DIR, TableGraphType
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
@@ -634,7 +660,9 @@ cdef class TableLine:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
@@ -706,7 +734,9 @@ cdef class TableLine:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
@@ -755,7 +785,9 @@ cdef class TableLine:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
@@ -911,9 +943,15 @@ cdef class Table:
     --------
     >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import Table, comments, lists, variables
-    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.cmt
+    317 objects loaded 
+    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.lst
+    17 objects loaded 
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.var
+    394 objects loaded 
 
     >>> # empty table
     >>> table = Table()
@@ -1402,8 +1440,12 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, tables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAKNFF"]    
         >>> table                       # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                  1 |
@@ -1469,8 +1511,12 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, tables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> table = tables["ANAKNFF"]    
         >>> table                       # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                  1 |
@@ -1531,7 +1577,9 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
@@ -1595,9 +1643,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1677,9 +1731,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR, TableLineType
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1896,8 +1956,12 @@ cdef class Table:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
@@ -1942,7 +2006,10 @@ cdef class Table:
 
         >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
         >>> sample_data_dir = Path(SAMPLE_DATA_DIR)
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=sample_data_dir/"ref.av")
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=sample_data_dir/"ref.av")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |  10[1]   |  10[2]   |  11[1]   |  11[2]   |  12[1]   |  12[2]   |  13[1]   |  13[2]   |  14[1]   |  14[2]    
         ----------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -1951,13 +2018,24 @@ cdef class Table:
         Intensité de capital             |     0.39 |     0.38 |     0.38 |     0.37 |     0.37 |     0.36 |     0.36 |     0.36 |     0.36 |     0.35  
         Productivité totale des facteurs |     1.10 |     1.08 |     1.11 |     1.09 |     1.12 |     1.10 |     1.13 |     1.11 |     1.14 |     1.12  
         <BLANKLINE>
-        >>> computed_table.files            # doctest: +ELLIPSIS
+        >>> computed_table.files            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         ['...ref.av']
 
         >>> # simple time series (current workspace + 4 extra files) - 5 observations - 2 decimals (default)
         >>> extra_files = [sample_data_dir / "ref.av", sample_data_dir / "fun.av", 
         ...                sample_data_dir / "fun2.av", sample_data_dir / "a.var"]
-        >>> computed_table = tables["C8_1"].compute("2010[1;2;3;4;5]:1", extra_files=extra_files)
+        >>> computed_table = tables["C8_1"].compute("2010[1;2;3;4;5]:1", extra_files=extra_files)   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\ref.av
+        ...
+        394 objects loaded
+        Loading ...\\fun.av
+        ...
+        394 objects loaded
+        Loading ...\\fun2.av
+        ...
+        394 objects loaded
+        Loading ...\\a.var
+        433 objects loaded
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |  10[1]   |  10[2]   |  10[3]   |  10[4]   | 10[5]         
         -------------------------------------------------------------------------------------
@@ -2030,9 +2108,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -2100,9 +2184,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -2213,9 +2303,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -2288,9 +2384,15 @@ cdef class Table:
         --------
         >>> from iode import SAMPLE_DATA_DIR, TableLineType
         >>> from iode import Table, comments, lists, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -2397,7 +2499,9 @@ cdef class Table:
         --------
         >>> import copy
         >>> from iode import SAMPLE_DATA_DIR, tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
         >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
