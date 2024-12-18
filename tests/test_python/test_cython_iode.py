@@ -128,8 +128,8 @@ def test_iode_miscellaneous(tmp_path):
     run_doctests(tmp_dir=tmp_path)
 
 
-def test_iode_errors_warnings_messages_from_C_API():
-    from iode.iode_cython import iode_error, iode_warning, iode_msg, iode_confirm, iode_panic
+def test_iode_errors_warnings_messages_from_C_API(capsys):
+    from iode.iode_cython import iode_error, iode_warning, iode_msg, iode_confirm
 
     # Do not call iode_error with level > 0 since it will exits the Python interpreter
     with pytest.raises(RuntimeError) as excinfo:
@@ -141,9 +141,8 @@ def test_iode_errors_warnings_messages_from_C_API():
 
     # will simply print a message in the console
     iode_msg('test message')
+    captured = capsys.readouterr()
+    assert captured.out == "test message\n"
 
     # Do not call iode_confirm since it will pause the Python interpreter
     # iode_confirm('test confirm')
-
-    # Do not call iode_panic since it will exits the Python interpreter
-    # iode_panic('test panic')
