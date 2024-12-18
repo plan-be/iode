@@ -39,10 +39,12 @@ cdef class Lists(_AbstractDatabase):
     Examples
     --------
     >>> from iode import lists, SAMPLE_DATA_DIR
-    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.lst
+    17 objects loaded 
     >>> len(lists)
     17
-    >>> lists           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> lists                                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Lists
     nb lists: 17
     filename: ...\tests\data\fun.lst
@@ -161,7 +163,9 @@ cdef class Lists(_AbstractDatabase):
         Examples
         --------
         >>> from iode import lists, SAMPLE_DATA_DIR
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
         >>> # get the first list
         >>> lists.i[0]
         ['$COPY0', '$COPY1']
@@ -243,7 +247,9 @@ cdef class Lists(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
 
         >>> # a) get one list
         >>> lists["ENVI"]
@@ -298,8 +304,12 @@ cdef class Lists(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import lists, variables
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         
         >>> # a) add one list
         >>> # --- by passing a string 
@@ -365,7 +375,9 @@ cdef class Lists(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
 
         >>> # a) delete one IODE list
         >>> lists.get_names("C*")
@@ -497,7 +509,9 @@ cdef class Lists(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, lists
         >>> import pandas as pd
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
         >>> len(lists)
         17
 
@@ -554,7 +568,9 @@ cdef class Lists(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, lists
         >>> import pandas as pd
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
         >>> len(lists)
         17
 
@@ -603,7 +619,9 @@ cdef class Lists(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
         >>> len(lists)
         17
         >>> original_hash = hash(lists)

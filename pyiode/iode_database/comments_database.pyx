@@ -37,10 +37,12 @@ cdef class Comments(_AbstractDatabase):
     Examples
     --------
     >>> from iode import comments, SAMPLE_DATA_DIR
-    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.cmt
+    317 objects loaded 
     >>> len(comments)
     317
-    >>> comments            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> comments                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Comments
     nb comments: 317
     filename: ...\tests\data\fun.cmt
@@ -114,7 +116,9 @@ cdef class Comments(_AbstractDatabase):
         Examples
         --------
         >>> from iode import comments, SAMPLE_DATA_DIR
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> # get the first comment
         >>> comments.i[0]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
@@ -187,7 +191,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
 
         >>> # a) get one Comment
         >>> comments["ACAF"]
@@ -242,7 +248,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         
         >>> # a) add one comment
         >>> comments["BDY"] = "Difference net incomes (YN - YK)"
@@ -294,7 +302,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
 
         >>> # a) delete one comment
         >>> comments.get_names("A*")
@@ -346,7 +356,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
 
@@ -356,13 +368,17 @@ cdef class Comments(_AbstractDatabase):
         []
 
         >>> # load all comments with a name starting with 'A'
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\fun.cmt
+        317 objects loaded
         >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> comments.clear()
         >>> # load all comments
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\fun.cmt
+        317 objects loaded
         >>> len(comments)
         317
         """
@@ -441,7 +457,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, comments
         >>> import pandas as pd
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
 
@@ -498,7 +516,9 @@ cdef class Comments(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, comments
         >>> import pandas as pd
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
 
@@ -547,7 +567,9 @@ cdef class Comments(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
         >>> original_hash = hash(comments)

@@ -134,7 +134,9 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> # date as default format "dd-mm-yyyy"
         >>> equations["ACAF"].date
         '12-06-1998'
@@ -157,8 +159,12 @@ cdef class Equation:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation, scalars, variables
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
@@ -213,8 +219,12 @@ cdef class Equation:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation, scalars, variables
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
@@ -331,8 +341,12 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> eq_ACAF = equations["ACAF"]
         >>> eq_ACAF.lec
@@ -345,6 +359,12 @@ cdef class Equation:
 
         >>> # estimate the ACQF equation
         >>> eq_ACAF.estimate("1980Y1", "1996Y1")
+        Estimating : iteration 1 (||eps|| = 0.173205)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.16075e-09)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136949)
         >>> scalars["acaf2"]
@@ -648,7 +668,9 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
@@ -690,8 +712,12 @@ cdef class Equation:
         --------
         >>> import copy
         >>> from iode import SAMPLE_DATA_DIR, equations, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',

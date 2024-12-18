@@ -39,10 +39,12 @@ cdef class Scalars(_AbstractDatabase):
     Examples
     --------
     >>> from iode import scalars, SAMPLE_DATA_DIR
-    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.scl
+    161 objects loaded 
     >>> len(scalars)
     161
-    >>> scalars         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> scalars                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Workspace: Scalars
     nb scalars: 161
     filename: ...\tests\data\fun.scl
@@ -114,7 +116,9 @@ cdef class Scalars(_AbstractDatabase):
         Examples
         --------
         >>> from iode import scalars, SAMPLE_DATA_DIR
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         >>> # get the first scalar
         >>> scalars.i[0]
         Scalar(0.0157684, 1, 0.00136871)
@@ -232,7 +236,9 @@ cdef class Scalars(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
 
         >>> # a) get one scalar
         >>> acaf1 = scalars["acaf1"]
@@ -303,7 +309,9 @@ cdef class Scalars(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         
         >>> # a) -------- add one scalar -------- 
         >>> # 1. default relax to 1.0
@@ -381,7 +389,9 @@ cdef class Scalars(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
 
         >>> # a) delete one scalar
         >>> scalars.get_names("a*")
@@ -601,7 +611,9 @@ cdef class Scalars(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, scalars
         >>> import pandas as pd
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         >>> len(scalars)
         161
 
@@ -669,7 +681,9 @@ cdef class Scalars(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR, scalars
         >>> import pandas as pd
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         >>> len(scalars)
         161
 
@@ -733,7 +747,9 @@ cdef class Scalars(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
         >>> len(scalars)
         161
         >>> original_hash = hash(scalars)

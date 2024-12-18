@@ -77,7 +77,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.is_subset()
         False
         >>> cmt_subset = comments["A*"].copy()
@@ -108,7 +110,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.is_subset()
         False
         >>> cmt_subset = comments["A*"].copy()
@@ -140,7 +144,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
 
         Database subset
 
@@ -212,7 +218,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.iode_type
         <IodeType.COMMENTS: 0>
         """
@@ -234,7 +242,9 @@ cdef class _AbstractDatabase:
         >>> from iode import comments
         >>> from pathlib import Path
         >>> from os.path import relpath
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> filename = comments.filename
         >>> Path(filename).name
         'fun.cmt'
@@ -263,7 +273,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.description = "test data from file 'fun.cmt'"
         >>> comments.description
         "test data from file 'fun.cmt'"
@@ -291,7 +303,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.get_position("ACAF")
         0
         """
@@ -316,7 +330,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.get_name(0)
         'ACAF'
         """
@@ -348,7 +364,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.get_names("A*;*_")         # doctest: +NORMALIZE_WHITESPACE
         ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
         'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
@@ -371,7 +389,9 @@ cdef class _AbstractDatabase:
         >>> comments.clear()
         >>> comments.get_names("A*;*_")
         []
-        >>> comments.get_names("A*;*_", f"{SAMPLE_DATA_DIR}/fun.cmt")   # doctest: +NORMALIZE_WHITESPACE
+        >>> comments.get_names("A*;*_", f"{SAMPLE_DATA_DIR}/fun.cmt")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\fun.cmt
+        317 objects loaded
         ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
         'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
         'QAI_', 'QAT_', 'QBBPPOT_', 'QC_', 'QQMAB_', 'QS_', 
@@ -427,7 +447,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> # get the list of all names
         >>> comments.names                # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
@@ -453,7 +475,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
@@ -485,7 +509,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
@@ -555,7 +581,9 @@ cdef class _AbstractDatabase:
         >>> import numpy as np
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.threshold
         1e-07
 
@@ -574,11 +602,15 @@ cdef class _AbstractDatabase:
         >>> vars_other["BENEF"] = np.asarray(variables["BENEF"]) + 1.e-8
         >>> vars_other["BQY"] = np.asarray(variables["BQY"]) + 1.e-8
         >>> # save the Variables file to compare with
-        >>> vars_other.save("fun_other.var")
+        >>> vars_other.save("fun_other.var")                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Saving ...\\fun_other.var
+        394 objects saved
 
         >>> # ---- compare the current Variables database ----
         >>> # ---- with the content of the saved file     ----
-        >>> lists_compare = variables.compare("fun_other.var")
+        >>> lists_compare = variables.compare("fun_other.var")  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\fun_other.var
+        394 objects loaded
         >>> for name, value in lists_compare.items():           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         ...    print(f"{name}: {value}")
         OLD_VAR: ['AOUC', 'AQC']
@@ -712,7 +744,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded
         >>> len(comments)
         317
         >>> # delete all comments
@@ -721,7 +755,9 @@ cdef class _AbstractDatabase:
         0
 
         >>> # reload all comments
-        >>> comments.merge_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.merge_from(f"{SAMPLE_DATA_DIR}/fun.cmt")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...\\fun.cmt
+        317 objects loaded
         >>> len(comments)
         317
         """
@@ -786,11 +822,21 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments, equations, identities, lists, tables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded 
 
         >>> # get list of comments containing 'Bruto'
         >>> comments.search("Bruto")            # doctest: +ELLIPSIS 
@@ -864,11 +910,15 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments, variables
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> len(variables)
         394
         """
@@ -890,12 +940,18 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
-        >>> comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")
+        >>> comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Saving .../fun2.cmt
+        317 objects saved
         >>> comments.clear()
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun2.cmt
+        317 objects loaded
         >>> len(comments)
         317
         """
@@ -912,7 +968,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
         >>> comments.clear()
@@ -935,7 +993,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> len(comments)
         317
         """
@@ -954,7 +1014,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> "ACAF" in comments
         True
         >>> "ZCAF" in comments
@@ -972,7 +1034,9 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
         >>> cmt_subset = comments["A*"]
         >>> cmt_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AQC']

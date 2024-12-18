@@ -33,8 +33,19 @@ cdef extern from "api/iode.h":
     # constants
     cdef double IODE_NAN
 
+    # functions calling super functions internally
+    cdef int     kerror(const int level, const char* fmt, ...) except -1
+    cdef void    kwarning(const char* fmt, ...) noexcept
+    cdef void    kmsg(const char* fmt, ...) noexcept
+    cdef int     kconfirm(const char* fmt, ...) noexcept
+    cdef void    kpanic()
+
 cdef extern from "cpp_api/iode_cpp_api.h":
-    cdef void   cpp_iode_init(string)
+    cdef void   cpp_iode_init(string) nogil
 
 cdef extern from "cli.cpp":
-    cdef int   free_tbl(char** tbl)
+    cdef int   free_tbl(char** tbl) nogil
+
+cdef extern from "super.cpp":
+    cdef void  python_assign_super() nogil
+

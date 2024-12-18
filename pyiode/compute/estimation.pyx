@@ -51,8 +51,10 @@ def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str =
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR, equations, dynamic_adjustment, AdjustmentMethod
-    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    >>> lec = equations["ACAF"].lec           # doctest: +NORMALIZE_WHITESPACE
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.eqs
+    274 objects loaded 
+    >>> lec = equations["ACAF"].lec                         # doctest: +NORMALIZE_WHITESPACE
     >>> lec
     '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
     
@@ -102,7 +104,9 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     --------
     >>> from iode import SAMPLE_DATA_DIR, scalars, variables
     >>> from iode import dickey_fuller_test
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Loading .../fun.var
+    394 objects loaded
 
     >>> # dickey_fuller_test("ACAF", True, True, 3) estimates the equation:
     >>> #     d(ACAF) := df_ * ACAF[-1] +            
@@ -110,6 +114,12 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> #     df_t * t +        (TREND)            
     >>> #     df1 * d(ACAF[-1]) + df2*d(ACAF[-2]) + df3*d(ACAF[-3])  (ORDER)
     >>> df_scalars = dickey_fuller_test("ACAF", True, True, 3)
+    Estimating : iteration 1 (||eps|| = 2.20454)
+    <BLANKLINE>
+    Estimating : iteration 2 (||eps|| = 2.39047e-10)
+    <BLANKLINE>
+    Solution reached after 2 iteration(s). Creating results file ...
+    <BLANKLINE>
     >>> df_scalars.get_names("df*")
     ['df1', 'df2', 'df3', 'df_', 'df_d', 'df_t']
     >>> # note: the function dickey_fuller_test() returns a separated Scalars database.
@@ -298,9 +308,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
 
@@ -376,9 +392,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -557,9 +579,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, EqMethod
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -603,9 +631,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -681,9 +715,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -719,9 +759,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -757,9 +803,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -802,9 +854,15 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> from iode.iode_cython import EditAndEstimateEquations
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
@@ -845,7 +903,9 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations.clear()
         >>> scalars.clear()
 
@@ -884,7 +944,9 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations.clear()
         >>> scalars.clear()
 
@@ -919,7 +981,9 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations.clear()
         >>> scalars.clear()
 
@@ -954,7 +1018,9 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations.clear()
         >>> scalars.clear()
 
@@ -994,7 +1060,9 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         >>> equations.clear()
         >>> scalars.clear()
 

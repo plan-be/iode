@@ -112,7 +112,9 @@ cdef class Sample:
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample.index("1982Y1")
         22
         >>> variables.sample.index("2020Y1")
@@ -145,10 +147,12 @@ cdef class Sample:
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables.sample.get_period_list()    #doctest: +ELLIPSIS
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        Loading .../fun.var
+        394 objects loaded
+        >>> variables.sample.get_period_list()    # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables.sample.get_period_list(astype=float)    #doctest: +ELLIPSIS
+        >>> variables.sample.get_period_list(astype=float)    # doctest: +ELLIPSIS
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
         if self.c_sample is NULL:
@@ -174,7 +178,9 @@ cdef class Sample:
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        Loading .../fun.var
+        394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables_2 = variables.copy()
