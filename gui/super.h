@@ -9,7 +9,7 @@
 #include <QStatusBar>
 
 
-void gui_error_super(const int level, const char* msg);
+int gui_error_super(const int level, const char* msg);
 
 void gui_warning_super(const char* msg);
 

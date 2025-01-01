@@ -68,7 +68,7 @@ extern void kwrmsg(char *);
 /* k_errorv.c */
 
 /* k_super.c */
-extern void    (*kerror_super)(const int level, const char* fmt);
+extern int     (*kerror_super)(const int level, const char* fmt);
 extern void    (*kwarning_super)(const char* msg);
 extern void    (*kpause_super)();
 extern void    (*kmsg_super)(const char* fmt);
@@ -90,7 +90,7 @@ extern int     (*kexecsystem_super)(const char*);
 extern int     (*kshellexec_super )(const char*);
 extern int     (*ODE_end_super)(const int);
 
-extern void    kerror(const int level, const char* fmt, ...);
+extern int     kerror(const int level, const char* fmt, ...);
 extern void    kwarning(const char* fmt, ...);
 extern void    kpause();
 extern void    kmsg(const char* fmt, ...);

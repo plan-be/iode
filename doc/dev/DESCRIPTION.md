@@ -282,7 +282,7 @@ Functions used only in a GUI context.
 
 |Syntax|
 |:---|
-|`void (*kerror_super)(int level, char*msg);`|
+|`int (*kerror_super)(int level, char*msg);`|
 |`void (*kpause_super)();`|
 |`int kpause_continue = 0;`|
 |`void (*kwarning_super)(char* msg);`|

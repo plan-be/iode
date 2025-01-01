@@ -42,7 +42,7 @@
  * 
  * List of function pointers that can replace the standard implementation  
  * ----------------------------------------------------------------------
- *      void (*kerror_super)(const int level, const char* msg);
+ *      int  (*kerror_super)(const int level, const char* msg);
  *      void (*kwarning_super)(const char* msg);
  *      void (*kmsg_super)(const char* msg);
  *      int  (*kwprintf_super)(const char* msg);
@@ -73,7 +73,7 @@
 // Global variables
 int MSG_DISABLED = 0;    // if 1, kmsg() is disabled
 
-void (*kerror_super)(const int level, const char*msg);
+int (*kerror_super)(const int level, const char*msg);
 void (*kwarning_super)(const char* msg);
 void (*kpause_super)();
 void (*kmsg_super)(const char* msg);
@@ -105,7 +105,7 @@ int  (*ODE_end_super)(const int);
  *  @param [in] ...         optional list of additional parameters    
  *  
  */
-void kerror(const int level, const char* fmt, ...)
+int kerror(const int level, const char* fmt, ...)
 {
     char    buf[10240];
     va_list myargs;
@@ -119,13 +119,15 @@ void kerror(const int level, const char* fmt, ...)
     va_end(myargs);
 
     if(kerror_super != 0) 
-        (*kerror_super)(level, buf);
+        return (*kerror_super)(level, buf);
     else {
         //fprintf(stderr, "%s\n", buf);
         printf("%s\n", buf);
-        if(level == 1)  
-            exit(1);
-    }    
+        if(level > 0)  
+            exit(level);
+        else
+            return -1;
+    }
 }
 
 
