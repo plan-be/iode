@@ -71,6 +71,8 @@
 #include <stdlib.h>
 
 // Global variables
+int MSG_DISABLED = 0;    // if 1, kmsg() is disabled
+
 void (*kerror_super)(const int level, const char*msg);
 void (*kwarning_super)(const char* msg);
 void (*kpause_super)();
@@ -202,6 +204,9 @@ void kmsg(const char* fmt, ...)
     char    buf[10240];
     va_list myargs;
 
+    if(MSG_DISABLED) 
+        return;
+
     va_start(myargs, fmt);
 #ifdef _MSC_VER   
     vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
@@ -230,20 +235,9 @@ void kmsg_null(const char* msg)
  *  
  *  @param [in] IsOn int    0: suppress the messages, 1: restore the default function
   */
-void kmsg_toggle(const int IsOn)
+void kmsg_toggle(const int value)
 {
-    static int  Current_IsOn = 1;
-    static void (*kmsg_super_ptr)(const char*); 
-    
-    if(IsOn && !Current_IsOn) { 
-        kmsg_super = kmsg_super_ptr;
-        Current_IsOn = 1;
-    }
-    else if(!IsOn && Current_IsOn) {
-        kmsg_super_ptr = kmsg_super;
-        kmsg_super = kmsg_null; 
-        Current_IsOn = 0;
-    }
+    MSG_DISABLED = (value == 0) ? 1 : 0;
 }
 
 
