@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 
-void gui_error_super(const int level, const char* msg)
+int gui_error_super(const int level, const char* msg)
 {
 	if (level > 0)
 	{
