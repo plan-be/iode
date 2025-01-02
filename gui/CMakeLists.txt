@@ -1,6 +1,24 @@
 
 message(STATUS "\n---- GUI (QT) ----\n")
 
+set(IODE_PACKAGE_NAME "iode-gui")
+set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
+set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
+set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
+set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
+set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
+set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
+set(IODE_PACKAGE_SDIST_INCLUDE "")
+set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
+
+# configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
+# Each variable reference will be replaced with the current value of the variable, or the empty string 
+# if the variable is not defined.
+# see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
+configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
+
 if(Python_FOUND)
     # Find PyUIC6
     find_program(PYUIC6_EXECUTABLE pyside6-uic)
@@ -64,24 +82,6 @@ if(Python_FOUND)
         message(CHECK_PASS "found")
         message(STATUS "\nSet up target for iode Python package\n")
         cmake_print_variables(CYTHON)
-
-        set(IODE_PACKAGE_NAME "iode-gui")
-        set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
-        set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
-        set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
-        set(IODE_PACKAGE_CMAKE_TARGET "iode_gui_super")
-        set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
-        set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
-        set(IODE_PACKAGE_SDIST_INCLUDE "")
-        set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
-        
-        # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
-        # Each variable reference will be replaced with the current value of the variable, or the empty string 
-        # if the variable is not defined.
-        # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-        configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 
         # copy all Python files to binary directory
         file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
