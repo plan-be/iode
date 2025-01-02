@@ -2,6 +2,24 @@
 
 message(STATUS "\n---- CYTHON ----\n")
 
+set(IODE_PACKAGE_NAME "iode")
+set(IODE_PACKAGE_DESCRIPTION "IODE is a package dedicated to econometric models and to the management of statistical series")
+set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\"")
+set(IODE_PACKAGE_SCRIPT "iodecmd = \"iode.cli:main\"")
+set(IODE_PACKAGE_CMAKE_TARGET "iode_cython")
+set(IODE_PACKAGE_CMAKE_TARGETS "\"${IODE_PACKAGE_CMAKE_TARGET}\"")
+set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode\"")
+set(IODE_PACKAGE_SDIST_INCLUDE "\"./iode/iode.msg\", \"**/*.pyi\", \"./iode/tests/data\"")
+set(IODE_PACKAGE_SDIST_EXCLUDE "")
+
+# configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
+# Each variable reference will be replaced with the current value of the variable, or the empty string 
+# if the variable is not defined.
+# see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
+configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.pyx.in ${CMAKE_CURRENT_SOURCE_DIR}/common.pyx)
+configure_file(${CMAKE_SOURCE_DIR}/generate_stub_files.py.in ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
+
 if(Python_FOUND)
   message(CHECK_START "Search for Cython")
   find_program(CYTHON "cython")
@@ -9,26 +27,6 @@ if(Python_FOUND)
     message(CHECK_PASS "found")
     message(STATUS "\nSet up target for iode Python package\n")
     cmake_print_variables(CYTHON)
-
-    set(IODE_PACKAGE_NAME "iode")
-    set(IODE_PACKAGE_DESCRIPTION "IODE is a package dedicated to econometric models and to the management of statistical series")
-    set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\"")
-    set(IODE_PACKAGE_SCRIPT "iodecmd = \"iode.cli:main\"")
-    set(IODE_PACKAGE_CMAKE_TARGET "iode_cython")
-    set(IODE_PACKAGE_CMAKE_TARGETS "\"${IODE_PACKAGE_CMAKE_TARGET}\"")
-    set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode\"")
-    set(IODE_PACKAGE_SDIST_INCLUDE "\"./iode/iode.msg\", \"**/*.pyi\", \"./iode/tests/data\"")
-    set(IODE_PACKAGE_SDIST_EXCLUDE "")
-    
-    # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
-    # Each variable reference will be replaced with the current value of the variable, or the empty string 
-    # if the variable is not defined.
-    # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-    configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-
-    # ---- GENERATE FILE FROM TEMPLATE ----
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.pyx.in ${CMAKE_CURRENT_SOURCE_DIR}/common.pyx)
-    configure_file(${CMAKE_SOURCE_DIR}/generate_stub_files.py.in ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
 
     file(INSTALL ${CMAKE_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode)
     file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)
