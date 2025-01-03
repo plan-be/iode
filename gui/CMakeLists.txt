@@ -16,8 +16,6 @@ set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 
 if(Python_FOUND)
     # Find PyUIC6
@@ -83,6 +81,9 @@ if(Python_FOUND)
         message(STATUS "\nSet up target for iode Python package\n")
         cmake_print_variables(CYTHON)
 
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
+        
         # copy all Python files to binary directory
         file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
              FILES_MATCHING PATTERN "*.py")
