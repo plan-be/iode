@@ -3,7 +3,7 @@ message(STATUS "\n---- GUI (QT) ----\n")
 
 set(IODE_PACKAGE_NAME "iode-gui")
 set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
-set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\"")
+set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\", \"qtconsole\", \"ipython\"")
 set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
 set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
 set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
