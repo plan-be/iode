@@ -1,8 +1,17 @@
 from PySide6.QtCore import Qt, QDir, QSettings, QFileInfo, Slot
 from PySide6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QTextEdit, QLineEdit
+from PySide6.QtWidgets import (QMainWindow, QMessageBox, QDialog, QLabel, QPlainTextEdit, 
+                               QGridLayout, QFileDialog, QTextEdit, QLineEdit)
 
-from iode import IodeType, variables
+try:
+    from qtconsole.rich_jupyter_widget import RichJupyterWidget
+    from qtconsole.manager import QtKernelManager
+    qtconsole_available = True
+except ImportError:
+    RichJupyterWidget = None
+    qtconsole_available = False
+
+from iode import IodeType, comments, equations, identities, lists, scalars, tables, variables
 from typing import List
 
 from iode_gui.utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
@@ -51,6 +60,11 @@ from iode_gui.menu.print_graph.graph_variables import MenuGraphVariables
 from iode_gui.ui_main_window import Ui_MainWindow
 
 
+_iode_databases = {'comments': comments, 'equations': equations, 
+                   'identities': identities, 'lists': lists, 'scalars': scalars, 
+                   'tables': tables, 'variables': variables}
+
+
 class MainWindow(AbstractMainWindow):
     """
     Implemented features:
@@ -75,6 +89,8 @@ class MainWindow(AbstractMainWindow):
 
         self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
         self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")
+
+        self._setup_ipython_console()
 
         # ---- open file(s) passed as files_to_load argument ----
         files_to_load_ = []
@@ -146,6 +162,63 @@ class MainWindow(AbstractMainWindow):
     @property
     def iode_command(self) -> QLineEdit:
         return self.ui.lineEdit_iode_command
+    
+    def _setup_ipython_console(self):
+        self.grid_layout_tab_python = QGridLayout(self.ui.tab_python_console)
+        self.grid_layout_tab_python.setObjectName(u"gridLayout")
+        self.jupyter_widget = None
+
+        if not qtconsole_available:
+            QMessageBox.warning(self, "WARNING", "IPython console not available. "
+                                "Please install qtconsole and ipython packages.")
+            self.label_python_command = QLabel(self.ui.tab_python_console)
+            self.label_python_command.setObjectName(u"label_python_command")
+            self.grid_layout_tab_python.addWidget(self.label_python_command, 0, 0, 1, 1)
+
+            self.lineEdit_python_command = QLineEdit(self.ui.tab_python_console)
+            self.lineEdit_python_command.returnPressed.connect(self.execute_python_command)
+
+            self.lineEdit_python_command.setObjectName(u"lineEdit_python_command")
+            self.grid_layout_tab_python.addWidget(self.lineEdit_python_command, 0, 1, 1, 1)
+
+            self.plainTextEdit_python_output = QPlainTextEdit(self.ui.tab_python_console)
+            self.plainTextEdit_python_output.setObjectName(u"plainTextEdit_python_output")
+            self.grid_layout_tab_python.addWidget(self.plainTextEdit_python_output, 1, 0, 1, 2)
+        else:
+            # ---- Start a kernel, connect to it, and create a RichJupyterWidget to use it ----
+            # see https://github.com/jupyter/qtconsole 
+            # and https://github.com/jupyter/qtconsole/blob/main/examples/embed_qtconsole.py 
+            kernel_manager = QtKernelManager(kernel_name="python3")
+            kernel_manager.start_kernel()
+
+            kernel_client = kernel_manager.client()
+            kernel_client.start_channels()
+
+            self.jupyter_widget = RichJupyterWidget()
+            self.jupyter_widget.kernel_manager = kernel_manager
+            self.jupyter_widget.kernel_client = kernel_client
+            self.jupyter_widget.executed.connect(self.ipython_cell_executed)
+
+            self.jupyter_widget.setMinimumHeight(20)
+            self.jupyter_widget.setObjectName("ipython_widget")
+            self.grid_layout_tab_python.addWidget(self.jupyter_widget, 0, 0, -1, -1)
+        
+        self._reset_kernel()
+
+    def _reset_kernel(self):
+        if self.jupyter_widget:
+            self.jupyter_widget.restart_kernel()
+            self.jupyter_widget.execute('from iode import *')
+            # kernel.shell.push(_iode_databases)
+            self.ipython_cell_executed()
+        else:
+            self.lineEdit_python_command.setText('')
+            self.execute_python_command()
+
+    def _shutdown_kernel(self):
+        if self.jupyter_widget:
+            self.jupyter_widget.kernel_client.stop_channels()
+            self.jupyter_widget.kernel_manager.shutdown_kernel()
 
     def _build_recent_projects_menu(self):
         self.ui.menuRecent_Projects.clear()
@@ -212,6 +285,9 @@ class MainWindow(AbstractMainWindow):
 
         # update current directory (chdir)
         QDir.setCurrent(project_dir.absolutePath())
+
+        # reset the IPython kernel
+        self._reset_kernel()
 
         # show File Explorer widget (in case it was hidden)
         self.ui.dockWidget_file_explorer.show()
@@ -288,6 +364,8 @@ class MainWindow(AbstractMainWindow):
             self.ui.treeView_file_explorer.save_settings()
             self.ui.tabWidget_IODE_objs.save_settings()
 
+            self._shutdown_kernel()
+
             event.accept()
 
     def _check_vars_sample(self):
@@ -334,6 +412,23 @@ class MainWindow(AbstractMainWindow):
 
         # show the corresponding tab
         self.ui.tabWidget_IODE_objs.show_tab(index)
+
+    @Slot()
+    def execute_python_command(self):
+        import iode
+        last_input = self.lineEdit_python_command.text()
+        try:
+            output = eval(last_input, iode.__dict__)
+            to_print = f">>> {last_input}\n"
+            if output is not None and isinstance(output, str):
+                to_print += output + "\n"
+            self.plainTextEdit_python_output.toPlainText(to_print)
+        except Exception as e:
+            QMessageBox.warning(self, "WARNING", f"Could not execute '{last_input}':\n{e}")
+
+    @Slot()
+    def ipython_cell_executed(self):
+        self.update_tab_and_completer()
 
     # File Menu
 
