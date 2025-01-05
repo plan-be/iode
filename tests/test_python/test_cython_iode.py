@@ -136,7 +136,7 @@ def test_iode_errors_warnings_messages_from_C_API(capsys):
         iode_error(level=0, message='test error')
     assert 'test error' in str(excinfo.value)
 
-    with pytest.warns(UserWarning, match="test warning"):
+    with pytest.warns(RuntimeWarning, match="test warning"):
         iode_warning('test warning')
 
     # will simply print a message in the console

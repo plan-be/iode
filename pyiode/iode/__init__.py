@@ -43,6 +43,7 @@ from .iode_cython import execute_lec
 # miscellaneous
 from .iode_cython import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 from .common import FileType
+from .super import *
 
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 

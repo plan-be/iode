@@ -47,6 +47,7 @@ installation_dir = str((Path(__file__).parent).resolve())
 cpp_iode_init(installation_dir.encode('utf-8'))
 
 # Super C functions are replaced here
+include "super.pyx"
 python_assign_super() 
 
 # PYIODE API
