@@ -1,64 +1,47 @@
 #pragma once
-#include <string>
-#include <iostream>
-#include <Python.h>
 #include "api/iode.h"
 #include "cpp_api/iode_cpp_api.h"
+#include "super.h"
 
-
-int kerror_super_PYTHON(const int level, const char* msg)
-{
-    if(level > 0)
-    {
-        std::cerr << "Error: " << msg << std::endl;
-        exit(level);
-    }
-    else
-    {
-        PyErr_SetString(PyExc_RuntimeError, msg);
-        return -1;
-    }
-}
-
-void kwarning_super_PYTHON(const char* msg)
-{
-    PyErr_WarnEx(PyExc_UserWarning, msg, 2);
-}
-
-void kmsg_super_PYTHON(const char* msg)
-{
-    PySys_WriteStdout("%s\n", msg);
-}
-
-int kconfirm_super_PYTHON(const char* msg)
-{
-    std::string s_yes = "OoYyJj1";
-    std::cout << std::string(msg) << std::endl;
-
-    std::string answer;
-    std::getline(std::cin, answer);
-    // Remove all spaces
-    answer.erase(std::remove(answer.begin(), answer.end(), ' '), answer.end());
-    
-    return (s_yes.find(answer[0]) != std::string::npos) ? 0 : 1;
-}
-
-void kpanic_super_PYTHON()
-{
-	std::cout << "Swap Panic!" << std::endl;
-	std::cout << "Attempting to save Data saved in ws.*files... ";
-	K_end_ws(1);
-	std::cout << "OK" << std::endl;
-	std::cout << "To restart iode with the last data, type :" << std::endl;
-	std::cout << "    iode -ws" << std::endl;
-	exit(2);
-}
 
 void python_assign_super()
 {
-    kerror_super = kerror_super_PYTHON;
-    kwarning_super = kwarning_super_PYTHON;
-    kmsg_super = kmsg_super_PYTHON;
-    kconfirm_super = kconfirm_super_PYTHON;
-    kpanic_super = kpanic_super_PYTHON;
+    kerror_super   = c_kerror_super;
+    kwarning_super = c_kwarning_super;
+    kmsg_super     = c_kmsg_super;
+    kconfirm_super = c_kconfirm_super;
+    kpanic_super   = c_kpanic_super;
+
+	SB_PrintObjDef_super    = c_PrintObjDef_super;
+	SB_ViewPrintGr_super    = c_ViewPrintGr_super;
+	SB_ViewPrintTbl_super   = c_ViewPrintTbl_super;
+	SB_ViewByTbl_super      = c_ViewByTbl_super;
+	SB_DataSearch_super     = c_DataSearch_super;
+	SB_DataDuplicate_super  = c_DataDuplicate_super;
+	SB_DataList_super       = c_DataList_super;
+	SB_DataCompare_super    = c_DataCompare_super;
+	SB_DataCalcLst_super    = c_DataCalcLst_super;
+	SB_DataListSort_super   = c_DataListSort_super;
+	SB_DataEditGraph_super  = c_DataEditGraph_super;
+	SB_DataScan_super       = c_DataScan_super;
+	SB_StatUnitRoot_super   = c_StatUnitRoot_super;
+	SB_WsLoad_super         = c_WsLoad_super;
+	SB_WsSave_super         = c_WsSave_super;
+	SB_WsMerge_super        = c_WsMerge_super;
+	SB_WsDescr_super        = c_WsDescr_super;
+	SB_WsCopy_super         = c_WsCopy_super;
+	SB_WsClear_super        = c_WsClear_super;
+	SB_WsSample_super       = c_WsSample_super;
+	SB_WsExtrapolate_super  = c_WsExtrapolate_super;
+	SB_WsHtoL_super         = c_WsHtoL_super;
+	SB_WsLtoH_super         = c_WsLtoH_super;
+	SB_WsSeasonAdj_super    = c_WsSeasonAdj_super;
+	SB_WsTrend_super        = c_WsTrend_super;
+	SB_ModelSimulate_super  = c_ModelSimulate_super;
+	SB_ModelCompile_super   = c_ModelCompile_super;
+	SB_IdtExecute_super     = c_IdtExecute_super;
+	SB_EqsEstimate_super    = c_EqsEstimate_super;
+	SB_XodeRuleImport_super = c_XodeRuleImport_super;
+
+	T_view_tbl_super        = c_ViewTable_super;
 }
