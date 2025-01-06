@@ -157,7 +157,7 @@ class EstimationResultsDialog(QDialog):
             lhs, _ = current_eq.split_equation()
 
             # create a new local Variables database
-            variables_db = variables[""].copy()
+            variables_db = variables.copy("")
 
             # get estimation sample
             sample: Sample = self.edit_est_eqs.sample
@@ -208,7 +208,7 @@ class EstimationResultsDialog(QDialog):
             lhs, _ = current_eq.split_equation()
 
             # create a new local Variables database
-            variables_db = variables[""].copy()
+            variables_db = variables.copy("")
 
             # get estimation sample
             sample: Sample = self.edit_est_eqs.sample
