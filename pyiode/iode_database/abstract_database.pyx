@@ -59,7 +59,7 @@ cdef class _AbstractDatabase:
     def __cinit__(self):
         # pointer *abstract_db_ptr is set in subclasses
         if isinstance(self.__class__, _AbstractDatabase):
-            raise RuntimeError("Cannot instanciate an abstract class")
+            raise RuntimeError("Cannot instantiate an abstract class")
 
     # Destructor
     def __dealloc__(self):
@@ -340,7 +340,7 @@ cdef class _AbstractDatabase:
             raise IndexError(f"Index {pos} is out of bounds for database of size {len(self)}")
         return self.abstract_db_ptr.get_name(pos).decode()
 
-    def get_names(self, pattern: Union[str, List[str]]="", filepath: Union[str, Path]=None) -> List[str]:
+    def get_names(self, pattern: Union[str, List[str]]=None, filepath: Union[str, Path]=None) -> List[str]:
         """
         Returns the list of objects names given a pattern.
         If a file is provided, search for names in the file instead of the current database.
@@ -398,6 +398,9 @@ cdef class _AbstractDatabase:
         'Q_', 'TFPHP_', 'VAFF_', 'VAI_', 'VAT_', 'VC_', 'VS_', 
         'WBF_', 'WBU_', 'WCF_', 'WCR1_', 'WCR2_', 'WIND_', 
         'WNF_', 'YDH_', 'ZZ_']
+        >>> # empty pattern -> return no names
+        >>> comments.get_names("")
+        []
         """
         cdef int i_iode_type = self.abstract_db_ptr.get_iode_type()
         cdef int _all = ord('*')
@@ -407,6 +410,10 @@ cdef class _AbstractDatabase:
         
         if not isinstance(pattern, str) and isinstance(pattern, Iterable) and all(isinstance(item, str) for item in pattern):
             pattern = ';'.join(pattern)
+
+        # empty pattern (but not None)
+        if isinstance(pattern, str) and not len(pattern):
+            return []
         
         if filepath is not None:
             if isinstance(filepath, Path):
