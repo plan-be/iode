@@ -128,13 +128,23 @@ cdef class _AbstractDatabase:
     def _subset(self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
 
-    def copy(self) -> Self:
+    def copy(self, pattern: str=None) -> Self:
         """
         Create a new database instance in which each object is a *copy* of the original object 
         from the global IODE database. Any change made to the *copied database* (*subset*) will 
         not be applied to the global workspace. This can be useful for example if you want to 
         save previous values of scalars before estimating an equation or a block of equations and 
         then restore the original values if the estimated values are not satisfying.
+
+        Parameters
+        ----------
+        pattern : str, optional
+            If provided, the copied database will only contain the objects whose name matches the 
+            provided pattern. By default (None), the copied database will contain all the objects 
+            from the global IODE database. The pattern syntax is the same as the one used for the 
+            `__getitem__` method. If the pattern is an empty string, the copied database will be 
+            empty, creating a new *detached* database.
+            Default to None.
 
         Returns
         -------
@@ -182,6 +192,10 @@ cdef class _AbstractDatabase:
         >>> cmt_subset_copy = comments["B*"].copy()
         >>> cmt_subset_copy.names
         ['BENEF', 'BENEF_', 'BQY', 'BVY']
+        >>> # or equivalently
+        >>> cmt_subset_copy = comments.copy("B*")
+        >>> cmt_subset_copy.names
+        ['BENEF', 'BENEF_', 'BQY', 'BVY']
         >>> # by using copy(), any modification made on the copy subset 
         >>> # let the global workspace unchanged
         >>> # a) add a comment -> only added in the copied subset
@@ -202,8 +216,18 @@ cdef class _AbstractDatabase:
         False
         >>> "BENEF_" in comments
         True
+
+        New detached database
+
+        >>> # a new empty *detached* database can be created by passing 
+        >>> # an empty string to the copy() method 
+        >>> cmt_subset_detached = comments.copy("")
+        >>> cmt_subset_detached.names
+        []
         """
-        return self._subset('*', copy=True)
+        if pattern is None:
+            pattern = '*'
+        return self._subset(pattern, copy=True)
 
     @property
     def iode_type(self) -> IodeType:
