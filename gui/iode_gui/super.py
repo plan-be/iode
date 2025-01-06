@@ -31,7 +31,8 @@ def error_super_GUI(level: int, msg: str) -> int:
 	if level > 0:
 		QMessageBox.critical(None, "ERROR", "Error: An unexpected error occurred!\n"
 							 "Will exit the program now")
-		main_window.close()
+		if main_window is not None:
+			main_window.close()
 		sys.exit(level)
 		return -1
 	else:
@@ -44,7 +45,10 @@ def warning_super_GUI(msg: str):
 
 @register_super_function('message')
 def msg_super_GUI(msg: str):
-	main_window.display_output(msg)
+	if main_window is not None:
+		main_window.display_output(msg)
+	else:
+		print(msg)
 
 @register_super_function('confirm')
 def confirm_super_GUI(msg: str) -> int:
@@ -72,123 +76,158 @@ def panic_super_GUI():
 # ========================================================================= #
 # See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c #
 # ========================================================================= #
+
+def check_main_window_exists(func):
+	def wrapper(*args, **kwargs):
+		if main_window is not None:
+			return func(*args, **kwargs)
+		else:
+			name = func.__name__.replace('_super_GUI', '')
+			QMessageBox.critical(None, "ERROR", f"Cannot run '{name}'. The graphical " 
+						         "user interface has not been initialized yet.")
+	return wrapper
+
 @register_super_function('PrintObjDef')
+@check_main_window_exists
 def PrintObjDef_super_GUI() -> int:
 	main_window.open_print_objects_definitions_dialog()
 	return 0
 
-@register_super_function('ViewPrintGr') 
+@register_super_function('ViewPrintGr')
+@check_main_window_exists
 def ViewPrintGr_super_GUI() -> int:
 	main_window.open_graphs_tables_dialog()
 	return 0
 
-@register_super_function('ViewPrintTbl') 
+@register_super_function('ViewPrintTbl')
+@check_main_window_exists
 def ViewPrintTbl_super_GUI() -> int:
 	main_window.open_print_tables_dialog()
 	return 0
 
-@register_super_function('ViewByTbl')  
+@register_super_function('ViewByTbl')
+@check_main_window_exists
 def ViewByTbl_super_GUI() -> int:
 	main_window.open_edit_tables_variables_dialog()
 	return 0
 
-@register_super_function('DataSearch')  
+@register_super_function('DataSearch')
+@check_main_window_exists
 def DataSearch_super_GUI() -> int:
 	main_window.open_search_text_dialog()
 	return 0
 
-@register_super_function('DataDuplicate') 
+@register_super_function('DataDuplicate')
+@check_main_window_exists
 def DataDuplicate_super_GUI() -> int:
 	main_window.open_duplicate_objects_dialog()
 	return 0
 
-@register_super_function('DataList') 
+@register_super_function('DataList')
+@check_main_window_exists
 def DataList_super_GUI() -> int:
 	main_window.open_file_contents_dialog()
 	return 0
 
-@register_super_function('DataCompare') 
+@register_super_function('DataCompare')
+@check_main_window_exists
 def DataCompare_super_GUI() -> int:
 	main_window.open_file_compare_dialog()
 	return 0
 
-@register_super_function('DataCalcLst') 
+@register_super_function('DataCalcLst')
+@check_main_window_exists
 def DataCalcLst_super_GUI() -> int:
 	main_window.open_list_calculus_dialog()
 	return 0
 
-@register_super_function('DataListSort') 
+@register_super_function('DataListSort')
+@check_main_window_exists
 def DataListSort_super_GUI() -> int:
 	main_window.open_sort_and_calculus_dialog()
 	return 0
 
-@register_super_function('DataEditGraph') 
+@register_super_function('DataEditGraph')
+@check_main_window_exists
 def DataEditGraph_super_GUI() -> int:
 	main_window.open_graphs_variables_dialog()
 	return 0
 
 @register_super_function('DataScan')
+@check_main_window_exists
 def DataScan_super_GUI() -> int:
 	main_window.open_scan_objects_dialog()
 	return 0
 
 @register_super_function('StatUnitRoot')
+@check_main_window_exists
 def StatUnitRoot_super_GUI() -> int:
 	dialog = UnitRootDialog(main_window)
 	dialog.open()
 	return 0
 
 @register_super_function('WsLoad')
+@check_main_window_exists
 def WsLoad_super_GUI() -> int:
 	main_window.open_project()
 	return 0
 
-@register_super_function('WsSave') 
+@register_super_function('WsSave')
+@check_main_window_exists
 def WsSave_super_GUI() -> int:
 	main_window.save_all_tabs()
 	return 0
 
-@register_super_function('WsMerge') 
+@register_super_function('WsMerge')
+@check_main_window_exists
 def WsMerge_super_GUI() -> int:
 	main_window.open_merge_into_workspace_dialog()
 	return 0
 
-@register_super_function('WsDescr') 
+@register_super_function('WsDescr')
+@check_main_window_exists
 def WsDescr_super_GUI() -> int:
 	main_window.open_change_workspace_descriptions_dialog()
 	return 0
 
 @register_super_function('WsCopy')
+@check_main_window_exists
 def WsCopy_super_GUI() -> int:
 	main_window.open_copy_into_workspace_dialog()
 	return 0
 
-@register_super_function('WsClear') 
+@register_super_function('WsClear')
+@check_main_window_exists 
 def WsClear_super_GUI() -> int:
 	main_window.clear_workspace()
 	return 0
 
-@register_super_function('WsSample') 
+@register_super_function('WsSample')
+@check_main_window_exists
 def WsSample_super_GUI() -> int:
 	main_window.open_change_variables_sample_dialog()
 	return 0
 
-@register_super_function('WsExtrapolate') 
+@register_super_function('WsExtrapolate')
+@check_main_window_exists
 def WsExtrapolate_super_GUI() -> int:
 	main_window.open_extrapolate_variables_dialog()
 	return 0
 
 @register_super_function('WsHtoL')
+@check_main_window_exists
 def WsHtoL_super_GUI() -> int:
 	main_window.open_high_to_low_dialog()
 	return 0
 
-@register_super_function('WsLtoH') 
+@register_super_function('WsLtoH')
+@check_main_window_exists
 def WsLtoH_super_GUI() -> int:
 	main_window.open_low_to_high_dialog()
 	return 0
 
-@register_super_function('WsSeasonAdj') 
+@register_super_function('WsSeasonAdj')
+@check_main_window_exists
 def WsSeasonAdj_super_GUI() -> int:
 	lec = ""
 	dialog = DynAdjustmentDialog(lec, main_window)
@@ -196,37 +235,44 @@ def WsSeasonAdj_super_GUI() -> int:
 	return 0
 
 @register_super_function('WsTrend')
+@check_main_window_exists
 def WsTrend_super_GUI() -> int:
 	main_window.open_trend_correction_dialog()
 	return 0
 
-@register_super_function('ModelSimulate') 
+@register_super_function('ModelSimulate')
+@check_main_window_exists 
 def ModelSimulate_super_GUI() -> int:
 	main_window.open_compute_simulation_dialog()
 	return 0
 
 @register_super_function('ModelCompile')
+@check_main_window_exists
 def ModelCompile_super_GUI() -> int:
 	main_window.open_compute_model_dialog()
 	return 0
 
 @register_super_function('IdtExecute')
+@check_main_window_exists
 def IdtExecute_super_GUI() -> int:
 	main_window.open_compute_identities_dialog()
 	return 0
 
-@register_super_function('EqsEstimate') 
+@register_super_function('EqsEstimate')
+@check_main_window_exists
 def EqsEstimate_super_GUI() -> int:
 	tab_widget: IodeTabWidget = main_window.tab_widget
 	tab_widget.open_edit_dialog(IodeType.EQUATIONS)
 	return 0
 
-@register_super_function('XodeRuleImport') 
+@register_super_function('XodeRuleImport')
+@check_main_window_exists
 def XodeRuleImport_super_GUI() -> int:
 	main_window.open_import_variables_dialog()
 	return 0
 
 @register_super_function('ViewTable')
+@check_main_window_exists
 def ViewTable_super_GUI(table_name: str, generalized_sample: str, nb_decimals: int) -> int:
 	if table_name not in tables:
 		QMessageBox.warning(None, "WARNING", "Could not compute the table '" + table_name + 
