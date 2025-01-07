@@ -5,79 +5,24 @@ set(IODE_PACKAGE_NAME "iode-gui")
 set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
 set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\", \"qtconsole\", \"ipython\"")
 set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
-set(IODE_PACKAGE_CMAKE_TARGETS "\"iode_generate_ui_python_files\"")
+set(IODE_PACKAGE_CMAKE_TARGETS "")
 set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
 set(IODE_PACKAGE_SDIST_INCLUDE "")
 set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
+
+set(RESOURCE_FILENAME "iode_resource")
+set(RC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.rc")
+set(QRC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.qrc")
+set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
+set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAME}.py")
 
 # configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
 # Each variable reference will be replaced with the current value of the variable, or the empty string 
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-
-if(Python_FOUND)
-    # Find PyUIC6
-    find_program(PYUIC6_EXECUTABLE pyside6-uic)
-    # Find PyRCC6
-    find_program(PYRCC6_EXECUTABLE pyside6-rcc)
-
-    set(RESOURCE_FILENAME "iode_resource")
-    set(RC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.rc")
-    set(QRC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.qrc")
-
-    set(PY_RESOURCE_FILENAME "${RESOURCE_FILENAME}_rc")
-    set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAME}.py")
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
-
-    # Check if PyUIC6 and PyRCC6 are found
-    if(PYUIC6_EXECUTABLE AND PYRCC6_EXECUTABLE)  
-        cmake_print_variables(PYUIC6_EXECUTABLE)
-        cmake_print_variables(PYRCC6_EXECUTABLE)
-
-        # Get all .ui files in the current directory and subdirectories
-        file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
-
-        # Create a custom command for each .ui file
-        foreach(UI_FILE ${UI_FILES})
-            # Get the output .py file path
-            get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
-            get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
-            set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
-
-            # Add a custom command to convert the .ui file to a .py file
-            add_custom_command(
-                OUTPUT ${PY_FILE}
-                COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE} --absolute-imports
-                DEPENDS ${UI_FILE}
-                )
-                
-            # Add the .py file to the list of sources
-            list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
-        endforeach()
-
-        # See Qt Resource System
-        add_custom_command(
-            OUTPUT ${PY_RESOURCE_FILE}
-            COMMAND ${PYRCC6_EXECUTABLE} -o ${PY_RESOURCE_FILE} ${QRC_RESOURCE_FILE}
-            DEPENDS ${QRC_RESOURCE_FILE}
-        )
-
-        # remove previously generated Python files if they exist
-        file(REMOVE ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
-
-        # Create a custom target that depends on all the .py files
-        add_custom_target(iode_generate_ui_python_files ALL DEPENDS ${GENERATED_FILES_FROM_UI} ${PY_RESOURCE_FILE})
-
-        message(STATUS "New target iode_generate_ui_python_files enabled")
-    else()
-        message(WARNING "pyside6-uic or pyside6-rcc not found. Please install PySide6.")
-    endif()
-else()
-  message(WARNING "Python not found")
-endif()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 
 if(SKBUILD)
 	message(STATUS "Skip target ${IODE_CPP_GUI_TARGET}\n")
