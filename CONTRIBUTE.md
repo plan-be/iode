@@ -29,6 +29,8 @@
    - *(nanobind)*
    - scikit-build-core
    - pyside6
+   - qtconsole
+   - ipython
    - pytest
    - numpy
    - pandas
