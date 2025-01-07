@@ -100,8 +100,6 @@ where `<target>` is one the item in the list below:
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`         -> Graphical user interface (GUI) based on Qt (C++)
-- `iode_generate_ui_python_files` -> Generates Python GUI scripts from Qt Designer files *.ui + Qt resource file *.qrc
-- `iode_gui_super`   -> Generates iode_gui_super.pyd (Python module that wraps the C API 'super' functions)
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
@@ -280,9 +278,13 @@ root_dir_iode> pip install <project_name_from_pyproject.toml>
 
 # GUI (Python)
 
-Before to work on any issue related to the GUI (Python), you have to build the CMake target `iode_generate_ui_python_files` and `iode_gui_super`.
-The `iode_generate_ui_python_files target` generates the Python scripts from the Qt Designer files *.ui and the Qt resource files *.qrc. 
-The `iode_gui_super` generates the iode_gui_super.pyd file that wraps the C API 'super' functions.
+Before to work on any issue related to the GUI (Python), you have to convert the 
+Qt Designer files *.ui and the Qt resource files *.qrc to Python scripts.
+To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
+```bash
+root_dir_iode> cd gui
+gui> python convert_ui_files_to_py.py
+```
 
 For rapid testing, you may run the script `gui/run_test_gui.py`.
 
