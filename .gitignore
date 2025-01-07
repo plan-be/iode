@@ -397,6 +397,7 @@ keyboard_shortcuts.*
 **/*.bak
 **/*.prf
 **/*.$$$
+**/*.egg-info
 
 **.rep
 !/tests/cli/*.rep
@@ -441,6 +442,8 @@ generate_stub_files.py
 /pyiode/iode/tests
 /pyiode/iode/iode.msg
 /pyiode/dist
+/pyiode/README*
+/pyiode/LICENSE*
 
 /pyiode/**/*.cmt
 /pyiode/**/*.eqs
@@ -465,6 +468,8 @@ generate_stub_files.py
 /gui/iode_gui/utils.py
 /gui/iode_gui/*resource*.py
 /gui/dist
+/gui/build
+/gui/LICENSE*
 
 # NSIS
 /nsis/*.nsh

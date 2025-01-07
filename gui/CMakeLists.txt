@@ -1,14 +1,7 @@
 
 message(STATUS "\n---- GUI (QT) ----\n")
 
-set(IODE_PACKAGE_NAME "iode-gui")
-set(IODE_PACKAGE_DESCRIPTION "Graphical User Interface (GUI) for the iode python package")
-set(IODE_PACKAGE_DEPENDENCIES "\"numpy\", \"pandas\", \"iode\", \"qtconsole\", \"ipython\"")
-set(IODE_PACKAGE_SCRIPT "iode-gui = \"iode_gui.main:main\"")
-set(IODE_PACKAGE_CMAKE_TARGETS "")
-set(IODE_PACKAGE_WHEEL_PACKAGES "\"./iode_gui\"")
-set(IODE_PACKAGE_SDIST_INCLUDE "")
-set(IODE_PACKAGE_SDIST_EXCLUDE "\"**/*.ui\", \"**/*.in\", \"./iode_gui/resources\"")
+file(INSTALL ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(RESOURCE_FILENAME "iode_resource")
 set(RC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.rc")
@@ -20,7 +13,7 @@ set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAM
 # Each variable reference will be replaced with the current value of the variable, or the empty string 
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-configure_file(${CMAKE_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
 

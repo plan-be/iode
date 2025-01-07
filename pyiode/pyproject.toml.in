@@ -1,15 +1,15 @@
 # configuration file for the iode python package
 
 [build-system]
-requires = [ "scikit-build-core >=0.4.3", "numpy", "cython>=3.0", "mypy>=1.10" ]
+requires = [ "scikit-build-core >=0.4.3", "numpy", "pandas", "cython>=3.0", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "${IODE_PACKAGE_NAME}"
+name = "iode"
 version = "${CMAKE_PROJECT_VERSION}"
-description = "${IODE_PACKAGE_DESCRIPTION}"
-readme = "../README.md"
-requires-python = ">=3.10"
+description = "IODE is a package dedicated to econometric models and to the management of statistical series"
+readme = "README.md"
+requires-python = ">=${MINIMUM_PYTHON_VERSION}"
 authors = [
     { name = "Alix Damman", email = "ald@plan.be" },
     { name = "Yannick Van den Abbeel", email = "yvda@plan.be" },
@@ -33,10 +33,10 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ ${IODE_PACKAGE_DEPENDENCIES} ]
+dependencies = [ "numpy", "pandas", "matplotlib" ]
 
 [project.scripts]
-${IODE_PACKAGE_SCRIPT}
+iodecmd = "iode.cli:main"
 
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
@@ -57,28 +57,28 @@ logging.level = "DEBUG"
 cmake.build-type = "Release"
 cmake.define.CMAKE_BUILD_TYPE = "Release"
 
-cmake.source-dir = ".."
+cmake.source-dir = "${CMAKE_SOURCE_DIR}"
 
 # A list of args to pass to CMake when configuring the project. Setting this in
 # config or envvar will override toml.
 cmake.args = ["-G", "Ninja"]
 
 # The build targets to use when building the project. Empty builds the default target.
-cmake.targets = [ ${IODE_PACKAGE_CMAKE_TARGETS} ]
+cmake.targets = [ "iode_cython" ]
 
 # The wheel will automatically look for Python packages at src/<package_name>, 
 # python/<package_name>, and <package_name>, in that order. 
 # If you want to list packages explicitly, you can. 
 # The final path element is the package.
-wheel.packages = [ ${IODE_PACKAGE_WHEEL_PACKAGES} ]
+wheel.packages = [ "./iode" ]
 
-wheel.license-files = ["../LICENSE.md"]
+wheel.license-files = ["LICENSE.md"]
 
 # Scikit-build-core defaults to using your .gitignore to select what to exclude from 
 # the source distribution. However, sdist.include and sdist.exclude can be used to 
 # override this behavior
-sdist.include = [${IODE_PACKAGE_SDIST_INCLUDE}]
-sdist.exclude = [${IODE_PACKAGE_SDIST_EXCLUDE}]
+sdist.include = [ "./iode/iode.msg", "**/*.pyi", "./iode/tests/data" ]
+sdist.exclude = [ "**/*.in" ]
 
 # The build directory. Defaults to a temporary directory, but can be set.
 build-dir = "../out/build/python/{wheel_tag}"

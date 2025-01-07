@@ -34,6 +34,7 @@ Required Dependencies
 - Python 3.10, 3.11 or 3.12
 - `numpy <http://www.numpy.org/>`__
 - `pandas <http://pandas.pydata.org/>`__
+- `matplotlib <http://matplotlib.org/>`__
 
 
 Optional Dependencies
