@@ -1,0 +1,15 @@
+# See https://setuptools.pypa.io/en/stable/userguide/miscellaneous.html 
+# for explanations and details
+
+include iode_gui/__init__.py
+include iode_gui/utils.py
+include iode_gui/iode_resource_rc.py
+global-include ui_*.py
+
+exclude CMakeLists.txt
+exclude *.py
+global-exclude *.ui *.in *.cpp *.h
+prune legacy
+prune *.egg-info
+prune build
+prune dist
