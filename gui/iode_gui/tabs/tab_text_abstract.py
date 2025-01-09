@@ -107,22 +107,16 @@ class AbstractTextWidget(IodeAbstractWidget):
             QMessageBox.warning(None, "WARNING", f"Could not save tab content to file {filepath}\n\n{str(e)}")
             return None
 
-    def save(self, filepath: str) -> str:
+    def save(self, filepath: str=None) -> Optional[str]:
         """
-        Saves the content to the file.
+        Saves the content to a file.
 
         :param filepath: The path of the file to save to.
-        :return: The path of the file.
+        :return: The path of the saved file.
         """
-        raise NotImplementedError()
-
-    def save(self) -> Optional[str]:
-        """
-        Saves the content to the current filepath.
-
-        :return: The path of the file.
-        """
-        return self.save(self.filepath)
+        if filepath is None:
+            filepath = self.filepath
+        self._save(filepath)
 
     def _save_as(self) -> Optional[str]:
         """

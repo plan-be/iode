@@ -289,7 +289,7 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
                 self.set_modified(False)
             return filepath
 
-    def save_as_(self) -> str:
+    def _save_as(self) -> str:
         return self.database_model.save_as(self.project_dir)
 
     def get_selected_objects_names(self) -> List[str]:
