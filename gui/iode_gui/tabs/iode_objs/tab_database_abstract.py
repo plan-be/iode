@@ -239,12 +239,6 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         else:
             return super().tooltip + " [" + str(self.database_model.nb_objects) + "]"
 
-    def reset(self):
-        """
-        Reset the database.
-        """
-        self.database_model.reset()
-
     def set_project_dir(self, projectDir: QDir):
         """
         Set the project directory.
@@ -259,8 +253,9 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         """
         Clear the Iode database.
         """
-        self.database_model.clear_database()
         self.reset_filter()
+        self.database_model.clear_database()
+        self.database_model.reset_model()
 
     def filter(self, silent: bool = False):
         """

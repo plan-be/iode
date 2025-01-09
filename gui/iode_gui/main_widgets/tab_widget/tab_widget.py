@@ -168,7 +168,7 @@ class IodeTabWidget(QTabWidget):
         """
         # reset IODE objects tabs
         for tab in self.tabs_database:
-            tab.reset()
+            tab.clear_database()
 
         # reset list of open files (tabs)
         self.files_list.clear()
@@ -307,7 +307,8 @@ class IodeTabWidget(QTabWidget):
     # TODO: merge setup() method with update_project_dir()
     def setup(self, main_window: AbstractMainWindow):
         """
-        - Initializes settings object and openedFiles list.
+        - initialize some attributes.
+        - close all tabs.
         - Reload previously opened files.
         """
         self.main_window = main_window
@@ -320,6 +321,9 @@ class IodeTabWidget(QTabWidget):
 
         # connects to append_dialog() slot
         self.subset_objects_dialog_requested.connect(main_window.append_dialog)
+
+        # reset all IODE databases
+
 
         # close all tabs
         self.clear()
@@ -344,6 +348,7 @@ class IodeTabWidget(QTabWidget):
             self.setTabText(index, tab_widget.tab_text)
             self.setTabToolTip(index, tab_widget.tooltip)
 
+        # restore previously opened files
         self.load_settings()
         self.show()
 
