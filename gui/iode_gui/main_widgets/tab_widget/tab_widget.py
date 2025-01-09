@@ -1221,7 +1221,7 @@ class IodeTabWidget(QTabWidget):
                                             QMessageBox.StandardButton.Yes)
                 if answer == QMessageBox.StandardButton.Yes:
                     tab_database.clear_database()
-                    self.update_object_tab(IodeType[file_type])
+                    self.update_object_tab(IodeType(int(file_type)))
 
             # reset context menu index
             self.index_context_menu = -1
