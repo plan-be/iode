@@ -357,8 +357,12 @@ class IodeTabWidget(QTabWidget):
         Reset all the paths (to directories and files) registered in the file system watcher.
         """
         # remove all previously registered directories and files
-        self.file_system_watcher.removePaths(self.file_system_watcher.directories())
-        self.file_system_watcher.removePaths(self.file_system_watcher.files())
+        dirs = self.file_system_watcher.directories()
+        if dirs:
+            self.file_system_watcher.removePaths(dirs)
+        files = self.file_system_watcher.files()
+        if files:
+            self.file_system_watcher.removePaths(files)
 
     def _add_action(self, name: str, tooltip: str, slot_func, shortcut: QShortcut = None) -> QAction:
         """
