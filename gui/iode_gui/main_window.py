@@ -519,7 +519,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuFileImportComments(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeType.COMMENTS)
+            self.ui.tabWidget_IODE_objs.reset_filter(IodeType.COMMENTS)
             self.update_tab_and_completer(IodeType.COMMENTS)
 
     @Slot()
@@ -528,7 +528,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuFileImportVariables(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.ui.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
             self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
@@ -558,7 +558,7 @@ class MainWindow(AbstractMainWindow):
         self.compute_hash(True)
         dialog = MenuWorkspaceCopyInto(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filters()
+            self.ui.tabWidget_IODE_objs.reset_filters()
             self.update_tab_and_completer()
 
     @Slot()
@@ -566,7 +566,7 @@ class MainWindow(AbstractMainWindow):
         self.compute_hash(True)
         dialog = MenuWorkspaceMergeInto(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filters()
+            self.ui.tabWidget_IODE_objs.reset_filters()
             self.update_tab_and_completer()
 
     @Slot()
@@ -603,7 +603,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuWorkspaceHighToLow(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.ui.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
             self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
@@ -613,7 +613,7 @@ class MainWindow(AbstractMainWindow):
 
         dialog = MenuWorkspaceLowToHigh(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
+            self.ui.tabWidget_IODE_objs.reset_filter(IodeType.VARIABLES)
             self.update_tab_and_completer(IodeType.VARIABLES)
 
     @Slot()
