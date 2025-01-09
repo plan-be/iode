@@ -315,6 +315,11 @@ class MainWindow(AbstractMainWindow):
         #       be called after to (re)load IODE databases.
         self._reset_kernel()
 
+        # open either the IODE commands tab of the IPython console tab
+        project_settings: QSettings = ProjectSettings.project_settings
+        tab_index = project_settings.value("tools_tab_index", type=int, defaultValue=0)
+        self.ui.tabWidget_tools.setCurrentIndex(tab_index)
+
         # update auto-completion
         self.completer.update_iode_objects_list_names()
 
@@ -374,6 +379,8 @@ class MainWindow(AbstractMainWindow):
 
             self.ui.treeView_file_explorer.save_settings()
             self.ui.tabWidget_IODE_objs.save_settings()
+            project_settings: QSettings = ProjectSettings.project_settings
+            project_settings.setValue("tools_tab_index", self.ui.tabWidget_tools.currentIndex())
 
             event.accept()
 
