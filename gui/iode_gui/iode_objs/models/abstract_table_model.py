@@ -322,7 +322,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
         # if not provided as argument, get path to the file associated with KDB of objects of type iode_type
         if filepath is None:
-            filepath = self._database.filename()
+            filepath = self._database.filename
 
         # if KDB not linked to any file, ask the user to give/create a file to save in.
         # Otherwise, check the filepath

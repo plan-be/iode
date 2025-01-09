@@ -52,15 +52,6 @@ class TextWidget(AbstractTextWidget):
         """
         return self._load_(filepath)
 
-    def save(self, filepath):
-        """
-        Saves the content of the editor to a file.
-
-        :param filepath: The path of the file to be saved.
-        :return: The path of the saved file.
-        """
-        return self._save(filepath)
-
     @Slot()
     def render_for_printing(self):
         """

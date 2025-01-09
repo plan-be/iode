@@ -72,14 +72,6 @@ class ReportWidget(AbstractTextWidget):
         """
         return self._load_(filepath)
 
-    def save(self, filepath):
-        """
-        Save the report to the given filepath.
-
-        :param filepath: The path to the report file.
-        """
-        return self._save(filepath)
-
     def load_settings(self):
         """
         Load the settings for the report from the given project settings.
