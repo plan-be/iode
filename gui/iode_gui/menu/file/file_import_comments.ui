@@ -338,7 +338,7 @@
    <sender>openButton</sender>
    <signal>clicked()</signal>
    <receiver>MenuFileImportComments</receiver>
-   <slot>import()</slot>
+   <slot>import_comments()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>548</x>
@@ -357,6 +357,6 @@
   <slot>browse_rule_file()</slot>
   <slot>browse_save_file()</slot>
   <slot>browse_debug_file()</slot>
-  <slot>import()</slot>
+  <slot>import_comments()</slot>
  </slots>
 </ui>
