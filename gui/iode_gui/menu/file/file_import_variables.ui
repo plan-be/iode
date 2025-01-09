@@ -328,11 +328,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>IodeSampleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>iode_gui/util/widgets/sample_edit.h</header>
-  </customwidget>
-  <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
    <header>iode_gui/util/widgets/file_chooser.h</header>
@@ -340,6 +335,11 @@
    <slots>
     <slot>updateFileType(QString)</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>IodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>iode_gui/util/widgets/sample_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -380,7 +380,7 @@
    <sender>openButton</sender>
    <signal>clicked()</signal>
    <receiver>MenuFileImportVariables</receiver>
-   <slot>import()</slot>
+   <slot>import_variables()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>548</x>
@@ -399,6 +399,6 @@
   <slot>browse_rule_file()</slot>
   <slot>browse_save_file()</slot>
   <slot>browse_debug_file()</slot>
-  <slot>import()</slot>
+  <slot>import_variables()</slot>
  </slots>
 </ui>
