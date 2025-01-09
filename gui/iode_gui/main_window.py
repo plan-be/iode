@@ -101,6 +101,12 @@ class MainWindow(AbstractMainWindow):
 
         self._setup_ipython_console()
 
+        # ---- restore geometry and state ----
+        self.restoreGeometry(self.user_settings.value("geometry"))
+        self.restoreState(self.user_settings.value("windowState"))
+        self.ui.dockWidget_file_explorer.restoreGeometry(self.user_settings.value("dockWidget_file_explorer_geometry"))
+        self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
+
         # ---- open file(s) passed as files_to_load argument ----
         files_to_load_ = []
         if files_to_load:
@@ -372,6 +378,10 @@ class MainWindow(AbstractMainWindow):
         else:
             self.user_settings.setValue("project_path", self.project_path)
             self.user_settings.setValue("font_family", self.font_family)
+            self.user_settings.setValue("geometry", self.saveGeometry())
+            self.user_settings.setValue("windowState", self.saveState())
+            self.user_settings.setValue("dockWidget_file_explorer_geometry", self.ui.dockWidget_file_explorer.saveGeometry())
+            self.user_settings.setValue("dockWidget_tools_geometry", self.ui.dockWidget_tools.saveGeometry())
 
             for dialog in self.dialogs: 
                 dialog.close()
