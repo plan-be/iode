@@ -58,6 +58,7 @@ Properties and methods specific to Comments
    Comments.series
    Comments.from_series
    Comments.to_series
+   Comments.convert_file
 
 =========
 Equations
