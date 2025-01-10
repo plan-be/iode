@@ -34,6 +34,7 @@ cdef extern from "api/iode.h":
     int B_DataCompareEps(char* arg)
     int B_DataCompare(char* arg, int iode_type)
     int B_FileImportCmt(char* arg)
+    int B_FileImportVar(char* arg)
 
     ctypedef struct KOBJ:
         SWHDL o_val

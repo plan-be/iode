@@ -23,6 +23,9 @@ from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_varia
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
+
+from iode.util import check_filepath
 
 KeyName = Union[str, List[str]]
 KeyPeriod = Union[None, str, List[str], slice]
@@ -2033,6 +2036,179 @@ cdef class Variables(_AbstractDatabase):
             series = ';'.join(series)
 
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
+
+    @classmethod
+    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], 
+                     save_file: Union[str, Path], rule_file: Union[str, Path], 
+                     from_period: Union[str, Period], to_period: Union[str, Period],
+                     debug_file: Union[str, Path]=None) -> None:
+        r"""
+        Convert an external file representing IODE variables to an IODE variables file (.var). 
+        The possible formats for the input file are:
+          
+          - `Ascii`: IODE-specific Ascii format for objects 
+          - `Rotated Ascii`: Ascii format for variables with series in columns 
+          - `DIF`: DIF format (Data Interchange Format) 
+          - `DIF` Belgostat: (old) exchange format specific to Belgostat 
+          - `NIS`: National Institute of Statistics Ascii format (old) 
+          - `GEM`: Ascii format of Chronos software 
+          - `PRN-Aremos`: Ascii format from Aremos software 
+          - `TXT Belgostat`: (old) Belgostat-specific exchange format 
+
+        The rule file is a simple text file contains the rules for: 
+        
+          - selecting the objects to be imported 
+          - determining the objects names.
+
+        Each rule consists of two fields:
+
+          - the selection pattern, containing a description of the names concerned by the rule. 
+            This mask is defined in the same way as the :py:meth:`~iode.Comments.search` method.
+          - the transcoding algorithm for the names, which can contain : 
+            - `+` : indicates that the character must be included in the name 
+            - `-` : indicates that the character should be skipped 
+            - any other character: included in the name 
+        
+        Example:
+
+            B* C+-+          -> transforms B1234 into CB2, BCDEF into CBE, etc 
+            *X ++++++++++    -> keeps names ending in X unchanged
+            * ++++++++++     -> keeps all names unchanged
+
+        Parameters
+        ----------
+        input_file : str or Path
+            The path to the input file to be converted. 
+        input_format : str or ImportFormats
+            The format of the input file. Possible formats are ASCII, ROT_ASCII (Rotated Ascii), 
+            DIF, BISTEL, NIS, GEM, PRN, TXT (TXT Belgostat).
+        save_file : str or Path
+            The path to the output file where the IODE variables will be saved.
+        rule_file : str or Path
+            The path to the rule file that defines the selection and transcoding rules. 
+        from_period : str or Period
+            The first period of the series to be imported. 
+        to_period : str or Period
+            The last period of the series to be imported.
+        debug_file : str or Path, optional
+            The path to the debug file where the debug information will be saved. 
+            If not provided, the debug information will be printed to the console.
+
+        Examples
+        --------
+        >>> from pathlib import Path
+        >>> from iode import SAMPLE_DATA_DIR, variables, ImportFormats
+        >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.av.ref"
+        >>> input_format = ImportFormats.ASCII
+        >>> save_file = "imported_var.var"
+        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
+        >>> debug_file = "debug.log"
+
+        >>> # print rules
+        >>> with open(rule_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        AC*  KK_--+++++++++++++
+        *U   UU_++++++++++++++++
+        >>> # get list of variables with a name starting with 'AC' 
+        >>> # and ending with 'U' from the input file
+        >>> with open(input_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        ...     for line in f:
+        ...         name = line.split(" ")[0]
+        ...         if name.startswith("AC") or name.endswith("U"):
+        ...             print(line.strip())
+        ...
+        ACAF na na ... -83.3406251108009 -96.4104198284833
+        ACAG na na ... 32.4202988291984 33.469601344881
+        CGU 69.354416 70.728317 ... 2652.457356636 2800.12343205764 
+        DPU 56.285999 58.596001 ... 1794.28676968594 1879.1395597413
+        DPUU 56.285999 58.596001 ... 1795.98222768555 1880.91519686508
+        IFU na na ... 1895.9196231884 1952.4775760035
+        IHU na na ... 855.342842036469 904.6210534989
+        MU na na ... 0.278260325684654 0.278260325684654
+        NAWRU na na ... 0.139645850151953 0.139645850151953
+        WBU 256.177 268.75299 ... 8525.33576585068 8986.56510007165
+        >>> # import variables from input_file to save_file
+        >>> # using the rules defined in rule_file
+        >>> variables.convert_file(input_file, input_format, save_file, rule_file, "2000Y1", "2010Y1", debug_file)
+        Reading object 1 : KK_AF
+        Reading object 2 : KK_AG
+        Reading object 3 : UU_CGU
+        Reading object 4 : UU_DPU
+        Reading object 5 : UU_DPUU
+        Reading object 6 : UU_IFU
+        Reading object 7 : UU_IHU
+        Reading object 8 : UU_MU
+        Reading object 9 : UU_NAWRU
+        Reading object 10 : UU_WBU
+        10 objects saved
+        >>> # check content of the saved file
+        >>> variables.load(save_file)        # doctest: +ELLIPSIS
+        Loading ...\imported_var.var
+        10 objects loaded
+        >>> variables                        # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Workspace: Variables
+        nb variables: 10
+        filename: ...\imported_var.var
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name      1960Y1  1961Y1  1962Y1  1963Y1  1964Y1  ...      2010Y1  2011Y1  2012Y1  2013Y1  2014Y1  2015Y1 
+        KK_AF           na      na      na      na      na  ...      -37.83  -44.54  -55.56  -68.89  -83.34  -96.41 
+        KK_AG           na      na      na      na      na  ...       28.25   29.28   30.32   31.37   32.42   33.47 
+        UU_CGU       69.35   70.73   77.93   88.62   95.53  ...     2173.77 2268.92 2381.03 2510.32 2652.46 2800.12 
+        UU_DPU       56.29   58.60   61.96   67.21   74.28  ...     1531.90 1584.26 1642.98 1712.98 1794.29 1879.14 
+        UU_DPUU      56.29   58.60   61.96   67.21   74.28  ...     1533.35 1585.75 1644.53 1714.60 1795.98 1880.92 
+        UU_IFU          na      na      na      na      na  ...     1566.97 1591.35 1676.27 1802.71 1895.92 1952.48 
+        UU_IHU          na      na      na      na      na  ...      726.94  755.66  784.87  815.30  855.34  904.62 
+        UU_MU           na      na      na      na      na  ...        0.28    0.28    0.28    0.28    0.28    0.28 
+        UU_NAWRU        na      na      na      na      na  ...        0.14    0.14    0.14    0.14    0.14    0.14 
+        UU_WBU      256.18  268.75  295.29  324.89  366.34  ...     7072.79 7328.34 7664.35 8073.34 8525.34 8986.57 
+        <BLANKLINE>
+        >>> # content of the debug file
+        >>> with open(debug_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     for line in f:
+        ...         print(line.strip())
+        ...
+        ACAF -> KK_AF       (Rule KK_--+++++++++++++)
+        ACAG -> KK_AG       (Rule KK_--+++++++++++++)
+        CGU -> UU_CGU       (Rule UU_++++++++++++++++)
+        DPU -> UU_DPU       (Rule UU_++++++++++++++++)
+        DPUU -> UU_DPUU     (Rule UU_++++++++++++++++)
+        IFU -> UU_IFU       (Rule UU_++++++++++++++++)
+        IHU -> UU_IHU       (Rule UU_++++++++++++++++)
+        MU -> UU_MU         (Rule UU_++++++++++++++++)
+        NAWRU -> UU_NAWRU   (Rule UU_++++++++++++++++)
+        WBU -> UU_WBU       (Rule UU_++++++++++++++++)
+        """
+        # $FileImportCmt format rule_file input_file language [debug_file]
+        input_file = check_filepath(input_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_import_formats: str = ''.join([item.name[0] for item in list(ImportFormats)])
+        if isinstance(input_format, ImportFormats):
+            input_format = input_format.name[0]
+        if input_format not in _c_import_formats:
+            raise ValueError(f"Invalid input format '{input_format}'. "
+                             f"Possible values are: {_c_import_formats}")
+        
+        save_file = check_filepath(save_file, IodeFileType.FILE_VARIABLES, file_must_exist=False)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        # $FileImportVar format rule infile outfile from to  [trace]
+        args = f"{input_format} {rule_file} {input_file} {save_file} {from_period} {to_period}"
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+            args += " " + debug_file
+
+        res = B_FileImportVar(args.encode('utf-8'))
+        if res < 0:
+            raise RuntimeError(f"Cannot import variables from file '{input_file}'")
 
     def _str_header(self) -> str:
         s = super()._str_header() 
