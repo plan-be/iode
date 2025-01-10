@@ -202,6 +202,6 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
     def set_mode(self, mode: VarsMode) -> None:
         if self._database is not None:
             self._database.mode = mode
-        if self._database_subset is not None:
-            self._database_subset.mode = mode
+        if self._displayed_database is not None:
+            self._displayed_database.mode = mode
         self.reset()
