@@ -59,7 +59,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
         else:
             QMessageBox.warning(None, "Error", f"Unknown IODE types {self.iode_type}")
             self._database = None
-        self._database_subset = None
         self._displayed_database = self._database
 
         self.alignment = Qt.AlignmentFlag.AlignLeft
@@ -112,7 +111,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         Returns whether a filter is currently active.
         """
-        return self._database_subset is not None
+        return self._displayed_database.is_subset()
 
     def reset_model(self):
         """
@@ -258,9 +257,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         if self._database is not None:
             self._database.clear()
-        if self._database_subset is not None:
-            del self._database_subset
-            self._database_subset = None
         self._displayed_database = self._database
 
     def load(self, filepath: str, force_overwrite: bool):
@@ -288,11 +284,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
             # load Iode file in the global database
             self._database.load(filepath)
-
-            # reset subset
-            if self._database_subset:
-                del self._database_subset
-                self._database_subset = None
 
             # 'displayed_database' now points to the newly loaded 'database'
             self._displayed_database = self._database
@@ -500,18 +491,12 @@ class IodeAbstractTableModel(QAbstractTableModel):
         :param pattern: The filter pattern.
         :param silent: If True, the filter is applied silently without updating the view.
         """
-        if self._database_subset:
-            del self._database_subset
-            self._database_subset = None
-
         if not pattern:
             self._displayed_database = self._database
         else:
             try:
-                self._database_subset = self._database.subset(pattern)
-                self._displayed_database = self._database_subset
+                self._displayed_database = self._database[pattern]
             except Exception as e:
-                self._database_subset = None
                 self._displayed_database = self._database
                 if not silent:
                     QMessageBox.warning(None, "WARNING", str(e))
