@@ -38,6 +38,24 @@ PRINT_FORMATS: Tuple[str, ...] = (
     "CSV file (Excel, ....)", 
     "No format")
 
+IMPORT_FORMATS: Tuple[str, ...] = (
+    "Ascii", 
+    "Rotated_Ascii", 
+    "DIF",
+    "BISTEL", 
+    "NIS", 
+    "GEM", 
+    "PRN", 
+    "TXT_Belgostat")
+
+EXPORT_FORMATS: Tuple[str, ...] = (
+    "CSV", 
+    "DIF", 
+    "WKS", 
+    "TSP", 
+    "Reverse CSV")
+
+
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
         self._name: str = name
