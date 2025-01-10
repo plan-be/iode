@@ -4,14 +4,15 @@ SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
 from .iode_cython import (__version__, NA, is_NA, 
-                          IodeType, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
-                          TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
-                          VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
-                          ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt)
+                          IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, EqTest, 
+                          TableCellType, TableCellFont, TableCellAlign, TableLineType, TableGraphType, 
+                          TableGraphGrid, TableGraphAlign, TableGraphAxis, VarsMode, LowToHighType, LowToHighMethod, 
+                          HighToLowType, SimulationInitialization, SimulationSort, ESTIMATION_MAXIT, ESTIMATION_EPS, 
+                          AdjustmentMethod, WriteFileExt)
 
 from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, 
                      EQ_TEST_NAMES, IODE_FILE_TYPES, SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
-                     PRINT_FORMATS)
+                     PRINT_FORMATS, IMPORT_FORMATS, EXPORT_FORMATS)
 
 # time
 from .iode_cython import Period, Sample, PERIODICITY_LIST
@@ -50,12 +51,13 @@ from .super import *
 __all__ = [
     # Constants
     'SAMPLE_DATA_DIR', 'NA', 'is_NA', 
-    'IodeType', 'IodeFileType', 'TableLang', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
-    'TableLineType', 'TableGraphType', 'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 
-    'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
-    'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
-    'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
-    'SIMULATION_INITIALIZATION_METHODS', 'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 
+    'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 'EqMethod', 'EqTest', 
+    'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 'TableGraphGrid', 
+    'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 
+    'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 
+    'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 
+    'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 'SIMULATION_INITIALIZATION_METHODS', 
+    'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 'IMPORT_FORMATS', 'EXPORT_FORMATS', 
 
     # time
     'Period', 'Sample', 'PERIODICITY_LIST',

@@ -20,6 +20,8 @@ from pyiode.common cimport (IodeEquationMethod, IodeEquationTest,
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, IodeAdjustmentMethod)
 from pyiode.common cimport IodeType as CIodeType
+from pyiode.common cimport IodeImportFormat as CIodeImportFormat 
+from pyiode.common cimport IodeExportFormat as CIodeExportFormat 
 from pyiode.common cimport IodeFileType as CIodeFileType
 from pyiode.common cimport TableLang as CTableLang
 from pyiode.common cimport TableCellType as CTableCellType 
@@ -120,6 +122,23 @@ class TableLang(IntEnum):
     ENGLISH = CTableLang.TABLE_ENGLISH
     DUTCH = CTableLang.TABLE_DUTCH
     FRENCH = CTableLang.TABLE_FRENCH
+
+class ImportFormats(IntEnum):
+    ASCII = CIodeImportFormat.IMPORT_ASCII
+    ROT_ASCII = CIodeImportFormat.IMPORT_ROT_ASCII
+    DIF = CIodeImportFormat.IMPORT_DIF
+    BISTEL = CIodeImportFormat.IMPORT_BISTEL
+    NIS = CIodeImportFormat.IMPORT_NIS
+    GEM = CIodeImportFormat.IMPORT_GEM
+    PRN = CIodeImportFormat.IMPORT_PRN
+    TXT = CIodeImportFormat.IMPORT_TXT
+
+class ExportFormats(IntEnum):
+    CSV = CIodeExportFormat.EXPORT_CSV
+    DIF = CIodeExportFormat.EXPORT_DIF
+    WKS = CIodeExportFormat.EXPORT_WKS
+    TSP = CIodeExportFormat.EXPORT_TSP
+    RCSV = CIodeExportFormat.EXPORT_RCSV
 
 class EqMethod(IntEnum):
     LSQ = 0

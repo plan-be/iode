@@ -17,6 +17,23 @@ cdef extern from "api/iode.h":
         TABLES,
         VARIABLES
 
+    cdef enum IodeExportFormat:
+        EXPORT_CSV,
+        EXPORT_DIF,
+        EXPORT_WKS,
+        EXPORT_TSP,
+        EXPORT_RCSV
+
+    cdef enum IodeImportFormat:
+        IMPORT_ASCII,
+        IMPORT_ROT_ASCII,
+        IMPORT_DIF,
+        IMPORT_BISTEL,
+        IMPORT_NIS,
+        IMPORT_GEM,
+        IMPORT_PRN,
+        IMPORT_TXT
+
 cdef extern from "cpp_api/common.h":
     cdef vector[string] v_iode_types
 
