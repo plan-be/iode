@@ -13,6 +13,9 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBComments as CKDBComments
 from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_comments
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
+
+from iode.util import check_filepath
 
 
 @cython.final
@@ -555,6 +558,169 @@ cdef class Comments(_AbstractDatabase):
         'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
         """
         return self.to_series()
+
+    @classmethod
+    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], 
+                     save_file: Union[str, Path], rule_file: Union[str, Path], 
+                     lang: Union[str, TableLang] = TableLang.ENGLISH, 
+                     debug_file: Union[str, Path]=None) -> None:
+        r"""
+        Convert an external file representing IODE comments to an IODE comments file (.cmt). 
+        The possible formats for the input file are:
+          
+          - `Ascii`: IODE-specific Ascii format for objects 
+          - `Rotated Ascii`: Ascii format for variables with series in columns 
+          - `DIF`: DIF format (Data Interchange Format) 
+          - `DIF` Belgostat: (old) exchange format specific to Belgostat 
+          - `NIS`: National Institute of Statistics Ascii format (old) 
+          - `GEM`: Ascii format of Chronos software 
+          - `PRN-Aremos`: Ascii format from Aremos software 
+          - `TXT Belgostat`: (old) Belgostat-specific exchange format 
+
+        The rule file is a simple text file contains the rules for: 
+        
+          - selecting the objects to be imported 
+          - determining the objects names.
+
+        Each rule consists of two fields:
+
+          - the selection pattern, containing a description of the names concerned by the rule. 
+            This mask is defined in the same way as the :py:meth:`~iode.Comments.search` method.
+          - the transcoding algorithm for the names, which can contain : 
+            - `+` : indicates that the character must be included in the name 
+            - `-` : indicates that the character should be skipped 
+            - any other character: included in the name 
+        
+        Example:
+
+            B* C+-+          -> transforms B1234 into CB2, BCDEF into CBE, etc 
+            *X ++++++++++    -> keeps names ending in X unchanged
+            * ++++++++++     -> keeps all names unchanged
+
+        Parameters
+        ----------
+        input_file : str or Path
+            The path to the input file to be converted. 
+        input_format : str or ImportFormats
+            The format of the input file. Possible formats are ASCII, ROT_ASCII (Rotated Ascii), 
+            DIF, BISTEL, NIS, GEM, PRN, TXT (TXT Belgostat).
+        save_file : str or Path
+            The path to the output file where the IODE comments will be saved.
+        rule_file : str or Path
+            The path to the rule file that defines the selection and transcoding rules. 
+        lang : str or TableLang, optional
+            The language of the extracted comments. 
+            It is only used when a text appears in several languages in the input file. 
+            Currently, only the Belgostat DIF format uses this value, allowing you to select 
+            the language of the extracted comments.
+            Default is ENGLISH.
+        debug_file : str or Path, optional
+            The path to the debug file where the debug information will be saved. 
+            If not provided, the debug information will be printed to the console.
+
+        Examples
+        --------
+        >>> from pathlib import Path
+        >>> from iode import SAMPLE_DATA_DIR, comments, ImportFormats
+        >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.ac.ref"
+        >>> input_format = ImportFormats.ASCII
+        >>> save_file = "imported_cmt.cmt"
+        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
+        >>> debug_file = "debug.log"
+
+        >>> # print rules
+        >>> with open(rule_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        AC*  KK_--+++++++++++++
+        *U   UU_++++++++++++++++
+        >>> # get list of comments with a name starting with 'AC' 
+        >>> # and ending with 'U' from the input file
+        >>> with open(input_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     for line in f:
+        ...         name = line.split(" ")[0]
+        ...         if name.startswith("AC") or name.endswith("U"):
+        ...             print(line.strip())
+        ...
+        ACAF "Ondernemingen: ontvangen kapitaaloverdrachten."
+        ACAG "Totale overheid: netto ontvangen kapitaaloverdrachten."
+        DPU "Nominale afschrijvingen op de kapitaalvoorraad."
+        DPUU "Nominale afschrijvingen op de kapitaalvoorraad (aangepast: inkomensoptiek)."
+        IFU "Bruto kapitaalvorming: ondernemingen."
+        IHU "Bruto kapitaalvorming: gezinnen."
+        WBU "Totale loonmassa (inclusief werkgeversbijdragen)."
+        >>> # import comments from input_file to save_file
+        >>> # using the rules defined in rule_file
+        >>> comments.convert_file(input_file, input_format, save_file, rule_file, 'E', debug_file)
+        Reading object 1 : KK_AF
+        Reading object 2 : KK_AG
+        Reading object 3 : UU_DPU
+        Reading object 4 : UU_DPUU
+        Reading object 5 : UU_IFU
+        Reading object 6 : UU_IHU
+        Reading object 7 : UU_WBU
+        7 objects saved
+        >>> # check content of the saved file
+        >>> comments.load(save_file)        # doctest: +ELLIPSIS
+        Loading ...\imported_cmt.cmt
+        7 objects loaded
+        >>> comments                        # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Workspace: Comments
+        nb comments: 7
+        filename: ...\imported_cmt.cmt
+        <BLANKLINE>
+          name                                        comments
+        KK_AF       Ondernemingen: ontvangen kapitaaloverdrachten.
+        KK_AG       Totale overheid: netto ontvangen kapitaaloverdrachten.
+        UU_DPU      Nominale afschrijvingen op de kapitaalvoorraad.
+        UU_DPUU     Nominale afschrijvingen op de kapitaalvoorraad (aangepast: inkomensoptiek).
+        UU_IFU      Bruto kapitaalvorming: ondernemingen.
+        UU_IHU      Bruto kapitaalvorming: gezinnen.
+        UU_WBU      Totale loonmassa (inclusief werkgeversbijdragen).
+        <BLANKLINE>
+        >>> # content of the debug file
+        >>> with open(debug_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     for line in f:
+        ...         print(line.strip())
+        ...
+        ACAF -> KK_AF       (Rule KK_--+++++++++++++)
+        ACAG -> KK_AG       (Rule KK_--+++++++++++++)
+        DPU -> UU_DPU       (Rule UU_++++++++++++++++)
+        DPUU -> UU_DPUU     (Rule UU_++++++++++++++++)
+        IFU -> UU_IFU       (Rule UU_++++++++++++++++)
+        IHU -> UU_IHU       (Rule UU_++++++++++++++++)
+        WBU -> UU_WBU       (Rule UU_++++++++++++++++)
+        """
+        # $FileImportCmt format rule_file input_file language [debug_file]
+        input_file = check_filepath(input_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_import_formats: str = ''.join([item.name[0] for item in list(ImportFormats)])
+        if isinstance(input_format, ImportFormats):
+            input_format = input_format.name[0]
+        if input_format not in _c_import_formats:
+            raise ValueError(f"Invalid input format '{input_format}'. "
+                             f"Possible values are: {_c_import_formats}")
+        
+        save_file = check_filepath(save_file, IodeFileType.FILE_COMMENTS, file_must_exist=False)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_table_langs: str = ''.join([item.name[0] for item in list(TableLang)])
+        if isinstance(lang, TableLang):
+            lang = lang.name[0]
+        if lang not in _c_table_langs:
+            raise ValueError(f"Invalid language '{lang}'. " 
+                             f"Possible values are: {_c_table_langs}") 
+
+        # $FileImportCmt format rule infile outfile language [trace]
+        args = f"{input_format} {rule_file} {input_file} {save_file} {lang}"
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+            args += " " + debug_file
+
+        res = B_FileImportCmt(args.encode('utf-8'))
+        if res < 0:
+            raise RuntimeError(f"Cannot import comments from file '{input_file}'")
 
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
