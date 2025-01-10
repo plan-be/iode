@@ -683,12 +683,12 @@ cdef class _AbstractDatabase:
                 different_objects_list_name: lists[different_objects_list_name]}
 
     def merge(self, other: Self, overwrite: bool=True):
-        f"""
+        """
         Merge the content of the 'other' database into the current database.
 
         Parameters
         ----------
-        other: {type(self).__name__}
+        other:
             other database to be merged in the current one.
         overwrite: bool, optional
             Whether or not to overwrite the objects with the same name in the two database.
@@ -698,41 +698,44 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS
+        Loading .../fun.cmt
+        317 objects loaded
 
-        >>> # copy comments with names starting with 'A' into a new database 'cmt_subset'
-        >>> cmt_subset = comments.subset("A*", deep_copy=True)
-        >>> cmt_subset.names
-        ['ACAF', 'ACAG', 'ACOUG', 'AQC']
+        >>> # copy comments with names starting with 'A' into a 
+        >>> # new database 'cmt_detached'
+        >>> cmt_detached = comments.copy("A*")
+        >>> cmt_detached.names
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> # remove 'ACAF' and 'ACAG' from the global Comments database
-        >>> comments.remove('ACAF;ACAG')
+        >>> del comments['ACAF;ACAG']
         >>> comments.get_names("A*")
-        ['ACOUG']
+        ['AOUC', 'AQC']
 
-        >>> # update the content of 'ACOUG' in 'cmt_subset'
-        >>> cmt_subset['ACOUG'] = "Comment modified"
-        >>> cmt_subset['ACOUG']
+        >>> # update the content of 'AOUC' in 'cmt_detached'
+        >>> cmt_detached['AOUC'] = "Comment modified"
+        >>> cmt_detached['AOUC']
         'Comment modified'
-        >>> # content of 'ACOUG' in the global Comments database
-        >>> comments['ACOUG']
-        ''
+        >>> # content of 'AOUC' in the global Comments database
+        >>> comments['AOUC']
+        'Kost per eenheid produkt.'
 
-        >>> # merge 'cmt_subset' into the global Comments database
-        >>> # preserve 'ACOUG' in the global Comments database
-        >>> comments.merge(cmt_subset, overwrite=False)
-        >>> comments.contains('ACAF')
+        >>> # merge 'cmt_detached' into the global Comments database
+        >>> # -> preserve 'AOUC' in the global Comments database
+        >>> comments.merge(cmt_detached, overwrite=False)
+        >>> 'ACAF' in comments
         True
-        >>> comments.contains('ACAG')
+        >>> 'ACAG' in comments
         True
-        >>> comments['ACOUG']
-        ''
+        >>> comments['AOUC']
+        'Kost per eenheid produkt.'
 
-        >>> # merge 'cmt_subset' into the global Comments database
-        >>> # overwrite the content of 'ACOUG' in the global Comments database 
-        >>> comments.merge(cmt_subset)
-        >>> comments['ACOUG']
-        ''
+        >>> # merging 'cmt_detached' into the global Comments database
+        >>> # -> overwrite the content of 'AOUC' in the global Comments database 
+        >>> comments.merge(cmt_detached)
+        >>> comments['AOUC']
+        'Comment modified'
         """
         if not isinstance(other, type(self)):
             raise TypeError(f"'other': Expected value of type {type(self).__name__}. " + 
