@@ -247,7 +247,7 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         """
         self.project_dir = projectDir
         self.load_settings()
-        self.reset()
+        self.reset_model()
 
     def clear_database(self):
         """
