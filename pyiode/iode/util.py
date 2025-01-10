@@ -388,6 +388,20 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     >>> from iode import IodeFileType, SAMPLE_DATA_DIR
     >>> from iode.util import check_filepath
 
+	>>> # No extension but an IODE objects file -> extension added automatically
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
+    >>> checked_filepath = check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)
+    >>> Path(checked_filepath).name
+    'fun.cmt'
+    >>> Path(checked_filepath).parent.name
+    'data'
+
+    >>> # any file
+    >>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun_xode.ac.ref")
+    >>> checked_filepath = check_filepath(filepath, IodeFileType.FILE_ANY, True)
+    >>> Path(checked_filepath).name
+    'fun_xode.ac.ref'
+
     >>> # wrong directory
     >>> cwd = Path.cwd()
     >>> fake_dir = cwd.parent / "fake_dir"
@@ -434,23 +448,14 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     Traceback (most recent call last):
     ...
     ValueError: You must provide an extension to the file '...fun'
-
-	>>> # extension added automatically
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
-    >>> checked_filepath = check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)
-    >>> Path(checked_filepath).name
-    'fun.cmt'
-    >>> Path(checked_filepath).parent.name
-    'data'
     """
     p_filepath: Path = check_file(filepath, False)
 
-    # check or add extension
     if p_filepath.suffix:
         # check extension
         ext = p_filepath.suffix
         expected_extensions = IODE_FILE_TYPES[int(expected_file_type)].extensions
-        if ext not in expected_extensions:
+        if not (expected_file_type == IodeFileType.FILE_ANY or ext in expected_extensions):
             raise ValueError(f"The file '{p_filepath.name}' has a wrong extension '{ext}'\n"
                              f"Expected extensions are: {expected_extensions}")
 
