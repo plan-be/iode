@@ -36,6 +36,7 @@ std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iod
  * 
  *  Syntax: $FileImportCmt rule infile outfile language [trace]
  *  where:
+ *      format = {A, R, D, N, G, P, T}
  *      rule = rulefile to use to translate names
  *      infile = file to import
  *      outfile = IODE-file with imported series
@@ -56,6 +57,7 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
  * 
  *  Syntax: $FileImportVar rule infile outfile from to  [trace]
  *  where:
+ *      format = {A, R, D, N, G, P, T}
  *      rule = rulefile to use to translate names
  *      infile = file to import
  *      outfile = IODE-file with imported series
@@ -78,6 +80,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  *  Syntax: $FileImportVar rule infile outfile from to  [trace]
  *          
  *  where:
+ *      format = {A, R, D, N, G, P, T}
  *      rule = rulefile to use to translate names
  *      infile = file to import
  *      outfile = IODE-file with imported series
@@ -102,7 +105,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  *  Syntax: $FileExport vfile cfile from to format outfile rule nan separator [trace]
  *  where:
  *      vfile = variables file to export
- *      cfile = variables file to export
+ *      cfile = comments file to export
  *      from = begin of sample
  *      to   = end of sample
  *      format = {CSV, DIF, WKS, TSP, Reverse CSV}
