@@ -427,6 +427,8 @@ keyboard_shortcuts.*
 *.at
 *.av
 
+imported*
+exported*
 generate_stub_files.py
 
 # C API
