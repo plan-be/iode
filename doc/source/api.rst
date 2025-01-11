@@ -373,6 +373,7 @@ Properties and methods specific to Variables
    Variables.from_array
    Variables.to_array
    Variables.convert_file
+   Variables.export_as_file
 
 =============
 Miscellaneous

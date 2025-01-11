@@ -31,10 +31,15 @@ cdef extern from "api/iode.h":
     double* KVPTR(char* name)
 
     void B_display_last_error()
+    int W_dest(char *filename,int type)
+    int W_flush()
+    int W_close()
     int B_DataCompareEps(char* arg)
     int B_DataCompare(char* arg, int iode_type)
     int B_FileImportCmt(char* arg)
     int B_FileImportVar(char* arg)
+    int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, 
+                       char* from_period, char* to_period, char* na, char* sep, int fmt)
 
     ctypedef struct KOBJ:
         SWHDL o_val

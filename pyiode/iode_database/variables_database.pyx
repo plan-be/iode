@@ -24,6 +24,8 @@ from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_hig
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
+from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
+from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
 from iode.util import check_filepath
 
@@ -2209,6 +2211,327 @@ cdef class Variables(_AbstractDatabase):
         res = B_FileImportVar(args.encode('utf-8'))
         if res < 0:
             raise RuntimeError(f"Cannot import variables from file '{input_file}'")
+
+    @classmethod
+    def export_as_file(cls, variables_file: Union[str, Path], rule_file: Union[str, Path], 
+                       save_file: Union[str, Path], export_format: Union[str, ExportFormats], 
+                       from_period: Union[str, Period], to_period: Union[str, Period],
+                       comments_file: Union[str, Path], nan_value: str="#N/A", separator: str=";",
+                       debug_file: Union[str, Path]=None) -> None:
+        r"""
+        Convert an IODE Variables file to a format used by some other programs. 
+        The possible output formats are:
+          
+          - `CSV` 
+          - `RCSV` 
+          - `DIF` 
+          - `WKS` 
+          - `TSP` 
+
+        If an IODE Comments file is passed, comments of the same name will be associated with variables 
+        in the result file when the output format allows it.
+
+        The rule file is a simple text file contains the rules for: 
+        
+          - selecting the variables (and comments) to be exported 
+          - determining the new variables names in the saved file.
+
+        Each rule consists of two fields:
+
+          - the selection pattern, containing a description of the names concerned by the rule. 
+            This mask is defined in the same way as the :py:meth:`~iode.Comments.search` method.
+          - the transcoding algorithm for the names, which can contain : 
+            - `+` : indicates that the character must be included in the name 
+            - `-` : indicates that the character should be skipped 
+            - any other character: included in the name 
+        
+        Example:
+
+            B* C+-+          -> transforms B1234 into CB2, BCDEF into CBE, etc 
+            *X ++++++++++    -> keeps names ending in X unchanged
+            * ++++++++++     -> keeps all names unchanged
+
+        Parameters
+        ----------
+        variables_file : str or Path
+            The path to the input Variables file to be converted. 
+        rule_file : str or Path
+            The path to the rule file that defines the selection and transcoding rules. 
+        save_file : str or Path
+            The path to the output file where the IODE variables will be saved.
+        export_format : str or ExportFormats
+            The format of the output file. Possible formats are CSV, RCSV (rotated CSV), 
+            DIF, WKS, TSP.
+        from_period : str or Period, optional
+            The first period of the series to be exported. 
+        to_period : str or Period, optional
+            The last period of the series to be exported.        
+        comments_file : str or Path, optional
+            The path to the input Comments file. 
+        nan_value: str, optional
+            The value to be used for missing data. 
+            Only used for `CSV` and `RCSV` (rotated CSV).
+            Default is "#N/A". 
+        separator: str, optional
+            The character to be used as separator. 
+            Only used for `CSV` and `RCSV` (rotated CSV).
+            Default is ";".
+        debug_file : str or Path, optional
+            The path to the debug file where the debug information will be saved. 
+            If not provided, the debug information will be printed to the console.
+
+        Examples
+        --------
+        >>> from pathlib import Path
+        >>> from iode import SAMPLE_DATA_DIR, comments, variables, ExportFormats
+        >>> variables_file = f"{SAMPLE_DATA_DIR}/fun.av"
+        >>> comments_file = f"{SAMPLE_DATA_DIR}/fun.ac"
+        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
+        >>> from_period = "2000Y1"
+        >>> to_period = "2010Y1"
+        
+        >>> comments.load(comments_file)            # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading .../fun.ac
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 316 : ZX
+        Reading object 317 : ZZ_
+        317 objects loaded 
+        >>> variables.load(variables_file)          # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading .../fun.av
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 393 : ZX
+        Reading object 394 : ZZF_
+        394 objects loaded
+
+        >>> # print file containing rules
+        >>> with open(rule_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        AC*  KK_--+++++++++++++
+        *U   UU_++++++++++++++++
+        >>> # get list of variables with a name starting with 'AC' 
+        >>> # and ending with 'U'
+        >>> variables.get_names("AC*;*U")
+        ['ACAF', 'ACAG', 'CGU', 'DPU', 'DPUU', 'IFU', 'IHU', 'MU', 'NAWRU', 'WBU']
+        >>> # get list of comments with a name starting with 'AC' 
+        >>> # and ending with 'U'
+        >>> comments.get_names("AC*;*U")
+        ['ACAF', 'ACAG', 'DPU', 'DPUU', 'IFU', 'IHU', 'WBU']
+
+        >>> # export variables to CSV
+        >>> export_format = ExportFormats.CSV
+        >>> save_file = "exported_var.csv"
+        >>> debug_file = "debug_csv.log"
+        >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
+        ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading ...\fun.av
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 393 : ZX
+        Reading object 394 : ZZF_
+        394 objects loaded
+        Loading ...\fun.ac
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 316 : ZX
+        Reading object 317 : ZZ_
+        317 objects loaded     
+        >>> # check content of the saved file
+        >>> # note: no comment found for variables CGU, MU and NAWRU
+        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        ...     print(f.read())
+        ...
+        code;comment;2000Y1;2001Y1;2002Y1;2003Y1;2004Y1;2005Y1;2006Y1;2007Y1;2008Y1;2009Y1;2010Y1;
+        KK_AF; Ondernemingen: ontvangen kapitaaloverdrachten.; 10.046611;...;-37.827429;
+        KK_AG; Totale overheid: netto ontvangen kapitaaloverdrachten.; -41.534787;...;28.253929;
+        UU_CGU; ; 1383.2586;...;2173.7682;
+        UU_DPU; Nominale afschrijvingen op de kapitaalvoorraad.; 953.60012;...;1531.9025;
+        UU_DPUU; Nominale afschrijvingen op de kapitaalvoorraad (aangepast:  inkomensoptiek).; 954.5012;...;1533.35;
+        UU_IFU; Bruto kapitaalvorming: ondernemingen.; 1076.1795;...;1566.9738;
+        UU_IHU; Bruto kapitaalvorming: gezinnen.; 471.00145;...;726.93744;
+        UU_MU; ; 0.42001992;...;0.27826033;
+        UU_NAWRU; ; 0.14141811;...;0.13964585;
+        UU_WBU; Totale loonmassa (inclusief werkgeversbijdragen).; 4922.5664;...;7072.7855;
+        >>> # content of the debug file
+        >>> with open(debug_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        ACAF -> KK_AF       (Rule KK_--+++++++++++++)
+        ACAG -> KK_AG       (Rule KK_--+++++++++++++)
+        CGU -> UU_CGU       (Rule UU_++++++++++++++++)
+        DPU -> UU_DPU       (Rule UU_++++++++++++++++)
+        DPUU -> UU_DPUU     (Rule UU_++++++++++++++++)
+        IFU -> UU_IFU       (Rule UU_++++++++++++++++)
+        IHU -> UU_IHU       (Rule UU_++++++++++++++++)
+        MU -> UU_MU         (Rule UU_++++++++++++++++)
+        NAWRU -> UU_NAWRU   (Rule UU_++++++++++++++++)
+        WBU -> UU_WBU       (Rule UU_++++++++++++++++)
+
+        >>> # export variables to rotated CSV
+        >>> export_format = ExportFormats.RCSV
+        >>> save_file = "exported_var.rcsv"
+        >>> debug_file = "debug_rcsv.log"
+        >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
+        ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading ...\fun.av
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 393 : ZX
+        Reading object 394 : ZZF_
+        394 objects loaded
+        Loading ...\fun.ac
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 316 : ZX
+        Reading object 317 : ZZ_
+        317 objects loaded 
+        >>> # check content of the saved file
+        >>> # warning: the comments file is not used for rotated CSV
+        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        ...     print(f.read())
+        ...
+        ; KK_AF; KK_AG; UU_CGU; UU_DPU; UU_DPUU; UU_IFU; UU_IHU; UU_MU; UU_NAWRU; UU_WBU;
+        2000Y1; 10.046611; -41.534787; ... 0.42001992; 0.14141811; 4922.5664;
+        2001Y1; 2.8679227; 18.939801; ... 0.40711156; 0.14138538; 5138.9458;
+        2002Y1; -0.92921251; 19.980815; ... 0.39212964; 0.14125761; 5341.3233;
+        2003Y1; -6.091565; 21.020502; ... 0.37923534; 0.14106277; 5556.2476;
+        2004Y1; -14.582094; 22.066476; ... 0.36772624; 0.14083541; 5696.1652;
+        2005Y1; -26.53879; 23.107962; ... 0.35617242; 0.14059196; 5814.7965;
+        2006Y1; -28.987288; 24.129637; ... 0.34370718; 0.14034559; 6015.8951;
+        2007Y1; -33.378426; 25.160909; ... 0.32978662; 0.1401158; 6295.5108;
+        2008Y1; -38.409518; 26.192111; ... 0.31416594; 0.13991636; 6650.3069;
+        2009Y1; -37.46351; 27.229955; ... 0.29691377; 0.13975922; 6861.5824;
+        2010Y1; -37.827429; 28.253929; ... 0.27826033; 0.13964585; 7072.7855;
+
+        >>> # export variables to TSP
+        >>> export_format = ExportFormats.TSP
+        >>> save_file = "exported_var.tsp"
+        >>> debug_file = "debug_tsp.log"
+        >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
+        ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        Loading ...\fun.av
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 393 : ZX
+        Reading object 394 : ZZF_
+        394 objects loaded
+        Loading ...\fun.ac
+        Reading object 1 : ACAF
+        Reading object 2 : ACAG
+        ...
+        Reading object 316 : ZX
+        Reading object 317 : ZZ_
+        317 objects loaded 
+        >>> # check content of the saved file
+        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        ...     print(f.read())
+        ...
+        FREQ A;
+        SMPL 2000 2010 ;
+        LOAD KK_AF ;
+        <BLANKLINE>
+        ? Ondernemingen: ontvangen kapitaaloverdrachten.
+        10.046611 2.8679227 -0.92921251 -6.091565 -14.582094 -26.53879 -28.987288
+        -33.378426 -38.409518 -37.46351 -37.827429
+        ;
+        LOAD KK_AG ;
+        <BLANKLINE>
+        ? Totale overheid: netto ontvangen kapitaaloverdrachten.
+        -41.534787 18.939801 19.980815 21.020502 22.066476 23.107962 24.129637
+        25.160909 26.192111 27.229955 28.253929
+        ;
+        LOAD UU_CGU ;
+        <BLANKLINE>
+        1383.2586 1463.8679 1539.7198 1615.7986 1672.9449 1723.928 1787.6062 1873.3473
+        1987.2756 2083.4747 2173.7682
+        ;
+        LOAD UU_DPU ;
+        <BLANKLINE>
+        ? Nominale afschrijvingen op de kapitaalvoorraad.
+        953.60012 1007.4142 1056.9933 1101.323 1143.7441 1195.2886 1252.6131 1316.011
+        1402.6103 1471.9715 1531.9025
+        ;
+        LOAD UU_DPUU ;
+        <BLANKLINE>
+        ? Nominale afschrijvingen op de kapitaalvoorraad (aangepast:
+        ? inkomensoptiek).
+        954.5012 1008.3662 1057.9921 1102.3636 1144.8248 1196.418 1253.7967 1317.2545
+        1403.9357 1473.3624 1533.35
+        ;
+        LOAD UU_IFU ;
+        <BLANKLINE>
+        ? Bruto kapitaalvorming: ondernemingen.
+        1076.1795 1136.1372 1150.8846 1197.4509 1277.7354 1399.6986 1490.8074 1562.3181
+        1617.3543 1602.6872 1566.9738
+        ;
+        LOAD UU_IHU ;
+        <BLANKLINE>
+        ? Bruto kapitaalvorming: gezinnen.
+        471.00145 486.53108 514.2291 552.55878 600.62646 634.63051 655.61486 671.66908
+        665.98197 697.87295 726.93744
+        ;
+        LOAD UU_MU ;
+        <BLANKLINE>
+        0.42001992 0.40711156 0.39212964 0.37923534 0.36772624 0.35617242 0.34370718
+        0.32978662 0.31416594 0.29691377 0.27826033
+        ;
+        LOAD UU_NAWRU ;
+        <BLANKLINE>
+        0.14141811 0.14138538 0.14125761 0.14106277 0.14083541 0.14059196 0.14034559
+        0.1401158 0.13991636 0.13975922 0.13964585
+        ;
+        LOAD UU_WBU ;
+        <BLANKLINE>
+        ? Totale loonmassa (inclusief werkgeversbijdragen).
+        4922.5664 5138.9458 5341.3233 5556.2476 5696.1652 5814.7965 6015.8951 6295.5108
+        6650.3069 6861.5824 7072.7855
+        ;
+        """
+        variables_file = check_filepath(variables_file, IodeFileType.FILE_VARIABLES, file_must_exist=True)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+        save_file = check_filepath(save_file, IodeFileType.FILE_ANY, file_must_exist=False)
+
+        if isinstance(export_format, str):
+            export_format = ExportFormats[export_format.upper()]
+        export_format = int(export_format)
+
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        if comments_file:
+            comments_file = check_filepath(comments_file, IodeFileType.FILE_COMMENTS, file_must_exist=True)
+        else:
+            comments_file = ""
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+        else:
+            debug_file = ""
+
+        res = EXP_RuleExport(debug_file.encode('utf-8'), rule_file.encode('utf-8'), save_file.encode('utf-8'), 
+                             variables_file.encode('utf-8'), comments_file.encode('utf-8'), 
+                             from_period.encode('utf-8'), to_period.encode('utf-8'), nan_value.encode('utf-8'), 
+                             separator.encode('utf-8'), export_format)
+
+        # -- make sure the debug file is written at the end of the function --
+        # note: W_flush() and W_close() are not called in the C function EXP_RuleExport
+        if debug_file:
+            W_flush()
+            W_close()
+
+        if res < 0:
+            raise RuntimeError(f"Cannot export the variables file '{variables_file}'")
 
     def _str_header(self) -> str:
         s = super()._str_header() 
