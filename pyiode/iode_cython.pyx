@@ -58,6 +58,7 @@ python_assign_super()
 
 include "common.pyx"
 include "util.pyx"
+include "a2m_print.pyx"
 include "cli.pyx"
 include "lec.pyx"
 include "iode_database/extra_files.pyx"
