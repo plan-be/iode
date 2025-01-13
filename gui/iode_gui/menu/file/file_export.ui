@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>EXPORT  FILE  BY  RULE</string>
+   <string>EXPORT  FILE  BY  RULE (VARIABLES)</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -440,11 +440,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>IodeSampleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>iode_gui/util/widgets/sample_edit.h</header>
-  </customwidget>
-  <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
    <header>iode_gui/util/widgets/file_chooser.h</header>
@@ -452,6 +447,11 @@
    <slots>
     <slot>updateFileType(QString)</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>IodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>iode_gui/util/widgets/sample_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
