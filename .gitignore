@@ -440,6 +440,7 @@ generate_stub_files.py
 !/pyiode/s_pyiode.c
 !/pyiode/super.cpp
 !/pyiode/cli.cpp
+!/pyiode/a2m_print.cpp
 /pyiode/common.pyx
 /pyiode/iode/tests
 /pyiode/iode/iode.msg

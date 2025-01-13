@@ -109,6 +109,16 @@ def test_iode_messages():
     iode.reset_msgs()
 
 
+def test_iode_print_preferences():
+    from iode.util import (set_printer_preferences, set_A2M_preferences, set_MIF_preferences, 
+                           set_RTF_preferences, set_HTML_preferences)
+    set_printer_preferences()
+    set_A2M_preferences()
+    set_MIF_preferences()
+    set_RTF_preferences()
+    set_HTML_preferences()
+
+
 def test_iode_miscellaneous(tmp_path):
     from iode.reports import (build_command_functions_list, build_report_functions_list, 
                               build_lec_functions_list)
