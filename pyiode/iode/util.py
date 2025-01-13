@@ -12,7 +12,9 @@ from .common import IODE_FILE_TYPES
 # (for the GUI for example)
 from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, iode_msg_path, print_error_msg, 
                               TableLine, TableCell, ComputedTable, EditAndEstimateEquations, 
-                              CorrelationMatrix, register_super_function)
+                              CorrelationMatrix, register_super_function, 
+                              set_printer_preferences, set_A2M_preferences, set_MIF_preferences, 
+                              set_RTF_preferences, set_HTML_preferences)
 from .common import FileType
 
 _list_separator = r",;\s"
