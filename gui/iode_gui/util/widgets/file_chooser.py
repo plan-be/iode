@@ -1,5 +1,5 @@
+from PySide6.QtCore import QDir, QFileInfo, QSettings
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
-from PySide6.QtCore import QDir, QFileInfo
 
 from enum import Enum, auto
 from pathlib import Path
@@ -85,7 +85,9 @@ class IodeFileChooser(QWidget):
             filter = f"{name} ({' '.join(extensions)})"
 
         if not path:
-            rootDir = QDir.homePath()
+            user_settings: QSettings = QSettings(QSettings.Scope.UserScope, self)
+            project_path = user_settings.value("project_path", defaultValue="")
+            rootDir = project_path
         else:
             parentDir = QFileInfo(path).absoluteDir()
             rootDir = parentDir.absolutePath() if parentDir.exists() else QDir.homePath()
