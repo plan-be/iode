@@ -5,7 +5,7 @@ from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
 from .ui_file_export import Ui_MenuFileExport
 
-from iode import IodeFileType, Sample, variables #, IodeExportFormat, export_as
+from iode import IodeFileType, ExportFormats, Sample, variables
 
 
 class MenuFileExport(MixinSettingsDialog):
@@ -15,10 +15,10 @@ class MenuFileExport(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        # self.v_export_formats = list(IodeExportFormat)
-        # v_export_formats_names = [export_format.name.title() for export_format in self.v_export_formats]
-        # self.ui.comboBox_format.addItems(v_export_formats_names)
-        # self.ui.comboBox_format.setCurrentIndex(0) 
+        self.v_export_formats = list(ExportFormats)
+        v_export_formats_names = [export_format.name.title() for export_format in self.v_export_formats]
+        self.ui.comboBox_format.addItems(v_export_formats_names)
+        self.ui.comboBox_format.setCurrentIndex(0) 
 
         self.ui.fileChooser_comment_file.enum_file_type = IodeFileType.FILE_COMMENTS
         self.ui.fileChooser_comment_file.enum_file_mode = EnumFileMode.EXISTING_FILE
@@ -59,8 +59,8 @@ class MenuFileExport(MixinSettingsDialog):
             # throw an error if from_period and/or to_period are/is invalid
             Sample(from_period, to_period)
 
-            comment_file: str = self.ui.fileChooser_comment_file.filepath.strip()
-            variable_file: str = self.ui.fileChooser_variable_file.filepath.strip()
+            comments_file: str = self.ui.fileChooser_comment_file.filepath.strip()
+            variables_file: str = self.ui.fileChooser_variable_file.filepath.strip()
             rule_file: str = self.ui.fileChooser_rule_file.filepath.strip()
             save_file: str = self.ui.fileChooser_save_file.filepath.strip()
             debug_file: str = self.ui.fileChooser_debug_file.filepath.strip()
@@ -76,13 +76,12 @@ class MenuFileExport(MixinSettingsDialog):
             if not nan_value:
                 raise ValueError("Please specify a value for missing data (nan).")
 
-            # i_export_format = self.ui.comboBox_format.currentIndex()
-            # export_format: IodeExportFormat = self.v_export_formats[i_export_format]
+            i_export_format = self.ui.comboBox_format.currentIndex()
+            export_format: ExportFormats = self.v_export_formats[i_export_format]
 
-            # export_as(variable_file, comment_file, from_period, to_period, export_format, 
-            #           save_file, rule_file, nan_value, separator, debug_file)
-
-            raise NotImplementedError("This feature is not yet implemented.")
+            variables.export_as_file(variables_file, rule_file, save_file, export_format, 
+                                     from_period, to_period, comments_file, nan_value, 
+                                     separator, debug_file)
 
             self.accept()
         except Exception as e:
