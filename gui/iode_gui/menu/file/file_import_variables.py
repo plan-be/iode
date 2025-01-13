@@ -5,7 +5,7 @@ from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
 from .ui_file_import_variables import Ui_MenuFileImportVariables
 
-from iode import IodeFileType, Sample, variables #, IodeImportFormat, import_variables_from_file
+from iode import IodeFileType, ImportFormats, Sample, variables
 
 
 class MenuFileImportVariables(MixinSettingsDialog):
@@ -15,12 +15,12 @@ class MenuFileImportVariables(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        # self.v_import_formats = list(IodeExportFormat)
-        # v_import_formats_names = [import_format.name.title() for import_format in self.v_import_formats]
-        # self.ui.comboBox_format.addItems(v_import_formats_names)
-        # self.ui.comboBox_format.setCurrentIndex(0)
+        self.v_import_formats = list(ImportFormats)
+        v_import_formats_names = [import_format.name.title() for import_format in self.v_import_formats]
+        self.ui.comboBox_format.addItems(v_import_formats_names)
+        self.ui.comboBox_format.setCurrentIndex(0)
 
-        self.ui.fileChooser_input_file.enum_file_type = IodeFileType.FILE_VARIABLES
+        self.ui.fileChooser_input_file.enum_file_type = IodeFileType.FILE_ANY
         self.ui.fileChooser_input_file.enum_file_mode = EnumFileMode.EXISTING_FILE
 
         self.ui.fileChooser_rule_file.enum_file_type = IodeFileType.FILE_ANY
@@ -62,13 +62,11 @@ class MenuFileImportVariables(MixinSettingsDialog):
             if not save_file:
                 raise ValueError("Please specify a save file path.")
 
-            # i_import_format = self.ui.comboBox_format.currentIndex()
-            # import_format: IodeExportFormat = self.v_import_formats[i_import_format]
+            i_import_format = self.ui.comboBox_format.currentIndex()
+            import_format: ImportFormats = self.v_import_formats[i_import_format]
 
-            # import_variables_from_file(input_file, import_format, save_file, from_period, 
-            #                            to_period, rule_file, debug_file)
-            
-            raise NotImplementedError("This feature is not yet implemented.")
+            variables.convert_file(input_file, import_format, save_file, rule_file, 
+                                   from_period, to_period, debug_file)
 
             self.accept()
         except Exception as e:
