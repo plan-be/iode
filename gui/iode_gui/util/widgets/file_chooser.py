@@ -82,7 +82,7 @@ class IodeFileChooser(QWidget):
         filter = ""
         if self.enum_file_type != IodeFileType.FILE_ANY:
             extensions = [f"*{ext}" for ext in file_type.extensions]
-            filter = f"{name} ({', '.join(extensions)})"
+            filter = f"{name} ({' '.join(extensions)})"
 
         if not path:
             rootDir = QDir.homePath()
