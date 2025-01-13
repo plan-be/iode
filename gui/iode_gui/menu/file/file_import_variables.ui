@@ -32,7 +32,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>IMPORT  FILE  BY  RULE</string>
+   <string>IMPORT  FILE  BY  RULE (VARIABLES)</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -63,10 +63,7 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1" colspan="2">
-      <widget class="IodeFileChooser" name="fileChooser_input_file" native="true"/>
-     </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_rule_file">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -79,7 +76,13 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="1" column="1" colspan="2">
+      <widget class="IodeFileChooser" name="fileChooser_input_file" native="true"/>
+     </item>
+     <item row="2" column="1" colspan="2">
+      <widget class="IodeFileChooser" name="fileChooser_rule_file" native="true"/>
+     </item>
+     <item row="1" column="0">
       <widget class="QLabel" name="label_input_file">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -92,8 +95,35 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="IodeFileChooser" name="fileChooser_rule_file" native="true"/>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_format">
+       <property name="text">
+        <string>Format</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="comboBox_format">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </widget>
