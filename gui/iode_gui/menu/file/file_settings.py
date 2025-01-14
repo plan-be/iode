@@ -15,10 +15,6 @@ class MenuFileSettings(MixinSettingsDialog):
         self.ui = Ui_MenuFileSettings()
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
-        self.ui.pushButton_apply.clicked.connect(self.apply)
-        self.ui.pushButton_cancel.clicked.connect(self.reject)
-        self.ui.pushButton_help.clicked.connect(self.help)
-        self.ui.pushButton_options.clicked.connect(self.set_print_options)
 
         print_destinations = ["Printer", "File"]
         self.ui.comboBox_print_dest.addItems(print_destinations)
