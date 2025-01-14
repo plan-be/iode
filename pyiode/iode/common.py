@@ -55,6 +55,23 @@ EXPORT_FORMATS: Tuple[str, ...] = (
     "TSP", 
     "Reverse CSV")
 
+GRAPHS_COLORS: Tuple[str, ...] = (
+    "Blue", 
+    "Yellow", 
+    "Black", 
+    "White", 
+    "Red", 
+    "Green", 
+    "Cyan", 
+    "Magenta")
+
+IODE_FONTS: Tuple[str, ...] = (
+    "Helvetica", 
+    "Times", 
+    "Courier", 
+    "Bookman", 
+    "Palatino", 
+    "Trebuchet MS")
 
 class FileType:
     def __init__(self, name: str, extensions: List[str]):
