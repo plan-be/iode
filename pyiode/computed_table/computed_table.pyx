@@ -3,6 +3,10 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.objects.table cimport CTable
+from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
+from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
+from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.computed_table.computed_table cimport CComputedTable
 
 
@@ -487,6 +491,129 @@ cdef class ComputedTable:
         "Déterminants de l'output potentiel"
         """
         return self.c_computed_table.get_title().decode()
+    
+    @property
+    def ymin(self) -> float:
+        """
+        Minimum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+        """
+        return self.c_computed_table.get_ymin()
+
+    @property
+    def ymax(self) -> float:
+        """
+        Maximum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+        """
+        self.c_computed_table.get_ymax()
+
+    @property
+    def gridx(self) -> TableGraphGrid:
+        """
+        The gridx value of the table offers a choice of three X-grid options: 
+        
+            - MAJOR: draws a line across the entire graph at each main axis graduation
+            - NONE: removes the grid from the graph.
+            - MINOR: draws a line at all graduations 
+
+        Returns
+        -------
+        TableGraphGrid
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> computed_table.gridx
+        <TableGraphGrid.MAJOR: 0>
+        """
+        return TableGraphGrid(<int>(self.c_computed_table.get_grid_xaxis()))
+
+    @property
+    def gridy(self) -> TableGraphGrid:
+        """
+        The gridy value of the table offers a choice of three Y-grid options: 
+        
+            - MAJOR: draws a line across the entire graph at each main axis graduation
+            - NONE: removes the grid from the graph.
+            - MINOR: draws a line at all graduations 
+
+        Returns
+        -------
+        TableGraphGrid
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> computed_table.gridy
+        <TableGraphGrid.MAJOR: 0>
+        """
+        return TableGraphGrid(<int>(self.c_computed_table.get_grid_yaxis()))
+
+    @property
+    def graph_axis(self) -> TableGraphAxis:
+        """
+        Graph axis of the table allows you to select the type of axis: 
+        
+            - VALUES : level
+            - LOG: logarithmic scale
+            - SEMILOG: semi-logarithmic scale 
+            - PERCENT: Y scale in percent from 0 to 100
+
+        Returns
+        -------
+        TableGraphAxis
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> computed_table.graph_axis
+        <TableGraphAxis.VALUES: 0>
+        """
+        return TableGraphAxis(self.c_computed_table.get_graph_axis())
+
+    @property
+    def graph_alignment(self) -> TableGraphAlign:
+        """
+        Graph alignment of the table.
+
+        Returns
+        -------
+        TableGraphAlign
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> computed_table.graph_alignment
+        <TableGraphAlign.LEFT: 0>
+        """
+        return TableGraphAlign(<int>(self.c_computed_table.get_alignement()))
 
     def is_editable(self, row: Union[int, str], column: Union[int, str]) -> bool:
         """

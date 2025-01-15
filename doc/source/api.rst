@@ -525,6 +525,12 @@ COMPUTED TABLE
    ComputedTable.sample
    ComputedTable.nb_periods
    ComputedTable.title
+   ComputedTable.ymin
+   ComputedTable.ymax
+   ComputedTable.gridx
+   ComputedTable.gridy
+   ComputedTable.graph_axis
+   ComputedTable.graph_alignment
 
    ComputedTable.is_editable
    ComputedTable.to_array
