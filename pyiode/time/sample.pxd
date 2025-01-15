@@ -5,7 +5,7 @@ from libcpp cimport bool
 from time.period cimport CPeriod, PERIOD
 
 cdef extern from "api/iode.h":
-    cdef struct SAMPLE:
+    ctypedef struct SAMPLE:
         PERIOD s_p1
         PERIOD s_p2
         short s_nb

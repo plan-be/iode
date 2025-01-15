@@ -8,12 +8,36 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.common cimport TableGraphAxis, TableGraphGrid, TableGraphAlign
+from pyiode.time.period cimport PERIOD
 from pyiode.time.sample cimport CSample
 from pyiode.objects.table cimport CTable
 
 
+cdef extern from "api/iode.h":
+    cdef int    COL_NOP             # No operation
+
+    ctypedef struct COL:
+        short   cl_opy              # operator on periods => cl_per[0] cl_opy cl_per[1])
+        PERIOD  cl_per[2]           # period 1 , period 2
+        short   cl_opf              # operator on files => cl_fnb[0] cl_opf cl_fnb[1]
+        short   cl_fnb[2]           # position in K_RWS of file1 and file2 (starts at 1)
+        double  cl_val[2][2]        # computed values of the LEC formulas on periods / files => max 4 values see table below
+        double  cl_res              # computed value (v00 opp v10) opf (v01 opp v11)
+
+    ctypedef struct COLS:
+        int     cl_nb               # Number of columns
+        COL     *cl_cols            # Pointer to the first COL struct
+
+    char* COL_ctoa(COL*, int, int, int)     # COL to ASCII
+
+
 cdef extern from "cpp_api/computed_table/computed_table.h":
     cdef cppclass CComputedTable "ComputedTable":
+        CTable*     ref_table
+        int         dim
+        COLS*       columns
+        vector[COL] files_ops
+
         CComputedTable(CTable* table, const string& gsample, const int nb_decimals) except +
 
         # Properties
@@ -35,6 +59,7 @@ cdef extern from "cpp_api/computed_table/computed_table.h":
         string get_title() except +
 
         # Methods
+        int find_file_op(const COL& col) except +
         string get_line_name(const int line) except +
         string get_column_name(const int col) except +
         double get_value(const int line, const int col, const bint full_precision) except +
