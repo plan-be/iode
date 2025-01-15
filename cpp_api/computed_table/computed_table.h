@@ -153,6 +153,61 @@ public:
         return ref_table->get_title(0);
     }
 
+    TableGraphGrid get_grid_xaxis() const
+    {
+        return ref_table->get_gridx();
+    }
+
+    TableGraphGrid get_grid_yaxis() const
+    {
+        return ref_table->get_gridy();
+    }
+
+    double get_ymin() const
+    {
+        return (double) ref_table->t_ymin;
+    }
+
+    double get_ymax() const
+    {
+        return (double) ref_table->t_ymax;
+    }
+
+    double get_zmin() const
+    {
+        return (double) ref_table->t_zmin;
+    } 
+
+    double get_zmax() const
+    {
+        return (double) ref_table->t_zmax;
+    }
+
+    bool logScale() const
+    {
+        return ref_table->get_graph_axis() == TableGraphAxis::TABLE_GRAPH_LOG;
+    }
+
+    TableGraphAxis get_graph_axis() const
+    {
+        return ref_table->get_graph_axis();
+    }
+
+    TableGraphAlign get_alignement() const
+    {
+        return ref_table->get_graph_alignment();
+    }
+
+    short get_graph_box() const
+    {
+        return (short) ref_table->t_box;
+    }
+
+    short get_graph_shadow() const
+    {
+        return (short) ref_table->t_shadow;
+    }
+
     std::string get_line_name(const int line) const
     {
         if(line >= line_names.size()) 
