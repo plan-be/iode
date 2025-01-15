@@ -2,12 +2,13 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
+from pyiode.time.period cimport PERIOD
 from pyiode.objects.table cimport CTable
 from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
-from pyiode.computed_table.computed_table cimport CComputedTable
+from pyiode.computed_table.computed_table cimport CComputedTable, COL, COL_ctoa, COL_NOP
 
 
 # ComputedTable wrapper class
@@ -614,6 +615,191 @@ cdef class ComputedTable:
         <TableGraphAlign.LEFT: 0>
         """
         return TableGraphAlign(<int>(self.c_computed_table.get_alignement()))
+
+    # TODO: Not sure if it is the right way to get the number of series (for plotting)
+    @property
+    def nb_plotting_series(self) -> int:
+        """
+        Number of series to plot.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (one extra file) - 5 observations
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
+        --------------------------------------------------------...----------------------
+        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
+        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
+        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
+        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
+        <BLANKLINE>
+        >>> computed_table.nb_plotting_series
+        8
+        """
+        return self.nb_lines * self.nb_operations_between_files
+
+    def plotting_series_name(self, row: int, op_files: int) -> str:
+        """
+        Name of the series to plot. 
+
+        Parameters
+        ----------
+        row : int
+            The row passed as position (int).
+        op_files : int
+            The files operation passed as position (int).
+
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (one extra file) - 5 observations
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
+        --------------------------------------------------------...----------------------
+        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
+        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
+        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
+        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
+        <BLANKLINE>
+        >>> computed_table.plotting_series_name(0, 0)
+        'Output potentiel [1]'
+        >>> computed_table.plotting_series_name(2, 1)
+        'Intensité de capital [2]'
+        >>> computed_table.plotting_series_name(3, 0)
+        'Productivité totale des facteurs [1]'
+        """
+        cdef int ch = ord('f')
+        cdef COL col
+        cdef bytes b_file_op_name
+
+        if row >= self.nb_lines:
+            raise ValueError(f"row must be less than {self.nb_lines}")
+        if op_files >= self.nb_operations_between_files:
+            raise ValueError(f"op_files must be less than {self.nb_operations_between_files}")
+        
+        # see function APIGraphLineTitle() (from api/k_graph.c)
+        name: str = self.c_computed_table.get_line_name(row).decode()
+        if self.nb_operations_between_files:
+            col = self.c_computed_table.files_ops[op_files]
+            if self.nb_files > 1 or col.cl_opf != COL_NOP:
+                b_file_op_name = COL_ctoa(&col, ch, 0, self.nb_files)
+                name += " " + b_file_op_name.decode()
+        return name
+
+    def plotting_series_values(self, row: int, op_files: int) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Get the x and y values of a series to plot.
+
+        Parameters
+        ----------
+        row : int
+            The row of the series to plot.
+        op_files : int
+            The operation between files to plot.
+
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            The x and y values of the series to plot.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (one extra file) - 5 observations
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
+        --------------------------------------------------------...----------------------
+        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
+        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
+        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
+        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
+        <BLANKLINE>
+        >>> x, y = computed_table.plotting_series_values(0, 0)  
+        >>> x
+        array([ 2010.,  2011.,  2012.,  2013.,  2014.])
+        >>> y           # doctest: +NORMALIZE_WHITESPACE
+        array([ 6936.11201678,  7045.34306763,  7161.54144319,  7302.29025433,
+                7460.11525977])
+        >>> x, y = computed_table.plotting_series_values(2, 1)
+        >>> y           # doctest: +NORMALIZE_WHITESPACE
+        array([ 0.37778214,  0.37005591,  0.36297298,  0.35620692,  0.34945039])
+        >>> x, y = computed_table.plotting_series_values(3, 0)
+        >>> y           # doctest: +NORMALIZE_WHITESPACE
+        array([ 1.09774397,  1.10872141,  1.11980863,  1.13100671,  1.14231678])
+        """
+        cdef int pos
+        cdef COL column
+        cdef PERIOD c_period
+
+        # See function T_GraphLine() (k_graph.c)
+        x = np.asarray(self.sample.get_period_list(astype=float))
+        y = np.full(self.nb_periods, np.nan)
+
+        col_val = 0
+        first_period = self.sample.start
+        for col in range(1, self.c_computed_table.columns.cl_nb, 2):
+            column = self.c_computed_table.columns.cl_cols[col]
+            pos = self.c_computed_table.find_file_op(column)
+            if pos == op_files:
+                c_period = column.cl_per[0]
+                period = Period(c_period.p_y, chr(c_period.p_p), c_period.p_s)
+                period_pos = period.difference(first_period)
+                y[period_pos] = self.c_computed_table.get_value(row, col_val, <bint>True)
+            col_val += 1
+
+        return x, y
+
+    @property
+    def plotting_series_names(self) -> List[str]:
+        """
+        Names of the series to plot.
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> # simple time series (one extra file) - 5 observations
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
+        --------------------------------------------------------...----------------------
+        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
+        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
+        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
+        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
+        <BLANKLINE>
+        >>> computed_table.plotting_series_names                # doctest: +ELLIPSIS
+        ['Output potentiel [1]', ..., 'Productivité totale des facteurs [2]']
+        """        
+        return [self.plotting_series_name(row, fileop) for row in range(self.nb_lines) 
+                for fileop in range(self.nb_operations_between_files)]
 
     def is_editable(self, row: Union[int, str], column: Union[int, str]) -> bool:
         """

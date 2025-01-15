@@ -531,6 +531,10 @@ COMPUTED TABLE
    ComputedTable.gridy
    ComputedTable.graph_axis
    ComputedTable.graph_alignment
+   ComputedTable.nb_plotting_series
+   ComputedTable.plotting_series_name
+   ComputedTable.plotting_series_names
+   ComputedTable.plotting_series_values
 
    ComputedTable.is_editable
    ComputedTable.to_array
