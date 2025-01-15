@@ -3,7 +3,7 @@
 #include "computed_table.h"
 
 
-class ComputedTableGraph: public ComputedTable
+struct ComputedTableGraph: public ComputedTable
 {
 public:
     ComputedTableGraph(Table* ref_table, const std::string& gsample);

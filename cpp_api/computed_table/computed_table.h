@@ -40,9 +40,8 @@ const static std::string ALLOWED_FORMATS = "HMRCD";
  * line ... |      |      |       |      |  ...  |      |      |       |      |
  * line M   |      |      |       |      |  ...  |      |      |       |      |
  */
-class ComputedTable
+struct ComputedTable
 {
-protected:
     Table*       ref_table;
     std::string  gsample;
     Sample*      sample;
@@ -58,21 +57,6 @@ protected:
     std::vector<int>         v_pos_in_columns_struct;
     // TODO ALD: consider Eigen 3 matrix
     std::vector<std::vector<double>> values;
-
-protected:
-    void compute_values();
-
-    /**
-     * @brief Tries to find the position in files_ops vector of the 
-     *        operation on files contained in the passed COL struct.
-     * 
-     * @param col input COL struct
-     * @return int position in the files_ops vector if operation on files 
-     *             has been found, -1 otherwise
-     * 
-     * @note equivalent of the funtion T_find_opf() (k_graph.c)
-     */
-    int find_file_op(const COL& col);
 
 private:
     /**
@@ -240,6 +224,20 @@ public:
         }
         return value;
     }
+
+    void compute_values();
+
+    /**
+     * @brief Tries to find the position in files_ops vector of the 
+     *        operation on files contained in the passed COL struct.
+     * 
+     * @param col input COL struct
+     * @return int position in the files_ops vector if operation on files 
+     *             has been found, -1 otherwise
+     * 
+     * @note equivalent of the funtion T_find_opf() (k_graph.c)
+     */
+    int find_file_op(const COL& col);
 
     /**
      * @brief Check if a cell is editable
