@@ -2,8 +2,10 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
+from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport PERIOD
 from pyiode.objects.table cimport CTable
+from pyiode.common cimport IODE_NAN
 from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
@@ -750,6 +752,7 @@ cdef class ComputedTable:
         cdef int pos
         cdef COL column
         cdef PERIOD c_period
+        cdef double c_value
 
         # See function T_GraphLine() (k_graph.c)
         x = np.asarray(self.sample.get_period_list(astype=float))
@@ -764,7 +767,8 @@ cdef class ComputedTable:
                 c_period = column.cl_per[0]
                 period = Period(c_period.p_y, chr(c_period.p_p), c_period.p_s)
                 period_pos = period.difference(first_period)
-                y[period_pos] = self.c_computed_table.get_value(row, col_val, <bint>True)
+                c_value = self.c_computed_table.get_value(row, col_val, <bint>True)
+                y[period_pos] = c_value if IODE_IS_A_NUMBER(c_value) else np.nan
             col_val += 1
 
         return x, y
@@ -1186,8 +1190,10 @@ cdef class ComputedTable:
         >>> computed_table["Q_F/Q_I", "2010/2009[1]"]
         0.9975986300775119
         """
+        cdef double c_value
         row, column = self._unfold_key(key)
-        return self.c_computed_table.get_value(row, column, <bint>True)
+        c_value = self.c_computed_table.get_value(row, column, <bint>True)
+        return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
 
     def __setitem__(self, key: Tuple[Union[int, str], Union[int, str]], value: float):
         """
@@ -1296,6 +1302,7 @@ cdef class ComputedTable:
         >>> variables["Q_I", "2011Y1"]
         1115.0
         """
+        cdef double c_value
         row, column = self._unfold_key(key)
 
         if not self.c_computed_table.is_editable(row, column):
@@ -1308,6 +1315,7 @@ cdef class ComputedTable:
         if not isinstance(value, float):
             raise TypeError(f"Expected new cell value of type float. Got value of type {type(value).__name__} instead.")
 
+        c_value = value if not np.isnan(value) else IODE_NAN
         self.c_computed_table.set_value(row, column, value, <bint>False)
 
     def __str__(self) -> str:
@@ -1326,7 +1334,7 @@ cdef class ComputedTable:
 
         def cell_value_to_str(i: int, j: int) -> str:
             value = self.c_computed_table.get_value(i, j, <bint>True)
-            return f"{value:.{self.nb_decimals}f}"  if value > IODE_NAN else NAN_REP
+            return f"{value:.{self.nb_decimals}f}" if IODE_IS_A_NUMBER(value) else NAN_REP
 
         data = []
         column_names = []
