@@ -104,6 +104,31 @@ def test_computed_table_nb_decimals():
     with pytest.raises(ValueError, match=r"nb_decimals must be between 0 and 99"):
         computed_table = iode.tables["C8_1"].compute("2010[1;2]:5", nb_decimals=-1)
 
+def test_computed_table_NA_values():
+    iode.tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    computed_table = iode.tables["C8_1"].compute("(1960;1961/1960):5")
+    col_names = computed_table.columns
+    line_names = computed_table.lines
+
+    # ---- getitem ----
+    assert line_names[1] == "Stock de capital"
+    assert col_names[0] == "60"
+    assert np.isnan(computed_table[1, 0])
+    assert col_names[1] == "61/60"
+    assert np.isnan(computed_table[1, 1])
+    assert col_names[2] == "61"
+    assert round(computed_table[1, 2], 4) == 1965.3674
+    assert col_names[3] == "62/61"
+    assert round(computed_table[1, 3], 4) == 4.722
+
+    # ---- setitem ----
+    assert line_names[0] == "Output potentiel"
+    assert round(computed_table[0, 2], 4) == 1873.7079
+    # check that np.nan is converted to IODE NA when setting a value in the table
+    with pytest.raises(ValueError, match="An IODE NA \(NaN\) value is not accepted to edit a cell of a computed table"):
+        computed_table[0, 2] = np.nan
+
 # Variables
 # ---------
 
