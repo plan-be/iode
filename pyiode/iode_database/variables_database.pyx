@@ -1237,7 +1237,12 @@ cdef class Variables(_AbstractDatabase):
     @property
     def sample(self) -> Sample:
         """
-        Current sample of the IODE Variables database.
+        Current (or new) sample of the IODE Variables database.
+
+        If a new sample is given, two cases are possible:
+          
+          - the sample is shorter than the current sample: the data beyond the new sample is destroyed,
+          - the sample is longer than the current sample: the value `NA` (not available) is set for the added periods.
 
         Parameters
         ----------
@@ -1251,26 +1256,48 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
+        
         >>> variables.sample
         Sample("1960Y1:2015Y1")
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
 
-        >>> # update sample by passing a string
-        >>> variables.sample = '1970Y1:2020Y1'
-        >>> variables.sample
-        Sample("1970Y1:2020Y1")
-        >>> # start or end period are optional
-        >>> variables.sample = ':2010Y1'
+        >>> # -- update sample by passing a string
+        >>> # case 1: new sample is shorter than the current sample
+        >>> #         the data beyond the new sample is destroyed
+        >>> variables.sample = '1970Y1:2010Y1'
         >>> variables.sample
         Sample("1970Y1:2010Y1")
-        >>> variables.sample = '1980Y1:'
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
+        >>> # case 2: new sample is longer than the current sample
+        >>> #         the value NA (not available) is set for the added periods
+        >>> variables.sample = '1968Y1:2012Y1'
         >>> variables.sample
-        Sample("1980Y1:2010Y1")
+        Sample("1968Y1:2012Y1")
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439, nan, nan]
+        
+        >>> # -- start period is optional -> the start period is kept as it is
+        >>> variables.sample = ':2010Y1'
+        >>> variables.sample
+        Sample("1968Y1:2010Y1")
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
+        >>> # -- end period is optional -> the end period is kept as it is
+        >>> variables.sample = '1970Y1:'
+        >>> variables.sample
+        Sample("1970Y1:2010Y1")
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
 
         >>> # update sample by passing a start period and 
         >>> # an end period separated by a comma
-        >>> variables.sample = '1980Y1', '2010Y1'
+        >>> variables.sample = '1968Y1', '2012Y1'
         >>> variables.sample
-        Sample("1980Y1:2010Y1")
+        Sample("1968Y1:2012Y1")
+        >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439, nan, nan]
         """
         cdef CSample* c_sample = self.database_ptr.get_sample()
         return Sample._from_ptr(c_sample, <bint>False)
