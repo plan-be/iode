@@ -110,7 +110,7 @@ class MixinSettingsDialog(QDialog):
         if not project_settings:
             return
 
-        dict_ui = vars(self.ui_obj)
+        dict_ui = vars(self.ui_obj) if hasattr(self.ui_obj, '__dict__') else None
         if not dict_ui:
             return
 
