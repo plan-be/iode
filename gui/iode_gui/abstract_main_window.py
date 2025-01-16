@@ -48,6 +48,7 @@ class AbstractMainWindow(QMainWindow):
     @Slot(PlotDialog)
     def append_plot(self, dialog: PlotDialog):
         dialog.plot()
+        dialog.open()
         self.dialogs.append(dialog)
 
     @Slot()

@@ -95,14 +95,6 @@ class MenuGraphVariables(MixinSettingsDialog):
             pattern_var_names: str = self.ui.textEdit_variables.toPlainText().strip()
             from_period: str = self.ui.sampleEdit_sample_from.text().strip()
             to_period: str = self.ui.sampleEdit_sample_to.text().strip()
-            # raise an error if from_period and/or to_period is/are invalid
-            sample = Sample(from_period, to_period)
-            periods: List[float] = sample.get_period_list(astype=float)
-            from_period = str(sample.start)
-            to_period = str(sample.end)
-
-            if from_period == to_period:
-                raise RuntimeError("Please select more than 1 period to plot")
 
             i_chart_type: int = self.ui.comboBox_chart_type.currentIndex()
             chart_type: TableGraphType = self.v_chart_types[i_chart_type]
@@ -115,10 +107,9 @@ class MenuGraphVariables(MixinSettingsDialog):
             y_min = float(self.ui.lineEdit_min_Y.text()) if self.ui.lineEdit_min_Y.text() else None
             y_max = float(self.ui.lineEdit_max_Y.text()) if self.ui.lineEdit_max_Y.text() else None
 
-            data = {var_name: variables[var_name, f"{from_period}:{to_period}"] 
-                    for var_name in variables.get_names(pattern_var_names)}
-            plot_dialog = PlotVariablesDialog(periods, data, chart_type, grid, var_mode, log_scale, 
-                                              y_min, y_max, title="VARIABLES")
+            plot_dialog = PlotVariablesDialog(variables, pattern_var_names, from_period, to_period,
+                                              chart_type, grid, var_mode, log_scale, y_min, y_max, 
+                                              title="VARIABLES")
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"Failed to plot variables '{pattern_var_names}':\n" + str(e))

@@ -763,13 +763,13 @@ class MainWindow(AbstractMainWindow):
     @Slot()
     def open_graphs_tables_dialog(self):
         dialog = MenuGraphTables(self)
-        dialog.new_plot.connect(self.append_dialog)
+        dialog.new_plot.connect(self.append_plot)
         dialog.exec()
 
     @Slot()
     def open_graphs_variables_dialog(self):
         dialog = MenuGraphVariables(self)
-        dialog.new_plot.connect(self.append_dialog)
+        dialog.new_plot.connect(self.append_plot)
         dialog.exec()
 
     @Slot(list, str, str)
@@ -779,7 +779,7 @@ class MainWindow(AbstractMainWindow):
         dialog.variables_names = variable_names
         dialog.from_period = from_period
         dialog.to_period = to_period
-        dialog.new_plot.connect(self.append_dialog)
+        dialog.new_plot.connect(self.append_plot)
         dialog.exec()
 
     # Help Menu

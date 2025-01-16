@@ -295,7 +295,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
 
     def setup(self,main_window: AbstractMainWindow):
         super().setup(main_window)
-        self.new_plot.connect(main_window.append_dialog)
+        self.new_plot.connect(main_window.append_plot)
         self.new_graph_dialog.connect(main_window.open_graphs_variables_dialog_from_vars_view)
 
     def setup_context_menu(self):
@@ -397,10 +397,8 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
             if from_period == to_period:
                 raise RuntimeError("Please select more than 1 period to make a plot")
 
-            periods_as_float = vars_sample.get_period_list(astype=float)
-            data = {var_name: variables[var_name, f"{from_period}:{to_period}"] 
-                    for var_name in variable_names}
-            plot_dialog = PlotVariablesDialog(periods_as_float, data, title="VARIABLES SUBSET")
+            plot_dialog = PlotVariablesDialog(variables, variable_names, from_period, to_period,
+                                              title="VARIABLES SUBSET")
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
