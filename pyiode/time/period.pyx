@@ -161,26 +161,6 @@ cdef class Period:
         shifted_period = self.c_period.shift(nb_periods)
         return Period(shifted_period.p_y, chr(shifted_period.p_p), shifted_period.p_s)
 
-    def to_float(self) -> float:
-        """
-        Returns a numerical representation of the period.
-
-        Returns
-        -------
-        float
-
-        Examples
-        --------
-        >>> from iode import Period
-        >>> period = Period(2000, 'Q', 1)
-        >>> period.to_float()
-        2000.0
-        >>> period = Period(2000, 'Q', 3)
-        >>> period.to_float()
-        2000.5
-        """
-        return self.c_period.to_float()
-
     # Attributes access
 
     @property
@@ -236,6 +216,44 @@ cdef class Period:
 
     def __eq__(self, other: Period) -> bool:
         return self.c_period == other.c_period
+
+    def __float__(self) -> float:
+        """
+        Returns a float representation of the period.
+
+        Returns
+        -------
+        float
+
+        Examples
+        --------
+        >>> from iode import Period
+        >>> period = Period(2000, 'Q', 1)
+        >>> float(period)
+        2000.0
+        >>> period = Period(2000, 'Q', 3)
+        >>> float(period)
+        2000.5
+        """
+        return self.c_period.to_float()
+
+    def __lt__(self, other: Period) -> bool:
+        return float(self) < float(other)
+
+    def __gt__(self, other: Period) -> bool:
+        return float(self) > float(other)
+
+    def __le__(self, other: Period) -> bool:
+        if self == other:
+            return True
+        else:
+            return self < other
+
+    def __ge__(self, other: Period) -> bool:
+        if self == other:
+            return True
+        else:
+            return self > other
 
     def __str__(self) -> str:
         if self.year == 0:

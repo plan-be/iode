@@ -557,7 +557,7 @@ TIME
    Period.difference
    Period.nb_periods_per_year  
    Period.shift
-   Period.to_float
+   Period.__float__
 
    Sample
    Sample.start
