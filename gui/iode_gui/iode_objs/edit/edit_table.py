@@ -46,7 +46,7 @@ class EditTableDialog(AbstractEditObjDialog):
             self.delete_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
             
             self.delete_shortcut.activated.connect(self.delete_line)
-            self.new_plot.connect(main_window.append_dialog)
+            self.new_plot.connect(main_window.append_plot)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
 
@@ -66,7 +66,6 @@ class EditTableDialog(AbstractEditObjDialog):
             generalized_sample = f"{str(sample.start)}:{sample.nb_periods}"
             computed_table = table.compute(generalized_sample)
             dialog = PlotTableDialog(computed_table)
-            dialog.plot()
             self.new_plot.emit(dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))

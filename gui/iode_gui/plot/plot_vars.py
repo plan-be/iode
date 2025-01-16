@@ -1,28 +1,53 @@
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QDialog
-
 from iode_gui.plot.plot import PlotDialog
 
 from typing import Union, List, Dict, Any
-import numpy as np
-from iode import VarsMode, TableGraphType, TableGraphGrid
+from iode import VarsMode, TableGraphType, TableGraphGrid, Period, Sample, Variables
 
 
 class PlotVariablesDialog(PlotDialog):
-    def __init__(self, x_data: Union[List[float], np.ndarray],
-                 y_data: Dict[str, Any],
+    def __init__(self, variables_database: Variables, 
+                 variables_names: Union[str, List[str]], 
+                 first_period: Union[str, Period] = None, 
+                 last_period: Union[str, Period] = None, 
                  chart_type: TableGraphType = TableGraphType.LINE, 
                  grid: TableGraphGrid = TableGraphGrid.MAJOR,  
                  var_mode: VarsMode = VarsMode.LEVEL,
                  log_scale: bool = False, 
                  y_min: float=None, y_max: float=None, 
                  title: str=None, parent=None): 
-        super().__init__(x_data, y_data, chart_type, grid, log_scale, y_min, y_max, title, parent)
+        super().__init__(chart_type, grid, log_scale, y_min, y_max, title, parent)
 
-        self.v_variable_modes = list(VarsMode)
-        v_variable_modes_names = [item.name.replace("_" , " ").title() for item in self.v_variable_modes]
-        # self.comboBox_x_axis_type.addItems(v_variable_modes_names)
+        self.variables_database = variables_database
+        if isinstance(variables_names, str):
+            self.variables_names = self.variables_database.get_names(variables_names)
+        else:
+            self.variables_names = variables_names
+        self.variables_database.mode = var_mode
+
+        vars_sample = self.variables_database.sample
+        if first_period is None:
+            first_period = vars_sample.start
+        if last_period is None:
+            last_period = vars_sample.end
         
-        self._var_mode = var_mode
-        index = self.v_variable_modes.index(var_mode) 
-        # self.comboBox_x_axis_type.setCurrentIndex(index)
+        # raise an error if first_period or/and last_period is/are invalid
+        plotting_sample = Sample(first_period, last_period)
+        
+        first_period = plotting_sample.start
+        if first_period < vars_sample.start:
+            raise RuntimeError(f"First period {first_period} is before the first period "
+                               f"of the variables database {vars_sample.start}")
+        
+        last_period = plotting_sample.end
+        if last_period > vars_sample.end:
+            raise RuntimeError(f"Last period {last_period} is after the last period "
+                               f"of the variables database {vars_sample.end}")
+
+        if first_period == last_period:
+            raise RuntimeError("Please select more than 1 period to plot")
+        
+        periods_filter = f"{first_period}:{last_period}"
+        x = plotting_sample.get_period_list(astype=float)
+        for variable_name in self.variables_names:
+            y = self.variables_database[variable_name, periods_filter]
+            self.add_series(variable_name, x, y)

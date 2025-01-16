@@ -10,7 +10,7 @@ from iode_gui.utils import URL_MANUAL
 from .correlation_matrix_model import CorrelationMatrixModel
 from .tests_eqs_model import TestsEqsModel
 from iode_gui.iode_objs.models.table_model import ScalarsModel
-from iode_gui.plot.plot_vars import PlotVariablesDialog
+from iode_gui.plot.plot import PlotDialog
 from .ui_estimation_results import Ui_EstimationResultsDialog
 
 from typing import List, Dict
@@ -49,7 +49,7 @@ class EstimationResultsDialog(QDialog):
         self.full_screen_shortcut.activated.connect(self.showMaximized)
 
     def setup(self, main_window: AbstractMainWindow):
-        self.new_plot.connect(main_window.append_dialog)
+        self.new_plot.connect(main_window.append_plot)
 
     def _set_coefficients_tab(self):
         """Sets the coefficients tab."""
@@ -165,8 +165,9 @@ class EstimationResultsDialog(QDialog):
             title = f"Equation {eq_name} : observed and fitted values"
             observed: List[float] = self.edit_est_eqs.get_observed_values(eq_name)
             fitted: List[float] = self.edit_est_eqs.get_fitted_values(eq_name)
-            data = {f"{lhs} : observed": observed, f"{lhs} : fitted": fitted}
-            plot_dialog = PlotVariablesDialog(periods, data, title=title)
+            plot_dialog = PlotDialog(title=title)
+            plot_dialog.add_series(f"{lhs} : observed", periods, observed) 
+            plot_dialog.add_series(f"{lhs} : fitted", periods, fitted)
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
@@ -191,9 +192,9 @@ class EstimationResultsDialog(QDialog):
 
             # Residual values
             title = f"Equation {eq_name}: residuals"
-            values: List[float] = self.edit_est_eqs.get_residual_values(eq_name)
-            data = {f"{lhs} : observed": values}
-            plot_dialog = PlotVariablesDialog(periods, data, title=title)
+            residual_values: List[float] = self.edit_est_eqs.get_residual_values(eq_name)
+            plot_dialog = PlotDialog(title=title)
+            plot_dialog.add_series(f"{lhs} : observed", periods, residual_values)
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
