@@ -107,9 +107,9 @@ cdef class Comments(_AbstractDatabase):
 
     def _subset(self, pattern: str, copy: bool) -> Comments:
         # call to __new__() that bypasses the __init__() constructor.
-        cdef Comments subset_ = Comments.__new__(Comments)
-        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_
+        cdef Comments subset_db = Comments.__new__(Comments)
+        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_db
 
     @property
     def i(self) -> PositionalIndexer:
@@ -385,6 +385,8 @@ cdef class Comments(_AbstractDatabase):
         >>> len(comments)
         317
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
@@ -443,6 +445,9 @@ cdef class Comments(_AbstractDatabase):
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
 
         for index, value in s.items():
             self._set_object(index, value)

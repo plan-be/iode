@@ -833,6 +833,8 @@ cdef class Tables(_AbstractDatabase):
             list of tables to copy from the input file(s).
             Defaults to load all tables from the input file(s). 
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 

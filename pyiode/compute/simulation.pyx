@@ -657,12 +657,30 @@ cdef class Simulation:
         >>> identities["XNATY"]
         Identity('grt NATY')
         >>> # endogenous variable
-        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
-        [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
+        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
+        <BLANKLINE>
         >>> # reset exogeneous variable
         >>> variables["UY", "2000Y1:2015Y1"] = 0.0
-        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS
-        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> variables["UY", "2000Y1:2015Y1"]    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY            0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
 
         >>> simu = Simulation()
         >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -679,11 +697,29 @@ cdef class Simulation:
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
         >>> # endogenous variable (unchanged)
-        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
-        [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
+        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
+        <BLANKLINE>
         >>> # exogeneous variable
-        >>> variables["UY", "2000Y1:2015Y1"]         # doctest: +ELLIPSIS
-        [624.1781881798956, 645.0542977503601, 661.6074127102179, ..., 525.1258272992568]
+        >>> variables["UY", "2000Y1:2015Y1"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY          624.18  645.05  661.61  ...  549.24  533.37  525.13
+        <BLANKLINE>
 
         >>> # exchange UY and XNATY
         >>> simu.model_exchange("UY-XNATY")
@@ -704,8 +740,17 @@ cdef class Simulation:
         2015Y1: 24 iters - error = 0.001463 - cpu=...ms
         2015Y1: 25 iters - error = 0.0007763 - cpu=...ms
         >>> # exogeneous variable (now XNATY)
-        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
-        [0.3508274950028535, 0.6702440874066322, 0.5092369210188463, ..., -0.19926923081414763]
+        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        XNATY         0.35    0.67    0.51  ...   -0.20   -0.20   -0.20
+        <BLANKLINE>
         """
         if list_exo is None:
             list_exo = ''
@@ -785,14 +830,32 @@ cdef class Simulation:
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> # reset values
         >>> variables["UY", "2000Y1:2015Y1"] = 0.0
-        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS
-        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY            0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
 
         >>> # endogenous variable
         >>> identities["XNATY"]
         Identity('grt NATY')
-        >>> variables["XNATY", "2000Y1:2015Y1"]         # doctest: +ELLIPSIS
-        [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
+        >>> variables["XNATY", "2000Y1:2015Y1"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
+        <BLANKLINE>
 
         >>> # simulate the model (no reordering)
         >>> simu = Simulation()
@@ -809,8 +872,17 @@ cdef class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
-        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS
-        [624.1781881798956, 645.0542977503601, 661.6074127102179, ..., 525.1258272992568]
+        >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY          624.18  645.05  661.61  ...  549.24  533.37  525.13
+        <BLANKLINE>
         """
         if isinstance(from_period, Period):
             from_period = str(from_period)
@@ -984,13 +1056,31 @@ cdef class Simulation:
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> # reset values
         >>> variables["UY", "2000Y1:2015Y1"] = 0.0
-        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS
-        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY            0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
         >>> # endogenous variable
         >>> identities["XNATY"]
         Identity('grt NATY')
-        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS
-        [0.22, 0.699999988079071, 0.4, 0.7, ..., -0.20000000298023224, -0.20000000298023224]
+        >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
+        <BLANKLINE>
         
         >>> simu.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
@@ -1001,8 +1091,17 @@ cdef class Simulation:
         2015Y1: 10 iters - error =  0.01144 - cpu=...ms
         2015Y1: 11 iters - error = 0.006679 - cpu=...ms
         2015Y1: 12 iters - error = 0.0003485 - cpu=...ms
-        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS
-        [624.1822680369564, 645.0533712662168, 661.5778936891761, ..., 525.2940777398553]
+        >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
+        UY          624.18  645.05  661.58  ...  549.26  533.49  525.29
+        <BLANKLINE>
         """
         if isinstance(from_period, Period):
             from_period = str(from_period)

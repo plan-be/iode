@@ -395,6 +395,8 @@ cdef class Identities(_AbstractDatabase):
             list of identities to copy from the input file(s).
             Defaults to load all identities from the input file(s). 
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
@@ -447,27 +449,81 @@ cdef class Identities(_AbstractDatabase):
         Identity('100*(QAFF_/(Q_F+Q_I))')
         >>> # reset variables GAP_ and GAP2
         >>> variables["GAP_"] = 0.
-        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
-        [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        GAP_          0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
         >>> variables["GAP2"] = 0.
-        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
-        [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        GAP2          0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
 
         >>> # compute GAP_ and GAP2 (assuming Scalars and Variables are already loaded)
         >>> identities.execute("GAP_;GAP2")
-        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
-        [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
-        [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        GAP_         -3.20   -3.98   -2.12  ...    4.06    3.78    3.24
+        <BLANKLINE>
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        GAP2         96.93   97.40   98.37  ...  102.50  102.15  101.59
+        <BLANKLINE>
 
         >>> # compute GAP_ and GAP2 over a subset of the sample
         >>> variables["GAP_"] = 0.
         >>> variables["GAP2"] = 0.
         >>> identities.execute("GAP_;GAP2", "2000Y1", "2005Y1")
-        >>> variables["GAP_", "2000Y1:2005Y1"]
-        [4.510095736743436, 3.312304975734315, 2.6151793579969107, 3.464117181974924, 5.478645527985804, 5.578699398837528]
-        >>> variables["GAP2", "2000Y1:2005Y1"]
-        [104.60957761618035, 103.05782573291968, 102.17336700422976, 102.82322081548728, 104.4719275849864, 104.3586710898436]
+        >>> variables["GAP_", "2000Y1:2005Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2005Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1
+        GAP_          4.51    3.31    2.62    3.46    5.48    5.58
+        <BLANKLINE>
+        >>> variables["GAP2", "2000Y1:2005Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2005Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1
+        GAP2        104.61  103.06  102.17  102.82  104.47  104.36
+        <BLANKLINE>
 
         >>> # compute GAP_ and GAP2 assuming Variables are not already loaded
         >>> variables.clear()
@@ -477,10 +533,26 @@ cdef class Identities(_AbstractDatabase):
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
         >>> identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
-        [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
-        [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  1963Y1  ...  2012Y1  2013Y1  2014Y1  2015Y1
+        GAP_         -3.20   -3.98   -2.12   -2.65  ...    3.61    4.06    3.78    3.24
+        <BLANKLINE>
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  1963Y1  ...  2012Y1  2013Y1  2014Y1  2015Y1
+        GAP2         96.93   97.40   98.37   97.71  ...  102.19  102.50  102.15  101.59
+        <BLANKLINE>
         >>> # note that the variables 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' are not 
         >>> # present in the Variables database after running identities.execute
         >>> variables.names
@@ -593,6 +665,9 @@ cdef class Identities(_AbstractDatabase):
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
 
         for index, value in s.items():
             self._set_object(index, value)

@@ -1,12 +1,15 @@
 # distutils: language = c++
 
 import numpy as np
+import pandas as pd
 
 from libcpp.vector cimport vector
+from pyiode.time.sample cimport CSample
 from lec cimport execute_lec as cpp_execute_lec
+from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 
 
-def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, List[float]]:
+def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, List[float], pd.Series]:
     r"""
     Compute a LEC formula using the current Variables and Scalars databases.
     The formula may be evaluate at a specific period or on the whole sample 
@@ -57,36 +60,49 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     >>> execute_lec(lec, t)
     10.046610792200543
     >>> # compute the LEC formula over the whole sample
-    >>> execute_lec(lec)        # doctest: +ELLIPSIS
-    [nan, 4.2884154594335815, 4.532163174288473, ..., -83.34062511080091, -96.41041982848331]
-    >>> variables["ACAF"]       # doctest: +ELLIPSIS
-    [nan, nan, nan, ..., -83.34062511080091, -96.41041982848331]
+    >>> execute_lec(lec)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    time
+    1960Y1          NaN
+    1961Y1     4.288415
+    1962Y1     4.532163
+    1963Y1     4.951813
+    ...
+    2012Y1   -55.559290
+    2013Y1   -68.894654
+    2014Y1   -83.340625
+    2015Y1   -96.410420
+    dtype: float64
+    >>> variables["ACAF"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Variables
+    nb variables: 1
+    filename: ...fun.var
+    description: Modèle fun - Simulation 1
+    sample: 1960Y1:2015Y1
+    mode: LEVEL
+    <BLANKLINE>
+    name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+    ACAF            na      na      na  ...  -68.89  -83.34  -96.41
+    <BLANKLINE>
     """
     cdef double c_value
     cdef vector[double] c_values
 
-    # evaluate LEC expression over the whole sample
-    if period is None:
-        c_values = cpp_execute_lec(lec.encode())
-        return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
-
-    if isinstance(period, int):
-        if period >= 0:
-            c_value = cpp_execute_lec(<string>lec.encode(), <int>period)
-            return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
-        # evaluate LEC expression over the whole sample
-        else:
-            c_values = cpp_execute_lec(lec.encode())
-            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
+    if isinstance(period, int) and period >= 0:
+        c_value = cpp_execute_lec(<string>lec.encode(), <int>period)
+        return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
 
     if isinstance(period, Period):
         period = str(period)
 
-    if isinstance(period, str):
-        if len(period):
-            c_value = cpp_execute_lec(<string>lec.encode(), <string>period.encode())
-            return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
-        # evaluate LEC expression over the whole sample
-        else:
-           c_values = cpp_execute_lec(lec.encode())
-           return [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
+    if isinstance(period, str) and len(period):
+        c_value = cpp_execute_lec(<string>lec.encode(), <string>period.encode())
+        return c_value if IODE_IS_A_NUMBER(c_value) else np.nan
+    
+    # evaluate LEC expression over the whole sample
+    c_values = cpp_execute_lec(lec.encode())
+    data = [value if IODE_IS_A_NUMBER(value) else np.nan for value in c_values]
+    sample = Sample._from_ptr(cpp_global_variables.get_sample(), <bint>False)
+    periods = sample.get_period_list()
+    series = pd.Series(data, index=periods)
+    series.index.name = "time"
+    return series

@@ -425,6 +425,8 @@ cdef class Lists(_AbstractDatabase):
             list of lists to copy from the input file(s).
             Defaults to load all lists from the input file(s). 
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
@@ -492,6 +494,9 @@ cdef class Lists(_AbstractDatabase):
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
 
         for index, value in s.items():
             self._set_object(index, value)

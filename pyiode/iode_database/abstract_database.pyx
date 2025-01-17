@@ -642,7 +642,7 @@ cdef class _AbstractDatabase:
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.var
+        Loading ...fun.var
         394 objects loaded
         >>> variables.threshold
         1e-07
@@ -656,20 +656,20 @@ cdef class _AbstractDatabase:
         >>> del vars_other["AOUC"]
         >>> del vars_other["AQC"]
         >>> # change the value of two variables (above threshold)
-        >>> vars_other["ACAF"] = np.asarray(variables["ACAF"]) + 1.e-5
-        >>> vars_other["ACAG"] = np.asarray(variables["ACAG"]) + 1.e-5
+        >>> vars_other["ACAF"] = "ACAF + 1.e-5"
+        >>> vars_other["ACAG"] = "ACAG + 1.e-5"
         >>> # change the value of two variables (below threshold)
-        >>> vars_other["BENEF"] = np.asarray(variables["BENEF"]) + 1.e-8
-        >>> vars_other["BQY"] = np.asarray(variables["BQY"]) + 1.e-8
+        >>> vars_other["BENEF"] = "BENEF + 1.e-8"
+        >>> vars_other["BQY"] = "BQY + 1.e-8"
         >>> # save the Variables file to compare with
         >>> vars_other.save("fun_other.var")                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Saving ...\\fun_other.var
+        Saving ...fun_other.var
         394 objects saved
 
         >>> # ---- compare the current Variables database ----
         >>> # ---- with the content of the saved file     ----
         >>> lists_compare = variables.compare("fun_other.var")  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\\fun_other.var
+        Loading ...fun_other.var
         394 objects loaded
         >>> for name, value in lists_compare.items():           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         ...    print(f"{name}: {value}")
@@ -766,6 +766,8 @@ cdef class _AbstractDatabase:
         >>> comments['AOUC']
         'Comment modified'
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'merge' on a subset of a workspace")
         if not isinstance(other, type(self)):
             raise TypeError(f"'other': Expected value of type {type(self).__name__}. " + 
                 "Got value of type {type(other).__name__}")
@@ -824,6 +826,8 @@ cdef class _AbstractDatabase:
         >>> len(comments)
         317
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'merge_from' on a subset of a workspace")
         if not isinstance(input_file, str):
             raise TypeError(f"'input_file': Expected value of type string. Got value of type {type(input_file).__name__}")
         # convert relative path to absolute path
@@ -986,7 +990,7 @@ cdef class _AbstractDatabase:
         394
         """
         if not self.is_global_workspace:
-            raise RuntimeError("Cannot call 'load' method on a subset of a database")
+            raise RuntimeError("The 'load' method can only be called on the global workspace")
         if not isinstance(filepath, str):
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
         self._load(filepath)
@@ -1040,6 +1044,8 @@ cdef class _AbstractDatabase:
         >>> len(comments)
         0
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'clear' method on a subset of a workspace")
         self.abstract_db_ptr.clear()
 
     # special methods
@@ -1165,9 +1171,6 @@ cdef class _AbstractDatabase:
                         f"Got selection key of type {type(key).__name__} instead.")
 
     def _get_object(self, key):
-        raise NotImplementedError()
-
-    def _subset(self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
 
     # needs to be overriden for Variables
