@@ -30,7 +30,7 @@ from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 from iode.util import check_filepath
 
 KeyName = Union[str, List[str]]
-KeyPeriod = Union[None, str, List[str], slice]
+KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
 
 
@@ -349,48 +349,52 @@ cdef class Variables(_AbstractDatabase):
         """
         return VarPositionalIndexer(self)
 
-    def _get_variable(self, key: Union[str, int], periods_: Union[str, int, List[str]]) -> Union[float, List[float]]: 
+    cdef int _get_period_position(self, string period) except +:
+        """
+        Get the position of a period in the sample.
+        """
+        cdef CSample* c_sample = self.database_ptr.get_sample()
+        return c_sample.get_period_position(period)
+
+    def _get_variable(self, key: Union[str, int], key_periods: Union[str, int, List[str]]) -> Union[float, List[float]]: 
         cdef double cpp_value
         cdef vector[double] cpp_values
-        # periods_ represents all periods
-        if periods_ is None:
+        
+        if isinstance(key_periods, str):
+            key_periods: int = self._get_period_position(key_periods.encode())
+
+        # key_periods represents all periods
+        if key_periods is None:
             if isinstance(key, int):
                 cpp_values = self.database_ptr.get(<int>key)
             else:
                 cpp_values = self.database_ptr.get(<string>(key.encode()))
             return [value if IODE_IS_A_NUMBER(value) else np.nan for value in cpp_values]
-        # periods_ represents a unique period 
-        elif isinstance(periods_, str):
+        # key_periods represents a unique period 
+        elif isinstance(key_periods, int):
             if isinstance(key, int):
-                raise TypeError("variables[key, period]: 'key' must be of type str when 'period' is of type str.")
+                cpp_value = self.database_ptr.get_var(<int>key, <int>key_periods, self.mode_)
             else:
-                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <string>periods_.encode(), self.mode_)
-                return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
-        # periods_ represents a unique period 
-        elif isinstance(periods_, int):
-            if isinstance(key, int):
-                cpp_value = self.database_ptr.get_var(<int>key, <int>periods_, self.mode_)
-            else:
-                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <int>periods_, self.mode_)
+                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <int>key_periods, self.mode_)
             return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
-        # periods_ represents a contiguous range of periods
-        elif isinstance(periods_, tuple):
-            t_first, t_last = periods_
+        # key_periods represents a contiguous range of periods
+        elif isinstance(key_periods, tuple):
+            t_first, t_last = key_periods
             if isinstance(key, int):
                 values = [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
             else:
                 values = [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
             return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
-        # periods_ represents a range/list of periods
-        elif isinstance(periods_, list):
+        # key_periods represents a range/list of periods
+        elif isinstance(key_periods, list):
             if isinstance(key, int):
                 raise TypeError("variables[key, periods]: 'key' must be of type str when 'periods' is of type list.")
             else:
-                values = [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in periods_]
+                values = [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in key_periods]
                 return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
         else:
             raise TypeError("Wrong selection of periods. Expected None or value of type str, int, or list(str). "
-                            f"Got value of type {type(periods_).__name__} instead.")
+                            f"Got value of type {type(key_periods).__name__} instead.")
 
     # overriden for Variables
     def __getitem__(self, key) -> Union[float, List[float], Variables]:
@@ -473,16 +477,16 @@ cdef class Variables(_AbstractDatabase):
         >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
         [[23.771, 26.240999, 30.159, ..., 140.73978, 144.8587818455608, 150.05335230584103]]
         """
-        names, periods_ = self._unfold_key(key)
+        names, key_periods = self._unfold_key(key)
         # names represents a single Variable
         if len(names) == 1:
-            return self._get_variable(names[0], periods_)
+            return self._get_variable(names[0], key_periods)
         # names represents a selection of Variables
-        elif periods_ is None:
+        elif key_periods is None:
             names = ';'.join(names)
             return self._subset(names, copy=False)
         else:
-            return [self._get_variable(name, periods_) for name in names]
+            return [self._get_variable(name, key_periods) for name in names]
 
     def _convert_values(self, values, nb_periods) -> Union[str, float, List[float]]:
         # value is a LEC expression
@@ -540,7 +544,7 @@ cdef class Variables(_AbstractDatabase):
             else:
                 self.database_ptr.update(<string>(key.encode()), cpp_values)
 
-    def _set_variable(self, key: Union[str, int], values: Any, periods_: Optional[str, int, Tuple[int, int], List[str]]):
+    def _set_variable(self, key: Union[str, int], values: Any, key_periods: Optional[str, int, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
 
         if isinstance(key, str):
@@ -553,22 +557,22 @@ cdef class Variables(_AbstractDatabase):
         else:
             # update values for the whole sample
             # raise an error if values is a vector and len(values) != self.nb_periods
-            if periods_ is None:
+            if key_periods is None:
                 self._update(key, values)
             # update the value for only one period 
-            elif isinstance(periods_, (str, int)):
-                if isinstance(key, int) and isinstance(periods_, str):
-                    raise TypeError("variables[key, period] = value: Expected 'key' to be a string.")
-                if isinstance(key, str) and isinstance(periods_, int):
+            elif isinstance(key_periods, (int, str)):
+                if isinstance(key, int) and isinstance(key_periods, str):
+                    key_periods = self._get_period_position(key_periods.encode())
+                if isinstance(key, str) and isinstance(key_periods, int):
                     raise TypeError("variables[key, period] = value: Expected 'period' to be a string.")
                 value = self._convert_values(values, 1)
                 if isinstance(key, int):
-                    self.database_ptr.set_var(<int>key, <int>periods_, <double>value, self.mode_)
+                    self.database_ptr.set_var(<int>key, <int>key_periods, <double>value, self.mode_)
                 else:
-                    self.database_ptr.set_var(<string>(key.encode()), <string>periods_.encode(), <double>value, self.mode_)
+                    self.database_ptr.set_var(<string>(key.encode()), <string>key_periods.encode(), <double>value, self.mode_)
             # update values for a contiguous range of periods
-            elif isinstance(periods_, tuple):
-                first_period, last_period = periods_
+            elif isinstance(key_periods, tuple):
+                first_period, last_period = key_periods
                 nb_periods = last_period - first_period + 1
                 # values is a LEC expression
                 if isinstance(values, str):
@@ -588,11 +592,11 @@ cdef class Variables(_AbstractDatabase):
                 if isinstance(key, int):
                     raise TypeError("variables[key, periods] = lec where 'key' is an integer is not implemented.")
                 if isinstance(values, str):
-                    raise NotImplementedError(f"Case variables[key, periods] = lec where '{periods_}' does not represents "
+                    raise NotImplementedError(f"Case variables[key, periods] = lec where '{key_periods}' does not represents "
                                               "a contiguous range of periods is not implemented")
                 else:
-                    values = self._convert_values(values, len(periods_))
-                    for period, value in zip(periods_, values):
+                    values = self._convert_values(values, len(key_periods))
+                    for period, value in zip(key_periods, values):
                         self.database_ptr.set_var(<string>(key.encode()), <string>period.encode(), <double>value, self.mode_)
 
     # overriden for Variables
@@ -743,10 +747,10 @@ cdef class Variables(_AbstractDatabase):
         >>> variables["A3"]                     # doctest: +ELLIPSIS 
         [0.0, 0.0, ..., 0.0, 0.0]
         """
-        names, periods_ = self._unfold_key(key)
+        names, key_periods = self._unfold_key(key)
         # update/add a single Variable
         if len(names) == 1:
-            self._set_variable(names[0], value, periods_)
+            self._set_variable(names[0], value, key_periods)
         # update/add several variables
         else:
             # if value is a string (LEC expression) or a numerical value -> set the same value for all Variables
@@ -757,7 +761,7 @@ cdef class Variables(_AbstractDatabase):
                                 f"{len(values)} values has been passed while the selection key '{key}' "
                                 f"represents {len(names)} variables.")
             for name, value in zip(names, values):
-                self._set_variable(name, value, periods_) 
+                self._set_variable(name, value, key_periods) 
 
     # overriden for Variables
     def __delitem__(self, key):
@@ -810,12 +814,12 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.get_names("D*")
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         """
-        names, periods_ = self._unfold_key(key)
+        names, key_periods = self._unfold_key(key)
         # names represents a single Variable
         if len(names) == 1:
             self.database_ptr.remove(names[0].encode())
         # names represents a selection of Variables
-        elif periods_ is None:
+        elif key_periods is None:
             for name in names:
                 self.database_ptr.remove(name.encode())
         else:
