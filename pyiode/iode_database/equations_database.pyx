@@ -785,6 +785,8 @@ cdef class Equations(_AbstractDatabase):
             Defaults to load all equations from the input file(s). 
         
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
@@ -860,6 +862,9 @@ cdef class Equations(_AbstractDatabase):
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
 
         for index, value in s.items():
             self._set_object(index, value)
@@ -984,6 +989,9 @@ cdef class Equations(_AbstractDatabase):
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_frame' method on a subset of a workspace")
 
         if 'lec' not in df.columns:
             raise ValueError("Expected at least one column with name 'lec'. "

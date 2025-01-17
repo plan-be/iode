@@ -10,10 +10,14 @@ else:
     Self = Any
 
 cimport cython
+from cython.operator cimport dereference
+from libc.string cimport memcpy
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from cython.operator cimport dereference
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
+from pyiode.time.period cimport CPeriod
+from pyiode.time.sample cimport CSample
+from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
@@ -153,13 +157,18 @@ class VarPositionalIndexer:
                 raise IndexError(f"Period index {t} out of range")
         return pos, t
 
+    def _convert_period(self, t: int) -> Period:
+        return self.database.sample.start.shift(t) if t is not None else None
+
     def __getitem__(self, index: Union[int, Tuple[int, int]]):
         pos, t = self._check_index(index)
-        return self.database._get_variable(pos, t)
+        period = self._convert_period(t)
+        return self.database._get_variable(pos, period)
     
     def __setitem__(self, index: Union[int, Tuple[int, int]], value):
         pos, t = self._check_index(index)
-        self.database._set_variable(pos, value, t)
+        period = self._convert_period(t)
+        self.database._set_variable(pos, value, period)
 
 
 @cython.final
@@ -219,12 +228,16 @@ cdef class Variables(_AbstractDatabase):
     cdef bint ptr_owner
     cdef CKDBVariables* database_ptr
     cdef IodeVarMode mode_
+    cdef Period first_period_subset
+    cdef Period last_period_subset
 
     def __cinit__(self, filepath: str = None) -> Variables:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
         self.ptr_owner = False
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        self.first_period_subset = None
+        self.last_period_subset = None
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -241,6 +254,7 @@ cdef class Variables(_AbstractDatabase):
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
     cdef Variables _from_ptr(CKDBVariables* database_ptr = NULL, bint owner=False):
+        cdef CSample* c_sample
         # call to __new__() that bypasses the __init__() constructor.
         cdef Variables wrapper = Variables.__new__(Variables)
         if database_ptr is not NULL:
@@ -252,74 +266,192 @@ cdef class Variables(_AbstractDatabase):
             wrapper.database_ptr = &cpp_global_variables
             wrapper.abstract_db_ptr = &cpp_global_variables
         wrapper.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        wrapper.first_period_subset = None
+        wrapper.last_period_subset = None
         return wrapper
+
+    def _get_periods_bounds(self) -> Tuple[int, int]:
+        if self.first_period_subset is None:
+            t_first_period: int = 0  
+        else: 
+            t_first_period: int = self._get_real_period_position(self.first_period_subset)
+        
+        if self.last_period_subset is None:
+            t_last_period: int = self.nb_periods - 1
+        else:
+            t_last_period: int = self._get_real_period_position(self.last_period_subset)
+
+        return t_first_period, t_last_period
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBVariables* kdb = new CKDBVariables(filepath.encode())
         del kdb
+        self.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        self.first_period_subset: Period = None
+        self.last_period_subset: Period = None
 
-    def _subset(self, pattern: str, copy: bool) -> Variables:
+    def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
+                last_period: Union[str, Period]=None) -> Variables:
+        cdef CSample* c_sample
         cdef Variables subset_db = Variables.__new__(Variables)
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        subset_db.ptr_owner = True
         subset_db.mode_ = IodeVarMode.VAR_MODE_LEVEL
+
+        if isinstance(first_period, str):
+            first_period = Period(first_period)
+        
+        if isinstance(last_period, str):
+            last_period = Period(last_period)
+
+        if first_period is None:
+            first_period = self.first_period_subset
+        
+        if last_period is None:
+            last_period = self.last_period_subset
+        
+        # check that first period subset < last period subset
+        if first_period is not None and last_period is not None and first_period > last_period:
+            raise ValueError(f"subset: first period of the subset ('{first_period}') must be " 
+                             f"<= last period of the subset ('{last_period}')")
+
+        # get the sample of the real database (not self.sample if self is already a subset)
+        whole_db_sample: Sample = self._get_whole_sample()
+        
+        # check that first period of the subset is inside the real Variables sample 
+        if first_period is not None and (first_period < whole_db_sample.start or first_period > whole_db_sample.end):
+            raise ValueError(f"subset: first period of the subset '{first_period}' is not inside the Variables sample '{whole_db_sample}'")
+        
+        # check that last period of the subset is inside the real Variables sample 
+        if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
+            raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
+
+        subset_db.first_period_subset = first_period
+        subset_db.last_period_subset = last_period
         return subset_db
 
-    def _unfold_key(self, key: KeyVariable) -> Tuple[KeyName, Optional[str, Tuple[int, int], List[str]]]:
+    def _unfold_key(self, key: KeyVariable) -> Tuple[KeyName, Optional[Period, Tuple[Period, Period], List[Period]]]:
+        """
+        split the key into a tuple (names, periods):
+
+           - names: str or list of str
+           - periods: None or Period or tuple of Period or list of Period
+
+        Examples
+        --------
+        >>> from iode import Period, Sample, variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        
+        >>> # select all periods
+        >>> variables._unfold_key("AC*")  # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], None)
+        
+        >>> # cannot pass more than 2 arguments
+        >>> variables._unfold_key(("AC*", '2000Y1:2010Y1', '2015Y1'))  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+           ...
+        ValueError: variables[...]: Expected maximum 2 arguments ('names' and 'periods'). Got 3 arguments
+        
+        >>> # select 1 period
+        >>> variables._unfold_key(("AC*", '2000Y1'))                # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], Period("2000Y1"))
+        >>> variables._unfold_key(("AC*", Period('2000Y1')))
+        (['ACAF', 'ACAG'], Period("2000Y1"))
+
+        >>> # select a range of periods (contiguous)
+        >>> variables._unfold_key(("AC*", '2000Y1:2010Y1'))         # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], (Period("2000Y1"), Period("2010Y1")))
+
+        >>> # select a list of years
+        >>> variables._unfold_key(("AC*", ['2000Y1', '2005Y1', '2010Y1']))  # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], [Period("2000Y1"), Period("2005Y1"), Period("2010Y1")])
+
+        >>> # select a range of contiguous periods using a Sample object
+        >>> variables._unfold_key(("AC*", Sample('2000Y1:2010Y1')))  # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], (Period("2000Y1"), Period("2010Y1")))
+
+        >>> # select a range of contiguous periods using a slice
+        >>> periods_range = slice('2000Y1', '2010Y1')               # doctest: +NORMALIZE_WHITESPACE
+        >>> variables._unfold_key(("AC*", periods_range))           # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], (Period("2000Y1"), Period("2010Y1")))
+        >>> periods_range = slice(Period('2000Y1'), Period('2010Y1'))
+        >>> variables._unfold_key(("AC*", periods_range))           # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], (Period("2000Y1"), Period("2010Y1")))
+        
+        >>> # select a range of non-contiguous periods using a slice with a step
+        >>> periods_range = slice('2006Y1', '2010Y1', 2)             # doctest: +NORMALIZE_WHITESPACE
+        >>> variables._unfold_key(("AC*", periods_range))            # doctest: +NORMALIZE_WHITESPACE
+        (['ACAF', 'ACAG'], [Period("2006Y1"), Period("2008Y1"), Period("2010Y1")])
+        """
         cdef CSample* c_sample
 
         # no selection on periods
         if not isinstance(key, tuple):
-            return super()._unfold_key(key), None
-        # key = names, periods
-        else:
-            if len(key) > 2:
-                raise ValueError(f"variables[...]: Expected maximum 2 arguments ('names' and 'periods'). "
-                                 f"Got {len(key)} arguments")
-            names, periods_ = key
+            key = key, None
+        
+        if len(key) > 2:
+            raise ValueError(f"variables[...]: Expected maximum 2 arguments ('names' and 'periods'). "
+                                f"Got {len(key)} arguments")
+        names, _periods = key
 
-            # get selection on Variable name(s)
-            names = super()._unfold_key(names) 
-            
-            # periods_ represents a unique period or a contiguous range of periods
-            if isinstance(periods_, str): 
-                # periods_ represents a contiguous range of periods
-                if ':' in periods_:
-                    first_period, last_period = periods_.split(':')
-                    if not first_period:
-                        first_period = None
-                    if not last_period:
-                        last_period = None
-                    periods_ = slice(first_period, last_period)
-                # periods_ represents a unique period
-                else:
-                    return names, periods_
-            
-            # check if periods_ is a list of periods
-            if isinstance(periods_, Iterable) and all(isinstance(period_, (str, Period)) for period_ in periods_):
-                return names, [str(period_) if isinstance(period_, Period) else period_ for period_ in periods_]
-            
-            # convert slice to a (start, end) tuple or a list of periods if step is not None
-            if isinstance(periods_, slice):
-                sample = self.sample
-                first_period = sample.start if periods_.start is None else periods_.start
-                last_period = sample.end if periods_.stop is None else periods_.stop
-                if isinstance(first_period, Period):
-                    first_period = str(first_period)
-                if isinstance(last_period, Period):
-                    last_period = str(last_period)
-                if periods_.step is not None:
-                    return names, self.periods_subset(first_period, last_period)[::periods_.step]
-                else:
-                    c_sample = self.database_ptr.get_sample()
-                    t_first = c_sample.get_period_position(<string>first_period.encode())
-                    t_last = c_sample.get_period_position(<string>last_period.encode())
-                    return names, (t_first, t_last)
+        # get selection on Variable name(s)
+        names = super()._unfold_key(names) 
+        
+        # _periods represents the whole sample
+        if _periods is None:
+            pass
+        # _periods represents a unique period
+        elif isinstance(_periods, Period):
+            pass
+        # _periods represents a unique period or a contiguous range of periods
+        elif isinstance(_periods, str): 
+            # _periods represents a contiguous range of periods
+            if ':' in _periods:
+                first_period, last_period = _periods.split(':')
+                first_period = Period(first_period) if first_period else None
+                last_period = Period(last_period) if last_period else None
+                _periods = first_period, last_period
+            # _periods represents a unique period
             else:
-                # wrong type for periods_
-                raise TypeError(f"variables[names, periods]: 'periods' must represent either a period (str), a list of periods "
-                                f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
+                _periods = Period(_periods)
+        
+        # _periods is a list of periods
+        elif isinstance(_periods, Iterable):
+            if not all(isinstance(period, (str, Period)) for period in _periods):
+                raise TypeError("variables[names, periods]: 'periods' must be a list of str or Period objects.")
+            _periods = [Period(period) if isinstance(period, str) else period for period in _periods]
+        
+        # _periods is a Sample object
+        elif isinstance(_periods, Sample):
+            _periods = _periods.start, _periods.end
 
+        # convert slice to a (start, end) tuple or a list of periods if step is not None
+        elif isinstance(_periods, slice):
+            sample = self.sample
+            first_period = sample.start if _periods.start is None else _periods.start
+            last_period = sample.end if _periods.stop is None else _periods.stop
+            if _periods.step is not None:
+                first_period, last_period = str(first_period), str(last_period)
+                _periods = self.periods_subset(first_period, last_period)[::_periods.step]
+                _periods = [Period(period) for period in _periods]
+            else:
+                if isinstance(first_period, str):
+                    first_period = Period(first_period)
+                if isinstance(last_period, str):
+                    last_period = Period(last_period)
+                _periods = first_period, last_period
+        else:
+            # wrong type for _periods
+            raise TypeError(f"variables[names, periods]: 'periods' must be of type str, Period, Sample, "
+                            f"list of str or Period, or a slice(str or Period, str or Period, int). "
+                            f"'periods' is of type {type(_periods).__name__}.")
+
+        return names, _periods
+
+    # TODO: add tests for the case of a subset over the periods
     @property
     def i(self) -> VarPositionalIndexer:
         """
@@ -349,64 +481,153 @@ cdef class Variables(_AbstractDatabase):
         """
         return VarPositionalIndexer(self)
 
-    cdef int _get_period_position(self, string period) except +:
+    def _get_whole_sample(self) -> Sample:
         """
-        Get the position of a period in the sample.
+        If the current instance is a subset of a Variables database, 
+        returns the sample of the original Variables database.
         """
-        cdef CSample* c_sample = self.database_ptr.get_sample()
-        return c_sample.get_period_position(period)
+        cdef CSample* c_sample 
+        if self.is_detached:
+            c_sample = self.database_ptr.get_sample()
+        else:
+            c_sample = cpp_global_variables.get_sample()
+        return Sample._from_ptr(c_sample, <bint>False)
 
-    def _get_variable(self, key: Union[str, int], key_periods: Union[str, int, List[str]]) -> Union[float, List[float]]: 
+    def _maybe_update_subset_sample(self):
+        """
+        Update the subset sample if the database sample has changed.
+
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> variables.sample
+        Sample("1960Y1:2015Y1")
+        >>> vars_subset = variables["A*", "2000Y1:2010Y1"]
+        >>> vars_subset.sample
+        Sample("2000Y1:2010Y1")
+        >>> variables.sample = "1960Y1:2005Y1"
+        >>> variables.sample
+        Sample("1960Y1:2005Y1")
+        >>> # automatic update of the subset sample
+        >>> vars_subset.sample
+        Sample("2000Y1:2005Y1")
+        """ 
+        if self.first_period_subset is None and self.last_period_subset is None:
+            return 
+    
+        whole_db_sample: Sample = self._get_whole_sample()
+
+        if self.first_period_subset is not None:
+            if self.first_period_subset < whole_db_sample.start:
+                self.first_period_subset = whole_db_sample.start
+            if self.first_period_subset > whole_db_sample.end:
+                self.first_period_subset = None
+                self.last_period_subset = None
+
+        if self.last_period_subset is not None:
+            if self.last_period_subset > whole_db_sample.end:
+                self.last_period_subset = whole_db_sample.end
+            if self.last_period_subset < whole_db_sample.start:
+                self.first_period_subset = None
+                self.last_period_subset = None
+
+    cdef int c_get_real_period_position(self, CPeriod c_period):
+        """
+        Get the position of a period in the Variables database sample (not the subset).
+        """
+        cdef CSample* c_sample
+        if self.is_detached:
+            c_sample = self.database_ptr.get_sample()
+        else:
+            c_sample = cpp_global_variables.get_sample()
+        return c_sample.get_period_position(<CPeriod>c_period)
+
+    def _get_real_period_position(self, period: Period):
+        """
+        Check if 'period' is inside the current (subset) sample.
+        Get the position of a period in the Variables database sample (not the subset).
+        """
+        sample: Sample = self.sample
+        if period < sample.start or period > sample.end:
+            raise IndexError(f"The period '{period}' is outside the sample '{sample}'")
+        return self.c_get_real_period_position(period.c_period)
+
+    def _get_variable(self, key_name: Union[str, int], key_periods: Union[None, Period, List[Period]]) -> Union[float, pd.Series, Variables]: 
+        """
+        Get the value(s) of the variable `key_name` for the period(s) `key_periods`.
+
+        Each period given is converted to its 'absolute' position in the Variables 
+        database sample (not relative to the subset sample for instance).
+        """
+        cdef int t
+        cdef int t_first
+        cdef int t_last
+        cdef int pos
         cdef double cpp_value
         cdef vector[double] cpp_values
-        
-        if isinstance(key_periods, str):
-            key_periods: int = self._get_period_position(key_periods.encode())
 
-        # key_periods represents all periods
+        # key_periods represents all periods (of the current subset) -> return a Variables object
         if key_periods is None:
-            if isinstance(key, int):
-                cpp_values = self.database_ptr.get(<int>key)
-            else:
-                cpp_values = self.database_ptr.get(<string>(key.encode()))
-            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in cpp_values]
-        # key_periods represents a unique period 
-        elif isinstance(key_periods, int):
-            if isinstance(key, int):
-                cpp_value = self.database_ptr.get_var(<int>key, <int>key_periods, self.mode_)
-            else:
-                cpp_value = self.database_ptr.get_var(<string>(key.encode()), <int>key_periods, self.mode_)
+            if isinstance(key_name, int):
+                key_name = self.get_name(key_name)
+            db_subset = self._subset(key_name, copy=False)
+            return db_subset
+        # key_periods represents a unique period -> return a float 
+        elif isinstance(key_periods, Period):
+            pos = self.get_position(key_name) if isinstance(key_name, str) else key_name
+            t = self._get_real_period_position(key_periods)
+            cpp_value = self.database_ptr.get_var(pos, t, self.mode_)
             return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
-        # key_periods represents a contiguous range of periods
+        # key_periods represents a contiguous range of periods -> return a Variables object
         elif isinstance(key_periods, tuple):
-            t_first, t_last = key_periods
-            if isinstance(key, int):
-                values = [self.database_ptr.get_var(<int>key, <int>t, self.mode_) for t in range(t_first, t_last+1)]
-            else:
-                values = [self.database_ptr.get_var(<string>(key.encode()), <int>t, self.mode_) for t in range(t_first, t_last+1)]
-            return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
-        # key_periods represents a range/list of periods
+            first_period, last_period = key_periods
+            if not isinstance(first_period, Period):
+                raise TypeError(f"Expected value of type 'Period' for the first period. "
+                                f"Got value of type {type(first_period).__name__} instead.")
+            if not isinstance(last_period, Period):
+                raise TypeError(f"Expected value of type 'Period' for the last period. "
+                                f"Got value of type {type(last_period).__name__} instead.")
+            if isinstance(key_name, int):
+                key_name = self.get_name(key_name)
+            db_subset = self._subset(key_name, copy=False, first_period=first_period, last_period=last_period)
+            return db_subset
+        # key_periods represents a list of non-contiguous periods -> return a pandas Series
         elif isinstance(key_periods, list):
-            if isinstance(key, int):
-                raise TypeError("variables[key, periods]: 'key' must be of type str when 'periods' is of type list.")
-            else:
-                values = [self.database_ptr.get_var(<string>(key.encode()), <string>period_.encode(), self.mode_) for period_ in key_periods]
-                return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
+            if not all(isinstance(period, Period) for period in key_periods):
+                raise TypeError("Expected a list of periods each of type 'Period'")
+            pos = self.get_position(key_name) if isinstance(key_name, str) else key_name
+            period_names = [str(period) for period in key_periods]
+            key_periods: List[int] = [self._get_real_period_position(period) for period in key_periods]
+            values = [self.database_ptr.get_var(pos, <int>p, self.mode_) for p in key_periods]
+            data = [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
+            series = pd.Series(data, index=period_names)
+            series.index.name = "time"
+            series.name = key_name if isinstance(key_name, str) else self.get_name(key_name)
+            return series
         else:
-            raise TypeError("Wrong selection of periods. Expected None or value of type str, int, or list(str). "
-                            f"Got value of type {type(key_periods).__name__} instead.")
+            raise TypeError("Wrong selection of periods.\nExpected None or value of type Period, "
+                            f"tuple(Period, Period) or list(Period).\nGot value of type "
+                            f"{type(key_periods).__name__} instead.")
 
     # overriden for Variables
-    def __getitem__(self, key) -> Union[float, List[float], Variables]:
+    def __getitem__(self, key) -> Union[float, Variables]:
         r"""
         Return the (subset of) variable(s) referenced by `key`.
 
-        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
-        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        The `key` represents a selection on the Variables names and optionally on the periods.
+
+        The selection on names can be: 
         
-        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
-        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
-        tabulation `\t`, or a newline `\n`.
+            - a single Variable name (e.g. "ACAF") 
+            - a list of Variable names (e.g. "ACAF;ACAG;AOUC") 
+            - a pattern (e.g. "A*;*_").
+        
+        If the selection on names represents a list of names or of sub-patterns, each name or sub-pattern must be 
+        separated by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, 
+        or a tabulation `\t`, or a newline `\n`.
 
         A (sub-)`pattern` is a list of characters representing a group of object names. 
         It includes some special characters which have a special meaning:
@@ -419,17 +640,28 @@ cdef class Variables(_AbstractDatabase):
             - `!` : any non-alphanumeric character or none at the beginning and end of a string 
             - `\` : escape the next character
 
-        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+        Note that the selection on names can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        The selection on periods can be:
+
+           - the whole sample (e.g. None) 
+           - a single period (e.g. "1990Y1") 
+           - a range of periods (e.g. "1990Y1:2000Y1") 
+           - a list of periods (e.g. ["1990Y1", "1995Y1", "2000Y1"]) 
 
         Parameters
         ----------
-        key: str or list(str)
-            (the list of) name(s) of the variable(s) to get.
-            The list of variables to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
+        key: str or list(str) or tuple(str, str) or tuple(str, list(str)) or tuple(str, str:str)
+            The key is split into two parts: the selection on names and the selection on periods.
+            The selection on names can be a single name, a list of names, or a pattern.
+            The selection on periods (optional) can be a single period, a list of periods, or a range of periods.
 
         Returns
         -------
-        Single variable or a subset of the database.
+        float or Variables
+            If `key` represents a single name and a single period, the returned value is a float.
+            If `key` represents a list of non-contiguous periods, the returned object is a pandas DataFrame.
+            Otherwise, a subset of the Variables workspace is returned.
 
         Examples
         --------
@@ -443,173 +675,347 @@ cdef class Variables(_AbstractDatabase):
 
         >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
-        >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
-        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
+        >>> variables["ACAF"]                       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF            na      na  ...  -83.34   -96.41
+        <BLANKLINE>
         >>> # get the variable value for a specific period
         >>> variables["ACAF", "1990Y1"]
         23.771
         >>> # get the variable values for range of periods (using a Python slice)
-        >>> variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
-        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:2000Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1990Y1  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1  1996Y1  1997Y1  1998Y1  1999Y1  2000Y1
+        ACAF         23.77   26.24   30.16   34.66    8.16  -13.13   32.17   39.94   29.65   13.53   10.05
+        <BLANKLINE>
         >>> # same as above but with the colon ':' inside the periods range string
-        >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
-        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:2000Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1990Y1  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1  1996Y1  1997Y1  1998Y1  1999Y1  2000Y1
+        ACAF         23.77   26.24   30.16   34.66    8.16  -13.13   32.17   39.94   29.65   13.53   10.05
+        <BLANKLINE>
 
         >>> # b) -------- get a subset of the Variables database using a pattern --------
-        >>> variables_subset = variables["A*"]
-        >>> variables_subset.names
+        >>> vars_subset = variables["A*"]
+        >>> vars_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
-        >>> # get the variable values for a specific period
-        >>> variables["A*", "1990Y1"]
-        [23.771, -28.1721855713507, 1.0, 0.9373591502749314, 1.0]
-        >>> # get the variable values for range of periods (using a Python slice)
-        >>> variables["A*", "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
-        [[23.771, 26.240999, 30.159, ..., 1.2031082, 1.3429699656745855, 1.3386028553645442]]
+        >>> # get the variable values for a specific period -> Worspace subset
+        >>> variables["A*", "1990Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:1990Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name       1990Y1
+        ACAF         23.77
+        ACAG        -28.17
+        AOUC          1.00
+        AOUC_         0.94
+        AQC           1.00
+        <BLANKLINE>
+        >>> # get the variable values for range of periods -> Workspace subset
+        >>> variables["A*", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:2000Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1990Y1  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1  1996Y1  1997Y1  1998Y1  1999Y1  2000Y1
+        ACAF         23.77   26.24   30.16   34.66    8.16  -13.13   32.17   39.94   29.65   13.53   10.05
+        ACAG        -28.17  -30.93  -40.29  -43.16  -16.03  -41.85  -40.24  -32.93  -38.35  -39.86  -41.53
+        AOUC          1.00    1.02    1.03    1.03    1.05    1.05    1.05    1.08    1.09    1.11    1.12
+        AOUC_         0.94    0.96    0.97    0.98    0.99    1.00    1.00    1.03    1.04    1.08    1.10
+        AQC           1.00    1.06    1.11    1.15    1.16    1.16    1.16    1.20    1.20    1.34    1.34
+        <BLANKLINE>
 
         >>> # c) -------- get a subset of the Variables database using a list of names --------
-        >>> variables_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
-        >>> variables_subset.names
+        >>> vars_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
+        >>> vars_subset.names
         ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
-        >>> # get the variable values for a specific period
-        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]
-        [23.771, -28.1721855713507, 1.0, -34.099998, -34.099997]
-        >>> # get the variable values for range of periods (using a Python slice)
-        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
-        [[23.771, 26.240999, 30.159, ..., 140.73978, 144.8587818455608, 150.05335230584103]]
+        >>> # get the variable values for a specific period -> pandas Series
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:1990Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1990Y1
+        ACAF         23.77
+        ACAG        -28.17
+        AQC           1.00
+        BQY         -34.10
+        BVY         -34.10
+        <BLANKLINE>
+        >>> # get the variable values for a list of non-contiguous periods -> pandas DataFrame
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], ["1990Y1", "1995Y1", "2000Y1"]]  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time          1990Y1      1995Y1      2000Y1
+        variables
+        ACAF       23.771000  -13.130997   10.046611
+        ACAG      -28.172186  -41.845993  -41.534787
+        AQC         1.000000    1.161687    1.338603
+        BQY       -34.099998   91.089355  119.955090
+        BVY       -34.099997  105.500000  150.053352       
+        >>> # get the variable values for range of periods -> Workspace subset
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1:2000Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:2000Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1990Y1  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1  1996Y1  1997Y1  1998Y1  1999Y1  2000Y1
+        ACAF         23.77   26.24   30.16   34.66    8.16  -13.13   32.17   39.94   29.65   13.53   10.05
+        ACAG        -28.17  -30.93  -40.29  -43.16  -16.03  -41.85  -40.24  -32.93  -38.35  -39.86  -41.53
+        AQC           1.00    1.06    1.11    1.15    1.16    1.16    1.16    1.20    1.20    1.34    1.34
+        BQY         -34.10   -1.26  -13.75   52.16   66.63   91.09  104.68  113.52  116.19  117.91  119.96
+        BVY         -34.10   -1.30  -14.70   58.10   75.90  105.50  123.20  135.62  140.74  144.86  150.05
+        <BLANKLINE>
         """
         names, key_periods = self._unfold_key(key)
-        # names represents a single Variable
+
+        # names represents a single IODE Variable
         if len(names) == 1:
             return self._get_variable(names[0], key_periods)
-        # names represents a selection of Variables
-        elif key_periods is None:
-            names = ';'.join(names)
-            return self._subset(names, copy=False)
+        # names represents a selection of IODE Variables
         else:
-            return [self._get_variable(name, key_periods) for name in names]
+            # periods = list of non-contiguous periods -> return a pandas DataFrame
+            if isinstance(key_periods, list):
+                data: List[pd.Series] = [self._get_variable(name, key_periods) for name in names]
+                columns = [str(period) for period in key_periods]
+                df = pd.concat(data, axis='columns').transpose()
+                df.index.name = "variables"
+                return df
+            # periods = single period or range of periods or the whole sample
+            # -> return a Variables object (Workspace subset)
+            else:
+                pattern = ';'.join(names)
+                if isinstance(key_periods, Period):
+                    first_period = last_period = key_periods
+                elif isinstance(key_periods, tuple):
+                    first_period, last_period = key_periods
+                else:
+                    first_period = last_period = None
+                db_subset = self._subset(pattern, copy=False, first_period=first_period, 
+                                         last_period=last_period)
+                return db_subset
 
-    def _convert_values(self, values, nb_periods) -> Union[str, float, List[float]]:
+    def _convert_values(self, values: Union[int, float, str, List[Union[int, float]], Variables]) \
+        -> Union[str, float, List[float], Variables]:
+        """
+        Check the type of 'values' and convert np.nan to IODE NA (if needed).
+        """    
         # value is a LEC expression
         if isinstance(values, str):
             return values
-        # same value for all periods to be set    
-        if isinstance(values, int):
-            values = float(values)
-        if isinstance(values, float):
-            value = NA if np.isnan(values) else values
-            return value if nb_periods == 1 else [value] * nb_periods
-        # iterable of int/float
-        if isinstance(values, Iterable) and all(isinstance(item, (int, float)) for item in values):
-            if len(values) == nb_periods:
-                return [NA if np.isnan(value) else float(value) for value in values]
-            else:
-                raise ValueError(f"variables[key] = values: Expected 'values' to be a vector of length {nb_periods} " 
-                                 f"but got vector of length {len(values)}.")    
+        # same value for all periods to be set
+        elif isinstance(values, (int, float)):
+            return NA if np.isnan(values) else float(values)
+        # Variables object
+        elif isinstance(values, Variables):
+            return values
+        # values is a list of float
+        elif isinstance(values, Iterable) and all(isinstance(value, (int, float)) for value in values):
+            return [NA if np.isnan(value) else float(value) for value in values]
         # wrong type for 'value'
-        raise TypeError("variables[key] = value(s): Expected a float or a list of float as 'value(s)'. "
+        else:
+            raise TypeError("variables[key] = value(s): Expected object of type int, "
+                            "float, str, list of int/float or Variables as 'value(s)'.\n"
                             f"Got 'value(s)' of type {type(values).__name__}") 
 
-    def _add(self, name: str, values: Union[str, float, List[float]]):
+    # NOTE: needed to create a dedicated method since Cython seems to have some 
+    #       difficulties with Union[..., Variables].
+    #       Without a dedicated method, the following error is raised:
+    #       ""Storing unsafe C derivative of temporary Python reference"
+    def __add_var(self, name: str, value: Variables):
+        cdef string c_name = name.encode()
+        t_first, t_last = value._get_periods_bounds()
+        _c_add_var_from_other(c_name, self.database_ptr, value.database_ptr, t_first, t_last)
+
+    def _add(self, name: str, values: Union[str, float, List[float], Variables]):
         cdef vector[double] cpp_values
 
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
 
-        # raise an error if values is a vector and len(values) != self.nb_periods
-        values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
             self.database_ptr.add(<string>(name.encode()), <string>values.encode())
         # values is a vector of float
-        else:
-            cpp_values = [<double>value_ for value_ in values]
+        elif isinstance(values, float):
+            cpp_values = [values] * self.nb_periods
             self.database_ptr.add(<string>(name.encode()), cpp_values)
-
-    def _update(self, key: Union[str, int], values: Union[str, float, List[float]]):
-        cdef vector[double] cpp_values
-
-        # raise an error if values is a vector and len(values) != self.nb_periods
-        values = self._convert_values(values, self.nb_periods)
-        # values is a LEC expression
-        if isinstance(values, str):
-            if isinstance(key, int):
-                self.database_ptr.update(<int>key, <string>values.encode())
-            else:
-                self.database_ptr.update(<string>(key.encode()), <string>values.encode())
-        # values is a vector of float
+        # values is a list of float
+        elif isinstance(values, list):
+            if len(values) != self.nb_periods:
+                raise ValueError(f"Cannot add IODE variable with name '{name}'.\n"
+                                 f"Expected a list of {self.nb_periods} values.\n"
+                                 f"Got {len(values)} values instead")
+            cpp_values = values
+            self.database_ptr.add(<string>(name.encode()), cpp_values)
+        # values is a Variables object
+        elif isinstance(values, Variables):
+            self.__add_var(name, values)
         else:
-            cpp_values = [<double>value_ for value_ in values]
-            if isinstance(key, int):
-                self.database_ptr.update(<int>key, cpp_values)
-            else:
-                self.database_ptr.update(<string>(key.encode()), cpp_values)
+            raise TypeError(f"Cannot add IODE variable with name '{name}'.\n"
+                            f"Expected value of type str, float or Variables. "
+                            f"Got value of type {type(values).__name__}")
 
-    def _set_variable(self, key: Union[str, int], values: Any, key_periods: Optional[str, int, Tuple[int, int], List[str]]):
+    # NOTE: needed to create a dedicated method since Cython seems to have some 
+    #       difficulties with Union[..., Variables].
+    #       Without a dedicated method, the following error is raised:
+    #       ""Storing unsafe C derivative of temporary Python reference"
+    def __update_var(self, name: str, t_first: int, t_last: int, value: Variables):
+        cdef string c_name = name.encode()
+        value_t_first, value_t_last = value._get_periods_bounds()
+        _c_copy_var_content(c_name, self.database_ptr, t_first, t_last, value.database_ptr, value_t_first, value_t_last)
+
+    def _set_variable(self, key_name: Union[str, int], values: Union[int, float, str, List[Union[int, float]], Variables], 
+        key_periods: Optional[Period, Tuple[Period, Period], List[Period]]):
+        cdef int t
+        cdef int t_first
+        cdef int t_last
+        cdef int pos
         cdef vector[double] cpp_values
 
-        if isinstance(key, str):
-            key = key.strip()
+        if isinstance(key_name, str):
+            key_name = key_name.strip()
+
+        # check type of passed 'values' and convert np.nan to IODE NA (if needed)
+        values = self._convert_values(values)
         
-        # new Variable -> raise an error if values is a vector and len(values) != self.nb_periods
-        if isinstance(key, str) and key not in self:
-            self._add(key, values)
+        # new Variable -> raises an error if key_periods is not None
+        #              -> only allowed when working on the whole sample
+        if isinstance(key_name, str) and key_name not in self:
+            if key_periods is not None:
+                raise RuntimeError(f"Cannot add IODE variable with name '{key_name}'.\nThe syntax 'variables['{key_name}'] = new_variable' "
+                                   f"must be used instead of 'variables['{key_name}', {key_periods}] = new_variable'")
+            if self.first_period_subset is not None or self.last_period_subset is not None:
+                raise RuntimeError(f"Cannot add IODE variable with name '{key_name}' when the subset does not cover the "
+                                   f"whole sample of the IODE Variables workspace.\n")
+            self._add(key_name, values)
         # update a Variable
         else:
-            # update values for the whole sample
-            # raise an error if values is a vector and len(values) != self.nb_periods
+            pos = self.get_position(key_name) if isinstance(key_name, str) else key_name
+            name = self.get_name(pos) if isinstance(key_name, int) else key_name
+            # update values for the whole (subset) sample
             if key_periods is None:
-                self._update(key, values)
+                key_periods = self.sample
+                key_periods = key_periods.start, key_periods.end
             # update the value for only one period 
-            elif isinstance(key_periods, (int, str)):
-                if isinstance(key, int) and isinstance(key_periods, str):
-                    key_periods = self._get_period_position(key_periods.encode())
-                if isinstance(key, str) and isinstance(key_periods, int):
-                    raise TypeError("variables[key, period] = value: Expected 'period' to be a string.")
-                value = self._convert_values(values, 1)
-                if isinstance(key, int):
-                    self.database_ptr.set_var(<int>key, <int>key_periods, <double>value, self.mode_)
-                else:
-                    self.database_ptr.set_var(<string>(key.encode()), <string>key_periods.encode(), <double>value, self.mode_)
+            if isinstance(key_periods, Period):
+                if not isinstance(values, float):
+                    raise TypeError(f"Cannot update the variable '{name}'.\n"
+                                    f"When updating a Variable for a single period, the "
+                                    f"right-hand side value must be of type float")
+                t = self._get_real_period_position(key_periods)
+                self.database_ptr.set_var(pos, t, <double>values, self.mode_)
             # update values for a contiguous range of periods
             elif isinstance(key_periods, tuple):
                 first_period, last_period = key_periods
-                nb_periods = last_period - first_period + 1
+                if not isinstance(first_period, Period):
+                    raise TypeError(f"Cannot update the variable '{name}'.\n"
+                                    f"Expected 'first_period' to be of type Period. "
+                                    f"Got {type(first_period).__name__} instead")
+                if not isinstance(last_period, Period):
+                    raise TypeError(f"Cannot update the variable '{name}'.\n"
+                                    f"Expected 'last_period' to be of type Period. "
+                                    f"Got {type(last_period).__name__} instead")
+                t_first = self._get_real_period_position(first_period)
+                t_last = self._get_real_period_position(last_period)
                 # values is a LEC expression
                 if isinstance(values, str):
-                    if isinstance(key, int):
-                        self.database_ptr.update(<int>(key), <string>values.encode(), <int>first_period, <int>last_period) 
-                    else:   
-                        self.database_ptr.update(<string>(key.encode()), <string>values.encode(), <int>first_period, <int>last_period)
+                    self.database_ptr.update(pos, <string>values.encode(), t_first, t_last) 
+                # set same value for all periods in the range
+                elif isinstance(values, float):
+                    for t in range(t_first, t_last + 1):   
+                        self.database_ptr.set_var(pos, t, <double>values, self.mode_)
+                # values is a list of floats
+                elif isinstance(values, list):
+                    nb_periods = t_last - t_first + 1
+                    if len(values) != nb_periods:
+                        raise ValueError(f"Cannot update the variable '{name}'.\n"
+                                         f"Expected a list of {nb_periods} values.\n"
+                                         f"Got {len(values)} values instead")
+                    for i, t in enumerate(range(t_first, t_last + 1)):   
+                        self.database_ptr.set_var(pos, t, <double>(values[i]), self.mode_)
+                # values is of type Variables
+                elif isinstance(values, Variables):
+                    sample: Sample = Sample(first_period, last_period)
+                    if values.sample != sample:
+                        raise ValueError(f"Cannot update the variable '{name}': Incompatible periods.\n"
+                                        f"Expected right-hand side Variables object to have sample {sample}.\n"
+                                        f"Got Variables object with sample {values.sample} instead.")
+                    self.__update_var(name, t_first, t_last, values)
                 else:
-                    values = self._convert_values(values, nb_periods)
-                    cpp_values = [<double>value for value in values]
-                    if isinstance(key, int):
-                        self.database_ptr.update(<int>(key), cpp_values, <int>first_period, <int>last_period)
-                    else:
-                        self.database_ptr.update(<string>(key.encode()), cpp_values, <int>first_period, <int>last_period)
+                    raise TypeError(f"Expected 'value' of type int, float, str or Variables.\n"
+                                    f"Got {type(values).__name__} instead")
             # update values for a list of periods
-            else:
-                if isinstance(key, int):
-                    raise TypeError("variables[key, periods] = lec where 'key' is an integer is not implemented.")
-                if isinstance(values, str):
-                    raise NotImplementedError(f"Case variables[key, periods] = lec where '{key_periods}' does not represents "
-                                              "a contiguous range of periods is not implemented")
+            elif isinstance(key_periods, list):                
+                # set the same value for all periods in the list
+                if isinstance(values, float):
+                    values = [values] * len(key_periods)
+                # values is a list of float containing a specific value for each period
+                elif isinstance(values, list):
+                    if len(values) != len(key_periods):
+                        raise ValueError(f"Cannot update the variable '{name}'.\n"
+                                         f"Expected a list of {len(key_periods)} values.\n"
+                                         f"Got {len(values)} values instead")
+                    
                 else:
-                    values = self._convert_values(values, len(key_periods))
-                    for period, value in zip(key_periods, values):
-                        self.database_ptr.set_var(<string>(key.encode()), <string>period.encode(), <double>value, self.mode_)
+                    raise TypeError(f"Cannot update the variable '{name}'.\n"
+                                    f"When updating values for non-contiguous periods, the right-hand side must be "
+                                    f"a float or a list of float.\nGot {type(values).__name__} instead")
+                for p, v in zip(key_periods, values):
+                    t = self._get_real_period_position(p)
+                    self.database_ptr.set_var(pos, t, <double>v, self.mode_)
+            else:
+                raise TypeError(f"Cannot update the variable '{name}'.\n"
+                                f"The periods selection must be specified as a single period, "
+                                f"a sample, or a list of periods.\n"
+                                f"Got periods selection of type {type(key_periods).__name__} instead")
 
     # overriden for Variables
     def __setitem__(self, key, value):
         r"""
         Update/add a (subset of) variable(s) referenced by `key` from/to the Variables database.
 
-        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
-        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        The `key` represents a selection on the Variables names and optionally on the periods.
+
+        The selection on names can be: 
         
-        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
-        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
-        tabulation `\t`, or a newline `\n`.
+            - a single Variable name (e.g. "ACAF") 
+            - a list of Variable names (e.g. "ACAF;ACAG;AOUC") 
+            - a pattern (e.g. "A*;*_").
+        
+        If the selection on names represents a list of names or of sub-patterns, each name or sub-pattern must be 
+        separated by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, 
+        or a tabulation `\t`, or a newline `\n`.
 
         A (sub-)`pattern` is a list of characters representing a group of object names. 
         It includes some special characters which have a special meaning:
@@ -622,20 +1028,28 @@ cdef class Variables(_AbstractDatabase):
             - `!` : any non-alphanumeric character or none at the beginning and end of a string 
             - `\` : escape the next character
 
-        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+        Note that the selection on names can contain references to IODE lists which are prefixed with the symbol `$`.
+
+        The selection on periods can be:
+
+           - the whole sample (e.g. None) 
+           - a single period (e.g. "1990Y1") 
+           - a range of periods (e.g. "1990Y1:2000Y1") 
+           - a list of periods (e.g. ["1990Y1", "1995Y1", "2000Y1"]) 
 
         Parameters
         ----------
-        key: str or list(str)
-            (the list of) name(s) of the variable(s) to update/add.
-            The list of variables to update/add can be specified by a pattern or by a list of sub-patterns 
-            (e.g. "A*;*_").
-        value: int, float, tuple(int, float), list(int, float), str or list of any of those
+        key: str or list(str) or tuple(str, str) or tuple(str, list(str)) or tuple(str, str:str)
+            The key is split into two parts: the selection on names and the selection on periods.
+            The selection on names can be a single name, a list of names, or a pattern.
+            The selection on periods (optional) can be a single period, a list of periods, or a range of periods.
+
+        value: str or int or float or dict(str, int or float) or Variables
+            If str, the value is interpreted as a LEC expression and is evaluated for each period.
             If int, the value is first converted to a float and then used for all periods.
             If float, the value is used for all periods.
-            If tuple or list, the number of elements must be equal to the number of periods. 
-            Each element is then used for the corresponding period.
-            If str, the value is interpreted as a LEC expression and is evaluated for each period.
+            If dict, the keys represents the periods to be modified.
+            If Variables, names and periods must match.
 
         Examples
         --------
@@ -649,105 +1063,378 @@ cdef class Variables(_AbstractDatabase):
         >>> # a) -------- add one variable --------
         >>> # 1) same value for all periods
         >>> variables["A0"] = NA
-        >>> variables["A0"]                     # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
+        >>> variables["A0"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A0              na      na  ...      na       na
+        <BLANKLINE>
         >>> # or equivalently
         >>> variables["A0"] = np.nan
-        >>> variables["A0"]                     # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
-        >>> # 2) vector (list) containing a specific value for each period
-        >>> variables["A1"] = list(range(variables.nb_periods))
-        >>> variables["A1"]                     # doctest: +ELLIPSIS 
-        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
-        >>> # 3) LEC expression
+        >>> variables["A0"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A0              na      na  ...      na       na
+        <BLANKLINE>
+        >>> # 2) LEC expression
         >>> variables["A2"] = "t + 10"
-        >>> variables["A2"]                     # doctest: +ELLIPSIS 
-        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+        >>> variables["A2"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A2           10.00   11.00  ...   64.00    65.00
+        <BLANKLINE>
+        >>> # 3) list of values for each period
+        >>> values = list(range(variables.nb_periods))
+        >>> variables["A1"] = values
+        >>> variables["A1"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        A1            0.00    1.00    2.00  ...   53.00   54.00   55.00
+        <BLANKLINE>
+        >>> # 4) Variables object
+        >>> variables["A3"] = variables["ACAF"]
+        >>> variables["A3"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        A3              na      na      na  ...  -68.89  -83.34  -96.41
+        <BLANKLINE> 
 
         >>> # b) -------- update one variable --------
-        >>> # 1) update all values of a Variable
-        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
-        >>> # 1.I) same value for all periods
-        >>> variables["ACAF"] = NA
-        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
-        >>> # or equivalently
-        >>> variables["ACAF"] = np.nan
-        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
-        >>> # 1.II) vector (list) containing a specific value for each period
-        >>> variables["ACAF"] = list(range(variables.nb_periods))
-        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
-        >>> # 1.III) LEC expression
-        >>> variables["ACAF"] = "t + 10"
-        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
-
-        >>> # 2) set one value of a Variable for a specific period
+        >>> # 1) set one value of a variable for a specific period
         >>> variables["ACAG", "1990Y1"]
         -28.1721855713507
         >>> variables["ACAG", "1990Y1"] = -28.2
         >>> variables["ACAG", "1990Y1"]
         -28.2
 
-        >>> # 3) set the variable values for range of periods 
-        >>> # 3.I) using a Python slice
-        >>> # 3.I.a) variable(periods) = same value for all periods
-        >>> variables["ACAF", "1991Y1":"1995Y1"] = 0.0
-        >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, 0.0, 0.0, 0.0, 0.0]
-        >>> # 3.I.b) variable(periods) = vector (list) containing a specific value for each period
-        >>> variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
-        >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, 1.0, 2.0, 3.0, 4.0]
-        >>> # 3.I.c) variable(periods) = LEC expression
-        >>> variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
-        >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [41.0, 42.0, 43.0, 44.0, 45.0]
-
-        >>> # 3.II) same as above but with the colon ':' inside the periods range string
-        >>> # 3.II.a) variable(periods) = same value for all periods
-        >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
-        >>> variables["ACAF", "1991Y1:1995Y1"]
-        [0.0, 0.0, 0.0, 0.0, 0.0]
-        >>> # 3.II.b) variable(periods) = vector (list) containing a specific value for each period
-        >>> variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
-        >>> variables["ACAF", "1991Y1":"1995Y1"]
-        [0.0, -1.0, -2.0, -3.0, -4.0]
-        >>> # 3.II.c) variable(periods) = LEC expression
-        >>> variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
-        >>> variables["ACAF", "1991Y1:1995Y1"]
-        [21.0, 22.0, 23.0, 24.0, 25.0]
-
-        >>> # c) -------- working on a subset --------
-        >>> # 1) get subset
-        >>> variables_subset = variables["A*"]
-        >>> variables_subset.names
-        ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
-        >>> # 2) add a variable to the subset
-        >>> variables_subset["A3"] = NA
-        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
+        >>> # 2) update all values of a variable
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF            na      na  ...  -83.34   -96.41
+        <BLANKLINE>
+        >>> # 2.1) same value for all periods
+        >>> variables["ACAF"] = NA
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF            na      na  ...      na       na
+        <BLANKLINE>
         >>> # or equivalently
-        >>> variables_subset["A3"] = np.nan
-        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
+        >>> variables["ACAF"] = np.nan
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF            na      na  ...      na       na
+        <BLANKLINE>
+        >>> # 2.2) LEC expression
+        >>> variables["ACAF"] = "t + 10"
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF         10.00   11.00  ...   64.00    65.00
+        <BLANKLINE>
+        >>> # 2.3) list of values for each period
+        >>> values = list(range(variables.nb_periods))
+        >>> variables["ACAF"] = values
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF          0.00    1.00    2.00  ...   53.00   54.00   55.00
+        <BLANKLINE>
+        >>> # 2.4) Variables object
+        >>> variables["ACAG"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAG            na      na      na  ...   31.37   32.42   33.47
+        <BLANKLINE>
+        >>> variables["ACAF"] = variables["ACAG"]
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF            na      na      na  ...   31.37   32.42   33.47
+        <BLANKLINE>
+
+        >>> # 3) set the values for range of periods 
+        >>> # 3.1) variable(periods) = same value for all periods
+        >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
+        >>> variables["ACAF", "1991Y1:1995Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE        
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          0.00    0.00    0.00    0.00    0.00
+        <BLANKLINE>
+        >>> # 3.2) variable(periods) = LEC expression
+        >>> variables["ACAF", "1991Y1:1995Y1"] = "t + 10"
+        >>> variables["ACAF", "1991Y1:1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         41.00   42.00   43.00   44.00   45.00
+        <BLANKLINE>
+        >>> # 3.3) variable(periods) = list of values for each period
+        >>> values = [1.0, 2.0, 3.0, 4.0, 5.0]
+        >>> variables["ACAF", "1991Y1:1995Y1"] = values
+        >>> variables["ACAF", "1991Y1:1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          1.00    2.00    3.00    4.00    5.00
+        <BLANKLINE>
+        >>> # 3.4) variable(periods) = Variables object
+        >>> variables["ACAG", "1991Y1:1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        <BLANKLINE>
+        >>> variables["ACAF", "1991Y1:1995Y1"] = variables["ACAG", "1991Y1:1995Y1"]
+        >>> variables["ACAF", "1991Y1:1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF        -30.93  -40.29  -43.16  -16.03  -41.85
+        <BLANKLINE>
+        
+        >>> # 4) set the values for a list of non-contiguous periods
+        >>> values = [1.0, 3.0, 5.0]
+        >>> variables["ACAF", ["1991Y1", "1993Y1", "1995Y1"]] = values
+        >>> variables["ACAF", ["1991Y1", "1993Y1", "1995Y1"]]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1991Y1    1.0
+        1993Y1    3.0
+        1995Y1    5.0
+        Name: ACAF, dtype: float64
+
+        >>> # c) -------- working on a subset (whole sample) --------
+        >>> # 1) get subset
+        >>> vars_subset = variables["A*"]
+        >>> vars_subset.names
+        ['A0', 'A1', 'A2', 'A3', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # 2) add a variable to the subset
+        >>> vars_subset["A4"] = NA
+        >>> vars_subset["A4"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A4              na      na  ...      na       na
+        <BLANKLINE>
+        >>> # or equivalently
+        >>> vars_subset["A4"] = np.nan
+        >>> vars_subset["A4"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A4              na      na  ...      na       na
+        <BLANKLINE>
         >>> # --> new variable also appears in the global workspace
-        >>> "A3" in variables
+        >>> "A4" in variables
         True
-        >>> variables["A3"]                     # doctest: +ELLIPSIS 
-        [nan, nan, ..., nan, nan]
+        >>> variables["A4"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A4              na      na  ...      na       na
+        <BLANKLINE>
         >>> # 3) update a variable in the subset
-        >>> variables_subset["A3"] = 0.0
-        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
-        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> vars_subset["A4"] = 0.0
+        >>> vars_subset["A4"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A4            0.00    0.00  ...    0.00     0.00
+        <BLANKLINE>
         >>> # --> variable is also updated in the global workspace
-        >>> variables["A3"]                     # doctest: +ELLIPSIS 
-        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> variables["A4"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        A4            0.00    0.00  ...    0.00     0.00
+        <BLANKLINE>
+        >>> # 4) delete a variable in the subset
+        >>> del vars_subset["A4"]
+        >>> "A4" in vars_subset
+        False
+        >>> # --> variable is also deleted in the global workspace
+        >>> "A4" in variables
+        False
+
+        >>> # d) -------- working on a subset (names + periods) --------
+        >>> # 1) get subset
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['A0', 'A1', 'A2', 'A3', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 9
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        A0              na      na      na      na      na
+        A1           31.00   32.00   33.00   34.00   35.00
+        A2           41.00   42.00   43.00   44.00   45.00
+        A3           26.24   30.16   34.66    8.16  -13.13
+        ACAF          1.00  -40.29    3.00  -16.03    5.00
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+        >>> # 2) add a new variable in the subset -> Forbidden !
+        >>> vars_subset["A4"] = 0.0          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+           ...
+        RuntimeError: Cannot add IODE variable with name 'A4' when the subset does not cover the whole sample of the IODE Variables workspace.
+        >>> # 3) update a variable in the subset
+        >>> vars_subset["A0"] = 1.0
+        >>> vars_subset["A0"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        A0            1.00    1.00    1.00    1.00    1.00
+        <BLANKLINE>
+        >>> # --> variable is also updated in the global workspace
+        >>> variables["A0", "1991Y1"]
+        1.0
+        >>> variables["A0", "1995Y1"]
+        1.0
+        >>> # 4) delete a variable in the subset -> Forbidden !
+        >>> del vars_subset["A0"]           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+          ...
+        RuntimeError: Cannot delete variable(s) 'A0' when the subset does not cover the whole sample of the IODE Variables workspace
         """
         names, key_periods = self._unfold_key(key)
+
         # update/add a single Variable
         if len(names) == 1:
             self._set_variable(names[0], value, key_periods)
@@ -801,20 +1488,44 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.get_names("B*")
         ['BRUGP', 'BVY']
 
-        >>> # delete one variable from a subset of the global database
-        >>> variables_subset = variables["D*"]
-        >>> variables_subset.names
+        >>> # delete one variable from a subset of the global workspace
+        >>> vars_subset = variables["D*"]
+        >>> vars_subset.names
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
-        >>> del variables_subset["DPUGO"]
-        >>> variables_subset.names
+        >>> del vars_subset["DPUGO"]
+        >>> vars_subset.names
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
-        >>> # NOTE: the variable has also been deleted from the global database
+        >>> # NOTE: the variable has also been deleted from the global workspace
         >>> "DPUGO" in variables
         False
         >>> variables.get_names("D*")
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> # WARNING: when deleting (one) variable(s), the period(s) cannot be specified
+        >>> del variables["DPUG", "1990Y1:1995Y1"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+            ...
+        RuntimeError: Cannot delete variable(s) 'DPUG'.
+        The syntax 'del variables['DPUG']' must be used instead of 'del variables['DPUG', <periods>]'
+        
+        >>> # subset over names and periods
+        >>> vars_subset = variables["D*", "1990Y1:1995Y1"]
+        >>> vars_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> del vars_subset["DPUG"]                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+            ...
+        RuntimeError: Cannot delete variable(s) 'DPUG' when the subset does not cover the whole sample of the IODE Variables workspace
         """
         names, key_periods = self._unfold_key(key)
+        if key_periods is not None:
+            names = f"'{names[0]}'" if len(names) == 1 else names
+            raise RuntimeError(f"Cannot delete variable(s) {names}.\nThe syntax 'del variables[{names}]' "
+                               f"must be used instead of 'del variables[{names}, <periods>]'")
+        if self.first_period_subset is not None or self.last_period_subset is not None:
+            names = f"'{names[0]}'" if len(names) == 1 else names
+            raise RuntimeError(f"Cannot delete variable(s) {names} when the subset does not cover the "
+                               f"whole sample of the IODE Variables workspace")
+
         # names represents a single Variable
         if len(names) == 1:
             self.database_ptr.remove(names[0].encode())
@@ -824,6 +1535,42 @@ cdef class Variables(_AbstractDatabase):
                 self.database_ptr.remove(name.encode())
         else:
             raise RuntimeError(f"Cannot select period(s) when deleting (a) variable(s)")
+
+    # self + other
+    def __add__(self, other):
+        return NotImplementedError()
+
+    # other + self
+    def __radd__(self, other):
+        return NotImplementedError()
+
+    # self - other
+    def __sub__(self, other):
+        return NotImplementedError()
+
+    # other - self
+    def __rsub__(self, other):
+        return NotImplementedError()
+
+    # self * other
+    def __mul__(self, other):
+        return NotImplementedError()
+    
+    # other * self
+    def __rmul__(self, other):
+        return NotImplementedError()
+
+    # self / other
+    def __truediv__(self, other):
+        return NotImplementedError()
+
+    # other / self
+    def __rtruediv__(self, other):
+        return NotImplementedError()
+
+    # self ** other
+    def __pow__(self, other):
+        return NotImplementedError()
 
     def from_frame(self, df: DataFrame):
         """
@@ -888,13 +1635,35 @@ cdef class Variables(_AbstractDatabase):
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
         Sample("1960Y1:1970Y1")
-        >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-        >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        >>> variables["VLA_00"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
+        VLA_00        0.00    1.00    2.00  ...    8.00    9.00   10.00
+        <BLANKLINE>
+        >>> variables["BXL_02"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
+        BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
+        <BLANKLINE>
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_frame' method on a subset of a workspace")
+
+        if self.first_period_subset is not None or self.last_period_subset is not None:
+            raise RuntimeError("Cannot call 'from_frame' method on a subset of a workspace")
 
         # list of variable names
         vars_names = df.index.to_list()
@@ -961,8 +1730,17 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKFO', 'ZX', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -971,8 +1749,17 @@ cdef class Variables(_AbstractDatabase):
         2014Y1    1.423714
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
-        >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ... 1.0159901, 1.0159901]
+        >>> variables["ZKFO"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZKFO          1.00    1.00  ...    1.02     1.02
+        <BLANKLINE>
         >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    1.00000
@@ -990,8 +1777,17 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -1000,8 +1796,17 @@ cdef class Variables(_AbstractDatabase):
         2014Y1    1.423714
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
-        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZZF_          0.69    0.69  ...    0.69     0.69
+        <BLANKLINE>
         >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    0.6884
@@ -1083,13 +1888,35 @@ cdef class Variables(_AbstractDatabase):
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
         Sample("1960Y1:1970Y1")
-        >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-        >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        >>> variables["VLA_00"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
+        VLA_00        0.00    1.00    2.00  ...    8.00    9.00   10.00
+        <BLANKLINE>
+        >>> variables["BXL_02"]         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
+        BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
+        <BLANKLINE>
         """
         if la is None:
             raise RuntimeError("larray library not found")
+
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'from_array' method on a subset of a workspace")
+
+        if self.first_period_subset is not None or self.last_period_subset is not None:
+            raise RuntimeError("Cannot call 'from_array' method on a subset of a workspace")
 
         # retrieve the time_axis_name. 
         # Raise an error if no time_axis_name present in array.
@@ -1153,13 +1980,31 @@ cdef class Variables(_AbstractDatabase):
         394 x 56
          names [394]: 'ACAF' 'ACAG' 'AOUC' ... 'ZKFO' 'ZX' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> array["AOUC"]
         time  1960Y1  ...              2014Y1              2015Y1
                  nan  ...  1.4237139558484628  1.4608626117037322
-        >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ..., 1.0159901, 1.0159901]
+        >>> variables["ZKFO"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZKFO          1.00    1.00  ...    1.02     1.02
+        <BLANKLINE>
         >>> array["ZKFO"]
         time  1960Y1  1961Y1  1962Y1  ...     2012Y1     2013Y1     2014Y1     2015Y1
                  1.0     1.0     1.0  ...  1.0159901  1.0159901  1.0159901  1.0159901
@@ -1172,13 +2017,31 @@ cdef class Variables(_AbstractDatabase):
         33 x 56
          names [33]: 'ACAF' 'ACAG' 'AOUC' ... 'WNF_' 'YDH_' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> array["AOUC"]
         time  1960Y1  ...              2014Y1              2015Y1
                  nan  ...  1.4237139558484628  1.4608626117037322
-        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZZF_          0.69    0.69  ...    0.69     0.69
+        <BLANKLINE>
         >>> array["ZZF_"]
         time      1960Y1      1961Y1  ...      2013Y1      2014Y1      2015Y1
               0.68840039  0.68840039  ...  0.68840039  0.68840039  0.68840039
@@ -1239,6 +2102,30 @@ cdef class Variables(_AbstractDatabase):
         self.mode_ = <IodeVarMode>value
 
     @property
+    def first_period(self) -> Period:
+        """
+        First period of the current Variables database.
+        """
+        cdef CSample* c_sample
+        if self.first_period_subset is not None:
+            return self.first_period_subset 
+        else:
+            whole_db_sample: Sample = self._get_whole_sample()
+            return whole_db_sample.start
+    
+    @property
+    def last_period(self) -> Period:
+        """
+        Last period of the current Variables database.
+        """
+        cdef CSample* c_sample
+        if self.last_period_subset is not None:
+            return self.last_period_subset 
+        else:
+            whole_db_sample: Sample = self._get_whole_sample()
+            return whole_db_sample.end
+
+    @property
     def sample(self) -> Sample:
         """
         Current (or new) sample of the IODE Variables database.
@@ -1270,7 +2157,16 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         Sample("1960Y1:2015Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [nan, nan, ..., -83.34062511080091, -96.41041982848331]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ACAF            na      na  ...  -83.34   -96.41
+        <BLANKLINE>
 
         >>> # -- update sample by passing a string
         >>> # case 1: new sample is shorter than the current sample
@@ -1279,27 +2175,63 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         Sample("1970Y1:2010Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1970Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1970Y1  1971Y1  ...  2009Y1   2010Y1
+        ACAF          1.21    5.20  ...  -37.46   -37.83
+        <BLANKLINE>
         >>> # case 2: new sample is longer than the current sample
         >>> #         the value NA (not available) is set for the added periods
         >>> variables.sample = '1968Y1:2012Y1'
         >>> variables.sample
         Sample("1968Y1:2012Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439, nan, nan]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1968Y1:2012Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1968Y1  1969Y1  1970Y1  ...  2010Y1 2011Y1   2012Y1
+        ACAF            na      na    1.21  ...  -37.83     na       na
+        <BLANKLINE>
         
         >>> # -- start period is optional -> the start period is kept as it is
         >>> variables.sample = ':2010Y1'
         >>> variables.sample
         Sample("1968Y1:2010Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1968Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1968Y1  1969Y1  1970Y1  ...  2009Y1   2010Y1
+        ACAF            na      na    1.21  ...  -37.46   -37.83
+        <BLANKLINE>
         >>> # -- end period is optional -> the end period is kept as it is
         >>> variables.sample = '1970Y1:'
         >>> variables.sample
         Sample("1970Y1:2010Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1970Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1970Y1  1971Y1  ...  2009Y1   2010Y1
+        ACAF          1.21    5.20  ...  -37.46   -37.83
+        <BLANKLINE>
 
         >>> # update sample by passing a start period and 
         >>> # an end period separated by a comma
@@ -1307,13 +2239,40 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         Sample("1968Y1:2012Y1")
         >>> variables['ACAF']                                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        [nan, nan, 1.2130001, 5.2020001, ..., -37.46350964127375, -37.82742883229439, nan, nan]
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1968Y1:2012Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1968Y1  1969Y1  1970Y1  ...  2010Y1 2011Y1   2012Y1
+        ACAF            na      na    1.21  ...  -37.83     na       na
+        <BLANKLINE>
         """
-        cdef CSample* c_sample = self.database_ptr.get_sample()
-        return Sample._from_ptr(c_sample, <bint>False)
+        whole_db_sample: Sample = self._get_whole_sample()
+        if self.first_period_subset is None and self.last_period_subset is None:
+            return whole_db_sample
+
+        self._maybe_update_subset_sample()
+
+        if self.first_period_subset is not None:
+            first_period = self.first_period_subset
+        else: 
+            first_period = whole_db_sample.first_period
+
+        if self.last_period_subset is not None:
+            last_period = self.last_period_subset
+        else:
+            last_period = whole_db_sample.last_period
+        
+        return Sample(first_period, last_period)
 
     @sample.setter    
     def sample(self, value: Union[str, Tuple[Union[str, Period], Union[str, Period]]]):
+        if self.first_period_subset is not None or self.last_period_subset is not None:
+            raise RuntimeError("Changing the sample on a subset of the Variables workspace is not allowed.") 
+
         if isinstance(value, str):
             if ':' not in value:
                 raise ValueError("sample: Missing colon ':' in the definition of the new sample. "
@@ -1329,7 +2288,10 @@ cdef class Variables(_AbstractDatabase):
             if isinstance(to_period, Period):
                 to_period = str(to_period)
         
-        self.database_ptr.set_sample(from_period.encode(), to_period.encode())
+        if self.is_detached:
+            self.database_ptr.set_sample(from_period.encode(), to_period.encode())
+        else:
+            cpp_global_variables.set_sample(from_period.encode(), to_period.encode())
 
     @property
     def nb_periods(self) -> int:
@@ -1352,7 +2314,8 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.nb_periods
         56
         """
-        return self.database_ptr.get_nb_periods()
+        # self.sample calls self._maybe_update_subset_sample()
+        return self.sample.nb_periods
         
     @property
     def periods(self) -> List[str]:
@@ -1375,7 +2338,8 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.periods       # doctest: +ELLIPSIS 
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         """
-        return [cpp_period.decode() for cpp_period in self.database_ptr.get_list_periods(bytes(), bytes())]
+        # self.sample calls self._maybe_update_subset_sample()
+        return self.sample.get_period_list()
 
     @property
     def periods_as_float(self) -> List[float]:
@@ -1398,7 +2362,8 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.periods_as_float          # doctest: +ELLIPSIS 
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
-        return self.database_ptr.get_list_periods_as_float(bytes(), bytes())
+        # self.sample calls self._maybe_update_subset_sample()
+        return self.sample.get_period_list(astype=float)
 
     @property
     def threshold(self) -> float:
@@ -1487,8 +2452,17 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKFO', 'ZX', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -1497,8 +2471,17 @@ cdef class Variables(_AbstractDatabase):
         2014Y1    1.423714
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
-        >>> variables["ZKFO"]               # doctest: +ELLIPSIS
-        [1.0, 1.0, ... 1.0159901, 1.0159901]
+        >>> variables["ZKFO"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZKFO          1.00    1.00  ...    1.02     1.02
+        <BLANKLINE>
         >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    1.00000
@@ -1516,8 +2499,17 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS
-        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        AOUC            na    0.25  ...    1.42     1.46
+        <BLANKLINE>
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1         NaN
@@ -1526,8 +2518,17 @@ cdef class Variables(_AbstractDatabase):
         2014Y1    1.423714
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
-        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
-        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
+        ZZF_          0.69    0.69  ...    0.69     0.69
+        <BLANKLINE>
         >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
         1960Y1    0.6884
@@ -1574,8 +2575,10 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS
         [1990.0, 1991.0, ..., 1999.0, 2000.0]
         """
+        # self.sample calls self._maybe_update_subset_sample()
+        sample = self.sample
+
         if from_period is None or to_period is None:
-            sample = self.sample
             if from_period is None:
                 from_period = sample.start
             if to_period is None:
@@ -1609,6 +2612,9 @@ cdef class Variables(_AbstractDatabase):
             list of variables to copy from the input file(s).
             Defaults to load all variables from the input file(s). 
         """
+        if not (self.is_global_workspace or self.is_detached):
+            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
+        
         input_files, names = self._copy_from(input_files, names)
 
         if from_period is None or to_period is None:
@@ -1689,54 +2695,150 @@ cdef class Variables(_AbstractDatabase):
         
         >>> # "stock" -> the result is a linear interpolation of the 2 surrounding source values.
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-72.50614701966526, -76.11763971671049, -79.7291324137557, -83.34062511080091]
-        >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [31.63267881532112, 31.895218819946884, 32.15775882457264, 32.4202988291984]
+        >>> variables["ACAF", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAF        -72.51  -76.12  -79.73  -83.34
+        <BLANKLINE>
+        >>> variables["ACAG", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAG         31.63   31.90   32.16   32.42
+        <BLANKLINE>
 
         Linear interpolation / flow
         
         >>> # "flow" -> the result is the source value divided by the nb of sub-periods. 
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
-        >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
+        >>> variables["ACAF", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAF        -20.84  -20.84  -20.84  -20.84
+        <BLANKLINE>
+        >>> variables["ACAG", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAG          8.11    8.11    8.11    8.11
+        <BLANKLINE>
 
         Cubic splines / stock
         
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2012Q1":"2012Q4"]
-        [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
-        >>> variables["ACAG", "2012Q1":"2012Q4"]
-        [29.544440560604077, 29.804280757173238, 30.064120953742403, 30.323961150311572]
+        >>> variables["ACAF", "2012Q1":"2012Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2012Q1:2012Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2012Q1  2012Q2  2012Q3  2012Q4
+        ACAF        -47.30  -50.05  -52.81  -55.56
+        <BLANKLINE>
+        >>> variables["ACAG", "2012Q1":"2012Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2012Q1:2012Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2012Q1  2012Q2  2012Q3  2012Q4
+        ACAG         29.54   29.80   30.06   30.32
+        <BLANKLINE>
 
         Cubic splines / flow
         
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2012Q1":"2012Q4"]
-        [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
-        >>> variables["ACAG", "2012Q1":"2012Q4"]
-        [7.483230672890683, 7.548190722032976, 7.6135768258069625, 7.678962929580949]
+        >>> variables["ACAF", "2012Q1":"2012Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2012Q1:2012Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2012Q1  2012Q2  2012Q3  2012Q4
+        ACAF        -12.75  -13.44  -14.27  -15.10
+        <BLANKLINE>
+        >>> variables["ACAG", "2012Q1":"2012Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2012Q1:2012Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2012Q1  2012Q2  2012Q3  2012Q4
+        ACAG          7.48    7.55    7.61    7.68
+        <BLANKLINE>
 
         Step / stock
         
         >>> # "stock" -> the result has the same value as the source
         >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-83.34062511080091, -83.34062511080091, -83.34062511080091, -83.34062511080091]
-        >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [32.4202988291984, 32.4202988291984, 32.4202988291984, 32.4202988291984]
+        >>> variables["ACAF", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAF        -83.34  -83.34  -83.34  -83.34
+        <BLANKLINE>
+        >>> variables["ACAG", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAG         32.42   32.42   32.42   32.42
+        <BLANKLINE>
 
         Step / flow
         
         >>> # "flow" -> the result is the source value plus a portion of 
         >>> # the difference between the 2 surrounding values in the source
         >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2014Q1":"2014Q4"]
-        [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
-        >>> variables["ACAG", "2014Q1":"2014Q4"]
-        [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
+        >>> variables["ACAF", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAF        -20.84  -20.84  -20.84  -20.84
+        <BLANKLINE>
+        >>> variables["ACAG", "2014Q1":"2014Q4"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2014Q1:2014Q4
+        mode: LEVEL
+        <BLANKLINE>
+        name        2014Q1  2014Q2  2014Q3  2014Q4
+        ACAG          8.11    8.11    8.11    8.11
+        <BLANKLINE>
         """
         if isinstance(filepath, str):
             filepath = Path(filepath)
@@ -1817,26 +2919,74 @@ cdef class Variables(_AbstractDatabase):
         Last Obs in year
         
         >>> variables.high_to_low(HighToLowType.LAST, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
-        >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
+        >>> variables["ACAF", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAF        -37.83  -44.54  -55.56  -68.89  -83.34
+        <BLANKLINE>
+        >>> variables["ACAG", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAG          7.06    7.32    7.58    7.84    8.11
+        <BLANKLINE>
 
         Mean of year
         
         >>> variables.high_to_low(HighToLowType.MEAN, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
-        >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
+        >>> variables["ACAF", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAF        -37.83  -44.54  -55.56  -68.89  -83.34
+        <BLANKLINE>
+        >>> variables["ACAG", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAG          7.06    7.32    7.58    7.84    8.11
+        <BLANKLINE>
 
         Sum
         
         >>> variables.high_to_low(HighToLowType.SUM, filepath, ["ACAF", "ACAG"])
-        >>> variables["ACAF", "2010Y1":"2014Y1"]
-        [-151.30971532917755, -178.1791705341729, -222.23715926887493, -275.5786172904802, -333.36250044320366]
-        >>> variables["ACAG", "2010Y1":"2014Y1"]
-        [28.253928978210485, 29.284600364034908, 30.323961150311572, 31.370138810695362, 32.4202988291984]
+        >>> variables["ACAF", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name         2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAF        -151.31 -178.18 -222.24 -275.58 -333.36
+        <BLANKLINE>
+        >>> variables["ACAG", "2010Y1":"2014Y1"]    # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2010Y1:2014Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2010Y1  2011Y1  2012Y1  2013Y1  2014Y1
+        ACAG         28.25   29.28   30.32   31.37   32.42
+        <BLANKLINE>
         """
         if isinstance(filepath, str):
             filepath = Path(filepath)
@@ -1913,50 +3063,114 @@ cdef class Variables(_AbstractDatabase):
         ...     variables["ACAF", ["2005Y1", "2007Y1"]] = NA
         >>> # create ACAF
         >>> reset_ACAF()
-        >>> variables["ACAF", :"2010Y1"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, nan, 6.0, nan, 8.0, 9.0, 10.0]
+        >>> variables["ACAF", :"2010Y1"]                # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF          0.00    1.00    2.00    3.00    4.00      na    6.00      na    8.00    9.00   10.00
+        <BLANKLINE>
 
         >>> # "TM1" (Y := Y[-1], if Y null or NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    4.00    6.00    6.00    8.00    9.00
+        <BLANKLINE>
 
         >>> # "TM1_A" (Y := Y[-1], always)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1_A, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    4.00    4.00    4.00    4.00    4.00
+        <BLANKLINE>
 
         >>> # "EXTRA" (Y := extrapolation, if Y null or NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    5.00    6.00    7.00    8.00    9.00
+        <BLANKLINE>
 
         >>> # "EXTRA_A" (Y := extrapolation, always)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA_A, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    5.00    6.00    7.00    8.00    9.00
+        <BLANKLINE>
 
         >>> # "ASIS" (Y unchanged)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.ASIS, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, nan, 6.0, nan, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00      na    6.00      na    8.00    9.00
+        <BLANKLINE>
 
         >>> # "TM1_NA" (Y := Y[-1], if Y = NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.TM1_NA, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    4.00    6.00    6.00    8.00    9.00
+        <BLANKLINE>
 
         >>> # "EXTRA_NA" (Y := extrapolation, if Y = NA)
         >>> reset_ACAF()
         >>> variables.extrapolate(SimulationInitialization.EXTRA_NA, "2005Y1", "2010Y1")
-        >>> variables["ACAF", "2003Y1":"2009Y1"]
-        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+        >>> variables["ACAF", "2003Y1":"2009Y1"]        # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ws
+        sample: 2003Y1:2009Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1
+        ACAF          3.00    4.00    5.00    6.00    7.00    8.00    9.00
+        <BLANKLINE>
         """
         if isinstance(method, str):
             method = method.upper()
@@ -2577,9 +3791,13 @@ cdef class Variables(_AbstractDatabase):
         return s
 
     def _str_table(self, names: List[str]) -> str:
+        cdef t
         columns = {"name": names}
-        for t, period in enumerate(self.periods):
-            columns[period] = [self.database_ptr.get_var(<string>(name.encode()), <int>t, self.mode_) for name in names]
+        names_pos: List[int] = [self.get_position(name) for name in names] 
+        for str_period in self.periods:
+            period = Period(str_period)
+            t = self._get_real_period_position(period)
+            columns[str_period] = [self.database_ptr.get_var(<int>pos, t, self.mode_) for pos in names_pos]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
     def __hash__(self) -> int:
@@ -2605,7 +3823,7 @@ cdef class Variables(_AbstractDatabase):
         True
 
         >>> # modify one variable
-        >>> original_variable = variables["ACAF"]
+        >>> original_variable = variables["ACAF"].copy()
         >>> variables["ACAF"] = 0.0
         >>> original_hash == hash(variables)
         False
@@ -2614,7 +3832,7 @@ cdef class Variables(_AbstractDatabase):
         True
 
         >>> # delete a variable
-        >>> original_variable = variables["ACAF"]
+        >>> original_variable = variables["ACAF"].copy()
         >>> del variables["ACAF"]
         >>> original_hash == hash(variables)
         False

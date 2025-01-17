@@ -99,6 +99,12 @@ cdef extern from "cpp_api/KDB/kdb_reference.h":
 cdef extern from "cpp_api/compute/simulation.h":
     void eqs_estimate(const string& eqs, const string& from_period, const string& to_period) except +
 
+cdef extern from "pyiode/iode_database/variables_database.cpp":
+    void _c_add_var_from_other(const string& name, KDBVariables* dest, KDBVariables* source, 
+                               const int source_t_first, const int source_t_last) except +
+    void _c_copy_var_content(const string& name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
+                             KDBVariables* source, const int source_t_first, const int source_t_last) except +
+
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
         # Public methods
@@ -297,26 +303,13 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         int add(string& name, vector[double]& values) except +
         int add(string& name, string& lec) except +
         void update(int pos, vector[double]& values) except +
-        void update(int pos, vector[double]& values, string& first_period, string& last_period) except +
         void update(int pos, vector[double]& values, int t_first, int t_last) except +
         void update(int pos, string& lec) except +
-        void update(int pos, string& lec, string& first_period, string& last_period) except +
         void update(int pos, string& lec, int t_first, int t_last) except +
-        void update(string& name, vector[double]& values) except +
-        void update(string& name, vector[double]& values, string& first_period, string& last_period) except +
-        void update(string& name, vector[double]& values, int t_first, int t_last) except +
-        void update(string& name, string& lec) except +
-        void update(string& name, string& lec, string& first_period, string& last_period) except +
-        void update(string& name, string& lec, int t_first, int t_last) except +
 
+        double* get_var_ptr(int pos) except +
         double get_var(int pos, int t, IodeVarMode mode) except +
-        double get_var(string& name, int t, IodeVarMode mode) except +
-        double get_var(string& name, string& period, IodeVarMode mode) except +
-        double* get_var_ptr(string& name) except +
-
         void set_var(int pos, int t, double value, IodeVarMode mode) except +
-        void set_var(string& name, int t, double value, IodeVarMode mode) except +
-        void set_var(string& name, string& period, double value, IodeVarMode mode) except +
 
         CSample* get_sample()
         void set_sample(string& from_period, string& to_period) except +

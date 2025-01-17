@@ -132,6 +132,92 @@ def test_computed_table_NA_values():
 # Variables
 # ---------
 
+def test_variables_setitem():
+    iode.variables.clear()
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # ==== set the variable values for range of periods using a Python slice ====
+    
+    # a) variable(periods) = same value for all periods
+    variables["ACAF", "1991Y1":"1995Y1"] = 0.0
+    variables["ACAF", "1991Y1":"1995Y1"]       
+    assert variables["ACAF", "1991Y1"] == 0.0
+    assert variables["ACAF", "1992Y1"] == 0.0
+    assert variables["ACAF", "1993Y1"] == 0.0
+    assert variables["ACAF", "1994Y1"] == 0.0
+    assert variables["ACAF", "1995Y1"] == 0.0
+
+    # b) variable(periods) = LEC expression
+    variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
+    variables["ACAF", "1991Y1":"1995Y1"]
+    assert variables["ACAF", "1991Y1"] == 41.0
+    assert variables["ACAF", "1992Y1"] == 42.0
+    assert variables["ACAF", "1993Y1"] == 43.0
+    assert variables["ACAF", "1994Y1"] == 44.0
+    assert variables["ACAF", "1995Y1"] == 45.0
+
+    # c) variable(periods) = Variables object
+    variables["ACAF", "1991Y1":"1995Y1"] = variables["ACAG", "1991Y1":"1995Y1"]
+    variables["ACAF", "1991Y1":"1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    assert variables["ACAF", "1991Y1"] == variables["ACAG", "1991Y1"]
+    assert variables["ACAF", "1992Y1"] == variables["ACAG", "1992Y1"]
+    assert variables["ACAF", "1993Y1"] == variables["ACAG", "1993Y1"]
+    assert variables["ACAF", "1994Y1"] == variables["ACAG", "1994Y1"]
+    assert variables["ACAF", "1995Y1"] == variables["ACAG", "1995Y1"]
+
+    # ==== make subset of a subset and test if modifications propagate ====
+    iode.variables.clear()
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # a) create subset of a subset
+    copy_ACAG = variables["ACAG"].copy()
+    vars_subset = variables["A*;*_", "1990Y1:2010Y1"]
+    assert str(vars_subset.sample) == "1990Y1:2010Y1"
+    assert vars_subset["ACAG", "1990Y1"] == copy_ACAG["ACAG", "1990Y1"]
+    assert vars_subset["ACAG", "2000Y1"] == copy_ACAG["ACAG", "2000Y1"]
+    assert vars_subset["ACAG", "2010Y1"] == copy_ACAG["ACAG", "2010Y1"]
+    vars_subset_subset = vars_subset["A*", "2000Y1:"]
+    assert str(vars_subset_subset.sample) == "2000Y1:2010Y1"
+    assert vars_subset_subset["ACAG", "2000Y1"] == copy_ACAG["ACAG", "2000Y1"]
+    assert vars_subset_subset["ACAG", "2010Y1"] == copy_ACAG["ACAG", "2010Y1"]
+
+    # b) modify subset of a subset and check if modifications propagate
+    vars_subset_subset["ACAG", "2000Y1"] = 100.0
+    assert variables["ACAG", "2000Y1"] == 100.0
+    assert vars_subset["ACAG", "2000Y1"] == 100.0
+    assert vars_subset_subset["ACAG", "2000Y1"] == 100.0
+    vars_subset["ACAG", "2001Y1"] = 200.0
+    assert variables["ACAG", "2001Y1"] == 200.0
+    assert vars_subset["ACAG", "2001Y1"] == 200.0
+    assert vars_subset_subset["ACAG", "2001Y1"] == 200.0
+    variables["ACAG", "2002Y1"] = 300.0
+    assert variables["ACAG", "2002Y1"] == 300.0
+    assert vars_subset["ACAG", "2002Y1"] == 300.0
+    assert vars_subset_subset["ACAG", "2002Y1"] == 300.0
+
+    # c) make subset of subset to be a copy and check if modifications do not propagate
+    iode.variables.clear()
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    vars_subset = variables["A*;*_", "1990Y1:2010Y1"]
+    assert str(vars_subset.sample) == "1990Y1:2010Y1"
+    assert not vars_subset.is_detached
+    vars_subset_subset = vars_subset["A*", "2000Y1:"].copy()
+    assert str(vars_subset_subset.sample) == "2000Y1:2010Y1"
+    assert vars_subset_subset.is_detached
+
+    vars_subset_subset["ACAG", "2000Y1"] = 100.0
+    assert variables["ACAG", "2000Y1"] == copy_ACAG["ACAG", "2000Y1"]
+    assert vars_subset["ACAG", "2000Y1"] == copy_ACAG["ACAG", "2000Y1"]
+    assert vars_subset_subset["ACAG", "2000Y1"] == 100.0
+    vars_subset["ACAG", "2001Y1"] = 200.0
+    assert variables["ACAG", "2001Y1"] == 200.0
+    assert vars_subset["ACAG", "2001Y1"] == 200.0
+    assert vars_subset_subset["ACAG", "2001Y1"] == copy_ACAG["ACAG", "2001Y1"]
+    variables["ACAG", "2002Y1"] = 300.0
+    assert variables["ACAG", "2002Y1"] == 300.0
+    assert vars_subset["ACAG", "2002Y1"] == 300.0
+    assert vars_subset_subset["ACAG", "2002Y1"] == copy_ACAG["ACAG", "2002Y1"]
+
 def test_from_frame():
     # check that pandas nan are converted to IODE NA
     iode.variables.clear()
