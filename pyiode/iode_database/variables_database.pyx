@@ -1253,6 +1253,12 @@ cdef class Variables(_AbstractDatabase):
         value: str or tuple(str, str)
             New sample as string 'start_period:last_period' or as a tuple 'start_period', 'last_period'.
         
+        Warnings
+        --------
+        Changing the sample on a subset of the Variables workspace is not allowed unless the 
+        :py:meth:`~iode.Variables.copy` method has been used (in that case, any change made on the subset 
+        will not be reflected in the global Variables workspace).
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
