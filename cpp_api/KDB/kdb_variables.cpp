@@ -316,6 +316,22 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 void KDBVariables::set_sample(const Period& from, const Period& to)
 {
 	Sample sample(from, to);
+	if(sample == *get_sample())
+		return;
+
+	// NOTE: prevent changing the sample on a subset (shallow copy).
+	//       A shallow copy is created by calling the C function K_quick_refer().
+	//       Each 'key' in the shallow copy points to the same data as the original.
+	//       The C function KV_sample(KDB*, SAMPLE*) used below does the following things: 
+	//       1. changes the 'sample' attribute of the passed KDB
+	//       2. reallocates the data for each 'key' (IODE variable) [a bit more more complicated than that but that's not the point]
+	//       Problem: if the 'sample' attribute is changed on the subset (passed KDB), the 'sample' attribute of 
+	//                the global KDB (K_WS) is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
+	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling K_WS[var_name, 2001] is still 
+	//                possible but will return garbage.
+	if(this->is_shallow_copy_database())
+		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
+
 	int res = KV_sample(get_database(), &sample);
 	if (res < 0) 
 	{
