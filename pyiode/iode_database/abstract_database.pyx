@@ -65,9 +65,38 @@ cdef class _AbstractDatabase:
     def __dealloc__(self):
         pass
 
-    def is_subset(self) -> bool:
+    @property
+    def is_global_workspace(self) -> bool:
         """
-        Whether or not the present object represents a subset of a global IODE database.
+        Whether or not the present database represents the global IODE workspace.
+        
+        Returns
+        -------
+        bool
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> comments.is_global_workspace
+        True
+        >>> cmt_copy = comments.copy()
+        >>> cmt_copy.is_global_workspace
+        False
+        >>> cmt_subset = comments["A*"]
+        >>> cmt_subset.is_global_workspace
+        False
+        """
+        return self.abstract_db_ptr.is_global_database()
+
+    @property
+    def is_detached(self) -> bool:
+        """
+        Whether or not any change made on the present database or subset will modify 
+        the global IODE workspace.
 
         Returns
         -------
@@ -80,49 +109,49 @@ cdef class _AbstractDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
-        >>> comments.is_subset()
+        >>> # 'comments' represents the global Comments workspace
+        >>> comments.is_detached
         False
-        >>> cmt_subset = comments["A*"].copy()
-        >>> cmt_subset.is_subset()
-        True
-        """
-        return not self.abstract_db_ptr.is_global_database()
+        >>> comments["ACAF"]
+        'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
-    def is_copy_subset(self) -> bool:
-        """
-        Whether or not the present object represents of a subset of a global IODE database 
-        and if the IODE objects of the subset represent *deep copies* of the IODE objects 
-        from the global IODE database.
-
-        A *deep copy* subset means that any change made on an object of the subset will **NOT** 
-        modify the corresponding object in the global IODE database.
-
-        A *shallow copy* subset means that any change made on an object of the subset will also 
-        modify the corresponding object in the global IODE database.
-
-        By default, the :py:meth:`iode.CommentsDatabase.subset` method return a *shallow copy* subset.
-
-        Returns
-        -------
-        bool
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.cmt
-        317 objects loaded 
-        >>> comments.is_subset()
+        >>> # by default, making a selection will create a new database 
+        >>> # object that is a 'view' of the global Comments workspace.
+        >>> # Any change made on this 'view' (subset) will also modify 
+        >>> # the global workspace.
+        >>> cmt_subset = comments["A*"]
+        >>> cmt_subset.is_detached
         False
-        >>> cmt_subset = comments["A*"].copy()
-        >>> cmt_subset.is_subset()
+        >>> cmt_subset["ACAF"] = "modified comment"
+        >>> cmt_subset["ACAF"]
+        'modified comment'
+        >>> comments["ACAF"]
+        'modified comment'
+        >>> # adding a new comment to the subset will also add it 
+        >>> # to the global workspace
+        >>> cmt_subset["NEW_CMT"] = "new comment"
+        >>> "NEW_CMT" in comments
         True
-        >>> cmt_subset.is_copy_subset()
+        >>> comments["NEW_CMT"]
+        'new comment'
+        >>> # removing a comment from the subset will also remove it 
+        >>> # from the global workspace
+        >>> del cmt_subset["NEW_CMT"]
+        >>> "NEW_CMT" in comments
+        False
+
+        >>> # explicitly calling the copy method will create a new 
+        >>> # detached database. Any change made on the copy will not 
+        >>> # modify the global workspace.
+        >>> cmt_copy = comments["A*"].copy()
+        >>> cmt_copy.is_detached
         True
+        >>> cmt_copy["AOUC"] = "modified comment"
+        >>> cmt_copy["AOUC"]
+        'modified comment'
+        >>> comments["AOUC"]
+        'Kost per eenheid produkt.'
         """
-        if self.abstract_db_ptr.is_global_database():
-            return False
         return self.abstract_db_ptr.is_local_database()
 
     def _subset(self, pattern: str, copy: bool) -> Self:
@@ -956,7 +985,7 @@ cdef class _AbstractDatabase:
         >>> len(variables)
         394
         """
-        if self.is_subset():
+        if not self.is_global_workspace:
             raise RuntimeError("Cannot call 'load' method on a subset of a database")
         if not isinstance(filepath, str):
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")

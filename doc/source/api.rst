@@ -47,8 +47,8 @@ Comments
    Comments.merge_from
    Comments.compare
 
-   Comments.is_subset
-   Comments.is_copy_subset
+   Comments.is_detached
+   Comments.is_global_workspace
 
 Properties and methods specific to Comments
 
@@ -98,8 +98,8 @@ Equations
    Equations.merge_from 
    Equations.compare 
 
-   Equations.is_subset
-   Equations.is_copy_subset
+   Equations.is_detached
+   Equations.is_global_workspace
 
 Properties and methods specific to Equations
 
@@ -150,8 +150,8 @@ Identities
    Identities.merge_from
    Identities.compare
 
-   Identities.is_subset
-   Identities.is_copy_subset
+   Identities.is_detached
+   Identities.is_global_workspace
 
 Properties and methods specific to Identities
 
@@ -200,8 +200,8 @@ Lists
    Lists.merge_from
    Lists.compare
 
-   Lists.is_subset
-   Lists.is_copy_subset
+   Lists.is_detached
+   Lists.is_global_workspace
 
 Properties and methods specific to Lists
 
@@ -248,8 +248,8 @@ Scalars
    Scalars.merge_from
    Scalars.compare
 
-   Scalars.is_subset
-   Scalars.is_copy_subset
+   Scalars.is_detached
+   Scalars.is_global_workspace
 
 Properties and methods specific to Scalars
 
@@ -299,8 +299,8 @@ Tables
    Tables.merge_from
    Tables.compare
 
-   Tables.is_subset
-   Tables.is_copy_subset
+   Tables.is_detached
+   Tables.is_global_workspace
 
 Properties and methods specific to Tables
 
@@ -345,8 +345,8 @@ Variables
    Variables.merge_from
    Variables.compare
 
-   Variables.is_subset
-   Variables.is_copy_subset
+   Variables.is_detached
+   Variables.is_global_workspace
 
 Properties and methods specific to Variables
 
