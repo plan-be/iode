@@ -2,7 +2,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from time.period cimport CPeriod, PERIOD
+from pyiode.time.period cimport CPeriod, PERIOD
 
 cdef extern from "api/iode.h":
     ctypedef struct SAMPLE:
