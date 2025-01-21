@@ -12,7 +12,7 @@
 from cython.operator cimport dereference
 
 from typing import Union, Tuple, List, Optional, Any
-from time.sample cimport CSample
+from pyiode.time.sample cimport CSample
 
 try:
     import larray as la

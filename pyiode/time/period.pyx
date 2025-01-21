@@ -2,7 +2,7 @@
 
 from typing import Union, Tuple
 from libcpp.string cimport string
-from time.period cimport CPeriod
+from pyiode.time.period cimport CPeriod
 
 from typing import List
 
