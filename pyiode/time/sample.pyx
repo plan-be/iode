@@ -243,14 +243,16 @@ cdef class Sample:
             warnings.warn("other sample in 'sample == other' is not defined")
             return False
         else:
-            return self.c_sample == other.c_sample
+            return str(self) == str(other)
 
     def __str__(self) -> str:
         if self.c_sample is NULL or (self.start is None and self.end is None):
             warnings.warn("'sample' is not defined")
             return str(None)
         else:
-            return f"{self.start}:{self.end}"
+            s_start = str(self.start) if self.start is not None else ""
+            s_end = str(self.end) if self.end is not None else ""
+            return s_start + ":" + s_end
 
     def __repr__(self) -> str:
         if self.c_sample is NULL or (self.start is None and self.end is None):
