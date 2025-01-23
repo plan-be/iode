@@ -119,6 +119,16 @@ TEST_F(KDBVariablesTest, GetSetVar)
     new_value = 60.0;
     Variables.set_var(name, s_period, new_value);
     EXPECT_DOUBLE_EQ(Variables.get_var(name, s_period), new_value);
+
+    // get pointers to a variable's data
+    double* data = Variables.get_var_ptr(pos);
+    EXPECT_TRUE(data != NULL);
+    value = Variables.get_var(pos, 0);
+    EXPECT_DOUBLE_EQ(*data, value);
+    EXPECT_DOUBLE_EQ(data[0], value);
+    value = Variables.get_var(pos, t);
+    EXPECT_DOUBLE_EQ(*(data + t), value);
+    EXPECT_DOUBLE_EQ(data[t], value);
 }
 
 TEST_F(KDBVariablesEmptyTest, Sample)
