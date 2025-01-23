@@ -215,7 +215,13 @@ cdef class Period:
     # Special methods
 
     def __eq__(self, other: Period) -> bool:
-        return self.c_period == other.c_period
+        if self.c_period.p_y != other.c_period.p_y:
+            return False
+        if self.c_period.p_p != other.c_period.p_p:
+            return False 
+        if self.c_period.p_s != other.c_period.p_s:
+            return False
+        return True
 
     def __float__(self) -> float:
         """
