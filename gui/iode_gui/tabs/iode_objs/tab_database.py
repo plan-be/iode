@@ -1,6 +1,5 @@
 from PySide6.QtCore import Qt, Slot, QSettings
-from PySide6.QtWidgets import (QLabel, QComboBox, QHBoxLayout, QVBoxLayout, 
-                               QSpacerItem, QSizePolicy)
+from PySide6.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import ProjectSettings
@@ -140,6 +139,24 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
 
+        # periods filter
+        self.label_filter_periods = QLabel("Periods:")
+        self.label_filter_periods.setObjectName("label_periods_filter")
+        self.top_horizontal_layout.insertWidget(2, self.label_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.lineEdit_filter_periods = QLineEdit()
+        self.lineEdit_filter_periods.setObjectName("lineEdit_filter_periods")
+        self.lineEdit_filter_periods.setPlaceholderText("periods range here")
+        sizePolicyFilter = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicyFilter.setHorizontalStretch(0)
+        sizePolicyFilter.setVerticalStretch(0)
+        self.lineEdit_filter_periods.setSizePolicy(sizePolicyFilter)
+        self.lineEdit_filter_periods.setMinimumSize(200, 0)
+        self.top_horizontal_layout.insertWidget(3, self.lineEdit_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.database_view.set_filter_periods(self.lineEdit_filter_periods)
+        self.database_view_2.set_filter_periods(self.lineEdit_filter_periods)
+
         # Add the mode label and combo box
         self.label_mode = QLabel("mode")
         self.label_mode.setObjectName("label_mode")
@@ -171,6 +188,8 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         self.shortcut_mode_minus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
         # Connect signals to slots
+        self.lineEdit_filter_periods.returnPressed.connect(self.database_view.filter_slot)
+
         self.combo_mode.currentIndexChanged.connect(self.update_mode)
         self.shortcut_mode_plus.activated.connect(self.next_mode)
         self.shortcut_mode_minus.activated.connect(self.previous_mode)
@@ -181,6 +200,14 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         self.database_model.rowsRemoved.connect(self.database_modified)
         self.database_model.database_modified.connect(self.database_modified)
         self.database_view.database_modified.connect(self.database_modified)
+
+    def reset_filter(self):
+        """
+        Reset the filter.
+        """
+        self.lineEdit_filter.setText("")
+        self.lineEdit_filter_periods.setText("")
+        self.database_view.filter()
 
     # NOTE: automatically called from IodeTabWidget.load_settings()
     def load_settings(self):

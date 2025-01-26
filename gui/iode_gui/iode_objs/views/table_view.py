@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Slot, Signal, QSettings
-from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView
+from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit
 from PySide6.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
 from PySide6.QtPrintSupport import QPrintPreviewDialog
 
@@ -31,6 +31,7 @@ from iode_gui.plot.plot_vars import PlotVariablesDialog
 from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView
 
+from typing import Tuple
 from pathlib import Path
 from iode import IodeType, tables, variables, Table, Sample
 
@@ -325,6 +326,20 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
             return None
         model: IodeAbstractTableModel = self.model()
         return AddVariableDialog(model.displayed_database, self)
+
+    def set_filter_periods(self, filter_line_edit: QLineEdit):
+        self.filter_line_edit_periods = filter_line_edit
+
+    def _get_key_filter(self) -> Tuple[str, str]:
+        names = self.filter_line_edit.text().strip()
+        periods = self.filter_line_edit_periods.text().strip()
+        if not names and not periods:
+            return None
+        if not names:
+            names = '*'
+        if not periods:
+            periods = None
+        return (names, periods)
 
     # override QTableView method
     @Slot(QContextMenuEvent)
