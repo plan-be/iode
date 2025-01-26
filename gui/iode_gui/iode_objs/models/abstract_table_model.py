@@ -3,7 +3,7 @@ from PySide6.QtCore import (QAbstractTableModel, QModelIndex, Qt, QDir, QFileInf
 from PySide6.QtWidgets import (QMessageBox, QDialog, QVBoxLayout, QLabel, QFileDialog, 
                                QDialogButtonBox, QSizePolicy)
 
-from typing import List, Union, Any
+from typing import List, Union, Tuple, Any
 from pathlib import Path
 from iode import (IodeType, IodeFileType, FileType, IODE_FILE_TYPES, Equation, Identity, 
                   comments, equations, identities, lists, scalars, tables, variables) 
@@ -484,18 +484,19 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
     @Slot(str)
     @Slot(str, bool)
-    def filter(self, pattern: str, silent: bool=False):
+    @Slot(tuple, bool)
+    def filter(self, key: Union[str, Tuple[str, str]], silent: bool=False):
         """
         Filters the database based on the given pattern.
 
-        :param pattern: The filter pattern.
+        :param key: The filter pattern (tuple(names, periods) for Variables).
         :param silent: If True, the filter is applied silently without updating the view.
         """
-        if not pattern:
+        if not key:
             self._displayed_database = self._database
         else:
             try:
-                self._displayed_database = self._database[pattern]
+                self._displayed_database = self._database[key]
             except Exception as e:
                 self._displayed_database = self._database
                 if not silent:

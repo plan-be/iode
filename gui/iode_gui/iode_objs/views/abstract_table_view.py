@@ -10,6 +10,7 @@ from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableMode
 from iode_gui.iode_objs.delegates.base_delegate import BaseDelegate
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
+from typing import Union, Tuple
 from iode import IodeType, variables
 # TODO : add MAX_LENGTH_NAME (= K_MAX_NAME) to the Python iode package
 MAX_LENGTH_NAME = 20
@@ -175,7 +176,7 @@ class IodeAbstractTableView(QTableView):
         table_model.reset()
         self.viewport().update()
 
-    def set_filter_line_edit(self, filter_line_edit: QLineEdit):
+    def set_filter_names(self, filter_line_edit: QLineEdit):
         """
         Set the filter line edit for this view.
 
@@ -232,6 +233,11 @@ class IodeAbstractTableView(QTableView):
             else:
                 return False
 
+    # overridden for Variables -> key = tuple(pattern names, periods)
+    def _get_key_filter(self) -> Union[str, Tuple[str, str]]:
+        pattern = self.filter_line_edit.text().strip()
+        return pattern
+
     def filter(self, silent=False):
         """
         Filter the view based on the text in the filter line edit.
@@ -239,9 +245,9 @@ class IodeAbstractTableView(QTableView):
         Args:
             silent (bool): If True, the filter operation is silent.
         """
-        pattern = self.filter_line_edit.text().strip()
+        key = self._get_key_filter()
         table_model: IodeAbstractTableModel = self.model()
-        table_model.filter(pattern, silent)
+        table_model.filter(key, silent)
         self.update()
 
     def get_selected_objects_names(self) -> list:

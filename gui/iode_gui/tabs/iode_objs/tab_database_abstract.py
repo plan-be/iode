@@ -1,6 +1,6 @@
 from PySide6.QtCore import QDir, Qt, Signal, Slot
 from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter,
-                               QPushButton, QSpacerItem, QSizePolicy)
+                               QPushButton, QSpacerItem, QSizePolicy, QLabel)
 from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -40,32 +40,36 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.vertical_layout.setContentsMargins(0, 0, 0, 0)
 
         # top horizontal layout
-        top_horizontal_layout = QHBoxLayout()
-        top_horizontal_layout.setObjectName(f"top_horizontal_layout_{iode_type_name}")
+        self.top_horizontal_layout = QHBoxLayout()
+        self.top_horizontal_layout.setObjectName(f"top_horizontal_layout_{iode_type_name}")
 
         # filter
+        self.label_filter = QLabel("Names:")
+        self.label_filter.setObjectName("label_names_filter")
+        self.top_horizontal_layout.addWidget(self.label_filter, alignment=Qt.AlignmentFlag.AlignLeft)
+
         self.lineEdit_filter = QLineEdit()
         self.lineEdit_filter.setObjectName("lineEdit_filter")
-        self.lineEdit_filter.setPlaceholderText("filter pattern here")
+        self.lineEdit_filter.setPlaceholderText("names pattern here")
         sizePolicyFilter = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicyFilter.setHorizontalStretch(0)
         sizePolicyFilter.setVerticalStretch(0)
         self.lineEdit_filter.setSizePolicy(sizePolicyFilter)
         self.lineEdit_filter.setMinimumSize(200, 0)
-        top_horizontal_layout.addWidget(self.lineEdit_filter, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.top_horizontal_layout.addWidget(self.lineEdit_filter, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.pushButton_filter = QPushButton("Filter")
         self.pushButton_filter.setObjectName("pushButton_filter")
-        top_horizontal_layout.addWidget(self.pushButton_filter, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.top_horizontal_layout.addWidget(self.pushButton_filter, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # spacer
         horizontalSpacer = QSpacerItem(828, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        top_horizontal_layout.addSpacerItem(horizontalSpacer)
+        self.top_horizontal_layout.addSpacerItem(horizontalSpacer)
 
         # print button
         self.pushButton_print = QPushButton("Print")
         self.pushButton_print.setObjectName("pushButton_print")
-        top_horizontal_layout.addWidget(self.pushButton_print, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.top_horizontal_layout.addWidget(self.pushButton_print, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # add button
         self.pushButton_add = QPushButton("Add " + IODE_DATABASE_TYPE_NAMES[iode_type])
@@ -74,9 +78,9 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         sizePolicyAdd.setHorizontalStretch(0)
         sizePolicyAdd.setVerticalStretch(0)
         self.pushButton_add.setSizePolicy(sizePolicyAdd)
-        top_horizontal_layout.addWidget(self.pushButton_add, alignment=Qt.AlignmentFlag.AlignRight)
+        self.top_horizontal_layout.addWidget(self.pushButton_add, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.vertical_layout.addLayout(top_horizontal_layout)
+        self.vertical_layout.addLayout(self.top_horizontal_layout)
 
         # Prepare splitter
         self.splitter: QSplitter = QSplitter(parent)
@@ -126,8 +130,8 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.database_view_2.setModel(self.database_model)
 
         # IODE objects names filter
-        self.database_view.set_filter_line_edit(self.lineEdit_filter)
-        self.database_view_2.set_filter_line_edit(self.lineEdit_filter)
+        self.database_view.set_filter_names(self.lineEdit_filter)
+        self.database_view_2.set_filter_names(self.lineEdit_filter)
 
         # Shortcuts
         self.shortcut_print = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P), self)
