@@ -18,12 +18,13 @@ jobs:
 
   build_gui:
     if: contains(github.head_ref, 'gui')
-    uses: ./.github/workflows/github-actions-gui.yml 
+    uses: ./.github/workflows/github-actions-python.yml 
     with:
-      build-config: debug
+        build-config: release
 
   build_python:
-      if: contains(github.head_ref, 'python')
+      if: |
+        !contains(github.head_ref, 'gui') && contains(github.head_ref, 'python')
       uses: ./.github/workflows/github-actions-python.yml 
       with:
           build-config: release
