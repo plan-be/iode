@@ -10,8 +10,7 @@ jobs:
   build_and_test:
     if: |
       !contains(github.head_ref, 'doc') && !contains(github.head_ref, 'python') && 
-      !contains(github.head_ref, 'gui') && !contains(github.head_ref, 'nsis') && 
-      !contains(github.head_ref, 'release')
+      !contains(github.head_ref, 'gui') && !contains(github.head_ref, 'release')
     uses: ./.github/workflows/github-actions-build-and-test.yml 
     with:
       build-config: debug
@@ -32,9 +31,3 @@ jobs:
   build_doc:
       if: contains(github.head_ref, 'doc')
       uses: ./.github/workflows/github-actions-doc.yml
-  
-  build_nsis:
-    if: contains(github.head_ref, 'nsis')
-    uses: ./.github/workflows/github-actions-nsis.yml 
-    with:
-      build-config: release
