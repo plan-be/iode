@@ -215,22 +215,6 @@ message(STATUS "=============================\n")
 # ---- search for librairies and packages ----
 message(STATUS "SEARCH FOR PACKAGES:\n")
 
-# -- find Qt --
-if(NOT SKBUILD)
-  message(CHECK_START "Search for Qt6 package")
-  if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-      list(APPEND CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
-  endif()
-  find_package(Qt6 COMPONENTS Core Widgets Gui Charts PrintSupport)
-
-  if(Qt6_FOUND)
-    message(CHECK_PASS "found")
-  else()
-    message(CHECK_FAIL "not found")
-  endif()
-  message(STATUS " ")
-endif()
-
 # -- find Python --
 message(CHECK_START "Search for Python")
 find_package(Python COMPONENTS Interpreter Development.Module NumPy
@@ -280,14 +264,14 @@ add_subdirectory ("scr4")
 add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
-# ---- executables ----
+# ---- archives ----
 
-set(IODE_CPP_GUI_TARGET iode_gui)
-add_subdirectory ("gui")
+add_subdirectory("archives")
 
 # ---- python ----
 
 add_subdirectory ("pyiode")
+add_subdirectory ("gui")
 
 # ---- tests ----
 
