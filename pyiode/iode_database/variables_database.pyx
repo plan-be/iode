@@ -932,7 +932,8 @@ cdef class Variables(_AbstractDatabase):
                 if not isinstance(values, float):
                     raise TypeError(f"Cannot update the variable '{name}'.\n"
                                     f"When updating a Variable for a single period, the "
-                                    f"right-hand side value must be of type float")
+                                    f"right-hand side value must be of type float.\n"
+                                    f"Got value of type {type(values).__name__} instead")
                 t = self._get_real_period_position(key_periods)
                 self.database_ptr.set_var(pos, t, <double>values, self.mode_)
             # update values for a contiguous range of periods
@@ -941,11 +942,11 @@ cdef class Variables(_AbstractDatabase):
                 if not isinstance(first_period, Period):
                     raise TypeError(f"Cannot update the variable '{name}'.\n"
                                     f"Expected 'first_period' to be of type Period. "
-                                    f"Got {type(first_period).__name__} instead")
+                                    f"Got value of type {type(first_period).__name__} instead")
                 if not isinstance(last_period, Period):
                     raise TypeError(f"Cannot update the variable '{name}'.\n"
                                     f"Expected 'last_period' to be of type Period. "
-                                    f"Got {type(last_period).__name__} instead")
+                                    f"Got value of type {type(last_period).__name__} instead")
                 t_first = self._get_real_period_position(first_period)
                 t_last = self._get_real_period_position(last_period)
                 # values is a LEC expression
@@ -974,7 +975,7 @@ cdef class Variables(_AbstractDatabase):
                     self.__update_var(name, t_first, t_last, values)
                 else:
                     raise TypeError(f"Expected 'value' of type int, float, str or Variables.\n"
-                                    f"Got {type(values).__name__} instead")
+                                    f"Got 'value' of type {type(values).__name__} instead")
             # update values for a list of periods
             elif isinstance(key_periods, list):                
                 # set the same value for all periods in the list
@@ -990,15 +991,15 @@ cdef class Variables(_AbstractDatabase):
                 else:
                     raise TypeError(f"Cannot update the variable '{name}'.\n"
                                     f"When updating values for non-contiguous periods, the right-hand side must be "
-                                    f"a float or a list of float.\nGot {type(values).__name__} instead")
+                                    f"a float or a list of float.\nGot input of type {type(values).__name__} instead")
                 for p, v in zip(key_periods, values):
                     t = self._get_real_period_position(p)
                     self.database_ptr.set_var(pos, t, <double>v, self.mode_)
             else:
                 raise TypeError(f"Cannot update the variable '{name}'.\n"
                                 f"The periods selection must be specified as a single period, "
-                                f"a sample, or a list of periods.\n"
-                                f"Got periods selection of type {type(key_periods).__name__} instead")
+                                f"a sample 'start:end', or a list of periods.\n"
+                                f"Got input of type {type(key_periods).__name__} instead")
 
     # overriden for Variables
     def __setitem__(self, key, value):
