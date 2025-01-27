@@ -218,9 +218,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
         if not index.isValid():
             return False 
-        
-        if self.data(index, Qt.ItemDataRole.DisplayRole) == value:
-            return False
 
         success = self.set_value(index.row(), index.column(), value)
         if success:

@@ -2,6 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from iode_gui.utils import NAN_REP, MAX_PRECISION_NUMBERS
 
 from typing import List, Any
+import numpy as np
 from iode import IodeType, is_NA
 
 
@@ -22,7 +23,7 @@ class IodeNumericalTableModel:
         """
         Converts the given value to a string based on the current precision and format.
         """
-        if isinstance(value, float) and is_NA(value):
+        if isinstance(value, float) and (is_NA(value) or np.isnan(value)):
             return NAN_REP
         if not isinstance(value, (int, float)):
             return NAN_REP
@@ -30,6 +31,12 @@ class IodeNumericalTableModel:
         # Otherwise, the specified precision is used.
         precision = -1 if self.no_precision else self._precision
         return f"{value:.{precision}{self._format}}"
+
+    def string_to_float(self, value: str) -> float:
+        """
+        Converts the given string to a float.
+        """
+        return np.nan if value == NAN_REP or value == "" else float(value)
 
     @property
     def precision(self) -> int:

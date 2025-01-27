@@ -75,13 +75,17 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
 
         return None
 
-    def setData(self, index: QModelIndex, value: str, role: int):
+    def setData(self, index: QModelIndex, value: Union[str, int, float], role: int):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
-            if self.data(index, Qt.ItemDataRole.DisplayRole) == value:
-                return False
             if value == NAN_REP:
+                QMessageBox.warning(None, "WARNING", "It is not allowed to set the value of a cell "
+                                    "of a computed table to NA")
                 return False
+            
             try:
+                value = float(value)
+                if value == self.computed_table[index.row(), index.column()]:
+                    return False
                 self.computed_table[index.row(), index.column()] = value
                 self.dataChanged.emit(index, index, [role])
                 return True
