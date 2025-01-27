@@ -53,7 +53,6 @@
  *      int IodeSetTblFile(int ref, char *filename)                      | Load the var file filename and set its reference number to ref.
  *      double IodeGetVarT(char *name, int t, int mode)                  | Get the value of the variable name at position t where t is the position in the KV_WS SAMPLE.
  *      int IodeSetVarT(char *name, int t, int mode, double value)       | Set the value of the variable name at position t, possibly after recalulation based on value and mode.
- *      double *IodeGetVector(char *name, int *lg)                       | Returns a pointer to the first value of the VAR name. 
  *      int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg) |
  *      int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg) | Determines the position to copy from (python object), where to copy to (KV_WS) and the nb of elements to copy 
  *  
@@ -739,30 +738,6 @@ int IodeSetVarT(char *name, int t, int mode, double value)
 
     KV_set(K_WS[VARIABLES], pos, t, mode, value);
     return(0);
-}
-
-
-/**
- *  Returns a pointer to the first value of the VAR name. 
- *  
- *  @param [in]  name   char*   variable name   
- *  @param [out] lg     int     sample size
- *  @return             double* pointer to the VAR name
- */
-double *IodeGetVector(char *name, int *lg)
-{
-    int     pos;
-    double  *value = NULL;
-    SAMPLE  *smpl;
-
-    smpl = KSMPL(KV_WS);
-    *lg = smpl->s_nb;
-
-    pos = K_find(K_WS[VARIABLES], name);
-    if(pos >= 0) {
-        value = KVVAL(K_WS[VARIABLES], pos, 0);
-    }
-    return(value);
 }
 
 

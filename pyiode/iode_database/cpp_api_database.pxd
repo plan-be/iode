@@ -60,7 +60,6 @@ cdef extern from "api/iode.h":
         char k_reserved[59]
         char *k_nameptr
 
-    cdef double  *IodeGetVector(char *name, int *lg)
     cdef int     IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
     cdef int     IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
 
@@ -69,6 +68,13 @@ cdef extern from "api/iode.h":
 
     # k_objfile.c
     KDB* K_interpret(int iode_type, char* filename)
+
+    # k_objs.c
+    int K_find(KDB*, char*)
+
+    # k_wsvar.c
+    double KV_get(KDB *kdb, int pos, int t, int mode)
+    void KV_set(KDB *kdb, int pos, int t, int mode, double new)
 
     # k_grep.c
     char** K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int _all)
