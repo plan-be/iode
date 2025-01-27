@@ -34,7 +34,7 @@ class ScalarsDelegate(BaseDelegate):
         editor = QLineEdit(parent)
 
         if index.column() == 0:
-            editor.setValidator(IodeDoubleValidator(editor))
+            editor.setValidator(IodeDoubleValidator(parent=editor))
         elif index.column() == 1:
             editor.setValidator(QDoubleValidator(0., 1., 10))
         else:
