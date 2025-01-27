@@ -476,11 +476,12 @@ generate_stub_files.py
 /gui/LICENSE*
 
 # NSIS
-/nsis/*.nsh
-!/nsis/*template*.nsh
+/archives/nsis/*.nsh
+!/archives/nsis/file_association.nsh
+!/archives/nsis/*template*.nsh
 
-/nsis/*.nsi
-!/nsis/*template*.nsi
+/archives/nsis/*.nsi
+!/archives/nsis/*template*.nsi
 
 # DOC
 /doc/source/conf.py
