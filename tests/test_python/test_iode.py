@@ -165,6 +165,14 @@ def test_variables_setitem():
     assert variables["ACAF", "1994Y1"] == variables["ACAG", "1994Y1"]
     assert variables["ACAF", "1995Y1"] == variables["ACAG", "1995Y1"]
 
+    # ==== select periods as 'first_period:' and 'last_period:' ====
+    iode.variables.clear()
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    vars_subset = variables["A*;*_", "1990Y1:"]
+    assert str(vars_subset.sample) == "1990Y1:2015Y1"
+    vars_subset = variables["A*;*_", ":2000Y1"]
+    assert str(vars_subset.sample) == "1960Y1:2000Y1"
+
     # ==== make subset of a subset and test if modifications propagate ====
     iode.variables.clear()
     iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
