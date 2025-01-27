@@ -15,13 +15,15 @@ from libc.string cimport memcpy
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
+from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
+from pyiode.iode_database.cpp_api_database cimport KV_get
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
-from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
+from pyiode.iode_database.cpp_api_database cimport IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
@@ -36,105 +38,6 @@ from iode.util import check_filepath
 KeyName = Union[str, List[str]]
 KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
-
-
-cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):
-    '''
-    Calls C API fonction IodeCalcSamplePosition() to determine which elements of array to copy into KV_WS and 
-    at which position in the KV_WS sample.
-    '''
-    IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), la_pos, ws_pos, lg)
-
-# TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
-#             - rewrite this function to be based on the C++ API
-cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
-    """
-    Create an numpy array from the content of an IODE variable (KV_WS[name]). 
-    The ndarray data may be either a newly allocated vector, or may point to the IODE memory.
-    Be aware that IODE data can be relocated in memory when creating new variables.
-
-    Parameters
-    ----------
-    name: C char* 
-        Name of the IODE variable to read 
-    copy: bool, optional
-        if True, a pointer to the IODE data is placed in the resulting ndarray.
-        if False, the data is allocated.
-
-    Returns
-    -------
-    out: ndarray 
-        1-dim numpy array containing the values of variables[name]
-    """  
-    cdef cnp.npy_intp shape[1]   # int of the size of a pointer (32 ou 64 bits) See https://numpy.org/doc/stable/reference/c-api/dtype.html
-    cdef int lg
-    cdef double *data_ptr = IodeGetVector(name, &lg)
-    
-    shape[0] = <cnp.npy_intp> lg  # vector length
-    if data_ptr != NULL:
-        # Create an array wrapper around data_ptr 
-        # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
-        vararray = cnp.PyArray_SimpleNewFromData(1, shape, cnp.NPY_DOUBLE, data_ptr) # See https://numpy.org/doc/stable/reference/c-api/array.html?highlight=pyarray_simplenewfromdata#c.PyArray_SimpleNewFromData
-        
-        if(copy):
-            # Duplicates if inmemory == 0 (?) => ch³anges to vararray will NOT modify KV_WS
-            vararray = vararray.copy()
-        vararray[vararray < -1.0e37] = np.nan
-    else:
-        vararray = np.ndarray(lg, dtype='double')        
-        #vararray.fill(0)        
-        vararray.fill(np.nan)
-    return vararray
-
-# TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
-#             - rewrite this function to be based on the C++ API
-def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[str]):
-    cdef int df_pos
-    cdef int ws_pos
-    cdef int lg
-
-    nb_periods_ = len(periods_list)
-    lg = nb_periods_
-    start_period, last_period = periods_list[0], periods_list[-1]
-
-    # calculate:
-    #   - df_pos: the position of the first element of data to be copied into WS
-    #   - ws_pos: the position in KV_WS sample where to copy df[...pos]
-    #   - the nb of values to be copied 
-    IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
-
-    # replace numpy/pandas NaN by IODE NaN
-    data = np.nan_to_num(data, nan=NA)
-
-    # copy each line of array into KV_WS on the time intersection of df and KV_WS
-    # values = <double*>cnp.PyArray_DATA(df[vars_names[0]].data)
-    if np.issubdtype(data.dtype, np.floating):
-        if data.data.c_contiguous:
-            for name, row_data in zip(vars_names, data):
-                # Save the vector of doubles in KV_WS
-                values = < double * > cnp.PyArray_DATA(row_data)
-                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-        else:
-            for name, row_data in zip(vars_names, data):
-                row_data = row_data.copy()  # copy if non contiguous
-                # Save the vector of doubles in KV_WS
-                values = < double * > cnp.PyArray_DATA(row_data)
-                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-    else:
-        for name, row_data in zip(vars_names, data):
-            row_data = row_data.astype("double") # astype creates a copy
-            # Save the vector of doubles in KV_WS
-            values = <double*>cnp.PyArray_DATA(row_data)
-            IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-
-def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
-    # Copy values from the IODE Variables database to a Numpy 2D array
-    data = np.empty((len(vars_list), nb_periods), dtype=np.float64)
-    for i, name in enumerate(vars_list):
-        # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
-        # data[i] = [cpp_values_ptr[t] for t in range(0, nb_periods_)]
-        data[i] = _iodevar_to_ndarray(_cstr(name), False)
-    return data
 
 
 class VarPositionalIndexer:
@@ -1573,6 +1476,191 @@ cdef class Variables(_AbstractDatabase):
     def __pow__(self, other):
         return NotImplementedError()
 
+    cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):
+        '''
+        Calls C API fonction IodeCalcSamplePosition() to determine which elements of array to copy into KV_WS and 
+        at which position in the KV_WS sample.
+        '''
+        IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), la_pos, ws_pos, lg)
+
+    # TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
+    #             - rewrite this function to be based on the C++ API
+    def _numpy_array_to_ws(self, data, vars_names: Iterable[str], periods_list: Iterable[str]):
+        cdef int df_pos
+        cdef int ws_pos
+        cdef int lg
+
+        nb_periods_ = len(periods_list)
+        lg = nb_periods_
+        start_period, last_period = periods_list[0], periods_list[-1]
+
+        # calculate:
+        #   - df_pos: the position of the first element of data to be copied into WS
+        #   - ws_pos: the position in KV_WS sample where to copy df[...pos]
+        #   - the nb of values to be copied 
+        IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
+
+        # replace numpy/pandas NaN by IODE NaN
+        data = np.nan_to_num(data, nan=NA)
+
+        # copy each line of array into KV_WS on the time intersection of df and KV_WS
+        # values = <double*>cnp.PyArray_DATA(df[vars_names[0]].data)
+        if np.issubdtype(data.dtype, np.floating):
+            if data.data.c_contiguous:
+                for name, row_data in zip(vars_names, data):
+                    # Save the vector of doubles in KV_WS
+                    values = < double * > cnp.PyArray_DATA(row_data)
+                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+            else:
+                for name, row_data in zip(vars_names, data):
+                    row_data = row_data.copy()  # copy if non contiguous
+                    # Save the vector of doubles in KV_WS
+                    values = < double * > cnp.PyArray_DATA(row_data)
+                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+        else:
+            for name, row_data in zip(vars_names, data):
+                row_data = row_data.astype("double") # astype creates a copy
+                # Save the vector of doubles in KV_WS
+                values = <double*>cnp.PyArray_DATA(row_data)
+                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+
+    @property
+    def to_ndarray(self) -> np.ndarray:
+        """
+        Create a Numpy ndarray from the current Variables database.
+
+        Returns
+        -------
+        np.ndarray
+            Numpy ndarray containing the variables values of the current Variables database or subset.
+
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> len(variables)
+        394
+        >>> variables.sample
+        Sample("1960Y1:2015Y1")
+        >>> variables.nb_periods
+        56
+
+        >>> # export the whole Variables workspace to a numpy ndarray (394 variables x 56 periods)
+        >>> data = variables.to_ndarray
+        >>> data.shape
+        (394, 56)
+        >>> data[5, 40]
+        442.26441085858613
+        >>> variables.i[5, 40]
+        442.26441085858613
+
+        >>> # export a subset of names
+        >>> vars_subset = variables["A*"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  1963Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF            na      na      na      na  ...  -68.89  -83.34  -96.41
+        ACAG            na      na      na      na  ...   31.37   32.42   33.47
+        AOUC            na    0.25    0.25    0.26  ...    1.39    1.42    1.46
+        AOUC_           na      na      na      na  ...    1.34    1.37    1.41
+        AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61    1.67
+        <BLANKLINE>
+        >>> data = vars_subset.to_ndarray
+        >>> data.shape
+        (5, 56)
+        >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[            nan,          nan,          nan,          nan,
+                                          ...
+                   -55.55928982, -68.89465432, -83.34062511, -96.41041983],
+                  [         nan,          nan,          nan,          nan,
+                                          ...
+                    30.32396115,  31.37013881,  32.42029883,  33.46960134],
+                  [         nan,   0.24783192,   0.25456766,   0.26379573,
+                                          ...
+                     1.35553983,   1.38777697,   1.42371396,   1.46086261],
+                  [         nan,          nan,          nan,          nan,
+                                          ...
+                     1.30459041,   1.33808573,   1.37301015,   1.4075568 ],
+                  [  0.21753037,   0.21544869,   0.22228125,   0.22953896,
+                                          ...
+                     1.51366598,   1.55803879,   1.61318117,   1.67429058]])
+
+        >>> # export a subset of names and periods
+        >>> vars_subset = variables["A*", "2000Y1:2010Y1"]
+        >>> vars_subset                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  2003Y1  ...  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF         10.05    2.87   -0.93   -6.09  ...  -33.38  -38.41  -37.46  -37.83
+        ACAG        -41.53   18.94   19.98   21.02  ...   25.16   26.19   27.23   28.25
+        AOUC          1.12    1.14    1.16    1.17  ...    1.22    1.26    1.29    1.31
+        AOUC_         1.10    1.14    1.15    1.16  ...    1.20    1.21    1.23    1.25
+        AQC           1.34    1.38    1.41    1.42  ...    1.41    1.43    1.45    1.46
+        <BLANKLINE>
+        >>> data = vars_subset.to_ndarray
+        >>> data.shape
+        (5, 11)
+        >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[ 10.04661079,   2.86792274,  -0.92921251,  -6.09156499,
+                -14.58209446, -26.53878957, -28.98728798, -33.37842578,
+                -38.40951778, -37.46350964, -37.82742883],
+               [-41.53478657,  18.93980114,  19.98081488,  21.02050218,
+                 22.06647552,  23.10796216,  24.12963715,  25.16090905,
+                 26.19211148,  27.22995512,  28.25392898],
+               [  1.11623762,   1.14047639,   1.15716928,   1.17048954,
+                  1.16767464,   1.1815207 ,   1.19946163,   1.21933288,
+                  1.26280574,   1.28713178,   1.3071099 ],
+               [  1.1019572 ,   1.13624426,   1.15021519,   1.16082895,
+                  1.14802147,   1.16412337,   1.18589708,   1.19516611,
+                  1.21383423,   1.23185399,   1.25016433],
+               [  1.33860286,   1.37918825,   1.40881647,   1.41970458,
+                  1.40065206,   1.39697298,   1.39806354,   1.40791334,
+                  1.42564488,   1.44633167,   1.46286837]])
+        """
+        cdef double value
+        cdef int mode = <int>self.mode_
+        cdef int t_first_period
+        cdef int t_last_period
+        cdef int nb_periods
+        cdef KDB* db_ptr = self.database_ptr.get_database()
+        if db_ptr is NULL:
+            raise RuntimeError("The IODE Variables workspace is empty")
+
+        if not len(self):
+            raise RuntimeError("The IODE Variables workspace is empty")
+
+        t_first_period, t_last_period = self._get_periods_bounds()
+        nb_periods = t_last_period - t_first_period + 1
+
+        if nb_periods <= 0:
+            raise RuntimeError("The sample of the Variables database to export is empty")
+
+        # Copy values from the IODE Variables database to a Numpy 2D array
+        data = np.empty((len(self), nb_periods), dtype=np.float64)
+        # declaring a C-contiguous array of 2D double
+        # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
+        cdef double[:, ::1] data_view = data
+        for i in range(len(self)):
+            for t in range(t_first_period, t_last_period + 1):
+                value = KV_get(db_ptr, i, t, mode)
+                data_view[i, t - t_first_period] = value if IODE_IS_A_NUMBER(value) else np.nan
+        return data
+
     def from_frame(self, df: DataFrame):
         """
         Copy the pandas DataFrame `df` into the IODE Variables database.
@@ -1678,7 +1766,7 @@ cdef class Variables(_AbstractDatabase):
         # numpy data
         data = df.to_numpy(copy=False)
 
-        _numpy_array_to_ws(data, vars_names, periods_list)
+        self._numpy_array_to_ws(data, vars_names, periods_list)
 
     def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
         """
@@ -1716,14 +1804,29 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> len(variables)
-        394
-        >>> variables.sample
-        Sample("1960Y1:2015Y1")
-        >>> variables.nb_periods
-        56
 
         >>> # Export the IODE Variables database as a pandas DataFrame
+        >>> variables                       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 394
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  1963Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF            na      na      na      na  ...  -68.89  -83.34  -96.41
+        ACAG            na      na      na      na  ...   31.37   32.42   33.47
+        AOUC            na    0.25    0.25    0.26  ...    1.39    1.42    1.46
+        AOUC_           na      na      na      na  ...    1.34    1.37    1.41
+        AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61    1.67
+        ...            ...     ...     ...     ...  ...     ...     ...     ...
+        ZJ              na      na      na      na  ...    1.59    1.63    1.67
+        ZKF           0.80    0.81    0.82    0.81  ...    0.87    0.87    0.87
+        ZKFO          1.00    1.00    1.00    1.00  ...    1.02    1.02    1.02
+        ZX            0.00    0.00    0.00    0.00  ...    0.00    0.00    0.00
+        ZZF_          0.69    0.69    0.69    0.69  ...    0.69    0.69    0.69
+        <BLANKLINE>
         >>> df = variables.to_frame()
         >>> df.shape
         (394, 56)
@@ -1731,101 +1834,76 @@ cdef class Variables(_AbstractDatabase):
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKFO', 'ZX', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
+        >>> df                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time     1960Y1    1961Y1    1962Y1  ...     2013Y1     2014Y1     2015Y1
+        names                                ...
+        ACAF        NaN       NaN       NaN  ... -68.894654 -83.340625 -96.410420
+        ACAG        NaN       NaN       NaN  ...  31.370139  32.420299  33.469601
+        AOUC        NaN  0.247832  0.254568  ...   1.387777   1.423714   1.460863
+        AOUC_       NaN       NaN       NaN  ...   1.338086   1.373010   1.407557
+        AQC    0.217530  0.215449  0.222281  ...   1.558039   1.613181   1.674291
+        ...         ...       ...       ...  ...        ...        ...        ...
+        ZJ          NaN       NaN       NaN  ...   1.591981   1.630309   1.667971
+        ZKF    0.802574  0.812873  0.819252  ...   0.874883   0.874351   0.873593
+        ZKFO   1.000000  1.000000  1.000000  ...   1.015990   1.015990   1.015990
+        ZX     0.000000  0.000000  0.000000  ...   0.000000   0.000000   0.000000
+        ZZF_   0.688400  0.688400  0.688400  ...   0.688400   0.688400   0.688400
         <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        AOUC            na    0.25  ...    1.42     1.46
-        <BLANKLINE>
-        >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        time
-        1960Y1         NaN
-        1961Y1    0.247832
-        ...
-        2014Y1    1.423714
-        2015Y1    1.460863
-        Name: AOUC, dtype: float64    
-        >>> variables["ZKFO"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        ZKFO          1.00    1.00  ...    1.02     1.02
-        <BLANKLINE>
-        >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        time
-        1960Y1    1.00000
-        1961Y1    1.00000
-        ...
-        2014Y1    1.01599
-        2015Y1    1.01599
-        Name: ZKFO, dtype: float64
+        [394 rows x 56 columns]
 
         >>> # Export a subset of the IODE Variables database as a pandas DataFrame
-        >>> df = variables["A*;*_"].to_frame()
+        >>> vars_subset = variables["A*;*_", "2000Y1:2010Y1"]
+        >>> vars_subset                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 33
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        2000Y1  2001Y1  2002Y1  2003Y1 ...  2007Y1   2008Y1   2009Y1   2010Y1
+        ACAF          10.05    2.87   -0.93   -6.09 ...  -33.38   -38.41   -37.46   -37.83
+        ACAG         -41.53   18.94   19.98   21.02 ...   25.16    26.19    27.23    28.25
+        AOUC           1.12    1.14    1.16    1.17 ...    1.22     1.26     1.29     1.31
+        AOUC_          1.10    1.14    1.15    1.16 ...    1.20     1.21     1.23     1.25
+        AQC            1.34    1.38    1.41    1.42 ...    1.41     1.43     1.45     1.46
+        ...             ...     ...     ...     ... ...     ...      ...      ...      ...
+        WCF_        3716.45 3863.90 3999.57 4147.95 ... 4665.91  4916.65  5042.74  5170.60
+        WIND_       1000.14 1035.22 1070.93 1102.91 ... 1178.12  1231.49  1268.86  1301.03
+        WNF_        2334.76 2427.49 2512.87 2606.28 ... 2932.23  3089.99  3169.32  3249.75
+        YDH_        7276.61 7635.91 7958.39 8331.07 ... 9685.61 10228.84 10630.74 10995.83
+        ZZF_           0.69    0.69    0.69    0.69 ...    0.69     0.69     0.69     0.69
+        <BLANKLINE>
+        >>> df = vars_subset.to_frame()
         >>> df.shape
-        (33, 56)
+        (33, 11)
         >>> df.index.to_list()              # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
-        ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
+        ['2000Y1', '2001Y1', '2002Y1', ..., '2008Y1', '2009Y1', '2010Y1']
+        >>> df                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time           2000Y1       2001Y1  ...        2009Y1        2010Y1
+        names                               ...
+        ACAF        10.046611     2.867923  ...    -37.463510    -37.827429
+        ACAG       -41.534787    18.939801  ...     27.229955     28.253929
+        AOUC         1.116238     1.140476  ...      1.287132      1.307110
+        AOUC_        1.101957     1.136244  ...      1.231854      1.250164
+        AQC          1.338603     1.379188  ...      1.446332      1.462868
+        ...               ...          ...  ...           ...           ...
+        WCF_      3716.447509  3863.897550  ...   5042.743118   5170.600010
+        WIND_     1000.144577  1035.218800  ...   1268.861647   1301.025126
+        WNF_      2334.763628  2427.492334  ...   3169.316544   3249.751702
+        YDH_      7276.607740  7635.905667  ...  10630.736896  10995.831393
+        ZZF_         0.688400     0.688400  ...      0.688400      0.688400
         <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        AOUC            na    0.25  ...    1.42     1.46
-        <BLANKLINE>
-        >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        time
-        1960Y1         NaN
-        1961Y1    0.247832
-        ...
-        2014Y1    1.423714
-        2015Y1    1.460863
-        Name: AOUC, dtype: float64    
-        >>> variables["ZZF_"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        ZZF_          0.69    0.69  ...    0.69     0.69
-        <BLANKLINE>
-        >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        time
-        1960Y1    0.6884
-        1961Y1    0.6884
-        ...
-        2014Y1    0.6884
-        2015Y1    0.6884
-        Name: ZZF_, dtype: float64
+        [33 rows x 11 columns]
         """
-        cdef cnp.ndarray[cnp.double_t, ndim = 2] data
-        cdef double* cpp_values_ptr
-
         if pd is None:
             raise RuntimeError("pandas library not found")
         
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = _ws_to_numpy_array(vars_list, len(periods_list))
+        data = self.to_ndarray
 
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
@@ -1935,7 +2013,7 @@ cdef class Variables(_AbstractDatabase):
         
         vars_names = array.axes[0].labels
         periods_list = array.axes[1].labels
-        _numpy_array_to_ws(array.data, vars_names, periods_list)
+        self._numpy_array_to_ws(array.data, vars_names, periods_list)
 
     def to_array(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> Array:
         """
@@ -1966,14 +2044,29 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> len(variables)
-        394
-        >>> variables.sample
-        Sample("1960Y1:2015Y1")
-        >>> variables.nb_periods
-        56
 
         >>> # Export the IODE Variables database as an (larray) Array object
+        >>> variables                       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 394
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  1963Y1  ...  2013Y1  2014Y1   2015Y1
+        ACAF            na      na      na      na  ...  -68.89  -83.34   -96.41
+        ACAG            na      na      na      na  ...   31.37   32.42    33.47
+        AOUC            na    0.25    0.25    0.26  ...    1.39    1.42     1.46
+        AOUC_           na      na      na      na  ...    1.34    1.37     1.41
+        AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61     1.67
+        ...            ...     ...     ...     ...  ...     ...     ...      ...
+        ZJ              na      na      na      na  ...    1.59    1.63     1.67
+        ZKF           0.80    0.81    0.82    0.81  ...    0.87    0.87     0.87
+        ZKFO          1.00    1.00    1.00    1.00  ...    1.02    1.02     1.02
+        ZX            0.00    0.00    0.00    0.00  ...    0.00    0.00     0.00
+        ZZF_          0.69    0.69    0.69    0.69  ...    0.69    0.69     0.69
+        <BLANKLINE>
         >>> array = variables.to_array()
         >>> array.shape
         (394, 56)
@@ -1981,79 +2074,71 @@ cdef class Variables(_AbstractDatabase):
         394 x 56
          names [394]: 'ACAF' 'ACAG' 'AOUC' ... 'ZKFO' 'ZX' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        AOUC            na    0.25  ...    1.42     1.46
-        <BLANKLINE>
-        >>> array["AOUC"]
-        time  1960Y1  ...              2014Y1              2015Y1
-                 nan  ...  1.4237139558484628  1.4608626117037322
-        >>> variables["ZKFO"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        ZKFO          1.00    1.00  ...    1.02     1.02
-        <BLANKLINE>
-        >>> array["ZKFO"]
-        time  1960Y1  1961Y1  1962Y1  ...     2012Y1     2013Y1     2014Y1     2015Y1
-                 1.0     1.0     1.0  ...  1.0159901  1.0159901  1.0159901  1.0159901
+        >>> array                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        names\\time      1960Y1  ...              2015Y1
+               ACAF         nan  ...  -96.41041982848331
+               ACAG         nan  ...   33.46960134488098
+               AOUC         nan  ...  1.4608626117037322
+              AOUC_         nan  ...  1.4075567973393608
+                AQC  0.21753037  ...  1.6742905757021305
+                ...         ...  ...                 ...
+                 ZJ         nan  ...  1.6679707618363606
+                ZKF  0.80257398  ...  0.8735925955073036
+               ZKFO         1.0  ...           1.0159901
+                 ZX         0.0  ...                 0.0
+               ZZF_  0.68840039  ...          0.68840039
 
         >>> # Export a subset of the IODE Variables database as an (larray) Array object
-        >>> array = variables["A*;*_"].to_array()
+        >>> vars_subset = variables["A*;*_", "2000Y1:2010Y1"]
+        >>> vars_subset                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 33
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        2000Y1  2001Y1  2002Y1  2003Y1 ...  2007Y1   2008Y1   2009Y1   2010Y1
+        ACAF          10.05    2.87   -0.93   -6.09 ...  -33.38   -38.41   -37.46   -37.83
+        ACAG         -41.53   18.94   19.98   21.02 ...   25.16    26.19    27.23    28.25
+        AOUC           1.12    1.14    1.16    1.17 ...    1.22     1.26     1.29     1.31
+        AOUC_          1.10    1.14    1.15    1.16 ...    1.20     1.21     1.23     1.25
+        AQC            1.34    1.38    1.41    1.42 ...    1.41     1.43     1.45     1.46
+        ...             ...     ...     ...     ... ...     ...      ...      ...      ...
+        WCF_        3716.45 3863.90 3999.57 4147.95 ... 4665.91  4916.65  5042.74  5170.60
+        WIND_       1000.14 1035.22 1070.93 1102.91 ... 1178.12  1231.49  1268.86  1301.03
+        WNF_        2334.76 2427.49 2512.87 2606.28 ... 2932.23  3089.99  3169.32  3249.75
+        YDH_        7276.61 7635.91 7958.39 8331.07 ... 9685.61 10228.84 10630.74 10995.83
+        ZZF_           0.69    0.69    0.69    0.69 ...    0.69     0.69     0.69     0.69
+        <BLANKLINE>
+        >>> array = vars_subset.to_array()
         >>> array.shape
-        (33, 56)
+        (33, 11)
         >>> array.axes.info
-        33 x 56
+        33 x 11
          names [33]: 'ACAF' 'ACAG' 'AOUC' ... 'WNF_' 'YDH_' 'ZZF_'
-         time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
-        >>> variables["AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        AOUC            na    0.25  ...    1.42     1.46
-        <BLANKLINE>
-        >>> array["AOUC"]
-        time  1960Y1  ...              2014Y1              2015Y1
-                 nan  ...  1.4237139558484628  1.4608626117037322
-        >>> variables["ZZF_"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1960Y1:2015Y1
-        mode: LEVEL
-        <BLANKLINE>
-        name        1960Y1  1961Y1  ...  2014Y1   2015Y1
-        ZZF_          0.69    0.69  ...    0.69     0.69
-        <BLANKLINE>
-        >>> array["ZZF_"]
-        time      1960Y1      1961Y1  ...      2013Y1      2014Y1      2015Y1
-              0.68840039  0.68840039  ...  0.68840039  0.68840039  0.68840039
+         time [11]: '2000Y1' '2001Y1' '2002Y1' ... '2008Y1' '2009Y1' '2010Y1'
+        >>> array                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        names\\time               2000Y1  ...               2010Y1
+               ACAF   10.046610792200543  ...   -37.82742883229439
+               ACAG   -41.53478656734795  ...   28.253928978210485
+               AOUC   1.1162376230972206  ...   1.3071099004906368
+              AOUC_     1.10195719812178  ...   1.2501643331956398
+                AQC   1.3386028553645442  ...   1.4628683697450802
+                ...                 ...  ...                 ...    
+               WCF_   3716.4475089520292  ...    5170.600010384268
+              WIND_   1000.1445769794319  ...    1301.025126372868
+               WNF_   2334.7636275081923  ...   3249.7517024908175
+               YDH_    7276.607740221424  ...   10995.831392939246
+               ZZF_           0.68840039  ...           0.68840039
         """
         if la is None:
             raise RuntimeError("larray library not found")
 
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = _ws_to_numpy_array(vars_list, len(periods_list))
-        
+        data = self.to_ndarray
+
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
         time_axis = la.Axis(name=time_axis_name, labels=periods_list)
         return la.Array(axes=(vars_axis, time_axis), data=data)

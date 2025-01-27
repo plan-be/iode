@@ -55,7 +55,6 @@ extern int IodeSetTblFile(int ref, char *filename);
 
 extern double IodeGetVarT(char *name, int t, int mode);
 extern int IodeSetVarT(char *name, int t, int mode, double value);
-extern double *IodeGetVector(char *name, int *lg);
 extern int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg);
 extern int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg);
 

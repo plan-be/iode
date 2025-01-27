@@ -818,7 +818,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |` int IodeSetTblFile(int ref, char *filename)`|Load the var file filename and set its reference number to ref.|
 |` double IodeGetVarT(char *name, int t, int mode)`|Get the value of the variable name at position t where t is the position in the KV\_WS SAMPLE.|
 |` int IodeSetVarT(char *name, int t, int mode, double value)`|Set the value of the variable name at position t, possibly after recalulation based on value and mode.|
-|` double *IodeGetVector(char *name, int *lg)`|Returns a pointer to the first value of the VAR name.|
 |` int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg)`||
 |` int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)`|Determines the position to copy from (python object), where to copy to (KV\_WS) and the nb of elements to copy|
 |**ESTIMATION**||
