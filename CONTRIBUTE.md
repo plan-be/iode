@@ -9,7 +9,6 @@
       > winget install Ninja-build.Ninja
     - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
     - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
-    - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
     - SCR4 executables -> used to build the user documentation. 
     <br> Ask maintainers to get access.
   - **Linux (Ubuntu)**:
@@ -48,10 +47,10 @@ conda install -c conda-forge <list of libraries>
 ```
 
 Archived C++ targets (no longer compiled or used):
-
 - C++ libraries:
   - [Qt 6.4](https://www.qt.io/download)
   <br> Please install it in C:/Qt.
+- [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
 - Python libraries: nanobind
 
 (*) already installed on the Github Actions host-runner [windows-xxx](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
