@@ -4,7 +4,8 @@ from .abstract_table_model import IodeAbstractTableModel
 from .numerical_table_model import IodeNumericalTableModel
 from iode_gui.utils import MAX_PRECISION_NUMBERS, NAN_REP
 
-from typing import List, Any
+from typing import Union, List, Any
+import numpy as np
 from iode import (IodeType, VarsMode, comments, equations, identities, lists, 
                   scalars, tables, variables, Scalar, Table, NA, is_NA)
 
@@ -20,8 +21,10 @@ class CommentsModel(IodeAbstractTableModel):
             QMessageBox.warning(None, "WARNING", str(e))
             return ""
 
-    def set_value(self, row: int, column: int, value: str) -> bool:
+    def set_value(self, row: int, column: int, value: str) -> bool:        
         try:
+            if self.data_cell(row, column) == value:
+                return False
             self._displayed_database.i[row] = value
             return True
         except Exception as e:
@@ -42,6 +45,8 @@ class EquationsModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
+            if self.data_cell(row, column) == value:
+                return False
             # here 'value' represents the LEC expression of the equation
             self._displayed_database.i[row] = value
             return True
@@ -63,6 +68,8 @@ class IdentitiesModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
+            if self.data_cell(row, column) == value:
+                return False
             self._displayed_database.i[row] = value
             return True
         except Exception as e:
@@ -92,6 +99,8 @@ class ListsModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
+            if self.data_cell(row, column) == value:
+                return False
             self._displayed_database.i[row] = value
             return True
         except Exception as e:
@@ -128,10 +137,15 @@ class ScalarsModel(IodeAbstractTableModel, IodeNumericalTableModel):
         try:
             scalar: Scalar = self._displayed_database.i[row]
 
+            value = self.string_to_float(value)
             if column == 0:
-                scalar.value = NA if value == NAN_REP or value == "" else float(value)
+                if value == scalar.value:
+                    return False
+                scalar.value = value
             elif column == 1:
-                scalar.relax = float(value)
+                if value == scalar.relax:
+                    return False
+                scalar.relax = 1.0 if np.isnan(value) else value
 
             return True
         except Exception as e:
@@ -156,6 +170,8 @@ class TablesModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
+            if self.data_cell(row, column) == value:
+                return False
             # here 'value' represents the title of the table
             table: Table = self._displayed_database.i[row]
             table.title = value
@@ -180,8 +196,11 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
             QMessageBox.warning(None, "WARNING", str(e))
             return ""
 
-    def set_value(self, row: int, column: int, value: float) -> bool:
+    def set_value(self, row: int, column: int, value: str) -> bool:
         try:
+            value = self.string_to_float(value)
+            if value == self._displayed_database.i[row, column]:
+                return False
             self._displayed_database.i[row, column] = value
             return True
         except Exception as e:
