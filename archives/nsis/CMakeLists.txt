@@ -16,8 +16,8 @@ message(STATUS "from the template file ${PROJECT_SOURCE_DIR}/nsis/iode_definitio
 # Each variable reference will be replaced with the current value of the variable, or the empty string if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(
-  ${PROJECT_SOURCE_DIR}/nsis/iode_definitions_template.nsh.in
-  ${PROJECT_SOURCE_DIR}/nsis/iode_definitions.nsh
+  ${CMAKE_CURRENT_SOURCE_DIR}/iode_definitions_template.nsh.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/iode_definitions.nsh
 )
 message(STATUS "DONE\n")
 
@@ -25,14 +25,14 @@ message(STATUS "DONE\n")
 
 set(IODE_NSIS_SCRIPT "iode_install.nsi")
 set(IODE_NSIS_UPDATE_SCRIPT "iode_update.nsi")
-set(IODE_NSIS_SCRIPT_DIR "${PROJECT_SOURCE_DIR}/nsis")
+set(IODE_NSIS_SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # ---- generate NSIS installer script from a template file ----
 
 message(STATUS "Generating the NSIS script ${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}")
 message(STATUS "from template file ${IODE_NSIS_SCRIPT_DIR}/iode_template.nsi\n")
 
-file(READ "${PROJECT_SOURCE_DIR}/nsis/iode_template.nsi" FILE_CONTENTS)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/iode_template.nsi" FILE_CONTENTS)
 file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
 
 # see https://cmake.org/cmake/help/latest/command/cmake_path.html#relative-path 
@@ -45,14 +45,14 @@ message(STATUS "List of files to be installed:\n")
 
 # GUI executable file
 message(STATUS "GUI executable file:")
-message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_CPP_GUI_TARGET}.exe")
+message(STATUS "\t${RELATIVE_DIR}\\cpp_gui\\${IODE_CPP_GUI_TARGET}.exe")
 
-set(QT_DIR "${RELATIVE_DIR}\\gui")
+set(QT_DIR "${RELATIVE_DIR}\\cpp_gui")
 file(READ "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
 string(REPLACE "<QT DIR>" ${QT_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
 
-set(GUI_EXE_FILE "${CMAKE_BINARY_DIR}/gui/${IODE_CPP_GUI_TARGET}.exe")
+set(GUI_EXE_FILE "${CMAKE_BINARY_DIR}/cpp_gui//${IODE_CPP_GUI_TARGET}.exe")
 
 # user documentation
 message(STATUS "User doc:")

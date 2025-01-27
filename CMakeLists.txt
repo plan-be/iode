@@ -283,11 +283,6 @@ if(NOT SKBUILD)
   add_subdirectory ("doc")
 endif()
 
-# -- nsis installer --
-if(TARGET ${IODE_CPP_GUI_TARGET})
-  add_subdirectory("nsis")
-endif()
-
 message(STATUS " ")
 message(STATUS "=============================\n")
 
