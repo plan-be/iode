@@ -2259,12 +2259,12 @@ cdef class Variables(_AbstractDatabase):
         if self.first_period_subset is not None:
             first_period = self.first_period_subset
         else: 
-            first_period = whole_db_sample.first_period
+            first_period = whole_db_sample.start
 
         if self.last_period_subset is not None:
             last_period = self.last_period_subset
         else:
-            last_period = whole_db_sample.last_period
+            last_period = whole_db_sample.end
         
         return Sample(first_period, last_period)
 
