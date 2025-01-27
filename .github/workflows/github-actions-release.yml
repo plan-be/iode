@@ -8,14 +8,14 @@ on:
 
 jobs:
   # see https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow 
-  build_nsis_release:
-    uses: ./.github/workflows/github-actions-nsis.yml 
+  build_python_release:
+    uses: ./.github/workflows/github-actions-python.yml
     with:
       build-config: release
 
   build_and_release:
     runs-on: ubuntu-latest
-    needs: build_nsis_release
+    needs: build_python_release
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,12 +39,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: iode-python-3.12
-          path: ${{ github.workspace }}/assets
-
-      - name: Restore Windows Installer and Updater
-        uses: actions/download-artifact@v4
-        with:
-          name: iode-nsis
           path: ${{ github.workspace }}/assets
   
       - name: Check Assets
