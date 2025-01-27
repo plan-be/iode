@@ -34,5 +34,5 @@ class VariablesDelegate(BaseDelegate):
         :return: The QLineEdit widget for editing variables.
         """
         editor = QLineEdit(parent)
-        editor.setValidator(IodeDoubleValidator(editor))
+        editor.setValidator(IodeDoubleValidator(parent=editor))
         return editor

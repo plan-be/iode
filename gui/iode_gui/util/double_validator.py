@@ -10,8 +10,7 @@ class IodeDoubleValidator(QDoubleValidator):
     A custom QDoubleValidator that accepts the NAN_REP string.
     """
 
-    @overload
-    def __init__(self, bottom: float, top: float, decimals: int, parent: QWidget=None):
+    def __init__(self, bottom: float=None, top: float=None, decimals: int=None, parent: QWidget=None):
         """
         Initialize the IodeDoubleValidator.
 
@@ -20,16 +19,16 @@ class IodeDoubleValidator(QDoubleValidator):
         :param decimals: The maximum number of decimal places allowed. 
         :param parent: The parent of this validator. If None, this validator has no parent.
         """
-        super().__init__(bottom, top, decimals, parent)
-        
-    @overload
-    def __init__(parent: QWidget=None):
-        """
-        Initialize the IodeDoubleValidator.
-
-        :param parent: The parent of this validator. If None, this validator has no parent.
-        """ 
-        super().__init__(parent)
+        if bottom is None and top is None and decimals is None:
+            super().__init__(parent)
+        else:
+            if bottom is None:
+                raise ValueError("bottom must be provided if top or decimals are provided")
+            if top is None:
+                raise ValueError("top must be provided if bottom or decimals are provided")
+            if decimals is None:
+                raise ValueError("decimals must be provided if bottom or top are provided")
+            super().__init__(bottom, top, decimals, parent)
 
     def validate(self, input: str, pos: int):
         """
