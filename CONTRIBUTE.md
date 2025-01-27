@@ -19,14 +19,9 @@
     - **LaTeX**: sudo apt install texlive-latex-extra
     - [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
 
-- C++ libraries:
-  - [Qt 6.4](https://www.qt.io/download)
-  <br> Please install it in C:/Qt.
-
  - Python libraries:
    - cython
    - mypy
-   - *(nanobind)*
    - scikit-build-core
    - pyside6
    - qtconsole
@@ -52,6 +47,13 @@ For all other Python libraries:
 conda install -c conda-forge <list of libraries>
 ```
 
+Archived C++ targets (no longer compiled or used):
+
+- C++ libraries:
+  - [Qt 6.4](https://www.qt.io/download)
+  <br> Please install it in C:/Qt.
+- Python libraries: nanobind
+
 (*) already installed on the Github Actions host-runner [windows-xxx](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 
 # Repository Structure
@@ -72,9 +74,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py310 python=3.10 numpy pandas larray cython pytest scikit-build-core (nanobind)
-> conda create --name py311 python=3.11 numpy pandas larray cython pytest scikit-build-core (nanobind)
-> conda create --name py312 python=3.12 numpy pandas larray cython pytest scikit-build-core (nanobind)
+> conda create --name py310 python=3.10 numpy pandas larray cython pytest scikit-build-core
+> conda create --name py311 python=3.11 numpy pandas larray cython pytest scikit-build-core
+> conda create --name py312 python=3.12 numpy pandas larray cython pytest scikit-build-core
 ```
 
 # Building Project
@@ -99,7 +101,6 @@ where `<target>` is one the item in the list below:
 - `iode_scr4`        -> C library providing many of the utility functions used in the C API.
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
-- `iode_gui`         -> Graphical user interface (GUI) based on Qt (C++)
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
