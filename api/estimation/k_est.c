@@ -129,7 +129,7 @@ static void E_savevar(char* name, int eqnb, MAT* mat)
     sprintf(varname, "%s%d", name, eqnb);              // JMP 1/3/2023
     
     // Create varname with NaN 
-    KV_add(varname);
+    KV_add(KV_WS, varname);
     var = KVPTR(varname);
     if(var == NULL) return;
     
