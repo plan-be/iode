@@ -53,11 +53,6 @@ extern char* IodeGetTblTitle(char *name);
 extern TBL* IodeGetTblDefinition(char *name);
 extern int IodeSetTblFile(int ref, char *filename);
 
-extern double IodeGetVarT(char *name, int t, int mode);
-extern int IodeSetVarT(char *name, int t, int mode, double value);
-extern int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg);
-extern int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg);
-
 extern int IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace);
 
 extern int IodeEstimate(char* veqs, char* afrom, char* ato);
