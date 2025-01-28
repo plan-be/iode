@@ -488,7 +488,7 @@ extern int E_GetLecName(char *,char *);
 extern int KV_sample(KDB *,SAMPLE *);
 extern int KV_merge(KDB *,KDB *,int );
 extern void KV_merge_del(KDB *,KDB *,int );
-extern int KV_add(char* varname);
+extern int KV_add(KDB* kdb, char* varname);
 extern double KV_get(KDB *,int ,int ,int );
 extern void KV_set(KDB *,int ,int ,int ,double );
 extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);

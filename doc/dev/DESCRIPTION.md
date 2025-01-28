@@ -353,7 +353,7 @@ Functions acting on workspaces of variables.
 |`int KV_sample(KDB *kdb, SAMPLE *nsmpl)`|Changes the SAMPLE of a KDB of variables.|
 |`int KV_merge(KDB *kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
-|`int KV_add(char* varname)`|Adds a new variable in KV\_WS. Fills it with L\_NAN.|
+|`int KV_add(KDB* kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
 |`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB *kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|

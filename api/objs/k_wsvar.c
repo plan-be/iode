@@ -6,7 +6,7 @@
  *    int KV_sample(KDB *kdb, SAMPLE *nsmpl)                                  Changes the SAMPLE of a KDB of variables.
  *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(char* varname)                                               Adds a new variable in KV_WS. Fills it with IODE_NAN.
+ *    int KV_add(KDB* kdb, char* varname)                                               Adds a new variable in KV_WS. Fills it with IODE_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
  *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
@@ -159,25 +159,30 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
  *  Adds a new variable in KV_WS. Fills it with IODE_NAN.
  *  If the variable already exists, replaces all values by IODE_NAN.
  *  
+ *  @param [in] kdb     KDB*        KDB of variables
  *  @param [in] char*   varname     name of the new variable
- *  @return     int                 position of varname in the KV_WS
+ *  @return     int                 position of varname in the kdb
  */
-int KV_add(char* varname)
+int KV_add(KDB* kdb, char* varname)
 {
-    int         pos, t, nobs;
+    int      pos, t, nobs;
     double   *vptr;
+
+    if(KTYPE(kdb) != VARIABLES) 
+        return(-1);
     
     // Create varname with NaN 
-    pos = K_find(KV_WS, varname);
+    pos = K_find(kdb, varname);
     if(pos < 0) {
-        nobs = KSMPL(KV_WS)->s_nb;
-        pos = K_add(KV_WS, varname, NULL, &nobs); // Set IODE_NAN if the new var
+        nobs = KSMPL(kdb)->s_nb;
+        pos = K_add(kdb, varname, NULL, &nobs); // Set IODE_NAN if the new var
     }
     else { 
         // Replaces all values by IODE_NAN 
-        vptr = KVPTR(varname);
-        if(vptr == NULL) return(-1);
-        for(t = 0; t < KSMPL(KV_WS)->s_nb; t++) 
+        vptr = K_vptr(kdb, varname, 0);
+        if(vptr == NULL) 
+            return(-1);
+        for(t = 0; t < KSMPL(kdb)->s_nb; t++) 
             vptr[t] = IODE_NAN;
     }
         
