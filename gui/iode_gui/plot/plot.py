@@ -114,7 +114,7 @@ class PlotDialog(QDialog):
                 raise ValueError("y_data must be 1-dimensional")
             if len(x_data) != len(y_data):
                 raise ValueError("x_data and y_data must have the same length")
-            self.series[label] = (np.asarray(x_data), np.asarray(y_data))
+            self.series[label] = (x_data, y_data)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", f"Error adding series {label}: {e}")
 
