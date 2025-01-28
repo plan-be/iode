@@ -1525,7 +1525,7 @@ cdef class Variables(_AbstractDatabase):
         >>> nb_periods
         11
         >>> # save original values to restore them later
-        >>> original_values = variables["A*", "2000Y1:2010Y1"].to_ndarray
+        >>> original_values = variables["A*", "2000Y1:2010Y1"].to_ndarray()
         >>> # create the numpy ndarray containing the values to copy into the Variables database
         >>> data = np.zeros((len(vars_names), nb_periods), dtype=float)
         >>> for i in range(len(vars_names)):
@@ -1687,7 +1687,6 @@ cdef class Variables(_AbstractDatabase):
                 value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
                 KV_set(db_ptr, var_pos, t, mode, value)
 
-    @property
     def to_ndarray(self) -> np.ndarray:
         """
         Create a Numpy ndarray from the current Variables database.
@@ -1711,7 +1710,7 @@ cdef class Variables(_AbstractDatabase):
         56
 
         >>> # export the whole Variables workspace to a numpy ndarray (394 variables x 56 periods)
-        >>> data = variables.to_ndarray
+        >>> data = variables.to_ndarray()
         >>> data.shape
         (394, 56)
         >>> data[5, 40]
@@ -1738,7 +1737,7 @@ cdef class Variables(_AbstractDatabase):
         AOUC_           na      na      na      na  ...    1.34    1.37    1.41
         AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61    1.67
         <BLANKLINE>
-        >>> data = vars_subset.to_ndarray
+        >>> data = vars_subset.to_ndarray()
         >>> data.shape
         (5, 56)
         >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1775,7 +1774,7 @@ cdef class Variables(_AbstractDatabase):
         AOUC_         1.10    1.14    1.15    1.16  ...    1.20    1.21    1.23    1.25
         AQC           1.34    1.38    1.41    1.42  ...    1.41    1.43    1.45    1.46
         <BLANKLINE>
-        >>> data = vars_subset.to_ndarray
+        >>> data = vars_subset.to_ndarray()
         >>> data.shape
         (5, 11)
         >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -2072,7 +2071,7 @@ cdef class Variables(_AbstractDatabase):
         
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = self.to_ndarray
+        data = self.to_ndarray()
 
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
@@ -2306,7 +2305,7 @@ cdef class Variables(_AbstractDatabase):
 
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = self.to_ndarray
+        data = self.to_ndarray()
 
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
         time_axis = la.Axis(name=time_axis_name, labels=periods_list)
