@@ -18,12 +18,11 @@ from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, 
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
-from pyiode.iode_database.cpp_api_database cimport KV_get
+from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
-from pyiode.iode_database.cpp_api_database cimport IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
@@ -33,7 +32,7 @@ from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
-from iode.util import check_filepath
+from iode.util import check_filepath, split_list
 
 KeyName = Union[str, List[str]]
 KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
@@ -1476,53 +1475,217 @@ cdef class Variables(_AbstractDatabase):
     def __pow__(self, other):
         return NotImplementedError()
 
-    cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):
-        '''
-        Calls C API fonction IodeCalcSamplePosition() to determine which elements of array to copy into KV_WS and 
-        at which position in the KV_WS sample.
-        '''
-        IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), la_pos, ws_pos, lg)
+    def from_ndarray(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
+        first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
+        """
+        Copy the numpy ndarray `array` into the IODE Variables database.
+        A row of the ndarray represents a variable.
+        A column of the ndarray represents a period.
 
-    # TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
-    #             - rewrite this function to be based on the C++ API
-    def _numpy_array_to_ws(self, data, vars_names: Iterable[str], periods_list: Iterable[str]):
-        cdef int df_pos
-        cdef int ws_pos
-        cdef int lg
+        Parameters
+        ----------
+        data: numpy ndarray
+            Numpy ndarray containing the variables values to copy into the IODE Variables database.
+        vars_names: str or list of str, optional
+            Names of the variables to copy into the IODE Variables database.
+            Default to all variables names found in the present database.
+        first_period: str or Period, optional
+            First period of the values to copy into the IODE Variables database. 
+            Default to the first period of the present database.
+        last_period: str or Period, optional
+            Last period of the values to copy into the IODE Variables database. 
+            Default to the last period of the present database.
 
-        nb_periods_ = len(periods_list)
-        lg = nb_periods_
-        start_period, last_period = periods_list[0], periods_list[-1]
+        Warnings
+        --------
+        IODE and pandas don't use the same constant to represent NaN values.
+        When loading a pandas DataFrame into the Variables database, the pandas 
+        NaN values (:math:`nan`) are converted to IODE NaN values (:math:`NA`).
 
-        # calculate:
-        #   - df_pos: the position of the first element of data to be copied into WS
-        #   - ws_pos: the position in KV_WS sample where to copy df[...pos]
-        #   - the nb of values to be copied 
-        IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
+        See Also
+        --------
+        Variables.from_frame
+        Variables.from_array
 
-        # replace numpy/pandas NaN by IODE NaN
-        data = np.nan_to_num(data, nan=NA)
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR, Sample
+        >>> import numpy as np
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded  
+        >>> # define the list of Variables to override, the first and last periods to copy
+        >>> vars_names = variables.get_names("A*")
+        >>> vars_names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> first_period = "2000Y1"
+        >>> last_periods = "2010Y1"
+        >>> sample = Sample(first_period, last_periods)
+        >>> nb_periods = sample.nb_periods
+        >>> nb_periods
+        11
+        >>> # save original values to restore them later
+        >>> original_values = variables["A*", "2000Y1:2010Y1"].to_ndarray
+        >>> # create the numpy ndarray containing the values to copy into the Variables database
+        >>> data = np.zeros((len(vars_names), nb_periods), dtype=float)
+        >>> for i in range(len(vars_names)):
+        ...     for j in range(nb_periods):
+        ...         data[i, j] = i * nb_periods + j
+        >>> data
+        array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.],
+               [ 11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,  21.],
+               [ 22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,  32.],
+               [ 33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,  43.],
+               [ 44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,  54.]])
+        
+        >>> variables["A*", "2000Y1:2010Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF         10.05    2.87   -0.93   -6.09  -14.58  -26.54  -28.99  -33.38  -38.41  -37.46  -37.83
+        ACAG        -41.53   18.94   19.98   21.02   22.07   23.11   24.13   25.16   26.19   27.23   28.25
+        AOUC          1.12    1.14    1.16    1.17    1.17    1.18    1.20    1.22    1.26    1.29    1.31
+        AOUC_         1.10    1.14    1.15    1.16    1.15    1.16    1.19    1.20    1.21    1.23    1.25
+        AQC           1.34    1.38    1.41    1.42    1.40    1.40    1.40    1.41    1.43    1.45    1.46
+        <BLANKLINE>
+        >>> # copy the numpy ndarray into the Variables database (overriding the existing values)
+        >>> variables.from_ndarray(data, vars_names, first_period, last_periods)
+        >>> variables["A*", "2000Y1:2010Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF          0.00    1.00    2.00    3.00    4.00    5.00    6.00    7.00    8.00    9.00   10.00
+        ACAG         11.00   12.00   13.00   14.00   15.00   16.00   17.00   18.00   19.00   20.00   21.00
+        AOUC         22.00   23.00   24.00   25.00   26.00   27.00   28.00   29.00   30.00   31.00   32.00
+        AOUC_        33.00   34.00   35.00   36.00   37.00   38.00   39.00   40.00   41.00   42.00   43.00
+        AQC          44.00   45.00   46.00   47.00   48.00   49.00   50.00   51.00   52.00   53.00   54.00
+        <BLANKLINE>
 
-        # copy each line of array into KV_WS on the time intersection of df and KV_WS
-        # values = <double*>cnp.PyArray_DATA(df[vars_names[0]].data)
-        if np.issubdtype(data.dtype, np.floating):
-            if data.data.c_contiguous:
-                for name, row_data in zip(vars_names, data):
-                    # Save the vector of doubles in KV_WS
-                    values = < double * > cnp.PyArray_DATA(row_data)
-                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-            else:
-                for name, row_data in zip(vars_names, data):
-                    row_data = row_data.copy()  # copy if non contiguous
-                    # Save the vector of doubles in KV_WS
-                    values = < double * > cnp.PyArray_DATA(row_data)
-                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+        >>> # if a subset represents all values to be updated, the values for the arguments 
+        >>> # vars_names, first_period and last_period can be omitted
+        >>> vars_subset = variables["A*", "2000Y1:2010Y1"]
+        >>> vars_subset.from_ndarray(original_values)
+        >>> vars_subset                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  2005Y1  2006Y1  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF         10.05    2.87   -0.93   -6.09  -14.58  -26.54  -28.99  -33.38  -38.41  -37.46  -37.83
+        ACAG        -41.53   18.94   19.98   21.02   22.07   23.11   24.13   25.16   26.19   27.23   28.25
+        AOUC          1.12    1.14    1.16    1.17    1.17    1.18    1.20    1.22    1.26    1.29    1.31
+        AOUC_         1.10    1.14    1.15    1.16    1.15    1.16    1.19    1.20    1.21    1.23    1.25
+        AQC           1.34    1.38    1.41    1.42    1.40    1.40    1.40    1.41    1.43    1.45    1.46
+        <BLANKLINE>
+        """
+        cdef var_pos
+        cdef bytes b_name
+        cdef char* c_name
+        cdef double value
+        cdef int i, j, t
+        cdef int mode = <int>self.mode_
+        cdef int t_first_period
+        cdef int t_last_period
+        cdef int nb_periods
+        cdef KDB* db_ptr = self.database_ptr.get_database()
+        if db_ptr is NULL:
+            raise RuntimeError("The IODE Variables workspace has not been initialized")
+
+        self_first_period, self_last_period = self._get_periods_bounds()
+        self_nb_periods = self_last_period - self_first_period + 1
+
+        if self_nb_periods <= 0:
+            raise RuntimeError("The sample of the Variables database to export is empty")
+
+        if vars_names is None:
+            vars_names = self.names
+        if isinstance(vars_names, str):
+            vars_names = split_list(vars_names)
+        
+        if len(vars_names) != data.shape[0]:
+            raise ValueError(f"The number of variables ({len(vars_names)}) to update is different "
+                             f"from the number of rows of the numpy ndarray ({data.shape[0]}).\n"
+                             f"Variables to updated are: {vars_names}")
+
+        for name in vars_names:
+            if name not in self:
+                if self.is_detached:
+                    raise ValueError(f"It is not allowed to add a new variable to a subset of the "
+                                        f"Variables workspace. The variable '{name}' has not been found "
+                                        "in the Variables workspace.")
+                else:
+                    # NOTE: Cython cannot directly convert a Python string to a C string, 
+                    #       so we need to use the encode() method to convert it to a bytes object first, 
+                    #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
+                    b_name = name.encode()
+                    c_name = b_name
+                    # add a new variable with all values set to IODE_NAN
+                    KV_add(db_ptr, c_name)
+
+        self_first_period = self.first_period
+        if first_period is None:
+            first_period = self_first_period
         else:
-            for name, row_data in zip(vars_names, data):
-                row_data = row_data.astype("double") # astype creates a copy
-                # Save the vector of doubles in KV_WS
-                values = <double*>cnp.PyArray_DATA(row_data)
-                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+            first_period = Period(first_period)
+
+        if first_period < self_first_period:
+            raise ValueError(f"The first period {first_period} is before the first period of "
+                             f"the current Variables database {self_first_period}")
+
+        self_last_period = self.last_period
+        if last_period is None:
+            last_period = self_last_period
+        else:
+            last_period = Period(last_period)
+
+        if last_period > self_last_period:
+            raise ValueError(f"The last period {last_period} is after the last period of "
+                             f"the current Variables database {self_last_period}")
+        
+        t_first_period = self._get_real_period_position(first_period)
+        t_last_period = self._get_real_period_position(last_period)
+        nb_periods = t_last_period - t_first_period + 1
+
+        if nb_periods != data.shape[1]:
+            raise ValueError(f"The number of periods ({nb_periods}) to update is different "
+                             f"from the number of columns of the numpy ndarray ({data.shape[1]}).\n"
+                             f"Periods to updated are: {first_period}:{last_period}")
+
+        if not data.flags['C_CONTIGUOUS']:
+            # make sure the array is C-contiguous
+            data = np.ascontiguousarray(data)
+
+        # convert the array to float64 if necessary
+        data = data.astype(np.float64)
+
+        # declaring a C-contiguous array of 2D double
+        # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
+        cdef double[:, ::1] data_view = data
+
+        # copy the values
+        for i, name in enumerate(vars_names):
+            # NOTE: Cython cannot directly convert a Python string to a C string, 
+            #       so we need to use the encode() method to convert it to a bytes object first, 
+            #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
+            b_name = name.encode()
+            c_name = b_name
+            var_pos = K_find(db_ptr, c_name)
+            for j, t in enumerate(range(t_first_period, t_last_period + 1)):
+                value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
+                KV_set(db_ptr, var_pos, t, mode, value)
 
     @property
     def to_ndarray(self) -> np.ndarray:
@@ -1632,6 +1795,7 @@ cdef class Variables(_AbstractDatabase):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
+        cdef i, t
         cdef double value
         cdef int mode = <int>self.mode_
         cdef int t_first_period
@@ -1699,7 +1863,11 @@ cdef class Variables(_AbstractDatabase):
         >>> # create the pandas DataFrame
         >>> vars_names = [f"{region}_{code}" for region in ["VLA", "WAL", "BXL"] for code in ["00", "01", "02"]]
         >>> periods_list = [f"{i}Y1" for i in range(1960, 1971)]
-        >>> data = np.arange(len(vars_names) * len(periods_list), dtype=float).reshape(len(vars_names), len(periods_list))
+        >>> nb_periods = len(periods_list)
+        >>> data = np.zeros((len(vars_names), nb_periods), dtype=float)
+        >>> for i in range(len(vars_names)):
+        ...     for j in range(nb_periods):
+        ...         data[i, j] = i * nb_periods + j
         >>> df = pd.DataFrame(index=vars_names, columns=periods_list, data=data)
         >>> # display the dataframe
         >>> df          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1759,14 +1927,15 @@ cdef class Variables(_AbstractDatabase):
 
         # list of periods
         periods_list = df.columns.to_list()
+        first_period, last_period = periods_list[0], periods_list[-1]
 
         # override the current sample
-        self.sample = f"{periods_list[0]}:{periods_list[-1]}"
+        self.sample = f"{first_period}:{last_period}"
 
         # numpy data
         data = df.to_numpy(copy=False)
 
-        self._numpy_array_to_ws(data, vars_names, periods_list)
+        self.from_ndarray(data, vars_names, first_period, last_period)
 
     def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
         """
@@ -2002,9 +2171,10 @@ cdef class Variables(_AbstractDatabase):
         if time_axis_name not in array.axes:
             raise RuntimeError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(array.axes)}.")
         time = array.axes[time_axis_name]
+        first_period, last_period = time.labels[0], time.labels[-1]
 
         # override the current sample
-        self.sample = f"{time.labels[0]}:{time.labels[-1]}"
+        self.sample = f"{first_period}:{last_period}"
         
         # push the time axis as last axis and combine all other axes 
         array = array.transpose(..., time_axis_name)
@@ -2012,8 +2182,7 @@ cdef class Variables(_AbstractDatabase):
             array = array.combine_axes(array.axes[:-1], sep=sep)
         
         vars_names = array.axes[0].labels
-        periods_list = array.axes[1].labels
-        self._numpy_array_to_ws(array.data, vars_names, periods_list)
+        self.from_ndarray(array.data, vars_names, first_period, last_period)
 
     def to_array(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> Array:
         """
