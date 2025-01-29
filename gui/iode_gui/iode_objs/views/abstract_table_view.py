@@ -238,14 +238,15 @@ class IodeAbstractTableView(QTableView):
         pattern = self.filter_line_edit.text().strip()
         return pattern
 
-    def filter(self, silent=False):
+    def filter(self, key: str=None, silent: bool=False):
         """
         Filter the view based on the text in the filter line edit.
 
         Args:
             silent (bool): If True, the filter operation is silent.
         """
-        key = self._get_key_filter()
+        if key is None:
+            key = self._get_key_filter()
         table_model: IodeAbstractTableModel = self.model()
         table_model.filter(key, silent)
         self.update()

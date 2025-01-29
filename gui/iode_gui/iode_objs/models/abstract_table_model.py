@@ -486,8 +486,9 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         Filters the database based on the given pattern.
 
-        :param key: The filter pattern (tuple(names, periods) for Variables).
-        :param silent: If True, the filter is applied silently without updating the view.
+        :param key: The filter pattern ( tuple(names, periods) for Variables ).
+        :param silent: If the key is invalid and if True, the displayed database 
+                       is set to the global IODE database without displaying a warning message.
         """
         if not key:
             self._displayed_database = self._database

@@ -717,7 +717,7 @@ class IodeTabWidget(QTabWidget):
             tab_widget.compute_hash()
 
             # Try to rerun filter (with silent = True)
-            tab_widget.filter(True)
+            tab_widget.filter(silent=True)
 
             # Update tab text and tooltip
             self.setTabText(index, tab_widget.tab_text)

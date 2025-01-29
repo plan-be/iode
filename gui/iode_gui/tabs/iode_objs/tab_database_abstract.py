@@ -261,13 +261,13 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.database_model.clear_database()
         self.database_model.reset_model()
 
-    def filter(self, silent: bool = False):
+    def filter(self, key: str=None, silent: bool=False):
         """
         Filter the database.
 
         :param bool silent: Whether to filter silently.
         """
-        self.database_view.filter(silent)
+        self.database_view.filter(key, silent)
 
     def reset_filter(self):
         """
@@ -368,7 +368,7 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
             # -> executing a command line or an IODE report may have renamed, added or removed IODE objects and
             #    then made the subset database invalid (remember that the subset database in the
             #    IodeTemplateTableModel class is a shallow copy of a subset of a global IODE database)
-            self.filter(True)
+            self.filter(silent=True)
             self.reset_model()
 
         self.tab_database_modified.emit(self.iode_type, modified)
