@@ -459,6 +459,7 @@ TABLE
 
    Table.nb_lines
    Table.nb_columns
+   Table.title
    Table.language
    Table.ymin
    Table.ymax

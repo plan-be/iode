@@ -882,6 +882,8 @@ cdef class Table:
 
     Attributes
     ----------
+    title: str
+        The title of the table.
     ymin: float
         Minimum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
         The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
@@ -1189,6 +1191,53 @@ cdef class Table:
     @property
     def nb_columns(self) -> int:
         return <int>(self.c_table.nb_columns())
+
+    @property
+    def title(self) -> str:
+        """
+        Title of the table.
+
+        Parameters
+        ----------
+        value: str
+            Title of the table.
+
+        Examples
+        --------
+        >>> from iode import Table, tables, SAMPLE_DATA_DIR
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS
+        Loading ...fun.tbl
+        46 objects loaded
+        >>> table = tables["ANAKNFF"]
+        >>> table.title
+        'Déterminants de la croissance de K'
+        >>> table.title = "New title"
+        >>> table.title
+        'New title'
+        """
+        cdef string c_title
+        cdef CTableLine* c_line
+
+        for i in range(len(self)):
+            c_line = self.c_table.get_line(i)
+            line_type = <int>(c_line.get_line_type())
+            if line_type == TableLineType.TITLE:
+                c_title = self.c_table.get_title(i)
+                return c_title.decode()
+        return ""
+
+    @title.setter
+    def title(self, value: str):
+        cdef CTableLine* c_line
+        cdef string c_title
+
+        for i in range(len(self)):
+            c_line = self.c_table.get_line(i)
+            line_type = <int>(c_line.get_line_type())
+            if line_type == TableLineType.TITLE:
+                c_title = value.encode()
+                self.c_table.set_title(i, c_title)
+        self.update_global_database()
 
     @property
     def language(self) -> str:
