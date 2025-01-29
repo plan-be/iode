@@ -89,9 +89,11 @@ class NumericalTableView:
         :rtype: list[str]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
-        model: IodeAbstractTableModel = self.model()
+        model = self.model()
         object_names = [model.headerData(row, Qt.Orientation.Vertical, Qt.ItemDataRole.DisplayRole) 
                         for row in range(selection_range.top(), selection_range.bottom() + 1)]
+        if not all(isinstance(name, str) for name in object_names):
+            raise RuntimeError("Something went wrong while extracting row names")
         return object_names
 
     def _extract_periods(self) -> List[str]:
@@ -102,9 +104,11 @@ class NumericalTableView:
         :rtype: list[str]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
-        model: IodeAbstractTableModel = self.model()
+        model = self.model()
         periods = [model.headerData(column, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole) 
                    for column in range(selection_range.left(), selection_range.right() + 1)]
+        if not all(isinstance(period, str) for period in periods):
+            raise RuntimeError("Something went wrong while extracting periods")
         return periods
 
     def _extract_values(self) -> List[List[str]]:
@@ -115,11 +119,13 @@ class NumericalTableView:
         :rtype: list[list[str]]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
-        model: IodeAbstractTableModel = self.model()
+        model = self.model()
         values = []
         for row in range(selection_range.top(), selection_range.bottom() + 1):
-            row_values = [model.data(model.index(row, column), Qt.ItemDataRole.DisplayRole) 
-                          for column in range(selection_range.left(), selection_range.right() + 1)]
+            row_values = [model.get_value(row, column) for column in 
+                          range(selection_range.left(), selection_range.right() + 1)]
+            if not all(isinstance(value, str) for value in row_values):
+                raise RuntimeError("Something went wrong while extracting values")
             row_values = ["" if value == NAN_REP else value for value in row_values]
             values += [row_values]
         return values
@@ -192,9 +198,11 @@ class NumericalTableView:
 
                 for i, row_string in enumerate(text.split("\n")):
                     for j, value in enumerate(row_string.split("\t")):
-                        index = model.index(start_index.row() + i, start_index.column() + j)
+                        row = start_index.row() + i
+                        column = start_index.column() + j
+                        index = model.index(row, column)
                         if index.isValid():
-                            model.setData(index, value, Qt.ItemDataRole.EditRole)
+                            model.set_value(row, column, value)
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", "Can't paste values\n\n" + str(e))   
 
@@ -212,7 +220,7 @@ class NumericalTableView:
 
                 # If the text from clipboard ends with the new-line character,
                 # the QString::split() function returns a list ending by an empty element.
-                # This empty element is then interpreted as a new NaN value by the setData function.
+                # This empty element is then interpreted as a new NaN value by the set_value function.
                 if text.endswith("\n"):
                     text = text[:-1]
 
@@ -255,7 +263,7 @@ class NumericalTableView:
                     for value in cells:
                         index = model.index(row, column)
                         if index.isValid():
-                            model.setData(index, value, Qt.ItemDataRole.EditRole)
+                            model.set_value(row, column, value)
                         column += 1
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", f"Can't paste values\n\n{str(e)}")
