@@ -519,7 +519,7 @@ class IodeTabWidget(QTabWidget):
         :param orientation: The orientation of the split.
         """
         tab_widget = self.widget(index)
-        if isinstance(tab_widget, TextWidget):
+        if isinstance(tab_widget, IodeAbstractWidget):
             tab_widget.split(orientation)
 
     def _undo_split_tab(self, index: int):
@@ -529,7 +529,7 @@ class IodeTabWidget(QTabWidget):
         :param index: The index of the tab to undo_split.
         """
         tab_widget = self.widget(index)
-        if isinstance(tab_widget, TextWidget):
+        if isinstance(tab_widget, IodeAbstractWidget):
             tab_widget.undo_split()
 
     def load_file(self, filepath: str, display_tab: bool = True, force_overwrite: bool = False,
@@ -1134,8 +1134,8 @@ class IodeTabWidget(QTabWidget):
         if point.isNull():
             return
 
-        index_context_menu = self.tabBar().tabAt(point)
-        tab_widget: IodeAbstractWidget = self.widget(index_context_menu)
+        self.index_context_menu = self.tabBar().tabAt(point)
+        tab_widget: IodeAbstractWidget = self.widget(self.index_context_menu)
         global_point = self.tabBar().mapToGlobal(point)
 
         # by design, there is only one tab per type of iode database
