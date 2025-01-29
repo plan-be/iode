@@ -199,7 +199,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
             return int(self.alignment)
 
         if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
-            return self.data_cell(index.row(), index.column())
+            return self.get_value(index.row(), index.column())
 
         return None
 
@@ -380,7 +380,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
             if self.hash_after != self.hash_before:
                 self.database_modified.emit()
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         """
         Returns the data for the given row and column.
 

@@ -14,7 +14,7 @@ class CommentsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(["Comment"], IodeType.COMMENTS, comments, parent)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             return self._displayed_database.i[row]
         except Exception as e:
@@ -23,7 +23,7 @@ class CommentsModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:        
         try:
-            if self.data_cell(row, column) == value:
+            if self.get_value(row, column) == value:
                 return False
             self._displayed_database.i[row] = value
             return True
@@ -36,7 +36,7 @@ class EquationsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(["Equation"], IodeType.EQUATIONS, equations, parent)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             return self._displayed_database.get_lec(row)
         except Exception as e:
@@ -45,7 +45,7 @@ class EquationsModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
-            if self.data_cell(row, column) == value:
+            if self.get_value(row, column) == value:
                 return False
             # here 'value' represents the LEC expression of the equation
             self._displayed_database.i[row] = value
@@ -59,7 +59,7 @@ class IdentitiesModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(["Identity"], IodeType.IDENTITIES, identities, parent)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             return str(self._displayed_database.i[row])
         except Exception as e:
@@ -68,7 +68,7 @@ class IdentitiesModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
-            if self.data_cell(row, column) == value:
+            if self.get_value(row, column) == value:
                 return False
             self._displayed_database.i[row] = value
             return True
@@ -90,7 +90,7 @@ class ListsModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(["List"], IodeType.LISTS, lists, parent)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             return "; ".join(self._displayed_database.i[row])
         except Exception as e:
@@ -99,7 +99,7 @@ class ListsModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
-            if self.data_cell(row, column) == value:
+            if self.get_value(row, column) == value:
                 return False
             self._displayed_database.i[row] = value
             return True
@@ -113,7 +113,7 @@ class ScalarsModel(IodeAbstractTableModel, IodeNumericalTableModel):
         IodeAbstractTableModel.__init__(self, ["Value", "Relax", "Std", "T-Stat"], IodeType.SCALARS, scalars_db, parent)
         IodeNumericalTableModel.__init__(self, precision, format)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             scalar: Scalar = self._displayed_database.i[row]
             if col == 0:
@@ -161,7 +161,7 @@ class TablesModel(IodeAbstractTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(["Table"], IodeType.TABLES, tables, parent)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             return self._displayed_database.get_title(row)
         except Exception as e:
@@ -170,7 +170,7 @@ class TablesModel(IodeAbstractTableModel):
 
     def set_value(self, row: int, column: int, value: str) -> bool:
         try:
-            if self.data_cell(row, column) == value:
+            if self.get_value(row, column) == value:
                 return False
             # here 'value' represents the title of the table
             table: Table = self._displayed_database.i[row]
@@ -188,7 +188,7 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
         IodeNumericalTableModel.__init__(self, precision, format)
         self.set_mode(mode)
 
-    def data_cell(self, row: int, col: int) -> str:
+    def get_value(self, row: int, col: int) -> str:
         try:
             value = self._displayed_database.i[row, col]
             return self.value_to_string(value)
