@@ -208,15 +208,18 @@ class IodeAbstractTableView(QTableView):
         """
         self.delete_shortcut.setEnabled(enable)
 
-    def check_global_sample(self):
+    def check_global_sample(self) -> bool:
         """
         Check the global sample and ask to set it if not already defined.
 
         Returns:
             bool: True if the sample is set, False otherwise.
         """
-        # check global sample and ask to set it if not already defined
-        if not variables.nb_periods:
+        # check if the sample of the IODE Variables database is set 
+        if variables.nb_periods:
+            return True
+        # if not -> ask to set it
+        else:
             reply = QMessageBox.question(None, "Sample", "Sample undefined. Set it?",
                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if reply == QMessageBox.StandardButton.Yes:
