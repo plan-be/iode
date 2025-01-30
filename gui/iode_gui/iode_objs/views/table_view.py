@@ -94,9 +94,9 @@ class IdentitiesView(IodeAbstractTableView):
 
         # ---- keyboard shortcuts ----
         self.shortcut_execute_current_idt = QShortcut(QKeySequence(Qt.Key.Key_F7), self)
-        self.shortcut_execute_idts = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F7), self)
-
         self.shortcut_execute_current_idt.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+
+        self.shortcut_execute_idts = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F7), self)
         self.shortcut_execute_idts.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
     
     # override IodeAbstractTableView method 

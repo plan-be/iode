@@ -91,26 +91,38 @@ class IodeTabWidget(QTabWidget):
         self.tab_variables: VariablesWidget = VariablesWidget(self)
 
         # Prepare shortcuts
-        self.filepath_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_C), self)
-        self.reveal_explorer_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_R), self)
-        self.next_tab_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Tab), self)
-        self.previous_tab_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_Tab), self)
-        self.clear_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_D), self)
-        self.close_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_W), self)
-        self.save_shortcut = QShortcut(QKeySequence.StandardKey.Save, self)
-
         # NOTE: By default, shortcuts are defined at the main Window level.
         #       Thus, a shortcut of a (combination of) key(s) may override the expected behavior
         #       from another widget dealing with the same (combination of) key(s).
         #       'setContext(Qt.WidgetWithChildrenShortcut)' makes sure that the shortcut does
         #       not propagate to other widgets.
+        self.filepath_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_C), self)
         self.filepath_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.filepath_shortcut.activated.connect(self.absolute_path)
+
+        self.reveal_explorer_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_R), self)
         self.reveal_explorer_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.reveal_explorer_shortcut.activated.connect(self.reveal_in_folder)
+
+        self.next_tab_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Tab), self)
         self.next_tab_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.next_tab_shortcut.activated.connect(self.show_next_tab)
+        
+        self.previous_tab_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_Tab), self)
         self.previous_tab_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.previous_tab_shortcut.activated.connect(self.show_previous_tab)
+        
+        self.clear_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_D), self)
         self.clear_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.clear_shortcut.activated.connect(self.clear_tab)
+        
+        self.close_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_W), self)
         self.close_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.close_shortcut.activated.connect(self.close_tab)
+        
+        self.save_shortcut = QShortcut(QKeySequence.StandardKey.Save, self)
         self.save_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.save_shortcut.activated.connect(self.save_tab)
 
         # ---- file system watcher ----
         self.file_system_watcher = QFileSystemWatcher(self)
@@ -122,17 +134,9 @@ class IodeTabWidget(QTabWidget):
         self.action_split_v: QAction = None
         self.action_undo_split: QAction = None
 
-        # ---- connect signals to slots  ----
+        # ---- signals to slots  ----
         self.currentChanged.connect(self.show_tab)
         self.tabCloseRequested.connect(self.remove_tab)
-
-        self.filepath_shortcut.activated.connect(self.absolute_path)
-        self.reveal_explorer_shortcut.activated.connect(self.reveal_in_folder)
-        self.next_tab_shortcut.activated.connect(self.show_next_tab)
-        self.previous_tab_shortcut.activated.connect(self.show_previous_tab)
-        self.clear_shortcut.activated.connect(self.clear_tab)
-        self.close_shortcut.activated.connect(self.close_tab)
-        self.save_shortcut.activated.connect(self.save_tab)
 
         self.file_system_watcher.fileChanged.connect(self.reload_file)
 

@@ -44,15 +44,15 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
 
         # create and connect shortcuts
         self.find_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F), self)
-        self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R), self)
-        self.duplicate_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_Down), self)
-
         self.find_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.replace_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.duplicate_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-
         self.find_shortcut.activated.connect(self.open_find_box)
+        
+        self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R), self)
+        self.replace_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.replace_shortcut.activated.connect(self.open_replace_box)
+        
+        self.duplicate_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_Down), self)
+        self.duplicate_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.duplicate_shortcut.activated.connect(self.duplicate_line)
 
     def left_area_paint_event(self, event: QPaintEvent):

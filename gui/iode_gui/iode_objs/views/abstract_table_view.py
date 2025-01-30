@@ -103,60 +103,70 @@ class IodeAbstractTableView(QTableView):
         self.object_name_edit.editingFinished.connect(self.close_name_editor)
 
         # to popup an editing dialog box
-        self.shortcutEditEnter = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Enter), self)
-        self.shortcutEditEnter.activated.connect(self.edit_obj)
+        self.edit_enter_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Enter), self)
+        self.edit_enter_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.edit_enter_shortcut.activated.connect(self.edit_obj)
 
-        self.shortcutEditReturn = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Return), self)
-        self.shortcutEditReturn.activated.connect(self.edit_obj)
+        self.edit_return_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Return), self)
+        self.edit_return_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.edit_return_shortcut.activated.connect(self.edit_obj)
 
         # gets objects of the same name or listed in the CLEC structure
         self.same_cmt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F1), self)
-        self.same_eq_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F2), self)
-        self.same_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F3), self)
-        self.same_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F4), self)
-        self.same_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F6), self)
-        self.vars_from_CLEC_shortcut     = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F7), self)
-        self.scalars_from_CLEC_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F5), self)
-
         self.same_cmt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.same_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.same_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.same_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.same_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.vars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.scalars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-
         self.same_cmt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.COMMENTS))
+        
+        self.same_eq_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F2), self)
+        self.same_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_eq_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.EQUATIONS))
+        
+        self.same_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F3), self)
+        self.same_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_idt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.IDENTITIES))
+        
+        self.same_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F4), self)
+        self.same_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_lst_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.LISTS))
+        
+        self.same_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F6), self)
+        self.same_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_tbl_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.TABLES))
-        self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.VARIABLES))
-        self.scalars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.SCALARS))
 
+        self.scalars_from_CLEC_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F5), self)
+        self.scalars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.scalars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.SCALARS))
+        
+        self.vars_from_CLEC_shortcut     = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F7), self)
+        self.vars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.VARIABLES))
+        
         # get list of related objects
         self.related_cmt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F1), self)
-        self.related_eq_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F2), self)
-        self.related_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F3), self)
-        self.related_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F4), self)
-        self.related_scl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F5), self)
-        self.related_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F6), self)
-        self.related_var_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F7), self)
-
         self.related_cmt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_scl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_var_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-
         self.related_cmt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.COMMENTS))
+        
+        self.related_eq_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F2), self)
+        self.related_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_eq_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.EQUATIONS))
+        
+        self.related_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F3), self)
+        self.related_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_idt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.IDENTITIES))
+        
+        self.related_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F4), self)
+        self.related_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_lst_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.LISTS))
+        
+        self.related_scl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F5), self)
+        self.related_scl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_scl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.SCALARS))
+        
+        self.related_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F6), self)
+        self.related_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_tbl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.TABLES))
+        
+        self.related_var_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F7), self)
+        self.related_var_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.related_var_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.VARIABLES))
 
     def setup(self, main_window: AbstractMainWindow):

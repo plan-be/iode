@@ -134,15 +134,15 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.database_view_2.set_filter_names(self.lineEdit_filter)
 
         # Shortcuts
-        self.shortcut_print = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P), self)
-        self.shortcut_add = QShortcut(QKeySequence(Qt.Key.Key_Insert), self)
-
         # NOTE: By default, shortcuts are defined at the main Window level.
         #       Thus, a shortcut of a (combination of) key(s) may override the expected behavior
         #       from another widget dealing with the same (combination of) key(s).
         #       'setContext(Qt::WidgetWithChildrenShortcut)' makes sure that the shortcut does
         #       not propagate to other widgets.
+        self.shortcut_print = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P), self)
         self.shortcut_print.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+
+        self.shortcut_add = QShortcut(QKeySequence(Qt.Key.Key_Insert), self)
         self.shortcut_add.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
         # Signals - slots
