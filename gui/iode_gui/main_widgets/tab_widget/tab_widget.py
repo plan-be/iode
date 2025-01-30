@@ -97,6 +97,7 @@ class IodeTabWidget(QTabWidget):
         self.previous_tab_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_Tab), self)
         self.clear_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_D), self)
         self.close_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_W), self)
+        self.save_shortcut = QShortcut(QKeySequence.StandardKey.Save, self)
 
         # NOTE: By default, shortcuts are defined at the main Window level.
         #       Thus, a shortcut of a (combination of) key(s) may override the expected behavior
@@ -109,6 +110,7 @@ class IodeTabWidget(QTabWidget):
         self.previous_tab_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.clear_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.close_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.save_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
         # ---- file system watcher ----
         self.file_system_watcher = QFileSystemWatcher(self)
@@ -130,6 +132,7 @@ class IodeTabWidget(QTabWidget):
         self.previous_tab_shortcut.activated.connect(self.show_previous_tab)
         self.clear_shortcut.activated.connect(self.clear_tab)
         self.close_shortcut.activated.connect(self.close_tab)
+        self.save_shortcut.activated.connect(self.save_tab)
 
         self.file_system_watcher.fileChanged.connect(self.reload_file)
 
@@ -397,7 +400,7 @@ class IodeTabWidget(QTabWidget):
         self.action_close = self._add_action("Close", "Close the current tab", self.close_tab, 
                                              self.close_shortcut)
         self._add_action("Save", "Save the content of the current tab", self.save_tab, 
-                         QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_S), self))
+                         self.save_shortcut)
         # NOTE: clear tab (ONLY FOR TABS REPRESENTING AN IODE DATABASE)
         self.action_clear = self._add_action("Clear", "Clear the content of the current tab", 
                                              self.clear_tab, self.clear_shortcut)
