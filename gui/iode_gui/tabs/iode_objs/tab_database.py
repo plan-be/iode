@@ -181,10 +181,9 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
 
         # Create shortcuts
         self.shortcut_mode_plus = QShortcut(QKeySequence(Qt.Key.Key_F5), self)
-        self.shortcut_mode_minus = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F5), self)
-
-        # Set shortcut context
         self.shortcut_mode_plus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+
+        self.shortcut_mode_minus = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F5), self)
         self.shortcut_mode_minus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
         # Connect signals to slots

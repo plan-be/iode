@@ -56,21 +56,23 @@ class NumericalWidget:
         self.bottom_layout.addWidget(self.checkbox_scientific, Qt.AlignmentFlag.AlignLeft)
 
         self.shortcut_precision_plus = QShortcut(QKeySequence(Qt.Key.Key_F4), self)
-        self.shortcut_precision_minus = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F4), self)
-        self.shortcut_increase_column_size = QShortcut(QKeySequence(Qt.Key.Key_F3), self)
-        self.shortcut_decrease_column_size = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F3), self)
-        self.shortcut_resize_to_contents = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_F3), self)
-
         self.shortcut_precision_plus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.shortcut_precision_minus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.shortcut_increase_column_size.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.shortcut_decrease_column_size.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.shortcut_resize_to_contents.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-
         self.shortcut_precision_plus.activated.connect(lambda: self.spinBox_precision.stepUp())
+        
+        self.shortcut_precision_minus = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F4), self)
+        self.shortcut_precision_minus.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_precision_minus.activated.connect(lambda: self.spinBox_precision.stepDown())
+        
+        self.shortcut_increase_column_size = QShortcut(QKeySequence(Qt.Key.Key_F3), self)
+        self.shortcut_increase_column_size.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_increase_column_size.activated.connect(self.increase_column_size)
+        
+        self.shortcut_decrease_column_size = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Key.Key_F3), self)
+        self.shortcut_decrease_column_size.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_decrease_column_size.activated.connect(self.decrease_column_size)
+        
+        self.shortcut_resize_to_contents = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_F3), self)
+        self.shortcut_resize_to_contents.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_resize_to_contents.activated.connect(lambda: self.table_view.resizeColumnsToContents())
 
     def increase_column_size(self):

@@ -84,45 +84,52 @@ class IodeFileExplorer(QTreeView):
 
         # prepare shortcuts
         self.new_file_shortcut = QShortcut(QKeySequence.StandardKey.New, self)
-        self.new_directory_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_N), self)
-        self.cut_shortcut = QShortcut(QKeySequence.StandardKey.Cut, self)
-        self.copy_shortcut = QShortcut(QKeySequence.StandardKey.Copy, self)
-        self.paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, self)
-        self.filepath_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_C), self)
-        self.reveal_explorer_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_R), self)
-        self.rename_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F2), self)
-        self.delete_shortcut = QShortcut(QKeySequence.StandardKey.Delete, self)
-        self.enter_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Enter), self)
-        self.cancel_shortcut = QShortcut(QKeySequence.StandardKey.Cancel, self)
-
-        # set context
         self.new_file_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.new_directory_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.cut_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.copy_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.paste_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.filepath_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.reveal_explorer_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.rename_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.delete_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.enter_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.cancel_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.new_file_shortcut.activated.connect(self.create_file)
 
-        # signals and slots
+        self.new_directory_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_N), self)
+        self.new_directory_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.new_directory_shortcut.activated.connect(self.create_dir)
+
+        self.cut_shortcut = QShortcut(QKeySequence.StandardKey.Cut, self)
+        self.cut_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.cut_shortcut.activated.connect(self.cut)
+
+        self.copy_shortcut = QShortcut(QKeySequence.StandardKey.Copy, self)
+        self.copy_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.copy_shortcut.activated.connect(self.copy)
+
+        self.paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, self)
+        self.paste_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.paste_shortcut.activated.connect(self.paste)
+
+        self.filepath_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_C), self)
+        self.filepath_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.filepath_shortcut.activated.connect(self.absolute_path)
+
+        self.reveal_explorer_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_R), self)
+        self.reveal_explorer_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.reveal_explorer_shortcut.activated.connect(self.reveal_in_folder)
+
+        self.rename_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F2), self)
+        self.rename_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.rename_shortcut.activated.connect(self.rename)
+
+        self.delete_shortcut = QShortcut(QKeySequence.StandardKey.Delete, self)
+        self.delete_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.delete_shortcut.activated.connect(self.remove)
+
+        self.enter_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Enter), self)
+        self.enter_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.enter_shortcut.activated.connect(lambda: self.open_files(False))
+
+        self.cancel_shortcut = QShortcut(QKeySequence.StandardKey.Cancel, self)
+        self.cancel_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.cancel_shortcut.activated.connect(self.cancel)
+
+        # other signals and slots
         self.doubleClicked.connect(self._open_file)
         self.customContextMenuRequested.connect(self.onCustomContextMenu)
-
-        self.new_file_shortcut.activated.connect(self.create_file)
-        self.new_directory_shortcut.activated.connect(self.create_dir)
-        self.cut_shortcut.activated.connect(self.cut)
-        self.copy_shortcut.activated.connect(self.copy)
-        self.paste_shortcut.activated.connect(self.paste)
-        self.filepath_shortcut.activated.connect(self.absolute_path)
-        self.reveal_explorer_shortcut.activated.connect(self.reveal_in_folder)
-        self.rename_shortcut.activated.connect(self.rename)
-        self.delete_shortcut.activated.connect(self.remove)
-        self.enter_shortcut.activated.connect(lambda: self.open_files(False))
-        self.cancel_shortcut.activated.connect(self.cancel)
 
         # context menu setup
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
