@@ -81,6 +81,10 @@ class NumericalTableView:
         """
         self.context_menu.popup(event.globalPos())
 
+    # NOTE: Weirdly, we have to store values of the selection borders into first/last_row/column 
+    #       variables to get the real values of the selection borders. 
+    #       If we try range(selection_range.top(), selection_range.bottom() + 1), 
+    #       we get wrong values for the borders (like -1).
     def _extract_objects_names(self) -> List[str]:
         """
         Extract the names of the selected objects.
@@ -89,13 +93,22 @@ class NumericalTableView:
         :rtype: list[str]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
+        first_row = selection_range.top()
+        last_row = selection_range.bottom()
+        if first_row == -1 or last_row == -1:
+            QMessageBox.warning(self, "WARNING", "Selection is empty")
+            return [[]]
         model = self.model()
         object_names = [model.headerData(row, Qt.Orientation.Vertical, Qt.ItemDataRole.DisplayRole) 
-                        for row in range(selection_range.top(), selection_range.bottom() + 1)]
+                        for row in range(first_row, last_row + 1)]
         if not all(isinstance(name, str) for name in object_names):
             raise RuntimeError("Something went wrong while extracting row names")
         return object_names
 
+    # NOTE: Weirdly, we have to store values of the selection borders into first/last_row/column 
+    #       variables to get the real values of the selection borders. 
+    #       If we try range(selection_range.left(), selection_range.right() + 1), 
+    #       we get wrong values for the borders (like -1).
     def _extract_periods(self) -> List[str]:
         """
         Extract the periods of the selected data.
@@ -104,13 +117,22 @@ class NumericalTableView:
         :rtype: list[str]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
+        first_column = selection_range.left()
+        last_column = selection_range.right()
+        if first_column == -1 or last_column == -1:
+            QMessageBox.warning(self, "WARNING", "Selection is empty")
+            return [[]]
         model = self.model()
         periods = [model.headerData(column, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole) 
-                   for column in range(selection_range.left(), selection_range.right() + 1)]
+                   for column in range(first_column, last_column + 1)]
         if not all(isinstance(period, str) for period in periods):
             raise RuntimeError("Something went wrong while extracting periods")
         return periods
-
+    # NOTE: Weirdly, we have to store values of the selection borders into first/last_row/column 
+    #       variables to get the real values of the selection borders. 
+    #       If we try range(selection_range.top(), selection_range.bottom() + 1) or 
+    #       range(selection_range.left(), selection_range.right() + 1), we get wrong values
+    #       for the borders (like -1).
     def _extract_values(self) -> List[List[str]]:
         """
         Extract the values of the selected data.
@@ -119,11 +141,18 @@ class NumericalTableView:
         :rtype: list[list[str]]
         """
         selection_range: QItemSelectionRange = self.selectionModel().selection().first()
+        first_row = selection_range.top()
+        last_row = selection_range.bottom()
+        first_column = selection_range.left()
+        last_column = selection_range.right()
+        if first_row == -1 or last_row == -1 or first_column == -1 or last_column == -1:
+            QMessageBox.warning(self, "WARNING", "Selection is empty")
+            return [[]]
         model = self.model()
         values = []
-        for row in range(selection_range.top(), selection_range.bottom() + 1):
-            row_values = [model.get_value(row, column) for column in 
-                          range(selection_range.left(), selection_range.right() + 1)]
+        for row in range(first_row, last_row + 1):
+            row_values = [model.data(model.index(row, column), Qt.ItemDataRole.DisplayRole) for column in 
+                          range(first_column, last_column + 1)]
             if not all(isinstance(value, str) for value in row_values):
                 raise RuntimeError("Something went wrong while extracting values")
             row_values = ["" if value == NAN_REP else value for value in row_values]
@@ -202,7 +231,7 @@ class NumericalTableView:
                         column = start_index.column() + j
                         index = model.index(row, column)
                         if index.isValid():
-                            model.set_value(row, column, value)
+                            model.setData(index, value, Qt.EditRole)
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", "Can't paste values\n\n" + str(e))   
 
@@ -220,7 +249,7 @@ class NumericalTableView:
 
                 # If the text from clipboard ends with the new-line character,
                 # the QString::split() function returns a list ending by an empty element.
-                # This empty element is then interpreted as a new NaN value by the set_value function.
+                # This empty element is then interpreted as a new NaN value by the setData function.
                 if text.endswith("\n"):
                     text = text[:-1]
 
@@ -263,7 +292,7 @@ class NumericalTableView:
                     for value in cells:
                         index = model.index(row, column)
                         if index.isValid():
-                            model.set_value(row, column, value)
+                            model.setData(index, value, Qt.EditRole)
                         column += 1
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", f"Can't paste values\n\n{str(e)}")
