@@ -48,7 +48,7 @@ class IodeAbstractTableView(QTableView):
         self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
 
         # sorting
-        self.setSortingEnabled(True)
+        self.setSortingEnabled(False)
 
         # stylesheet
         self.setStyleSheet(stylesheet)
@@ -64,6 +64,7 @@ class IodeAbstractTableView(QTableView):
         # Selecting only rows.
         # See: https://doc.qt.io/qt-5/qabstractitemview.html#SelectionBehavior-enum
         self.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
+        
         # -- Mode --
         # When the user selects an item in the usual way, the selection is cleared and the new item selected.
         # However, if the user presses the Ctrl key when clicking on an item, the clicked item gets toggled
