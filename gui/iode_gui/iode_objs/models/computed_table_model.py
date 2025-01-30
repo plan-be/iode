@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QMessageBox
 from .numerical_table_model import IodeNumericalTableModel  
 from iode_gui.utils import NAN_REP  
 
-from typing import List, Union, Any
+from typing import List, Union
 from iode import tables, Table, split_list
 from iode.iode_cython import ComputedTable
 
@@ -63,9 +63,6 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
         else:
             return self.computed_table.lines[section]
 
-    def get_value(self, row: int, column: int) -> str:
-        return self.value_to_string(self.computed_table[row, column])
-
     def data(self, index: QModelIndex, role: int = Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return ""
@@ -74,13 +71,9 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
             return Qt.AlignmentFlag.AlignRight
 
         if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
-            return self.get_value(index.row(), index.column())
+            return self.value_to_string(self.computed_table[index.row(), index.column()])
 
         return None
-
-    def set_value(self, row: int, column: int, value: Any) -> bool:
-        self.computed_table[row, column] = value
-        return True
 
     def setData(self, index: QModelIndex, value: Union[str, int, float], role: int):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
@@ -93,9 +86,9 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
                 value = float(value)
                 if value == self.computed_table[index.row(), index.column()]:
                     return False
-                success = self.set_value(index.row(), index.column(), value)
-                if success:
-                    self.dataChanged.emit(index, index, [role])
+                self.computed_table[index.row(), index.column()] = value
+                self.dataChanged.emit(index, index, [role])
+                return True
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", str(e))
                 return False
