@@ -5,6 +5,7 @@ include iode_gui/__init__.py
 include iode_gui/utils.py
 include iode_gui/iode_resource_rc.py
 global-include ui_*.py
+graft iode_gui/doc
 
 exclude CMakeLists.txt
 exclude *.py
