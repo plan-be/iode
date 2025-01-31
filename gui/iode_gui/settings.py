@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QChec
                                QPlainTextEdit)
 from PySide6.QtGui import QDesktopServices, QCloseEvent
 
-from iode_gui.utils import URL_MANUAL
+from iode_gui.utils import URL_MANUAL, Context
 from iode_gui.util.widgets.file_chooser import IodeFileChooser
 from iode_gui.util.widgets.sample_edit import IodeSampleEdit
 
@@ -72,6 +72,9 @@ class MixinSettingsDialog(QDialog):
 
     @Slot()
     def load_settings(self):
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
@@ -106,6 +109,9 @@ class MixinSettingsDialog(QDialog):
 
     @Slot()
     def save_settings(self):
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return

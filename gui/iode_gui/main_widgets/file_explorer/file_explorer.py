@@ -9,6 +9,7 @@ from PySide6.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices,
                            QCloseEvent, QDragMoveEvent, QDropEvent)
 from PySide6.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
 
+from iode_gui.utils import Context
 from iode_gui.settings import ProjectSettings
 from iode_gui.main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
 from iode_gui.main_widgets.file_explorer.file_delegate import FileDelegate
@@ -322,6 +323,9 @@ class IodeFileExplorer(QTreeView):
         """
         Load directories that were expanded when the program has been closed.
         """
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
@@ -346,6 +350,9 @@ class IodeFileExplorer(QTreeView):
         """
         Save directories that are expanded before to close the program.
         """
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
@@ -378,16 +385,21 @@ class IodeFileExplorer(QTreeView):
         # to set corresponding file in color when its content is modified (and not yet saved to file)
         self.tab_widget.file_content_modified.connect(self.file_content_modified)
 
-    def update_project_dir(self, project_dir: QDir, onStartup: bool=False):
+    def update_project_dir(self, project_dir: QDir, on_startup: bool=False):
         """
         Update the project path and the content of the File Explorer.
 
-        :param project_dir: Directory containing the IODE project to open.
-        :param onStartup: Whether or not the method is called on startup.
+        Parameters
+        ----------
+        project_dir: str 
+            Directory containing the IODE project to open.
+        on_startup: bool, optional 
+            Whether or not the method is called on startup.
+            If True, do not ask to save workspace and content of all other tabs.
         """
         self.project_dir = project_dir
 
-        if not onStartup:
+        if not on_startup:
             self.save_settings()
 
         # Notes: - see https://doc.qt.io/qt-6/qtwidgets-itemviews-dirview-example.html

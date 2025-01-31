@@ -21,11 +21,12 @@ except ImportError:
     qtconsole_available = False
 
 from iode import IodeType, comments, equations, identities, lists, scalars, tables, variables
-from typing import List
+from typing import List, Union, Dict, Any, Optional
+from pathlib import Path
 
 from iode_gui.utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
                             ORGANIZATION_NAME, URL_HOMEPAGE, URL_CHANGELOG, URL_PYTHON_API, 
-                            URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY)
+                            URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY, Context)
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings
@@ -84,11 +85,22 @@ class MainWindow(AbstractMainWindow):
     - CTRL + S saves the current tab content.
     - CTRL + SHIFT + S saves all tabs content.
     - CTRL + SHIFT + D clears the whole workspace.
+
+    Parameters
+    ----------
+    project_path : Union[str, Path], optional
+        Path to the project directory.
+        If not given, it is deduced from the list of files to load.
+        Default to None.
+    files_to_load : List[str], optional
+        List of files to load at start. 
+        Default to None.
     """
 
     MAX_RECENT_PROJECTS = 30
 
-    def __init__(self, parent=None, files_to_load: List[str]=None):
+    def __init__(self, parent=None, project_dir: Union[str, Path]=None, files_to_load: List[Union[str, Path]]=None, 
+                 vars_to_import: Dict[str, Any]=None):
         super().__init__(parent)
 
         # ---- setup the present class ----
@@ -108,9 +120,19 @@ class MainWindow(AbstractMainWindow):
         self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
 
         # ---- open file(s) passed as files_to_load argument ----
-        files_to_load_ = []
-        if files_to_load:
-            parent_dir = None
+        if files_to_load is None:
+            files_to_load = []
+
+        if not isinstance(files_to_load, list):
+            QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
+            files_to_load = []
+
+        _files_to_load = []
+        if len(files_to_load):
+            if not all(isinstance(file, (str, Path)) for file in files_to_load):
+                QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
+                files_to_load = []    
+            files_to_load = [str(Path(file).resolve()) if isinstance(file, Path) else file for file in files_to_load]
             for filepath in files_to_load:
                 fileInfo = QFileInfo(filepath)
                 if not fileInfo.exists():
@@ -119,16 +141,22 @@ class MainWindow(AbstractMainWindow):
                     QMessageBox.warning(self, "WARNING", "Only files can be open")
                     break
                 else:
-                    if parent_dir is None:
-                        parent_dir = fileInfo.absolutePath()
-                    if fileInfo.absolutePath() != parent_dir:
+                    if project_dir is None:
+                        project_dir = Path(fileInfo.absolutePath())
+                    if fileInfo.absolutePath() != project_dir:
                         QMessageBox.warning(self, "WARNING", "All files to open must come from the same directory")
-                        parent_dir = None
-                        files_to_load_.clear()
+                        _files_to_load.clear()
                         break
-                    files_to_load_.append(fileInfo.absoluteFilePath())
-            if parent_dir:
-                self.project_path = parent_dir
+                    _files_to_load.append(fileInfo.absoluteFilePath())
+        
+        if project_dir is not None:
+            if isinstance(project_dir, Path):
+                project_dir = str(project_dir.resolve())
+            if not isinstance(project_dir, str):
+                raise TypeError("project_dir must be a string or a Path object")
+            self.project_path = project_dir
+        else:
+            self.project_path: str = self.user_settings.value("project_path", None)
 
         # ---- menus ----
         self._build_recent_projects_menu()
@@ -164,11 +192,18 @@ class MainWindow(AbstractMainWindow):
             self.ui.tabWidget_IODE_objs.hide()
             self.ui.dockWidget_file_explorer.hide()
         else:
-            self.open_directory(self.project_path, True)
+            self.open_directory(self.project_path, on_startup=True)
 
         # files_to_load is not empty
-        for filepath in files_to_load_:
+        for filepath in _files_to_load:
             self.ui.tabWidget_IODE_objs.load_file(filepath, True, True)
+
+        # NOTE: push vars to IPython console here since open_directory() reset the IPython kernel
+        if vars_to_import is not None:
+            if not isinstance(vars_to_import, dict):
+                raise TypeError("Python variables to import in the IPython console must be "
+                                "passed as a dictionary")
+            self._push_data_to_kernel(vars_to_import)
 
     @property
     def output(self) -> QTextEdit:
@@ -221,6 +256,9 @@ class MainWindow(AbstractMainWindow):
 
         self._reset_kernel()
 
+    def _push_data_to_kernel(self, data: Dict[str, Any]):
+        self.kernel.shell.push(data)
+
     def _reset_kernel(self):
         if self.jupyter_widget:
             self.kernel.shell.reset()
@@ -246,6 +284,9 @@ class MainWindow(AbstractMainWindow):
             self.ui.menuRecent_Projects.addAction(action)
 
     def _add_project_path_to_list(self, project_dir: QDir):
+        if Context.called_from_python_script:
+            return
+        
         project_path = project_dir.absolutePath()
 
         # add project directory path to list of recently opened projects (= directories)
@@ -269,15 +310,19 @@ class MainWindow(AbstractMainWindow):
             self.ui.tabWidget_IODE_objs.save_all_tabs()
         return answer
 
-    def open_directory(self, dir_path: str, onStartup: bool = False) -> bool:
+    def open_directory(self, dir_path: str, on_startup: bool=False) -> bool:
         """
-        Update the project path and the content of the File Explorer.
+        Update the tabs and the content of the File Explorer.
         Ask to save workspace and content of all other tabs before to switch from project directory.
-        If the new project directory contains a project settings file (.ini), reopen tabs listed in
-        the project settings file.
+        If the new project directory contains a project settings file (.ini) and called_from_python_script 
+        is False, reopen tabs listed in the project settings file.
 
-        :param dir_path: path to the directory to open as IODE project root.
-        :return: bool whether or not the IODE project root has been updated.
+        Parameters
+        ----------
+        dir_path: str
+            Path to the directory to open as current project.
+        on_startup: bool, optional
+            If True, do not ask to save workspace and content of all other tabs.
         """
         if not dir_path:
             QMessageBox.warning(self, "WARNING", "Empty path for new Project")
@@ -291,9 +336,12 @@ class MainWindow(AbstractMainWindow):
         self.project_path = project_dir.absolutePath()
         
         # create/update settings
-        self.ui.treeView_file_explorer.save_settings()
-        self.ui.tabWidget_IODE_objs.save_settings()
-        ProjectSettings.change_project(project_dir, self)
+        if not Context.called_from_python_script:
+            self.ui.treeView_file_explorer.save_settings()
+            self.ui.tabWidget_IODE_objs.save_settings()
+            ProjectSettings.change_project(project_dir, self)
+        else:
+            ProjectSettings.project_settings = None
 
         # update current directory (chdir)
         QDir.setCurrent(project_dir.absolutePath())
@@ -302,7 +350,7 @@ class MainWindow(AbstractMainWindow):
         self.ui.dockWidget_file_explorer.show()
         
         # update file explorer view
-        self.ui.treeView_file_explorer.update_project_dir(project_dir, onStartup)
+        self.ui.treeView_file_explorer.update_project_dir(project_dir, on_startup)
         
         # (re)open tabs
         self.ui.tabWidget_IODE_objs.setup(self)
@@ -322,9 +370,10 @@ class MainWindow(AbstractMainWindow):
         self._reset_kernel()
 
         # open either the IODE commands tab of the IPython console tab
-        project_settings: QSettings = ProjectSettings.project_settings
-        tab_index = project_settings.value("tools_tab_index", type=int, defaultValue=0)
-        self.ui.tabWidget_tools.setCurrentIndex(tab_index)
+        if not Context.called_from_python_script:
+            project_settings: QSettings = ProjectSettings.project_settings
+            tab_index = project_settings.value("tools_tab_index", type=int, defaultValue=0)
+            self.ui.tabWidget_tools.setCurrentIndex(tab_index)
 
         # update auto-completion
         self.completer.update_iode_objects_list_names()
@@ -376,21 +425,23 @@ class MainWindow(AbstractMainWindow):
         if answer == QMessageBox.StandardButton.Discard: 
             event.ignore()
         else:
-            self.user_settings.setValue("project_path", self.project_path)
-            self.user_settings.setValue("font_family", self.font_family)
-            self.user_settings.setValue("geometry", self.saveGeometry())
-            self.user_settings.setValue("windowState", self.saveState())
-            self.user_settings.setValue("dockWidget_file_explorer_geometry", self.ui.dockWidget_file_explorer.saveGeometry())
-            self.user_settings.setValue("dockWidget_tools_geometry", self.ui.dockWidget_tools.saveGeometry())
+            if not Context.called_from_python_script:
+                self.user_settings.setValue("project_path", self.project_path)
+                self.user_settings.setValue("font_family", self.font_family)
+                self.user_settings.setValue("geometry", self.saveGeometry())
+                self.user_settings.setValue("windowState", self.saveState())
+                self.user_settings.setValue("dockWidget_file_explorer_geometry", self.ui.dockWidget_file_explorer.saveGeometry())
+                self.user_settings.setValue("dockWidget_tools_geometry", self.ui.dockWidget_tools.saveGeometry())
 
             for dialog in self.dialogs: 
                 dialog.close()
             self.dialogs.clear()
 
-            self.ui.treeView_file_explorer.save_settings()
-            self.ui.tabWidget_IODE_objs.save_settings()
-            project_settings: QSettings = ProjectSettings.project_settings
-            project_settings.setValue("tools_tab_index", self.ui.tabWidget_tools.currentIndex())
+            if not Context.called_from_python_script:
+                self.ui.treeView_file_explorer.save_settings()
+                self.ui.tabWidget_IODE_objs.save_settings()
+                project_settings: QSettings = ProjectSettings.project_settings
+                project_settings.setValue("tools_tab_index", self.ui.tabWidget_tools.currentIndex())
 
             event.accept()
 
@@ -503,7 +554,8 @@ class MainWindow(AbstractMainWindow):
             else:
                 QMessageBox.warning(self, "WARNING", f"Directory {project_path} seems to no longer exist")
                 self.recent_projects.remove(project_path)
-                self.user_settings.setValue("recent_projects", self.recent_projects)
+                if not Context.called_from_python_script:
+                    self.user_settings.setValue("recent_projects", self.recent_projects)
 
     @Slot()
     def save_current_tab(self):

@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt, QSettings, Slot, Signal
 from PySide6.QtWidgets import QTextEdit, QMessageBox
 from PySide6.QtGui import QKeyEvent
 
+from iode_gui.utils import Context
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings, class_name_to_settings_group_name
 from iode_gui.text_edit.complete_line_edit import IodeAutoCompleteLineEdit
@@ -88,6 +89,9 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         Store the last MAX_NB_COMMANDS_TO_REMEMBER executed commands 
         to the project settings file.
         """
+        if Context.called_from_python_script:
+            return
+        
         user_settings: QSettings = ProjectSettings.project_settings
         if not user_settings:
             return
@@ -105,6 +109,9 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         Load the list of the last MAX_NB_COMMANDS_TO_REMEMBER commands executed 
         in the previous GUI session.
         """
+        if Context.called_from_python_script:
+            return
+        
         user_settings: QSettings = ProjectSettings.project_settings
         if not user_settings:
             return
