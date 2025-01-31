@@ -444,6 +444,7 @@ generate_stub_files.py
 !/pyiode/iode_database/variables_database.cpp
 /pyiode/common.pyx
 /pyiode/iode/tests
+/pyiode/iode/doc
 /pyiode/iode/iode.msg
 /pyiode/dist
 /pyiode/README*
