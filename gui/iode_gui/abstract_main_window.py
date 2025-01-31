@@ -28,7 +28,7 @@ class AbstractMainWindow(QMainWindow):
         # location if QSettings::UserScope -> FOLDERID_RoamingAppData
         # see https://doc.qt.io/qt-6/qsettings.html#setPath
         self.user_settings: QSettings = QSettings(QSettings.Scope.UserScope, self)
-        self.project_path: str = self.user_settings.value("project_path", None)
+        self.project_path: str = None
         self.recent_projects: List[str] = self.user_settings.value("recent_projects", [])
         self.font_family: List[str] = self.user_settings.value("font_family", DEFAULT_FONT_FAMILY)
 

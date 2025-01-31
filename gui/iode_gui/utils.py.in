@@ -23,3 +23,15 @@ URL_PYTHON_API = QUrl("${PYTHON_API_URL}")
 
 URL_MANUAL = QUrl.fromLocalFile(DOC_DIR + "/iode.chm")
 URL_SHORTCUTS = QUrl.fromLocalFile(GUI_DOC_DIR + "/keyboard_shortcuts.pdf")
+
+
+class Context:
+    """Context class to store the context of the application"""
+    called_from_python_script: bool = False
+
+    def __init__(self) -> None:
+        raise NotImplementedError()
+
+    @classmethod
+    def set_called_from_python_script(cls, called_from_python_script: bool) -> None:
+       cls.called_from_python_script = called_from_python_script

@@ -17,7 +17,7 @@ from iode_gui.tabs.iode_objs.tab_database import (CommentsWidget, EquationsWidge
                                          ListsWidget, ScalarsWidget, TablesWidget, VariablesWidget)
 from iode_gui.tabs.tab_text import TextWidget
 from iode_gui.tabs.tab_report import ReportWidget
-from iode_gui.utils import SHOW_IN_TEXT_TAB_EXTENSIONS_LIST
+from iode_gui.utils import Context, SHOW_IN_TEXT_TAB_EXTENSIONS_LIST
 
 from iode import IodeType, IodeFileType, IODE_FILE_TYPES, IODE_DATABASE_TYPE_NAMES
 from iode.util import get_iode_file_type
@@ -162,8 +162,6 @@ class IodeTabWidget(QTabWidget):
         # setup context menu
         self._setup_context_menu()
 
-        # reopen all tabs (files) that were open.
-        # display the tab that was displayed the last time the user quit the IODE gui.
         self.load_settings()
 
     @Slot()
@@ -173,6 +171,14 @@ class IodeTabWidget(QTabWidget):
         - Reopen all tabs (files) that were open.
         - Display the tab that was displayed the last time the user quit the IODE gui.
         """
+        if Context.called_from_python_script:
+            self.files_list.clear()
+            self._build_files_list()
+            for tab in self.tabs_database:
+                tab.update()
+            self.show_tab(0)
+            return
+        
         # reset IODE objects tabs
         for tab in self.tabs_database:
             tab.clear_database()
@@ -270,6 +276,9 @@ class IodeTabWidget(QTabWidget):
         associated with each tab. The tooltip is either the path to the 
         corresponding file or a default string in case of unsaved IODE database.
         """
+        if Context.called_from_python_script:
+            return
+
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
@@ -316,7 +325,7 @@ class IodeTabWidget(QTabWidget):
         """
         - initialize some attributes.
         - close all tabs.
-        - Reload previously opened files.
+        - Reload previously opened files if called_from_python_script is False.
         """
         self.main_window = main_window
 
@@ -330,7 +339,6 @@ class IodeTabWidget(QTabWidget):
         self.subset_objects_dialog_requested.connect(main_window.append_dialog)
 
         # reset all IODE databases
-
 
         # close all tabs
         self.clear()
@@ -355,8 +363,9 @@ class IodeTabWidget(QTabWidget):
             self.setTabText(index, tab_widget.tab_text)
             self.setTabToolTip(index, tab_widget.tooltip)
 
-        # restore previously opened files
+        # restore previously opened files (if called_from_python_script is False)
         self.load_settings()
+        
         self.show()
 
     def _reset_file_system_watcher(self):

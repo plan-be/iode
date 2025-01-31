@@ -4,7 +4,7 @@ from PySide6.QtPrintSupport import QPrintPreviewDialog
 
 from iode import IodeFileType, TableLang
 
-from iode_gui.utils import IODE_REPORT_EXTENSION
+from iode_gui.utils import IODE_REPORT_EXTENSION, Context
 from iode_gui.settings import ProjectSettings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.text_edit.report_editor import IodeReportEditor
@@ -76,6 +76,9 @@ class ReportWidget(AbstractTextWidget):
         """
         Load the settings for the report from the given project settings.
         """
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
@@ -92,6 +95,9 @@ class ReportWidget(AbstractTextWidget):
         """
         Save the settings for the report to the given project settings.
         """
+        if Context.called_from_python_script:
+            return
+        
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return

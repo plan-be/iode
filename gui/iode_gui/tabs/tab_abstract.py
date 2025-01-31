@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
 from PySide6.QtCore import Qt, QRect, Slot
 
+from iode_gui.utils import Context
+
 from typing import List
 from pathlib import Path
 from iode import IodeType, IodeFileType, FileType, IODE_FILE_TYPES
 from iode.util import check_filepath
-
 
 class IodeAbstractWidget(QWidget):
     """
@@ -131,13 +132,15 @@ class IodeAbstractWidget(QWidget):
         """
         Load settings for the current tab from a QSettings object.
         """
-        pass
+        if Context.called_from_python_script:
+            return
 
     def save_settings(self):
         """
         Save settings for the current tab to a QSettings object.
         """
-        pass
+        if Context.called_from_python_script:
+            return
 
     def _check_new_filepath(self, filepath: str) -> bool:
         try:
