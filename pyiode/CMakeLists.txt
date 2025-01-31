@@ -22,6 +22,8 @@ if(Python_FOUND)
     cmake_print_variables(CYTHON)
 
     file(INSTALL ${CMAKE_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/doc/build/iode.chm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/doc)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/doc/build/iode.pdf DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/doc)
     file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)
     # copy all Python files to binary directory to then be able to generate stub files *.pyi
     file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
