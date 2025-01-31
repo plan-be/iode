@@ -1824,6 +1824,119 @@ cdef class Variables(_AbstractDatabase):
                 data_view[i, t - t_first_period] = value if IODE_IS_A_NUMBER(value) else np.nan
         return data
 
+    def __array__(self, dtype=None):
+        """
+        Return a Numpy ndarray from the current Variables database.
+
+        Returns
+        -------
+        np.ndarray
+            Numpy ndarray containing the variables values of the current Variables database or subset.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> len(variables)
+        394
+        >>> variables.sample
+        Sample("1960Y1:2015Y1")
+        >>> variables.nb_periods
+        56
+
+        >>> # export the whole Variables workspace to a numpy ndarray (394 variables x 56 periods)
+        >>> data = np.asarray(variables)
+        >>> data.shape
+        (394, 56)
+        >>> data[5, 40]
+        442.26441085858613
+        >>> variables.i[5, 40]
+        442.26441085858613
+
+        >>> # export a subset of names
+        >>> vars_subset = variables["A*"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1960Y1  1961Y1  1962Y1  1963Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF            na      na      na      na  ...  -68.89  -83.34  -96.41
+        ACAG            na      na      na      na  ...   31.37   32.42   33.47
+        AOUC            na    0.25    0.25    0.26  ...    1.39    1.42    1.46
+        AOUC_           na      na      na      na  ...    1.34    1.37    1.41
+        AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61    1.67
+        <BLANKLINE>
+        >>> data = np.asarray(vars_subset)
+        >>> data.shape
+        (5, 56)
+        >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[            nan,          nan,          nan,          nan,
+                                          ...
+                   -55.55928982, -68.89465432, -83.34062511, -96.41041983],
+                  [         nan,          nan,          nan,          nan,
+                                          ...
+                    30.32396115,  31.37013881,  32.42029883,  33.46960134],
+                  [         nan,   0.24783192,   0.25456766,   0.26379573,
+                                          ...
+                     1.35553983,   1.38777697,   1.42371396,   1.46086261],
+                  [         nan,          nan,          nan,          nan,
+                                          ...
+                     1.30459041,   1.33808573,   1.37301015,   1.4075568 ],
+                  [  0.21753037,   0.21544869,   0.22228125,   0.22953896,
+                                          ...
+                     1.51366598,   1.55803879,   1.61318117,   1.67429058]])
+
+        >>> # export a subset of names and periods
+        >>> vars_subset = variables["A*", "2000Y1:2010Y1"]
+        >>> vars_subset                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2010Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       2000Y1  2001Y1  2002Y1  2003Y1  ...  2007Y1  2008Y1  2009Y1  2010Y1
+        ACAF         10.05    2.87   -0.93   -6.09  ...  -33.38  -38.41  -37.46  -37.83
+        ACAG        -41.53   18.94   19.98   21.02  ...   25.16   26.19   27.23   28.25
+        AOUC          1.12    1.14    1.16    1.17  ...    1.22    1.26    1.29    1.31
+        AOUC_         1.10    1.14    1.15    1.16  ...    1.20    1.21    1.23    1.25
+        AQC           1.34    1.38    1.41    1.42  ...    1.41    1.43    1.45    1.46
+        <BLANKLINE>
+        >>> data = np.asarray(vars_subset)
+        >>> data.shape
+        (5, 11)
+        >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[ 10.04661079,   2.86792274,  -0.92921251,  -6.09156499,
+                -14.58209446, -26.53878957, -28.98728798, -33.37842578,
+                -38.40951778, -37.46350964, -37.82742883],
+               [-41.53478657,  18.93980114,  19.98081488,  21.02050218,
+                 22.06647552,  23.10796216,  24.12963715,  25.16090905,
+                 26.19211148,  27.22995512,  28.25392898],
+               [  1.11623762,   1.14047639,   1.15716928,   1.17048954,
+                  1.16767464,   1.1815207 ,   1.19946163,   1.21933288,
+                  1.26280574,   1.28713178,   1.3071099 ],
+               [  1.1019572 ,   1.13624426,   1.15021519,   1.16082895,
+                  1.14802147,   1.16412337,   1.18589708,   1.19516611,
+                  1.21383423,   1.23185399,   1.25016433],
+               [  1.33860286,   1.37918825,   1.40881647,   1.41970458,
+                  1.40065206,   1.39697298,   1.39806354,   1.40791334,
+                  1.42564488,   1.44633167,   1.46286837]])
+        """
+        data = self.to_ndarray()
+        if dtype is not None:
+            data = data.astype(dtype)
+        return data
+
     def from_frame(self, df: DataFrame):
         """
         Copy the pandas DataFrame `df` into the IODE Variables database.
