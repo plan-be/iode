@@ -628,6 +628,17 @@ REPORTS
    execute_report
    execute_command
 
+
+************************
+GRAPHICAL USER INTERFACE
+************************
+
+.. autosummary::
+   :toctree: _generated
+
+   view_workspace
+
+
 *****
 PRINT
 *****

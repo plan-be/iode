@@ -42,6 +42,9 @@ from .iode_cython import Simulation, dynamic_adjustment, dickey_fuller_test
 # lec
 from .iode_cython import execute_lec
 
+# gui
+from .gui import view_workspace
+
 # miscellaneous
 from .iode_cython import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 from .common import FileType
@@ -84,6 +87,9 @@ __all__ = [
 
     # lec
     'execute_lec', 
+
+    # gui
+    'view_workspace', 
 
     # miscellaneous
     'add_error_msg', 'clear_error_msgs', 'display_error_msgs', 'reset_msgs', 'suppress_msgs', 
