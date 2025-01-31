@@ -1,6 +1,7 @@
 from pathlib import Path
 
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
+DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 
 # Constants
 from .iode_cython import (__version__, NA, is_NA, 
@@ -50,7 +51,7 @@ from .super import *
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 
 __all__ = [
     # Constants
-    'SAMPLE_DATA_DIR', 'NA', 'is_NA', 
+    'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 'is_NA', 
     'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 'EqMethod', 'EqTest', 
     'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 'TableGraphGrid', 
     'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 
