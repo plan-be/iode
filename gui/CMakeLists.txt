@@ -2,6 +2,7 @@
 message(STATUS "\n---- GUI (QT) ----\n")
 
 file(INSTALL ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
+file(INSTALL ${CMAKE_SOURCE_DIR}/doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/doc)
 
 set(RESOURCE_FILENAME "iode_resource")
 set(RC_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/resources/${RESOURCE_FILENAME}.rc")

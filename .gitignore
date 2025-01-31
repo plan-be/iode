@@ -472,6 +472,7 @@ generate_stub_files.py
 /gui/iode_gui/__init__.py
 /gui/iode_gui/utils.py
 /gui/iode_gui/*resource*.py
+/gui/iode_gui/doc
 /gui/dist
 /gui/build
 /gui/LICENSE*

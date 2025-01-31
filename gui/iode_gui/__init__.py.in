@@ -1,3 +1,7 @@
+from pathlib import Path
+
 __version__ = "${CMAKE_PROJECT_VERSION}"
+
+DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 
 from iode_gui.main import main
