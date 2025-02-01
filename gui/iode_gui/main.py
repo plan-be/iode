@@ -38,11 +38,19 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
     depth : int, optional
         Stack depth where to look for Python variables. 
         Defaults to 0 (where this function was called).
-    """
 
-    app = QApplication(sys.argv)
-    app.setOrganizationName(ORGANIZATION_NAME)
-    app.setApplicationName("IODE")
+    Warnings
+    --------
+    If both project_dir and files_to_load are set, an error is raised.
+    """
+    if project_dir is not None and files_to_load is not None:
+        raise ValueError("project_dir and files_to_load cannot be both set")
+
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+        app.setOrganizationName(ORGANIZATION_NAME)
+        app.setApplicationName("IODE")
 
     # force to use '.' as a decimal point
     loc = QLocale()
@@ -55,18 +63,20 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
     app.processEvents()
 
     # imported from larray-editor code
-    caller_frame = sys._getframe(depth + 1)
-    global_vars = caller_frame.f_globals
-    local_vars = caller_frame.f_locals
-    vars_to_import = {k: global_vars[k] for k in sorted(global_vars.keys())}
-    if local_vars is not global_vars:
-        vars_to_import.update({k: local_vars[k] for k in sorted(local_vars.keys())})
+    vars_to_import = None
+    if called_from_python_script:
+        caller_frame = sys._getframe(depth + 1)
+        global_vars = caller_frame.f_globals
+        local_vars = caller_frame.f_locals
+        vars_to_import = {k: global_vars[k] for k in sorted(global_vars.keys())}
+        if local_vars is not global_vars:
+            vars_to_import.update({k: local_vars[k] for k in sorted(local_vars.keys())})
 
-    for key in vars_to_import:
-        if key in _iode_databases_names:
-            globals()[key] = vars_to_import[key]
+        for key in vars_to_import:
+            if key in _iode_databases_names:
+                globals()[key] = vars_to_import[key]
     
-    vars_to_import = {k: v for k, v in vars_to_import.items() if k not in globals().keys()}
+        vars_to_import = {k: v for k, v in vars_to_import.items() if k not in globals().keys()}
 
     Context.set_called_from_python_script(called_from_python_script)
     main_window = MainWindow(None, project_dir, files_to_load, vars_to_import)
@@ -76,11 +86,8 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
     app.exec()
 
 
-def main():
-    project_dir = Path('.').resolve()
+def start():
+    project_dir = None
     files_to_load = sys.argv[1:]
-    open_application(project_dir, files_to_load)
-
-
-if __name__ == "__main__":
-    main()
+    called_from_python_script = False
+    open_application(project_dir, files_to_load, called_from_python_script)

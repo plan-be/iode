@@ -103,6 +103,12 @@ class MainWindow(AbstractMainWindow):
                  vars_to_import: Dict[str, Any]=None):
         super().__init__(parent)
 
+        # NOTE: save the absolute path of the application's current directory.
+        #       Current directory is modified in the method open_directory() below.
+        #       This is used to restore the current directory when the user closes 
+        #       the application.
+        self.application_dir = QDir.currentPath()
+
         # ---- setup the present class ----
         # Create an instance of the widgets defined in the .ui file
         self.ui = Ui_MainWindow()
@@ -129,6 +135,8 @@ class MainWindow(AbstractMainWindow):
 
         _files_to_load = []
         if len(files_to_load):
+            if project_dir is not None:
+                raise ValueError("project_dir and files_to_load cannot be both set")
             if not all(isinstance(file, (str, Path)) for file in files_to_load):
                 QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
                 files_to_load = []    
@@ -150,6 +158,8 @@ class MainWindow(AbstractMainWindow):
                     _files_to_load.append(fileInfo.absoluteFilePath())
         
         if project_dir is not None:
+            if len(files_to_load):
+                raise ValueError("project_dir and files_to_load cannot be both set")
             if isinstance(project_dir, Path):
                 project_dir = str(project_dir.resolve())
             if not isinstance(project_dir, str):
@@ -359,7 +369,8 @@ class MainWindow(AbstractMainWindow):
         self._add_project_path_to_list(project_dir)
 
         # set currentProjectPath global settings
-        self.user_settings.setValue("project_path", self.project_path)
+        if not Context.called_from_python_script:
+            self.user_settings.setValue("project_path", self.project_path)
 
         # reset the IPython kernel
         # NOTE: this must be done after to update the File Explorer and the tabs widgets
@@ -443,6 +454,10 @@ class MainWindow(AbstractMainWindow):
                 project_settings: QSettings = ProjectSettings.project_settings
                 project_settings.setValue("tools_tab_index", self.ui.tabWidget_tools.currentIndex())
 
+            # restore the application current directory to the initial one 
+            # (before any directory (project) was opened)
+            QDir.setCurrent(self.application_dir)
+
             event.accept()
 
     def _check_vars_sample(self):
@@ -520,8 +535,9 @@ class MainWindow(AbstractMainWindow):
         self.ui.tabWidget_IODE_objs.clear_workspace()
         dialog = MenuFileNewProject(self.project_path, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            newProjectPath = dialog.get_path_new_project()
-            self.open_directory(newProjectPath)
+            new_project_path = dialog.project_path
+            Context.called_from_python_script = False
+            self.open_directory(new_project_path)
 
     @Slot()
     def open_project(self):
@@ -539,6 +555,7 @@ class MainWindow(AbstractMainWindow):
 
         # update current project path + open it in the Iode GUI File Explorer
         self.project_path = dir
+        Context.called_from_python_script = False
         self.open_directory(self.project_path)
 
     @Slot()
@@ -551,6 +568,7 @@ class MainWindow(AbstractMainWindow):
                 answer = self._ask_save_all_tabs()
                 if answer == QMessageBox.StandardButton.Discard:
                     return
+                Context.called_from_python_script = False
                 self.open_directory(project_path)
             else:
                 QMessageBox.warning(self, "WARNING", f"Directory {project_path} seems to no longer exist")

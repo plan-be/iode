@@ -36,7 +36,7 @@ classifiers = [
 dependencies = [ "numpy", "pandas", "matplotlib", "iode", "pyside6", "qtconsole", "ipython" ]
 
 [project.gui-scripts]
-iode-gui = "iode_gui.main:main"
+iode-gui = "iode_gui.main:start"
 
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
