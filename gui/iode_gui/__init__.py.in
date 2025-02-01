@@ -4,4 +4,4 @@ __version__ = "${CMAKE_PROJECT_VERSION}"
 
 DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 
-from iode_gui.main import main, open_application
+from iode_gui.main import start, open_application
