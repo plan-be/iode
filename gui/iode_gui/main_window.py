@@ -517,6 +517,7 @@ class MainWindow(AbstractMainWindow):
             if answer == QMessageBox.StandardButton.Discard:
                 return
 
+        self.ui.tabWidget_IODE_objs.clear_workspace()
         dialog = MenuFileNewProject(self.project_path, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             newProjectPath = dialog.get_path_new_project()
