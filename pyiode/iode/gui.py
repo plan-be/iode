@@ -1,4 +1,5 @@
 from pathlib import Path
+import inspect
 
 
 def view_workspace(depth: int=0):
@@ -41,7 +42,16 @@ def view_workspace(depth: int=0):
     """
     try:
         from iode_gui import open_application
-        project_dir = Path('.').resolve()
+
+        # Get the current call stack
+        stack = inspect.stack()
+        # The second frame in the stack is the caller of this function
+        caller_frame = stack[1]
+        # Extract the file path from the caller's frame
+        caller_file_path = caller_frame.filename
+        # Extract the directory path from the caller's file path
+        project_dir = Path(caller_file_path).parent.resolve()
+
         open_application(project_dir, called_from_python_script=True, depth = depth + 1)
     except ImportError:
         raise Exception('view_workspace() is not available because the iode_gui package is not installed')
