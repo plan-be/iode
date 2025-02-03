@@ -1,0 +1,192 @@
+---- Start ----
+- Open the iode-gui
+
+- Describe the new GUI:
+    * File Folder on the left (now IODE works by project = root directory)
+    * Tab Panel in the middel (7 tabs reserved for the 7 IODE object types)
+    * 2 consoles in the bottom
+
+---- Help Menu ----
+
+- show each item in the Help menu
+
+---- Open Files From The File Explorer ----
+
+- 1 file: double click on a file (reports/rep_proc.rep)
+- 2+ files: select several files with CTRL or SHIFT + click (fun.eqs ... fun.var) 
+            -> right click -> Open
+- iode-gui tries to deduced the right program the files 
+  -> open data/output/test_wrt.csv -> open Excel
+- force to open a file a text file: 
+  right click on a file -> select data/output/test_wrt.csv -> Open As Text
+- open the Windows File Explorer: 
+  right click on a file or directory -> Reveal In File Explorer
+
+---- Tabs Panel ----
+
+- clear a IODE database: select tab (CMT) ... (VAR) -> CTRL + D
+- clear all IODE databases: CTRL + SHIFT + D
+- reload IODE databases (see above)
+- save the content of a tab: select a tab -> CTRL + S
+- save the content of all tabs -> CTRL + SHIFT + S
+- split a tab (right or down)
+- show that when a tab is split, the 2 views are synchronized
+  * do it on the comments tab + the rep_proc.rep tab
+- move tabs randomly
+- Note: IODE databases tab cannot be closed
+
+---- Auto-Complete ----
+
+1) IODE report:
+   - auto-complete IODE command: start new line, then start writing $DataA -> $DataAppendCmt
+
+2) 'IODE commands' console:
+   - auto-complete IODE command: start new line, then start writing $DataA -> $DataAppendCmt
+
+3) 'Python console':
+   - show press Tab to auto-complete Python object or method:
+     * eq -> then press Tab -> equations
+     * equations["ACAF"]. -> then press Tab equations["ACAF"].coefficients
+     * equations["ACAF"]. -> then press Tab equations["ACAF"].variables
+
+---- Python console - help() ----
+
+- show what the command help(py_object_or_funtion) does:
+  * help(equations["ACAF"].estimate)
+
+---- Add / Update / Delete IODE Objects ----
+
+- open the 'Comments' tab
+
+1) add a comment (3 ways):
+   - add a comment using the 'Add Comments' button:
+     * A0 - Add button comment
+   - add a comment using the 'IODE commands' console:
+     * $DataAppendCmt A1 Report command comment
+     (Note: show the auto-complete feature)
+   - add a comment using the IPython console:
+     * comments["A2"] = "Python comment"
+2) update a comment (3 ways):
+   - inside the table (double click on comment A0, edit, press Enter)
+   - CTRL + ENTER (the old way)
+   - from the 'IODE commands' console:
+     * $DataUpdateCmt A1 Updated comment
+   - from the 'Python console':
+     * comments["A2"] = "Updated comment"
+3) delete a comment(3 ways):
+   - inside the displayed table: select A0 -> press delete
+   - from the 'IODE commands' console:
+     * $DataDeleteCmt A1
+   - from the 'Python console':
+     * del comments["A2"]
+
+---- Working On A Subset ----
+
+1) Set "A*" on the 'Names' field, then press ENTER (or click on the 'Filter' button)
+   - create a new comment A0 -> it appears in the subset as well as in the global database
+   - create a new comment A1 -> $DataAppendCmt A1 Report command comment -> idem
+   - update the comment A0 -> new value appears in the subset as well as in the global database 
+   - update the comment A1 -> $DataUpdateCmt A1 Updated comment -> idem
+   - delete the comment A0 -> deleted in the subset as well as in the globale database
+   - delete the comment A1 -> $DataDeleteCmt A1
+
+2) In the 'Python console', create a subset of the 'Comments' database:
+     * cmt_subset = comments["A*"]
+   - display cmt_subset in the 'Python console':
+     * cmt_subset
+   - create a new comment A2 in the subset -> also affect the global database: 
+     * cmt_subset["A2"] = "New comment"
+   - update the comment A2 -> also affect the global database:
+     * cmt_subset["A2"] = "Updated comment"
+   - delete the comment A2 -> -> also affect the global database:
+     * del cmt_subset["A2"]
+
+---- Detached (= Copy) Subset ----
+
+Note: Using the 'copy()' method on a subset, any change made on the subset is NOT reflected in the global database
+
+1) create a detached subset of Comments in the 'Python console':
+   * cmt_subset_detached = comments["A*"].copy()
+   or
+   * cmt_subset_detached = comments.copy("A*) 
+2) check if the subset is 'detached':
+   * cmt_subset.is_detached
+     False
+   * cmt_subset_detached.is_detached
+     True
+2) add a new variable to the detached subset:
+   * cmt_subset_detached["A3"] = "New comment"
+   -> the view of the global database didn't change but A3 is present in the detached subset:
+   * cmt_subset_detached
+3) update a comment in the detached database:
+   * cmt_subset_detached["ACAF"] = "Updated ACAF"
+   -> the view of the global database didn't change but ACAF is modified in the detached subset
+   * cmt_subset_detached
+4) delete a comment in the detached database:
+   * del cmt_subset_detached["ACAF"] 
+   -> the view of the global database didn't change but ACAF is modified in the detached subset:
+   cmt_subset_detached
+
+---- Filter Variables On A Subset Of Periods ----
+
+1) Set "2000Y1:2010Y1" in the 'Periods' field -> press ENTER (or click on Filter)
+2) - In the 'Python console':
+   * var_subset = variables["A*", "2000Y1:2010Y1"]
+   * var_subset
+   - Any change made on the Variables subset is reflected in the global database
+   * var_subset["ACAF", "2005Y1"] = -30.
+   - NOTE: it is not allowed to add or delete variables on a subset if the subset does not 
+           cover the whole sample of the Variables database 
+   * var_subset["A0"] = 0.0
+   -> raise an error (on purpose -> to protect users against themselves)
+   * del var_subset["ACAF"]
+   -> raise an error (on purpose-> to protect users against themselves)
+   - But it possible to add and delete variables if the subset is only on names:
+   * var_subset = variables["A*"]
+   * var_subset["A0"] = 0.0
+   * del var_subset["A0"]
+
+---- Copy Variables To Excel ----
+
+1) open the Variables tab and Excel
+2) select a subset of values -> righ click -> Copy -> paste in Excel
+3) select a subset of values -> righ click -> Copy Including Headers -> paste in Excel  
+
+---- Plot Subset Of Variables ----
+
+- select a subset of values -> right click -> Plot
+- select entire variables by clicking on their names -> right click -> Plot
+
+---- Print IODE objects or file ----
+
+- print all IODE objects
+- print a subset of IODE objects (Variables)
+
+---- Close and Reopen GUI ----
+
+- Close and reopen the GUI -> iode-gui remembers and reopen tabs
+
+---- More On IODE With Python ----
+
+- demonstration of methods to_frame(), from_frame(), to_array() and from_array()
+  * on both the total database and on a subset
+
+---- Close and Reopen GUI ----
+- Close and reopen the GUI -> iode-gui remembers and reopen tabs
+
+---- IODE Python From A Script (PyCharm) ----
+
+- open run_gui.py in PyCharm
+- show auto-complete on IODE objects and methods
+- display documentation of an method through the shortcut CTRL + Q
+- run script in debug mode -> show how to see content of IODE workspace in debug mode
+
+---- Open the GUI from a Python script ----
+ 
+- run run_gui.py in normal mode and show where view_workspace() is called
+- show that the subsets created in run_gui.py before to call view_workspace() 
+  are accessible in the 'Python console' of the IODE GUI
+
+---- Compare Variants Ouptut Of A Model ----
+
+- run run_gui.py until the compare() function of larray is called 
