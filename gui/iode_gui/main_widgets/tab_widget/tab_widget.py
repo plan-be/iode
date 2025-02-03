@@ -476,7 +476,7 @@ class IodeTabWidget(QTabWidget):
         index = self.addTab(report_widget, report_widget.tab_text)
         self.setTabToolTip(index, report_widget.tooltip)
 
-        report_widget.tab_text_modified.connect(self.tab_text_modified)
+        report_widget.tab_text_modified.connect(self.tab_text_modified_slot)
         report_widget.ask_compute_hash.connect(self.compute_hash)
 
         return index
@@ -501,7 +501,7 @@ class IodeTabWidget(QTabWidget):
         if forced:
             text_widget.forced_as_text = True
 
-        text_widget.tab_text_modified.connect(self.tab_text_modified)
+        text_widget.tab_text_modified.connect(self.tab_text_modified_slot)
 
         return index
 
@@ -847,7 +847,7 @@ class IodeTabWidget(QTabWidget):
             QMessageBox.warning(None, "WARNING", str(e))
 
     @Slot(str, bool)
-    def tab_text_modified(self, filepath: str, modified: bool):
+    def tab_text_modified_slot(self, filepath: str, modified: bool):
         """
         updates the tab name and tooltip and sends the file_content_modified signal to be
         caught by the file explorer.
@@ -997,7 +997,7 @@ class IodeTabWidget(QTabWidget):
                 if answer == QMessageBox.StandardButton.Yes:
                     tab_widget.save()
                 elif answer == QMessageBox.StandardButton.No:
-                    tab_widget.tab_text_modified(filepath, False)
+                    tab_widget.tab_text_modified_slot(filepath, False)
                 elif answer == QMessageBox.StandardButton.Discard:
                     return
 
