@@ -138,9 +138,9 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
    - NOTE: it is not allowed to add or delete variables on a subset if the subset does not 
            cover the whole sample of the Variables database 
    * var_subset["A0"] = 0.0
-   -> raise an error (on purpose -> to protect users against themselves)
+   -> raise an error (for now)
    * del var_subset["ACAF"]
-   -> raise an error (on purpose-> to protect users against themselves)
+   -> raise an error (for now)
    - But it possible to add and delete variables if the subset is only on names:
    * var_subset = variables["A*"]
    * var_subset["A0"] = 0.0
@@ -150,7 +150,9 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 
 1) open the Variables tab and Excel
 2) select a subset of values -> righ click -> Copy -> paste in Excel
-3) select a subset of values -> righ click -> Copy Including Headers -> paste in Excel  
+3) select a subset of values -> righ click -> Copy Including Headers -> paste in Excel 
+4) copy values from Excel -> select a cell in the Variables tab -> right click -> Paste
+5) copy values + headers from Excel -> select any cell -> right click -> Paste Special 
 
 ---- Plot Subset Of Variables ----
 
@@ -190,3 +192,4 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 ---- Compare Variants Ouptut Of A Model ----
 
 - run run_gui.py until the compare() function of larray is called 
+
