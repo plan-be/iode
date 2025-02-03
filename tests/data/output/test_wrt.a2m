@@ -1,0 +1,53 @@
+.sep |
+.esc ~
+.pghead IODE
+.pgfoot - page %d -
+.par1 tit_1
+Mon titre
+
+.par1 enum_1
+This is an enum paragraph
+
+This is a normal paragraph
+
+.tb
+.tborder 1
+.theader
+| Syntax | Description
+.tbody
+| ~cint L_errno       | Last error number during LEC compilation
+| ~cchar* L_error()   | Returns a static buffer containing the last LEC compilation error message.
+.te
+.gb 16.00 10.00
+.ggrid TMM
+.galign L
+.gbox 0 b 0
+.gtitle Equation ACAF : observed and fitted values
+.gty L "(ACAF/VAF[-1])  : observed" 1980Y1  0.011412042  0.016028202  0.011903394  0.012051363  0.010215556  0.010582964  0.0090882893  0.009277778  0.0082268494  0.0051589358  0.0066405193  0.0068489061  0.0075258742  0.0082727193  0.0019340143  -0.0029850522  0.0069569681 
+.gty L "(ACAF/VAF[-1])  : fitted" 1980Y1  0.012562124  0.012491075  0.012526504  0.011687035  0.011060337  0.010403968  0.0095320575  0.0090522427  0.008714914  0.0076539375  0.0065561227  0.006355248  0.0064942167  0.0062763884  0.0062678674  -0.0029850522  0.0044903364 
+.ge
+.par1 tit_1
+Mon titre 1
+
+.par1 par_1
+Mon para level 1 (‚…‡)
+
+Second para 1
+
+.par1 par_2
+Mon para level 2 (ƒˆŒ)
+
+
+Second para level 2
+.par1 tit_2
+Title 2
+
+.par1 enum_2
+Mon enum level 2 (ƒˆŒ)
+
+.par1 enum_2
+enum2 suite
+
+.par1 enum_2
+enum2 suite
+

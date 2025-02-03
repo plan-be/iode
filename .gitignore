@@ -402,6 +402,7 @@ keyboard_shortcuts.*
 **.rep
 !/tests/cli/*.rep
 !/tests/data/*.rep
+!/tests/data/reports/*.rep
 
 # Python stub files
 
