@@ -20,6 +20,8 @@ class NumericalTableView:
     #       super().__init__(parent) (i.e. called inside QTableView.__init__(parent)) in the beginning of 
     #       IodeAbstractTableView.__init__()
     def setup(self, allow_to_paste: bool):
+        self.allow_to_paste = allow_to_paste
+        
         self.shortcut_copy = QShortcut(QKeySequence.StandardKey.Copy, self)
         self.shortcut_copy.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_copy.activated.connect(self.copy)
@@ -28,7 +30,7 @@ class NumericalTableView:
         self.shortcut_copy_including_headers.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_copy_including_headers.activated.connect(self.copy_including_headers)
 
-        if self.allow_to_paste:
+        if allow_to_paste:
             self.shortcut_past = QShortcut(QKeySequence.StandardKey.Paste, self)
             self.shortcut_past.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
             self.shortcut_past.activated.connect(self.paste)
