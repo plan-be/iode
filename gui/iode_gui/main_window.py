@@ -214,6 +214,7 @@ class MainWindow(AbstractMainWindow):
                 raise TypeError("Python variables to import in the IPython console must be "
                                 "passed as a dictionary")
             self._push_data_to_kernel(vars_to_import)
+        self.ui.actionSave.shortcut
 
     @property
     def output(self) -> QTextEdit:

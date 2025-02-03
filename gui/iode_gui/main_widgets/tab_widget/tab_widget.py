@@ -120,9 +120,8 @@ class IodeTabWidget(QTabWidget):
         self.close_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.close_shortcut.activated.connect(self.close_tab)
         
-        self.save_shortcut = QShortcut(QKeySequence.StandardKey.Save, self)
-        self.save_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.save_shortcut.activated.connect(self.save_tab)
+        # NOTE: set in the setup() method
+        self.save_key_sequence: QKeySequence = None
 
         # ---- file system watcher ----
         self.file_system_watcher = QFileSystemWatcher(self)
@@ -335,6 +334,9 @@ class IodeTabWidget(QTabWidget):
         # set output
         self.output = main_window.output
 
+        # set save_key_sequence
+        self.save_key_sequence = main_window.ui.actionSave.shortcut
+
         # connects to append_dialog() slot
         self.subset_objects_dialog_requested.connect(main_window.append_dialog)
 
@@ -380,7 +382,8 @@ class IodeTabWidget(QTabWidget):
         if files:
             self.file_system_watcher.removePaths(files)
 
-    def _add_action(self, name: str, tooltip: str, slot_func, shortcut: QShortcut = None) -> QAction:
+    def _add_action(self, name: str, tooltip: str, slot_func, 
+                    shortcut: Union[QShortcut, QKeySequence] = None) -> QAction:
         """
         Add an action to the context menu.
 
@@ -397,7 +400,7 @@ class IodeTabWidget(QTabWidget):
         action.setToolTip(tooltip)
         action.setVisible(True)
         if shortcut is not None: 
-            key_sequence = shortcut.key()
+            key_sequence = shortcut.key() if isinstance(shortcut, QShortcut) else shortcut
             if not key_sequence.isEmpty():
                 action.setShortcut(key_sequence)
         action.triggered.connect(slot_func)
@@ -413,7 +416,7 @@ class IodeTabWidget(QTabWidget):
         self.action_close = self._add_action("Close", "Close the current tab", self.close_tab, 
                                              self.close_shortcut)
         self._add_action("Save", "Save the content of the current tab", self.save_tab, 
-                         self.save_shortcut)
+                         self.save_key_sequence)
         # NOTE: clear tab (ONLY FOR TABS REPRESENTING AN IODE DATABASE)
         self.action_clear = self._add_action("Clear", "Clear the content of the current tab", 
                                              self.clear_tab, self.clear_shortcut)
