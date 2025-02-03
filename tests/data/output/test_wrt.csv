@@ -1,0 +1,16 @@
+"Mon titre"
+" - This is an enum paragraph"
+"This is a normal paragraph"
+"Syntax","Description",
+"int L_errno","Last error number during LEC compilation",
+"char* L_error()","Returns a static buffer containing the last LEC compilation error message.",
+"*** GRAPH ***"
+"Mon titre 1"
+"Mon para level 1 (йаз)"
+"Second para 1"
+"Mon para level 2 (вко)"
+"Second para level 2"
+"Title 2"
+" - Mon enum level 2 (вко)"
+" - enum2 suite"
+" - enum2 suite"
