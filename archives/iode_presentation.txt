@@ -185,7 +185,7 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
   * array = variables.to_array()
   * array
   * variables.clear()
-  * variables.from_array()
+  * variables.from_array(array)
 
 ---- Execute IODE Commands And Reports From Python ----
 
@@ -198,7 +198,7 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 
 - open run_gui.py in PyCharm
 - show auto-complete on IODE objects and methods
-- display documentation of an method through the shortcut CTRL + Q
+- display documentation of a method through the shortcut CTRL + Q
 - run script in debug mode -> show how to see content of IODE workspace in debug mode
 
 ---- Open the GUI from a Python script ----
@@ -210,6 +210,9 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 ---- Compare Variants Ouptut Of A Model ----
 
 - run run_gui.py until the compare() function of larray is called 
+
+
+
 
 
 
