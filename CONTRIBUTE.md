@@ -97,13 +97,13 @@ To build a specific target, you need to run
 > cmake --build --preset <preset_config> --target <target>
 ```
 where `<target>` is one the item in the list below:
-- `iode_scr4`        -> C library providing many of the utility functions used in the C API.
-- `iode_c_api`       -> Core API of IODE (in pure C).
-- `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
-- `nsis`             -> Builds a Windows Installer for the users.
-- `test_c_api`       -> Builds the tests for the C API (based on Google Test).
-- `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
-- `iode_doc`         -> Builds the user documentation (using Python Sphinx)
+- `iode_scr4`          -> C library providing many of the utility functions used in the C API.
+- `iode_c_api`         -> Core API of IODE (in pure C).
+- `iode_cpp_api`       -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
+- `iode_cython`        -> Cython wrapper for the C/C++ API.
+- `test_c_api`         -> Builds the tests for the C API (based on Google Test).
+- `test_cpp_api`       -> Builds the tests for the C++ classes (based on Google Test).
+- `iode_doc`           -> Builds the user documentation (using Python Sphinx)
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
 To build the Python module for IODE (Cython), please:
