@@ -22,7 +22,7 @@ cmt_subset.save("cmt_subset.ac")
 vars_subset.save("vars_subset.av")
 
 # create a copy of the variables database
-vars_copy = variables.copy("*")
+vars_copy = variables.copy()
 
 # will open a viewer showing all IODE databases
 view_workspace()
