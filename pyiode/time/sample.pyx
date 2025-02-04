@@ -226,6 +226,26 @@ cdef class Sample:
         else:
             return self.c_sample.nb_periods()
 
+    @property
+    def periods(self) -> List[str]:
+        """
+        Return the list of periods.
+
+        Returns
+        -------
+        List[str]
+
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        Loading .../fun.var
+        394 objects loaded
+        >>> variables.sample.periods    # doctest: +ELLIPSIS
+        ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
+        """
+        return self.get_period_list(astype=str)
+
     # Special methods
 
     def __len__(self) -> int:
