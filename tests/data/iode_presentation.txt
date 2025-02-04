@@ -35,6 +35,10 @@
 - move tabs randomly
 - Note: IODE databases tab cannot be closed
 
+---- Close and Reopen GUI ----
+
+- Close and reopen the GUI -> iode-gui remembers and reopen tabs
+
 ---- Auto-Complete ----
 
 1) IODE report:
@@ -161,20 +165,34 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 
 ---- Print IODE objects or file ----
 
-- print all IODE objects
-- print a subset of IODE objects (Variables)
+- print all IODE objects (show with Comments)
+- print a subset of IODE objects (show with Comments + Variables)
 
----- Close and Reopen GUI ----
-
-- Close and reopen the GUI -> iode-gui remembers and reopen tabs
-
----- More On IODE With Python ----
+---- IODE <--> pandas, larray ----
 
 - demonstration of methods to_frame(), from_frame(), to_array() and from_array()
-  * on both the total database and on a subset
+  * series = comments.to_series()
+  * series
+  * comments.clear()
+  * comments
+  * comments.from_series(series)
+  * comments
 
----- Close and Reopen GUI ----
-- Close and reopen the GUI -> iode-gui remembers and reopen tabs
+  * df = variables.to_frame()
+  * df
+  * variables.clear()
+  * variables.from_frame(df)
+  * array = variables.to_array()
+  * array
+  * variables.clear()
+  * variables.from_array()
+
+---- Execute IODE Commands And Reports From Python ----
+
+- demonstration of the functions 'execute_command()' and 'execute_report()':
+  * execute_command("$DataAppendCmt A5 New Comment")
+  * execute_command("$DataDeleteCmt A5")
+  * execute_report("reports/rep_proc.rep", "C:/usr/Projects/iode-1/tests/data C:/usr/Projects/iode-1/tests/data/output")
 
 ---- IODE Python From A Script (PyCharm) ----
 
@@ -192,4 +210,6 @@ Note: Using the 'copy()' method on a subset, any change made on the subset is NO
 ---- Compare Variants Ouptut Of A Model ----
 
 - run run_gui.py until the compare() function of larray is called 
+
+
 
