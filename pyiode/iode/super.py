@@ -1,9 +1,11 @@
 import sys
 import warnings
 from iode.iode_cython import register_super_function
+from iode.iode_cython import skip_pause
+from iode.iode_cython import skip_msg_box
 
 
-__all__ = []
+__all__ = ['skip_pause', 'skip_msg_box']
 
 
 @register_super_function('error')
@@ -36,6 +38,15 @@ def py_panic(msg: str):
     print("To restart iode with the last data, type :")
     print("    iode -ws")
     sys.exit(2)
+
+@register_super_function('pause')
+def py_pause():
+    input("Press Enter to continue...")
+
+@register_super_function('msgbox')
+def py_kmsgbox(title: str, msg: str) -> int:
+    print(f'{title}: {msg}')
+    return 1
 
 @register_super_function('PrintObjDef')
 def PrintObjDef_super() -> int:
