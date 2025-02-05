@@ -2,6 +2,7 @@ import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
 from iode.util import register_super_function
+from iode.super import skip_pause, skip_msg_box
 
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 
@@ -72,6 +73,14 @@ def panic_super_GUI():
 	main_window.close()
 	sys.exit(msg)
 
+@register_super_function('pause')
+def pause_super_GUI():
+	QMessageBox.information(None, "PAUSE", "Click OK to continue")
+
+@register_super_function('msgbox')
+def msgbox_super_GUI(title: str, msg: str) -> int:
+	QMessageBox.information(None, title, msg)
+	return 1
 
 # ========================================================================= #
 # See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c #
