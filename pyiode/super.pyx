@@ -6,6 +6,9 @@ from pyiode.super cimport K_end_ws
 from pyiode.super cimport K_find
 from pyiode.super cimport K_add
 from pyiode.super cimport K_del
+from pyiode.super cimport kmsgbox_continue
+from pyiode.super cimport kpause_continue
+
 
 cdef extern from "super.h":
     cdef int c_kerror_super(const int level, const char* msg) except? -1
@@ -13,6 +16,9 @@ cdef extern from "super.h":
     cdef void c_kmsg_super(const char* msg) noexcept
     cdef int c_kconfirm_super(const char* msg) noexcept
     cdef void c_kpanic_super() except *
+    cdef void c_kpause_super() noexcept
+    cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
+                             const unsigned char** buts) noexcept
 
     cdef int c_PrintObjDef_super() except? -1
     cdef int c_ViewPrintGr_super() except? -1
@@ -52,7 +58,7 @@ cdef extern from "super.h":
 __registry_super_functions = {}
 
 # Define a set of allowed keys
-allowed_keys = {'error', 'warning', 'message', 'confirm', 'panic', 
+allowed_keys = {'error', 'warning', 'message', 'confirm', 'panic', 'pause', 'msgbox',
                 'PrintObjDef', 'ViewPrintGr', 'ViewPrintTbl', 'ViewByTbl', 
                 'DataSearch', 'DataDuplicate', 'DataList', 'DataCompare', 
                 'DataCalcLst', 'DataListSort', 'DataEditGraph', 'DataScan', 
@@ -96,6 +102,23 @@ cdef int c_kconfirm_super(const char* msg) noexcept:
 cdef void c_kpanic_super():
     K_end_ws(1)
     __registry_super_functions['panic']()
+
+cdef void c_kpause_super() noexcept:
+    __registry_super_functions['pause']()
+
+cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
+                         const unsigned char** buts) noexcept:
+    cdef size_t length_title = strlen(<char*>title)
+    cdef size_t length_msg = strlen(<char*>msg)
+    cdef bytes b_title = bytes(title[:length_title])
+    cdef bytes b_msg = bytes(msg[:length_msg])
+    return __registry_super_functions['msgbox'](b_title.decode('utf-8'), b_msg.decode('utf-8'))
+
+def skip_pause(value: bool):
+    kpause_continue = <bint>value
+
+def skip_msg_box(value: bool):
+    kmsgbox_continue = <bint>value
 
 cdef int c_PrintObjDef_super():
     return __registry_super_functions['PrintObjDef']()

@@ -139,7 +139,8 @@ def test_iode_miscellaneous(tmp_path):
 
 
 def test_iode_errors_warnings_messages_from_C_API(capsys):
-    from iode.iode_cython import iode_error, iode_warning, iode_msg, iode_confirm
+    from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm, 
+                                  iode_pause, iode_msgbox)
 
     # Do not call iode_error with level > 0 since it will exits the Python interpreter
     with pytest.raises(RuntimeError) as excinfo:
@@ -156,3 +157,10 @@ def test_iode_errors_warnings_messages_from_C_API(capsys):
 
     # Do not call iode_confirm since it will pause the Python interpreter
     # iode_confirm('test confirm')
+
+    # Do not call iode_kpause since it will pause the Python interpreter
+    # iode_pause()
+
+    iode_msgbox('MSG BOX', 'test msgbox')
+    captured = capsys.readouterr()
+    assert captured.out == "MSG BOX: test msgbox\n"
