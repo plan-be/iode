@@ -41,6 +41,9 @@ bld/
 # Visual Studio Code options directory
 .vscode/
 
+# PyCharm
+.idea/
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
@@ -376,6 +379,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Batch file for enabling cl compiler
+dev_prompt.bat
 
 # LaTeX
 keyboard_shortcuts.*
