@@ -341,17 +341,20 @@ Computed Tables
     | ``PrintTblFile``     | ``tables.print_to_file(destination_file, generalized_sample, names, nb_decimals, format)`` --> See :meth:`iode.Tables.print_to_file` | 
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | ``PrintTbl``         | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
+    |                      | ``computed_table.print_to_file(destination_file, format)`` --> See :meth:`iode.ComputedTable.print_to_file`                          |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | ``ViewTblFile``      | Not Implemented                                                                                                                      |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-    | ``ViewTbl``          | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
+    | ``ViewTbl``          | ``computed_table = table.compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`                  |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | ``ViewByTbl``        | Not Implemented                                                                                                                      |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-    | ``PrintVar``         | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
+    | ``PrintVar``         | ``table = Table(2, title, list_of_variables)`` --> See :class:`iode.Table`                                                           |
+    |                      | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
     |                      | ``computed_table.print_to_file(destination_file, format)`` --> See :meth:`iode.ComputedTable.print_to_file`                          |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-    | ``ViewVar``          | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
+    | ``ViewVar``          | ``table = Table(2, title, list_of_variables)`` --> See :class:`iode.Table`                                                           |
+    |                      | ``computed_table = table.compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`                  |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | ``ViewWidth``        | Not Implemented                                                                                                                      |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
