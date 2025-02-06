@@ -1335,6 +1335,9 @@ extern int B_ModelSimulateSaveNIters(char *arg);
 extern int B_ModelSimulateSaveNorms(char *arg);
 
 /* b_print.c */
+extern int B_TBL_TITLE;  
+extern int B_EQS_INFOS;
+extern int B_EQS_LEC;
 extern int B_PrintVal(double );
 extern double B_calc_ttest(SCL *);
 extern int B_replesc(unsigned char *,unsigned char *);
