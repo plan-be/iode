@@ -29,6 +29,7 @@ Comments
    Comments.save
    Comments.clear
    Comments.copy
+   Comments.print_to_file
 
    Comments.get_names
    Comments.rename
@@ -58,6 +59,7 @@ Properties and methods specific to Comments
    Comments.series
    Comments.from_series
    Comments.to_series
+
    Comments.convert_file
 
 =========
@@ -78,6 +80,9 @@ Equations
    Equations.save
    Equations.clear
    Equations.copy
+   Equations.print_to_file
+   Equations.print_lec
+   Equations.print_infos
 
    Equations.search
    Equations.get_names
@@ -111,6 +116,7 @@ Properties and methods specific to Equations
    Equations.to_frame
 
    Equations.estimate
+   Equations.print_nb_decimals
    Equations.print_equations_as
    Equations.print_equations_lec_as
 
@@ -132,6 +138,7 @@ Identities
    Identities.save
    Identities.clear
    Identities.copy
+   Identities.print_to_file
 
    Identities.search
    Identities.get_names
@@ -184,6 +191,7 @@ Lists
    Lists.save
    Lists.clear
    Lists.copy
+   Lists.print_to_file
 
    Lists.search
    Lists.get_names
@@ -232,6 +240,7 @@ Scalars
    Scalars.save
    Scalars.clear
    Scalars.copy
+   Scalars.print_to_file
 
    Scalars.search
    Scalars.get_names
@@ -262,6 +271,8 @@ Properties and methods specific to Scalars
    Scalars.from_series
    Scalars.from_frame
    Scalars.to_frame
+
+   Scalars.print_nb_decimals
 
 ======
 Tables
@@ -310,7 +321,9 @@ Properties and methods specific to Tables
 .. autosummary::
    :toctree: _generated
 
+   Tables.print_nb_decimals
    Tables.print_tables_as
+   Tables.compute_and_print_to_file
 
 =========
 Variables
@@ -330,6 +343,7 @@ Variables
    Variables.save
    Variables.clear
    Variables.copy
+   Variables.print_to_file
 
    Variables.search
    Variables.get_names
@@ -377,6 +391,7 @@ Properties and methods specific to Variables
    Variables.to_frame
    Variables.from_array
    Variables.to_array
+
    Variables.convert_file
    Variables.export_as_file
 
@@ -547,6 +562,7 @@ COMPUTED TABLE
    ComputedTable.to_frame
    ComputedTable.__getitem__
    ComputedTable.__setitem__
+   
    ComputedTable.print_to_file
 
 ****

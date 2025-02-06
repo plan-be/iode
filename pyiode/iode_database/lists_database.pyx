@@ -617,6 +617,71 @@ cdef class Lists(_AbstractDatabase):
         columns = {"name": names, "lists": ['; '.join(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lists": JUSTIFY.LEFT})
 
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+        """
+        Print the list IODE lists defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all IODE lists matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all IODE lists of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the IODE lists will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the IODE lists to print.
+            If None, print all IODE lists of the (subset of the) current database.
+            Defaults to None.
+
+        Examples
+        --------
+        >>> from iode import lists, SAMPLE_DATA_DIR
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded
+        >>> lists.print_to_file(output_dir / "lists.csv", names=["ENVI", "IDT", "MAINEQ"])      # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...lists.csv'...
+        Printing ENVI ...
+        Printing IDT ...
+        Printing MAINEQ ...
+        Print done
+        >>> with open(output_dir / "lists.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - ENVI : EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_"
+        " - IDT : OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR; WBGR;YSFICR;YSEFPR"
+        " - MAINEQ : W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_"
+        """
+        self._print_to_file(filepath, format, names)
+
     def __hash__(self) -> int:
         """
         Return a hash value for the current Lists database.

@@ -307,7 +307,6 @@ Below *workspace* must be replaced by either:
     | ``datapatternXXX``   | Not Yet Implemented                                                                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
 
-
 =========
 Equations
 =========
@@ -388,7 +387,6 @@ Models
     | ``ModelSimulateSaveNorms``  | Not Yet Implemented                                                                                                                        |
     +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 
-
 ==================
 Execute Identities 
 ==================
@@ -422,11 +420,17 @@ Print IODE Objects
     +----------------------+--------------------------------------------------------------------------------------------------+
     | IODE Report Commands | Python Equivalent                                                                                |
     +======================+==================================================================================================+
+    | `PrintNbDec`         | ``equations.print_nb_decimals = value`` --> See See :meth:`Equations.print_nb_decimals`          | 
+    |                      | ``scalars.print_nb_decimals = value`` --> See See :meth:`Scalars.print_nb_decimals`              | 
+    |                      | ``tables.print_nb_decimals = value`` --> See See :meth:`Tables.print_nb_decimals`                | 
+    +----------------------+--------------------------------------------------------------------------------------------------+
     | `PrintObjTitle`      | ``tables.print_tables_as = enum`` --> See See :meth:`Tables.print_tables_as`                     | 
     +----------------------+--------------------------------------------------------------------------------------------------+
     | `PrintObjInfos`      | ``equations.print_equations_as = enum`` --> See See :meth:`Equations.print_equations_as`         | 
     +----------------------+--------------------------------------------------------------------------------------------------+
     | `PrintObjLec`        | ``equations.print_equations_lec_as = enum`` --> See See :meth:`Equations.print_equations_lec_as` | 
+    +----------------------+--------------------------------------------------------------------------------------------------+
+    | `PrintObjDefXxx`     | ``workspace.print_to_file(filepath, names, format)`` --> See See :meth:`Comments.print_to_file`  | 
     +----------------------+--------------------------------------------------------------------------------------------------+
 
 =============

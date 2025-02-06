@@ -748,6 +748,99 @@ cdef class Scalars(_AbstractDatabase):
         columns = {"name": data[0], "value": data[1], "relax": data[2], "std": data[3]}
         return table2str(columns, max_lines=10, precision=4, justify_funcs={"name": JUSTIFY.LEFT})
 
+    @property
+    def print_nb_decimals(self) -> int:
+        """
+        Number of decimals to print.
+
+        Parameters
+        ----------
+        value: int
+            number of decimals to print (equations coeffs, scalars and computed tables values).
+
+        Examples
+        --------
+        >>> from iode import scalars
+        >>> scalars.print_nb_decimals = 4
+        >>> scalars.print_nb_decimals
+        4
+        """
+        return self._get_print_nb_decimals()
+
+    @print_nb_decimals.setter
+    def print_nb_decimals(self, value: int):
+        self._set_print_nb_decimals(value)
+
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+        """
+        Print the list scalars defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all scalars matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all scalars of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the scalars will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the scalars to print.
+            If None, print all scalars of the (subset of the) current database.
+            Defaults to None.
+
+        Examples
+        --------
+        >>> from iode import scalars, SAMPLE_DATA_DIR
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> scalars.print_nb_decimals = 4
+
+        >>> scalars.print_to_file(output_dir / "scalars.csv", names="a*")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Printing IODE objects definition to file '...scalars.csv'...
+        Printing acaf1 ...
+        Printing acaf2 ...
+        Printing acaf3 ...
+        Printing acaf4 ...
+        Print done
+        >>> with open(output_dir / "scalars.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - acaf1 : 0.0158 (1, 0.0014, 11.5206)"
+        " - acaf2 : -0.0000 (1, 0.0000, -5.3691)"
+        " - acaf3 : 2.5026 (1, 0.8730, 2.8666)"
+        " - acaf4 : -0.0085 (1, 0.0021, -4.0825)"
+        <BLANKLINE>
+        """
+        self._print_to_file(filepath, format, names)
+
     def __hash__(self) -> int:
         """
         Return a hash value for the current Scalars database.

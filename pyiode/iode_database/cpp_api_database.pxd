@@ -23,6 +23,7 @@ cdef extern from "api/iode.h":
     ctypedef char FNAME[512]
     ctypedef char ONAME[21]
 
+    int K_NBDEC
     int B_TBL_TITLE
     int B_EQS_INFOS
     int B_EQS_LEC
@@ -34,13 +35,19 @@ cdef extern from "api/iode.h":
     double* KVPTR(char* name)
 
     void B_display_last_error()
+    int B_PrintNbDec(char* nbdec)
+    int B_PrintLang(char* lang)
     int B_PrintObjTblTitle(char* arg)
     int B_PrintObjEqsInfos(char* arg)
     int B_PrintObjLec(char* arg)
 
+    int B_PrintObjDef(char* objs_list, int iode_type)
+    int B_PrintDest(char* arg) # arg = 'filepath format'
+
     int W_dest(char* filename, int file_type)
     int W_flush()
     int W_close()
+
     int B_DataCompareEps(char* arg)
     int B_DataCompare(char* arg, int iode_type)
     int B_FileImportCmt(char* arg)
