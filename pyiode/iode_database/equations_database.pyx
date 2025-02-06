@@ -1391,6 +1391,29 @@ cdef class Equations(_AbstractDatabase):
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lec": JUSTIFY.LEFT})
 
     @property
+    def print_nb_decimals(self) -> int:
+        """
+        Number of decimals to print.
+
+        Parameters
+        ----------
+        value: int
+            number of decimals to print (equations coeffs, scalars and computed tables values).
+
+        Examples
+        --------
+        >>> from iode import equations
+        >>> equations.print_nb_decimals = 4
+        >>> equations.print_nb_decimals
+        4
+        """
+        return self._get_print_nb_decimals()
+
+    @print_nb_decimals.setter
+    def print_nb_decimals(self, value: int):
+        self._set_print_nb_decimals(value)
+
+    @property
     def print_equations_as(self) -> PrintEquationsAs:
         """
         Whether to print only the LEC formula, or the LEC formula and the comment, 
@@ -1509,6 +1532,144 @@ cdef class Equations(_AbstractDatabase):
             value = PrintEquationsLecAs[upper_str]
         value = str(int(value))
         B_PrintObjLec(value.encode())
+
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+        """
+        Print the list equations defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all equations matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all equations of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the equations will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the equations to print.
+            If None, print all equations of the (subset of the) current database.
+            Defaults to None.
+
+        Examples
+        --------
+        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> from iode import PrintEquationsAs, PrintEquationsLecAs
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> equations.print_nb_decimals = 4
+        
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
+        >>> equations.print_to_file(output_dir / "equations_lec_only.csv", names=["ACAF", "ACAG"])              # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...equations_lec_only.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "equations_lec_only.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
+        " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"
+
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
+        >>> equations.print_to_file(output_dir / "equations_coeffs_as_values.csv", names=["ACAF", "ACAG"])      # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...equations_coeffs_as_values.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "equations_coeffs_as_values.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - (ACAF/VAF[-1 ]) := 0.0158 + -0.0000*GOSF[-1 ] + -0.0085*(TIME= 1995)"
+        " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
+        <BLANKLINE>
+
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
+        >>> equations.print_to_file(output_dir / "equations_coeffs_ttest.csv", names=["ACAF", "ACAG"])          # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...equations_coeffs_ttest.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "equations_coeffs_ttest.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - (ACAF/VAF[-1 ]) := 0.0158(11.5206)  + -0.0000(-5.3691) *GOSF[-1 ] + -0.0085(-4.0825) *(TIME= 1995)"
+        " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
+        <BLANKLINE>
+
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
+        >>> equations.print_to_file(output_dir / "equations_lec_cmt.csv", names=["ACAF", "ACAG"])               # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...equations_lec_cmt.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "equations_lec_cmt.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
+        " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"
+
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS_ESTIMATION
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
+        >>> equations.print_to_file(output_dir / "equations_lec_cmt_estim.csv", names=["ACAF", "ACAG"])         # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...equations_lec_cmt_estim.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "equations_lec_cmt_estim.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
+        " - Estimation : L on 1980Y1-1996Y1"
+        " - Block : ACAF"
+        " - Tests :"
+        " - St dev of residuals : 0.004270"
+        " - Mean of YOBS : 0.008185"
+        " - Sum of Squares of Residuals : 0.000052"
+        " - Standard error (%) : 0.001927 (23.545813)"
+        " - F-stat : 32.273193"
+        " - R2 (R2 adjusted) : 0.821761 (0.796299)"
+        " - Durbin-Watson : 2.329346"
+        " - Log Likelihood : 83.807526"
+        " - Coefficient values (relax, stderr, t-stat) :"
+        " - acaf1 : 0.0158 (1, 0.0014, 11.5206)"
+        " - acaf2 : -0.0000 (1, 0.0000, -5.3691)"
+        " - acaf4 : -0.0085 (1, 0.0021, -4.0825)"
+        " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
+        <BLANKLINE>
+        """
+        self._print_to_file(filepath, format, names)
 
     def __hash__(self) -> int:
         """

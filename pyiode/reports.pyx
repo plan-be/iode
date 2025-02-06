@@ -112,30 +112,33 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     Examples
     --------
     >>> from iode import execute_report, variables
+    >>> from pathlib import Path
+    >>> create_var_rep = str(output_dir / "create_var.rep")
+    >>> result_var_file = str(output_dir / "test_var.av")
 
     >>> # create an dump report
-    >>> with open("create_var.rep", "w") as f:
+    >>> with open(create_var_rep, "w") as f:                # doctest: +ELLIPSIS
     ...     f.write("$WsClearVar\n")
     ...     f.write("$WsSample 2000Y1 2005Y1\n")
     ...     f.write("$DataCalcVar %1% t+1 \n")
     ...     f.write("$DataCalcVar %2% t-1 \n")
     ...     f.write("$DataCalcVar %3% %1%/%2%\n")
     ...     f.write("$DataCalcVar %4% grt %1% \n")
-    ...     f.write("$WsSaveVar test_var.av\n")
+    ...     f.write(f"$WsSaveVar {result_var_file}\n")
     12
     24
     22
     22
     25
     26
-    23
+    ...
 
     >>> # execute report
-    >>> execute_report("create_var.rep", ["A", "B", "C", "D"])
-    Saving test_var.av
+    >>> execute_report(create_var_rep, ["A", "B", "C", "D"])    # doctest: +ELLIPSIS
+    Saving ...test_var.av
 
     >>> # check content of file test_var.av
-    >>> with open("test_var.av", "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+    >>> with open(result_var_file, "r") as f:                   # doctest: +NORMALIZE_WHITESPACE
     ...     print(f.read())
     sample 2000Y1 2005Y1
     A 1 2 3 4 5 6
@@ -172,6 +175,8 @@ def execute_command(command: Union[str, List[str]]):
     Examples
     --------
     >>> from iode import execute_command
+    >>> from pathlib import Path
+    >>> result_var_file = str(output_dir / "test_var.av")
 
     >>> # execute IODE command one by one
     >>> execute_command("$WsClearVar")
@@ -180,11 +185,11 @@ def execute_command(command: Union[str, List[str]]):
     >>> execute_command("$DataCalcVar B t-1")
     >>> execute_command("$DataCalcVar C A/B")
     >>> execute_command("$DataCalcVar D grt A")
-    >>> execute_command("$WsSaveVar test_var.av")
-    Saving test_var.av
+    >>> execute_command(f"$WsSaveVar {result_var_file}")    # doctest: +ELLIPSIS
+    Saving ...test_var.av
 
     >>> # check content of file test_var.av
-    >>> with open("test_var.av", "r") as f:         # doctest: +NORMALIZE_WHITESPACE
+    >>> with open(result_var_file, "r") as f:               # doctest: +NORMALIZE_WHITESPACE
     ...     print(f.read())
     sample 2000Y1 2005Y1
     A 1 2 3 4 5 6

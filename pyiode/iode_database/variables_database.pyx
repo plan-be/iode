@@ -3720,9 +3720,9 @@ cdef class Variables(_AbstractDatabase):
         >>> from iode import SAMPLE_DATA_DIR, variables, ImportFormats
         >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.av.ref"
         >>> input_format = ImportFormats.ASCII
-        >>> save_file = "imported_var.var"
+        >>> save_file = str(output_dir / "imported_var.var")
         >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
-        >>> debug_file = "debug.log"
+        >>> debug_file = str(output_dir / "debug.log")
 
         >>> # print rules
         >>> with open(rule_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
@@ -3942,8 +3942,8 @@ cdef class Variables(_AbstractDatabase):
 
         >>> # export variables to CSV
         >>> export_format = ExportFormats.CSV
-        >>> save_file = "exported_var.csv"
-        >>> debug_file = "debug_csv.log"
+        >>> save_file = str(output_dir / "exported_var.csv")
+        >>> debug_file = str(output_dir / "debug_csv.log")
         >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
         ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         Loading ...\fun.av
@@ -3993,8 +3993,8 @@ cdef class Variables(_AbstractDatabase):
 
         >>> # export variables to rotated CSV
         >>> export_format = ExportFormats.RCSV
-        >>> save_file = "exported_var.rcsv"
-        >>> debug_file = "debug_rcsv.log"
+        >>> save_file = str(output_dir / "exported_var.rcsv")
+        >>> debug_file = str(output_dir / "debug_rcsv.log")
         >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
         ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         Loading ...\fun.av
@@ -4031,8 +4031,8 @@ cdef class Variables(_AbstractDatabase):
 
         >>> # export variables to TSP
         >>> export_format = ExportFormats.TSP
-        >>> save_file = "exported_var.tsp"
-        >>> debug_file = "debug_tsp.log"
+        >>> save_file = str(output_dir / "exported_var.tsp")
+        >>> debug_file = str(output_dir / "debug_tsp.log")
         >>> variables.export_as_file(variables_file, rule_file, save_file, export_format, 
         ...                          from_period, to_period, comments_file, debug_file=debug_file)      # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         Loading ...\fun.av
@@ -4166,6 +4166,73 @@ cdef class Variables(_AbstractDatabase):
             t = self._get_real_period_position(period)
             columns[str_period] = [self.database_ptr.get_var(<int>pos, t, self.mode_) for pos in names_pos]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
+
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+        """
+        Print the list variables defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all variables matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all variables of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the variables will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the variables to print.
+            If None, print all variables of the (subset of the) current database.
+            Defaults to None.
+
+        Examples
+        --------
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> variables.print_to_file(output_dir / "variables.csv", names=["ACAF", "ACAG"])       # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...variables.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "variables.csv") as f:                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        <BLANKLINE>
+        "Name","1960Y1","1961Y1","1962Y1","1963Y1",...,"2012Y1","2013Y1","2014Y1","2015Y1",
+        <BLANKLINE>
+        "ACAF","#N/A","#N/A","#N/A","#N/A",...,"-55.55929","-68.894654","-83.340625","-96.41042",
+        "ACAG","#N/A","#N/A","#N/A","#N/A",...,"30.323961","31.370139","32.420299","33.469601",
+        <BLANKLINE>
+        """
+        self._print_to_file(filepath, format, names)
 
     def __hash__(self) -> int:
         """

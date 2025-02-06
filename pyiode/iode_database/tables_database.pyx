@@ -850,6 +850,29 @@ cdef class Tables(_AbstractDatabase):
         return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 
     @property
+    def print_nb_decimals(self) -> int:
+        """
+        Number of decimals to print.
+
+        Parameters
+        ----------
+        value: int
+            number of decimals to print (equations coeffs, scalars and computed tables values).
+
+        Examples
+        --------
+        >>> from iode import tables
+        >>> tables.print_nb_decimals = 4
+        >>> tables.print_nb_decimals
+        4
+        """
+        return self._get_print_nb_decimals()
+
+    @print_nb_decimals.setter
+    def print_nb_decimals(self, value: int):
+        self._set_print_nb_decimals(value)
+
+    @property
     def print_tables_as(self) -> PrintTablesAs:
         """
         Whether to print the full definitions, only the titles or the computed values 
@@ -888,8 +911,136 @@ cdef class Tables(_AbstractDatabase):
         if value <= 1:
             B_PrintObjTblTitle(str(value).encode())
 
-    def print_to_file(self, destination_file: Union[str, Path], generalized_sample: str, 
-                      names: Union[str, Path, List[Union[str, Path]]], nb_decimals: int, format: str = None):
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None, 
+                      generalized_sample: str=None, nb_decimals: int=4) -> None:
+        """
+        Print the list tables defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all tables matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all tables of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the tables will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the tables to print.
+            If None, print all tables of the (subset of the) current database.
+            Defaults to None.
+        generalized_sample: str
+            generalized sample to use for computing the tables. 
+            Mandatory if `print_tables_as` is `PrintTablesAs.COMPUTED`.
+        nb_decimals: int, optional
+            number of decimals to use for computing the tables. 
+            Only used if `print_tables_as` is `PrintTablesAs.COMPUTED`.
+            Defaults to 4.
+
+        Examples
+        --------
+        >>> from iode import tables, SAMPLE_DATA_DIR, PrintTablesAs
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+
+        >>> tables.print_tables_as = PrintTablesAs.TITLES
+        >>> tables.print_to_file(output_dir / "tables_titles.csv", names=["ANAKNFF", "ANAPRIX"])        # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...tables_titles.csv'...
+        Printing ANAKNFF ...
+        Printing ANAPRIX ...
+        Print done
+        >>> with open(output_dir / "tables_titles.csv") as f:                # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        "ANAKNFF : Déterminants de la croissance de K"
+        "ANAPRIX : Analyse des prix"
+
+        >>> tables.print_tables_as = PrintTablesAs.FULL
+        >>> tables.print_to_file(output_dir / "tables_full.csv", names=["ANAKNFF", "ANAPRIX"])          # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...tables_full.csv'...
+        Printing ANAKNFF ...
+        Printing ANAPRIX ...
+        Print done
+        >>> with open(output_dir / "tables_full.csv") as f:                  # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        "ANAKNFF : definition",
+        <BLANKLINE>
+        \"""Déterminants de la croissance de K""\",
+        <BLANKLINE>
+        " ",\"""#s""\",
+        <BLANKLINE>
+        \"""Croissance de K ""\","dln KNFF",
+        \"""Output gap ""\","knff1*ln (QAFF_/(Q_F+Q_I))",
+        \"""Rentabilité ""\","knf2*ln mavg(3,RENT)",
+        \"""Croissance anticipée de l'output""\","0.416*mavg(4,dln QAFF_)+0.023",
+        <BLANKLINE>
+        "ANAPRIX : definition",
+        <BLANKLINE>
+        \"""Analyse des prix""\",
+        <BLANKLINE>
+        " ",\"""#s""\",
+        <BLANKLINE>
+        \"""GAP_""\","GAP_",
+        \"""dln (PC/(1+ITCR))-dln AOUC""\","100*(dln (PC/(1+ITCR))-dln AOUC)",
+
+        >>> tables.print_tables_as = PrintTablesAs.COMPUTED
+        >>> tables.print_to_file(output_dir / "tables_computed.csv", names=["ANAKNFF", "ANAPRIX"], 
+        ...                      generalized_sample="(2010;2010/2009):5", nb_decimals=4)                # doctest: +ELLIPSIS
+        >>> with open(output_dir / "tables_computed.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        "Déterminants de la croissance de K"
+        <BLANKLINE>
+        " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
+        <BLANKLINE>
+        "Croissance de K","0.0203","-27.1039","0.0182","-10.1346","0.0201","10.5786","0.0238","18.2162","0.0244","2.4760",
+        "Output gap","0.0008","-36.5874","0.0019","150.7142","0.0031","59.9968","0.0035","14.1806","0.0030","-13.9993",
+        "Rentabilité","-0.0078","34.5565","-0.0084","7.5121","-0.0084","0.3108","-0.0084","0.1740","-0.0086","2.4613",
+        "Croissance anticipée de l'output","0.0293","-5.2615","0.0285","-2.9300","0.0293","2.9104","0.0318","8.6515","0.0322","1.2418",
+        "Analyse des prix"
+        <BLANKLINE>
+        " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
+        <BLANKLINE>
+        "GAP_","3.3765","-11.6805","3.5664","5.6238","3.7392","4.8438","3.6566","-2.2090","3.3138","-9.3736",
+        "dln (PC/(1+ITCR))-dln AOUC","0.0354","-384.6132","-0.1389","-491.8586","-0.0381","-72.5373","0.0422","-210.7056","0.0224","-46.8953",
+        <BLANKLINE>
+        """
+        if self.print_tables_as == PrintTablesAs.COMPUTED:
+            self.compute_and_print_to_file(filepath, generalized_sample, names, nb_decimals, format)
+        else:
+            self._print_to_file(filepath, format, names)
+
+    def compute_and_print_to_file(self, destination_file: Union[str, Path], generalized_sample: str, 
+                                  names: Union[str, Path, List[Union[str, Path]]]=None, nb_decimals: int=4, 
+                                  format: str = None):
         """
         Compute and print a list of IODE tables to a file.
 
@@ -898,7 +1049,6 @@ cdef class Tables(_AbstractDatabase):
         - 'M' (MIF file)
         - 'R' (RTF file)
         - 'C' (CSV file)
-        - 'D' (DUMMY file)
 
         If argument `format` is not provided, the A2M format will be used to print the output.
 
@@ -910,10 +1060,12 @@ cdef class Tables(_AbstractDatabase):
             The destination file path.
         generalized_sample: str
             The generalized sample (see :py:meth:`` for details).
-        names: str or list(str) 
+        names: str or list(str), optinal 
             The names of the IODE tables to be printed.
-        nb_decimals: int 
+            If None, all tables of the (subset of the) database will be printed.
+        nb_decimals: int, optional
             The number of decimals to use in the output.
+            Defaults to 4.
         format: str, optional 
             The format of the output file. Deduced from the extension if not provided.
             If destination_file has no extension and format is None, the A2M format is used.
@@ -1005,8 +1157,8 @@ cdef class Tables(_AbstractDatabase):
         <BLANKLINE>
 
         >>> names = ["C8_1", "C8_2", "C8_3", "C8_4"]
-        >>> tables.print_to_file(tmp_dir / "tables_2_periods.csv", "(2010;2010/2009):5", names, 2)
-        >>> with open(tmp_dir / "tables_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE
+        >>> tables.compute_and_print_to_file(output_dir / "tables_2_periods.csv", "(2010;2010/2009):5", names, 2)
+        >>> with open(output_dir / "tables_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>
@@ -1042,8 +1194,8 @@ cdef class Tables(_AbstractDatabase):
         394 objects loaded
         >>> extra_files[0].name
         'ref.av'
-        >>> tables.print_to_file(tmp_dir / "tables_2_files.csv", "2010[1-2]:5", names, 2)    
-        >>> with open(tmp_dir / "tables_2_files.csv", "r") as f:
+        >>> tables.compute_and_print_to_file(output_dir / "tables_2_files.csv", "2010[1-2]:5", names, 2)    
+        >>> with open(output_dir / "tables_2_files.csv", "r") as f:
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>
@@ -1094,12 +1246,12 @@ cdef class Tables(_AbstractDatabase):
         if not len(names):
             raise ValueError("'names' must be a non-empty string or a non-empty list of strings.")
         
-        if self.print_tables_as == PrintTablesAs.COMPUTED:
-            if not len(generalized_sample):
-                raise ValueError("'generalized_sample' must be a non-empty string.")
+        if generalized_sample is None or len(generalized_sample) == 0:
+            raise ValueError("'generalized_sample' must be a non-empty string.")
 
-            self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
-                                            names.encode(), nb_decimals, c_format)
+        self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
+                                        names.encode(), nb_decimals, c_format)
+    
     # TODO: fix the skiped tests below
     def __hash__(self) -> int:
         """

@@ -629,9 +629,9 @@ cdef class Comments(_AbstractDatabase):
         >>> from iode import SAMPLE_DATA_DIR, comments, ImportFormats
         >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.ac.ref"
         >>> input_format = ImportFormats.ASCII
-        >>> save_file = "imported_cmt.cmt"
+        >>> save_file = str(output_dir / "imported_cmt.cmt")
         >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
-        >>> debug_file = "debug.log"
+        >>> debug_file = str(output_dir / "debug.log")
 
         >>> # print rules
         >>> with open(rule_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
@@ -730,6 +730,70 @@ cdef class Comments(_AbstractDatabase):
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "comments": JUSTIFY.LEFT})
+
+    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+        """
+        Print the list comments defined by `names` to the file `filepath` using the format `format`.
+
+        Argument `format` must be in the list:
+        - 'H' (HTML file)
+        - 'M' (MIF file)
+        - 'R' (RTF file)
+        - 'C' (CSV file)
+
+        If argument `format` is null (default), the *A2M* format will be used to print the output.
+
+        If the filename does not contain an extension, it is automatically added based on 
+        the value of `format`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will print 
+        all comments matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, print all comments of the (subset of the) current database.
+
+        Parameters
+        ----------
+        filepath: str or Path
+            path to the file to print.
+            If the filename does not contain an extension, it is automatically 
+            added based on the value of the format argument.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the comments will be dumped in the *A2M* format.
+        names: str or list of str, optional
+            pattern or list of names of the comme,ts to print.
+            If None, print all comments of the (subset of the) current database.
+            Defaults to None.
+
+        Examples
+        --------
+        >>> from iode import comments, SAMPLE_DATA_DIR
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded
+        >>> comments.print_to_file(output_dir / "comments.csv", names=["ACAF", "ACAG"])     # doctest: +ELLIPSIS
+        Printing IODE objects definition to file '...comments.csv'...
+        Printing ACAF ...
+        Printing ACAG ...
+        Print done
+        >>> with open(output_dir / "comments.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        ...     print(f.read())
+        ...
+        " - ACAF : Ondernemingen : ontvangen kapitaaloverdrachten."
+        " - ACAG : Totale overheid : netto ontvangen kapitaaloverdrachten."
+        <BLANKLINE>
+        """
+        self._print_to_file(filepath, format, names)
 
     def __hash__(self) -> int:
         """

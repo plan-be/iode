@@ -21,15 +21,20 @@ from pyiode.common cimport IodeType
 from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport K_NBDEC
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
 from pyiode.iode_database.cpp_api_database cimport B_display_last_error
+from pyiode.iode_database.cpp_api_database cimport B_PrintNbDec
+from pyiode.iode_database.cpp_api_database cimport B_PrintDest
+from pyiode.iode_database.cpp_api_database cimport B_PrintObjDef
+from pyiode.iode_database.cpp_api_database cimport W_dest, W_flush, W_close
 
 
 # WARNING: remember:
 #          - private Python methods start with __ are NOT inherited in the derived class
-#          - protected Pythod methods start with _ and are inherited in the derived class 
-#            (and so can be overidde)
+#          - protected Python methods start with _ and are inherited in the derived class 
+#            (and so can be overidden)
 
 class PositionalIndexer:
     def __init__(self, database):
@@ -339,6 +344,14 @@ cdef class _AbstractDatabase:
     def description(self, value: str):
         self.abstract_db_ptr.set_description(value.encode())
 
+    def _get_print_nb_decimals(self) -> int:
+        return K_NBDEC
+
+    def _set_print_nb_decimals(self, value: int):
+        cdef b_value = str(value).encode()
+        cdef char* c_value = b_value
+        B_PrintNbDec(c_value)
+
     def get_position(self, name: str) -> int:
         """
         Return the position of the IODE object with name `name` in the database.
@@ -460,6 +473,9 @@ cdef class _AbstractDatabase:
         cdef KDB* kdb_ptr = NULL
         cdef size_t length = 0
         cdef char* c_list = NULL
+
+        if pattern is None:
+            pattern = '*'
         
         if not isinstance(pattern, str) and isinstance(pattern, Iterable) and all(isinstance(item, str) for item in pattern):
             pattern = ';'.join(pattern)
@@ -648,6 +664,7 @@ cdef class _AbstractDatabase:
         1e-07
 
         >>> # ---- create Variables file to compare with ----
+        >>> vars_other_filepath = str(output_dir / "fun_other.var")
         >>> vars_other = variables.copy()
         >>> # add two variables
         >>> vars_other["NEW_VAR"] = 0.0
@@ -662,13 +679,13 @@ cdef class _AbstractDatabase:
         >>> vars_other["BENEF"] = "BENEF + 1.e-8"
         >>> vars_other["BQY"] = "BQY + 1.e-8"
         >>> # save the Variables file to compare with
-        >>> vars_other.save("fun_other.var")                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> vars_other.save(vars_other_filepath)                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Saving ...fun_other.var
         394 objects saved
 
         >>> # ---- compare the current Variables database ----
         >>> # ---- with the content of the saved file     ----
-        >>> lists_compare = variables.compare("fun_other.var")  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists_compare = variables.compare(vars_other_filepath)  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading ...fun_other.var
         394 objects loaded
         >>> for name, value in lists_compare.items():           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -958,7 +975,55 @@ cdef class _AbstractDatabase:
         else:
             raise TypeError(f"'scalars' is not available for {self.iode_type.name} objects.")
 
+    def _print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None):
+        cdef int res
+        cdef char* c_arg = NULL
+        cdef bytes b_arg = b''
+        cdef int int_type = self.iode_type.value
 
+        if format is not None:
+            if not isinstance(format, str):
+                raise TypeError(f"'format': Expected value of type string. "
+                                f"Got value of type {type(format).__name__} instead.")
+            if not len(format):
+                raise ValueError("'format' must be a non-empty char. Either 'H', 'M', 'R' or 'C'.")
+            format = format[0].upper()
+
+        if not isinstance(filepath, (str, Path)):
+            raise TypeError(f"'filepath': Expected value of type string or Path. "
+                            f"Got value of type {type(filepath).__name__}")
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        suffix = filepath.suffix
+        if suffix:
+            deduced_format = suffix[1].upper()
+            if format is not None and format != deduced_format:
+                warnings.warn(f"The passed value '{format}' for 'format' is inconsistent "
+                              f"with the the suffix '{suffix}' of the filepath '{str(filepath)}'.\n"
+                              f"The format '{deduced_format}' deduced from the suffix will be used instead.")
+            format = deduced_format
+
+        if format is not None and format not in 'HMRC':
+            raise ValueError("'format' must be either 'H', 'M', 'R' or 'C'")
+
+        arg = str(filepath)
+        if format is not None:
+            arg += ' ' + format
+        # NOTE: Cython cannot convert a Python string to a C string directly.
+        b_arg = arg.encode('utf-8')
+        c_arg = b_arg
+        res = B_PrintDest(c_arg)
+        if res != 0:
+            raise RuntimeError(f"The filepath '{filepath}' is not valid")
+
+        names = ';'.join(self.get_names(names))
+        res = B_PrintObjDef(names.encode('utf-8'), int_type)
+        if res != 0:
+            raise RuntimeError(f"Error while printing objects to file '{filepath}'")
+        
+        # write and close output file
+        W_close()
+        
 
     def _load(self, filepath: str):
         raise NotImplementedError()
@@ -975,19 +1040,35 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import comments, equations, identities, lists, tables, scalars, variables
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments, variables
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
-        317 objects loaded 
-        >>> len(comments)
-        317
-
+        317 objects loaded
+        
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.idt
+        48 objects loaded
+        
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded
+        
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> len(variables)
-        394
         """
         if not self.is_global_workspace:
             raise RuntimeError("The 'load' method can only be called on the global workspace")

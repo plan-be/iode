@@ -1003,7 +1003,6 @@ cdef class ComputedTable:
         - 'M' (MIF file)
         - 'R' (RTF file)
         - 'C' (CSV file)
-        - 'D' (DUMMY file)
 
         If argument `format` is null (default), the A2M format will be used
         to print the output.
@@ -1040,8 +1039,8 @@ cdef class ComputedTable:
         Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 | ... |     0.36 | -1.90
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 | ... |     1.14 |  1.00
         <BLANKLINE>
-        >>> computed_table.print_to_file(tmp_dir / "computed_table_2_periods.csv")
-        >>> with open(tmp_dir / "computed_table_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        >>> computed_table.print_to_file(output_dir / "computed_table_2_periods.csv")
+        >>> with open(output_dir / "computed_table_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>
@@ -1066,8 +1065,8 @@ cdef class ComputedTable:
         Intensité de capital             |    0.01 |    0.01 |    0.01 |    0.01 |    0.01
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
-        >>> computed_table.print_to_file(tmp_dir / "computed_table_2_files.csv")    
-        >>> with open(tmp_dir / "computed_table_2_files.csv", "r") as f:
+        >>> computed_table.print_to_file(output_dir / "computed_table_2_files.csv")    
+        >>> with open(output_dir / "computed_table_2_files.csv", "r") as f:
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>
