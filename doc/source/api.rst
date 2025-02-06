@@ -279,6 +279,7 @@ Tables
    Tables.save
    Tables.clear
    Tables.copy
+   Tables.print_to_file
 
    Tables.search
    Tables.get_names
@@ -307,7 +308,7 @@ Properties and methods specific to Tables
 .. autosummary::
    :toctree: _generated
 
-   Tables.print_to_file
+   Tables.print_tables_as
 
 =========
 Variables

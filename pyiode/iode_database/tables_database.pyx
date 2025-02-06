@@ -15,6 +15,9 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTitle
+
+from iode.common import PrintTablesAs
 
 
 @cython.final
@@ -65,11 +68,13 @@ cdef class Tables(_AbstractDatabase):
     """
     cdef bint ptr_owner
     cdef CKDBTables* database_ptr
+    cdef int print_as
 
     def __cinit__(self, filepath: str = None) -> Tables:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.print_as = B_TBL_TITLE
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -96,6 +101,7 @@ cdef class Tables(_AbstractDatabase):
             wrapper.ptr_owner = False
             wrapper.database_ptr = &cpp_global_tables
             wrapper.abstract_db_ptr = &cpp_global_tables
+        wrapper.print_as = B_TBL_TITLE
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -843,6 +849,45 @@ cdef class Tables(_AbstractDatabase):
         columns = {"name": names, "table titles": titles}
         return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 
+    @property
+    def print_tables_as(self) -> PrintTablesAs:
+        """
+        Whether to print the full definitions, only the titles or the computed values 
+        of the IODE tables in the current database.
+
+        Parameters
+        ----------
+        value: PrintTablesAs
+            Possible values are: PrintTablesAs.FULL, PrintTablesAs.TITLES, 
+            PrintTablesAs.COMPUTED
+
+        Examples
+        --------
+        >>> from iode import tables, PrintTablesAs
+        >>> tables.print_tables_as
+        <PrintTablesAs.FULL: 0>
+        >>> tables.print_tables_as = PrintTablesAs.TITLES
+        >>> tables.print_tables_as
+        <PrintTablesAs.TITLES: 1>
+        >>> tables.print_tables_as = "COMPUTED"
+        >>> tables.print_tables_as
+        <PrintTablesAs.COMPUTED: 2>
+        """
+        return PrintTablesAs(self.print_as)
+
+    @print_tables_as.setter
+    def print_tables_as(self, value: Union[PrintTablesAs, str]):
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintTablesAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintTablesAs.__members__.keys())}. ")
+            value = PrintTablesAs[upper_str]
+        value = int(value)
+        self.print_as = value
+        if value <= 1:
+            B_PrintObjTblTitle(str(value).encode())
+
     def print_to_file(self, destination_file: Union[str, Path], generalized_sample: str, 
                       names: Union[str, Path, List[Union[str, Path]]], nb_decimals: int, format: str = None):
         """
@@ -1042,9 +1087,6 @@ cdef class Tables(_AbstractDatabase):
             c_format = destination_file.suffix.encode('utf-8')[1]
         destination_file = str(destination_file.resolve())
 
-        if not len(generalized_sample):
-            raise ValueError("'generalized_sample' must be a non-empty string.")
-
         if not isinstance(names, str) and not all(isinstance(name, str) for name in names):
             raise TypeError("'names' must be a string or a list of strings")        
         if isinstance(names, list):
@@ -1052,8 +1094,12 @@ cdef class Tables(_AbstractDatabase):
         if not len(names):
             raise ValueError("'names' must be a non-empty string or a non-empty list of strings.")
         
-        self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
-                                        names.encode(), nb_decimals, c_format)
+        if self.print_tables_as == PrintTablesAs.COMPUTED:
+            if not len(generalized_sample):
+                raise ValueError("'generalized_sample' must be a non-empty string.")
+
+            self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
+                                            names.encode(), nb_decimals, c_format)
     # TODO: fix the skiped tests below
     def __hash__(self) -> int:
         """
