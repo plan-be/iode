@@ -9,7 +9,7 @@ from iode_gui.iode_objs.models.computed_table_model import ComputedTableModel
 from iode_gui.iode_objs.views.computed_table_view import ComputedTableView
 
 
-class ComputedTableNumericalDialog(QDialog, NumericalWidget):
+class ComputedTableDialog(QDialog, NumericalWidget):
     def __init__(self, table_name: str, generalized_sample: str, nb_decimals: int, variables: str=None, parent=None):
         QDialog.__init__(self, parent)
         NumericalWidget.__init__(self)
