@@ -203,6 +203,9 @@ class TablesView(IodeAbstractTableView):
 
     @Slot()
     def display(self):
+        # import here to avoid circular import
+        from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
+
         # get the selected object
         selection = self.selectedIndexes()
         if not selection:
@@ -221,8 +224,8 @@ class TablesView(IodeAbstractTableView):
             generalized_sample = f"{sample.start}:{sample.nb_periods}"
 
             # computes and display the selected table
-            # dialog = ComputedTableDialog(table_name, generalized_sample, 4, "", self)
-            # self.main_window.append_dialog(dialog)
+            dialog = ComputedTableDialog(table_name, generalized_sample, nb_decimals=4, parent=self)
+            self.main_window.append_dialog(dialog)
         except Exception as e:
             QMessageBox.warning(self, "WARNING", f"Could not compute table {table_name}:\n{str(e)}")
             return
