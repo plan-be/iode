@@ -6,7 +6,7 @@ from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from iode_gui.utils import TMP_FILENAME
 from iode_gui.settings import MixinSettingsDialog, ProjectSettings, PRINT_DESTINATION
 from iode_gui.menu.file.file_settings import MenuFileSettings
-from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableNumericalDialog
+from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from iode_gui.print.print_file_dialog import PrintFileDialog
 from .ui_print_tables import Ui_MenuPrintTables
 
@@ -39,7 +39,7 @@ class MenuPrintTables(MixinSettingsDialog):
 
         self.ui.spinBox_nb_decimals.setValue(5)
 
-        self.table_views: List[ComputedTableNumericalDialog] = []
+        self.table_views: List[ComputedTableDialog] = []
         self.load_settings()
 
     # override MixinSettingsDialog method
@@ -75,7 +75,7 @@ class MenuPrintTables(MixinSettingsDialog):
             
             table_names: List[str] = tables.get_names(pattern_table_names)
             for table_name in table_names:
-                computed_table_dialog = ComputedTableNumericalDialog(table_name, generalized_sample, nb_decimals, parent=self)
+                computed_table_dialog = ComputedTableDialog(table_name, generalized_sample, nb_decimals, parent=self)
                 self.table_views.append(computed_table_dialog)
                 computed_table_dialog.open()    
         except Exception as e:

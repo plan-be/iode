@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QCloseEvent
 
 from iode_gui.settings import MixinSettingsDialog
-from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableNumericalDialog
+from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from .ui_edit_tables import Ui_MenuDataEditTables
 
 from typing import List
@@ -22,7 +22,7 @@ class MenuDataEditTables(MixinSettingsDialog):
         self.ui.textEdit_table_names.include_iode_command(False)        
         self.ui.textEdit_table_names.include_lec_functions(False)  
 
-        self.table_views: List[ComputedTableNumericalDialog] = []
+        self.table_views: List[ComputedTableDialog] = []
         self.load_settings()
 
     # override MixinSettingsDialog method
@@ -46,7 +46,7 @@ class MenuDataEditTables(MixinSettingsDialog):
 
             table_names: List[str] = tables.get_names(pattern)
             for table_name in table_names:
-                computed_table_dialog = ComputedTableNumericalDialog(table_name, generalized_sample, 4, parent=self)
+                computed_table_dialog = ComputedTableDialog(table_name, generalized_sample, 4, parent=self)
                 self.table_views.append(computed_table_dialog)
                 computed_table_dialog.open()
         except Exception as e:

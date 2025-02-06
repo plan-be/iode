@@ -10,7 +10,7 @@ from iode_gui.main_window import MainWindow
 from iode_gui.main_widgets.tab_widget.tab_widget import IodeTabWidget
 from iode_gui.iode_objs.misc.unit_root import UnitRootDialog
 from iode_gui.iode_objs.misc.dyn_adjustment import DynAdjustmentDialog
-from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableNumericalDialog
+from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 
 
 __all__ = ['gui_assign_super']
@@ -289,7 +289,7 @@ def ViewTable_super_GUI(table_name: str, generalized_sample: str, nb_decimals: i
 		return 1
 	
 	try:
-		view = ComputedTableNumericalDialog(table_name, generalized_sample, nb_decimals, parent=main_window)
+		view = ComputedTableDialog(table_name, generalized_sample, nb_decimals, parent=main_window)
 		view.open()
 		return 0
 	except Exception as e:
