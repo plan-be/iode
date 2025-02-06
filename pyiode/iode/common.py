@@ -1,7 +1,18 @@
 from .iode_cython import IodeType, IodeFileType, TableLang, EqMethod, EqTest, _get_file_types
 
 from typing import List, Tuple
+from enum import IntEnum
 
+
+PRINT_DEF_TABLES: Tuple[str, str] = (
+    "Print full definitions",
+    "Print only titles", 
+    "Print computed tables")
+
+class PrintTablesAs(IntEnum):
+    FULL = 0
+    TITLES = 1
+    COMPUTED = 2
 
 IODE_DATABASE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeType]
 
