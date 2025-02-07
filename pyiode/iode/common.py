@@ -24,6 +24,16 @@ class PrintEquationsAs(IntEnum):
     EQ_COMMENTS = 1
     EQ_COMMENTS_ESTIMATION = 2
 
+PRINT_DEF_EQ_LEC: Tuple[str, str, str] = ( 
+    "As is",
+    "Replace coeffs by values",
+    "Replace coeffs by values + t-test")
+
+class PrintEquationsLecAs(IntEnum):
+    AS_IS = 0
+    COEFFS_TO_VALUES = 1
+    COEFFS_TO_VALUES_TTEST = 2
+
 IODE_DATABASE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeType]
 
 IODE_FILE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeFileType]
