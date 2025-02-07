@@ -16,6 +16,10 @@ from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equat
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInfos
+
+from iode.common import PrintEquationsAs
+
 
 EquationInput = Union[str, Dict[str, Any], Equation]
 
@@ -1384,6 +1388,44 @@ cdef class Equations(_AbstractDatabase):
         columns = {"name": names, "lec": data[0], "method": data[1], "sample": data[2], "block": data[3], 
                    "fstat": data[4], "r2adj": data[5], "dw": data[6], "loglik": data[7], "date": data[8]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lec": JUSTIFY.LEFT})
+
+    @property
+    def print_equations_as(self) -> PrintEquationsAs:
+        """
+        Whether to print only the LEC formula, or the LEC formula and the comment, 
+        or the LEC formula, the comment and the estimation results of the IODE equations 
+        in the current database.
+
+        Parameters
+        ----------
+        value: PrintEquationsAs
+            Possible values are: PrintEquationsAs.EQ_ONLY, PrintEquationsAs.EQ_COMMENTS, 
+            PrintEquationsAs.EQ_COMMENTS_ESTIMATION
+
+        Examples
+        --------
+        >>> from iode import equations, PrintEquationsAs
+        >>> equations.print_equations_as
+        <PrintEquationsAs.EQ_ONLY: 0>
+        >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS
+        >>> equations.print_equations_as
+        <PrintEquationsAs.EQ_COMMENTS: 1>
+        >>> equations.print_equations_as = "EQ_COMMENTS_ESTIMATION"
+        >>> equations.print_equations_as
+        <PrintEquationsAs.EQ_COMMENTS_ESTIMATION: 2>
+        """
+        return PrintEquationsAs(B_EQS_INFOS)
+
+    @print_equations_as.setter
+    def print_equations_as(self, value: Union[PrintEquationsAs, str]):
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintEquationsAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintEquationsAs.__members__.keys())}. ")
+            value = PrintEquationsAs[upper_str]
+        value = str(int(value))
+        B_PrintObjEqsInfos(value.encode())
 
     def __hash__(self) -> int:
         """

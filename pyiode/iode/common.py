@@ -14,6 +14,16 @@ class PrintTablesAs(IntEnum):
     TITLES = 1
     COMPUTED = 2
 
+PRINT_DEF_EQUATIONS: Tuple[str, str, str] = (
+    "Equation only",
+    "Equation + comments",
+    "All (equation, comment, estimation)")
+
+class PrintEquationsAs(IntEnum):
+    EQ_ONLY = 0
+    EQ_COMMENTS = 1
+    EQ_COMMENTS_ESTIMATION = 2
+
 IODE_DATABASE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeType]
 
 IODE_FILE_TYPE_NAMES: List[str] = [member.name.title() for member in IodeFileType]
