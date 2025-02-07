@@ -17,8 +17,9 @@ from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_varia
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInfos
+from pyiode.iode_database.cpp_api_database cimport B_EQS_LEC, B_PrintObjLec
 
-from iode.common import PrintEquationsAs
+from iode.common import PrintEquationsAs, PrintEquationsLecAs
 
 
 EquationInput = Union[str, Dict[str, Any], Equation]
@@ -1426,6 +1427,88 @@ cdef class Equations(_AbstractDatabase):
             value = PrintEquationsAs[upper_str]
         value = str(int(value))
         B_PrintObjEqsInfos(value.encode())
+
+    @property
+    def print_equations_lec_as(self) -> PrintEquationsLecAs:
+        """
+        Whether to print the LEC formula of each equation: 
+          
+          - as is,
+          - with coefficients replaced by their values,
+          - with coefficients replaced by their values + t-tests. 
+
+        Parameters
+        ----------
+        value: PrintEquationsLecAs
+            Possible values are: PrintEquationsLecAs.AS_IS, 
+            PrintEquationsLecAs.COEFFS_TO_VALUES, 
+            PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
+
+        Examples
+        --------
+        >>> from iode import equations, PrintEquationsLecAs
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.AS_IS: 0>
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.COEFFS_TO_VALUES: 1>
+        >>> equations.print_equations_lec_as = "COEFFS_TO_VALUES_TTEST"
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
+        """
+        return PrintEquationsLecAs(B_EQS_LEC)
+
+    @print_equations_lec_as.setter
+    def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintEquationsLecAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintEquationsLecAs.__members__.keys())}. ")
+            value = PrintEquationsLecAs[upper_str]
+        value = str(int(value))
+        B_PrintObjLec(value.encode())
+
+    @property
+    def print_equations_lec_as(self) -> PrintEquationsLecAs:
+        """
+        Whether to print the LEC formula of each equation: 
+          
+          - as is,
+          - with coefficients replaced by their values,
+          - with coefficients replaced by their values + t-tests. 
+
+        Parameters
+        ----------
+        value: PrintEquationsLecAs
+            Possible values are: PrintEquationsLecAs.AS_IS, 
+            PrintEquationsLecAs.COEFFS_TO_VALUES, 
+            PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
+
+        Examples
+        --------
+        >>> from iode import equations, PrintEquationsLecAs
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.AS_IS: 0>
+        >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.COEFFS_TO_VALUES: 1>
+        >>> equations.print_equations_lec_as = "COEFFS_TO_VALUES_TTEST"
+        >>> equations.print_equations_lec_as
+        <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
+        """
+        return PrintEquationsLecAs(B_EQS_LEC)
+
+    @print_equations_lec_as.setter
+    def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintEquationsLecAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintEquationsLecAs.__members__.keys())}. ")
+            value = PrintEquationsLecAs[upper_str]
+        value = str(int(value))
+        B_PrintObjLec(value.encode())
 
     def __hash__(self) -> int:
         """

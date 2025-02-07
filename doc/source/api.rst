@@ -112,6 +112,7 @@ Properties and methods specific to Equations
 
    Equations.estimate
    Equations.print_equations_as
+   Equations.print_equations_lec_as
 
 ==========
 Identities

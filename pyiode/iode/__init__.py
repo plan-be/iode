@@ -14,7 +14,7 @@ from .iode_cython import (__version__, NA, is_NA,
 from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, 
                      EQ_TEST_NAMES, IODE_FILE_TYPES, SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
                      PRINT_FORMATS, IMPORT_FORMATS, EXPORT_FORMATS, GRAPHS_COLORS, IODE_FONTS, PrintTablesAs, 
-                     PrintEquationsAs)
+                     PrintEquationsAs, PrintEquationsLecAs)
 
 # time
 from .iode_cython import Period, Sample, PERIODICITY_LIST
@@ -63,7 +63,7 @@ __all__ = [
     'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 
     'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 'SIMULATION_INITIALIZATION_METHODS', 
     'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 'IMPORT_FORMATS', 'EXPORT_FORMATS', 'GRAPHS_COLORS', 
-    'IODE_FONTS', 'PrintTablesAs', 'PrintEquationsAs', 
+    'IODE_FONTS', 'PrintTablesAs', 'PrintEquationsAs', 'PrintEquationsLecAs', 
 
     # time
     'Period', 'Sample', 'PERIODICITY_LIST',
