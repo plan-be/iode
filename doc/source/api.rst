@@ -111,6 +111,7 @@ Properties and methods specific to Equations
    Equations.to_frame
 
    Equations.estimate
+   Equations.print_equations_as
 
 ==========
 Identities

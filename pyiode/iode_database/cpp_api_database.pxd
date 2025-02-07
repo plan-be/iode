@@ -24,6 +24,7 @@ cdef extern from "api/iode.h":
     ctypedef char ONAME[21]
 
     int B_TBL_TITLE
+    int B_EQS_INFOS
     double K_CMP_EPS
 
     char*   KCPTR(char* name)
@@ -33,7 +34,9 @@ cdef extern from "api/iode.h":
 
     void B_display_last_error()
     int B_PrintObjTblTitle(char* arg)
-    int W_dest(char *filename,int type)
+    int B_PrintObjEqsInfos(char* arg)
+
+    int W_dest(char* filename, int file_type)
     int W_flush()
     int W_close()
     int B_DataCompareEps(char* arg)
