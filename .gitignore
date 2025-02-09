@@ -434,6 +434,9 @@ keyboard_shortcuts.*
 *.at
 *.av
 
+*.csv
+*.a2m
+
 imported*
 exported*
 generate_stub_files.py
