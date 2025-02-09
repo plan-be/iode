@@ -15,7 +15,7 @@ from typing import List, Any
 # https://docs.python.org/3.11/library/inspect.html#inspect.getmembers
 # If the optional predicate argument - which will be called with the value object of each 
 # member - is supplied, only members for which the predicate returns a true value are included.
-def run_doctests(items: List[str]=None, tmp_dir: Path=None, verbose: bool=False, raise_on_error: bool=False):
+def run_doctests(items: List[str]=None, output_dir: Path=None, verbose: bool=False, raise_on_error: bool=False):
     if items is not None:
         def predicate(value: Any) -> bool:
             # WARNING: Python functions defined in a Cython pyx file are of type '_cython_xxx.cython_function_or_method'.
@@ -36,7 +36,7 @@ def run_doctests(items: List[str]=None, tmp_dir: Path=None, verbose: bool=False,
                 iode.__test__[name] = doc
 
     # run doctests
-    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode, "tmp_dir": tmp_dir})
+    failure_count, test_count = doctest.testmod(iode, globs={"iode": iode, "output_dir": output_dir})
     assert failure_count == 0
     for name in iode.__test__:
         logging.info(f"tested function/method: '{name}'")
@@ -48,7 +48,7 @@ def test_iode_time():
 
 
 def test_iode_objects(tmp_path):
-    run_doctests(items=['Equation', 'Identity', 'Scalar', 'Table', 'split_list'], tmp_dir=tmp_path)
+    run_doctests(items=['Equation', 'Identity', 'Scalar', 'Table', 'split_list'], output_dir=tmp_path)
 
 
 def test_iode_table_line_cell():
@@ -73,16 +73,16 @@ def test_iode_computed_table(tmp_path):
         doc = inspect.getdoc(value_)
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
-    run_doctests(tmp_dir=tmp_path)
+    run_doctests(output_dir=tmp_path)
 
 
 def test_iode_databases(tmp_path):
     run_doctests(items=['Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 
-                        'Variables', 'load_extra_files', 'reset_extra_files'], tmp_dir=tmp_path)
+                        'Variables', 'load_extra_files', 'reset_extra_files'], output_dir=tmp_path)
 
 
 def test_iode_execute(tmp_path):
-    run_doctests(items=['execute_report', 'execute_command', 'execute_lec'], tmp_dir=tmp_path)
+    run_doctests(items=['execute_report', 'execute_command', 'execute_lec'], output_dir=tmp_path)
 
 
 def test_iode_writing(tmp_path):
@@ -91,7 +91,7 @@ def test_iode_writing(tmp_path):
 
 
 def test_iode_simulation_estimation(tmp_path):
-    run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'], tmp_dir=tmp_path)
+    run_doctests(items=['Simulation', 'dynamic_adjustment', 'dickey_fuller_test'], output_dir=tmp_path)
 
 
 def test_iode_edit_and_estimate_equations(tmp_path):
@@ -100,7 +100,7 @@ def test_iode_edit_and_estimate_equations(tmp_path):
     iode.__test__ = {}
     iode.__test__['EditAndEstimateEquations'] = EditAndEstimateEquations.__doc__
 
-    run_doctests(items=['EditAndEstimateEquations'], tmp_dir=tmp_path)
+    run_doctests(items=['EditAndEstimateEquations'], output_dir=tmp_path)
 
 
 def test_iode_messages():
@@ -135,7 +135,7 @@ def test_iode_miscellaneous(tmp_path):
     iode.__test__['iode_msg_path'] = iode_msg_path.__doc__
     iode.__test__['print_error_msg'] = print_error_msg.__doc__
 
-    run_doctests(tmp_dir=tmp_path)
+    run_doctests(output_dir=tmp_path)
 
 
 def test_iode_errors_warnings_messages_from_C_API(capsys):
