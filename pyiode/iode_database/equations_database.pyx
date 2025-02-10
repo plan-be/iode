@@ -1533,7 +1533,7 @@ cdef class Equations(_AbstractDatabase):
         value = str(int(value))
         B_PrintObjLec(value.encode())
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
         """
         Print the list equations defined by `names` to the file `filepath` using the format `format`.
 
@@ -1568,14 +1568,14 @@ cdef class Equations(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the equations will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the equations to print.
             If None, print all equations of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the equations will be dumped in the *A2M* format.
 
         Examples
         --------
@@ -1588,7 +1588,7 @@ cdef class Equations(_AbstractDatabase):
         
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_only.csv", names=["ACAF", "ACAG"])              # doctest: +ELLIPSIS
+        >>> equations.print_to_file(output_dir / "equations_lec_only.csv", ["ACAF", "ACAG"])              # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_only.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -1601,7 +1601,7 @@ cdef class Equations(_AbstractDatabase):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
-        >>> equations.print_to_file(output_dir / "equations_coeffs_as_values.csv", names=["ACAF", "ACAG"])      # doctest: +ELLIPSIS
+        >>> equations.print_to_file(output_dir / "equations_coeffs_as_values.csv", ["ACAF", "ACAG"])      # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_coeffs_as_values.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -1615,7 +1615,7 @@ cdef class Equations(_AbstractDatabase):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
-        >>> equations.print_to_file(output_dir / "equations_coeffs_ttest.csv", names=["ACAF", "ACAG"])          # doctest: +ELLIPSIS
+        >>> equations.print_to_file(output_dir / "equations_coeffs_ttest.csv", ["ACAF", "ACAG"])          # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_coeffs_ttest.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -1629,7 +1629,7 @@ cdef class Equations(_AbstractDatabase):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_cmt.csv", names=["ACAF", "ACAG"])               # doctest: +ELLIPSIS
+        >>> equations.print_to_file(output_dir / "equations_lec_cmt.csv", ["ACAF", "ACAG"])               # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_cmt.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -1642,7 +1642,7 @@ cdef class Equations(_AbstractDatabase):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS_ESTIMATION
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_cmt_estim.csv", names=["ACAF", "ACAG"])         # doctest: +ELLIPSIS
+        >>> equations.print_to_file(output_dir / "equations_lec_cmt_estim.csv", ["ACAF", "ACAG"])         # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_cmt_estim.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -1669,7 +1669,7 @@ cdef class Equations(_AbstractDatabase):
         " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
         <BLANKLINE>
         """
-        self._print_to_file(filepath, format, names)
+        self._print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         """
