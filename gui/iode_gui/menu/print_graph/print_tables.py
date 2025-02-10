@@ -13,7 +13,7 @@ from .ui_print_tables import Ui_MenuPrintTables
 from typing import List
 from pathlib import Path
 from iode import (IodeType, TableLang, IodeFileType, tables, 
-                  load_extra_files, reset_extra_files)
+                  load_extra_files, reset_extra_files, PrintTablesAs)
 
 
 class MenuPrintTables(MixinSettingsDialog):
@@ -101,13 +101,19 @@ class MenuPrintTables(MixinSettingsDialog):
             if extra_files:
                 load_extra_files(extra_files)
             
+            if not pattern_table_names:
+                pattern_table_names = '*'
+            
             # check list of tables is valid
             table_names: List[str] = tables.get_names(pattern_table_names)
 
             project_settings: QSettings = ProjectSettings.project_settings
-            print_to_file = project_settings.value(PRINT_DESTINATION, type=bool)
+            if project_settings is None:
+                b_print_to_file = False
+            else:
+                b_print_to_file = project_settings.value(PRINT_DESTINATION, type=bool)
 
-            if print_to_file:
+            if b_print_to_file:
                 # Ask the user to set the output file and format
                 dialog = PrintFileDialog(parent=self)
                 if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -121,9 +127,11 @@ class MenuPrintTables(MixinSettingsDialog):
                 output_file = TMP_FILENAME + '.htm'
                 _format = 'H'
 
-            tables.print_to_file(output_file, generalized_sample, table_names, nb_decimals, _format)
+            tables.print_tables_as = PrintTablesAs.COMPUTED
+            tables.print_to_file(output_file, table_names, generalized_sample=generalized_sample, 
+                                 nb_decimals=nb_decimals, format=_format)
             
-            if not print_to_file:
+            if not b_print_to_file:
                 output_file = Path(output_file)
                 if not output_file.exists():
                     raise RuntimeError("Couldn't export tables to a file")

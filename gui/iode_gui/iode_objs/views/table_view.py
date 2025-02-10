@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt, Slot, Signal, QSettings
 from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit
 from PySide6.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
-from PySide6.QtPrintSupport import QPrintPreviewDialog
+from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings, PRINT_DESTINATION
@@ -31,9 +31,9 @@ from iode_gui.plot.plot_vars import PlotVariablesDialog
 from .numerical_view import NumericalTableView
 from .abstract_table_view import IodeAbstractTableView
 
-from typing import Tuple
+from typing import Tuple, Union, Dict, Any
 from pathlib import Path
-from iode import IodeType, tables, variables, Table, Sample
+from iode import IodeType, equations, scalars, tables, variables, Table, Sample
 
 
 class CommentsView(IodeAbstractTableView):
@@ -56,7 +56,7 @@ class CommentsView(IodeAbstractTableView):
 
 class EquationsView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeType.COMMENTS, EquationsDelegate(parent), parent)
+        super().__init__(IodeType.EQUATIONS, EquationsDelegate(parent), parent)
     
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -83,10 +83,26 @@ class EquationsView(IodeAbstractTableView):
         if model.filter_active:
             self.filter()
 
+    # override not implemented in abstract view class
+    def _print_to_file_kwargs(self, dialog: PrintFileDialog) -> Dict[str, Any]:        
+        print_equations_as = dialog.print_equations_as
+        if print_equations_as is not None:
+            equations.print_equations_as = print_equations_as
+
+        print_equations_lec_as = dialog.print_equations_lec_as
+        if print_equations_lec_as is not None:
+            equations.print_equations_lec_as = print_equations_lec_as
+
+        nb_decimals = dialog.print_nb_decimals
+        if nb_decimals is not None:
+            equations.print_nb_decimals = nb_decimals
+
+        return dict()
+
 
 class IdentitiesView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeType.COMMENTS, IdentitiesDelegate(parent), parent)
+        super().__init__(IodeType.IDENTITIES, IdentitiesDelegate(parent), parent)
 
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -135,7 +151,7 @@ class IdentitiesView(IodeAbstractTableView):
 
 class ListsView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeType.COMMENTS, ListsDelegate(parent), parent)
+        super().__init__(IodeType.LISTS, ListsDelegate(parent), parent)
     
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -153,7 +169,7 @@ class ListsView(IodeAbstractTableView):
 
 class ScalarsView(IodeAbstractTableView, NumericalTableView):
     def __init__(self, parent=None):
-        IodeAbstractTableView.__init__(self, IodeType.COMMENTS, ScalarsDelegate(parent), parent)
+        IodeAbstractTableView.__init__(self, IodeType.SCALARS, ScalarsDelegate(parent), parent)
         NumericalTableView.__init__(self)
         NumericalTableView.setup(self, allow_to_paste=False)
 
@@ -174,10 +190,16 @@ class ScalarsView(IodeAbstractTableView, NumericalTableView):
         self.popup_context_menu(event)
         event.accept()
 
+    # override not implemented in abstract view class
+    def _print_to_file_kwargs(self, dialog: PrintFileDialog) -> Dict[str, Any]:  
+        nb_decimals = dialog.print_nb_decimals
+        if nb_decimals is not None:
+            scalars.print_nb_decimals = nb_decimals
+        return dict()
 
 class TablesView(IodeAbstractTableView):
     def __init__(self, parent=None):
-        super().__init__(IodeType.COMMENTS, TablesDelegate(parent), parent)
+        super().__init__(IodeType.TABLES, TablesDelegate(parent), parent)
 
         # headers
         self.horizontalHeader().setStretchLastSection(True)
@@ -201,6 +223,22 @@ class TablesView(IodeAbstractTableView):
         model: IodeAbstractTableModel = self.model()
         return AddTableDialog(model.displayed_database, self)
 
+    # override not implemented in abstract view class
+    def _print_to_file_kwargs(self, dialog: PrintFileDialog) -> Dict[str, Any]: 
+        print_tables_as = dialog.print_tables_as
+        if print_tables_as is not None:
+            tables.print_tables_as = print_tables_as
+        
+        nb_decimals = dialog.print_nb_decimals
+        if nb_decimals is not None:
+            tables.print_nb_decimals = nb_decimals
+        
+        generalized_sample = dialog.generalized_sample
+        if generalized_sample is not None:
+            return {'generalized_sample': dialog.generalized_sample}
+        else:
+            return dict()
+    
     @Slot()
     def display(self):
         # import here to avoid circular import
@@ -263,7 +301,7 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
     new_graph_dialog = Signal(list, str, str)
     
     def __init__(self, parent=None):
-        IodeAbstractTableView.__init__(self, IodeType.COMMENTS, VariablesDelegate(parent), parent)
+        IodeAbstractTableView.__init__(self, IodeType.VARIABLES, VariablesDelegate(parent), parent)
         NumericalTableView.__init__(self)
 
         # ---- keyboard shortcuts ----
@@ -349,54 +387,6 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
     def contextMenuEvent(self, event: QContextMenuEvent):
         self.popup_context_menu(event)
         event.accept()
-
-    # override AbstractTableView method
-    @Slot()
-    def print(self):
-        try:
-            project_settings: QSettings = ProjectSettings.project_settings
-            print_to_file = project_settings.value(PRINT_DESTINATION, type=bool)
-
-            if print_to_file:
-                # Set up the output file using the filepath associated with the Variable objects
-                model: VariablesModel = self.model()
-                filepath = model.filepath
-                output_file = Path(filepath).with_suffix("")
-
-                # Ask the user to set the output file and format
-                dialog = PrintFileDialog(output_file, 'D', self)
-                if dialog.exec() == QDialog.DialogCode.Accepted:
-                    output_file = dialog.output_file
-                    _format = dialog.file_format
-                else:
-                    return
-
-                # Set the number of decimals and the language
-                nb_decimals = model.precision
-                language = "ENGLISH"
-
-                # Build the generalized sample
-                sample = variables.sample
-                generalized_sample = f"{sample.start}:{sample.nb_periods}"
-
-                # List of names = filter pattern or '*' if pattern is empty
-                pattern = self.filter_line_edit.text().strip()
-                if not pattern:
-                    pattern = "*"
-                vars_names = variables.get_names(pattern)
-
-                # create a temporary table to print the (selected) variables
-                table = Table(2, "Variables to print", vars_names)
-                table.language = language
-                computed_table = table.compute(generalized_sample, None, nb_decimals)
-                computed_table.print_to_file(output_file, _format)
-            else:
-                dialog = QPrintPreviewDialog(self.printer)
-                dialog.paintRequested.connect(self.render_for_printing)
-                self.dump_table_in_document()
-                dialog.exec()
-        except Exception as e:
-            QMessageBox.warning(None, "WARNING", str(e))
 
     @Slot()
     def plot_series(self):

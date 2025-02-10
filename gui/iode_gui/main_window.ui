@@ -26,7 +26,7 @@
    <string>IODE</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../iode_gui/iode_resource.qrc">
+    <iconset resource="../iode_gui/iode_resource.qrc">
     <normaloff>:/images/iode_icon.png</normaloff>:/images/iode_icon.png</iconset>
   </property>
   <property name="statusTip">
@@ -164,7 +164,6 @@
     <addaction name="separator"/>
     <addaction name="actionPrint_View_Tables"/>
     <addaction name="actionPrint_View_Variables"/>
-    <addaction name="actionObject_Definitions"/>
     <addaction name="separator"/>
     <addaction name="actionGRAPHICS"/>
     <addaction name="separator"/>
@@ -1132,22 +1131,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionObject_Definitions</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_print_objects_definitions_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionGraphs_from_Tables</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -1524,7 +1507,6 @@
   <slot>open_execute_report_command_line_dialog()</slot>
   <slot>open_print_tables_dialog()</slot>
   <slot>open_print_variables_dialog()</slot>
-  <slot>open_print_objects_definitions_dialog()</slot>
   <slot>open_graphs_tables_dialog()</slot>
   <slot>open_graphs_variables_dialog()</slot>
   <slot>open_release_notes()</slot>

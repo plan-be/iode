@@ -829,10 +829,6 @@ class MainWindow(AbstractMainWindow):
         dialog.exec()
 
     @Slot()
-    def open_print_objects_definitions_dialog(self):
-        QMessageBox.warning(self, "WARNING", "Object Definitions not yet implemented")
-
-    @Slot()
     def open_graphs_tables_dialog(self):
         dialog = MenuGraphTables(self)
         dialog.new_plot.connect(self.append_plot)
