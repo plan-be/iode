@@ -372,6 +372,7 @@ int B_PrintObjDefArgs(char* arg, int type)
 {
     int         i, rc = 0;
 
+    kmsg("Printing IODE objects definition to file '%s'...", W_filename);
     if(arg == 0 || arg[0] == 0)
         for(i = 0 ; i < KNB(K_WS[type]) ; i++) {
             rc = B_PrintObjDef_1(KONAME(K_WS[type], i), &type);
@@ -386,6 +387,7 @@ int B_PrintObjDefArgs(char* arg, int type)
     }
     /*    W_close();*/
     W_flush();
+    kmsg("Print done");
     return(rc);
 }
 
