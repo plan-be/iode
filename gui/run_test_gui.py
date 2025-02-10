@@ -24,7 +24,5 @@ def run_view_workspace():
 if __name__ == "__main__":
     project_dir = Path('.').resolve()
     start()
-
-    run_view_workspace()
-    
-    run_view_workspace()
+    # run_view_workspace()
+    # run_view_workspace()

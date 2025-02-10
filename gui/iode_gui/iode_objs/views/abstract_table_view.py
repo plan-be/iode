@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QRegularExpression, QModelIndex, Signal, Slot
+from PySide6.QtCore import Qt, QRegularExpression, QModelIndex, QSettings, Signal, Slot
 from PySide6.QtGui import (QTextCursor, QTextCharFormat, QFont, QKeySequence, QKeyEvent, 
                            QTextDocument, QTextFrameFormat, QShortcut, QRegularExpressionValidator)
 from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSizePolicy, 
@@ -6,11 +6,14 @@ from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSiz
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
+from iode_gui.settings import ProjectSettings, PRINT_DESTINATION
 from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_gui.iode_objs.delegates.base_delegate import BaseDelegate
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
+from iode_gui.print.print_file_dialog import PrintFileDialog
 
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict, Any
+from pathlib import Path
 from iode import IodeType, variables
 # TODO : add MAX_LENGTH_NAME (= K_MAX_NAME) to the Python iode package
 MAX_LENGTH_NAME = 20
@@ -392,6 +395,48 @@ class IodeAbstractTableView(QTableView):
         """Renders the document for printing."""
         self.document.print_(self.printer)
 
+    def _print_to_file_kwargs(self, dialog: PrintFileDialog) -> Dict[str, Any]:
+        """Get other kwargs for the print_to_file method"""
+        return dict()
+
+    @Slot()
+    def print(self):
+        """Prints the objects."""
+        project_settings: QSettings = ProjectSettings.project_settings
+        if project_settings is None:
+            b_print_to_file = False    
+        else:
+            b_print_to_file = project_settings.value(PRINT_DESTINATION, type=bool)
+
+        try:
+            if b_print_to_file:
+                # Set up the output file using the filepath associated with the ?? objects
+                table_model: IodeAbstractTableModel = self.model()
+                filepath = table_model.filepath
+                output_file = Path(filepath).with_suffix("")
+
+                # Ask the user to set the output file and format
+                dialog = PrintFileDialog(self.iode_type, output_file, parent=self)
+                if dialog.exec() == QDialog.DialogCode.Accepted:
+                    database_to_print = table_model.displayed_database
+                    if database_to_print is None or not len(database_to_print):
+                        QMessageBox.warning(self, "Warning", "No data to print")
+                        return
+                    output_file = dialog.output_file
+                    kwargs = {'names': None, 'format': dialog.file_format}
+                    kwargs.update(self._print_to_file_kwargs(dialog))
+                    database_to_print.print_to_file(output_file, **kwargs)
+                else:
+                    return
+            else:
+                self.printer = QPrinter()
+                dialog = QPrintPreviewDialog(self.printer, self)
+                dialog.paintRequested.connect(self.render_for_printing)
+                self.dump_table_in_document()
+                dialog.exec()
+        except Exception as e:
+            QMessageBox.critical(self, "ERROR", str(e))
+
     @Slot()
     def remove_objects(self):
         """Removes the selected objects."""
@@ -470,15 +515,6 @@ class IodeAbstractTableView(QTableView):
     def filter_slot(self):
         """Filters the objects."""
         self.filter()
-
-    @Slot()
-    def print(self):
-        """Prints the objects."""
-        self.printer = QPrinter()
-        dialog = QPrintPreviewDialog(self.printer, self)
-        dialog.paintRequested.connect(self.render_for_printing)
-        self.dump_table_in_document()
-        dialog.exec()
 
     def _open_edit_dialog(self, obj_name: str):
         raise NotImplementedError()
