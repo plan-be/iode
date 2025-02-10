@@ -323,7 +323,6 @@ Properties and methods specific to Tables
 
    Tables.print_nb_decimals
    Tables.print_tables_as
-   Tables.compute_and_print_to_file
 
 =========
 Variables

@@ -788,7 +788,7 @@ cdef class Identities(_AbstractDatabase):
         columns = {"name": names, "identities": [join_lines(str(self._get_object(name))) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "identities": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
         """
         Print the list identities defined by `names` to the file `filepath` using the format `format`.
 
@@ -823,14 +823,14 @@ cdef class Identities(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the identities will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the identities to print.
             If None, print all identities of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the identities will be dumped in the *A2M* format.
 
         Examples
         --------
@@ -838,7 +838,7 @@ cdef class Identities(_AbstractDatabase):
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded
-        >>> identities.print_to_file(output_dir / "identities.csv", names="G*")     # doctest: +ELLIPSIS
+        >>> identities.print_to_file(output_dir / "identities.csv", "G*")     # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...identities.csv'...
         Printing GAP2 ...
         Printing GAP_ ...
@@ -851,7 +851,7 @@ cdef class Identities(_AbstractDatabase):
         " - GAP_ : 100*((QAF_/Q_F) -1)"
         " - GOSFR : GOSF/VAF_"
         """
-        self._print_to_file(filepath, format, names)
+        self._print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         """

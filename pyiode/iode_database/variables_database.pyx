@@ -4167,7 +4167,7 @@ cdef class Variables(_AbstractDatabase):
             columns[str_period] = [self.database_ptr.get_var(<int>pos, t, self.mode_) for pos in names_pos]
         return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
         """
         Print the list variables defined by `names` to the file `filepath` using the format `format`.
 
@@ -4202,14 +4202,14 @@ cdef class Variables(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the variables will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the variables to print.
             If None, print all variables of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the variables will be dumped in the *A2M* format.
 
         Examples
         --------
@@ -4217,7 +4217,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> variables.print_to_file(output_dir / "variables.csv", names=["ACAF", "ACAG"])       # doctest: +ELLIPSIS
+        >>> variables.print_to_file(output_dir / "variables.csv", ["ACAF", "ACAG"])       # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...variables.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -4232,7 +4232,7 @@ cdef class Variables(_AbstractDatabase):
         "ACAG","#N/A","#N/A","#N/A","#N/A",...,"30.323961","31.370139","32.420299","33.469601",
         <BLANKLINE>
         """
-        self._print_to_file(filepath, format, names)
+        self._print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         """

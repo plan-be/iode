@@ -731,7 +731,7 @@ cdef class Comments(_AbstractDatabase):
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "comments": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
         """
         Print the list comments defined by `names` to the file `filepath` using the format `format`.
 
@@ -766,14 +766,14 @@ cdef class Comments(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the comments will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the comme,ts to print.
             If None, print all comments of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the comments will be dumped in the *A2M* format.
 
         Examples
         --------
@@ -781,7 +781,7 @@ cdef class Comments(_AbstractDatabase):
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded
-        >>> comments.print_to_file(output_dir / "comments.csv", names=["ACAF", "ACAG"])     # doctest: +ELLIPSIS
+        >>> comments.print_to_file(output_dir / "comments.csv", ["ACAF", "ACAG"])     # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...comments.csv'...
         Printing ACAF ...
         Printing ACAG ...
@@ -793,7 +793,7 @@ cdef class Comments(_AbstractDatabase):
         " - ACAG : Totale overheid : netto ontvangen kapitaaloverdrachten."
         <BLANKLINE>
         """
-        self._print_to_file(filepath, format, names)
+        self._print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         """

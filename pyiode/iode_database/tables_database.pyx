@@ -911,7 +911,7 @@ cdef class Tables(_AbstractDatabase):
         if value <= 1:
             B_PrintObjTblTitle(str(value).encode())
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None, 
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, 
                       generalized_sample: str=None, nb_decimals: int=4) -> None:
         """
         Print the list tables defined by `names` to the file `filepath` using the format `format`.
@@ -947,14 +947,14 @@ cdef class Tables(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the tables will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the tables to print.
             If None, print all tables of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the tables will be dumped in the *A2M* format.
         generalized_sample: str
             generalized sample to use for computing the tables. 
             Mandatory if `print_tables_as` is `PrintTablesAs.COMPUTED`.
@@ -965,13 +965,52 @@ cdef class Tables(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import tables, SAMPLE_DATA_DIR, PrintTablesAs
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import tables, PrintTablesAs, load_extra_files
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
 
+        >>> tables["ANAKNFF"]              # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                  1 |
+        TITLE |                "Déterminants de la croissance de K"
+        ----- | ------------------------------------------------------------------
+        CELL  |                                    |              "#s"
+        ----- | ------------------------------------------------------------------
+        CELL  | "Croissance de K "                 |                      dln KNFF
+        CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
+        CELL  | "Rentabilité "                     |          knf2*ln mavg(3,RENT)
+        CELL  | "Croissance anticipée de l'output" | 0.416*mavg(4,dln QAFF_)+0.023
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> tables["ANAPRIX"]              # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  |                              |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
+        <BLANKLINE>
+        nb lines: 6
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
         >>> tables.print_tables_as = PrintTablesAs.TITLES
-        >>> tables.print_to_file(output_dir / "tables_titles.csv", names=["ANAKNFF", "ANAPRIX"])        # doctest: +ELLIPSIS
+        >>> tables.print_to_file(output_dir / "tables_titles.csv", ["ANAKNFF", "ANAPRIX"])        # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...tables_titles.csv'...
         Printing ANAKNFF ...
         Printing ANAPRIX ...
@@ -983,7 +1022,7 @@ cdef class Tables(_AbstractDatabase):
         "ANAPRIX : Analyse des prix"
 
         >>> tables.print_tables_as = PrintTablesAs.FULL
-        >>> tables.print_to_file(output_dir / "tables_full.csv", names=["ANAKNFF", "ANAPRIX"])          # doctest: +ELLIPSIS
+        >>> tables.print_to_file(output_dir / "tables_full.csv", ["ANAKNFF", "ANAPRIX"])          # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...tables_full.csv'...
         Printing ANAKNFF ...
         Printing ANAPRIX ...
@@ -1010,77 +1049,6 @@ cdef class Tables(_AbstractDatabase):
         <BLANKLINE>
         \"""GAP_""\","GAP_",
         \"""dln (PC/(1+ITCR))-dln AOUC""\","100*(dln (PC/(1+ITCR))-dln AOUC)",
-
-        >>> tables.print_tables_as = PrintTablesAs.COMPUTED
-        >>> tables.print_to_file(output_dir / "tables_computed.csv", names=["ANAKNFF", "ANAPRIX"], 
-        ...                      generalized_sample="(2010;2010/2009):5", nb_decimals=4)                # doctest: +ELLIPSIS
-        >>> with open(output_dir / "tables_computed.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
-        ...     print(f.read())
-        ...
-        "Déterminants de la croissance de K"
-        <BLANKLINE>
-        " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
-        <BLANKLINE>
-        "Croissance de K","0.0203","-27.1039","0.0182","-10.1346","0.0201","10.5786","0.0238","18.2162","0.0244","2.4760",
-        "Output gap","0.0008","-36.5874","0.0019","150.7142","0.0031","59.9968","0.0035","14.1806","0.0030","-13.9993",
-        "Rentabilité","-0.0078","34.5565","-0.0084","7.5121","-0.0084","0.3108","-0.0084","0.1740","-0.0086","2.4613",
-        "Croissance anticipée de l'output","0.0293","-5.2615","0.0285","-2.9300","0.0293","2.9104","0.0318","8.6515","0.0322","1.2418",
-        "Analyse des prix"
-        <BLANKLINE>
-        " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
-        <BLANKLINE>
-        "GAP_","3.3765","-11.6805","3.5664","5.6238","3.7392","4.8438","3.6566","-2.2090","3.3138","-9.3736",
-        "dln (PC/(1+ITCR))-dln AOUC","0.0354","-384.6132","-0.1389","-491.8586","-0.0381","-72.5373","0.0422","-210.7056","0.0224","-46.8953",
-        <BLANKLINE>
-        """
-        if self.print_tables_as == PrintTablesAs.COMPUTED:
-            self.compute_and_print_to_file(filepath, generalized_sample, names, nb_decimals, format)
-        else:
-            self._print_to_file(filepath, format, names)
-
-    def compute_and_print_to_file(self, destination_file: Union[str, Path], generalized_sample: str, 
-                                  names: Union[str, Path, List[Union[str, Path]]]=None, nb_decimals: int=4, 
-                                  format: str = None):
-        """
-        Compute and print a list of IODE tables to a file.
-
-        Argument `format` must be in the list:
-        - 'H' (HTML file)
-        - 'M' (MIF file)
-        - 'R' (RTF file)
-        - 'C' (CSV file)
-
-        If argument `format` is not provided, the A2M format will be used to print the output.
-
-        If the filename does not contain an extension, it is automatically added based on the format.
-
-        Parameters
-        ----------
-        destination_file: str or Path 
-            The destination file path.
-        generalized_sample: str
-            The generalized sample (see :py:meth:`` for details).
-        names: str or list(str), optinal 
-            The names of the IODE tables to be printed.
-            If None, all tables of the (subset of the) database will be printed.
-        nb_decimals: int, optional
-            The number of decimals to use in the output.
-            Defaults to 4.
-        format: str, optional 
-            The format of the output file. Deduced from the extension if not provided.
-            If destination_file has no extension and format is None, the A2M format is used.
-
-        Examples
-        --------
-        >>> from pathlib import Path
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Table, load_extra_files, tables, variables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.tbl
-        46 objects loaded
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.var
-        394 objects loaded
 
         >>> tables["C8_1"]              # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
@@ -1156,101 +1124,104 @@ cdef class Tables(_AbstractDatabase):
         graph_alignment: 'LEFT'
         <BLANKLINE>
 
+        >>> tables.print_tables_as = PrintTablesAs.COMPUTED
         >>> names = ["C8_1", "C8_2", "C8_3", "C8_4"]
-        >>> tables.compute_and_print_to_file(output_dir / "tables_2_periods.csv", "(2010;2010/2009):5", names, 2)
+        >>> tables.print_to_file(output_dir / "tables_2_periods.csv", names, 
+        ...                      generalized_sample="(2010;2010/2009):5", nb_decimals=4)
         >>> with open(output_dir / "tables_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
+        ...
         "Déterminants de l'output potentiel"
         <BLANKLINE>
         " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
         <BLANKLINE>
-        "Output potentiel","6936.11","1.74","7045.34","1.57","7161.54","1.65","7302.29","1.97","7460.12","2.16",       
-        "Stock de capital","11293.85","2.82","11525.01","2.05","11736.78","1.84","11975.49","2.03","12263.95","2.41",  
-        "Intensité de capital","0.39","-2.17","0.38","-2.05","0.37","-1.91","0.36","-1.86","0.36","-1.90",
-        "Productivité totale des facteurs","1.10","1.00","1.11","1.00","1.12","1.00","1.13","1.00","1.14","1.00",      
+        "Output potentiel","6936.1120","1.7386","7045.3431","1.5748","7161.5414","1.6493","7302.2903","1.9653","7460.1153","2.1613",
+        "Stock de capital","11293.8486","2.8185","11525.0126","2.0468","11736.7826","1.8375","11975.4885","2.0338","12263.9472","2.4087",
+        "Intensité de capital","0.3855","-2.1730","0.3776","-2.0452","0.3704","-1.9140","0.3635","-1.8641","0.3566","-1.8968",
+        "Productivité totale des facteurs","1.0977","1.0000","1.1087","1.0000","1.1198","1.0000","1.1310","1.0000","1.1423","1.0000",
         "Déterminants de la productivité"
         <BLANKLINE>
         " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
         <BLANKLINE>
-        "Productivité","2.13","1.42","2.17","2.07","2.22","2.00","2.26","1.86","2.30","1.61",
-        "Intensité de capital","1.34","0.68","1.35","0.64","1.36","0.60","1.37","0.59","1.38","0.60",
-        "TFPFHP_","1.10","1.00","1.11","1.00","1.12","1.00","1.13","1.00","1.14","1.00",
+        "Productivité","2.1305","1.4222","2.1746","2.0711","2.2181","2.0014","2.2593","1.8562","2.2957","1.6105",
+        "Intensité de capital","1.3438","0.6834","1.3524","0.6426","1.3606","0.6009","1.3685","0.5850","1.3767","0.5954",
+        "TFPFHP_","1.0977","1.0000","1.1087","1.0000","1.1198","1.0000","1.1310","1.0000","1.1423","1.0000",
         "Output gap"
         <BLANKLINE>
         " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
         <BLANKLINE>
-        "Output gap (methodologie FPB).","3.38","-11.68","3.57","5.62","3.74","4.84","3.66","-2.21","3.31","-9.37",    
+        "Output gap (methodologie FPB).","3.3765","-11.6805","3.5664","5.6238","3.7392","4.8438","3.6566","-2.2090","3.3138","-9.3736",
         "Déterminants de la croissance du stock de capital"
         <BLANKLINE>
         " ","10","10/09","11","11/10","12","12/11","13","13/12","14","14/13",
         <BLANKLINE>
-        "Croissnce du stoc de capital","0.02","-27.10","0.02","-10.13","0.02","10.58","0.02","18.22","0.02","2.48",    
-        "Rentabilité","-0.01","34.56","-0.01","7.51","-0.01","0.31","-0.01","0.17","-0.01","2.46",
+        "Croissnce du stoc de capital","0.0203","-27.1039","0.0182","-10.1346","0.0201","10.5786","0.0238","18.2162","0.0244","2.4760",
+        "Rentabilité","-0.0093","34.5565","-0.0100","7.5121","-0.0100","0.3108","-0.0100","0.1740","-0.0103","2.4613",
         <BLANKLINE>
 
-        >>> extra_files = load_extra_files(Path(SAMPLE_DATA_DIR) / "ref.av")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> extra_files = load_extra_files(f"{SAMPLE_DATA_DIR}/ref.av")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading ...\\ref.av
         ...
         394 objects loaded
         >>> extra_files[0].name
         'ref.av'
-        >>> tables.compute_and_print_to_file(output_dir / "tables_2_files.csv", "2010[1-2]:5", names, 2)    
+        >>> tables.print_to_file(output_dir / "tables_2_files.csv", names, 
+        ...                      generalized_sample="2010[1-2]:5", nb_decimals=4)    
         >>> with open(output_dir / "tables_2_files.csv", "r") as f:
         ...     print(f.read())
+        ...
         "Déterminants de l'output potentiel"
         <BLANKLINE>
         " ","10[1-2]","11[1-2]","12[1-2]","13[1-2]","14[1-2]",
         <BLANKLINE>
-        "Output potentiel","138.72","140.91","143.23","146.05","149.20",
-        "Stock de capital","225.88","230.50","234.74","239.51","245.28",
-        "Intensité de capital","0.01","0.01","0.01","0.01","0.01",
-        "Productivité totale des facteurs","0.02","0.02","0.02","0.02","0.02",
+        "Output potentiel","138.7221","140.9067","143.2307","146.0457","149.2022",
+        "Stock de capital","225.8768","230.5000","234.7354","239.5095","245.2787",
+        "Intensité de capital","0.0077","0.0076","0.0074","0.0073","0.0071",
+        "Productivité totale des facteurs","0.0220","0.0222","0.0224","0.0226","0.0228",
         "Déterminants de la productivité"
         <BLANKLINE>
         " ","10[1-2]","11[1-2]","12[1-2]","13[1-2]","14[1-2]",
         <BLANKLINE>
-        "Productivité","0.00","-0.00","-0.00","0.00","0.00",
-        "Intensité de capital","-0.01","-0.01","-0.01","-0.01","-0.01",
-        "TFPFHP_","0.02","0.02","0.02","0.02","0.02",
+        "Productivité","0.0000","-0.0000","-0.0000","0.0000","0.0000",
+        "Intensité de capital","-0.0084","-0.0085","-0.0085","-0.0086","-0.0086",
+        "TFPFHP_","0.0220","0.0222","0.0224","0.0226","0.0228",
         "Output gap"
         <BLANKLINE>
         " ","10[1-2]","11[1-2]","12[1-2]","13[1-2]","14[1-2]",
         <BLANKLINE>
-        "Output gap (methodologie FPB).","-0.00","0.00","0.00","0.00","0.00",
+        "Output gap (methodologie FPB).","-0.0000","0.0000","0.0000","0.0000","0.0000",
         "Déterminants de la croissance du stock de capital"
         <BLANKLINE>
         " ","10[1-2]","11[1-2]","12[1-2]","13[1-2]","14[1-2]",
         <BLANKLINE>
-        "Croissnce du stoc de capital","0.00","-0.00","-0.00","0.00","-0.00",
-        "Rentabilité","0.00","-0.00","-0.00","-0.00","0.00",
+        "Croissnce du stoc de capital","0.0000","-0.0000","-0.0000","0.0000","-0.0000",
+        "Rentabilité","0.0000","-0.0000","-0.0000","-0.0000","0.0000",
         <BLANKLINE>
         """
         cdef char c_format = b'\0'
-        if format is not None:
-            if not len(format):
-                raise ValueError("format must be a non-empty char")
-            c_format = format.encode('utf-8')[0]
+        if self.print_tables_as != PrintTablesAs.COMPUTED:
+            self._print_to_file(filepath, names, format)
+        else:
+            if format is not None:
+                if not len(format):
+                    raise ValueError("format must be a non-empty char")
+                c_format = format.encode('utf-8')[0]
 
-        if isinstance(destination_file, str):
-            if not len(destination_file):
-                raise ValueError("'destination_file' must be a non-empty string or a Path object.")
-            destination_file = Path(destination_file)
-        if destination_file.suffix:
-            c_format = destination_file.suffix.encode('utf-8')[1]
-        destination_file = str(destination_file.resolve())
+            if isinstance(filepath, str):
+                if not len(filepath):
+                    raise ValueError("'filepath' must be a non-empty string or a Path object.")
+                filepath = Path(filepath)
+            if filepath.suffix:
+                c_format = filepath.suffix.encode('utf-8')[1]
+            filepath = str(filepath.resolve())
 
-        if not isinstance(names, str) and not all(isinstance(name, str) for name in names):
-            raise TypeError("'names' must be a string or a list of strings")        
-        if isinstance(names, list):
-            names = ';'.join(names)
-        if not len(names):
-            raise ValueError("'names' must be a non-empty string or a non-empty list of strings.")
-        
-        if generalized_sample is None or len(generalized_sample) == 0:
-            raise ValueError("'generalized_sample' must be a non-empty string.")
+            names = ';'.join(self.get_names(names))
+            
+            if generalized_sample is None or len(generalized_sample) == 0:
+                raise ValueError("'generalized_sample' must be a non-empty string.")
 
-        self.database_ptr.print_to_file(destination_file.encode(), generalized_sample.encode(), 
-                                        names.encode(), nb_decimals, c_format)
+            self.database_ptr.print_to_file(filepath.encode(), generalized_sample.encode(), 
+                                            names.encode(), nb_decimals, c_format)
     
     # TODO: fix the skiped tests below
     def __hash__(self) -> int:

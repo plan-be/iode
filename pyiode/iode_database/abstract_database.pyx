@@ -975,7 +975,7 @@ cdef class _AbstractDatabase:
         else:
             raise TypeError(f"'scalars' is not available for {self.iode_type.name} objects.")
 
-    def _print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None):
+    def _print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         cdef int res
         cdef char* c_arg = NULL
         cdef bytes b_arg = b''

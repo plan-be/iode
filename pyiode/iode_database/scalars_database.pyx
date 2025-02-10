@@ -771,7 +771,7 @@ cdef class Scalars(_AbstractDatabase):
     def print_nb_decimals(self, value: int):
         self._set_print_nb_decimals(value)
 
-    def print_to_file(self, filepath: Union[str, Path], format: str=None, names: Union[str, List[str]]=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
         """
         Print the list scalars defined by `names` to the file `filepath` using the format `format`.
 
@@ -806,14 +806,14 @@ cdef class Scalars(_AbstractDatabase):
             path to the file to print.
             If the filename does not contain an extension, it is automatically 
             added based on the value of the format argument.
-        format: str, optional
-            format of the output file. Possible values are: 'H' (HTML file), 
-            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
-            Defaults to None meaning that the scalars will be dumped in the *A2M* format.
         names: str or list of str, optional
             pattern or list of names of the scalars to print.
             If None, print all scalars of the (subset of the) current database.
             Defaults to None.
+        format: str, optional
+            format of the output file. Possible values are: 'H' (HTML file), 
+            'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
+            Defaults to None meaning that the scalars will be dumped in the *A2M* format.
 
         Examples
         --------
@@ -823,7 +823,7 @@ cdef class Scalars(_AbstractDatabase):
         161 objects loaded
         >>> scalars.print_nb_decimals = 4
 
-        >>> scalars.print_to_file(output_dir / "scalars.csv", names="a*")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.print_to_file(output_dir / "scalars.csv", "a*")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Printing IODE objects definition to file '...scalars.csv'...
         Printing acaf1 ...
         Printing acaf2 ...
@@ -839,7 +839,7 @@ cdef class Scalars(_AbstractDatabase):
         " - acaf4 : -0.0085 (1, 0.0021, -4.0825)"
         <BLANKLINE>
         """
-        self._print_to_file(filepath, format, names)
+        self._print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         """

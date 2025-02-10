@@ -337,7 +337,8 @@ Computed Tables
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | IODE Report Commands | Python Equivalent                                                                                                                    |
     +======================+======================================================================================================================================+
-    | ``PrintTblFile``     | ``tables.print_to_file(destination_file, generalized_sample, names, nb_decimals, format)`` --> See :meth:`iode.Tables.print_to_file` | 
+    | ``PrintTblFile``     | ``tables.print_tables_as = "COMPUTED"`` --> See :meth:`Tables.print_tables_as`                                                       | 
+    |                      | ``tables.print_to_file(destination_file, names, generalized_sample, nb_decimals)`` --> See :meth:`iode.Tables.print_to_file`         | 
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
     | ``PrintTbl``         | ``computed_table = tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute`     |
     |                      | ``computed_table.print_to_file(destination_file, format)`` --> See :meth:`iode.ComputedTable.print_to_file`                          |
@@ -430,7 +431,7 @@ Print IODE Objects
     +----------------------+--------------------------------------------------------------------------------------------------+
     | `PrintObjLec`        | ``equations.print_equations_lec_as = enum`` --> See See :meth:`Equations.print_equations_lec_as` | 
     +----------------------+--------------------------------------------------------------------------------------------------+
-    | `PrintObjDefXxx`     | ``workspace.print_to_file(filepath, names, format)`` --> See See :meth:`Comments.print_to_file`  | 
+    | `PrintObjDefXxx`     | ``workspace.print_to_file(filepath, names)`` --> See See :meth:`Comments.print_to_file`          | 
     +----------------------+--------------------------------------------------------------------------------------------------+
 
 =============
