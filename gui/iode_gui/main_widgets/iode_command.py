@@ -96,6 +96,10 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         if not user_settings:
             return
         
+        # end all groups to be sure we are at the top level
+        while user_settings.group():
+            user_settings.endGroup()
+
         user_settings.beginGroup(self.settings_group_name)
 
         nb_commands_to_save = min(len(self.executed_commands_list), self.MAX_NB_COMMANDS_TO_REMEMBER)
@@ -116,6 +120,10 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         if not user_settings:
             return
     
+        # end all groups to be sure we are at the top level
+        while user_settings.group():
+            user_settings.endGroup()
+
         user_settings.beginGroup(self.settings_group_name)
 
         self.executed_commands_list = user_settings.value("LAST_EXECUTED_COMMANDS", [])

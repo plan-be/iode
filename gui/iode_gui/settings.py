@@ -83,6 +83,10 @@ class MixinSettingsDialog(QDialog):
         if not dict_ui:
             return
 
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
         project_settings.beginGroup("MENU")
         project_settings.beginGroup(self.menu_class_name)
 
@@ -119,6 +123,10 @@ class MixinSettingsDialog(QDialog):
         dict_ui = vars(self.ui_obj) if hasattr(self.ui_obj, '__dict__') else None
         if not dict_ui:
             return
+        
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
 
         project_settings.beginGroup("MENU")
         project_settings.beginGroup(self.menu_class_name)
