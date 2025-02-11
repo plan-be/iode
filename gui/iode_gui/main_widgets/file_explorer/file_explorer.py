@@ -330,6 +330,10 @@ class IodeFileExplorer(QTreeView):
         if not project_settings:
             return
 
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
         # get list of expanded directories at the moment the application was closed
         project_settings.beginGroup("FILE_EXPLORER")
         dirs_to_expand = project_settings.value("expanded_dirs")
@@ -356,6 +360,10 @@ class IodeFileExplorer(QTreeView):
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
+        
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
 
         # build list of expanded directories
         dir_paths = [dir_info.absoluteFilePath() for dir_info in 

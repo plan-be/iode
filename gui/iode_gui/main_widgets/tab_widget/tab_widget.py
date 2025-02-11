@@ -189,6 +189,10 @@ class IodeTabWidget(QTabWidget):
         project_settings = ProjectSettings.project_settings
         if not project_settings:
             return
+        
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
 
         # get project name (which is the name of the root directory of the project)
         project_name = QFileInfo(self.project_dir_path).fileName()
@@ -196,68 +200,73 @@ class IodeTabWidget(QTabWidget):
         # ---- LOAD SETTINGS ----
         project_settings.beginGroup("PROJECT")
 
-        index = -1
-        size = project_settings.beginReadArray("tabs")
-        if size == 0:
-            self.show_tab(0)
-        else:
-            progress = QProgressDialog("", "", 0, size)
-            progress.setWindowModality(Qt.WindowModality.WindowModal)
-            progress.setWindowTitle("Loading project " + project_name)
-            progress.setCancelButton(None)
+        try:
+            index = -1
+            size = project_settings.beginReadArray("tabs")
+            if size == 0:
+                self.show_tab(0)
+            else:
+                progress = QProgressDialog("", "", 0, size)
+                progress.setWindowModality(Qt.WindowModality.WindowModal)
+                progress.setWindowTitle("Loading project " + project_name)
+                progress.setCancelButton(None)
 
-            filename = ""
-            # reopen all tabs (files) that were open the last time the user quit the IODE gui
-            for i in range(size):
-                project_settings.setArrayIndex(i)
+                filename = ""
+                # reopen all tabs (files) that were open the last time the user quit the IODE gui
+                for i in range(size):
+                    project_settings.setArrayIndex(i)
 
-                filepath: str = project_settings.value("filepath", type=str)
-                file_type = IodeFileType(project_settings.value("file_type", type=int))
-                forced_as_text = project_settings.value("forced_as_text", type=bool)
-                splitted = project_settings.value("splitted", type=bool)
-                split_orientation = Qt.Orientation(project_settings.value("split_orientation", type=int))
+                    filepath: str = project_settings.value("filepath", type=str)
+                    file_type = IodeFileType(project_settings.value("file_type", type=int))
+                    forced_as_text = project_settings.value("forced_as_text", type=bool)
+                    splitted = project_settings.value("splitted", type=bool)
+                    split_orientation = Qt.Orientation(project_settings.value("split_orientation", type=int))
 
-                try:
-                    # unsaved database
-                    if not filepath:
-                        index = self.update_object_tab(IodeType(int(file_type)))
-                        if index != i:
-                            self.tabBar().moveTab(index, i)
-                    else:
-                        filename = QFileInfo(filepath).fileName()
+                    try:
+                        # unsaved database
+                        if not filepath:
+                            index = self.update_object_tab(IodeType(int(file_type)))
+                            if index != i:
+                                self.tabBar().moveTab(index, i)
+                        else:
+                            filename = QFileInfo(filepath).fileName()
 
-                        progress.setLabelText("Loading file " + filename + "...")
-                        progress.setValue(i)
-                        QCoreApplication.processEvents()
+                            progress.setLabelText("Loading file " + filename + "...")
+                            progress.setValue(i)
+                            QCoreApplication.processEvents()
 
-                        index = self.load_file(filepath, False, True, i, forced_as_text)
-                except Exception as e:
-                    QMessageBox.warning(None, "WARNING", f"Cannot load file {filename}.\n{str(e)}")
-                    index = -1
+                            index = self.load_file(filepath, False, True, i, forced_as_text)
+                    except Exception as e:
+                        QMessageBox.warning(None, "WARNING", f"Cannot load file {filename}.\n{str(e)}")
+                        index = -1
 
-                # split tab if necessary
-                if splitted and index >= 0:
-                    self._split_tab(index, split_orientation)
+                    # split tab if necessary
+                    if splitted and index >= 0:
+                        self._split_tab(index, split_orientation)
 
-                if index < 0:
-                    continue
+                    if index < 0:
+                        continue
 
-                # split tab if necessary
-                if splitted:
-                    self._split_tab(index, split_orientation)
+                    # split tab if necessary
+                    if splitted:
+                        self._split_tab(index, split_orientation)
 
-                tab_widget: IodeAbstractWidget = self.widget(index)
-                if tab_widget:
-                    tab_widget.load_settings()
+                    tab_widget: IodeAbstractWidget = self.widget(index)
+                    if tab_widget:
+                        tab_widget.load_settings()
 
-            progress.setValue(size)
+                progress.setValue(size)
 
-        project_settings.endArray()
+            project_settings.endArray()
 
-        self._build_files_list()
+            self._build_files_list()
 
-        # get the position of the tab displayed the last time the user quit the IODE GUI
-        index = project_settings.value("index_last_open_tab", -1, type=int)
+            # get the position of the tab displayed the last time the user quit the IODE GUI
+            index = project_settings.value("index_last_open_tab", -1, type=int)
+
+        except Exception as e:
+            QMessageBox.warning(None, "WARNING", f"Could not reload last open tabs.\n{str(e)}")
+            index = -1
 
         project_settings.endGroup()
 
@@ -282,40 +291,48 @@ class IodeTabWidget(QTabWidget):
         if not project_settings:
             return
 
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
         # ---- SAVE SETTINGS ----
 
         project_settings.beginGroup("PROJECT")
 
-        # clear the "tabs" entry
-        project_settings.remove("tabs")
+        try:
+            # clear the "tabs" entry
+            project_settings.remove("tabs")
 
-        # save the list of open tabs
-        project_settings.beginWriteArray("tabs")
-        for i in range(self.count()):
-            project_settings.setArrayIndex(i)
-            tab_widget: IodeAbstractWidget = self.widget(i)
+            # save the list of open tabs
+            project_settings.beginWriteArray("tabs")
+            for i in range(self.count()):
+                project_settings.setArrayIndex(i)
+                tab_widget: IodeAbstractWidget = self.widget(i)
 
-            file_type: IodeFileType = tab_widget.file_type
-            if file_type <= IodeFileType.FILE_VARIABLES:
-                tab_database_widget: AbstractIodeObjectWidget = tab_widget 
-                filepath = "" if tab_database_widget.is_unsaved_database else tab_database_widget.filepath
-            else:
-                filepath = tab_widget.filepath
+                file_type: IodeFileType = tab_widget.file_type
+                if file_type <= IodeFileType.FILE_VARIABLES:
+                    tab_database_widget: AbstractIodeObjectWidget = tab_widget 
+                    filepath = "" if tab_database_widget.is_unsaved_database else tab_database_widget.filepath
+                else:
+                    filepath = tab_widget.filepath
 
-            project_settings.setValue("filepath", filepath)
-            project_settings.setValue("file_type", int(file_type))
-            project_settings.setValue("forced_as_text", tab_widget.forced_as_text)
-            project_settings.setValue("splitted", tab_widget.splitted)
-            project_settings.setValue("split_orientation", tab_widget.split_orientation.value)
+                project_settings.setValue("filepath", filepath)
+                project_settings.setValue("file_type", int(file_type))
+                project_settings.setValue("forced_as_text", tab_widget.forced_as_text)
+                project_settings.setValue("splitted", tab_widget.splitted)
+                project_settings.setValue("split_orientation", tab_widget.split_orientation.value)
 
-            if tab_widget:
-                tab_widget.save_settings()
+                if tab_widget:
+                    tab_widget.save_settings()
 
-        project_settings.endArray()
+            project_settings.endArray()
 
-        # save index of the currently displayed tab
-        index = self.currentIndex()
-        project_settings.setValue("index_last_open_tab", index)
+            # save index of the currently displayed tab
+            index = self.currentIndex()
+            project_settings.setValue("index_last_open_tab", index)
+        
+        except Exception as e:
+            QMessageBox.warning(None, "WARNING", f"Could not save the list of open tabs.\n{str(e)}")
 
         project_settings.endGroup()
 

@@ -57,6 +57,10 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         if project_settings is None:
             return
         
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+        
         project_settings.beginGroup(self.settings_group_name)
         self.load_numeric_settings(project_settings)
         project_settings.endGroup()
@@ -70,6 +74,10 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         if project_settings is None:
             return
         
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
         project_settings.beginGroup(self.settings_group_name)
         self.save_numeric_settings(project_settings)
         project_settings.endGroup()
