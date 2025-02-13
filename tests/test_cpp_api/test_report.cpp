@@ -42,7 +42,7 @@ TEST_F(ReportTest, REPORT_LINE)
 
 TEST_F(ReportTest, REPORT_ENGINE)
 {
-    std::string filepath = input_test_dir + "rep_expand.rep";
+    std::string filepath = report_test_dir + "rep_expand.rep";
 
     // U_test_suppress_kmsg_msgs();
 
@@ -50,34 +50,34 @@ TEST_F(ReportTest, REPORT_ENGINE)
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
     std::cout << "execute report '" << filepath << "'" << std::endl;
     execute_report(filepath, parameters);
-    compare_files(input_test_dir + "rep_expand.a2m", input_test_dir + "rep_expand.ref.a2m");
+    compare_files(input_test_dir + "rep_expand.a2m", output_test_dir + "rep_expand.ref.a2m");
 
     // U_test_reset_kmsg_msgs();
 }
 
 TEST_F(ReportTest, REPORT_FUNCS)
 {
-    std::string filepath = input_test_dir + "rep_fns.rep";
+    std::string filepath = report_test_dir + "rep_fns.rep";
 
     // U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
     std::cout << "execute report '" << filepath << "'" << std::endl;
     execute_report(filepath, parameters);
-    compare_files(input_test_dir + "rep_fns.a2m", input_test_dir + "rep_fns.ref.a2m");
+    compare_files(input_test_dir + "rep_fns.a2m", output_test_dir + "rep_fns.ref.a2m");
 
     // U_test_reset_kmsg_msgs();
 }
 
 TEST_F(ReportTest, REPORT_PROC)
 {
-    std::string filepath = input_test_dir + "rep_proc.rep";
+    std::string filepath = report_test_dir + "rep_proc.rep";
 
     // U_test_suppress_kmsg_msgs();
 
     std::cout << "execute report '" << filepath << "'" << std::endl;
     execute_report(filepath, parameters);
-    compare_files(input_test_dir + "rep_proc.a2m", input_test_dir + "rep_proc.ref.a2m");
+    compare_files(input_test_dir + "rep_proc.a2m", output_test_dir + "rep_proc.ref.a2m");
 
     // U_test_reset_kmsg_msgs();
 }
