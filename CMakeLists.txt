@@ -250,9 +250,6 @@ file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/do
 message(STATUS "\n-> files to highlight IODE report commands in Texpad and Notepad++ <-")
 file(INSTALL resources/syntax/ioderep.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
 file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
-# -- copy misc files --
-message(STATUS "\n-> error messages file <-")
-file(INSTALL iode.msg DESTINATION ${CMAKE_BINARY_DIR})
 message(STATUS "DONE")
 
 message(STATUS " ")

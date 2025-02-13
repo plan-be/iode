@@ -19,7 +19,7 @@ from libcpp.string cimport string
 cdef extern from "api/iode.h":
     # MISC functions
     #cdef char   *IODE_VERSION
-    cdef int    IodeInit(char*)
+    cdef int    IodeInit()
     cdef int    IodeEnd()
     
     # KDB functions
@@ -41,7 +41,7 @@ cdef extern from "api/iode.h":
     cdef void    kpanic()
 
 cdef extern from "cpp_api/iode_cpp_api.h":
-    cdef void   cpp_iode_init(string) nogil
+    cdef void   cpp_iode_init() nogil
 
 cdef extern from "cli.cpp":
     cdef int   free_tbl(char** tbl) nogil

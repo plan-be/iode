@@ -77,7 +77,7 @@ wheel.license-files = ["LICENSE.md"]
 # Scikit-build-core defaults to using your .gitignore to select what to exclude from 
 # the source distribution. However, sdist.include and sdist.exclude can be used to 
 # override this behavior
-sdist.include = [ "./iode/iode.msg", "**/*.pyi", "./iode/tests/data", "./iode/doc" ]
+sdist.include = [ "**/*.pyi", "./iode/tests/data", "./iode/doc" ]
 sdist.exclude = [ "**/*.in" ]
 
 # The build directory. Defaults to a temporary directory, but can be set.

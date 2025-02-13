@@ -5,7 +5,7 @@ message(STATUS "\n---- IODE COMMAND LINE ----\n")
 if(SKBUILD)
 	message(STATUS "Skip target ${IODE_CLI_TARGET}\n")
 else()
-	file(INSTALL ${PROJECT_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(INSTALL ${PROJECT_SOURCE_DIR}/archives/iode.msg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 	add_executable(${IODE_CLI_TARGET} "iodecmd.cpp")
 

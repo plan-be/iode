@@ -1,6 +1,3 @@
-
-file(INSTALL ${PROJECT_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 enable_testing()
 
 add_executable(test_c_api pch.cpp test_c_api.cpp)

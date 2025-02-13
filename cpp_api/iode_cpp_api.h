@@ -28,4 +28,4 @@
 #include "computed_table/computed_table.h"
 #include "computed_table/computed_table_graph.h"
 
-void cpp_iode_init(const std::string& iode_msg_path = "");
+void cpp_iode_init();

@@ -38,13 +38,9 @@ import numpy as np
 cimport numpy as cnp
 cnp.import_array()
 
-# get the path to the iode Python installation directory 
-# -> constains iode.msg file (to print errors)
-installation_dir = str((Path(__file__).parent).resolve())
-
 # initialize SWAP memory (SCR4), create empty workspaces and 
 # assign 'super' functions
-cpp_iode_init(installation_dir.encode('utf-8'))
+cpp_iode_init()
 
 # Super C functions are replaced here
 include "super.pyx"

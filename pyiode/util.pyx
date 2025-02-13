@@ -93,32 +93,9 @@ def reset_msgs():
     IodeResetMsgs()
 
 
-def iode_msg_path() -> str:
-    '''Return the path to the iode.msg file.
-    
-    Returns
-    -------
-    str
-
-    Examples
-    --------
-    >>> from pathlib import Path
-    >>> from iode.iode_cython import iode_msg_path
-    >>> iode_msg_path = Path(iode_msg_path())
-    >>> iode_msg_path.exists()
-    True
-    >>> iode_msg_path.name
-    'iode.msg'
-    '''
-    iode_msg_path = B_GetIodeMsgPath()
-    if iode_msg_path is None:
-        raise RuntimeError("iode.msg file not found.")
-    return iode_msg_path.decode("cp850")
-
-
 def print_error_msg(error_code: int) -> str:
     '''Print an error message corresponding to an error code.
-       See error codes and error messages in the iode.msg file.
+       See error codes and error messages in from the C++ iode_msg_map object (errors.hpp).
 
     Parameters
     ----------
@@ -133,7 +110,7 @@ def print_error_msg(error_code: int) -> str:
     --------
     >>> from iode.iode_cython import print_error_msg
     >>> print_error_msg(16)
-    ' Sample modified'
+    'Sample modified'
     '''
     return B_msg(error_code).decode("cp850")
 
