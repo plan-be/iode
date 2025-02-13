@@ -25,11 +25,13 @@
 #ifdef __GNUC__
     char    *SEPARATOR = "/";
     char    *IODE_DATA_DIR   = "../data/";
-    char    *IODE_OUTPUT_DIR = "../output/";
-#else
+    char    *IODE_OUTPUT_DIR = "../data/output/";
+    char    *IODE_REPORT_DIR = "../data/reports/";
+    #else
     char    *SEPARATOR = "\\";
     char    *IODE_DATA_DIR   = "..\\data\\";
-    char    *IODE_OUTPUT_DIR = "..\\output\\";
+    char    *IODE_OUTPUT_DIR = "..\\data\\output\\";
+    char    *IODE_REPORT_DIR = "..\\data\\reports\\";
 #endif
 
 // Temporarily removed fns (to allow linking)
@@ -427,7 +429,7 @@ public:
 	    char filename[512];
 	
 	    sprintf(filename, "%stest1.%s", IODE_OUTPUT_DIR, typeext);
-	    sprintf(reffilename, "%stest1.ref.%s", IODE_DATA_DIR, typeext);
+	    sprintf(reffilename, "%stest1.ref.%s", IODE_OUTPUT_DIR, typeext);
 	    W_dest(filename, typeint);
 	    U_test_W_printf_cmds();
 	    W_close();
@@ -466,7 +468,7 @@ public:
 	    char filename[512];
 	
 	    sprintf(filename, ".%s%s", SEPARATOR, outfile);
-	    sprintf(reffilename, "%s%s", IODE_DATA_DIR, reffile);
+	    sprintf(reffilename, "%s%s", IODE_OUTPUT_DIR, reffile);
 	    return U_diff_files(reffilename, filename) == 1;
 	}
 
@@ -914,8 +916,6 @@ public:
 TEST_F(IodeCAPITest, Tests_IODEMSG)
 {
     char    *msg;
-    char    *path;
-    char    expected_path[1024];
 
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
@@ -1739,19 +1739,19 @@ TEST_F(IodeCAPITest, Tests_B_FILE)
     U_test_print_title("Tests B_FILE");
 
     // Cleanup files
-    _unlink("toto.a2m");
+    _unlink("test.a2m");
     _unlink("tata.a2m");
     _unlink("tutu.a2m");
 
     //  Create a file
-    U_test_create_a_file("toto", W_A2M);
+    U_test_create_a_file("test", W_A2M);
 
     //  Check that the file exists
-    U_test_file_exists("toto.a2m", "File %s exists");
+    U_test_file_exists("test.a2m", "File %s exists");
 
     //  Call B_FileRename()
-    rc = B_FileRename("toto tata", FILE_A2M);
-    rc = U_test_file_exists("tata.a2m", "B_FileRename(\"toto tata\", FILE_A2M)");
+    rc = B_FileRename("test tata", FILE_A2M);
+    rc = U_test_file_exists("tata.a2m", "B_FileRename(\"test tata\", FILE_A2M)");
 
     //  Call B_FileCopy()
     rc = B_FileCopy("tata tutu", FILE_A2M);
@@ -1778,71 +1778,70 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
     U_test_print_title("Tests B_FSYS");
 
     // Cleanup files
-    _unlink("toto.a2m");
-    _unlink("toto.a2m.oem");
-    _unlink("toto.a2m.ansi");
-    _unlink("totodbl.a2m.ansi");
+    _unlink("test.a2m");
+    _unlink("test.a2m.oem");
+    _unlink("test.a2m.ansi");
+    _unlink("testdbl.a2m.ansi");
     _unlink("brol.a2m.ansi");
     _unlink("brol2.a2m.ansi");
 
 
-    //  Create toto.a2m -> ansi-coded file
-    // sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
-    // U_test_create_a_file("toto", W_A2M); // Ansi-coded file
+    //  Create test.a2m -> ansi-coded file
+    // sprintf(arg, "%s\\test", IODE_OUTPUT_DIR);
+    // U_test_create_a_file("test", W_A2M); // Ansi-coded file
     // => Pb with conversions => files created by test1.c differ from those created by test_c_api.cpp.
-    // Therefore, we copy data\toto.a2m into local toto.a2m
-    sprintf(arg, "%stoto.a2m toto.a2m", IODE_DATA_DIR);
+    // Therefore, we copy data\test.a2m into local test.a2m
+    sprintf(arg, "%stest.a2m test.a2m", IODE_DATA_DIR);
     rc = B_SysCopy(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("toto.a2m", "toto.a2m");
+    U_test_compare_localfile_to_reffile("test.a2m", "test.a2m");
 
-
-    // B_SysAnsiToOem() : translate ansi to oem -> toto.a2m.oem
-    sprintf(arg, "toto.a2m toto.a2m.oem");
+    // B_SysAnsiToOem() : translate ansi to oem -> test.a2m.oem
+    sprintf(arg, "test.a2m test.a2m.oem");
     rc = B_SysAnsiToOem(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("toto.a2m.oem", "toto.a2m.oem.ref");
+    U_test_compare_localfile_to_reffile("test.a2m.oem", "test.a2m.oem.ref");
 
-    // B_SysAnsiToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
-    sprintf(arg, "toto.a2m toto.a2m.utf8");
+    // B_SysAnsiToUTF8() : translate ansi to utf8 -> test.a2m.utf8
+    sprintf(arg, "test.a2m test.a2m.utf8");
     rc = B_SysAnsiToUTF8(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
+    U_test_compare_localfile_to_reffile("test.a2m.utf8", "test.a2m.utf8.ref");
 
-    // B_SysOemToAnsi() : translate oem to ansi -> toto.a2m.ansi
-    sprintf(arg, "toto.a2m.oem toto.a2m.ansi");
+    // B_SysOemToAnsi() : translate oem to ansi -> test.a2m.ansi
+    sprintf(arg, "test.a2m.oem test.a2m.ansi");
     rc = B_SysOemToAnsi(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("toto.a2m.ansi", "toto.a2m.ansi.ref");
+    U_test_compare_localfile_to_reffile("test.a2m.ansi", "test.a2m.ansi.ref");
 
-    // B_SysOemToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
-    sprintf(arg, "toto.a2m.oem toto.a2m.utf8");
-    rc = B_SysOemToUTF8("toto.a2m.oem toto.a2m.utf8");
+    // B_SysOemToUTF8() : translate ansi to utf8 -> test.a2m.utf8
+    sprintf(arg, "test.a2m.oem test.a2m.utf8");
+    rc = B_SysOemToUTF8("test.a2m.oem test.a2m.utf8");
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
+    U_test_compare_localfile_to_reffile("test.a2m.utf8", "test.a2m.utf8.ref");
 
-    // B_SysRename(char* arg) : rename toto.a2m.ansi -> brol.a2m.ansi
-    sprintf(arg, "toto.a2m.ansi brol.a2m.ansi");
+    // B_SysRename(char* arg) : rename test.a2m.ansi -> brol.a2m.ansi
+    sprintf(arg, "test.a2m.ansi brol.a2m.ansi");
     EXPECT_EQ(rc, 0);
     rc = B_SysRename(arg);
-    U_test_compare_localfile_to_reffile("brol.a2m.ansi", "toto.a2m.ansi.ref");
+    U_test_compare_localfile_to_reffile("brol.a2m.ansi", "test.a2m.ansi.ref");
 
-    // B_SysCopy(char* arg) : copy brol.a2m.ansi dans totodbl.a2m.ansi
-    sprintf(arg, "brol.a2m.ansi totodbl.a2m.ansi");
+    // B_SysCopy(char* arg) : copy brol.a2m.ansi dans testdbl.a2m.ansi
+    sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
     rc = B_SysCopy(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "toto.a2m.ansi.ref");
+    U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "test.a2m.ansi.ref");
 
-    // B_SysAppend(char* arg) : append totodbl.a2m.ansi to brol.a2m.ansi
-    sprintf(arg, "brol.a2m.ansi totodbl.a2m.ansi");
+    // B_SysAppend(char* arg) : append testdbl.a2m.ansi to brol.a2m.ansi
+    sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
     rc = B_SysAppend(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "totodbl.a2m.ansi.ref");
+    U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "testdbl.a2m.ansi.ref");
 
     // B_SysDelete(char* arg) : delete totdbl.a2m.ansi and brol.a2m.ansi
-    rc = B_SysDelete("brol.a2m.ansi totodbl.a2m.ansi tutu.a2m toto.a2m toto.a2m.oem toto.a2m.utf8");
+    rc = B_SysDelete("brol.a2m.ansi testdbl.a2m.ansi tutu.a2m test.a2m test.a2m.oem test.a2m.utf8");
     rc = U_test_file_not_exists("brol.a2m.ansi",  "B_SysDelete(\"brol.a2m.ansi\")");
-    rc = U_test_file_not_exists("brol2.a2m.ansi", "B_SysDelete(\"totodbl.a2m.ansi\")");
+    rc = U_test_file_not_exists("brol2.a2m.ansi", "B_SysDelete(\"testdbl.a2m.ansi\")");
 
     U_test_reset_a2m_msgs();
 }
@@ -2500,7 +2499,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     // Calls to B_ReportExec(reportfile)
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
 
-    sprintf(cmd,  "%srep_expand.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_expand.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
     EXPECT_EQ(rc, 0);
     U_test_compare_outfile_to_reffile("rep_expand.a2m", "rep_expand.ref.a2m");
@@ -2518,7 +2517,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%srep_fns.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_fns.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     U_test_compare_outfile_to_reffile("rep_fns.a2m", "rep_fns.ref.a2m");
@@ -2536,12 +2535,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%srep_proc.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_proc.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     U_test_compare_outfile_to_reffile("rep_proc.a2m", "rep_proc.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
-
-

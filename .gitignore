@@ -406,9 +406,6 @@ keyboard_shortcuts.*
 **/*.egg-info
 
 **.rep
-!/tests/cli/*.rep
-!/tests/data/*.rep
-!/tests/data/reports/*.rep
 
 # Python stub files
 
@@ -507,8 +504,13 @@ generate_stub_files.py
 # TESTS
 /tests/**/*.ini
 /tests/output
+!/tests/output/empty
+!/tests/data/test.a2m
 /tests/sandbox
 /tests/cli/ex.ansi.*
 /tests/cli/ex.oem.*
 /tests/cli/test*.csv
 /tests/cli/*.exe
+!/tests/cli/*.rep
+!/tests/data/*.rep
+!/tests/data/reports/*.rep

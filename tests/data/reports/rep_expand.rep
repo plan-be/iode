@@ -37,9 +37,9 @@ Example 8: `{lec + @fn + @T}`      : `{@upper(b)+1@T}`      -> {@upper(b)+1@T}
 ------------------------
 Commands between `{...}` 
 ------------------------
-Example 1: normal command             `{Command parms}`   `{$WsLoadVar data\fun.av}`  -> {$WsLoadVar %input_dir%\fun.av}
-Example 2: error (tot does not exist) `{Command parms}`   `{$WsLoadVar data\toto}`    -> {$WsLoadVar %input_dir%\toto}
-Example 3: error + inverting result   `{!Command parms}`  `{$!WsLoadVar data\toto}`   -> {$!WsLoadVar %input_dir%\toto}
+Example 1: normal command              `{Command parms}`   `{$WsLoadVar data\fun.av}`  -> {$WsLoadVar %input_dir%\fun.av}
+Example 2: error (toto does not exist) `{Command parms}`   `{$WsLoadVar data\toto}`    -> {$WsLoadVar %input_dir%\toto}
+Example 3: error + inverting result    `{!Command parms}`  `{$!WsLoadVar data\toto}`   -> {$!WsLoadVar %input_dir%\toto}
 
 ---------------------------
 Expressions between `%...%`
