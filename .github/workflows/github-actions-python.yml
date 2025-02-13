@@ -89,7 +89,7 @@ jobs:
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install "numpy<2.0" pandas larray "cython>=3.0" mypy pandoc ipython ipykernel nbsphinx scikit-build-core pytest
+              conda install "numpy<2.0" pandas larray "cython>=3.0" "mypy>=1.10" pandoc ipython ipykernel nbsphinx scikit-build-core pytest
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -104,12 +104,14 @@ jobs:
             shell: bash -el {0}
             run: | 
               cython --version
+              mypy --version
               cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cython
           - name: Build iode wheel file
             shell: bash -el {0}
             run: |
               cd pyiode 
               cython --version
+              mypy --version
               pip wheel --verbose .
           - name: Install iode package
             shell: bash -el {0}
