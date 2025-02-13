@@ -29,6 +29,13 @@ class ProjectSettings:
         return cls.project_settings
 
 
+def get_settings() -> QSettings:
+    if Context.called_from_python_script:
+        return QSettings(QSettings.Scope.UserScope) 
+    else:
+        return ProjectSettings.project_settings
+
+
 def class_name_to_settings_group_name(object: Any) -> str:
         menu_class_name: str = object.__class__.__name__
         # remove the Ui_ part of the class name
@@ -72,11 +79,8 @@ class MixinSettingsDialog(QDialog):
 
     @Slot()
     def load_settings(self):
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
-        if not project_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
         
         dict_ui = vars(self.ui_obj)
@@ -84,40 +88,37 @@ class MixinSettingsDialog(QDialog):
             return
 
         # end all groups to be sure we are at the top level
-        while project_settings.group():
-            project_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
 
-        project_settings.beginGroup("MENU")
-        project_settings.beginGroup(self.menu_class_name)
+        settings.beginGroup("MENU")
+        settings.beginGroup(self.menu_class_name)
 
         for attr_name, attr_value in dict_ui.items():
             if isinstance(attr_value, (QComboBox, QFontComboBox)):
-                attr_value.setCurrentIndex(project_settings.value(attr_name, type=int))
+                attr_value.setCurrentIndex(settings.value(attr_name, type=int))
             elif isinstance(attr_value, (QCheckBox, QRadioButton)):
-                attr_value.setChecked(project_settings.value(attr_name, type=bool))
+                attr_value.setChecked(settings.value(attr_name, type=bool))
             elif isinstance(attr_value, QSpinBox):
-                attr_value.setValue(project_settings.value(attr_name, type=int))
+                attr_value.setValue(settings.value(attr_name, type=int))
             elif isinstance(attr_value, QDoubleSpinBox):
-                attr_value.setValue(project_settings.value(attr_name, type=float))
+                attr_value.setValue(settings.value(attr_name, type=float))
             elif isinstance(attr_value, QLineEdit):
-                attr_value.setText(project_settings.value(attr_name, type=str))
+                attr_value.setText(settings.value(attr_name, type=str))
             elif isinstance(attr_value, (QTextEdit, QPlainTextEdit)):
-                attr_value.setPlainText(project_settings.value(attr_name, type=str))
+                attr_value.setPlainText(settings.value(attr_name, type=str))
             elif isinstance(attr_value, IodeFileChooser):
-                attr_value.filepath = project_settings.value(attr_name, type=str)
+                attr_value.filepath = settings.value(attr_name, type=str)
             elif isinstance(attr_value, IodeSampleEdit):
-                attr_value.setText(project_settings.value(attr_name, type=str))
+                attr_value.setText(settings.value(attr_name, type=str))
 
-        project_settings.endGroup()
-        project_settings.endGroup()
+        settings.endGroup()
+        settings.endGroup()
 
     @Slot()
     def save_settings(self):
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
-        if not project_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
 
         dict_ui = vars(self.ui_obj) if hasattr(self.ui_obj, '__dict__') else None
@@ -125,30 +126,30 @@ class MixinSettingsDialog(QDialog):
             return
         
         # end all groups to be sure we are at the top level
-        while project_settings.group():
-            project_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
 
-        project_settings.beginGroup("MENU")
-        project_settings.beginGroup(self.menu_class_name)
+        settings.beginGroup("MENU")
+        settings.beginGroup(self.menu_class_name)
 
         for attr_name, attr_value in dict_ui.items():
             if isinstance(attr_value, (QComboBox, QFontComboBox)):
-                project_settings.setValue(attr_name, attr_value.currentIndex())
+                settings.setValue(attr_name, attr_value.currentIndex())
             elif isinstance(attr_value, (QCheckBox, QRadioButton)):
-                project_settings.setValue(attr_name, attr_value.isChecked())
+                settings.setValue(attr_name, attr_value.isChecked())
             elif isinstance(attr_value, (QSpinBox, QDoubleSpinBox)):
-                project_settings.setValue(attr_name, attr_value.value())
+                settings.setValue(attr_name, attr_value.value())
             elif isinstance(attr_value, QLineEdit):
-                project_settings.setValue(attr_name, attr_value.text())
+                settings.setValue(attr_name, attr_value.text())
             elif isinstance(attr_value, (QTextEdit, QPlainTextEdit)):
-                project_settings.setValue(attr_name, attr_value.toPlainText())
+                settings.setValue(attr_name, attr_value.toPlainText())
             elif isinstance(attr_value, IodeFileChooser):
-                project_settings.setValue(attr_name, attr_value.filepath)
+                settings.setValue(attr_name, attr_value.filepath)
             elif isinstance(attr_value, IodeSampleEdit):
-                project_settings.setValue(attr_name, attr_value.text())
+                settings.setValue(attr_name, attr_value.text())
 
-        project_settings.endGroup()
-        project_settings.endGroup()
+        settings.endGroup()
+        settings.endGroup()
 
     @Slot()
     def help(self):

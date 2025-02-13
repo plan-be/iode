@@ -4,7 +4,7 @@ from PySide6.QtGui import QCloseEvent, QTextDocument
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.utils import TMP_FILENAME
-from iode_gui.settings import MixinSettingsDialog, ProjectSettings, PRINT_TO_FILE
+from iode_gui.settings import MixinSettingsDialog, get_settings, PRINT_TO_FILE
 from iode_gui.menu.file.file_settings import MenuFileSettings
 from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from iode_gui.print.print_file_dialog import PrintFileDialog
@@ -107,11 +107,11 @@ class MenuPrintTables(MixinSettingsDialog):
             # check list of tables is valid
             table_names: List[str] = tables.get_names(pattern_table_names)
 
-            project_settings: QSettings = ProjectSettings.project_settings
-            if project_settings is None:
+            settings: QSettings = get_settings()
+            if settings is None:
                 b_print_to_file = False
             else:
-                b_print_to_file = project_settings.value(PRINT_TO_FILE, type=bool)
+                b_print_to_file = settings.value(PRINT_TO_FILE, type=bool)
 
             if b_print_to_file:
                 # Ask the user to set the output file and format
