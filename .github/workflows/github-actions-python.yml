@@ -89,7 +89,7 @@ jobs:
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install "numpy<2.0" pandas larray "cython>=3.0" "mypy>=1.10" pandoc ipython ipykernel nbsphinx scikit-build-core pytest
+              conda install "numpy<2.0" pandas larray "cython>=3.0" "mypy>=1.10" pandoc ipython ipykernel nbsphinx "scikit-build-core>=0.10" pytest
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
