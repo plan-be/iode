@@ -934,7 +934,7 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
 
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
-    EXPECT_EQ(std::string(msg), " Sample modified");
+    EXPECT_EQ(std::string(msg), "Sample modified");
 
     //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
     //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.

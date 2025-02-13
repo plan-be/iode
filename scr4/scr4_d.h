@@ -136,6 +136,7 @@ extern char             *IS_text();
 extern char             *SCR_search_path();
 extern MENU             *MN_create_default();
 extern char             *SCR_err_txt();
+extern char             *(*SCR_err_txt_super)(int val);
 
 #include <scr4_rd.h>
 

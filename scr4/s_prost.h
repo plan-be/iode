@@ -42,6 +42,7 @@ extern char *SCR_err_txt_t(unsigned char *keyw);
 extern char *SCR_get_err_txt_lang(FILE *fd_msg,int val,int lang);
 extern char *SCR_err_txt_lang(int val,int lang);
 extern char *SCR_get_err_txt(FILE *fd_msg,int val);
+extern char* (*SCR_err_txt_super)(int val);
 extern char *SCR_err_txt(int val);
 extern unsigned char *SCR_fmt_dbl(double d,unsigned char *txt,int size,int nb_dec);
 extern unsigned char *SCR_fmt_long(unsigned char *out,unsigned char *fmt,unsigned long l);
