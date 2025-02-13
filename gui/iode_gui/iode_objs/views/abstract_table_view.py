@@ -409,16 +409,17 @@ class IodeAbstractTableView(QTableView):
             b_print_to_file = settings.value(PRINT_TO_FILE, type=bool)
 
         try:
+            table_model: IodeAbstractTableModel = self.model()
+            database_to_print = table_model.displayed_database
+
             if b_print_to_file:
-                # Set up the output file using the filepath associated with the ?? objects
-                table_model: IodeAbstractTableModel = self.model()
+                # Set up the output file using the filepath associated with the IODE objects
                 filepath = table_model.filepath
                 output_file = Path(filepath).with_suffix("")
 
                 # Ask the user to set the output file and format
                 dialog = PrintFileDialog(self.iode_type, output_file, parent=self)
-                if dialog.exec() == QDialog.DialogCode.Accepted:
-                    database_to_print = table_model.displayed_database
+                if dialog.exec() == QDialog.DialogCode.Accepted: 
                     if database_to_print is None or not len(database_to_print):
                         QMessageBox.warning(self, "Warning", "No data to print")
                         return
@@ -430,6 +431,13 @@ class IodeAbstractTableView(QTableView):
                     return
             else:
                 self.printer = QPrinter()
+                if len(database_to_print) > 100:
+                    iode_type_name = self.iode_type.name.lower()
+                    msg = f"There are more than 100 {iode_type_name} to be printed. "
+                    msg += "Are you sure to continue?"
+                    answer: QMessageBox.StandardButton = QMessageBox.question(self, "WARNING", msg)
+                    if answer != QMessageBox.StandardButton.Yes:
+                        return
                 dialog = QPrintPreviewDialog(self.printer, self)
                 dialog.paintRequested.connect(self.render_for_printing)
                 self.dump_table_in_document()
