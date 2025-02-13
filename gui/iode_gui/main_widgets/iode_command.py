@@ -2,9 +2,8 @@ from PySide6.QtCore import Qt, QSettings, Slot, Signal
 from PySide6.QtWidgets import QTextEdit, QMessageBox
 from PySide6.QtGui import QKeyEvent
 
-from iode_gui.utils import Context
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_gui.settings import ProjectSettings, class_name_to_settings_group_name
+from iode_gui.settings import get_settings, class_name_to_settings_group_name
 from iode_gui.text_edit.complete_line_edit import IodeAutoCompleteLineEdit
 
 from typing import List
@@ -89,47 +88,41 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         Store the last MAX_NB_COMMANDS_TO_REMEMBER executed commands 
         to the project settings file.
         """
-        if Context.called_from_python_script:
-            return
-        
-        user_settings: QSettings = ProjectSettings.project_settings
-        if not user_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
         
         # end all groups to be sure we are at the top level
-        while user_settings.group():
-            user_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
 
-        user_settings.beginGroup(self.settings_group_name)
+        settings.beginGroup(self.settings_group_name)
 
         nb_commands_to_save = min(len(self.executed_commands_list), self.MAX_NB_COMMANDS_TO_REMEMBER)
         commands_to_save = self.executed_commands_list[-nb_commands_to_save:]
-        user_settings.setValue("LAST_EXECUTED_COMMANDS", commands_to_save)
+        settings.setValue("LAST_EXECUTED_COMMANDS", commands_to_save)
 
-        user_settings.endGroup()
+        settings.endGroup()
 
     def load_settings(self):
         """
         Load the list of the last MAX_NB_COMMANDS_TO_REMEMBER commands executed 
         in the previous GUI session.
         """
-        if Context.called_from_python_script:
-            return
-        
-        user_settings: QSettings = ProjectSettings.project_settings
-        if not user_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
     
         # end all groups to be sure we are at the top level
-        while user_settings.group():
-            user_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
 
-        user_settings.beginGroup(self.settings_group_name)
+        settings.beginGroup(self.settings_group_name)
 
-        self.executed_commands_list = user_settings.value("LAST_EXECUTED_COMMANDS", [])
+        self.executed_commands_list = settings.value("LAST_EXECUTED_COMMANDS", [])
         self.iterator = len(self.executed_commands_list)
 
-        user_settings.endGroup()
+        settings.endGroup()
 
     @Slot()
     def run_command(self):

@@ -132,15 +132,13 @@ class IodeAbstractWidget(QWidget):
         """
         Load settings for the current tab from a QSettings object.
         """
-        if Context.called_from_python_script:
-            return
+        pass
 
     def save_settings(self):
         """
         Save settings for the current tab to a QSettings object.
         """
-        if Context.called_from_python_script:
-            return
+        pass
 
     def _check_new_filepath(self, filepath: str) -> bool:
         try:

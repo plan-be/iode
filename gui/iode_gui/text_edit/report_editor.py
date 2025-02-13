@@ -1,7 +1,7 @@
-from PySide6.QtCore import Qt, QDir, QFileInfo
+from PySide6.QtCore import Qt, QDir, QFileInfo, QSettings
 from PySide6.QtWidgets import QTextEdit, QMessageBox
 
-from iode_gui.settings import ProjectSettings, RUN_REPORTS_FROM_PROJECT_DIR
+from iode_gui.settings import get_settings, RUN_REPORTS_FROM_PROJECT_DIR
 from .highlighter import IodeHighlighter
 from .completer import IodeCompleter
 from .text_editor import IodeTextEditor
@@ -49,10 +49,10 @@ class IodeReportEditor(IodeTextEditor):
         """
         saved_current_dir: str = QDir.currentPath()
         
-        project_settings = ProjectSettings.project_settings
-        if project_settings:
-            run_from_project_dir = project_settings.value(RUN_REPORTS_FROM_PROJECT_DIR, 
-                                                          defaultValue=True, type=bool)
+        settings: QSettings = get_settings()
+        if settings:
+            run_from_project_dir = settings.value(RUN_REPORTS_FROM_PROJECT_DIR, 
+                                                  defaultValue=True, type=bool)
         else:
             run_from_project_dir = True
         

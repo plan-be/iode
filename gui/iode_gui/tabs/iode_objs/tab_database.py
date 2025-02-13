@@ -2,8 +2,7 @@ from PySide6.QtCore import Qt, Slot, QSettings
 from PySide6.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QShortcut, QKeySequence
 
-from iode_gui.utils import Context
-from iode_gui.settings import ProjectSettings
+from iode_gui.settings import get_settings
 from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
 from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget
 from iode_gui.iode_objs.models.table_model import  VariablesModel
@@ -99,25 +98,17 @@ class ScalarsWidget(AbstractIodeObjectWidget, NumericalWidget):
 
     # NOTE: automatically called from IodeTabWidget.load_settings()
     def load_settings(self):
-        if Context.called_from_python_script:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
-        
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
-            return
-        
-        self.load_numeric_settings(project_settings)
+        self.load_numeric_settings(settings)
 
     # NOTE: automatically called from IodeTabWidget.save_settings()
     def save_settings(self):
-        if Context.called_from_python_script:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
-        
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
-            return
-        
-        self.save_numeric_settings(project_settings)
+        self.save_numeric_settings(settings)
 
 
 class TablesWidget(AbstractIodeObjectWidget):
@@ -222,15 +213,12 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         """
         Loads settings from a QSettings object.
         """
-        if Context.called_from_python_script:
-            return
-        
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
 
-        self.load_numeric_settings(project_settings)
-        mode = project_settings.value("mode", 0, type=int)
+        self.load_numeric_settings(settings)
+        mode = settings.value("mode", 0, type=int)
         self.combo_mode.setCurrentIndex(mode)
 
     # NOTE: automatically called from IodeTabWidget.save_settings()
@@ -238,15 +226,12 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         """
         Saves settings to a QSettings object.
         """
-        if Context.called_from_python_script:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
         
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
-            return
-        
-        self.save_numeric_settings(project_settings)
-        project_settings.setValue("mode", self.combo_mode.currentIndex())
+        self.save_numeric_settings(settings)
+        settings.setValue("mode", self.combo_mode.currentIndex())
 
     @Slot(int)
     def update_mode(self, index):

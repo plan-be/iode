@@ -439,11 +439,12 @@ class MainWindow(AbstractMainWindow):
         else:
             if not Context.called_from_python_script:
                 self.user_settings.setValue("project_path", self.project_path)
-                self.user_settings.setValue("font_family", self.font_family)
-                self.user_settings.setValue("geometry", self.saveGeometry())
-                self.user_settings.setValue("windowState", self.saveState())
-                self.user_settings.setValue("dockWidget_file_explorer_geometry", self.ui.dockWidget_file_explorer.saveGeometry())
-                self.user_settings.setValue("dockWidget_tools_geometry", self.ui.dockWidget_tools.saveGeometry())
+            
+            self.user_settings.setValue("font_family", self.font_family)
+            self.user_settings.setValue("geometry", self.saveGeometry())
+            self.user_settings.setValue("windowState", self.saveState())
+            self.user_settings.setValue("dockWidget_file_explorer_geometry", self.ui.dockWidget_file_explorer.saveGeometry())
+            self.user_settings.setValue("dockWidget_tools_geometry", self.ui.dockWidget_tools.saveGeometry())
 
             for dialog in self.dialogs: 
                 dialog.close()

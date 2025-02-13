@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSiz
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_gui.settings import ProjectSettings, PRINT_TO_FILE
+from iode_gui.settings import get_settings, PRINT_TO_FILE
 from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_gui.iode_objs.delegates.base_delegate import BaseDelegate
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
@@ -402,11 +402,11 @@ class IodeAbstractTableView(QTableView):
     @Slot()
     def print(self):
         """Prints the objects."""
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
+        settings: QSettings = get_settings()
+        if settings is None:
             b_print_to_file = False    
         else:
-            b_print_to_file = project_settings.value(PRINT_TO_FILE, type=bool)
+            b_print_to_file = settings.value(PRINT_TO_FILE, type=bool)
 
         try:
             if b_print_to_file:

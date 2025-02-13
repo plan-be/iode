@@ -2,8 +2,7 @@ from PySide6.QtCore import Qt, Slot, QSettings
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QCloseEvent
 
-from iode_gui.utils import Context
-from iode_gui.settings import ProjectSettings, class_name_to_settings_group_name
+from iode_gui.settings import get_settings, class_name_to_settings_group_name
 from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget
 from iode_gui.iode_objs.models.computed_table_model import ComputedTableModel
 from iode_gui.iode_objs.views.computed_table_view import ComputedTableView
@@ -50,34 +49,28 @@ class ComputedTableDialog(QDialog, NumericalWidget):
 
     @Slot()
     def load_settings(self):
-        if Context.called_from_python_script:
-            return
-        
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
         
         # end all groups to be sure we are at the top level
-        while project_settings.group():
-            project_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
         
-        project_settings.beginGroup(self.settings_group_name)
-        self.load_numeric_settings(project_settings)
-        project_settings.endGroup()
+        settings.beginGroup(self.settings_group_name)
+        self.load_numeric_settings(settings)
+        settings.endGroup()
 
     @Slot()
     def save_settings(self):
-        if Context.called_from_python_script:
-            return
-        
-        project_settings: QSettings = ProjectSettings.project_settings
-        if project_settings is None:
+        settings: QSettings = get_settings()
+        if settings is None:
             return
         
         # end all groups to be sure we are at the top level
-        while project_settings.group():
-            project_settings.endGroup()
+        while settings.group():
+            settings.endGroup()
 
-        project_settings.beginGroup(self.settings_group_name)
-        self.save_numeric_settings(project_settings)
-        project_settings.endGroup()
+        settings.beginGroup(self.settings_group_name)
+        self.save_numeric_settings(settings)
+        settings.endGroup()

@@ -4,8 +4,8 @@ from PySide6.QtPrintSupport import QPrintPreviewDialog
 
 from iode import IodeFileType, TableLang
 
-from iode_gui.utils import IODE_REPORT_EXTENSION, Context
-from iode_gui.settings import ProjectSettings
+from iode_gui.utils import IODE_REPORT_EXTENSION
+from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.text_edit.report_editor import IodeReportEditor
 from iode_gui.tabs.tab_text_abstract import AbstractTextWidget
@@ -76,16 +76,13 @@ class ReportWidget(AbstractTextWidget):
         """
         Load the settings for the report from the given project settings.
         """
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
-        if not project_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
 
-        parameters = project_settings.value("report_parameters", "")
-        language_index = project_settings.value("report_language", 0, type=int)
-        nb_decimals = project_settings.value("report_nb_decimals", 2, type=int)
+        parameters = settings.value("report_parameters", "")
+        language_index = settings.value("report_language", 0, type=int)
+        nb_decimals = settings.value("report_nb_decimals", 2, type=int)
 
         self.ui.lineEdit_parameters.setText(parameters)
         self.ui.comboBox_language.setCurrentIndex(language_index)
@@ -95,20 +92,17 @@ class ReportWidget(AbstractTextWidget):
         """
         Save the settings for the report to the given project settings.
         """
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
-        if not project_settings:
+        settings: QSettings = get_settings()
+        if not settings:
             return
 
         parameters = self.ui.lineEdit_parameters.text()
         language_index = self.ui.comboBox_language.currentIndex()
         nb_decimals = self.ui.spinBox_nbDecimals.value()
 
-        project_settings.setValue("report_parameters", parameters)
-        project_settings.setValue("report_language", language_index)
-        project_settings.setValue("report_nb_decimals", nb_decimals)
+        settings.setValue("report_parameters", parameters)
+        settings.setValue("report_language", language_index)
+        settings.setValue("report_nb_decimals", nb_decimals)
 
     @Slot()
     def run(self):
