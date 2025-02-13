@@ -1,7 +1,7 @@
 # configuration file for the iode python package
 
 [build-system]
-requires = [ "scikit-build-core >=0.4.3", "numpy", "pandas", "cython>=3.0", "mypy>=1.10" ]
+requires = [ "scikit-build-core>=0.10", "numpy", "pandas", "cython>=3.0", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
