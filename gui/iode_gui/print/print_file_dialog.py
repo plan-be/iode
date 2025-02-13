@@ -89,6 +89,10 @@ class PrintFileDialog(MixinSettingsDialog):
         if self.iode_type == IodeType.TABLES:
             if self.ui.comboBox_print_table_as.currentIndex() < 0:
                 self.ui.comboBox_print_table_as.setCurrentIndex(0)
+        
+        # Adjust the size of the dialog
+        self.adjustSize()
+
 
     @property
     def file_format(self) -> str:
@@ -198,7 +202,7 @@ class PrintFileDialog(MixinSettingsDialog):
         self.ui.label_nb_decimals.hide()
         self.ui.spinBox_nb_decimals.hide()
         layout.removeItem(self.ui.horizontalSpacer_nb_decimals)
-    
+ 
     def _show_nb_decimals(self):
         layout: QGridLayout = self.layout()
         self.ui.label_nb_decimals.show()
@@ -216,6 +220,8 @@ class PrintFileDialog(MixinSettingsDialog):
             else:
                 self._hide_generalized_sample()
                 self._hide_nb_decimals()
+            # Adjust the size of the dialog
+            self.adjustSize()
 
     # Will automatically save to settings -> see IodeSettingsDialog::closeEvent()
     @Slot()
