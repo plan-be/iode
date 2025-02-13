@@ -4,7 +4,7 @@ from PySide6.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_gui.settings import ProjectSettings, PRINT_DESTINATION
+from iode_gui.settings import ProjectSettings, PRINT_TO_FILE
 
 from iode_gui.iode_objs.delegates.comments_delegate import CommentsDelegate
 from iode_gui.iode_objs.delegates.equations_delegate import EquationsDelegate
