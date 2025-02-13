@@ -3,6 +3,7 @@ numpy < 2.0     # numpy >= 2.0 makes mypy (1.11) to crash (21/08/2024)
 pandas 
 matplotlib
 larray
+pytest
 
 cython >= 3.0
 scikit-build-core >= 0.10
