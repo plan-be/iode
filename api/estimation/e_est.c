@@ -550,7 +550,7 @@ again: /* first step of all methods and second step for Zellner and 3 stages met
     return((E_CONV == 1) ? 0 : -1);
 
 err :
-    E_msg("Estimation: error %d", E_errno);
+    E_msg_n(E_errno);
     return(-1);
 }
 

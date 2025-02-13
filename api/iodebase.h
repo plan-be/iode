@@ -457,10 +457,10 @@ extern void E_free_work(void);
 //extern int E_prep_reset(void);
 
 /* e_error.c */
-//extern void E_msg_n(int );
-extern void E_error_n(int );
-extern void E_msg(char* fmt,...);
-extern void E_error(char* fmt,...);
+extern void E_msg_n(int, ...);
+extern void E_error_n(int, ...);
+extern void E_msg(char* fmt, ...);
+extern void E_error(char* fmt, ...);
 
 /* e_print.c */
 //extern void E_print_enum(void);
