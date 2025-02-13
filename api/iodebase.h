@@ -819,8 +819,6 @@ extern int B_get_arg0(char *,char *,int );
 extern int B_argpos(char *,int );
 
 /* b_errors */
-extern void B_IodeMsgPath(char*);
-extern char* B_GetIodeMsgPath();
 extern void B_seterror(char *,...);
 extern void B_seterrn(int , ...);
 

@@ -5,11 +5,9 @@
  * 
  * Main functions
  * --------------
- *      void B_IodeMsgPath(char*)           Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR.
- *      char* B_GetIodeMsgPath()            Returns the path to the iode.msg file (global SCR_NAME_ERR).
- *      char *B_msg(int n)                  Returns a static buffer containing the message n from file iode.msg. 
+ *      char *B_msg(int n)                  Returns a static buffer containing the message n from the table iode_msg_map. 
  *      void B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
- *      void B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
+ *      void B_seterrn(int n, ...)          Formats a message found in iode_msg_map and adds the result to the list of last errors.
  *      void B_get_last_error()             Returns the last recorded errors (in B_ERROR_MSG).
  *      void B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
  *      void B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
@@ -22,79 +20,15 @@
 
 char**   B_ERROR_MSG; // Table of last recorded error messages 
 int      B_ERROR_NB;  // Nb of last recorded error messages 
-char     *B_ERROR_DFT_MSG = "Error message not found (check the file 'iode.msg')"; // Default message if not found in iode.msg 
+char     *B_ERROR_DFT_MSG = "Unknown error"; // Default message if not found in iode_msg_map
 
-//extern char SCR_ERR_NAME[];  // Name of the iode.msg file
-
-/**
- *  Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR. 
- *  The path is constructed by appending "iode.msg" to the path of the current executable.
- *  
- *  To use is the context of programs calling iode API fns like iodecmd or 
- *  tests linked with iode_c_api.lib.
- *  
- *  Don't use this function in the context of the "DOS" GUI interface where this file is 
- *  already appended to iode.scr file.
- *  
- *  @param char* dir_path The directory path where the iode.msg file is located.
- *                        If NULL, the function will retrieve the directory path 
- *                        of the current executable.
- */
-void B_IodeMsgPath(char* dir_path)
-{
-	char 	    module[1024], file[1024];
-    static  int done = 0;
-
-    // Get module directory (c:/iode p.ex)
-    if(done) 
-        return;
-
-    if(dir_path == NULL)
-    {
-#ifdef __GNUC__
-        readlink("/proc/self/exe", module, sizeof(module) - 1);
-#else
-        GetModuleFileName(0, module, 1000);
-#endif
-        SCR_split_dir(module, file);
-    }
-    else
-    {
-        strcpy(module, dir_path);
-    }
-
-#ifdef __GNUC__
-	sprintf(SCR_NAME_ERR, "%s/iode.msg", module);
- #else
-	sprintf(SCR_NAME_ERR, "%s\\iode.msg", module);
- #endif
- 
-    done = 1; 
-}
 
 /**
- * @brief Return the path to the iode.msg file (global SCR_NAME_ERR).
- *         
- * @return char* 
- */
-char* B_GetIodeMsgPath()
-{
-    static char path[256];
-
-    if(SCR_NAME_ERR == NULL)
-        return NULL;
-    
-    memset(path, 0, sizeof(path));
-    strcpy(path, SCR_NAME_ERR);
-    return path;
-}
-
-/**
- *  Returns a static buffer containing the message n from file iode.msg. 
+ *  Returns a static buffer containing the message n from the table iode_msg_map. 
  *  
- *  @note The identification in iode.msg is 1000 + n.
+ *  @note The identification in iode_msg_map is 1000 + n.
  *  
- *  @param [in] n   int             message number (see dos/iode.msg)
+ *  @param [in] n   int             message number (see iode_msg_map)
  *  @return         static char*    message text
  *  
  */
@@ -171,16 +105,16 @@ void B_seterror(char* fmt, ...)
 
 
 /**     
- *  Formats a message found in iode.msg and adds the result to the list of last errors.
+ *  Formats a message found in iode_msg_map and adds the result to the list of last errors.
  *  
- *  Read the text or format of a message in the file iode.msg.
+ *  Read the text or format of a message in the table iode_msg_map.
  *  Next, formats the message using the optional parameters and calls B_seterror() to 
  *  add the resulting message to the table of errors B_ERROR_MSG.
  *  
  *  Warning: if the parameters of the formating string are incorrect or missing, the program may
  *  crash!
  *  
- *  @param [in] n       int     message id in iode.msg (add 1000 to find the message)
+ *  @param [in] n       int     message id in iode_msg_map (add 1000 to find the message)
  *  @param [in] ...      -      any argument needed to format the message
  *
  *  @global [in, out] B_ERROR_NB  int       number of records errors

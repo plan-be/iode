@@ -70,7 +70,6 @@ void initialize_cli()
 {
     cli_assign_super();
     SCR_ALLOC_DOC = 0;
-    B_IodeMsgPath(NULL);
 }
 
 // Clean up and finish the command line interface

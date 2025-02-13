@@ -899,12 +899,9 @@ public:
 	
 	    if(done) return;
 	    done = 1;
-	
-	    //B_IodeMsgPath(NULL);            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
-	
-	    IODE_assign_super_API();    // set *_super fn pointers
-	    // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub
-	    K_init_ws(0);                       // Initialises 7 empty WS
+		
+	    IODE_assign_super_API();    // set *_super fn pointersressed for GitHub
+	    K_init_ws(0);               // Initialises 7 empty WS
 	    B_A2mGetAllParms();
 	
 	}
@@ -920,27 +917,9 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
     char    *path;
     char    expected_path[1024];
 
-    // B_IodeMsgPath(NULL);
-    B_IodeMsgPath(build_dir);
-
-#ifdef __GNUC__
-	sprintf(expected_path, "%s/iode.msg", build_dir);
- #else
-	sprintf(expected_path, "%s\\iode.msg", build_dir);
- #endif
-
-    path = B_GetIodeMsgPath();
-    EXPECT_STREQ(path, expected_path);
-
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
     EXPECT_EQ(std::string(msg), "Sample modified");
-
-    //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
-    //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
-    //B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
-    //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
-    //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
 }
 
 TEST_F(IodeCAPITest, Tests_BUF)

@@ -243,7 +243,7 @@ if(Qt6_FOUND)
                        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:${IODE_CPP_GUI_TARGET}>/doc)
     # copy iode.msg to the final build directory
     add_custom_command(TARGET ${IODE_CPP_GUI_TARGET} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/iode.msg $<TARGET_FILE_DIR:${IODE_CPP_GUI_TARGET}>/iode.msg)
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/archives/iode.msg $<TARGET_FILE_DIR:${IODE_CPP_GUI_TARGET}>/iode.msg)
 
     if(WIN32)
         # If Windows: Need to copy Qt DLLs in the same directory as generated executable

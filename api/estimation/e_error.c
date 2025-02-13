@@ -84,7 +84,7 @@ void E_error(char* fmt,...)
 /**
  *  Displays the estimation error message number n using B_seterror().
  *  
- *  @param [in] int n   Estimation error number (identified par 1200+n in iode.msg) 
+ *  @param [in] int n   Estimation error number (identified par 1200+n in iode_msg_map) 
  *  
  */
  
