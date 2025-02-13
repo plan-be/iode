@@ -29,27 +29,38 @@ void E_msg(char* fmt,...)
     
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);  
-    else {
+    else 
+    {
 #ifdef _MSC_VER   
         vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
 #else
         vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
 #endif  
     }
-    
     va_end(myargs);
 
     kmsg("%s\n", buf);
 }
 
 
-//void E_msg_n(int n)
-//{
-//    char    *B_msg();
-//
-//    E_msg(B_msg(200 + n));
-//}
-//
+// see B_seterrn() for code example
+void E_msg_n(int n, ...)
+{
+    char    buf[256];
+    char    *B_msg();
+    va_list myargs;
+    
+    va_start(myargs, n);    
+#ifdef _MSC_VER   
+    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, B_msg(200 + n), myargs);
+#else
+    vsnprintf_s(buf, sizeof(buf) - 1, B_msg(200 + n), myargs);
+#endif    
+    va_end(myargs);
+
+    kmsg("%s\n", buf);
+}
+
 
 /**
  *  Displays an estimation error message using B_seterror().
@@ -67,10 +78,10 @@ void E_error(char* fmt,...)
     
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
-    else {
+    else 
+    {
 #if defined(_MSC_VER)  
         vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
-        
 #else
         vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
 #endif  
@@ -87,10 +98,20 @@ void E_error(char* fmt,...)
  *  @param [in] int n   Estimation error number (identified par 1200+n in iode_msg_map) 
  *  
  */
- 
-void E_error_n(int n)
+// see B_seterrn() for code example
+void E_error_n(int n, ...)
 {
+    char    buf[256];
     char    *B_msg();
+    va_list myargs;
+    
+    va_start(myargs, n);
+#if defined(_MSC_VER)  
+        vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, B_msg(200 + n), myargs);
+#else
+        vsnprintf_s(buf, sizeof(buf) - 1, B_msg(200 + n), myargs);
+#endif  
+    va_end(myargs);
 
-    E_error("%s", B_msg(200 + n));
+    B_seterror(buf);
 }
