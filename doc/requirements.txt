@@ -4,7 +4,6 @@ pandas
 matplotlib
 larray
 
-cmake
 cython >= 3.0
 scikit-build-core >= 0.10
 mypy >=1.10
