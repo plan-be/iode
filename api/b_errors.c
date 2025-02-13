@@ -102,7 +102,6 @@ char *B_msg(int n)
 {
     char    *msg;
     
-    B_IodeMsgPath(NULL);                    // JMP 10/04/2023
     msg = SCR_err_txt(n + 1000);   
     if(msg == 0) return(B_ERROR_DFT_MSG);   // JMP 13/04/2023
     return(msg); 
