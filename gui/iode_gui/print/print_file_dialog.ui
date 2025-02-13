@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
+    <width>506</width>
     <height>322</height>
    </rect>
   </property>
@@ -14,14 +14,20 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label_print_format">
+     <property name="minimumSize">
+      <size>
+       <width>140</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="text">
       <string>Format</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="4">
+   <item row="0" column="2" colspan="4">
     <widget class="QComboBox" name="comboBox_print_format">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -43,7 +49,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="5" colspan="3">
+   <item row="0" column="6" colspan="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -66,7 +72,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>140</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -75,7 +81,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3" colspan="3">
+   <item row="1" column="2" colspan="3">
     <widget class="QComboBox" name="comboBox_print_eq_as">
      <property name="minimumSize">
       <size>
@@ -85,7 +91,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="6" colspan="2">
+   <item row="1" column="5" colspan="3">
     <spacer name="horizontalSpacer_print_eq_as">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -108,7 +114,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>140</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -117,7 +123,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3" colspan="3">
+   <item row="2" column="2" colspan="3">
     <widget class="QComboBox" name="comboBox_print_eq_lec_as">
      <property name="minimumSize">
       <size>
@@ -127,7 +133,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="6" colspan="2">
+   <item row="2" column="5" colspan="3">
     <spacer name="horizontalSpacer_print_eq_lec_as">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -150,7 +156,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>140</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -159,7 +165,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3" colspan="3">
+   <item row="3" column="2" colspan="3">
     <widget class="QComboBox" name="comboBox_print_table_as">
      <property name="minimumSize">
       <size>
@@ -169,7 +175,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="6" colspan="2">
+   <item row="3" column="5" colspan="3">
     <spacer name="horizontalSpacer_print_table_as">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -186,13 +192,13 @@
     <widget class="QLabel" name="label_generalized_sample">
      <property name="minimumSize">
       <size>
-       <width>120</width>
+       <width>140</width>
        <height>16</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>120</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -211,7 +217,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="5" colspan="2">
+   <item row="4" column="5" colspan="3">
     <spacer name="horizontalSpacer_generalized_sample">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -224,11 +230,11 @@
      </property>
     </spacer>
    </item>
-   <item row="5" column="0">
+   <item row="5" column="0" colspan="2">
     <widget class="QLabel" name="label_nb_decimals">
      <property name="minimumSize">
       <size>
-       <width>70</width>
+       <width>140</width>
        <height>16</height>
       </size>
      </property>
@@ -243,7 +249,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1" colspan="2">
+   <item row="5" column="2">
     <widget class="QSpinBox" name="spinBox_nb_decimals">
      <property name="minimumSize">
       <size>
@@ -259,7 +265,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3" colspan="4">
+   <item row="5" column="3" colspan="5">
     <spacer name="horizontalSpacer_nb_decimals">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -272,14 +278,20 @@
      </property>
     </spacer>
    </item>
-   <item row="6" column="0">
+   <item row="6" column="0" colspan="2">
     <widget class="QLabel" name="label_output_file">
+     <property name="minimumSize">
+      <size>
+       <width>140</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="text">
       <string>File</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1" colspan="7">
+   <item row="6" column="2" colspan="6">
     <widget class="IodeFileChooser" name="fileChooser_output_file" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -314,7 +326,7 @@
      </property>
     </spacer>
    </item>
-   <item row="7" column="1" colspan="2">
+   <item row="7" column="1">
     <widget class="QPushButton" name="pushButton_apply">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -342,7 +354,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="3">
+   <item row="7" column="2">
     <widget class="QPushButton" name="pushButton_cancel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -370,7 +382,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="4">
+   <item row="7" column="3">
     <widget class="QPushButton" name="pushButton_options">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -398,7 +410,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="5" colspan="2">
+   <item row="7" column="4" colspan="3">
     <widget class="QPushButton" name="pushButton_help">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
