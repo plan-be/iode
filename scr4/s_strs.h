@@ -176,7 +176,8 @@ extern char     *SCR_search_path(),
 		*SCR_change_ext(),
 		*SCR_cat_ext(),
 		*SCR_fullpath(),
-		*SCR_getcwd();
+		*SCR_getcwd(),
+		* (*SCR_err_txt_super)(int val);
 
 /* ALLOC */
 extern char     *SCR_malloc_doc();
