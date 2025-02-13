@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QWidget
 
 from iode_gui.print.file_print_preferences import FilePrintPreferences
 from iode_gui.settings import (ProjectSettings, MixinSettingsDialog, 
-                               PRINT_DESTINATION, RUN_REPORTS_FROM_PROJECT_DIR)
+                               PRINT_TO_FILE, RUN_REPORTS_FROM_PROJECT_DIR)
 from .ui_file_settings import Ui_MenuFileSettings
 
 
@@ -16,8 +16,8 @@ class MenuFileSettings(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        print_destinations = ["Printer", "File"]
-        self.ui.comboBox_print_dest.addItems(print_destinations)
+        PRINT_TO_FILEs = ["Printer", "File"]
+        self.ui.comboBox_print_dest.addItems(PRINT_TO_FILEs)
         self.ui.comboBox_print_dest.setCurrentIndex(0)
 
         self.load_settings()
@@ -42,7 +42,7 @@ class MenuFileSettings(MixinSettingsDialog):
         project_settings: QSettings = ProjectSettings.project_settings
         if project_settings is not None:
             print_to_file: bool = self.ui.comboBox_print_dest.currentText() == "File"
-            project_settings.setValue(PRINT_DESTINATION, print_to_file)
+            project_settings.setValue(PRINT_TO_FILE, print_to_file)
             project_settings.setValue(RUN_REPORTS_FROM_PROJECT_DIR, 
                                       self.ui.radioButton_run_from_project_dir.isChecked())
         self.accept()

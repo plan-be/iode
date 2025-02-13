@@ -13,7 +13,7 @@ import re
 from typing import Any
 
 RUN_REPORTS_FROM_PROJECT_DIR = "run_reports_from_project_dir"
-PRINT_DESTINATION = "print_destination"
+PRINT_TO_FILE = "print_to_file"
 
 
 class ProjectSettings:
