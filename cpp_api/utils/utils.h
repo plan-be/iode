@@ -434,6 +434,7 @@ inline char** vector_to_double_char(const std::vector<std::string>& vec)
 inline std::string get_last_error()
 {
     char* c_errors = B_get_last_error();
+    if(c_errors == NULL) return "";
     std::string msg(c_errors);
     SCR_free(c_errors);
     return msg;
