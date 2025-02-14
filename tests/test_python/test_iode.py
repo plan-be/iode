@@ -339,10 +339,14 @@ def test_estimation():
 # ----------
 
 def test_simulation():
+    comments.clear()
     equations.clear()
+    identities.clear()
     lists.clear()
     scalars.clear()
+    tables.clear()
     variables.clear()
+
     equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
     lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
     scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
@@ -355,18 +359,26 @@ def test_simulation():
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    # value of a variable is not available on year 1960 and 
-    # the lists _PRE, _INTER and _POST do not exist yet
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.warns(RuntimeWarning, match=r"Cannot simulate SCC:\nPre-recursive list \"_PRE\" not found!\n" 
+                                            r"Recursive list \"_INTER\" not found!\n"
+                                            r"Post-recursive list \"_POST\" not found!"):
         simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
-    assert 'Cannot simulate SCC:\nPre-recursive list "_PRE" not found!\n'
-    'Recursive list "_INTER" not found!\n'
-    'Post-recursive list "_POST" not found!' in str(excinfo.value)  
     
     simu.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
-    with pytest.raises(RuntimeError) as excinfo:
+    with pytest.warns(RuntimeWarning, match=r"PMAB : becomes unavailable at 1960Y1"):
         simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
-    assert "PMAB : becomes unavailable at 1960Y1" in str(excinfo.value)
+    
+    # Test simulation: divergence (max nb iterations = 2)
+    simu = Simulation()
+    simu.convergence_threshold = 0.01
+    simu.max_nb_iterations = 2
+    simu.debug = True
+    simu.relax = 1.0
+    simu.initialization_method = 'TM1'
+
+    with pytest.warns(RuntimeWarning, match=r"Could not simulate the model: the simulation "
+                                            r"did not converged"):
+        simu.model_simulate("2000Y1", "2010Y1")
 
 
 # WRITE
