@@ -303,8 +303,8 @@ void EditAndEstimateEquations::estimate()
         if(m_corr) delete m_corr;
         m_corr = nullptr;
 
-        std::string msg = "Cannot proceed estimation.\n";
-        msg += "equations: " + join(v_equations, ";") + "\n";
+        std::string msg = "Could not estimate equation(s) ";
+        msg += join(v_equations, ";") + "\n";
         msg += get_last_error();
         throw std::runtime_error(msg);
     }
@@ -374,17 +374,21 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
 
 void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
 {
-    std::string error_msg = "Could not estimate equations " + eqs + "\n";
+    std::string error_msg = "Could not estimate equation(s) " + eqs;
 
     Sample* sample = Variables.get_sample();
     if(sample->nb_periods() == 0)
-        throw std::runtime_error(error_msg + "No sample is defined");
+        throw std::runtime_error(error_msg + ": No sample is defined");
     std::string from_ = (from.empty()) ? sample->start_period().to_string() : from;
     std::string to_ = (to.empty()) ? sample->end_period().to_string() : to;
 
     int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
     if(res != 0)
-        throw std::runtime_error(error_msg + "from: " + from + " to " + to);
+    {
+        error_msg += " from '" + from + "' to '" + to + "'\n";
+        error_msg += get_last_error();
+        throw std::runtime_error(error_msg);
+    }
 }
 
 void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from, const std::string& to)
