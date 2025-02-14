@@ -5,6 +5,8 @@ from libcpp.vector cimport vector
 from pyiode.compute.simulation cimport CSimulation
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
+import warnings
+
 
 # Simulation wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
@@ -527,7 +529,7 @@ cdef class Simulation:
         >>> # force IODE to create the three list _PRE, _INTER and _POST 
         >>> # when the method model_simulate is called 
         >>> simu.debug = True
-        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -683,7 +685,7 @@ cdef class Simulation:
         <BLANKLINE>
 
         >>> simu = Simulation()
-        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -696,6 +698,9 @@ cdef class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        >>> success
+        True
+
         >>> # endogenous variable (unchanged)
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
@@ -723,10 +728,11 @@ cdef class Simulation:
 
         >>> # exchange UY and XNATY
         >>> simu.model_exchange("UY-XNATY")
+        
         >>> # update endogenous variable (now UY)
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
-        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 30 - #INTER 204 - #POST 40
@@ -760,7 +766,7 @@ cdef class Simulation:
 
         self.c_simulation.model_exchange(list_exo.encode())
 
-    def model_compile(self, list_eqs: Union[str, List[str]]=None):
+    def model_compile(self, list_eqs: Union[str, List[str]]=None) -> bool:
         """
         Recompiles a list of equations, or all equations if no list is specified. 
         It is only useful if (the list of) equations contain macros in their LEC form (like $list).
@@ -776,6 +782,11 @@ cdef class Simulation:
         list_eqs : str or list(str), optional
             List of equations to recompile. 
             Default to empty (recompile all equations).
+
+        Returns
+        -------
+        bool
+            True if the compilation is successful, False otherwise.
         """
         if list_eqs is None:
             list_eqs = ''
@@ -783,10 +794,15 @@ cdef class Simulation:
             all(isinstance(item, str) for item in list_eqs):
             list_eqs = ';'.join(list_eqs)
         
-        self.c_simulation.model_compile(list_eqs.encode())
+        try:
+            self.c_simulation.model_compile(list_eqs.encode())
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     def model_simulate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
-                       list_eqs: Union[str, List[str]]=None):
+                       list_eqs: Union[str, List[str]]=None) -> bool:
         """
         Run the simulation of a model for a given sample.
 
@@ -804,6 +820,11 @@ cdef class Simulation:
         list_eqs : str or list(str), optional
             List of equations representing the model.
             Default to empty (all equations).
+
+        Returns
+        -------
+        bool
+            True if the simulation is successful, False otherwise.
 
         Examples
         --------
@@ -859,7 +880,7 @@ cdef class Simulation:
 
         >>> # simulate the model (no reordering)
         >>> simu = Simulation()
-        >>> simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -872,6 +893,8 @@ cdef class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        >>> success
+        True
         >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 1
@@ -896,10 +919,15 @@ cdef class Simulation:
             all(isinstance(item, str) for item in list_eqs):
             list_eqs = ';'.join(list_eqs)
 
-        self.c_simulation.model_simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
+        try: 
+            self.c_simulation.model_simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str="_PRE", inter_name: str="_INTER", 
-                            post_name: str="_POST", list_eqs: Union[str, List[str]]=None):
+                            post_name: str="_POST", list_eqs: Union[str, List[str]]=None) -> bool:
         """
         Decompose the model into Strongly Connex Components (SCC) and reorder it. 
         
@@ -925,6 +953,11 @@ cdef class Simulation:
             List of equations representing the model.
             Default to empty (all equations).
 
+        Returns
+        -------
+        bool
+            True if the model was successfully reordered.
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
@@ -943,12 +976,15 @@ cdef class Simulation:
         394 objects loaded
 
         >>> simu = Simulation()
-        >>> simu.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
+        >>> success
+        True
+
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
@@ -973,11 +1009,16 @@ cdef class Simulation:
             all(isinstance(item, str) for item in list_eqs):
             list_eqs = ';'.join(list_eqs)
 
-        self.c_simulation.model_calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
-                                              post_name.encode(), list_eqs.encode())
+        try:
+            self.c_simulation.model_calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
+                                                post_name.encode(), list_eqs.encode())
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     def model_simulate_SCC(self, from_period: Union[str, Period], to_period: Union[str, Period], 
-                           pre_name: str="_PRE", inter_name: str="_INTER", post_name: str="_POST"):
+                           pre_name: str="_PRE", inter_name: str="_INTER", post_name: str="_POST") -> bool:
         """
         Simulates a model previously decomposed into Strongly Connex Components (SCC) and reordered.
         It is intended to be called after the method :meth:`Simulation.model_calculate_SCC`.
@@ -1001,6 +1042,11 @@ cdef class Simulation:
         post_name : str, optional
             Name of the list representing the post-recursive equations.
             Default to "_POST".
+
+        Returns
+        -------
+        bool
+            True if the simulation was successful, False otherwise.
 
         See Also
         --------
@@ -1030,12 +1076,15 @@ cdef class Simulation:
 
         Step 1 - Compute the Strongly Connex Components (SCC) decomposition
 
-        >>> simu.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
+        >>> success
+        True
+
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
@@ -1082,7 +1131,7 @@ cdef class Simulation:
         XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
         <BLANKLINE>
         
-        >>> simu.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simu.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         2000Y1: 1 iters - error =   0.3155 - cpu=...ms
         2000Y1: 2 iters - error =    1.953 - cpu=...ms
@@ -1091,6 +1140,9 @@ cdef class Simulation:
         2015Y1: 10 iters - error =  0.01144 - cpu=...ms
         2015Y1: 11 iters - error = 0.006679 - cpu=...ms
         2015Y1: 12 iters - error = 0.0003485 - cpu=...ms
+        >>> success
+        True
+
         >>> variables["UY", "2000Y1:2015Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 1
@@ -1109,5 +1161,11 @@ cdef class Simulation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        self.c_simulation.model_simulate_SCC(from_period.encode(), to_period.encode(), 
-                                             pre_name.encode(), inter_name.encode(), post_name.encode())
+        try:
+            self.c_simulation.model_simulate_SCC(from_period.encode(), to_period.encode(), 
+                                                pre_name.encode(), inter_name.encode(), 
+                                                post_name.encode())
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
