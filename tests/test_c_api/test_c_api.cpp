@@ -6,6 +6,7 @@
 
 #include "pch.h"
 #include <math.h>
+#include <regex>
 #include <filesystem>
 
 
@@ -918,8 +919,57 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
     char    *msg;
 
     U_test_print_title("Tests IODEMSG");
-    msg = B_msg(16); // Sample modified
+    
+    // 1016 -> Sample modified
+    msg = B_msg(16);
     EXPECT_EQ(std::string(msg), "Sample modified");
+
+    // Illegal sample : %.80s %.80s
+    B_seterror("Illegal sample : %.80s %.80s", "2010Y1", "1960Y1");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Illegal sample : 2010Y1 1960Y1");
+
+    // 1088 -> "Illegal sample : %.80s %.80s"
+    B_seterrn(88, "2010Y1", "1960Y1");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Illegal sample : 2010Y1 1960Y1");
+
+    // 1206 -> "Estimation : NaN Generated"
+    E_error("Estimation : NaN Generated");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
+
+    // 1206 -> "Estimation : NaN Generated"
+    E_error_n(6);
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
+
+    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
+    E_error("Estimation : Equation %.80s : compiling error %.80s", "ACAF", "???");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
+
+    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
+    E_error_n(12, "ACAF", "???");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
+
+    // wrong number of arguments
+    E_error_n(12, "ACAF");
+    msg = B_get_last_error();
+    std::regex pattern("Estimation : Equation ACAF : compiling error .*");
+    EXPECT_TRUE(std::regex_match(std::string(msg), pattern));
+
+    E_error_n(12, "ACAF", "???", "???");
+    msg = B_get_last_error();
+    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
+
+    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
+    E_msg_n(12, "ACAF", "???");
+
+    // wrong number of arguments
+    E_msg_n(12, "ACAF");
+    E_msg_n(12, "ACAF", "???", "???");
 }
 
 TEST_F(IodeCAPITest, Tests_BUF)
