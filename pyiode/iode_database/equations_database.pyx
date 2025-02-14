@@ -628,7 +628,7 @@ cdef class Equations(_AbstractDatabase):
         """
         return self._variables()
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None):
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None) -> bool:
         r"""
         Estimate an equation or a block of equations.
 
@@ -675,6 +675,11 @@ cdef class Equations(_AbstractDatabase):
             If not provided, all equations of the present Equations database will be estimated.
             Default to None (all equations).
 
+        Returns
+        -------
+        bool
+            True if the estimation process has converged, False otherwise.
+
         Warnings
         --------
         If some equations to be estimated belongs to a same block, the *block* (:meth:`Equation.block`), 
@@ -704,15 +709,17 @@ cdef class Equations(_AbstractDatabase):
         >>> scalars["dpuh_2"] = 0., 1.
 
         >>> # estimate an equation
-        >>> equations.estimate("1980Y1", "1996Y1", "ACAF")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = equations.estimate("1980Y1", "1996Y1", "ACAF")      # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 0.173205)
         <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 5.16075e-09)
         <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
         <BLANKLINE>
+        >>> success
+        True
         >>> # or equivalenty
-        >>> equations["ACAF"].estimate("1980Y1", "1996Y1")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = equations["ACAF"].estimate("1980Y1", "1996Y1")      # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 7.05003e-13)
         <BLANKLINE>
         Solution reached after 1 iteration(s). Creating results file ...
@@ -733,7 +740,7 @@ cdef class Equations(_AbstractDatabase):
         >>> block = "ACAF;DPUH"
         >>> for name in block.split(";"):
         ...     equations[name] = {"block": block, "method": "LSQ"}
-        >>> equations.estimate("1980Y1", "1996Y1", block)           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = equations.estimate("1980Y1", "1996Y1", block)           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 0.141421)
         <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 1.522e-12)
@@ -744,6 +751,8 @@ cdef class Equations(_AbstractDatabase):
         <BLANKLINE>
         Solution reached after 1 iteration(s). Creating results file ...
         <BLANKLINE>
+        >>> success
+        True
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136079)
         >>> scalars["acaf2"]
@@ -775,7 +784,12 @@ cdef class Equations(_AbstractDatabase):
             all(isinstance(item, str) for item in list_eqs):
             list_eqs = ';'.join(list_eqs)
         
-        cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
+        try:
+            cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
+            return True
+        except RuntimeError as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         """

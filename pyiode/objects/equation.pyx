@@ -291,7 +291,7 @@ cdef class Equation:
         lhs, rhs = self.c_equation.split_equation()
         return lhs.decode(), rhs.decode() 
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None):
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None) -> bool:
         r"""
         Estimate the present equation.
 
@@ -334,6 +334,11 @@ cdef class Equation:
             The ending period of the execution range.
             Defaults to the ending period of the current Variables sample.
 
+        Returns
+        -------
+        bool
+            True if the estimation process has converged, False otherwise.
+
         Warnings
         --------
         If the present equation belongs to a block, you must use the :meth:`Equations.estimate` method instead.
@@ -358,13 +363,15 @@ cdef class Equation:
         >>> scalars["acaf4"] = 0., 1.
 
         >>> # estimate the ACQF equation
-        >>> eq_ACAF.estimate("1980Y1", "1996Y1")
+        >>> success = eq_ACAF.estimate("1980Y1", "1996Y1")
         Estimating : iteration 1 (||eps|| = 0.173205)
         <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 5.16075e-09)
         <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
         <BLANKLINE>
+        >>> success
+        True
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136949)
         >>> scalars["acaf2"]
@@ -385,7 +392,12 @@ cdef class Equation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
+        try:
+            cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     cdef void update_global_database(self):
         if self.c_database is not NULL:
