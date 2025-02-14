@@ -13,6 +13,7 @@ from iode_gui.text_edit.completer import IodeCompleter
 from .ui_edit_equation import Ui_EditEquationDialog
 
 from typing import Dict
+import warnings
 from iode import equations, Equation, EqMethod, Sample, IodeType
 from iode.util import EditAndEstimateEquations
 
@@ -183,6 +184,7 @@ class EditEquationDialog(MixinSettingsDialog):
     @Slot()
     def estimate(self):
         """Estimates the equation."""
+        warnings.simplefilter("error")
         try:
             self._save_current_equation()
 
@@ -224,6 +226,7 @@ class EditEquationDialog(MixinSettingsDialog):
             self._display_equation()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
+        warnings.simplefilter("default")
 
     # same as ODE_blk_next_fn() from o_est.c from old GUI
     @Slot()

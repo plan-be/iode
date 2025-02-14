@@ -14,6 +14,7 @@ from iode_gui.plot.plot import PlotDialog
 from .ui_estimation_results import Ui_EstimationResultsDialog
 
 from typing import List, Dict
+import warnings
 from iode import Sample, Scalars, Equation, EQ_TEST_NAMES, EqTest, variables
 from iode.util import EditAndEstimateEquations
 
@@ -147,6 +148,7 @@ class EstimationResultsDialog(QDialog):
     @Slot()
     def plot_yobs_yest(self):
         """Plots the observed and estimated values."""
+        warnings.simplefilter("error")
         try:
             # Get the current equation
             current_eq: Equation = self.edit_est_eqs.current_equation
@@ -171,11 +173,13 @@ class EstimationResultsDialog(QDialog):
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
+        warnings.simplefilter("default")
 
     # same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
     @Slot()
     def plot_residual(self):
         """Plots the residual."""
+        warnings.simplefilter("error")
         try:
             # Get the current equation
             current_eq: Equation = self.edit_est_eqs.current_equation
@@ -193,11 +197,14 @@ class EstimationResultsDialog(QDialog):
             # Residual values
             title = f"Equation {eq_name}: residuals"
             residual_values: List[float] = self.edit_est_eqs.get_residual_values(eq_name)
+            if not residual_values:
+                return
             plot_dialog = PlotDialog(title=title)
             plot_dialog.add_series(f"{lhs} : observed", periods, residual_values)
             self.new_plot.emit(plot_dialog)
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
+        warnings.simplefilter("default")
 
     @Slot()
     def print_output(self):
