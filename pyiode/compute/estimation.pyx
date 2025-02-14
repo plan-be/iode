@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional
+import warnings
 
 # Import necessary types/classes
 from libcpp.string cimport string
@@ -972,7 +973,11 @@ cdef class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        return self.c_estimation_ptr.get_observed_values(name.encode())
+        observed_values = [value for value in self.c_estimation_ptr.get_observed_values(name.encode())]
+        if not observed_values:
+            warnings.warn(f"No observed values found for '{name}'", RuntimeWarning)
+            return None
+        return observed_values
 
     def get_fitted_values(self, name: str) -> List[float]:
         """
@@ -1009,7 +1014,11 @@ cdef class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        return self.c_estimation_ptr.get_fitted_values(name.encode())
+        fitted_values = [value for value in self.c_estimation_ptr.get_fitted_values(name.encode())]
+        if not fitted_values:
+            warnings.warn(f"No fitted values found for '{name}'", RuntimeWarning)
+            return None
+        return fitted_values
 
     def get_residual_values(self, name: str) -> List[float]:
         """
@@ -1046,12 +1055,20 @@ cdef class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        return self.c_estimation_ptr.get_residual_values(name.encode())
+        residual_values = [value for value in self.c_estimation_ptr.get_residual_values(name.encode())]
+        if not residual_values:
+            warnings.warn(f"No residual values found for '{name}'", RuntimeWarning)
+            return None
+        return residual_values
     
-    def estimate(self):
+    def estimate(self) -> bool:
         """
         Estimate the current block of equations (which is not necessarily all the equations 
         in the local Equations database 'kdb_eqs').
+
+        Returns
+        -------
+        True if the estimation was successful, False otherwise.
 
         Notes
         -----
@@ -1227,7 +1244,12 @@ cdef class EditAndEstimateEquations:
         >>> scalars["dpuh_1"]
         Scalar(0.0109855, 1, 0.00481857)
         """
-        self.c_estimation_ptr.estimate()
+        try:
+            self.c_estimation_ptr.estimate()
+            return True
+        except Exception as e:
+            warnings.warn(str(e), RuntimeWarning)
+            return False
 
     @property
     def is_done(self) -> bool:
