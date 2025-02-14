@@ -215,9 +215,9 @@ const static std::map<int, std::string> iode_msg_map = {
     {1209, "Estimation : Singular Matrix (GMG)"},
     {1210, "Estimation : No current estimation"},
     {1211, "Estimation : Memory Full"},
-    {1211, "Estimation : Equation %.80s : compiling error %.80s"},
-    {1212, "Estimation : Instrument %.80s : error %.80s"},
-    {1213, "Block: syntax error"},
+    {1212, "Estimation : Equation %.80s : compiling error %.80s"},
+    {1213, "Estimation : Instrument %.80s : error %.80s"},
+    {1214, "Block: syntax error"},
     
     {1250, "Report : Memory Full"},
     {1251, "Report : Define of %.80s (%.80s) not possible"},
