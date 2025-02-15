@@ -104,8 +104,7 @@ def test_iode_edit_and_estimate_equations(tmp_path):
 
 
 def test_iode_messages():
-    run_doctests(items=['add_error_msg', 'clear_error_msgs', 'display_error_msgs', 
-                        'reset_msgs', 'suppress_msgs'])
+    run_doctests(items=['reset_msgs', 'suppress_msgs'])
     iode.reset_msgs()
 
 
@@ -122,7 +121,7 @@ def test_iode_print_preferences():
 def test_iode_miscellaneous(tmp_path):
     from iode.reports import (build_command_functions_list, build_report_functions_list, 
                               build_lec_functions_list)
-    from iode.util import table2str, check_filepath, get_iode_file_type, print_error_msg
+    from iode.util import table2str, check_filepath, get_iode_file_type
 
     iode.__test__ = {}
     iode.__test__['build_command_functions_list'] = build_command_functions_list.__doc__ 
@@ -131,7 +130,6 @@ def test_iode_miscellaneous(tmp_path):
     iode.__test__['table2str'] = table2str.__doc__
     iode.__test__['check_filepath'] = check_filepath.__doc__
     iode.__test__['get_iode_file_type'] = get_iode_file_type.__doc__
-    iode.__test__['print_error_msg'] = print_error_msg.__doc__
 
     run_doctests(output_dir=tmp_path)
 
