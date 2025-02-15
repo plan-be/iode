@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from iode_gui.settings import MixinSettingsDialog
 from .ui_compute_scc_decomposition import Ui_MenuComputeSCCDecomposition
 
+import warnings
 from iode import IodeType, Simulation
 
 
@@ -34,10 +35,13 @@ class MenuComputeSCCDecomposition(MixinSettingsDialog):
             inter_recursive_list_name: str = self.ui.lineEdit_inter_recursive_list_name.text().strip()
             post_recursive_list_name: str = self.ui.lineEdit_post_recursive_list_name.text().strip()
 
+            warnings.simplefilter("error")
             simu = Simulation()
             simu.model_calculate_SCC(nb_iterations, pre_recursive_list_name, inter_recursive_list_name, 
                                      post_recursive_list_name, equations_list)
+            warnings.simplefilter("default")
 
             self.accept()
         except Exception as e:
             QMessageBox.warning(self, "WARNING", str(e))
+            warnings.simplefilter("default")
