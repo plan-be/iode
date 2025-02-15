@@ -17,7 +17,7 @@ def w_dest(filename: Union[str, Path] = "", dest: Union[WriteFileExt, str] = Wri
         dest = WriteFileExt[dest]
     dest = int(dest)
 
-    W_dest(_cstr(filename), dest)
+    W_dest(filename.encode(), dest)
 
 def w_flush():
     '''Flush the output session buffer.'''
@@ -29,7 +29,7 @@ def w_close():
 
 def w_print(txt: str = ""):
     '''Send a string into the output session buffer.'''
-    return W_printf(_cstr("%s"), _cstr(txt))
+    return W_printf("%s".encode(), txt.encode())
     
 def w_print_enum(level: int = 1, text: str = ""):
     '''Print a bulleted paragraph of the given level''' 
@@ -57,11 +57,8 @@ def w_print_tit(level: int = 1, title: str = ""):
 
 def w_print_pg_header(arg: str = ""):
     '''Define the page header as from the current page''' 
-    W_print_pg_header(_cstr(arg))
+    W_print_pg_header(arg.encode())
     
 def w_print_pg_footer(arg: str = ""):
     '''Define the page footer as from the current page''' 
-    W_print_pg_footer(_cstr(arg))
-
-    
-
+    W_print_pg_footer(arg.encode())
