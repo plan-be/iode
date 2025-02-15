@@ -263,6 +263,9 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
 
 void EditAndEstimateEquations::estimate()
 {
+    // clear C API errors stack
+    B_clear_last_error();
+
     // frees all allocated variables for the last estimation
     if(estimation_done)
         E_free_work();
@@ -375,6 +378,8 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
 void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
 {
     std::string error_msg = "Could not estimate equation(s) " + eqs;
+    // clear C API errors stack
+    B_clear_last_error();
 
     Sample* sample = Variables.get_sample();
     if(sample->nb_periods() == 0)
