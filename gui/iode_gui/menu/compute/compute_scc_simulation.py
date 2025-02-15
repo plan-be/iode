@@ -5,6 +5,7 @@ from PySide6.QtGui import QDoubleValidator
 from iode_gui.settings import MixinSettingsDialog
 from .ui_compute_scc_simulation import Ui_MenuComputeSCCSimulation
 
+import warnings
 from iode import (Simulation, SimulationInitialization, SIMULATION_INITIALIZATION_METHODS, 
                   Sample, lists, variables)
 
@@ -75,6 +76,7 @@ class MenuComputeSCCSimulation(MixinSettingsDialog):
             # throw an error if from_period and/or to_period are/is invalid
             Sample(from_period, to_period)
 
+            warnings.simplefilter("error")
             simu = Simulation()
             simu.convergence_threshold = convergence
             simu.max_nb_iterations = max_iterations
@@ -84,7 +86,10 @@ class MenuComputeSCCSimulation(MixinSettingsDialog):
 
             simu.model_simulate_SCC(from_period, to_period, pre_recursive_list_name, 
                                     inter_recursive_list_name, post_recursive_list_name)
+            warnings.simplefilter("default")
 
             self.accept()
         except Exception as e:
             QMessageBox.warning(self, "WARNING", str(e))
+            warnings.simplefilter("default")
+        

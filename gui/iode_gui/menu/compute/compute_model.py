@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from iode_gui.settings import MixinSettingsDialog
 from .ui_compute_model import Ui_MenuComputeModel
 
+import warnings
 from iode import IodeType, Simulation
 
 
@@ -25,9 +26,12 @@ class MenuComputeModel(MixinSettingsDialog):
         try:
             equations_list: str = self.ui.textEdit_equations_list.toPlainText().strip()
 
+            warnings.simplefilter("error")
             simu = Simulation()
             simu.model_compile(equations_list)         
+            warnings.simplefilter("default")
 
             self.accept()
         except Exception as e:
             QMessageBox.warning(self, "WARNING", str(e))
+            warnings.simplefilter("default")

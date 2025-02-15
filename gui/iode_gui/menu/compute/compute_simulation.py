@@ -5,6 +5,7 @@ from PySide6.QtGui import QDoubleValidator
 from iode_gui.settings import MixinSettingsDialog
 from .ui_compute_simulation import Ui_MenuComputeSimulation
 
+import warnings
 from iode import (IodeType, Simulation, SimulationInitialization, SimulationSort,
                   SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
                   Sample, variables)
@@ -80,6 +81,7 @@ class MenuComputeSimulation(MixinSettingsDialog):
             # throw an error if from_period and/or to_period are/is invalid
             Sample(from_period, to_period)
 
+            warnings.simplefilter("error")
             simu = Simulation()
             simu.convergence_threshold = convergence
             simu.max_nb_iterations = max_iterations
@@ -93,7 +95,9 @@ class MenuComputeSimulation(MixinSettingsDialog):
                 simu.model_exchange(exchange_vars_list)
 
             simu.model_simulate(from_period, to_period, equations_list)
+            warnings.simplefilter("default")
 
             self.accept()
         except Exception as e:
             QMessageBox.warning(self, "WARNING", str(e))
+            warnings.simplefilter("default")
