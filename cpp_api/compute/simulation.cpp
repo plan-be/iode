@@ -34,7 +34,11 @@ void Simulation::model_exchange(const std::string& list_exo)
  */
 void Simulation::model_compile(const std::string& list_eqs)
 {
-    if (list_eqs.empty()) KE_compile(K_WS[EQUATIONS]);            // EndoExo whole WS
+    // clear C API errors stack
+    B_clear_last_error();
+
+    if (list_eqs.empty()) 
+        KE_compile(K_WS[EQUATIONS]);            // EndoExo whole WS
     else 
     {
         char* c_list_eqs = to_char_array(list_eqs);
@@ -65,6 +69,9 @@ void Simulation::model_compile(const std::string& list_eqs)
  */
 void Simulation::model_simulate(const std::string& from, const std::string& to, const std::string& list_eqs)
 {
+    // clear C API errors stack
+    B_clear_last_error();
+
     Sample* sample = nullptr;
     try
     {
@@ -120,6 +127,9 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
 void Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
 {
     std::string error_msg;
+
+    // clear C API errors stack
+    B_clear_last_error();
 
     // result list names
     if (pre_name.empty())   
@@ -182,6 +192,9 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
  */
 void Simulation::model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
 {
+    // clear C API errors stack
+    B_clear_last_error();
+
     Sample* sample = nullptr;
     try
     {
