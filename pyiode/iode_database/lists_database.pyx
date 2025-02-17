@@ -18,7 +18,7 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 
 @cython.final
-cdef class Lists(_AbstractDatabase):
+cdef class Lists(IodeDatabase):
     r"""
     IODE Lists database. 
 
@@ -297,11 +297,12 @@ cdef class Lists(_AbstractDatabase):
             (the list of) name(s) of the IODE list(s) to update/add.
             The list of lists to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: str or list(str)
-            (new) IODE list value(s).
+        value: str or dict(str, str) or pd.Series or Lists
+            (new) IODE list(s) value(s).
 
         Examples
         --------
+        >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import lists, variables
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -337,7 +338,58 @@ cdef class Lists(_AbstractDatabase):
         >>> lists["B_VAR"]
         ['BQY', 'BVY']
 
-        >>> # c) working on a subset
+        >>> # c) add/update multiple lists at once
+        >>> # 1) using a dict of values
+        >>> values = {"ENVI": "PWMAB; PWMS; PWXAB; PWXS; QWXAB; QWXS; POIL; NATY",
+        ...           "IDT": "FLGR; KL; PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR; WBGR; YSFICR",
+        ...           "MAINEQ": "NFYH; KNFF; PC; PXAB; PMAB; QXAB; QMAB"}
+        >>> lists["ENVI, IDT, MAINEQ"] = values
+        >>> lists["ENVI, IDT, MAINEQ"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Lists
+        nb lists: 3
+        filename: ...fun.lst
+        description: Modèle fun                                        
+        <BLANKLINE>
+        name 	                                    lists                                    
+        ENVI  	PWMAB; PWMS; PWXAB; PWXS; QWXAB; QWXS; POIL; NATY                            
+        IDT   	FLGR; KL; PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR; WBGR; YSFICR
+        MAINEQ	NFYH; KNFF; PC; PXAB; PMAB; QXAB; QMAB  
+
+        >>> # 2) using a pandas series
+        >>> data = ["PWMS; PWXAB; PWXS; QWXAB; QWXS; POIL",
+        ...         "KL; PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR; WBGR", 
+        ...         "KNFF; PC; PXAB; PMAB; QXAB"]
+        >>> series = pd.Series(data, index=["ENVI", "IDT", "MAINEQ"])
+        >>> lists["ENVI, IDT, MAINEQ"] = series
+        >>> lists["ENVI, IDT, MAINEQ"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Lists
+        nb lists: 3
+        filename: ...fun.lst
+        description: Modèle fun                                        
+        <BLANKLINE>
+        name 	                             lists                             
+        ENVI  	PWMS; PWXAB; PWXS; QWXAB; QWXS; POIL                           
+        IDT   	KL; PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR; WBGR
+        MAINEQ	KNFF; PC; PXAB; PMAB; QXAB   
+
+        >>> # 3) using another Lists database (subset)
+        >>> lists_subset = lists["ENVI, IDT, MAINEQ"].copy()
+        >>> lists_subset["ENVI"] = "PWXAB; PWXS; QWXAB; QWXS"
+        >>> lists_subset["IDT"] = "PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR"
+        >>> lists_subset["MAINEQ"] = "PC; PXAB; PMAB"
+        >>> lists["ENVI, IDT, MAINEQ"] = lists_subset
+        >>> lists["ENVI, IDT, MAINEQ"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Lists
+        nb lists: 3
+        filename: ...fun.lst
+        description: Modèle fun                                        
+        <BLANKLINE>
+        name 	                        lists                        
+        ENVI  	PWXAB; PWXS; QWXAB; QWXS                             
+        IDT   	PROD; QL; RDEBT; RENT; RLBER; SBGX; WCRH; IUGR; SBGXR
+        MAINEQ	PC; PXAB; PMAB
+
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> lists_subset = lists["E*"]
         >>> lists_subset.names
@@ -496,7 +548,8 @@ cdef class Lists(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, s.index.tolist())
 
         for index, value in s.items():
             self._set_object(index, value)

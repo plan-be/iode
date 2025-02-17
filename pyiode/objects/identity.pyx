@@ -1,5 +1,5 @@
 # distutils: language = c++
-
+from copy import copy
 from typing import Union, Tuple, List, Optional
 
 from cython.operator cimport dereference
@@ -107,6 +107,22 @@ cdef class Identity:
         """
         return [var.decode() for var in self.c_identity.get_variables_list(<bint>False)]
 
+    def copy(self) -> Identity:
+        """
+        Return a copy of the current Identity.
+
+        Examples
+        --------
+        >>> from iode import Identity
+        >>> idt = Identity("FLG/VBBP")
+        >>> idt
+        Identity('FLG/VBBP')
+        >>> copied_idt = idt.copy()
+        >>> copied_idt
+        Identity('FLG/VBBP')
+        """
+        return copy(self)
+
     # Special methods
 
     def __eq__(self, other: Identity) -> bool:
@@ -118,12 +134,12 @@ cdef class Identity:
 
         Examples
         --------
-        >>> import copy
+        >>> from copy import copy
         >>> from iode import Identity
         >>> idt = Identity("FLG/VBBP")
         >>> idt
         Identity('FLG/VBBP')
-        >>> copied_idt = copy.copy(idt)
+        >>> copied_idt = copy(idt)
         >>> copied_idt
         Identity('FLG/VBBP')
         """

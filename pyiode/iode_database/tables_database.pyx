@@ -21,7 +21,7 @@ from iode.common import PrintTablesAs
 
 
 @cython.final
-cdef class Tables(_AbstractDatabase):
+cdef class Tables(IodeDatabase):
     r"""
     IODE Tables database. 
 
@@ -431,9 +431,8 @@ cdef class Tables(_AbstractDatabase):
             (the list of) name(s) of the table(s) to update/add.
             The list of tables to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: int, tuple(...), dict(str, ...), Table or list of any of those
+        value: int, Table, dict(str, ...) or Tables
             If int, then it is interpreted as the number of columns to create a new empty table.
-            If tuple or dictionary, it is forwarded to the Table constructor to create a new table.
             If Table, then it is used to update an existing table or to create a new table if it does not exist yet.
 
         See Also
@@ -626,7 +625,7 @@ cdef class Tables(_AbstractDatabase):
         graph_alignment: 'LEFT'
         <BLANKLINE>
 
-        >>> # c) working on a subset
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> tables_subset = tables["C8_*"]
         >>> tables_subset.names
@@ -736,6 +735,44 @@ cdef class Tables(_AbstractDatabase):
         gridy: 'MAJOR'
         graph_axis: 'VALUES'
         graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> # d) add/update several equations at once        
+        >>> # 1) using a dict of values
+        >>> table_C8_1 = tables["C8_1"].copy()
+        >>> table_C8_1.title = table_C8_1.title + " (copy)"
+        >>> table_C8_2 = tables["C8_2"].copy()
+        >>> table_C8_2.title = table_C8_2.title + " (copy)"
+        >>> table_C8_3 = tables["C8_3"].copy()
+        >>> table_C8_3.title = table_C8_3.title + " (copy)"
+        >>> values = {"C8_1": table_C8_1, "C8_2": table_C8_2, "C8_3": table_C8_3}
+        >>> tables["C8_1, C8_2, C8_3"] = values
+        >>> tables["C8_1, C8_2, C8_3"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Tables
+        nb tables: 3
+        filename: ...fun.tbl
+        <BLANKLINE>
+        name                       table titles
+        C8_1        Déterminants de l'output potentiel (copy)
+        C8_2        Déterminants de la productivité (copy)
+        C8_3        Output gap (copy)
+        <BLANKLINE>
+
+        >>> # 2) using another Tables database (subset)
+        >>> tables_subset = tables["C8_1, C8_2, C8_3"].copy()
+        >>> tables_subset["C8_1"].title = tables_subset["C8_1"].title.replace("(copy)", "(detached subset)")
+        >>> tables_subset["C8_2"].title = tables_subset["C8_2"].title.replace("(copy)", "(detached subset)")
+        >>> tables_subset["C8_3"].title = tables_subset["C8_3"].title.replace("(copy)", "(detached subset)")
+        >>> tables["C8_1, C8_2, C8_3"] = tables_subset
+        >>> tables["C8_1, C8_2, C8_3"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Tables
+        nb tables: 3
+        filename: ...fun.tbl
+        <BLANKLINE>
+        name                            table titles
+        C8_1        Déterminants de l'output potentiel (detached subset)
+        C8_2        Déterminants de la productivité (detached subset)
+        C8_3        Output gap (detached subset)
         <BLANKLINE>
         """
         super().__setitem__(key, value)

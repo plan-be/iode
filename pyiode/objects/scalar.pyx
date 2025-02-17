@@ -1,5 +1,5 @@
 # distutils: language = c++
-
+from copy import copy
 from typing import Union, Tuple, List, Optional
 
 from cython.operator cimport dereference
@@ -137,6 +137,7 @@ cdef class Scalar:
         if np.isnan(val):
             val = NA
         self.c_scalar.val = val
+        self.c_scalar.std = NA
     
     @property
     def relax(self) -> float:
@@ -147,6 +148,7 @@ cdef class Scalar:
         if value < 0.0 or value > 1.0:
             raise ValueError("Expected relax value between 0.0 and 1.0")
         self.c_scalar.relax = value
+        self.c_scalar.std = NA
 
     @property
     def std(self) -> float:
@@ -170,6 +172,24 @@ cdef class Scalar:
         std = self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
         return value, relax, std
 
+    def copy(self) -> Scalar:
+        """
+        Return a copy of the current Scalar.
+
+        Examples
+        --------
+        >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> scalars["acaf1"]
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> copied_scl = scalars["acaf1"].copy()
+        >>> copied_scl
+        Scalar(0.0157684, 1, 0.00136871)
+        """
+        return copy(self)
+
     # Special methods
 
     def __eq__(self, other: Scalar) -> bool:
@@ -181,14 +201,14 @@ cdef class Scalar:
 
         Examples
         --------
-        >>> import copy
+        >>> from copy import copy
         >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> scalars["acaf1"]
         Scalar(0.0157684, 1, 0.00136871)
-        >>> copied_scl = copy.copy(scalars["acaf1"])
+        >>> copied_scl = copy(scalars["acaf1"])
         >>> copied_scl
         Scalar(0.0157684, 1, 0.00136871)
         """

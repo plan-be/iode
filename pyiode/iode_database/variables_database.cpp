@@ -1,4 +1,4 @@
-#pragma one
+#pragma once
 #include "api/iode.h"
 #include "cpp_api/iode_cpp_api.h"
 #include <string>
@@ -83,35 +83,34 @@ void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVaria
     K_add(kdb, const_cast<char*>(name.c_str()), source_var_ptr, &nb_periods);
 }
 
-void _c_copy_var_content(const std::string& name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
-                         KDBVariables* source,const int source_t_first, const int source_t_last)
+void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
+                         const std::string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last)
 {
-    if(name.empty())
+    if(dest_name.empty())
        throw std::invalid_argument("Destination variable name is empty");
+
+    if(source_name.empty())
+       throw std::invalid_argument("Source variable name is empty");
 
     // sanity checks
     _c_sanity_checks(dest, dest_t_first, dest_t_last, source, source_t_first, source_t_last);
 
-    // check that the destinaton variable exists in the destination database
-    int dest_var_pos = dest->get_position(name);
-
-    // check that the source/destinaton variable exists in the source/destinaton database
-    // NOTE: this can happen if the destinaton or the destination is shallow copy of the global database 
+    // check that the destination variable exists in the destination database
+    // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
     // TODO: find a way to delete also the variable from the shallow copies
-
-    double* source_var_ptr = source->get_var_ptr(0);
-    if(source_var_ptr == NULL)
-    {
-        std::string source_name = source->get_name(0);
-        throw std::invalid_argument("Variable named '" + source_name + "' seems to no longer exist in the source database");
-    }
-    source_var_ptr += source_t_first;
-
-    double* dest_var_ptr = dest->get_var_ptr(name);
+    int dest_var_pos = dest->get_position(dest_name);
+    double* dest_var_ptr = dest->get_var_ptr(dest_name);
     if(dest_var_ptr == NULL)
-        throw std::invalid_argument("Variable named '" + name + "' seems to no longer exist in the destination database");
+        throw std::invalid_argument("Variable named '" + dest_name + "' seems to no longer exist in the destination database");
     dest_var_ptr += dest_t_first;
+
+    // check that the source variable exists in the source database
+    int source_var_pos = source->get_position(source_name);
+    double* source_var_ptr = source->get_var_ptr(source_var_pos);
+    if(source_var_ptr == NULL)
+        throw std::invalid_argument("Variable named '" + source_name + "' seems to no longer exist in the source database");
+    source_var_ptr += source_t_first;
 
     // copy the data
     int nb_periods = dest_t_last - dest_t_first + 1;

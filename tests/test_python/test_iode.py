@@ -24,6 +24,33 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir() 
 
+# Iode Databases
+# --------------
+
+def test_check_same_names():
+    comments.clear()
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+
+    update_cmt = {"ACAF": "updated ACAF", "AOUC": "updated AOUC"}
+    # works fine
+    comments["ACAF, AOUC"] = update_cmt
+
+    # missing comments in the right hand side
+    with pytest.raises(KeyError, match=r"Missing value for the comments: 'ACAG, AQC'"):
+        comments["ACAF, ACAG, AOUC, AQC"] = update_cmt
+
+    # too many items in the right hand side
+    update_cmt = {"ACAF": "updated ACAF", "ACAG": "updated ACAG", "AOUC": "updated AOUC", "AQC": "updated AQC"}
+    with pytest.raises(KeyError, match=r"Unexpected comments in the right-hand side: 'ACAF, AOUC'"):
+        comments["ACAG, AQC"] = update_cmt
+
+    update_cmt = ["updated ACAF", "updated ACAG", "updated AOUC", "updated AQC"]
+    with pytest.raises(ValueError, match=r"Cannot add/update values for comments for the selection key 'ACAF, ACAG, AOUC'.\n"
+                                         r"4 values has been passed while the selection key 'ACAF, ACAG, AOUC' "
+                                         r"represents 3 comments."):
+        comments["ACAF, ACAG, AOUC"] = update_cmt
+
+
 # Equations
 # ---------
 

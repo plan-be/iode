@@ -121,8 +121,8 @@ cdef extern from "cpp_api/compute/simulation.h":
 cdef extern from "pyiode/iode_database/variables_database.cpp":
     void _c_add_var_from_other(const string& name, KDBVariables* dest, KDBVariables* source, 
                                const int source_t_first, const int source_t_last) except +
-    void _c_copy_var_content(const string& name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
-                             KDBVariables* source, const int source_t_first, const int source_t_last) except +
+    void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
+                             const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
 
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    

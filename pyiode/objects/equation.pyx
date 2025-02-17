@@ -1,11 +1,14 @@
 # distutils: language = c++
 
+from copy import copy
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional
 
 from libcpp.map cimport map
 from libcpp.string cimport string
 from cython.operator cimport dereference
+from libc.string cimport memset
+
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport EQ
 from pyiode.objects.equation cimport CEquation
@@ -404,6 +407,10 @@ cdef class Equation:
             self.c_database.update(<string>(self.endogenous.encode("utf-8")), 
                                    dereference(self.c_equation))
 
+    cdef void reset_date_and_tests(self):
+        self.c_equation.date = 0L
+        memset(&self.c_equation.tests, 0, EQS_NBTESTS * sizeof(float))
+
     # Attributes access
 
     @property
@@ -444,6 +451,7 @@ cdef class Equation:
     def lec(self, value: str):
         value = value.strip()
         self.c_equation.set_lec(value.encode())
+        self.reset_date_and_tests()
         self.update_global_database()
 
     @property
@@ -488,6 +496,7 @@ cdef class Equation:
                 value = EqMethod[value]
         value = int(value)
         self.c_equation.set_method(<IodeEquationMethod>(value))
+        self.reset_date_and_tests()
         self.update_global_database()
 
     @property
@@ -548,6 +557,7 @@ cdef class Equation:
         from_period, to_period = value.split(':')
 
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
+        self.reset_date_and_tests()
         self.update_global_database()
 
     @property
@@ -579,6 +589,7 @@ cdef class Equation:
         if not isinstance(value, str):
             value = ';'.join(value)
         self.c_equation.set_instruments(value.encode())
+        self.reset_date_and_tests()
         self.update_global_database()
 
     @property
@@ -590,6 +601,7 @@ cdef class Equation:
         if not isinstance(value, str):
             value = ';'.join(value)
         self.c_equation.set_block(value.encode())
+        self.reset_date_and_tests()
         self.update_global_database()
 
     @property
@@ -711,18 +723,12 @@ cdef class Equation:
         return self.endogenous, self.lec, self.method, str(self.sample), self.comment, self.instruments, \
                self.block, *tests, self.date
 
-    # Special methods
-
-    def __eq__(self, other: Equation) -> bool:
-        return self.c_equation == other.c_equation
-
-    def __copy__(self) -> Equation:
+    def copy(self) -> Equation:
         r"""
         Return a copy of the current Equation.
 
         Examples
         --------
-        >>> import copy
         >>> from iode import SAMPLE_DATA_DIR, equations, variables
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
@@ -749,7 +755,68 @@ cdef class Equation:
                          stderrp = 23.5458,
                          stdev = 0.0042699},
                 date = '12-06-1998')
-        >>> copied_eq = copy.copy(equations["ACAF"])
+        >>> copied_eq = equations["ACAF"].copy()
+        >>> copied_eq                   # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                         dw = 2.32935,
+                         fstat = 32.2732,
+                         loglik = 83.8075,
+                         meany = 0.00818467,
+                         r2 = 0.821761,
+                         r2adj = 0.796299,
+                         ssres = 5.19945e-05,
+                         stderr = 0.00192715,
+                         stderrp = 23.5458,
+                         stdev = 0.0042699},
+                date = '12-06-1998')
+        """
+        return copy(self)
+
+    # Special methods
+
+    def __eq__(self, other: Equation) -> bool:
+        return self.c_equation == other.c_equation
+
+    def __copy__(self) -> Equation:
+        r"""
+        Return a copy of the current Equation.
+
+        Examples
+        --------
+        >>> from copy import copy
+        >>> from iode import SAMPLE_DATA_DIR, equations, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                         dw = 2.32935,
+                         fstat = 32.2732,
+                         loglik = 83.8075,
+                         meany = 0.00818467,
+                         r2 = 0.821761,
+                         r2adj = 0.796299,
+                         ssres = 5.19945e-05,
+                         stderr = 0.00192715,
+                         stderrp = 23.5458,
+                         stdev = 0.0042699},
+                date = '12-06-1998')
+        >>> copied_eq = copy(equations["ACAF"])
         >>> copied_eq                   # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',

@@ -426,7 +426,8 @@ EQUATION
    Equation.instruments
    Equation.tests
    Equation.coefficients
-   Equation.variables      
+   Equation.variables 
+   Equation.copy     
 
    Equation.get_formated_date  
    Equation.split_equation
@@ -442,7 +443,8 @@ IDENTITY
    Identity
 
    Identity.coefficients
-   Identity.variables  
+   Identity.variables
+   Identity.copy 
 
 ====
 LIST
@@ -464,6 +466,7 @@ SCALAR
    Scalar.value
    Scalar.relax
    Scalar.std
+   Scalar.copy
 
 =====
 TABLE
@@ -491,6 +494,7 @@ TABLE
    Table.coefficients
    Table.variables
    Table.compute
+   Table.copy
    Table.index
    Table.insert
    Table.__len__
