@@ -26,7 +26,7 @@ EquationInput = Union[str, Dict[str, Any], Equation]
 
 
 @cython.final
-cdef class Equations(_AbstractDatabase):
+cdef class Equations(IodeDatabase):
     r"""
     IODE Equations database. 
 
@@ -192,19 +192,7 @@ cdef class Equations(_AbstractDatabase):
                 method = 'LSQ',
                 from_period = '1980Y1',
                 to_period = '1996Y1',
-                block = 'ACAF',
-                tests = {corr = 1,
-                        dw = 2.32935,
-                        fstat = 32.2732,
-                        loglik = 83.8075,
-                        meany = 0.00818467,
-                        r2 = 0.821761,
-                        r2adj = 0.796299,
-                        ssres = 5.19945e-05,
-                        stderr = 0.00192715,
-                        stderrp = 23.5458,
-                        stdev = 0.0042699},
-                date = '12-06-1998')
+                block = 'ACAF')
         >>> # update last equation
         >>> equations.i[-1] = "ZZF_ := ZZF_[-1] + 1"
         >>> equations.i[-1]             # doctest: +NORMALIZE_WHITESPACE
@@ -235,6 +223,13 @@ cdef class Equations(_AbstractDatabase):
 
         # update existing equation
         if isinstance(key, int) or self.database_ptr.contains(key.encode()):
+            endogenous = key
+
+        if pd is not None and isinstance(value, pd.Series):
+            value = value.to_dict()
+
+        # update existing equation
+        if isinstance(key, int) or self.database_ptr.contains(key.encode()):
             if isinstance(value, str):
                 equation = self._get_object(key)
                 equation.lec = value
@@ -255,18 +250,19 @@ cdef class Equations(_AbstractDatabase):
                 if 'block' in value:
                     equation.block = value.pop('block')
                 if 'tests' in value:
-                    warnings.warn(f"Update equation '{key}': 'tests' cannot be updated manually. Skipped new values.")
+                    warnings.warn(f"Cannot update equation '{key}': 'tests' cannot be updated manually. Skipped new values.")
                     del value['tests']
                 if 'date' in value:
-                    warnings.warn(f"Update equation '{key}': 'date' cannot be updated manually. Skipped new value.")
+                    warnings.warn(f"Cannot update equation '{key}': 'date' cannot be updated manually. Skipped new value.")
                     del value['date']
                 if len(value):
-                    raise ValueError(f"Update equation '{key}': only 'lec', 'method', 'sample', 'comment', "
+                    raise ValueError(f"Cannot update equation '{key}': only 'lec', 'method', 'sample', 'comment', "
                                      f"'instruments' and 'block' keys are accepted. "
                                      f"Got unknown key(s): {';'.join(value.keys())}")
             else:
-                raise TypeError(f"Update equation '{key}': Expected input to be of type str or dict or Equation. "
+                raise TypeError(f"Cannot update equation '{key}': Expected input to be of type str or dict or Equation. "
                                 f"Got value of type {type(value).__name__}")
+
             c_equation = (<Equation>equation).c_equation
             if isinstance(key, int):
                 self.database_ptr.update(<int>key, dereference(c_equation))
@@ -277,9 +273,6 @@ cdef class Equations(_AbstractDatabase):
             if isinstance(value, str):
                 equation = Equation(endogenous=key, lec=value.strip())
             elif isinstance(value, Equation):
-                if value.endogenous != key:
-                    raise ValueError(f"Name of the endogenous variable '{value.endogenous}' must be the same as "
-                                     f"the name of the inserted equation '{key}' in the Equations database")
                 equation = value
             elif isinstance(value, (tuple, list)):
                 value = [key] + list(value)
@@ -288,8 +281,9 @@ cdef class Equations(_AbstractDatabase):
                 value['endogenous'] = key
                 equation = Equation(**value)
             else:
-                raise TypeError(f"New equation '{key}': Expected input to be of type str or tuple or list or "
+                raise TypeError(f"Cannot add equation '{key}': Expected input to be of type str or tuple or list or "
                                 f"dict or Equation. Got value of type {type(value).__name__}")
+            
             c_equation = (<Equation>equation).c_equation
             self.database_ptr.add(key.encode(), dereference(c_equation))
 
@@ -398,11 +392,12 @@ cdef class Equations(_AbstractDatabase):
             (the list of) name(s) of the equation(s) to update/add.
             The list of equations to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: str or Equation or dict(str, ...) or list of any of those
+        value: str or Equation or dict(str, ...) or pandas.DataFrame or Equations
             If str, then it is interpreted as the LEC of the equation.
-            If dictionary, then it is interpreted as the values of the attributes of the equation to update or add. 
             The key 'endogenous' is added automatically and does not need to be specified.
-            If Equation, then it is used to update an existing equation or to create a new equation if it does not exist yet.
+            If pandas DataFrame, then only the columns 'endogenous', 'lec', 'method', 'sample', 'block', 
+            'instruments' and 'comment' are used. The columns 'endogenous' and 'lec' are mandatory.
+            The tests values as well the (estimation) date of equations are set/updated when performing the estimation.
         
         See Also
         --------
@@ -410,8 +405,9 @@ cdef class Equations(_AbstractDatabase):
 
         Examples
         --------
+        >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import equations, EqMethod
+        >>> from iode import equations, Equation, EqMethod
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -453,19 +449,7 @@ cdef class Equations(_AbstractDatabase):
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
-                 block = 'ACAF',
-                 tests = {corr = 1,
-                          dw = 2.32935,
-                          fstat = 32.2732,
-                          loglik = 83.8075,
-                          meany = 0.00818467,
-                          r2 = 0.821761,
-                          r2adj = 0.796299,
-                          ssres = 5.19945e-05,
-                          stderr = 0.00192715,
-                          stderrp = 23.5458,
-                          stdev = 0.0042699},
-                 date = '12-06-1998')
+                 block = 'ACAF')
         >>> # update block and sample of a block of equations to estimation (dictionary)
         >>> estim_sample = "2000Y1:2010Y1"
         >>> block = "ACAF; ACAG; AOUC"
@@ -487,21 +471,65 @@ cdef class Equations(_AbstractDatabase):
                  method = 'MAX_LIKELIHOOD',
                  from_period = '1990Y1',
                  to_period = '2015Y1',
-                 block = 'ACAF',
-                 tests = {corr = 1,
-                          dw = 2.32935,
-                          fstat = 32.2732,
-                          loglik = 83.8075,
-                          meany = 0.00818467,
-                          r2 = 0.821761,
-                          r2adj = 0.796299,
-                          ssres = 5.19945e-05,
-                          stderr = 0.00192715,
-                          stderrp = 23.5458,
-                          stdev = 0.0042699},
-                 date = '12-06-1998')
+                 block = 'ACAF')
 
-        >>> # c) working on a subset
+        >>> # c) add/update several equations at once        
+        >>> # 1) using a dict of values
+        >>> eq_ACAF = Equation("ACAF", "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)", 
+        ...                    method=EqMethod.ZELLNER, from_period='1980Y1', to_period='1996Y1')
+        >>> eq_ACAG = Equation("ACAG", "ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))", 
+        ...                    method=EqMethod.ZELLNER, from_period='1980Y1', to_period='1996Y1')
+        >>> eq_AOUC = Equation("AOUC", "AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]", 
+        ...                    method=EqMethod.ZELLNER, from_period='1980Y1', to_period='1996Y1')
+        >>> values = {"ACAF": eq_ACAF, "ACAG": eq_ACAG, "AOUC": eq_AOUC}
+        >>> equations["ACAF, ACAG, AOUC"] = values
+        >>> equations["ACAF, ACAG, AOUC"]              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Equations
+        nb equations: 3
+        filename: ...fun.eqs
+        <BLANKLINE>
+        name	                                     lec                                      	 method	   sample   	...
+        ACAF	(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                        ZELLNER	1980Y1:1996Y1	...	    
+        ACAG	ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))      ZELLNER	1980Y1:1996Y1	...    
+        AOUC	AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]  ZELLNER	1980Y1:1996Y1	...	
+        <BLANKLINE>
+
+        >>> # 2) using a pandas DataFrame
+        >>> data = []
+        >>> data.append(["ACAF", "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)", "GLS", '1980Y1:1996Y1'])
+        >>> data.append(["ACAG", "ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))", "GLS", '1980Y1:1996Y1'])
+        >>> data.append(["AOUC", "AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]", "GLS", '1980Y1:1996Y1'])
+        >>> df = pd.DataFrame(data, index=["ACAF", "ACAG", "AOUC"], columns=["endogenous", "lec", "method", "sample"])
+        >>> equations["ACAF, ACAG, AOUC"] = df
+        >>> equations["ACAF, ACAG, AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Equations
+        nb equations: 3
+        filename: ...fun.eqs
+        <BLANKLINE>
+        name	                                     lec                                      	method	    sample    ...
+        ACAF	(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                      	   GLS	1980Y1:1996Y1 ...
+        ACAG	ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))    	   GLS	1980Y1:1996Y1 ...
+        AOUC	AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]	   GLS	1980Y1:1996Y1 ...
+        <BLANKLINE>
+        
+        >>> # 3) using another Equations database (subset)
+        >>> equations_subset = equations["ACAF, ACAG, AOUC"].copy()
+        >>> equations_subset["ACAF"].method = EqMethod.MAX_LIKELIHOOD
+        >>> equations_subset["ACAG"].method = EqMethod.MAX_LIKELIHOOD
+        >>> equations_subset["AOUC"].method = EqMethod.MAX_LIKELIHOOD
+        >>> equations["ACAF, ACAG, AOUC"] = equations_subset
+        >>> equations["ACAF, ACAG, AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Equations
+        nb equations: 3
+        filename: ...fun.eqs
+        <BLANKLINE>
+        name	                                     lec                                      	    method    	    sample    ...
+        ACAF	(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                      	MAX_LIKELIHOOD	1980Y1:1996Y1 ...
+        ACAG	ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))    	MAX_LIKELIHOOD	1980Y1:1996Y1 ...
+        AOUC	AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]	MAX_LIKELIHOOD	1980Y1:1996Y1 ...
+        <BLANKLINE>
+
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> equations_subset = equations["A*"]
         >>> equations_subset.names
@@ -537,7 +565,7 @@ cdef class Equations(_AbstractDatabase):
                  lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
                  method = 'LSQ',
                  from_period = '1960Y1',
-                 to_period = '2015Y1')  
+                 to_period = '2015Y1') 
         """
         super().__setitem__(key, value)
 
@@ -883,7 +911,8 @@ cdef class Equations(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, s.index.tolist())
 
         for index, value in s.items():
             self._set_object(index, value)
@@ -1010,7 +1039,8 @@ cdef class Equations(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_frame' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, df.index.to_list())
 
         if 'lec' not in df.columns:
             raise ValueError("Expected at least one column with name 'lec'. "

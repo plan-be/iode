@@ -19,7 +19,7 @@ from iode.util import check_filepath
 
 
 @cython.final
-cdef class Comments(_AbstractDatabase):
+cdef class Comments(IodeDatabase):
     r"""
     IODE Comments database. 
 
@@ -244,11 +244,12 @@ cdef class Comments(_AbstractDatabase):
             (the list of) name(s) of the comment(s) to update/add.
             The list of comments to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: str or list(str)
-            (new) comment value(s).
+        value: str or dict(str, str) or pandas.Series(str, str) or Comments
+            (new) comment(s) value(s).
 
         Examples
         --------
+        >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -267,7 +268,52 @@ cdef class Comments(_AbstractDatabase):
         >>> comments["ACAF"]
         'New Value'
 
-        >>> # c) working on a subset
+        >>> # c) add/update several comments at once
+        >>> # 1) using a dict of values
+        >>> values = {"AOUC": "Updated AOUC from dict", "ACAF": "Updated ACAF from dict", 
+        ...           "ACAG": "Updated ACAG from dict"}
+        >>> comments["ACAF, ACAG, AOUC"] = values
+        >>> comments["ACAF, ACAG, AOUC"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Comments
+        nb comments: 3
+        filename: ...fun.cmt
+        <BLANKLINE>
+        name	       comments       
+        ACAF	Updated ACAF from dict
+        ACAG	Updated ACAG from dict
+        AOUC	Updated AOUC from dict
+
+        >>> # 2) using a pandas series
+        >>> data = ["Updated AOUC from series", "Updated ACAF from series", "Updated ACAG from series"]
+        >>> series = pd.Series(data, index=["AOUC", "ACAF", "ACAG"])
+        >>> comments["ACAF, ACAG, AOUC"] = series
+        >>> comments["ACAF, ACAG, AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Comments
+        nb comments: 3
+        filename: ...fun.cmt
+        <BLANKLINE>
+        name	        comments        
+        ACAF	Updated ACAF from series
+        ACAG	Updated ACAG from series
+        AOUC	Updated AOUC from series
+
+        >>> # 3) using an iode Comments object (subset)
+        >>> comments_subset = comments["ACAF, ACAG, AOUC"].copy()
+        >>> comments_subset["ACAF"] = "Updated ACAF from another iode Comments database"
+        >>> comments_subset["ACAG"] = "Updated ACAG from another iode Comments database"
+        >>> comments_subset["AOUC"] = "Updated AOUC from another iode Comments database"
+        >>> comments["ACAF, ACAG, AOUC"] = comments_subset
+        >>> comments["ACAF, ACAG, AOUC"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Comments
+        nb comments: 3
+        filename: ...fun.cmt
+        <BLANKLINE>
+        name	                    comments                    
+        ACAF	Updated ACAF from another iode Comments database
+        ACAG	Updated ACAG from another iode Comments database
+        AOUC	Updated AOUC from another iode Comments database
+
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> comments_subset = comments["A*"]
         >>> comments_subset.names
@@ -447,7 +493,8 @@ cdef class Comments(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, s.index.tolist())
 
         for index, value in s.items():
             self._set_object(index, value)

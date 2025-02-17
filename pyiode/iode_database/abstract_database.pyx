@@ -11,6 +11,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
+from pandas.core.indexes.multi import MultiIndex
 from iode.common import IODE_FILE_TYPES
 from iode.util import join_lines, table2str, JUSTIFY, check_filepath, split_list
 
@@ -57,13 +58,13 @@ class PositionalIndexer:
 
 
 # Define the Python wrapper class for KDBAbstract
-cdef class _AbstractDatabase:
+cdef class IodeDatabase:
     cdef CKDBAbstract* abstract_db_ptr 
 
     # Constructor
     def __cinit__(self):
         # pointer *abstract_db_ptr is set in subclasses
-        if isinstance(self.__class__, _AbstractDatabase):
+        if isinstance(self.__class__, IodeDatabase):
             raise RuntimeError("Cannot instantiate an abstract class")
 
     # Destructor
@@ -791,7 +792,7 @@ cdef class _AbstractDatabase:
         if not isinstance(overwrite, bool):
             raise TypeError(f"'overwrite': Expected value of type boolean. Got value of type {type(overwrite).__name__}")
         
-        cdef CKDBAbstract* other_db_ptr = (<_AbstractDatabase>other).abstract_db_ptr
+        cdef CKDBAbstract* other_db_ptr = (<IodeDatabase>other).abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
     def _copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]) -> Tuple[str, str]:
@@ -1273,6 +1274,18 @@ cdef class _AbstractDatabase:
     def _set_object(self, key, value):
         raise NotImplementedError()
 
+    def _check_same_names(self, left_names, right_names):
+        left_names = set(left_names)
+        right_names = set(right_names)
+        missing_names = left_names - right_names
+        if len(missing_names):
+            missing_names = sorted(list(missing_names))
+            raise KeyError(f"Missing value for the {self.iode_type.name.lower()}: '{', '.join(missing_names)}'")
+        extra_names = right_names - left_names
+        if len(extra_names):
+            extra_names = sorted(list(extra_names))
+            raise KeyError(f"Unexpected {self.iode_type.name.lower()} in the right-hand side: '{', '.join(extra_names)}'")
+
     # needs to be overriden for Variables
     def __setitem__(self, key, value):
         names = self._unfold_key(key)
@@ -1281,15 +1294,50 @@ cdef class _AbstractDatabase:
             self._set_object(names[0], value)
         # update/add several IODE objects
         else:
-            # if value is a string or a numerical value -> set the same value for all objects 
-            values = [value] * len(names) if isinstance(value, str) or not isinstance(value, Iterable) else value
-            # check list of values has the same length as list of names
-            if len(names) != len(values):
-                raise ValueError(f"Cannot add/update values for {type(self).__name__} objects for the selection key '{key}'.\n"
-                                f"{len(values)} values has been passed while the selection key '{key}' "
-                                f"represents {len(names)} objects.")
-            for name, value in zip(names, values):
-                self._set_object(name, value) 
+            # if value is a string or a numerical value -> set the same value for all objects
+            if isinstance(value, str) or not isinstance(value, Iterable):
+                for name in names:
+                    self._set_object(name, value)
+            # if value is a list, a tuple or a numpy array
+            elif isinstance(value, (list, tuple, np.ndarray)):
+                values = value
+                # check list of values has the same length as list of names
+                if len(names) != len(values):
+                    iode_type_name = self.iode_type.name.lower()
+                    raise ValueError(f"Cannot add/update values for {iode_type_name} for the selection key '{key}'.\n"
+                                    f"{len(values)} values has been passed while the selection key '{key}' "
+                                    f"represents {len(names)} {iode_type_name}.")
+                for name, value in zip(names, values):
+                    self._set_object(name, value)
+            # if value is a dict
+            elif isinstance(value, dict):
+                # check that all names in the selection key are present in the dict
+                self._check_same_names(names, value.keys())
+                for name, value in value.items():
+                    self._set_object(name, value)
+            # if value is a pandas Series
+            elif isinstance(value, pd.Series):
+                if isinstance(value.index, MultiIndex):
+                    raise ValueError(f"Expected pandas Series with a single-level index.\n")
+                # NOTE: _check_same_names() called in from_series()
+                self[names].from_series(value)
+            # if value is a pandas DataFrame
+            elif isinstance(value, pd.DataFrame):
+                if isinstance(value.index, MultiIndex):
+                    raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
+                # NOTE: _check_same_names() called in from_frame()
+                self[names].from_frame(value)
+            # if value is an IodeDatabase object
+            elif isinstance(value, IodeDatabase):
+                # check that all names in the selection key are present in the IodeDatabase object
+                self._check_same_names(names, value.names)
+                # TODO: use the C/C++ API to copy all objects faster
+                for name in names:
+                    self._set_object(name, value[name])
+            else:
+                raise TypeError(f"Invalid type for the right hand side value when trying to set {self.iode_type.name.lower()}.\n"
+                                f"Expected value of type str, scalar, list, numpy (nd)array, dict, pandas.Series/DataFrame "
+                                f"or {self.__class__.__name__}.\nGot value of type {type(value).__name__} instead.")
 
     # needs to be overriden for Variables
     def __delitem__(self, key):

@@ -10,7 +10,7 @@ from .common import IODE_FILE_TYPES
 
 # import constants, functions and classes hidden from users but maybe useful for developers
 # (for the GUI for example)
-from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, TableLine, TableCell, 
+from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, IodeDatabase, TableLine, TableCell, 
                               ComputedTable, EditAndEstimateEquations, CorrelationMatrix, 
                               register_super_function, set_printer_preferences, set_A2M_preferences, 
                               set_MIF_preferences, set_RTF_preferences, set_HTML_preferences)

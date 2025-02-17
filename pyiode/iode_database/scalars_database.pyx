@@ -18,7 +18,7 @@ ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, floa
 
 
 @cython.final
-cdef class Scalars(_AbstractDatabase):
+cdef class Scalars(IodeDatabase):
     r"""
     IODE Scalars database. 
 
@@ -128,7 +128,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> # update first scalar
         >>> scalars.i[0] = 0.02
         >>> scalars.i[0]
-        Scalar(0.02, 1, 0.00136871)
+        Scalar(0.02, 1, na)
         >>> # update last scalar
         >>> scalars.i[-1] = -7.3, 0.5
         >>> scalars.i[-1]
@@ -154,8 +154,11 @@ cdef class Scalars(_AbstractDatabase):
         if isinstance(value, int):
             value = float(value) 
 
+        if pd is not None and isinstance(value, pd.Series):
+            value = value.to_dict()
+
+        # update a scalar
         if isinstance(key, int) or self.database_ptr.contains(key.encode()):
-            # update existing scalar
             if isinstance(value, float):
                 scalar = self._get_object(key)
                 scalar.value = value
@@ -163,39 +166,43 @@ cdef class Scalars(_AbstractDatabase):
                 scalar = value
             elif isinstance(value, (tuple, list)) and all(isinstance(elem, (int, float)) for elem in value):
                 if len(value) > 2:
-                    raise ValueError(f"Update scalar '{key}': Expected input to be a tuple or list of length 2. "
-                                     f"Got {type(value).__name__} of length {len(value)}")
-                scalar = Scalar(float(value[0]), float(value[1]))
+                    raise ValueError(f"Cannot update scalar '{key}': Expected input to be a tuple or list of length 2. "
+                                    f"Got {type(value).__name__} of length {len(value)}")
+                scalar = self._get_object(key)
+                scalar.value = float(value[0])
+                scalar.relax = float(value[1])
             elif isinstance(value, dict):
                 scalar = self._get_object(key)
                 scalar.value = value.pop('value', scalar.value)
                 scalar.relax = value.pop('relax', scalar.relax)
                 if len(value):
-                    raise ValueError(f"Update scalar '{key}': only 'value' and 'relax' keys are accepted. "
+                    raise ValueError(f"Cannot update scalar '{key}': only 'value' and 'relax' keys are accepted. "
                                      f"Got unknown key(s): {';'.join(value.keys())}")
             else:
-                raise TypeError(f"Update scalar '{key}': Expected input to be of type float or tuple(float, float) "
+                raise TypeError(f"Cannot update scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
+
             if isinstance(key, int):
                 self.database_ptr.update(<int>key, <double>scalar.value, <double>scalar.relax, <double>scalar.std)
             else:    
                 self.database_ptr.update(<string>(key.encode()), <double>scalar.value, <double>scalar.relax, <double>scalar.std)
+        # add a new scalar
         else:
-            # add a new scalar
             if isinstance(value, float):
                 scalar = Scalar(value)
             elif isinstance(value, Scalar):
                 scalar = value
             elif isinstance(value, (tuple, list)) and all(isinstance(elem, (int, float)) for elem in value):
                 if len(value) > 2:
-                    raise ValueError(f"New scalar '{key}': Expected input to be a tuple or list of length 2. "
-                                     f"Got {type(value).__name__} of length {len(value)}")
+                    raise ValueError(f"Cannot add scalar '{key}': Expected input to be a tuple or list of length 2. "
+                                    f"Got {type(value).__name__} of length {len(value)}")
                 scalar = Scalar(float(value[0]), float(value[1]))
             elif isinstance(value, dict):
                 scalar = Scalar(**value)
             else:
-                raise TypeError(f"New scalar '{key}': Expected input to be of type float or tuple(float, float) "
+                raise TypeError(f"Cannot add scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
+
             self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Scalar, Scalars]:
@@ -294,12 +301,13 @@ cdef class Scalars(_AbstractDatabase):
             (the list of) name(s) of the scalar(s) to update/add.
             The list of scalars to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: float or tuple(float, float) Scalar or dict(str, ...) or list of any of those
+        value: float or tuple(float, float) or Scalar or dict(str, ...) or pd.Series or pd.DataFrame or Scalars
             If float, then it is interpreted as the value of the scalar.
             If tuple of two float, then it is interpreted as the value and relax of the scalar.
-            If dictionary, then it is interpreted as the values of the attributes value and relax of the scalar to update or add.
             The standard deviation is computed during the estimation process and cannot be modified manually.
             If Scalar, then it is used to update an existing scalar or to create a new scalar if it does not exist yet.
+            If pandas Series, then it is interpreted as a list of couples (scalar name, scalar value).
+            If pandas DataFrame, then only the columns names 'value' and 'relax' are allowed.
 
         See Also
         --------
@@ -307,8 +315,9 @@ cdef class Scalars(_AbstractDatabase):
 
         Examples
         --------
+        >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import scalars
+        >>> from iode import scalars, Scalar
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
@@ -329,7 +338,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> # only update the value
         >>> scalars["acaf1"] = 0.8
         >>> scalars["acaf1"]
-        Scalar(0.8, 1, 0.00136871)
+        Scalar(0.8, 1, na)
         >>> # update value and relax (tuple)
         >>> scalars["acaf2"] = 0.8, 0.9
         >>> scalars["acaf2"]
@@ -341,7 +350,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> # update value and relax (dictionary)
         >>> scalars["acaf3"] = {"relax": 0.9, "value": 0.8}
         >>> scalars["acaf3"]
-        Scalar(0.8, 0.9, 0.87301)
+        Scalar(0.8, 0.9, na)
         >>> # update value and/or relax (Scalar object)
         >>> # NOTE: the standard deviation (std) cannot be changed manually
         >>> scalars["acaf4"]
@@ -349,9 +358,71 @@ cdef class Scalars(_AbstractDatabase):
         >>> scalars["acaf4"].value = 0.8
         >>> scalars["acaf4"].relax = 0.9
         >>> scalars["acaf4"]
-        Scalar(0.8, 0.9, 0.0020833)
+        Scalar(0.8, 0.9, na)
 
-        >>> # c) working on a subset
+        >>> # c) add/update multiple scalars at once
+        >>> # 1) using a dict of values
+        >>> values = {"acaf1": 0.016, "acaf2": (-8.e-04, 0.9), "acaf3": Scalar(2.5)}
+        >>> scalars["acaf1, acaf2, acaf3"] = values
+        >>> scalars["acaf1, acaf2, acaf3"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Scalars
+        nb scalars: 3
+        filename: ...fun.scl
+        <BLANKLINE>
+         name	 value 	relax   std  
+        acaf1	 0.0160	1.0000	 na
+        acaf2	-0.0008	0.9000	 na
+        acaf3	 2.5000	1.0000	 na
+        <BLANKLINE>
+
+        >>> # 2) using a pandas series (only scalar's values)
+        >>> data = [0.015, -9.e-04, 2.8]
+        >>> series = pd.Series(data, index=["acaf1", "acaf2", "acaf3"])
+        >>> scalars["acaf1, acaf2, acaf3"] = series
+        >>> scalars["acaf1, acaf2, acaf3"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Scalars
+        nb scalars: 3
+        filename: ...fun.scl
+        <BLANKLINE>
+         name	 value 	relax 	std  
+        acaf1	 0.0150	1.0000	 na
+        acaf2	-0.0009	0.9000	 na
+        acaf3	 2.8000	1.0000	 na
+        <BLANKLINE>
+
+        >>> # 3) using a pandas DataFrame (value + relax)
+        >>> data = [(0.014, 0.98), (-7.e-04, 0.95), (2.3, 0.92)]
+        >>> df = pd.DataFrame(data, index=["acaf1", "acaf2", "acaf3"], columns=["value", "relax"])
+        >>> scalars["acaf1, acaf2, acaf3"] = df
+        >>> scalars["acaf1, acaf2, acaf3"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Scalars
+        nb scalars: 3
+        filename: ...fun.scl
+        <BLANKLINE>
+         name	 value 	relax 	std  
+        acaf1	 0.0140	0.9800	 na
+        acaf2	-0.0007	0.9500	 na
+        acaf3	 2.3000	0.9200	 na
+        <BLANKLINE>
+
+        >>> # 4) using another Scalars database (subset)
+        >>> scalars_subset = scalars["acaf1, acaf2, acaf3"].copy()
+        >>> scalars_subset["acaf1"] = 0.02
+        >>> scalars_subset["acaf2"] = (-5.e-04, 0.94)
+        >>> scalars_subset["acaf3"] = Scalar(2.9)
+        >>> scalars["acaf1, acaf2, acaf3"] = scalars_subset
+        >>> scalars["acaf1, acaf2, acaf3"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Scalars
+        nb scalars: 3
+        filename: ...fun.scl
+        <BLANKLINE>
+         name	 value 	relax 	std  
+        acaf1    0.0200 0.9800   na
+        acaf2   -0.0005 0.9400   na
+        acaf3    2.9000 1.0000   na
+        <BLANKLINE>
+
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> scalars_subset = scalars["a*"]
         >>> scalars_subset.names
@@ -503,7 +574,8 @@ cdef class Scalars(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, s.index.tolist())
 
         for index, value in s.items():
             self._set_object(index, value)
@@ -589,7 +661,8 @@ cdef class Scalars(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_frame' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, df.index.to_list())
 
         if 'value' not in df.columns:
             raise ValueError("Expected at least one column with name 'value'. "
@@ -864,26 +937,32 @@ cdef class Scalars(_AbstractDatabase):
         True
 
         >>> # modify one scalar
-        >>> original_value = scalars["acaf1"].value
+        >>> saved_scalar = scalars["acaf1"].copy()
+        >>> scalars["acaf1"]
+        Scalar(0.0157684, 1, 0.00136871)
         >>> scalars["acaf1"] = 0.02
-        >>> original_hash == hash(scalars)
+        >>> scalars["acaf1"]
+        Scalar(0.02, 1, na)
+        >>> original_hash == hash(scalars)      # modified scalar
         False
-        >>> scalars["acaf1"].value = original_value  # revert the change
+        >>> scalars["acaf1"] = saved_scalar     # revert the change
+        >>> scalars["acaf1"] 
+        Scalar(0.0157684, 1, 0.00136871)
         >>> original_hash == hash(scalars)
         True
 
         >>> # delete a scalar
-        >>> original_scalar = scalars["acaf1"]
+        >>> saved_scalar = scalars["acaf1"]
         >>> del scalars["acaf1"]
-        >>> original_hash == hash(scalars)
+        >>> original_hash == hash(scalars)      # deleted scalar
         False
-        >>> scalars["acaf1"] = original_scalar
+        >>> scalars["acaf1"] = saved_scalar
         >>> original_hash == hash(scalars)
         True
 
         >>> # add a scalar
         >>> scalars["new_scalar"] = (0.9, 1.0)
-        >>> original_hash == hash(scalars)
+        >>> original_hash == hash(scalars)      # added scalar
         False
         >>> del scalars["new_scalar"]
         >>> original_hash == hash(scalars)

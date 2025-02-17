@@ -12,6 +12,7 @@ from pyiode.iode_database.cpp_api_database cimport KDB
 
 cdef extern from "api/iode.h":
     ctypedef char ONAME[21]
+    int EQS_NBTESTS
 
     cdef struct LNAME:
         ONAME name

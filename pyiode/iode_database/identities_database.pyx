@@ -17,7 +17,7 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 
 @cython.final
-cdef class Identities(_AbstractDatabase):
+cdef class Identities(IodeDatabase):
     r"""
     IODE Identities database. 
 
@@ -249,11 +249,12 @@ cdef class Identities(_AbstractDatabase):
             (the list of) name(s) of the identity(ies) to update/add.
             The list of identities to update/add can be specified by a pattern or by a list of sub-patterns 
             (e.g. "A*;*_").
-        value: str, Identity, list(str) or list(Identity)
-            (new) identity value(s).
+        value: str, Identity, dict(str, str or Identity) or pd.Series(str) or Identities
+            (new) identity(ies) value(s).
 
         Examples
         --------
+        >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -272,7 +273,52 @@ cdef class Identities(_AbstractDatabase):
         >>> identities["AOUC"]
         Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]')
 
-        >>> # c) working on a subset
+        >>> # c) add/update several identities at once
+        >>> # 1) using a dict of values
+        >>> values = {"GAP2": "0.9 * 100*(QAFF_/(Q_F+Q_I))", "GAP_": "0.9 * 100*((QAF_/Q_F)-1)", 
+        ...           "GOSFR": "0.9 * (GOSF/VAF_)"}
+        >>> identities["GAP2, GAP_, GOSFR"] = values
+        >>> identities["GAP2, GAP_, GOSFR"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE               
+        Workspace: Identities
+        nb identities: 3
+        filename: ...fun.idt
+        <BLANKLINE>
+        name	         identities        
+        GAP2 	0.9 * 100*(QAFF_/(Q_F+Q_I))
+        GAP_ 	0.9 * 100*((QAF_/Q_F)-1)   
+        GOSFR	0.9 * (GOSF/VAF_)   
+
+        >>> # 2) using a pandas series
+        >>> data = ["0.8 * 100*(QAFF_/(Q_F+Q_I))", "0.8 * 100*((QAF_/Q_F)-1)", "0.8 * (GOSF/VAF_)"]
+        >>> series = pd.Series(data, index=["GAP2", "GAP_", "GOSFR"])
+        >>> identities["GAP2, GAP_, GOSFR"] = series
+        >>> identities["GAP2, GAP_, GOSFR"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Identities
+        nb identities: 3
+        filename: ...fun.idt
+        <BLANKLINE>
+        name	         identities        
+        GAP2 	0.8 * 100*(QAFF_/(Q_F+Q_I))
+        GAP_ 	0.8 * 100*((QAF_/Q_F)-1)   
+        GOSFR	0.8 * (GOSF/VAF_) 
+
+        >>> # 3) using another Identities database (subset)
+        >>> identities_subset = identities["GAP2, GAP_, GOSFR"].copy()
+        >>> identities_subset["GAP2"] = "0.7 * 100*(QAFF_/(Q_F+Q_I))"
+        >>> identities_subset["GAP_"] = "0.7 * 100*((QAF_/Q_F)-1)"
+        >>> identities_subset["GOSFR"] = "0.7 * (GOSF/VAF_)"
+        >>> identities["GAP2, GAP_, GOSFR"] = identities_subset
+        >>> identities["GAP2, GAP_, GOSFR"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Identities
+        nb identities: 3
+        filename: ...fun.idt
+        <BLANKLINE>
+        name	         identities        
+        GAP2 	0.7 * 100*(QAFF_/(Q_F+Q_I))
+        GAP_ 	0.7 * 100*((QAF_/Q_F)-1)   
+        GOSFR	0.7 * (GOSF/VAF_) 
+
+        >>> # d) working on a subset
         >>> # 1) get subset
         >>> identities_subset = identities["X*"]
         >>> identities_subset.names
@@ -667,7 +713,8 @@ cdef class Identities(_AbstractDatabase):
             raise RuntimeError("pandas library not found")
 
         if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'from_series' method on a subset of a workspace")
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, s.index.tolist())
 
         for index, value in s.items():
             self._set_object(index, value)

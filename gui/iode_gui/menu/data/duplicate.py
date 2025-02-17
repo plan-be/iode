@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from iode_gui.settings import MixinSettingsDialog
 from .ui_duplicate import Ui_MenuDataDuplicateObj
 
-import copy
+from copy import copy
 from iode import (IodeType, comments, equations, identities, 
                   lists, scalars, tables, variables)
 
@@ -46,15 +46,15 @@ class MenuDataDuplicateObj(MixinSettingsDialog):
             elif iode_type == IodeType.EQUATIONS:
                 raise RuntimeError("Cannot duplicate an equation")
             elif iode_type == IodeType.IDENTITIES:
-                identities[dup_obj_name] = copy.copy(identities[obj_name])
+                identities[dup_obj_name] = copy(identities[obj_name])
             elif iode_type == IodeType.LISTS:
-                lists[dup_obj_name] = copy.copy(lists[obj_name])
+                lists[dup_obj_name] = copy(lists[obj_name])
             elif iode_type == IodeType.SCALARS:
-                scalars[dup_obj_name] = copy.copy(scalars[obj_name])
+                scalars[dup_obj_name] = copy(scalars[obj_name])
             elif iode_type == IodeType.TABLES:
-                tables[dup_obj_name] = copy.copy(tables[obj_name])
+                tables[dup_obj_name] = copy(tables[obj_name])
             elif iode_type == IodeType.VARIABLES:
-                variables[dup_obj_name] = copy.copy(variables[obj_name])
+                variables[dup_obj_name] = copy(variables[obj_name])
 
             self.accept()
         except Exception as e:

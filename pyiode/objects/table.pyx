@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 import warnings
+from copy import copy
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional
 
@@ -2102,6 +2103,60 @@ cdef class Table:
             load_extra_files(extra_files)
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
+    def copy(self) -> Table:
+        r"""
+        Return a copy of the current Table.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  |                                    |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> copied_tbl = tables["C8_1"].copy()
+        >>> copied_tbl              # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  | ""                                 |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        """
+        return copy(self)
+
+    # --- special methods ---
+
     def __len__(self) -> int:
         """
         Number of lines of the table.
@@ -2546,7 +2601,7 @@ cdef class Table:
 
         Examples
         --------
-        >>> import copy
+        >>> from copy import copy
         >>> from iode import SAMPLE_DATA_DIR, tables
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
@@ -2570,7 +2625,7 @@ cdef class Table:
         graph_axis: 'VALUES'
         graph_alignment: 'LEFT'
         <BLANKLINE>
-        >>> copied_tbl = copy.copy(tables["C8_1"])
+        >>> copied_tbl = copy(tables["C8_1"])
         >>> copied_tbl              # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
