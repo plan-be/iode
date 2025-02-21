@@ -5,9 +5,12 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 if sys.version_info.minor >= 11:
+    from enum import IntEnum, StrEnum
     from typing import Self
 else:
     Self = Any
+    from enum import Enum, IntEnum
+    StrEnum = Enum
 
 cimport cython
 from cython.operator cimport dereference
@@ -20,6 +23,9 @@ from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
+from pyiode.iode_database.cpp_api_database cimport BinaryOperation as CBinaryOperation
+from pyiode.iode_database.cpp_api_database cimport _c_operation_scalar, _c_operation_one_var, _c_operation_one_period
+from pyiode.iode_database.cpp_api_database cimport _c_operation_between_two_vars
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
@@ -27,7 +33,7 @@ from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR, KVVAL
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
@@ -37,6 +43,39 @@ from iode.util import check_filepath, split_list
 KeyName = Union[str, List[str]]
 KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
+
+class BinaryOperation(IntEnum):
+    OP_ADD = CBinaryOperation.OP_ADD
+    OP_SUB = CBinaryOperation.OP_SUB
+    OP_MUL = CBinaryOperation.OP_MUL
+    OP_DIV = CBinaryOperation.OP_DIV
+    OP_POW = CBinaryOperation.OP_POW
+
+
+def _check_same_periods(left_periods: List[str], right_periods: List[str], check_contiguous: bool=True, 
+    right_hand_side_obj_type:str = None):
+    left_periods_set = set(left_periods)
+    right_periods_set = set(right_periods)
+    missing_periods = left_periods_set - right_periods_set
+    if len(missing_periods):
+        missing_periods = sorted(list(missing_periods))
+        raise KeyError(f"Missing value for the periods: '{', '.join(missing_periods)}'")
+    extra_periods = right_periods_set - left_periods_set
+    if len(extra_periods):
+        extra_periods = sorted(list(extra_periods))
+        raise KeyError(f"Unexpected periods in the right-hand side: '{', '.join(extra_periods)}'")
+    if check_contiguous:
+        # check if left-hand side 'periods' represents contiguous periods
+        if len(left_periods) > 1:
+            sample = Sample(left_periods[0], left_periods[-1])
+            if left_periods != sample.periods:
+                raise ValueError(f"Expected contiguous periods in the left-hand side.")
+        # check if right-hand side 'periods' represents contiguous periods
+        if len(right_periods) > 1:
+            sample = Sample(right_periods[0], right_periods[-1])
+            if right_periods != sample.periods:
+                suffix = f" {right_hand_side_obj_type} object" if right_hand_side_obj_type else ""
+                raise ValueError(f"Expected contiguous periods in the right-hand side{suffix}.")
 
 
 class VarPositionalIndexer:
@@ -727,6 +766,25 @@ cdef class Variables(IodeDatabase):
                                          last_period=last_period)
                 return db_subset
 
+    def _expand_key_periods(self, key_periods: Union[str, Period, List[str], Tuple[str, str], Sample]) -> List[str]:
+        if key_periods is None:
+            return self.periods
+        
+        if isinstance(key_periods, (str, Period)):
+            key_periods = [key_periods]
+        
+        if isinstance(key_periods, list):
+            key_periods = [str(p) for p in key_periods]
+        elif isinstance(key_periods, tuple):
+            key_periods = Sample(key_periods[0], key_periods[1]).periods 
+        elif isinstance(key_periods, Sample):
+            key_periods = key_periods.periods
+        else:
+            raise TypeError(f"Expected periods to be of type str, Period, list, tuple or Sample.\n"
+                            f"Got periods of type {type(key_periods).__name__} instead")
+
+        return key_periods
+
     def _convert_values(self, values: Union[int, float, str, Iterable[Union[int, float]], \
         Dict[str, Any], np.ndarray, pd.Series, pd.DataFrame, Array, Variables]) \
         -> Union[str, float, List[float], Variables]:
@@ -747,16 +805,17 @@ cdef class Variables(IodeDatabase):
             return {name: self._convert_values(value) for name, value in values.items()}
         # numpy array
         elif isinstance(values, np.ndarray):
-            values = values.astype(float)
+            if values.dtype != np.float64:
+                values = values.astype(np.float64)
             values = np.nan_to_num(values, nan=NA)
             return values
         # pandas Series or DataFrame
         elif isinstance(values, (pd.Series, pd.DataFrame)):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             return values.fillna(NA)
         # larray Array
         elif la is not None and isinstance(values, Array):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             values.data = np.nan_to_num(values.data, nan=NA)
             return values
         # list of float
@@ -825,13 +884,16 @@ cdef class Variables(IodeDatabase):
         _c_copy_var_content(c_dest_name, self.database_ptr, t_first, t_last, 
                             c_source_name, value.database_ptr, value_t_first, value_t_last)
 
-    def _set_variable(self, key_name: Union[str, int], values: Union[str, int, float, Iterable[int, float], Variables], 
+    def _set_variable(self, key_name: Union[str, int], values: Union[str, int, float, np.ndarray, Iterable[int, float], Variables], 
         key_periods: Optional[Period, Tuple[Period, Period], List[Period]]):
         cdef int t
         cdef int t_first
         cdef int t_last
         cdef int pos
+        cdef KDB* c_db_ptr = NULL
         cdef vector[double] cpp_values
+        cdef double* var_ptr = NULL
+        cdef double[::1] numpy_data_memview 
 
         if isinstance(key_name, str):
             key_name = key_name.strip()
@@ -903,6 +965,11 @@ cdef class Variables(IodeDatabase):
                     if len(values) != nb_periods:
                         raise ValueError(f"Cannot update the variable '{name}'.\n"
                                          f"Expected {nb_periods} values.\nGot {len(values)} values instead")
+                    if isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+                        c_db_ptr = self.database_ptr.get_database()
+                        var_ptr = KVVAL(c_db_ptr, pos, t_first)
+                        numpy_data_memview = data
+                        memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
                     for i, t in enumerate(range(t_first, t_last + 1)):   
                         self.database_ptr.set_var(pos, t, <double>(values[i]), self.mode_)
                 else:
@@ -918,8 +985,7 @@ cdef class Variables(IodeDatabase):
                     if len(values) != len(key_periods):
                         raise ValueError(f"Cannot update the variable '{name}'.\n"
                                          f"Expected a list of {len(key_periods)} values.\n"
-                                         f"Got {len(values)} values instead")
-                    
+                                         f"Got {len(values)} values instead")   
                 else:
                     raise TypeError(f"Cannot update the variable '{name}'.\n"
                                     f"When updating values for non-contiguous periods, the right-hand side must be "
@@ -933,17 +999,66 @@ cdef class Variables(IodeDatabase):
                                 f"a sample 'start:end', or a list of periods.\n"
                                 f"Got input of type {type(key_periods).__name__} instead")
 
-    def _check_same_periods(self, left_periods, right_periods):
-        left_periods = set(left_periods)
-        right_periods = set(right_periods)
-        missing_periods = left_periods - right_periods
-        if len(missing_periods):
-            missing_periods = sorted(list(missing_periods))
-            raise KeyError(f"Missing value for the periods: '{', '.join(missing_periods)}'")
-        extra_periods = right_periods - left_periods
-        if len(extra_periods):
-            extra_periods = sorted(list(extra_periods))
-            raise KeyError(f"Unexpected periods in the right-hand side: '{', '.join(extra_periods)}'")
+    def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
+        if isinstance(value.index, MultiIndex):
+            raise ValueError(f"Expected pandas Series with a single-level index.\n") 
+        if len(key_names) > 1:
+            if len(key_periods) > 1:
+                raise ValueError("Cannot set or update the value of several variables with a pandas Series "
+                                "when the selection key represents more than one period.")
+            # check that names in the selection key are present in the Series object
+            series_names = value.index.to_list()
+            self._check_same_names(key_names, series_names)
+        else:
+            # check that periods in the selection key are present in the Series object
+            series_periods = value.index.to_list()
+            _check_same_periods(key_periods, series_periods, True, "pandas Series")
+        return value
+
+    def _check_pandas_dataframe(self, value: pd.DataFrame, key_names: List[str], key_periods: List[str]) \
+        -> Union[pd.Series, pd.DataFrame]:
+        if isinstance(value.index, MultiIndex):
+            raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
+        # check that periods in the selection key are present in the DataFrame object
+        df_periods = value.columns.to_list()
+        _check_same_periods(key_periods, df_periods, True, "pandas DataFrame")
+        
+        df_names = value.index.to_list()
+        if len(key_names) == 1:
+            if len(df_names) > 1:
+                raise ValueError(f"Expected DataFrame with a single index.\n")
+            # transform the DataFrame to a Series
+            value = value.squeeze()
+        else:
+            # check that names in the selection key are present in the DataFrame object
+            self._check_same_names(key_names, df_names)   
+        return value
+
+    def _check_larray_array(self, value: Array, key_names: List[str], key_periods: List[str]) -> Array:
+        # Raise an error if no 'time' axis is present in the passed array.
+        if 'time' not in value.axes:
+            raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
+                                f"Got axes {repr(value.axes)}.")
+        time = value.axes['time']
+        # push the time axis as last axis and combine all other axes 
+        value = value.transpose(..., time)
+        if value.ndim > 2:
+            value = value.combine_axes(value.axes[:-1], sep='_')
+        
+        # check that periods in the selection key are present in the Array object
+        array_periods = list(time.labels)
+        _check_same_periods(key_periods, array_periods, True, "Array")
+        
+        if len(key_names) == 1:
+            if value.ndim == 2:
+                if value.shape[0] > 1:
+                    raise ValueError(f"Expected Array object to represent a single variable.\n")
+                value = value.i[0, :]
+        else:   
+            # check that names in the selection key are present in the Array object
+            array_names = list(value.axes[0].labels)
+            self._check_same_names(key_names, array_names)
+        return value
 
     # overriden for Variables
     def __setitem__(self, key, value):
@@ -1628,84 +1743,42 @@ cdef class Variables(IodeDatabase):
                 self._set_variable(name, value, key_periods)
             return
 
-        if key_periods is None:
-            key_periods = self.periods
-        if isinstance(key_periods, Period):
-            key_periods = str(key_periods)
-        if isinstance(key_periods, str):
-            key_periods = [key_periods]
-        if isinstance(key_periods, tuple):
-            key_periods = Sample(key_periods[0], key_periods[1]).periods    
-        
-        # check if key_periods represents contiguous periods
-        if len(key_periods) > 1:
-            sample = Sample(key_periods[0], key_periods[-1])
-            if key_periods != sample.periods:
-                raise ValueError(f"Expected contiguous periods in the selection key.\n")
+        key_periods: List[str] = self._expand_key_periods(key_periods)
+        first_period, last_period = key_periods[0], key_periods[-1]
         
         # if value is a numpy array
         if isinstance(value, np.ndarray):
-            self.from_numpy(value, names, key_periods[0], key_periods[-1])
+            self.from_numpy(value, names, first_period, last_period)
             return
+
+        # if value is a pandas DataFrame
+        if isinstance(value, pd.DataFrame):
+            value = self._check_pandas_dataframe(value, names, key_periods)
+            if isinstance(value, pd.DataFrame):
+                for name, series in value.iterrows():
+                    self._set_variable(name, series.to_numpy(copy=False), first_period, last_period)
+                return
 
         # if value is pandas Series
         if isinstance(value, pd.Series):
-            if isinstance(value.index, MultiIndex):
-                raise ValueError(f"Expected pandas Series with a single-level index.\n")
-            series_periods = value.index.to_list()
-            # check that periods in the selection key are present in the Series object
-            self._check_same_periods(key_periods, series_periods)
-            data = value.to_numpy(copy=False)           
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
-            return
-        
-        # if value is a pandas DataFrame
-        if isinstance(value, pd.DataFrame):
-            if isinstance(value.index, MultiIndex):
-                raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
-            # check that periods in the selection key are present in the DataFrame object
-            df_periods = value.columns.to_list()
-            self._check_same_periods(key_periods, df_periods)
-            
-            df_names = value.index.to_list()
-            if len(names) == 1:
-                if len(df_names) > 1:
-                    raise ValueError(f"Expected DataFrame with a single index.\n")
-                else:
-                    value = value.squeeze()
+            value = self._check_pandas_series(value, names, key_periods)
+            if len(names) > 1:
+                for name in names:
+                    self._set_variable(name, value[name], first_period, last_period)
             else:
-                # check that names in the selection key are present in the DataFrame object
-                self._check_same_names(names, df_names)
-            
-            data = value.to_numpy(copy=False)           
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
+                data = value.to_numpy(copy=False)
+                self._set_variable(names[0], data, first_period, last_period)
             return
         
         if la is not None and isinstance(value, Array):
-            # Raise an error if no 'time' axis is present in the passed array.
-            if 'time' not in value.axes:
-                raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
-                                    f"Got axes {repr(value.axes)}.")
-            time = value.axes['time']
-            # push the time axis as last axis and combine all other axes 
-            value = value.transpose(..., time)
-            if value.ndim > 2:
-                value = value.combine_axes(value.axes[:-1], sep='_')
-            # check that periods in the selection key are present in the Array object
-            array_periods = time.labels
-            self._check_same_periods(key_periods, array_periods)
-            
+            value = self._check_larray_array(value, names, key_periods)
+            data = value.data
             if len(names) == 1:
-                if value.ndim == 2:
-                    if value.shape[0] > 1:
-                        raise ValueError(f"Expected Array object to represent a single variable.\n")
-                    value = value.i[0, :]
-            else:   
-                # check that names in the selection key are present in the Array object
-                array_names = value.axes[0].labels
-                self._check_same_names(names, array_names)
-            data = value.data    
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
+                data = data.flatten()
+                self._set_variable(names[0], data, first_period, last_period)
+            else:
+                for name, _data in zip(names, data):
+                    self._set_variable(name, _data, first_period, last_period)
             return
 
         raise TypeError(f"Invalid type for the right hand side value when trying to set variables.\n"
@@ -1799,41 +1872,187 @@ cdef class Variables(IodeDatabase):
         else:
             raise RuntimeError(f"Cannot select period(s) when deleting (a) variable(s)")
 
+    # NOTE: needed to create a dedicated method since Cython seems to have some 
+    #       difficulties with Union[..., Variables].
+    #       Without a dedicated method, the following error is raised:
+    #       ""Storing unsafe C derivative of temporary Python reference"
+    def __binary_op_variables__(self, other: Variables, op: BinaryOperation) -> Variables:
+        cdef int i_op = int(op)
+        cdef CKDBVariables* cpp_self_db = self.database_ptr
+        cdef CKDBVariables* cpp_other_db = self.database_ptr
+        if len(self) != len(other):
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different number of variables.\n"
+                             f"Left operand has {len(self)} variables.\nRight operand has {len(other)} variables")
+        if self.sample != other.sample:
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different samples.\n"
+                             f"Left operand sample: {self.sample}\nRight operand sample: {other.sample}")
+        t_first, t_last = self._get_periods_bounds()
+        names = self.names
+        if len(names) == 1:
+            name = names[0]
+            other_name = other.names[0]
+            _c_operation_between_two_vars(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                       cpp_other_db, <string>other_name.encode(), <int>t_first, <int>t_last)
+        else:
+            self._check_same_names(names, other.names)
+            for name in names:
+                _c_operation_between_two_vars(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                           cpp_other_db, <string>name.encode(), <int>t_first, <int>t_last)
+        return self
+
+    def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Variables], 
+                      op: BinaryOperation, copy_self: bool):
+        cdef int i, t_first, t_last
+        cdef int i_op = int(op)
+        cdef double c_value
+        cdef CKDBVariables* c_database = NULL
+        cdef double[::1] numpy_data_memview 
+
+        py_database: Variables = self.copy() if copy_self else self
+
+        if isinstance(other, Variables):
+            return py_database.__binary_op_variables__(other, op)
+
+        t_first, t_last = py_database._get_periods_bounds()
+        nb_periods = t_last - t_first + 1
+
+        other = py_database._convert_values(other)
+        c_database = py_database.database_ptr
+
+        if isinstance(other, float):
+            c_value = other
+            _c_operation_scalar(i_op, c_database, <int>t_first, <int>t_last, c_value)
+            return py_database
+
+        key_names = py_database.names
+        key_periods = py_database.periods
+           
+        if isinstance(other, np.ndarray):
+            data = other
+            if data.ndim == 1:
+                if len(key_names) != 1:
+                    raise ValueError("Expected a 1D numpy array for the right-hand side operand as the left-hand side "
+                                     "represents a single variable.")
+                name = key_names[0]
+                numpy_data_memview = data
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            else:
+                if data.shape[0] != len(key_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(key_names)} "
+                                    f"variables and a numpy ndarray with {data.shape[0]} rows")
+                if data.shape[-1] != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                    f"periods and a numpy ndarray with {data.shape[-1]} columns") 
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)  # Makes a contiguous copy of the numpy array.
+                for i, name in enumerate(key_names):
+                    numpy_data_memview = data[i]
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        if isinstance(other, pd.DataFrame):
+            other = self._check_pandas_dataframe(other, key_names, key_periods)
+            if isinstance(other, pd.DataFrame):
+                for name, series in other.iterrows():
+                    numpy_data_memview = series.to_numpy(copy=False)
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        if isinstance(other, pd.Series):
+            other = self._check_pandas_series(other, key_names, key_periods)
+            numpy_data_memview = other.to_numpy(copy=False)
+            if len(key_names) == 1:
+                name = key_names[0]
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            else:
+                _c_operation_one_period(i_op, c_database, t_first, &numpy_data_memview[0])
+            return py_database
+                
+        if isinstance(other, Array):
+            other = self._check_larray_array(other, key_names, key_periods)
+            data = other.data
+            if len(key_names) == 1:
+                name = key_names[0]
+                numpy_data_memview = data.flatten()
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            else:
+                for name, _data in zip(key_names, data):
+                    numpy_data_memview = _data
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        raise TypeError(f"unsupported operand type for {op.name}.\nAccepted types are: "
+                        f"'int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array "
+                        f"or iode Variables'.\nGot operand type {type(other).__name__} instead.")
+
     # self + other
     def __add__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.ADD, True)
 
     # other + self
     def __radd__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.ADD, True)
 
     # self - other
     def __sub__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.SUB, True)
 
     # other - self
     def __rsub__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return other.__binary_op__(self, BinaryOperation.SUB, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X - Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
 
     # self * other
     def __mul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.MUL, True)
     
     # other * self
     def __rmul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.MUL, True)
 
     # self / other
     def __truediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        return self.__binary_op__(other, BinaryOperation.DIV, True)
 
     # other / self
     def __rtruediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return self.__binary_op__(other, BinaryOperation.DIV, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X / Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
 
     # self ** other
     def __pow__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.POW, True)
+
+    # self += other
+    def __iadd__(self, other):
+        self.__binary_op__(other, BinaryOperation.ADD, False)
+        return self
+
+    # self -= other
+    def __isub__(self, other):
+        self.__binary_op__(other, BinaryOperation.SUB, False)
+        return self
+
+    # self *= other
+    def __imul__(self, other):
+        self.__binary_op__(other, BinaryOperation.MUL, False)
+        return self
+
+    # self /= other
+    def __itruediv__(self, other):
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        self.__binary_op__(other, BinaryOperation.DIV, False)
+        return self
 
     def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
         first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
@@ -1955,6 +2174,7 @@ cdef class Variables(IodeDatabase):
         cdef bytes b_name
         cdef char* c_name
         cdef double value
+        cdef double* var_ptr = NULL
         cdef int i, j, t
         cdef int mode = <int>self.mode_
         cdef int t_first_period
@@ -2030,27 +2250,33 @@ cdef class Variables(IodeDatabase):
             # make sure the array is C-contiguous
             data = np.ascontiguousarray(data)
 
-        # convert the array to float64 if necessary
-        data = data.astype(np.float64)
+        # astype(nb.float64) + np.nan -> NA
+        data = self._convert_values(data)
 
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
 
         # copy the values
-        # TODO: 1) convert all np.nan from the numpy array to the C IODE_NAN value
-        #       2) use memcpy to copy the values from the numpy array to the C KBD* database structure
-        #          This means to force the values of the numpy array to represent variables values in the 'LEVEL' mode
-        for i, name in enumerate(vars_names):
-            # NOTE: Cython cannot directly convert a Python string to a C string, 
-            #       so we need to use the encode() method to convert it to a bytes object first, 
-            #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
-            b_name = name.encode()
-            c_name = b_name
-            var_pos = K_find(db_ptr, c_name)
-            for j, t in enumerate(range(t_first_period, t_last_period + 1)):
-                value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
-                KV_set(db_ptr, var_pos, t, mode, value)
+        # TODO: If mode == LEVEL:
+        if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+            for i, name in enumerate(vars_names):
+                # NOTE: Cython cannot directly convert a Python string to a C string, 
+                #       so we need to use the encode() method to convert it to a bytes object first, 
+                #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
+                b_name = name.encode()
+                c_name = b_name
+                var_pos = K_find(db_ptr, c_name)
+                var_ptr = KVVAL(db_ptr, var_pos, t_first_period)
+                memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
+        else:
+            for i, name in enumerate(vars_names):
+                b_name = name.encode()
+                c_name = b_name
+                var_pos = K_find(db_ptr, c_name)
+                for j, t in enumerate(range(t_first_period, t_last_period + 1)):
+                    value = data_view[i, j]
+                    KV_set(db_ptr, var_pos, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
         """
@@ -2159,8 +2385,9 @@ cdef class Variables(IodeDatabase):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
-        cdef i, t
+        cdef int i, t
         cdef double value
+        cdef double* var_ptr = NULL
         cdef int mode = <int>self.mode_
         cdef int t_first_period
         cdef int t_last_period
@@ -2180,13 +2407,22 @@ cdef class Variables(IodeDatabase):
 
         # Copy values from the IODE Variables database to a Numpy 2D array
         data = np.empty((len(self), nb_periods), dtype=np.float64)
+
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
-        for i in range(len(self)):
-            for t in range(t_first_period, t_last_period + 1):
-                value = KV_get(db_ptr, i, t, mode)
-                data_view[i, t - t_first_period] = value if IODE_IS_A_NUMBER(value) else np.nan
+        if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+            for i in range(len(self)):
+                var_ptr = KVVAL(db_ptr, i, t_first_period)
+                memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
+        else:
+            for i in range(len(self)):
+                for t in range(t_first_period, t_last_period + 1):
+                    value = KV_get(db_ptr, i, t, mode)
+                    data_view[i, t - t_first_period] = value
+        
+        _NA = 0.9999 * NA
+        data[data < _NA] = np.nan
         return data
 
     def __array__(self, dtype=None):

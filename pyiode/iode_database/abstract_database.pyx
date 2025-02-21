@@ -1271,10 +1271,12 @@ cdef class IodeDatabase:
             names = ';'.join(names)
             return self._subset(names, copy=False)
 
-    def _set_object(self, key, value):
-        raise NotImplementedError()
-
     def _check_same_names(self, left_names, right_names):
+        """
+        Check that the names of the objects in the left and right from an expression 
+        'variables[left_names, periods] op values[right_names, periods]' represent 
+        the same sets. If not, raise a KeyError.
+        """
         left_names = set(left_names)
         right_names = set(right_names)
         missing_names = left_names - right_names
@@ -1285,6 +1287,9 @@ cdef class IodeDatabase:
         if len(extra_names):
             extra_names = sorted(list(extra_names))
             raise KeyError(f"Unexpected {self.iode_type.name.lower()} in the right-hand side: '{', '.join(extra_names)}'")
+
+    def _set_object(self, key, value):
+        raise NotImplementedError()
 
     # needs to be overriden for Variables
     def __setitem__(self, key, value):

@@ -74,7 +74,7 @@ void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVaria
     if(source_var_ptr == NULL)
     {
         std::string source_name = source->get_name(0);
-        throw std::invalid_argument("Variable named '" + source_name + "' seems to no longer exist in the source database");
+        throw std::invalid_argument("Variable named '" + source_name + "' seems to not exist in the source database");
     }
 
     // add the variable to the destination database
@@ -102,17 +102,175 @@ void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const
     int dest_var_pos = dest->get_position(dest_name);
     double* dest_var_ptr = dest->get_var_ptr(dest_name);
     if(dest_var_ptr == NULL)
-        throw std::invalid_argument("Variable named '" + dest_name + "' seems to no longer exist in the destination database");
+        throw std::invalid_argument("Variable named '" + dest_name + "' seems to not exist in the destination database");
     dest_var_ptr += dest_t_first;
 
     // check that the source variable exists in the source database
     int source_var_pos = source->get_position(source_name);
     double* source_var_ptr = source->get_var_ptr(source_var_pos);
     if(source_var_ptr == NULL)
-        throw std::invalid_argument("Variable named '" + source_name + "' seems to no longer exist in the source database");
+        throw std::invalid_argument("Variable named '" + source_name + "' seems to not exist in the source database");
     source_var_ptr += source_t_first;
 
     // copy the data
     int nb_periods = dest_t_last - dest_t_first + 1;
     memcpy(dest_var_ptr, source_var_ptr, nb_periods * sizeof(double));
+}
+
+enum BinaryOperation 
+{
+    OP_ADD,
+    OP_SUB,
+    OP_MUL,
+    OP_DIV,
+    OP_POW
+};
+
+void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int t_last, const double value)
+{
+    double* var_ptr;
+
+    switch(op)
+    {
+    case OP_ADD:
+        for(int i=0; i < database->count(); i++)
+        {
+            var_ptr = database->get_var_ptr(i);
+            for(int t = t_first; t <= t_last; t++)
+                var_ptr[t] += value;
+        }
+        break;
+    case OP_SUB:  
+        for(int i=0; i < database->count(); i++)
+        {
+            var_ptr = database->get_var_ptr(i);
+            for(int t = t_first; t <= t_last; t++)
+                var_ptr[t] -= value;
+        }
+        break;
+    case OP_MUL: 
+        for(int i=0; i < database->count(); i++)
+        {
+            var_ptr = database->get_var_ptr(i);
+            for(int t = t_first; t <= t_last; t++)
+                var_ptr[t] *= value;
+        }
+        break;
+    case OP_DIV:
+        if(value == 0)
+            throw std::invalid_argument("Division by zero");
+        for(int i=0; i < database->count(); i++)
+        {
+            var_ptr = database->get_var_ptr(i);
+            for(int t = t_first; t <= t_last; t++)
+                var_ptr[t] /= value;
+        }
+        break;
+    case OP_POW: 
+        for(int i=0; i < database->count(); i++)
+        {
+            var_ptr = database->get_var_ptr(i);
+            for(int t = t_first; t <= t_last; t++)
+                var_ptr[t] = pow(var_ptr[t], value);
+        }
+        break;
+    }
+}
+
+void _c_operation_one_period(const int op, KDBVariables* database, int t, const double* values)
+{
+    KDB* db = database->get_database();
+    int nb_names = database->count();
+    double value;
+
+    switch(op)
+    {
+    case OP_ADD:
+        for(int i = 0; i <= nb_names; i++)
+            *KVVAL(db, i, t) += values[i];
+        break;
+    case OP_SUB: 
+        for(int i = 0; i <= nb_names; i++) 
+            *KVVAL(db, i, t) -= values[i];
+        break;
+    case OP_MUL: 
+        for(int i = 0; i <= nb_names; i++) 
+            *KVVAL(db, i, t) *= values[i];
+        break;
+    case OP_DIV:
+        for(int i = 0; i <= nb_names; i++)
+        {
+            value = values[i];
+            if(value == 0)
+                throw std::invalid_argument("Division by zero");
+            *KVVAL(db, i, t) /= value;
+        }
+        break;
+    case OP_POW: 
+        for(int i = 0; i <= nb_names; i++)
+            *KVVAL(db, i, t) = pow(*KVVAL(db, i, t), values[i]);
+        break;
+    }
+}
+
+void _c_operation_one_var(const int op, KDBVariables* database, const std::string& name, int t_first, int t_last, const double* values)
+{
+    double value;
+
+    int pos = database->get_position(name);
+    double* var_ptr = database->get_var_ptr(pos);
+    
+    switch(op)
+    {
+    case OP_ADD:
+        for(int t = t_first; t <= t_last; t++)
+            var_ptr[t] += values[t - t_first];
+        break;
+    case OP_SUB: 
+        for(int t = t_first; t <= t_last; t++) 
+            var_ptr[t] -= values[t - t_first];
+        break;
+    case OP_MUL: 
+        for(int t = t_first; t <= t_last; t++) 
+            var_ptr[t] *= values[t - t_first];
+        break;
+    case OP_DIV:
+        for(int t = t_first; t <= t_last; t++)
+        {
+            value = values[t - t_first];
+            if(value == 0)
+                throw std::invalid_argument("Division by zero");
+            var_ptr[t] /= value;
+        }
+        break;
+    case OP_POW: 
+        for(int t = t_first; t <= t_last; t++)
+            var_ptr[t] = pow(var_ptr[t], values[t - t_first]);
+        break;
+    }
+}
+
+void _c_operation_between_two_vars(const int op, KDBVariables* database, const std::string& name, const int t_first, const int t_last, 
+    KDBVariables* other, const std::string& other_name, const int other_t_first, const int other_t_last)
+{
+    if(name.empty())
+    throw std::invalid_argument("Destination variable name is empty");
+
+    if(other_name.empty())
+    throw std::invalid_argument("Source variable name is empty");
+
+    // sanity checks
+    _c_sanity_checks(database, t_first, t_last, other, other_t_first, other_t_last);
+
+    // check that the destination variable exists in the destination database
+    // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
+    //       and the variable has been removed from the global database
+    // TODO: find a way to delete also the variable from the shallow copies
+    int other_var_pos = other->get_position(other_name);
+    double* other_var_ptr = other->get_var_ptr(other_var_pos);
+    if(other_var_ptr == NULL)
+    throw std::invalid_argument("Variable named '" + other_name + "' seems to not exist in the source database");
+    other_var_ptr += other_t_first;
+
+    _c_operation_one_var(op, database, name, t_first, t_last, other_var_ptr);
 }
