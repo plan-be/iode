@@ -5,9 +5,12 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 if sys.version_info.minor >= 11:
+    from enum import IntEnum, StrEnum
     from typing import Self
 else:
     Self = Any
+    from enum import Enum, IntEnum
+    StrEnum = Enum
 
 cimport cython
 from cython.operator cimport dereference
@@ -18,8 +21,11 @@ from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, 
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
-from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add
+from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add, K_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
+from pyiode.iode_database.cpp_api_database cimport BinaryOperation as CBinaryOperation
+from pyiode.iode_database.cpp_api_database cimport _c_operation_scalar, _c_operation_one_var, _c_operation_one_period
+from pyiode.iode_database.cpp_api_database cimport _c_operation_between_two_vars
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
@@ -27,16 +33,49 @@ from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
+from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR, KVVAL
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
 from iode.util import check_filepath, split_list
 
-KeyName = Union[str, List[str]]
+KeyName = Union[str, List[str], slice]
 KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
+
+class BinaryOperation(IntEnum):
+    OP_ADD = CBinaryOperation.OP_ADD
+    OP_SUB = CBinaryOperation.OP_SUB
+    OP_MUL = CBinaryOperation.OP_MUL
+    OP_DIV = CBinaryOperation.OP_DIV
+    OP_POW = CBinaryOperation.OP_POW
+
+
+def _check_same_periods(left_periods: List[str], right_periods: List[str], check_contiguous: bool=True, 
+    right_hand_side_obj_type:str = None):
+    left_periods_set = set(left_periods)
+    right_periods_set = set(right_periods)
+    missing_periods = left_periods_set - right_periods_set
+    if len(missing_periods):
+        missing_periods = sorted(list(missing_periods))
+        raise KeyError(f"Missing value for the periods: '{', '.join(missing_periods)}'")
+    extra_periods = right_periods_set - left_periods_set
+    if len(extra_periods):
+        extra_periods = sorted(list(extra_periods))
+        raise KeyError(f"Unexpected periods in the right-hand side: '{', '.join(extra_periods)}'")
+    if check_contiguous:
+        # check if left-hand side 'periods' represents contiguous periods
+        if len(left_periods) > 1:
+            sample = Sample(left_periods[0], left_periods[-1])
+            if left_periods != sample.periods:
+                raise ValueError(f"Expected contiguous periods in the left-hand side.")
+        # check if right-hand side 'periods' represents contiguous periods
+        if len(right_periods) > 1:
+            sample = Sample(right_periods[0], right_periods[-1])
+            if right_periods != sample.periods:
+                suffix = f" {right_hand_side_obj_type} object" if right_hand_side_obj_type else ""
+                raise ValueError(f"Expected contiguous periods in the right-hand side{suffix}.")
 
 
 class VarPositionalIndexer:
@@ -616,7 +655,48 @@ cdef class Variables(IodeDatabase):
         ACAF         23.77   26.24   30.16   34.66    8.16  -13.13   32.17   39.94   29.65   13.53   10.05
         <BLANKLINE>
 
-        >>> # b) -------- get a subset of the Variables database using a pattern --------
+        >>> # b) -------- get the values for a single period --------
+        >>> variables[:, "1990Y1"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 394
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:1990Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1990Y1
+        ACAF         23.77
+        ACAG        -28.17
+        AOUC          1.00
+        ...            ...
+        ZKFO          1.00
+        ZX            0.00
+        ZZF_          0.69
+        <BLANKLINE> 
+        >>> # or equivalently:
+        >>> variables["*", "1990Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 394
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1990Y1:1990Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1990Y1
+        ACAF         23.77
+        ACAG        -28.17
+        AOUC          1.00
+        AOUC_         0.94
+        AQC           1.00
+        ...            ...
+        ZJ            1.09
+        ZKF           0.81
+        ZKFO          1.00
+        ZX            0.00
+        ZZF_          0.69
+        <BLANKLINE>
+
+        >>> # c) -------- get a subset of the Variables database using a pattern --------
         >>> vars_subset = variables["A*"]
         >>> vars_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
@@ -653,7 +733,7 @@ cdef class Variables(IodeDatabase):
         AQC           1.00    1.06    1.11    1.15    1.16    1.16    1.16    1.20    1.20    1.34    1.34
         <BLANKLINE>
 
-        >>> # c) -------- get a subset of the Variables database using a list of names --------
+        >>> # d) -------- get a subset of the Variables database using a list of names --------
         >>> vars_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
         >>> vars_subset.names
         ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
@@ -727,6 +807,25 @@ cdef class Variables(IodeDatabase):
                                          last_period=last_period)
                 return db_subset
 
+    def _expand_key_periods(self, key_periods: Union[str, Period, List[str], Tuple[str, str], Sample]) -> List[str]:
+        if key_periods is None:
+            return self.periods
+        
+        if isinstance(key_periods, (str, Period)):
+            key_periods = [key_periods]
+        
+        if isinstance(key_periods, list):
+            key_periods = [str(p) for p in key_periods]
+        elif isinstance(key_periods, tuple):
+            key_periods = Sample(key_periods[0], key_periods[1]).periods 
+        elif isinstance(key_periods, Sample):
+            key_periods = key_periods.periods
+        else:
+            raise TypeError(f"Expected periods to be of type str, Period, list, tuple or Sample.\n"
+                            f"Got periods of type {type(key_periods).__name__} instead")
+
+        return key_periods
+
     def _convert_values(self, values: Union[int, float, str, Iterable[Union[int, float]], \
         Dict[str, Any], np.ndarray, pd.Series, pd.DataFrame, Array, Variables]) \
         -> Union[str, float, List[float], Variables]:
@@ -747,16 +846,17 @@ cdef class Variables(IodeDatabase):
             return {name: self._convert_values(value) for name, value in values.items()}
         # numpy array
         elif isinstance(values, np.ndarray):
-            values = values.astype(float)
+            if values.dtype != np.float64:
+                values = values.astype(np.float64)
             values = np.nan_to_num(values, nan=NA)
             return values
         # pandas Series or DataFrame
         elif isinstance(values, (pd.Series, pd.DataFrame)):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             return values.fillna(NA)
         # larray Array
         elif la is not None and isinstance(values, Array):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             values.data = np.nan_to_num(values.data, nan=NA)
             return values
         # list of float
@@ -778,12 +878,21 @@ cdef class Variables(IodeDatabase):
         # NOTE: 'value' can contains more than one variable as long as the variable named 'name' is present
         _c_add_var_from_other(c_name, self.database_ptr, value.database_ptr, t_first, t_last)
 
-    def _add(self, name: str, values: Union[str, float, List[float], Variables]):
+    def _add(self, name: str, values: Union[str, int, float, np.ndarray, Iterable[float], Variables]):
         cdef vector[double] cpp_values
+        cdef int c_nb_periods
+        cdef char* c_name
+        cdef bytes b_name
+        cdef double[::1] numpy_data_memview
+        cdef KDB* c_db_ptr = NULL
 
         if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
+            raise TypeError(f"Cannot add a new IODE variable.\nExpected value for the 'name' argument of type string. "
+                            f"Got value of type {type(name).__name__}")
 
+        if isinstance(values, int):
+            values = float(values)
+        
         # values is a LEC expression
         if isinstance(values, str):
             self.database_ptr.add(<string>(name.encode()), <string>values.encode())
@@ -791,27 +900,45 @@ cdef class Variables(IodeDatabase):
         elif isinstance(values, float):
             cpp_values = [values] * self.nb_periods
             self.database_ptr.add(<string>(name.encode()), cpp_values)
-        # values is a list of float
-        elif isinstance(values, list):
+        elif isinstance(values, np.ndarray):
+            if values.ndim != 1:
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a 1-dimensional numpy array.\n" 
+                                 f"Got a {values.ndim}-dimensional numpy array instead")
             if len(values) != self.nb_periods:
-                raise ValueError(f"Cannot add IODE variable with name '{name}'.\n"
-                                 f"Expected a list of {self.nb_periods} values.\n"
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a numpy array of {self.nb_periods} values (number of periods).\n"
                                  f"Got {len(values)} values instead")
-            cpp_values = values
-            self.database_ptr.add(<string>(name.encode()), cpp_values)
+            # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
+            if not values.flags['C_CONTIGUOUS']:
+                values = np.ascontiguousarray(values)
+            numpy_data_memview = values
+            b_name = name.encode()
+            c_name = b_name
+            c_nb_periods = self.nb_periods
+            c_db_ptr = self.database_ptr.get_database()
+            K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
         # values is a Variables object
         # NOTE: 'values' can contains more than one variable as long as the variable
         #       named 'name' is present
         elif isinstance(values, Variables):
             if values.sample != self.sample:
-                raise ValueError(f"Cannot add the variable '{name}': Incompatible periods.\n"
+                raise ValueError(f"Cannot add the IODE variable '{name}': Incompatible periods.\n"
                                 f"Expected right-hand side Variables object to have sample {self.sample}.\n"
                                 f"Got Variables object with sample {values.sample} instead.")
             self.__add_var(name, values)
+        # values is an iterable of float
+        elif isinstance(values, Iterable):
+            if len(values) != self.nb_periods:
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a iterable of {self.nb_periods} values.\n"
+                                 f"Got {len(values)} values instead")
+            cpp_values = values
+            self.database_ptr.add(<string>(name.encode()), cpp_values)
         else:
-            raise TypeError(f"Cannot add IODE variable with name '{name}'.\n"
-                            f"Expected value of type str, float or Variables. "
-                            f"Got value of type {type(values).__name__}")
+            raise TypeError(f"Cannot add the IODE variable '{name}'.\n"
+                            f"Expected value of type str, int, float, numpy array, iterable of float or Variables. "
+                            f"Got value of type {type(values).__name__} instead")
 
     # NOTE: needed to create a dedicated method since Cython seems to have some 
     #       difficulties with Union[..., Variables].
@@ -825,26 +952,51 @@ cdef class Variables(IodeDatabase):
         _c_copy_var_content(c_dest_name, self.database_ptr, t_first, t_last, 
                             c_source_name, value.database_ptr, value_t_first, value_t_last)
 
-    def _set_variable(self, key_name: Union[str, int], values: Union[str, int, float, Iterable[int, float], Variables], 
-        key_periods: Optional[Period, Tuple[Period, Period], List[Period]]):
+    def _set_variable(self, key_name: Union[str, int], values: Union[str, int, float, np.ndarray, Iterable[float], Variables], 
+        key_periods: Optional[str, Period, Tuple[Any], List[Any]]):
         cdef int t
         cdef int t_first
         cdef int t_last
         cdef int pos
+        cdef KDB* c_db_ptr = NULL
         cdef vector[double] cpp_values
+        cdef double* var_ptr = NULL
+        cdef double[::1] numpy_data_memview 
 
         if isinstance(key_name, str):
             key_name = key_name.strip()
+
+        if isinstance(values, int):
+            values = float(values)
         
-        # new Variable -> raises an error if key_periods is not None
-        #              -> only allowed when working on the whole sample
+        if key_periods is not None:
+            if isinstance(key_periods, str):
+                key_periods = Period(key_periods)
+            elif isinstance(key_periods, Period):
+                pass
+            elif isinstance(key_periods, tuple):
+                key_periods = Period(key_periods[0]), Period(key_periods[1])
+            elif isinstance(key_periods, list):
+                key_periods = [Period(p) for p in key_periods]
+            else:
+                raise TypeError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                                f"The periods selection must be either omitted or specified as a single period, "
+                                f"a sample 'start:end', or a list of periods.\nGot periods selection of type "
+                                f"{type(key_periods).__name__} instead")
+
+        # new Variable -> raises an error if key_periods is not None or does not represent the full sample
+        #              -> only allowed when the current database is not a subset over the whole Variables sample
         if isinstance(key_name, str) and key_name not in self:
-            if key_periods is not None:
-                raise RuntimeError(f"Cannot add IODE variable with name '{key_name}'.\nThe syntax 'variables['{key_name}'] = new_variable' "
-                                   f"must be used instead of 'variables['{key_name}', {key_periods}] = new_variable'")
+            if not (key_periods is None or isinstance(key_periods, tuple)):
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}'.\nThe syntax 'variables['{key_name}'] = new_variable' "
+                                   f"should be used instead of 'variables['{key_name}', <periods>] = new_variable'")
             if self.first_period_subset is not None or self.last_period_subset is not None:
-                raise RuntimeError(f"Cannot add IODE variable with name '{key_name}' when the subset does not cover the "
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}' when the subset does not cover the "
                                    f"whole sample of the IODE Variables workspace.\n")
+            if isinstance(key_periods, tuple) and key_periods != (self.sample.start, self.sample.end):
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}'.\n"
+                                   f"When adding a new variable, the periods selection must be omitted or "
+                                   f"represent the whole Variables sample {self.sample}.\nGot periods selection {key_periods} instead.")
             # NOTE: if 'values' is a Variables object, it can contains more than one variable as long as the variable
             #       named 'name' is present
             self._add(key_name, values)
@@ -859,24 +1011,18 @@ cdef class Variables(IodeDatabase):
                 key_periods = sample.start, sample.end
             # update the value for only one period 
             if isinstance(key_periods, Period):
-                if not isinstance(values, float):
-                    raise TypeError(f"Cannot update the variable '{name}'.\n"
-                                    f"When updating a Variable for a single period, the "
-                                    f"right-hand side value must be of type float.\n"
-                                    f"Got value of type {type(values).__name__} instead")
                 t = self._get_real_period_position(key_periods)
-                self.database_ptr.set_var(pos, t, <double>values, self.mode_)
+                if isinstance(values, float):
+                    self.database_ptr.set_var(pos, t, <double>values, self.mode_)
+                elif isinstance(values, Variables):
+                    self.__copy_var(name, name, t, t, values)
+                else:
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
+                                    f"When updating values for a single period, the right-hand side must be "
+                                    f"a float or an interable of float.\nGot input of type {type(values).__name__} instead")
             # update values for a contiguous range of periods
             elif isinstance(key_periods, tuple):
                 first_period, last_period = key_periods
-                if not isinstance(first_period, Period):
-                    raise TypeError(f"Cannot update the variable '{name}'.\n"
-                                    f"Expected 'first_period' to be of type Period. "
-                                    f"Got value of type {type(first_period).__name__} instead")
-                if not isinstance(last_period, Period):
-                    raise TypeError(f"Cannot update the variable '{name}'.\n"
-                                    f"Expected 'last_period' to be of type Period. "
-                                    f"Got value of type {type(last_period).__name__} instead")
                 t_first = self._get_real_period_position(first_period)
                 t_last = self._get_real_period_position(last_period)
                 # values is a LEC expression
@@ -890,7 +1036,7 @@ cdef class Variables(IodeDatabase):
                 elif isinstance(values, Variables):
                     sample: Sample = Sample(first_period, last_period)
                     if values.sample != sample:
-                        raise ValueError(f"Cannot update the variable '{name}': Incompatible periods.\n"
+                        raise ValueError(f"Cannot update the IODE variable '{name}': Incompatible periods.\n"
                                         f"Expected right-hand side Variables object to have sample {sample}.\n"
                                         f"Got Variables object with sample {values.sample} instead.")
                     # NOTE: 'values' can contains more than one variable as long as the variable
@@ -901,49 +1047,101 @@ cdef class Variables(IodeDatabase):
                 elif isinstance(values, Iterable):
                     nb_periods = t_last - t_first + 1
                     if len(values) != nb_periods:
-                        raise ValueError(f"Cannot update the variable '{name}'.\n"
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
                                          f"Expected {nb_periods} values.\nGot {len(values)} values instead")
+                    if isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+                        c_db_ptr = self.database_ptr.get_database()
+                        var_ptr = KVVAL(c_db_ptr, pos, t_first)
+                        # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
+                        if not values.flags['C_CONTIGUOUS']:
+                            values = np.ascontiguousarray(values)
+                        numpy_data_memview = values
+                        memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
                     for i, t in enumerate(range(t_first, t_last + 1)):   
                         self.database_ptr.set_var(pos, t, <double>(values[i]), self.mode_)
                 else:
-                    raise TypeError(f"Expected 'value' of type int, float, str or Variables.\n"
-                                    f"Got 'value' of type {type(values).__name__} instead")
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\nExpected 'value' of type str, int, "
+                                    f"float, numpy array, pandas Series or Variables.\nGot 'value' of type "
+                                    f"{type(values).__name__} instead")
             # update values for a list of periods
-            elif isinstance(key_periods, list):                
+            elif isinstance(key_periods, list):              
                 # set the same value for all periods in the list
                 if isinstance(values, float):
                     values = [values] * len(key_periods)
                 # values is a list of float containing a specific value for each period
                 elif isinstance(values, list):
                     if len(values) != len(key_periods):
-                        raise ValueError(f"Cannot update the variable '{name}'.\n"
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
                                          f"Expected a list of {len(key_periods)} values.\n"
-                                         f"Got {len(values)} values instead")
-                    
+                                         f"Got {len(values)} values instead")   
                 else:
-                    raise TypeError(f"Cannot update the variable '{name}'.\n"
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
                                     f"When updating values for non-contiguous periods, the right-hand side must be "
                                     f"a float or a list of float.\nGot input of type {type(values).__name__} instead")
                 for p, v in zip(key_periods, values):
                     t = self._get_real_period_position(p)
                     self.database_ptr.set_var(pos, t, <double>v, self.mode_)
-            else:
-                raise TypeError(f"Cannot update the variable '{name}'.\n"
-                                f"The periods selection must be specified as a single period, "
-                                f"a sample 'start:end', or a list of periods.\n"
-                                f"Got input of type {type(key_periods).__name__} instead")
 
-    def _check_same_periods(self, left_periods, right_periods):
-        left_periods = set(left_periods)
-        right_periods = set(right_periods)
-        missing_periods = left_periods - right_periods
-        if len(missing_periods):
-            missing_periods = sorted(list(missing_periods))
-            raise KeyError(f"Missing value for the periods: '{', '.join(missing_periods)}'")
-        extra_periods = right_periods - left_periods
-        if len(extra_periods):
-            extra_periods = sorted(list(extra_periods))
-            raise KeyError(f"Unexpected periods in the right-hand side: '{', '.join(extra_periods)}'")
+    def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
+        if isinstance(value.index, MultiIndex):
+            raise ValueError(f"Expected pandas Series with a single-level index.\n") 
+        if len(key_names) > 1:
+            if len(key_periods) > 1:
+                raise ValueError("Cannot set or update the value of several variables with a pandas Series "
+                                "when the selection key represents more than one period.")
+            # check that names in the selection key are present in the Series object
+            series_names = value.index.to_list()
+            self._check_same_names(key_names, series_names)
+        else:
+            # check that periods in the selection key are present in the Series object
+            series_periods = value.index.to_list()
+            _check_same_periods(key_periods, series_periods, True, "pandas Series")
+        return value
+
+    def _check_pandas_dataframe(self, value: pd.DataFrame, key_names: List[str], key_periods: List[str]) \
+        -> Union[pd.Series, pd.DataFrame]:
+        if isinstance(value.index, MultiIndex):
+            raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
+        # check that periods in the selection key are present in the DataFrame object
+        df_periods = value.columns.to_list()
+        _check_same_periods(key_periods, df_periods, True, "pandas DataFrame")
+        
+        df_names = value.index.to_list()
+        if len(key_names) == 1:
+            if len(df_names) > 1:
+                raise ValueError(f"Expected DataFrame with a single index.\n")
+            # transform the DataFrame to a Series
+            value = value.squeeze()
+        else:
+            # check that names in the selection key are present in the DataFrame object
+            self._check_same_names(key_names, df_names)   
+        return value
+
+    def _check_larray_array(self, value: Array, key_names: List[str], key_periods: List[str]) -> Array:
+        # Raise an error if no 'time' axis is present in the passed array.
+        if 'time' not in value.axes:
+            raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
+                                f"Got axes {repr(value.axes)}.")
+        time = value.axes['time']
+        # push the time axis as last axis and combine all other axes 
+        value = value.transpose(..., time)
+        if value.ndim > 2:
+            value = value.combine_axes(value.axes[:-1], sep='_')
+        
+        # check that periods in the selection key are present in the Array object
+        array_periods = list(time.labels)
+        _check_same_periods(key_periods, array_periods, True, "Array")
+        
+        if len(key_names) == 1:
+            if value.ndim == 2:
+                if value.shape[0] > 1:
+                    raise ValueError(f"Expected Array object to represent a single variable.\n")
+                value = value.i[0, :]
+        else:   
+            # check that names in the selection key are present in the Array object
+            array_names = list(value.axes[0].labels)
+            self._check_same_names(key_names, array_names)
+        return value
 
     # overriden for Variables
     def __setitem__(self, key, value):
@@ -1555,7 +1753,7 @@ cdef class Variables(IodeDatabase):
         >>> vars_subset["A0"] = 0.0         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Traceback (most recent call last):
            ...
-        RuntimeError: Cannot add IODE variable with name 'A0' when the subset does not cover the whole sample of the IODE Variables workspace.
+        RuntimeError: Cannot add the IODE variable 'A0' when the subset does not cover the whole sample of the IODE Variables workspace.
         >>> # 3) update a variable in the subset
         >>> vars_subset["ACAF"] = 1.0
         >>> vars_subset["ACAF"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1628,84 +1826,53 @@ cdef class Variables(IodeDatabase):
                 self._set_variable(name, value, key_periods)
             return
 
-        if key_periods is None:
-            key_periods = self.periods
-        if isinstance(key_periods, Period):
-            key_periods = str(key_periods)
-        if isinstance(key_periods, str):
-            key_periods = [key_periods]
-        if isinstance(key_periods, tuple):
-            key_periods = Sample(key_periods[0], key_periods[1]).periods    
-        
-        # check if key_periods represents contiguous periods
-        if len(key_periods) > 1:
-            sample = Sample(key_periods[0], key_periods[-1])
-            if key_periods != sample.periods:
-                raise ValueError(f"Expected contiguous periods in the selection key.\n")
+        key_periods: List[str] = self._expand_key_periods(key_periods)
         
         # if value is a numpy array
         if isinstance(value, np.ndarray):
             self.from_numpy(value, names, key_periods[0], key_periods[-1])
             return
 
-        # if value is pandas Series
-        if isinstance(value, pd.Series):
-            if isinstance(value.index, MultiIndex):
-                raise ValueError(f"Expected pandas Series with a single-level index.\n")
-            series_periods = value.index.to_list()
-            # check that periods in the selection key are present in the Series object
-            self._check_same_periods(key_periods, series_periods)
-            data = value.to_numpy(copy=False)           
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
-            return
-        
+        key_period_bounds = key_periods[0], key_periods[-1]
+
         # if value is a pandas DataFrame
         if isinstance(value, pd.DataFrame):
-            if isinstance(value.index, MultiIndex):
-                raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
-            # check that periods in the selection key are present in the DataFrame object
-            df_periods = value.columns.to_list()
-            self._check_same_periods(key_periods, df_periods)
-            
-            df_names = value.index.to_list()
-            if len(names) == 1:
-                if len(df_names) > 1:
-                    raise ValueError(f"Expected DataFrame with a single index.\n")
-                else:
-                    value = value.squeeze()
+            value = self._check_pandas_dataframe(value, names, key_periods)
+            if isinstance(value, pd.DataFrame):
+                data = value.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                for name, _data in zip(names, data):
+                    self._set_variable(name, _data, key_period_bounds)
+                return
+
+        # if value is pandas Series
+        if isinstance(value, pd.Series):
+            value = self._check_pandas_series(value, names, key_periods)
+            if len(names) > 1:
+                for name in names:
+                    self._set_variable(name, value[name], key_period_bounds)
             else:
-                # check that names in the selection key are present in the DataFrame object
-                self._check_same_names(names, df_names)
-            
-            data = value.to_numpy(copy=False)           
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
+                data = value.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                self._set_variable(names[0], data, key_period_bounds)
             return
         
         if la is not None and isinstance(value, Array):
-            # Raise an error if no 'time' axis is present in the passed array.
-            if 'time' not in value.axes:
-                raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
-                                    f"Got axes {repr(value.axes)}.")
-            time = value.axes['time']
-            # push the time axis as last axis and combine all other axes 
-            value = value.transpose(..., time)
-            if value.ndim > 2:
-                value = value.combine_axes(value.axes[:-1], sep='_')
-            # check that periods in the selection key are present in the Array object
-            array_periods = time.labels
-            self._check_same_periods(key_periods, array_periods)
-            
+            value = self._check_larray_array(value, names, key_periods)
+            data = value.data
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
             if len(names) == 1:
-                if value.ndim == 2:
-                    if value.shape[0] > 1:
-                        raise ValueError(f"Expected Array object to represent a single variable.\n")
-                    value = value.i[0, :]
-            else:   
-                # check that names in the selection key are present in the Array object
-                array_names = value.axes[0].labels
-                self._check_same_names(names, array_names)
-            data = value.data    
-            self.from_numpy(data, names, key_periods[0], key_periods[-1])
+                data = data.flatten()
+                self._set_variable(names[0], data, key_period_bounds)
+            else:
+                for name, _data in zip(names, data):
+                    self._set_variable(name, _data, key_period_bounds)
             return
 
         raise TypeError(f"Invalid type for the right hand side value when trying to set variables.\n"
@@ -1799,41 +1966,998 @@ cdef class Variables(IodeDatabase):
         else:
             raise RuntimeError(f"Cannot select period(s) when deleting (a) variable(s)")
 
+    # NOTE: needed to create a dedicated method since Cython seems to have some 
+    #       difficulties with Union[..., Variables].
+    #       Without a dedicated method, the following error is raised:
+    #       ""Storing unsafe C derivative of temporary Python reference"
+    def __binary_op_variables__(self, other: Variables, op: BinaryOperation) -> Variables:
+        cdef int i_op = int(op)
+        cdef CKDBVariables* cpp_self_db = self.database_ptr
+        cdef CKDBVariables* cpp_other_db = self.database_ptr
+        if len(self) != len(other):
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different number of variables.\n"
+                             f"Left operand has {len(self)} variables.\nRight operand has {len(other)} variables")
+        if self.sample != other.sample:
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different samples.\n"
+                             f"Left operand sample: {self.sample}\nRight operand sample: {other.sample}")
+        t_first, t_last = self._get_periods_bounds()
+        names = self.names
+        if len(names) == 1:
+            name = names[0]
+            other_name = other.names[0]
+            _c_operation_between_two_vars(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                       cpp_other_db, <string>other_name.encode(), <int>t_first, <int>t_last)
+        else:
+            self._check_same_names(names, other.names)
+            for name in names:
+                _c_operation_between_two_vars(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                           cpp_other_db, <string>name.encode(), <int>t_first, <int>t_last)
+        return self
+
+    def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Variables], 
+                      op: BinaryOperation, copy_self: bool):
+        cdef int i, t_first, t_last
+        cdef int i_op = int(op)
+        cdef double c_value
+        cdef CKDBVariables* c_database = NULL
+        cdef double[::1] numpy_data_memview 
+
+        py_database: Variables = self.copy() if copy_self else self
+
+        if isinstance(other, Variables):
+            return py_database.__binary_op_variables__(other, op)
+
+        t_first, t_last = py_database._get_periods_bounds()
+        nb_periods = t_last - t_first + 1
+
+        other = py_database._convert_values(other)
+        c_database = py_database.database_ptr
+
+        if isinstance(other, float):
+            c_value = other
+            _c_operation_scalar(i_op, c_database, t_first, t_last, c_value)
+            return py_database
+
+        key_names = py_database.names
+        key_periods = py_database.periods
+           
+        if isinstance(other, np.ndarray):
+            data = other
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(key_names) == 1:
+                if data.ndim != 1:
+                    raise ValueError("Expected a 1D numpy array for the right-hand side operand as the left-hand side "
+                                     "represents a single variable.")
+                if len(data) != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                     f"periods and a numpy ndarray with {len(data)} elements")
+                name = key_names[0]
+                numpy_data_memview = data
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            elif len(key_periods) == 1:
+                if data.ndim != 1:
+                    raise ValueError("Expected a 1D numpy array for the right-hand side operand as the left-hand side "
+                                     "represents a single period.")
+                if len(data) != len(key_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(key_names)} "
+                                     f"variables and a numpy ndarray with {len(data)} elements")
+                numpy_data_memview = data
+                _c_operation_one_period(i_op, c_database, t_first, &numpy_data_memview[0], len(data))
+            else:
+                if data.shape[0] != len(key_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(key_names)} "
+                                    f"variables and a numpy ndarray with {data.shape[0]} rows")
+                if data.shape[-1] != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                    f"periods and a numpy ndarray with {data.shape[-1]} columns") 
+                for name, _data in zip(key_names, data):
+                    numpy_data_memview = _data
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        if isinstance(other, pd.DataFrame):
+            other = self._check_pandas_dataframe(other, key_names, key_periods)
+            if isinstance(other, pd.DataFrame):
+                data = other.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                for name, _data in zip(key_names, data):
+                    numpy_data_memview = _data
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        if isinstance(other, pd.Series):
+            other = self._check_pandas_series(other, key_names, key_periods)
+            data = other.to_numpy(copy=False)
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            numpy_data_memview = data
+            if len(key_names) == 1:
+                if len(data) != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                     f"periods and a pandas Series with {len(data)} elements")
+                name = key_names[0]
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            else:
+                if len(data) != len(key_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(key_names)} "
+                                     f"variables and a pandas Series with {len(data)} elements")
+                if len(key_periods) != 1:
+                    raise ValueError("Cannot perform arithmetic operation between a left-hand side representing multiple variables "
+                                     "and periods and a pandas Series")
+                _c_operation_one_period(i_op, c_database, t_first, &numpy_data_memview[0], len(data))
+            return py_database
+            
+        if isinstance(other, Array):
+            other = self._check_larray_array(other, key_names, key_periods)
+            data = other.data
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(key_names) == 1:
+                name = key_names[0]
+                numpy_data_memview = data.flatten()
+                _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            else:
+                for name, _data in zip(key_names, data):
+                    numpy_data_memview = _data
+                    _c_operation_one_var(i_op, c_database, <string>name.encode(), t_first, t_last, &numpy_data_memview[0])
+            return py_database
+
+        raise TypeError(f"unsupported operand type for {op.name}.\nAccepted types are: "
+                        f"'int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array "
+                        f"or iode Variables'.\nGot operand type {type(other).__name__} instead.")
+
     # self + other
     def __add__(self, other):
-        return NotImplementedError()
+        r"""
+        Add `other` to the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, add the scalar to all values of the current (subset of) Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, add the two Variables objects.
+            The two Variables objects must share the same sample and represent the same set of variables names.
+        
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be correct. 
+        This possibility is provided for speed reasons (when the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # add a scalar to all values of a subset of a Variables object
+        >>> new_vars_subset = vars_subset + 2.0
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         28.24   32.16   36.66   10.16  -11.13
+        ACAG        -28.93  -38.29  -41.16  -14.03  -39.85
+        AOUC          3.02    3.03    3.03    3.05    3.05
+        AOUC_         2.96    2.97    2.98    2.99    3.00
+        AQC           3.06    3.11    3.15    3.16    3.16
+        <BLANKLINE>
+
+        >>> # add two (subsets of) a Variables object
+        >>> new_vars_subset = vars_subset + vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         52.48   60.32   69.32   16.32  -26.26
+        ACAG        -61.87  -80.57  -86.32  -32.06  -83.69
+        AOUC          2.05    2.06    2.06    2.09    2.10
+        AOUC_         1.93    1.95    1.96    1.98    1.99
+        AQC           2.13    2.22    2.31    2.31    2.32
+        <BLANKLINE>
+
+        >>> # add a pandas Series to a single variable
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] + series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        <BLANKLINE>
+        
+        >>> # add a pandas Series to a subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -12.13
+        ACAG        -39.85
+        AOUC          4.05
+        AOUC_         5.00
+        AQC           6.16
+        <BLANKLINE>
+
+        >>> # add a pandas DataFrame to the subset of a Variables object  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset + df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>
+
+        >>> # add an larray Array to a subset of a Variables object
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset + array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>        
+
+        >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be correct.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # add a numpy 1D ndarray to a single variable
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> updated_ACAF = vars_subset["ACAF"] + data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        <BLANKLINE>
+        >>> # add a numpy 1D ndarray to the subset corresponding to a single period
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -12.13
+        ACAG        -39.85
+        AOUC          4.05
+        AOUC_         5.00
+        AQC           6.16
+        <BLANKLINE>        
+        >>> # add a numpy 2D ndarray to a (subset of a) Variables object
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> new_vars_subset = vars_subset + data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>
+        """
+        return self.__binary_op__(other, BinaryOperation.OP_ADD, True)
 
     # other + self
     def __radd__(self, other):
-        return NotImplementedError()
+        r"""
+        Add `other` to the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, add the scalar to all values of the current (subset of) Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, add the two Variables objects.
+            The two Variables objects must share the same sample and represent the same set of variables names.
+        
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be correct. 
+        This possibility is provided for speed reasons (when the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # add a scalar to all values of a subset of a Variables object
+        >>> new_vars_subset = vars_subset + 2.0
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         28.24   32.16   36.66   10.16  -11.13
+        ACAG        -28.93  -38.29  -41.16  -14.03  -39.85
+        AOUC          3.02    3.03    3.03    3.05    3.05
+        AOUC_         2.96    2.97    2.98    2.99    3.00
+        AQC           3.06    3.11    3.15    3.16    3.16
+        <BLANKLINE>
+
+        >>> # add two (subsets of) a Variables object
+        >>> new_vars_subset = vars_subset + vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         52.48   60.32   69.32   16.32  -26.26
+        ACAG        -61.87  -80.57  -86.32  -32.06  -83.69
+        AOUC          2.05    2.06    2.06    2.09    2.10
+        AOUC_         1.93    1.95    1.96    1.98    1.99
+        AQC           2.13    2.22    2.31    2.31    2.32
+        <BLANKLINE>
+
+        >>> # add a pandas Series to a single variable
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] + series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        <BLANKLINE>
+        
+        >>> # add a pandas Series to a subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -12.13
+        ACAG        -39.85
+        AOUC          4.05
+        AOUC_         5.00
+        AQC           6.16
+        <BLANKLINE>
+
+        >>> # add a pandas DataFrame to the subset of a Variables object  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset + df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>
+
+        >>> # add an larray Array to a subset of a Variables object
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset + array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>        
+
+        >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be correct.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # add a numpy 1D ndarray to a single variable
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> updated_ACAF = vars_subset["ACAF"] + data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        <BLANKLINE>
+        >>> # add a numpy 1D ndarray to the subset corresponding to a single period
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -12.13
+        ACAG        -39.85
+        AOUC          4.05
+        AOUC_         5.00
+        AQC           6.16
+        <BLANKLINE>        
+        >>> # add a numpy 2D ndarray to a (subset of a) Variables object
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> new_vars_subset = vars_subset + data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         27.24   32.16   37.66   12.16   -8.13
+        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
+        AOUC         12.02   13.03   14.03   15.05   16.05
+        AOUC_        16.96   17.97   18.98   19.99   21.00
+        AQC          22.06   23.11   24.15   25.16   26.16
+        <BLANKLINE>
+        """
+        return self.__binary_op__(other, BinaryOperation.OP_ADD, True)
+
+    # self += other
+    def __iadd__(self, other):
+        r"""
+        Add `other` to the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, add the scalar to all values of the current (subset of) Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, add the two Variables objects.
+            The two Variables objects must share the same sample and represent the same set of variables names.
+
+        Warnings
+        --------
+        Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be correct. 
+        This possibility is provided for speed reasons (when the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # add a scalar to all values of the current subset of a Variables object
+        >>> vars_subset += 2.0
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         28.24   32.16   36.66   10.16  -11.13
+        ACAG        -28.93  -38.29  -41.16  -14.03  -39.85
+        AOUC          3.02    3.03    3.03    3.05    3.05
+        AOUC_         2.96    2.97    2.98    2.99    3.00
+        AQC           3.06    3.11    3.15    3.16    3.16
+        <BLANKLINE>
+
+        >>> # add a (subsets of) a Variables object to the current (subset of) Variables object
+        >>> vars_subset += vars_subset
+        >>> vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         56.48   64.32   73.32   20.32  -22.26
+        ACAG        -57.87  -76.57  -82.32  -28.06  -79.69
+        AOUC          6.05    6.06    6.06    6.09    6.10
+        AOUC_         5.93    5.95    5.96    5.98    5.99
+        AQC           6.13    6.22    6.31    6.31    6.32
+        <BLANKLINE>
+
+        >>> # add a pandas Series to a single variable
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> vars_subset["ACAF"] += series
+        >>> vars_subset["ACAF"]                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         57.48   66.32   76.32   24.32  -17.26
+        <BLANKLINE>
+        
+        >>> # add a pandas Series to the subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset[:, "1995Y1"] += series
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -16.26
+        ACAG        -77.69
+        AOUC          9.10
+        AOUC_         9.99
+        AQC          11.32
+        <BLANKLINE>
+
+        >>> # add a pandas DataFrame to the current subset of the Variables object  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset += df
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         58.48   68.32   79.32   28.32  -11.26
+        ACAG        -51.87  -69.57  -74.32  -19.06  -67.69
+        AOUC         17.05   18.06   19.06   20.09   24.10
+        AOUC_        21.93   22.95   23.96   24.98   29.99
+        AQC          27.13   28.22   29.31   30.31   36.32
+        <BLANKLINE>
+
+        >>> # add an larray Array to the current subset of the Variables object
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset += array
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         59.48   70.32   82.32   32.32   -6.26
+        ACAG        -45.87  -62.57  -66.32  -10.06  -57.69
+        AOUC         28.05   30.06   32.06   34.09   39.10
+        AOUC_        37.93   39.95   41.96   43.98   49.99
+        AQC          48.13   50.22   52.31   54.31   61.32
+        <BLANKLINE>        
+
+        >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be correct.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # add a numpy 1D ndarray to a single variable
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> vars_subset["ACAF"] += data
+        >>> vars_subset["ACAF"]                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         60.48   72.32   85.32   36.32   -1.26
+        <BLANKLINE>
+        >>> # add a numpy 1D ndarray to the subset corresponding to a single period
+        >>> vars_subset[:, "1995Y1"] += data
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF         -0.26
+        ACAG        -55.69
+        AOUC         42.10
+        AOUC_        53.99
+        AQC          66.32
+        <BLANKLINE>        
+        >>> # add a numpy 2D ndarray to the current (subset of the) Variables object
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> vars_subset += data
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         61.48   74.32   88.32   40.32    4.74
+        ACAG        -39.87  -55.57  -58.32   -1.06  -45.69
+        AOUC         39.05   42.06   45.06   48.09   57.10
+        AOUC_        53.93   56.95   59.96   62.98   73.99
+        AQC          69.13   72.22   75.31   78.31   91.32
+        <BLANKLINE>
+        """
+        self.__binary_op__(other, BinaryOperation.OP_ADD, False)
+        return self
 
     # self - other
     def __sub__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.OP_SUB, True)
 
     # other - self
     def __rsub__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return other.__binary_op__(self, BinaryOperation.OP_SUB, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X - Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
+
+    # self -= other
+    def __isub__(self, other):
+        self.__binary_op__(other, BinaryOperation.OP_SUB, False)
+        return self
 
     # self * other
     def __mul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.OP_MUL, True)
     
     # other * self
     def __rmul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.OP_MUL, True)
+
+    # self *= other
+    def __imul__(self, other):
+        self.__binary_op__(other, BinaryOperation.OP_MUL, False)
+        return self
 
     # self / other
     def __truediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        return self.__binary_op__(other, BinaryOperation.OP_DIV, True)
 
     # other / self
     def __rtruediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return self.__binary_op__(other, BinaryOperation.OP_DIV, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X / Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
+
+    # self /= other
+    def __itruediv__(self, other):
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        self.__binary_op__(other, BinaryOperation.OP_DIV, False)
+        return self
 
     # self ** other
     def __pow__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.OP_POW, True)
 
     def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
         first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
@@ -1955,6 +3079,7 @@ cdef class Variables(IodeDatabase):
         cdef bytes b_name
         cdef char* c_name
         cdef double value
+        cdef double* var_ptr = NULL
         cdef int i, j, t
         cdef int mode = <int>self.mode_
         cdef int t_first_period
@@ -2030,27 +3155,33 @@ cdef class Variables(IodeDatabase):
             # make sure the array is C-contiguous
             data = np.ascontiguousarray(data)
 
-        # convert the array to float64 if necessary
-        data = data.astype(np.float64)
+        # astype(nb.float64) + np.nan -> NA
+        data = self._convert_values(data)
 
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
 
         # copy the values
-        # TODO: 1) convert all np.nan from the numpy array to the C IODE_NAN value
-        #       2) use memcpy to copy the values from the numpy array to the C KBD* database structure
-        #          This means to force the values of the numpy array to represent variables values in the 'LEVEL' mode
-        for i, name in enumerate(vars_names):
-            # NOTE: Cython cannot directly convert a Python string to a C string, 
-            #       so we need to use the encode() method to convert it to a bytes object first, 
-            #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
-            b_name = name.encode()
-            c_name = b_name
-            var_pos = K_find(db_ptr, c_name)
-            for j, t in enumerate(range(t_first_period, t_last_period + 1)):
-                value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
-                KV_set(db_ptr, var_pos, t, mode, value)
+        # TODO: If mode == LEVEL:
+        if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+            for i, name in enumerate(vars_names):
+                # NOTE: Cython cannot directly convert a Python string to a C string, 
+                #       so we need to use the encode() method to convert it to a bytes object first, 
+                #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
+                b_name = name.encode()
+                c_name = b_name
+                var_pos = K_find(db_ptr, c_name)
+                var_ptr = KVVAL(db_ptr, var_pos, t_first_period)
+                memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
+        else:
+            for i, name in enumerate(vars_names):
+                b_name = name.encode()
+                c_name = b_name
+                var_pos = K_find(db_ptr, c_name)
+                for j, t in enumerate(range(t_first_period, t_last_period + 1)):
+                    value = data_view[i, j]
+                    KV_set(db_ptr, var_pos, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
         """
@@ -2159,8 +3290,9 @@ cdef class Variables(IodeDatabase):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
-        cdef i, t
+        cdef int i, t
         cdef double value
+        cdef double* var_ptr = NULL
         cdef int mode = <int>self.mode_
         cdef int t_first_period
         cdef int t_last_period
@@ -2180,13 +3312,22 @@ cdef class Variables(IodeDatabase):
 
         # Copy values from the IODE Variables database to a Numpy 2D array
         data = np.empty((len(self), nb_periods), dtype=np.float64)
+
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
-        for i in range(len(self)):
-            for t in range(t_first_period, t_last_period + 1):
-                value = KV_get(db_ptr, i, t, mode)
-                data_view[i, t - t_first_period] = value if IODE_IS_A_NUMBER(value) else np.nan
+        if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
+            for i in range(len(self)):
+                var_ptr = KVVAL(db_ptr, i, t_first_period)
+                memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
+        else:
+            for i in range(len(self)):
+                for t in range(t_first_period, t_last_period + 1):
+                    value = KV_get(db_ptr, i, t, mode)
+                    data_view[i, t - t_first_period] = value
+        
+        _NA = 0.9999 * NA
+        data[data < _NA] = np.nan
         return data
 
     def __array__(self, dtype=None):

@@ -376,6 +376,25 @@ Properties and methods specific to Variables
    Variables.periods_as_float
    Variables.threshold
 
+   Variables.__add__
+   Variables.__radd__
+   Variables.__iadd__
+   
+   Variables.__sub__
+   Variables.__rsub__
+   Variables.__isub__
+   
+   Variables.__mul__
+   Variables.__rmul__
+   Variables.__imul__
+   
+   Variables.__truediv__
+   Variables.__rtruediv__
+   Variables.__itruediv__
+   
+   Variables.__pow__
+   Variables.__ipow__
+
    Variables.periods_subset
    Variables.low_to_high
    Variables.high_to_low
