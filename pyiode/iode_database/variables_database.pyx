@@ -1645,7 +1645,7 @@ cdef class Variables(IodeDatabase):
         
         # if value is a numpy array
         if isinstance(value, np.ndarray):
-            self.from_ndarray(value, names, key_periods[0], key_periods[-1])
+            self.from_numpy(value, names, key_periods[0], key_periods[-1])
             return
 
         # if value is pandas Series
@@ -1656,7 +1656,7 @@ cdef class Variables(IodeDatabase):
             # check that periods in the selection key are present in the Series object
             self._check_same_periods(key_periods, series_periods)
             data = value.to_numpy(copy=False)           
-            self.from_ndarray(data, names, key_periods[0], key_periods[-1])
+            self.from_numpy(data, names, key_periods[0], key_periods[-1])
             return
         
         # if value is a pandas DataFrame
@@ -1678,7 +1678,7 @@ cdef class Variables(IodeDatabase):
                 self._check_same_names(names, df_names)
             
             data = value.to_numpy(copy=False)           
-            self.from_ndarray(data, names, key_periods[0], key_periods[-1])
+            self.from_numpy(data, names, key_periods[0], key_periods[-1])
             return
         
         if la is not None and isinstance(value, Array):
@@ -1705,7 +1705,7 @@ cdef class Variables(IodeDatabase):
                 array_names = value.axes[0].labels
                 self._check_same_names(names, array_names)
             data = value.data    
-            self.from_ndarray(data, names, key_periods[0], key_periods[-1])
+            self.from_numpy(data, names, key_periods[0], key_periods[-1])
             return
 
         raise TypeError(f"Invalid type for the right hand side value when trying to set variables.\n"
@@ -1835,7 +1835,7 @@ cdef class Variables(IodeDatabase):
     def __pow__(self, other):
         return NotImplementedError()
 
-    def from_ndarray(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
+    def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
         first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
         """
         Copy the numpy ndarray `array` into the IODE Variables database.
@@ -1885,7 +1885,7 @@ cdef class Variables(IodeDatabase):
         >>> nb_periods
         11
         >>> # save original values to restore them later
-        >>> original_values = variables["A*", "2000Y1:2010Y1"].to_ndarray()
+        >>> original_values = variables["A*", "2000Y1:2010Y1"].to_numpy()
         >>> # create the numpy ndarray containing the values to copy into the Variables database
         >>> data = np.zeros((len(vars_names), nb_periods), dtype=float)
         >>> for i in range(len(vars_names)):
@@ -1914,7 +1914,7 @@ cdef class Variables(IodeDatabase):
         AQC           1.34    1.38    1.41    1.42    1.40    1.40    1.40    1.41    1.43    1.45    1.46
         <BLANKLINE>
         >>> # copy the numpy ndarray into the Variables database (overriding the existing values)
-        >>> variables.from_ndarray(data, vars_names, first_period, last_periods)
+        >>> variables.from_numpy(data, vars_names, first_period, last_periods)
         >>> variables["A*", "2000Y1:2010Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 5
@@ -1934,7 +1934,7 @@ cdef class Variables(IodeDatabase):
         >>> # if a subset represents all values to be updated, the values for the arguments 
         >>> # vars_names, first_period and last_period can be omitted
         >>> vars_subset = variables["A*", "2000Y1:2010Y1"]
-        >>> vars_subset.from_ndarray(original_values)
+        >>> vars_subset.from_numpy(original_values)
         >>> vars_subset                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 5
@@ -2052,7 +2052,7 @@ cdef class Variables(IodeDatabase):
                 value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
                 KV_set(db_ptr, var_pos, t, mode, value)
 
-    def to_ndarray(self) -> np.ndarray:
+    def to_numpy(self) -> np.ndarray:
         """
         Create a Numpy ndarray from the current Variables database.
 
@@ -2075,7 +2075,7 @@ cdef class Variables(IodeDatabase):
         56
 
         >>> # export the whole Variables workspace to a numpy ndarray (394 variables x 56 periods)
-        >>> data = variables.to_ndarray()
+        >>> data = variables.to_numpy()
         >>> data.shape
         (394, 56)
         >>> data[5, 40]
@@ -2102,7 +2102,7 @@ cdef class Variables(IodeDatabase):
         AOUC_           na      na      na      na  ...    1.34    1.37    1.41
         AQC           0.22    0.22    0.22    0.23  ...    1.56    1.61    1.67
         <BLANKLINE>
-        >>> data = vars_subset.to_ndarray()
+        >>> data = vars_subset.to_numpy()
         >>> data.shape
         (5, 56)
         >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -2139,7 +2139,7 @@ cdef class Variables(IodeDatabase):
         AOUC_         1.10    1.14    1.15    1.16  ...    1.20    1.21    1.23    1.25
         AQC           1.34    1.38    1.41    1.42  ...    1.41    1.43    1.45    1.46
         <BLANKLINE>
-        >>> data = vars_subset.to_ndarray()
+        >>> data = vars_subset.to_numpy()
         >>> data.shape
         (5, 11)
         >>> data                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -2297,7 +2297,7 @@ cdef class Variables(IodeDatabase):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
-        data = self.to_ndarray()
+        data = self.to_numpy()
         if dtype is not None:
             data = data.astype(dtype)
         return data
@@ -2414,7 +2414,7 @@ cdef class Variables(IodeDatabase):
         # numpy data
         data = df.to_numpy(copy=False)
 
-        self.from_ndarray(data, vars_names, first_period, last_period)
+        self.from_numpy(data, vars_names, first_period, last_period)
 
     def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
         """
@@ -2551,7 +2551,7 @@ cdef class Variables(IodeDatabase):
         
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = self.to_ndarray()
+        data = self.to_numpy()
 
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
@@ -2662,7 +2662,7 @@ cdef class Variables(IodeDatabase):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, vars_names) 
 
-        self.from_ndarray(array.data, vars_names, first_period, last_period)
+        self.from_numpy(array.data, vars_names, first_period, last_period)
 
     def to_array(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> Array:
         """
@@ -2786,7 +2786,7 @@ cdef class Variables(IodeDatabase):
 
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        data = self.to_ndarray()
+        data = self.to_numpy()
 
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
         time_axis = la.Axis(name=time_axis_name, labels=periods_list)

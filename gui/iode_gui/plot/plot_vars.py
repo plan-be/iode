@@ -49,7 +49,7 @@ class PlotVariablesDialog(PlotDialog):
         periods_filter = f"{first_period}:{last_period}"
         x = plotting_sample.get_period_list(astype=float)
         for variable_name in self.variables_names:
-            # NOTE: need to call flatten() since to_ndarray() returns an array of dimensions
+            # NOTE: need to call flatten() since to_numpy() returns an array of dimensions
             #       (nb_variables, n_periods) even if nb_variables == 1
-            y = self.variables_database[variable_name, periods_filter].to_ndarray().flatten()
+            y = self.variables_database[variable_name, periods_filter].to_numpy().flatten()
             self.add_series(variable_name, x, y)
