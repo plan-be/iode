@@ -1234,14 +1234,16 @@ cdef class IodeDatabase:
             names = self.names
             first_name, last_name = key.start, key.stop
             # raise an error if first_name refers to an IODE object that does not exist
-            first_index = names.index(first_name)
+            first_index = names.index(first_name) if first_name is not None else None
             # raise an error if last_name refers to an IODE object that does not exist
-            last_index = names.index(last_name)
+            last_index = names.index(last_name) if last_name is not None else None
             # last_name must be equal or after first_name
-            if last_index < first_index:
+            if first_index is not None and last_index is not None and last_index < first_index:
                 raise ValueError(f"Cannot select {type(self).__name__} objects between '{first_name}' and '{last_name}'. "
                                  f"'{first_name}' is after '{last_name}'.")
-            names = names[first_index:last_index+1]
+            if last_index is not None:
+                last_index += 1     # slice is exclusive
+            names = names[first_index:last_index]
             # invalid key
             if not len(names):
                 raise ValueError(f"Invalid name or pattern '{key}' for {type(self).__name__} objects.")
@@ -1271,10 +1273,12 @@ cdef class IodeDatabase:
             names = ';'.join(names)
             return self._subset(names, copy=False)
 
-    def _set_object(self, key, value):
-        raise NotImplementedError()
-
     def _check_same_names(self, left_names, right_names):
+        """
+        Check that the names of the objects in the left and right from an expression 
+        'variables[left_names, periods] op values[right_names, periods]' represent 
+        the same sets. If not, raise a KeyError.
+        """
         left_names = set(left_names)
         right_names = set(right_names)
         missing_names = left_names - right_names
@@ -1285,6 +1289,9 @@ cdef class IodeDatabase:
         if len(extra_names):
             extra_names = sorted(list(extra_names))
             raise KeyError(f"Unexpected {self.iode_type.name.lower()} in the right-hand side: '{', '.join(extra_names)}'")
+
+    def _set_object(self, key, value):
+        raise NotImplementedError()
 
     # needs to be overriden for Variables
     def __setitem__(self, key, value):

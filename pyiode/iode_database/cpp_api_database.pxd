@@ -34,6 +34,8 @@ cdef extern from "api/iode.h":
     char*   KLPTR(char* name)
     double* KVPTR(char* name)
 
+    double* KVVAL(KDB* kdb, int pos, int t)
+
     void B_display_last_error()
     int B_PrintNbDec(char* nbdec)
     int B_PrintLang(char* lang)
@@ -84,6 +86,9 @@ cdef extern from "api/iode.h":
     # k_objs.c
     int K_find(KDB*, char*)
 
+    # k_objsv.c
+    int K_add(KDB *kdb, char* name, ...)
+
     # k_wsvar.c
     int KV_add(KDB* kdb, char* varname)
     double KV_get(KDB *kdb, int pos, int t, int mode)
@@ -123,6 +128,20 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
                                const int source_t_first, const int source_t_last) except +
     void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
                              const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
+
+    cdef enum BinaryOperation:
+        OP_ADD,
+        OP_SUB,
+        OP_MUL,
+        OP_DIV,
+        OP_POW
+
+    void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int t_last, const double value) except +
+    void _c_operation_one_period(const int op, KDBVariables* database, const int t, const double* values, const int nb_values) except +
+    void _c_operation_one_var(const int op, KDBVariables* database, const string& name, int t_first, int t_last, const double* values) except +
+    void _c_operation_between_two_vars(const int op, KDBVariables* database, const string& name, const int t_first, const int t_last, 
+                                       KDBVariables* other, const string& other_name, const int other_t_first, const int other_t_last) except +
+
 
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
