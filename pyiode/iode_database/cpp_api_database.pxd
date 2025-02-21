@@ -124,6 +124,18 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
     void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
                              const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
 
+    cdef enum BinaryOperation:
+        OP_ADD,
+        OP_SUB,
+        OP_MUL,
+        OP_DIV,
+        OP_POW
+
+    void _c_operation(const int op, KDBVariables* database, int t_first, int t_last, const double *values, const bool is_scalar) except +
+    void _c_operation_variable(const int op, KDBVariables* database, const string& name, const int t_first, const int t_last, 
+                               KDBVariables* other, const string& other_name, const int other_t_first, const int other_t_last) except +
+
+
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
         # Public methods

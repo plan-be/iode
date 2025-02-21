@@ -5,9 +5,12 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 if sys.version_info.minor >= 11:
+    from enum import IntEnum, StrEnum
     from typing import Self
 else:
     Self = Any
+    from enum import Enum, IntEnum
+    StrEnum = Enum
 
 cimport cython
 from cython.operator cimport dereference
@@ -20,6 +23,8 @@ from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
+from pyiode.iode_database.cpp_api_database cimport BinaryOperation as CBinaryOperation
+from pyiode.iode_database.cpp_api_database cimport _c_operation, _c_operation_variable
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
@@ -32,11 +37,19 @@ from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
+from iode.common import BinaryOp
 from iode.util import check_filepath, split_list
 
 KeyName = Union[str, List[str]]
 KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
 KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
+
+class BinaryOperation(IntEnum):
+    OP_ADD = CBinaryOperation.OP_ADD
+    OP_SUB = CBinaryOperation.OP_SUB
+    OP_MUL = CBinaryOperation.OP_MUL
+    OP_DIV = CBinaryOperation.OP_DIV
+    OP_POW = CBinaryOperation.OP_POW
 
 
 class VarPositionalIndexer:
@@ -747,16 +760,17 @@ cdef class Variables(IodeDatabase):
             return {name: self._convert_values(value) for name, value in values.items()}
         # numpy array
         elif isinstance(values, np.ndarray):
-            values = values.astype(float)
+            if values.dtype != np.float64:
+                values = values.astype(np.float64)
             values = np.nan_to_num(values, nan=NA)
             return values
         # pandas Series or DataFrame
         elif isinstance(values, (pd.Series, pd.DataFrame)):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             return values.fillna(NA)
         # larray Array
         elif la is not None and isinstance(values, Array):
-            values = values.astype(float)
+            values = values.astype(np.float64)
             values.data = np.nan_to_num(values.data, nan=NA)
             return values
         # list of float
@@ -1799,41 +1813,142 @@ cdef class Variables(IodeDatabase):
         else:
             raise RuntimeError(f"Cannot select period(s) when deleting (a) variable(s)")
 
+    # NOTE: needed to create a dedicated method since Cython seems to have some 
+    #       difficulties with Union[..., Variables].
+    #       Without a dedicated method, the following error is raised:
+    #       ""Storing unsafe C derivative of temporary Python reference"
+    def __binary_op_variables__(self, other: Variables, op: BinaryOperation) -> Variables:
+        cdef int i_op = int(op)
+        cdef CKDBVariables* cpp_self_db = self.database_ptr
+        cdef CKDBVariables* cpp_other_db = self.database_ptr
+        if len(self) != len(other):
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different number of variables.\n"
+                                f"Left operand has {len(self)} variables.\nRight operand has {len(other)} variables")
+        if self.sample != other.sample:
+            raise ValueError(f"Cannot perform arithmetic operation between two Variables with different samples.\n"
+                                f"Left operand sample: {self.sample}\nRight operand sample: {other.sample}")
+        t_first, t_last = self._get_periods_bounds()
+        names = self.names
+        if len(names) == 1:
+            name = names[0]
+            other_name = other.names[0]
+            _c_operation_variable(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                  cpp_other_db, <string>other_name.encode(), <int>t_first, <int>t_last)
+        else:
+            self._check_same_names(names, other.names)
+            for name in names:
+                _c_operation_variable(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
+                                      cpp_other_db, <string>name.encode(), <int>t_first, <int>t_last)
+        return self
+
+    def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Variables], 
+                      op: BinaryOperation, copy_self: bool):
+        cdef int i_op = int(op)
+        cdef double c_value
+        cdef CKDBVariables* c_database = NULL
+
+        py_database: Variables = self.copy() if copy_self else self
+
+        if isinstance(other, Variables):
+            return py_database.__binary_op_variables__(other, op)
+
+        t_first, t_last = py_database._get_periods_bounds()
+        nb_periods = t_last - t_first + 1
+
+        other = py_database._convert_values(other)
+        c_database = py_database.database_ptr
+
+        if isinstance(other, float):
+            c_value = other
+            _c_operation(i_op, c_database, <int>t_first, <int>t_last, &c_value, <bint>True)
+            return py_database
+        
+        # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+        if not data.flags['C_CONTIGUOUS']:
+            data = np.ascontiguousarray(data)  # Makes a contiguous copy of the numpy array.
+
+        cdef double[::1] numpy_data_memview = data
+        if isinstance(other, np.ndarray):
+            _c_operation(i_op, c_database, <int>t_first, <int>t_last, <double*>other.data, <bint>False)
+        elif isinstance(other, pd.Series):
+            _c_operation(i_op, c_database, <int>t_first, <int>t_last, <double*>other.values.data, <bint>False)
+        elif isinstance(other, pd.DataFrame):
+            _c_operation(i_op, c_database, <int>t_first, <int>t_last, <double*>other.values.data, <bint>False)
+        elif isinstance(other, Array):
+            _c_operation(i_op, c_database, <int>t_first, <int>t_last, <double*>other.data, <bint>False)
+        else:
+            raise TypeError(f"unsupported operand type for {op.name}.\nAccepted types are: "
+                            f"'int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or Variables'.\n"
+                            f"Got operand type {type(other).__name__} instead.")
+        return py_database
+
     # self + other
     def __add__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.ADD, True)
 
     # other + self
     def __radd__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.ADD, True)
 
     # self - other
     def __sub__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.SUB, True)
 
     # other - self
     def __rsub__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return other.__binary_op__(self, BinaryOperation.SUB, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X - Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
 
     # self * other
     def __mul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.MUL, True)
     
     # other * self
     def __rmul__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.MUL, True)
 
     # self / other
     def __truediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        return self.__binary_op__(other, BinaryOperation.DIV, True)
 
     # other / self
     def __rtruediv__(self, other):
-        return NotImplementedError()
+        if isinstance(other, Variables):
+            return self.__binary_op__(other, BinaryOperation.DIV, True)
+        else:
+            raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X / Y'.\n"
+                            f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
 
     # self ** other
     def __pow__(self, other):
-        return NotImplementedError()
+        return self.__binary_op__(other, BinaryOperation.POW, True)
+
+    # self += other
+    def __iadd__(self, other):
+        self.__binary_op__(other, BinaryOperation.ADD, False)
+        return self
+
+    # self -= other
+    def __isub__(self, other):
+        self.__binary_op__(other, BinaryOperation.SUB, False)
+        return self
+
+    # self *= other
+    def __imul__(self, other):
+        self.__binary_op__(other, BinaryOperation.MUL, False)
+        return self
+
+    # self /= other
+    def __itruediv__(self, other):
+        if isinstance(other, (int, float)) and other == 0:
+            raise ZeroDivisionError("division by zero")
+        self.__binary_op__(other, BinaryOperation.DIV, False)
+        return self
 
     def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
         first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
@@ -2030,15 +2145,16 @@ cdef class Variables(IodeDatabase):
             # make sure the array is C-contiguous
             data = np.ascontiguousarray(data)
 
-        # convert the array to float64 if necessary
-        data = data.astype(np.float64)
+        # astype(nb.float64) + np.nan -> NA
+        data = self._convert_values(data)
 
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
 
         # copy the values
-        # TODO: 1) convert all np.nan from the numpy array to the C IODE_NAN value
+        # TODO: If mode == LEVEL:
+        #       1) convert all np.nan from the numpy array to the C IODE_NAN value
         #       2) use memcpy to copy the values from the numpy array to the C KBD* database structure
         #          This means to force the values of the numpy array to represent variables values in the 'LEVEL' mode
         for i, name in enumerate(vars_names):
@@ -2049,7 +2165,7 @@ cdef class Variables(IodeDatabase):
             c_name = b_name
             var_pos = K_find(db_ptr, c_name)
             for j, t in enumerate(range(t_first_period, t_last_period + 1)):
-                value = IODE_NAN if np.isnan(data_view[i, j]) else data_view[i, j]
+                value = data_view[i, j]
                 KV_set(db_ptr, var_pos, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
