@@ -383,8 +383,8 @@ Properties and methods specific to Variables
    Variables.seasonal_adjustment
    Variables.trend_correction
 
-   Variables.from_ndarray
-   Variables.to_ndarray
+   Variables.from_numpy
+   Variables.to_numpy
    Variables.df
    Variables.from_frame
    Variables.to_frame

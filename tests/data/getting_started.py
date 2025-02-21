@@ -886,7 +886,7 @@ print(f"exogenous variable 'UY' after simulation:\n{variables['UY', '1998Y1:2005
 # %% [markdown]
 # ## Import/Export IODE Variables workspace from/to numpy ndarray
 # 
-# To export the content of the `Variables` workspace (or a subset of it) to a numpy ndarray object, use the [to_ndarray](../_generated/iode.Variables.to_ndarray.rst#iode.Variables.to_ndarray) method.
+# To export the content of the `Variables` workspace (or a subset of it) to a numpy ndarray object, use the [to_numpy](../_generated/iode.Variables.to_numpy.rst#iode.Variables.to_numpy) method.
 
 # %%
 len(variables)
@@ -902,7 +902,7 @@ variables.nb_periods
 
 # %%
 # export the whole Variables workspace to a numpy ndarray (394 variables x 56 periods)
-data = variables.to_ndarray()
+data = variables.to_numpy()
 data.shape
 
 # %%
@@ -924,7 +924,7 @@ vars_subset.names
 vars_subset
 
 # %%
-data = vars_subset.to_ndarray()
+data = vars_subset.to_numpy()
 data.shape
 
 # %%
@@ -944,14 +944,14 @@ vars_subset = variables["A*", "2000Y1:2010Y1"]
 vars_subset
 
 # %%
-data = vars_subset.to_ndarray()
+data = vars_subset.to_numpy()
 data.shape
 
 # %%
 data
 
 # %% [markdown]
-# To update a subset of the Variables workspace, use the [from_ndarray](../_generated/iode.Variables.from_ndarray.rst#iode.Variables.from_ndarray) method.
+# To update a subset of the Variables workspace, use the [from_numpy](../_generated/iode.Variables.from_numpy.rst#iode.Variables.from_numpy) method.
 
 # %%
 vars_names = variables.get_names("A*")
@@ -966,7 +966,7 @@ nb_periods
 
 # %%
 # save original values to restore them later
-original_values = variables["A*", "2000Y1:2010Y1"].to_ndarray()
+original_values = variables["A*", "2000Y1:2010Y1"].to_numpy()
 original_values
 
 # %%
@@ -982,7 +982,7 @@ variables["A*", "2000Y1:2010Y1"]
 
 # %%
 # copy the numpy ndarray into the Variables database (overriding the existing values)
-variables.from_ndarray(data, vars_names, first_period, last_periods)
+variables.from_numpy(data, vars_names, first_period, last_periods)
 variables["A*", "2000Y1:2010Y1"]
 
 # %% [markdown]
@@ -990,7 +990,7 @@ variables["A*", "2000Y1:2010Y1"]
 
 # %%
 vars_subset = variables["A*", "2000Y1:2010Y1"]
-vars_subset.from_ndarray(original_values)
+vars_subset.from_numpy(original_values)
 vars_subset
 
 # %% [markdown]
