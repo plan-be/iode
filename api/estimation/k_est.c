@@ -22,12 +22,7 @@
 
 
 // Fns declarations
-static void E_savescl(double val, int eqnb, char*txt);
-void E_tests2scl(EQ* eq, int j, int n, int k);
-static void E_savevar(char* name, int eqnb, MAT* mat);
 static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tests);
-int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names, int);
-int KE_estim(char* veqs, char* afrom, char* ato);
 
 // Global vars
 //char            **EST_ARGS; // not used ?
@@ -52,7 +47,7 @@ extern  int     E_T, E_NCE;
  *  
  */
 
-static void E_savescl(double val, int eqnb, char*txt)  
+void E_savescl(double val, int eqnb, char*txt)  
 {
     char    buf[40];                        // JMP 25/04/2022 : 20 -> 40 
     static SCL  scl = {0.9, 1.0, IODE_NAN}; // Why static ?
@@ -118,8 +113,8 @@ void E_tests2scl(EQ* eq, int j, int n, int k)
  *  @param [in] int   eqnb  Suffix of the variable
  *  @param [in] MAT*  mat   content to store in the variable
  */
- 
-static void E_savevar(char* name, int eqnb, MAT* mat) 
+
+ void E_savevar(char* name, int eqnb, MAT* mat) 
 {
     int         t;
     double   *var; 
