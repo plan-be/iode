@@ -297,6 +297,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_DW]) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_LOGLIK]) / 1e6, 83.810104);
 
+    double value;
     double max_value;
     double min_value;
 
@@ -308,6 +309,10 @@ TEST_F(EstimationTest, Estimate)
     min_value = *std::min_element(obs.begin(), obs.end());
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
 
+    EXPECT_TRUE(Variables.contains("_YOBS0"));
+    value = Variables.get_var("_YOBS0", from);
+    EXPECT_DOUBLE_EQ(round(1e6 * value) / 1e6, 0.011412);
+
     // Fitted values
     Variable fitted = est.get_fitted_values("ACAF");
     EXPECT_DOUBLE_EQ(round(1e6 * fitted[0]) / 1e6, 0.012562);
@@ -316,6 +321,10 @@ TEST_F(EstimationTest, Estimate)
     min_value = *std::min_element(fitted.begin(), fitted.end());
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
 
+    EXPECT_TRUE(Variables.contains("_YCALC0"));
+    value = Variables.get_var("_YCALC0", from);
+    EXPECT_DOUBLE_EQ(round(1e6 * value) / 1e6, 0.012562);
+
     // Residual values
     Variable residuals = est.get_residual_values("ACAF");
     EXPECT_DOUBLE_EQ(round(1e6 * residuals[0]) / 1e6, -0.00115);
@@ -323,6 +332,10 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.003537);
     min_value = *std::min_element(residuals.begin(), residuals.end());
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.004334);
+
+    EXPECT_TRUE(Variables.contains("_YRES0"));
+    value = Variables.get_var("_YRES0", from);
+    EXPECT_DOUBLE_EQ(round(1e6 * value) / 1e6, -0.00115);
 
     // Correlation matrix
     // -- ACAF
