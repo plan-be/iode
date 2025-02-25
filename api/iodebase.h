@@ -580,8 +580,8 @@ extern void T_auto(TBL *,char *,char **,int ,int ,int );
 extern int KE_est_s(KDB *,KDB *,KDB *,SAMPLE *,char **, int);
 extern void E_tests2scl(EQ *,int ,int ,int );
 extern int KE_estim(char* veqs, char* afrom, char* ato);
-//extern void E_savescl(double ,int ,char *);
-//extern void E_savevar(char *,int ,MAT *);
+extern void E_savescl(double, int, char*);
+extern void E_savevar(char*, int, MAT*);
 
 /* k_ccvar.c */
 extern KDB *KV_load_str(char *);
