@@ -381,6 +381,61 @@ cdef class Equation:
         Scalar(-7.96505e-06, 1, 1.48247e-06)
         >>> scalars["acaf4"]
         Scalar(-0.0085027, 1, 0.00208257)
+        >>> equations["ACAF"]                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                        dw = 2.33007,
+                        fstat = 32.2851,
+                        loglik = 83.8101,
+                        meany = 0.00818467,
+                        r2 = 0.821815,
+                        r2adj = 0.79636,
+                        ssres = 5.19787e-05,
+                        stderr = 0.00192685,
+                        stderrp = 23.5422,
+                        stdev = 0.0042699},
+                date = '...')
+        >>> # observed values (left hand side of the equation)
+        >>> variables["_YOBS0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YOBS0        0.01    0.02    0.01  ...    0.00   -0.00    0.01
+        <BLANKLINE>
+        >>> # fitted values (right hand side of the equation)
+        >>> variables["_YCALC0", "1980Y1:1996Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name      1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YCALC0       0.01    0.01    0.01  ...    0.01   -0.00    0.00
+        <BLANKLINE>
+        >>> # residuals values
+        >>> variables["_YRES0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YRES0       -0.00    0.00   -0.00  ...   -0.00   -0.00    0.00
+        <BLANKLINE>
         """
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
