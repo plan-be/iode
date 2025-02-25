@@ -762,6 +762,61 @@ cdef class Equations(IodeDatabase):
         Scalar(0, 1, na)
         >>> scalars["dpuh_2"]
         Scalar(0, 1, na)
+        >>> equations["ACAF"]                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                        dw = 2.33007,
+                        fstat = 32.2851,
+                        loglik = 83.8101,
+                        meany = 0.00818467,
+                        r2 = 0.821815,
+                        r2adj = 0.79636,
+                        ssres = 5.19787e-05,
+                        stderr = 0.00192685,
+                        stderrp = 23.5422,
+                        stdev = 0.0042699},
+                date = '...')
+        >>> # observed values (left hand side of the equation)
+        >>> variables["_YOBS0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YOBS0        0.01    0.02    0.01  ...    0.00   -0.00    0.01
+        <BLANKLINE>
+        >>> # fitted values (right hand side of the equation)
+        >>> variables["_YCALC0", "1980Y1:1996Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name      1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YCALC0       0.01    0.01    0.01  ...    0.01   -0.00    0.00
+        <BLANKLINE>
+        >>> # residuals values
+        >>> variables["_YRES0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YRES0       -0.00    0.00   -0.00  ...   -0.00    0.00    0.00
+        <BLANKLINE>
 
         >>> # estimate a block
         >>> # prepare equations (same block and method)
@@ -791,6 +846,116 @@ cdef class Equations(IodeDatabase):
         Scalar(0.0109855, 1, 0.00481857)
         >>> scalars["dpuh_2"]
         Scalar(0.0574893, 1, 0.0368951)
+        >>> equations["ACAF"]                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF;DPUH',
+                tests = {corr = 1,
+                        dw = 2.33007,
+                        fstat = 32.2851,
+                        loglik = 83.8101,
+                        meany = 0.00818467,
+                        r2 = 0.821815,
+                        r2adj = 0.79636,
+                        ssres = 5.19787e-05,
+                        stderr = 0.00192685,
+                        stderrp = 23.5422,
+                        stdev = 0.0042699},
+                date = '...')
+        >>> # observed values for ACAF
+        >>> variables["_YOBS0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YOBS0        0.01    0.02    0.01  ...    0.00   -0.00    0.01
+        <BLANKLINE>
+        >>> # fitted values for ACAF
+        >>> variables["_YCALC0", "1980Y1:1996Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name      1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YCALC0       0.01    0.01    0.01  ...    0.01   -0.00    0.00
+        <BLANKLINE>
+        >>> # residuals values for ACAF
+        >>> variables["_YRES0", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YRES0       -0.00    0.00   -0.00  ...   -0.00   -0.00    0.00
+        <BLANKLINE>
+        >>> equations["DPUH"]                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'DPUH',
+                lec = 'dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF;DPUH',
+                tests = {corr = 0.126096,
+                        dw = 3.15593,
+                        fstat = 3.51611,
+                        loglik = 43.5743,
+                        meany = 0.0505132,
+                        r2 = 0.189895,
+                        r2adj = 0.135888,
+                        ssres = 0.00591031,
+                        stderr = 0.01985,
+                        stderrp = 39.2966,
+                        stdev = 0.0213538},
+                date = '...')
+        >>> # observed values for DPUH
+        >>> variables["_YOBS1", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YOBS1        0.06    0.09    0.07  ...    0.04    0.04    0.01
+        <BLANKLINE>
+        >>> # fitted values for DPUH
+        >>> variables["_YCALC1", "1980Y1:1996Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name      1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YCALC1       0.07    0.06    0.08  ...    0.04    0.03    0.03
+        <BLANKLINE>
+        >>> # residuals values for DPUH
+        >>> variables["_YRES1", "1980Y1:1996Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1980Y1:1996Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1980Y1  1981Y1  1982Y1  ...  1994Y1  1995Y1  1996Y1
+        _YRES1       -0.01    0.02   -0.02  ...   -0.00    0.01   -0.03
+        <BLANKLINE>
         """
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
