@@ -352,6 +352,11 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
 
             // create the Scalars containing the results of an estimated equation
             E_tests2scl(&eq, i, E_T, E_NCE);
+
+            // create the Variables containing the fitted, observed and residual values
+            E_savevar("_YCALC", i, E_RHS);
+            E_savevar("_YOBS", i, E_LHS); 
+            E_savevar("_YRES", i, E_U);   
         }
         else
         {
