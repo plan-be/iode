@@ -2132,7 +2132,7 @@ cdef class Variables(IodeDatabase):
             If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
             The first (combined) axis must be equal to the variables names.
             If `other` is an iode Variables object, add the two Variables objects.
-            The two Variables objects must share the same sample and represent the same set of variables names.
+            `self` and `other` must share the same sample and represent the same set of variables names.
         
         Returns
         -------
@@ -2141,8 +2141,8 @@ cdef class Variables(IodeDatabase):
         Warnings
         --------
         Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
-        between for the names and periods. The result is not guaranteed to be correct. 
-        This possibility is provided for speed reasons (when the subset is large).
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
 
         Examples
         --------
@@ -2318,7 +2318,7 @@ cdef class Variables(IodeDatabase):
 
         >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
         >>> #          as there is no compatibility check between for the names and periods.
-        >>> #          The result is not guaranteed to be correct.
+        >>> #          The result is not guaranteed to be the one you expected.
         >>> #          This possibility is provided for speed reasons 
         >>> #          (when dealing with large subsets/databases).
         >>> # add a numpy 1D ndarray to a single variable
@@ -2384,20 +2384,16 @@ cdef class Variables(IodeDatabase):
 
         Parameters
         ----------
-        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+        other: int, float, numpy ndarray, larray Array or iode Variables
             If `other` is an int or a float, add the scalar to all values of the current (subset of) Variables object.
             If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
             Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
             columns must be equal to the number of periods.
-            If `other` is a pandas Series, it must represent either a single variable or a single period.
-            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
-            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
-            variables names and the columns of the DataFrame must be equal to the periods.
             If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
             If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
             The first (combined) axis must be equal to the variables names.
             If `other` is an iode Variables object, add the two Variables objects.
-            The two Variables objects must share the same sample and represent the same set of variables names.
+            `self` and `other` must share the same sample and represent the same set of variables names.
         
         Returns
         -------
@@ -2406,8 +2402,8 @@ cdef class Variables(IodeDatabase):
         Warnings
         --------
         Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
-        between for the names and periods. The result is not guaranteed to be correct. 
-        This possibility is provided for speed reasons (when the subset is large).
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
 
         Examples
         --------
@@ -2439,7 +2435,7 @@ cdef class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # add a scalar to all values of a subset of a Variables object
-        >>> new_vars_subset = vars_subset + 2.0
+        >>> new_vars_subset = 2.0 + vars_subset
         >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 5
@@ -2474,86 +2470,12 @@ cdef class Variables(IodeDatabase):
         AQC           2.13    2.22    2.31    2.31    2.32
         <BLANKLINE>
 
-        >>> # add a pandas Series to a single variable
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
-        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
-        1991Y1    1.0
-        1992Y1    2.0
-        1993Y1    3.0
-        1994Y1    4.0
-        1995Y1    5.0
-        dtype: float64
-        >>> updated_ACAF = vars_subset["ACAF"] + series
-        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1991Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
-        ACAF         27.24   32.16   37.66   12.16   -8.13
-        <BLANKLINE>
-        
-        >>> # add a pandas Series to a subset corresponding to a single period
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
-        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
-        ACAF     1.0
-        ACAG     2.0
-        AOUC     3.0
-        AOUC_    4.0
-        AQC      5.0
-        dtype: float64
-        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + series
-        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 5
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1995Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1995Y1
-        ACAF        -12.13
-        ACAG        -39.85
-        AOUC          4.05
-        AOUC_         5.00
-        AQC           6.16
-        <BLANKLINE>
-
-        >>> # add a pandas DataFrame to the subset of a Variables object  
+        >>> # add an larray Array to a subset of a Variables object
         >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
         ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
-        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
-        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
-               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
-        ACAF      1.0     2.0     3.0     4.0     5.0
-        ACAG      6.0     7.0     8.0     9.0    10.0
-        AOUC     11.0    12.0    13.0    14.0    15.0
-        AOUC_    16.0    17.0    18.0    19.0    20.0
-        AQC      21.0    22.0    23.0    24.0    25.0
-        >>> new_vars_subset = vars_subset + df
-        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 5
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1991Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
-        ACAF         27.24   32.16   37.66   12.16   -8.13
-        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
-        AOUC         12.02   13.03   14.03   15.05   16.05
-        AOUC_        16.96   17.97   18.98   19.99   21.00
-        AQC          22.06   23.11   24.15   25.16   26.16
-        <BLANKLINE>
-
-        >>> # add an larray Array to a subset of a Variables object
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
         >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
@@ -2564,7 +2486,7 @@ cdef class Variables(IodeDatabase):
               AOUC    11.0    12.0    13.0    14.0    15.0
              AOUC_    16.0    17.0    18.0    19.0    20.0
                AQC    21.0    22.0    23.0    24.0    25.0
-        >>> new_vars_subset = vars_subset + array
+        >>> new_vars_subset = array + vars_subset
         >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 5
@@ -2583,62 +2505,45 @@ cdef class Variables(IodeDatabase):
 
         >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
         >>> #          as there is no compatibility check between for the names and periods.
-        >>> #          The result is not guaranteed to be correct.
+        >>> #          The result is not guaranteed to be the one you expected.
         >>> #          This possibility is provided for speed reasons 
         >>> #          (when dealing with large subsets/databases).
         >>> # add a numpy 1D ndarray to a single variable
         >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
-        >>> updated_ACAF = vars_subset["ACAF"] + data
+        >>> updated_ACAF = data + vars_subset["ACAF"]
         >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 1
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1991Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
-        ACAF         27.24   32.16   37.66   12.16   -8.13
-        <BLANKLINE>
+        array([[ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ]])
         >>> # add a numpy 1D ndarray to the subset corresponding to a single period
-        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] + data
+        >>> vars_subset_1995Y1 = data + vars_subset[:, "1995Y1"]
         >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 5
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1995Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1995Y1
-        ACAF        -12.13
-        ACAG        -39.85
-        AOUC          4.05
-        AOUC_         5.00
-        AQC           6.16
-        <BLANKLINE>        
+        array([[-12.130997  , -11.130997  , -10.130997  ,  -9.130997  ,
+                 -8.130997  ],
+               [-40.845993  , -39.845993  , -38.845993  , -37.845993  ,
+                -36.845993  ],
+               [  2.0498914 ,   3.0498914 ,   4.0498914 ,   5.0498914 ,
+                  6.0498914 ],
+               [  1.99526324,   2.99526324,   3.99526324,   4.99526324,
+                  5.99526324],
+               [  2.1616869 ,   3.1616869 ,   4.1616869 ,   5.1616869 ,
+                  6.1616869 ]])        
         >>> # add a numpy 2D ndarray to a (subset of a) Variables object
         >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
         ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
-        >>> new_vars_subset = vars_subset + data
+        >>> new_vars_subset = data + vars_subset
         >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Workspace: Variables
-        nb variables: 5
-        filename: ...fun.var
-        description: Modèle fun - Simulation 1
-        sample: 1991Y1:1995Y1
-        mode: LEVEL
-        <BLANKLINE>
-         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
-        ACAF         27.24   32.16   37.66   12.16   -8.13
-        ACAG        -24.93  -33.29  -35.16   -7.03  -31.85
-        AOUC         12.02   13.03   14.03   15.05   16.05
-        AOUC_        16.96   17.97   18.98   19.99   21.00
-        AQC          22.06   23.11   24.15   25.16   26.16
-        <BLANKLINE>
+        array([[ 27.240999  ,  32.159     ,  37.661999  ,  12.1610022 ,
+                 -8.130997  ],
+               [-24.934     , -33.285999  , -35.157997  ,  -7.029003  ,
+                -31.845993  ],
+               [ 12.02443339,  13.0314501 ,  14.03091768,  15.04628419,
+                 16.0498914 ],
+               [ 16.96466659,  17.97403904,  18.97881286,  19.98955638,
+                 20.99526324],
+               [ 22.0628064 ,  23.1102825 ,  24.1532652 ,  25.1571276 ,
+                 26.1616869 ]])
         """
         return self.__binary_op__(other, BinaryOperation.OP_ADD, True)
 
@@ -2662,13 +2567,13 @@ cdef class Variables(IodeDatabase):
             If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
             The first (combined) axis must be equal to the variables names.
             If `other` is an iode Variables object, add the two Variables objects.
-            The two Variables objects must share the same sample and represent the same set of variables names.
+            `self` and `other` must share the same sample and represent the same set of variables names.
 
         Warnings
         --------
         Adding a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
-        between for the names and periods. The result is not guaranteed to be correct. 
-        This possibility is provided for speed reasons (when the subset is large).
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
 
         Examples
         --------
@@ -2844,7 +2749,7 @@ cdef class Variables(IodeDatabase):
 
         >>> # WARNING: adding a numpy ndarray to a (subset of a) Variables object is not recommended 
         >>> #          as there is no compatibility check between for the names and periods.
-        >>> #          The result is not guaranteed to be correct.
+        >>> #          The result is not guaranteed to be the one you expected.
         >>> #          This possibility is provided for speed reasons 
         >>> #          (when dealing with large subsets/databases).
         >>> # add a numpy 1D ndarray to a single variable
@@ -2906,10 +2811,331 @@ cdef class Variables(IodeDatabase):
 
     # self - other
     def __sub__(self, other):
+        r"""
+        Subtract `other` from the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, subtract the scalar from all values of the current (subset of) Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+        
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Subtracting a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # subtract a scalar from all values of a subset of a Variables object
+        >>> new_vars_subset = vars_subset - 2.0
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF     	 24.24	 28.16	 32.66	  6.16	-15.13
+        ACAG     	-32.93	-42.29	-45.16	-18.03	-43.85
+        AOUC    	 -0.98	 -0.97	 -0.97	 -0.95	 -0.95
+        AOUC_   	 -1.04	 -1.03	 -1.02	 -1.01	 -1.00
+        AQC  	     -0.94	 -0.89	 -0.85	 -0.84	 -0.84
+        <BLANKLINE>
+
+        >>> # subtract (a subset of) a Variables object from another
+        >>> new_vars_subset = vars_subset - vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF 	      0.00	  0.00	  0.00	  0.00	  0.00
+        ACAG 	      0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC 	      0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC_	      0.00	  0.00	  0.00	  0.00	  0.00
+        AQC  	      0.00	  0.00	  0.00	  0.00	  0.00
+        <BLANKLINE>
+
+        >>> # subtract a pandas Series from a single variable
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] - series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     25.24	 28.16	 31.66	  4.16	-18.13
+        <BLANKLINE>
+        
+        >>> # subtract a pandas Series from a subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] - series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF 	    -14.13
+        ACAG     	-43.85
+        AOUC 	     -1.95
+        AOUC_	     -3.00
+        AQC  	     -3.84
+        <BLANKLINE>
+
+        >>> # subtract a pandas DataFrame from the subset of a Variables object  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset - df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF    	 25.24	 28.16	 31.66	  4.16	-18.13
+        ACAG     	-36.93	-47.29	-51.16	-25.03	-51.85
+        AOUC     	 -9.98	-10.97	-11.97	-12.95	-13.95
+        AOUC_    	-15.04	-16.03	-17.02	-18.01	-19.00
+        AQC     	-19.94	-20.89	-21.85	-22.84	-23.84
+        <BLANKLINE>
+
+        >>> # subtract an larray Array from a subset of a Variables object
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset - array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF     	 25.24	 28.16	 31.66	  4.16	-18.13
+        ACAG     	-36.93	-47.29	-51.16	-25.03	-51.85
+        AOUC     	 -9.98	-10.97	-11.97	-12.95	-13.95
+        AOUC_   	-15.04	-16.03	-17.02	-18.01	-19.00
+        AQC      	-19.94	-20.89	-21.85	-22.84	-23.84
+        <BLANKLINE>        
+
+        >>> # WARNING: subtracting a numpy ndarray from a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # subtract a numpy 1D ndarray from a single variable
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> updated_ACAF = vars_subset["ACAF"] - data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     25.24	 28.16	 31.66	  4.16	-18.13
+        <BLANKLINE>
+        >>> # subtract a numpy 1D ndarray from the subset corresponding to a single period
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] - data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF 	    -14.13
+        ACAG     	-43.85
+        AOUC     	 -1.95
+        AOUC_   	 -3.00
+        AQC      	 -3.84
+        <BLANKLINE>        
+        >>> # subtract a numpy 2D ndarray from a (subset of a) Variables object
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> new_vars_subset = vars_subset - data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF    	 25.24	 28.16	 31.66	  4.16	-18.13
+        ACAG    	-36.93	-47.29	-51.16	-25.03	-51.85
+        AOUC    	 -9.98	-10.97	-11.97	-12.95	-13.95
+        AOUC_    	-15.04	-16.03	-17.02	-18.01	-19.00
+        AQC  	    -19.94	-20.89	-21.85	-22.84	-23.84
+        <BLANKLINE>
+        """
         return self.__binary_op__(other, BinaryOperation.OP_SUB, True)
 
     # other - self
     def __rsub__(self, other):
+        r"""
+        subtract `self` from `other`.
+
+        Parameters
+        ----------
+        other: iode Variables
+            `self` and `other` must share the same sample and represent 
+            the same set of variables names.
+        
+        Returns
+        -------
+        Variables
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # subtract a (subset of) Variables object from another
+        >>> new_vars_subset = vars_subset - vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF 	      0.00	  0.00	  0.00	  0.00	  0.00
+        ACAG     	  0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC     	  0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC_	      0.00	  0.00	  0.00	  0.00	  0.00
+        AQC  	      0.00	  0.00	  0.00	  0.00	  0.00
+        <BLANKLINE>
+        """
         if isinstance(other, Variables):
             return other.__binary_op__(self, BinaryOperation.OP_SUB, True)
         else:
@@ -2918,38 +3144,1554 @@ cdef class Variables(IodeDatabase):
 
     # self -= other
     def __isub__(self, other):
+        r"""
+        subtract `other` from the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, subtract the scalar from all values of the current (subset of) Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+        Warnings
+        --------
+        Subtracting a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # subtract a scalar from all values of the current subset of a Variables object
+        >>> vars_subset -= 2.0
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF     	 24.24	 28.16	 32.66	  6.16	-15.13
+        ACAG     	-32.93	-42.29	-45.16	-18.03	-43.85
+        AOUC    	 -0.98	 -0.97	 -0.97	 -0.95	 -0.95
+        AOUC_   	 -1.04	 -1.03	 -1.02	 -1.01	 -1.00
+        AQC  	     -0.94	 -0.89	 -0.85	 -0.84	 -0.84
+        <BLANKLINE>
+
+        >>> # subtract a (subsets of) a Variables object from the current one
+        >>> vars_subset -= vars_subset
+        >>> vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF 	      0.00	  0.00	  0.00	  0.00	  0.00
+        ACAG 	      0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC 	      0.00	  0.00	  0.00	  0.00	  0.00
+        AOUC_	      0.00	  0.00	  0.00	  0.00	  0.00
+        AQC  	      0.00	  0.00	  0.00	  0.00	  0.00
+        <BLANKLINE>
+
+        >>> # subtract a pandas Series from a single variable
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> vars_subset["ACAF"] -= series
+        >>> vars_subset["ACAF"]                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         -1.00   -2.00   -3.00   -4.00   -5.00
+        <BLANKLINE>
+        
+        >>> # subtract a pandas Series from the subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset[:, "1995Y1"] -= series
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF         -6.00
+        ACAG         -2.00
+        AOUC         -3.00
+        AOUC_        -4.00
+        AQC          -5.00
+        <BLANKLINE>
+
+        >>> # subtract a pandas DataFrame from the current subset of the Variables object  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset -= df
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         -2.00   -4.00   -6.00   -8.00  -11.00
+        ACAG         -6.00   -7.00   -8.00   -9.00  -12.00
+        AOUC        -11.00  -12.00  -13.00  -14.00  -18.00
+        AOUC_       -16.00  -17.00  -18.00  -19.00  -24.00
+        AQC         -21.00  -22.00  -23.00  -24.00  -30.00
+        <BLANKLINE>
+
+        >>> # subtract an larray Array from the current subset of the Variables object
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset -= array
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         -3.00   -6.00   -9.00  -12.00  -16.00
+        ACAG        -12.00  -14.00  -16.00  -18.00  -22.00
+        AOUC        -22.00  -24.00  -26.00  -28.00  -33.00
+        AOUC_       -32.00  -34.00  -36.00  -38.00  -44.00
+        AQC         -42.00  -44.00  -46.00  -48.00  -55.00
+        <BLANKLINE>   
+
+        >>> # WARNING: subtracting a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # subtract a numpy 1D ndarray from a single variable
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> vars_subset["ACAF"] -= data
+        >>> vars_subset["ACAF"]                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         -4.00   -8.00  -12.00  -16.00  -21.00
+        <BLANKLINE>
+        >>> # subtract a numpy 1D ndarray from the subset corresponding to a single period
+        >>> vars_subset[:, "1995Y1"] -= data
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF        -22.00
+        ACAG        -24.00
+        AOUC        -36.00
+        AOUC_       -48.00
+        AQC         -60.00
+        <BLANKLINE>        
+        >>> # subtract a numpy 2D ndarray from the current (subset of the) Variables object
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> vars_subset -= data
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         -5.00  -10.00  -15.00  -20.00  -27.00
+        ACAG        -18.00  -21.00  -24.00  -27.00  -34.00
+        AOUC        -33.00  -36.00  -39.00  -42.00  -51.00
+        AOUC_       -48.00  -51.00  -54.00  -57.00  -68.00
+        AQC         -63.00  -66.00  -69.00  -72.00  -85.00
+        <BLANKLINE>
+        """
         self.__binary_op__(other, BinaryOperation.OP_SUB, False)
         return self
 
     # self * other
     def __mul__(self, other):
+        r"""
+        multiply the current (subset of) Variables object by `other`.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, multiply all values of the current (subset of) Variables object the scalar.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.        
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Multiplying a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # multiply all values of a subset of a Variables object by a scalar
+        >>> new_vars_subset = vars_subset * 2.0
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF    	 52.48	 60.32	 69.32	 16.32	-26.26
+        ACAG     	-61.87	-80.57	-86.32	-32.06	-83.69
+        AOUC 	      2.05	  2.06	  2.06	  2.09	  2.10
+        AOUC_	      1.93	  1.95	  1.96	  1.98	  1.99
+        AQC  	      2.13	  2.22	  2.31	  2.31	  2.32
+        <BLANKLINE>
+
+        >>> # multiply two (subsets of) a Variables object
+        >>> new_vars_subset = vars_subset * vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1   1992Y1   1993Y1  1994Y1   1995Y1
+        ACAF     	688.59	 909.57	 1201.45   66.60   172.42
+        ACAG     	956.91	1622.96	 1862.61  256.93  1751.09
+        AOUC 	      1.05	   1.06	    1.06	1.09	 1.10
+        AOUC_	      0.93	   0.95	    0.96	0.98	 0.99
+        AQC  	      1.13	   1.23	    1.33	1.34	 1.35
+        <BLANKLINE>
+
+        >>> # multiply a single variable by a pandas Series
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] * series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     26.24	 60.32	103.99	 32.64	-65.65
+        <BLANKLINE>
+        
+        >>> # multiply a subset corresponding to a single period by a pandas Series
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] * series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name    1995Y1
+        ACAF 	 -13.13
+        ACAG 	 -83.69
+        AOUC 	   3.15
+        AOUC_	   3.98
+        AQC  	   5.81
+        <BLANKLINE>
+
+        >>> # multiply a subset of a Variables object by a pandas DataFrame  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset * df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          26.24   60.32  103.99   32.64  -65.65
+        ACAG        -185.60 -282.00 -345.26 -144.26 -418.46
+        AOUC          11.27   12.38   13.40   14.65   15.75
+        AOUC_         15.43   16.56   17.62   18.80   19.91
+        AQC           22.32   24.43   26.53   27.77   29.04
+        <BLANKLINE>
+
+        >>> # multiply a subset of a Variables object by an larray Array
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset * array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          26.24   60.32  103.99   32.64  -65.65
+        ACAG        -185.60 -282.00 -345.26 -144.26 -418.46
+        AOUC          11.27   12.38   13.40   14.65   15.75
+        AOUC_         15.43   16.56   17.62   18.80   19.91
+        AQC           22.32   24.43   26.53   27.77   29.04
+        <BLANKLINE>     
+
+        >>> # WARNING: multiplying a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # multiply a single variable by a numpy 1D ndarray
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> updated_ACAF = vars_subset["ACAF"] * data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     26.24	 60.32	103.99	 32.64	-65.65
+        <BLANKLINE>
+        >>> # multiply the subset corresponding to a single period by a numpy 1D ndarray
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] * data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name   1995Y1
+        ACAF 	-13.13
+        ACAG 	-83.69
+        AOUC 	  3.15
+        AOUC_	  3.98
+        AQC  	  5.81
+        <BLANKLINE>       
+        >>> # multiply a (subset of a) Variables object by a numpy 2D ndarray
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> new_vars_subset = vars_subset * data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          26.24   60.32  103.99   32.64  -65.65
+        ACAG        -185.60 -282.00 -345.26 -144.26 -418.46
+        AOUC          11.27   12.38   13.40   14.65   15.75
+        AOUC_         15.43   16.56   17.62   18.80   19.91
+        AQC           22.32   24.43   26.53   27.77   29.04
+        <BLANKLINE>
+        """
         return self.__binary_op__(other, BinaryOperation.OP_MUL, True)
     
     # other * self
     def __rmul__(self, other):
+        r"""
+        multiply `other` by the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, larray Array or iode Variables
+            If `other` is an int or a float, multiply all values of the current (subset of) Variables object by the scalar.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.        
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Multiplying a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # multiply all values of a subset of a Variables object by a scalar
+        >>> new_vars_subset = 2.0 * vars_subset
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF    	 52.48	 60.32	 69.32	 16.32	-26.26
+        ACAG     	-61.87	-80.57	-86.32	-32.06	-83.69
+        AOUC 	      2.05	  2.06	  2.06	  2.09	  2.10
+        AOUC_	      1.93	  1.95	  1.96	  1.98	  1.99
+        AQC  	      2.13	  2.22	  2.31	  2.31	  2.32
+        <BLANKLINE>
+
+        >>> # multiply two (subsets of) a Variables object
+        >>> new_vars_subset = vars_subset * vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF     	688.59	 909.57	 1201.45   66.60   172.42
+        ACAG     	956.91	1622.96	 1862.61  256.93  1751.09
+        AOUC 	      1.05	   1.06	    1.06	1.09	 1.10
+        AOUC_	      0.93	   0.95	    0.96	0.98	 0.99
+        AQC  	      1.13	   1.23	    1.33	1.34	 1.35
+        <BLANKLINE>
+
+        >>> # multiply a subset of a Variables object by an larray Array
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = array * vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          26.24   60.32  103.99   32.64  -65.65
+        ACAG        -185.60 -282.00 -345.26 -144.26 -418.46
+        AOUC          11.27   12.38   13.40   14.65   15.75
+        AOUC_         15.43   16.56   17.62   18.80   19.91
+        AQC           22.32   24.43   26.53   27.77   29.04
+        <BLANKLINE>   
+
+        >>> # WARNING: multiplying a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # multiply a single variable by a numpy 1D ndarray
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> result = data + vars_subset["ACAF"]
+        >>> result                                      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ]])
+        >>> # multiply the subset corresponding to a single period by a numpy 1D ndarray
+        >>> vars_subset_1995Y1 = data * vars_subset[:, "1995Y1"]
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[ -13.130997  ,  -26.261994  ,  -39.392991  ,  -52.523988  ,
+                -65.654985  ],
+               [ -41.845993  ,  -83.691986  , -125.537979  , -167.383972  ,
+                -209.229965  ],
+               [   1.0498914 ,    2.0997828 ,    3.1496742 ,    4.1995656 ,
+                   5.24945701],
+               [   0.99526324,    1.99052648,    2.98578972,    3.98105296,
+                   4.9763162 ],
+               [   1.1616869 ,    2.3233738 ,    3.4850607 ,    4.6467476 ,
+                   5.8084345 ]])       
+        >>> # multiply a (subset of a) Variables object by a numpy 2D ndarray
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> result = data * vars_subset
+        >>> result                                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        array([[  26.240999  ,   60.318     ,  103.985997  ,   32.6440088 ,
+                  -65.654985  ],
+                [-185.604     , -282.001993  , -345.263976  , -144.261027  ,
+                 -418.45993   ],
+                [  11.26876733,   12.37740123,   13.40192989,   14.6479787 ,
+                   15.74837102],
+                [  15.4346655 ,   16.55866374,   17.61863151,   18.80157119,
+                   19.90526479],
+                [  22.3189344 ,   24.426215  ,   26.5250996 ,   27.7710624 ,
+                   29.0421725 ]])
+        """
         return self.__binary_op__(other, BinaryOperation.OP_MUL, True)
 
     # self *= other
     def __imul__(self, other):
+        r"""
+        multiply the current (subset of) Variables object by `other`.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, multiply all values of the current (subset of) Variables object by the scalar.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+
+        Warnings
+        --------
+        Multiplying a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # multiply all values of a subset of a Variables object by a scalar
+        >>> vars_subset *= 2.0
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF    	 52.48	 60.32	 69.32	 16.32	-26.26
+        ACAG     	-61.87	-80.57	-86.32	-32.06	-83.69
+        AOUC 	      2.05	  2.06	  2.06	  2.09	  2.10
+        AOUC_	      1.93	  1.95	  1.96	  1.98	  1.99
+        AQC  	      2.13	  2.22	  2.31	  2.31	  2.32
+        <BLANKLINE>
+
+        >>> # multiply two (subsets of) a Variables object
+        >>> vars_subset *= vars_subset
+        >>> vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF        2754.36 3638.26 4805.82  266.41  689.69
+        ACAG        3827.65 6491.85 7450.45 1027.72 7004.35
+        AOUC           4.20    4.26    4.25    4.38    4.41
+        AOUC_          3.72    3.80    3.83    3.92    3.96
+        AQC            4.52    4.93    5.32    5.36    5.40
+        <BLANKLINE>
+
+        >>> # multiply a single variable by a pandas Series
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> vars_subset["ACAF"] *= series
+        >>> vars_subset["ACAF"]                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name         1991Y1   1992Y1    1993Y1   1994Y1   1995Y1
+        ACAF        2754.36  7276.52  14417.45  1065.63  3448.46
+        <BLANKLINE>
+        
+        >>> # multiply a subset corresponding to a single period by a pandas Series
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset[:, "1995Y1"] *= series
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name         1995Y1
+        ACAF         3448.46
+        ACAG        14008.70
+        AOUC           13.23
+        AOUC_          15.85
+        AQC            26.99
+        <BLANKLINE>
+
+        >>> # multiply a subset of a Variables object by a pandas DataFrame  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset *= df
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name         1991Y1          1992Y1          1993Y1         1994Y1    1995Y1
+        ACAF         2754.36        14553.04        43252.35        4262.53   17242.31
+        ACAG        22965.90        45442.93        59603.61        9249.44  140086.97
+        AOUC           46.18           51.07           55.27          61.30     198.41
+        AOUC_          59.56           64.52           68.98          74.42     316.98
+        AQC            94.88          108.48          122.36         128.54     674.76
+        <BLANKLINE>
+
+        >>> # multiply a subset of a Variables object by an larray Array
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> vars_subset *= array
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name          1991Y1          1992Y1          1993Y1         1994Y1            1995Y1
+        ACAF          2754.36        29106.09       129757.05       17050.10          86211.54
+        ACAG        137795.38       318100.50       476828.85       83244.98        1400869.70
+        AOUC           507.94          612.80          718.45         858.25           2976.13
+        AOUC_          952.92         1096.76         1241.66        1414.00           6339.51
+        AQC           1992.54         2386.56         2814.32        3084.93          16868.96
+        <BLANKLINE>    
+
+        >>> # WARNING: multiplying a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # multiply a single variable by a numpy 1D ndarray
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> vars_subset["ACAF"] *= data
+        >>> vars_subset["ACAF"]                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name         1991Y1    1992Y1     1993Y1    1994Y1     1995Y1
+        ACAF        2754.36  58212.18  389271.15  68200.40  431057.71
+        <BLANKLINE>
+        >>> # multiply the subset corresponding to a single period by a numpy 1D ndarray
+        >>> vars_subset[:, "1995Y1"] *= data
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name           1995Y1
+        ACAF         431057.71
+        ACAG        2801739.41
+        AOUC           8928.40
+        AOUC_         25358.05
+        AQC           84344.78
+        <BLANKLINE>      
+        >>> # multiply a (subset of a) Variables object by a numpy 2D ndarray
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> vars_subset *= data
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name          1991Y1          1992Y1          1993Y1          1994Y1            1995Y1
+        ACAF          2754.36        116424.36      1167813.46      272801.62        2155288.53
+        ACAG        826772.28       2226703.47      3814630.82      749204.78       28017394.08
+        AOUC          5587.35          7353.60         9339.81       12015.54         133926.04
+        AOUC_        15246.65         18644.88        22349.96       26865.93         507161.04
+        AQC          41843.33         52504.32        64729.44       74038.26        2108619.46
+        <BLANKLINE>
+        """
         self.__binary_op__(other, BinaryOperation.OP_MUL, False)
         return self
 
     # self / other
     def __truediv__(self, other):
+        r"""
+        divide the current (subset of) Variables object by `other`.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, divide all values of the current (subset of) Variables object by the scalar.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+                
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Dividing a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # divide all values of a subset of a Variables object by a scalar
+        >>> new_vars_subset = vars_subset / 2.0
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	 13.12	 15.08	 17.33	  4.08	 -6.57
+        ACAG 	-15.47	-20.14	-21.58	 -8.01	-20.92
+        AOUC 	  0.51	  0.52	  0.52	  0.52	  0.52
+        AOUC_	  0.48	  0.49	  0.49	  0.49	  0.50
+        AQC  	  0.53	  0.56	  0.58	  0.58	  0.58
+        <BLANKLINE>
+
+        >>> # divide (a subset of) a Variables object by another
+        >>> new_vars_subset = vars_subset / vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	  1.00	  1.00	  1.00	  1.00	  1.00
+        ACAG 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC_	  1.00	  1.00	  1.00	  1.00	  1.00
+        AQC  	  1.00	  1.00	  1.00	  1.00	  1.00
+        <BLANKLINE>
+
+        >>> # divide a a single variable by a pandas Series
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.0
+        1992Y1    2.0
+        1993Y1    3.0
+        1994Y1    4.0
+        1995Y1    5.0
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] / series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF	 26.24	 15.08	 11.55	  2.04	 -2.63
+        <BLANKLINE>
+        
+        >>> # divide a pandas Series to the subset corresponding to a single period
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.0
+        ACAG     2.0
+        AOUC     3.0
+        AOUC_    4.0
+        AQC      5.0
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] / series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1995Y1
+        ACAF 	-13.13
+        ACAG 	-20.92
+        AOUC 	  0.35
+        AOUC_	  0.25
+        AQC  	  0.23
+        <BLANKLINE>
+
+        >>> # divide a (subset of a) Variables object by a pandas DataFrame  
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      1.0     2.0     3.0     4.0     5.0
+        ACAG      6.0     7.0     8.0     9.0    10.0
+        AOUC     11.0    12.0    13.0    14.0    15.0
+        AOUC_    16.0    17.0    18.0    19.0    20.0
+        AQC      21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset / df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	 26.24	 15.08	 11.55	  2.04	 -2.63
+        ACAG 	 -5.16	 -5.76	 -5.39	 -1.78	 -4.18
+        AOUC 	  0.09	  0.09	  0.08	  0.07	  0.07
+        AOUC_	  0.06	  0.06	  0.05	  0.05	  0.05
+        AQC  	  0.05	  0.05	  0.05	  0.05	  0.05
+        <BLANKLINE>
+
+        >>> # divide (a subset of) a Variables object by an larray Array
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     3.0     4.0     5.0
+              ACAG     6.0     7.0     8.0     9.0    10.0
+              AOUC    11.0    12.0    13.0    14.0    15.0
+             AOUC_    16.0    17.0    18.0    19.0    20.0
+               AQC    21.0    22.0    23.0    24.0    25.0
+        >>> new_vars_subset = vars_subset / array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	 26.24	 15.08	 11.55	  2.04	 -2.63
+        ACAG 	 -5.16	 -5.76	 -5.39	 -1.78	 -4.18
+        AOUC 	  0.09	  0.09	  0.08	  0.07	  0.07
+        AOUC_	  0.06	  0.06	  0.05	  0.05	  0.05
+        AQC  	  0.05	  0.05	  0.05	  0.05	  0.05
+        <BLANKLINE>        
+
+        >>> # WARNING: dividing a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # divide a single variable by a numpy 1D ndarray
+        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        >>> updated_ACAF = vars_subset["ACAF"] / data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF	 26.24	 15.08	 11.55	  2.04	 -2.63
+        <BLANKLINE>
+        >>> # divide the subset corresponding to a single period by a numpy 1D ndarray
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] / data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1995Y1
+        ACAF 	-13.13
+        ACAG 	-20.92
+        AOUC 	  0.35
+        AOUC_	  0.25
+        AQC  	  0.23
+        <BLANKLINE>
+        >>> # divide a (subset of a) Variables object by a numpy 2D ndarray
+        >>> data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0], 
+        ...                  [6.0, 7.0, 8.0, 9.0, 10.0], 
+        ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
+        ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
+        ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
+        >>> new_vars_subset = vars_subset / data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	 26.24	 15.08	 11.55	  2.04	 -2.63
+        ACAG 	 -5.16	 -5.76	 -5.39	 -1.78	 -4.18
+        AOUC 	  0.09	  0.09	  0.08	  0.07	  0.07
+        AOUC_	  0.06	  0.06	  0.05	  0.05	  0.05
+        AQC  	  0.05	  0.05	  0.05	  0.05	  0.05
+        <BLANKLINE>
+        """
         if isinstance(other, (int, float)) and other == 0:
             raise ZeroDivisionError("division by zero")
         return self.__binary_op__(other, BinaryOperation.OP_DIV, True)
 
     # other / self
     def __rtruediv__(self, other):
+        r"""
+        divide `other` by the current (subset of) Variables object.
+
+        Parameters
+        ----------
+        other: iode Variables
+            `self` and `other` must share the same sample and represent 
+            the same set of variables names.
+        
+        Returns
+        -------
+        Variables
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # divide (a subset of) a Variables object by another
+        >>> new_vars_subset = vars_subset / vars_subset
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	  1.00	  1.00	  1.00	  1.00	  1.00
+        ACAG 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC_	  1.00	  1.00	  1.00	  1.00	  1.00
+        AQC  	  1.00	  1.00	  1.00	  1.00	  1.00
+        <BLANKLINE>
+        """
         if isinstance(other, Variables):
-            return self.__binary_op__(other, BinaryOperation.OP_DIV, True)
+            return other.__binary_op__(self, BinaryOperation.OP_DIV, True)
         else:
             raise TypeError(f"unsupported operand type for 'X' in the arithmetic operation 'X / Y'.\n"
                             f"The only accepted type for 'X' is 'Variables'.\nGot 'X' of type {type(other).__name__} instead")
 
     # self /= other
     def __itruediv__(self, other):
+        r"""
+        divide the current (subset of) Variables object by `other`.
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, divide all values of the current (subset of) Variables object by the scalar.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+        
+        Warnings
+        --------
+        Dividing a numpy ndarray to a Variables object is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # divide all values of a subset of a Variables object by a scalar
+        >>> vars_subset /= 2.0
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	 13.12	 15.08	 17.33	  4.08	 -6.57
+        ACAG 	-15.47	-20.14	-21.58	 -8.01	-20.92
+        AOUC 	  0.51	  0.52	  0.52	  0.52	  0.52
+        AOUC_	  0.48	  0.49	  0.49	  0.49	  0.50
+        AQC  	  0.53	  0.56	  0.58	  0.58	  0.58
+        <BLANKLINE>
+
+        >>> # divide (a subset of) a Variables object by another
+        >>> vars_subset /= vars_subset
+        >>> vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	1991Y1	1992Y1	1993Y1	1994Y1	1995Y1
+        ACAF 	  1.00	  1.00	  1.00	  1.00	  1.00
+        ACAG 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC 	  1.00	  1.00	  1.00	  1.00	  1.00
+        AOUC_	  1.00	  1.00	  1.00	  1.00	  1.00
+        AQC  	  1.00	  1.00	  1.00	  1.00	  1.00
+        <BLANKLINE>
+
+        >>> # divide a a single variable by a pandas Series
+        >>> series = pd.Series([1.0, 0.5, 0.25, 0.2, 0.1], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.00
+        1992Y1    0.50
+        1993Y1    0.25
+        1994Y1    0.20
+        1995Y1    0.10
+        dtype: float64
+        >>> vars_subset["ACAF"] /= series
+        >>> vars_subset["ACAF"]                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF          1.00    2.00    4.00    5.00   10.00
+        <BLANKLINE>
+        
+        >>> # divide a pandas Series to the subset corresponding to a single period
+        >>> series = pd.Series([1.0, 0.5, 0.25, 0.2, 0.1], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.00
+        ACAG     0.50
+        AOUC     0.25
+        AOUC_    0.20
+        AQC      0.10
+        dtype: float64
+        >>> vars_subset[:, "1995Y1"] /= series
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF         10.00
+        ACAG          2.00
+        AOUC          4.00
+        AOUC_         5.00
+        AQC          10.00
+        <BLANKLINE>
+
+        >>> # divide a (subset of a) Variables object by a pandas DataFrame  
+        >>> data = np.array([[0.1, 0.2, 0.25, 0.5, 1.0], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1]])
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF      0.1     0.2    0.25     0.5     1.0
+        ACAG      1.0     0.5    0.25     0.2     0.1
+        AOUC      1.0     0.5    0.25     0.2     0.1
+        AOUC_     1.0     0.5    0.25     0.2     0.1
+        AQC       1.0     0.5    0.25     0.2     0.1
+        >>> vars_subset /= df
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         10.00   10.00   16.00   10.00   10.00
+        ACAG          1.00    2.00    4.00    5.00   20.00
+        AOUC          1.00    2.00    4.00    5.00   40.00
+        AOUC_         1.00    2.00    4.00    5.00   50.00
+        AQC           1.00    2.00    4.00    5.00  100.00
+        <BLANKLINE>
+
+        >>> # divide (a subset of) a Variables object by an larray Array
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+            ACAF       0.1     0.2    0.25     0.5     1.0
+            ACAG       1.0     0.5    0.25     0.2     0.1
+            AOUC       1.0     0.5    0.25     0.2     0.1
+            AOUC_      1.0     0.5    0.25     0.2     0.1
+            AQC        1.0     0.5    0.25     0.2     0.1
+        >>> vars_subset /= array
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1   1995Y1
+        ACAF        100.00   50.00   64.00   20.00    10.00
+        ACAG          1.00    4.00   16.00   25.00   200.00
+        AOUC          1.00    4.00   16.00   25.00   400.00
+        AOUC_         1.00    4.00   16.00   25.00   500.00
+        AQC           1.00    4.00   16.00   25.00  1000.00
+        <BLANKLINE>      
+
+        >>> # WARNING: dividing a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # divide a single variable by a numpy 1D ndarray
+        >>> data = np.array([1.0, 0.5, 1.0, 0.5, 1.0])
+        >>> vars_subset["ACAF"] /= data
+        >>> vars_subset["ACAF"]                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name        1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF        100.00  100.00   64.00   40.00   10.00
+        <BLANKLINE>
+        >>> # divide the subset corresponding to a single period by a numpy 1D ndarray
+        >>> vars_subset[:, "1995Y1"] /= data
+        >>> vars_subset[:, "1995Y1"]                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1995Y1
+        ACAF          10.00
+        ACAG         400.00
+        AOUC         400.00
+        AOUC_       1000.00
+        AQC         1000.00
+        <BLANKLINE>
+        >>> # divide a (subset of a) Variables object by a numpy 2D ndarray
+        >>> data = np.array([[0.1, 0.2, 0.25, 0.5, 1.0], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
+        ...                  [1.0, 0.5, 0.25, 0.2, 0.1]])
+        >>> vars_subset /= data
+        >>> vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name        1991Y1  1992Y1  1993Y1  1994Y1    1995Y1
+        ACAF        1000.00  500.00  256.00   80.00     10.00
+        ACAG           1.00    8.00   64.00  125.00   4000.00
+        AOUC           1.00    8.00   64.00  125.00   4000.00
+        AOUC_          1.00    8.00   64.00  125.00  10000.00
+        AQC            1.00    8.00   64.00  125.00  10000.00
+        <BLANKLINE>
+        """
         if isinstance(other, (int, float)) and other == 0:
             raise ZeroDivisionError("division by zero")
         self.__binary_op__(other, BinaryOperation.OP_DIV, False)
@@ -2957,6 +4699,272 @@ cdef class Variables(IodeDatabase):
 
     # self ** other
     def __pow__(self, other):
+        r"""
+        Compute the expression :math:`self^{other}` ( self \*\* other ).
+
+        Parameters
+        ----------
+        other: int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array or iode Variables
+            If `other` is an int or a float, compute 'value \*\* other' for all values of the current (subset of) 
+            Variables object.
+            If `other` is a numpy ndarray, the shape of the ndarray must be compatible with the current (subset of) 
+            Variables object. Specifically, the number of rows must be equal to the number of variables and the number of 
+            columns must be equal to the number of periods.
+            If `other` is a pandas Series, it must represent either a single variable or a single period.
+            If `other` is a pandas DataFrame, it must represent the same variables names and periods 
+            as the current (subset of) Variables object. Specifically, the index of the DataFrame must be equal to the 
+            variables names and the columns of the DataFrame must be equal to the periods.
+            If `other` is an larray Array, its last axis must be equal to the periods and be named 'time'. 
+            If the Array has more than two axes, the first n-1 axes are combined to form the variables names. 
+            The first (combined) axis must be equal to the variables names.
+            If `other` is an iode Variables object, it must share the same sample and represent the same 
+            set of variables names as `self`.
+                
+        Returns
+        -------
+        Variables
+
+        Warnings
+        --------
+        Using a numpy ndarray is not recommended as there is no compatibility check 
+        between for the names and periods. The result is not guaranteed to be the one you expected. 
+        This possibility is provided for speed reasons (when the database or the subset is large).
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import larray as la
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, NA, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
+        >>> vars_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> vars_subset                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF         26.24   30.16   34.66    8.16  -13.13
+        ACAG        -30.93  -40.29  -43.16  -16.03  -41.85
+        AOUC          1.02    1.03    1.03    1.05    1.05
+        AOUC_         0.96    0.97    0.98    0.99    1.00
+        AQC           1.06    1.11    1.15    1.16    1.16
+        <BLANKLINE>
+
+        >>> # compute 'value ** other' for all values of the current 
+        >>> # (subset of) Variables object.
+        >>> new_vars_subset = vars_subset ** 2
+        >>> new_vars_subset                                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1   1992Y1   1993Y1  1994Y1   1995Y1
+        ACAF 	    688.59	 909.57	 1201.45   66.60   172.42
+        ACAG     	956.91	1622.96	 1862.61  256.93  1751.09
+        AOUC 	      1.05	   1.06	    1.06	1.09	 1.10
+        AOUC_    	  0.93	   0.95	    0.96	0.98	 0.99
+        AQC  	      1.13	   1.23	    1.33	1.34	 1.35
+        <BLANKLINE>
+
+        >>> # compute 'V[name, period] ** W[name, period]' for each name and period
+        >>> # for all names and periods
+        >>> other = vars_subset.copy()
+        >>> other = 2.0
+        >>> new_vars_subset = vars_subset ** other
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1   1992Y1   1993Y1  1994Y1   1995Y1
+        ACAF 	    688.59	 909.57	 1201.45   66.60   172.42
+        ACAG     	956.91	1622.96	 1862.61  256.93  1751.09
+        AOUC 	      1.05	   1.06	    1.06	1.09	 1.10
+        AOUC_    	  0.93	   0.95	    0.96	0.98	 0.99
+        AQC  	      1.13	   1.23	    1.33	1.34	 1.35
+        <BLANKLINE>
+
+        >>> # compute 'iode_var[period] ** series[period]' for each period
+        >>> series = pd.Series([1.0, 2.0, 0.5, 1./4., 2.0], index=vars_subset.periods)
+        >>> series                                              # doctest: +NORMALIZE_WHITESPACE
+        1991Y1    1.00
+        1992Y1    2.00
+        1993Y1    0.50
+        1994Y1    0.25
+        1995Y1    2.00
+        dtype: float64
+        >>> updated_ACAF = vars_subset["ACAF"] ** series
+        >>> updated_ACAF                                        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     26.24	909.57	  5.89	  1.69	172.42
+        <BLANKLINE>
+        
+        >>> # compute 'single_period_subset[name] ** series[name]' for each name
+        >>> series = pd.Series([1.0, 2.0, 0.5, 1./4., 2.0], index=vars_subset.names)
+        >>> series                                          # doctest: +NORMALIZE_WHITESPACE
+        ACAF     1.00
+        ACAG     2.00
+        AOUC     0.50
+        AOUC_    0.25
+        AQC      2.00
+        dtype: float64
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] ** series
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name	 1995Y1
+        ACAF 	 -13.13
+        ACAG 	1751.09
+        AOUC 	   1.02
+        AOUC_	   1.00
+        AQC  	   1.35
+        <BLANKLINE>
+
+        >>> # compute 'iode_var[name, period] ** df[name, period]' for each name and period
+        >>> data = np.array([[1.0, 2.0, 0.5, 1./4., 2.0],
+        ...                  [2.0, -1.0, 2.0, -1.0, 2.0], 
+        ...                  [1./4., 2.0, 1.0, 2.0, 0.5],
+        ...                  [0.5, 1./4., 2.0, 1.0, 2.0],
+        ...                  [2.0, 0.5, 1./4., 2.0, 1.0]])
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df                                              # doctest: +NORMALIZE_WHITESPACE
+              1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	1.00	2.00	0.50	0.25	 2.0
+        ACAG	2.00   -1.00	2.00   -1.00	 2.0
+        AOUC	0.25	2.00	1.00	2.00	 0.5
+        AOUC_	0.50	0.25	2.00	1.00	 2.0
+        AQC	    2.00	0.50	0.25	2.00	 1.0
+        >>> new_vars_subset = vars_subset ** df
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1   1993Y1  1994Y1   1995Y1
+        ACAF 	     26.24	909.57	   5.89	   1.69	  172.42
+        ACAG     	956.91	 -0.02	1862.61	  -0.06	 1751.09
+        AOUC 	      1.01	  1.06	   1.03	   1.09	    1.02
+        AOUC_	      0.98	  0.99	   0.96	   0.99	    0.99
+        AQC  	      1.13	  1.05	   1.04	   1.34	    1.16
+        <BLANKLINE>
+
+        >>> # compute 'iode_var[name, period] ** array[name, period]' for each name and period
+        >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> array = la.Array(data, axes=(axis_names, axis_time))
+        >>> array                                           # doctest: +NORMALIZE_WHITESPACE
+        names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+              ACAF     1.0     2.0     0.5    0.25     2.0
+              ACAG     2.0    -1.0     2.0    -1.0     2.0
+              AOUC    0.25     2.0     1.0     2.0     0.5
+             AOUC_     0.5    0.25     2.0     1.0     2.0
+               AQC     2.0     0.5    0.25     2.0     1.0
+        >>> new_vars_subset = vars_subset ** array
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1   1993Y1  1994Y1  1995Y1
+        ACAF 	     26.24	909.57	   5.89	  1.69	 172.42
+        ACAG 	    956.91	 -0.02	1862.61	 -0.06	1751.09
+        AOUC 	      1.01	  1.06	   1.03	  1.09	   1.02
+        AOUC_	      0.98	  0.99	   0.96	  0.99	   0.99
+        AQC  	      1.13	  1.05	   1.04	  1.34	   1.16
+        <BLANKLINE>        
+
+        >>> # WARNING: using a numpy ndarray to a (subset of a) Variables object is not recommended 
+        >>> #          as there is no compatibility check between for the names and periods.
+        >>> #          The result is not guaranteed to be the one you expected.
+        >>> #          This possibility is provided for speed reasons 
+        >>> #          (when dealing with large subsets/databases).
+        >>> # compute 'iode_var[period] ** data[t]' for each period
+        >>> data = np.array([1.0, 2.0, 0.5, 1./4., 2.0])
+        >>> updated_ACAF = vars_subset["ACAF"] ** data
+        >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
+        ACAF	     26.24	909.57	  5.89	  1.69	172.42
+        <BLANKLINE>
+        >>> # compute 'single_period_subset[name] ** data[i]' for each name
+        >>> vars_subset_1995Y1 = vars_subset[:, "1995Y1"] ** data
+        >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1995Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1995Y1
+        ACAF 	    -13.13
+        ACAG       1751.09
+        AOUC 	      1.02
+        AOUC_	      1.00
+        AQC  	      1.35
+        <BLANKLINE>        
+        >>> # compute 'iode_var[name, period] ** data[i, t]' for each name and period
+        >>> data = np.array([[1.0, 2.0, 0.5, 1./4., 2.0],
+        ...                  [2.0, -1.0, 2.0, -1.0, 2.0], 
+        ...                  [1./4., 2.0, 1.0, 2.0, 0.5],
+        ...                  [0.5, 1./4., 2.0, 1.0, 2.0],
+        ...                  [2.0, 0.5, 1./4., 2.0, 1.0]])
+        >>> new_vars_subset = vars_subset ** data
+        >>> new_vars_subset                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 5
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1991Y1:1995Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name       1991Y1  1992Y1   1993Y1  1994Y1   1995Y1
+        ACAF    	 26.24	909.57	   5.89	   1.69	  172.42
+        ACAG    	956.91	 -0.02	1862.61	  -0.06	 1751.09
+        AOUC 	      1.01	  1.06	   1.03	   1.09	    1.02
+        AOUC_	      0.98	  0.99	   0.96	   0.99	    0.99
+        AQC  	      1.13	  1.05	   1.04	   1.34	    1.16
+        <BLANKLINE>
+        """
         return self.__binary_op__(other, BinaryOperation.OP_POW, True)
 
     def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
