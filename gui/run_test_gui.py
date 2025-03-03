@@ -1,10 +1,20 @@
 from pathlib import Path
 from iode import comments, equations, identities, lists, scalars, tables, variables
-from iode import SAMPLE_DATA_DIR
+from iode import SAMPLE_DATA_DIR, view_workspace
 from iode_gui import start, open_application
 
 
-global_var = 10
+class MyClass:
+    def __init__(self, value: str):
+        self.value = value
+
+
+def my_function():
+    print("This is an imported function")
+
+
+global_list = [1, 2, 3, 4, 5]
+global_instance = MyClass("global instance of MyClass")
 
 
 def run_view_workspace():
@@ -15,14 +25,20 @@ def run_view_workspace():
     scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
     tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    local_var = [1, 2, 3, 4, 5]
-    # will open a viewer showing all IODE databases
-    project_dir = Path(__file__).parent.resolve()
-    open_application(project_dir, called_from_python_script=True, depth=1)
+    local_list = [6, 7, 8, 9, 10]
+    local_instance = MyClass("local instance of MyClass")
+    
+    view_workspace()
+    
+    print("local_list:", local_list)
+    print("local_instance:", local_instance.value)
 
 
 if __name__ == "__main__":
-    project_dir = Path('.').resolve()
     start()
-    # run_view_workspace()
-    # run_view_workspace()
+
+    run_view_workspace()
+    
+    print("global_list:", global_list)
+    print("global_instance:", global_instance.value)
+    print(variables["A*", "1960Y1:1965Y1"])
