@@ -213,7 +213,7 @@ class MainWindow(AbstractMainWindow):
             if not isinstance(vars_to_import, dict):
                 raise TypeError("Python variables to import in the IPython console must be "
                                 "passed as a dictionary")
-            self._push_data_to_kernel(vars_to_import)
+            self.push_data_to_kernel(vars_to_import)
         self.ui.actionSave.shortcut
 
     @property
@@ -267,8 +267,11 @@ class MainWindow(AbstractMainWindow):
 
         self._reset_kernel()
 
-    def _push_data_to_kernel(self, data: Dict[str, Any]):
+    def push_data_to_kernel(self, data: Dict[str, Any]):
         self.kernel.shell.push(data)
+
+    def pull_data_from_kernel(self, name: str) -> Any:
+        return self.kernel.shell.user_ns[name]
 
     def _reset_kernel(self):
         if self.jupyter_widget:

@@ -1,4 +1,5 @@
 import sys
+import inspect
 from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import QLocale
@@ -62,28 +63,54 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
     splash.show()
     app.processEvents()
 
-    # imported from larray-editor code
+    # code adapted from the larray-editor project (file api.py) 
     vars_to_import = None
     if called_from_python_script:
-        caller_frame = sys._getframe(depth + 1)
-        global_vars = caller_frame.f_globals
-        local_vars = caller_frame.f_locals
-        vars_to_import = {k: global_vars[k] for k in sorted(global_vars.keys())}
-        if local_vars is not global_vars:
-            vars_to_import.update({k: local_vars[k] for k in sorted(local_vars.keys())})
+        # Get the current call stack
+        stack = inspect.stack()
+        # The second frame in the stack is the caller of this function
+        caller_frame = stack[depth + 1].frame
+        caller_global_vars = caller_frame.f_globals
+        caller_global_keys = set(caller_global_vars.keys()) - set(caller_frame.f_builtins)
+        caller_global_keys = {name for name in caller_global_keys if not name.startswith("__")}
+        vars_to_import = {k: caller_global_vars[k] for k in caller_global_keys}
+        
+        caller_local_vars = caller_frame.f_locals
+        caller_local_keys = set(caller_local_vars.keys()) - caller_global_keys
+        for k in caller_local_keys:
+            vars_to_import[k] = caller_local_vars[k]
 
         for key in vars_to_import:
             if key in _iode_databases_names:
                 globals()[key] = vars_to_import[key]
     
         vars_to_import = {k: v for k, v in vars_to_import.items() if k not in globals().keys()}
+        
+        imported_keys = set(vars_to_import.keys())
+        caller_local_keys = caller_local_keys.intersection(imported_keys)
+        caller_global_keys = caller_global_keys.intersection(imported_keys)
 
     Context.set_called_from_python_script(called_from_python_script)
     main_window = MainWindow(None, project_dir, files_to_load, vars_to_import)
     gui_assign_super(main_window)
     main_window.show()
     splash.finish(main_window)
-    app.exec()
+    exit_code = app.exec()
+
+    # NOTE: pull modified or reassigned variables from the IPython kernel back to 
+    #       the caller frame
+    if called_from_python_script and exit_code == 0:
+        for key in caller_local_keys:
+            try:
+                caller_frame.f_locals[key] = main_window.pull_data_from_kernel(key)
+            except KeyError:
+                pass
+        
+        for key in caller_global_keys - _iode_databases_names:
+            try:
+                caller_frame.f_globals[key] = main_window.pull_data_from_kernel(key)
+            except KeyError:
+                pass
 
 
 def start():
