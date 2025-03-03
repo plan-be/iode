@@ -617,6 +617,9 @@ cdef class Equation:
 
     @property
     def comment(self) -> str:
+        """
+        Equation comment.
+        """
         return self.c_equation.get_comment().decode()
 
     @comment.setter
@@ -649,6 +652,22 @@ cdef class Equation:
 
     @property
     def block(self) -> str:
+        """
+        Estimation block of equations to which the equation belongs.
+
+        Parameters
+        ----------
+        value: str or list(str)
+           
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> equations["ACAF"].block             # doctest: +NORMALIZE_WHITESPACE
+        'ACAF'
+        """
         return self.c_equation.get_block().decode()
 
     @block.setter
@@ -661,11 +680,46 @@ cdef class Equation:
 
     @property
     def tests(self) -> Dict[str, float]:
+        r"""
+        Estimation tests.
+
+        Returns
+        -------
+        dict(str, float)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> equations["ACAF"].tests             # doctest: +NORMALIZE_WHITESPACE
+        {'corr': 1.0, 'dw': 2.329345941543579, 'fstat': 32.273193359375, 'loglik': 83.80752563476562, 
+        'meany': 0.008184665814042091, 'r2': 0.8217613697052002, 'r2adj': 0.7962986826896667, 
+        'ssres': 5.1994487876072526e-05, 'stderr': 0.0019271461060270667, 'stderrp': 23.545812606811523, 
+        'stdev': 0.004269900266081095}
+        """
         cdef map[string, float] cpp_tests = self.c_equation.get_tests_as_map()
         return {item.first.decode(): item.second for item in cpp_tests}
 
     @property
     def date(self) -> str:
+        r"""
+        Date of the last estimation.
+        
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> equations["ACAF"].date
+        '12-06-1998'
+        """
         return self.get_formated_date()
 
     # misc
