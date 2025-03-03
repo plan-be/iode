@@ -163,6 +163,38 @@ cdef class IodeDatabase:
     def _subset(self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
 
+    def new_detached(self) -> Self:
+        """
+        Create a new empty detached database.
+        Here *detached* means that the new database is not linked to the global workspace. 
+        Any change made to the *copied database* (*subset*) will not be applied to the global 
+        workspace. This can be useful for example if you want to save previous values of scalars 
+        before estimating an equation or a block of equations and then restore the original values 
+        if the estimated values are not satisfying.
+        
+        Returns
+        -------
+        Database
+
+        See Also
+        --------
+        IodeDatabase.copy
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> cmt_detached = comments.new_detached()
+        >>> cmt_detached.is_detached
+        True
+        >>> cmt_detached.names
+        []
+        """
+        return self._subset("", copy=True)
+
     def copy(self, pattern: str=None) -> Self:
         """
         Create a new database instance in which each object is a *copy* of the original object 
@@ -184,6 +216,10 @@ cdef class IodeDatabase:
         Returns
         -------
         Database
+
+        See Also
+        --------
+        IodeDatabase.new_detached
         
         Examples
         --------
@@ -256,8 +292,12 @@ cdef class IodeDatabase:
 
         >>> # a new empty *detached* database can be created by passing 
         >>> # an empty string to the copy() method 
-        >>> cmt_subset_detached = comments.copy("")
-        >>> cmt_subset_detached.names
+        >>> cmt_detached = comments.copy("")
+        >>> cmt_detached.names
+        []
+        >>> # or equivalently by using the new_detached() method 
+        >>> cmt_detached = comments.new_detached()
+        >>> cmt_detached.names
         []
         """
         if pattern is None:
