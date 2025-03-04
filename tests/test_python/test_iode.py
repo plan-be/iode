@@ -252,7 +252,21 @@ def test_variables_setitem():
     assert vars_subset["ACAG", "2002Y1"] == 300.0
     assert vars_subset_subset["ACAG", "2002Y1"] == copy_ACAG["ACAG", "2002Y1"]
 
-def test_from_frame():
+def test_variables_numpy_1D():
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # exporting a subset representing a single variable returns 
+    # a 1D numpy ndarray
+    array = variables["ACAF", "2000Y1:2010Y1"].to_numpy()
+    assert array.ndim == 1
+    assert array.shape == (11,)
+
+    array *= 1.1 
+    variables.from_numpy(array, "ACAF", "2000Y1:2010Y1")
+    assert all(variables["ACAF", "2000Y1:2010Y1"].to_numpy() == array)
+
+def test_variables_from_frame():
     # check that pandas nan are converted to IODE NA
     variables.clear()
     assert len(variables) == 0
@@ -277,8 +291,7 @@ def test_from_frame():
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
 
-
-def test_from_array():
+def test_variables_from_array():
     # check that LArray nan are converted to IODE NA
     variables.clear()
     assert len(variables) == 0
@@ -301,6 +314,7 @@ def test_from_array():
     assert variables["VLA_00", "1970Y1"] == 10.0
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
+
 
 # Estimation
 # ----------
