@@ -23,22 +23,10 @@ jobs:
       - name: Create assets dir
         run: mkdir assets
 
-      - name: Restore Python 3.10 Wheel Files
+      - name: Restore iode documentation files
         uses: actions/download-artifact@v4
         with:
-          name: iode-python-3.10
-          path: ${{ github.workspace }}/assets
-
-      - name: Restore Python 3.11 Wheel Files
-        uses: actions/download-artifact@v4
-        with:
-          name: iode-python-3.11
-          path: ${{ github.workspace }}/assets
-
-      - name: Restore Python 3.12 Wheel Files
-        uses: actions/download-artifact@v4
-        with:
-          name: iode-python-3.12
+          name: iode-doc
           path: ${{ github.workspace }}/assets
   
       - name: Check Assets
