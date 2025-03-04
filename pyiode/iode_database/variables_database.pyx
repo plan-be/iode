@@ -2512,7 +2512,7 @@ cdef class Variables(IodeDatabase):
         >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         >>> updated_ACAF = data + vars_subset["ACAF"]
         >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        array([[ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ]])
+        array([ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ])
         >>> # add a numpy 1D ndarray to the subset corresponding to a single period
         >>> vars_subset_1995Y1 = data + vars_subset[:, "1995Y1"]
         >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -3801,7 +3801,7 @@ cdef class Variables(IodeDatabase):
         >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         >>> result = data + vars_subset["ACAF"]
         >>> result                                      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        array([[ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ]])
+        array([ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ])
         >>> # multiply the subset corresponding to a single period by a numpy 1D ndarray
         >>> vars_subset_1995Y1 = data * vars_subset[:, "1995Y1"]
         >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -5011,8 +5011,8 @@ cdef class Variables(IodeDatabase):
         >>> vars_names
         ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> first_period = "2000Y1"
-        >>> last_periods = "2010Y1"
-        >>> sample = Sample(first_period, last_periods)
+        >>> last_period = "2010Y1"
+        >>> sample = Sample(first_period, last_period)
         >>> nb_periods = sample.nb_periods
         >>> nb_periods
         11
@@ -5046,7 +5046,7 @@ cdef class Variables(IodeDatabase):
         AQC           1.34    1.38    1.41    1.42    1.40    1.40    1.40    1.41    1.43    1.45    1.46
         <BLANKLINE>
         >>> # copy the numpy ndarray into the Variables database (overriding the existing values)
-        >>> variables.from_numpy(data, vars_names, first_period, last_periods)
+        >>> variables.from_numpy(data, vars_names, first_period, last_period)
         >>> variables["A*", "2000Y1:2010Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 5
@@ -5129,6 +5129,10 @@ cdef class Variables(IodeDatabase):
             c_name = b_name
             # add a new variable with all values set to IODE_NAN
             KV_add(db_ptr, c_name)
+
+        # value for argument 'first_period' represents a sample (range of periods)
+        if isinstance(first_period, str) and ':' in first_period:
+            first_period, last_period = first_period.split(':')
 
         self_first_period = self.first_period
         if first_period is None:
@@ -5334,6 +5338,9 @@ cdef class Variables(IodeDatabase):
                     value = KV_get(db_ptr, i, t, mode)
                     data_view[i, t - t_first_period] = value
         
+        if len(self) == 1:
+            data = data.reshape((nb_periods,))
+
         _NA = 0.9999 * NA
         data[data < _NA] = np.nan
         return data
