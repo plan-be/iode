@@ -4,7 +4,7 @@ from .abstract_table_model import IodeAbstractTableModel
 from .numerical_table_model import IodeNumericalTableModel
 from iode_gui.utils import MAX_PRECISION_NUMBERS, NAN_REP
 
-from typing import Union, List, Any
+from typing import Union, List, Tuple, Any
 import numpy as np
 from iode import (IodeType, VarsMode, comments, equations, identities, lists, 
                   scalars, tables, variables, Scalar, Table, NA, is_NA)
@@ -206,6 +206,10 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
             return False
+    
+    def paste(self, names: List[str], periods: Union[slice, List[Any]], 
+              values: Union[np.ndarray, List[List[float]]]):
+        variables[names, periods] = values
 
     @Slot()
     def update_display_values(self):

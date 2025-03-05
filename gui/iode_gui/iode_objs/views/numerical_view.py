@@ -6,9 +6,13 @@ from PySide6.QtGui import (QKeySequence, QAction, QShortcut, QContextMenuEvent,
 from iode_gui.utils import NAN_REP
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
+from iode_gui.iode_objs.models.numerical_table_model import IodeNumericalTableModel
 
+import re
 from typing import List, Tuple
-from iode import variables, Sample
+
+
+_name_pattern = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
 
 
 class NumericalTableView:
@@ -37,7 +41,7 @@ class NumericalTableView:
 
             self.shortcut_past_vars = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_V), self)
             self.shortcut_past_vars.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-            self.shortcut_past_vars.activated.connect(self.paste_vars)
+            self.shortcut_past_vars.activated.connect(self.paste_special)
 
         self.setup_context_menu()
 
@@ -70,7 +74,7 @@ class NumericalTableView:
             action.setShortcut(self.shortcut_past_vars.key())
             action.setToolTip("Paste values according to variable names and optionally periods")
             action.setVisible(True)
-            action.triggered.connect(self.paste_vars)
+            action.triggered.connect(self.paste_special)
             self.context_menu.addAction(action)
 
     @Slot(QContextMenuEvent)
@@ -223,35 +227,44 @@ class NumericalTableView:
                 text = clipboard.text()
 
                 # If the text from clipboard ends with the new-line character,
-                # the split() function returns a list ending by an empty element.
+                # the split() function in the loop below will return a list 
+                # ending by an empty element.
                 if text.endswith("\n"):
                     text = text[:-1]
 
+                ok = True
                 for i, row_string in enumerate(text.split("\n")):
                     for j, value in enumerate(row_string.split("\t")):
                         row = start_index.row() + i
                         column = start_index.column() + j
                         index = model.index(row, column)
                         if index.isValid():
-                            model.setData(index, value, Qt.EditRole)
+                            ok = model.setData(index, value, Qt.EditRole)
+                            if not ok:
+                                return
+                        else:
+                            raise IndexError(f"Invalid index at row {row} and column {column}")
             except Exception as e:
-                QMessageBox.warning(None, "WARNING", "Can't paste values\n\n" + str(e))   
+                QMessageBox.warning(None, "WARNING", "Can't continue to paste values\n\n" + str(e))   
+
+    def _paste_special(self, names: List[str], columns: List[str], values: List[List[float]]):
+        raise NotImplementedError()
 
     @Slot()
-    def paste_vars(self):
+    def paste_special(self):
         """
-        This method pastes variables from the clipboard into the model.
+        Paste variables from clipboard. 
+        The content of the clipboard must include the variable names.
+        Optionally, it can include the periods.
         """
         if self.allow_to_paste:
             try:
-                model: IodeAbstractTableModel = self.model()
-
                 clipboard = QGuiApplication.clipboard()
                 text = clipboard.text()
+                _model: IodeNumericalTableModel = self.model()
 
-                # If the text from clipboard ends with the new-line character,
-                # the QString::split() function returns a list ending by an empty element.
-                # This empty element is then interpreted as a new NaN value by the setData function.
+                # If the text from clipboard ends with the new-line character, the 
+                # split() function below will return a list ending by an empty element.
                 if text.endswith("\n"):
                     text = text[:-1]
 
@@ -259,42 +272,25 @@ class NumericalTableView:
                 if len(lines) == 0:
                     return
 
-                # ---- extract columns ----
-                sample_vars = variables.sample
+                # ---- extract columns names ----
+                columns: List[str] = lines.pop(0).split("\t")
+                columns = [cell.strip() for cell in columns[1:]]
 
-                # check if the first line represents the periods
-                cells = lines[0].split("\t")
-                if cells[0] == "":
-                    from_period = cells[1]
-                    to_period = cells[-1]
-                    lines = lines[1:]
-                else:
-                    from_period, to_period = self._ask_sample()
-
-                # check that the passed sample has the size equal to the number of cells per line.
-                # We compare to len(cells) -1 because the first cell is supposed to contains
-                # the variable name, not a value
-                sample = Sample(from_period, to_period)
-                if sample.nb_periods != len(cells) - 1:
-                    QMessageBox.warning(None, "WARNING", "Can't paste values.\n" + 
-                                        f"The passed sample {str(sample)} does not " + 
-                                        f"correspond to number of values per variable: '{len(cells)}'")
-                    return
-
-                start_column = sample_vars.index(from_period)
-
-                for line in lines:
+                # ---- extract rows (= names) and values ----   
+                names: List[str] = []
+                values: List[List[float]] = []
+                for i, line in enumerate(lines):
                     cells = line.split("\t")
+                    name = cells.pop(0).strip()
+                    if not name:
+                        raise ValueError(f"Empty name at row {i}")
+                    if not _name_pattern.fullmatch(name):
+                        raise ValueError(f"Invalid name '{name}' at row {i}")
+                    names.append(name)
 
-                    var_name = cells.pop(0).strip()
-                    # raises an error if the the variable name is not found
-                    row = variables.get_position(var_name)
-
-                    column = start_column
-                    for value in cells:
-                        index = model.index(row, column)
-                        if index.isValid():
-                            model.setData(index, value, Qt.EditRole)
-                        column += 1
+                    cells = [_model.string_to_float(cell.strip()) for cell in cells]
+                    values.append(cells)
+                
+                self._paste_special(names, columns, values)      
             except Exception as e:
                 QMessageBox.warning(None, "WARNING", f"Can't paste values\n\n{str(e)}")
