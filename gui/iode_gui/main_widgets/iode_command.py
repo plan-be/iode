@@ -44,14 +44,16 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         self.output = main_window.output
         self.setup_completer = main_window.completer
         self.setPlaceholderText("Enter a command here...")
-        self.load_settings()
 
-    def handle_special_keys(self, event: QKeyEvent) -> bool:
+    # override the _handle_special_keys() method from 
+    # the IodeWidgetWithCompleter class 
+    def _handle_special_keys(self, event: QKeyEvent) -> bool:
         """
         Handle special keys' events.
 
         :param event: The key event.
-        :return: Whether or not to exit keyPressEvent().
+        :return: Whether or not to exit the _key_press_event() method 
+                 from the IodeWidgetWithCompleter class.
         """
         if event.key() == Qt.Key.Key_Up:
             if self.executed_commands_list:
@@ -59,28 +61,30 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
                 try:
                     if self.current_index > 0:
                         self.current_index -= 1
+                    else:
+                        self.current_index = len(self.executed_commands_list) - 1
                     previous_command = self.executed_commands_list[self.current_index]
                     self.setText(previous_command)
+                    return True
                 except Exception as e:
                     QMessageBox.warning(self, "Error", f"Failed to get previous command:\n{str(e)}")
-            return True
         elif event.key() == Qt.Key.Key_Down:
             if self.executed_commands_list:
                 # get next command from the list
                 try:
-                    if self.current_index + 1 == len(self.executed_commands_list):
-                        self.setText("")
-                    else:
+                    if self.current_index < len(self.executed_commands_list) - 1:
                         self.current_index += 1
-                        next_command = self.executed_commands_list[self.current_index]
-                        self.setText(next_command)
+                    else:
+                        self.current_index = 0
+                    next_command = self.executed_commands_list[self.current_index]
+                    self.setText(next_command)
+                    return True
                 except Exception as e:
                     QMessageBox.warning(self, "Error", f"Failed to get next command:\n{str(e)}")
-            return True
         elif event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.run_command()
             return True
-
+        
         return False
 
     def save_settings(self):
@@ -100,6 +104,8 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
 
         nb_commands_to_save = min(len(self.executed_commands_list), self.MAX_NB_COMMANDS_TO_REMEMBER)
         commands_to_save = self.executed_commands_list[-nb_commands_to_save:]
+        if isinstance(commands_to_save, str):
+            commands_to_save = [commands_to_save]
         settings.setValue("LAST_EXECUTED_COMMANDS", commands_to_save)
 
         settings.endGroup()
@@ -119,8 +125,11 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
 
         settings.beginGroup(self.settings_group_name)
 
-        self.executed_commands_list = settings.value("LAST_EXECUTED_COMMANDS", [])
-        self.iterator = len(self.executed_commands_list)
+        commands_to_load = settings.value("LAST_EXECUTED_COMMANDS", [])
+        if isinstance(commands_to_load, str):
+            commands_to_load = [commands_to_load]
+        self.executed_commands_list = commands_to_load
+        self.current_index = len(self.executed_commands_list)
 
         settings.endGroup()
 
@@ -148,8 +157,10 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         # try to execute the command
         try:
             execute_command(cmd)
-            if cmd not in self.executed_commands_list:
+            if len(self.executed_commands_list) > 0 and cmd != self.executed_commands_list[-1]:
                 self.executed_commands_list.append(cmd)
+            if len(self.executed_commands_list) > self.MAX_NB_COMMANDS_TO_REMEMBER:
+                self.executed_commands_list = self.executed_commands_list[-self.MAX_NB_COMMANDS_TO_REMEMBER:]
             # move current index to the end of the list
             self.current_index = len(self.executed_commands_list) - 1
             # connected to MainWindow.update_tab_and_completer
