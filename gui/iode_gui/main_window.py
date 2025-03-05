@@ -353,6 +353,7 @@ class MainWindow(AbstractMainWindow):
         if not Context.called_from_python_script:
             self.ui.treeView_file_explorer.save_settings()
             self.ui.tabWidget_IODE_objs.save_settings()
+            self.ui.lineEdit_iode_command.save_settings()
             ProjectSettings.change_project(project_dir, self)
         else:
             ProjectSettings.project_settings = None
@@ -368,6 +369,9 @@ class MainWindow(AbstractMainWindow):
         
         # (re)open tabs
         self.ui.tabWidget_IODE_objs.setup(self)
+
+        # (re)load last executed commands
+        self.ui.lineEdit_iode_command.load_settings()
 
         # add directory path to list of recently opened projects (= directories)
         self._add_project_path_to_list(project_dir)

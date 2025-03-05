@@ -153,6 +153,9 @@ class IodeWidgetWithCompleter():
     def enable_autocomplete(self, enabled: bool):
         self._completer_enabled = enabled
 
+    def _handle_special_keys(self, event: QKeyEvent) -> bool:
+        return False
+
     def _key_press_event(self, super_cls, event: QKeyEvent):
         if not self._completer_enabled:
             super_cls.keyPressEvent(event)
@@ -168,6 +171,10 @@ class IodeWidgetWithCompleter():
                 self._completer.popup().hide()
                 super_cls.keyPressEvent(event)
                 return
+
+        exit: bool = self._handle_special_keys(event)
+        if exit:
+            return
 
         # CTRL + Space forces auto-completion
         force_autocomplete = event.keyCombination() == QKeyCombination(Qt.KeyboardModifier.ControlModifier | Qt.Key.Key_Space)
