@@ -40,9 +40,6 @@ from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
 from iode.util import check_filepath, split_list
 
-KeyName = Union[str, List[str], slice]
-KeyPeriod = Union[None, str, int, Tuple[str, str], Tuple[int, int], List[str], slice]
-KeyVariable = Union[KeyName, Tuple[KeyName, KeyPeriod]]
 
 class BinaryOperation(IntEnum):
     OP_ADD = CBinaryOperation.OP_ADD
@@ -272,12 +269,24 @@ cdef class Variables(IodeDatabase):
         subset_db.last_period_subset = last_period
         return subset_db
 
-    def _unfold_key(self, key: KeyVariable) -> Tuple[KeyName, Optional[Period, Tuple[Period, Period], List[Period]]]:
+    def _unfold_key(self, key):
         """
         split the key into a tuple (names, periods):
 
            - names: str or list of str
            - periods: None or Period or tuple of Period or list of Period
+
+        Parameters
+        ----------
+        key : key_names or tuple(key_names, key_periods)
+            - key_names: str, list(str), slice(str, str, int)
+            - key_periods: None, str, int, tuple(str, str), tuple(int, int), list(str), slice(str, str, int)
+
+        Returns
+        -------
+        tuple(key_names, key_periods)
+            - key_names: str, list(str), slice(str, str, int)
+            - key_periods: None, Period, tuple(Period, Period), list(Period)
 
         Examples
         --------
@@ -826,11 +835,17 @@ cdef class Variables(IodeDatabase):
 
         return key_periods
 
-    def _convert_values(self, values: Union[int, float, str, Iterable[Union[int, float]], \
-        Dict[str, Any], np.ndarray, pd.Series, pd.DataFrame, Array, Variables]) \
-        -> Union[str, float, List[float], Variables]:
+    def _convert_values(self, values) -> Union[str, float, List[float], List[List[float]], Variables]:
         """
         Check the type of 'values' and convert np.nan to IODE NA (if needed).
+
+        Parameters
+        ----------
+        values : str, int, float, list(int|float), list(list(int|float), numpy array, pandas Series, pandas DataFrame or Variables
+
+        Returns
+        -------
+        str, float, list(float), list(list(float)) or Variables
         """
         # value is a LEC expression
         if isinstance(values, str):
@@ -860,13 +875,21 @@ cdef class Variables(IodeDatabase):
             values.data = np.nan_to_num(values.data, nan=NA)
             return values
         # list of float
-        elif isinstance(values, Iterable) and all(isinstance(value, (int, float)) for value in values):
-            return [NA if np.isnan(value) else float(value) for value in values]
+        elif isinstance(values, Iterable):
+            if isinstance(values[0], Iterable):
+                return [self._convert_values(value) for value in values]
+            else:
+                if not all(isinstance(value, (int, float)) for value in values):
+                    raise TypeError(f"Expected values to be a list of int or float.\n"
+                                    f"Not all items in the {type(values).__name__} are of "
+                                    f"type int or float:\n{values}")
+                return [NA if np.isnan(value) else float(value) for value in values]
         # wrong type for 'value'
         else:
-            raise TypeError("variables[key] = value: Expected 'value' of type int, float, "
+            raise TypeError("Expected value(s) of type int, float, "
                             "str, list of int/float, numpy ndarray, pandas Series, "
-                            f"pandas DataFrame or Variables.\nGot 'value(s)' of type {type(values).__name__}") 
+                            "pandas DataFrame or Variables.\n"
+                            f"Got 'value(s)' of type {type(values).__name__}:\n{values}") 
 
     # NOTE: needed to create a dedicated method since Cython seems to have some 
     #       difficulties with Union[..., Variables].
@@ -969,6 +992,10 @@ cdef class Variables(IodeDatabase):
         if isinstance(values, int):
             values = float(values)
         
+        if values is None:
+            raise ValueError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                             f"Got None as value.")
+
         if key_periods is not None:
             if isinstance(key_periods, str):
                 key_periods = Period(key_periods)
@@ -1069,16 +1096,19 @@ cdef class Variables(IodeDatabase):
                 # set the same value for all periods in the list
                 if isinstance(values, float):
                     values = [values] * len(key_periods)
-                # values is a list of float containing a specific value for each period
-                elif isinstance(values, list):
+                # values is a iterable of float containing a specific value for each period
+                elif isinstance(values, Iterable):
                     if len(values) != len(key_periods):
                         raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
                                          f"Expected a list of {len(key_periods)} values.\n"
-                                         f"Got {len(values)} values instead")   
+                                         f"Got {len(values)} values instead")
+                    if not all(isinstance(v, float) for v in values):
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
+                                         f"Not all items of {type(values).__name__} are of type float:\n{values}")   
                 else:
                     raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
                                     f"When updating values for non-contiguous periods, the right-hand side must be "
-                                    f"a float or a list of float.\nGot input of type {type(values).__name__} instead")
+                                    f"a float or an iterable of float.\nGot input of type {type(values).__name__} instead")
                 for p, v in zip(key_periods, values):
                     t = self._get_real_period_position(p)
                     KV_set(c_db_ptr, pos, t, self.mode_, <double>v)
