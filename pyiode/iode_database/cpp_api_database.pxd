@@ -347,7 +347,6 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
 
         double* get_var_ptr(int pos) except +
         double get_var(int pos, int t, IodeVarMode mode) except +
-        void set_var(int pos, int t, double value, IodeVarMode mode) except +
 
         CSample* get_sample()
         void set_sample(string& from_period, string& to_period) except +
