@@ -984,6 +984,8 @@ cdef class Variables(IodeDatabase):
                                 f"a sample 'start:end', or a list of periods.\nGot periods selection of type "
                                 f"{type(key_periods).__name__} instead")
 
+        c_db_ptr = self.database_ptr.get_database()
+
         # new Variable -> raises an error if key_periods is not None or does not represent the full sample
         #              -> only allowed when the current database is not a subset over the whole Variables sample
         if isinstance(key_name, str) and key_name not in self:
@@ -1013,7 +1015,7 @@ cdef class Variables(IodeDatabase):
             if isinstance(key_periods, Period):
                 t = self._get_real_period_position(key_periods)
                 if isinstance(values, float):
-                    self.database_ptr.set_var(pos, t, <double>values, self.mode_)
+                    KV_set(c_db_ptr, pos, t, self.mode_, <double>values)
                 elif isinstance(values, Variables):
                     self.__copy_var(name, name, t, t, values)
                 else:
@@ -1030,8 +1032,8 @@ cdef class Variables(IodeDatabase):
                     self.database_ptr.update(pos, <string>values.encode(), t_first, t_last) 
                 # set same value for all periods in the range
                 elif isinstance(values, float):
-                    for t in range(t_first, t_last + 1):   
-                        self.database_ptr.set_var(pos, t, <double>values, self.mode_)
+                    for t in range(t_first, t_last + 1): 
+                        KV_set(c_db_ptr, pos, t, self.mode_, <double>values)  
                 # values is of type Variables
                 elif isinstance(values, Variables):
                     sample: Sample = Sample(first_period, last_period)
@@ -1050,15 +1052,14 @@ cdef class Variables(IodeDatabase):
                         raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
                                          f"Expected {nb_periods} values.\nGot {len(values)} values instead")
                     if isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
-                        c_db_ptr = self.database_ptr.get_database()
                         var_ptr = KVVAL(c_db_ptr, pos, t_first)
                         # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
                         if not values.flags['C_CONTIGUOUS']:
                             values = np.ascontiguousarray(values)
                         numpy_data_memview = values
                         memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
-                    for i, t in enumerate(range(t_first, t_last + 1)):   
-                        self.database_ptr.set_var(pos, t, <double>(values[i]), self.mode_)
+                    for i, t in enumerate(range(t_first, t_last + 1)):
+                        KV_set(c_db_ptr, pos, t, self.mode_, <double>(values[i]))
                 else:
                     raise TypeError(f"Cannot update the IODE variable '{name}'.\nExpected 'value' of type str, int, "
                                     f"float, numpy array, pandas Series or Variables.\nGot 'value' of type "
@@ -1080,7 +1081,7 @@ cdef class Variables(IodeDatabase):
                                     f"a float or a list of float.\nGot input of type {type(values).__name__} instead")
                 for p, v in zip(key_periods, values):
                     t = self._get_real_period_position(p)
-                    self.database_ptr.set_var(pos, t, <double>v, self.mode_)
+                    KV_set(c_db_ptr, pos, t, self.mode_, <double>v)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
         if isinstance(value.index, MultiIndex):
