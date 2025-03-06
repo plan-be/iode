@@ -5098,6 +5098,8 @@ cdef class Variables(IodeDatabase):
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace has not been initialized")
 
+        self_names = self.names
+
         self_first_period, self_last_period = self._get_periods_bounds()
         self_nb_periods = self_last_period - self_first_period + 1
 
@@ -5105,7 +5107,7 @@ cdef class Variables(IodeDatabase):
             raise RuntimeError("The sample of the Variables database to export is empty")
 
         if vars_names is None:
-            vars_names = self.names
+            vars_names = self_names
         if isinstance(vars_names, str):
             vars_names = split_list(vars_names)
 
@@ -5120,16 +5122,7 @@ cdef class Variables(IodeDatabase):
 
         # check that all names in the pandas object are present in the current subset 
         if self.is_detached:
-            self._check_same_names(self.names, vars_names)
-
-        for name in vars_names:
-            # NOTE: Cython cannot directly convert a Python string to a C string, 
-            #       so we need to use the encode() method to convert it to a bytes object first, 
-            #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
-            b_name = name.encode()
-            c_name = b_name
-            # add a new variable with all values set to IODE_NAN
-            KV_add(db_ptr, c_name)
+            self._check_same_names(self_names, vars_names)
 
         # value for argument 'first_period' represents a sample (range of periods)
         if isinstance(first_period, str) and ':' in first_period:
@@ -5164,6 +5157,17 @@ cdef class Variables(IodeDatabase):
                              f"from the number of columns of the numpy ndarray ({data.shape[1]}).\n"
                              f"Periods to updated are: {first_period}:{last_period}")
 
+        # add new variables if they do not exist
+        new_vars = set(vars_names) - set(self_names)
+        for name in new_vars:
+            # NOTE: Cython cannot directly convert a Python string to a C string, 
+            #       so we need to use the encode() method to convert it to a bytes object first, 
+            #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
+            b_name = name.encode()
+            c_name = b_name
+            # add a new variable with all values set to IODE_NAN
+            KV_add(db_ptr, c_name)
+
         if not data.flags['C_CONTIGUOUS']:
             # make sure the array is C-contiguous
             data = np.ascontiguousarray(data)
@@ -5176,7 +5180,6 @@ cdef class Variables(IodeDatabase):
         cdef double[:, ::1] data_view = data
 
         # copy the values
-        # TODO: If mode == LEVEL:
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
             for i, name in enumerate(vars_names):
                 # NOTE: Cython cannot directly convert a Python string to a C string, 
