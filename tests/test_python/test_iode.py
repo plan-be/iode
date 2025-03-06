@@ -159,45 +159,372 @@ def test_computed_table_NA_values():
 # ---------
 
 def test_variables_setitem():
-    variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-
-    # ==== set the variable values for range of periods using a Python slice ====
-    
-    # a) variable(periods) = same value for all periods
-    variables["ACAF", "1991Y1":"1995Y1"] = 0.0
-    variables["ACAF", "1991Y1":"1995Y1"]       
-    assert variables["ACAF", "1991Y1"] == 0.0
-    assert variables["ACAF", "1992Y1"] == 0.0
-    assert variables["ACAF", "1993Y1"] == 0.0
-    assert variables["ACAF", "1994Y1"] == 0.0
-    assert variables["ACAF", "1995Y1"] == 0.0
-
-    # b) variable(periods) = LEC expression
-    variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
-    variables["ACAF", "1991Y1":"1995Y1"]
-    assert variables["ACAF", "1991Y1"] == 41.0
-    assert variables["ACAF", "1992Y1"] == 42.0
-    assert variables["ACAF", "1993Y1"] == 43.0
-    assert variables["ACAF", "1994Y1"] == 44.0
-    assert variables["ACAF", "1995Y1"] == 45.0
-
-    # c) variable(periods) = Variables object
-    variables["ACAF", "1991Y1":"1995Y1"] = variables["ACAG", "1991Y1":"1995Y1"]
-    variables["ACAF", "1991Y1":"1995Y1"]        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-    assert variables["ACAF", "1991Y1"] == variables["ACAG", "1991Y1"]
-    assert variables["ACAF", "1992Y1"] == variables["ACAG", "1992Y1"]
-    assert variables["ACAF", "1993Y1"] == variables["ACAG", "1993Y1"]
-    assert variables["ACAF", "1994Y1"] == variables["ACAG", "1994Y1"]
-    assert variables["ACAF", "1995Y1"] == variables["ACAG", "1995Y1"]
-
     # ==== select periods as 'first_period:' and 'last_period:' ====
     variables.clear()
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
     vars_subset = variables["A*;*_", "1990Y1:"]
     assert str(vars_subset.sample) == "1990Y1:2015Y1"
     vars_subset = variables["A*;*_", ":2000Y1"]
     assert str(vars_subset.sample) == "1960Y1:2000Y1"
+
+    # ==== setitem  ====
+    names = ["AOUC", "AOUC_", "AQC"]
+    other_names = ["BENEF", "BQY", "BRUGP"]
+    
+    # ==== 1) periods = unique period ====
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    vars_subset = variables["A*", "1990Y1":"1992Y1"].copy()
+
+    # **** 1.a) values = float ****
+    variables[names, "1991Y1"] = 0.0
+    assert variables["AOUC", "1991Y1"] == 0.0
+    assert variables["AOUC_", "1991Y1"] == 0.0
+    assert variables["AQC", "1991Y1"] == 0.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1992Y1"] == vars_subset["ACAF", "1992Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1992Y1"] == vars_subset["AOUC", "1992Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1992Y1"] == vars_subset["AOUC_", "1992Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1992Y1"] == vars_subset["AQC", "1992Y1"]
+
+    # **** 1.b) values = LEC expression ****
+    variables[names, "1991Y1"] = "t + 10"
+    assert variables["AOUC", "1991Y1"] == 41.0
+    assert variables["AOUC_", "1991Y1"] == 41.0
+    assert variables["AQC", "1991Y1"] == 41.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1992Y1"] == vars_subset["ACAF", "1992Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1992Y1"] == vars_subset["AOUC", "1992Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1992Y1"] == vars_subset["AOUC_", "1992Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1992Y1"] == vars_subset["AQC", "1992Y1"]
+
+    # **** 1.c) values = list(float) ****
+    variables[names, "1991Y1"] = [1.0, 2.0, 3.0]
+    assert variables["AOUC", "1991Y1"] == 1.0
+    assert variables["AOUC_", "1991Y1"] == 2.0
+    assert variables["AQC", "1991Y1"] == 3.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1992Y1"] == vars_subset["ACAF", "1992Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1992Y1"] == vars_subset["AOUC", "1992Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1992Y1"] == vars_subset["AOUC_", "1992Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1992Y1"] == vars_subset["AQC", "1992Y1"]
+
+    # **** 1.d) values = numpy array ****
+    variables[names, "1991Y1"] = np.asarray([4.0, 5.0, 6.0])
+    assert variables["AOUC", "1991Y1"] == 4.0
+    assert variables["AOUC_", "1991Y1"] == 5.0
+    assert variables["AQC", "1991Y1"] == 6.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1992Y1"] == vars_subset["ACAF", "1992Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1992Y1"] == vars_subset["AOUC", "1992Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1992Y1"] == vars_subset["AOUC_", "1992Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1992Y1"] == vars_subset["AQC", "1992Y1"]
+
+    # **** 1.e) values = Variables object ****
+    values = variables[other_names, "1991Y1"]
+    for name, other_name in zip(names, other_names):
+        variables[name, "1991Y1"] = values[other_name, "1991Y1"]
+    assert variables["AOUC", "1991Y1"] == variables["BENEF", "1991Y1"]
+    assert variables["AOUC_", "1991Y1"] == variables["BQY", "1991Y1"]
+    assert variables["AQC", "1991Y1"] == variables["BRUGP", "1991Y1"]
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1992Y1"] == vars_subset["ACAF", "1992Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1992Y1"] == vars_subset["AOUC", "1992Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1992Y1"] == vars_subset["AOUC_", "1992Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1992Y1"] == vars_subset["AQC", "1992Y1"]
+
+    # ==== 2) periods = tuple(from_period, to_period) ====
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    vars_subset = variables["A*", "1990Y1":"1996Y1"].copy()
+    periods = ("1991Y1", "1995Y1")
+
+    # **** 2.a) values = float ****
+    variables[names, periods] = 0.0
+    assert variables["AOUC", "1991Y1"] == 0.0
+    assert variables["AOUC", "1993Y1"] == 0.0
+    assert variables["AOUC", "1995Y1"] == 0.0
+    assert variables["AOUC_", "1991Y1"] == 0.0
+    assert variables["AOUC_", "1993Y1"] == 0.0
+    assert variables["AOUC_", "1995Y1"] == 0.0
+    assert variables["AQC", "1991Y1"] == 0.0
+    assert variables["AQC", "1993Y1"] == 0.0
+    assert variables["AQC", "1995Y1"] == 0.0
+    
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 2.b) values = LEC expression ****
+    variables[names, periods] = "t + 10"
+    assert variables["AOUC", "1991Y1"] == 41.0
+    assert variables["AOUC", "1993Y1"] == 43.0
+    assert variables["AOUC", "1995Y1"] == 45.0
+    assert variables["AOUC_", "1991Y1"] == 41.0
+    assert variables["AOUC_", "1993Y1"] == 43.0
+    assert variables["AOUC_", "1995Y1"] == 45.0
+    assert variables["AQC", "1991Y1"] == 41.0
+    assert variables["AQC", "1993Y1"] == 43.0
+    assert variables["AQC", "1995Y1"] == 45.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 2.c) values = list(list(float)) ****
+    values = [[1.0, 2.0, 3.0, 4.0, 5.0], 
+              [10.0, 20.0, 30.0, 40.0, 50.0], 
+              [100.0, 200.0, 300.0, 400.0, 500.0]]
+    variables[names, periods] = values
+    assert variables["AOUC", "1991Y1"] == 1.0
+    assert variables["AOUC", "1993Y1"] == 3.0
+    assert variables["AOUC", "1995Y1"] == 5.0
+    assert variables["AOUC_", "1991Y1"] == 10.0
+    assert variables["AOUC_", "1993Y1"] == 30.0
+    assert variables["AOUC_", "1995Y1"] == 50.0
+    assert variables["AQC", "1991Y1"] == 100.0
+    assert variables["AQC", "1993Y1"] == 300.0
+    assert variables["AQC", "1995Y1"] == 500.0
+    
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 2.d) values = numpy array ****
+    values = np.asarray(values) * 10.0
+    variables[names, periods] = values
+    assert variables["AOUC", "1991Y1"] == 10.0
+    assert variables["AOUC", "1993Y1"] == 30.0
+    assert variables["AOUC", "1995Y1"] == 50.0
+    assert variables["AOUC_", "1991Y1"] == 100.0
+    assert variables["AOUC_", "1993Y1"] == 300.0
+    assert variables["AOUC_", "1995Y1"] == 500.0
+    assert variables["AQC", "1991Y1"] == 1000.0
+    assert variables["AQC", "1993Y1"] == 3000.0
+    assert variables["AQC", "1995Y1"] == 5000.0
+    
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 2.e) values = Variables object ****
+    values = variables[other_names, periods]
+    for name, other_name in zip(names, other_names):
+        variables[name, periods] = values[other_name, periods]
+    assert variables["AOUC", "1991Y1"] == variables["BENEF", "1991Y1"]
+    assert variables["AOUC", "1993Y1"] == variables["BENEF", "1993Y1"]
+    assert variables["AOUC", "1995Y1"] == variables["BENEF", "1995Y1"]
+    assert variables["AOUC_", "1991Y1"] == variables["BQY", "1991Y1"]
+    assert variables["AOUC_", "1993Y1"] == variables["BQY", "1993Y1"]
+    assert variables["AOUC_", "1995Y1"] == variables["BQY", "1995Y1"]
+    assert variables["AQC", "1991Y1"] == variables["BRUGP", "1991Y1"]
+    assert variables["AQC", "1993Y1"] == variables["BRUGP", "1993Y1"]
+    assert variables["AQC", "1995Y1"] == variables["BRUGP", "1995Y1"]
+    
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # ==== 3) periods = slice ====
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    vars_subset = variables["A*", "1990Y1":"1996Y1"].copy()
+
+    # **** 3.a) values = float **** 
+    variables[names, "1991Y1":"1995Y1"] = 0.0
+    assert variables["AOUC", "1991Y1"] == 0.0
+    assert variables["AOUC", "1993Y1"] == 0.0
+    assert variables["AOUC", "1995Y1"] == 0.0
+    assert variables["AOUC_", "1991Y1"] == 0.0
+    assert variables["AOUC_", "1993Y1"] == 0.0
+    assert variables["AOUC_", "1995Y1"] == 0.0
+    assert variables["AQC", "1991Y1"] == 0.0
+    assert variables["AQC", "1993Y1"] == 0.0
+    assert variables["AQC", "1995Y1"] == 0.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 3.b) values = LEC expression ****
+    variables[names, "1991Y1":"1995Y1"] = "t + 10"
+    assert variables["AOUC", "1991Y1"] == 41.0
+    assert variables["AOUC", "1993Y1"] == 43.0
+    assert variables["AOUC", "1995Y1"] == 45.0
+    assert variables["AOUC_", "1991Y1"] == 41.0
+    assert variables["AOUC_", "1993Y1"] == 43.0
+    assert variables["AOUC_", "1995Y1"] == 45.0
+    assert variables["AQC", "1991Y1"] == 41.0
+    assert variables["AQC", "1993Y1"] == 43.0
+    assert variables["AQC", "1995Y1"] == 45.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 3.c) values = list(list(float)) ****
+    values = [[1.0, 2.0, 3.0, 4.0, 5.0], 
+              [10.0, 20.0, 30.0, 40.0, 50.0], 
+              [100.0, 200.0, 300.0, 400.0, 500.0]]
+    variables[names, "1991Y1":"1995Y1"] = values
+    assert variables["AOUC", "1991Y1"] == 1.0
+    assert variables["AOUC", "1992Y1"] == 2.0
+    assert variables["AOUC", "1993Y1"] == 3.0
+    assert variables["AOUC", "1994Y1"] == 4.0
+    assert variables["AOUC", "1995Y1"] == 5.0
+    assert variables["AOUC_", "1991Y1"] == 10.0
+    assert variables["AOUC_", "1992Y1"] == 20.0
+    assert variables["AOUC_", "1993Y1"] == 30.0
+    assert variables["AOUC_", "1994Y1"] == 40.0
+    assert variables["AOUC_", "1995Y1"] == 50.0
+    assert variables["AQC", "1991Y1"] == 100.0
+    assert variables["AQC", "1992Y1"] == 200.0
+    assert variables["AQC", "1993Y1"] == 300.0
+    assert variables["AQC", "1994Y1"] == 400.0
+    assert variables["AQC", "1995Y1"] == 500.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 3.d) values = numpy array
+    values = np.asarray(values) * 10.0
+    variables[names, "1991Y1":"1995Y1"] = values
+    assert variables["AOUC", "1991Y1"] == 10.0
+    assert variables["AOUC", "1992Y1"] == 20.0
+    assert variables["AOUC", "1993Y1"] == 30.0
+    assert variables["AOUC", "1994Y1"] == 40.0
+    assert variables["AOUC", "1995Y1"] == 50.0
+    assert variables["AOUC_", "1991Y1"] == 100.0
+    assert variables["AOUC_", "1992Y1"] == 200.0
+    assert variables["AOUC_", "1993Y1"] == 300.0
+    assert variables["AOUC_", "1994Y1"] == 400.0
+    assert variables["AOUC_", "1995Y1"] == 500.0
+    assert variables["AQC", "1991Y1"] == 1000.0
+    assert variables["AQC", "1992Y1"] == 2000.0
+    assert variables["AQC", "1993Y1"] == 3000.0
+    assert variables["AQC", "1994Y1"] == 4000.0
+    assert variables["AQC", "1995Y1"] == 5000.0
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
+
+    # **** 3.e) values = Variables object ****
+    values = variables[other_names, "1991Y1":"1995Y1"]
+    for name, other_name in zip(names, other_names):
+        variables[name, "1991Y1":"1995Y1"] = values[other_name, "1991Y1":"1995Y1"]
+    assert variables["AOUC", "1991Y1"] == variables["BENEF", "1991Y1"]
+    assert variables["AOUC", "1992Y1"] == variables["BENEF", "1992Y1"]
+    assert variables["AOUC", "1993Y1"] == variables["BENEF", "1993Y1"]
+    assert variables["AOUC", "1994Y1"] == variables["BENEF", "1994Y1"]
+    assert variables["AOUC", "1995Y1"] == variables["BENEF", "1995Y1"]
+    assert variables["AOUC_", "1991Y1"] == variables["BQY", "1991Y1"]
+    assert variables["AOUC_", "1992Y1"] == variables["BQY", "1992Y1"]
+    assert variables["AOUC_", "1993Y1"] == variables["BQY", "1993Y1"]
+    assert variables["AOUC_", "1994Y1"] == variables["BQY", "1994Y1"]
+    assert variables["AOUC_", "1995Y1"] == variables["BQY", "1995Y1"]
+    assert variables["AQC", "1991Y1"] == variables["BRUGP", "1991Y1"]
+    assert variables["AQC", "1992Y1"] == variables["BRUGP", "1992Y1"]
+    assert variables["AQC", "1993Y1"] == variables["BRUGP", "1993Y1"]
+    assert variables["AQC", "1994Y1"] == variables["BRUGP", "1994Y1"]
+    assert variables["AQC", "1995Y1"] == variables["BRUGP", "1995Y1"]
+
+    assert variables["ACAF", "1990Y1"] == vars_subset["ACAF", "1990Y1"]
+    assert variables["ACAF", "1996Y1"] == vars_subset["ACAF", "1996Y1"]
+    assert variables["ACAG", "1990Y1"] == vars_subset["ACAG", "1990Y1"]
+    assert variables["ACAG", "1996Y1"] == vars_subset["ACAG", "1996Y1"]
+    assert variables["AOUC", "1990Y1"] == vars_subset["AOUC", "1990Y1"]
+    assert variables["AOUC", "1996Y1"] == vars_subset["AOUC", "1996Y1"]
+    assert variables["AOUC_", "1990Y1"] == vars_subset["AOUC_", "1990Y1"]
+    assert variables["AOUC_", "1996Y1"] == vars_subset["AOUC_", "1996Y1"]
+    assert variables["AQC", "1990Y1"] == vars_subset["AQC", "1990Y1"]
+    assert variables["AQC", "1996Y1"] == vars_subset["AQC", "1996Y1"]
 
     # ==== make subset of a subset and test if modifications propagate ====
     variables.clear()
