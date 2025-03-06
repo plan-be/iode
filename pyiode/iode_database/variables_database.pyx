@@ -353,9 +353,11 @@ cdef class Variables(IodeDatabase):
         # _periods represents the whole sample
         if _periods is None:
             pass
+        
         # _periods represents a unique period
         elif isinstance(_periods, Period):
             pass
+        
         # _periods represents a unique period or a contiguous range of periods
         elif isinstance(_periods, str): 
             # _periods represents a contiguous range of periods
@@ -368,12 +370,13 @@ cdef class Variables(IodeDatabase):
             else:
                 _periods = Period(_periods)
         
-        # _periods is a list of periods
-        elif isinstance(_periods, Iterable):
-            if not all(isinstance(period, (str, Period)) for period in _periods):
-                raise TypeError("variables[names, periods]: 'periods' must be a list of str or Period objects.")
-            _periods = [Period(period) if isinstance(period, str) else period for period in _periods]
-        
+        # _periods represents a range of contiguous periods
+        elif isinstance(_periods, tuple):
+            if len(_periods) != 2:
+                raise ValueError(f"variables[names, periods]: when 'periods' is a tuple, it must "
+                                 f"contain 2 elements.\nGot {len(_periods)} elements.")
+            _periods = (Period(_periods[0]), Period(_periods[1]))
+
         # _periods is a Sample object
         elif isinstance(_periods, Sample):
             _periods = _periods.start, _periods.end
@@ -393,11 +396,18 @@ cdef class Variables(IodeDatabase):
                 if isinstance(last_period, str):
                     last_period = Period(last_period)
                 _periods = first_period, last_period
+
+        # _periods is a list of periods
+        elif isinstance(_periods, Iterable):
+            if not all(isinstance(period, (str, Period)) for period in _periods):
+                raise TypeError("variables[names, periods]: 'periods' must be a list of str or Period objects.")
+            _periods = [Period(period) if isinstance(period, str) else period for period in _periods]
+
         else:
             # wrong type for _periods
             raise TypeError(f"variables[names, periods]: 'periods' must be of type str, Period, Sample, "
-                            f"list of str or Period, or a slice(str or Period, str or Period, int). "
-                            f"'periods' is of type {type(_periods).__name__}.")
+                            f"tuple(str or Period, str or Period)), list(str or Period), or a "
+                            f"slice(str or Period, str or Period, int).\n'periods' is of type {type(_periods).__name__}.")
 
         return names, _periods
 
@@ -1066,8 +1076,8 @@ cdef class Variables(IodeDatabase):
                     sample: Sample = Sample(first_period, last_period)
                     if values.sample != sample:
                         raise ValueError(f"Cannot update the IODE variable '{name}': Incompatible periods.\n"
-                                        f"Expected right-hand side Variables object to have sample {sample}.\n"
-                                        f"Got Variables object with sample {values.sample} instead.")
+                                         f"Expected right-hand side Variables object to have sample {sample}.\n"
+                                         f"Got Variables object with sample {values.sample} instead.")
                     # NOTE: 'values' can contains more than one variable as long as the variable
                     #       named 'name' is present
                     source_name = name if len(values) > 1 else values.names[0]
@@ -1100,7 +1110,7 @@ cdef class Variables(IodeDatabase):
                 elif isinstance(values, Iterable):
                     if len(values) != len(key_periods):
                         raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
-                                         f"Expected a list of {len(key_periods)} values.\n"
+                                         f"Expected a {type(values).__name__} of {len(key_periods)} values.\n"
                                          f"Got {len(values)} values instead")
                     if not all(isinstance(v, float) for v in values):
                         raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
