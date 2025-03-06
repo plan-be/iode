@@ -1053,24 +1053,27 @@ cdef class Variables(IodeDatabase):
                 t = self._get_real_period_position(key_periods)
                 if isinstance(values, float):
                     KV_set(c_db_ptr, pos, t, self.mode_, <double>values)
+                # values is a LEC expression
+                elif isinstance(values, str):
+                    self.database_ptr.update(pos, <string>values.encode(), t, t) 
                 elif isinstance(values, Variables):
                     self.__copy_var(name, name, t, t, values)
                 else:
                     raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
-                                    f"When updating values for a single period, the right-hand side must be "
-                                    f"a float or an interable of float.\nGot input of type {type(values).__name__} instead")
+                                    f"When updating values for a single period, the right-hand side must be of type "
+                                    f"int, float, str or interable of float.\nGot input of type {type(values).__name__} instead")
             # update values for a contiguous range of periods
             elif isinstance(key_periods, tuple):
                 first_period, last_period = key_periods
                 t_first = self._get_real_period_position(first_period)
                 t_last = self._get_real_period_position(last_period)
-                # values is a LEC expression
-                if isinstance(values, str):
-                    self.database_ptr.update(pos, <string>values.encode(), t_first, t_last) 
                 # set same value for all periods in the range
-                elif isinstance(values, float):
+                if isinstance(values, float):
                     for t in range(t_first, t_last + 1): 
                         KV_set(c_db_ptr, pos, t, self.mode_, <double>values)  
+                # values is a LEC expression
+                elif isinstance(values, str):
+                    self.database_ptr.update(pos, <string>values.encode(), t_first, t_last) 
                 # values is of type Variables
                 elif isinstance(values, Variables):
                     sample: Sample = Sample(first_period, last_period)
