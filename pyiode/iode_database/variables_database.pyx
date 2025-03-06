@@ -985,8 +985,23 @@ cdef class Variables(IodeDatabase):
         _c_copy_var_content(c_dest_name, self.database_ptr, t_first, t_last, 
                             c_source_name, value.database_ptr, value_t_first, value_t_last)
 
-    def _set_variable(self, key_name: Union[str, int], values: Union[str, int, float, np.ndarray, Iterable[float], Variables], 
-        key_periods: Optional[str, Period, Tuple[Any], List[Any]]):
+    def _set_variable(self, key_name, values, key_periods):
+        """
+        Update/add a variable referenced by `key_name` from/to the current Variables database.
+
+        Parameters
+        ----------
+        key_name: str, int
+            The name of the variable to update/add.
+            If `key_name` is an int, it is interpreted as the position of the variable in 
+            the Variables database.
+        values: str or int or float or numpy array or iterable(float) or Variables
+            The new values of the variable.
+            If `values` is a str, it is interpreted as a LEC expression.
+        key_periods: str or Period or tuple(str, str) or list(str), optional
+            The periods to update/add. 
+            If `key_periods` is None, values for the whole sample is updated/added.
+        """
         cdef int t
         cdef int t_first
         cdef int t_last
@@ -1832,9 +1847,15 @@ cdef class Variables(IodeDatabase):
         # check type of passed 'value' and convert np.nan to IODE NA
         value = self._convert_values(value)
 
-        # if value is a string (LEC expression) or a numerical value 
+        # if value is a float -> set the same value for all variables and periods
+        if isinstance(value, float):
+            for name in names:
+                self._set_variable(name, value, key_periods)
+            return
+
+        # if value is a string (LEC expression)
         # -> set the same value for all variables and periods
-        if isinstance(value, str) or not isinstance(value, Iterable):
+        if isinstance(value, str):
             for name in names:
                 self._set_variable(name, value, key_periods)
             return
@@ -1859,7 +1880,7 @@ cdef class Variables(IodeDatabase):
                 self._set_variable(name, _value, key_periods)
             return
 
-        # if value is an Variables object
+        # if value is a Variables object
         if isinstance(value, Variables):
             if len(names) > 1:
                 # check that names in the selection key are present in the Variables object
