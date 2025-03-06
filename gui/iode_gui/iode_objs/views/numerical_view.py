@@ -221,7 +221,7 @@ class NumericalTableView:
         if self.allow_to_paste:
             try:
                 start_index: QModelIndex = self.selectionModel().selectedIndexes()[0]
-                model: IodeAbstractTableModel = self.model()
+                _model: IodeAbstractTableModel = self.model()
 
                 clipboard = QApplication.clipboard()
                 text = clipboard.text()
@@ -232,14 +232,19 @@ class NumericalTableView:
                 if text.endswith("\n"):
                     text = text[:-1]
 
+                # convert values to float
+                lines = text.split("\n")
+                cells = [line.split("\t") for line in lines]
+                cells = [[_model.string_to_float(value) for value in row] for row in cells]
+
                 ok = True
-                for i, row_string in enumerate(text.split("\n")):
-                    for j, value in enumerate(row_string.split("\t")):
+                for i, row in enumerate(cells):
+                    for j, value in enumerate(row):
                         row = start_index.row() + i
                         column = start_index.column() + j
-                        index = model.index(row, column)
+                        index = _model.index(row, column)
                         if index.isValid():
-                            ok = model.setData(index, value, Qt.EditRole)
+                            ok = _model.setData(index, value, Qt.EditRole)
                             if not ok:
                                 return
                         else:
