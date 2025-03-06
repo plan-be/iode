@@ -196,9 +196,10 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
             QMessageBox.warning(None, "WARNING", str(e))
             return ""
 
-    def set_value(self, row: int, column: int, value: str) -> bool:
+    def set_value(self, row: int, column: int, value: Union[str, float]) -> bool:
         try:
-            value = self.string_to_float(value)
+            if isinstance(value, str):
+                value = self.string_to_float(value)
             if value == self._displayed_database.i[row, column]:
                 return False
             self._displayed_database.i[row, column] = value
