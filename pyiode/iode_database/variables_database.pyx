@@ -5042,7 +5042,10 @@ cdef class Variables(IodeDatabase):
         Parameters
         ----------
         data: numpy ndarray
-            Numpy ndarray containing the variables values to copy into the IODE Variables database.
+            Numpy ndarray containing the variables values to copy into the 
+            IODE Variables database. If the ndarray is a 1D array, either 
+            `var_names` must represent a single variable or `first_period` 
+            must be equal to `last_period`.
         vars_names: str or list of str, optional
             Names of the variables to copy into the IODE Variables database.
             Default to all variables names found in the present database.
@@ -5175,15 +5178,6 @@ cdef class Variables(IodeDatabase):
         if isinstance(vars_names, str):
             vars_names = split_list(vars_names)
 
-        if data.ndim == 1:
-            # if the data is a 1D array, we assume that it is a single variable to update
-            data = data.reshape(1, -1)
-        
-        if len(vars_names) != data.shape[0]:
-            raise ValueError(f"The number of variables ({len(vars_names)}) to update is different "
-                             f"from the number of rows of the numpy ndarray ({data.shape[0]}).\n"
-                             f"Variables to updated are: {vars_names}")
-
         # check that all names in the pandas object are present in the current subset 
         if self.is_detached:
             self._check_same_names(self_names, vars_names)
@@ -5215,6 +5209,25 @@ cdef class Variables(IodeDatabase):
         t_first_period = self._get_real_period_position(first_period)
         t_last_period = self._get_real_period_position(last_period)
         nb_periods = t_last_period - t_first_period + 1
+
+        # If the ndarray is a 1D array, either `var_names` must represent 
+        # a single variable or `first_period` must be equal to `last_period`
+        if data.ndim == 1:
+            # data = single variable
+            if len(vars_names) == 1:
+                data = data.reshape(1, -1)
+            # data = single period
+            elif nb_periods == 1:
+                data = data.reshape(-1, 1)
+            else:
+                raise ValueError("When the passed numpy ndarray is 1D, either the argument "
+                                 "'vars_names' must represent a single variable or the arguments "
+                                 "'first_period' and 'last_period' must be equal")
+        
+        if len(vars_names) != data.shape[0]:
+            raise ValueError(f"The number of variables ({len(vars_names)}) to update is different "
+                             f"from the number of rows of the numpy ndarray ({data.shape[0]}).\n"
+                             f"Variables to updated are: {vars_names}")
 
         if nb_periods != data.shape[1]:
             raise ValueError(f"The number of periods ({nb_periods}) to update is different "
