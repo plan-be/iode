@@ -276,6 +276,27 @@ to upload your package and enter your credentials for the account you registered
 root_dir_iode> pip install <project_name_from_pyproject.toml>
 ```
 
+## How to overwrite pypi package when doing upload from command line?
+
+"Overriding" a package on PyPI is officially not supported. 
+But there is a trick that works: using *build numbers*.
+
+The trick is to rename the files in the following pattern:
+```
+mypackage-x.y.z-py2.py3-none-any.whl
+mypackage-x.y.z-1-py3-none-any.whl
+mypackage-x.y.z-2-py3-none-any.whl
+```
+where *-1* or *-2* are *build numbers*. 
+
+If pip finds all these files for the same release, it will pick the one with the highest 
+build number. It also seems to work if it finds only a single file with a non-zero build number, 
+so you can use that after you deleted the original.
+
+This is very quickly mentioned in the [PEP 427 documentation](https://www.python.org/dev/peps/pep-0427/#file-name-convention)
+
+Note: this trick has been found on StackOverflow [here](https://stackoverflow.com/a/63944201)
+
 # GUI (Python)
 
 Before to work on any issue related to the GUI (Python), you have to convert the 
