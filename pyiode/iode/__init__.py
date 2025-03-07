@@ -27,7 +27,8 @@ from .util import split_list
 
 # IODE databases
 from .iode_cython import comments, equations, identities, lists, scalars, tables, variables
-from .iode_cython import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
+from .iode_cython import Comments, Equations, Identities, Lists, Scalars, Tables
+from .iode_database.variables_database import Variables
 from .iode_cython import load_extra_files, reset_extra_files
 
 # Reports
