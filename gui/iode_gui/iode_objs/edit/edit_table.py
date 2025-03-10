@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt, Signal, Slot, QModelIndex
 from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtGui import QShortcut, QKeySequence
 
+from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from .edit_iode_obj import AbstractEditObjDialog
 from .edit_table_model import EditTableModel
@@ -25,6 +26,7 @@ class EditTableDialog(AbstractEditObjDialog):
         super().__init__(name, database, tables, parent)
         self.ui = Ui_EditTableDialog()
         self.ui.setupUi(self)
+        self.settings_group = "EDIT_TABLE"
 
         try:
             self.previous_value = database[name]
@@ -47,8 +49,49 @@ class EditTableDialog(AbstractEditObjDialog):
             
             self.delete_shortcut.activated.connect(self.delete_line)
             self.new_plot.connect(main_window.append_plot)
+
+            self.load_settings()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
+
+    def load_settings(self):
+        """
+        Load directories that were expanded when the program has been closed.
+        """
+        project_settings = get_settings()
+        if not project_settings:
+            return
+
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
+        project_settings.beginGroup(self.settings_group)
+        insert_line_type_index = project_settings.value("insert_line_type", type=int, defaultValue=-1)
+        if insert_line_type_index >= 0:
+            self.ui.comboBox_insert_line_type.setCurrentIndex(insert_line_type_index)
+        insert_where_index = project_settings.value("insert_where", type=int, defaultValue=-1)
+        if insert_where_index >= 0:
+            self.ui.comboBox_insert_where.setCurrentIndex(insert_where_index)
+        project_settings.endGroup()
+
+    def save_settings(self):
+        """
+        Save directories that are expanded before to close the program.
+        """
+        project_settings = get_settings()
+        if not project_settings:
+            return
+        
+        # end all groups to be sure we are at the top level
+        while project_settings.group():
+            project_settings.endGroup()
+
+        # save list of expanded directories to project settings
+        project_settings.beginGroup(self.settings_group)
+        project_settings.setValue("insert_line_type", self.ui.comboBox_insert_line_type.currentIndex())
+        project_settings.setValue("insert_where", self.ui.comboBox_insert_where.currentIndex())
+        project_settings.endGroup()
 
     @Slot()
     def edit(self):
@@ -56,6 +99,7 @@ class EditTableDialog(AbstractEditObjDialog):
         edit_table_model: EditTableModel = self.ui.tableView.model()
         table = edit_table_model.table
         self._edit(name, table)
+        self.save_settings()
 
     @Slot()
     def plot(self):
@@ -95,6 +139,8 @@ class EditTableDialog(AbstractEditObjDialog):
                 if position < 0:
                     return
                 edit_table_model.insert_line(line_type, position, after=False)
+            
+            self.save_settings()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
 
