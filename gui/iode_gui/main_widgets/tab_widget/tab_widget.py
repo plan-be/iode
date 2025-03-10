@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 from typing import List, Union, Optional
 
-from iode_gui.settings import ProjectSettings
+from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.tabs.tab_abstract import IodeAbstractWidget
 from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
@@ -186,7 +186,7 @@ class IodeTabWidget(QTabWidget):
         self.files_list.clear()
 
         # extract settings
-        project_settings = ProjectSettings.project_settings
+        project_settings = get_settings()
         if not project_settings:
             return
         
@@ -284,10 +284,7 @@ class IodeTabWidget(QTabWidget):
         associated with each tab. The tooltip is either the path to the 
         corresponding file or a default string in case of unsaved IODE database.
         """
-        if Context.called_from_python_script:
-            return
-
-        project_settings = ProjectSettings.project_settings
+        project_settings = get_settings()
         if not project_settings:
             return
 
