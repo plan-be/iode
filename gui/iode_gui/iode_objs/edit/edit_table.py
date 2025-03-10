@@ -75,11 +75,15 @@ class EditTableDialog(AbstractEditObjDialog):
         try:
             edit_table_model: EditTableModel = self.ui.tableView.model()
             selection = self.ui.tableView.selectionModel().selectedRows()
-            position = selection[0].row() if selection else -1
+            selected_row = selection[0].row() if selection else -1
             i_insert_line_type: int = self.ui.comboBox_insert_line_type.currentIndex()
             line_type = self.v_line_types[i_insert_line_type]
             i_insert_where = self.ui.comboBox_insert_where.currentIndex()
             insert_where = self.v_insert_where[i_insert_where]
+
+            # NOTE: position in IODE table = selected row - 1 because the first row is the 
+            #       divider and it is not taken into account in the line positions in IODE tables.
+            position = selected_row - 1
 
             if insert_where == EnumInsertWhere.INSERT_AT_THE_END:
                 edit_table_model.append_line(line_type)
