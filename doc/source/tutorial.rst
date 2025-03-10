@@ -15,3 +15,4 @@ It is mainly dedicated to help new users to familiarize with it and others to re
    ./tutorial/getting_started.ipynb
    ./tutorial/pandas.ipynb
    ./tutorial/larray.ipynb
+   ./tutorial/numpy.ipynb
