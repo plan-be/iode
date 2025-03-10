@@ -9,8 +9,7 @@ from PySide6.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices,
                            QCloseEvent, QDragMoveEvent, QDropEvent)
 from PySide6.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
 
-from iode_gui.utils import Context
-from iode_gui.settings import ProjectSettings
+from iode_gui.settings import get_settings
 from iode_gui.main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
 from iode_gui.main_widgets.file_explorer.file_delegate import FileDelegate
 from iode_gui.main_widgets.tab_widget.tab_widget import IodeTabWidget
@@ -323,10 +322,7 @@ class IodeFileExplorer(QTreeView):
         """
         Load directories that were expanded when the program has been closed.
         """
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
+        project_settings = get_settings()
         if not project_settings:
             return
 
@@ -354,10 +350,7 @@ class IodeFileExplorer(QTreeView):
         """
         Save directories that are expanded before to close the program.
         """
-        if Context.called_from_python_script:
-            return
-        
-        project_settings = ProjectSettings.project_settings
+        project_settings = get_settings()
         if not project_settings:
             return
         
