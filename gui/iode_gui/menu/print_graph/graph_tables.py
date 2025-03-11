@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot, Signal
 from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.plot.plot_table import PlotTableDialog
 from iode_gui.menu.file.file_settings import MenuFileSettings
 from .ui_graph_tables import Ui_MenuGraphTables
@@ -19,9 +20,7 @@ class MenuGraphTables(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        self.ui.textEdit_table_names.handle_iode_type(IodeType.TABLES)        
-        self.ui.textEdit_table_names.include_iode_command(False)       
-        self.ui.textEdit_table_names.include_lec_functions(False)
+        self.ui.textEdit_table_names.setup_completer(iode_types=IodeType.TABLES)
 
         self.v_table_langs = list(TableLang)
         v_table_lang_names = [iode_type.name.title() for iode_type in self.v_table_langs]

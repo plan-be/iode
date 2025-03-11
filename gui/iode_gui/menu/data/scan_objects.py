@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_scan_objects import Ui_MenuDataScanObjects
 
 from iode import IodeType, equations, identities, lists, tables
@@ -20,9 +21,7 @@ class MenuDataScanObjects(MixinSettingsDialog):
         self.ui.comboBox_iode_types.setCurrentIndex(0)
         self.update_name_completer(0)
 
-        self.ui.textEdit_lists_to_scan.handle_iode_type(IodeType.COMMENTS)        
-        self.ui.textEdit_lists_to_scan.include_iode_command(False)        
-        self.ui.textEdit_lists_to_scan.include_lec_functions(False)
+        self.ui.textEdit_lists_to_scan.setup_completer(iode_types=IodeType.COMMENTS)
 
         self.ui.comboBox_iode_types.currentIndexChanged.connect(self.update_name_completer)
         self.load_settings()
@@ -30,8 +29,7 @@ class MenuDataScanObjects(MixinSettingsDialog):
     @Slot(int)
     def update_name_completer(self, i_iode_type):
         iode_type: IodeType = self.v_iode_types[i_iode_type]
-        self.ui.textEdit_lists_to_scan.reset_iode_types()
-        self.ui.textEdit_lists_to_scan.handle_iode_type(iode_type)
+        self.ui.textEdit_lists_to_scan.setup_completer(iode_types=iode_type)
 
     @Slot()
     def scan(self):

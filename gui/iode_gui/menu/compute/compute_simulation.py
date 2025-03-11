@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDoubleValidator
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_compute_simulation import Ui_MenuComputeSimulation
 
 import warnings
@@ -18,13 +19,8 @@ class MenuComputeSimulation(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)  
 
-        self.ui.textEdit_equations_list.handle_iode_type(IodeType.EQUATIONS)        
-        self.ui.textEdit_equations_list.include_iode_command(False)        
-        self.ui.textEdit_equations_list.include_lec_functions(False)
-
-        self.ui.textEdit_exchange.handle_iode_type(IodeType.VARIABLES)        
-        self.ui.textEdit_exchange.include_iode_command(False)        
-        self.ui.textEdit_exchange.include_lec_functions(False)
+        self.ui.textEdit_equations_list.setup_completer(iode_types=IodeType.EQUATIONS)
+        self.ui.textEdit_exchange.setup_completer(iode_types=IodeType.VARIABLES)
 
         self.v_simulation_initialization = list(SimulationInitialization)
         self.ui.comboBox_initialization.addItems(SIMULATION_INITIALIZATION_METHODS)

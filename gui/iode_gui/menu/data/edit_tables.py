@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QCloseEvent
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from .ui_edit_tables import Ui_MenuDataEditTables
 
@@ -18,9 +19,7 @@ class MenuDataEditTables(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        self.ui.textEdit_table_names.handle_iode_type(IodeType.TABLES)        
-        self.ui.textEdit_table_names.include_iode_command(False)        
-        self.ui.textEdit_table_names.include_lec_functions(False)  
+        self.ui.textEdit_table_names.setup_completer(iode_types=IodeType.TABLES) 
 
         self.table_views: List[ComputedTableDialog] = []
         self.load_settings()

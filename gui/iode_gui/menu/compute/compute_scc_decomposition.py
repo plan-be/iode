@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_compute_scc_decomposition import Ui_MenuComputeSCCDecomposition
 
 import warnings
@@ -15,9 +16,7 @@ class MenuComputeSCCDecomposition(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)  
 
-        self.ui.textEdit_equations_list.handle_iode_type(IodeType.EQUATIONS)        
-        self.ui.textEdit_equations_list.include_iode_command(False)        
-        self.ui.textEdit_equations_list.include_lec_functions(False)
+        self.ui.textEdit_equations_list.setup_completer(iode_types=IodeType.EQUATIONS)
 
         self.ui.spinBox_triangulation_iterations.setValue(5)
         self.ui.lineEdit_pre_recursive_list_name.setText("_PRE")

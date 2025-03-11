@@ -5,6 +5,7 @@ from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.utils import TMP_FILENAME
 from iode_gui.settings import MixinSettingsDialog, get_settings, PRINT_TO_FILE
+from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.menu.file.file_settings import MenuFileSettings
 from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from iode_gui.print.print_file_dialog import PrintFileDialog
@@ -23,9 +24,7 @@ class MenuPrintVariables(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        self.ui.textEdit_variable_names.handle_iode_type(IodeType.VARIABLES)        
-        self.ui.textEdit_variable_names.include_iode_command(False)       
-        self.ui.textEdit_variable_names.include_lec_functions(False)
+        self.ui.textEdit_variable_names.setup_completer(iode_types=IodeType.VARIABLES)
 
         self.v_table_langs = list(TableLang)
         v_table_lang_names = [iode_type.name.title() for iode_type in self.v_table_langs]

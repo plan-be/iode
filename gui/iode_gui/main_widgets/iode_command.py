@@ -42,7 +42,8 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         """
         self.main_window = main_window
         self.output = main_window.output
-        self.setup_completer = main_window.completer
+        self.setup_completer(main_window=main_window, report_commands=True, 
+                             lec_functions=True, iode_types=-1)
         self.setPlaceholderText("Enter a command here...")
 
     # override the _handle_special_keys() method from 

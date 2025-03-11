@@ -116,9 +116,7 @@ class AddTableDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.TABLES
         self.ui = Ui_AddTableDialog()
         self.ui.setupUi(self)
-        completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
-        self.ui.textEdit_lec.completer = completer
+        self.ui.textEdit_lec.setup_completer(iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
 
     @Slot()
     def add(self):

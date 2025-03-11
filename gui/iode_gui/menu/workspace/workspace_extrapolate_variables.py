@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_workspace_extrapolate_variables import Ui_MenuWorkspaceExtrapolateVariables
 
 
@@ -16,9 +17,7 @@ class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        self.ui.textEdit_variables_list.handle_iode_type(IodeType.VARIABLES)        
-        self.ui.textEdit_variables_list.include_iode_command(False)        
-        self.ui.textEdit_variables_list.include_lec_functions(False)        
+        self.ui.textEdit_variables_list.setup_completer(iode_types=IodeType.VARIABLES)     
 
         self.v_simulation_initialization = list(SimulationInitialization)
         self.ui.comboBox_method.addItems(SIMULATION_INITIALIZATION_METHODS)
