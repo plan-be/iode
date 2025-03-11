@@ -1,6 +1,8 @@
 from PySide6.QtCore import QStringListModel, QKeyCombination, Qt, Slot
-from PySide6.QtWidgets import QCompleter, QLineEdit
+from PySide6.QtWidgets import QCompleter, QLineEdit, QWidget
 from PySide6.QtGui import QKeyEvent
+
+from iode_gui.abstract_main_window import AbstractMainWindow
 
 from iode import IodeType, comments, equations, identities, lists, scalars, tables, variables
 from iode.reports import build_command_functions_list, build_report_functions_list, build_lec_functions_list
@@ -12,17 +14,17 @@ class IodeCompleter(QCompleter):
     A custom QCompleter for Iode objects.
     """
 
-    def __init__(self, report_commands: bool=True, lec_functions: bool=False, 
-                 iode_types: Union[IodeType, List[IodeType]]=None, parent=None):
+    def __init__(self, widget: QWidget, report_commands: bool=True, lec_functions: bool=False, 
+                 iode_types: Union[int, IodeType, List[Union[int, IodeType]]]=None):
         """
         Initializes the IodeCompleter.
 
         :param report_commands: Whether to include report commands.
         :param lec_functions: Whether to include LEC functions.
         :param iode_types: The type(s) of Iode object to include.
-        :param parent: The parent QObject.
         """
-        super().__init__(parent)
+        super().__init__()
+        self.setWidget(widget)
 
         self.list_model = QStringListModel(self)
         self.setModel(self.list_model)
@@ -33,17 +35,24 @@ class IodeCompleter(QCompleter):
         self.lec_functions_list: List[str] = self.build_lec_functions_list()
         self.iode_databases: List[Any] = [comments, equations, identities, lists, 
                                           scalars, tables, variables] 
-        self.iode_types_handled: Set[int] = set()
+        self._iode_types_handled: Set[int] = set()
 
         self._report_commands: bool = report_commands
         self._lec_functions: bool = lec_functions
+        self._update_model: bool = False
 
         if iode_types is not None:
-            if not isinstance(iode_types, list):
-                iode_types = [iode_types]
-            self.iode_types_handled = set(int(iode_type) for iode_type in iode_types)
+            # If iode_types is -1, then all IODE types are handled
+            if isinstance(iode_types, int) and iode_types == -1:
+                self.iode_types = iode_types
+            else:
+                if not isinstance(iode_types, list):
+                    iode_types = [iode_types]
+                for iode_type in iode_types:
+                    self.iode_types = iode_type
 
         self.update_iode_objects_list_names()
+        self._update_model = True
 
     @property
     def report_commands(self) -> bool:
@@ -92,14 +101,34 @@ class IodeCompleter(QCompleter):
         lec_functions_list.sort()
         return lec_functions_list
 
-    def handle_iode_type(self, iode_type: IodeType, update_model: bool=True):
-        self.iode_types_handled.add(int(iode_type))
-        if update_model:
+    @property
+    def update_model(self):
+        return self._update_model
+    
+    @update_model.setter
+    def update_model(self, value: bool):
+        self._update_model = value
+
+    @property
+    def iode_types(self) -> List[int]:
+        return list(self._iode_types_handled)
+
+    @iode_types.setter
+    def iode_types(self, value: Union[int, IodeType]):
+        # If iode_types is -1, then all IODE types are handled.
+        if isinstance(value, int) and value == -1:
+            self._iode_types_handled = set(range(len(self.iode_databases)))
+        else:
+            if isinstance(value, IodeType):
+                value = int(value)
+            self._iode_types_handled.add(value)
+        
+        if self.update_model:
             self.update_iode_objects_list_names()
     
-    def reset_iode_types(self, update_model: bool=True):
-        self.iode_types_handled = set()
-        if update_model:
+    def reset_iode_types(self):
+        self._iode_types_handled = set()
+        if self.update_model:
             self.update_iode_objects_list_names()
 
     @Slot()
@@ -116,12 +145,13 @@ class IodeCompleter(QCompleter):
         if self.lec_functions:
             names_list += self.lec_functions_list
 
-        # Build list of all Iode objects
+        # Build list of all IODE objects
         object_names: List[str] = []
-        for iode_type in self.iode_types_handled:
+        for iode_type in self.iode_types:
             object_names += self.iode_databases[iode_type].names
-        # Sort and remove duplicates from object names
+        # remove duplicates
         object_names = set(object_names)
+        # Sort object names
         object_names = list(object_names)
         object_names.sort()
 
@@ -143,11 +173,14 @@ class IodeWidgetWithCompleter():
     iode_func_prefixes = ['@', '#', '$']
 
     def __init__(self, completer_enabled: bool = True):
-        self._completer = IodeCompleter()
+        self._completer: IodeCompleter = None
         self._completer_enabled = completer_enabled
 
-    def setup_completer(self):
-        self._completer.setWidget(self)
+    def setup_completer(self, main_window: AbstractMainWindow=None, report_commands: bool=False, 
+                        lec_functions: bool=False, iode_types: Union[int, IodeType, List[IodeType]]=None):
+        self._completer = IodeCompleter(self, report_commands, lec_functions, iode_types)
+        if main_window is not None:
+            main_window.update_completer_requested.connect(self.update_completer)
         self._completer.activated.connect(self.insert_completion)
 
     def enable_autocomplete(self, enabled: bool):
@@ -157,6 +190,10 @@ class IodeWidgetWithCompleter():
         return False
 
     def _key_press_event(self, super_cls, event: QKeyEvent):
+        if self._completer is None:
+            self._handle_special_keys(event)
+            return 
+        
         if not self._completer_enabled:
             super_cls.keyPressEvent(event)
             return
@@ -201,27 +238,7 @@ class IodeWidgetWithCompleter():
     
     def insert_completion(self, completion: str):
         raise NotImplementedError()
-    
-    def reset_iode_types(self):
-        self._completer.reset_iode_types()
 
-    def handle_iode_type(self, iode_type: IodeType):
-        """
-        Sets the iode type for the completer.
-        """
-        self._completer.handle_iode_type(iode_type)
-
-    def include_iode_command(self, value: bool):
-        """
-        Includes iode commands in the completer if ok is True.
-        """
-        self._completer.report_commands = value
-
-    def include_lec_functions(self, value: bool):
-        """
-        Includes lec functions in the completer if ok is True.
-        """
-        self._completer.lec_functions = value
-
+    @Slot()
     def update_completer(self):
         self._completer.update_iode_objects_list_names()

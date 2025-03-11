@@ -1,7 +1,6 @@
-from PySide6.QtCore import Qt, QSettings, Slot
+from PySide6.QtCore import Qt, QSettings, Slot, Signal
 from PySide6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
 
-from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.plot.plot import PlotDialog
 from iode_gui.utils import DEFAULT_FONT_FAMILY
 
@@ -10,12 +9,10 @@ from iode import IodeType
 
 
 class AbstractMainWindow(QMainWindow):
+    update_completer_requested = Signal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        # ---- prepare auto-completion ----
-        self.completer = IodeCompleter(True, False, -1, self)
 
         # ---- list of open dialogs ----
         self.dialogs: List[QDialog] = []

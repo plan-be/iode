@@ -395,7 +395,7 @@ class MainWindow(AbstractMainWindow):
             self.ui.tabWidget_tools.setCurrentIndex(tab_index)
 
         # update auto-completion
-        self.completer.update_iode_objects_list_names()
+        self.update_completer_requested.emit()
 
         return True
 
@@ -509,7 +509,7 @@ class MainWindow(AbstractMainWindow):
                 self.ui.tabWidget_IODE_objs.update_object_tab(iode_type)
 
         # update the list of Iode object names available for autocomplete
-        self.completer.update_iode_objects_list_names()
+        self.update_completer_requested.emit()
 
         # show the corresponding tab
         self.ui.tabWidget_IODE_objs.show_tab(index)

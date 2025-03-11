@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
 from PySide6.QtGui import QDoubleValidator
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.plot.plot_vars import PlotVariablesDialog
 from iode_gui.menu.file.file_settings import MenuFileSettings
 from .ui_graph_variables import Ui_MenuGraphVariables
@@ -22,10 +23,8 @@ class MenuGraphVariables(MixinSettingsDialog):
         self.ui = Ui_MenuGraphVariables()
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
-
-        self.ui.textEdit_variables.handle_iode_type(IodeType.VARIABLES)        
-        self.ui.textEdit_variables.include_iode_command(False)       
-        self.ui.textEdit_variables.include_lec_functions(False)
+ 
+        self.ui.textEdit_variables.setup_completer(iode_types=IodeType.VARIABLES)
 
         self.v_variable_modes = list(VarsMode)
         v_variable_modes_names = [item.name.replace("_" , " ").title() for item in self.v_variable_modes]

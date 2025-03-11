@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_compute_identities import Ui_MenuComputeIdentities
 
 from typing import Union, List
@@ -20,9 +21,7 @@ class MenuComputeIdentities(MixinSettingsDialog):
         self.ui.comboBox_language.addItems(v_table_lang_names)
         self.ui.comboBox_language.setCurrentIndex(0)   
 
-        self.ui.textEdit_identities_list.handle_iode_type(IodeType.IDENTITIES)        
-        self.ui.textEdit_identities_list.include_iode_command(False)        
-        self.ui.textEdit_identities_list.include_lec_functions(False)
+        self.ui.textEdit_identities_list.setup_completer(iode_types=IodeType.IDENTITIES)
 
         self.ui.fileChooser_var_file1.enum_file_type = IodeFileType.FILE_VARIABLES
         self.ui.fileChooser_var_file2.enum_file_type = IodeFileType.FILE_VARIABLES

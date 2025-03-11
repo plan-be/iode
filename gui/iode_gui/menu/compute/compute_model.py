@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_compute_model import Ui_MenuComputeModel
 
 import warnings
@@ -15,9 +16,7 @@ class MenuComputeModel(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)  
 
-        self.ui.textEdit_equations_list.handle_iode_type(IodeType.EQUATIONS)        
-        self.ui.textEdit_equations_list.include_iode_command(False)        
-        self.ui.textEdit_equations_list.include_lec_functions(False)
+        self.ui.textEdit_equations_list.setup_completer(iode_types=IodeType.EQUATIONS)
 
         self.load_settings()
 

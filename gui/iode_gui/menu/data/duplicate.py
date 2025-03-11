@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_duplicate import Ui_MenuDataDuplicateObj
 
 from copy import copy
@@ -21,9 +22,7 @@ class MenuDataDuplicateObj(MixinSettingsDialog):
         self.ui.comboBox_iode_types.addItems(v_iode_type_names)
         self.ui.comboBox_iode_types.setCurrentIndex(0)    
 
-        self.ui.lineEdit_obj_name.handle_iode_type(IodeType.COMMENTS)        
-        self.ui.lineEdit_obj_name.include_iode_command(False)        
-        self.ui.lineEdit_obj_name.include_lec_functions(False)
+        self.ui.lineEdit_obj_name.setup_completer(iode_types=IodeType.COMMENTS)
 
         self.ui.comboBox_iode_types.currentIndexChanged.connect(self.update_name_completer)
         self.load_settings()
@@ -31,8 +30,7 @@ class MenuDataDuplicateObj(MixinSettingsDialog):
     @Slot(int)
     def update_name_completer(self, i_iode_type):
         iode_type: IodeType = self.v_iode_types[i_iode_type]
-        self.ui.lineEdit_obj_name.reset_iode_types()
-        self.ui.lineEdit_obj_name.handle_iode_type(iode_type)
+        self.ui.lineEdit_obj_name.setup_completer(main_window=self.main_window, iode_types=iode_type)
 
     @Slot()
     def duplicate(self):

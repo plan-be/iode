@@ -342,9 +342,6 @@ class IodeTabWidget(QTabWidget):
         """
         self.main_window = main_window
 
-        # set completer
-        self.completer = main_window.completer
-
         # set output
         self.output = main_window.output
 

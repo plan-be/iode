@@ -95,9 +95,7 @@ class EditIdentityDialog(AbstractEditObjDialog):
         self.ui.textEdit_content.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
         self.ui.textEdit_content.setPlainText(self.previous_value)
 
-        completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
-        self.ui.textEdit_content.completer = completer
+        self.ui.textEdit_content.setup_completer(iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
 
     @Slot()
     def edit(self):
@@ -119,9 +117,7 @@ class EditListDialog(AbstractEditObjDialog):
         self.ui.textEdit_content.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
         self.ui.textEdit_content.setPlainText(self.previous_value)
 
-        completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                  iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
-        self.ui.textEdit_content.completer = completer
+        self.ui.textEdit_content.setup_completer(iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
 
     @Slot()
     def edit(self):

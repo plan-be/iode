@@ -34,6 +34,8 @@ class IodeReportEditor(IodeTextEditor):
         """
         self.output: QTextEdit = main_window.output
         self.project_path: str = main_window.project_path
+        self.setup_completer(main_window=main_window, report_commands=True, 
+                             lec_functions=True, iode_types=-1)
 
     def run(self, filepath: str, parameters: Union[str, List[str]], nb_decimals: int, language: TableLang):
         """

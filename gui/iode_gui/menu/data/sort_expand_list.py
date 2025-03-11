@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_sort_expand_list import Ui_MenuDataSortExpandList
 
 from iode import IodeType, lists
@@ -14,9 +15,7 @@ class MenuDataSortExpandList(MixinSettingsDialog):
         self.ui.setupUi(self)
         self.prepare_settings(self.ui)
 
-        self.ui.lineEdit_sort.handle_iode_type(IodeType.LISTS)        
-        self.ui.lineEdit_sort.include_iode_command(False)        
-        self.ui.lineEdit_sort.include_lec_functions(False)
+        self.ui.lineEdit_sort.setup_completer(iode_types=IodeType.LISTS)
 
         self.load_settings()
 

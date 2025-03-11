@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.text_edit.completer import IodeCompleter
 from .ui_list_calculus import Ui_MenuDataListCalculus
 
 from itertools import product
@@ -19,13 +20,8 @@ class MenuDataListCalculus(MixinSettingsDialog):
         self.ui.comboBox_operator.addItems(self.v_operators)
         self.ui.comboBox_operator.setCurrentIndex(0)  
 
-        self.ui.lineEdit_list1.handle_iode_type(IodeType.LISTS)        
-        self.ui.lineEdit_list1.include_iode_command(False)        
-        self.ui.lineEdit_list1.include_lec_functions(False)
-
-        self.ui.lineEdit_list2.handle_iode_type(IodeType.LISTS)        
-        self.ui.lineEdit_list2.include_iode_command(False)        
-        self.ui.lineEdit_list2.include_lec_functions(False)
+        self.ui.lineEdit_list1.setup_completer(iode_types=IodeType.LISTS)
+        self.ui.lineEdit_list2.setup_completer(iode_types=IodeType.LISTS)
 
         self.ui.lineEdit_list_res.setText("_RES")
 

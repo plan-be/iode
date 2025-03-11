@@ -28,15 +28,10 @@ class EditEquationDialog(MixinSettingsDialog):
         self.ui = Ui_EditEquationDialog()
         self.ui.setupUi(self)
 
-        self.completer = IodeCompleter()
         self.database = database
         self.main_window = main_window
 
-        # attach completer to textEdit_lec
-        self.completer = IodeCompleter(report_commands=False, lec_functions=False, 
-                                       iode_types=[IodeType.SCALARS, IodeType.VARIABLES], 
-                                       parent=self.ui.textEdit_lec)
-        self.ui.textEdit_lec.completer = self.completer
+        self.ui.textEdit_lec.setup_completer(main_window=main_window, iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
         self.ui.textEdit_lec.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
 
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
