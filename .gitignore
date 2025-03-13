@@ -514,3 +514,4 @@ generate_stub_files.py
 !/tests/cli/*.rep
 !/tests/data/*.rep
 !/tests/data/reports/*.rep
+pyiode/source_code.py
