@@ -17,7 +17,6 @@ from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 
-@cython.final
 cdef class Lists(IodeDatabase):
     r"""
     IODE Lists database. 

@@ -25,7 +25,6 @@ from iode.common import PrintEquationsAs, PrintEquationsLecAs
 EquationInput = Union[str, Dict[str, Any], Equation]
 
 
-@cython.final
 cdef class Equations(IodeDatabase):
     r"""
     IODE Equations database. 

@@ -109,7 +109,6 @@ class VarPositionalIndexer:
         self.database._set_variable(pos, value, period)
 
 
-@cython.final
 cdef class Variables(IodeDatabase):
     r"""
     IODE Variables database. 

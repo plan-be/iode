@@ -18,7 +18,6 @@ from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
 from iode.util import check_filepath
 
 
-@cython.final
 cdef class Comments(IodeDatabase):
     r"""
     IODE Comments database. 

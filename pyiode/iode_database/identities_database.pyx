@@ -16,7 +16,6 @@ from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_varia
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 
-@cython.final
 cdef class Identities(IodeDatabase):
     r"""
     IODE Identities database. 
