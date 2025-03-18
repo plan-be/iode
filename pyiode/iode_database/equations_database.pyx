@@ -105,6 +105,18 @@ cdef class Equations(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_equations
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Equations) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_equations
+        instance.abstract_db_ptr = &cpp_global_equations
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBEquations* kdb = new CKDBEquations(filepath.encode())
@@ -1925,4 +1937,4 @@ cdef class Equations(IodeDatabase):
         return hash_value(dereference(self.database_ptr))
 
 
-equations: Equations = Equations._from_ptr()
+equations: Equations = Equations.get_instance()

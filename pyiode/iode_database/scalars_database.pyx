@@ -97,6 +97,18 @@ cdef class Scalars(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_scalars
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Scalars) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_scalars
+        instance.abstract_db_ptr = &cpp_global_scalars
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBScalars* kdb = new CKDBScalars(filepath.encode())
@@ -970,4 +982,4 @@ cdef class Scalars(IodeDatabase):
         return hash_value(dereference(self.database_ptr))
 
 
-scalars: Scalars = Scalars._from_ptr()
+scalars: Scalars = Scalars.get_instance()

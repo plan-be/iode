@@ -207,6 +207,21 @@ cdef class Variables(IodeDatabase):
         wrapper.last_period_subset = None
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Variables) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_variables
+        instance.abstract_db_ptr = &cpp_global_variables
+        instance.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        instance.first_period_subset = None
+        instance.last_period_subset = None
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     def _get_periods_bounds(self) -> Tuple[int, int]:
         if self.first_period_subset is None:
             t_first_period: int = 0  

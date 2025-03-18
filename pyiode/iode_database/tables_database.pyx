@@ -103,6 +103,18 @@ cdef class Tables(IodeDatabase):
         wrapper.print_as = B_TBL_TITLE
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Tables) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_tables
+        instance.abstract_db_ptr = &cpp_global_tables
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBTables* kdb = new CKDBTables(filepath.encode())
@@ -1314,4 +1326,4 @@ cdef class Tables(IodeDatabase):
         return hash_value(dereference(self.database_ptr))
 
 
-tables: Tables = Tables._from_ptr()
+tables: Tables = Tables.get_instance()
