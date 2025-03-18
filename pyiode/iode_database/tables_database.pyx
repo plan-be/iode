@@ -20,7 +20,6 @@ from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTit
 from iode.common import PrintTablesAs
 
 
-@cython.final
 cdef class Tables(IodeDatabase):
     r"""
     IODE Tables database. 

@@ -17,7 +17,6 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
 
 
-@cython.final
 cdef class Scalars(IodeDatabase):
     r"""
     IODE Scalars database. 
