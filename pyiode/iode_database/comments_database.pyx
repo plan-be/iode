@@ -99,6 +99,18 @@ cdef class Comments(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_comments
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Comments) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_comments
+        instance.abstract_db_ptr = &cpp_global_comments
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBComments* kdb = new CKDBComments(filepath.encode())
@@ -891,4 +903,4 @@ cdef class Comments(IodeDatabase):
         """
         return hash_value(dereference(self.database_ptr))
 
-comments: Comments = Comments._from_ptr()
+comments: Comments = Comments.get_instance()

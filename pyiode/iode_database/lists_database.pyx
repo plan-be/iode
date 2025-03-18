@@ -144,6 +144,18 @@ cdef class Lists(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_lists
         return wrapper
 
+    @staticmethod
+    def __init_instance(instance: Lists) -> Self:
+        instance.ptr_owner = False
+        instance.database_ptr = &cpp_global_lists
+        instance.abstract_db_ptr = &cpp_global_lists
+        return instance
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return cls.__init_instance(instance)
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBLists* kdb = new CKDBLists(filepath.encode())
@@ -785,4 +797,4 @@ cdef class Lists(IodeDatabase):
         return hash_value(dereference(self.database_ptr))
 
 
-lists: Lists = Lists._from_ptr()
+lists: Lists = Lists.get_instance()
