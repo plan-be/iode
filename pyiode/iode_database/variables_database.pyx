@@ -12,6 +12,15 @@ else:
     from enum import Enum, IntEnum
     StrEnum = Enum
 
+import numpy as np
+import pandas as pd
+try:
+    import larray as la
+    Array = la.Array
+except ImportError:
+    la = None
+    Array = Any
+
 cimport cython
 from cython.operator cimport dereference
 from libc.string cimport memcpy
@@ -38,6 +47,7 @@ from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
+from iode import Period, Sample, NA 
 from iode.util import check_filepath, split_list
 
 
