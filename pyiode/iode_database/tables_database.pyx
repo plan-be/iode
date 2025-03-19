@@ -115,13 +115,18 @@ cdef class Tables(IodeDatabase):
         instance = cls.__new__(cls)
         return cls.__init_instance(instance)
 
+    @classmethod
+    def _new_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return instance
+
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
         cdef CKDBTables* kdb = new CKDBTables(filepath.encode())
         del kdb
 
     def _subset(self, pattern: str, copy: bool) -> Tables:
-        cdef Tables subset_db = Tables.__new__(Tables)
+        subset_db: Tables = self._new_instance()
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
