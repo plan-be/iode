@@ -1166,7 +1166,7 @@ cdef class Variables(IodeDatabase):
                     KV_set(c_db_ptr, pos, t, self.mode_, <double>v)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
-        if isinstance(value.index, MultiIndex):
+        if isinstance(value.index, pd.MultiIndex):
             raise ValueError(f"Expected pandas Series with a single-level index.\n") 
         if len(key_names) > 1:
             if len(key_periods) > 1:
@@ -1183,7 +1183,7 @@ cdef class Variables(IodeDatabase):
 
     def _check_pandas_dataframe(self, value: pd.DataFrame, key_names: List[str], key_periods: List[str]) \
         -> Union[pd.Series, pd.DataFrame]:
-        if isinstance(value.index, MultiIndex):
+        if isinstance(value.index, pd.MultiIndex):
             raise ValueError(f"Expected pandas DataFrame with a single-level index.\n")
         # check that periods in the selection key are present in the DataFrame object
         df_periods = value.columns.to_list()
@@ -5563,7 +5563,7 @@ cdef class Variables(IodeDatabase):
             data = data.astype(dtype)
         return data
 
-    def from_frame(self, df: DataFrame):
+    def from_frame(self, df: pd.DataFrame):
         """
         Copy the pandas DataFrame `df` into the IODE Variables database.
         The variable names to copy are deduced from the index of the DataFrame.
@@ -5677,7 +5677,7 @@ cdef class Variables(IodeDatabase):
 
         self.from_numpy(data, vars_names, first_period, last_period)
 
-    def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
+    def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> pd.DataFrame:
         """
         Create a pandas DataFrame from the current Variables database.
         The index of the returned DataFrame is build from the Variables names 
@@ -5814,7 +5814,7 @@ cdef class Variables(IodeDatabase):
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         data = self.to_numpy()
 
-        df = DataFrame(index=vars_list, columns=periods_list, data=data)
+        df = pd.DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name
         return df
