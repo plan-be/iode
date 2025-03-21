@@ -215,8 +215,12 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     K_WARN_DUP = 0;
 
-    if(res != 0) 
-        throw std::runtime_error(get_last_error());
+    if(res != 0)
+    {
+        std::string last_error = get_last_error();
+        if(!last_error.empty())
+            throw std::runtime_error("Cannot export variables\n" + last_error);
+    }
 }
 
 void low_to_high(const IodeLowToHigh type, const char method, const std::string& filepath, const std::string& var_list)
