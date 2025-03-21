@@ -405,9 +405,10 @@ void KDBVariables::copy_from(const std::string& input_file, const std::string& f
 
         if (res < 0)
 		{
-			std::string msg = "Cannot copy the content of file '" + input_file + "' into the Variables database.\n";
-			msg += get_last_error();
-			throw std::runtime_error(msg);
+			std::string last_error = get_last_error();
+			if(!last_error.empty())
+				throw std::runtime_error("Cannot copy the content of file '" + input_file + 
+						"' into the Variables database.\n" + last_error);
 		}
 }
 
