@@ -53,11 +53,14 @@ void Simulation::model_compile(const std::string& list_eqs)
             SCR_free_tbl((unsigned char**) eqs);
             if (rc < 0)
             {
-                std::string error_msg = "Could not compile the model";
-                if(!list_eqs.empty()) 
-                    error_msg += " for the equations list " + list_eqs + "\n";
-                error_msg += get_last_error();
-                throw std::runtime_error(error_msg);
+                std::string last_error = get_last_error();
+                if(!last_error.empty()) 
+                {
+                    std::string error_msg = "Could not compile the model";
+                    if(!list_eqs.empty()) 
+                        error_msg += " for the equations list " + list_eqs + "\n";
+                    throw std::runtime_error(error_msg + last_error);
+                }
             }
         }
     }
@@ -105,17 +108,20 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
     if (rc < 0)
     {
         std::string c_api_error = get_last_error();
-        std::string error_msg = "Could not simulate the model: the simulation did not converged\n";
-        if (!c_api_error.empty()) 
+        if(!c_api_error.empty())
+        {
+            std::string error_msg = "Could not simulate the model: the simulation did not converged\n";
+            if (!c_api_error.empty()) 
             error_msg += c_api_error + "\n";
-        error_msg += "Sample: " + sample->to_string() + "\n";
-        error_msg += "Equations list: " + list_eqs + "\n";
-        error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
-        error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
-        error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
-        error_msg += "Sort algorithm: " + get_sort_algorithm_as_string() + "\n";
-        delete sample;
-        throw std::runtime_error(error_msg);
+            error_msg += "Sample: " + sample->to_string() + "\n";
+            error_msg += "Equations list: " + list_eqs + "\n";
+            error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
+            error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
+            error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
+            error_msg += "Sort algorithm: " + get_sort_algorithm_as_string() + "\n";
+            delete sample;
+            throw std::runtime_error(error_msg);
+        }
     }
 
     delete sample;
@@ -171,15 +177,18 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     if (rc < 0)
     {
         std::string c_api_error = get_last_error();
-        std::string error_msg = "Could not not calculate SCC\n";
-        if(!c_api_error.empty()) 
-            error_msg += c_api_error + "\n";
-        error_msg += "Pre-recursive list name: " + pre_name + "\n";
-        error_msg += "Recursive list name: " + inter_name + "\n";
-        error_msg += "Post-recursive list name: " + post_name + "\n";
-        error_msg += "Equations list: " + list_eqs + "\n";
-        error_msg += "Nb passes: " + std::to_string(get_nb_passes());
-        throw std::runtime_error(error_msg);
+        if(!c_api_error.empty())
+        {
+            std::string error_msg = "Could not not calculate SCC\n";
+            if(!c_api_error.empty()) 
+                error_msg += c_api_error + "\n";
+            error_msg += "Pre-recursive list name: " + pre_name + "\n";
+            error_msg += "Recursive list name: " + inter_name + "\n";
+            error_msg += "Post-recursive list name: " + post_name + "\n";
+            error_msg += "Equations list: " + list_eqs + "\n";
+            error_msg += "Nb passes: " + std::to_string(get_nb_passes());
+            throw std::runtime_error(error_msg);
+        }
     }
 }
 
@@ -243,20 +252,23 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     if (rc < 0)
     {
         std::string c_api_error = get_last_error();
-        std::string error_msg = "Could not simulate SCC\n";
-        if(!c_api_error.empty()) 
+        if(!c_api_error.empty())
+        {
+            std::string error_msg = "Could not simulate SCC\n";
+            if(!c_api_error.empty()) 
             error_msg += c_api_error + "\n";
-        error_msg += "Sample: " + sample->to_string() + "\n";
-        error_msg += "Equations list: " + list_eqs + "\n";
-        error_msg += "Pre-recursive list name: " + pre_name + "\n";
-        error_msg += "Recursive list name: " + inter_name + "\n";
-        error_msg += "Post-recursive list name: " + post_name + "\n";
-        error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
-        error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
-        error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
-        error_msg += "Sort algorithm: ", get_sort_algorithm_as_string();
-        delete sample;
-        throw std::runtime_error(error_msg);
+            error_msg += "Sample: " + sample->to_string() + "\n";
+            error_msg += "Equations list: " + list_eqs + "\n";
+            error_msg += "Pre-recursive list name: " + pre_name + "\n";
+            error_msg += "Recursive list name: " + inter_name + "\n";
+            error_msg += "Post-recursive list name: " + post_name + "\n";
+            error_msg += "Max iterations: " + std::to_string(get_max_nb_iterations()) + "\n";
+            error_msg += "Convergence threshold: " + std::to_string(get_convergence_threshold()) + "\n";
+            error_msg += "Initialization method: " + get_initialization_method_as_string() + "\n";
+            error_msg += "Sort algorithm: ", get_sort_algorithm_as_string();
+            delete sample;
+            throw std::runtime_error(error_msg);
+        }
     }
     delete sample;
 }

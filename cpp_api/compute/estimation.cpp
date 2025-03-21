@@ -306,10 +306,9 @@ void EditAndEstimateEquations::estimate()
         if(m_corr) delete m_corr;
         m_corr = nullptr;
 
-        std::string msg = "Could not estimate equation(s) ";
-        msg += join(v_equations, ";") + "\n";
-        msg += get_last_error();
-        throw std::runtime_error(msg);
+        std::string last_error = get_last_error();
+        if(!last_error.empty())
+            throw std::runtime_error("Could not estimate equation(s) " + join(v_equations, ";") + "\n" + last_error);
     }
 }
 
@@ -395,9 +394,9 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
     if(res != 0)
     {
-        error_msg += " from '" + from + "' to '" + to + "'\n";
-        error_msg += get_last_error();
-        throw std::runtime_error(error_msg);
+        std::string last_error = get_last_error();
+        if(!last_error.empty())
+            throw std::runtime_error(error_msg + " from '" + from + "' to '" + to + "'\n" + last_error);
     }
 }
 

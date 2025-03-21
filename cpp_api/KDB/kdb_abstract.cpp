@@ -307,9 +307,13 @@ void KDBAbstract::copy_from(const std::string& input_file, const std::string obj
     int res = B_WsCopy(const_cast<char*>(buf.c_str()), k_type);
     if(res < 0)
     {
-        std::string msg = "Cannot copy content of file '" + input_file + "' into the " + v_iode_types[k_type] + " database.\n";
-        msg += get_last_error();
-        throw std::runtime_error(msg);
+        std::string last_error = get_last_error();
+        if(!last_error.empty())
+        {
+            std::string msg = "Cannot copy the content of file '" + input_file;
+            msg += "' into the " + v_iode_types[k_type] + " database.\n" + last_error;
+            throw std::runtime_error(msg);
+        }
     }
 }
 
