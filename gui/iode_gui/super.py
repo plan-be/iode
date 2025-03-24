@@ -39,11 +39,13 @@ def error_super_GUI(level: int, msg: str) -> int:
 		sys.exit(level)
 		return -1
 	else:
+		main_window.display_output(f"ERROR -> {msg}")
 		QMessageBox.critical( None, "ERROR", msg)
 		return 0
 	
 @register_super_function('warning')
 def warning_super_GUI(msg: str):
+	main_window.display_output(f"WARNING -> {msg}")
 	QMessageBox.warning(None, "WARNING", msg)
 
 @register_super_function('message')
