@@ -4,9 +4,28 @@
 #include "super.h"
 
 
+int error_as_cpp_exception(const int level, const char* msg)
+{
+	if(level > 0)
+	{
+		printf("Error: %s\n", msg);
+		exit(level);
+	}
+	else
+		throw std::runtime_error(msg);
+}
+
+void _update_kerror_super(const bool std_exception)
+{
+	if (std_exception)
+		kerror_super = error_as_cpp_exception;
+	else
+		kerror_super = c_kerror_super;
+}
+
 void python_assign_super()
 {
-    kerror_super   = c_kerror_super;
+	kerror_super   = error_as_cpp_exception;
     kwarning_super = c_kwarning_super;
     kmsg_super     = c_kmsg_super;
     kconfirm_super = c_kconfirm_super;
