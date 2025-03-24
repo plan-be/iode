@@ -8,13 +8,6 @@ from iode.iode_cython import skip_msg_box
 __all__ = ['skip_pause', 'skip_msg_box']
 
 
-@register_super_function('error')
-def py_error(level: int, msg: str):
-    if level > 0:
-        sys.exit(level)
-    else:
-        raise RuntimeError(msg)
-
 @register_super_function('warning')
 def py_warning(msg: str):
     warnings.warn(msg, RuntimeWarning)

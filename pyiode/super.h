@@ -47,4 +47,7 @@ int c_ViewTable_super(TBL* tbl, char* smpl, char* name);
 
 // ========================================= //
 
+int error_as_cpp_exception(const int level, const char* msg);
+
+void _update_kerror_super(const bool std_exception);
 void python_assign_super();
