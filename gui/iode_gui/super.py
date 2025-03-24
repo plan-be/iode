@@ -1,7 +1,7 @@
 import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
-from iode.util import register_super_function
+from iode.util import register_super_function, update_kerror_super
 from iode.super import skip_pause, skip_msg_box
 
 from PySide6.QtWidgets import QMainWindow, QMessageBox
@@ -25,6 +25,8 @@ def gui_assign_super(arg_main_window: MainWindow):
 		return
 	
 	main_window = arg_main_window
+
+	update_kerror_super()
 
 
 @register_super_function('error')
