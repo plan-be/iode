@@ -1,7 +1,10 @@
 # configuration file for the iode python package
 
+# ==== requires setuptools >= 77, pkginfo > 1.12 && twine <= 6.0.1 ====
+# https://github.com/pypi/warehouse/issues/15611#issuecomment-2608722983
+
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,6 +12,7 @@ name = "iode-gui"
 version = "${CMAKE_PROJECT_VERSION}"
 description = "Graphical User Interface (GUI) for the iode python package"
 readme = "README.md"
+license = "GPL-3.0-or-later"
 requires-python = ">=${MINIMUM_PYTHON_VERSION}"
 authors = [
     { name = "Alix Damman", email = "ald@plan.be" },
@@ -18,7 +22,6 @@ authors = [
 ]
 classifiers = [
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
     'Operating System :: Microsoft :: Windows',
     'Intended Audience :: Science/Research',
     'Intended Audience :: Developers',
@@ -41,9 +44,6 @@ iode-gui = "iode_gui.main:start"
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
 
-# see https://setuptools.pypa.io/en/stable/userguide/pyproject_config.html
-[tool.setuptools]
-license-files = ["LICENSE.md"]
 
 [tool.setuptools.packages]
 # Disable implicit namespaces -> This will prevent any folder without 
