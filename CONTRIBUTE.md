@@ -35,7 +35,9 @@
    - sphinx_rtd_theme
    - myst-parser
    - build
-   - twine
+   - pkginfo (>1.12)
+   - setuptools (>=77)
+   - twine (<=6.0.0)
 
 **note**: To install `larray`, you have to run:
 ```bash
