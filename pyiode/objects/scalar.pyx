@@ -154,6 +154,9 @@ cdef class Scalar:
     def std(self) -> float:
         return self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
 
+    def _set_std(self, value: float):
+        self.c_scalar.std = value
+
     # misc
 
     def _as_tuple(self) -> Tuple[float, float, float]:
