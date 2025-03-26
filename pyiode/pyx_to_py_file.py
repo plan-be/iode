@@ -171,6 +171,8 @@ class CythonParser:
                 default = 'None'
             elif isinstance(default, ConstNode):
                 default = default.value
+            elif isinstance(default, AttributeNode):
+                default = f'{default.obj.name}.{default.attribute}'
             else:
                 raise NotImplementedError(f'Default argument: type {type(default).__name__} is not supported yet')
             arg += f'={default}'
