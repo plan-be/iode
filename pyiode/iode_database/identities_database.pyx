@@ -15,6 +15,8 @@ from pyiode.iode_database.cpp_api_database cimport Identities as cpp_global_iden
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
+import pandas as pd
+
 
 cdef class Identities(IodeDatabase):
     r"""
@@ -672,7 +674,7 @@ cdef class Identities(IodeDatabase):
         self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
 
-    def from_series(self, s: Series):
+    def from_series(self, s: pd.Series):
         r"""
         Copy the pandas Series `s` into the IODE Identities database.
         The identity names to copy are deduced from the index of the Series.
@@ -725,9 +727,6 @@ cdef class Identities(IodeDatabase):
         >>> identities["DER_LOG_T"]
         Identity('d(ln t)')
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, s.index.tolist())
@@ -735,7 +734,7 @@ cdef class Identities(IodeDatabase):
         for index, value in s.items():
             self._set_object(index, value)
 
-    def to_series(self) -> Series:
+    def to_series(self) -> pd.Series:
         r"""
         Create a pandas Series from the current Identities database.
         The index of the returned Series is build from the Identities names.
@@ -786,15 +785,12 @@ cdef class Identities(IodeDatabase):
         >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
         'grt TFPFHP_'
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-        
         names = self.names
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
     @property
-    def series(self) -> Series:
+    def series(self) -> pd.Series:
         r"""
         Create a pandas Series from the current Identities database.
         The index of the returned Series is build from the Identities names.

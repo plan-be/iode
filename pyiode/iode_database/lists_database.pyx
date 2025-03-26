@@ -7,6 +7,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
+import pandas as pd
 from iode.util import split_list
 
 cimport cython
@@ -498,7 +499,7 @@ cdef class Lists(IodeDatabase):
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
-    def from_series(self, s: Series):
+    def from_series(self, s: pd.Series):
         r"""
         Copy the pandas Series `s` into the IODE Lists database.
         The IODE list names to copy are deduced from the index of the Series.
@@ -560,9 +561,6 @@ cdef class Lists(IodeDatabase):
         >>> lists["MIX_LST"]
         ['A', 'B', 'C', 'D', 'E', 'F']
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, s.index.tolist())
@@ -570,7 +568,7 @@ cdef class Lists(IodeDatabase):
         for index, value in s.items():
             self._set_object(index, value)
 
-    def to_series(self) -> Series:
+    def to_series(self) -> pd.Series:
         r"""
         Create a pandas Series from the current Lists database.
         The index of the returned Series is build from the Lists names.
@@ -620,16 +618,13 @@ cdef class Lists(IodeDatabase):
         ['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']
         >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
         "['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']"
-        """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-        
+        """        
         names = self.names
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
     @property
-    def series(self) -> Series:
+    def series(self) -> pd.Series:
         r"""
         Create a pandas Series from the current Lists database.
         The index of the returned Series is build from the Lists names.
