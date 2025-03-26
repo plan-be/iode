@@ -151,7 +151,7 @@ cdef class Identities(IodeDatabase):
         """
         return PositionalIndexer(self)
 
-    def _get_object(self, key: Union[str, int]):
+    def _get_object(self, key: Union[str, int]) -> Identity:
         cdef CIdentity* c_identity
         if isinstance(key, int):
             c_identity = self.database_ptr.get(<int>key)
