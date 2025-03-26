@@ -736,6 +736,8 @@ cdef class IodeDatabase:
         SAME_VAR: ['AOUC_', 'BENEF', 'BQY', 'BRUGP', ..., 'ZKFO', 'ZX', 'ZZF_'] 
         CHANGED_VAR: ['ACAF', 'ACAG']
         """
+        from iode.iode_database.lists_database import lists
+        
         int_iode_type: int = self.abstract_db_ptr.get_iode_type()
         expected_file_type: IodeFileType = IodeFileType(int_iode_type)
 
