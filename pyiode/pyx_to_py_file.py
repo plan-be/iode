@@ -277,6 +277,8 @@ class CythonParser:
             list_args = ', '.join(args.keys())
             maybe_return = 'return ' if return_type_annotation is not None else ''
             if super_class is not None:
+                if 'cls' in list_args:
+                    list_args.replace('cls, ', '')
                 py_func_code.append(f'{indent}    {maybe_return}{super_class}.{pyx_func_name}({list_args})\n')
             else:
                 py_func_code.append(f'{indent}    {maybe_return}{pyx_func_name}({list_args})\n')
