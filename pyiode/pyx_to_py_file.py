@@ -10,16 +10,16 @@ from Cython.Compiler.Nodes import (Node, DefNode, ClassDefNode, PyClassDefNode, 
                                    CFuncDefNode, CVarDefNode, CArgDeclNode, DecoratorNode, 
                                    SingleAssignmentNode, IfStatNode, TryExceptStatNode)
 
-pyiode_dir = Path(__file__).parent
+
 cython_reserved_keywords = {'cdef', 'cpdef', '&', 'dereference', '@cython'}
 
 
 # ---- Parse cython pyx file ----
 
 class CythonParser:
-    def __init__(self, name: str, file_path: Path):
-        self.name = name
+    def __init__(self, file_path: Path):
         self.file_path = file_path
+        self.name = file_path.stem
         self.source_code = []
         self.python_code = []
         self.pyx_code = []
@@ -409,40 +409,17 @@ class CythonParser:
 
 
 if __name__ == "__main__":
-    stem = "variables_database"
+    # ask user to input the path of the cython file
+    relative_path = input("Please enter the relative path to the cython file *.pyx and press Enter: ")
+
+    pyiode_dir = Path(__file__).parent
     tmp_file = 'source_code.py'
-    file_path_py = pyiode_dir / "iode" / "iode_database" / f"{stem}.py"
-    file_path_cython = pyiode_dir / "iode_database" / f"{stem}.pyx"
+    file_path_cython = pyiode_dir / relative_path
+    file_path_py = pyiode_dir / "iode" / str(Path(relative_path).with_suffix('.py'))
 
     copyfile(file_path_cython, file_path_cython.with_suffix('.pyx.bak'))
 
-    cython_parser = CythonParser(stem, file_path_cython)
+    cython_parser = CythonParser(file_path_cython)
     cython_parser.parse()
     cython_parser.cleanup_pyx_file()
     cython_parser.write_to_python_file(file_path_py)
-    
-    
-    """
-    # ---- cython file -> remove docstrings and rename functions as __cython_...
-    copyfile(file_path_cython, tmp_file)
-    cython_remove_docstrings(file_path_cython)
-    cython_rename_class_property(file_path_cython)
-
-    # ---- python file -> call cython functions and remove cimports and c(p)defs
-    cython_items = get_list_cimport_items(tmp_file)
-    cython_items = cython_items.union({"cdef", "cpdef", "&", "@cython"})
-    print('cython_items:', cython_items, '\n')
-
-    if file_path_py.exists():
-        file_path_py.unlink()
-    copyfile(tmp_file, file_path_py)
-    rename_cython_class_to_py_class(file_path_py)
-    tagging_cdef_func(file_path_py)
-    remove_cython_code(file_path_py)
-    
-    answer = input(f"Please check for possible errors in the python script "
-                   f"{file_path_py.name} and press y/yes to continue")
-    if answer.lower()[0] == 'y':
-        pass
-    
-    """
