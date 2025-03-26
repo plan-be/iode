@@ -220,7 +220,7 @@ cdef class Equations(IodeDatabase):
         """
         return PositionalIndexer(self)
 
-    def _get_object(self, key: Union[str, int]):
+    def _get_object(self, key: Union[str, int]) -> Equation:
         cdef CEquation* c_eq
         if isinstance(key, int):
             c_eq = self.database_ptr.get(<int>key)

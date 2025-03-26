@@ -155,7 +155,7 @@ cdef class Comments(IodeDatabase):
         """
         return PositionalIndexer(self)
 
-    def _get_object(self, key: Union[str, int]):
+    def _get_object(self, key: Union[str, int]) -> str:
         if isinstance(key, int):
             return self.database_ptr.get(<int>key).decode()
         else:

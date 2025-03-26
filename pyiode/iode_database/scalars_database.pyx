@@ -152,7 +152,7 @@ cdef class Scalars(IodeDatabase):
         """
         return PositionalIndexer(self)
 
-    def _get_object(self, key: Union[str, int]):
+    def _get_object(self, key: Union[str, int]) -> Scalar:
         cdef CScalar* c_scalar
         if isinstance(key, int):
             c_scalar = self.database_ptr.get(<int>key)
