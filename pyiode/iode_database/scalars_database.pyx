@@ -14,6 +14,8 @@ from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 from pyiode.iode_database.cpp_api_database cimport Scalars as cpp_global_scalars
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
+import pandas as pd
+
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
 
 
@@ -170,7 +172,7 @@ cdef class Scalars(IodeDatabase):
         if isinstance(value, int):
             value = float(value) 
 
-        if pd is not None and isinstance(value, pd.Series):
+        if isinstance(value, pd.Series):
             value = value.to_dict()
 
         # update a scalar
@@ -531,7 +533,7 @@ cdef class Scalars(IodeDatabase):
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
-    def from_series(self, s: Series):
+    def from_series(self, s: pd.Series):
         r"""
         Copy the pandas Series `s` into the IODE Scalars database.
         The scalar names to copy are deduced from the index of the Series.
@@ -586,9 +588,6 @@ cdef class Scalars(IodeDatabase):
         >>> scalars["beta_"]
         Scalar(3.6, 1, na)
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, s.index.tolist())
@@ -596,7 +595,7 @@ cdef class Scalars(IodeDatabase):
         for index, value in s.items():
             self._set_object(index, value)
 
-    def from_frame(self, df: DataFrame):
+    def from_frame(self, df: pd.DataFrame):
         r"""
         Copy the pandas DataFrame `df` into the IODE Scalars database.
         The scalar names to copy are deduced from the index of the DataFrame.
@@ -673,9 +672,6 @@ cdef class Scalars(IodeDatabase):
         >>> scalars["beta_1"]
         Scalar(0.01, 0.8, 0.25687)
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, df.index.to_list())
@@ -694,7 +690,7 @@ cdef class Scalars(IodeDatabase):
                     scalar.c_scalar.std = row.std
                 self._set_object(row[0], scalar)
 
-    def to_frame(self) -> DataFrame:
+    def to_frame(self) -> pd.DataFrame:
         r"""
         Create a pandas DataFrame from the current Scalars database.
         The index of the returned DataFrame is build from the Scalars names.
@@ -757,15 +753,12 @@ cdef class Scalars(IodeDatabase):
         relax    1.000000
         std      0.102838
         Name: qc0_, dtype: float64
-        """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-        
+        """        
         data = {name: self._get_object(name)._as_tuple() for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', dtype="float64", columns=["value", "relax", "std"])
 
     @property
-    def df(self) -> DataFrame:
+    def df(self) -> pd.DataFrame:
         r"""
         Create a pandas DataFrame from the current Scalars database.
         The index of the returned DataFrame is build from the Scalars names.

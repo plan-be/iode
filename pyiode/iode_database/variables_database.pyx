@@ -992,9 +992,6 @@ cdef class Variables(IodeDatabase):
         return data
 
     def from_frame(self, df: pd.DataFrame):
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         # list of variable names
         vars_names = df.index.to_list()
 

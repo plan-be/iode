@@ -4837,10 +4837,7 @@ class Variables(CythonVariables):
         ZZF_         0.688400     0.688400  ...      0.688400      0.688400
         <BLANKLINE>
         [33 rows x 11 columns]
-        """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-        
+        """        
         vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         data = self.to_numpy()

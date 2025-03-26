@@ -19,6 +19,7 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInfos
 from pyiode.iode_database.cpp_api_database cimport B_EQS_LEC, B_PrintObjLec
 
+import pandas as pd
 from iode.common import PrintEquationsAs, PrintEquationsLecAs
 
 
@@ -241,7 +242,7 @@ cdef class Equations(IodeDatabase):
         if isinstance(key, int) or self.database_ptr.contains(key.encode()):
             endogenous = key
 
-        if pd is not None and isinstance(value, pd.Series):
+        if isinstance(value, pd.Series):
             value = value.to_dict()
 
         # update existing equation
@@ -1018,7 +1019,7 @@ cdef class Equations(IodeDatabase):
         input_files, names = self._copy_from(input_files, names)
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
-    def from_series(self, s: Series):
+    def from_series(self, s: pd.Series):
         r"""
         Copy the pandas Series `s` into the IODE Equations database.
         The equation names to copy are deduced from the index of the Series.
@@ -1088,9 +1089,6 @@ cdef class Equations(IodeDatabase):
                 from_period = '1960Y1',
                 to_period = '2015Y1')
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, s.index.tolist())
@@ -1098,7 +1096,7 @@ cdef class Equations(IodeDatabase):
         for index, value in s.items():
             self._set_object(index, value)
 
-    def from_frame(self, df: DataFrame):
+    def from_frame(self, df: pd.DataFrame):
         r"""
         Copy the pandas DataFrame `df` into the IODE Equations database.
         The equation names to copy are deduced from the index of the DataFrame.
@@ -1216,9 +1214,6 @@ cdef class Equations(IodeDatabase):
                           stderrp = 0,
                           stdev = 0})
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         if not (self.is_global_workspace or self.is_detached):
             # check that all names in the pandas object are present in the current subset 
             self._check_same_names(self.names, df.index.to_list())
@@ -1257,7 +1252,7 @@ cdef class Equations(IodeDatabase):
 
                 self._set_object(endogenous, equation)
 
-    def to_frame(self) -> DataFrame:
+    def to_frame(self) -> pd.DataFrame:
         r"""
         Create a pandas DataFrame from the current Equations database.
         The index of the returned DataFrame is build from the Equations names.
@@ -1422,10 +1417,7 @@ cdef class Equations(IodeDatabase):
         loglik                                                       0.0
         date
         Name: YDH_, dtype: object
-        """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-        
+        """        
         test_names = [member.name.lower() for member in EqTest]
         dtype = {"lec": str, "method": str, "sample": str, "comment": str, "instruments": str, "block": str}
         dtype.update({test_name: float for test_name in test_names})
@@ -1435,7 +1427,7 @@ cdef class Equations(IodeDatabase):
         return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
 
     @property
-    def df(self) -> DataFrame:
+    def df(self) -> pd.DataFrame:
         r"""
         Create a pandas DataFrame from the current Equations database.
         The index of the returned DataFrame is build from the Equations names.

@@ -12,6 +12,8 @@ from pyiode.common cimport TableGraphGrid as CTableGraphGrid
 from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.computed_table.computed_table cimport CComputedTable, COL, COL_ctoa, COL_NOP
 
+import pandas as pd
+
 
 # ComputedTable wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
@@ -903,7 +905,7 @@ cdef class ComputedTable:
         row, column = self._unfold_key((row, column))
         return self.c_computed_table.is_editable(row, column)
 
-    def to_frame(self) -> DataFrame:
+    def to_frame(self) -> pd.DataFrame:
         """
         Convert the computed table to a pandas DataFrame.
 
@@ -939,13 +941,10 @@ cdef class ComputedTable:
         <BLANKLINE>
         [4 rows x 6 columns]
         """
-        if pd is None:
-            raise RuntimeError("pandas library not found")
-
         # get data from the C++ computed table
         data = [[self.c_computed_table.get_value(i, j, <bint>True) for j in range(self.nb_columns)] 
                 for i in range(self.nb_lines)]
-        df = DataFrame(index=self.lines, columns=self.columns, data=data)
+        df = pd.DataFrame(index=self.lines, columns=self.columns, data=data)
         # replace IODE NaN values by numpy or pandas values
         df.where(df < IODE_NAN * (1.0 - 1e-30))
         df.index.name = "name"

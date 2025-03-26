@@ -38,15 +38,6 @@ from pyiode.common cimport (v_iode_types, v_file_types, v_table_langs, v_eq_meth
                             v_adjustment_method, mLowToHigh)
 
 try:
-    import pandas as pd
-    Series = pd.Series
-    DataFrame = pd.DataFrame
-except ImportError:
-    pd = None
-    Series = Any
-    DataFrame = Any
-
-try:
     import larray as la
     Array = la.Array
     Axis = la.Axis
