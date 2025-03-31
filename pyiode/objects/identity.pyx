@@ -53,6 +53,11 @@ cdef class Identity:
         wrapper.ptr_owner = owner
         return wrapper
 
+    @classmethod
+    def _new_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return instance
+
     @property
     def coefficients(self) -> List[str]:
         """

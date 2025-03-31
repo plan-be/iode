@@ -96,6 +96,11 @@ cdef class Sample:
         wrapper.ptr_owner = owner
         return wrapper
     
+    @classmethod
+    def _new_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return instance
+
     def index(self, period: Union[str, Period]) -> int:
         """
         Position of the 'period' in the sample.
