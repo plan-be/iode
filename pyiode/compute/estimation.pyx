@@ -19,6 +19,8 @@ from pyiode.compute.estimation cimport dickey_fuller_test as cpp_dickey_fuller_t
 from pyiode.compute.estimation cimport CCorrelationMatrix
 from pyiode.compute.estimation cimport CEditAndEstimateEquations
 
+from iode.iode_database.scalars_database import Scalars as PyScalars
+
 
 def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str = "c1", c2: str = "c2") -> str:
     r"""
@@ -78,7 +80,7 @@ def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str =
     return cpp_dynamic_adjustment(<IodeAdjustmentMethod>method, eqs.encode(), c1.encode(), c2.encode()).decode()
 
 
-def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalars:
+def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> PyScalars:
     """
     Dickey-Fuller tests.
 
@@ -148,8 +150,12 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     """
     # Note: cpp_dickey_fuller_test allocates a new CKDBScalars* pointer
     cdef CKDBScalars* df_scalars
+    scalars_db: Scalars = PyScalars._new_instance()
     df_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
-    return Scalars._from_ptr(df_scalars, <bint>True)
+    scalars_db.ptr_owner = <bint>True
+    scalars_db.database_ptr = df_scalars
+    scalars_db.abstract_db_ptr = df_scalars
+    return scalars_db
 
 
 # CorrelationMatrix wrapper class
