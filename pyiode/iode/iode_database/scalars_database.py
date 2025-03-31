@@ -8,8 +8,8 @@ else:
 
 import pandas as pd
 from iode.util import table2str, JUSTIFY
-
-from iode.iode_cython import PositionalIndexer, Scalar
+from iode.objects.scalar import Scalar
+from iode.iode_cython import PositionalIndexer
 from iode.iode_cython import Scalars as CythonScalars
 
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
@@ -112,7 +112,8 @@ class Scalars(CythonScalars):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Scalar:
-        return CythonScalars._get_object(self, key)
+        scalar = Scalar._new_instance()
+        return CythonScalars._get_object(self, key, scalar)
 
     def _set_object(self, key: Union[str, int], value):
         CythonScalars._set_object(self, key, value)

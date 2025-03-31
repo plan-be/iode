@@ -59,16 +59,18 @@ cdef class Scalars(IodeDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: Union[str, int]) -> Scalar:
+    def _get_object(self, key: Union[str, int], scalar: Scalar) -> Scalar:
         cdef CScalar* c_scalar
         if isinstance(key, int):
             c_scalar = self.database_ptr.get(<int>key)
         else:
             key = key.strip()
             c_scalar = self.database_ptr.get(<string>(key.encode()))
+        
+        scalar.c_scalar = c_scalar 
         # self.database_ptr.get() does not allocate a new C++ Scalar instance
-        py_scalar = Scalar._from_ptr(c_scalar, <bint>False) 
-        return py_scalar
+        scalar.ptr_owner = <bint>False
+        return scalar
 
     def _set_object(self, key: Union[str, int], value):
         if isinstance(key, str):
@@ -105,10 +107,11 @@ cdef class Scalars(IodeDatabase):
                 raise TypeError(f"Cannot update scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
 
+            c_scalar = (<Scalar>scalar).c_scalar
             if isinstance(key, int):
-                self.database_ptr.update(<int>key, <double>scalar.value, <double>scalar.relax, <double>scalar.std)
+                self.database_ptr.update(<int>key, c_scalar.val, c_scalar.relax, c_scalar.std)
             else:    
-                self.database_ptr.update(<string>(key.encode()), <double>scalar.value, <double>scalar.relax, <double>scalar.std)
+                self.database_ptr.update(<string>(key.encode()), c_scalar.val, c_scalar.relax, c_scalar.std)
         # add a new scalar
         else:
             if isinstance(value, float):
@@ -126,7 +129,8 @@ cdef class Scalars(IodeDatabase):
                 raise TypeError(f"Cannot add scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
 
-            self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
+            c_scalar = (<Scalar>scalar).c_scalar
+            self.database_ptr.add(key.encode(), c_scalar.val, c_scalar.relax, c_scalar.std)
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         if not (self.is_global_workspace or self.is_detached):
