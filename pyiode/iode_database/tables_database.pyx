@@ -72,7 +72,7 @@ cdef class Tables(IodeDatabase):
         else:
             return self.database_ptr.get_title(<string>(key.encode())).decode()
 
-    def _get_object(self, key: Union[str, int]) -> Table:
+    def _get_object(self, key: Union[str, int], table: Table) -> Table:
         cdef CTable* c_table
         if isinstance(key, int):
             c_table = self.database_ptr.get(<int>key)
@@ -82,8 +82,11 @@ cdef class Tables(IodeDatabase):
             c_table = self.database_ptr.get(<string>(key.encode()))
             name = key
 
-        py_table = Table._from_ptr(c_table, <bint>True, name.encode(), self.database_ptr) 
-        return py_table
+        table.c_table_name = name.encode()
+        table.c_table = c_table
+        table.c_database = self.database_ptr
+        table.ptr_owner = <bint>True
+        return table
 
     def _set_object(self, key: Union[str, int], value):
         cdef CTable* c_table

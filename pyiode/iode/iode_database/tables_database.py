@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import Union, Tuple, List, Dict, Optional, Any
+from typing import Union, Tuple, List, Dict, Any
 
 if sys.version_info.minor >= 11:
     from typing import Self
@@ -8,7 +8,8 @@ else:
     Self = Any
 
 from iode.common import PrintTablesAs
-from iode.iode_cython import PositionalIndexer, Table
+from iode.objects.table import Table
+from iode.iode_cython import PositionalIndexer
 from iode.iode_cython import Tables as CythonTables
 
 
@@ -233,7 +234,8 @@ class Tables(CythonTables):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Table:
-        return CythonTables._get_object(self, key)
+        table = Table._new_instance()
+        return CythonTables._get_object(self, key, table)
 
     def _set_object(self, key: Union[str, int], value):
         CythonTables._set_object(self, key, value)
