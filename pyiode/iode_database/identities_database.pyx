@@ -60,7 +60,7 @@ cdef class Identities(IodeDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: Union[str, int]) -> Identity:
+    def _get_object(self, key: Union[str, int], identity: Identity) -> Identity:
         cdef CIdentity* c_identity
         if isinstance(key, int):
             c_identity = self.database_ptr.get(<int>key)
@@ -68,9 +68,10 @@ cdef class Identities(IodeDatabase):
             key  = key.strip()
             c_identity = self.database_ptr.get(<string>(key.encode()))
         
+        identity.c_identity = c_identity
         # self.database_ptr.get() does not allocate a new C++ Identity instance
-        py_identity = Identity._from_ptr(c_identity, <bint>False) 
-        return py_identity
+        identity.ptr_owner = <bint>False
+        return identity
 
     def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
         if isinstance(value, Identity):
