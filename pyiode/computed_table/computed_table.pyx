@@ -104,6 +104,11 @@ cdef class ComputedTable:
         wrapper.c_computed_table = new CComputedTable(c_table, generalized_sample, nb_decimals)
         return wrapper
 
+    @classmethod
+    def _new_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return instance
+
     @property
     def nb_decimals(self) -> int:
         """

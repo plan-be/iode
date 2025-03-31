@@ -1183,6 +1183,11 @@ cdef class Table:
         wrapper.ptr_owner = owner
         return wrapper
 
+    @classmethod
+    def _new_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        return instance
+
     def update_global_database(self):
         if self.c_database is not NULL and self.c_table is not NULL:
             self.c_database.update(self.c_table_name, dereference(self.c_table))
