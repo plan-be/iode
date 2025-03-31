@@ -456,6 +456,7 @@ generate_stub_files.py
 /pyiode/dist
 /pyiode/README*
 /pyiode/LICENSE*
+/pyiode/copy_py_files_to_sites_packages.py
 
 /pyiode/**/*.cmt
 /pyiode/**/*.eqs
