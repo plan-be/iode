@@ -71,7 +71,7 @@ cdef class Equations(IodeDatabase):
         else:
             return self.database_ptr.get_lec(<string>(key.encode())).decode()
 
-    def _get_object(self, key: Union[str, int]) -> Equation:
+    def _get_object(self, key: Union[str, int], eq: Equation) -> Equation:
         cdef CEquation* c_eq
         if isinstance(key, int):
             c_eq = self.database_ptr.get(<int>key)
@@ -79,8 +79,10 @@ cdef class Equations(IodeDatabase):
             key = key.strip()
             c_eq = self.database_ptr.get(<string>(key.encode()))
         
-        py_eq = Equation._from_ptr(c_eq, <bint>True, self.database_ptr) 
-        return py_eq
+        eq.c_equation = c_eq
+        eq.c_database = self.database_ptr
+        eq.ptr_owner = <bint>True
+        return eq
 
     def _set_object(self, key: Union[str, int], value):
         cdef CEquation* c_equation

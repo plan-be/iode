@@ -22,7 +22,8 @@ from .iode_cython import Period, Sample, PERIODICITY_LIST
 # IODE objects
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
-from .iode_cython import Equation, Identity, Scalar, Table
+from .iode_cython import Identity, Scalar, Table
+from .objects.equation import Equation
 from .util import split_list
 
 # IODE databases

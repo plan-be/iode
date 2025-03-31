@@ -9,7 +9,9 @@ else:
 import pandas as pd
 from iode.common import EqTest, PrintEquationsAs, PrintEquationsLecAs
 from iode.util import join_lines, table2str, JUSTIFY
-from iode.iode_cython import PositionalIndexer, Equation, Period
+from iode.objects.equation import Equation
+
+from iode.iode_cython import PositionalIndexer, Period
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
@@ -168,7 +170,8 @@ class Equations(CythonEquations):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Equation:
-        return CythonEquations._get_object(self, key)
+        eq = Equation._new_instance()
+        return CythonEquations._get_object(self, key, eq)
 
     def _set_object(self, key: Union[str, int], value):
         CythonEquations._set_object(self, key, value)
@@ -1088,7 +1091,7 @@ class Equations(CythonEquations):
                 test_values = [args.pop(test_name, 0.0) for test_name in test_names]
 
                 equation = Equation(endogenous, **args)
-                equation._set_tests(test_values)
+                equation._set_tests_from_list(test_values)
                 equation._set_date(date)
 
                 self._set_object(endogenous, equation)
