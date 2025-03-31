@@ -8,7 +8,8 @@ else:
 
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
-from iode.iode_cython import PositionalIndexer, Identity, Period
+from iode.objects.identity import Identity
+from iode.iode_cython import PositionalIndexer, Period
 from iode.iode_cython import Identities as CythonIdentities
 
 
@@ -109,7 +110,8 @@ class Identities(CythonIdentities):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Identity:
-        return CythonIdentities._get_object(self, key)
+        identity = Identity._new_instance()
+        return CythonIdentities._get_object(self, key, identity)
 
     def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
         CythonIdentities._set_object(self, key, value)
