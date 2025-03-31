@@ -420,6 +420,8 @@ if __name__ == "__main__":
     tmp_file = 'source_code.py'
     file_path_cython = pyiode_dir / relative_path
     file_path_py = pyiode_dir / "iode" / str(Path(relative_path).with_suffix('.py'))
+    if not file_path_py.parent.exists():
+        file_path_py.parent.mkdir(parents=True)
 
     copyfile(file_path_cython, file_path_cython.with_suffix('.pyx.bak'))
 
