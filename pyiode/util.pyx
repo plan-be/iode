@@ -41,9 +41,6 @@ def is_NA(value: float) -> bool:
     """
     return not IODE_IS_A_NUMBER(value)
 
-def iode_number_to_str(value: float) -> str:
-    return "na" if is_NA(value) else f"{value:g}"
-
 
 # Messages
 # --------

@@ -19,6 +19,10 @@ from .common import FileType
 _list_separator = r",;\s"
 
 
+def iode_number_to_str(value: float) -> str:
+    return "na" if is_NA(value) else f"{value:g}"
+
+
 def split_list(list_txt: str):
     """
     Split an IODE list written as a string and return a Python list.
