@@ -1,4 +1,5 @@
 import sys
+import warnings
 from pathlib import Path
 from typing import Union, Tuple, List, Dict, Optional, Any
 if sys.version_info.minor >= 11:
@@ -8,16 +9,17 @@ else:
 
 import pandas as pd
 from iode.common import EqTest, PrintEquationsAs, PrintEquationsLecAs
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.util import join_lines, table2str, JUSTIFY
 from iode.objects.equation import Equation
 
-from iode.iode_cython import PositionalIndexer, Period
+from iode.iode_cython import Period
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
 
 
-class Equations(CythonEquations):
+class Equations(IodeDatabase):
     r"""
     IODE Equations database. 
 
@@ -65,25 +67,19 @@ class Equations(CythonEquations):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonEquations.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonEquations()
         return instance
 
     def _load(self, filepath: str):
-        CythonEquations._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonEquations._subset(self, pattern, copy)
+        instance = Equations.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     def get_lec(self, key: Union[str, int]) -> str:
         r"""
@@ -109,7 +105,10 @@ class Equations(CythonEquations):
         >>> equations.get_lec(0)       # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        return CythonEquations.get_lec(self, key)
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
+        return self._cython_instance.get_lec(name)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -170,11 +169,69 @@ class Equations(CythonEquations):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Equation:
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
         eq = Equation._new_instance()
-        return CythonEquations._get_object(self, key, eq)
+        return self._cython_instance._get_object(name, eq)
 
     def _set_object(self, key: Union[str, int], value):
-        CythonEquations._set_object(self, key, value)
+        name = self._single_object_key_to_name(key)
+
+        if isinstance(value, pd.Series):
+            value = value.to_dict()
+
+        # update existing equation
+        if name in self:
+            if isinstance(value, str):
+                equation = self._get_object(name)
+                equation.lec = value
+            elif isinstance(value, Equation):
+                equation = value
+            elif isinstance(value, dict):
+                equation = self._get_object(name)
+                if 'lec' in value:
+                    equation.lec = value.pop('lec')
+                if 'method' in value:
+                    equation.method = value.pop('method')
+                if 'sample' in value:
+                    equation.sample = value.pop('sample')
+                if 'comment' in value:
+                    equation.comment = value.pop('comment')
+                if 'instruments' in value:
+                    equation.instruments = value.pop('instruments')
+                if 'block' in value:
+                    equation.block = value.pop('block')
+                if 'tests' in value:
+                    warnings.warn(f"Cannot update equation '{name}': 'tests' cannot be updated manually. Skipped new values.")
+                    del value['tests']
+                if 'date' in value:
+                    warnings.warn(f"Cannot update equation '{name}': 'date' cannot be updated manually. Skipped new value.")
+                    del value['date']
+                if len(value):
+                    raise ValueError(f"Cannot update equation '{name}': only 'lec', 'method', 'sample', 'comment', "
+                                     f"'instruments' and 'block' keys are accepted. "
+                                     f"Got unknown key(s): {';'.join(value.keys())}")
+            else:
+                raise TypeError(f"Cannot update equation '{name}': Expected input to be of type str or dict or Equation. "
+                                f"Got value of type {type(value).__name__}")
+        # add a new equation
+        else:
+            if isinstance(value, str):
+                equation = Equation(endogenous=name, lec=value.strip())
+            elif isinstance(value, Equation):
+                equation = value
+            elif isinstance(value, (tuple, list)):
+                value = [name] + list(value)
+                equation = Equation(*value)
+            elif isinstance(value, dict):
+                value['endogenous'] = name
+                equation = Equation(**value)
+            else:
+                raise TypeError(f"Cannot add equation '{name}': Expected input to be of type str or tuple or list or "
+                                f"dict or Equation. Got value of type {type(value).__name__}")
+
+        self._cython_instance._set_object(name, equation)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Self]:
         r"""
@@ -296,10 +353,13 @@ class Equations(CythonEquations):
         --------
         >>> import pandas as pd
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import equations, Equation, EqMethod
+        >>> from iode import equations, variables, Equation, EqMethod
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
-        274 objects loaded 
+        274 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
         
         >>> # a) add one equation
         >>> equations["BDY"] = "BDY := YN - YK"
@@ -351,8 +411,8 @@ class Equations(CythonEquations):
         >>> # update lec, method, sample and block
         >>> equations["ACAF"].lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
         >>> equations["ACAF"].method = EqMethod.MAX_LIKELIHOOD
-        >>> # new equation sample is from 1990Y1 to the last year of Variables
-        >>> equations["ACAF"].sample = "1990Y1:"
+        >>> # new equation sample is from 1990Y1 to 2015Y1
+        >>> equations["ACAF"].sample = "1990Y1:2015Y1"
         >>> equations["ACAF"].block = "ACAF"
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
@@ -454,7 +514,7 @@ class Equations(CythonEquations):
                  lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
                  method = 'LSQ',
                  from_period = '1960Y1',
-                 to_period = '2015Y1') 
+                 to_period = '2015Y1')
         """
         super().__setitem__(key, value)
 
@@ -526,7 +586,7 @@ class Equations(CythonEquations):
         >>> equations["A*"].coefficients
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return self._coefficients()
+        return super()._coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -543,7 +603,7 @@ class Equations(CythonEquations):
         >>> equations["A*"].variables
         ['ACAF', 'ACAG', 'AOUC', 'GOSF', 'PM', 'QL', 'TIME', 'VAF', 'VAFF', 'VBBP', 'VM', 'WCRH']
         """
-        return self._variables()
+        return super()._variables()
 
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None) -> bool:
         r"""
@@ -846,7 +906,7 @@ class Equations(CythonEquations):
         _YRES1       -0.01    0.02   -0.02  ...   -0.00    0.01   -0.03
         <BLANKLINE>
         """
-        return CythonEquations.estimate(self, from_period, to_period, list_eqs)
+        return self._cython_instance.estimate(from_period, to_period, list_eqs)
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
@@ -859,9 +919,9 @@ class Equations(CythonEquations):
         names: str or list(str)
             list of equations to copy from the input file(s).
             Defaults to load all equations from the input file(s). 
-        
         """
-        CythonEquations.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -1468,11 +1528,11 @@ class Equations(CythonEquations):
         >>> equations.print_nb_decimals
         4
         """
-        return self._get_print_nb_decimals()
+        return self._cython_instance._get_print_nb_decimals()
 
     @print_nb_decimals.setter
     def print_nb_decimals(self, value: int):
-        self._set_print_nb_decimals(value)
+        self._cython_instance._set_print_nb_decimals(value)
 
     @property
     def print_equations_as(self) -> PrintEquationsAs:
@@ -1499,11 +1559,24 @@ class Equations(CythonEquations):
         >>> equations.print_equations_as
         <PrintEquationsAs.EQ_COMMENTS_ESTIMATION: 2>
         """
-        return CythonEquations.get_print_equations_as(self)
+        i_value = self._cython_instance.get_print_equations_as()
+        return PrintEquationsAs(i_value)
 
     @print_equations_as.setter
-    def print_equations_as(self, value: Union[PrintEquationsAs, str]):
-        CythonEquations.set_print_equations_as(self, value)
+    def print_equations_as(self, value: Union[PrintEquationsAs, str, int]):
+        if not isinstance(value, (PrintEquationsAs, str, int)):
+            raise TypeError(f"Expected value of type PrintEquationsAs, str or int. "
+                            f"Got {type(value).__name__} instead.")
+        if isinstance(value, int) and not (0 <= value <= 2):
+            raise ValueError(f"Invalid value {value}. Expected value between 0 and 2.")
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintEquationsAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintEquationsAs.__members__.keys())}. ")
+            value = PrintEquationsAs[upper_str]
+        value = str(int(value))
+        self._cython_instance.set_print_equations_as(value)
 
     @property
     def print_equations_lec_as(self) -> PrintEquationsLecAs:
@@ -1533,47 +1606,26 @@ class Equations(CythonEquations):
         >>> equations.print_equations_lec_as
         <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
         """
-        return CythonEquations.get_print_equations_lec_as(self)
+        i_value = self._cython_instance.get_print_equations_lec_as()
+        return PrintEquationsLecAs(i_value) 
 
     @print_equations_lec_as.setter
-    def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
-        CythonEquations.set_print_equations_lec_as(self, value)
+    def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str, int]):
+        if not isinstance(value, (PrintEquationsLecAs, str, int)):
+            raise TypeError(f"Expected value of type PrintEquationsLecAs, str or int. "
+                            f"Got {type(value).__name__} instead.")
+        if isinstance(value, int) and not (0 <= value <= 2):
+            raise ValueError(f"Invalid value {value}. Expected value between 0 and 2.")
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintEquationsLecAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintEquationsLecAs.__members__.keys())}. ")
+            value = PrintEquationsLecAs[upper_str]
+        value = str(int(value))
+        self._cython_instance.set_print_equations_lec_as(value)
 
-    @property
-    def print_equations_lec_as(self) -> PrintEquationsLecAs:
-        r"""
-        Whether to print the LEC formula of each equation: 
-          
-          - as is,
-          - with coefficients replaced by their values,
-          - with coefficients replaced by their values + t-tests. 
-
-        Parameters
-        ----------
-        value: PrintEquationsLecAs
-            Possible values are: PrintEquationsLecAs.AS_IS, 
-            PrintEquationsLecAs.COEFFS_TO_VALUES, 
-            PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
-
-        Examples
-        --------
-        >>> from iode import equations, PrintEquationsLecAs
-        >>> equations.print_equations_lec_as
-        <PrintEquationsLecAs.AS_IS: 0>
-        >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
-        >>> equations.print_equations_lec_as
-        <PrintEquationsLecAs.COEFFS_TO_VALUES: 1>
-        >>> equations.print_equations_lec_as = "COEFFS_TO_VALUES_TTEST"
-        >>> equations.print_equations_lec_as
-        <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
-        """
-        return CythonEquations.get_print_equations_lec_as(self)
-
-    @print_equations_lec_as.setter
-    def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
-        CythonEquations.set_print_equations_lec_as(self, value)
-
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list equations defined by `names` to the file `filepath` using the format `format`.
 
@@ -1619,11 +1671,15 @@ class Equations(CythonEquations):
 
         Examples
         --------
-        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> from iode import equations, scalars, SAMPLE_DATA_DIR
         >>> from iode import PrintEquationsAs, PrintEquationsLecAs
+        >>> output_dir = getfixture('tmp_path')
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
         >>> equations.print_nb_decimals = 4
         
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
@@ -1709,7 +1765,7 @@ class Equations(CythonEquations):
         " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
         <BLANKLINE>
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -1754,7 +1810,7 @@ class Equations(CythonEquations):
         >>> original_hash == hash(equations)
         True
         """
-        return CythonEquations.__hash__(self)
+        return super().__hash__()
 
 
 equations: Equations = Equations.get_instance()

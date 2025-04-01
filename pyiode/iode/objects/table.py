@@ -147,7 +147,7 @@ class TableCell(CythonTableCell):
     >>> table[4][1]
     GAP_
     >>> table[4][1].cell_type
-    'CELL'
+    'LEC'
     """
     def __init__(self):
         raise TypeError("This class cannot be instantiated directly.")
@@ -437,7 +437,7 @@ class TableLine(CythonTableLine):
     <BLANKLINE>
 
     >>> table[0]
-    Table example
+    Analyse des prix
     >>> table[0].line_type
     'TITLE'
     >>> table[0].graph_type

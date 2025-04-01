@@ -19,15 +19,15 @@ from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTit
 from iode.common import PrintTablesAs
 
 
-cdef class Tables(IodeDatabase):
+cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBTables* database_ptr
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_tables
+        self.abstract_db_ptr = &cpp_global_tables
         self.print_as = B_TBL_TITLE
 
     def __dealloc__(self):
@@ -50,37 +50,21 @@ cdef class Tables(IodeDatabase):
         wrapper.print_as = B_TBL_TITLE
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Tables) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_tables
-        instance.abstract_db_ptr = &cpp_global_tables
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBTables* kdb = new CKDBTables(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Tables:
-        subset_db: Tables = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Tables, pattern: str, copy: bool) -> Tables:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
-    def get_title(self, key: Union[str, int]) -> str:
-        if isinstance(key, int):
-            return self.database_ptr.get_title(<int>key).decode()
-        else:
-            return self.database_ptr.get_title(<string>(key.encode())).decode()
+    def get_title(self, name: str) -> str:
+        return self.database_ptr.get_title(name.encode()).decode()
 
-    def _get_object(self, key: Union[str, int], table: Table) -> Table:
+    def _get_object(self, name: str, table: Table) -> Table:
         cdef CTable* c_table
-        if isinstance(key, int):
-            c_table = self.database_ptr.get(<int>key)
-            name = self.get_name(<int>key)
-        else:
-            key = key.strip()
-            c_table = self.database_ptr.get(<string>(key.encode()))
-            name = key
+        name = name.strip()
+        c_table = self.database_ptr.get(name.encode())
 
         table.c_table_name = name.encode()
         table.c_table = c_table
@@ -88,42 +72,16 @@ cdef class Tables(IodeDatabase):
         table.ptr_owner = <bint>True
         return table
 
-    def _set_object(self, key: Union[str, int], value):
+    def _set_object(self, name: str, table: Table):
         cdef CTable* c_table
 
-        if isinstance(key, str):
-            key = key.strip()
-
-        if isinstance(key, int) or self.database_ptr.contains(key.encode()):
-            # update existing table
-            if not isinstance(value, Table):
-                raise TypeError(f"Update table '{key}': Expected input of type 'Table'. "
-                                f"Got value of type {type(value).__name__} instead")
-            c_table = (<Table>value).c_table
-            if isinstance(key, int):
-                self.database_ptr.update(<int>key, dereference(c_table))
-            else:
-                self.database_ptr.update(<string>(key.encode()), dereference(c_table))
+        c_table = table.c_table
+        if self.database_ptr.contains(name.encode()):
+            self.database_ptr.update(name.encode(), dereference(c_table))
         else:
-            # add a new table
-            if isinstance(value, int):
-                table = Table(nb_columns=value)
-            elif isinstance(value, Table):
-                table = value
-            elif isinstance(value, (tuple, list)):
-                table = Table(*value)
-            elif isinstance(value, dict):
-                table = Table(**value)
-            else:
-                raise TypeError(f"New table '{key}': Expected input to be of type int or tuple or list or "
-                                f"dict or Table. Got value of type {type(value).__name__} instead")
-            c_table = (<Table>table).c_table
-            self.database_ptr.add(<string>(key.encode()), dereference(c_table))
+            self.database_ptr.add(<string>(name.encode()), dereference(c_table))
 
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def _str_table(self, names: List[str]) -> str:
@@ -131,46 +89,22 @@ cdef class Tables(IodeDatabase):
         columns = {"name": names, "table titles": titles}
         return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 
-    def get_print_tables_as(self) -> PrintTablesAs:
-        return PrintTablesAs(self.print_as)
+    # Specify how to print a TABLE 
+    #      0 : print table full definitions
+    #      1 : print only table titles
+    #      2 : print computed version of tables
+    def get_print_tables_as(self) -> int:
+        return self.print_as
 
-    def set_print_tables_as(self, value: Union[PrintTablesAs, str]):
-        if isinstance(value, str):
-            upper_str = value.upper()
-            if upper_str not in PrintTablesAs.__members__:
-                raise ValueError(f"Invalid value '{value}'. "
-                                 f"Expected one of {', '.join(PrintTablesAs.__members__.keys())}. ")
-            value = PrintTablesAs[upper_str]
-        value = int(value)
+    def set_print_tables_as(self, value: int):
         self.print_as = value
         if value <= 1:
             B_PrintObjTblTitle(str(value).encode())
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4) -> None:
-        cdef char c_format = b'\0'
-        if self.print_tables_as != PrintTablesAs.COMPUTED:
-            self._print_to_file(filepath, names, format)
-        else:
-            if format is not None:
-                if not len(format):
-                    raise ValueError("format must be a non-empty char")
-                c_format = format.encode('utf-8')[0]
-
-            if isinstance(filepath, str):
-                if not len(filepath):
-                    raise ValueError("'filepath' must be a non-empty string or a Path object.")
-                filepath = Path(filepath)
-            if filepath.suffix:
-                c_format = filepath.suffix.encode('utf-8')[1]
-            filepath = str(filepath.resolve())
-
-            names = ';'.join(self.get_names(names))
-            
-            if generalized_sample is None or len(generalized_sample) == 0:
-                raise ValueError("'generalized_sample' must be a non-empty string.")
-
-            self.database_ptr.print_to_file(filepath.encode(), generalized_sample.encode(), 
-                                            names.encode(), nb_decimals, c_format)
+    def cpp_tables_print_to_file(self, filepath: str, names: List[str], format: str, generalized_sample: str, nb_decimals: int):
+        cdef char c_format = format.encode('utf-8')[0]
+        self.database_ptr.print_to_file(filepath.encode(), generalized_sample.encode(), 
+                                        names.encode(), nb_decimals, c_format)
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database_ptr))

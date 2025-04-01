@@ -113,6 +113,7 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     --------
     >>> from iode import execute_report, variables
     >>> from pathlib import Path
+    >>> output_dir = getfixture('tmp_path')
     >>> create_var_rep = str(output_dir / "create_var.rep")
     >>> result_var_file = str(output_dir / "test_var.av")
 
@@ -176,6 +177,7 @@ def execute_command(command: Union[str, List[str]]):
     --------
     >>> from iode import execute_command
     >>> from pathlib import Path
+    >>> output_dir = getfixture('tmp_path')
     >>> result_var_file = str(output_dir / "test_var.av")
 
     >>> # execute IODE command one by one

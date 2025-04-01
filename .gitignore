@@ -450,7 +450,8 @@ generate_stub_files.py
 !/pyiode/a2m_print.cpp
 !/pyiode/iode_database/variables_database.cpp
 /pyiode/common.pyx
-/pyiode/iode/tests
+/pyiode/iode/tests/data
+/pyiode/iode/output
 /pyiode/iode/doc
 /pyiode/iode/iode.msg
 /pyiode/dist

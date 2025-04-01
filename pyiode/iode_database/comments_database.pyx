@@ -17,14 +17,14 @@ import pandas as pd
 from iode.util import check_filepath
 
 
-cdef class Comments(IodeDatabase):
+cdef class Comments(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBComments* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Comments:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_comments
+        self.abstract_db_ptr = &cpp_global_comments
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -45,43 +45,26 @@ cdef class Comments(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_comments
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Comments) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_comments
-        instance.abstract_db_ptr = &cpp_global_comments
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBComments* kdb = new CKDBComments(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Comments:
-        subset_db: Comments = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Comments, pattern: str, copy: bool) -> Comments:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
-    def _get_object(self, key: Union[str, int]) -> str:
-        if isinstance(key, int):
-            return self.database_ptr.get(<int>key).decode()
+    def _get_object(self, name: str) -> str:
+        name = name.strip()
+        return self.database_ptr.get(name.encode()).decode()
+
+    def _set_object(self, name: str, value: str):
+        name = name.strip()
+        if self.database_ptr.contains(name.encode()):
+            self.database_ptr.update(name.encode(), <string>(value.encode()))
         else:
-            key = key.strip()
-            return self.database_ptr.get(<string>(key.encode())).decode()
+            self.database_ptr.add(name.encode(), value.encode())
 
-    def _set_object(self, key: Union[str, int], value: str):
-        value = value.strip()
-        if isinstance(key, int):
-            self.database_ptr.update(<int>key, <string>(value.encode()))
-        else:
-            if self.database_ptr.contains(key.encode()):
-                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
-            else:
-                self.database_ptr.add(key.encode(), value.encode())
-
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     @classmethod

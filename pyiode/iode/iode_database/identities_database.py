@@ -8,12 +8,13 @@ else:
 
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.identity import Identity
-from iode.iode_cython import PositionalIndexer, Period
+from iode.iode_cython import Period
 from iode.iode_cython import Identities as CythonIdentities
 
 
-class Identities(CythonIdentities):
+class Identities(IodeDatabase):
     r"""
     IODE Identities database. 
 
@@ -61,25 +62,19 @@ class Identities(CythonIdentities):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonIdentities.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonIdentities()
         return instance
 
     def _load(self, filepath: str):
-        CythonIdentities._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonIdentities._subset(self, pattern, copy)
+        instance = Identities.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     @property
     def i(self) -> PositionalIndexer:
@@ -110,11 +105,15 @@ class Identities(CythonIdentities):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Identity:
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
         identity = Identity._new_instance()
-        return CythonIdentities._get_object(self, key, identity)
+        return self._cython_instance._get_object(name, identity)
 
     def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
-        CythonIdentities._set_object(self, key, value)
+        name = self._single_object_key_to_name(key)
+        self._cython_instance._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Self]:
         r"""
@@ -365,7 +364,7 @@ class Identities(CythonIdentities):
         >>> identities["A*;N*"].coefficients
         ['gamma2', 'gamma3', 'gamma4', 'gamma_']
         """
-        return self._coefficients()
+        return super()._coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -382,7 +381,7 @@ class Identities(CythonIdentities):
         >>> identities["A*;N*"].variables                       # doctest: +ELLIPSIS
         ['KNFFY', 'NFYH', 'PKF', 'PM', 'QAFF', ..., 'WCF', 'WCRH', 'WMIN', 'ZJ']
         """
-        return self._variables()
+        return super()._variables()
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
@@ -396,7 +395,8 @@ class Identities(CythonIdentities):
             list of identities to copy from the input file(s).
             Defaults to load all identities from the input file(s). 
         """
-        CythonIdentities.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, scalar_files: Union[str, List[str]]=None, trace: bool=False):
         r"""
@@ -554,7 +554,7 @@ class Identities(CythonIdentities):
         >>> variables.names
         ['GAP2', 'GAP_']
         """
-        CythonIdentities.execute(self, identities, from_period, to_period, var_files, scalar_files, trace)
+        self._cython_instance.execute(identities, from_period, to_period, var_files, scalar_files, trace)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -729,7 +729,7 @@ class Identities(CythonIdentities):
         columns = {"name": names, "identities": [join_lines(str(self._get_object(name))) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "identities": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list identities defined by `names` to the file `filepath` using the format `format`.
 
@@ -776,6 +776,7 @@ class Identities(CythonIdentities):
         Examples
         --------
         >>> from iode import identities, SAMPLE_DATA_DIR
+        >>> output_dir = getfixture('tmp_path')
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded
@@ -792,7 +793,7 @@ class Identities(CythonIdentities):
         " - GAP_ : 100*((QAF_/Q_F) -1)"
         " - GOSFR : GOSF/VAF_"
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -842,7 +843,7 @@ class Identities(CythonIdentities):
         >>> original_hash == hash(identities)
         True
         """
-        return CythonIdentities.__hash__(self)
+        return super().__hash__()
 
 
 identities: Identities = Identities.get_instance()

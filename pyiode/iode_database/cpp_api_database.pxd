@@ -189,11 +189,9 @@ cdef extern from "cpp_api/KDB/kdb_comments.h":
 
         # Public methods
         KDBComments* subset(string& pattern, bool deep_copy) except +
-        string get(int pos) except +
         string get(string& name) except +
         string copy(string& name) except +
         int add(string& name, string& comment) except +
-        void update(int pos, string& comment) except +
         void update(string& name, string& comment) except +
 
     size_t hash_value(KDBComments&) except +
@@ -209,18 +207,13 @@ cdef extern from "cpp_api/KDB/kdb_equations.h":
 
         # Public methods
         KDBEquations* subset(string& pattern, bool deep_copy) except +
-        CEquation* get(int pos) except +
         CEquation* get(string& name) except +
         CEquation* copy(string& name) except +
-        string get_lec(int pos) except +
         string get_lec(string& name) except +
         int add(string& name, CEquation& equation) except +
         int add(string& name, string& lec, string& method, string& from_period, string& to_period, 
                 string& comment, string& instruments, string& block, bint date) except +
-        void update(int pos, CEquation& equation) except +
         void update(string& name, CEquation& equation) except +
-        void update(int pos, string& lec, string& method, string& from_period, string& to_period, 
-                    string& comment, string& instruments, string& block, bint date) except +
         void update(string& name, string& lec, string& method, string& from_period, string& to_period, 
                     string& comment, string& instruments, string& block, bint date) except +
 
@@ -237,13 +230,10 @@ cdef extern from "cpp_api/KDB/kdb_identities.h":
 
         # Public methods
         KDBIdentities* subset(string& pattern, bool deep_copy) except +
-        CIdentity* get(int pos) except +
         CIdentity* get(string& name) except +
         CIdentity* copy(string& name) except +
         int add(string& name, string& identity_lec) except +
-        void update(int pos, string& identity_lec) except +
         void update(string& name, string& identity_lec) except +
-        string get_lec(int pos) except +
         string get_lec(string& name) except +
         void execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bint trace) except +
@@ -261,11 +251,9 @@ cdef extern from "cpp_api/KDB/kdb_lists.h":
 
         # Public methods
         KDBLists* subset(string& pattern, bool deep_copy) except +
-        string get(int pos) except +
         string get(string& name) except +
         string copy(string& name) except +
         int add(string& name, string& list_) except +
-        void update(int pos, string& list_) except +
         void update(string& name, string& list_) except +
 
     size_t hash_value(KDBLists&) except +
@@ -281,14 +269,11 @@ cdef extern from "cpp_api/KDB/kdb_scalars.h":
 
         # Public methods
         KDBScalars* subset(string& pattern, bool deep_copy) except +
-        CScalar* get(int pos) except +
         CScalar* get(string& name) except +
         CScalar* copy(string& name) except +
         int add(string& name, CScalar& scalar) except +
         int add(string& name, double value, double relax, double std) except +
-        void update(int pos, CScalar& scalar) except +
         void update(string& name, CScalar& scalar) except +
-        void update(int pos, double value, double relax, double std) except +
         void update(string& name, double value, double relax, double std) except +
 
     size_t hash_value(KDBScalars&) except +
@@ -304,10 +289,8 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
 
         # Public methods
         KDBTables* subset(string& pattern, bool deep_copy) except +
-        CTable* get(int pos) except +
         CTable* get(string& name) except +
         CTable* copy(string& name) except +
-        string get_title(int pos) except +
         string get_title(string& name) except +
         int add(string name, CTable& table) except +
         int add(string name, int nb_columns) except +
@@ -317,7 +300,6 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
                 vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
         int add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
                 bool files=False, bool date=False) except +
-        void update(int pos, CTable& table) except +
         void update(string& name, CTable& table) except +
         void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
                            char format_) except +
@@ -335,15 +317,14 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
 
         # Public methods
         KDBVariables* subset(string& pattern, bool deep_copy) except +
-        vector[double] get(int pos) except +
         vector[double] get(string& name) except +
         vector[double] copy(string& name) except +
         int add(string& name, vector[double]& values) except +
         int add(string& name, string& lec) except +
-        void update(int pos, vector[double]& values) except +
-        void update(int pos, vector[double]& values, int t_first, int t_last) except +
-        void update(int pos, string& lec) except +
-        void update(int pos, string& lec, int t_first, int t_last) except +
+        void update(string& name, vector[double]& values) except +
+        void update(string& name, vector[double]& values, int t_first, int t_last) except +
+        void update(string& name, string& lec) except +
+        void update(string& name, string& lec, int t_first, int t_last) except +
 
         double* get_var_ptr(int pos) except +
         double get_var(int pos, int t, IodeVarMode mode) except +

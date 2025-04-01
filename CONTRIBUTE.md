@@ -146,18 +146,17 @@ The final and third step is to ask CMake to run the tests:
 To test the Python API:
 
 You first have to build it and install it locally.
-In a console, go to root directory of your local `iode` project.
-Then type:
+In a console, go to *pyiode* directory and type:
 ```bash
 root_dir_iode> cd pyiode
 pyiode> pip install .
 ```
 Note: you must have cython, numpy, pandas, larray, scikit-build-core and pytest installed.
 
-Finally, return to the root project directory and type `pytest` :
+Once `iode` is installed, run `pytest` from *pyiode* directory :
 ```bash
-pyiode> cd ..
-root_dir_iode> pytest
+root_dir_iode> cd pyiode
+pyiode> pytest
 ```
 
 **Note**: to only create the wheel file, type:

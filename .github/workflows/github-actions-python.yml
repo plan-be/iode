@@ -123,4 +123,6 @@ jobs:
           - name: Test iode Python
             if: runner.os == 'Windows'
             shell: bash -el {0}
-            run: pytest
+            run: |
+              cd pyiode 
+              pytest
