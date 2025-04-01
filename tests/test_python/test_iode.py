@@ -68,6 +68,25 @@ def test_subset_type():
     assert isinstance(tables["C*"], Tables)
     assert isinstance(variables["A*"], Variables)
 
+def test_database_getitem_returned_type():
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    assert isinstance(comments["ACAF"], str)
+    assert isinstance(equations["ACAF"], Equation)
+    assert isinstance(identities["AOUC"], Identity)
+    assert isinstance(lists["COPY"], list)
+    assert isinstance(scalars["acaf1"], Scalar)
+    assert isinstance(tables["C8_1"], Table)
+    assert isinstance(variables["ACAF"], Variables) 
+    assert isinstance(variables["ACAF", "1990Y1:2000Y1"], Variables) 
+    assert isinstance(variables["ACAF", "2000Y1"], float) 
+
 # Equations
 # ---------
 
