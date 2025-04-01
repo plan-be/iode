@@ -27,7 +27,7 @@ class Identity(CythonIdentity):
     Identity('FLG/VBBP')
     """
     def __init__(self, lec: str) -> Self:
-        return CythonIdentity.__init__(self, lec)
+        CythonIdentity.__init__(self, lec)
 
     @classmethod
     def _new_instance(cls) -> Self:
