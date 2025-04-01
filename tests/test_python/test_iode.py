@@ -87,6 +87,22 @@ def test_database_getitem_returned_type():
     assert isinstance(variables["ACAF", "1990Y1:2000Y1"], Variables) 
     assert isinstance(variables["ACAF", "2000Y1"], float) 
 
+def test_type_copy_iode_objects():
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+
+    eq_ACAF = equations["ACAF"]
+    assert isinstance(eq_ACAF.copy(), Equation)
+    idt_AOUC = identities["AOUC"]
+    assert isinstance(idt_AOUC.copy(), Identity)
+    scl_acaf1 = scalars["acaf1"]
+    assert isinstance(scl_acaf1.copy(), Scalar)
+    table_C8_1 = tables["C8_1"]
+    assert isinstance(table_C8_1.copy(), Table)
+
+
 # Equations
 # ---------
 
