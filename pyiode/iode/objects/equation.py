@@ -78,7 +78,7 @@ class Equation(CythonEquation):
              to_period = '2015Y1')
     """
     def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str]=EqMethod.LSQ, from_period: Union[str, Period]='', to_period: Union[str, Period]='', comment: str='', instruments: str='', block: str='') -> Self:
-        return CythonEquation.__init__(self, endogenous, lec, method, from_period, to_period, comment, instruments, block)
+        CythonEquation.__init__(self, endogenous, lec, method, from_period, to_period, comment, instruments, block)
 
     @classmethod
     def _new_instance(cls) -> Self:

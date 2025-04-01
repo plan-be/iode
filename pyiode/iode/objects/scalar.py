@@ -63,7 +63,7 @@ class Scalar(CythonScalar):
     ValueError: Expected 'relax' value between 0.0 and 1.0
     """
     def __init__(self, value: float, relax: float=1.0) -> Self:
-        return CythonScalar.__init__(self, value, relax)
+        CythonScalar.__init__(self, value, relax)
 
     @classmethod
     def _new_instance(cls) -> Self:
