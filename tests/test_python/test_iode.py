@@ -119,7 +119,6 @@ def test_type_copy_iode_objects():
     table_C8_1 = tables["C8_1"]
     assert isinstance(table_C8_1.copy(), Table)
 
-
 # Equations
 # ---------
 
@@ -223,6 +222,19 @@ def test_computed_table_NA_values():
     # check that np.nan is converted to IODE NA when setting a value in the table
     with pytest.raises(ValueError, match=r"An IODE NA \(NaN\) value is not accepted to edit a cell of a computed table"):
         computed_table[0, 2] = np.nan
+
+# Tables
+# ------
+
+def test_table_getitem_returned_type():
+    from iode.objects.table import TableLine, TableCell
+    
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    table = tables["ANAPRIX"]
+
+    assert isinstance(table.divider, TableLine)
+    assert isinstance(table[4], TableLine)
+    assert isinstance(table[4][0], TableCell)
 
 # Variables
 # ---------
