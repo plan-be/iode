@@ -16,14 +16,14 @@ import pandas as pd
 from iode.util import split_list
 
 
-cdef class Lists(IodeDatabase):
+cdef class Lists(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBLists* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Lists:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_lists
+        self.abstract_db_ptr = &cpp_global_lists
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -44,31 +44,20 @@ cdef class Lists(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_lists
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Lists) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_lists
-        instance.abstract_db_ptr = &cpp_global_lists
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBLists* kdb = new CKDBLists(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Lists:
-        subset_db: Lists = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Lists, pattern: str, copy: bool) -> Lists:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
-    def _get_object(self, key: Union[str, int]) -> List[str]:
-        if isinstance(key, int):
-            str_list = self.database_ptr.get(<int>key).decode()
-        else:
-            key = key.strip()
-            str_list = self.database_ptr.get(<string>(key.encode())).decode()
+    def _get_object(self, name: str) -> List[str]:
+        name = name.strip()
+        str_list = self.database_ptr.get(name.encode()).decode()
         return split_list(str_list)
 
-    def _set_object(self, key: Union[str, int], value: Union[str, List[str]]):
+    def _set_object(self, name: str, value: Union[str, List[str]]):
         if isinstance(value, str):
             value = value.strip()
             value = split_list(value)
@@ -77,19 +66,13 @@ cdef class Lists(IodeDatabase):
         # normalize the IODE list
         value = ';'.join(value)
 
-        if isinstance(key, int):
-            self.database_ptr.update(<int>key, <string>(value.encode()))
+        name = name.strip()
+        if self.database_ptr.contains(name.encode()):
+            self.database_ptr.update(name.encode(), <string>(value.encode()))
         else:
-            key = key.strip()
-            if self.database_ptr.contains(key.encode()):
-                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
-            else:
-                self.database_ptr.add(key.encode(), value.encode())
+            self.database_ptr.add(name.encode(), value.encode())
 
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):     
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def __hash__(self) -> int:

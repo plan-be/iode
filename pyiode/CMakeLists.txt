@@ -75,6 +75,7 @@ if(Python_FOUND)
     # after the iode_cython target is built
     add_custom_command(TARGET iode_cython POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_BINARY_DIR}/iode
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_SOURCE_DIR}/iode
         COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
     
     install(TARGETS iode_cython LIBRARY DESTINATION iode)

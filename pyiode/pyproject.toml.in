@@ -93,7 +93,7 @@ build-verbosity = 1
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--doctest-modules --doctest-continue-on-failure --durations=0 --verbose"
-testpaths = ["../tests/test_python"]
+testpaths = ["./iode"]
 log_cli = "True"
 log_cli_level = "INFO"
 

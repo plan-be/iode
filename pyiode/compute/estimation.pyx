@@ -150,7 +150,7 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> PyScal
     """
     # Note: cpp_dickey_fuller_test allocates a new CKDBScalars* pointer
     cdef CKDBScalars* df_scalars
-    scalars_db: Scalars = PyScalars._new_instance()
+    scalars_db: Scalars = PyScalars.get_instance()
     df_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
     scalars_db.ptr_owner = <bint>True
     scalars_db.database_ptr = df_scalars

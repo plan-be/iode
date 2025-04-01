@@ -1027,6 +1027,7 @@ cdef class ComputedTable:
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, tables, variables
+        >>> output_dir = getfixture('tmp_path')
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded 
@@ -1044,7 +1045,7 @@ cdef class ComputedTable:
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 | ... |     1.14 |  1.00
         <BLANKLINE>
         >>> computed_table.print_to_file(output_dir / "computed_table_2_periods.csv")
-        >>> with open(output_dir / "computed_table_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+        >>> with open("computed_table_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>
@@ -1070,7 +1071,7 @@ cdef class ComputedTable:
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
         >>> computed_table.print_to_file(output_dir / "computed_table_2_files.csv")    
-        >>> with open(output_dir / "computed_table_2_files.csv", "r") as f:
+        >>> with open("computed_table_2_files.csv", "r") as f:
         ...     print(f.read())
         "Déterminants de l'output potentiel"
         <BLANKLINE>

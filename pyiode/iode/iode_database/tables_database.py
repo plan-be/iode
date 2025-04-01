@@ -9,11 +9,11 @@ else:
 
 from iode.common import PrintTablesAs
 from iode.objects.table import Table
-from iode.iode_cython import PositionalIndexer
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Tables as CythonTables
 
 
-class Tables(CythonTables):
+class Tables(IodeDatabase):
     r"""
     IODE Tables database. 
 
@@ -61,25 +61,19 @@ class Tables(CythonTables):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonTables.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonTables()
         return instance
 
     def _load(self, filepath: str):
-        CythonTables._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonTables._subset(self, pattern, copy)
+        instance = Tables.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     def get_title(self, key: Union[str, int]) -> str:
         r"""
@@ -105,7 +99,10 @@ class Tables(CythonTables):
         >>> tables.get_title(0)
         'Déterminants de la croissance de K'
         """
-        return CythonTables.get_title(self, key)
+        name = self._single_object_key_to_name(key)
+        if name not in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
+        return self._cython_instance.get_title(name)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -234,11 +231,36 @@ class Tables(CythonTables):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Table:
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
         table = Table._new_instance()
-        return CythonTables._get_object(self, key, table)
+        return self._cython_instance._get_object(name, table)
 
     def _set_object(self, key: Union[str, int], value):
-        CythonTables._set_object(self, key, value)
+        name = self._single_object_key_to_name(key)
+
+        # update existing table
+        if name in self:
+            if not isinstance(value, Table):
+                raise TypeError(f"Cannot update the table '{name}': Expected input of type 'Table'. "
+                                f"Got value of type '{type(value).__name__}' instead")
+            table = value
+        # add a new table
+        else:
+            if isinstance(value, int):
+                table = Table(nb_columns=value)
+            elif isinstance(value, Table):
+                table = value
+            elif isinstance(value, (tuple, list)):
+                table = Table(*value)
+            elif isinstance(value, dict):
+                table = Table(**value)
+            else:
+                raise TypeError(f"New table '{name}': Expected input to be of type int or tuple or list or "
+                                f"dict or Table. Got value of type {type(value).__name__} instead")
+        
+        self._cython_instance._set_object(name, table)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
         r"""
@@ -368,13 +390,16 @@ class Tables(CythonTables):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import tables, Table, comments, TableGraphAxis
+        >>> from iode import tables, Table, comments, lists, TableGraphAxis
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded
         
         >>> # a) -------- new table --------
         >>> # 1. specify list of line titles and list of LEC expressions
@@ -771,7 +796,7 @@ class Tables(CythonTables):
         >>> tables["A*"].coefficients
         ['knf2', 'knff1']
         """
-        return self._coefficients()
+        return super()._coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -788,7 +813,7 @@ class Tables(CythonTables):
         >>> tables["A*"].variables
         ['AOUC', 'GAP_', 'ITCR', 'KNFF', 'PC', 'QAFF_', 'Q_F', 'Q_I', 'RENT']
         """
-        return self._variables()
+        return super()._variables()
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
@@ -802,10 +827,11 @@ class Tables(CythonTables):
             list of tables to copy from the input file(s).
             Defaults to load all tables from the input file(s). 
         """
-        CythonTables.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def _str_table(self, names: List[str]) -> str:
-        return CythonTables._str_table(self, names)
+        return self._cython_instance._str_table(names)
 
     @property
     def print_nb_decimals(self) -> int:
@@ -854,13 +880,26 @@ class Tables(CythonTables):
         >>> tables.print_tables_as
         <PrintTablesAs.COMPUTED: 2>
         """
-        return CythonTables.get_print_tables_as(self)
+        i_value = self._cython_instance.get_print_tables_as()
+        return PrintTablesAs(i_value)
 
     @print_tables_as.setter
-    def print_tables_as(self, value: Union[PrintTablesAs, str]):
-        CythonTables.set_print_tables_as(self, value)
+    def print_tables_as(self, value: Union[PrintTablesAs, str, int]):
+        if not isinstance(value, (PrintTablesAs, str, int)):
+            raise TypeError(f"Expected value of type 'PrintTablesAs', 'str' or 'int'. "
+                            f"Got value of type '{type(value).__name__}' instead.")
+        if isinstance(value, int) and not (0 <= value <= 2):
+            raise ValueError(f"Invalid value {value}. Expected an integer between 0 and 2.")
+        if isinstance(value, str):
+            upper_str = value.upper()
+            if upper_str not in PrintTablesAs.__members__:
+                raise ValueError(f"Invalid value '{value}'. "
+                                 f"Expected one of {', '.join(PrintTablesAs.__members__.keys())}. ")
+            value = PrintTablesAs[upper_str]
+        value = int(value)
+        self._cython_instance.set_print_tables_as(value)
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4):
         """
         Print the list tables defined by `names` to the file `filepath` using the format `format`.
 
@@ -914,10 +953,17 @@ class Tables(CythonTables):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import tables, PrintTablesAs, load_extra_files
+        >>> from iode import tables, scalars, variables, PrintTablesAs, load_extra_files
+        >>> output_dir = getfixture('tmp_path')
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
 
         >>> tables["ANAKNFF"]              # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                  1 |
@@ -1114,8 +1160,7 @@ class Tables(CythonTables):
         394 objects loaded
         >>> extra_files[0].name
         'ref.av'
-        >>> tables.print_to_file(output_dir / "tables_2_files.csv", names, 
-        ...                      generalized_sample="2010[1-2]:5", nb_decimals=4)    
+        >>> tables.print_to_file(output_dir / "tables_2_files.csv", names, generalized_sample="2010[1-2]:5", nb_decimals=4)    
         >>> with open(output_dir / "tables_2_files.csv", "r") as f:
         ...     print(f.read())
         ...
@@ -1147,7 +1192,27 @@ class Tables(CythonTables):
         "Rentabilité","0.0000","-0.0000","-0.0000","-0.0000","0.0000",
         <BLANKLINE>
         """
-        return CythonTables.print_to_file(self, filepath, names, format, generalized_sample, nb_decimals)
+        if self.print_tables_as != PrintTablesAs.COMPUTED:
+           super().print_to_file(filepath, names, format)
+        else:
+            if format is not None and not len(format):
+                raise ValueError("format must be a non-empty char")
+
+            if isinstance(filepath, str):
+                if not len(filepath):
+                    raise ValueError("'filepath' must be a non-empty string or a Path object.")
+                filepath = Path(filepath)
+            if filepath.suffix:
+                # [:1] to skip the dot
+                format = filepath.suffix[1:]
+            filepath = str(filepath.resolve())
+
+            names = ';'.join(self.get_names(names))
+
+            if generalized_sample is None or not len(generalized_sample):
+                raise ValueError("'generalized_sample' must be a non-empty string.")
+            
+            self._cython_instance.cpp_tables_print_to_file(filepath, names, format, generalized_sample, nb_decimals)
 
     def __hash__(self) -> int:
         r"""
@@ -1200,7 +1265,7 @@ class Tables(CythonTables):
         >>> original_hash == hash(tables)           # doctest: +SKIP
         True
         """
-        return CythonTables.__hash__(self)
+        return super().__hash__()
 
 
 tables: Tables = Tables.get_instance()

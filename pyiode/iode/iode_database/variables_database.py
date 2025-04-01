@@ -8,7 +8,7 @@ if sys.version_info.minor >= 11:
     from typing import Self
 else:
     Self = Any
-    from enum import Enum, IntEnum
+    from enum import Enum
     StrEnum = Enum
 
 import numpy as np
@@ -20,8 +20,10 @@ except ImportError:
     la = None
     Array = Any
 
-from iode import Period, Sample, NA 
+from iode import Period, Sample, NA
+from iode.common import IodeFileType 
 from iode.util import check_filepath, split_list
+from iode.iode_database.abstract_database import IodeDatabase
 from iode.iode_cython import (Variables as CythonVariables, BinaryOperation, VarsMode, 
                               LowToHighType, LowToHighMethod, HighToLowType, 
                               SimulationInitialization, ImportFormats, ExportFormats)
@@ -86,7 +88,7 @@ class VarPositionalIndexer:
         self.database._set_variable(pos, value, period)
 
 
-class Variables(CythonVariables):
+class Variables(IodeDatabase):
     r"""
     IODE Variables database. 
 
@@ -142,28 +144,207 @@ class Variables(CythonVariables):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonVariables.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonVariables()
         return instance
 
     def _get_periods_bounds(self) -> Tuple[int, int]:
-        return CythonVariables._get_periods_bounds(self)
+        return self._cython_instance._get_periods_bounds()
 
     def _load(self, filepath: str):
-        CythonVariables._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, last_period: Union[str, Period]=None) -> Self:
-        return CythonVariables._subset(self, pattern, copy, first_period, last_period)
+        instance = Variables.get_instance()
+
+        if isinstance(first_period, str):
+            first_period = Period(first_period)
+        
+        if isinstance(last_period, str):
+            last_period = Period(last_period)
+
+        # get the sample of the real database
+        whole_db_sample: Sample = self._get_whole_sample()
+
+        # get the position of "self" first and last periods according to the real database sample
+        self_t_first, self_t_last = self._get_periods_bounds()
+
+        # if first_period and last_period arguments are None, they will be set to the first 
+        # and last periods of the parent database sample (if the parent db is a subset of the real db)
+        if first_period is None and self_t_first > 0:
+            first_period = self.sample.start
+        if last_period is None and self_t_last < whole_db_sample.nb_periods - 1:
+            last_period = self.sample.end
+
+        # check that first period subset < last period subset
+        if first_period is not None and last_period is not None and first_period > last_period:
+            raise ValueError(f"subset: first period of the subset ('{first_period}') must be " 
+                             f"<= last period of the subset ('{last_period}')")
+        
+        # check that first period of the subset is inside the real Variables sample 
+        if first_period is not None and (first_period < whole_db_sample.start or first_period > whole_db_sample.end):
+            raise ValueError(f"subset: first period of the subset '{first_period}' is not inside the Variables sample '{whole_db_sample}'")
+        
+        # check that last period of the subset is inside the real Variables sample 
+        if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
+            raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
+
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy, first_period, last_period)
+        return instance
+
+    def copy(self, pattern: str=None) -> Self:
+        r"""
+        Create a new Variables database in which each variable is a *copy* of the original variable 
+        from the global Variables workspace. Any change made to the *copied database* (*subset*) will 
+        not be applied to the global workspace. This can be useful for example if you want to 
+        save previous values of variables before making a simulation.
+
+        Parameters
+        ----------
+        pattern : str, optional
+            If provided, the copied database will only contain the variables whose name matches the 
+            provided pattern. By default (None), the copied database will contain all the variables 
+            from the global Variables workspace. The pattern syntax is the same as the one used for the 
+            `__getitem__` method. If the pattern is an empty string, the copied database will be 
+            empty, creating a new *detached* database.
+            Default to None.
+
+        Returns
+        -------
+        Variables
+
+        See Also
+        --------
+        Variables.new_detached
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded 
+
+        Variables subset
+
+        >>> # without using copy(), any modification made on 
+        >>> # the subset will also change the corresponding 
+        >>> # global Variables workspace
+        >>> var_subset = variables["A*"]
+        >>> var_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # a) add a variable
+        >>> var_subset["A0"] = 0.0
+        >>> "A0" in var_subset
+        True
+        >>> "A0" in variables
+        True
+        >>> variables["A0"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name    1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        A0        0.00    0.00    0.00  ...    0.00    0.00    0.00
+        <BLANKLINE>
+
+        >>> # b) modify a variable
+        >>> var_subset["ACAF"] = 1.0
+        >>> var_subset["ACAF"]          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name    1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF      1.00    1.00    1.00  ...    1.00    1.00    1.00
+        <BLANKLINE>
+        >>> variables["ACAF"]           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name    1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        ACAF      1.00    1.00    1.00  ...    1.00    1.00    1.00
+        <BLANKLINE>
+        >>> # c) delete a variable
+        >>> del var_subset["ACAG"]
+        >>> "ACAG" in var_subset
+        False
+        >>> "ACAG" in variables
+        False
+
+        Copied database subset
+
+        >>> var_subset_copy = variables["B*"].copy()
+        >>> var_subset_copy.names
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> # or equivalently
+        >>> var_subset_copy = variables.copy("B*")
+        >>> var_subset_copy.names
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> # by using copy(), any modification made on the copy subset 
+        >>> # let the global workspace unchanged
+        >>> # a) add a variable -> only added in the copied subset
+        >>> var_subset_copy["B0"] = 0.0
+        >>> "B0" in var_subset_copy
+        True
+        >>> "B0" in variables
+        False
+        >>> # b) modify a variable -> only modified in the copied subset
+        >>> var_subset_copy["BENEF"] = 1.0
+        >>> var_subset_copy["BENEF"]           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name    1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1  2015Y1
+        BENEF     1.00    1.00    1.00  ...    1.00    1.00    1.00
+        <BLANKLINE>
+        >>> variables["BENEF"]           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1960Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name    1960Y1  1961Y1  1962Y1  ...  2013Y1  2014Y1   2015Y1
+        BENEF    11.66   13.61   12.21  ...   19.00  -32.20  -117.38
+        <BLANKLINE>
+        >>> # c) delete a variable -> only deleted in the copied subset
+        >>> del var_subset_copy["BQY"]
+        >>> "BQY" in var_subset_copy
+        False
+        >>> "BQY" in variables
+        True
+
+        New detached Variables database
+
+        >>> # a new empty *detached* Variables database can be created by passing 
+        >>> # an empty string to the copy() method 
+        >>> var_detached = variables.copy("")
+        >>> var_detached.names
+        []
+        >>> # or equivalently by using the new_detached() method 
+        >>> var_detached = variables.new_detached()
+        >>> var_detached.names
+        []
+        """
+        return super().copy(pattern)
 
     def _unfold_key(self, key) -> Any:
         r"""
@@ -181,7 +362,7 @@ class Variables(CythonVariables):
         Returns
         -------
         tuple(key_names, key_periods)
-            - key_names: str, list(str), slice(str, str, int)
+            - key_names: list(str), slice(str, str, int)
             - key_periods: None, Period, tuple(Period, Period), list(Period)
 
         Examples
@@ -232,7 +413,78 @@ class Variables(CythonVariables):
         >>> variables._unfold_key(("AC*", periods_range))            # doctest: +NORMALIZE_WHITESPACE
         (['ACAF', 'ACAG'], [Period("2006Y1"), Period("2008Y1"), Period("2010Y1")])
         """
-        return CythonVariables._unfold_key(self, key)
+        # no selection on periods
+        if not isinstance(key, tuple):
+            key = key, None
+        
+        if len(key) > 2:
+            raise ValueError(f"variables[...]: Expected maximum 2 arguments ('names' and 'periods'). "
+                                f"Got {len(key)} arguments")
+        names, _periods = key
+
+        # get selection on Variable name(s)
+        names = super()._unfold_key(names) 
+        
+        # _periods represents the whole sample
+        if _periods is None:
+            pass
+        
+        # _periods represents a unique period
+        elif isinstance(_periods, Period):
+            pass
+        
+        # _periods represents a unique period or a contiguous range of periods
+        elif isinstance(_periods, str): 
+            # _periods represents a contiguous range of periods
+            if ':' in _periods:
+                first_period, last_period = _periods.split(':')
+                first_period = Period(first_period) if first_period else None
+                last_period = Period(last_period) if last_period else None
+                _periods = first_period, last_period
+            # _periods represents a unique period
+            else:
+                _periods = Period(_periods)
+        
+        # _periods represents a range of contiguous periods
+        elif isinstance(_periods, tuple):
+            if len(_periods) != 2:
+                raise ValueError(f"variables[names, periods]: when 'periods' is a tuple, it must "
+                                 f"contain 2 elements.\nGot {len(_periods)} elements.")
+            _periods = (Period(_periods[0]), Period(_periods[1]))
+
+        # _periods is a Sample object
+        elif isinstance(_periods, Sample):
+            _periods = _periods.start, _periods.end
+
+        # convert slice to a (start, end) tuple or a list of periods if step is not None
+        elif isinstance(_periods, slice):
+            sample = self.sample
+            first_period = sample.start if _periods.start is None else _periods.start
+            last_period = sample.end if _periods.stop is None else _periods.stop
+            if _periods.step is not None:
+                first_period, last_period = str(first_period), str(last_period)
+                _periods = self.periods_subset(first_period, last_period)[::_periods.step]
+                _periods = [Period(period) for period in _periods]
+            else:
+                if isinstance(first_period, str):
+                    first_period = Period(first_period)
+                if isinstance(last_period, str):
+                    last_period = Period(last_period)
+                _periods = first_period, last_period
+
+        # _periods is a list of periods
+        elif isinstance(_periods, Iterable):
+            if not all(isinstance(period, (str, Period)) for period in _periods):
+                raise TypeError("variables[names, periods]: 'periods' must be a list of str or Period objects.")
+            _periods = [Period(period) if isinstance(period, str) else period for period in _periods]
+
+        else:
+            # wrong type for _periods
+            raise TypeError(f"variables[names, periods]: 'periods' must be of type str, Period, Sample, "
+                            f"tuple(str or Period, str or Period)), list(str or Period), or a "
+                            f"slice(str or Period, str or Period, int).\n'periods' is of type {type(_periods).__name__}.")
+
+        return names, _periods
 
     @property
     def i(self) -> VarPositionalIndexer:
@@ -263,12 +515,16 @@ class Variables(CythonVariables):
         """
         return VarPositionalIndexer(self)
 
+    @property
+    def _is_subset_over_periods(self) -> bool:
+        return self._cython_instance.get_is_subset_over_periods()
+
     def _get_whole_sample(self) -> Sample:
         r"""
         If the current instance is a subset of a Variables database, 
         returns the sample of the original Variables database.
         """
-        return CythonVariables._get_whole_sample(self)
+        return self._cython_instance._get_whole_sample()
 
     def _maybe_update_subset_sample(self):
         r"""
@@ -292,14 +548,14 @@ class Variables(CythonVariables):
         >>> vars_subset.sample
         Sample("2000Y1:2005Y1")
         """
-        CythonVariables._maybe_update_subset_sample(self)
+        self._cython_instance._maybe_update_subset_sample()
 
     def _get_real_period_position(self, period: Period) -> int:
         r"""
         Check if 'period' is inside the current (subset) sample.
         Get the position of a period in the Variables database sample (not the subset).
         """
-        return CythonVariables._get_real_period_position(self, period)
+        return self._cython_instance._get_real_period_position(period)
 
     def _get_variable(self, key_name: Union[str, int], key_periods: Union[None, Period, List[Period]]) -> Union[float, pd.Series, Self]:
         r"""
@@ -308,7 +564,43 @@ class Variables(CythonVariables):
         Each period given is converted to its 'absolute' position in the Variables 
         database sample (not relative to the subset sample for instance).
         """
-        return CythonVariables._get_variable(self, key_name, key_periods)
+        name = self.get_name(key_name) if isinstance(key_name, int) else key_name
+        if name not in self:
+            raise KeyError(f"Variable '{name}' not found in the Variables database")
+
+        pos = self.get_position(key_name) if isinstance(key_name, str) else key_name
+
+        # key_periods represents all periods (of the current subset) -> return a Variables object
+        if key_periods is None:
+            db_subset = self._subset(name, copy=False)
+        # key_periods represents a unique period -> return a float 
+        elif isinstance(key_periods, Period):
+            db_subset = self._cython_instance._get_variable(pos, key_periods)
+        # key_periods represents a contiguous range of periods -> return a Variables object
+        elif isinstance(key_periods, tuple):
+            first_period, last_period = key_periods
+            if not isinstance(first_period, Period):
+                raise TypeError(f"Expected value of type 'Period' for the first period. "
+                                f"Got value of type {type(first_period).__name__} instead.")
+            if not isinstance(last_period, Period):
+                raise TypeError(f"Expected value of type 'Period' for the last period. "
+                                f"Got value of type {type(last_period).__name__} instead.")
+            db_subset = self._subset(name, copy=False, first_period=first_period, last_period=last_period)
+        # key_periods represents a list of non-contiguous periods -> return a pandas Series
+        elif isinstance(key_periods, list):
+            if not all(isinstance(period, Period) for period in key_periods):
+                raise TypeError("Expected a list of periods each of type 'Period'")
+            period_names = [str(period) for period in key_periods]
+            values = self._cython_instance._get_variable(pos, key_periods)
+            series = pd.Series(values, index=period_names)
+            series.index.name = "time"
+            series.name = name
+            db_subset = series
+        else:
+            raise TypeError("Wrong selection of periods.\nExpected None or value of type Period, "
+                            f"tuple(Period, Period) or list(Period).\nGot value of type "
+                            f"{type(key_periods).__name__} instead.")
+        return db_subset
 
     def __getitem__(self, key) -> Union[float, Self]:
         r"""
@@ -638,14 +930,44 @@ class Variables(CythonVariables):
                             "pandas DataFrame or Variables.\n"
                             f"Got 'value(s)' of type {type(values).__name__}:\n{values}") 
 
-    def __add_var(self, name: str, value: Self):
-        CythonVariables.__add_var(self, name, value)
-
     def _add(self, name: str, values: Union[str, int, float, np.ndarray, Iterable[float], Self]):
-        CythonVariables._add(self, name, values)
+        if not isinstance(name, str):
+            raise TypeError(f"Cannot add a new IODE variable.\nExpected value for the 'name' argument of type string. "
+                            f"Got value of type {type(name).__name__}")
+        
+        if isinstance(values, (float, str)):
+            pass
+        elif isinstance(values, int):
+            values = float(values)
+        elif isinstance(values, np.ndarray):
+            if values.ndim != 1:
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a 1-dimensional numpy array.\n" 
+                                 f"Got a {values.ndim}-dimensional numpy array instead")
+            if len(values) != self.nb_periods:
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a numpy array of {self.nb_periods} values (number of periods).\n"
+                                 f"Got {len(values)} values instead")
+            # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
+            if not values.flags['C_CONTIGUOUS']:
+                values = np.ascontiguousarray(values)
+        elif isinstance(values, Variables):
+            if values.sample != self.sample:
+                raise ValueError(f"Cannot add the IODE variable '{name}': Incompatible periods.\n"
+                                f"Expected right-hand side Variables object to have sample {self.sample}.\n"
+                                f"Got Variables object with sample {values.sample} instead.")
+            values = values._cython_instance
+        elif isinstance(values, Iterable):
+            if len(values) != self.nb_periods:
+                raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
+                                 f"Expected a iterable of {self.nb_periods} values.\n"
+                                 f"Got {len(values)} values instead")
+        else:
+            raise TypeError(f"Cannot add the IODE variable '{name}'.\n"
+                            f"Expected value of type str, int, float, numpy array, iterable of float or Variables. "
+                            f"Got value of type {type(values).__name__} instead")
 
-    def __copy_var(self, source_name: str, dest_name: str, t_first: int, t_last: int, value: Self):
-        CythonVariables.__copy_var(self, source_name, dest_name, t_first, t_last, value)
+        self._cython_instance._add(name, values)
 
     def _set_variable(self, key_name, values, key_periods):
         r"""
@@ -664,16 +986,110 @@ class Variables(CythonVariables):
             The periods to update/add. 
             If `key_periods` is None, values for the whole sample is updated/added.
         """
-        CythonVariables._set_variable(self, key_name, values, key_periods)
+        if isinstance(key_name, str):
+            key_name = key_name.strip()
+
+        if isinstance(values, int):
+            values = float(values)
+        
+        if values is None:
+            raise ValueError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                             f"Got None as value.")
+
+        if key_periods is not None:
+            if isinstance(key_periods, str):
+                key_periods = Period(key_periods)
+            elif isinstance(key_periods, Period):
+                pass
+            elif isinstance(key_periods, tuple):
+                key_periods = Period(key_periods[0]), Period(key_periods[1])
+            elif isinstance(key_periods, list):
+                key_periods = [Period(p) for p in key_periods]
+            else:
+                raise TypeError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                                f"The periods selection must be either omitted or specified as a single period, "
+                                f"a sample 'start:end', or a list of periods.\nGot periods selection of type "
+                                f"{type(key_periods).__name__} instead")
+
+        # new Variable -> raises an error if key_periods is not None or does not represent the full sample
+        #              -> only allowed when the current database is not a subset over the whole Variables sample
+        if isinstance(key_name, str) and key_name not in self:
+            if not (key_periods is None or isinstance(key_periods, tuple)):
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}'.\nThe syntax 'variables['{key_name}'] = new_variable' "
+                                   f"should be used instead of 'variables['{key_name}', <periods>] = new_variable'")
+            if self._is_subset_over_periods:
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}' when the subset does not cover the "
+                                   f"whole sample of the IODE Variables workspace.\n")
+            if isinstance(key_periods, tuple) and key_periods != (self.sample.start, self.sample.end):
+                raise RuntimeError(f"Cannot add the IODE variable '{key_name}'.\n"
+                                   f"When adding a new variable, the periods selection must be omitted or "
+                                   f"represent the whole Variables sample {self.sample}.\nGot periods selection {key_periods} instead.")
+            # NOTE: if 'values' is a Variables object, it can contains more than one variable as long as the variable
+            #       named 'name' is present
+            self._add(key_name, values)
+        
+        # update a Variable
+        else:
+            pos = self.get_position(key_name) if isinstance(key_name, str) else key_name
+            name = self.get_name(pos) if isinstance(key_name, int) else key_name
+            # update values for the whole (subset) sample
+            if key_periods is None:
+                sample = self.sample
+                key_periods = sample.start, sample.end
+            # update the value for only one period 
+            elif isinstance(key_periods, Period):
+                if not isinstance(values, (float, str, Variables)):
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
+                                    f"When updating values for a single period, the right-hand side must be of type "
+                                    f"int, float, str or interable of float.\nGot input of type {type(values).__name__} instead")
+            # update values for a contiguous range of periods
+            elif isinstance(key_periods, tuple):
+                if not isinstance(values, (float, str, list, tuple, Variables, np.ndarray, pd.Series)):
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\nExpected 'value' of type str, int, "
+                                    f"float, list/tuple of float, numpy array, pandas Series or Variables.\nGot 'value' of type "
+                                    f"{type(values).__name__} instead")                    
+                if isinstance(values, np.ndarray):
+                    # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
+                    if not values.flags['C_CONTIGUOUS']:
+                        values = np.ascontiguousarray(values)
+                if isinstance(values, Variables):
+                    sample: Sample = Sample(*key_periods)
+                    if values.sample != sample:
+                        raise ValueError(f"Cannot update the IODE variable '{name}': Incompatible periods.\n"
+                                         f"Expected right-hand side Variables object to have sample {sample}.\n"
+                                         f"Got Variables object with sample {values.sample} instead.")
+                elif not isinstance(values, str) and isinstance(values, Iterable):
+                    nb_periods = len(Sample(*key_periods))
+                    if len(values) != nb_periods:
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
+                                         f"Expected {nb_periods} values.\nGot {len(values)} values instead")
+            # update values for a list of periods
+            elif isinstance(key_periods, list):              
+                # set the same value for all periods in the list
+                if isinstance(values, float):
+                    values = [values] * len(key_periods)
+                # values is a iterable of float containing a specific value for each period
+                elif isinstance(values, Iterable):
+                    if len(values) != len(key_periods):
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
+                                         f"Expected a {type(values).__name__} of {len(key_periods)} values.\n"
+                                         f"Got {len(values)} values instead")
+                    if not all(isinstance(v, float) for v in values):
+                        raise ValueError(f"Cannot update the IODE variable '{name}'.\n"
+                                         f"Not all items of {type(values).__name__} are of type float:\n{values}")   
+                else:
+                    raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
+                                    f"When updating values for non-contiguous periods, the right-hand side must be "
+                                    f"a float or an iterable of float.\nGot input of type {type(values).__name__} instead")
+
+            if isinstance(values, Variables):
+                values = values._cython_instance
+            self._cython_instance._update_variable(name, pos, values, key_periods)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
         if isinstance(value.index, pd.MultiIndex):
             raise ValueError(f"Expected pandas Series with a single-level index.\n") 
-        if len(key_names) > 1:
-            if len(key_periods) > 1:
-                raise ValueError("Cannot set or update the value of several variables with a pandas Series "
-                                "when the selection key represents more than one period.")
-            # check that names in the selection key are present in the Series object
+        if len(key_names) > 1:            # check that names in the selection key are present in the Series object
             series_names = value.index.to_list()
             self._check_same_names(key_names, series_names)
         else:
@@ -703,7 +1119,7 @@ class Variables(CythonVariables):
     def _check_larray_array(self, value: Array, key_names: List[str], key_periods: List[str]) -> Array:
         if 'time' not in value.axes:
             raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
-                                f"Got axes {repr(value.axes)}.")
+                             f"Got axes {repr(value.axes)}.")
         time = value.axes['time']
         # push the time axis as last axis and combine all other axes 
         value = value.transpose(..., time)
@@ -1359,7 +1775,116 @@ class Variables(CythonVariables):
           ...
         RuntimeError: Cannot delete variable(s) 'ACAF' when the subset does not cover the whole sample of the IODE Variables workspace
         """
-        CythonVariables.__setitem__(self, key, value)
+        names, key_periods = self._unfold_key(key)
+
+        # check type of passed 'value' and convert np.nan to IODE NA
+        value = self._convert_values(value)
+
+        # if value is a float -> set the same value for all variables and periods
+        if isinstance(value, float):
+            for name in names:
+                self._set_variable(name, value, key_periods)
+            return
+
+        # if value is a string (LEC expression)
+        # -> set the same value for all variables and periods
+        if isinstance(value, str):
+            for name in names:
+                self._set_variable(name, value, key_periods)
+            return
+        
+        # if value is a list or a tuple
+        if isinstance(value, (list, tuple)):
+            if len(names) == 1:
+                self._set_variable(names[0], value, key_periods)
+            else:
+                if len(value) != len(names):
+                    raise ValueError(f"Expected {len(names)} values to set the variables.\n"
+                                    f"Got {len(value)} values instead.")
+                for name, _value in zip(names, value):
+                    self._set_variable(name, _value, key_periods)
+            return
+
+        # if value is a dict
+        if isinstance(value, dict):
+            # check that all names in the selection key are present in the dict
+            self._check_same_names(names, value.keys())
+            for name, _value in value.items():
+                self._set_variable(name, _value, key_periods)
+            return
+
+        # if value is a Variables object
+        if isinstance(value, Variables):
+            if len(names) > 1:
+                # check that names in the selection key are present in the Variables object
+                self._check_same_names(names, value.names)
+            for name in names:
+                # NOTE: _set_variable() will extract the data for the given name.
+                #       No need to pass value[name] here.
+                self._set_variable(name, value, key_periods)
+            return
+
+        key_periods: List[str] = self._expand_key_periods(key_periods)
+        key_period_bounds = key_periods[0], key_periods[-1]
+
+        # if value is a numpy array
+        if isinstance(value, np.ndarray):
+            if len(names) == 1:
+                # if the value is a 2D array, we need to flatten it
+                if value.ndim > 1:
+                    value = value.flatten()
+                self._set_variable(names[0], value, key_period_bounds)
+            else:
+                self.from_numpy(value, names, key_periods[0], key_periods[-1])
+            return
+
+        # if value is a pandas DataFrame
+        if isinstance(value, pd.DataFrame):
+            value = self._check_pandas_dataframe(value, names, key_periods)
+            if isinstance(value, pd.DataFrame):
+                data = value.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                for name, _data in zip(names, data):
+                    self._set_variable(name, _data, key_period_bounds)
+                return
+
+        # if value is pandas Series
+        if isinstance(value, pd.Series):
+            value = self._check_pandas_series(value, names, key_periods)
+            if len(names) > 1:
+                if len(key_periods) > 1:
+                    raise ValueError("Cannot set or update the value of several variables with a pandas Series "
+                                     "when the selection key represents more than one period.")
+                for name in names:
+                    self._set_variable(name, value[name], key_period_bounds)
+            else:
+                data = value.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                self._set_variable(names[0], data, key_period_bounds)
+            return
+        
+        if la is not None and isinstance(value, Array):
+            value = self._check_larray_array(value, names, key_periods)
+            data = value.data
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(names) == 1:
+                data = data.flatten()
+                self._set_variable(names[0], data, key_period_bounds)
+            else:
+                for name, _data in zip(names, data):
+                    self._set_variable(name, _data, key_period_bounds)
+            return
+
+        raise TypeError(f"Invalid type for the right hand side value when trying to set variables.\n"
+                        f"Expected value of type str, int, float, list(int|float), tuple(int|float), dict(str, ...), "
+                        f"numpy array, pandas Series, pandas DataFrame or Variables.\n"
+                        f"Got value of type {type(value).__name__} instead.")
 
     def __delitem__(self, key):
         r"""
@@ -1426,13 +1951,118 @@ class Variables(CythonVariables):
             ...
         RuntimeError: Cannot delete variable(s) 'DPUG' when the subset does not cover the whole sample of the IODE Variables workspace
         """
-        CythonVariables.__delitem__(self, key)
+        names, key_periods = self._unfold_key(key)
+        if key_periods is not None:
+            names = f"'{names[0]}'" if len(names) == 1 else names
+            raise RuntimeError(f"Cannot delete variable(s) {names}.\nThe syntax 'del variables[{names}]' "
+                               f"must be used instead of 'del variables[{names}, <periods>]'")
+        if self._is_subset_over_periods:
+            names = f"'{names[0]}'" if len(names) == 1 else names
+            raise RuntimeError(f"Cannot delete variable(s) {names} when the subset does not cover the "
+                               f"whole sample of the IODE Variables workspace")
+        if key_periods is not None:
+            raise RuntimeError("Cannot select period(s) when deleting (a) variable(s)")
+        self._cython_instance.remove_objects(names)
 
-    def __binary_op_variables__(self, other: Self, op: BinaryOperation) -> Self:
-        return CythonVariables.__binary_op_variables__(self, other, op)
+    def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Self], 
+                      op: BinaryOperation, copy_self: bool) -> Self:
+        other = self._convert_values(other)    
+        _self: Variables = self.copy() if copy_self else self
 
-    def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Self], op: BinaryOperation, copy_self: bool) -> Self:
-        return CythonVariables.__binary_op__(self, other, op, copy_self)
+        if isinstance(other, (int, float)):
+            _self._cython_instance = _self._cython_instance.binary_op_scalar(other, op, copy_self)
+            return _self
+        
+        self_names = _self.names
+        self_periods = _self.periods
+        nb_periods = len(self_periods)
+
+        if isinstance(other, np.ndarray):
+            data = other
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(self_names) == 1:
+                if data.ndim != 1:
+                    raise ValueError("Expected a 1D numpy array for the right-hand side operand as the left-hand side "
+                                     "represents a single variable.")
+                if len(data) != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                     f"periods and a numpy ndarray with {len(data)} elements")
+            elif nb_periods == 1:
+                if data.ndim != 1:
+                    raise ValueError("Expected a 1D numpy array for the right-hand side operand as the left-hand side "
+                                     "represents a single period.")
+                if len(data) != len(self_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(self_names)} "
+                                     f"variables and a numpy ndarray with {len(data)} elements")
+            else:
+                if data.shape[0] != len(self_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(self_names)} "
+                                    f"variables and a numpy ndarray with {data.shape[0]} rows")
+                if data.shape[-1] != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                    f"periods and a numpy ndarray with {data.shape[-1]} columns") 
+            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            return _self
+
+        if isinstance(other, pd.DataFrame):
+            # NOTE: _check_pandas_dataframe() may squeeze the DataFrame to a Series
+            other = _self._check_pandas_dataframe(other, self_names, self_periods)
+            if isinstance(other, pd.DataFrame):
+                data = other.to_numpy(copy=False)
+                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+                if not data.flags['C_CONTIGUOUS']:
+                    data = np.ascontiguousarray(data)
+                _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+                return _self
+
+        if isinstance(other, pd.Series):
+            other = _self._check_pandas_series(other, self_names, self_periods)
+            data = other.to_numpy(copy=False)
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(self_names) == 1:
+                if len(data) != nb_periods:
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
+                                     f"periods and a pandas Series with {len(data)} elements")
+            else:
+                if len(data) != len(self_names):
+                    raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {len(self_names)} "
+                                     f"variables and a pandas Series with {len(data)} elements")
+                if nb_periods != 1:
+                    raise ValueError("Cannot perform arithmetic operation between a left-hand side representing multiple variables "
+                                     "and periods and a pandas Series")
+            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            return _self
+
+        if la is not None and isinstance(other, Array):
+            other = _self._check_larray_array(other, self_names, self_periods)
+            data = other.data
+            # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
+            if not data.flags['C_CONTIGUOUS']:
+                data = np.ascontiguousarray(data)
+            if len(self_names) == 1:
+                data = data.flatten()
+            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            return _self
+
+        if isinstance(other, Variables):
+            if len(_self) != len(other):
+                raise ValueError(f"Cannot perform arithmetic operation between two Variables with different number of variables.\n"
+                                f"Left operand has {len(_self)} variables.\nRight operand has {len(other)} variables")
+            if _self.sample != other.sample:
+                raise ValueError(f"Cannot perform arithmetic operation between two Variables with different samples.\n"
+                                f"Left operand sample: {_self.sample}\nRight operand sample: {other.sample}")
+            if len(self_names) > 1:
+                _self._check_same_names(self_names, other.names)
+            _self._cython_instance = _self._cython_instance.binary_op_variables(other._cython_instance, op, self_names, copy_self)
+            return _self
+
+        raise TypeError(f"unsupported operand type for {op.name}.\nAccepted types are: "
+                        f"'int, float, numpy ndarray, pandas Series, pandas DataFrame, larray Array "
+                        f"or iode Variables'.\nGot operand of type '{type(other).__name__}' instead.")
 
     def __add__(self, other):
         r"""
@@ -4276,7 +4906,8 @@ class Variables(CythonVariables):
         """
         return self.__binary_op__(other, BinaryOperation.OP_POW, True)
 
-    def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
+    def from_numpy(self, data: np.ndarray, vars_names: Union[str, List[str]]=None, 
+                   first_period: Union[str, Period]=None, last_period: Union[str, Period]=None):
         r"""
         Copy the numpy ndarray `array` into the IODE Variables database.
         A row of the ndarray represents a variable.
@@ -4394,7 +5025,87 @@ class Variables(CythonVariables):
         AQC           1.34    1.38    1.41    1.42    1.40    1.40    1.40    1.41    1.43    1.45    1.46
         <BLANKLINE>
         """
-        CythonVariables.from_numpy(self, data, vars_names, first_period, last_period)
+        self_names = self.names
+
+        self_first_period, self_last_period = self._get_periods_bounds()
+        self_nb_periods = self_last_period - self_first_period + 1
+
+        if self_nb_periods <= 0:
+            raise RuntimeError("The sample of the Variables database to export is empty")
+        
+        if data.ndim == 0 or data.ndim > 2:
+            raise ValueError("The numpy ndarray must be either 1D or 2D")
+
+        if vars_names is None:
+            vars_names = self_names
+        if isinstance(vars_names, str):
+            vars_names = split_list(vars_names)
+
+        # check that all names in the pandas object are present in the current subset 
+        if self.is_detached:
+            self._check_same_names(self_names, vars_names)
+
+        # value for argument 'first_period' represents a sample (range of periods)
+        if isinstance(first_period, str) and ':' in first_period:
+            first_period, last_period = first_period.split(':')
+
+        self_first_period = self.first_period
+        if first_period is None:
+            first_period = self_first_period
+        else:
+            first_period = Period(first_period)
+
+        if first_period < self_first_period:
+            raise ValueError(f"The first period {first_period} is before the first period of "
+                             f"the current Variables database {self_first_period}")
+
+        self_last_period = self.last_period
+        if last_period is None:
+            last_period = self_last_period
+        else:
+            last_period = Period(last_period)
+
+        if last_period > self_last_period:
+            raise ValueError(f"The last period {last_period} is after the last period of "
+                             f"the current Variables database {self_last_period}")
+        
+        t_first_period = self._get_real_period_position(first_period)
+        t_last_period = self._get_real_period_position(last_period)
+        nb_periods = t_last_period - t_first_period + 1
+
+        # If the ndarray is a 1D array, either `var_names` must represent 
+        # a single variable or `first_period` must be equal to `last_period`
+        if data.ndim == 1:
+            # data = single variable
+            if len(vars_names) == 1:
+                data = data.reshape(1, -1)
+            # data = single period
+            elif nb_periods == 1:
+                data = data.reshape(-1, 1)
+            else:
+                raise ValueError("When the passed numpy ndarray is 1D, either the argument "
+                                 "'vars_names' must represent a single variable or the arguments "
+                                 "'first_period' and 'last_period' must be equal")
+        
+        if len(vars_names) != data.shape[0]:
+            raise ValueError(f"The number of variables ({len(vars_names)}) to update is different "
+                             f"from the number of rows of the numpy ndarray ({data.shape[0]}).\n"
+                             f"Variables to updated are: {vars_names}")
+
+        if nb_periods != data.shape[1]:
+            raise ValueError(f"The number of periods ({nb_periods}) to update is different "
+                             f"from the number of columns of the numpy ndarray ({data.shape[1]}).\n"
+                             f"Periods to updated are: {first_period}:{last_period}")
+
+        if not data.flags['C_CONTIGUOUS']:
+            # make sure the array is C-contiguous
+            data = np.ascontiguousarray(data)
+
+        # astype(nb.float64) + np.nan -> NA
+        data = self._convert_values(data)
+
+        new_vars = set(vars_names) - set(self_names)
+        self._cython_instance.from_numpy(data, vars_names, new_vars, t_first_period, t_last_period)
 
     def to_numpy(self) -> np.ndarray:
         r"""
@@ -4503,7 +5214,7 @@ class Variables(CythonVariables):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
-        return CythonVariables.to_numpy(self)
+        return self._cython_instance.to_numpy()
 
     def __array__(self, dtype=None):
         r"""
@@ -4706,7 +5417,27 @@ class Variables(CythonVariables):
         BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
         <BLANKLINE>
         """
-        CythonVariables.from_frame(self, df)
+        # list of variable names
+        vars_names = df.index.to_list()
+
+        # list of periods
+        periods_list = df.columns.to_list()
+        first_period, last_period = periods_list[0], periods_list[-1]
+
+        if not (self.is_global_workspace or self.is_detached):
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, vars_names)
+
+        if self._is_subset_over_periods:
+            raise RuntimeError("Cannot call 'from_frame' method on a subset of the sample of the variables workspace")
+
+        # override the current sample
+        self.sample = f"{first_period}:{last_period}"
+
+        # numpy data
+        data = df.to_numpy(copy=False)
+
+        self.from_numpy(data, vars_names, first_period, last_period)
 
     def to_frame(self, vars_axis_name: str='names', time_axis_name: str='time', sample_as_floats: bool=False) -> pd.DataFrame:
         r"""
@@ -4925,7 +5656,33 @@ class Variables(CythonVariables):
         BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
         <BLANKLINE>
         """
-        CythonVariables.from_array(self, array, time_axis_name, sep)
+        if la is None:
+            raise RuntimeError("larray library not found")  
+
+        if self._is_subset_over_periods:
+            raise RuntimeError("Cannot call 'from_array' method on a subset of a workspace")
+
+        # retrieve the time_axis_name. 
+        # Raise an error if no time_axis_name is present in the array.
+        if time_axis_name not in array.axes:
+            raise ValueError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(array.axes)}.")
+        time = array.axes[time_axis_name]
+        first_period, last_period = time.labels[0], time.labels[-1]
+
+        # override the current sample
+        self.sample = f"{first_period}:{last_period}"
+        
+        # push the time axis as last axis and combine all other axes 
+        array = array.transpose(..., time_axis_name)
+        if array.ndim > 2:
+            array = array.combine_axes(array.axes[:-1], sep=sep)
+        vars_names = array.axes[0].labels
+
+        if not (self.is_global_workspace or self.is_detached):
+            # check that all names in the pandas object are present in the current subset 
+            self._check_same_names(self.names, vars_names) 
+
+        self.from_numpy(array.data, vars_names, first_period, last_period)
 
     def to_array(self, vars_axis_name: str='names', time_axis_name: str='time', sample_as_floats: bool=False) -> Array:
         r"""
@@ -5089,25 +5846,28 @@ class Variables(CythonVariables):
         >>> variables["ACAF", "1990Y1"]
         23.771
         """
-        return CythonVariables.get_mode(self)
+        return self._cython_instance.get_mode()
 
     @mode.setter
     def mode(self, value: Union[VarsMode, str]):
-        CythonVariables.set_mode(self, value)
+        if isinstance(value, str):
+            value = value.upper()
+            value = VarsMode[value]
+        self._cython_instance.set_mode(int(value))
 
     @property
     def first_period(self) -> Period:
         r"""
         First period of the current Variables database.
         """
-        return CythonVariables.get_first_period(self)
+        return self._cython_instance.get_first_period()
 
     @property
     def last_period(self) -> Period:
         r"""
         Last period of the current Variables database.
         """
-        return CythonVariables.get_last_period(self)
+        return self._cython_instance.get_last_period()
 
     @property
     def sample(self) -> Sample:
@@ -5234,11 +5994,27 @@ class Variables(CythonVariables):
         ACAF            na      na    1.21  ...  -37.83     na       na
         <BLANKLINE>
         """
-        return CythonVariables.get_sample(self)
+        return self._cython_instance.get_sample()
 
     @sample.setter
     def sample(self, value: Union[str, Tuple[Union[str, Period], Union[str, Period]]]):
-        CythonVariables.set_sample(self, value)
+        if self._is_subset_over_periods:
+            raise RuntimeError("Changing the sample on a subset of the Variables workspace is not allowed.") 
+
+        if isinstance(value, str):
+            if ':' not in value:
+                raise ValueError(f"sample: Missing colon ':' in the definition of the new sample. Got value '{value}'.")
+            from_period, to_period = value.split(':')
+        elif isinstance(value, tuple):
+            if not len(value) == 2:
+                raise ValueError(f"'sample': Expected two values: from_period, to_period. Got {len(value)} values.")
+            from_period, to_period = value
+            if isinstance(from_period, Period):
+                from_period = str(from_period)
+            if isinstance(to_period, Period):
+                to_period = str(to_period)
+
+        self._cython_instance.set_sample(from_period, to_period)
 
     @property
     def nb_periods(self) -> int:
@@ -5351,11 +6127,13 @@ class Variables(CythonVariables):
         >>> variables.threshold
         1e-05
         """
-        return CythonVariables.get_threshold(self)
+        return self._cython_instance.get_threshold()
 
     @threshold.setter
     def threshold(self, value: float):
-        CythonVariables.set_threshold(self, value)
+        ok = self._cython_instance.set_threshold(value)
+        if not ok:
+            raise ValueError(f"threshold: Invalid value '{value}'.")
 
     @property
     def df(self) -> pd.DataFrame:
@@ -5519,7 +6297,20 @@ class Variables(CythonVariables):
         >>> variables.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS
         [1990.0, 1991.0, ..., 1999.0, 2000.0]
         """
-        return CythonVariables.periods_subset(self, from_period, to_period, as_float)
+        # self.sample calls self._maybe_update_subset_sample()
+        sample = self.sample
+        if from_period is None or to_period is None:
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        return self._cython_instance.periods_subset(from_period, to_period, as_float)
 
     def copy_from(self, input_files: Union[str, List[str]], from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, names: Union[str, List[str]]='*'):
         r"""
@@ -5537,7 +6328,22 @@ class Variables(CythonVariables):
             list of variables to copy from the input file(s).
             Defaults to load all variables from the input file(s). 
         """
-        CythonVariables.copy_from(self, input_files, from_period, to_period, names)
+        input_files, names = self._copy_from(input_files, names)
+
+        # self.sample calls self._maybe_update_subset_sample()
+        sample = self.sample
+        if from_period is None or to_period is None:
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+        
+        self._cython_instance.copy_from(input_files, from_period, to_period, names)
 
     def low_to_high(self, type_of_series: Union[LowToHighType, str], method: Union[LowToHighMethod, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         r"""
@@ -5746,7 +6552,29 @@ class Variables(CythonVariables):
         ACAG          8.11    8.11    8.11    8.11
         <BLANKLINE>
         """
-        CythonVariables.low_to_high(self, type_of_series, method, filepath, var_list)
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        if not filepath.exists():
+            raise ValueError(f"file '{str(filepath)}' not found.")
+        filepath = str(filepath)
+
+        if isinstance(type_of_series, str):
+            type_of_series = type_of_series.upper()
+            type_of_series = LowToHighType[type_of_series]
+        type_of_series = int(type_of_series)
+
+        if isinstance(method, str):
+            method = method.upper()
+            if len(method) > 1:
+                method = LowToHighMethod[method]
+        else:
+            method = method.value
+
+        if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
+            all(isinstance(item, str) for item in var_list):
+            var_list = ';'.join(var_list)
+
+        self._cython_instance.low_to_high(type_of_series, method, filepath, var_list)
 
     def high_to_low(self, type_of_series: Union[HighToLowType, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         r"""
@@ -5872,9 +6700,25 @@ class Variables(CythonVariables):
         ACAG         28.25   29.28   30.32   31.37   32.42
         <BLANKLINE>
         """
-        CythonVariables.high_to_low(self, type_of_series, filepath, var_list)
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        if not filepath.exists():
+            raise ValueError(f"file '{str(filepath)}' not found.")
+        filepath = str(filepath)
 
-    def extrapolate(self, method: Union[SimulationInitialization, str], from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, variables_list: Union[str, List[str]]=None):
+        if isinstance(type_of_series, str):
+            type_of_series = type_of_series.upper()
+            type_of_series = LowToHighType[type_of_series]
+        type_of_series = int(type_of_series)
+
+        if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
+            all(isinstance(item, str) for item in var_list):
+            var_list = ';'.join(var_list)
+
+        self._cython_instance.high_to_low(type_of_series, filepath, var_list)
+
+    def extrapolate(self, method: Union[SimulationInitialization, str], from_period: Union[str, Period]=None, 
+                    to_period: Union[str, Period]=None, variables_list: Union[str, List[str]]=None):
         r"""
         Extrapolate variables using one the method described below, based on previous periods.
 
@@ -6040,7 +6884,31 @@ class Variables(CythonVariables):
         ACAF          3.00    4.00    5.00    6.00    7.00    8.00    9.00
         <BLANKLINE>
         """
-        CythonVariables.extrapolate(self, method, from_period, to_period, variables_list)
+        if isinstance(method, str):
+            method = method.upper()
+            method = SimulationInitialization[method]
+        method = int(method)
+
+        if from_period is None or to_period is None:
+            sample = self.sample
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
+
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        if variables_list is None:
+            variables_list = ''
+        if not isinstance(variables_list, str) and isinstance(variables_list, Iterable) and \
+            all(isinstance(name, str) for name in variables_list):
+            variables_list = ';'.join(variables_list)
+
+        self._cython_instance.extrapolate(method, from_period, to_period, variables_list)
 
     def seasonal_adjustment(self, input_file: str, eps_test: float=5.0, series: Union[str, List[str]]=None):
         r"""
@@ -6077,7 +6945,19 @@ class Variables(CythonVariables):
         --------
         Variables.trend_correction
         """
-        CythonVariables.seasonal_adjustment(self, input_file, eps_test, series)
+        if isinstance(input_file, str):
+            input_file = Path(input_file)
+        if not input_file.exists():
+            raise ValueError(f"file '{str(input_file)}' not found.")
+        input_file = str(input_file)
+
+        if series is None:
+            series = ''
+        if not isinstance(series, str) and isinstance(series, Iterable) and \
+            all(isinstance(name, str) for name in series):
+            series = ';'.join(series)
+        
+        self._cython_instance.seasonal_adjustment(input_file, eps_test, series)
 
     def trend_correction(self, input_file: str, lambda_: float, series: Union[str, List[str]]=None, log: bool=False):
         r"""
@@ -6105,7 +6985,19 @@ class Variables(CythonVariables):
         --------
         Variables.seasonal_adjustment
         """
-        CythonVariables.trend_correction(self, input_file, lambda_, series, log)
+        if isinstance(input_file, str):
+            input_file = Path(input_file)
+        if not input_file.exists():
+            raise ValueError(f"file '{str(input_file)}' not found.")
+        input_file = str(input_file)
+
+        if series is None:
+            series = ''
+        if not isinstance(series, str) and isinstance(series, Iterable) and \
+            all(isinstance(name, str) for name in series):
+            series = ';'.join(series)
+        
+        self._cython_instance.trend_correction(input_file, lambda_, series, log)
 
     @classmethod
     def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], from_period: Union[str, Period], to_period: Union[str, Period], debug_file: Union[str, Path]=None):
@@ -6165,6 +7057,8 @@ class Variables(CythonVariables):
         --------
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR, variables, ImportFormats
+        >>> output_dir = getfixture('tmp_path')
+
         >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.av.ref"
         >>> input_format = ImportFormats.ASCII
         >>> save_file = str(output_dir / "imported_var.var")
@@ -6248,10 +7142,39 @@ class Variables(CythonVariables):
         NAWRU -> UU_NAWRU   (Rule UU_++++++++++++++++)
         WBU -> UU_WBU       (Rule UU_++++++++++++++++)
         """
-        CythonVariables.convert_file(input_file, input_format, save_file, rule_file, from_period, to_period, debug_file)
+        # $FileImportCmt format rule_file input_file language [debug_file]
+        input_file = check_filepath(input_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_import_formats: str = ''.join([item.name[0] for item in list(ImportFormats)])
+        if isinstance(input_format, ImportFormats):
+            input_format = input_format.name[0]
+        if input_format not in _c_import_formats:
+            raise ValueError(f"Invalid input format '{input_format}'. "
+                             f"Possible values are: {_c_import_formats}")
+        
+        save_file = check_filepath(save_file, IodeFileType.FILE_VARIABLES, file_must_exist=False)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        # $FileImportVar format rule infile outfile from to  [trace]
+        args = f"{input_format} {rule_file} {input_file} {save_file} {from_period} {to_period}"
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+            args += " " + debug_file
+
+        res = CythonVariables.convert_file(args)
+        if res < 0:
+            raise RuntimeError(f"Cannot import variables from file '{input_file}'")
 
     @classmethod
-    def export_as_file(cls, variables_file: Union[str, Path], rule_file: Union[str, Path], save_file: Union[str, Path], export_format: Union[str, ExportFormats], from_period: Union[str, Period], to_period: Union[str, Period], comments_file: Union[str, Path], nan_value: str='#N/A', separator: str=';', debug_file: Union[str, Path]=None):
+    def export_as_file(cls, variables_file: Union[str, Path], rule_file: Union[str, Path], save_file: Union[str, Path], 
+                       export_format: Union[str, ExportFormats], from_period: Union[str, Period], to_period: Union[str, Period], 
+                       comments_file: Union[str, Path], nan_value: str='#N/A', separator: str=';', debug_file: Union[str, Path]=None):
         r"""
         Convert an IODE Variables file to a format used by some other programs. 
         The possible output formats are:
@@ -6318,6 +7241,8 @@ class Variables(CythonVariables):
         --------
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR, comments, variables, ExportFormats
+        >>> output_dir = getfixture('tmp_path')
+
         >>> variables_file = f"{SAMPLE_DATA_DIR}/fun.av"
         >>> comments_file = f"{SAMPLE_DATA_DIR}/fun.ac"
         >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
@@ -6530,7 +7455,32 @@ class Variables(CythonVariables):
         6650.3069 6861.5824 7072.7855
         ;
         """
-        CythonVariables.export_as_file(variables_file, rule_file, save_file, export_format, from_period, to_period, comments_file, nan_value, separator, debug_file)
+        variables_file = check_filepath(variables_file, IodeFileType.FILE_VARIABLES, file_must_exist=True)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+        save_file = check_filepath(save_file, IodeFileType.FILE_ANY, file_must_exist=False)
+
+        if isinstance(export_format, str):
+            export_format = ExportFormats[export_format.upper()]
+        export_format = int(export_format)
+
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        if comments_file:
+            comments_file = check_filepath(comments_file, IodeFileType.FILE_COMMENTS, file_must_exist=True)
+        else:
+            comments_file = ""
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+        else:
+            debug_file = ""
+        
+        res = CythonVariables.export_as_file(variables_file, rule_file, save_file, export_format, from_period, to_period, comments_file, nan_value, separator, debug_file)
+        if res < 0:
+            raise RuntimeError(f"Cannot export the variables file '{variables_file}'")
 
     def _str_header(self) -> str:
         s = super()._str_header() 
@@ -6539,7 +7489,7 @@ class Variables(CythonVariables):
         return s
 
     def _str_table(self, names: List[str]) -> str:
-        return CythonVariables._str_table(self, names)
+        return self._cython_instance._str_table(names)
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
@@ -6588,6 +7538,7 @@ class Variables(CythonVariables):
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> output_dir = getfixture('tmp_path')
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
@@ -6606,7 +7557,7 @@ class Variables(CythonVariables):
         "ACAG","#N/A","#N/A","#N/A","#N/A",...,"30.323961","31.370139","32.420299","33.469601",
         <BLANKLINE>
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -6656,7 +7607,7 @@ class Variables(CythonVariables):
         >>> original_hash == hash(variables)
         True
         """
-        return CythonVariables.__hash__(self)
+        return super().__hash__()
 
 
 variables: Variables = Variables.get_instance()

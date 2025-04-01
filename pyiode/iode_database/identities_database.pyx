@@ -16,14 +16,14 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 import pandas as pd
 
 
-cdef class Identities(IodeDatabase):
+cdef class Identities(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBIdentities* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Identities:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_identities
+        self.abstract_db_ptr = &cpp_global_identities
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -44,53 +44,36 @@ cdef class Identities(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_identities
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Identities) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_identities
-        instance.abstract_db_ptr = &cpp_global_identities
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBIdentities* kdb = new CKDBIdentities(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Identities:
-        subset_db: Identities = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Identities, pattern: str, copy: bool) -> Identities:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
-    def _get_object(self, key: Union[str, int], identity: Identity) -> Identity:
+    def _get_object(self, name: str, identity: Identity) -> Identity:
         cdef CIdentity* c_identity
-        if isinstance(key, int):
-            c_identity = self.database_ptr.get(<int>key)
-        else:
-            key  = key.strip()
-            c_identity = self.database_ptr.get(<string>(key.encode()))
+        name  = name.strip()
+        c_identity = self.database_ptr.get(name.encode())
         
         identity.c_identity = c_identity
         # self.database_ptr.get() does not allocate a new C++ Identity instance
         identity.ptr_owner = <bint>False
         return identity
 
-    def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
+    def _set_object(self, name: str, value: Union[str, Identity]):
         if isinstance(value, Identity):
             value = str(value)
         value = value.strip()
 
-        if isinstance(key, int):
-            self.database_ptr.update(<int>key, <string>(value.encode()))
+        name = name.strip()
+        if self.database_ptr.contains(name.encode()):
+            self.database_ptr.update(name.encode(), <string>(value.encode()))
         else:
-            key = key.strip()
-            if self.database_ptr.contains(key.encode()):
-                self.database_ptr.update(<string>(key.encode()), <string>(value.encode()))
-            else:
-                self.database_ptr.add(key.encode(), value.encode())
+            self.database_ptr.add(name.encode(), value.encode())
 
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, scalar_files: Union[str, List[str]]=None, trace: bool=False):

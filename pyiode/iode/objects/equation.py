@@ -1,4 +1,5 @@
 import sys
+import warnings
 from copy import copy
 from typing import Union, Tuple, List, Dict, Any
 if sys.version_info.minor >= 11:
@@ -77,7 +78,19 @@ class Equation(CythonEquation):
              from_period = '1960Y1',
              to_period = '2015Y1')
     """
-    def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str]=EqMethod.LSQ, from_period: Union[str, Period]='', to_period: Union[str, Period]='', comment: str='', instruments: str='', block: str='') -> Self:
+    def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str]=EqMethod.LSQ, from_period: Union[str, Period]=None, 
+                 to_period: Union[str, Period]=None, comment: str='', instruments: str='', block: str='') -> Self:
+        if from_period is None or to_period is None:
+            from iode.iode_database.variables_database import variables
+            vars_sample = variables.sample
+            if vars_sample.start is None or vars_sample.end is None:
+                warnings.warn("The sample of the Variables workspace is not defined. Set estimation sample as undefined.")
+                from_period, to_period = '', ''
+            else:
+                if from_period is None:
+                    from_period = vars_sample.start
+                if to_period is None:
+                    to_period = vars_sample.end
         CythonEquation.__init__(self, endogenous, lec, method, from_period, to_period, comment, instruments, block)
 
     @classmethod

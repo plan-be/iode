@@ -8,12 +8,11 @@ else:
 
 import pandas as pd
 from iode.util import table2str, JUSTIFY
-
-from iode.iode_cython import PositionalIndexer
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Lists as CythonLists
 
 
-class Lists(CythonLists):
+class Lists(IodeDatabase):
     r"""
     IODE Lists database. 
 
@@ -108,25 +107,19 @@ class Lists(CythonLists):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonLists.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonLists()
         return instance
 
     def _load(self, filepath: str):
-        CythonLists._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonLists._subset(self, pattern, copy)
+        instance = Lists.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     @property
     def i(self) -> PositionalIndexer:
@@ -157,10 +150,14 @@ class Lists(CythonLists):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> List[str]:
-        return CythonLists._get_object(self, key)
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
+        return self._cython_instance._get_object(name)
 
     def _set_object(self, key: Union[str, int], value: Union[str, List[str]]):
-        CythonLists._set_object(self, key, value)
+        name = self._single_object_key_to_name(key)
+        self._cython_instance._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Self]:
         r"""
@@ -430,7 +427,8 @@ class Lists(CythonLists):
             list of lists to copy from the input file(s).
             Defaults to load all lists from the input file(s). 
         """
-        CythonLists.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -614,7 +612,7 @@ class Lists(CythonLists):
         columns = {"name": names, "lists": ['; '.join(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lists": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list IODE lists defined by `names` to the file `filepath` using the format `format`.
 
@@ -661,6 +659,7 @@ class Lists(CythonLists):
         Examples
         --------
         >>> from iode import lists, SAMPLE_DATA_DIR
+        >>> output_dir = getfixture('tmp_path')
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded
@@ -677,7 +676,7 @@ class Lists(CythonLists):
         " - IDT : OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR; WBGR;YSFICR;YSEFPR"
         " - MAINEQ : W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_"
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -727,7 +726,7 @@ class Lists(CythonLists):
         >>> original_hash == hash(lists)
         True
         """
-        return CythonLists.__hash__(self)
+        return super().__hash__()
 
 
 lists: Lists = Lists.get_instance()

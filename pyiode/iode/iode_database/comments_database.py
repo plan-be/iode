@@ -9,11 +9,12 @@ else:
 
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
-from iode.iode_cython import PositionalIndexer, ImportFormats, TableLang
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
+from iode.iode_cython import  ImportFormats, TableLang
 from iode.iode_cython import Comments as CythonComments
 
 
-class Comments(CythonComments):
+class Comments(IodeDatabase):
     r"""
     IODE Comments database. 
 
@@ -62,25 +63,19 @@ class Comments(CythonComments):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonComments.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonComments()
         return instance
 
     def _load(self, filepath: str):
-        CythonComments._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonComments._subset(self, pattern, copy)
+        instance = Comments.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     @property
     def i(self) -> PositionalIndexer:
@@ -111,10 +106,14 @@ class Comments(CythonComments):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> str:
-        return CythonComments._get_object(self, key)
+        name = self._single_object_key_to_name(key)
+        if not name in self:
+            raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
+        return self._cython_instance._get_object(name)
 
     def _set_object(self, key: Union[str, int], value: str):
-        CythonComments._set_object(self, key, value)
+        name = self._single_object_key_to_name(key)
+        self._cython_instance._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Self]:
         r"""
@@ -391,7 +390,8 @@ class Comments(CythonComments):
         >>> len(comments)
         317
         """
-        CythonComments.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -563,7 +563,7 @@ class Comments(CythonComments):
         return self.to_series()
 
     @classmethod
-    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], lang: Union[str, TableLang]=TableLang.ENGLISH, debug_file: Union[str, Path]=None) -> None:
+    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], lang: Union[str, TableLang]=TableLang.ENGLISH, debug_file: Union[str, Path]=None):
         r"""
         Convert an external file representing IODE comments to an IODE comments file (.cmt). 
         The possible formats for the input file are:
@@ -622,6 +622,8 @@ class Comments(CythonComments):
         --------
         >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR, comments, ImportFormats
+        >>> output_dir = getfixture('tmp_path')
+
         >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.ac.ref"
         >>> input_format = ImportFormats.ASCII
         >>> save_file = str(output_dir / "imported_cmt.cmt")
@@ -697,7 +699,7 @@ class Comments(CythonComments):
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "comments": JUSTIFY.LEFT})
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list comments defined by `names` to the file `filepath` using the format `format`.
 
@@ -744,6 +746,7 @@ class Comments(CythonComments):
         Examples
         --------
         >>> from iode import comments, SAMPLE_DATA_DIR
+        >>> output_dir = getfixture('tmp_path')
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded
@@ -759,7 +762,7 @@ class Comments(CythonComments):
         " - ACAG : Totale overheid : netto ontvangen kapitaaloverdrachten."
         <BLANKLINE>
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -809,7 +812,7 @@ class Comments(CythonComments):
         >>> original_hash == hash(comments)
         True
         """
-        return CythonComments.__hash__(self)
+        return super().__hash__()
 
 
 comments: Comments = Comments.get_instance()
