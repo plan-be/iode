@@ -19,15 +19,15 @@ from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTit
 from iode.common import PrintTablesAs
 
 
-cdef class Tables(IodeDatabase):
+cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBTables* database_ptr
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_tables
+        self.abstract_db_ptr = &cpp_global_tables
         self.print_as = B_TBL_TITLE
 
     def __dealloc__(self):
@@ -50,21 +50,13 @@ cdef class Tables(IodeDatabase):
         wrapper.print_as = B_TBL_TITLE
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Tables) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_tables
-        instance.abstract_db_ptr = &cpp_global_tables
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBTables* kdb = new CKDBTables(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Tables:
-        subset_db: Tables = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Tables, pattern: str, copy: bool) -> Tables:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
     def get_title(self, key: Union[str, int]) -> str:
         if isinstance(key, int):
@@ -120,10 +112,7 @@ cdef class Tables(IodeDatabase):
             c_table = (<Table>table).c_table
             self.database_ptr.add(<string>(key.encode()), dereference(c_table))
 
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def _str_table(self, names: List[str]) -> str:
@@ -149,7 +138,7 @@ cdef class Tables(IodeDatabase):
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4) -> None:
         cdef char c_format = b'\0'
         if self.print_tables_as != PrintTablesAs.COMPUTED:
-            self._print_to_file(filepath, names, format)
+            self._cython_instance._print_to_file(filepath, names, format)
         else:
             if format is not None:
                 if not len(format):

@@ -21,14 +21,14 @@ import pandas as pd
 from iode.common import PrintEquationsAs, PrintEquationsLecAs
 
 
-cdef class Equations(IodeDatabase):
+cdef class Equations(CythonIodeDatabase):
     cdef bint ptr_owner
     cdef CKDBEquations* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Equations:
-        self.database_ptr = NULL
-        self.abstract_db_ptr = NULL
         self.ptr_owner = False
+        self.database_ptr = &cpp_global_equations
+        self.abstract_db_ptr = &cpp_global_equations
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -49,21 +49,13 @@ cdef class Equations(IodeDatabase):
             wrapper.abstract_db_ptr = &cpp_global_equations
         return wrapper
 
-    @staticmethod
-    def __init_instance(instance: Equations) -> Self:
-        instance.ptr_owner = False
-        instance.database_ptr = &cpp_global_equations
-        instance.abstract_db_ptr = &cpp_global_equations
-        return instance
-
     def _load(self, filepath: str):
         cdef CKDBEquations* kdb = new CKDBEquations(filepath.encode())
         del kdb
 
-    def _subset(self, pattern: str, copy: bool) -> Equations:
-        subset_db: Equations = self._new_instance()
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+    def initialize_subset(self, cython_instance: Equations, pattern: str, copy: bool) -> Equations:
+        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return cython_instance
 
     def get_lec(self, key: Union[str, int]) -> str:
         if isinstance(key, int):
@@ -184,10 +176,7 @@ cdef class Equations(IodeDatabase):
             warnings.warn(str(e), RuntimeWarning)
             return False
 
-    def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
-        if not (self.is_global_workspace or self.is_detached):
-            raise RuntimeError("Cannot call 'copy_from' method on a subset of a workspace")
-        input_files, names = self._copy_from(input_files, names)
+    def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def get_print_equations_as(self) -> PrintEquationsAs:

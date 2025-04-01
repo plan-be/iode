@@ -9,13 +9,13 @@ else:
 import pandas as pd
 from iode.util import table2str, JUSTIFY
 from iode.objects.scalar import Scalar
-from iode.iode_cython import PositionalIndexer
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Scalars as CythonScalars
 
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
 
 
-class Scalars(CythonScalars):
+class Scalars(IodeDatabase):
     r"""
     IODE Scalars database. 
 
@@ -63,25 +63,19 @@ class Scalars(CythonScalars):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonScalars.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonScalars()
         return instance
 
     def _load(self, filepath: str):
-        CythonScalars._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonScalars._subset(self, pattern, copy)
+        instance = Scalars.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     @property
     def i(self) -> PositionalIndexer:
@@ -112,11 +106,12 @@ class Scalars(CythonScalars):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Scalar:
+        key = self._check_key_single_object(key)
         scalar = Scalar._new_instance()
-        return CythonScalars._get_object(self, key, scalar)
+        return self._cython_instance._get_object(key, scalar)
 
     def _set_object(self, key: Union[str, int], value):
-        CythonScalars._set_object(self, key, value)
+        self._cython_instance._set_object(key, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Scalar, Self]:
         r"""
@@ -422,7 +417,8 @@ class Scalars(CythonScalars):
             list of scalars to copy from the input file(s).
             Defaults to load all scalars from the input file(s). 
         """
-        CythonScalars.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -744,7 +740,7 @@ class Scalars(CythonScalars):
     def print_nb_decimals(self, value: int):
         self._set_print_nb_decimals(value)
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list scalars defined by `names` to the file `filepath` using the format `format`.
 
@@ -796,14 +792,14 @@ class Scalars(CythonScalars):
         161 objects loaded
         >>> scalars.print_nb_decimals = 4
 
-        >>> scalars.print_to_file(output_dir / "scalars.csv", "a*")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.print_to_file("scalars.csv", "a*")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Printing IODE objects definition to file '...scalars.csv'...
         Printing acaf1 ...
         Printing acaf2 ...
         Printing acaf3 ...
         Printing acaf4 ...
         Print done
-        >>> with open(output_dir / "scalars.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("scalars.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - acaf1 : 0.0158 (1, 0.0014, 11.5206)"
@@ -812,7 +808,7 @@ class Scalars(CythonScalars):
         " - acaf4 : -0.0085 (1, 0.0021, -4.0825)"
         <BLANKLINE>
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -868,7 +864,7 @@ class Scalars(CythonScalars):
         >>> original_hash == hash(scalars)
         True
         """
-        return CythonScalars.__hash__(self)
+        return super().__hash__()
 
 
 scalars: Scalars = Scalars.get_instance()

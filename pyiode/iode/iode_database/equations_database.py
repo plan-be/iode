@@ -8,16 +8,17 @@ else:
 
 import pandas as pd
 from iode.common import EqTest, PrintEquationsAs, PrintEquationsLecAs
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.util import join_lines, table2str, JUSTIFY
 from iode.objects.equation import Equation
 
-from iode.iode_cython import PositionalIndexer, Period
+from iode.iode_cython import  Period
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
 
 
-class Equations(CythonEquations):
+class Equations(IodeDatabase):
     r"""
     IODE Equations database. 
 
@@ -65,25 +66,19 @@ class Equations(CythonEquations):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonEquations.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonEquations()
         return instance
 
     def _load(self, filepath: str):
-        CythonEquations._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonEquations._subset(self, pattern, copy)
+        instance = Equations.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     def get_lec(self, key: Union[str, int]) -> str:
         r"""
@@ -109,7 +104,7 @@ class Equations(CythonEquations):
         >>> equations.get_lec(0)       # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        return CythonEquations.get_lec(self, key)
+        return self._cython_instance.get_lec(key)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -170,11 +165,12 @@ class Equations(CythonEquations):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Equation:
+        key = self._check_key_single_object(key)
         eq = Equation._new_instance()
-        return CythonEquations._get_object(self, key, eq)
+        return self._cython_instance._get_object(key, eq)
 
     def _set_object(self, key: Union[str, int], value):
-        CythonEquations._set_object(self, key, value)
+        self._cython_instance._set_object(key, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Self]:
         r"""
@@ -526,7 +522,7 @@ class Equations(CythonEquations):
         >>> equations["A*"].coefficients
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return self._coefficients()
+        return super()._coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -543,7 +539,7 @@ class Equations(CythonEquations):
         >>> equations["A*"].variables
         ['ACAF', 'ACAG', 'AOUC', 'GOSF', 'PM', 'QL', 'TIME', 'VAF', 'VAFF', 'VBBP', 'VM', 'WCRH']
         """
-        return self._variables()
+        return super()._variables()
 
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None) -> bool:
         r"""
@@ -846,7 +842,7 @@ class Equations(CythonEquations):
         _YRES1       -0.01    0.02   -0.02  ...   -0.00    0.01   -0.03
         <BLANKLINE>
         """
-        return CythonEquations.estimate(self, from_period, to_period, list_eqs)
+        return self._cython_instance.estimate(from_period, to_period, list_eqs)
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
@@ -859,9 +855,9 @@ class Equations(CythonEquations):
         names: str or list(str)
             list of equations to copy from the input file(s).
             Defaults to load all equations from the input file(s). 
-        
         """
-        CythonEquations.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -1468,11 +1464,11 @@ class Equations(CythonEquations):
         >>> equations.print_nb_decimals
         4
         """
-        return self._get_print_nb_decimals()
+        return self._cython_instance._get_print_nb_decimals()
 
     @print_nb_decimals.setter
     def print_nb_decimals(self, value: int):
-        self._set_print_nb_decimals(value)
+        self._cython_instance._set_print_nb_decimals(value)
 
     @property
     def print_equations_as(self) -> PrintEquationsAs:
@@ -1499,11 +1495,11 @@ class Equations(CythonEquations):
         >>> equations.print_equations_as
         <PrintEquationsAs.EQ_COMMENTS_ESTIMATION: 2>
         """
-        return CythonEquations.get_print_equations_as(self)
+        return self._cython_instance.get_print_equations_as()
 
     @print_equations_as.setter
     def print_equations_as(self, value: Union[PrintEquationsAs, str]):
-        CythonEquations.set_print_equations_as(self, value)
+        self._cython_instance.set_print_equations_as(value)
 
     @property
     def print_equations_lec_as(self) -> PrintEquationsLecAs:
@@ -1533,11 +1529,11 @@ class Equations(CythonEquations):
         >>> equations.print_equations_lec_as
         <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
         """
-        return CythonEquations.get_print_equations_lec_as(self)
+        return self._cython_instance.get_print_equations_lec_as()
 
     @print_equations_lec_as.setter
     def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
-        CythonEquations.set_print_equations_lec_as(self, value)
+        self._cython_instance.set_print_equations_lec_as(value)
 
     @property
     def print_equations_lec_as(self) -> PrintEquationsLecAs:
@@ -1567,13 +1563,13 @@ class Equations(CythonEquations):
         >>> equations.print_equations_lec_as
         <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
         """
-        return CythonEquations.get_print_equations_lec_as(self)
+        return self._cython_instance.get_print_equations_lec_as()
 
     @print_equations_lec_as.setter
     def print_equations_lec_as(self, value: Union[PrintEquationsLecAs, str]):
-        CythonEquations.set_print_equations_lec_as(self, value)
+        self._cython_instance.set_print_equations_lec_as(value)
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""
         Print the list equations defined by `names` to the file `filepath` using the format `format`.
 
@@ -1628,12 +1624,12 @@ class Equations(CythonEquations):
         
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_only.csv", ["ACAF", "ACAG"])              # doctest: +ELLIPSIS
+        >>> equations.print_to_file("equations_lec_only.csv", ["ACAF", "ACAG"])              # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_only.csv'...
         Printing ACAF ...
         Printing ACAG ...
         Print done
-        >>> with open(output_dir / "equations_lec_only.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("equations_lec_only.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
@@ -1641,12 +1637,12 @@ class Equations(CythonEquations):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES
-        >>> equations.print_to_file(output_dir / "equations_coeffs_as_values.csv", ["ACAF", "ACAG"])      # doctest: +ELLIPSIS
+        >>> equations.print_to_file("equations_coeffs_as_values.csv", ["ACAF", "ACAG"])      # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_coeffs_as_values.csv'...
         Printing ACAF ...
         Printing ACAG ...
         Print done
-        >>> with open(output_dir / "equations_coeffs_as_values.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("equations_coeffs_as_values.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - (ACAF/VAF[-1 ]) := 0.0158 + -0.0000*GOSF[-1 ] + -0.0085*(TIME= 1995)"
@@ -1655,12 +1651,12 @@ class Equations(CythonEquations):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_ONLY
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
-        >>> equations.print_to_file(output_dir / "equations_coeffs_ttest.csv", ["ACAF", "ACAG"])          # doctest: +ELLIPSIS
+        >>> equations.print_to_file("equations_coeffs_ttest.csv", ["ACAF", "ACAG"])          # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_coeffs_ttest.csv'...
         Printing ACAF ...
         Printing ACAG ...
         Print done
-        >>> with open(output_dir / "equations_coeffs_ttest.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("equations_coeffs_ttest.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - (ACAF/VAF[-1 ]) := 0.0158(11.5206)  + -0.0000(-5.3691) *GOSF[-1 ] + -0.0085(-4.0825) *(TIME= 1995)"
@@ -1669,12 +1665,12 @@ class Equations(CythonEquations):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_cmt.csv", ["ACAF", "ACAG"])               # doctest: +ELLIPSIS
+        >>> equations.print_to_file("equations_lec_cmt.csv", ["ACAF", "ACAG"])               # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_cmt.csv'...
         Printing ACAF ...
         Printing ACAG ...
         Print done
-        >>> with open(output_dir / "equations_lec_cmt.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("equations_lec_cmt.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
@@ -1682,12 +1678,12 @@ class Equations(CythonEquations):
 
         >>> equations.print_equations_as = PrintEquationsAs.EQ_COMMENTS_ESTIMATION
         >>> equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS
-        >>> equations.print_to_file(output_dir / "equations_lec_cmt_estim.csv", ["ACAF", "ACAG"])         # doctest: +ELLIPSIS
+        >>> equations.print_to_file("equations_lec_cmt_estim.csv", ["ACAF", "ACAG"])         # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...equations_lec_cmt_estim.csv'...
         Printing ACAF ...
         Printing ACAG ...
         Print done
-        >>> with open(output_dir / "equations_lec_cmt_estim.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("equations_lec_cmt_estim.csv") as f:                     # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         " - (ACAF/VAF[-1 ]) := acaf1 + acaf2*GOSF[-1 ] + acaf4*(TIME= 1995)"
@@ -1709,7 +1705,7 @@ class Equations(CythonEquations):
         " - ACAG := ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )"        
         <BLANKLINE>
         """
-        self._print_to_file(filepath, names, format)
+        super().print_to_file(filepath, names, format)
 
     def __hash__(self) -> int:
         r"""
@@ -1754,7 +1750,7 @@ class Equations(CythonEquations):
         >>> original_hash == hash(equations)
         True
         """
-        return CythonEquations.__hash__(self)
+        return super().__hash__()
 
 
 equations: Equations = Equations.get_instance()

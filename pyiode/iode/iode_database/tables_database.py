@@ -9,11 +9,11 @@ else:
 
 from iode.common import PrintTablesAs
 from iode.objects.table import Table
-from iode.iode_cython import PositionalIndexer
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Tables as CythonTables
 
 
-class Tables(CythonTables):
+class Tables(IodeDatabase):
     r"""
     IODE Tables database. 
 
@@ -61,25 +61,19 @@ class Tables(CythonTables):
     def __init__(self, filepath: str=None):
         raise TypeError("This class cannot be instantiated directly.")
 
-    @staticmethod
-    def __init_instance(instance: Self) -> Self:
-        return CythonTables.__init_instance(instance)
-
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        return cls.__init_instance(instance)
-
-    @classmethod
-    def _new_instance(cls) -> Self:
-        instance = cls.__new__(cls)
+        instance._cython_instance = CythonTables()
         return instance
 
     def _load(self, filepath: str):
-        CythonTables._load(self, filepath)
+        self._cython_instance._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        return CythonTables._subset(self, pattern, copy)
+        instance = Tables.get_instance()
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        return instance
 
     def get_title(self, key: Union[str, int]) -> str:
         r"""
@@ -105,7 +99,7 @@ class Tables(CythonTables):
         >>> tables.get_title(0)
         'Déterminants de la croissance de K'
         """
-        return CythonTables.get_title(self, key)
+        return self._cython_instance.get_title(self, key)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -234,11 +228,12 @@ class Tables(CythonTables):
         return PositionalIndexer(self)
 
     def _get_object(self, key: Union[str, int]) -> Table:
+        key = self._check_key_single_object(key)
         table = Table._new_instance()
-        return CythonTables._get_object(self, key, table)
+        return self._cython_instance._get_object(key, table)
 
     def _set_object(self, key: Union[str, int], value):
-        CythonTables._set_object(self, key, value)
+        self._cython_instance._set_object(key, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
         r"""
@@ -802,10 +797,11 @@ class Tables(CythonTables):
             list of tables to copy from the input file(s).
             Defaults to load all tables from the input file(s). 
         """
-        CythonTables.copy_from(self, input_files, names)
+        input_files, names = self._copy_from(input_files, names)
+        self._cython_instance.copy_from(input_files, names)
 
     def _str_table(self, names: List[str]) -> str:
-        return CythonTables._str_table(self, names)
+        return self._cython_instance._str_table(self, names)
 
     @property
     def print_nb_decimals(self) -> int:
@@ -854,13 +850,13 @@ class Tables(CythonTables):
         >>> tables.print_tables_as
         <PrintTablesAs.COMPUTED: 2>
         """
-        return CythonTables.get_print_tables_as(self)
+        return self._cython_instance.get_print_tables_as(self)
 
     @print_tables_as.setter
     def print_tables_as(self, value: Union[PrintTablesAs, str]):
-        CythonTables.set_print_tables_as(self, value)
+        self._cython_instance.set_print_tables_as(self, value)
 
-    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4) -> None:
+    def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4):
         """
         Print the list tables defined by `names` to the file `filepath` using the format `format`.
 
@@ -958,24 +954,24 @@ class Tables(CythonTables):
         <BLANKLINE>
 
         >>> tables.print_tables_as = PrintTablesAs.TITLES
-        >>> tables.print_to_file(output_dir / "tables_titles.csv", ["ANAKNFF", "ANAPRIX"])        # doctest: +ELLIPSIS
+        >>> tables.print_to_file("tables_titles.csv", ["ANAKNFF", "ANAPRIX"])        # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...tables_titles.csv'...
         Printing ANAKNFF ...
         Printing ANAPRIX ...
         Print done
-        >>> with open(output_dir / "tables_titles.csv") as f:                # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("tables_titles.csv") as f:                # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         "ANAKNFF : Déterminants de la croissance de K"
         "ANAPRIX : Analyse des prix"
 
         >>> tables.print_tables_as = PrintTablesAs.FULL
-        >>> tables.print_to_file(output_dir / "tables_full.csv", ["ANAKNFF", "ANAPRIX"])          # doctest: +ELLIPSIS
+        >>> tables.print_to_file("tables_full.csv", ["ANAKNFF", "ANAPRIX"])          # doctest: +ELLIPSIS
         Printing IODE objects definition to file '...tables_full.csv'...
         Printing ANAKNFF ...
         Printing ANAPRIX ...
         Print done
-        >>> with open(output_dir / "tables_full.csv") as f:                  # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("tables_full.csv") as f:                  # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         "ANAKNFF : definition",
@@ -1075,9 +1071,9 @@ class Tables(CythonTables):
 
         >>> tables.print_tables_as = PrintTablesAs.COMPUTED
         >>> names = ["C8_1", "C8_2", "C8_3", "C8_4"]
-        >>> tables.print_to_file(output_dir / "tables_2_periods.csv", names, 
+        >>> tables.print_to_file("tables_2_periods.csv", names, 
         ...                      generalized_sample="(2010;2010/2009):5", nb_decimals=4)
-        >>> with open(output_dir / "tables_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE
+        >>> with open("tables_2_periods.csv", "r") as f:    # doctest: +NORMALIZE_WHITESPACE
         ...     print(f.read())
         ...
         "Déterminants de l'output potentiel"
@@ -1114,9 +1110,9 @@ class Tables(CythonTables):
         394 objects loaded
         >>> extra_files[0].name
         'ref.av'
-        >>> tables.print_to_file(output_dir / "tables_2_files.csv", names, 
+        >>> tables.print_to_file("tables_2_files.csv", names, 
         ...                      generalized_sample="2010[1-2]:5", nb_decimals=4)    
-        >>> with open(output_dir / "tables_2_files.csv", "r") as f:
+        >>> with open("tables_2_files.csv", "r") as f:
         ...     print(f.read())
         ...
         "Déterminants de l'output potentiel"
@@ -1147,7 +1143,7 @@ class Tables(CythonTables):
         "Rentabilité","0.0000","-0.0000","-0.0000","-0.0000","0.0000",
         <BLANKLINE>
         """
-        return CythonTables.print_to_file(self, filepath, names, format, generalized_sample, nb_decimals)
+        return self._cython_instance.print_to_file(self, filepath, names, format, generalized_sample, nb_decimals)
 
     def __hash__(self) -> int:
         r"""
@@ -1200,7 +1196,7 @@ class Tables(CythonTables):
         >>> original_hash == hash(tables)           # doctest: +SKIP
         True
         """
-        return CythonTables.__hash__(self)
+        return super().__hash__()
 
 
 tables: Tables = Tables.get_instance()
