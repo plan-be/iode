@@ -50,6 +50,23 @@ def test_check_same_names():
                                          r"represents 3 comments."):
         comments["ACAF, ACAG, AOUC"] = update_cmt
 
+def test_subset_type():
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # check that the subset type is correct
+    assert isinstance(comments["A*"], Comments)
+    assert isinstance(equations["A*"], Equations)
+    assert isinstance(identities["A*"], Identities)
+    assert isinstance(lists["C*"], Lists)
+    assert isinstance(scalars["a*"], Scalars)
+    assert isinstance(tables["C*"], Tables)
+    assert isinstance(variables["A*"], Variables)
 
 # Equations
 # ---------
