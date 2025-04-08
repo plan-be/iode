@@ -109,8 +109,9 @@ class Scalars(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        scalar = Scalar._new_instance()
-        return self._cython_instance._get_object(name, scalar)
+        scalar = Scalar.get_instance()
+        scalar._cython_instance = self._cython_instance._get_object(name, scalar._cython_instance)
+        return scalar
 
     def _set_object(self, key: Union[str, int], value):
         name = self._single_object_key_to_name(key)
@@ -162,7 +163,7 @@ class Scalars(IodeDatabase):
                 raise TypeError(f"Cannot add scalar '{name}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
         
-        self._cython_instance._set_object(name, scalar)
+        self._cython_instance._set_object(name, scalar._cython_instance)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Scalar, Self]:
         r"""

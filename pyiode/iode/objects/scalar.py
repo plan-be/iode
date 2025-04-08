@@ -8,10 +8,11 @@ else:
 
 import numpy as np
 from iode.util import iode_number_to_str
+from iode.iode_cython import NA
 from iode.iode_cython import Scalar as CythonScalar
 
 
-class Scalar(CythonScalar):
+class Scalar:
     r"""
     IODE Scalars are dimensionless variables defined by a single value. 
     They can be the estimated coefficients in an equation or constant values over time (relax = 0).
@@ -63,11 +64,18 @@ class Scalar(CythonScalar):
     ValueError: Expected 'relax' value between 0.0 and 1.0
     """
     def __init__(self, value: float, relax: float=1.0) -> Self:
-        CythonScalar.__init__(self, value, relax)
+        if relax < 0.0 or relax > 1.0:
+            raise ValueError("Expected 'relax' value between 0.0 and 1.0")   
+        if np.isinf(value):
+            raise ValueError("Expected 'value' to be a finite number")
+        if np.isnan(value):
+            value = NA
+        self._cython_instance = CythonScalar(value, relax)
 
     @classmethod
-    def _new_instance(cls) -> Self:
+    def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
+        instance._cython_instance = CythonScalar.__new__(CythonScalar)
         return instance
 
     @property
@@ -99,26 +107,32 @@ class Scalar(CythonScalar):
         ...
         ValueError: Expected 'value' to be a finite number
         """
-        return CythonScalar.get_value(self)
+        return self._cython_instance.get_value()
 
     @value.setter
     def value(self, val: float):
-        CythonScalar.set_value(self, val)
+        if np.isinf(val):
+            raise ValueError("Expected 'value' to be a finite number")
+        if np.isnan(val):
+            val = NA
+        self._cython_instance.set_value(val)
 
     @property
     def relax(self) -> float:
-        return CythonScalar.get_relax(self)
+        return self._cython_instance.get_relax()
 
     @relax.setter
     def relax(self, value: float):
-        CythonScalar.set_relax(self, value)
+        if value < 0.0 or value > 1.0:
+            raise ValueError("Expected relax value between 0.0 and 1.0")
+        self._cython_instance.set_relax(value)
 
     @property
     def std(self) -> float:
-        return CythonScalar.get_std(self)
+        return self._cython_instance.get_std()
 
     def _set_std(self, value: float):
-        CythonScalar._set_std(self, value)
+        self._cython_instance._set_std(value)
 
     def _as_tuple(self) -> Tuple[float, float, float]:
         r"""
@@ -131,7 +145,7 @@ class Scalar(CythonScalar):
         >>> scalar._as_tuple()
         (0.9, 0.8, nan)
         """
-        return CythonScalar._as_tuple(self)
+        return self._cython_instance._as_tuple()
 
     def copy(self) -> Self:
         r"""
@@ -152,7 +166,7 @@ class Scalar(CythonScalar):
         return copy(self)
 
     def __eq__(self, other: Self) -> bool:
-        return CythonScalar.__eq__(self, other)
+        return self._cython_instance.equal(other)
 
     def __copy__(self) -> Self:
         r"""
@@ -182,6 +196,6 @@ class Scalar(CythonScalar):
         return str(self)
 
     def __hash__(self) -> int:
-        return CythonScalar.__hash__(self)
+        return self._cython_instance.__hash__()
 
 

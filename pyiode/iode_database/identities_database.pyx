@@ -62,12 +62,9 @@ cdef class Identities(CythonIodeDatabase):
         identity.ptr_owner = <bint>False
         return identity
 
-    def _set_object(self, name: str, value: Union[str, Identity]):
-        if isinstance(value, Identity):
-            value = str(value)
-        value = value.strip()
-
+    def _set_object(self, name: str, value: str):
         name = name.strip()
+        value = value.strip()
         if self.database_ptr.contains(name.encode()):
             self.database_ptr.update(name.encode(), <string>(value.encode()))
         else:

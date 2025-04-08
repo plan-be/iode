@@ -24,17 +24,12 @@ cdef class Equation:
         self.c_database = NULL
         self.c_equation = NULL
 
-    def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str]=EqMethod.LSQ, from_period: Union[str, Period]='', to_period: Union[str, Period]='', comment: str='', instruments: str='', block: str='') -> Equation:
-        if isinstance(from_period, Period):
-            from_period = str(from_period)
-        if isinstance(to_period, Period):
-            to_period = str(to_period)
-
+    def __init__(self, endogenous: str, lec: str, from_period: str, to_period: str, comment: str, 
+                 instruments: str, block: str) -> Equation:
         self.ptr_owner = <bint>True
         self.c_database = NULL
         self.c_equation = new CEquation(endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
                                         to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
-        self.set_method(method)
 
     def __dealloc__(self):
         if self.ptr_owner and self.c_equation is not NULL:
@@ -73,19 +68,13 @@ cdef class Equation:
         lhs, rhs = self.c_equation.split_equation()
         return lhs.decode(), rhs.decode() 
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None) -> bool:
+    def estimate(self, from_period: str=None, to_period: str=None) -> bool:
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
                 from_period = c_sample.start_period().to_string().decode()
             if to_period is None:
                 to_period = c_sample.end_period().to_string().decode()
-        
-        if isinstance(from_period, Period):
-            from_period = str(from_period)
-
-        if isinstance(to_period, Period):
-            to_period = str(to_period)
         
         try:
             cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
@@ -96,8 +85,7 @@ cdef class Equation:
 
     cdef void update_global_database(self):
         if self.c_database is not NULL:
-            self.c_database.update(<string>(self.endogenous.encode("utf-8")), 
-                                   dereference(self.c_equation))
+            self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
 
     cdef void reset_date_and_tests(self):
         self.c_equation.date = 0L
@@ -118,20 +106,7 @@ cdef class Equation:
     def get_method(self) -> str:
         return EqMethod(<int>(self.c_equation.get_method_as_int())).name
 
-    def set_method(self, value: Union[EqMethod, str]):
-        if isinstance(value, str):
-            value = value.upper()
-            # warning: In the IODE ascii and binary files, the method is stored as a string (char*).
-            #          In particular: 
-            #              - if no method have been specifed, the method is stored as an empty string
-            #              - the GLS method is returned as 'GLS (3SLS)'   
-            if not value:
-                value = EqMethod.LSQ         
-            elif "GLS" in value:
-                value = EqMethod.GLS
-            else:
-                value = EqMethod[value]
-        value = int(value)
+    def set_method(self, value: int):
         self.c_equation.set_method(<IodeEquationMethod>(value))
         self.reset_date_and_tests()
         self.update_global_database()
@@ -140,13 +115,7 @@ cdef class Equation:
         cdef CSample sample = self.c_equation.get_sample()
         return Sample._from_ptr(new CSample(sample), <bint>True)
 
-    def set_sample(self, value: Union[str, Sample]):
-        if isinstance(value, Sample):
-            value = str(value)
-        if ':' not in value:
-            raise ValueError("New sample value must contain the colon character ':'")
-        from_period, to_period = value.split(':')
-
+    def set_sample(self, from_period: str, to_period: str):
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
         self.reset_date_and_tests()
         self.update_global_database()
@@ -162,9 +131,7 @@ cdef class Equation:
         _instruments = self.c_equation.get_instruments().decode().split(';')
         return _instruments[0] if len(_instruments) == 1 else _instruments
 
-    def set_instruments(self, value: Union[str, List[str]]):
-        if not isinstance(value, str):
-            value = ';'.join(value)
+    def set_instruments(self, value: str):
         self.c_equation.set_instruments(value.encode())
         self.reset_date_and_tests()
         self.update_global_database()
@@ -172,9 +139,7 @@ cdef class Equation:
     def get_block(self) -> str:
         return self.c_equation.get_block().decode()
 
-    def set_block(self, value: Union[str, List[str]]):
-        if not isinstance(value, str):
-            value = ';'.join(value)
+    def set_block(self, value: str):
         self.c_equation.set_block(value.encode())
         self.reset_date_and_tests()
         self.update_global_database()
@@ -187,9 +152,6 @@ cdef class Equation:
         return [self.c_equation.tests[i] for i in range(len(EqTest))]
 
     def _set_tests_from_list(self, tests: List[float]):
-        if len(tests) != len(EqTest):
-            raise ValueError("Cannot set equation test values. "
-                             f"Expected vector of size {len(EqTest)} but got vector of size {len(tests)}.")
         for i, value in enumerate(tests):
             self.c_equation.set_test(<IodeEquationTest>i, value)
         self.update_global_database()
@@ -201,12 +163,7 @@ cdef class Equation:
             self.c_equation.set_date(value.encode(), format.encode())
         self.update_global_database()
 
-    def _as_tuple(self) -> Tuple:
-        tests = [self.c_equation.tests[i] for i in range(len(EqTest))]
-        return self.endogenous, self.lec, self.method, str(self.sample), self.comment, self.instruments, \
-               self.block, *tests, self.date
-
-    def __eq__(self, other: Equation) -> bool:
+    def equal(self, other: Equation) -> bool:
         return self.c_equation == other.c_equation
 
     def __hash__(self) -> int:

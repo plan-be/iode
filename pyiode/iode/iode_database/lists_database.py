@@ -7,7 +7,7 @@ else:
     Self = Any
 
 import pandas as pd
-from iode.util import table2str, JUSTIFY
+from iode.util import table2str, JUSTIFY, split_list
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Lists as CythonLists
 
@@ -153,10 +153,17 @@ class Lists(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        return self._cython_instance._get_object(name)
+        iode_list = self._cython_instance._get_object(name)
+        return iode_list
 
     def _set_object(self, key: Union[str, int], value: Union[str, List[str]]):
         name = self._single_object_key_to_name(key)
+        if isinstance(value, str):
+            value = value.strip()
+            value = split_list(value)
+        else:
+            value = [item.strip() for item in value]
+        value = ';'.join(value)
         self._cython_instance._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Self]:

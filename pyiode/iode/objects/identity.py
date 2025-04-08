@@ -9,7 +9,7 @@ else:
 from iode.iode_cython import Identity as CythonIdentity
 
 
-class Identity(CythonIdentity):
+class Identity:
     r"""
     IODE Identities are formulas (LEC expressions) used to construct series based on other variables. 
     The name of an identity is the one of the series that will be built.
@@ -27,11 +27,12 @@ class Identity(CythonIdentity):
     Identity('FLG/VBBP')
     """
     def __init__(self, lec: str) -> Self:
-        CythonIdentity.__init__(self, lec)
+        self._cython_instance = CythonIdentity(lec)
 
     @classmethod
-    def _new_instance(cls) -> Self:
+    def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
+        instance._cython_instance = CythonIdentity.__new__(CythonIdentity)
         return instance
 
     @property
@@ -59,7 +60,7 @@ class Identity(CythonIdentity):
         >>> idt.coefficients
         ['gamma2', 'gamma3', 'gamma4', 'gamma_']
         """
-        return CythonIdentity.get_coefficients(self)
+        return self._cython_instance.get_coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -86,7 +87,7 @@ class Identity(CythonIdentity):
         >>> idt.variables
         ['W', 'ZJ', 'WMIN']
         """
-        return CythonIdentity.get_variables(self)
+        return self._cython_instance.get_variables()
 
     def copy(self) -> Self:
         r"""
@@ -105,7 +106,7 @@ class Identity(CythonIdentity):
         return copy(self)
 
     def __eq__(self, other: Self) -> bool:
-        return CythonIdentity.__eq__(self, other)
+        return self._cython_instance.equal(other)
 
     def __copy__(self) -> Self:
         r"""
@@ -125,7 +126,7 @@ class Identity(CythonIdentity):
         return Identity(str(self))
 
     def __str__(self) -> str:
-        return CythonIdentity.__str__(self)
+        return self._cython_instance._str_()
 
     def __repr__(self) -> str:
         return f"Identity('{str(self)}')"
