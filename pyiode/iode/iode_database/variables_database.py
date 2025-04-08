@@ -20,9 +20,11 @@ except ImportError:
     la = None
     Array = Any
 
-from iode import Period, Sample, NA
+from iode import NA
 from iode.common import IodeFileType 
 from iode.util import check_filepath, split_list
+from iode.time.period import Period
+from iode.time.sample import Sample
 from iode.iode_database.abstract_database import IodeDatabase
 from iode.iode_cython import (Variables as CythonVariables, BinaryOperation, VarsMode, 
                               LowToHighType, LowToHighMethod, HighToLowType, 
@@ -30,7 +32,14 @@ from iode.iode_cython import (Variables as CythonVariables, BinaryOperation, Var
 
 
 
-def _check_same_periods(left_periods: List[str], right_periods: List[str], check_contiguous: bool=True, right_hand_side_obj_type: str=None):
+def _check_same_periods(left_periods: Iterable[Union[str, Period]], right_periods: Iterable[Union[str, Period]], 
+                        check_contiguous: bool=True, right_hand_side_obj_type: str=None):
+    if isinstance(left_periods, str) or not isinstance(left_periods, Iterable):
+        raise TypeError("left_periods must be a list of str or Period objects.")
+    if isinstance(right_periods, str) or not isinstance(right_periods, Iterable):
+        raise TypeError("right_periods must be a list of str or Period objects.")
+    left_periods = [str(period) for period in left_periods]
+    right_periods = [str(period) for period in right_periods]
     left_periods_set = set(left_periods)
     right_periods_set = set(right_periods)
     missing_periods = left_periods_set - right_periods_set
@@ -45,12 +54,14 @@ def _check_same_periods(left_periods: List[str], right_periods: List[str], check
         # check if left-hand side 'periods' represents contiguous periods
         if len(left_periods) > 1:
             sample = Sample(left_periods[0], left_periods[-1])
-            if left_periods != sample.periods:
+            contiguous_periods = [str(period) for period in sample.periods]
+            if left_periods != contiguous_periods:
                 raise ValueError(f"Expected contiguous periods in the left-hand side.")
         # check if right-hand side 'periods' represents contiguous periods
         if len(right_periods) > 1:
             sample = Sample(right_periods[0], right_periods[-1])
-            if right_periods != sample.periods:
+            contiguous_periods = [str(period) for period in sample.periods]
+            if right_periods != contiguous_periods:
                 suffix = f" {right_hand_side_obj_type} object" if right_hand_side_obj_type else ""
                 raise ValueError(f"Expected contiguous periods in the right-hand side{suffix}.")
 
@@ -191,7 +202,10 @@ class Variables(IodeDatabase):
         if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
             raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
 
-        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy, first_period, last_period)
+        cython_first_period = first_period._cython_instance if first_period is not None else None
+        cython_last_period = last_period._cython_instance if last_period is not None else None
+        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy, 
+                                                                            cython_first_period, cython_last_period)
         return instance
 
     def copy(self, pattern: str=None) -> Self:
@@ -524,7 +538,9 @@ class Variables(IodeDatabase):
         If the current instance is a subset of a Variables database, 
         returns the sample of the original Variables database.
         """
-        return self._cython_instance._get_whole_sample()
+        whole_sample = Sample.get_instance()
+        whole_sample._cython_instance = self._cython_instance._get_whole_sample()
+        return whole_sample
 
     def _maybe_update_subset_sample(self):
         r"""
@@ -555,7 +571,9 @@ class Variables(IodeDatabase):
         Check if 'period' is inside the current (subset) sample.
         Get the position of a period in the Variables database sample (not the subset).
         """
-        return self._cython_instance._get_real_period_position(period)
+        if not isinstance(period, Period):
+            raise TypeError(f"Expected value of type 'Period'. Got value of type {type(period).__name__} instead.")
+        return self._cython_instance._get_real_period_position(period._cython_instance)
 
     def _get_variable(self, key_name: Union[str, int], key_periods: Union[None, Period, List[Period]]) -> Union[float, pd.Series, Self]:
         r"""
@@ -575,7 +593,7 @@ class Variables(IodeDatabase):
             db_subset = self._subset(name, copy=False)
         # key_periods represents a unique period -> return a float 
         elif isinstance(key_periods, Period):
-            db_subset = self._cython_instance._get_variable(pos, key_periods)
+            db_subset = self._cython_instance._get_variable(pos, key_periods._cython_instance)
         # key_periods represents a contiguous range of periods -> return a Variables object
         elif isinstance(key_periods, tuple):
             first_period, last_period = key_periods
@@ -585,14 +603,16 @@ class Variables(IodeDatabase):
             if not isinstance(last_period, Period):
                 raise TypeError(f"Expected value of type 'Period' for the last period. "
                                 f"Got value of type {type(last_period).__name__} instead.")
-            db_subset = self._subset(name, copy=False, first_period=first_period, last_period=last_period)
+            db_subset = self._subset(name, copy=False, first_period=first_period, 
+                                     last_period=last_period)
         # key_periods represents a list of non-contiguous periods -> return a pandas Series
         elif isinstance(key_periods, list):
             if not all(isinstance(period, Period) for period in key_periods):
                 raise TypeError("Expected a list of periods each of type 'Period'")
-            period_names = [str(period) for period in key_periods]
-            values = self._cython_instance._get_variable(pos, key_periods)
-            series = pd.Series(values, index=period_names)
+            cython_key_periods = [p._cython_instance for p in key_periods]
+            values = self._cython_instance._get_variable(pos, cython_key_periods)
+            key_periods = [str(period) for period in key_periods]
+            series = pd.Series(values, index=key_periods, dtype=float)
             series.index.name = "time"
             series.name = name
             db_subset = series
@@ -1084,6 +1104,18 @@ class Variables(IodeDatabase):
 
             if isinstance(values, Variables):
                 values = values._cython_instance
+            
+            if isinstance(key_periods, Period):
+                key_periods = key_periods._cython_instance
+            elif isinstance(key_periods, tuple):
+                key_periods = key_periods[0]._cython_instance, key_periods[1]._cython_instance
+            elif isinstance(key_periods, list):
+                key_periods = [period._cython_instance for period in key_periods]
+            else:
+                raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
+                                f"Expected periods to be of type str, Period, list or tuple.\n"
+                                f"Got periods of type {type(key_periods).__name__} instead")
+            
             self._cython_instance._update_variable(name, pos, values, key_periods)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
@@ -5860,14 +5892,18 @@ class Variables(IodeDatabase):
         r"""
         First period of the current Variables database.
         """
-        return self._cython_instance.get_first_period()
+        period = Period.get_instance()
+        period._cython_instance = self._cython_instance.get_first_period()
+        return period
 
     @property
     def last_period(self) -> Period:
         r"""
         Last period of the current Variables database.
         """
-        return self._cython_instance.get_last_period()
+        period = Period.get_instance()
+        period._cython_instance = self._cython_instance.get_last_period()
+        return period
 
     @property
     def sample(self) -> Sample:
@@ -5894,6 +5930,10 @@ class Variables(IodeDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
+        >>> variables.clear()
+        >>> variables.sample
+        None
+
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
@@ -5994,7 +6034,11 @@ class Variables(IodeDatabase):
         ACAF            na      na    1.21  ...  -37.83     na       na
         <BLANKLINE>
         """
-        return self._cython_instance.get_sample()
+        sample = Sample.get_instance()
+        sample._cython_instance = self._cython_instance.get_sample()
+        if sample._cython_instance.is_undefined():
+            warnings.warn("The sample of the Variables database is not defined")
+        return sample
 
     @sample.setter
     def sample(self, value: Union[str, Tuple[Union[str, Period], Union[str, Period]]]):

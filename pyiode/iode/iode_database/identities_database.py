@@ -8,9 +8,10 @@ else:
 
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
+from iode.time.period import Period
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.identity import Identity
-from iode.iode_cython import Period
+
 from iode.iode_cython import Identities as CythonIdentities
 
 

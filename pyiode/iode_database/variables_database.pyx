@@ -101,7 +101,7 @@ cdef class Variables(CythonIodeDatabase):
             t_first_period: int = self._get_real_period_position(self.first_period_subset)
         
         if self.last_period_subset is None:
-            t_last_period: int = self.get_sample().nb_periods - 1
+            t_last_period: int = self.get_sample().get_nb_periods() - 1
         else:
             t_last_period: int = self._get_real_period_position(self.last_period_subset)
 
@@ -137,18 +137,20 @@ cdef class Variables(CythonIodeDatabase):
             return 
     
         whole_db_sample: Sample = self._get_whole_sample()
+        global_first_period = whole_db_sample.get_start()
+        global_last_period = whole_db_sample.get_end()
 
-        if self.first_period_subset is not None:
-            if self.first_period_subset < whole_db_sample.start:
-                self.first_period_subset = whole_db_sample.start
-            if self.first_period_subset > whole_db_sample.end:
+        if self.first_period_subset is not None and global_first_period is not None:
+            if self.first_period_subset < global_first_period:
+                self.first_period_subset = global_first_period
+            if self.first_period_subset > global_last_period:
                 self.first_period_subset = None
                 self.last_period_subset = None
 
-        if self.last_period_subset is not None:
-            if self.last_period_subset > whole_db_sample.end:
-                self.last_period_subset = whole_db_sample.end
-            if self.last_period_subset < whole_db_sample.start:
+        if self.last_period_subset is not None and global_last_period is not None:
+            if self.last_period_subset > global_last_period:
+                self.last_period_subset = global_last_period
+            if self.last_period_subset < global_first_period:
                 self.first_period_subset = None
                 self.last_period_subset = None
 
@@ -165,7 +167,9 @@ cdef class Variables(CythonIodeDatabase):
 
     def _get_real_period_position(self, period: Period) -> int:
         sample: Sample = self.get_sample()
-        if period < sample.start or period > sample.end:
+        if sample.is_undefined():
+            raise RuntimeError("The sample of the IODE Variables workspace is not defined")
+        if period < sample.get_start() or period > sample.get_end():
             raise IndexError(f"The period '{period}' is outside the sample '{sample}'")
         return self.c_get_real_period_position(period.c_period)
 
@@ -181,6 +185,9 @@ cdef class Variables(CythonIodeDatabase):
             return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
         # key_periods represents a list of non-contiguous periods -> return a pandas Series
         if isinstance(key_periods, list):
+            if not all(isinstance(p, Period) for p in key_periods):
+                raise TypeError("key_periods must be a list of Cython Period objects")
+            # convert Period objects to their corresponding integer positions
             key_periods: List[int] = [self._get_real_period_position(period) for period in key_periods]
             values = [self.database_ptr.get_var(<int>name_pos, <int>p, self.mode_) for p in key_periods]
             return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
@@ -204,13 +211,13 @@ cdef class Variables(CythonIodeDatabase):
             self.database_ptr.add(<string>(name.encode()), <string>values.encode())
         # values is a vector of float
         elif isinstance(values, float):
-            cpp_values = [values] * self.get_sample().nb_periods
+            cpp_values = [values] * self.get_sample().get_nb_periods()
             self.database_ptr.add(<string>(name.encode()), cpp_values)
         elif isinstance(values, np.ndarray):
             numpy_data_memview = values
             b_name = name.encode()
             c_name = b_name
-            c_nb_periods = self.get_sample().nb_periods
+            c_nb_periods = self.get_sample().get_nb_periods()
             c_db_ptr = self.database_ptr.get_database()
             K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
         # values is a Variables object
@@ -253,7 +260,15 @@ cdef class Variables(CythonIodeDatabase):
                 self.__copy_var(name, name, t, t, values)
         # update values for a contiguous range of periods
         elif isinstance(key_periods, tuple):
+            if len(key_periods) != 2:
+                raise TypeError("key_periods must be a tuple of 2 Period objects")
             first_period, last_period = key_periods
+            if not isinstance(first_period, Period):
+                raise TypeError("key_periods must be a tuple of 2 Cython Period objects.\n"
+                                f"Got first_period of type {type(first_period)} instead.")
+            if not isinstance(first_period, Period) or not isinstance(last_period, Period):
+                raise TypeError("key_periods must be a tuple of 2 Cython Period objects.\n"
+                                f"Got last_period of type {type(last_period)} instead.")
             t_first = self._get_real_period_position(first_period)
             t_last = self._get_real_period_position(last_period)
             # set same value for all periods in the range
@@ -279,7 +294,9 @@ cdef class Variables(CythonIodeDatabase):
                 for i, t in enumerate(range(t_first, t_last + 1)):
                     KV_set(c_db_ptr, pos, t, self.mode_, <double>(values[i]))
         # update values for a list of periods
-        elif isinstance(key_periods, list):              
+        elif isinstance(key_periods, list):
+            if not all(isinstance(p, Period) for p in key_periods):
+                raise TypeError("key_periods must be a list of Cython Period objects")             
             for p, v in zip(key_periods, values):
                 t = self._get_real_period_position(p)
                 KV_set(c_db_ptr, pos, t, self.mode_, <double>v)
@@ -439,7 +456,7 @@ cdef class Variables(CythonIodeDatabase):
             return self.first_period_subset 
         else:
             whole_db_sample: Sample = self._get_whole_sample()
-            return whole_db_sample.start
+            return whole_db_sample.get_start()
 
     def get_last_period(self) -> Period:
         cdef CSample* c_sample
@@ -447,17 +464,23 @@ cdef class Variables(CythonIodeDatabase):
             return self.last_period_subset 
         else:
             whole_db_sample: Sample = self._get_whole_sample()
-            return whole_db_sample.end
+            return whole_db_sample.get_end()
 
     def get_is_subset_over_periods(self) -> bool:
         if self.first_period_subset is None and self.last_period_subset is None:
             return False
         
         whole_db_sample: Sample = self._get_whole_sample()
-        if self.first_period_subset is not None and self.first_period_subset != whole_db_sample.start:
-            return True
-        if self.last_period_subset is not None and self.last_period_subset != whole_db_sample.end:
-            return True
+        global_first_period = whole_db_sample.get_start()
+        global_last_period = whole_db_sample.get_end()
+        if self.first_period_subset is not None: 
+            if global_first_period is None:
+                return True 
+            return self.first_period_subset != global_first_period
+        if self.last_period_subset is not None:
+            if global_last_period is None:
+                return True
+            return self.last_period_subset != global_last_period
         
         return False
 
@@ -471,14 +494,17 @@ cdef class Variables(CythonIodeDatabase):
         if self.first_period_subset is not None:
             first_period = self.first_period_subset
         else: 
-            first_period = whole_db_sample.start
+            first_period = whole_db_sample.get_start()
 
         if self.last_period_subset is not None:
             last_period = self.last_period_subset
         else:
-            last_period = whole_db_sample.end
-        
-        return Sample(first_period, last_period)
+            last_period = whole_db_sample.get_end()
+
+        if first_period is None or last_period is None:
+            return Sample._from_ptr(NULL, <bint>True)
+        else:        
+            return Sample(str(first_period), str(last_period))
 
     def set_sample(self, from_period: str, to_period: str):
         if self.get_is_detached():
@@ -541,7 +567,7 @@ cdef class Variables(CythonIodeDatabase):
     def _str_table(self, names: List[str]) -> str:
         cdef t
         # self.get_sample() calls self._maybe_update_subset_sample()
-        periods = self.get_sample().get_period_list()
+        periods = self.get_sample().get_period_list('str')
         columns = {"name": names}
         names_pos: List[int] = [self.get_position(name) for name in names] 
         for str_period in periods:

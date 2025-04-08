@@ -105,7 +105,7 @@ cdef class ComputedTable:
         return wrapper
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def get_instance(cls) -> ComputedTable:
         instance = cls.__new__(cls)
         return instance
 

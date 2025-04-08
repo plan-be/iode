@@ -47,10 +47,6 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
             logging.info(f"tested method/function: '{name}'")
 
 
-def test_iode_time():
-    run_doctests_for_obj(iode_cython.Period)
-    run_doctests_for_obj(iode_cython.Sample)
-
 def test_iode_computed_table():
     run_doctests_for_obj(iode_cython.ComputedTable)
 
@@ -64,17 +60,14 @@ def test_iode_simulation_estimation():
     run_doctests_for_obj(iode_cython.dynamic_adjustment)
     run_doctests_for_obj(iode_cython.dickey_fuller_test)
 
-
 def test_iode_edit_and_estimate_equations():
     from iode.util import EditAndEstimateEquations
     run_doctests_for_obj(EditAndEstimateEquations)
-
 
 def test_iode_messages():
     run_doctests_for_obj(iode_cython.reset_msgs)
     run_doctests_for_obj(iode_cython.suppress_msgs)
     iode.reset_msgs()
-
 
 def test_iode_print_preferences():
     from iode.util import (set_printer_preferences, set_A2M_preferences, set_MIF_preferences, 
@@ -84,7 +77,6 @@ def test_iode_print_preferences():
     set_MIF_preferences()
     set_RTF_preferences()
     set_HTML_preferences()
-
 
 def test_iode_miscellaneous():
     from iode.reports import (build_command_functions_list, build_report_functions_list, 
@@ -98,7 +90,6 @@ def test_iode_miscellaneous():
     run_doctests_for_obj(table2str)
     run_doctests_for_obj(check_filepath)
     run_doctests_for_obj(get_iode_file_type)
-
 
 def test_iode_errors_warnings_messages_from_C_API(capsys):
     from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm, 

@@ -24,6 +24,28 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir() 
 
+
+# Sample
+# ------
+
+def test_sample():
+    with pytest.raises(ValueError, match=r"When only one parameter is passed to Sample\(\), "
+                                         r"it is considered as a string representation of the desired sample "
+                                         r"and must include a colon ':'"):
+        Sample("1982Y1")    
+    
+    with pytest.raises(ValueError, match=r"Both start and end periods must be specified"):
+        Sample('', '2020Y1')
+    
+    with pytest.raises(ValueError, match=r"Both start and end periods must be specified"):
+        Sample('')
+
+    with pytest.raises(ValueError, match=r"Both start and end periods must be specified"):
+        Sample('', '')
+
+    with pytest.raises(TypeError, match=r"Sample.__init__\(\) missing 1 required positional argument: 'start_period'"):
+        Sample()
+
 # Iode Databases
 # --------------
 
