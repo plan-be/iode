@@ -16,13 +16,7 @@ cdef class Scalar:
         self.ptr_owner = False
         self.c_scalar = NULL
 
-    def __init__(self, value: float, relax: float=1.0) -> Scalar:
-        if relax < 0.0 or relax > 1.0:
-            raise ValueError("Expected 'relax' value between 0.0 and 1.0")   
-        if np.isinf(value):
-            raise ValueError("Expected 'value' to be a finite number")
-        if np.isnan(value):
-            value = NA
+    def __init__(self, value: float, relax: float) -> Scalar:
         self.ptr_owner = <bint>True 
         self.c_scalar = new CScalar(value, relax)
 
@@ -46,10 +40,6 @@ cdef class Scalar:
         return self.c_scalar.val if IODE_IS_A_NUMBER(self.c_scalar.val) else np.nan
 
     def set_value(self, val: float):
-        if np.isinf(val):
-            raise ValueError("Expected 'value' to be a finite number")
-        if np.isnan(val):
-            val = NA
         self.c_scalar.val = val
         self.c_scalar.std = NA
 
@@ -57,8 +47,6 @@ cdef class Scalar:
         return self.c_scalar.relax
 
     def set_relax(self, value: float):
-        if value < 0.0 or value > 1.0:
-            raise ValueError("Expected relax value between 0.0 and 1.0")
         self.c_scalar.relax = value
         self.c_scalar.std = NA
 
@@ -74,7 +62,7 @@ cdef class Scalar:
         std = self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
         return value, relax, std
 
-    def __eq__(self, other: Scalar) -> bool:
+    def equal(self, other: Scalar) -> bool:
         return self.c_scalar == other.c_scalar
 
     def __hash__(self) -> int:

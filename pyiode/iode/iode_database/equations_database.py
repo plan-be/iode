@@ -172,8 +172,9 @@ class Equations(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        eq = Equation._new_instance()
-        return self._cython_instance._get_object(name, eq)
+        eq = Equation.get_instance()
+        eq._cython_instance = self._cython_instance._get_object(name, eq._cython_instance)
+        return eq
 
     def _set_object(self, key: Union[str, int], value):
         name = self._single_object_key_to_name(key)
@@ -231,7 +232,7 @@ class Equations(IodeDatabase):
                 raise TypeError(f"Cannot add equation '{name}': Expected input to be of type str or tuple or list or "
                                 f"dict or Equation. Got value of type {type(value).__name__}")
 
-        self._cython_instance._set_object(name, equation)
+        self._cython_instance._set_object(name, equation._cython_instance)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Self]:
         r"""

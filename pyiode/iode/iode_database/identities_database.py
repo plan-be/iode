@@ -108,11 +108,14 @@ class Identities(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        identity = Identity._new_instance()
-        return self._cython_instance._get_object(name, identity)
+        identity = Identity.get_instance()
+        identity._cython_instance = self._cython_instance._get_object(name, identity._cython_instance)
+        return identity
 
     def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
         name = self._single_object_key_to_name(key)
+        if isinstance(value, Identity):
+            value = str(value)
         self._cython_instance._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Self]:

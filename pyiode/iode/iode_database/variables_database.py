@@ -2043,7 +2043,7 @@ class Variables(IodeDatabase):
             # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
             if not data.flags['C_CONTIGUOUS']:
                 data = np.ascontiguousarray(data)
-            if len(self_names) == 1:
+            if len(self_names) == 1 or nb_periods == 1:
                 data = data.flatten()
             _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
             return _self

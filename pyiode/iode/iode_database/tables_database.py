@@ -234,8 +234,9 @@ class Tables(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        table = Table._new_instance()
-        return self._cython_instance._get_object(name, table)
+        table = Table.get_instance()
+        table._cython_instance = self._cython_instance._get_object(name, table._cython_instance)
+        return table
 
     def _set_object(self, key: Union[str, int], value):
         name = self._single_object_key_to_name(key)
@@ -260,7 +261,7 @@ class Tables(IodeDatabase):
                 raise TypeError(f"New table '{name}': Expected input to be of type int or tuple or list or "
                                 f"dict or Table. Got value of type {type(value).__name__} instead")
         
-        self._cython_instance._set_object(name, table)
+        self._cython_instance._set_object(name, table._cython_instance)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
         r"""

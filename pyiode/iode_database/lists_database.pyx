@@ -13,7 +13,6 @@ from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 import pandas as pd
-from iode.util import split_list
 
 
 cdef class Lists(CythonIodeDatabase):
@@ -57,15 +56,7 @@ cdef class Lists(CythonIodeDatabase):
         str_list = self.database_ptr.get(name.encode()).decode()
         return split_list(str_list)
 
-    def _set_object(self, name: str, value: Union[str, List[str]]):
-        if isinstance(value, str):
-            value = value.strip()
-            value = split_list(value)
-        else:
-            value = [item.strip() for item in value]
-        # normalize the IODE list
-        value = ';'.join(value)
-
+    def _set_object(self, name: str, value: str):
         name = name.strip()
         if self.database_ptr.contains(name.encode()):
             self.database_ptr.update(name.encode(), <string>(value.encode()))

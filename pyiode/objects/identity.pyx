@@ -39,10 +39,10 @@ cdef class Identity:
     def get_variables(self) -> List[str]:
         return [var.decode() for var in self.c_identity.get_variables_list(<bint>False)]
 
-    def __eq__(self, other: Identity) -> bool:
+    def equal(self, other: Identity) -> bool:
         return self.c_identity == other.c_identity
 
-    def __str__(self) -> str:
+    def _str_(self) -> str:
         return self.c_identity.get_lec().decode("utf-8")
 
 

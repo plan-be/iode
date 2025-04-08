@@ -47,6 +47,9 @@ cdef class TableCell:
         wrapper.py_parent_table = py_parent_table
         return wrapper
 
+    def get_nb_columns(self) -> int:
+        return self.nb_columns
+
     def get_cell_type(self) -> str:
         return TableCellType(<int>(self.c_cell.get_type())).name if self.c_cell is not NULL else None
 
@@ -88,17 +91,11 @@ cdef class TableCell:
     def get_coefficients(self) -> List[str]:
         if self.c_cell is NULL:
             return
-        if self.cell_type != 'LEC':
-            warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
-            return [] 
         return [item.decode() for item in self.c_cell.get_coefficients_from_lec()]     
 
     def get_variables(self) -> List[str]:
         if self.c_cell is NULL:
             return
-        if self.cell_type != 'LEC':
-            warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
-            return [] 
         return [item.decode() for item in self.c_cell.get_variables_from_lec()]
 
     def _str_(self) -> str:
@@ -141,13 +138,9 @@ cdef class TableLine:
     def get_graph_type(self) -> str:
         return TableGraphType(<int>(self.c_line.get_line_graph())).name if self.c_line is not NULL else None
 
-    def set_graph_type(self, value: Union[TableGraphType, str]):
+    def set_graph_type(self, value: int):
         if self.c_line is NULL:
             return
-        if isinstance(value, str):
-            value = value.upper()
-            value = TableGraphType[value]
-        value = int(value)
         self.c_line.set_line_graph(<CTableGraphType>value)
         self.py_parent_table.update_global_database()
 
@@ -160,48 +153,36 @@ cdef class TableLine:
         self.c_line.set_line_axis(<bint>value)
         self.py_parent_table.update_global_database()
 
-    def __len__(self) -> int:
+    def size(self) -> int:
         if self.c_line is NULL:
             return 0
-        if self.line_type == TableLineType.TITLE:
+        
+        line_type: TableLineType = self.c_line.get_line_type()
+        if line_type == TableLineType.TITLE:
             return 1
-        elif self.line_type == TableLineType.CELL:
+        elif line_type == TableLineType.CELL:
             return self.nb_columns
         else:
             return 0
 
-    def _get_row_from_index(self, index: int) -> int:
-        if not (-self.nb_columns < index < self.nb_columns):
-            raise ValueError(f"The index of the cell must be in range [{-self.nb_columns + 1, self.nb_columns - 1}].\n"
-                             f"Got value {index} instead.")
-        if index < 0:
-            index = self.nb_columns + index
-        return index
-
-    def _getitem_(self, index, cell: TableCell) -> TableCell:
+    def _getitem_(self, col: int, cell: TableCell) -> TableCell:
         cdef CTableCell* c_cell
 
         if self.c_line is NULL:
             return
-
-        row = self._get_row_from_index(index)
-        c_cell = self.c_line.get_cell(row, self.nb_columns)
+        
+        c_cell = self.c_line.get_cell(col, self.nb_columns)
 
         cell.c_cell = c_cell
         cell.nb_columns = self.nb_columns
         cell.py_parent_table = self.py_parent_table
         return cell
 
-    def __setitem__(self, index, value):
+    def _setitem_(self, col: int, value: str):
         if self.c_line is NULL:
             return
         
-        row = self._get_row_from_index(index)
-        if isinstance(value, TableCell):
-            value = str(value)
-        if not isinstance(value, str):
-            raise TypeError(f"Expected value of type str or TableCell. Got value of type {type(value).__name__} instead.")
-        c_cell = self.c_line.get_cell(row, self.nb_columns)
+        c_cell = self.c_line.get_cell(col, self.nb_columns)
         c_cell.set_content(value.encode())
         self.py_parent_table.update_global_database()
 
@@ -229,7 +210,7 @@ cdef class TableLine:
         elif line_type == TableLineType.SEP:
             return '---'
         else:
-            return f"<{self.line_type}>"
+            return f"<{self.get_line_type()}>"
 
 
 cdef class Table:
@@ -244,49 +225,25 @@ cdef class Table:
         self.c_table_name = b''
         self.c_table = NULL
 
-    def __init__(self, nb_columns: int=2, table_title: str='', lecs_or_vars: Union[str, List[str]]=None, lines_titles: List[str]=None, mode: bool=False, files: bool=False, date: bool=False) -> Table:
+    def __init__(self, nb_columns: int, table_title: str, lecs_or_vars: Union[None, List[str]], 
+                 lines_titles: Union[None, List[str]], mode: bool, files: bool, date: bool) -> Table:
         cdef vector[string] cpp_variables = []
         cdef vector[string] cpp_lines_titles = []
         cdef vector[string] cpp_lecs = []
-
-        if nb_columns < 1:
-            raise ValueError(f"'nb_columns': Expected value greater than 0. Got value '{nb_columns}'.")
-
-        if lecs_or_vars is None:
-            lecs_or_vars = ""
 
         if lines_titles is None:
             variables = lecs_or_vars
             if isinstance(variables, str):
                 self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
-            elif isinstance(variables, Iterable) and all(isinstance(var, str) for var in variables):
+            else:
                 for variable in variables:
                     cpp_variables.push_back(variable.encode())
                 self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), cpp_variables, <bint>mode, <bint>files, <bint>date)
-            else:
-                raise TypeError(f"'lecs_or_vars': Expected value of type str or list of str. "
-                                f"Got value of type {type(lecs_or_vars).__name__} instead")
-        else:
-            if isinstance(lines_titles, str):
-                lines_titles = [lines_titles]
-            if not (isinstance(lines_titles, Iterable) and all(isinstance(line_title, str) for line_title in lines_titles)):
-                raise TypeError(f"'lines_titles': Expected a value of type list of str. "
-                                f"Got value of type {type(lines_titles).__name__} instead")
-
-            lecs = lecs_or_vars
-            if isinstance(lecs, str):
-                lecs = [lecs]
-            if not (isinstance(lecs, Iterable) and all(isinstance(lec, str) for lec in lecs)):
-                raise TypeError(f"'lecs_or_vars': Expected a value of type str or list of str. "
-                                f"Got value of type {type(lines_titles).__name__} instead")
-            
-            if len(lines_titles) != len(lecs):
-                raise ValueError(f"'lecs_or_vars' and 'lines_titles': The list of LEC expressions ({len(lecs)}) " 
-                                 f"and the list of line titles ({len(lines_titles)}) must have the same lenght")
-            
+        else:            
             for line_title in lines_titles:
                 cpp_lines_titles.push_back(line_title.encode())
 
+            lecs = lecs_or_vars
             for lec in lecs:
                 cpp_lecs.push_back(lec.encode())
 
@@ -330,7 +287,7 @@ cdef class Table:
         cdef string c_title
         cdef CTableLine* c_line
 
-        for i in range(len(self)):
+        for i in range(self.get_nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -342,7 +299,7 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef string c_title
 
-        for i in range(len(self)):
+        for i in range(self.get_nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -416,7 +373,7 @@ cdef class Table:
             return []
 
         py_coeffs = []
-        nb_columns = self.nb_columns
+        nb_columns = self.get_nb_columns()
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
@@ -425,7 +382,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
 
-        for i in range(len(self)):
+        for i in range(self.get_nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -445,7 +402,7 @@ cdef class Table:
             return []
 
         py_vars = []
-        nb_columns = self.nb_columns
+        nb_columns = self.get_nb_columns()
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
@@ -454,7 +411,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
 
-        for i in range(len(self)):
+        for i in range(self.get_nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -482,8 +439,8 @@ cdef class Table:
             raise TypeError(f"Expected value of type str. Got value of type {type(key).__name__} instead.")
         key = key.replace('"', '').strip()
 
-        nb_columns = self.nb_columns
-        for i in range(len(self)):
+        nb_columns = self.get_nb_columns()
+        for i in range(self.get_nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -501,10 +458,9 @@ cdef class Table:
         
         raise ValueError(f"Content '{key}' not found in table")
 
-    def insert(self, index: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType]):
+    def insert(self, row: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType]):
         cdef CTableLine* c_line
 
-        row = self._get_row_from_index(index)
         if isinstance(value, TableLineType):
             if value == TableLineType.FILES:
                 self.c_table.insert_line_files(row, <bint>False)
@@ -526,7 +482,7 @@ cdef class Table:
                 self.c_table.insert_title(row, value.encode(), <bint>False)
         elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
             c_line = self.c_table.insert_line_with_cells(row, <bint>False)
-            nb_columns = self.nb_columns
+            nb_columns = self.get_nb_columns()
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
@@ -547,31 +503,21 @@ cdef class Table:
             load_extra_files(extra_files)
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
-    def _getitem_(self, index: int, line: TableLine) -> TableLine:
-        cdef CTableLine* c_line
-
-        row = self._get_row_from_index(index)
-        c_line = self.c_table.get_line(row)
+    def _getitem_(self, row: int, line: TableLine) -> TableLine:
+        cdef CTableLine* c_line = self.c_table.get_line(row)
 
         line.c_line = c_line
         line.nb_columns = self.c_table.nb_columns()
         line.py_parent_table = self
         return line
 
-    def __setitem__(self, index: int, value: Union[str, List[str], Tuple[str], TableLine]):
+    def _setitem_(self, row: int, value: Union[str, List[str], Tuple[str]]):
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
-
-        row = self._get_row_from_index(index)
-
-        if isinstance(value, TableLine):
-            value = str(value)
-        if isinstance(value, str) and '|' in value:
-            value = value.split('|')
         
         c_line = self.c_table.get_line(row)
         line_type = <int>(c_line.get_line_type())
-        nb_columns = self.nb_columns
+        nb_columns = self.get_nb_columns()
         if line_type == TableLineType.TITLE:
             if not isinstance(value, str):
                 raise TypeError(f"Cannot upate line {row}. Expected new content of type str. "
@@ -592,12 +538,11 @@ cdef class Table:
     
         self.update_global_database()
 
-    def __delitem__(self, index: int):
-        row = self._get_row_from_index(index)
+    def _delitem_(self, row: int):
         self.c_table.delete_line(row)
         self.update_global_database()
 
-    def __iadd__(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
+    def _iadd_(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
         cdef CTableLine* c_line
 
         if isinstance(value, TableLineType):
@@ -616,12 +561,12 @@ cdef class Table:
             if all(character == '-' for character in value):
                 self.c_table.add_line_separator()
             elif '|' in value:
-                self.__iadd__(value.split('|'))
+                self._iadd_(value.split('|'))
             else:
                 self.c_table.add_title(value.encode())
         elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
             c_line = self.c_table.add_line_with_cells()
-            nb_columns = self.nb_columns
+            nb_columns = self.get_nb_columns()
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
@@ -629,9 +574,9 @@ cdef class Table:
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_line_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
-                self.__iadd__(str(value))
+                self._iadd_(str(value))
             else:
-                self.__iadd__(line_type)
+                self._iadd_(line_type)
 
         self.update_global_database()
         return self
@@ -654,7 +599,7 @@ cdef class Table:
         lines = []
 
         # lines (-1 for the divider line)
-        for i in range(-1, self.nb_lines):
+        for i in range(-1, self.get_nb_lines()):
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -713,16 +658,3 @@ cdef class Table:
             s += "\n"
         
         return s
-
-    def _repr_(self) -> str:
-        s = self.__str__() + '\n'
-        s += f"nb lines: {self.nb_lines}\n"
-        s += f"nb columns: {self.nb_columns}\n"
-        s += f"language: '{self.language}'\n"
-        s += f"gridx: '{self.gridx}'\n"
-        s += f"gridy: '{self.gridy}'\n"
-        s += f"graph_axis: '{self.graph_axis}'\n"
-        s += f"graph_alignment: '{self.graph_alignment}'\n"
-        return s
-
-

@@ -109,7 +109,8 @@ class Comments(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        return self._cython_instance._get_object(name)
+        comment = self._cython_instance._get_object(name)
+        return comment
 
     def _set_object(self, key: Union[str, int], value: str):
         name = self._single_object_key_to_name(key)
