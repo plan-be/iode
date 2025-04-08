@@ -173,6 +173,8 @@ class CythonParser:
                 default = default.value
             elif isinstance(default, AttributeNode):
                 default = f'{default.obj.name}.{default.attribute}'
+            elif isinstance(default, NameNode):
+                default = default.name
             else:
                 raise NotImplementedError(f'Default argument: type {type(default).__name__} is not supported yet')
             arg += f'={default}'
@@ -276,18 +278,20 @@ class CythonParser:
         else:
             print(f'{indent}    not pure python function -> calling cython function in .py file / keep as it in .pyx file')
             pyx_func_code.extend(body_code)
-            list_args = ', '.join(args.keys())
             maybe_return = 'return ' if return_type_annotation is not None else ''
             if super_class is not None:
-                if 'cls' in list_args:
-                    list_args.replace('cls, ', '')
-                if 'self' in list_args:
-                    list_args.replace('self, ', '')
+                if 'cls' in args:
+                    del args['cls']
+                if 'self' in args:
+                    del args['self']
+                list_args = ', '.join(args.keys())
                 py_func_code.append(f'{indent}    {maybe_return}self._cython_instance.{pyx_func_name}({list_args})\n')
+                print(f'{indent}    {py_func_code[-1].strip()}')
             else:
+                list_args = ', '.join(args.keys())
                 py_func_code.append(f'{indent}    {maybe_return}{pyx_func_name}({list_args})\n')
+                print(f'{indent}    {py_func_code[-1].strip()}')
                 self.import_from_cython.add(pyx_func_name)
-        
         if len(pyx_func_code) > 0:
             pyx_func_code.append('\n')
         if len(py_func_code) > 0:
