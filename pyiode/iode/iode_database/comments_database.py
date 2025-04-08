@@ -10,7 +10,7 @@ else:
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
-from iode.iode_cython import  ImportFormats, TableLang
+from iode.iode_cython import ImportFormats, TableLang
 from iode.iode_cython import Comments as CythonComments
 
 

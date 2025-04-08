@@ -9,11 +9,11 @@ else:
 
 import pandas as pd
 from iode.common import EqTest, PrintEquationsAs, PrintEquationsLecAs
-from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
+from iode.time.period import Period
 from iode.util import join_lines, table2str, JUSTIFY
+from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
-from iode.iode_cython import Period
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]

@@ -8,7 +8,9 @@ else:
     Self = Any
 
 from iode.common import EqMethod, EqTest
-from iode.iode_cython import Period, Sample
+from iode.time.period import Period
+from iode.time.sample import Sample
+
 from iode.iode_cython import Equation as CythonEquation
 
 
@@ -521,6 +523,8 @@ class Equation:
         --------
         >>> from iode import Equation, variables
         >>> variables.clear()
+        >>> variables.sample
+        None
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF.sample
         None
@@ -553,7 +557,9 @@ class Equation:
         >>> eq_ACAF.sample
         Sample("1960Y1:2015Y1")
         """
-        return self._cython_instance.get_sample()
+        sample = Sample.get_instance()
+        sample._cython_instance = self._cython_instance.get_sample()
+        return sample
 
     @sample.setter
     def sample(self, value: Union[str, Sample]):
