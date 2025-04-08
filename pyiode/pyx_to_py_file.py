@@ -244,6 +244,8 @@ class CythonParser:
             pyx_func_name = f'set_{func_name}'
         else:
             pyx_func_name = func_name 
+        if class_name is None:
+            pyx_func_name = f'cython_{pyx_func_name}'
         pyx_func_signature = f'{indent}def {pyx_func_name}({arg_defs})'
         if return_type_annotation is not None:
             pyx_func_signature += f' -> {return_type_annotation.string.value}'
@@ -279,7 +281,9 @@ class CythonParser:
             if super_class is not None:
                 if 'cls' in list_args:
                     list_args.replace('cls, ', '')
-                py_func_code.append(f'{indent}    {maybe_return}{super_class}.{pyx_func_name}({list_args})\n')
+                if 'self' in list_args:
+                    list_args.replace('self, ', '')
+                py_func_code.append(f'{indent}    {maybe_return}self._cython_instance.{pyx_func_name}({list_args})\n')
             else:
                 py_func_code.append(f'{indent}    {maybe_return}{pyx_func_name}({list_args})\n')
                 self.import_from_cython.add(pyx_func_name)
@@ -324,7 +328,7 @@ class CythonParser:
         if isinstance(class_node, CClassDefNode):
             super_class = f'Cython{class_name}'
             self.import_from_cython.add(f'{class_name} as {super_class}')
-            py_base_classes = super_class
+            py_base_classes = ''
             if pyx_base_classes:
                 py_base_classes += f', {pyx_base_classes}'
         else:
