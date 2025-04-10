@@ -40,7 +40,7 @@ from .iode_database.tables_database import Tables, tables
 from .iode_database.variables_database import Variables, variables
 
 # Reports
-from .iode_cython import execute_report, execute_command
+from .reports import execute_report, execute_command
 
 # Printing
 from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
