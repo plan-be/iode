@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMessageBox, QWidget
 from PySide6.QtGui import QFont, QColor
 
 from iode import Table, TableLineType, TableCellAlign, tables
-from iode.util import TableLine, TableCell
+from iode.objects.table import TableCell, TableLine
 
 # NOTE FOR THE DEVELOPERS:
 # Read-only model: https://doc.qt.io/qt-6/model-view-programming.html#read-only-access
