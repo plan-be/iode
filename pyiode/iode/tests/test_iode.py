@@ -750,7 +750,7 @@ def test_variables_from_array():
 # ----------
 
 def test_estimation():
-    from iode.iode_cython import EditAndEstimateEquations
+    from iode.compute.estimation import EditAndEstimateEquations
 
     comments.clear()
     equations.clear()

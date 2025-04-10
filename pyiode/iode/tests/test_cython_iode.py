@@ -47,14 +47,6 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
             logging.info(f"tested method/function: '{name}'")
 
 
-def test_iode_estimation():
-    run_doctests_for_obj(iode_cython.dynamic_adjustment)
-    run_doctests_for_obj(iode_cython.dickey_fuller_test)
-
-def test_iode_edit_and_estimate_equations():
-    from iode.util import EditAndEstimateEquations
-    run_doctests_for_obj(EditAndEstimateEquations)
-
 def test_iode_messages():
     run_doctests_for_obj(iode_cython.reset_msgs)
     run_doctests_for_obj(iode_cython.suppress_msgs)
@@ -68,14 +60,6 @@ def test_iode_print_preferences():
     set_MIF_preferences()
     set_RTF_preferences()
     set_HTML_preferences()
-
-def test_iode_miscellaneous():
-    from iode.util import table2str, check_filepath, get_iode_file_type
-
-    iode_cython.__test__ = {}
-    run_doctests_for_obj(table2str)
-    run_doctests_for_obj(check_filepath)
-    run_doctests_for_obj(get_iode_file_type)
 
 def test_iode_errors_warnings_messages_from_C_API(capsys):
     from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm, 
