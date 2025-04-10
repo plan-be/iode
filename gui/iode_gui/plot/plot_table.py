@@ -2,7 +2,7 @@ from iode_gui.plot.plot import PlotDialog
 
 from typing import Union, List, Dict, Any
 from iode import TableGraphType, TableGraphGrid
-from iode.util import ComputedTable
+from iode.computed_table.computed_table import ComputedTable
 
 
 class PlotTableDialog(PlotDialog):
