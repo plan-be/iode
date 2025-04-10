@@ -83,7 +83,7 @@ cdef class Equation:
             warnings.warn(str(e), RuntimeWarning)
             return False
 
-    cdef void update_global_database(self):
+    cdef void update_owner_database(self):
         if self.c_database is not NULL:
             self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
 
@@ -101,7 +101,7 @@ cdef class Equation:
         value = value.strip()
         self.c_equation.set_lec(value.encode())
         self.reset_date_and_tests()
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_method(self) -> str:
         return EqMethod(<int>(self.c_equation.get_method_as_int())).name
@@ -109,7 +109,7 @@ cdef class Equation:
     def set_method(self, value: int):
         self.c_equation.set_method(<IodeEquationMethod>(value))
         self.reset_date_and_tests()
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_sample(self) -> Sample:
         cdef CSample sample = self.c_equation.get_sample()
@@ -118,14 +118,14 @@ cdef class Equation:
     def set_sample(self, from_period: str, to_period: str):
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
         self.reset_date_and_tests()
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_comment(self) -> str:
         return self.c_equation.get_comment().decode()
 
     def set_comment(self, value: str):
         self.c_equation.set_comment(value.encode())
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_instruments(self) -> Union[str, List[str]]:
         _instruments = self.c_equation.get_instruments().decode().split(';')
@@ -134,7 +134,7 @@ cdef class Equation:
     def set_instruments(self, value: str):
         self.c_equation.set_instruments(value.encode())
         self.reset_date_and_tests()
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_block(self) -> str:
         return self.c_equation.get_block().decode()
@@ -142,7 +142,7 @@ cdef class Equation:
     def set_block(self, value: str):
         self.c_equation.set_block(value.encode())
         self.reset_date_and_tests()
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_tests(self) -> Dict[str, float]:
         cdef map[string, float] cpp_tests = self.c_equation.get_tests_as_map()
@@ -154,14 +154,14 @@ cdef class Equation:
     def _set_tests_from_list(self, tests: List[float]):
         for i, value in enumerate(tests):
             self.c_equation.set_test(<IodeEquationTest>i, value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def _set_date(self, value: str, format: str='dd-mm-yyyy'):
         if not value:
             self.c_equation.reset_date()
         else:    
             self.c_equation.set_date(value.encode(), format.encode())
-        self.update_global_database()
+        self.update_owner_database()
 
     def equal(self, other: Equation) -> bool:
         return self.c_equation == other.c_equation
