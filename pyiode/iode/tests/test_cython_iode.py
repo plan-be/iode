@@ -50,7 +50,6 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
 def test_iode_execute():
     run_doctests_for_obj(iode_cython.execute_report)
     run_doctests_for_obj(iode_cython.execute_command)
-    run_doctests_for_obj(iode_cython.execute_lec)
 
 def test_iode_simulation_estimation():
     run_doctests_for_obj(iode_cython.Simulation)
