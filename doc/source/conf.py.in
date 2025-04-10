@@ -17,9 +17,8 @@ import sys
 import iode
 print(f"iode: {iode.__version__}, {iode.__file__}")
 
-iode.TableLine = iode.iode_cython.TableLine
-iode.TableCell = iode.iode_cython.TableCell
-iode.ComputedTable = iode.iode_cython.ComputedTable
+from iode.objects.table import TableCell, TableLine
+from iode.computed_table.computed_table import ComputedTable
 
 
 # -- Project information -----------------------------------------------------
