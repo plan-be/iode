@@ -46,8 +46,11 @@ from .reports import execute_report, execute_command
 from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
                           w_print_pg_footer, w_print_pg_header, w_print_tit)
 
-# Estimation - Simulation
-from .iode_cython import Simulation, dynamic_adjustment, dickey_fuller_test 
+# Simulation
+from .compute.simulation import Simulation
+
+# Estimation
+from .iode_cython import dynamic_adjustment, dickey_fuller_test 
 
 # lec
 from .lec import execute_lec
@@ -59,6 +62,7 @@ from .gui import view_workspace
 from .iode_cython import reset_msgs, suppress_msgs
 from .common import FileType
 from .super import *
+
 
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 
@@ -92,8 +96,11 @@ __all__ = [
     'w_close', 'w_dest', 'w_flush', 'w_print', 'w_print_cmd', 'w_print_enum', 'w_print_par', 'w_print_pg_footer', 
     'w_print_pg_header', 'w_print_tit', 
 
-    # Estimation - Simulation
-    'Simulation', 'dynamic_adjustment', 'dickey_fuller_test', 
+    # Simulation
+    'Simulation', 
+
+    # Estimation
+    'dynamic_adjustment', 'dickey_fuller_test', 
 
     # lec
     'execute_lec', 

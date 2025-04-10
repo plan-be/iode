@@ -47,8 +47,7 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
             logging.info(f"tested method/function: '{name}'")
 
 
-def test_iode_simulation_estimation():
-    run_doctests_for_obj(iode_cython.Simulation)
+def test_iode_estimation():
     run_doctests_for_obj(iode_cython.dynamic_adjustment)
     run_doctests_for_obj(iode_cython.dickey_fuller_test)
 
