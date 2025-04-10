@@ -13,10 +13,10 @@ from iode_gui.iode_objs.models.table_model import ScalarsModel
 from iode_gui.plot.plot import PlotDialog
 from .ui_estimation_results import Ui_EstimationResultsDialog
 
-from typing import List, Dict
 import warnings
+from typing import List, Dict
 from iode import Sample, Scalars, Equation, EQ_TEST_NAMES, EqTest, variables
-from iode.util import EditAndEstimateEquations
+from iode.compute.estimation import EditAndEstimateEquations
 
 
 class EstimationResultsDialog(QDialog):

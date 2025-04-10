@@ -4,8 +4,7 @@ from PySide6.QtCore import Qt
 
 from .ui_estimation_coefs import Ui_EstimationCoefsDialog
 from iode_gui.iode_objs.models.table_model import ScalarsModel
-
-from iode.util import EditAndEstimateEquations
+from iode.compute.estimation import EditAndEstimateEquations
 
 
 class EstimationCoefsDialog(QDialog):

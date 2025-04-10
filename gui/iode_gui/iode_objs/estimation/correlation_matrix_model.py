@@ -1,6 +1,6 @@
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
 
-from iode.util import CorrelationMatrix
+from iode.compute.estimation import CorrelationMatrix
 
 
 class CorrelationMatrixModel(QAbstractTableModel):

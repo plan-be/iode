@@ -15,7 +15,7 @@ from .ui_edit_equation import Ui_EditEquationDialog
 from typing import Dict
 import warnings
 from iode import equations, Equation, EqMethod, Sample, IodeType
-from iode.util import EditAndEstimateEquations
+from iode.compute.estimation import EditAndEstimateEquations
 
 
 class EditEquationDialog(MixinSettingsDialog):
