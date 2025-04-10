@@ -877,7 +877,7 @@ class Variables(IodeDatabase):
 
     def _expand_key_periods(self, key_periods: Union[str, Period, List[str], Tuple[str, str], Sample]) -> List[str]:
         if key_periods is None:
-            return self.periods
+            return self.periods_as_str
         
         if isinstance(key_periods, (str, Period)):
             key_periods = [key_periods]
@@ -1306,7 +1306,7 @@ class Variables(IodeDatabase):
         A3              na    1.00    2.00  ...   53.00   54.00      na
         <BLANKLINE>
         >>> # 5) pandas Series
-        >>> values = pd.Series(values, index=variables.periods)
+        >>> values = pd.Series(values, index=variables.periods_as_str)
         >>> variables["A4"] = values
         >>> variables["A4"]                     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
@@ -1423,7 +1423,7 @@ class Variables(IodeDatabase):
         ACAG            na    1.00    2.00  ...   53.00   54.00      na
         <BLANKLINE>
         >>> # 2.5) pandas Series
-        >>> values = pd.Series(values, index=variables.periods)
+        >>> values = pd.Series(values, index=variables.periods_as_str)
         >>> variables["AOUC"] = values
         >>> variables["AOUC"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
@@ -2006,7 +2006,7 @@ class Variables(IodeDatabase):
             return _self
         
         self_names = _self.names
-        self_periods = _self.periods
+        self_periods = _self.periods_as_str
         nb_periods = len(self_periods)
 
         if isinstance(other, np.ndarray):
@@ -2193,7 +2193,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # add a pandas Series to a single variable
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -2246,7 +2246,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -2273,7 +2273,7 @@ class Variables(IodeDatabase):
 
         >>> # add an larray Array to a subset of a Variables object
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -2459,7 +2459,7 @@ class Variables(IodeDatabase):
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -2622,7 +2622,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # add a pandas Series to a single variable
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -2675,7 +2675,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -2702,7 +2702,7 @@ class Variables(IodeDatabase):
 
         >>> # add an larray Array to the current subset of the Variables object
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -2887,7 +2887,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # subtract a pandas Series from a single variable
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -2940,7 +2940,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -2967,7 +2967,7 @@ class Variables(IodeDatabase):
 
         >>> # subtract an larray Array from a subset of a Variables object
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -3213,7 +3213,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # subtract a pandas Series from a single variable
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -3266,7 +3266,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -3293,7 +3293,7 @@ class Variables(IodeDatabase):
 
         >>> # subtract an larray Array from the current subset of the Variables object
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -3477,7 +3477,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # multiply a single variable by a pandas Series
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -3530,7 +3530,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -3557,7 +3557,7 @@ class Variables(IodeDatabase):
 
         >>> # multiply a subset of a Variables object by an larray Array
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -3742,7 +3742,7 @@ class Variables(IodeDatabase):
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]])
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -3905,7 +3905,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # multiply a single variable by a pandas Series
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -3958,7 +3958,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -3985,7 +3985,7 @@ class Variables(IodeDatabase):
 
         >>> # multiply a subset of a Variables object by an larray Array
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -4170,7 +4170,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # divide a a single variable by a pandas Series
-        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.0
         1992Y1    2.0
@@ -4223,7 +4223,7 @@ class Variables(IodeDatabase):
         ...                  [11.0, 12.0, 13.0, 14.0, 15.0], 
         ...                  [16.0, 17.0, 18.0, 19.0, 20.0], 
         ...                  [21.0, 22.0, 23.0, 24.0, 25.0]],)
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      1.0     2.0     3.0     4.0     5.0
@@ -4250,7 +4250,7 @@ class Variables(IodeDatabase):
 
         >>> # divide (a subset of) a Variables object by an larray Array
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -4499,7 +4499,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # divide a a single variable by a pandas Series
-        >>> series = pd.Series([1.0, 0.5, 0.25, 0.2, 0.1], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 0.5, 0.25, 0.2, 0.1], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.00
         1992Y1    0.50
@@ -4552,7 +4552,7 @@ class Variables(IodeDatabase):
         ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
         ...                  [1.0, 0.5, 0.25, 0.2, 0.1], 
         ...                  [1.0, 0.5, 0.25, 0.2, 0.1]])
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
                1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF      0.1     0.2    0.25     0.5     1.0
@@ -4579,7 +4579,7 @@ class Variables(IodeDatabase):
 
         >>> # divide (a subset of) a Variables object by an larray Array
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -4771,7 +4771,7 @@ class Variables(IodeDatabase):
         <BLANKLINE>
 
         >>> # compute 'iode_var[period] ** series[period]' for each period
-        >>> series = pd.Series([1.0, 2.0, 0.5, 1./4., 2.0], index=vars_subset.periods)
+        >>> series = pd.Series([1.0, 2.0, 0.5, 1./4., 2.0], index=vars_subset.periods_as_str)
         >>> series                                              # doctest: +NORMALIZE_WHITESPACE
         1991Y1    1.00
         1992Y1    2.00
@@ -4824,7 +4824,7 @@ class Variables(IodeDatabase):
         ...                  [1./4., 2.0, 1.0, 2.0, 0.5],
         ...                  [0.5, 1./4., 2.0, 1.0, 2.0],
         ...                  [2.0, 0.5, 1./4., 2.0, 1.0]])
-        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods) 
+        >>> df = pd.DataFrame(data, index=vars_subset.names, columns=vars_subset.periods_as_str) 
         >>> df                                              # doctest: +NORMALIZE_WHITESPACE
               1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
         ACAF	1.00	2.00	0.50	0.25	 2.0
@@ -4851,7 +4851,7 @@ class Variables(IodeDatabase):
 
         >>> # compute 'iode_var[name, period] ** array[name, period]' for each name and period
         >>> axis_names = la.Axis(name="names", labels=vars_subset.names)
-        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods)
+        >>> axis_time = la.Axis(name="time", labels=vars_subset.periods_as_str)
         >>> array = la.Array(data, axes=(axis_names, axis_time))
         >>> array                                           # doctest: +NORMALIZE_WHITESPACE
         names\time  1991Y1  1992Y1  1993Y1  1994Y1  1995Y1
@@ -5602,7 +5602,7 @@ class Variables(IodeDatabase):
         [33 rows x 11 columns]
         """        
         vars_list = self.names
-        periods_list = self.periods_as_float if sample_as_floats else self.periods
+        periods_list = self.periods_as_float if sample_as_floats else self.periods_as_str
         data = self.to_numpy()
 
         df = pd.DataFrame(index=vars_list, columns=periods_list, data=data)
@@ -5837,7 +5837,7 @@ class Variables(IodeDatabase):
             raise RuntimeError("larray library not found")
 
         vars_list = self.names
-        periods_list = self.periods_as_float if sample_as_floats else self.periods
+        periods_list = self.periods_as_float if sample_as_floats else self.periods_as_str
         data = self.to_numpy()
 
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
@@ -6085,9 +6085,33 @@ class Variables(IodeDatabase):
         return self.sample.nb_periods
 
     @property
-    def periods(self) -> List[str]:
+    def periods(self) -> List[Period]:
         r"""
         Return the list of periods from the current Variables sample.
+
+        Returns
+        -------
+        list(Period)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> variables.sample
+        Sample("1960Y1:2015Y1")
+        >>> variables.periods       # doctest: +ELLIPSIS 
+        [Period("1960Y1"), Period("1961Y1"), ..., Period("2014Y1"), Period("2015Y1")]
+        """
+        # self.sample calls self._maybe_update_subset_sample()
+        return self.sample.periods
+
+    @property
+    def periods_as_str(self) -> List[str]:
+        r"""
+        Return the list of periods as string from the current Variables sample.
 
         Returns
         -------
@@ -6102,11 +6126,11 @@ class Variables(IodeDatabase):
         394 objects loaded
         >>> variables.sample
         Sample("1960Y1:2015Y1")
-        >>> variables.periods       # doctest: +ELLIPSIS 
+        >>> variables.periods_as_str          # doctest: +ELLIPSIS 
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         """
         # self.sample calls self._maybe_update_subset_sample()
-        return self.sample.get_period_list()
+        return self.sample.get_period_list(astype=str)
 
     @property
     def periods_as_float(self) -> List[float]:
