@@ -1,8 +1,8 @@
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 from typing import List
-from iode.util import EditAndEstimateEquations
 from iode import EqTest, EQ_TEST_NAMES, Equation
+from iode.compute.estimation import EditAndEstimateEquations
 
 
 class TestsEqsModel(QAbstractTableModel):
