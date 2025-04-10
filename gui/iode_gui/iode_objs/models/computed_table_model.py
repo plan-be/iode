@@ -7,7 +7,7 @@ from iode_gui.utils import NAN_REP
 
 from typing import List, Union
 from iode import tables, Table, split_list
-from iode.iode_cython import ComputedTable
+from iode.computed_table.computed_table import ComputedTable
 
 
 class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):

@@ -9,7 +9,7 @@ from .ui_edit_tables import Ui_MenuDataEditTables
 
 from typing import List
 from iode import IodeType, tables, variables, Sample, Table, reset_extra_files
-from iode.util import ComputedTable
+from iode.computed_table.computed_table import ComputedTable
 
 
 class MenuDataEditTables(MixinSettingsDialog):
