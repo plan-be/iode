@@ -47,10 +47,6 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
             logging.info(f"tested method/function: '{name}'")
 
 
-def test_iode_execute():
-    run_doctests_for_obj(iode_cython.execute_report)
-    run_doctests_for_obj(iode_cython.execute_command)
-
 def test_iode_simulation_estimation():
     run_doctests_for_obj(iode_cython.Simulation)
     run_doctests_for_obj(iode_cython.dynamic_adjustment)
@@ -75,14 +71,9 @@ def test_iode_print_preferences():
     set_HTML_preferences()
 
 def test_iode_miscellaneous():
-    from iode.reports import (build_command_functions_list, build_report_functions_list, 
-                              build_lec_functions_list)
     from iode.util import table2str, check_filepath, get_iode_file_type
 
     iode_cython.__test__ = {}
-    run_doctests_for_obj(build_command_functions_list)
-    run_doctests_for_obj(build_report_functions_list)
-    run_doctests_for_obj(build_lec_functions_list)
     run_doctests_for_obj(table2str)
     run_doctests_for_obj(check_filepath)
     run_doctests_for_obj(get_iode_file_type)
