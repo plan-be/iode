@@ -1013,8 +1013,8 @@ class Table:
         instance._cython_instance = CythonTable.__new__(CythonTable)
         return instance
 
-    def update_global_database(self):
-        self._cython_instance.update_global_database()
+    def update_owner_database(self):
+        self._cython_instance.update_owner_database()
 
     @property
     def nb_lines(self) -> int:

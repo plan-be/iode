@@ -62,7 +62,7 @@ cdef class TableCell:
             value = TableCellAlign[value]
         value = int(value)
         self.c_cell.set_align(<CTableCellAlign>value)
-        self.py_parent_table.update_global_database()
+        self.py_parent_table.update_owner_database()
 
     def get_bold(self) -> bool:
         return self.c_cell.is_bold() if self.c_cell is not NULL else None
@@ -70,7 +70,7 @@ cdef class TableCell:
     def set_bold(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_bold(<bint>value)
-            self.py_parent_table.update_global_database()
+            self.py_parent_table.update_owner_database()
 
     def get_italic(self) -> bool:
         return self.c_cell.is_italic() if self.c_cell is not NULL else None
@@ -78,7 +78,7 @@ cdef class TableCell:
     def set_italic(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_italic(<bint>value)
-            self.py_parent_table.update_global_database()
+            self.py_parent_table.update_owner_database()
 
     def get_underline(self) -> bool:
         return self.c_cell.is_underline() if self.c_cell is not NULL else None
@@ -86,7 +86,7 @@ cdef class TableCell:
     def set_underline(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_underline(<bint>value)
-            self.py_parent_table.update_global_database()
+            self.py_parent_table.update_owner_database()
 
     def get_coefficients(self) -> List[str]:
         if self.c_cell is NULL:
@@ -142,7 +142,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         self.c_line.set_line_graph(<CTableGraphType>value)
-        self.py_parent_table.update_global_database()
+        self.py_parent_table.update_owner_database()
 
     def get_axis_left(self) -> bool:
         return self.c_line.is_left_axis() if self.c_line is not NULL else None
@@ -151,7 +151,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         self.c_line.set_line_axis(<bint>value)
-        self.py_parent_table.update_global_database()
+        self.py_parent_table.update_owner_database()
 
     def size(self) -> int:
         if self.c_line is NULL:
@@ -184,7 +184,7 @@ cdef class TableLine:
         
         c_cell = self.c_line.get_cell(col, self.nb_columns)
         c_cell.set_content(value.encode())
-        self.py_parent_table.update_global_database()
+        self.py_parent_table.update_owner_database()
 
     def _str_(self) -> str:
         cdef CTableCell* c_cell
@@ -273,7 +273,7 @@ cdef class Table:
         wrapper.ptr_owner = owner
         return wrapper
 
-    def update_global_database(self):
+    def update_owner_database(self):
         if self.c_database is not NULL and self.c_table is not NULL:
             self.c_database.update(self.c_table_name, dereference(self.c_table))
 
@@ -305,7 +305,7 @@ cdef class Table:
             if line_type == TableLineType.TITLE:
                 c_title = value.encode()
                 self.c_table.set_title(i, c_title)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_language(self) -> str:
         return self.c_table.get_language().decode().upper()
@@ -319,7 +319,7 @@ cdef class Table:
             value = TableLang[upper_str]
         value = int(value)
         self.c_table.set_language(<CTableLang>value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_gridx(self) -> str:
         return TableGraphGrid(<int>(self.c_table.get_gridx())).name
@@ -330,7 +330,7 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridx(<CTableGraphGrid>value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_gridy(self) -> str:
         return TableGraphGrid(<int>(self.c_table.get_gridy())).name
@@ -341,7 +341,7 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridy(<CTableGraphGrid>value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_graph_axis(self) -> str:
         return TableGraphAxis(self.c_table.get_graph_axis()).name
@@ -352,7 +352,7 @@ cdef class Table:
             value = TableGraphAxis[value]
         value = int(value)
         self.c_table.set_graph_axis(<CTableGraphAxis>value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_graph_alignment(self) -> str:
         return TableGraphAlign(<int>(self.c_table.get_graph_alignment())).name
@@ -363,7 +363,7 @@ cdef class Table:
             value = TableGraphAlign[value]
         value = int(value)
         self.c_table.set_graph_alignment(<CTableGraphAlign>value)
-        self.update_global_database()
+        self.update_owner_database()
 
     def get_coefficients(self) -> List[str]:
         cdef CTableLine* c_line
@@ -494,7 +494,7 @@ cdef class Table:
             else:
                 self.insert(row, line_type)
         
-        self.update_global_database()
+        self.update_owner_database()
 
     def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, nb_decimals: int=2) -> ComputedTable:
         if not generalized_sample:
@@ -536,11 +536,11 @@ cdef class Table:
         else:
             warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
     
-        self.update_global_database()
+        self.update_owner_database()
 
     def _delitem_(self, row: int):
         self.c_table.delete_line(row)
-        self.update_global_database()
+        self.update_owner_database()
 
     def _iadd_(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
         cdef CTableLine* c_line
@@ -578,7 +578,7 @@ cdef class Table:
             else:
                 self._iadd_(line_type)
 
-        self.update_global_database()
+        self.update_owner_database()
         return self
 
     def _copy_(self, table: Table) -> Table:
