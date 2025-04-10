@@ -380,6 +380,7 @@ Properties and methods specific to Variables
    Variables.sample
    Variables.nb_periods
    Variables.periods
+   Variables.periods_as_str
    Variables.periods_as_float
    Variables.threshold
 
