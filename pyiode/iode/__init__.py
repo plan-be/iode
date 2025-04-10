@@ -50,7 +50,7 @@ from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_prin
 from .compute.simulation import Simulation
 
 # Estimation
-from .iode_cython import dynamic_adjustment, dickey_fuller_test 
+from .compute.estimation import dynamic_adjustment, dickey_fuller_test 
 
 # lec
 from .lec import execute_lec
