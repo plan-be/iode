@@ -9,7 +9,8 @@ else:
     Self = Any
 
 from iode.common import TableLang
-from iode.iode_cython import ComputedTable
+from iode.computed_table.computed_table import ComputedTable
+
 from iode.iode_cython import (TableGraphType, TableGraphGrid, TableGraphAlign, 
                               TableGraphAxis, TableLineType, TableCellAlign)
 from iode.iode_cython import TableCell as CythonTableCell
@@ -1578,7 +1579,8 @@ class Table:
         row = self._get_row_from_index(index)
         self._cython_instance.insert(row, value)
 
-    def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, nb_decimals: int=2) -> ComputedTable:
+    def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, 
+                nb_decimals: int=2) -> ComputedTable:
         r"""
         Compute the values corresponding to LEC expressions in cells.
         
@@ -1770,7 +1772,12 @@ class Table:
         >>> [Path(filepath).name for filepath in computed_table.files]
         ['fun.var', 'ref.av', 'fun.av', 'fun2.av', 'a.var']
         """
-        return self._cython_instance.compute(generalized_sample, extra_files, nb_decimals)
+        computed_table = ComputedTable.get_instance()
+        computed_table._cython_instance = self._cython_instance.compute(generalized_sample, extra_files, nb_decimals)
+        if computed_table._cython_instance is None:
+            warnings.warn(f"Could not compute the table '{self.title.strip()}' with the generalized sample '{generalized_sample}'.")
+            return None
+        return computed_table
 
     def copy(self) -> Self:
         r"""

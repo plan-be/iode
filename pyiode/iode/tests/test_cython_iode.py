@@ -47,9 +47,6 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
             logging.info(f"tested method/function: '{name}'")
 
 
-def test_iode_computed_table():
-    run_doctests_for_obj(iode_cython.ComputedTable)
-
 def test_iode_execute():
     run_doctests_for_obj(iode_cython.execute_report)
     run_doctests_for_obj(iode_cython.execute_command)
