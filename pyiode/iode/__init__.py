@@ -50,7 +50,7 @@ from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_prin
 from .iode_cython import Simulation, dynamic_adjustment, dickey_fuller_test 
 
 # lec
-from .iode_cython import execute_lec
+from .lec import execute_lec
 
 # gui
 from .gui import view_workspace
