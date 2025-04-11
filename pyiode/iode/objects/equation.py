@@ -11,7 +11,7 @@ from iode.common import EqMethod, EqTest
 from iode.time.period import Period
 from iode.time.sample import Sample
 
-from iode.iode_cython import reset_msgs, suppress_msgs
+from iode.iode_cython import enable_msgs, suppress_msgs
 from iode.iode_cython import Equation as CythonEquation
 
 
@@ -436,11 +436,11 @@ class Equation:
         try:
             success = self._cython_instance.estimate(from_period, to_period)
             if quiet:
-                reset_msgs()
+                enable_msgs()
             return success
         except Exception as e:
             if quiet:
-                reset_msgs()
+                enable_msgs()
             raise e
 
     @property

@@ -10,7 +10,7 @@
 #       _pystr(cstr) -> str                     | Convert a C null terminated string (ANSI cp850) into a python string (UTF8).
 #       _arg_to_str(arg, sep: str = ' ') -> str | Convert None, a list of str or an str to a str
 #       suppress_msgs()                         | Suppress the output during an IODE session.
-#       reset_msgs()                            | Reset the normal output mechanism during an IODE session.
+#       enable_msgs()                            | Reset the normal output mechanism during an IODE session.
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
@@ -50,7 +50,7 @@ def suppress_msgs():
     IodeSuppressMsgs()
 
 
-def reset_msgs():
+def enable_msgs():
     '''Reset the normal output mechanism during an IODE session.'''
     IodeResetMsgs()
  
