@@ -1,9 +1,5 @@
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
 
 cimport cython
 from cython.operator cimport dereference
@@ -14,7 +10,6 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
 
 import pandas as pd
-from iode.util import check_filepath
 
 
 cdef class Comments(CythonIodeDatabase):
@@ -68,37 +63,8 @@ cdef class Comments(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     @classmethod
-    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], lang: Union[str, TableLang]=TableLang.ENGLISH, debug_file: Union[str, Path]=None) -> None:
-        # $FileImportCmt format rule_file input_file language [debug_file]
-        input_file = check_filepath(input_file, IodeFileType.FILE_ANY, file_must_exist=True)
-
-        _c_import_formats: str = ''.join([item.name[0] for item in list(ImportFormats)])
-        if isinstance(input_format, ImportFormats):
-            input_format = input_format.name[0]
-        if input_format not in _c_import_formats:
-            raise ValueError(f"Invalid input format '{input_format}'. "
-                             f"Possible values are: {_c_import_formats}")
-        
-        save_file = check_filepath(save_file, IodeFileType.FILE_COMMENTS, file_must_exist=False)
-        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
-
-        _c_table_langs: str = ''.join([item.name[0] for item in list(TableLang)])
-        if isinstance(lang, TableLang):
-            lang = lang.name[0]
-        if lang not in _c_table_langs:
-            raise ValueError(f"Invalid language '{lang}'. " 
-                             f"Possible values are: {_c_table_langs}") 
-
-        # $FileImportCmt format rule infile outfile language [trace]
-        args = f"{input_format} {rule_file} {input_file} {save_file} {lang}"
-        
-        if debug_file:
-            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
-            args += " " + debug_file
-
-        res = B_FileImportCmt(args.encode('utf-8'))
-        if res < 0:
-            raise RuntimeError(f"Cannot import comments from file '{input_file}'")
+    def convert_file(cls, args: str) -> int:
+        return B_FileImportCmt(args.encode('utf-8'))
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database_ptr))

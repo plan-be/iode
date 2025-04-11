@@ -486,8 +486,16 @@ class IodeDatabase:
         
         if isinstance(filepath, Path):
             filepath = str(filepath.resolve())
+        if filepath is not None:
+            if not isinstance(filepath, str):
+                raise TypeError("'filepath': Expected None or value of type Path or str. "
+                                f"Got value of type '{type(filepath).__name__}' instead")
+            expected_file_type = IodeFileType(self.iode_type.value)
+            filepath = check_filepath(filepath, expected_file_type, file_must_exist=True)
 
-        return self._cython_instance.get_names(pattern, filepath)
+        iode_list = self._cython_instance.get_names(pattern, filepath)
+        iode_list = split_list(iode_list)
+        return iode_list
 
     @property
     def names(self) -> List[str]:

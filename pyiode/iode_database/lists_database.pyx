@@ -1,9 +1,5 @@
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
 
 cimport cython
 from cython.operator cimport dereference
@@ -51,10 +47,9 @@ cdef class Lists(CythonIodeDatabase):
         cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return cython_instance
 
-    def _get_object(self, name: str) -> List[str]:
+    def _get_object(self, name: str) -> str:
         name = name.strip()
-        str_list = self.database_ptr.get(name.encode()).decode()
-        return split_list(str_list)
+        return self.database_ptr.get(name.encode()).decode()
 
     def _set_object(self, name: str, value: str):
         name = name.strip()

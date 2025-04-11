@@ -9,6 +9,7 @@ else:
     Self = Any
 
 from iode.common import TableLang
+from iode.iode_database.extra_files import load_extra_files
 from iode.computed_table.computed_table import ComputedTable
 
 from iode.iode_cython import (TableGraphType, TableGraphGrid, TableGraphAlign, 
@@ -1772,8 +1773,11 @@ class Table:
         >>> [Path(filepath).name for filepath in computed_table.files]
         ['fun.var', 'ref.av', 'fun.av', 'fun2.av', 'a.var']
         """
+        if extra_files is not None:
+            load_extra_files(extra_files)
+
         computed_table = ComputedTable.get_instance()
-        computed_table._cython_instance = self._cython_instance.compute(generalized_sample, extra_files, nb_decimals)
+        computed_table._cython_instance = self._cython_instance.compute(generalized_sample, nb_decimals)
         if computed_table._cython_instance is None:
             warnings.warn(f"Could not compute the table '{self.title.strip()}' with the generalized sample '{generalized_sample}'.")
             return None

@@ -8,6 +8,7 @@ else:
     Self = Any
 
 from iode.common import PrintTablesAs
+from iode.util import JUSTIFY, table2str, join_lines
 from iode.objects.table import Table
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import Tables as CythonTables
@@ -832,7 +833,10 @@ class Tables(IodeDatabase):
         self._cython_instance.copy_from(input_files, names)
 
     def _str_table(self, names: List[str]) -> str:
-        return self._cython_instance._str_table(names)
+        titles = [join_lines(self.get_title(name)) for name in names]
+        columns = {"name": names, "table titles": titles}
+        justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT}
+        return table2str(columns, max_lines=10, max_width=-1, justify_funcs=justify_funcs)
 
     @property
     def print_nb_decimals(self) -> int:

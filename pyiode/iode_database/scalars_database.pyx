@@ -1,9 +1,5 @@
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
 
 cimport cython
 from cython.operator cimport dereference

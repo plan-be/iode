@@ -2,13 +2,7 @@ import warnings
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Set, Optional, Any
-if sys.version_info.minor >= 11:
-    from enum import IntEnum, StrEnum
-    from typing import Self
-else:
-    Self = Any
-    from enum import Enum, IntEnum
-    StrEnum = Enum
+from enum import IntEnum
 
 import numpy as np
 import pandas as pd
@@ -44,8 +38,6 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR, K
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
-
-from iode.util import check_filepath, split_list
 
 
 class BinaryOperation(IntEnum):
@@ -564,17 +556,15 @@ cdef class Variables(CythonIodeDatabase):
             W_close()
         return res
 
-    def _str_table(self, names: List[str]) -> str:
+    def _str_table(self, names: List[str], periods: List[str]) -> Dict[str, List[float]]:
         cdef t
-        # self.get_sample() calls self._maybe_update_subset_sample()
-        periods = self.get_sample().get_period_list('str')
-        columns = {"name": names}
         names_pos: List[int] = [self.get_position(name) for name in names] 
+        columns = {"name": names}
         for str_period in periods:
             period = Period(str_period)
             t = self._get_real_period_position(period)
             columns[str_period] = [self.database_ptr.get_var(<int>pos, <int>t, self.mode_) for pos in names_pos]
-        return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
+        return columns
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database_ptr))
