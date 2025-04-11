@@ -2,6 +2,7 @@ import warnings
 from collections.abc import Iterable
 from typing import List, Union
 
+from iode.iode_cython import suppress_msgs, reset_msgs
 from iode.time.period import Period
 from iode.iode_cython import SimulationSort, SimulationInitialization
 from iode.iode_cython import Simulation as CythonSimulation
@@ -766,7 +767,7 @@ class Simulation:
         
         self._cython_instance.model_exchange(list_exo)
 
-    def model_compile(self, list_eqs: Union[str, List[str]]=None) -> bool:
+    def model_compile(self, list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
         Recompiles a list of equations, or all equations if no list is specified. 
         It is only useful if (the list of) equations contain macros in their LEC form (like $list).
@@ -782,6 +783,9 @@ class Simulation:
         list_eqs : str or list(str), optional
             List of equations to recompile. 
             Default to empty (recompile all equations).
+        quiet : bool, optional
+            If True, suppresses the log messages during the compilation process. 
+            Default to False.
 
         Returns
         -------
@@ -801,15 +805,22 @@ class Simulation:
             raise TypeError("'list_eqs': Expected None or value of type str or list of str. "
                             f"Got value of type {type(list_eqs)} instead.")
         
+        if quiet:
+            suppress_msgs()
+
         try:
             self._cython_instance.model_compile(list_eqs)
-            return True
+            success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
-            return False
+            success = False
+
+        if quiet:
+            reset_msgs()
+        return success
 
     def model_simulate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
-                       list_eqs: Union[str, List[str]]=None) -> bool:
+                       list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
         Run the simulation of a model for a given sample.
 
@@ -827,6 +838,9 @@ class Simulation:
         list_eqs : str or list(str), optional
             List of equations representing the model.
             Default to empty (all equations).
+        quiet : bool, optional
+            If True, suppresses the log messages during the simulation process. 
+            Default to False.
 
         Returns
         -------
@@ -853,7 +867,7 @@ class Simulation:
         Loading .../fun.var
         394 objects loaded
 
-        >>> # exogeneous variable 
+        >>> # exogenous variable 
         >>> equations["UY"].lec
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
         >>> # reset values
@@ -933,15 +947,22 @@ class Simulation:
             raise TypeError("'list_eqs': Expected None or value of type str or list of str. "
                             f"Got value of type {type(list_eqs)} instead.")
 
+        if quiet:
+            suppress_msgs()
+
         try: 
             self._cython_instance.model_simulate(from_period, to_period, list_eqs)
-            return True
+            success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
-            return False
+            success = False
+
+        if quiet:
+            reset_msgs()
+        return success
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str='_PRE', inter_name: str='_INTER', 
-                            post_name: str='_POST', list_eqs: Union[str, List[str]]=None) -> bool:
+                            post_name: str='_POST', list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
         Decompose the model into Strongly Connex Components (SCC) and reorder it. 
         
@@ -966,6 +987,9 @@ class Simulation:
         list_eqs : str or list(str), optional
             List of equations representing the model.
             Default to empty (all equations).
+        quiet : bool, optional
+            If True, suppresses the log messages during the SCC decomposition process.
+            Default to False.
 
         Returns
         -------
@@ -1030,15 +1054,22 @@ class Simulation:
             raise TypeError("'list_eqs': Expected None or value of type str or list of str. "
                             f"Got value of type {type(list_eqs)} instead.")
 
+        if quiet:
+            suppress_msgs()
+
         try:
             self._cython_instance.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
-            return True
+            success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
-            return False
+            success = False
+
+        if quiet:
+            reset_msgs()
+        return success
 
     def model_simulate_SCC(self, from_period: Union[str, Period], to_period: Union[str, Period], pre_name: str='_PRE', 
-                           inter_name: str='_INTER', post_name: str='_POST') -> bool:
+                           inter_name: str='_INTER', post_name: str='_POST', quiet: bool=False) -> bool:
         r"""
         Simulates a model previously decomposed into Strongly Connex Components (SCC) and reordered.
         It is intended to be called after the method :meth:`Simulation.model_calculate_SCC`.
@@ -1062,6 +1093,9 @@ class Simulation:
         post_name : str, optional
             Name of the list representing the post-recursive equations.
             Default to "_POST".
+        quiet : bool, optional
+            If True, the simulation will not display log messages.
+            Default to False.
 
         Returns
         -------
@@ -1181,9 +1215,16 @@ class Simulation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
+        if quiet:
+            suppress_msgs()
+
         try:
             self._cython_instance.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
-            return True
+            success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
-            return False
+            success = False
+        
+        if quiet:
+            reset_msgs()
+        return success

@@ -77,14 +77,7 @@ class ComputedTable:
     Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
     <BLANKLINE>
     >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals
-    >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av") # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-    Loading ...ref.av
-    Reading object 1 : ACAF
-    Reading object 2 : ACAG
-    ...
-    Reading object 393 : ZX
-    Reading object 394 : ZZF_
-    394 objects loaded
+    >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
     >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
        line title \ period[file]     |  10[1]   |  10[2]   |  11[1]   |  11[2]   |  12[1]   |  12[2]   |  13[1]   |  13[2]   |  14[1]   |  14[2]    
     ----------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -301,10 +294,7 @@ class ComputedTable:
         394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -342,10 +332,7 @@ class ComputedTable:
         394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -383,10 +370,7 @@ class ComputedTable:
         394 objects loaded
 
         >>> # simple time series (current workspace + one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table.nb_files
         2
         >>> for filepath in computed_table.files:
@@ -842,10 +826,7 @@ class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
@@ -1023,10 +1004,7 @@ class ComputedTable:
         <BLANKLINE>
 
         >>> extra_files = Path(SAMPLE_DATA_DIR) / "ref.av"
-        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=extra_files)     # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1-2]:5", extra_files=extra_files)
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
         -----------------------------------------------------------------------------------
@@ -1134,10 +1112,7 @@ class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
@@ -1225,10 +1200,7 @@ class ComputedTable:
         <BLANKLINE>
 
         >>> # compute table
-        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = table.compute("(2010;2010/2009)[1;2]:2", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------

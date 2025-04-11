@@ -1581,7 +1581,7 @@ class Table:
         self._cython_instance.insert(row, value)
 
     def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, 
-                nb_decimals: int=2) -> ComputedTable:
+                nb_decimals: int=2, quiet: bool=True) -> ComputedTable:
         r"""
         Compute the values corresponding to LEC expressions in cells.
         
@@ -1672,6 +1672,9 @@ class Table:
         nb_decimals: int, optional
             The number of decimals to display.
             Default to 2.
+        quiet: bool, optional
+            If True, suppresses the logging messages when loading the extra files.
+            Default to True.
 
         Returns
         -------
@@ -1732,10 +1735,7 @@ class Table:
 
         >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
         >>> sample_data_dir = Path(SAMPLE_DATA_DIR)
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=sample_data_dir/"ref.av")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=sample_data_dir/"ref.av")
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |  10[1]   |  10[2]   |  11[1]   |  11[2]   |  12[1]   |  12[2]   |  13[1]   |  13[2]   |  14[1]   |  14[2]    
         ----------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -1750,18 +1750,7 @@ class Table:
         >>> # simple time series (current workspace + 4 extra files) - 5 observations - 2 decimals (default)
         >>> extra_files = [sample_data_dir / "ref.av", sample_data_dir / "fun.av", 
         ...                sample_data_dir / "fun2.av", sample_data_dir / "a.var"]
-        >>> computed_table = tables["C8_1"].compute("2010[1;2;3;4;5]:1", extra_files=extra_files)   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\ref.av
-        ...
-        394 objects loaded
-        Loading ...\fun.av
-        ...
-        394 objects loaded
-        Loading ...\fun2.av
-        ...
-        394 objects loaded
-        Loading ...\a.var
-        433 objects loaded
+        >>> computed_table = tables["C8_1"].compute("2010[1;2;3;4;5]:1", extra_files=extra_files)
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |  10[1]   |  10[2]   |  10[3]   |  10[4]   | 10[5]         
         -------------------------------------------------------------------------------------
@@ -1774,7 +1763,7 @@ class Table:
         ['fun.var', 'ref.av', 'fun.av', 'fun2.av', 'a.var']
         """
         if extra_files is not None:
-            load_extra_files(extra_files)
+            load_extra_files(extra_files, quiet)
 
         computed_table = ComputedTable.get_instance()
         computed_table._cython_instance = self._cython_instance.compute(generalized_sample, nb_decimals)
