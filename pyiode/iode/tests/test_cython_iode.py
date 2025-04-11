@@ -48,9 +48,9 @@ def run_doctests_for_obj(obj: Any, verbose: bool=True):
 
 
 def test_iode_messages():
-    run_doctests_for_obj(iode_cython.reset_msgs)
+    run_doctests_for_obj(iode_cython.enable_msgs)
     run_doctests_for_obj(iode_cython.suppress_msgs)
-    iode.reset_msgs()
+    iode.enable_msgs()
 
 def test_iode_print_preferences():
     from iode.util import (set_printer_preferences, set_A2M_preferences, set_MIF_preferences, 

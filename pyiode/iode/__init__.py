@@ -59,7 +59,7 @@ from .lec import execute_lec
 from .gui import view_workspace
 
 # miscellaneous
-from .iode_cython import reset_msgs, suppress_msgs
+from .iode_cython import enable_msgs, suppress_msgs
 from .common import FileType
 from .super import *
 
@@ -109,7 +109,7 @@ __all__ = [
     'view_workspace', 
 
     # miscellaneous
-    'reset_msgs', 'suppress_msgs', 
+    'enable_msgs', 'suppress_msgs', 
 ]
 
 # ==== DEPRECATED API ====

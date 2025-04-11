@@ -717,7 +717,7 @@ MISCELLANEOUS
 
    is_NA
    suppress_msgs
-   reset_msgs
+   enable_msgs
 
 
 **********

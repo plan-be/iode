@@ -2,7 +2,7 @@ import warnings
 from collections.abc import Iterable
 from typing import List, Union
 
-from iode.iode_cython import suppress_msgs, reset_msgs
+from iode.iode_cython import suppress_msgs, enable_msgs
 from iode.time.period import Period
 from iode.iode_cython import SimulationSort, SimulationInitialization
 from iode.iode_cython import Simulation as CythonSimulation
@@ -816,7 +816,7 @@ class Simulation:
             success = False
 
         if quiet:
-            reset_msgs()
+            enable_msgs()
         return success
 
     def model_simulate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
@@ -958,7 +958,7 @@ class Simulation:
             success = False
 
         if quiet:
-            reset_msgs()
+            enable_msgs()
         return success
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str='_PRE', inter_name: str='_INTER', 
@@ -1065,7 +1065,7 @@ class Simulation:
             success = False
 
         if quiet:
-            reset_msgs()
+            enable_msgs()
         return success
 
     def model_simulate_SCC(self, from_period: Union[str, Period], to_period: Union[str, Period], pre_name: str='_PRE', 
@@ -1226,5 +1226,5 @@ class Simulation:
             success = False
         
         if quiet:
-            reset_msgs()
+            enable_msgs()
         return success

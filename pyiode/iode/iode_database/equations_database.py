@@ -14,7 +14,7 @@ from iode.util import join_lines, table2str, JUSTIFY
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
-from iode.iode_cython import suppress_msgs, reset_msgs
+from iode.iode_cython import suppress_msgs, enable_msgs
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
@@ -917,11 +917,11 @@ class Equations(IodeDatabase):
                 suppress_msgs()
             success = self._cython_instance.estimate(from_period, to_period, list_eqs)
             if quiet:
-                reset_msgs()
+                enable_msgs()
             return success
         except Exception as e:
             if quiet:
-                reset_msgs()
+                enable_msgs()
             raise e
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
