@@ -749,7 +749,7 @@ def test_variables_from_array():
 # Estimation
 # ----------
 
-def test_estimation():
+def test_estimation(capsys):
     from iode.compute.estimation import EditAndEstimateEquations
 
     comments.clear()
@@ -805,11 +805,57 @@ def test_estimation():
                                             r"Estimation : NaN Generated"):
         equations.estimate("1980Y1", "1996Y1", "ACAF")
 
+    # ======== test quiet mode ========
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    equations.clear()
+    scalars.clear()
+
+    equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+    equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
+
+    estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
+    estimation.block = "ACAF;DPUH", "ACAF"
+
+    captured = capsys.readouterr()
+    success = estimation.estimate(quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert success
+
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+
+    # create scalars
+    scalars.clear()
+    scalars["acaf1"] = 0., 1.
+    scalars["acaf2"] = 0., 1.
+    scalars["acaf4"] = 0., 1.
+
+    captured = capsys.readouterr()
+    success = eq_ACAF.estimate("1980Y1", "1996Y1", quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert success
+
+    # create scalars
+    scalars.clear()
+    scalars["acaf1"] = 0., 1.
+    scalars["acaf2"] = 0., 1.
+    scalars["acaf4"] = 0., 1.
+    scalars["dpuh_1"] = 0., 1.
+    scalars["dpuh_2"] = 0., 1.
+
+    captured = capsys.readouterr()
+    success = equations.estimate("1980Y1", "1996Y1", "ACAF", quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert success
+
 
 # Simulation
 # ----------
 
-def test_simulation():
+def test_simulation(capsys):
     comments.clear()
     equations.clear()
     identities.clear()
@@ -851,6 +897,20 @@ def test_simulation():
                                             r"did not converged"):
         simu.model_simulate("2000Y1", "2010Y1")
 
+    # ======== test quiet mode ========
+    captured = capsys.readouterr()
+
+    simu.model_calculate_SCC(10, quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+
+    simu.model_simulate_SCC("2000Y1", "2015Y1", quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+
+    simu.model_simulate("2000Y1", "2015Y1", quiet=True)
+    captured = capsys.readouterr()
+    assert captured.out == ""
 
 # WRITE
 # -----

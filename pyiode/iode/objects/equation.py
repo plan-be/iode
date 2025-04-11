@@ -11,6 +11,7 @@ from iode.common import EqMethod, EqTest
 from iode.time.period import Period
 from iode.time.sample import Sample
 
+from iode.iode_cython import reset_msgs, suppress_msgs
 from iode.iode_cython import Equation as CythonEquation
 
 
@@ -277,7 +278,7 @@ class Equation:
         """
         return self._cython_instance.split_equation()
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None) -> bool:
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, quiet: bool=False) -> bool:
         r"""
         Estimate the present equation.
 
@@ -319,6 +320,9 @@ class Equation:
         to_period : str or Period, optional
             The ending period of the execution range.
             Defaults to the ending period of the current Variables sample.
+        quiet : bool, optional
+            If True, suppresses the log messages during the estimation process. 
+            Default to False.
 
         Returns
         -------
@@ -426,7 +430,18 @@ class Equation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        return self._cython_instance.estimate(from_period, to_period)
+        if quiet:
+            suppress_msgs()
+        
+        try:
+            success = self._cython_instance.estimate(from_period, to_period)
+            if quiet:
+                reset_msgs()
+            return success
+        except Exception as e:
+            if quiet:
+                reset_msgs()
+            raise e
 
     @property
     def endogenous(self) -> str:

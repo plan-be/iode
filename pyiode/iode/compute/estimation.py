@@ -7,6 +7,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
+from iode.iode_cython import suppress_msgs, reset_msgs
 from iode.time.period import Period
 from iode.time.sample import Sample
 from iode.objects.equation import Equation
@@ -1067,10 +1068,16 @@ class EditAndEstimateEquations:
             return []
         return residual_values
 
-    def estimate(self) -> bool:
+    def estimate(self, quiet: bool=False) -> bool:
         r"""
         Estimate the current block of equations (which is not necessarily all the equations 
         in the local Equations database 'kdb_eqs').
+
+        Parameters
+        ----------
+        quiet: bool, optional
+            If True, the estimation will be silent (no printout). 
+            Default is False.
 
         Returns
         -------
@@ -1256,12 +1263,19 @@ class EditAndEstimateEquations:
         >>> scalars["dpuh_1"]
         Scalar(0.0109855, 1, 0.00481857)
         """
+        if quiet:
+            suppress_msgs()
+
         try:
             self._cython_instance.estimate()
-            return True
+            success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
-            return False
+            success = False
+        
+        if quiet:
+            reset_msgs()
+        return success
 
     @property
     def is_done(self) -> bool:

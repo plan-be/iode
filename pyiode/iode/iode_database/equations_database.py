@@ -14,6 +14,7 @@ from iode.util import join_lines, table2str, JUSTIFY
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
+from iode.iode_cython import suppress_msgs, reset_msgs
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
@@ -606,7 +607,8 @@ class Equations(IodeDatabase):
         """
         return super()._variables()
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None) -> bool:
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
+                 list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
         Estimate an equation or a block of equations.
 
@@ -652,6 +654,9 @@ class Equations(IodeDatabase):
             List of equations to be estimated. 
             If not provided, all equations of the present Equations database will be estimated.
             Default to None (all equations).
+        quiet : bool, optional
+            If True, suppresses the log messages during the estimation process
+            Default to False.
 
         Returns
         -------
@@ -907,7 +912,17 @@ class Equations(IodeDatabase):
         _YRES1       -0.01    0.02   -0.02  ...   -0.00    0.01   -0.03
         <BLANKLINE>
         """
-        return self._cython_instance.estimate(from_period, to_period, list_eqs)
+        try:
+            if quiet:
+                suppress_msgs()
+            success = self._cython_instance.estimate(from_period, to_period, list_eqs)
+            if quiet:
+                reset_msgs()
+            return success
+        except Exception as e:
+            if quiet:
+                reset_msgs()
+            raise e
 
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
