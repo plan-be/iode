@@ -8,7 +8,9 @@ else:
     Self = Any
 
 import pandas as pd
-from iode.util import join_lines, table2str, JUSTIFY
+from iode.common import IodeFileType
+from iode.util import check_filepath, join_lines, table2str, JUSTIFY
+from iode.time.period import Period
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.iode_cython import ImportFormats, TableLang
 from iode.iode_cython import Comments as CythonComments
@@ -564,7 +566,9 @@ class Comments(IodeDatabase):
         return self.to_series()
 
     @classmethod
-    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], lang: Union[str, TableLang]=TableLang.ENGLISH, debug_file: Union[str, Path]=None):
+    def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], 
+                     save_file: Union[str, Path], rule_file: Union[str, Path], 
+                     lang: Union[str, TableLang]=TableLang.ENGLISH, debug_file: Union[str, Path]=None):
         r"""
         Convert an external file representing IODE comments to an IODE comments file (.cmt). 
         The possible formats for the input file are:
@@ -694,7 +698,36 @@ class Comments(IodeDatabase):
         IHU -> UU_IHU       (Rule UU_++++++++++++++++)
         WBU -> UU_WBU       (Rule UU_++++++++++++++++)
         """
-        return CythonComments.convert_file(input_file, input_format, save_file, rule_file, lang, debug_file)
+        # $FileImportCmt format rule_file input_file language [debug_file]
+        input_file = check_filepath(input_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_import_formats: str = ''.join([item.name[0] for item in list(ImportFormats)])
+        if isinstance(input_format, ImportFormats):
+            input_format = input_format.name[0]
+        if input_format not in _c_import_formats:
+            raise ValueError(f"Invalid input format '{input_format}'. "
+                             f"Possible values are: {_c_import_formats}")
+        
+        save_file = check_filepath(save_file, IodeFileType.FILE_COMMENTS, file_must_exist=False)
+        rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
+
+        _c_table_langs: str = ''.join([item.name[0] for item in list(TableLang)])
+        if isinstance(lang, TableLang):
+            lang = lang.name[0]
+        if lang not in _c_table_langs:
+            raise ValueError(f"Invalid language '{lang}'. " 
+                             f"Possible values are: {_c_table_langs}") 
+
+        # $FileImportCmt format rule infile outfile language [trace]
+        args = f"{input_format} {rule_file} {input_file} {save_file} {lang}"
+        
+        if debug_file:
+            debug_file = check_filepath(debug_file, IodeFileType.FILE_LOG, file_must_exist=False)
+            args += " " + debug_file
+
+        res = CythonComments.convert_file(args)
+        if res < 0:
+            raise RuntimeError(f"Couldn't import comments from file '{input_file}'")
 
     def _str_table(self, names: List[str]) -> str:
         columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}

@@ -1,9 +1,5 @@
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
 
 cimport cython
 from cython.operator cimport dereference
@@ -18,7 +14,6 @@ from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInf
 from pyiode.iode_database.cpp_api_database cimport B_EQS_LEC, B_PrintObjLec
 
 import pandas as pd
-from iode.common import PrintEquationsAs, PrintEquationsLecAs
 
 
 cdef class Equations(CythonIodeDatabase):

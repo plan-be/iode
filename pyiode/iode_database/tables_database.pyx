@@ -2,11 +2,6 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional, Any
 
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
-
 cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
@@ -15,8 +10,6 @@ from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTitle
-
-from iode.common import PrintTablesAs
 
 
 cdef class Tables(CythonIodeDatabase):
@@ -83,11 +76,6 @@ cdef class Tables(CythonIodeDatabase):
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
-
-    def _str_table(self, names: List[str]) -> str:
-        titles = [join_lines(self.database_ptr.get_title(<string>(name.encode())).decode()) for name in names]
-        columns = {"name": names, "table titles": titles}
-        return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 
     # Specify how to print a TABLE 
     #      0 : print table full definitions

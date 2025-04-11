@@ -1,16 +1,9 @@
-from pathlib import Path
 import warnings
+from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
-import sys
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
 
 import pandas as pd
-from iode.common import IODE_FILE_TYPES
-from iode.util import join_lines, table2str, JUSTIFY, check_filepath, split_list
 
 from cython.operator cimport dereference
 from libc.string cimport strlen
@@ -75,7 +68,7 @@ cdef class CythonIodeDatabase:
     def get_name(self, pos: int) -> str:
         return self.abstract_db_ptr.get_name(pos).decode()
 
-    def get_names(self, pattern: str, filepath: str=None) -> List[str]:
+    def get_names(self, pattern: str, filepath: str=None) -> str:
         cdef int i_iode_type = self.abstract_db_ptr.get_iode_type()
         cdef int _all = ord('*')
         cdef KDB* kdb_ptr = NULL
@@ -83,8 +76,6 @@ cdef class CythonIodeDatabase:
         cdef char* c_list = NULL
         
         if filepath is not None:
-            expected_file_type = IodeFileType(i_iode_type)
-            filepath = check_filepath(filepath, expected_file_type, file_must_exist=True)
             c_list = K_expand(i_iode_type, filepath.encode(), pattern.encode(), _all)
         else:
             kdb_ptr = self.abstract_db_ptr.get_database()
@@ -97,14 +88,12 @@ cdef class CythonIodeDatabase:
         length = strlen(c_list)
         if length == 0:
             SCR_free(c_list)
-            return []
+            return ''
 
         b_list: bytes = c_list[:length]
         SCR_free(c_list)
 
-        py_list = split_list(b_list.decode())
-        py_list = [item for item in py_list if len(item)]
-        return py_list
+        return b_list.decode()
 
     def property_names(self) -> List[str]:
         return [name.decode() for name in self.abstract_db_ptr.get_names(b'', <bint>True)]

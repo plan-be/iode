@@ -22,7 +22,7 @@ except ImportError:
 
 from iode import NA
 from iode.common import IodeFileType 
-from iode.util import check_filepath, split_list
+from iode.util import check_filepath, split_list, table2str, JUSTIFY
 from iode.time.period import Period
 from iode.time.sample import Sample
 from iode.iode_database.abstract_database import IodeDatabase
@@ -7557,7 +7557,10 @@ class Variables(IodeDatabase):
         return s
 
     def _str_table(self, names: List[str]) -> str:
-        return self._cython_instance._str_table(names)
+        # self.periods_as_str calls self._maybe_update_subset_sample()
+        periods = self.periods_as_str
+        dict_columns = self._cython_instance._str_table(names, periods)
+        return table2str(dict_columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""

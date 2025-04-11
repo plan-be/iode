@@ -18,9 +18,6 @@ from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 
-from iode.util import check_filepath
-from iode.iode_database.extra_files import load_extra_files, reset_extra_files
-
 
 cdef class TableCell:
     cdef CTableCell* c_cell
@@ -496,11 +493,9 @@ cdef class Table:
         
         self.update_owner_database()
 
-    def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, nb_decimals: int=2) -> ComputedTable:
+    def compute(self, generalized_sample: str, nb_decimals: int=2) -> ComputedTable:
         if not generalized_sample:
             raise ValueError("'generalized_sample' must not be empty")
-        if extra_files is not None:
-            load_extra_files(extra_files)
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def _getitem_(self, row: int, line: TableLine) -> TableLine:
