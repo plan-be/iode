@@ -240,10 +240,6 @@ void kmsg_null(const char* msg)
 void kmsg_toggle(const int value)
 {
     MSG_DISABLED = (value == 0) ? 1 : 0;
-    if(MSG_DISABLED)
-        printf("\n%s\n", "Disabled logging messages");
-    else
-        printf("\n%s\n", "Enabled logging messages");
 }
 
 
