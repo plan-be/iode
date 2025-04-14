@@ -14,7 +14,7 @@ from .iode_cython import (__version__, NA, is_NA,
 from .common import (IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, 
                      EQ_TEST_NAMES, IODE_FILE_TYPES, SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
                      PRINT_FORMATS, IMPORT_FORMATS, EXPORT_FORMATS, GRAPHS_COLORS, IODE_FONTS, PERIODICITY_LIST, 
-                     PrintTablesAs, PrintEquationsAs, PrintEquationsLecAs)
+                     WRITE_FILE_EXT, PrintTablesAs, PrintEquationsAs, PrintEquationsLecAs)
 
 # time
 from .time.period import Period 
@@ -43,8 +43,8 @@ from .iode_database.variables_database import Variables, variables
 from .reports import execute_report, execute_command
 
 # Printing
-from .iode_cython import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
-                          w_print_pg_footer, w_print_pg_header, w_print_tit)
+from .write import (write_close, write_destination, write_flush, write, write_code_block, write_enum, 
+                    write_paragraph, write_title, write_page_footer, write_page_header)
 
 # Simulation
 from .compute.simulation import Simulation
@@ -73,10 +73,10 @@ __all__ = [
     'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 'TableGraphGrid', 
     'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 
     'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 
-    'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 
-    'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 'SIMULATION_INITIALIZATION_METHODS', 
-    'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 'IMPORT_FORMATS', 'EXPORT_FORMATS', 'GRAPHS_COLORS', 
-    'IODE_FONTS', 'PrintTablesAs', 'PrintEquationsAs', 'PrintEquationsLecAs', 
+    'WriteFileExt', 'WRITE_FILE_EXT', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 'IODE_FILE_TYPE_NAMES', 
+    'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
+    'SIMULATION_INITIALIZATION_METHODS', 'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 'IMPORT_FORMATS', 
+    'EXPORT_FORMATS', 'GRAPHS_COLORS', 'IODE_FONTS', 'PrintTablesAs', 'PrintEquationsAs', 'PrintEquationsLecAs', 
 
     # time
     'Period', 'Sample', 'PERIODICITY_LIST',
@@ -93,8 +93,8 @@ __all__ = [
     'execute_report', 'execute_command', 
 
     # Printing
-    'w_close', 'w_dest', 'w_flush', 'w_print', 'w_print_cmd', 'w_print_enum', 'w_print_par', 'w_print_pg_footer', 
-    'w_print_pg_header', 'w_print_tit', 
+    'write_close', 'write_destination', 'write_flush', 'write', 'write_code_block', 'write_enum', 
+    'write_paragraph', 'write_title', 'write_page_footer', 'write_page_header', 
 
     # Simulation
     'Simulation', 
