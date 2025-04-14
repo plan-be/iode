@@ -58,11 +58,6 @@ def _cpp_char_string_map_to_py(map[char, string] c_map) -> Dict[str, str]:
     return {chr(item.first): item.second.decode() for item in c_map}
 
 
-# VERSION
-# -------
-__version__ = "${CMAKE_PROJECT_VERSION}"
-
-
 # IODE CONSTANTS
 # --------------
 NA: float = IODE_NAN
