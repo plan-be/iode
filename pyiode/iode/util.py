@@ -5,7 +5,7 @@ from textwrap import wrap
 
 from typing import List, Dict, Any
 
-from iode.iode_cython import is_NA, IodeFileType, IodeType
+from iode.iode_cython import cython_is_NA, cython_suppress_msgs, cython_enable_msgs, IodeFileType, IodeType
 from .common import IODE_FILE_TYPES
 
 # import constants, functions and classes hidden from users but maybe useful for developers
@@ -18,8 +18,52 @@ from .common import FileType
 _list_separator = r",;\s"
 
 
+def is_NA(value: float) -> bool:
+    """
+    Check whether a float value represents a valid IODE number or an IODE *Not Available* 
+    :math:`NA` value.
+
+    Parameters
+    ----------
+    value: float
+
+    Returns
+    -------
+    bool
+        True if the float value represents an IODE *Not Available* :math:`NA` value.
+
+    Examples
+    --------
+    >>> from iode import NA, is_NA
+    >>> is_NA(1.0)
+    False
+    >>> is_NA(NA)
+    True
+    """
+    if isinstance(value, int):
+        value = float(value)
+    if not isinstance(value, float):
+        raise TypeError("Expected value of type float. "
+                        f"Got value of type {type(value).__name__} instead.")
+    return cython_is_NA(value)
+
+
 def iode_number_to_str(value: float) -> str:
     return "na" if is_NA(value) else f"{value:g}"
+
+
+def suppress_msgs():
+    """
+    Suppress the output during an IODE session
+    """
+    cython_suppress_msgs()
+
+
+def enable_msgs():
+    """
+    Reset the normal output mechanism during an IODE session
+    """
+    cython_enable_msgs()
 
 
 def split_list(list_txt: str):

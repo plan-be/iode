@@ -11,7 +11,7 @@ from iode.common import EqMethod, EqTest
 from iode.time.period import Period
 from iode.time.sample import Sample
 
-from iode.iode_cython import enable_msgs, suppress_msgs
+from iode.util import enable_msgs, suppress_msgs
 from iode.iode_cython import Equation as CythonEquation
 
 

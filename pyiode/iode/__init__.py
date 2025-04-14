@@ -4,9 +4,8 @@ SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 
 # Constants
-from .iode_cython import (__version__, NA, is_NA, 
-                          IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, EqTest, 
-                          TableCellType, TableCellFont, TableCellAlign, TableLineType, TableGraphType, 
+from .iode_cython import (__version__, NA, IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, 
+                          EqTest, TableCellType, TableCellFont, TableCellAlign, TableLineType, TableGraphType, 
                           TableGraphGrid, TableGraphAlign, TableGraphAxis, VarsMode, LowToHighType, LowToHighMethod, 
                           HighToLowType, SimulationInitialization, SimulationSort, ESTIMATION_MAXIT, ESTIMATION_EPS, 
                           AdjustmentMethod, WriteFileExt)
@@ -59,7 +58,7 @@ from .lec import execute_lec
 from .gui import view_workspace
 
 # miscellaneous
-from .iode_cython import enable_msgs, suppress_msgs
+from .util import is_NA, enable_msgs, suppress_msgs
 from .common import FileType
 from .super import *
 
@@ -68,13 +67,12 @@ from .super import *
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 
 __all__ = [
     # Constants
-    'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 'is_NA', 
-    'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 'EqMethod', 'EqTest', 
-    'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 'TableGraphGrid', 
-    'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 
-    'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 
-    'WriteFileExt', 'WRITE_FILE_EXT', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 'IODE_FILE_TYPE_NAMES', 
-    'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
+    'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 
+    'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 
+    'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 
+    'HighToLowType', 'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 
+    'AdjustmentMethod', 'WriteFileExt', 'WRITE_FILE_EXT', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
+    'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
     'SIMULATION_INITIALIZATION_METHODS', 'SIMULATION_SORT_ALGORITHMS', 'PRINT_FORMATS', 'IMPORT_FORMATS', 
     'EXPORT_FORMATS', 'GRAPHS_COLORS', 'IODE_FONTS', 'PrintTablesAs', 'PrintEquationsAs', 'PrintEquationsLecAs', 
 
@@ -109,7 +107,7 @@ __all__ = [
     'view_workspace', 
 
     # miscellaneous
-    'enable_msgs', 'suppress_msgs', 
+    'is_NA', 'enable_msgs', 'suppress_msgs', 
 ]
 
 # ==== DEPRECATED API ====
