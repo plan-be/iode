@@ -7,7 +7,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
-from iode.iode_cython import suppress_msgs, enable_msgs
+from iode.util import suppress_msgs, enable_msgs
 from iode.time.period import Period
 from iode.time.sample import Sample
 from iode.objects.equation import Equation

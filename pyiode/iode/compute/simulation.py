@@ -2,7 +2,7 @@ import warnings
 from collections.abc import Iterable
 from typing import List, Union
 
-from iode.iode_cython import suppress_msgs, enable_msgs
+from iode.util import suppress_msgs, enable_msgs
 from iode.time.period import Period
 from iode.iode_cython import SimulationSort, SimulationInitialization
 from iode.iode_cython import Simulation as CythonSimulation

@@ -14,7 +14,7 @@ from iode.util import join_lines, table2str, JUSTIFY
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
-from iode.iode_cython import suppress_msgs, enable_msgs
+from iode.util import suppress_msgs, enable_msgs
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]

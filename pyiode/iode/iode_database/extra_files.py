@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union, List
 
-from iode.iode_cython import enable_msgs, suppress_msgs
+from iode.util import enable_msgs, suppress_msgs
 from iode.iode_cython import cython_load_extra_files, cython_reset_extra_files
 
 
