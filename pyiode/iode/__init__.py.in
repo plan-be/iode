@@ -1,10 +1,12 @@
 from pathlib import Path
 
+__version__ = "${CMAKE_PROJECT_VERSION}"
+
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 
 # Constants
-from .iode_cython import (__version__, NA, IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, 
+from .iode_cython import (NA, IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, 
                           EqTest, TableCellType, TableCellFont, TableCellAlign, TableLineType, TableGraphType, 
                           TableGraphGrid, TableGraphAlign, TableGraphAxis, VarsMode, LowToHighType, LowToHighMethod, 
                           HighToLowType, SimulationInitialization, SimulationSort, ESTIMATION_MAXIT, ESTIMATION_EPS, 
@@ -67,7 +69,8 @@ from .super import *
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance. 
 __all__ = [
     # Constants
-    'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 
+    '__version__', 'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 
+    'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 
     'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 
     'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 
     'HighToLowType', 'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 

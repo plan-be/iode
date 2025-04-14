@@ -10,7 +10,7 @@ file(INSTALL ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION ${CMAKE_CURRENT_SOURCE_D
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.pyx.in ${CMAKE_CURRENT_SOURCE_DIR}/common.pyx)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode/__init__.py)
 configure_file(${CMAKE_SOURCE_DIR}/generate_stub_files.py.in ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
 
 if(Python_FOUND)
