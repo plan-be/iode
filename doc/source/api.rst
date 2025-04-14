@@ -695,17 +695,17 @@ PRINT
 .. autosummary::
    :toctree: _generated
 
-   w_dest
-   w_close
-   w_flush
-   w_print
+   write_destination
+   write_flush
+   write_close
 
-   w_print_enum
-   w_print_cmd
-   w_print_par
-   w_print_tit
-   w_print_pg_header
-   w_print_pg_footer
+   write
+   write_title
+   write_enum
+   write_paragraph
+   write_code_block
+   write_page_header
+   write_page_footer
 
 
 *************

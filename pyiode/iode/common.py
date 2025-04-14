@@ -88,6 +88,15 @@ EXPORT_FORMATS: Tuple[str, ...] = (
     "TSP", 
     "Reverse CSV")
 
+WRITE_FILE_EXT: Tuple[str, ...] = (
+    "GDI",
+    "A2M",
+    "MIF",
+    "HTML",
+    "RTF",
+    "CSV",
+    "DUMMY")
+
 GRAPHS_COLORS: Tuple[str, ...] = (
     "Blue", 
     "Yellow", 

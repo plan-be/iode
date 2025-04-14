@@ -113,14 +113,14 @@ class Sample:
         return self._cython_instance.index(period)
 
     def get_period_list(self, astype: Union[type(Any), str]=str) -> List[Any]:
-        rf"""
+        r"""
         List of all periods of the sample.
         Periods are exported as string (default) or as float.
 
         Parameters
         ----------
         astype: type or str
-            Allowed returned type for periods are {list(_ALLOWED_TYPES_FOR_PERIOD)}.
+            Allowed returned type for periods are: 'str', 'float', 'Period'.
             Default to str.
 
         Returns
@@ -130,7 +130,7 @@ class Sample:
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{{SAMPLE_DATA_DIR}}/fun.var")      # doctest: +ELLIPSIS
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.get_period_list()                  # doctest: +ELLIPSIS
@@ -146,7 +146,7 @@ class Sample:
             raise TypeError(f"Expected 'astype' to be a string or a type. Got {type(astype).__name__} instead.")
         if astype not in _ALLOWED_TYPES_FOR_PERIOD:
             raise ValueError(f"Allowed types for 'astype' are {list(_ALLOWED_TYPES_FOR_PERIOD)}")
-                
+        
         if astype == 'Period':
             list_periods = self._cython_instance.get_period_list('str')
             return [Period(p) for p in list_periods]

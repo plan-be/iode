@@ -915,58 +915,60 @@ def test_simulation(capsys):
 # WRITE
 # -----
 
-def test_iode_wrt():
+def test_iode_wrt(tmp_path):
 
-    def iode_wrt_1(filename:str="", dest: WriteFileExt = WriteFileExt.A2M):
-        w_dest(filename, dest)
-        
-        w_print(".sep |\n")
-        w_print(".esc ~\n")
-        
-        w_print_pg_header("IODE")
-        w_print_pg_footer("- page %d - ")
-        
-        w_print_tit(1, "Mon titre")
-        
-        w_print_enum(1)
-        w_print("This is an enum paragraph\n\n")
-        w_print("This is a normal paragraph\n\n")
-        
-        w_print(".tb\n")
-        w_print(".tborder 1\n")
-        w_print(".theader\n")
-        w_print("| Syntax | Description\n")
-        w_print(".tbody\n")
-        w_print("| ~cint L_errno       | Last error number during LEC compilation\n")
-        w_print("| ~cchar* L_error()   | Returns a static buffer containing the last LEC compilation error message.\n")
-        w_print(".te\n")
-            
-        w_print(".gb 16.00 10.00\n")
-        w_print(".ggrid TMM\n")
-        w_print(".galign L\n")
-        w_print(".gbox 0 b 0\n")
-        w_print(".gtitle Equation ACAF : observed and fitted values\n")
-        w_print(".gty L \"(ACAF/VAF[-1])  : observed\" 1980Y1  0.011412042  0.016028202  0.011903394  0.012051363  0.010215556  0.010582964  0.0090882893  0.009277778  0.0082268494  0.0051589358  0.0066405193  0.0068489061  0.0075258742  0.0082727193  0.0019340143  -0.0029850522  0.0069569681 \n")
-        w_print(".gty L \"(ACAF/VAF[-1])  : fitted\" 1980Y1  0.012562124  0.012491075  0.012526504  0.011687035  0.011060337  0.010403968  0.0095320575  0.0090522427  0.008714914  0.0076539375  0.0065561227  0.006355248  0.0064942167  0.0062763884  0.0062678674  -0.0029850522  0.0044903364 \n")
-        w_print(".ge\n")
-        
-        w_print_tit(1, "Mon titre 1")
-        w_print_par(1, "Mon para level 1 (éàç)")
-        w_print(f"Second para 1\n\n")
-        w_print_par(2, "Mon para level 2 (âêî)\n")
-        w_print(f"Second para level 2\n")
-        w_print_tit(2, "Title 2")
-        w_print_enum(2, "Mon enum level 2 (âêî)")
-        w_print_enum(2, "enum2 suite")
-        w_print_enum(2, "enum2 suite")
-        
-        w_close()
+    from iode import WriteFileExt
+    from iode import (write_close, write_destination, write_flush, write, write_code_block, write_enum, 
+                      write_paragraph, write_title, write_page_footer, write_page_header)
+    
+    def print_test_file(filename: str, file_type: WriteFileExt):
+        # open a new file
+        write_destination(filename, file_type)
 
-    iode_wrt_1("", WriteFileExt.DUMMY)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.htm"), WriteFileExt.HTML)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.a2m"), WriteFileExt.A2M)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.rtf"), WriteFileExt.RTF)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.csv"), WriteFileExt.CSV)
+        write_page_header("IODE")
+        write_page_footer("- page %d - ")
+
+        # print a title
+        write_title("My Title (level 1)")
+
+        # print text
+        write("This is a simple text\n\n")
+
+        # print a new paragraph
+        write_paragraph("This is a paragraph with level 1\n")
+
+        # print a bulleted paragraph
+        write_enum("first item\n", 1)
+        write_enum("second item\n", 1)
+        write_enum("first sub-item\n", 2)
+        write_enum("second sub-item\n", 2)
+        write_enum("third item\n", 1)
+
+        # print code blocks
+        write_code_block("equations.estimate('2000Y1', '2010Y1', 'ACAF')\n")
+        write_code_block("equations.model_simulate('2000Y1', '2010Y1')\n")
+
+        write_title("Estimation/Simulation (level 2)", 2)
+
+        # print a new paragraph
+        write_paragraph("This is a paragraph with level 2\n", 2)
+
+        # # print a table (A2M format)
+        write(".tb\n")
+        write(".tborder 1\n")
+        write(".theader\n")
+        write("| Syntax | Description\n")
+        write(".tbody\n")
+        write("| estimate        | run an estimation of the coefficients of an equation\n")
+        write("| model_simulate  | run a complete simulation of the model\n")
+        write(".te\n")
+
+        # don't forget to close the file
+        write_close()
+
+    filename = tmp_path / "test.rtf"
+    print_test_file(filename, WriteFileExt.RTF) 
+
 
 # PANDAS FUNCTIONS
 # ----------------
