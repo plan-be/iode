@@ -334,7 +334,7 @@ cdef class Variables(CythonIodeDatabase):
         t_first, t_last = self._get_periods_bounds()
         if len(names) == 1:
             name = names[0]
-            other_name = cython_other.names[0]
+            other_name = cython_other.property_names()[0]
             _c_operation_between_two_vars(i_op, cpp_self_db, <string>name.encode(), <int>t_first, <int>t_last, 
                                           cpp_other_db, <string>other_name.encode(), <int>t_first, <int>t_last)
         else:
