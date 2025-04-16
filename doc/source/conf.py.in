@@ -20,6 +20,10 @@ print(f"iode: {iode.__version__}, {iode.__file__}")
 from iode.objects.table import TableCell, TableLine
 from iode.computed_table.computed_table import ComputedTable
 
+iode.TableCell = TableCell
+iode.TableLine = TableLine
+iode.ComputedTable = ComputedTable
+
 
 # -- Project information -----------------------------------------------------
 
