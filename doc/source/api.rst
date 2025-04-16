@@ -627,6 +627,7 @@ ESTIMATION
 .. autosummary::
    :toctree: _generated
 
+   Equation.estimate
    Equations.estimate
    dynamic_adjustment
    dickey_fuller_test 
