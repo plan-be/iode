@@ -682,6 +682,11 @@ def test_variables_setitem():
     assert vars_subset["ACAG", "2002Y1"] == 300.0
     assert vars_subset_subset["ACAG", "2002Y1"] == copy_ACAG["ACAG", "2002Y1"]
 
+def test_variables_binary_op():
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables["SUM"] = variables["ACAF"] + variables["ACAG"]
+
 def test_variables_numpy_1D():
     variables.clear()
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
