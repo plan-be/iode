@@ -90,7 +90,7 @@ cdef class Equations(CythonIodeDatabase):
             to_period = str(to_period)
 
         if list_eqs is None:
-            list_eqs = ';'.join(self.names)
+            list_eqs = ';'.join(self.property_names())
 
         if not isinstance(list_eqs, str) and isinstance(list_eqs, Iterable) and \
             all(isinstance(item, str) for item in list_eqs):
