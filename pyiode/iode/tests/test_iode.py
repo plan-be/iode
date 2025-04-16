@@ -770,6 +770,12 @@ def test_estimation(capsys):
     equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
 
+    eq_subset = equations["ACAF; DPUH"]
+    coefficients = eq_subset.coefficients
+    for name in coefficients:
+        scalars[name] = 0., 1.
+    eq_subset.estimate("1980Y1", "1996Y1")
+
     estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
     estimation.block = "ACAF;DPUH", "ACAF"
     estimation.estimate()
