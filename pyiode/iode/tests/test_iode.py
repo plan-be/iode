@@ -893,8 +893,9 @@ def test_simulation(capsys):
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    with pytest.warns(RuntimeWarning, match=r"Could not simulate the model: the simulation "
-                                            r"did not converged"):
+    with pytest.warns(RuntimeWarning, match=r"Could not simulate the model for the sample "
+                                            r"2000Y1:2010Y1:\nModel does not converge after "
+                                            r"2 iterations"):
         simu.model_simulate("2000Y1", "2010Y1")
 
     # ======== test quiet mode ========
