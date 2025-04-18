@@ -5471,7 +5471,7 @@ class Variables(IodeDatabase):
 
         self.from_numpy(data, vars_names, first_period, last_period)
 
-    def to_frame(self, vars_axis_name: str='names', time_axis_name: str='time', sample_as_floats: bool=False) -> pd.DataFrame:
+    def to_frame(self, vars_axis_name: str='names', time_axis_name: str='time', periods_as_type: Union[str, type]=str) -> pd.DataFrame:
         r"""
         Create a pandas DataFrame from the current Variables database.
         The index of the returned DataFrame is build from the Variables names 
@@ -5485,9 +5485,10 @@ class Variables(IodeDatabase):
         time_axis_name: str, optional
             Name of the axis representing the periods.
             Defaults to 'time'.
-        sample_as_floats: bool, optional
-            Whether or not to export periods as string or float values.
-            Defaults to False (periods are exported as string values).
+        periods_as_type: str or type, optional
+            Type in which periods are converted. 
+            Possible values are: str, int or float.
+            Defaults to str.
 
         Warnings
         --------
@@ -5600,9 +5601,43 @@ class Variables(IodeDatabase):
         ZZF_         0.688400     0.688400  ...      0.688400      0.688400
         <BLANKLINE>
         [33 rows x 11 columns]
+
+        >>> # Export a subset of the IODE Variables database with periods as int
+        >>> df = variables["A*;*_", "2000Y1:2010Y1"].to_frame(periods_as_type=int) 
+        >>> df.columns.to_list()            # doctest: +ELLIPSIS
+        [2000, 2001, 2002, 2003, ..., 2007, 2008, 2009, 2010]
+        >>> df                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time             2000         2001  ...          2009          2010
+        names                               ...
+        ACAF        10.046611     2.867923  ...    -37.463510    -37.827429
+        ACAG       -41.534787    18.939801  ...     27.229955     28.253929
+        AOUC         1.116238     1.140476  ...      1.287132      1.307110
+        AOUC_        1.101957     1.136244  ...      1.231854      1.250164
+        AQC          1.338603     1.379188  ...      1.446332      1.462868
+        ...               ...          ...  ...           ...           ...
+        WCF_      3716.447509  3863.897550  ...   5042.743118   5170.600010
+        WIND_     1000.144577  1035.218800  ...   1268.861647   1301.025126
+        WNF_      2334.763628  2427.492334  ...   3169.316544   3249.751702
+        YDH_      7276.607740  7635.905667  ...  10630.736896  10995.831393
+        ZZF_         0.688400     0.688400  ...      0.688400      0.688400
+        <BLANKLINE>
+        [33 rows x 11 columns]
         """        
         vars_list = self.names
-        periods_list = self.periods_as_float if sample_as_floats else self.periods_as_str
+
+        if isinstance(periods_as_type, type):
+            periods_as_type = periods_as_type.__name__
+        
+        if periods_as_type == 'str':
+            periods_list = self.periods_as_str
+        elif periods_as_type == 'int':
+            periods_list = [int(p) for p in self.periods_as_float]
+        elif periods_as_type == 'float':
+            periods_list = self.periods_as_float
+        else:
+            raise ValueError(f"Invalid type for periods_as_type: {periods_as_type}. "
+                             f"Expected 'str', 'int' or 'float'.")
+
         data = self.to_numpy()
 
         df = pd.DataFrame(index=vars_list, columns=periods_list, data=data)
@@ -5716,7 +5751,7 @@ class Variables(IodeDatabase):
 
         self.from_numpy(array.data, vars_names, first_period, last_period)
 
-    def to_array(self, vars_axis_name: str='names', time_axis_name: str='time', sample_as_floats: bool=False) -> Array:
+    def to_array(self, vars_axis_name: str='names', time_axis_name: str='time', periods_as_type: Union[str, type]=str) -> Array:
         r"""
         Creates an Array from the current IODE Variables database.
         
@@ -5728,9 +5763,10 @@ class Variables(IodeDatabase):
         time_axis_name: str, optional
             Name of the axis representing the periods.
             Defaults to 'time'.
-        sample_as_floats: bool, optional
-            Whether or not to convert periods as float values.
-            Defaults to False (periods are exported as string values).
+        periods_as_type: str or type, optional
+            Type in which periods are converted. 
+            Possible values are: str, int or float.
+            Defaults to str.
 
         Warnings
         --------
@@ -5832,12 +5868,46 @@ class Variables(IodeDatabase):
                WNF_   2334.7636275081923  ...   3249.7517024908175
                YDH_    7276.607740221424  ...   10995.831392939246
                ZZF_           0.68840039  ...           0.68840039
+
+        >>> # Export a subset of the IODE Variables database as an (larray) Array object
+        >>> # with periods as int
+        >>> array = variables["A*;*_", "2000Y1:2010Y1"].to_array(periods_as_type=int)
+        >>> array.axes.info
+        33 x 11
+         names [33]: 'ACAF' 'ACAG' 'AOUC' ... 'WNF_' 'YDH_' 'ZZF_'
+         time [11]: 2000 2001 2002 ... 2008 2009 2010
+        >>> array                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        names\time                 2000  ...                 2010
+              ACAF   10.046610792200543  ...   -37.82742883229439
+              ACAG   -41.53478656734795  ...   28.253928978210485
+              AOUC   1.1162376230972206  ...   1.3071099004906368
+             AOUC_     1.10195719812178  ...   1.2501643331956398
+               AQC   1.3386028553645442  ...   1.4628683697450802
+               ...                 ...  ...                 ...    
+              WCF_   3716.4475089520292  ...    5170.600010384268
+             WIND_   1000.1445769794319  ...    1301.025126372868
+              WNF_   2334.7636275081923  ...   3249.7517024908175
+              YDH_    7276.607740221424  ...   10995.831392939246
+              ZZF_           0.68840039  ...           0.68840039
         """
         if la is None:
             raise RuntimeError("larray library not found")
 
         vars_list = self.names
-        periods_list = self.periods_as_float if sample_as_floats else self.periods_as_str
+
+        if isinstance(periods_as_type, type):
+            periods_as_type = periods_as_type.__name__
+
+        if periods_as_type == 'str':
+            periods_list = self.periods_as_str
+        elif periods_as_type == 'int':
+            periods_list = [int(p) for p in self.periods_as_float]
+        elif periods_as_type == 'float':
+            periods_list = self.periods_as_float
+        else:
+            raise ValueError(f"Invalid type for periods_as_type: {periods_as_type}. "
+                             f"Expected 'str', 'int' or 'float'.")
+
         data = self.to_numpy()
 
         vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
