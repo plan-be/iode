@@ -1,14 +1,16 @@
 from pathlib import Path
 import inspect
-from typing import Tuple
+from typing import Tuple, Union
 
 
-def view_workspace(depth: int=0):
+def view_workspace(directory_path: Union[str, Path]=None, depth: int=0):
     """
     Open the Graphical User Interface to view and edit the IODE databases.
 
     Parameters
     ----------
+    directory_path: str or Path, optional
+        Path to the project directory. Defaults to current directory.
     depth : int, optional
         Stack depth where to look for variables. 
         Defaults to 0 (where this function was called).
@@ -38,12 +40,28 @@ def view_workspace(depth: int=0):
     >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.var
     394 objects loaded 
+
     >>> # will open a viewer showing all IODE databases
     >>> view_workspace()                                # doctest: +SKIP
+
+    >>> # will open a viewer showing the content of the SAMPLE_DATA_DIR directory
+    >>> view_workspace(SAMPLE_DATA_DIR)                 # doctest: +SKIP
     """
     try:
         from iode_gui import open_application
+    except ImportError:
+        raise Exception('view_workspace() is not available because the iode_gui package is not installed')
 
+    # If a directory path is provided, use it as the project directory
+    if directory_path is not None:
+        if isinstance(directory_path, str):
+            directory_path = Path(directory_path)
+        if not directory_path.exists():
+            raise ValueError(f"Provided path '{directory_path}' does not exist.")
+        if not directory_path.is_dir():
+            raise ValueError(f"Provided path '{directory_path}' is not a valid directory.")
+        project_dir = Path(directory_path).resolve()
+    else:
         # Get the current call stack
         stack = inspect.stack()
         # The second frame in the stack is the caller of this function
@@ -53,7 +71,5 @@ def view_workspace(depth: int=0):
         # Extract the directory path from the caller's file path
         project_dir = Path(caller_file_path).parent.resolve()
 
-        open_application(project_dir, called_from_python_script=True, depth = depth + 1)
-    except ImportError:
-        raise Exception('view_workspace() is not available because the iode_gui package is not installed')
+    open_application(project_dir, called_from_python_script=True, depth = depth + 1)
     
