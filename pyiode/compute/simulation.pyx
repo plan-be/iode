@@ -41,6 +41,9 @@ cdef class Simulation:
         self.c_simulation.set_max_nb_iterations_newton(value)
 
     def get_sort_algorithm(self) -> str:
+        return f"{SimulationSort(<int>(self.c_simulation.get_sort_algorithm())).name}"
+
+    def get_sort_algorithm_long(self) -> str:
         return f"{SimulationSort(<int>(self.c_simulation.get_sort_algorithm())).name} " + \
                f"({self.c_simulation.get_sort_algorithm_as_string().decode()})"
 
@@ -48,6 +51,9 @@ cdef class Simulation:
         self.c_simulation.set_sort(<SimuSortAlgorithm>value)
 
     def get_initialization_method(self) -> str:
+        return f"{SimulationInitialization(<int>(self.c_simulation.get_initialization_method())).name}"
+
+    def get_initialization_method_long(self) -> str:
         return f"{SimulationInitialization(<int>(self.c_simulation.get_initialization_method())).name} " + \
                f"({self.c_simulation.get_initialization_method_as_string().decode()})"
 

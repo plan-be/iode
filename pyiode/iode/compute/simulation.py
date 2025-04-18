@@ -1,4 +1,5 @@
 import warnings
+from textwrap import fill
 from collections.abc import Iterable
 from typing import List, Union
 
@@ -107,7 +108,7 @@ class Simulation:
         Number of passes to make when the pseudo-triangulation sorting algorithm is used.
         Default to 5.
     debug_newton: bool
-        Save a trace of the sub-iterations when the Newton-Raphson alogrithm is used.
+        Save a trace of the sub-iterations when the Newton-Raphson algorithm is used.
         Default to False.
 
     Examples
@@ -125,22 +126,10 @@ class Simulation:
     394 objects loaded
 
     >>> simu = Simulation()
-    >>> simu.convergence_threshold
-    0.001
-    >>> simu.relax
-    1.0
-    >>> simu.max_nb_iterations
-    100
-    >>> simu.sort_algorithm
-    'BOTH (Connex compon. + Triangulation)'
-    >>> simu.initialization_method
-    'TM1 (Y := Y[-1], if Y null or NA)'
-    >>> simu.debug
-    False
-    >>> simu.nb_passes
-    5
-    >>> simu.debug_newton
-    False
+    >>> simu
+    Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
+               sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
+               False, nb_passes = 5, debug_newton = False)
     """
     def __init__(self, convergence_threshold: float=0.001, relax: float=1.0, max_nb_iterations: int=100, 
                   sort_algorithm: Union[SimulationSort, str]=SimulationSort.BOTH, initialization_method: Union[SimulationInitialization, str]=SimulationInitialization.TM1, 
@@ -354,30 +343,67 @@ class Simulation:
         >>> simu = Simulation()
         >>> # default value
         >>> simu.sort_algorithm
-        'BOTH (Connex compon. + Triangulation)'
+        'BOTH'
 
         >>> simu.sort_algorithm = "none"
         >>> simu.sort_algorithm
-        'NONE (None)'
+        'NONE'
         >>> simu.sort_algorithm = SimulationSort.NONE
         >>> simu.sort_algorithm
-        'NONE (None)'
+        'NONE'
 
         >>> simu.sort_algorithm = "connex"
         >>> simu.sort_algorithm
-        'CONNEX (Connex compon. decomposition)'
+        'CONNEX'
         >>> simu.sort_algorithm = SimulationSort.CONNEX
         >>> simu.sort_algorithm
-        'CONNEX (Connex compon. decomposition)'
+        'CONNEX'
 
         >>> simu.sort_algorithm = "both"
         >>> simu.sort_algorithm
-        'BOTH (Connex compon. + Triangulation)'
+        'BOTH'
         >>> simu.sort_algorithm = SimulationSort.BOTH
         >>> simu.sort_algorithm
-        'BOTH (Connex compon. + Triangulation)'
+        'BOTH'
         """
         return self._cython_instance.get_sort_algorithm()
+
+    @property
+    def sort_algorithm_long(self) -> str:
+        r"""
+        Sorting algorithm used to reorganized the list of equations *before* the simulation is performed.
+        This reorganization can be usefully to to speed up the simulation. 
+
+        Examples
+        -------- 
+        >>> from iode import Simulation, SimulationSort
+        >>> simu = Simulation()
+        >>> # default value
+        >>> simu.sort_algorithm_long
+        'BOTH (Connex compon. + Triangulation)'
+
+        >>> simu.sort_algorithm = "none"
+        >>> simu.sort_algorithm_long
+        'NONE (None)'
+        >>> simu.sort_algorithm = SimulationSort.NONE
+        >>> simu.sort_algorithm_long
+        'NONE (None)'
+
+        >>> simu.sort_algorithm = "connex"
+        >>> simu.sort_algorithm_long
+        'CONNEX (Connex compon. decomposition)'
+        >>> simu.sort_algorithm = SimulationSort.CONNEX
+        >>> simu.sort_algorithm_long
+        'CONNEX (Connex compon. decomposition)'
+
+        >>> simu.sort_algorithm = "both"
+        >>> simu.sort_algorithm_long
+        'BOTH (Connex compon. + Triangulation)'
+        >>> simu.sort_algorithm = SimulationSort.BOTH
+        >>> simu.sort_algorithm_long
+        'BOTH (Connex compon. + Triangulation)'
+        """
+        return self._cython_instance.get_sort_algorithm_long()
 
     @sort_algorithm.setter
     def sort_algorithm(self, value: Union[SimulationSort, str, int]):
@@ -426,58 +452,123 @@ class Simulation:
         >>> simu = Simulation()
         >>> # default value
         >>> simu.initialization_method
-        'TM1 (Y := Y[-1], if Y null or NA)'
+        'TM1'
 
         >>> simu.initialization_method = "TM1"
         >>> simu.initialization_method
-        'TM1 (Y := Y[-1], if Y null or NA)'
+        'TM1'
         >>> simu.initialization_method = SimulationInitialization.TM1
         >>> simu.initialization_method
-        'TM1 (Y := Y[-1], if Y null or NA)'
+        'TM1'
 
         >>> simu.initialization_method = "TM1_A"
         >>> simu.initialization_method
-        'TM1_A (Y := Y[-1], always)'
+        'TM1_A'
         >>> simu.initialization_method = SimulationInitialization.TM1_A
         >>> simu.initialization_method
-        'TM1_A (Y := Y[-1], always)'
+        'TM1_A'
 
         >>> simu.initialization_method = "EXTRA"
         >>> simu.initialization_method
-        'EXTRA (Y := extrapolation, if Y null or NA)'
+        'EXTRA'
         >>> simu.initialization_method = SimulationInitialization.EXTRA
         >>> simu.initialization_method
-        'EXTRA (Y := extrapolation, if Y null or NA)'
+        'EXTRA'
 
         >>> simu.initialization_method = "EXTRA_A"
         >>> simu.initialization_method
-        'EXTRA_A (Y := extrapolation, always)'
+        'EXTRA_A'
         >>> simu.initialization_method = SimulationInitialization.EXTRA_A
         >>> simu.initialization_method
-        'EXTRA_A (Y := extrapolation, always)'
+        'EXTRA_A'
 
         >>> simu.initialization_method = "ASIS"
         >>> simu.initialization_method
-        'ASIS (Y unchanged)'
+        'ASIS'
         >>> simu.initialization_method = SimulationInitialization.ASIS
         >>> simu.initialization_method
-        'ASIS (Y unchanged)'
+        'ASIS'
 
         >>> simu.initialization_method = "TM1_NA"
         >>> simu.initialization_method
-        'TM1_NA (Y := Y[-1], if Y = NA)'
+        'TM1_NA'
         >>> simu.initialization_method = SimulationInitialization.TM1_NA
         >>> simu.initialization_method
-        'TM1_NA (Y := Y[-1], if Y = NA)'
+        'TM1_NA'
 
         >>> simu.initialization_method = "EXTRA_NA"
         >>> simu.initialization_method
-        'EXTRA_NA (Y := extrapolation, if Y = NA)'
+        'EXTRA_NA'
         >>> simu.initialization_method = SimulationInitialization.EXTRA_NA
         >>> simu.initialization_method
-        'EXTRA_NA (Y := extrapolation, if Y = NA)'
+        'EXTRA_NA'
         """
         return self._cython_instance.get_initialization_method()
+
+    @property
+    def initialization_method_long(self) -> str:
+        r"""
+        At the start of each period to be simulated, a starting value must be chosen 
+        for each endogenous variable. 
+
+        Examples
+        -------- 
+        >>> from iode import Simulation, SimulationInitialization
+        >>> simu = Simulation()
+        >>> # default value
+        >>> simu.initialization_method_long
+        'TM1 (Y := Y[-1], if Y null or NA)'
+
+        >>> simu.initialization_method = "TM1"
+        >>> simu.initialization_method_long
+        'TM1 (Y := Y[-1], if Y null or NA)'
+        >>> simu.initialization_method = SimulationInitialization.TM1
+        >>> simu.initialization_method_long
+        'TM1 (Y := Y[-1], if Y null or NA)'
+
+        >>> simu.initialization_method = "TM1_A"
+        >>> simu.initialization_method_long
+        'TM1_A (Y := Y[-1], always)'
+        >>> simu.initialization_method = SimulationInitialization.TM1_A
+        >>> simu.initialization_method_long
+        'TM1_A (Y := Y[-1], always)'
+
+        >>> simu.initialization_method = "EXTRA"
+        >>> simu.initialization_method_long
+        'EXTRA (Y := extrapolation, if Y null or NA)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA
+        >>> simu.initialization_method_long
+        'EXTRA (Y := extrapolation, if Y null or NA)'
+
+        >>> simu.initialization_method = "EXTRA_A"
+        >>> simu.initialization_method_long
+        'EXTRA_A (Y := extrapolation, always)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA_A
+        >>> simu.initialization_method_long
+        'EXTRA_A (Y := extrapolation, always)'
+
+        >>> simu.initialization_method = "ASIS"
+        >>> simu.initialization_method_long
+        'ASIS (Y unchanged)'
+        >>> simu.initialization_method = SimulationInitialization.ASIS
+        >>> simu.initialization_method_long
+        'ASIS (Y unchanged)'
+
+        >>> simu.initialization_method = "TM1_NA"
+        >>> simu.initialization_method_long
+        'TM1_NA (Y := Y[-1], if Y = NA)'
+        >>> simu.initialization_method = SimulationInitialization.TM1_NA
+        >>> simu.initialization_method_long
+        'TM1_NA (Y := Y[-1], if Y = NA)'
+
+        >>> simu.initialization_method = "EXTRA_NA"
+        >>> simu.initialization_method_long
+        'EXTRA_NA (Y := extrapolation, if Y = NA)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA_NA
+        >>> simu.initialization_method_long
+        'EXTRA_NA (Y := extrapolation, if Y = NA)'
+        """
+        return self._cython_instance.get_initialization_method_long()
 
     @initialization_method.setter
     def initialization_method(self, value: Union[SimulationInitialization, str, int]):
@@ -1228,3 +1319,69 @@ class Simulation:
         if quiet:
             enable_msgs()
         return success
+
+    def __str__(self) -> str:
+        r"""
+        Returns a string representation of the Simulation object.
+
+        Returns
+        -------
+        str
+            String representation of the Simulation object.
+
+        Examples
+        --------
+        >>> from iode import Simulation
+        >>> simu = Simulation()
+        >>> print(simu)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        --- Simulation ---
+        convergence_threshold = 0.001
+        relax = 1.0
+        max_nb_iterations = 100
+        sort_algorithm = BOTH (Connex compon. + Triangulation)
+        initialization_method = TM1 (Y := Y[-1], if Y null or NA)
+        debug = False
+        nb_passes = 5
+        debug_newton = False
+        ------------------
+        """
+        s = ["--- Simulation ---"]
+        s += [f"convergence_threshold = {self.convergence_threshold}"]
+        s += [f"relax = {self.relax}"]
+        s += [f"max_nb_iterations = {self.max_nb_iterations}"]
+        s += [f"sort_algorithm = {self.sort_algorithm_long}"]
+        s += [f"initialization_method = {self.initialization_method_long}"]
+        s += [f"debug = {self.debug}"]
+        s += [f"nb_passes = {self.nb_passes}"]
+        s += [f"debug_newton = {self.debug_newton}"]
+        s += ["------------------"]
+        return '\n'.join(s)
+
+    def __repr__(self) -> str:
+        r"""
+        Returns a string representation of the Simulation object.
+
+        Returns
+        -------
+        str
+            String representation of the Simulation object.
+
+        Examples
+        --------
+        >>> from iode import Simulation
+        >>> simu = Simulation()
+        >>> simu        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
+                   sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
+                   False, nb_passes = 5, debug_newton = False)
+        """
+        args = [f"convergence_threshold = {self.convergence_threshold}"]
+        args += [f"relax = {self.relax}"]
+        args += [f"max_nb_iterations = {self.max_nb_iterations}"]
+        args += [f"sort_algorithm = '{self.sort_algorithm}'"]
+        args += [f"initialization_method = '{self.initialization_method}'"]
+        args += [f"debug = {self.debug}"]
+        args += [f"nb_passes = {self.nb_passes}"]
+        args += [f"debug_newton = {self.debug_newton}"]
+        s = f"Simulation({', '.join(args)})"
+        return fill(s, subsequent_indent=' ' * len("Simulation("), width=80)
