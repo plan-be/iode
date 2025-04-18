@@ -645,7 +645,9 @@ SIMULATION
    Simulation.convergence_threshold
    Simulation.relax
    Simulation.sort_algorithm
+   Simulation.sort_algorithm_long
    Simulation.initialization_method
+   Simulation.initialization_method_long
    Simulation.max_nb_iterations
    Simulation.max_nb_iterations_newton
    Simulation.nb_passes
