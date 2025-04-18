@@ -687,6 +687,29 @@ def test_variables_binary_op():
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
     variables["SUM"] = variables["ACAF"] + variables["ACAG"]
 
+    # ==== larray 1D ====
+    names = ["ACAF", "ACAG", "AOUC", "AOUC_", "AQC"]
+    periods = ["1990Y1", "1991Y1", "1992Y1", "1993Y1", "1994Y1"]
+    data = [0.0, 1.0, 2.0, 3.0, 4.0]
+    
+    names_axis = la.Axis(labels=names, name="name")
+    array = la.Array(data=data, axes=names_axis, dtype=float)
+    variables[names, "1990Y1"] = array
+    assert variables["ACAF", "1990Y1"] == 0.0
+    assert variables["ACAG", "1990Y1"] == 1.0
+    assert variables["AOUC", "1990Y1"] == 2.0
+    assert variables["AOUC_", "1990Y1"] == 3.0
+    assert variables["AQC", "1990Y1"] == 4.0
+
+    periods_axis = la.Axis(labels=periods, name="time")
+    array = la.Array(data=data, axes=periods_axis, dtype=float)
+    variables["ACAF", periods] = array
+    assert variables["ACAF", "1990Y1"] == 0.0
+    assert variables["ACAF", "1991Y1"] == 1.0
+    assert variables["ACAF", "1992Y1"] == 2.0
+    assert variables["ACAF", "1993Y1"] == 3.0
+    assert variables["ACAF", "1994Y1"] == 4.0
+
 def test_variables_numpy_1D():
     variables.clear()
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
