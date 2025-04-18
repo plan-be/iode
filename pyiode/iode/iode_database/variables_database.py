@@ -1121,7 +1121,8 @@ class Variables(IodeDatabase):
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
         if isinstance(value.index, pd.MultiIndex):
             raise ValueError(f"Expected pandas Series with a single-level index.\n") 
-        if len(key_names) > 1:            # check that names in the selection key are present in the Series object
+        if len(key_names) > 1:
+            # check that names in the selection key are present in the Series object
             series_names = value.index.to_list()
             self._check_same_names(key_names, series_names)
         else:
@@ -1140,7 +1141,7 @@ class Variables(IodeDatabase):
         df_names = value.index.to_list()
         if len(key_names) == 1:
             if len(df_names) > 1:
-                raise ValueError(f"Expected DataFrame with a single index.\n")
+                raise ValueError(f"Expected DataFrame with a single index value.\n")
             # transform the DataFrame to a Series
             value = value.squeeze()
         else:
@@ -1149,6 +1150,20 @@ class Variables(IodeDatabase):
         return value
 
     def _check_larray_array(self, value: Array, key_names: List[str], key_periods: List[str]) -> Array:
+        if value.ndim == 1:
+            if len(key_names) > 1 and len(key_periods) > 1: 
+                raise ValueError(f"Expected Array object representing {len(key_names)} variables "
+                                 f"and {len(key_periods)} periods (at least 2 axes).\n"
+                                 f"Got Array object with a single axis {value.axes[0]} instead.")
+            labels = list(value.axes[0].labels)
+            if len(key_names) > 1:
+                # check that names in the selection key are present in the Array object
+                self._check_same_names(key_names, labels)
+            else:
+                # check that periods in the selection key are present in the Array object
+                _check_same_periods(key_periods, labels, True, "Array")
+            return value
+    
         if 'time' not in value.axes:
             raise ValueError(f"Passed Array object must contain an axis named 'time'.\n"
                              f"Got axes {repr(value.axes)}.")
