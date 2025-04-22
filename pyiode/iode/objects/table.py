@@ -1401,10 +1401,28 @@ class Table:
 
         >>> tables["YDH"].divider
         ('1', 'PC_*40.34')
+
+        >>> tables["YDH"].divider = ["1", "40.34"]
+        >>> tables["YDH"].divider
+        ('1', '40.34')
         """
         div_line = TableLine.get_instance()
         div_line._cython_instance = self._cython_instance.get_divider(div_line._cython_instance)
         return div_line
+
+    @divider.setter
+    def divider(self, value: Union[List[str], Tuple[str]]):
+        if not isinstance(value, (list, tuple)):
+            raise TypeError(f"Cannot update cells of the 'divider' line. Expected new content of type list "
+                            f"or tuple of str.\nGot new content of type {type(value).__name__} instead.")
+        if not all(isinstance(item, str) for item in value):
+            raise TypeError(f"Cannot update cells of the 'divider' line. One or more items of the passed "
+                            f"{type(value).__name__} are not of type str")
+        if len(value) != self.nb_columns:
+            raise ValueError(f"Cannot update cells of the 'divider' line.\nThe length of the passed "
+                             f"{type(value).__name__} ({len(value)}) must be the same of the number of "
+                             f"cells ({self.nb_columns}) in the table")
+        self._cython_instance.set_divider(value)
 
     def _get_row_from_index(self, index: int) -> int:
         if not (-len(self) < index < len(self)):

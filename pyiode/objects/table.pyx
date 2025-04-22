@@ -428,6 +428,30 @@ cdef class Table:
         divider.py_parent_table = self
         return divider
 
+    def set_divider(self, value: Union[List[str], Tuple[str]]):
+        cdef CTableLine* c_line
+        c_line = self.c_table.get_divider_line()
+        if c_line is NULL:
+            raise RuntimeError("Cannot set divider line. No divider line found in the table.")
+
+        if not isinstance(value, (list, tuple)):
+            raise TypeError(f"Cannot update cells of the 'divider' line. Expected new content of type list "
+                            f"or tuple of str.\nGot new content of type {type(value).__name__} instead.")
+        if not all(isinstance(item, str) for item in value):
+            raise TypeError(f"Cannot update cells of the 'divider' line. One or more items of the passed "
+                            f"{type(value).__name__} are not of type str")
+        
+        nb_columns = self.get_nb_columns()
+        if len(value) != nb_columns:
+            raise ValueError(f"Cannot update cells of the 'divider' line.\nThe length of the passed {type(value).__name__} "
+                             f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
+        
+        for j, cell_content in enumerate(value):
+            c_cell = c_line.get_cell(j, nb_columns)
+            c_cell.set_content(cell_content.encode())
+
+        self.update_owner_database()
+
     def index(self, key: str) -> int:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
@@ -477,7 +501,10 @@ cdef class Table:
                 self.insert(row, value.split('|'))
             else:
                 self.c_table.insert_title(row, value.encode(), <bint>False)
-        elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
+        elif isinstance(value, (list, tuple)):
+            if not all(isinstance(item, str) for item in value):
+                raise TypeError(f"Cannot insert line with cells at position {row}.\nOne or more items "
+                                f"of the passed {type(value).__name__} are not of type str")
             c_line = self.c_table.insert_line_with_cells(row, <bint>False)
             nb_columns = self.get_nb_columns()
             if len(value) != nb_columns:
@@ -515,15 +542,18 @@ cdef class Table:
         nb_columns = self.get_nb_columns()
         if line_type == TableLineType.TITLE:
             if not isinstance(value, str):
-                raise TypeError(f"Cannot upate line {row}. Expected new content of type str. "
+                raise TypeError(f"Cannot update line {row}. Expected new content of type str. "
                                 f"Got new content of type {type(value).__name__} instead.")
             c_line.get_cell(0, nb_columns).set_text(value.encode())
         elif line_type == TableLineType.CELL:
-            if not (isinstance(value, Iterable) and all(isinstance(item, str) for item in value)):
-                raise TypeError(f"Cannot upate cells at line {row}. Expected new content of type list or tuple of str.\n"
+            if not isinstance(value, (list, tuple)):
+                raise TypeError(f"Cannot update cells at line {row}. Expected new content of type list or tuple of str.\n"
                                 f"Got new content of type {type(value).__name__} instead.")
+            if not all(isinstance(item, str) for item in value):
+                raise TypeError(f"Cannot update cells at line {row}. One or more items of the passed "
+                                f"{type(value).__name__} are not of type str")
             if len(value) != nb_columns:
-                raise ValueError(f"Cannot upate cells at line {row}.\nThe length of passed {type(value).__name__} "
+                raise ValueError(f"Cannot update cells at line {row}.\nThe length of the passed {type(value).__name__} "
                                  f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
             for j, cell_content in enumerate(value):
                 c_cell = c_line.get_cell(j, nb_columns)
