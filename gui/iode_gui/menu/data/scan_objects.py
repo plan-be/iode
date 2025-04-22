@@ -3,13 +3,14 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_scan_objects import Ui_MenuDataScanObjects
 
 from iode import IodeType, equations, identities, lists, tables
 
 
 class MenuDataScanObjects(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuDataScanObjects()
         self.ui.setupUi(self)
@@ -58,4 +59,5 @@ class MenuDataScanObjects(MixinSettingsDialog):
             result += f"exogenous (_EXO list): {'; '.join(vars_list)}"
             self.ui.textEdit_note.setPlainText(result)
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

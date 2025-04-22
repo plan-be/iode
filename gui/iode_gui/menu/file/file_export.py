@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.util.widgets.file_chooser import EnumFileMode
 from .ui_file_export import Ui_MenuFileExport
 
@@ -9,7 +10,7 @@ from iode import IodeFileType, ExportFormats, Sample, variables
 
 
 class MenuFileExport(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuFileExport()
         self.ui.setupUi(self)
@@ -85,4 +86,5 @@ class MenuFileExport(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDoubleValidator
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_file_compare import Ui_MenuDataFileCompare
 
 from iode import (IodeType, IodeFileType, comments, equations, identities, 
@@ -10,7 +11,7 @@ from iode import (IodeType, IodeFileType, comments, equations, identities,
 
 
 class MenuDataFileCompare(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuDataFileCompare()
         self.ui.setupUi(self)
@@ -80,6 +81,7 @@ class MenuDataFileCompare(MixinSettingsDialog):
             self.ui.label_nb_elements_both_equal.setText(f"{len(results[list_both_equal])} Elements")
             self.ui.label_nb_elements_both_different.setText(f"{len(results[list_different])} Elements")
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to compare {iode_type.name} with those "
                                 f"contained in file '{input_file}'.\n" + str(e))
 

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_duplicate import Ui_MenuDataDuplicateObj
 
 from copy import copy
@@ -11,7 +12,7 @@ from iode import (IodeType, comments, equations, identities,
 
 
 class MenuDataDuplicateObj(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuDataDuplicateObj()
         self.ui.setupUi(self)
@@ -56,5 +57,6 @@ class MenuDataDuplicateObj(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to duplicate IODE {iode_type.name} "
                                 f"'{obj_name}'.\n" + str(e))

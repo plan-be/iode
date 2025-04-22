@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_compute_scc_decomposition import Ui_MenuComputeSCCDecomposition
 
 import warnings
@@ -10,7 +11,7 @@ from iode import IodeType, Simulation
 
 
 class MenuComputeSCCDecomposition(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuComputeSCCDecomposition()
         self.ui.setupUi(self)
@@ -42,5 +43,6 @@ class MenuComputeSCCDecomposition(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))
             warnings.simplefilter("default")

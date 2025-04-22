@@ -3,13 +3,14 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_workspace_high_to_low import Ui_MenuWorkspaceHighToLow
 
 from iode import IodeFileType, variables, HighToLowType
 
 
 class MenuWorkspaceHighToLow(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceHighToLow()
         self.ui.setupUi(self)
@@ -45,4 +46,5 @@ class MenuWorkspaceHighToLow(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", "Failed to build series of lower periodicity.\n" + str(e))

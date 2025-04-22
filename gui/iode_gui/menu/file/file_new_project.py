@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_file_new_project import Ui_MenuFileNewProject
 
 from pathlib import Path
@@ -10,7 +11,7 @@ from iode import IodeFileType
 
 
 class MenuFileNewProject(MixinSettingsDialog):
-    def __init__(self, project_path: str, parent: QWidget = None) -> None:
+    def __init__(self, project_path: str, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuFileNewProject()
         self.ui.setupUi(self)
@@ -61,4 +62,5 @@ class MenuFileNewProject(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

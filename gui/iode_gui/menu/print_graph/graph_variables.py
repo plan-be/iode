@@ -6,6 +6,7 @@ from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.plot.plot_vars import PlotVariablesDialog
 from iode_gui.menu.file.file_settings import MenuFileSettings
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_graph_variables import Ui_MenuGraphVariables
 
 from typing import List, Union
@@ -18,7 +19,7 @@ from iode import (IodeType, TableLang, VarsMode, TableGraphType, Variables,
 class MenuGraphVariables(MixinSettingsDialog):
     new_plot = Signal(QDialog)
 
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuGraphVariables()
         self.ui.setupUi(self)
@@ -111,6 +112,7 @@ class MenuGraphVariables(MixinSettingsDialog):
                                               title="VARIABLES")
             self.new_plot.emit(plot_dialog)
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to plot variables '{pattern_var_names}':\n" + str(e))
 
     @Slot()
@@ -124,4 +126,5 @@ class MenuGraphVariables(MixinSettingsDialog):
             dialog.show_print_tab()
             dialog.exec()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))
