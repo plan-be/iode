@@ -853,9 +853,12 @@ class Table:
     graph_alignment: 'LEFT'
     <BLANKLINE>
 
-    >>> # the first cell represents a line title and the second a LEC expression
+    >>> # left column = line title
+    >>> # right column = variable or LEC expression
     >>> table_title = "Table example with titles on the left and LEC expressions on the right"
+    >>> # content of the left column
     >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
+    >>> # content of the right column
     >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
     >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
     >>> table           # doctest: +NORMALIZE_WHITESPACE
@@ -2169,8 +2172,8 @@ class Table:
         >>> table += TableLineType.SEP
 
         >>> # append a line with cells
-        >>> # "    -> STRING cell
-        >>> # no " -> LEC cell
+        >>> # NOTE: line containing double quotes " -> assumed to be a STRING cell
+        >>> #       line without double quotes      -> assumed to be a LEC cell
         >>> table += ['"RIDG:"', 'RIDG']
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
