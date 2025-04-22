@@ -11,7 +11,7 @@ from pyiode.super cimport kpause_continue
 
 
 cdef extern from "super.h":
-    cdef void _update_kerror_super(const bint std_exception)
+    cdef void _c_api_error_as_exception(const bint value)
 
     cdef int c_kerror_super(const int level, const char* msg) except? -1
     cdef void c_kwarning_super(const char* msg) noexcept
@@ -115,9 +115,8 @@ cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg,
     cdef bytes b_msg = bytes(msg[:length_msg])
     return __registry_super_functions['msgbox'](b_title.decode('utf-8'), b_msg.decode('utf-8'))
 
-def update_kerror_super():
-    std_exception = 'error' not in __registry_super_functions
-    _update_kerror_super(<bint>std_exception)
+def c_api_error_as_exception(value: bool):
+    _c_api_error_as_exception(<bint>value)
 
 def skip_pause(value: bool):
     kpause_continue = <bint>value
