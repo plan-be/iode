@@ -2,12 +2,13 @@ from PySide6.QtCore import Qt, QDir, QFileInfo, QSettings
 from PySide6.QtWidgets import QTextEdit, QMessageBox
 
 from iode_gui.settings import get_settings, RUN_REPORTS_FROM_PROJECT_DIR
-from .highlighter import IodeHighlighter
-from .completer import IodeCompleter
-from .text_editor import IodeTextEditor
+from iode_gui.text_edit.highlighter import IodeHighlighter
+from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.text_edit.text_editor import IodeTextEditor
 from iode_gui.abstract_main_window import AbstractMainWindow
 
 from iode import TableLang, execute_report, execute_command
+from iode.util import c_api_error_as_exception
 from typing import Union, List
 
 
@@ -67,6 +68,10 @@ class IodeReportEditor(IodeTextEditor):
         if not isinstance(parameters, str):
             parameters = ";".join(parameters)
 
+        # If the C/C++ API throws an error, it is caught and displayed in a message box.
+        # This allows to continue the execution of the report even after an error.
+        c_api_error_as_exception(False)
+
         try:
             # updates current directory execution (chdir)
             if not run_from_project_dir:
@@ -96,6 +101,9 @@ class IodeReportEditor(IodeTextEditor):
             success = False
             msg = str(e)
             QMessageBox.warning(None, "WARNING", f"{msg}\n")
+
+        # convert errors from the C/C++ API to Python exceptions again
+        c_api_error_as_exception(True)
 
         if self.output:
             if success:
