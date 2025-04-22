@@ -219,7 +219,7 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
     # override base method
     @Slot()
     def reset(self):
-        self.column_names = self._displayed_database.periods
+        self.column_names = self._displayed_database.periods_as_str
         super().reset()
 
     @Slot(VarsMode)
