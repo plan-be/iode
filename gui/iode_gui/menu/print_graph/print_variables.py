@@ -9,6 +9,7 @@ from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.menu.file.file_settings import MenuFileSettings
 from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
 from iode_gui.print.print_file_dialog import PrintFileDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_print_variables import Ui_MenuPrintVariables
 
 from typing import List
@@ -18,7 +19,7 @@ from iode import (IodeType, TableLang, IodeFileType, Table, tables, variables,
 
 
 class MenuPrintVariables(MixinSettingsDialog):
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuPrintVariables()
         self.ui.setupUi(self)
@@ -79,6 +80,7 @@ class MenuPrintVariables(MixinSettingsDialog):
             self.table_views.append(computed_table_dialog)
             computed_table_dialog.open()    
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to display variables '{pattern_variable_names}':\n" + str(e))
 
     @Slot()
@@ -145,6 +147,7 @@ class MenuPrintVariables(MixinSettingsDialog):
                 dialog.paintRequested.connect(lambda: document.print_(printer))
                 dialog.exec()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to print variables '{pattern_variable_names}':\n" + str(e))
 
     @Slot()
@@ -154,4 +157,5 @@ class MenuPrintVariables(MixinSettingsDialog):
             dialog.show_print_tab()
             dialog.exec()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

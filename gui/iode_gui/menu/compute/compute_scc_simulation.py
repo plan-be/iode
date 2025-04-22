@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDoubleValidator
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_compute_scc_simulation import Ui_MenuComputeSCCSimulation
 
 import warnings
@@ -11,7 +12,7 @@ from iode import (Simulation, SimulationInitialization, SIMULATION_INITIALIZATIO
 
 
 class MenuComputeSCCSimulation(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuComputeSCCSimulation()
         self.ui.setupUi(self)
@@ -90,6 +91,7 @@ class MenuComputeSCCSimulation(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))
             warnings.simplefilter("default")
         

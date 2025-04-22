@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_list_calculus import Ui_MenuDataListCalculus
 
 from itertools import product
@@ -10,7 +11,7 @@ from iode import IodeType, lists
 
 
 class MenuDataListCalculus(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuDataListCalculus()
         self.ui.setupUi(self)
@@ -64,4 +65,5 @@ class MenuDataListCalculus(MixinSettingsDialog):
             self.ui.textEdit_res.setPlainText("; ".join(list_result))
             self.ui.label_count.setText(str(len(list_result)))
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

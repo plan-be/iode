@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_workspace_merge_into import Ui_MenuWorkspaceMergeInto
 
 
@@ -10,7 +11,7 @@ from iode import (IodeType, IodeFileType, comments, equations, identities,
 
 
 class MenuWorkspaceMergeInto(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceMergeInto()
         self.ui.setupUi(self)
@@ -50,6 +51,7 @@ class MenuWorkspaceMergeInto(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", "Failed to merge into workspace:\n" + str(e))
 
     @Slot(int)

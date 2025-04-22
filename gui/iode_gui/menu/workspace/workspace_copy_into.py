@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_workspace_copy_into import Ui_MenuWorkspaceCopyInto
 
 
@@ -10,7 +11,7 @@ from iode import (IodeType, IodeFileType, comments, equations, identities,
 
 
 class MenuWorkspaceCopyInto(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceCopyInto()
         self.ui.setupUi(self)
@@ -58,6 +59,7 @@ class MenuWorkspaceCopyInto(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", "Failed to copy into workspace.\n" + str(e))
 
     @Slot(int)

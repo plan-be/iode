@@ -3,13 +3,14 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_workspace_trend_correction import Ui_MenuWorkspaceTrendCorrection
 
 from iode import IodeFileType, variables
 
 
 class MenuWorkspaceTrendCorrection(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceTrendCorrection()
         self.ui.setupUi(self)
@@ -34,4 +35,5 @@ class MenuWorkspaceTrendCorrection(MixinSettingsDialog):
             variables.trend_correction(filepath, lambda_value, series, log)
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", "Failed to compute trend correction.\n" + str(e))

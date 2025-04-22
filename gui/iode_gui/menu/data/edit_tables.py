@@ -5,6 +5,7 @@ from PySide6.QtGui import QCloseEvent
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.tabs.iode_objs.tab_computed_table import ComputedTableDialog
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_edit_tables import Ui_MenuDataEditTables
 
 from typing import List
@@ -13,7 +14,7 @@ from iode.computed_table.computed_table import ComputedTable
 
 
 class MenuDataEditTables(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuDataEditTables()
         self.ui.setupUi(self)
@@ -49,4 +50,5 @@ class MenuDataEditTables(MixinSettingsDialog):
                 self.table_views.append(computed_table_dialog)
                 computed_table_dialog.open()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to edit table(s) .\n" + str(e))

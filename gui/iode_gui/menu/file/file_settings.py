@@ -4,11 +4,12 @@ from PySide6.QtWidgets import QWidget
 from iode_gui.print.file_print_preferences import FilePrintPreferences
 from iode_gui.settings import (get_settings, MixinSettingsDialog, 
                                PRINT_TO_FILE, RUN_REPORTS_FROM_PROJECT_DIR)
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_file_settings import Ui_MenuFileSettings
 
 
 class MenuFileSettings(MixinSettingsDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
 
         # Initialize UI components

@@ -3,13 +3,14 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_file_import_comments import Ui_MenuFileImportComments
 
 from iode import IodeFileType, TableLang, ImportFormats, comments
 
 
 class MenuFileImportComments(MixinSettingsDialog):
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuFileImportComments()
         self.ui.setupUi(self)
@@ -64,4 +65,5 @@ class MenuFileImportComments(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))

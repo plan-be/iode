@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_workspace_extrapolate_variables import Ui_MenuWorkspaceExtrapolateVariables
 
 
@@ -11,7 +12,7 @@ from iode import (IodeType, SimulationInitialization, SIMULATION_INITIALIZATION_
 
 
 class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceExtrapolateVariables()
         self.ui.setupUi(self)
@@ -38,4 +39,5 @@ class MenuWorkspaceExtrapolateVariables(MixinSettingsDialog):
 
             self.accept()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", "Failed to extrapolate the variables.\n" + str(e))

@@ -5,6 +5,7 @@ from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
 from iode_gui.plot.plot_table import PlotTableDialog
 from iode_gui.menu.file.file_settings import MenuFileSettings
+from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_graph_tables import Ui_MenuGraphTables
 
 from typing import List
@@ -14,7 +15,7 @@ from iode import (IodeType, TableLang, IodeFileType, Table, tables, reset_extra_
 class MenuGraphTables(MixinSettingsDialog):
     new_plot = Signal(QDialog)
 
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: AbstractMainWindow):
         super().__init__(parent)
         self.ui = Ui_MenuGraphTables()
         self.ui.setupUi(self)
@@ -62,6 +63,7 @@ class MenuGraphTables(MixinSettingsDialog):
                 self.new_plot.emit(plot_dialog)
 
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", f"Failed to plot tables '{pattern_table_names}':\n" + str(e))
 
     @Slot()
@@ -75,4 +77,5 @@ class MenuGraphTables(MixinSettingsDialog):
             dialog.show_print_tab()
             dialog.exec()
         except Exception as e:
+            self.parent().display_output(f"ERROR -> {str(e)}")
             QMessageBox.warning(self, "WARNING", str(e))
