@@ -1,7 +1,7 @@
 import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
-from iode.util import register_super_function, update_kerror_super
+from iode.util import register_super_function, c_api_error_as_exception
 from iode.super import skip_pause, skip_msg_box
 
 from PySide6.QtWidgets import QMainWindow, QMessageBox
@@ -25,9 +25,7 @@ def gui_assign_super(arg_main_window: MainWindow):
 		return
 	
 	main_window = arg_main_window
-
-	update_kerror_super()
-
+	c_api_error_as_exception(True)
 
 @register_super_function('error')
 def error_super_GUI(level: int, msg: str) -> int:
@@ -40,7 +38,7 @@ def error_super_GUI(level: int, msg: str) -> int:
 		return -1
 	else:
 		main_window.display_output(f"ERROR -> {msg}")
-		QMessageBox.critical( None, "ERROR", msg)
+		QMessageBox.critical(None, "ERROR", msg)
 		return 0
 	
 @register_super_function('warning')
