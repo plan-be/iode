@@ -10,7 +10,7 @@ from .common import IODE_FILE_TYPES
 
 # import constants, functions and classes hidden from users but maybe useful for developers
 # (for the GUI for example)
-from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, register_super_function, update_kerror_super, 
+from iode.iode_cython import (IODE_DEFAULT_DATABASE_FILENAME, register_super_function, c_api_error_as_exception, 
                               set_printer_preferences, set_A2M_preferences, set_MIF_preferences, set_RTF_preferences, 
                               set_HTML_preferences)
 from .common import FileType
