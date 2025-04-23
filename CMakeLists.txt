@@ -27,15 +27,15 @@ if(NOT SKBUILD)
 endif()
 
 # ---- main project ----
-project ("iode" VERSION 7.1.0 HOMEPAGE_URL "https://iode.readthedocs.io/en/latest/" LANGUAGES C CXX)
+project ("iode" VERSION 7.1.0 HOMEPAGE_URL "https://iode.readthedocs.io/en/stable/" LANGUAGES C CXX)
 
 # previous homepage URL: https://iode.plan.be/doku.php
 
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
 set(IODE_EMAIL "ald@plan.be; yvda@plan.be; gb@plan.be; jmarc.paul@gmail.com")
-set(PYTHON_API_URL "https://iode.readthedocs.io/en/latest/api.html")
-set(CHANGELOG_URL "https://iode.readthedocs.io/en/latest/changes.html")
+set(PYTHON_API_URL "https://iode.readthedocs.io/en/stable/api.html")
+set(CHANGELOG_URL "https://iode.readthedocs.io/en/stable/changes.html")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 set(MINIMUM_PYTHON_VERSION "3.10")
 
