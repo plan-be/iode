@@ -371,9 +371,30 @@ The change log files for each version are located in the directory doc/changes.
 
 ## Push The New Tag To Github
 
-1. Push the tag to Github: git push origin <tag_name>.
-2. Check that the pushed tag has triggered the Workflow `github-actions-release.yml` in the Github Actions. Wait until the end of the `build_and_release` job. 
-3. Check on Github if the new release has been created.
+Push the tag to Github: git push origin <tag_name>.
+
+## Buid the Python packages
+
+Build the *iode* (for all supported python versions) and *iode_gui* Python packages:
+```bash
+root_dir_iode> cd pyiode
+pyiode> conda activate py3xx
+pyiode> python -m build --sdist --wheel
+```
+```bash
+root_dir_iode> cd gui
+gui> python -m build --sdist --wheel
+```
+
+## Upload the Python packages to PyPI
+
+Upload the *iode* and *iode_gui* Python packages to PyPI:
+```bash
+pyiode> twine upload dist/*
+```
+```bash
+gui> twine upload dist/*
+```
 
 ## After the release
 
