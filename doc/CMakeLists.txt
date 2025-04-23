@@ -1,7 +1,3 @@
-# IODE manuals
-# ------------
-# Files to generate iode.chm, readme.htm, iode1.mif and iode2.mif, iode wiki pages
-
 cmake_minimum_required (VERSION 3.16)
 
 message(STATUS "\n---- DOC ----\n")

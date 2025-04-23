@@ -244,7 +244,6 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 message(STATUS "\n-> user doc files <-")
 file(INSTALL doc/build/iode.chm DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
-file(INSTALL doc/build/readme.htm DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
 # -- copy syntax files --
 message(STATUS "\n-> files to highlight IODE report commands in Texpad and Notepad++ <-")
