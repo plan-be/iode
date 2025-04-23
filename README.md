@@ -18,10 +18,10 @@ functionalities required for the construction and the handling of econometric mo
 
 ## Installation
 
-Follow instructions on the [documentation](https://iode.readthedocs.io/en/latest/install.html) page.
+Follow instructions on the [documentation](https://iode.readthedocs.io/en/stable/install.html) page.
 
 ## Documentation
-https://iode.readthedocs.io/en/latest/index.html
+https://iode.readthedocs.io/en/stable
 
 ## Support
 "Alix Damman" <ald@plan.be>, "Yannick Van den Abbeel" <yvda@plan.be>
