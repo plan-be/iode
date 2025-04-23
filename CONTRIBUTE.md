@@ -364,7 +364,7 @@ The change log files for each version are located in the directory doc/changes.
 
 1. Create a local branch based on `origin master` with the name containing the keyword `release`.
 2. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on `<current date>`".
-3. Commit your changes (the commit message should be something like `release <tag> on <current date>`)
+3. Commit your changes (the commit message should be something like `RELEASE: released <tag>`)
 4. Create an annotated tag on the new commit.
    The name of the tag is the name of the last change log file in doc/changelog/versions (`v<major>.<minor>.<patch>(-beta.<beta>)`).
    The annotation should be something like `RELEASE: release <tag> on <current date>`.
