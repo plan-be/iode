@@ -41,7 +41,7 @@ jobs:
         with:
             fail_on_unmatched_files: true
             generate_release_notes: false
-            prerelease: true
+            prerelease: false
             body_path: ${{ github.workspace }}/doc/source/changes/${{github.ref_name}}.rst.inc
             files: |
                 ${{ github.workspace }}/assets/*
