@@ -1,0 +1,59 @@
+{% set name = "iode-gui" %}
+{% set version = "${CMAKE_PROJECT_VERSION}" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/iode_gui-{{ version }}.tar.gz
+  sha256: cb0249f4e74585ba5af220cf10b3e8b1a955ae04e4b6732e83362dbea33fac74
+
+build:
+  entry_points:
+    - iode-gui = iode_gui.main:start
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  # If this is a new build for the same version, increment the build number
+  number: 0
+
+requirements:
+  host:
+    - python >=3.10
+    - setuptools >=77
+    - setuptools-scm
+    - pip
+  
+  run:
+    - python >=3.10
+    - numpy
+    - pandas
+    - matplotlib-base
+    - iode
+    - pyside6
+    - qtconsole
+    - ipython
+
+test:
+  imports:
+    - iode_gui
+  
+  commands:
+    - pip check
+  
+  requires:
+    - pip
+
+about:
+  home: https://github.com/plan-be/iode
+  summary: Graphical User Interface (GUI) for the iode python package
+  license: GPL-3.0-only
+  license_family: GPL
+  license_file: LICENSE.md
+  doc_url: http://iode.readthedocs.io/
+  dev_url: https://github.com/plan-be/iode
+
+extra:
+  recipe-maintainers:
+    - alixdamman
+    - yvdabb

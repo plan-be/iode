@@ -15,5 +15,6 @@ set(PY_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/${PY_RESOURCE_FILENAM
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/condarecipe/iode-gui/meta.yaml.in ${CMAKE_CURRENT_SOURCE_DIR}/condarecipe/iode-gui/meta.yaml)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/__init__.py)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode_gui/utils.py)
