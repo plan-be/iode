@@ -1,0 +1,65 @@
+{% set name = "iode" %}
+{% set version = "${CMAKE_PROJECT_VERSION}" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/iode-{{ version }}.tar.gz
+  sha256: 058ab421ded95d43883ffd34280152f03fcefe152dd9b58e0297219986a673d3
+
+build:
+  entry_points:
+    - iodecmd = iode.cli:main
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  # If this is a new build for the same version, increment the build number
+  number: 0
+  # Make sure that the iode package is only available for the Windows OS
+  skip: True  # [not win]
+
+requirements:
+  host:
+    - python >=3.10
+    - scikit-build-core >=0.10
+    - numpy
+    - pandas
+    - cython >=3.0
+    - mypy >=1.10
+    - pip
+  
+  run:
+    - python >=3.10
+    - numpy
+    - pandas
+    - matplotlib-base
+
+test:
+  imports:
+    - iode
+  
+  commands:
+    - pip check
+    - iodecmd --help
+    - pytest --disable-warnings --doctest-modules --pyargs iode
+  
+  requires:
+    - pip
+    - pytest
+    - larray
+
+about:
+  home: https://github.com/plan-be/iode
+  summary: |
+    IODE is a package dedicated to econometric models and to the 
+    management of statistical series
+  license: GPL-3.0-only
+  license_family: GPL
+  license_file: LICENSE.md
+  doc_url: http://iode.readthedocs.io/
+  dev_url: https://github.com/plan-be/iode
+
+extra:
+  recipe-maintainers:
+    - alixdamman
+    - yvdabb

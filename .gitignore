@@ -456,6 +456,7 @@ generate_stub_files.py
 /pyiode/iode/iode.msg
 /pyiode/dist
 /pyiode/dist_build
+/pyiode/**/meta.yaml
 /pyiode/README*
 /pyiode/LICENSE*
 /pyiode/copy_py_files_to_sites_packages.py
