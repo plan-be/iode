@@ -11,9 +11,12 @@ import pytest
 import re
 import numpy as np
 import pandas as pd
-import larray as la
-import logging
+try:
+    import larray as la
+except ImportError:
+    la = None
 
+import logging
 from pathlib import Path
 
 # GLOBALS
@@ -682,6 +685,7 @@ def test_variables_setitem():
     assert vars_subset["ACAG", "2002Y1"] == 300.0
     assert vars_subset_subset["ACAG", "2002Y1"] == copy_ACAG["ACAG", "2002Y1"]
 
+@pytest.mark.skipif(la is None, reason="larray is not installed")
 def test_variables_binary_op():
     variables.clear()
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
@@ -749,6 +753,7 @@ def test_variables_from_frame():
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
 
+@pytest.mark.skipif(la is None, reason="larray is not installed")
 def test_variables_from_array():
     # check that LArray nan are converted to IODE NA
     variables.clear()
