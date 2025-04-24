@@ -487,6 +487,7 @@ generate_stub_files.py
 /gui/dist
 /gui/dist_build
 /gui/build
+/gui/**/meta.yaml
 /gui/LICENSE*
 
 # NSIS
