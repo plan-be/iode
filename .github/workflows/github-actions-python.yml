@@ -15,8 +15,22 @@ jobs:
         name: Build Python API for IODE
         strategy:
           matrix:
-            os: [windows-latest, ubuntu-latest]
-            python-minor-version: ["10", "11", "12"]
+            include:
+              - os: windows-latest
+                python-minor-version: "10"
+                without-larray: false
+              - os: windows-latest
+                python-minor-version: "11"
+                without-larray: false
+              - os: windows-latest
+                python-minor-version: "11"
+                without-larray: true
+              - os: windows-latest
+                python-minor-version: "12"
+                without-larray: false
+              - os: ubuntu-latest
+                python-minor-version: "11"
+                without-larray: false
     
         runs-on: ${{ matrix.os }}
 
@@ -67,10 +81,11 @@ jobs:
             uses: ./.github/actions/build_api
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
-          # - name: Test the C and C++ APIs
-          #   uses: ./.github/actions/test_api
-          #   with:
-          #     cmake-config: ${{ env.os }}-${{ inputs.build-config }}
+          - name: Test the C and C++ APIs
+            if: runner.os == 'Windows' && matrix.python-minor-version == '12'
+            uses: ./.github/actions/test_api
+            with:
+              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v2
             with:
@@ -82,7 +97,7 @@ jobs:
           - name: Check conda
             shell: bash -el {0}
             run: conda info
-          - name: Install Python libraires
+          - name: Install Python libraries
             shell: bash -el {0}
             # fixed numpy<2.0 since newer versions make mypy to crash 
             # (see mypy issue https://github.com/python/mypy/issues/17538)
@@ -90,6 +105,10 @@ jobs:
               conda config --add channels conda-forge
               conda config --add channels larray-project
               conda install --file doc/requirements.txt
+          - name: Uninstall optional dependencies (larray)
+            if: matrix.without-larray
+            shell: bash -el {0}
+            run: pip uninstall -y larray
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
