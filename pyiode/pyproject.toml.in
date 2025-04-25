@@ -78,7 +78,7 @@ wheel.license-files = ["LICENSE.md"]
 # the source distribution. However, sdist.include and sdist.exclude can be used to 
 # override this behavior
 sdist.include = [ "**/__init__.py", "**/*.pyi", "./iode/tests/data", "./iode/doc" ]
-sdist.exclude = [ "**/*.in", "dist", "dist_build" ]
+sdist.exclude = [ "**/*.in", "iode_cython.pyd", "dist", "dist_build" ]
 
 # The build directory. Defaults to a temporary directory, but can be set.
 build-dir = "../out/build/python/{wheel_tag}"
