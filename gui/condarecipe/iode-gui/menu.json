@@ -1,0 +1,15 @@
+{
+    "menu_name": "IODE",
+    "menu_items": [
+        {
+            "name": "IODE Editor",
+            "pywscript": "${PYTHON_SCRIPTS}/iode-gui-script.py",
+            "icon": "{{ MENU_DIR }}/iode_icon.ico"
+        },
+        {
+            "name": "IODE Documentation",
+            "webbrowser": "https://iode.readthedocs.io/en/stable",
+            "icon": "{{ MENU_DIR }}/iode_help.ico"
+        }
+    ]
+}
