@@ -42,6 +42,7 @@
    - conda-build
    - conda-verify
    - anaconda-client
+   - menuinst
 
 **note**: To install `larray`, you have to run:
 ```bash
@@ -424,8 +425,8 @@ root_dir_iode> conda install --use-local iode-gui
 Then, to upload the conda packages to the Anaconda repository, you have to run:
 ```bash
 root_dir_iode> anaconda login
-root_dir_iode> anaconda upload <path-to-miniconda>/conda-bld/win-64/iode-<version>-py3*.tar.bz2
-root_dir_iode> anaconda upload <path-to-miniconda>/conda-bld/win-64/iode_gui-<version>-py3*.tar.bz2
+root_dir_iode> anaconda upload --channel plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-py3*.tar.bz2
+root_dir_iode> anaconda upload --channel plan-be <path-to-miniconda>/conda-bld/noarch/iode_gui-<version>-py3*.tar.bz2
 ```
 
 ## After the release
