@@ -37,8 +37,11 @@
    - build
    - pkginfo (>1.12)
    - setuptools (>=77)
+   - setuptools-scm
    - twine (<=6.0.0)
    - conda-build
+   - conda-verify
+   - anaconda-client
 
 **note**: To install `larray`, you have to run:
 ```bash
