@@ -1,3 +1,4 @@
+import os
 import sys
 import inspect
 from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
@@ -32,7 +33,7 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         Default to None.
     called_from_python_script : bool, optional
         If False, the IODE application will look into the settings file 
-        of the project the list of last opened files and load them.
+        of the project, check the list of last opened files and reload them.
         Also when False, the IODE application will save the list of the 
         opened files when closing.
         Default to False.
@@ -117,4 +118,15 @@ def start():
     project_dir = None
     files_to_load = sys.argv[1:]
     called_from_python_script = False
+
+    # from official documentation https://docs.python.org/3/library/sys.html#sys.__stdout__ :
+    # Under some conditions stdin, stdout and stderr as well as the original values __stdin__, 
+    # __stdout__ and __stderr__ can be None. It is usually the case for Windows GUI apps that 
+    # aren't connected to a console and Python apps started with pythonw.
+    # 
+    # code below is from: https://github.com/scipy/scipy/issues/22096#issue-2743279073
+    if sys.executable.endswith('pythonw.exe'):
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.path.join(os.getenv('TEMP'), 'stderr-' + os.path.basename(sys.argv[0])), 'w')
+
     open_application(project_dir, files_to_load, called_from_python_script)

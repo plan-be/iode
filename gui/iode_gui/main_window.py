@@ -103,118 +103,124 @@ class MainWindow(AbstractMainWindow):
                  vars_to_import: Dict[str, Any]=None):
         super().__init__(parent)
 
-        # NOTE: save the absolute path of the application's current directory.
-        #       Current directory is modified in the method open_directory() below.
-        #       This is used to restore the current directory when the user closes 
-        #       the application.
-        self.application_dir = QDir.currentPath()
+        try:
+            # NOTE: save the absolute path of the application's current directory.
+            #       Current directory is modified in the method open_directory() below.
+            #       This is used to restore the current directory when the user closes 
+            #       the application.
+            self.application_dir = QDir.currentPath()
 
-        # ---- setup the present class ----
-        # Create an instance of the widgets defined in the .ui file
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+            # ---- setup the present class ----
+            # Create an instance of the widgets defined in the .ui file
+            self.ui = Ui_MainWindow()
+            self.ui.setupUi(self)
 
-        self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
-        self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")
+            self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
+            self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")
 
-        self._setup_ipython_console()
+            self._setup_ipython_console()
 
-        # ---- restore geometry and state ----
-        self.restoreGeometry(self.user_settings.value("geometry"))
-        self.restoreState(self.user_settings.value("windowState"))
-        self.ui.dockWidget_file_explorer.restoreGeometry(self.user_settings.value("dockWidget_file_explorer_geometry"))
-        self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
+            # ---- restore geometry and state ----
+            self.restoreGeometry(self.user_settings.value("geometry"))
+            self.restoreState(self.user_settings.value("windowState"))
+            self.ui.dockWidget_file_explorer.restoreGeometry(self.user_settings.value("dockWidget_file_explorer_geometry"))
+            self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
 
-        # ---- open file(s) passed as files_to_load argument ----
-        if files_to_load is None:
-            files_to_load = []
+            # ---- open file(s) passed as files_to_load argument ----
+            if files_to_load is None:
+                files_to_load = []
 
-        if not isinstance(files_to_load, list):
-            QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
-            files_to_load = []
-
-        _files_to_load = []
-        if len(files_to_load):
-            if project_dir is not None:
-                raise ValueError("project_dir and files_to_load cannot be both set")
-            if not all(isinstance(file, (str, Path)) for file in files_to_load):
+            if not isinstance(files_to_load, list):
                 QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
-                files_to_load = []    
-            files_to_load = [str(Path(file).resolve()) if isinstance(file, Path) else file for file in files_to_load]
-            for filepath in files_to_load:
-                fileInfo = QFileInfo(filepath)
-                if not fileInfo.exists():
-                    QMessageBox.warning(self, "WARNING", f"Cannot open '{filepath}'. File does not exist")
-                elif not fileInfo.isFile():
-                    QMessageBox.warning(self, "WARNING", "Only files can be open")
-                    break
-                else:
-                    if project_dir is None:
-                        project_dir = Path(fileInfo.absolutePath())
-                    if fileInfo.absolutePath() != project_dir:
-                        QMessageBox.warning(self, "WARNING", "All files to open must come from the same directory")
-                        _files_to_load.clear()
-                        break
-                    _files_to_load.append(fileInfo.absoluteFilePath())
-        
-        if project_dir is not None:
+                files_to_load = []
+
+            _files_to_load = []
             if len(files_to_load):
-                raise ValueError("project_dir and files_to_load cannot be both set")
-            if isinstance(project_dir, Path):
-                project_dir = str(project_dir.resolve())
-            if not isinstance(project_dir, str):
-                raise TypeError("project_dir must be a string or a Path object")
-            self.project_path = project_dir
-        else:
-            self.project_path: str = self.user_settings.value("project_path", None)
+                if project_dir is not None:
+                    raise ValueError("project_dir and files_to_load cannot be both set")
+                if not all(isinstance(file, (str, Path)) for file in files_to_load):
+                    QMessageBox.critical(None, "ERROR", "files_to_load must be a list of strings or Path objects")
+                    files_to_load = []    
+                files_to_load = [str(Path(file).resolve()) if isinstance(file, Path) else file for file in files_to_load]
+                for filepath in files_to_load:
+                    fileInfo = QFileInfo(filepath)
+                    if not fileInfo.exists():
+                        QMessageBox.warning(self, "WARNING", f"Cannot open '{filepath}'. File does not exist")
+                    elif not fileInfo.isFile():
+                        QMessageBox.warning(self, "WARNING", "Only files can be open")
+                        break
+                    else:
+                        if project_dir is None:
+                            project_dir = Path(fileInfo.absolutePath())
+                        if fileInfo.absolutePath() != project_dir:
+                            QMessageBox.warning(self, "WARNING", "All files to open must come from the same directory")
+                            _files_to_load.clear()
+                            break
+                        _files_to_load.append(fileInfo.absoluteFilePath())
 
-        # ---- menus ----
-        self._build_recent_projects_menu()
+            if project_dir is not None:
+                if len(files_to_load):
+                    raise ValueError("project_dir and files_to_load cannot be both set")
+                if isinstance(project_dir, Path):
+                    project_dir = str(project_dir.resolve())
+                if not isinstance(project_dir, str):
+                    raise TypeError("project_dir must be a string or a Path object")
+                self.project_path = project_dir
+            else:
+                self.project_path: str = self.user_settings.value("project_path", None)
 
-        # ---- file explorer ----
-        # connect the Tabs widget to the File Explorer
-        self.ui.treeView_file_explorer.set_iode_tab_widget(self.ui.tabWidget_IODE_objs)
+            # ---- menus ----
+            self._build_recent_projects_menu()
 
-        # ---- iode commands line ----
-        # setup the line widget to execute IODE commands
-        self.ui.lineEdit_iode_command.setup(self)
+            # ---- file explorer ----
+            # connect the Tabs widget to the File Explorer
+            self.ui.treeView_file_explorer.set_iode_tab_widget(self.ui.tabWidget_IODE_objs)
 
-        # ---- shortcuts ----
-        self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
-        self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+            # ---- iode commands line ----
+            # setup the line widget to execute IODE commands
+            self.ui.lineEdit_iode_command.setup(self)
 
-        # ---- signals and slots ----
-        self.ui.lineEdit_iode_command.ask_compute_hash.connect(self.ui.tabWidget_IODE_objs.compute_hash)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+            # ---- shortcuts ----
+            self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
+            self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
 
-        # ---- load project (if any) ----
-        # first time launching the GUI -> ask the user to either start a new project
-        # or to open an existing folder containing reports and/or KDB files as project
-        if self.project_path is None:
-            QMessageBox.information(self, "IODE interface",
-                                    "<p align='center'>First time with the IODE interface ?<br><br>" +
-                                    "Please go the File menu to either create a new project folder or to open an folder containing " +
-                                    "reports and/or IODE database files.</p>" +
-                                    "<p align='left'>To open file(s) from the file tree (left panel):<br>" +
-                                    "- double click on a file,<br>" +
-                                    "- select several files with CTRL and then press ENTER.</p>")
-            self.ui.treeView_file_explorer.hide()
-            self.ui.tabWidget_IODE_objs.hide()
-            self.ui.dockWidget_file_explorer.hide()
-        else:
-            self.open_directory(self.project_path, on_startup=True)
+            # ---- signals and slots ----
+            self.ui.lineEdit_iode_command.ask_compute_hash.connect(self.ui.tabWidget_IODE_objs.compute_hash)
+            self.full_screen_shortcut.activated.connect(self.showMaximized)
 
-        # files_to_load is not empty
-        for filepath in _files_to_load:
-            self.ui.tabWidget_IODE_objs.load_file(filepath, True, True)
+            # ---- load project (if any) ----
+            # first time launching the GUI -> ask the user to either start a new project
+            # or to open an existing folder containing reports and/or KDB files as project
+            if self.project_path is None:
+                QMessageBox.information(self, "IODE interface",
+                                        "<p align='center'>First time with the IODE interface ?<br><br>" +
+                                        "Please go the File menu to either create a new project folder or to open an folder containing " +
+                                        "reports and/or IODE database files.</p>" +
+                                        "<p align='left'>To open file(s) from the file tree (left panel):<br>" +
+                                        "- double click on a file,<br>" +
+                                        "- select several files with CTRL and then press ENTER.</p>")
+                self.ui.treeView_file_explorer.hide()
+                self.ui.tabWidget_IODE_objs.hide()
+                self.ui.dockWidget_file_explorer.hide()
+            else:
+                self.open_directory(self.project_path, on_startup=True)
 
-        # NOTE: push vars to IPython console here since open_directory() reset the IPython kernel
-        if vars_to_import is not None:
-            if not isinstance(vars_to_import, dict):
-                raise TypeError("Python variables to import in the IPython console must be "
-                                "passed as a dictionary")
-            self.push_data_to_kernel(vars_to_import)
-        self.ui.actionSave.shortcut
+            # files_to_load is not empty
+            for filepath in _files_to_load:
+                self.ui.tabWidget_IODE_objs.load_file(filepath, True, True)
+
+            # NOTE: push vars to IPython console here since open_directory() reset the IPython kernel
+            if vars_to_import is not None:
+                if not isinstance(vars_to_import, dict):
+                    raise TypeError("Python variables to import in the IPython console must be "
+                                    "passed as a dictionary")
+                self.push_data_to_kernel(vars_to_import)
+            self.ui.actionSave.shortcut
+        except Exception as e:
+            if Context.called_from_python_script:
+                raise e
+            else:
+                QMessageBox.critical(None, "ERROR", str(e))
 
     @property
     def output(self) -> QTextEdit:
@@ -228,10 +234,12 @@ class MainWindow(AbstractMainWindow):
         self.grid_layout_tab_python = QGridLayout(self.ui.tab_python_console)
         self.grid_layout_tab_python.setObjectName(u"gridLayout")
         self.jupyter_widget = None
-
+ 
         if not qtconsole_available:
             QMessageBox.warning(self, "WARNING", "IPython console not available. "
                                 "Please install qtconsole and ipython packages.")
+            self.kernel = None
+
             self.label_python_command = QLabel(self.ui.tab_python_console)
             self.label_python_command.setObjectName(u"label_python_command")
             self.grid_layout_tab_python.addWidget(self.label_python_command, 0, 0, 1, 1)
@@ -251,7 +259,7 @@ class MainWindow(AbstractMainWindow):
             # and https://github.com/jupyter/qtconsole/blob/main/examples/embed_qtconsole.py 
             kernel_manager = QtInProcessKernelManager()
             kernel_manager.start_kernel()
-            self.kernel = kernel_manager.kernel
+            self.kernel = kernel_manager.kernel 
 
             kernel_client = kernel_manager.client()
             kernel_client.start_channels()
@@ -268,10 +276,14 @@ class MainWindow(AbstractMainWindow):
         self._reset_kernel()
 
     def push_data_to_kernel(self, data: Dict[str, Any]):
-        self.kernel.shell.push(data)
+        if self.jupyter_widget:
+            self.kernel.shell.push(data)
 
     def pull_data_from_kernel(self, name: str) -> Any:
-        return self.kernel.shell.user_ns[name]
+        if self.jupyter_widget:
+            return self.kernel.shell.user_ns[name]
+        else:
+            return None
 
     def _reset_kernel(self):
         if self.jupyter_widget:
