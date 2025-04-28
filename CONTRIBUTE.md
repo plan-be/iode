@@ -38,6 +38,7 @@
    - pkginfo (>1.12)
    - setuptools (>=77)
    - twine (<=6.0.0)
+   - conda-build
 
 **note**: To install `larray`, you have to run:
 ```bash
@@ -394,6 +395,34 @@ pyiode> twine upload dist/*
 ```
 ```bash
 gui> twine upload dist/*
+```
+
+## Build the conda packages
+
+The script `meta.yaml` is used by conda-build to build the conda packages. 
+The are located in the sub-directories *condarecipe/<package>* from the top directories *pyiode* and *gui*. First, make sure you have the conda-build tool installed on your system (*conda install conda-build*). To build the conda packages for *iode* and *iode_gui*, you have to run the following commands:
+```bash 
+root_dir_iode> cd pyiode
+pyiode> conda activate py3xx
+pyiode> conda build . --no-anaconda-upload
+pyiode> cd ../gui
+gui> conda build . --no-anaconda-upload
+```
+Repeat the above commands for each supported Python version.
+
+To check that the conda packages have been built correctly, you can run the following command:
+```bash
+root_dir_iode> conda install --use-local iode
+root_dir_iode> conda install --use-local iode-gui
+```
+
+## Upload the conda packages
+
+Then, to upload the conda packages to the Anaconda repository, you have to run:
+```bash
+root_dir_iode> anaconda login
+root_dir_iode> anaconda upload <path-to-miniconda>/conda-bld/win-64/iode-<version>-py3*.tar.bz2
+root_dir_iode> anaconda upload <path-to-miniconda>/conda-bld/win-64/iode_gui-<version>-py3*.tar.bz2
 ```
 
 ## After the release
