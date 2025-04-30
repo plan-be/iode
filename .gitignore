@@ -456,7 +456,7 @@ generate_stub_files.py
 /pyiode/iode/iode.msg
 /pyiode/dist
 /pyiode/dist_build
-/pyiode/**/meta.yaml
+/pyiode/**/meta*.yaml
 /pyiode/README*
 /pyiode/LICENSE*
 /pyiode/copy_py_files_to_sites_packages.py
@@ -487,7 +487,7 @@ generate_stub_files.py
 /gui/dist
 /gui/dist_build
 /gui/build
-/gui/**/meta.yaml
+/gui/**/meta*.yaml
 /gui/LICENSE*
 
 # NSIS
