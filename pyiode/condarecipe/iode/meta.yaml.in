@@ -12,7 +12,10 @@ source:
 build:
   entry_points:
     - iodecmd = iode.cli:main
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  script:
+    - echo "Building the iode package for python {{ PY_VER }}"
+    - python --version 
+    - {{ PYTHON }} -m pip install . -vv --no-deps
   # If this is a new build for the same version, increment the build number
   number: 0
   # Make sure that the iode package is only available for the Windows OS
@@ -20,18 +23,18 @@ build:
 
 requirements:
   host:
-    - python >=3.10
+    - python ={{ PY_VER }}
     - scikit-build-core >=0.10
-    - numpy
-    - pandas
+    - numpy >=2.0
+    - pandas >=2.0
     - cython >=3.0
     - mypy >=1.10
     - pip
   
   run:
-    - python >=3.10
-    - numpy
-    - pandas
+    - python ={{ PY_VER }}
+    - numpy >=2.0
+    - pandas >=2.0
     - matplotlib-base
 
 test:
