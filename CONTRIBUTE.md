@@ -408,11 +408,15 @@ The are located in the sub-directories *condarecipe/<package>* from the top dire
 ```bash 
 root_dir_iode> cd pyiode
 pyiode> conda activate py3xx
-pyiode> conda build . --no-anaconda-upload
+pyiode> conda build . --python=3.xx --no-anaconda-upload
+```
+where `3.xx` is the Python version used during the build.
+Repeat the above commands for each supported Python version.
+Then, build the conda packages for the GUI:
+```bash
 pyiode> cd ../gui
 gui> conda build . --no-anaconda-upload
 ```
-Repeat the above commands for each supported Python version.
 
 To check that the conda packages have been built correctly, you can run the following command:
 ```bash
