@@ -113,7 +113,7 @@ cdef class Sample:
         
         return self.c_sample.nb_periods()
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: Sample) -> bool:
         if self.is_undefined():
             warnings.warn("'sample' in 'sample == other' is not defined")
             return False
