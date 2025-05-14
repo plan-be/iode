@@ -7,6 +7,7 @@ import pandas as pd
 
 from cython.operator cimport dereference
 from libc.string cimport strlen
+from libcpp.string cimport string
 from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
@@ -95,7 +96,8 @@ cdef class CythonIodeDatabase:
         return b_list.decode()
 
     def property_names(self) -> List[str]:
-        return [name.decode() for name in self.abstract_db_ptr.get_names(b'', <bint>True)]
+        cdef string s = string(b'')
+        return [name.decode() for name in self.abstract_db_ptr.get_names(s, <bint>True)]
 
     def rename(self, old_name: str, new_name: str) -> int:
         return self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())
@@ -116,10 +118,12 @@ cdef class CythonIodeDatabase:
     def merge_from(self, input_file: str):
         self.abstract_db_ptr.merge_from(input_file.encode())
 
-    def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, in_formula: bool=True, in_text: bool=True, list_result: str='_RES') -> List[str]:
-        return [name_other.decode() for name_other in self.abstract_db_ptr.search(pattern.encode(), 
-                <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, 
-                list_result.encode())]
+    def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, 
+               in_formula: bool=True, in_text: bool=True, list_result: str='_RES') -> List[str]:
+        cdef string s_pattern = string(pattern.encode('utf-8'))
+        cdef string s_list_result = string(list_result.encode('utf-8'))
+        return [name_other.decode() for name_other in self.abstract_db_ptr.search(s_pattern, 
+                <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, s_list_result)]
 
     def print_to_file(self, filepath: str, names: str, format: str=None):
         cdef int res
