@@ -512,15 +512,20 @@ cdef class Variables(CythonIodeDatabase):
         return res == 0            
 
     def periods_subset(self, from_period: str, to_period: str, as_float: bool) -> List[Union[str, float]]:
+        cdef string s_from_period = string(from_period.encode('utf-8'))
+        cdef string s_to_period = string(to_period.encode('utf-8'))
         if as_float:
-            return self.database_ptr.get_list_periods_as_float(from_period.encode(), to_period.encode())
+            return self.database_ptr.get_list_periods_as_float(s_from_period, s_to_period)
         else:
             return [cpp_period.decode() for cpp_period in 
-                    self.database_ptr.get_list_periods(from_period.encode(), to_period.encode())]
+                    self.database_ptr.get_list_periods(s_from_period, s_to_period)]
 
     def copy_from(self, input_files: str, from_period: str, to_period: str, names: str):
-        self.database_ptr.copy_from(input_files.encode(), from_period.encode(), to_period.encode(), 
-                                    names.encode())
+        cdef string s_input_files = string(input_files.encode('utf-8'))
+        cdef string s_from_period = string(from_period.encode('utf-8'))
+        cdef string s_to_period = string(to_period.encode('utf-8'))
+        cdef string s_names = string(names.encode('utf-8'))
+        self.database_ptr.copy_from(s_input_files, s_from_period, s_to_period, s_names)
 
     def low_to_high(self, type_of_series: int, method: str, filepath: str, var_list: str):
         cpp_low_to_high(<IodeLowToHigh>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
