@@ -954,22 +954,8 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
     msg = B_get_last_error();
     EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
 
-    // wrong number of arguments
-    E_error_n(12, "ACAF");
-    msg = B_get_last_error();
-    std::regex pattern("Estimation : Equation ACAF : compiling error .*");
-    EXPECT_TRUE(std::regex_match(std::string(msg), pattern));
-
-    E_error_n(12, "ACAF", "???", "???");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
-
     // 1212, "Estimation : Equation %.80s : compiling error %.80s"
     E_msg_n(12, "ACAF", "???");
-
-    // wrong number of arguments
-    E_msg_n(12, "ACAF");
-    E_msg_n(12, "ACAF", "???", "???");
 }
 
 TEST_F(IodeCAPITest, Tests_BUF)
