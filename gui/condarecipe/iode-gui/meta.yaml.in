@@ -6,8 +6,13 @@ package:
   version: {{ version }}
 
 source:
+  # --- build from PyPI ---
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/iode_gui-{{ version }}.tar.gz
   sha256: cb0249f4e74585ba5af220cf10b3e8b1a955ae04e4b6732e83362dbea33fac74
+  
+  # --- build from git repository ---
+  # git_url: https://github.com/plan-be/iode.git
+  # git_rev: ${CMAKE_PROJECT_VERSION}    # (Defaults to "HEAD")
 
 build:
   entry_points:
@@ -16,12 +21,18 @@ build:
   script: 
     - mkdir -p "{{ PREFIX }}\Menu"                                                    # [win]
     - copy "{{ RECIPE_DIR }}\menu.json" "{{ PREFIX }}\Menu\{{ PKG_NAME }}-menu.json"  # [win]
-    - copy "{{ SRC_DIR }}\iode_gui\resources\iode_icon.ico" "{{ PREFIX }}\Menu"       # [win]
-    - copy "{{ SRC_DIR }}\iode_gui\resources\iode_help.ico" "{{ PREFIX }}\Menu"       # [win]
-    - python --version
-    - {{ PYTHON }} -m pip install . -vv --no-deps
+    - copy "{{ RECIPE_DIR }}\iode_icon.ico" "{{ PREFIX }}\Menu"                       # [win]
+    - copy "{{ RECIPE_DIR }}\iode_help.ico" "{{ PREFIX }}\Menu"                       # [win]
     - echo "content of the Menu folder"                                               # [win]
     - dir "{{ PREFIX }}\Menu"                                                         # [win]
+    - cmake --preset windows-release                                                  # [win]      
+    - cmake --preset linux-release                                                    # [linux]      
+    - echo "Building the iode-gui package for python {{ PY_VER }}"
+    # if source is git_url -> current dir is root project dir -> need to move to gui 
+    - if exist gui cd gui
+    - python --version
+    - python convert_ui_files_to_py.py
+    - {{ PYTHON }} -m pip install . -vv --no-deps
   # If this is a new build for the same version, increment the build number
   number: 0
 
@@ -32,10 +43,14 @@ requirements:
     - setuptools-scm
     - pip
   
+  build:
+    - git
+    - cmake
+
   run:
     - python
-    - numpy
-    - pandas
+    - numpy >=2.0
+    - pandas >=2.0
     - matplotlib-base
     - iode
     - pyside6
