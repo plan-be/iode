@@ -6,20 +6,29 @@ package:
   version: {{ version }}
 
 source:
+  # --- build from PyPI ---
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/iode-{{ version }}.tar.gz
   sha256: 058ab421ded95d43883ffd34280152f03fcefe152dd9b58e0297219986a673d3
+
+  # --- build from git repository ---
+  # git_url: https://github.com/plan-be/iode.git
+  # git_rev: ${CMAKE_PROJECT_VERSION}    # (Defaults to "HEAD")
 
 build:
   entry_points:
     - iodecmd = iode.cli:main
   script:
+    - cmake --preset windows-release                                                  # [win]      
+    - cmake --preset linux-release                                                    # [linux]      
+    # if source is git_url -> current dir is root project dir -> need to move to pyiode 
+    - if exist pyiode cd pyiode
     - echo "Building the iode package for python {{ PY_VER }}"
     - python --version 
     - {{ PYTHON }} -m pip install . -vv --no-deps
   # If this is a new build for the same version, increment the build number
   number: 0
   # Make sure that the iode package is only available for the Windows OS
-  skip: True  # [not win]
+  skip: True                                                                          # [not win]
 
 requirements:
   host:
@@ -30,7 +39,14 @@ requirements:
     - cython >=3.0
     - mypy >=1.10
     - pip
-  
+
+  build:
+    - git
+    - cmake 
+    - ninja
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+
   run:
     - python ={{ PY_VER }}
     - numpy >=2.0
