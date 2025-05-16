@@ -120,8 +120,8 @@ cdef class CythonIodeDatabase:
 
     def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, 
                in_formula: bool=True, in_text: bool=True, list_result: str='_RES') -> List[str]:
-        cdef string s_pattern = string(pattern.encode('utf-8'))
-        cdef string s_list_result = string(list_result.encode('utf-8'))
+        cdef string s_pattern = pattern.encode('utf-8')
+        cdef string s_list_result = list_result.encode('utf-8')
         return [name_other.decode() for name_other in self.abstract_db_ptr.search(s_pattern, 
                 <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, s_list_result)]
 

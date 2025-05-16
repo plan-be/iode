@@ -194,15 +194,15 @@ cdef class CythonEditAndEstimateEquations:
         return corr_matrix
 
     def get_observed_values(self, name: str) -> List[float]:
-        cdef string s_name = string(name.encode('utf-8'))
+        cdef string s_name = name.encode('utf-8')
         return [value for value in self.c_estimation_ptr.get_observed_values(s_name)]
 
     def get_fitted_values(self, name: str) -> List[float]:
-        cdef string s_name = string(name.encode('utf-8'))
+        cdef string s_name = name.encode('utf-8')
         return [value for value in self.c_estimation_ptr.get_fitted_values(s_name)]
 
     def get_residual_values(self, name: str) -> List[float]:
-        cdef string s_name = string(name.encode('utf-8'))
+        cdef string s_name = name.encode('utf-8')
         return [value for value in self.c_estimation_ptr.get_residual_values(s_name)]
 
     def estimate(self):
