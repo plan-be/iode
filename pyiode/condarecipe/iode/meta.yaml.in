@@ -36,7 +36,7 @@ requirements:
     - scikit-build-core >=0.10
     - numpy >=2.0
     - pandas >=2.0
-    - cython >=3.0
+    - cython ==3.0.11
     - mypy >=1.10
     - pip
 
