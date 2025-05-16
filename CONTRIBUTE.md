@@ -19,15 +19,15 @@
     - [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
 
  - Python libraries:
-   - cython
+   - cython == 3.0.11
    - mypy
    - scikit-build-core
    - pyside6
    - qtconsole
    - ipython
    - pytest
-   - numpy
-   - pandas
+   - numpy >= 2.0
+   - pandas >= 2.0
    - larray
    - sphinx 
    - numpydoc
@@ -35,10 +35,10 @@
    - sphinx_rtd_theme
    - myst-parser
    - build
-   - pkginfo (>1.12)
-   - setuptools (>=77)
+   - pkginfo >1.12
+   - setuptools >=77
    - setuptools-scm
-   - twine (<=6.0.0)
+   - twine <=6.0.0
    - conda-build
    - conda-verify
    - anaconda-client
@@ -80,9 +80,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py310 python=3.10 numpy pandas larray cython pytest scikit-build-core
-> conda create --name py311 python=3.11 numpy pandas larray cython pytest scikit-build-core
-> conda create --name py312 python=3.12 numpy pandas larray cython pytest scikit-build-core
+> conda create --name py310 python=3.10 numpy pandas larray cython==3.0.11 pytest scikit-build-core
+> conda create --name py311 python=3.11 numpy pandas larray cython==3.0.11 pytest scikit-build-core
+> conda create --name py312 python=3.12 numpy pandas larray cython==3.0.11 pytest scikit-build-core
 ```
 
 # Building Project

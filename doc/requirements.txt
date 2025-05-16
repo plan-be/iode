@@ -5,7 +5,7 @@ matplotlib
 larray
 pytest
 
-cython >= 3.0
+cython == 3.0.11
 scikit-build-core >= 0.10
 mypy >=1.10
 
