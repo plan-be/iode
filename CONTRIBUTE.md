@@ -53,6 +53,11 @@ For all other Python libraries:
 conda install -c conda-forge <list of libraries>
 ```
 
+**note**: To install `build` and `myst-parser`, you have to use pip:
+```bash
+pip install build myst-parser
+```
+
 Archived C++ targets (no longer compiled or used):
 - C++ libraries:
   - [Qt 6.4](https://www.qt.io/download)
