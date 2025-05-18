@@ -42,7 +42,7 @@ import mypy.stubgen
 if __name__ == "__main__":
     # NOTE: see https://mypy.readthedocs.io/en/latest/stubgen.html 
     #       for options of stubgen command
-    sys.argv = ["stubgen", "--package", "iode", "--include-docstrings", 
+    sys.argv = ["stubgen", "--package", "iode", "--include-docstrings", "--no-analysis", 
                 "--search-path", "${CMAKE_CURRENT_BINARY_DIR}", 
                 "--output", "${CMAKE_CURRENT_SOURCE_DIR}", "--verbose"]
     print(' '.join(sys.argv))
