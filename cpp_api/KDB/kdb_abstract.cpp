@@ -364,7 +364,7 @@ std::vector<std::string> KDBAbstract::search(const std::string& pattern, const b
     return objs_list;
 }
 
-void KDBAbstract::save(const std::string& filepath)
+void KDBAbstract::save(const std::string& filepath, const bool compress)
 {
     KDB* kdb = get_database();
     if(kdb == NULL) 
@@ -381,7 +381,13 @@ void KDBAbstract::save(const std::string& filepath)
         throw std::invalid_argument("Cannot save the '" + v_iode_types[k_type] + "' database.\n" +   
                                     "The filepath '" + filepath_ + "' is too long.");
 
+    // LZH compression
+    int klzh = K_LZH;
+    K_LZH = 2;
+
     int res = B_WsDump(kdb, c_filepath);
+    K_LZH = klzh;
+
     if (res != EXIT_SUCCESS)
         throw std::runtime_error("Cannot save the '" + v_iode_types[k_type] + "' database in the file '" + 
                                   filepath + "'.\nReason: unknown.");
