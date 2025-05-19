@@ -13,6 +13,7 @@ from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 cdef extern from "api/iodebase.h":
     int RPF_SimNIterInt(unsigned char** args)
     double RPF_SimNormReal(unsigned char** args)
+    int B_ModelSimulateSaveNIters(char *arg)
 
 cdef extern from "cpp_api/compute/simulation.h":
     cdef cppclass CSimulation "Simulation":

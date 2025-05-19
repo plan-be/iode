@@ -655,6 +655,7 @@ SIMULATION
    Simulation.debug_newton
 
    Simulation.nb_iterations
+   Simulation.save_nb_iterations
    Simulation.norm
    Simulation.model_exchange
    Simulation.model_compile

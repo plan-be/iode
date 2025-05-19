@@ -15,6 +15,8 @@ Improvements
     in the last simulation for a given period (same as `@SimNIter`)
   * PYTHON: added the :meth:`Simulation.norm` method to get the norm value of the last simulation 
     for a given period (same as `@SimNorm`) 
+  * PYTHON: added the :meth:`Simulation.save_nb_iterations` method to the number of iterations needed 
+    to complete each simulated period in a new variable named `var_name` (same as `$ModelSimulateSaveNiters`)
 
 
 Fixed Bugs 
