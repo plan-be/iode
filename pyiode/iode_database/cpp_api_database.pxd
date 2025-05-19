@@ -175,7 +175,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         vector[string] search(string& pattern, bint word, bint case_sensitive, bint in_name, 
                               bint in_formula, bint in_text, string& list_result) except +
 
-        void save(string& filepath) except +
+        void save(string& filepath, bool compress) except +
         void clear() except +
 
 cdef extern from "cpp_api/KDB/kdb_template.h":

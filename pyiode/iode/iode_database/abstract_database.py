@@ -1062,13 +1062,19 @@ class IodeDatabase:
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
         self._load(filepath)
 
-    def save(self, filepath: str):
+    def save(self, filepath: str, compress: bool=False):
         r"""
         Save objects of the current database into the file 'filepath'.
 
         Parameters
         ----------
         filepath: str
+            path to the file to save.
+        compress: bool, optional
+            Whether or not to compress the file. 
+            If True, the file will be written using the LZH compression algorithm.
+            This may slow down the writing process but will reduce the size of the saved file.
+            Default to False.
         
         Examples
         --------
@@ -1091,7 +1097,7 @@ class IodeDatabase:
         """
         if not isinstance(filepath, str):
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
-        self._cython_instance.save(filepath)
+        self._cython_instance.save(filepath, compress)
 
     def clear(self):
         r"""
