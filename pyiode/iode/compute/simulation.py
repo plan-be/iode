@@ -762,6 +762,62 @@ class Simulation:
             raise RuntimeError(f"Could not get the number of iterations for the period {period}")
         return nb_iter
 
+    def norm(self, period: Union[str, Period]) -> float:
+        r"""
+        Get the norm value of the last simulation for the period `period`.
+        
+        Parameters
+        ----------
+        period: str or Period
+            The period for which to get the norm value.
+        
+        Returns
+        -------
+        float
+            The norm value for the specified period.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> from iode import Simulation
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> simu = Simulation()
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =   0.6558 - cpu=...ms
+        2000Y1: 2 iters - error =   0.1684 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5237 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error = 0.002907 - cpu=...ms
+        2015Y1: 20 iters - error = 0.001537 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        >>> success
+        True
+        >>> # get the norm value for the period 2000Y1
+        >>> round(simu.norm("2000Y1"), 10)
+        0.0008501467
+        """
+        if isinstance(period, Period):
+            period = str(period)
+        if not isinstance(period, str):
+            raise TypeError(f"'period': Expected value of type 'str' or 'Period'. Got value of type {type(period)} instead.")
+        norm = self._cython_instance.get_norm(period)
+        if norm < 0:
+            raise RuntimeError(f"Could not get the norm value for the period {period}")
+        return norm
+
     def model_exchange(self, list_exo: Union[str, List[str]]=None):
         r"""
         Set a list of endogenous-exogenous pairs for ``goal seeking``. 
