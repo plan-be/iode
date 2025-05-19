@@ -882,6 +882,72 @@ class Simulation:
             raise RuntimeError(f"Could not get the norm value for the period {period}")
         return norm
 
+    def save_norms(self, var_name: str):
+        r"""
+        Save the lowest norm value reached to complete each simulated period in a new variable named `var_name`.
+
+        If no simulation has yet been performed, the new variable `var_name` is created with NA values.
+
+        If a simulation has already taken place, the values for non-simulated periods are set to 0 and 
+        those for simulated periods contain the lowest norm value reached for that period. 
+
+        Parameters
+        ----------
+        var_name: str
+            The name of the variable to save the lowest norm values.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> from iode import Simulation
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> simu = Simulation()
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =   0.6558 - cpu=...ms
+        2000Y1: 2 iters - error =   0.1684 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5237 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error = 0.002907 - cpu=...ms
+        2015Y1: 20 iters - error = 0.001537 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        >>> success
+        True
+        >>> # save the lowest norm value for each period in a new variable
+        >>> simu.save_norms("SIMU_NORM")
+        >>> # check the new variable
+        >>> variables["SIMU_NORM", "2000Y1:2015Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+           name    2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  ...     2010Y1  2011Y1  2012Y1  2013Y1  2014Y1  2015Y1
+        SIMU_NORM    0.00    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00    0.00    0.00    0.00
+        <BLANKLINE>
+        >>> round(variables["SIMU_NORM", "2000Y1"], 10)
+        0.0008501467
+        >>> round(variables["SIMU_NORM", "2015Y1"], 10)
+        0.0005893242
+        """
+        success = self._cython_instance.save_norms(var_name)
+        if not success:
+            raise RuntimeError(f"Could not save the lowest norm value for each period as a new variable '{var_name}'")
+
     def model_exchange(self, list_exo: Union[str, List[str]]=None):
         r"""
         Set a list of endogenous-exogenous pairs for ``goal seeking``. 

@@ -2,7 +2,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.compute.simulation cimport CSimulation, RPF_SimNIterInt, RPF_SimNormReal
-from pyiode.compute.simulation cimport B_ModelSimulateSaveNIters
+from pyiode.compute.simulation cimport B_ModelSimulateSaveNIters, B_ModelSimulateSaveNorms
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
@@ -95,6 +95,12 @@ cdef class Simulation:
         cdef bytes b_var_name = var_name.encode('utf-8')
         cdef char* c_var_name = b_var_name
         res: int = B_ModelSimulateSaveNIters(c_var_name)
+        return res == 0
+
+    def save_norms(self, var_name: str) -> bool:
+        cdef bytes b_var_name = var_name.encode('utf-8')
+        cdef char* c_var_name = b_var_name
+        res: int = B_ModelSimulateSaveNorms(c_var_name)
         return res == 0
 
     def model_exchange(self, list_exo: str):

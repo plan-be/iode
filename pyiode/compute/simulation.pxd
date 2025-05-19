@@ -14,6 +14,7 @@ cdef extern from "api/iodebase.h":
     int RPF_SimNIterInt(unsigned char** args)
     double RPF_SimNormReal(unsigned char** args)
     int B_ModelSimulateSaveNIters(char *arg)
+    int B_ModelSimulateSaveNorms(char *arg)
 
 cdef extern from "cpp_api/compute/simulation.h":
     cdef cppclass CSimulation "Simulation":

@@ -657,6 +657,7 @@ SIMULATION
    Simulation.nb_iterations
    Simulation.save_nb_iterations
    Simulation.norm
+   Simulation.save_norms
    Simulation.model_exchange
    Simulation.model_compile
    Simulation.model_simulate
