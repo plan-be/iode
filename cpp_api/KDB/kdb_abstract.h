@@ -205,7 +205,7 @@ public:
 
     // save - clear
 
-    void save(const std::string& filepath);
+    void save(const std::string& filepath, const bool compress=false);
 
     void clear();
 
