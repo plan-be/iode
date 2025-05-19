@@ -10,6 +10,9 @@ from libcpp.vector cimport vector
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
+cdef extern from "api/iodebase.h":
+    int RPF_SimNIterInt(unsigned char** args)
+
 cdef extern from "cpp_api/compute/simulation.h":
     cdef cppclass CSimulation "Simulation":
         CSimulation() except +
