@@ -58,7 +58,7 @@ cdef class CythonIodeDatabase:
         return K_NBDEC
 
     def _set_print_nb_decimals(self, value: int):
-        cdef b_value = str(value).encode()
+        cdef bytes b_value = str(value).encode()
         cdef char* c_value = b_value
         B_PrintNbDec(c_value)
 
