@@ -149,8 +149,8 @@ cdef class CythonIodeDatabase:
         # write and close output file
         W_close()
 
-    def save(self, filepath: str):
-        self.abstract_db_ptr.save(filepath.encode())
+    def save(self, filepath: str, compress: bool):
+        self.abstract_db_ptr.save(filepath.encode(), <bint>compress)
 
     def clear(self):
         self.abstract_db_ptr.clear()

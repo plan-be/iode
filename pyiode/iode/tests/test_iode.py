@@ -75,6 +75,34 @@ def test_check_same_names():
                                          r"represents 3 comments."):
         comments["ACAF, ACAG, AOUC"] = update_cmt
 
+def test_workspace_save_compressed(tmp_path):
+    # check that the workspace is saved in compressed format
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # save the workspace in compressed format
+    comments.save(str(tmp_path / "fun_compressed.cmt"), compress=True)
+    equations.save(str(tmp_path / "fun_compressed.eqs"), compress=True)
+    identities.save(str(tmp_path / "fun_compressed.idt"), compress=True)
+    lists.save(str(tmp_path / "fun_compressed.lst"), compress=True)
+    scalars.save(str(tmp_path / "fun_compressed.scl"), compress=True)
+    tables.save(str(tmp_path / "fun_compressed.tbl"), compress=True)
+    variables.save(str(tmp_path / "fun_compressed.var"), compress=True)
+
+    # load the workspace from compressed files
+    comments.load(str(tmp_path / "fun_compressed.cmt"))
+    equations.load(str(tmp_path / "fun_compressed.eqs"))
+    identities.load(str(tmp_path / "fun_compressed.idt"))
+    lists.load(str(tmp_path / "fun_compressed.lst"))
+    scalars.load(str(tmp_path / "fun_compressed.scl"))
+    tables.load(str(tmp_path / "fun_compressed.tbl"))
+    variables.load(str(tmp_path / "fun_compressed.var"))
+
 def test_subset_type():
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
     equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
