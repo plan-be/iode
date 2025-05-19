@@ -1,7 +1,7 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.compute.simulation cimport CSimulation, RPF_SimNIterInt
+from pyiode.compute.simulation cimport CSimulation, RPF_SimNIterInt, RPF_SimNormReal
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
@@ -83,6 +83,12 @@ cdef class Simulation:
         cdef unsigned char* c_period = b_period
         nb_iter: int = RPF_SimNIterInt(&c_period)
         return nb_iter
+
+    def get_norm(self, period: str) -> float:
+        cdef bytes b_period = period.encode('utf-8')
+        cdef unsigned char* c_period = b_period
+        norm: float = RPF_SimNormReal(&c_period)
+        return norm
 
     def model_exchange(self, list_exo: str):
         self.c_simulation.model_exchange(list_exo.encode())
