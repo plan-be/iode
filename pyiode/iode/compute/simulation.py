@@ -762,6 +762,70 @@ class Simulation:
             raise RuntimeError(f"Could not get the number of iterations for the period {period}")
         return nb_iter
 
+    def save_nb_iterations(self, var_name: str):
+        r"""
+        Save the number of iterations needed to complete each simulated period in a new 
+        variable named `var_name`.
+
+        If no simulation has yet been performed, the new variable `var_name` is created with NA values.
+
+        If a simulation has already taken place, the values for non-simulated periods are set to 0 and 
+        those for simulated periods contain the number of iterations required for convergence for that period. 
+        If there is no convergence, the value is set to the defined maximum number of iterations for the simulation.
+
+        Parameters
+        ----------
+        var_name: str
+            The name of the variable to save the number of iterations.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> from iode import Simulation
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> simu = Simulation()
+        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        2000Y1: 1 iters - error =   0.6558 - cpu=...ms
+        2000Y1: 2 iters - error =   0.1684 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5237 - cpu=...ms
+        ...
+        2015Y1: 19 iters - error = 0.002907 - cpu=...ms
+        2015Y1: 20 iters - error = 0.001537 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        >>> success
+        True
+        >>> # save the number of iterations for each period in a new variable
+        >>> simu.save_nb_iterations("NB_ITER")
+        >>> # check the new variable
+        >>> variables["NB_ITER", "2000Y1:2015Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
+        Workspace: Variables
+        nb variables: 1
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 2000Y1:2015Y1
+        mode: LEVEL
+        <BLANKLINE>
+          name     2000Y1  2001Y1  2002Y1  2003Y1  2004Y1  ...     2010Y1  2011Y1  2012Y1  2013Y1  2014Y1  2015Y1
+        NB_ITER     31.00   24.00   26.00   28.00   27.00  ...      22.00   23.00   21.00   21.00   21.00   21.00
+        <BLANKLINE>
+        """
+        success = self._cython_instance.save_nb_iterations(var_name)
+        if not success:
+            raise RuntimeError(f"Could not save the number of iterations for each period as a new variable '{var_name}'")
+
     def norm(self, period: Union[str, Period]) -> float:
         r"""
         Get the norm value of the last simulation for the period `period`.
