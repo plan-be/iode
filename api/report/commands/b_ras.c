@@ -139,10 +139,13 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
                PERIOD *rper, PERIOD *cper, int maxit, double eps)
 {
     int     rc = -1, nrows, ncols, crow, ccol, rt, ct;
-    char    **xvars, **yvars;
+    char    **xvars = NULL;
+    char    **yvars = NULL;
     char    cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1];
-    MAT     *A;
-    double *col, *row, var, fvar;
+    MAT     *A = NULL;
+    double  *row = NULL;
+    double  *col = NULL;
+    double  var, fvar;
     KDB     *kdb = K_WS[VARIABLES];
 
     if(rper != NULL && cper != NULL) {
@@ -225,13 +228,13 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     }
 
 cleanup:
-    SCR_free_tbl(xvars);
-    SCR_free_tbl(yvars);
-    M_free(A);
-    SCR_free(rper);
-    SCR_free(cper);
-    SCR_free(row);
-    SCR_free(col);
+    if(xvars != NULL) SCR_free_tbl(xvars);
+    if(yvars != NULL) SCR_free_tbl(yvars);
+    if(A != NULL) M_free(A);
+    if(rper != NULL) SCR_free(rper);
+    if(cper != NULL) SCR_free(cper);
+    if(row != NULL) SCR_free(row);
+    if(col != NULL) SCR_free(col);
     return(rc);
 }
 
