@@ -9,8 +9,8 @@ from pyiode.common cimport (IodeType, IodeFileType, TableLang, IodeEquationMetho
                             TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType, 
                             IodeVarMode, VariablesInitialization)
-from pyiode.time.period cimport CPeriod
-from pyiode.time.sample cimport CSample
+from pyiode.time.period cimport CPeriod, PERIOD
+from pyiode.time.sample cimport CSample, SAMPLE
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.identity cimport CIdentity
 from pyiode.objects.scalar cimport CScalar
@@ -56,6 +56,8 @@ cdef extern from "api/iode.h":
     int B_FileImportVar(char* arg)
     int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, 
                        char* from_period, char* to_period, char* na, char* sep, int fmt)
+    int RasExecute(char* pattern, char* xdim, char* ydim, PERIOD* ref_period, PERIOD* sum_period, 
+                   int maxit, double eps)
 
     ctypedef struct KOBJ:
         SWHDL o_val

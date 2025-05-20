@@ -19,6 +19,7 @@ Improvements
     to complete each simulated period in a new variable named `var_name` (same as `$ModelSimulateSaveNiters`)
   * PYTHON: added the :meth:`Simulation.save_norms` method to save the lowest norm value reached 
     to complete each simulated period in a new variable named `var_name` (same as `$ModelSimulateSaveNorms`)
+  * PYTHON: added the :meth:`Variables.execute_RAS` method to execute the RAS algorithm (same as `$DataRasVar`)
 
 Fixed Bugs 
 ----------

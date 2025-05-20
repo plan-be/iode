@@ -20,7 +20,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.util cimport IODE_IS_A_NUMBER
-from pyiode.time.period cimport CPeriod
+from pyiode.time.period cimport CPeriod, PERIOD, PER_atoper
 from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add, K_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
@@ -37,6 +37,7 @@ from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_lo
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR, KVVAL
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
+from pyiode.iode_database.cpp_api_database cimport RasExecute
 from pyiode.iode_database.cpp_api_database cimport W_flush, W_close
 
 
@@ -542,6 +543,22 @@ cdef class Variables(CythonIodeDatabase):
 
     def trend_correction(self, input_file: str, lambda_: float, series: str, log: bool):
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
+
+    def execute_RAS(self, pattern: str, xdim: str, ydim: str, ref_period: str, sum_period: str, 
+                    max_nb_iterations: int, epsilon: float) -> bool:
+        cdef bytes b_pattern = pattern.encode('utf-8')
+        cdef bytes b_xdim = xdim.encode('utf-8')
+        cdef bytes b_ydim = ydim.encode('utf-8')
+        cdef char* c_pattern = b_pattern
+        cdef char* c_xdim = b_xdim
+        cdef char* c_ydim = b_ydim
+        cdef PERIOD* c_ref_period = PER_atoper(ref_period.encode('utf-8'))
+        cdef PERIOD* c_sum_period = PER_atoper(sum_period.encode('utf-8'))
+        
+        # Note: c_ref_period and c_sum_period are freed at the end of RasExecute
+        res: int = RasExecute(c_pattern, c_xdim, c_ydim, c_ref_period, c_sum_period, 
+                              max_nb_iterations, epsilon)
+        return res == 0
 
     @classmethod
     def convert_file(cls, args: str) -> int:

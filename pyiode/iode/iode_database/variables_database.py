@@ -7152,6 +7152,166 @@ class Variables(IodeDatabase):
         
         self._cython_instance.trend_correction(input_file, lambda_, series, log)
 
+    def execute_RAS(self, pattern: str, xdim: Union[str, List[str]], ydim: Union[str, List[str]], ref_year: Union[str, Period], 
+                    sum_year: Union[str, Period], max_nb_iterations: int=100, epsilon: float=0.001):
+        r"""
+        Execute the RAS algorithm (also called IPF for 'Iterative Proportional Fitting').
+        The RAS algorithm is used to adjust the data in a matrix to match specified row and column totals.
+
+        If xdim is 'R1;R2;R3;R4;R5;R6;RT' and ydim is 'C1;C2;C3;C4;C5;CT', the RAS matrix then looks as follows::
+
+          R1C1 R1C2 R1C3 R1C4 R1C5 R1C6 | R1CT    
+          R2C1 R2C2 R2C3 R2C4 R2C5 R2C6 | R2CT    
+          R3C1 R3C2 R3C3 R3C4 R3C5 R3C6 | R3CT    
+          R4C1 R4C2 R4C3 R4C4 R4C5 R4C6 | R4CT    
+          R5C1 R5C2 R5C3 R5C4 R5C5 R5C6 | R5CT    
+          ------------------------------------    
+          RTC1 RTC2 RTC3 RTC4 RTC5 RTC6 | RTCT
+
+        with the values of the 'RiCj' variables taken from 'ref_year' (the year for which all data is known). The values of row 
+        and column sums 'RTCj' and 'RiCT' are taken from 'sum_year' (the year for which only the sums are known). 
+        If some values are known in 'sum_year', then those are used.
+
+        The RAS algorithm replaces the :math:`NA` values of the 'RiCj' variables for the year 'sum_year' so that the row and 
+        column sums are the closest possible as those defined in 'RTCj' and 'RiCT'.
+
+        Parameters
+        ----------
+        pattern: str   
+            The variables that meet the following criteria are used: 'x' is replaced with all values 
+            from xdim and 'y' with those from ydim.
+        xdim: str or list(str)
+            (Iode) list of the values that 'x' from the pattern can take. 
+            Warning: the last one in the list is the SUM over the x dimension.
+        ydim: str or list(str)
+            (Iode) list of the values that 'y' from the pattern can take. 
+            Warning: the last one from the list is the SUM over the y dimension.
+        ref_year: str or Period   
+            The year for which all data is known. 
+        sum_year: str or Period      
+            The year for which only the sums are known. 
+        max_nb_iterations: int, optional       
+            Maximum number of iterations. Defaults to 100.
+        epsilon: float, optional         
+            Convergence threshold. Defaults to 0.001. 
+
+        Examples
+        --------
+        >>> from iode import lists, variables, NA
+        >>> variables.clear()
+        >>> # create a workspace
+        >>> variables.sample = "2000Y1:2001Y1"
+        >>> variables["R1C1"] = [5, NA]
+        >>> variables["R1C2"] = [3, NA]
+        >>> variables["R1C3"] = [4, NA]
+        >>> variables["R1C4"] = [7, 5]
+        >>> variables["R1CT"] = [20, 20]
+        >>> variables["R2C1"] = [1, NA]
+        >>> variables["R2C2"] = [1, 2]
+        >>> variables["R2C3"] = [4, NA]
+        >>> variables["R2C4"] = [4, NA]
+        >>> variables["R2CT"] = [10, 10]
+        >>> variables["R3C1"] = [3, NA]
+        >>> variables["R3C2"] = [1, NA]
+        >>> variables["R3C3"] = [3, 2]
+        >>> variables["R3C4"] = [3, NA]
+        >>> variables["R3CT"] = [10, 10]
+        >>> variables["R4C1"] = [1, 0]
+        >>> variables["R4C2"] = [2, NA]
+        >>> variables["R4C3"] = [1, NA]
+        >>> variables["R4C4"] = [1, NA]
+        >>> variables["R4CT"] = [5, 5]
+        >>> variables["RTC1"] = [10, 10]
+        >>> variables["RTC2"] = [7, 7]
+        >>> variables["RTC3"] = [13, 13]
+        >>> variables["RTC4"] = [15, 15]
+        >>> variables["RTCT"] = [90, 90]
+        >>> variables                       # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 25
+        filename: ws
+        sample: 2000Y1:2001Y1  
+        mode: LEVEL
+        <BLANKLINE>
+        name       2000Y1  2001Y1
+        R1C1         5.00      na
+        R1C2         3.00      na
+        R1C3         4.00      na
+        R1C4         7.00    5.00
+        R1CT        20.00   20.00
+        ...           ...     ...
+        RTC1        10.00   10.00
+        RTC2         7.00    7.00
+        RTC3        13.00   13.00
+        RTC4        15.00   15.00
+        RTCT        90.00   90.00
+        <BLANKLINE>
+        >>> # RAS algorithm
+        >>> lists["X"] = "R1,R2,R3,R4,RT"
+        >>> lists["Y"] = "C1,C2,C3,C4,CT"
+        >>> variables.execute_RAS("xy", "$X", "$Y", "2000Y1", "2001Y1")     # doctest: +NORMALIZE_WHITESPACE
+        RAS             1 iter, 0.272727 < 0.001000
+        RAS             2 iter, 0.130816 < 0.001000
+        RAS             3 iter, 0.030428 < 0.001000
+        RAS             4 iter, 0.008493 < 0.001000
+        RAS             5 iter, 0.002433 < 0.001000
+        RAS             6 iter, 0.000702 < 0.001000
+        RAS converged,  6 iter, 0.000702 < 0.001000
+        >>> variables                     # doctest: +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 25
+        filename: ws
+        sample: 2000Y1:2001Y1
+        mode: LEVEL
+        <BLANKLINE>
+        name       2000Y1  2001Y1
+        R1C1         5.00    6.29
+        R1C2         3.00    2.59
+        R1C3         4.00    6.12
+        R1C4         7.00    5.00
+        R1CT        20.00   20.00
+        ...           ...     ...
+        RTC1        10.00   10.00
+        RTC2         7.00    7.00
+        RTC3        13.00   13.00
+        RTC4        15.00   15.00
+        RTCT        90.00   90.00
+        <BLANKLINE>
+        """
+        from iode import lists
+
+        if isinstance(xdim, (list, tuple)):
+            xdim = ','.join(xdim)
+            lists["XDIM"] = xdim
+            xdim = "$XDIM"
+        if not isinstance(xdim, str):
+            raise TypeError("xdim must be a string or a list of strings.")
+        if not xdim.startswith("$"):
+            raise ValueError("xdim must represent an Iode list and start with '$'")  
+    
+        if isinstance(ydim, (list, tuple)):
+            ydim = ','.join(ydim)
+            lists["YDIM"] = ydim
+            ydim = "$YDIM"
+        if not isinstance(ydim, str):
+            raise TypeError("ydim must be a string or a list of strings.")
+        if not ydim.startswith("$"):
+            raise ValueError("ydim must represent an Iode list and start with '$'")
+        
+        # make sure that ref_year represents a valid period
+        if isinstance(ref_year, str):
+            ref_year = Period(ref_year)
+        ref_year = str(ref_year)
+        
+        # make sure that sum_year represents a valid period
+        if isinstance(sum_year, str):
+            sum_year = Period(sum_year)
+        sum_year = str(sum_year)
+        
+        success: bool = self._cython_instance.execute_RAS(pattern, xdim, ydim, ref_year, sum_year, max_nb_iterations, epsilon)
+        if not success:
+            raise RuntimeError("RAS algorithm did not converge. Please check the input data and parameters.")
+
     @classmethod
     def convert_file(cls, input_file: Union[str, Path], input_format: Union[str, ImportFormats], save_file: Union[str, Path], rule_file: Union[str, Path], from_period: Union[str, Period], to_period: Union[str, Period], debug_file: Union[str, Path]=None):
         r"""
