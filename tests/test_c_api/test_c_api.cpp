@@ -2578,3 +2578,103 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
 
     U_test_reset_kmsg_msgs();
 }
+
+
+TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
+{
+    char* pattern = "xy";
+    char* xdim = "$X";
+    char* ydim = "$Y";
+    PERIOD* ref_period = PER_atoper("2000Y1");
+    PERIOD* sum_period = PER_atoper("2001Y1");
+    int maxit = 100;
+    double eps = 0.0001;
+
+    int pos;
+    int res;
+
+    B_WsClear("Var", VARIABLES);
+    B_WsSample("2000Y1 2001Y1");
+
+    pos = KV_add(KV_WS, "R1C1");
+    *KVVAL(KV_WS, pos, 0) = 5.0;
+    pos = KV_add(KV_WS, "R1C2");
+    *KVVAL(KV_WS, pos, 0) = 3.0;
+    pos = KV_add(KV_WS, "R1C3");
+    *KVVAL(KV_WS, pos, 0) = 5.0;
+    pos = KV_add(KV_WS, "R1C4");
+    *KVVAL(KV_WS, pos, 0) = 7.0;
+    *KVVAL(KV_WS, pos, 1) = 5.0;
+    pos = KV_add(KV_WS, "R1CT");
+    *KVVAL(KV_WS, pos, 0) = 20.0;
+    *KVVAL(KV_WS, pos, 1) = 20.0;
+
+    pos = KV_add(KV_WS, "R2C1");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    pos = KV_add(KV_WS, "R2C2");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    *KVVAL(KV_WS, pos, 1) = 2.0;
+    pos = KV_add(KV_WS, "R2C3");
+    *KVVAL(KV_WS, pos, 0) = 4.0;
+    pos = KV_add(KV_WS, "R2C4");
+    *KVVAL(KV_WS, pos, 0) = 4.0;
+    pos = KV_add(KV_WS, "R2CT");
+    *KVVAL(KV_WS, pos, 0) = 10.0;
+    *KVVAL(KV_WS, pos, 1) = 10.0;
+
+    pos = KV_add(KV_WS, "R3C1");
+    *KVVAL(KV_WS, pos, 0) = 3.0;
+    pos = KV_add(KV_WS, "R3C2");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    pos = KV_add(KV_WS, "R3C3");
+    *KVVAL(KV_WS, pos, 0) = 3.0;
+    *KVVAL(KV_WS, pos, 1) = 2.0;
+    pos = KV_add(KV_WS, "R3C4");
+    *KVVAL(KV_WS, pos, 0) = 3.0;
+    pos = KV_add(KV_WS, "R3CT");
+    *KVVAL(KV_WS, pos, 0) = 10.0;
+    *KVVAL(KV_WS, pos, 1) = 10.0;
+
+    pos = KV_add(KV_WS, "R4C1");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    *KVVAL(KV_WS, pos, 1) = 0.0;
+    pos = KV_add(KV_WS, "R4C2");
+    *KVVAL(KV_WS, pos, 0) = 2.0;
+    pos = KV_add(KV_WS, "R4C3");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    pos = KV_add(KV_WS, "R4C4");
+    *KVVAL(KV_WS, pos, 0) = 1.0;
+    pos = KV_add(KV_WS, "R4CT");
+    *KVVAL(KV_WS, pos, 0) = 5.0;
+    *KVVAL(KV_WS, pos, 1) = 5.0;
+
+    pos = KV_add(KV_WS, "RTC1");
+    *KVVAL(KV_WS, pos, 0) = 10.0;
+    *KVVAL(KV_WS, pos, 1) = 10.0;
+    pos = KV_add(KV_WS, "RTC2");
+    *KVVAL(KV_WS, pos, 0) = 7.0;
+    *KVVAL(KV_WS, pos, 1) = 7.0;
+    pos = KV_add(KV_WS, "RTC3");
+    *KVVAL(KV_WS, pos, 0) = 13.0;
+    *KVVAL(KV_WS, pos, 1) = 13.0;
+    pos = KV_add(KV_WS, "RTC4");
+    *KVVAL(KV_WS, pos, 0) = 15.0;
+    *KVVAL(KV_WS, pos, 1) = 15.0;
+
+    pos = KV_add(KV_WS, "RTCT");
+    *KVVAL(KV_WS, pos, 0) = 90.0;
+    *KVVAL(KV_WS, pos, 1) = 90.0;
+
+    K_add(KL_WS, "X", "R1,R2,R3,R4,RT");
+    K_add(KL_WS, "Y", "C1,C2,C3,C4,CT");
+
+    pos = K_find(KL_WS, "X");
+    EXPECT_NE(pos, -1);
+    pos = K_find(KL_WS, "Y");
+    EXPECT_NE(pos, -1);
+
+    // Note: ref_period and sum_period are freed in RasExecute()
+    res = RasExecute(pattern, xdim, ydim, ref_period, sum_period, maxit, eps);
+
+    EXPECT_EQ(res, 0);
+}
