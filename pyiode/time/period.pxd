@@ -8,6 +8,8 @@ cdef extern from "api/iode.h":
         char p_p
         char p_pad[3]
 
+    PERIOD* PER_atoper(char*)
+
 # declare C++ Period class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
 cdef extern from "time/period.h":

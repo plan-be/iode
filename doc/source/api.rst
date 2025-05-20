@@ -409,6 +409,7 @@ Properties and methods specific to Variables
    Variables.extrapolate
    Variables.seasonal_adjustment
    Variables.trend_correction
+   Variables.execute_RAS
 
    Variables.from_numpy
    Variables.to_numpy
