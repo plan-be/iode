@@ -304,7 +304,7 @@ Below *workspace* must be replaced by either:
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datarasvar``       | ``variables.execute_RAS(pattern, xdim, ydim, ref_year, sum_year, maxit, epsilon)`` --> See :meth:`Variables.execute_RAS`       |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datapatternXXX``   | Not Yet Implemented                                                                                                            |
+    | ``datapatternXXX``   | ``workspace.get_names_from_pattern(list_name, pattern, xdim, ydim)`` --> See :meth:`Database.get_names_from_pattern`           |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
 
 =========

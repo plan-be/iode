@@ -14,6 +14,7 @@ from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport K_NBDEC
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
+from pyiode.iode_database.cpp_api_database cimport B_DataPattern
 from pyiode.iode_database.cpp_api_database cimport B_display_last_error
 from pyiode.iode_database.cpp_api_database cimport B_PrintNbDec
 from pyiode.iode_database.cpp_api_database cimport B_PrintDest
@@ -124,6 +125,21 @@ cdef class CythonIodeDatabase:
         cdef string s_list_result = list_result.encode('utf-8')
         return [name_other.decode() for name_other in self.abstract_db_ptr.search(s_pattern, 
                 <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, s_list_result)]
+
+    def get_names_from_pattern(self, list_name: str, pattern: str, xdim: str, ydim: str) -> bool:
+        cdef bytes b_arg
+        cdef char* c_arg
+        cdef int int_type = self.get_iode_type().value
+        cdef int res
+
+        arg: str = f"{list_name} {pattern} {xdim}"
+        if ydim:
+            arg += " " + ydim
+        b_arg = arg.encode('utf-8')
+        c_arg = b_arg
+
+        res = B_DataPattern(c_arg, int_type)
+        return res == 0
 
     def print_to_file(self, filepath: str, names: str, format: str=None):
         cdef int res

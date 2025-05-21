@@ -33,6 +33,7 @@ Comments
    Comments.print_to_file
 
    Comments.get_names
+   Comments.get_names_from_pattern
    Comments.rename
    Comments.search
 
@@ -88,6 +89,7 @@ Equations
 
    Equations.search
    Equations.get_names
+   Equations.get_names_from_pattern
    Equations.rename
    Equations.coefficients
    Equations.variables
@@ -145,6 +147,7 @@ Identities
 
    Identities.search
    Identities.get_names
+   Identities.get_names_from_pattern
    Identities.rename
    Identities.coefficients
    Identities.variables
@@ -199,6 +202,7 @@ Lists
 
    Lists.search
    Lists.get_names
+   Lists.get_names_from_pattern
    Lists.rename
 
    Lists.__len__
@@ -249,6 +253,7 @@ Scalars
 
    Scalars.search
    Scalars.get_names
+   Scalars.get_names_from_pattern
    Scalars.rename
 
    Scalars.__len__
@@ -302,6 +307,7 @@ Tables
 
    Tables.search
    Tables.get_names
+   Tables.get_names_from_pattern
    Tables.rename
    Tables.coefficients
    Tables.variables
@@ -353,6 +359,7 @@ Variables
 
    Variables.search
    Variables.get_names
+   Variables.get_names_from_pattern
    Variables.rename
 
    Variables.__len__

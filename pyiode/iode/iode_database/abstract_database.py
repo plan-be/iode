@@ -497,6 +497,96 @@ class IodeDatabase:
         iode_list = split_list(iode_list)
         return iode_list
 
+    def get_names_from_pattern(self, list_name: str, pattern: str, xdim: Union[str, List[str]], 
+                               ydim: Union[str, list[str]]=None) -> List[str]:
+        r"""
+        Generate an IODE list containing the names of objects that match a given pattern.
+
+        Parameters
+        ----------
+        list_name: str
+            Name of the IODE list which will contain the resulting list of names.
+        pattern: str
+            Pattern to which the name of the objects must conform, where "x" is replaced by 
+            the elements from 'xdim' and, if specified, "y" by the elements from 'ydim'.
+        xdim: str or list(str)
+            x dimension of the list. It can be a list of strings or an existing IODE list.
+            If it is an existing IODE list, it must be referred as "$<list_name>". 
+        ydim: str or list(str), optional
+            y dimension of the list. It can be a list of strings or an existing IODE list.
+            If it is an existing IODE list, it must be referred as "$<list_name>". 
+            Defaults to None.
+
+        Returns
+        -------
+        list(str)
+        
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from iode import variables, lists
+        >>> # fill the variables database
+        >>> variables.sample = "2000Y1:2010Y1"
+        >>> variables["R1C1"] = np.nan
+        >>> variables["R1C2"] = np.nan
+        >>> variables["R1C3"] = np.nan
+        >>> variables["R2C1"] = np.nan
+        >>> variables["R2C2"] = np.nan
+        >>> variables["R2C3"] = np.nan
+        >>> variables["R3C1"] = np.nan
+        >>> variables["R3C2"] = np.nan
+        >>> variables["R3C3"] = np.nan
+        >>> # create an IODE list X
+        >>> lists["X"] = ["R1", "R2", "R3"]
+        >>> # create an IODE list Y
+        >>> lists["Y"] = ["C1", "C2", "C3"]
+        >>> # generate the IODE list of variables names 
+        >>> # given a pattern
+        >>> variables.get_names_from_pattern("RC", "xy", "$X", "$Y")
+        ['R1C1', 'R1C2', 'R1C3', 'R2C1', 'R2C2', 'R2C3', 'R3C1', 'R3C2', 'R3C3']
+        >>> lists["RC"]
+        ['R1C1', 'R1C2', 'R1C3', 'R2C1', 'R2C2', 'R2C3', 'R3C1', 'R3C2', 'R3C3']
+        """
+        from iode import lists
+
+        if not isinstance(list_name, str):
+            raise TypeError("'list_name': Expected value of type str. "
+                            f"Got value of type '{type(list_name).__name__}' instead")
+        
+        if not isinstance(pattern, str):
+            raise TypeError("'pattern': Expected value of type str. "
+                            f"Got value of type '{type(pattern).__name__}' instead")
+        
+        if isinstance(xdim, (list, tuple)):
+            if not all(isinstance(item, str) for item in xdim):
+                raise TypeError("'xdim': Expected value of type list of strings. "
+                                "One or more items are not of type str.")
+            xdim = ','.join(xdim)
+            lists["X"] = xdim
+            xdim = "$X"
+        if not isinstance(xdim, str):
+            raise TypeError("'xdim': Expected value of type str. "
+                            f"Got value of type '{type(xdim).__name__}' instead")
+        
+        if isinstance(ydim, (list, tuple)):
+            if not all(isinstance(item, str) for item in ydim):
+                raise TypeError("'ydim': Expected value of type list of strings. "
+                                "One or more items are not of type str.")
+            ydim = ','.join(ydim)
+            lists["Y"] = ydim
+            ydim = "$Y"
+        if ydim is not None and not isinstance(ydim, str):
+            raise TypeError("'ydim': Expected None or value of type str. "
+                            f"Got value of type '{type(ydim).__name__}' instead")
+        if ydim is None:
+            ydim = ""
+        
+        success = self._cython_instance.get_names_from_pattern(list_name, pattern, xdim, ydim)
+        if not success:
+            warnings.warn(f"Could not generate list of names '{list_name}' given the pattern '{pattern}'")
+            return []
+        return lists[list_name]    
+
     @property
     def names(self) -> List[str]:
         r"""
