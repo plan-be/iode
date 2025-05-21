@@ -905,7 +905,7 @@ class Tables(IodeDatabase):
         self._cython_instance.set_print_tables_as(value)
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4):
-        """
+        r'''
         Print the list tables defined by `names` to the file `filepath` using the format `format`.
 
         Argument `format` must be in the list:
@@ -1031,25 +1031,26 @@ class Tables(IodeDatabase):
         ...
         "ANAKNFF : definition",
         <BLANKLINE>
-        \"""Déterminants de la croissance de K""\",
+        """Déterminants de la croissance de K""",
         <BLANKLINE>
-        " ",\"""#s""\",
+        " ","""#s""",
         <BLANKLINE>
-        \"""Croissance de K ""\","dln KNFF",
-        \"""Output gap ""\","knff1*ln (QAFF_/(Q_F+Q_I))",
-        \"""Rentabilité ""\","knf2*ln mavg(3,RENT)",
-        \"""Croissance anticipée de l'output""\","0.416*mavg(4,dln QAFF_)+0.023",
+        """Croissance de K ""","dln KNFF",
+        """Output gap ""","knff1*ln (QAFF_/(Q_F+Q_I))",
+        """Rentabilité ""","knf2*ln mavg(3,RENT)",
+        """Croissance anticipée de l'output""","0.416*mavg(4,dln QAFF_)+0.023",
         <BLANKLINE>
         "ANAPRIX : definition",
         <BLANKLINE>
-        \"""Analyse des prix""\",
+        """Analyse des prix""",
         <BLANKLINE>
-        " ",\"""#s""\",
+        " ","""#s""",
         <BLANKLINE>
-        \"""GAP_""\","GAP_",
-        \"""dln (PC/(1+ITCR))-dln AOUC""\","100*(dln (PC/(1+ITCR))-dln AOUC)",
-
-
+        """GAP_""","GAP_",
+        """dln (PC/(1+ITCR))-dln AOUC""","100*(dln (PC/(1+ITCR))-dln AOUC)",
+        <BLANKLINE>
+        <BLANKLINE>
+        
         >>> tables["C8_1"]              # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
@@ -1196,7 +1197,7 @@ class Tables(IodeDatabase):
         "Croissnce du stoc de capital","0.0000","-0.0000","-0.0000","0.0000","-0.0000",
         "Rentabilité","0.0000","-0.0000","-0.0000","-0.0000","0.0000",
         <BLANKLINE>
-        """
+        '''
         if self.print_tables_as != PrintTablesAs.COMPUTED:
            super().print_to_file(filepath, names, format)
         else:
