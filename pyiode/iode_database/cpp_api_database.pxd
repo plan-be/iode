@@ -58,6 +58,7 @@ cdef extern from "api/iode.h":
                        char* from_period, char* to_period, char* na, char* sep, int fmt)
     int RasExecute(char* pattern, char* xdim, char* ydim, PERIOD* ref_period, PERIOD* sum_period, 
                    int maxit, double eps)
+    int B_DataPattern(char* arg, int iode_type)
 
     ctypedef struct KOBJ:
         SWHDL o_val
