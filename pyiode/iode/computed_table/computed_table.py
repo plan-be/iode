@@ -1254,7 +1254,7 @@ class ComputedTable:
         self._cython_instance._setitem_(row, column, value)
 
     def __str__(self) -> str:
-        upper_left_corner = " line title \ period[file] "
+        upper_left_corner = r" line title \ period[file] "
         line_names = self.lines
 
         max_length = max([len(upper_left_corner)] + [len(line_name) for line_name in line_names])
