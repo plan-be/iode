@@ -97,7 +97,7 @@ int B_EqsStepWise(char* arg)
     }
     if(check_scl_var(eqs) == -1)return(1);                      /*GŠre les erreurs de pr‚sence des scalaires et variables de l'‚quation*/
     E_StepWise(smpl, eqs, cond, test);                          /*Effectue les estimations*/
-    return(1);
+    return(0);
 }
 
 //print_result(double F,double R,double cond,char **tab_scl,int nb_scls,int combi,char *cond_string)  /*Imprime le r‚sultat d'un estimation*/
