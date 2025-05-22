@@ -924,6 +924,264 @@ class Equations(IodeDatabase):
                 enable_msgs()
             raise e
 
+    def estimate_step_wise(self, eq_names: Union[str, List[str]], from_period: Union[str, Period]=None, 
+                           to_period: Union[str, Period]=None, lec_condition: str=None, test: str="r2"):
+        r"""
+        Estimates (an) equation(s) and searches for the best possible test values for all 
+        possible combinations of coefficients.
+
+        Parameters
+        ----------
+        eq_names : str or list(str)
+            Name(s) of the equation(s) to be estimated.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+        from_period : str, optional
+            The starting period for the estimation.
+            Defaults to the starting period of the current Variables sample.
+        to_period : str, optional
+            The ending period for the estimation.
+            Defaults to the ending period of the current Variables sample.
+        lec_condition : str
+            Boolean condition written as a LEC expression which is evaluated for each 
+            combination of coefficients. Defaults to None (no condition).
+        test : str, {r2|fstat}
+            Test name. It must be either 'r2' or 'fstat'.
+            Defaults to 'r2'.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> coefficient_names = equations["ACAF"].coefficients
+        >>> coefficient_names
+        ['acaf1', 'acaf2', 'acaf4']
+
+        Estimate the equation for the test 'r2' with no condition
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> equations.estimate_step_wise("ACAF", "1980Y1", "1996Y1")      # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , r2=0.609659
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , r2=0.454420
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        >>> # r2
+        >>> equations["ACAF"].tests["r2"]
+        0.8218154311180115
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0.0157705, 1, 0.00136949)
+        acaf2 -> Scalar(-7.96505e-06, 1, 1.48247e-06)
+        acaf4 -> Scalar(-0.0085027, 1, 0.00208257)
+
+        Estimate the equation for the test 'fstat' with no condition
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> equations.estimate_step_wise("ACAF", "1980Y1", "1996Y1", test="fstat")        # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , fstat=23.427977
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , fstat=12.493701
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107        
+        >>> # fstat
+        >>> equations["ACAF"].tests["fstat"]
+        32.28510665893555
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0.0157705, 1, 0.00136949)
+        acaf2 -> Scalar(-7.96505e-06, 1, 1.48247e-06)
+        acaf4 -> Scalar(-0.0085027, 1, 0.00208257)
+
+        Estimate the equation for the test 'r2' with condition (acaf2 > 0)
+
+        >>> # write the condition (all coefficients > 0)
+        >>> lec_condition = "acaf2 > 0"
+        >>> lec_condition
+        'acaf2 > 0'
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> equations.estimate_step_wise("ACAF", "1980Y1", "1996Y1", lec_condition)       # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , r2=0.609659
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , r2=0.454420
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        >>> # r2
+        >>> equations["ACAF"].tests["r2"]
+        -0.8659535050392151
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0, 0, 0)
+        acaf2 -> Scalar(8.01576e-06, 1, 1.63024e-06)
+        acaf4 -> Scalar(-0.0133032, 1, 0.00637902)
+
+        Estimate the equation for the test 'fstat' with condition (acaf2 > 0)
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> equations.estimate_step_wise("ACAF", "1980Y1", "1996Y1", lec_condition, "fstat")      # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , fstat=23.427977
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , fstat=12.493701
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        >>> # fstat
+        >>> equations["ACAF"].tests["fstat"]
+        -6.961214542388916
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0, 0, 0)
+        acaf2 -> Scalar(8.01576e-06, 1, 1.63024e-06)
+        acaf4 -> Scalar(-0.0133032, 1, 0.00637902)
+        """
+        if isinstance(eq_names, str):
+            eq_names = self.get_names(eq_names)
+        if not isinstance(eq_names, (list, tuple)):
+            raise TypeError("eq_names must be a string or a list of strings")
+        
+        for eq_name in eq_names:
+            if eq_name not in self.names:
+                raise ValueError(f"Equation '{eq_name}' not found in the Equations database")
+            self[eq_name].estimate_step_wise(from_period, to_period, lec_condition, test)
+
     def copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]='*'):
         r"""
         Copy (a subset of) equations from the input file(s) 'input_files' into the current database.

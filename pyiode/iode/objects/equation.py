@@ -443,6 +443,289 @@ class Equation:
                 enable_msgs()
             raise e
 
+    def estimate_step_wise(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
+                           lec_condition: str=None, test: str="r2"):
+        r"""
+        Estimates an equation and searches for the best possible test values for all 
+        possible combinations of coefficients.
+
+        Parameters
+        ----------
+        from_period : str, optional
+            The starting period for the estimation.
+            Defaults to the starting period of the current Variables sample.
+        to_period : str, optional
+            The ending period for the estimation.
+            Defaults to the ending period of the current Variables sample.
+        lec_condition : str
+            Boolean condition written as a LEC expression which is evaluated for each 
+            combination of coefficients. Defaults to None (no condition).
+        test : str, {r2|fstat}
+            Test name. It must be either 'r2' or 'fstat'.
+            Defaults to 'r2'.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> eq_ACAF = equations["ACAF"]
+        >>> coefficient_names = eq_ACAF.coefficients
+        >>> coefficient_names
+        ['acaf1', 'acaf2', 'acaf4']
+
+        Estimate the equation for the test 'r2' with no condition
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> eq_ACAF.estimate_step_wise("1980Y1", "1996Y1")      # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , r2=0.609659
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , r2=0.454420
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        >>> # r2
+        >>> equations["ACAF"].tests["r2"]
+        0.8218154311180115
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0.0157705, 1, 0.00136949)
+        acaf2 -> Scalar(-7.96505e-06, 1, 1.48247e-06)
+        acaf4 -> Scalar(-0.0085027, 1, 0.00208257)
+
+        Estimate the equation for the test 'fstat' with no condition
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> eq_ACAF.estimate_step_wise("1980Y1", "1996Y1", test="fstat")        # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , fstat=23.427977
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , fstat=12.493701
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107        
+        >>> # fstat
+        >>> equations["ACAF"].tests["fstat"]
+        32.28510665893555
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0.0157705, 1, 0.00136949)
+        acaf2 -> Scalar(-7.96505e-06, 1, 1.48247e-06)
+        acaf4 -> Scalar(-0.0085027, 1, 0.00208257)
+
+        Estimate the equation for the test 'r2' with condition (acaf2 > 0)
+
+        >>> # write the condition (all coefficients > 0)
+        >>> lec_condition = "acaf2 > 0"
+        >>> lec_condition
+        'acaf2 > 0'
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> eq_ACAF.estimate_step_wise("1980Y1", "1996Y1", lec_condition)       # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , r2=0.609659
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , r2=0.454420
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.821815
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , r2=-0.865954
+        >>> # r2
+        >>> equations["ACAF"].tests["r2"]
+        -0.8659535050392151
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0, 0, 0)
+        acaf2 -> Scalar(8.01576e-06, 1, 1.63024e-06)
+        acaf4 -> Scalar(-0.0133032, 1, 0.00637902)
+
+        Estimate the equation for the test 'fstat' with condition (acaf2 > 0)
+
+        >>> # reset the coefficients
+        >>> scalars[coefficient_names] = Scalar(0.9, 1.)
+        >>> # estimate 
+        >>> eq_ACAF.estimate_step_wise("1980Y1", "1996Y1", lec_condition, "fstat")      # doctest: +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.03548e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 , fstat=23.427977
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 1.62578e-10)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf4 , fstat=12.493701
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        Estimating : iteration 1 (||eps|| = 1.55885)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf1 acaf2 acaf4 , fstat=32.285107
+        Estimating : iteration 1 (||eps|| = 1.27279)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 3.19716e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+        ACAF: scalars : acaf2 acaf4 , fstat=-6.961215
+        >>> # fstat
+        >>> equations["ACAF"].tests["fstat"]
+        -6.961214542388916
+        >>> # display the estimated coefficients
+        >>> for name in coefficient_names:
+        ...     print(f"{name} -> {scalars[name]}")
+        acaf1 -> Scalar(0, 0, 0)
+        acaf2 -> Scalar(8.01576e-06, 1, 1.63024e-06)
+        acaf4 -> Scalar(-0.0133032, 1, 0.00637902)
+        """
+        if from_period is not None:
+            if not isinstance(from_period, (str, Period)):
+                raise TypeError("from_period must be of type str or Period")
+            # make sure that from_period is a valid period
+            if isinstance(from_period, str):
+                from_period = Period(from_period)
+            from_period = str(from_period)
+
+        if to_period is not None:
+            if not isinstance(to_period, (str, Period)):
+                raise TypeError("to_period must be of type str or Period")
+            # make sure that to_period is a valid period
+            if isinstance(to_period, str):
+                to_period = Period(to_period)
+            to_period = str(to_period)
+
+        if lec_condition is None:
+            # Note: in the C function B_StepWise(), the lec condition is considered as True if eval(lec) != 0  
+            lec_condition = '1'
+        if not isinstance(lec_condition, str):
+            raise TypeError("LEC condition must be a string")
+        
+        if not isinstance(test, str):
+            raise TypeError("Test must be a string and be either 'r2' or 'fstat'")
+        if test not in ['r2', 'fstat']:
+            raise ValueError("Test must be either 'r2' or 'fstat'")
+        
+        success = self._cython_instance.estimate_step_wise(from_period, to_period, lec_condition, test)
+        if not success:
+            msg = f"Estimation of the equation '{self.endogenous}' for the period range [{from_period}, {to_period}]"
+            if lec_condition:
+                msg += f" with condition:\n\t'{lec_condition}'\nfailed. "
+            else:
+                msg += "failed.\n"
+            msg += "No coefficients have been estimated."
+            warnings.warn(msg)    
+
     @property
     def endogenous(self) -> str:
         return self._cython_instance.get_endogenous()

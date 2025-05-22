@@ -10,6 +10,7 @@ from cython.operator cimport dereference
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport EQ
 from pyiode.objects.equation cimport CEquation
+from pyiode.objects.equation cimport B_EqsStepWise
 from pyiode.objects.equation cimport hash_value as hash_value_eq
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 
@@ -82,6 +83,26 @@ cdef class Equation:
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             return False
+
+    def estimate_step_wise(self, from_period: Union[str, None], to_period: Union[str, None], 
+                           lec_condition: str, test: str) -> bool:
+        cdef bytes b_arg
+        cdef char* c_arg = NULL
+        cdef int res
+        
+        if from_period is None or to_period is None:
+            c_sample = cpp_global_variables.get_sample()
+            if from_period is None:
+                from_period = c_sample.start_period().to_string().decode()
+            if to_period is None:
+                to_period = c_sample.end_period().to_string().decode()
+
+        arg: str = f'{from_period} {to_period} {self.get_endogenous()} "{lec_condition}" {test}'
+        b_arg = arg.encode()
+        c_arg = b_arg
+        
+        res = B_EqsStepWise(c_arg)
+        return res == 0
 
     cdef void update_owner_database(self):
         if self.c_database is not NULL:

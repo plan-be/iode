@@ -120,6 +120,7 @@ Properties and methods specific to Equations
    Equations.to_frame
 
    Equations.estimate
+   Equations.estimate_step_wise
    Equations.print_nb_decimals
    Equations.print_equations_as
    Equations.print_equations_lec_as
@@ -467,6 +468,7 @@ EQUATION
    Equation.get_formated_date  
    Equation.split_equation
    Equation.estimate
+   Equation.estimate_step_wise
 
 ========
 IDENTITY
