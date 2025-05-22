@@ -22,6 +22,9 @@ Improvements
   * PYTHON: added the :meth:`Variables.execute_RAS` method to execute the RAS algorithm (same as `$DataRasVar`)
   * PYTHON: added the :meth:`Variables.get_names_from_pattern` method to get the names of IODE objects matching 
     a given pattern (same as `$DataPatternXXX`)
+  * PYTHON: added the :meth:`Equation.estimate_stepwise` and :meth:`Equations.estimate_stepwise` methods to estimate 
+    an equation and searches for the best possible test values for all possible combinations of coefficients 
+    (same as `$EqsStepWise`)
 
 Fixed Bugs 
 ----------

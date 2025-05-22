@@ -40,6 +40,9 @@ cdef extern from "api/iode.h":
         long date
         float tests[20]
 
+    int B_EqsStepWise(char* arg)    
+
+
 cdef extern from "cpp_api/objects/equation.h":
 
     # declare C++ Equation class
