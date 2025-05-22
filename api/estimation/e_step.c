@@ -211,7 +211,7 @@ static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eq
  *  @param [in] char*   cond    LEC expression that must satisfy "cond[0] == 0" to accept the estimation (?)
  *  @param [in] char*   test    name of the test to optimize: "n", "k", "stdev", "meany", "ssres", "stderr", 
  *                                              "fstat" , "r2"    , "r2adj" , "dw" or "loglik"
- *  @return     int             best test "test" value
+ *  @return     double          best test "test" value
  */
 
 double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
