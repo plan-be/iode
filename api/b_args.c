@@ -84,9 +84,11 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
  */
 char **B_vtom_chk(char* arg, int nb)
 {
-    char    **args;
+    char **args;
+    char *tmp = SCR_stracpy(arg);       // need to create a copy of arg to avoid segmentation fault 
+                                        // when called from C++/cython: 
 
-    args = SCR_vtoms(arg, B_SEPS);
+    args = SCR_vtomsq(tmp, B_SEPS, '"');
     if(args == 0) return(args);
     if((nb > 0 && SCR_tbl_size(args) != nb)) {
         B_seterrn(OM_ILL_ARGS);
