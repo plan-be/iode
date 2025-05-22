@@ -1436,7 +1436,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
     SAMPLE      *smpl;
-    double   r2, *df;
+    double      r2, *df;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -1473,6 +1473,39 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     r2 = E_StepWise(smpl, "ACAF", "", "r2");
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
     SCR_free(smpl);
+
+    // B_EqsStepWise
+    for(int i = 0; i < 4; i++)
+    {
+        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->relax = 1.0;
+    }
+    rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
+    EXPECT_EQ(rc, 0);
+
+    for(int i = 0; i < 4; i++)
+    {
+        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->relax = 1.0;
+    }
+    rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
+    EXPECT_EQ(rc, 0);
+
+    for(int i = 0; i < 4; i++)
+    {
+        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->relax = 1.0;
+    }
+    rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
+    EXPECT_EQ(rc, 0);
+
+    for(int i = 0; i < 4; i++)
+    {
+        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->relax = 1.0;
+    }
+    rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
+    EXPECT_EQ(rc, 0);
 
     // Dickey-Fuller test (E_UnitRoot)
     df = E_UnitRoot("ACAF+ACAG", 0, 0, 0);
