@@ -67,36 +67,56 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg)                                                 
 {
-    int     lg1, lg2,lg3,lg4,lg5;
-    char    from[16], to[16], eqs[30], cond[1024], test[20];
+    char    *from, *to, *eqs, *cond, *test;
+    char**  args;
     SAMPLE  *smpl;
 
-    lg1 = B_get_arg0(from, arg, 15);                              /*Lit les arguments*/
-    lg2 = B_get_arg0(to, arg + lg1, 15);
-    lg3 = B_get_arg0(eqs, arg + lg1 + lg2, 29);
-    lg4 = B_get_arg0(cond, arg + lg1 + lg2 + lg3, 1023);
-    lg5 = B_get_arg0(test, arg + lg1 + lg2 + lg3 + lg4, 19);
+    args = B_vtom_chk(arg, 5);
+    if(args == NULL) 
+        return(1);
 
-    smpl = PER_atosmpl(from, to);                                /*Calcul le sample*/
-
+    from = args[0];                                              
+    to = args[1];                                                
+    smpl = PER_atosmpl(from, to);                                /*Calcule le sample*/
     if(smpl == NULL) {                                           /*GŠre les erreurs de sample*/
         kerror(0,"Incorrect sample");
+        SCR_free_tbl(args);
         return(1);
     }
-    if(K_find(K_WS[EQUATIONS],eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
+
+
+    eqs = args[2];                                               
+    if(K_find(K_WS[EQUATIONS], eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
         kerror(0,"Eqs %s not found",eqs);
+        SCR_free_tbl(args);
         return(1);
     }
 
-    if(C_evallec(cond,0)==-1)return(1);                          /*GŠre les erreurs de condition*/
+    cond = args[3];                                              
+    if(C_evallec(cond, 0)==-1)                                       /*GŠre les erreurs de condition*/
+    {
+        SCR_free_tbl(args);
+        return(1);                          
+    }
 
+    test = args[4];
     strcpy(test,SCR_lower(test));
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0) {        /*GŠre les erreurs de test*/
+    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*GŠre les erreurs de test*/
+    {
         kerror(0,"Incorrect test name");
+        SCR_free_tbl(args);
         return(1);
     }
-    if(check_scl_var(eqs) == -1)return(1);                      /*GŠre les erreurs de pr‚sence des scalaires et variables de l'‚quation*/
+
+    if(check_scl_var(eqs) == -1)                                /*GŠre les erreurs de pr‚sence des scalaires et variables de l'‚quation*/
+    {
+        SCR_free_tbl(args);
+        return(1);                      
+    }
+
     E_StepWise(smpl, eqs, cond, test);                          /*Effectue les estimations*/
+    
+    SCR_free_tbl(args);
     return(0);
 }
 
