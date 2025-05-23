@@ -38,6 +38,20 @@ cdef class Equation:
             self.c_equation = NULL
             self.c_database = NULL
 
+    cdef void update_owner_database(self):
+        if self.c_database is not NULL:
+            self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
+
+    cdef void extract_eq_from_database(self):
+        # if c_equation belongs to a database, we need to (re)extract it from the database 
+        # every time we need to access one of its properties since processes like estimation
+        # can modify the equation
+        if self.c_database is not NULL:
+            if self.ptr_owner and self.c_equation is not NULL:
+                del self.c_equation
+            self.c_equation = self.c_database.get(self.c_equation.get_endo())
+            self.ptr_owner = True
+
     @staticmethod
     cdef Equation _from_ptr(CEquation* ptr, bint owner=False, CKDBEquations* c_database=NULL):
         """
@@ -51,25 +65,33 @@ cdef class Equation:
         return wrapper
 
     def get_formated_date(self, format: str='dd-mm-yyyy') -> str:
+        self.extract_eq_from_database()
         return self.c_equation.get_date_as_string(format.encode()).decode()
 
     def get_coefficients(self) -> List[str]:
+        self.extract_eq_from_database()
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>False)]
 
     def _get_and_create_coefficients(self) -> List[str]:
+        self.extract_eq_from_database()
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>True)]
 
     def get_variables(self) -> List[str]:
+        self.extract_eq_from_database()
         return [var.decode() for var in self.c_equation.get_variables_list(<bint>False)]
 
     def _get_and_create_variables(self) -> List[str]:
+        self.extract_eq_from_database()
         return [var.decode() for var in self.c_equation.get_variables_list(<bint>True)]
 
     def split_equation(self) -> Tuple[str, str]:
+        self.extract_eq_from_database()
         lhs, rhs = self.c_equation.split_equation()
         return lhs.decode(), rhs.decode() 
 
     def estimate(self, from_period: str=None, to_period: str=None) -> bool:
+        self.extract_eq_from_database()
+
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
@@ -104,10 +126,6 @@ cdef class Equation:
         res = B_EqsStepWise(c_arg)
         return res == 0
 
-    cdef void update_owner_database(self):
-        if self.c_database is not NULL:
-            self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
-
     cdef void reset_date_and_tests(self):
         self.c_equation.date = 0L
         memset(&self.c_equation.tests, 0, EQS_NBTESTS * sizeof(float))
@@ -116,6 +134,7 @@ cdef class Equation:
         return self.c_equation.get_endo().decode()
 
     def get_lec(self) -> str:
+        self.extract_eq_from_database()
         return self.c_equation.get_lec().decode()
 
     def set_lec(self, value: str):
@@ -125,6 +144,7 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_method(self) -> str:
+        self.extract_eq_from_database()
         return EqMethod(<int>(self.c_equation.get_method_as_int())).name
 
     def set_method(self, value: int):
@@ -133,6 +153,7 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_sample(self) -> Sample:
+        self.extract_eq_from_database()
         cdef CSample sample = self.c_equation.get_sample()
         return Sample._from_ptr(new CSample(sample), <bint>True)
 
@@ -142,6 +163,7 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_comment(self) -> str:
+        self.extract_eq_from_database()
         return self.c_equation.get_comment().decode()
 
     def set_comment(self, value: str):
@@ -149,6 +171,7 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_instruments(self) -> Union[str, List[str]]:
+        self.extract_eq_from_database()
         _instruments = self.c_equation.get_instruments().decode().split(';')
         return _instruments[0] if len(_instruments) == 1 else _instruments
 
@@ -158,6 +181,7 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_block(self) -> str:
+        self.extract_eq_from_database()
         return self.c_equation.get_block().decode()
 
     def set_block(self, value: str):
@@ -166,10 +190,12 @@ cdef class Equation:
         self.update_owner_database()
 
     def get_tests(self) -> Dict[str, float]:
+        self.extract_eq_from_database()
         cdef map[string, float] cpp_tests = self.c_equation.get_tests_as_map()
         return {item.first.decode(): item.second for item in cpp_tests}
 
     def _get_list_tests(self) -> List[float]:
+        self.extract_eq_from_database()
         return [self.c_equation.tests[i] for i in range(len(EqTest))]
 
     def _set_tests_from_list(self, tests: List[float]):
@@ -185,9 +211,11 @@ cdef class Equation:
         self.update_owner_database()
 
     def equal(self, other: Equation) -> bool:
+        self.extract_eq_from_database()
         return self.c_equation == other.c_equation
 
     def __hash__(self) -> int:
+        self.extract_eq_from_database()
         return <int>hash_value_eq(dereference(self.c_equation))
 
 
