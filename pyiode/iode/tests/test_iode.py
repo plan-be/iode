@@ -49,6 +49,26 @@ def test_sample():
     with pytest.raises(TypeError, match=r"Sample.__init__\(\) missing 1 required positional argument: 'start_period'"):
         Sample()
 
+# Iode Objects
+# ------------
+
+# Equation
+# --------
+
+def test_equation():
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    eq_ACAF = equations["ACAF"]
+    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
+    assert round(eq_ACAF.tests["r2"], 10) == 0.8217613697
+    
+    scalars[eq_ACAF.coefficients] = Scalar(0., 1.)
+    eq_ACAF.estimate_step_wise("1980Y1", "1996Y1", "acaf2 > 0", "r2")
+    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
+    assert round(eq_ACAF.tests["r2"], 10) == -0.8659535050
+
 # Iode Databases
 # --------------
 
