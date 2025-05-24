@@ -257,6 +257,20 @@ cdef class Table:
             self.c_table_name = b''
             self.c_table = NULL
 
+    cdef void extract_tbl_from_database(self):
+        # if c_table belongs to a database, we need to (re)extract it from the database every 
+        # time we need to access one of its attributes since working for example on the global 
+        # database may modify the table (which is not automatically reflected in c_table)
+        if self.c_database is not NULL:
+            if self.ptr_owner and self.c_table is not NULL:
+                del self.c_table
+            self.c_table = self.c_database.get(self.c_table_name)
+            self.ptr_owner = True
+
+    def update_owner_database(self):
+        if self.c_database is not NULL and self.c_table is not NULL:
+            self.c_database.update(self.c_table_name, dereference(self.c_table))
+
     @staticmethod
     cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b'', CKDBTables* c_database_ptr=NULL):
         """
@@ -270,21 +284,20 @@ cdef class Table:
         wrapper.ptr_owner = owner
         return wrapper
 
-    def update_owner_database(self):
-        if self.c_database is not NULL and self.c_table is not NULL:
-            self.c_database.update(self.c_table_name, dereference(self.c_table))
-
     def get_nb_lines(self) -> int:
+        self.extract_tbl_from_database()
         return <int>(self.c_table.nb_lines())
 
     def get_nb_columns(self) -> int:
+        self.extract_tbl_from_database()
         return <int>(self.c_table.nb_columns())
 
     def get_title(self) -> str:
         cdef string c_title
         cdef CTableLine* c_line
+        self.extract_tbl_from_database()
 
-        for i in range(self.get_nb_lines()):
+        for i in range(self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -296,7 +309,7 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef string c_title
 
-        for i in range(self.get_nb_lines()):
+        for i in range(self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -305,6 +318,7 @@ cdef class Table:
         self.update_owner_database()
 
     def get_language(self) -> str:
+        self.extract_tbl_from_database()
         return self.c_table.get_language().decode().upper()
 
     def set_language(self, value: Union[TableLang, str]):
@@ -319,6 +333,7 @@ cdef class Table:
         self.update_owner_database()
 
     def get_gridx(self) -> str:
+        self.extract_tbl_from_database()
         return TableGraphGrid(<int>(self.c_table.get_gridx())).name
 
     def set_gridx(self, value: Union[TableGraphGrid, str]):
@@ -330,6 +345,7 @@ cdef class Table:
         self.update_owner_database()
 
     def get_gridy(self) -> str:
+        self.extract_tbl_from_database()
         return TableGraphGrid(<int>(self.c_table.get_gridy())).name
 
     def set_gridy(self, value: Union[TableGraphGrid, str]):
@@ -341,6 +357,7 @@ cdef class Table:
         self.update_owner_database()
 
     def get_graph_axis(self) -> str:
+        self.extract_tbl_from_database()
         return TableGraphAxis(self.c_table.get_graph_axis()).name
 
     def set_graph_axis(self, value: Union[TableGraphAxis, str]):
@@ -352,6 +369,7 @@ cdef class Table:
         self.update_owner_database()
 
     def get_graph_alignment(self) -> str:
+        self.extract_tbl_from_database()
         return TableGraphAlign(<int>(self.c_table.get_graph_alignment())).name
 
     def set_graph_alignment(self, value: Union[TableGraphAlign, str]):
@@ -365,12 +383,13 @@ cdef class Table:
     def get_coefficients(self) -> List[str]:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
+        self.extract_tbl_from_database()
 
         if self.c_table is NULL:
             return []
 
         py_coeffs = []
-        nb_columns = self.get_nb_columns()
+        nb_columns = self.c_table.nb_columns()
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
@@ -379,7 +398,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
 
-        for i in range(self.get_nb_lines()):
+        for i in range(self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -394,12 +413,13 @@ cdef class Table:
     def get_variables(self) -> List[str]:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
+        self.extract_tbl_from_database()
 
         if self.c_table is NULL:
             return []
 
         py_vars = []
-        nb_columns = self.get_nb_columns()
+        nb_columns = self.c_table.nb_columns()
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
@@ -408,7 +428,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
 
-        for i in range(self.get_nb_lines()):
+        for i in range(self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -421,6 +441,8 @@ cdef class Table:
 
     def get_divider(self, divider: TableLine) -> TableLine:
         cdef CTableLine* c_line
+
+        self.extract_tbl_from_database()
         c_line = self.c_table.get_divider_line()
 
         divider.c_line = c_line
@@ -430,6 +452,8 @@ cdef class Table:
 
     def set_divider(self, value: Union[List[str], Tuple[str]]):
         cdef CTableLine* c_line
+        cdef CTableCell* c_cell
+        
         c_line = self.c_table.get_divider_line()
         if c_line is NULL:
             raise RuntimeError("Cannot set divider line. No divider line found in the table.")
@@ -441,7 +465,7 @@ cdef class Table:
             raise TypeError(f"Cannot update cells of the 'divider' line. One or more items of the passed "
                             f"{type(value).__name__} are not of type str")
         
-        nb_columns = self.get_nb_columns()
+        nb_columns = self.c_table.nb_columns()
         if len(value) != nb_columns:
             raise ValueError(f"Cannot update cells of the 'divider' line.\nThe length of the passed {type(value).__name__} "
                              f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
@@ -460,8 +484,9 @@ cdef class Table:
             raise TypeError(f"Expected value of type str. Got value of type {type(key).__name__} instead.")
         key = key.replace('"', '').strip()
 
-        nb_columns = self.get_nb_columns()
-        for i in range(self.get_nb_lines()):
+        self.extract_tbl_from_database()
+        nb_columns = self.c_table.nb_columns()
+        for i in range(self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -506,7 +531,7 @@ cdef class Table:
                 raise TypeError(f"Cannot insert line with cells at position {row}.\nOne or more items "
                                 f"of the passed {type(value).__name__} are not of type str")
             c_line = self.c_table.insert_line_with_cells(row, <bint>False)
-            nb_columns = self.get_nb_columns()
+            nb_columns = self.c_table.nb_columns()
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
@@ -521,12 +546,14 @@ cdef class Table:
         self.update_owner_database()
 
     def compute(self, generalized_sample: str, nb_decimals: int=2) -> ComputedTable:
+        self.extract_tbl_from_database()
         if not generalized_sample:
             raise ValueError("'generalized_sample' must not be empty")
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def _getitem_(self, row: int, line: TableLine) -> TableLine:
-        cdef CTableLine* c_line = self.c_table.get_line(row)
+        cdef CTableLine* c_line
+        c_line = self.c_table.get_line(row)
 
         line.c_line = c_line
         line.nb_columns = self.c_table.nb_columns()
@@ -539,7 +566,7 @@ cdef class Table:
         
         c_line = self.c_table.get_line(row)
         line_type = <int>(c_line.get_line_type())
-        nb_columns = self.get_nb_columns()
+        nb_columns = self.c_table.nb_columns()
         if line_type == TableLineType.TITLE:
             if not isinstance(value, str):
                 raise TypeError(f"Cannot update line {row}. Expected new content of type str. "
@@ -591,7 +618,7 @@ cdef class Table:
                 self.c_table.add_title(value.encode())
         elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
             c_line = self.c_table.add_line_with_cells()
-            nb_columns = self.get_nb_columns()
+            nb_columns = self.c_table.nb_columns()
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
@@ -607,6 +634,7 @@ cdef class Table:
         return self
 
     def _copy_(self, table: Table) -> Table:
+        self.extract_tbl_from_database()
         del table.c_table
         table.c_table = new CTable(dereference(self.c_table))
         table.ptr_owner = <bint>True
@@ -617,14 +645,15 @@ cdef class Table:
     def _str_(self) -> str:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
+        self.extract_tbl_from_database()
 
-        nb_cols = self.get_nb_columns()
+        nb_cols = self.c_table.nb_columns()
         max_title_length = 0
         max_cells_length = [0] * nb_cols
         lines = []
 
         # lines (-1 for the divider line)
-        for i in range(-1, self.get_nb_lines()):
+        for i in range(-1, self.c_table.nb_lines()):
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
