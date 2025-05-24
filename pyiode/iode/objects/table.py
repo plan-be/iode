@@ -1827,7 +1827,7 @@ class Table:
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
         ----- | ---------------------------------------------
-        CELL  | ""                                 |   "#s"
+        CELL  |                                    |   "#s"
         ----- | ---------------------------------------------
         CELL  | "Output potentiel"                 |  Q_F+Q_I
         CELL  | "Stock de capital"                 | KNFF[-1]
@@ -2257,7 +2257,7 @@ class Table:
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
         ----- | ---------------------------------------------
-        CELL  | ""                                 |   "#s"
+        CELL  |                                    |   "#s"
         ----- | ---------------------------------------------
         CELL  | "Output potentiel"                 |  Q_F+Q_I
         CELL  | "Stock de capital"                 | KNFF[-1]
