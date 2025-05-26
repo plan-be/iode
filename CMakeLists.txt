@@ -27,7 +27,7 @@ if(NOT SKBUILD)
 endif()
 
 # ---- main project ----
-project ("iode" VERSION 7.0.1 HOMEPAGE_URL "https://iode.readthedocs.io/en/stable/" LANGUAGES C CXX)
+project ("iode" VERSION 7.1.0 HOMEPAGE_URL "https://iode.readthedocs.io/en/stable/" LANGUAGES C CXX)
 
 # previous homepage URL: https://iode.plan.be/doku.php
 

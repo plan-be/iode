@@ -440,12 +440,11 @@ root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noar
 
 ## After the release
 
-1. In the directory doc/changelog/versions, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
-2. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` to the changes.rst file in the directory doc/changelog.
-3. Commit the changes.
-4. Update all references MAJOR_VERSION.MINOR_VERSION everywhere in the project (in iode.h, documentation, ...)
-5. Commit the changes.
-6. Create a Pull Request and push to master.
+1. Update the version number in the root CMakeLists.txt file (in project(...)). Check that the version has been updated everywhere in the project.
+2. In the directory doc/changelog/versions, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
+3. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` to the changes.rst file in the directory doc/changelog.
+4. Commit the changes.
+5. Create a Pull Request and push to master.
 
 # Github Actions
 
