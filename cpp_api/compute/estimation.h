@@ -387,7 +387,7 @@ public:
  * @param from  first period of the estimation sample
  * @param to    last period of the estimation sample
  * 
- * @note equivalent to function IodeEstimate() from b_api.c
+ * @note equivalent to function IodeEstimate() from b_api.c (iode_dos repository)
  */
 void eqs_estimate(const std::string& eqs, const std::string& from = "", const std::string& to = "");
 
