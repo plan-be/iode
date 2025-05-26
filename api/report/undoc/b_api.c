@@ -15,7 +15,6 @@
  *  
  *    WS related functions
  *        
- *      int IodeLoad(char *name, int type)            | Return the IODE version in a const string.
  *      int IodeSave(char *name, int type)            | Load an IODE workspace file.
  *      int IodeClearWs(int type)                     | Clear a workspace.
  *      int IodeClearAll()                            | Clear all workspaces.
@@ -168,24 +167,6 @@ int IodeEnd()
 // --------------------
 // WS related functions
 // --------------------
-
-/**
- *  Load an IODE workspace file.
- *  
- *  @param [in] name    char*   filename 
- *  @param [in] type    int     file type (COMMENTS...VARIABLES)
- *  @return             int     nb of objects read or -1 on error
- */
-int  IodeLoad(char *name, int type)
-{
-    KDB     *kdb;
-
-    if(B_WsLoad(name, type) < 0) return(-1);
-    else {
-        kdb = K_WS[type];
-        return(KNB(kdb));
-    }
-}
 
 
 /**

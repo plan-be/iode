@@ -19,7 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-extern int IodeLoad(char *name, int type);
 extern int IodeSave(char *name, int type);
 extern int IodeClearWs(int type);
 extern int IodeClearAll();
