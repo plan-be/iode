@@ -15,7 +15,6 @@
  *  
  *    SAMPLE Functions
  *  
- *      char **IodeGetSampleAsPeriods()               | Return all periods of the current KV_WS sample in a table of strings.
  *      char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) | Return all periods from aper_from to aper_to in a table of strings.
  *      double *IodeGetSampleAsDoubles(int *lg)                          | Return a sample as a list of doubles.
  *      int IodeSetSampleStr(char* str_from, char* str_to)               | Set the WS sample from periods as strings
@@ -157,31 +156,6 @@ int IodeEnd()
 // ----------------
 // SAMPLE Functions
 // ----------------
-
-
-/**
- *  Return all periods of the current KV_WS sample in a table of strings.
- *  
- *  @return  char**     allocated table of char* 
- *  
- *  TODO: call IodeCreateSampleAsPeriods() 
- */
-char **IodeGetSampleAsPeriods() 
-{
-    SAMPLE  *smpl = KSMPL(KV_WS);
-    char    **periods;
-    PERIOD	*per_t;
-    int		t;
-
-    if(smpl == NULL || smpl->s_nb == 0) return(NULL);
-    periods = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
-	for(t = 0;  t < smpl->s_nb; t++) {
-        per_t = PER_addper(&(smpl->s_p1), t);
-        periods[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
-	}
-
-    return(periods);
-}
 
 
 /**
