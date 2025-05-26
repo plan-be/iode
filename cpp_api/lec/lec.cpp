@@ -42,7 +42,7 @@ bool clec_equal(const CLEC* clec_1, const CLEC* clec_2)
  *  
  *  @param   lec     std::string   LEC expression
  * 
- *  @note same as function IodeLinkLec() from b_api.c
+ *  @note same as function IodeLinkLec() from b_api.c (from iode_dos repository).
  */
 static CLEC* link_lec(const std::string& lec)
 {

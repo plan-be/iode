@@ -783,13 +783,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|**REPORTS**||
-|` int IodeExecArgs(char *filename, char **args)`|Execute a report with optionnal parameters.|
-|` int IodeExec(char *filename)`|Execute a report with no parameters.|
-|**LEC DIRECT EXECUTION**||
-|` static CLEC* IodeLinkLec(char* lec)`|Compile and link a LEC expression with the KV\_WS and KS\_WS.|
-|` double IodeExecLecT(char* lec, int t)`|Calc a LEC expression in t.|
-|` double *IodeExecLec(char* lec)`|Calculate a LEC expression on the full KV\_WS sample.|
 |**MESSAGES**||
 |` void IodeSuppressMsgs()`|Suppress all messages from the A2M interpretor and from the IODE functions.|
 |` void IodeResetMsgs()`|Reset the messages from the A2M interpretor and from the IODE functions.|

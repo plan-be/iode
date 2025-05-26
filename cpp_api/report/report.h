@@ -14,7 +14,7 @@
  * @param filepath 
  * @param parameters 
  * 
- * @note same as function IodeExecArgs() from b_api.c
+ * @note same as function IodeExecArgs() from b_api.c (from iode_dos repository).
  *       See https://iode.plan.be/doku.php?id=reportexec 
  */
 void execute_report(const std::string& filepath, const std::string& parameters = "");
