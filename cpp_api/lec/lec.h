@@ -36,7 +36,7 @@ bool clec_equal(const CLEC* clec_1, const CLEC* clec_2);
  *  @return       double        value of the calculated LEC expression at the period t 
  *                              or IODE_NAN on error
  * 
- *  @note same as function IodeExecLecT() from b_api.c
+ *  @note same as function IodeExecLecT() from b_api.c (from iode_dos repository)
  */
 double execute_lec(const std::string& lec, const int t);
 
@@ -48,7 +48,7 @@ double execute_lec(const std::string& lec, const int t);
  *  @return           double        value of the calculated LEC expression for the passed period 
  *                                  or IODE_NAN on error
  * 
- *  @note same as function IodeExecLecT() from b_api.c
+ *  @note same as function IodeExecLecT() from b_api.c (from iode_dos repository)
  */
 double execute_lec(const std::string& lec, const std::string& period);
 
@@ -59,6 +59,6 @@ double execute_lec(const std::string& lec, const std::string& period);
  * 
  *  @return  std::vector<double>    vector containing the calculated values
  * 
- *  @note same as function IodeExecLec() from b_api.c
+ *  @note same as function IodeExecLec() from b_api.c (from iode_dos repository)
  */
 std::vector<double> execute_lec(const std::string& lec);

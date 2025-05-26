@@ -89,58 +89,6 @@ int IodeEnd()
 }
 
 
-// ----------------------------------------
-// GRAPH MANIPULATION FUNCTIONS (see GB ?)
-// ----------------------------------------
-
-int IodeGetChart(char *name, char *gsmpl)
-{
-    int     pos;
-    TBL     *tbl;
-
-    pos = K_find(K_WS[TABLES], name);
-    if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0)
-        return(-1);
-
-    return(APIPrepareChart(tbl, gsmpl));
-}
-
-int IodeFreeChart(int hdl)
-{
-    return(APIChartFree(hdl));
-}
-
-int IodeChartNl(int hdl)
-{
-    return(APIChartNl(hdl));
-}
-
-int IodeChartNc(int hdl)
-{
-    return(APIChartNc(hdl));
-}
-
-char    IodeChartType(int hdl, int i)
-{
-    return(APIChartType(hdl, i));
-}
-
-int    IodeChartAxis(int hdl, int i)
-{
-    return(APIChartAxis(hdl, i));
-}
-
-char    *IodeChartTitle(int hdl, int i)
-{
-    return(APIChartTitle(hdl, i));
-}
-
-double  *IodeChartData(int hdl, int i)
-{
-    return(APIChartData(hdl, i));
-}
-
-
 // ---------------
 // OUTPUT MESSAGES
 // ---------------
