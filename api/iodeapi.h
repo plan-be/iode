@@ -19,8 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-extern int IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace);
-
 extern int IodeEstimate(char* veqs, char* afrom, char* ato);
 
 extern int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug);

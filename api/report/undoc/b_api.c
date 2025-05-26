@@ -13,10 +13,6 @@
  *      int IodeInit()                                | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
  *  
- *   IDENTITES
- *  
- *      int IodeExecuteIdts(char *asmpl, char *idt_list, char *var_files, char *scl_files, int trace) | Execute identities
- *  
  *   ESTIMATION
  *  
  *      int IodeEstimate(char* veqs, char* afrom, char* ato)             | Estimate an equation of a given sample. 
@@ -124,57 +120,6 @@ int IodeEnd()
     ODE_INIFILE = 0;
     
     return(0);
-}
-
-
-// --------------------
-// IDENTITIES FUNCTIONS
-// --------------------
-
-int IodeExecuteIdts(char *asmpl, char *idt_list, char *var_files, char *scl_files, int trace) 
-{
-    int     rc; 
-    U_ch    **idts, **pers;
-    SAMPLE  *smpl = NULL;
-
-    // Sample (null => full sample, see K_exec())
-    if(asmpl && asmpl[0] != 0) {
-        pers = SCR_vtoms(asmpl, " :");
-        if(SCR_tbl_size(pers) == 2) {
-            smpl = PER_atosmpl(pers[0], pers[1]);
-        }
-        SCR_free_tbl(pers);
-        if(smpl == NULL) {
-            kerror(0, "Bad sample: '%s'", asmpl);
-            return(-1);
-        }    
-    }
-    
-//    if(smpl == 0) {
-//        kerror(0, "IdtExecute: '%s' wrong sample ", asmpl);
-//        return(-1);
-//    }
-    
-    // Input files
-    if(var_files) B_IdtExecuteVarFiles(var_files);
-    if(scl_files) B_IdtExecuteSclFiles(scl_files);
-    
-    // Optional trace
-    KEXEC_TRACE = trace;
-    
-    // Idt list
-    idts = NULL;
-    if(idt_list && idt_list[0] != 0) {
-        idts  = SCR_vtoms(idt_list, " ,;\t");
-    }
-    
-    // Execution
-    rc = B_IdtExecuteIdts(smpl, idts);
-    
-    // Cleanup
-    SCR_free_tbl(idts);
-    SCR_free(smpl);
-    return(rc);
 }
 
 

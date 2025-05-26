@@ -1974,6 +1974,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 
 TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
 {
+    char    **idts;
+    SAMPLE  *smpl = NULL;
     double  *AOUC;
     int     rc;
 
@@ -1998,7 +2000,11 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
 
     //rc = iode.idt_execute("1961:2015", "AOUC")
     //print(f"rc={rc}")
-    rc = IodeExecuteIdts("1961Y1:2015Y1", "AOUC", NULL, NULL, 1);
+
+    // Sample (null => full sample, see K_exec())
+    smpl = PER_atosmpl("1961Y1", "2015Y1");   
+    idts = (char**) SCR_vtoms((U_ch*) "AOUC", (U_ch*) " ,;\t");
+    rc = B_IdtExecuteIdts(smpl, idts);
     printf("rc=%d\n", rc);
 
     //AOUC = iode.get_var("AOUC")
