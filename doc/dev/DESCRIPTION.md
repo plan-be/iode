@@ -784,7 +784,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
 |**SAMPLE Functions**||
-|` double *IodeGetSampleAsDoubles(int *lg)`|Return a sample as a list of doubles.|
 |` int IodeSetSampleStr(char* str_from, char* str_to)`|Set the WS sample from periods as strings|
 |` int IodeSetSample(int from, int to)`|Set the WS sample from integers (yearly only).|
 |**OBJECTS MANIPULATION FUNCTIONS**||
