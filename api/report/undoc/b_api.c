@@ -17,9 +17,6 @@
  *  
  *      void IodeSuppressMsgs()                                          | Suppress all messages from the A2M interpretor and from the IODE functions.
  *      void IodeResetMsgs()                                             | Reset the messages from the A2M interpretor and from the IODE functions.
- *      void IodeAddErrorMsg(char* msg)                                  | Add a message in the error message stack
- *      void IodeDisplayErrorMsgs()                                      | Display the error messages accumulated during the previous function calls.
- *      void IodeClearErrorMsgs()                                        | Clear the stack of messages.
  *  
  *   MISCELLANEOUS
  *  
@@ -166,36 +163,7 @@ void IodeResetMsgs()
 {
     kmsg_toggle(1);
     A2mMessage_toggle(1);
-}
-
-
-// Manage the messages generated via B_seterror() and B_seterrn() (see b_errors.c)  
-
-/**
- *  Add a new error message to the stack of messages.
- *  
- *  @param [in] msg char* text of the message
- */
-void IodeAddErrorMsg(char* msg)
-{   
-    B_add_error(msg);
-}    
-
-/**
- *  Display the error messages accumulated during the previous function calls.
- */
-void IodeDisplayErrorMsgs()
-{
-    B_display_last_error();
-}    
-
-/**
- *  Clear the stack of messages.
- */
- void IodeClearErrorMsgs()
-{
-    B_clear_last_error();
-}    
+}   
 
 // --------------
 // MISC FUNCTIONS
