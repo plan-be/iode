@@ -15,7 +15,6 @@
  *  
  *    SAMPLE Functions
  *  
- *      double *IodeGetSampleAsDoubles(int *lg)                          | Return a sample as a list of doubles.
  *      int IodeSetSampleStr(char* str_from, char* str_to)               | Set the WS sample from periods as strings
  *      int IodeSetSample(int from, int to)                              | Set the WS sample from integers (yearly only).
  *  
@@ -155,34 +154,6 @@ int IodeEnd()
 // ----------------
 // SAMPLE Functions
 // ----------------
-
-
-/**
- *  Returns a sample as a list of doubles.
- *  
- *  @param [out] lg     int*     number of periods
- *  @return             double*  list of periods in the form {2000.0, 2000.25, 2000.5, 2000.75, 2001.0, ...}   
- */
-double *IodeGetSampleAsDoubles(int *lg)
-{
-    double  *value = NULL;
-    SAMPLE  *smpl;
-    PERIOD	*from;
-    int		t, per;
-
-    smpl = (SAMPLE *) KDATA(K_WS[VARIABLES]);
-    *lg = smpl->s_nb;
-
-    value = (double *) SW_nalloc(smpl->s_nb * sizeof(double));
-    from = &smpl->s_p1;
-    for(t = 0;  t < smpl->s_nb; t++) {
-        per = PER_nbper(from);
-        value[t] = (double) from->p_y + (from->p_s + t - 1)/per
-                   + ((from->p_s + t - 1) % per)/ (double) per;
-    }
-
-    return(value);
-}
 
 
 /**
