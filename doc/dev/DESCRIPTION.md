@@ -786,9 +786,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |**MESSAGES**||
 |` void IodeSuppressMsgs()`|Suppress all messages from the A2M interpretor and from the IODE functions.|
 |` void IodeResetMsgs()`|Reset the messages from the A2M interpretor and from the IODE functions.|
-|**MISCELLANEOUS**||
-|` int IodeSetNbDec(int nbdec)`|Define the number of decimals in the tables and variables to be printed.|
-|` int IodeGetNbDec()`|Returns the number of decimals currently set for the printing of tables and variables.|
 
 ## Group "DDE communcations" {#T66}
 
