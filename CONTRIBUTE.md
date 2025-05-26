@@ -400,10 +400,10 @@ gui> python -m build --sdist --wheel
 
 Upload the *iode* and *iode_gui* Python packages to PyPI:
 ```bash
-pyiode> twine upload dist/*
+pyiode> twine upload dist/iode-<version>-*.whl
 ```
 ```bash
-gui> twine upload dist/*
+gui> twine upload dist/iode_gui-<version>-*.whl
 ```
 
 ## Build the conda packages
