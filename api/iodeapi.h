@@ -19,9 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-extern int IodeSetSampleStr(char* str_from, char* str_to);
-extern int IodeSetSample(int from, int to);
-
 
 extern int IodeDeleteObj(char* obj_name, int obj_type);
 extern char *IodeGetCmt(char *name);

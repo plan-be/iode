@@ -13,11 +13,6 @@
  *      int IodeInit()                                | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
  *  
- *    SAMPLE Functions
- *  
- *      int IodeSetSampleStr(char* str_from, char* str_to)               | Set the WS sample from periods as strings
- *      int IodeSetSample(int from, int to)                              | Set the WS sample from integers (yearly only).
- *  
  *    OBJECTS MANIPULATION FUNCTIONS
  *  
  *      int IodeDeleteObj(char* obj_name, int obj_type)                  | Delete the object obj_name of type obj_type.
@@ -149,60 +144,6 @@ int IodeEnd()
     
     return(0);
 }
-
-
-// ----------------
-// SAMPLE Functions
-// ----------------
-
-
-/**
- * Set the WS sample from periods as strings
- */
-int IodeSetSampleStr(char* str_from, char* str_to)
-{
-    SAMPLE  *smpl;
-    int     rc;
-    
-    //printf("Setting sample to %s-%s: ", str_from, str_to);
-    smpl = PER_atosmpl(str_from, str_to);
-    if(smpl) {
-        rc = KV_sample(KV_WS, smpl);
-        //printf("done. rc = %d\n", rc);
-        SW_nfree(smpl);
-        //printf("Sample re-set to %s-%s\n", str_from, str_to);
-        return(rc);
-    }    
-    //printf("error\n");
-    return(-1); 
-}
-
-/**
- * Set the WS sample from integers (yearly only).
- */
-int IodeSetSample(int from, int to)
-{
-    char    afrom[64];
-    char    ato[64];
-    SAMPLE  *smpl;
-    int     rc;
-    
-    sprintf(afrom, "%dY1", from);
-    sprintf(ato,   "%dY1", to);
-    printf("Setting sample to %s-%s: ", afrom, ato);
-    smpl = PER_atosmpl(afrom, ato);
-    if(smpl) {
-        rc = KV_sample(KV_WS, smpl);
-        printf("done. rc = %d\n", rc);
-        SW_nfree(smpl);
-        printf("Sample re-set to %s-%s\n", afrom, ato);
-        return(rc);
-    }    
-    printf("error\n");
-    return(-1); 
-}
-
-// End of SAMPLE
 
 
 // -------------------------------
