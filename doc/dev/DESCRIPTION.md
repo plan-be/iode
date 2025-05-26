@@ -783,23 +783,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|**OBJECTS MANIPULATION FUNCTIONS**||
-|` int IodeDeleteObj(char* obj_name, int obj_type)`|Delete the object obj\_name of type obj\_type.|
-|` char *IodeGetCmt(char *name)`|Return a pointer to the comment "name". The pointer cannot be freed.|
-|` int IodeSetCmt(char *name, char *cmt)`|Save a the comment cmt under the name "name".|
-|` int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sample_to, char**blk, char**instr, float *tests)`|Retrieve an equation and its elements.|
-|` char *IodeGetEqsLec(char *name)`|Retrieve the (non allocated) LEC form of the equation "name".|
-|` int IodeSetEqs(char *name, char *eqlec)`|Change the LEC form of an equation.|
-|` char *IodeGetIdt(char *name)`|Return the (non allocated) pointer to an identity.|
-|` int IodeSetIdt(char *name, char *idt)`|Set the LEC form of an identity.|
-|` char *IodeGetLst(char *name)`|Return the (non allocated) pointer to a list.|
-|` int IodeSetLst(char *name, char *lst)`|Set a list value.|
-|` int IodeGetScl(char *name, double* value, double *relax, double *std_err)`|Change the values of an existing scalar. Return \-1 if the scalar does not exist.|
-|` int IodeSetScl(char *name, double value, double relax, double std)`|Set the values of a scalar. The scalar is created if it does not exist.|
-|` char* IodeGetTbl(char *name, char *gsmpl)`|Compute a table on the GSAMPLE gsmpl and return a string containing the result.|
-|` char* IodeGetTblTitle(char *name)`|Return a table (first) title in an not allocated string.|
-|` TBL* IodeGetTblDefinition(char *name)`|Return a table struct|
-|` int IodeSetTblFile(int ref, char *filename)`|Load the var file filename and set its reference number to ref.|
 |**ESTIMATION**||
 |` int IodeEstimate(char* veqs, char* afrom, char* ato)`|Estimate an equation of a given sample.|
 |**SIMULATION**||
