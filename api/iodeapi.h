@@ -18,9 +18,6 @@ extern "C" {
 
 extern int IodeInit();
 extern int IodeEnd();
-                         
-extern int IodeExecArgs(char *filename, char **args);
-extern int IodeExec(char *filename);
 
 extern double IodeExecLecT(char* lec, int t);
 extern double *IodeExecLec(char* lec);
