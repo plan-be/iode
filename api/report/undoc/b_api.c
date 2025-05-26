@@ -12,11 +12,7 @@
  *  -----------------
  *      int IodeInit()                                | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
- *  
- *   ESTIMATION
- *  
- *      int IodeEstimate(char* veqs, char* afrom, char* ato)             | Estimate an equation of a given sample. 
- *  
+ *   
  *   SIMULATION
  *  
  *      int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug) | Simulate a model.
@@ -120,20 +116,7 @@ int IodeEnd()
     ODE_INIFILE = 0;
     
     return(0);
-}
-
-
-// --------------------
-// ESTIMATION FUNCTIONS
-// --------------------
-
-// Estimate an equation of a given sample. 
-// Only defined to standardize the API functions
-// TODO: add all estimation parameters
-int IodeEstimate(char* veqs, char* afrom, char* ato)
-{
-    return(KE_estim(veqs, afrom, ato));
-}    
+}   
 
 
 // --------------------

@@ -783,8 +783,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|**ESTIMATION**||
-|` int IodeEstimate(char* veqs, char* afrom, char* ato)`|Estimate an equation of a given sample.|
 |**SIMULATION**||
 |` int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug)`|Simulate of model.|
 |**REPORTS**||
