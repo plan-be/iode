@@ -434,6 +434,8 @@ keyboard_shortcuts.*
 *.csv
 *.a2m
 
+**/*.dbg
+
 imported*
 exported*
 generate_stub_files.py
@@ -520,4 +522,3 @@ generate_stub_files.py
 !/tests/cli/*.rep
 !/tests/data/*.rep
 !/tests/data/reports/*.rep
-pyiode/source_code.py
