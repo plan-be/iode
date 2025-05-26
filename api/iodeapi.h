@@ -19,24 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-
-extern int IodeDeleteObj(char* obj_name, int obj_type);
-extern char *IodeGetCmt(char *name);
-extern int IodeSetCmt(char *name, char *cmt);
-extern int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sample_to, char**blk, char**instr, float *tests);
-extern char *IodeGetEqsLec(char *name);
-extern int IodeSetEqs(char *name, char *eqlec);
-extern char *IodeGetIdt(char *name);
-extern int IodeSetIdt(char *name, char *idt);
-extern char *IodeGetLst(char *name);
-extern int IodeSetLst(char *name, char *lst);
-extern int IodeGetScl(char *name, double* value, double *relax, double *std_err);
-extern int IodeSetScl(char *name, double value, double relax, double std);
-extern char* IodeGetTbl(char *name, char *gsmpl);
-extern char* IodeGetTblTitle(char *name);
-extern TBL* IodeGetTblDefinition(char *name);
-extern int IodeSetTblFile(int ref, char *filename);
-
 extern int IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace);
 
 extern int IodeEstimate(char* veqs, char* afrom, char* ato);
