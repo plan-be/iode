@@ -784,7 +784,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
 |**SAMPLE Functions**||
-|` char *IodeGetSampleAsString()`|Returns current sample in an ALLOCATED string in the form "per1 per2".|
 |` char **IodeGetSampleAsPeriods()`|Return all periods of the current KV\_WS sample in a table of strings.|
 |` char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to)`|Return all periods from aper\_from to aper\_to in a table of strings.|
 |` double *IodeGetSampleAsDoubles(int *lg)`|Return a sample as a list of doubles.|
