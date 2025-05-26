@@ -783,8 +783,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|**WS related functions**||
-|` char **IodeContents(char *pattern, int type)`|Returns a table of object names corresponding to the specified pattern.|
 |**SAMPLE Functions**||
 |` int IodeGetSampleLength()`|Returns the current sample length (0 if undefined)|
 |` int IodeIsSampleSet()`|Indicates if the VAR sample is defined|

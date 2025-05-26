@@ -13,10 +13,6 @@
  *      int IodeInit()                                | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
  *  
- *    WS related functions
- *      
- *      char **IodeContents(char *pattern, int type)  | Returns a table of object names corresponding to the specified pattern.
- *  
  *    SAMPLE Functions
  *  
  *      int IodeGetSampleLength()                     | Returns the current sample length (0 if undefined)
@@ -158,24 +154,6 @@ int IodeEnd()
     ODE_INIFILE = 0;
     
     return(0);
-}
-
-
-// --------------------
-// WS related functions
-// --------------------
-
-
-/**
- *  Returns a table of object names corresponding to the specified pattern.
- *  
- *  @param [in] pattern char*   object name pattern (may include * or ?)
- *  @param [in] type    int     workspace type to be searched
- *  @return             char**  table of object names or NULL if no objects found
- */
-char **IodeContents(char *pattern, int type)
-{
-    return(K_grep(K_WS[type], pattern, 0, 1, 0, 0, '*'));
 }
 
 
