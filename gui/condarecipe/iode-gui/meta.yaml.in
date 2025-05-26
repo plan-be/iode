@@ -8,7 +8,7 @@ package:
 source:
   # --- build from PyPI ---
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/iode_gui-{{ version }}.tar.gz
-  sha256: cb0249f4e74585ba5af220cf10b3e8b1a955ae04e4b6732e83362dbea33fac74
+  sha256: 57d904d2e08701c6b249ac3e8b2b5a1845fd65e85ec7773c0623bfc97c3aba4f
   
   # --- build from git repository ---
   # git_url: https://github.com/plan-be/iode.git
