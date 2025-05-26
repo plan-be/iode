@@ -35,9 +35,6 @@ extern void kmsg_null(const char* msg);
 extern void IodeSuppressMsgs();
 extern void IodeResetMsgs();
 
-extern int IodeSetNbDec(int nbdec);
-extern int IodeGetNbDec();
-
 #ifdef SCRCPP
 }
 #endif

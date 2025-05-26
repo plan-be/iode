@@ -10,19 +10,14 @@
  *  
  *  List of functions
  *  -----------------
- *      int IodeInit()                                | Initialise an IODE session.
- *      int IodeEnd()                                 | Terminate an IODE session.
+ *      int IodeInit()              | Initialise an IODE session.
+ *      int IodeEnd()               | Terminate an IODE session.
  *   
  *   MESSAGES
  *  
- *      void IodeSuppressMsgs()                                          | Suppress all messages from the A2M interpretor and from the IODE functions.
- *      void IodeResetMsgs()                                             | Reset the messages from the A2M interpretor and from the IODE functions.
- *  
- *   MISCELLANEOUS
- *  
- *      int IodeSetNbDec(int nbdec)                                      | Define the number of decimals in the tables and variables to be printed.
- *      int IodeGetNbDec()                                               |  Returns the number of decimals currently set for the printing of tables and variables.
- *  
+ *      void IodeSuppressMsgs()     | Suppress all messages from the A2M interpretor and from the IODE functions.
+ *      void IodeResetMsgs()        | Reset the messages from the A2M interpretor and from the IODE functions.
+ *   
  */
  
 #include "iode.h"
@@ -164,30 +159,3 @@ void IodeResetMsgs()
     kmsg_toggle(1);
     A2mMessage_toggle(1);
 }   
-
-// --------------
-// MISC FUNCTIONS
-// --------------
-
-/**
- *  Define the number of decimals in the tables and variables to be printed.
- *  
- *  @param [in] nbdec   int   new nb of decimals
- */
-int IodeSetNbDec(int nbdec)
-{
-    K_NBDEC = nbdec; // JMP 18-04-2022
-    return(0);
-}
-
-/**
- *  Returns the number of decimals currently set for the printing of tables and variables.
- *  
- *  @param [in] nbdec   int   new nb of decimals
- */
-int IodeGetNbDec()
-{
-    return(K_NBDEC);    // JMP 18-04-2022
-}
-
-
