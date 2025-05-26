@@ -87,7 +87,7 @@ jobs:
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           - name: Configure Conda
-            uses: conda-incubator/setup-miniconda@v2
+            uses: conda-incubator/setup-miniconda@v3
             with:
               # channels: conda-forge, defaults
               python-version: "3.${{ matrix.python-minor-version }}"
