@@ -15,7 +15,6 @@
  *  
  *    WS related functions
  *      
- *      int IodeClearAll()                            | Clear all workspaces.
  *      char **IodeContents(char *pattern, int type)  | Returns a table of object names corresponding to the specified pattern.
  *  
  *    SAMPLE Functions
@@ -165,22 +164,6 @@ int IodeEnd()
 // --------------------
 // WS related functions
 // --------------------
-
-
-/**
- *  Clear all workspaces.
- *  
- *  @return          int    always 0
- */
-int IodeClearAll()
-{
-    int type;
-
-    for(type = COMMENTS; type <= VARIABLES; type++)
-        K_clear(K_WS[type]);
-    
-    return(0);
-}
 
 
 /**
