@@ -783,7 +783,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|`char *IodeVersion()`|Return the IODE version in a const string.|
 |**WS related functions**||
 |` int IodeLoad(char *name, int type)`|Return the IODE version in a const string.|
 |` int IodeSave(char *name, int type)`|Load an IODE workspace file.|

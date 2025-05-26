@@ -12,7 +12,6 @@
  *  -----------------
  *      int IodeInit()                                | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
- *      char *IodeVersion()                           | Return the IODE version in a const string.
  *  
  *    WS related functions
  *        
@@ -163,16 +162,6 @@ int IodeEnd()
     ODE_INIFILE = 0;
     
     return(0);
-}
-
-/**
- *  Return the IODE version in a const string.
- *  
- *  @return char*  IODE version
- */
-char *IodeVersion()
-{
-   return(IODE_VERSION);
 }
 
 
