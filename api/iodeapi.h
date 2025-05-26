@@ -19,8 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-extern char **IodeContents(char *pattern, int type);
-
 extern int IodeGetSampleLength();
 extern int IodeIsSampleSet();
 extern char *IodeGetSampleAsString();
