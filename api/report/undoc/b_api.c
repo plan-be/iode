@@ -14,8 +14,7 @@
  *      int IodeEnd()                                 | Terminate an IODE session.
  *  
  *    WS related functions
- *        
- *      int IodeSave(char *name, int type)            | Load an IODE workspace file.
+ *      
  *      int IodeClearWs(int type)                     | Clear a workspace.
  *      int IodeClearAll()                            | Clear all workspaces.
  *      char **IodeContents(char *pattern, int type)  | Returns a table of object names corresponding to the specified pattern.
@@ -167,19 +166,6 @@ int IodeEnd()
 // --------------------
 // WS related functions
 // --------------------
-
-
-/**
- *  Save an IODE workspace in a binary file.
- *  
- *  @param [in] name    char*   filename
- *  @param [in] type    int     object type
- *  @return             int     return value of B_WsSave()
- */
-int  IodeSave(char *name, int type)
-{
-    return(B_WsSave(name, type));
-}
 
 
 /**
