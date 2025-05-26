@@ -135,12 +135,4 @@ public:
 
     void model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name = "_PRE", 
         const std::string& inter_name = "_INTER", const std::string& post_name = "_POST");
-
-    // TODO: add the functions below (giving simulation/reordering informations (see b_api.c)
-    //  double IodeModelSimNorm(char* period); 
-    //  int IodeModelSimNIter(char* period);
-    //  int IodeModelSimCpu(char* period);
-    // TODO: consider adding new fns to return the elapsed time for the last SCC decomposition (KSIM_CPU_SCC) and Reordering (KSIM_CPU_SORT)
-
-
 };
