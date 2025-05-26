@@ -15,8 +15,6 @@
  *  
  *    SAMPLE Functions
  *  
- *      int IodeGetSampleLength()                     | Returns the current sample length (0 if undefined)
- *      int IodeIsSampleSet()                         | Indicates if the VAR sample is defined
  *      char *IodeGetSampleAsString()                 | Returns current sample in an ALLOCATED string in the form "per1 per2".
  *      char **IodeGetSampleAsPeriods()               | Return all periods of the current KV_WS sample in a table of strings.
  *      char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) | Return all periods from aper_from to aper_to in a table of strings.
@@ -160,22 +158,6 @@ int IodeEnd()
 // ----------------
 // SAMPLE Functions
 // ----------------
-
-//  Returns the current sample length (0 if undefined)
-int IodeGetSampleLength()
-{
-    SAMPLE  *smpl;
-
-    smpl = (SAMPLE *) KDATA(K_WS[VARIABLES]);
-    return(smpl->s_nb);
-}
-
-
-//  Indicates if the VAR sample is defined
-int IodeIsSampleSet()
-{
-    return(IodeGetSampleLength() != 0);
-}
 
 
 /**
