@@ -18,7 +18,6 @@ extern "C" {
 
 extern int IodeInit();
 extern int IodeEnd();
-extern char *IodeVersion();
 
 extern int IodeLoad(char *name, int type);
 extern int IodeSave(char *name, int type);
