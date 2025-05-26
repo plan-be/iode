@@ -19,7 +19,6 @@ extern "C" {
 extern int IodeInit();
 extern int IodeEnd();
 
-extern char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to);
 extern double *IodeGetSampleAsDoubles(int *lg);
 extern int IodeSetSampleStr(char* str_from, char* str_to);
 extern int IodeSetSample(int from, int to);
