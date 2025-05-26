@@ -15,7 +15,6 @@
  *  
  *    SAMPLE Functions
  *  
- *      char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) | Return all periods from aper_from to aper_to in a table of strings.
  *      double *IodeGetSampleAsDoubles(int *lg)                          | Return a sample as a list of doubles.
  *      int IodeSetSampleStr(char* str_from, char* str_to)               | Set the WS sample from periods as strings
  *      int IodeSetSample(int from, int to)                              | Set the WS sample from integers (yearly only).
@@ -156,34 +155,6 @@ int IodeEnd()
 // ----------------
 // SAMPLE Functions
 // ----------------
-
-
-/**
- *  Return all periods from aper_from to aper_to in a table of strings.
- *  
- *  @return  char** allocated table of char* 
- *    
- *  @param [in] aper_from char*     starting period
- *  @param [in] aper_to   char*     ending period
- *  @return               char**    list of periods {"1990Y1", "1991Y1"..., NULL}
- */
-char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
-{
-    SAMPLE  *smpl;
-    char    **periods;
-    PERIOD	*per_t;
-    int		t;
-
-    smpl = PER_atosmpl(aper_from, aper_to);
-    if(smpl == NULL || smpl->s_nb == 0) return(NULL);
-    periods = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
-	for(t = 0;  t < smpl->s_nb; t++) {
-        per_t = PER_addper(&(smpl->s_p1), t);
-        periods[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
-	}
-    SW_nfree(smpl);
-    return(periods);
-}
 
 
 /**
