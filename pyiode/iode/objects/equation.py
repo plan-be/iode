@@ -1192,54 +1192,10 @@ class Equation:
         return copied_eq
 
     def __str__(self) -> str:
-        sample = self.sample
-        tests = self.tests
-        indent = " " * len("Equation(")
-
-        s = [f"endogenous = {self.endogenous}"]
-        s += [f"lec = {self.lec}"]
-        s += [f"method = {self.method}"]
-        if len(sample):
-            s+= [f"sample = {sample}"]
-        if self.comment:
-            s += [f"comment = {self.comment}"]
-        if self.block:
-            s += [f"block = {self.block}"]
-        if self.instruments:
-            s += [f"instruments = {self.instruments}"]
-        if tests['corr'] > 0.0:
-            indent_tests = " " * len("tests = ")
-            s += ["tests = " + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
-                                for key, value in self.tests.items())]
-        if self.date:
-            s += [f"date = {self.date}"]
-
-        return "Equation(" + f",\n{indent}".join(s) + ")"
+        return self._cython_instance._str_()
 
     def __repr__(self) -> str:
-        sample = self.sample
-        tests = self.tests
-        indent = " " * len("Equation(")
-
-        s = [f"endogenous = {repr(self.endogenous)}"]
-        s += [f"lec = {repr(self.lec)}"]
-        s += [f"method = {repr(self.method)}"]
-        if len(sample):
-            s+= [f"from_period = '{sample.start}'", f"to_period = '{sample.end}'"]
-        if self.comment:
-            s += [f"comment = {repr(self.comment)}"]
-        if self.block:
-            s += [f"block = {repr(self.block)}"]
-        if self.instruments:
-            s += [f"instruments = {repr(self.instruments)}"]
-        if tests['corr'] > 0.0:
-            indent_tests = " " * len("tests = {")
-            s += ["tests = {" + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
-                                for key, value in self.tests.items()) + "}"]
-        if self.date:
-            s += [f"date = {repr(self.date)}"]
-
-        return "Equation(" + f",\n{indent}".join(s) + ")" 
+        return self._cython_instance._repr_()
 
     def __hash__(self) -> int:
         return self._cython_instance.__hash__()
