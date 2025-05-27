@@ -19,16 +19,19 @@ cdef class Equation:
     cdef bint ptr_owner
     cdef CEquation* c_equation
     cdef CKDBEquations* c_database
+    cdef bint lock              # prevent extract_eq_from_database() to be executed
 
     def __cinit__(self):
         self.ptr_owner = False
         self.c_database = NULL
         self.c_equation = NULL
+        self.lock = False
 
     def __init__(self, endogenous: str, lec: str, from_period: str, to_period: str, comment: str, 
                  instruments: str, block: str) -> Equation:
         self.ptr_owner = <bint>True
         self.c_database = NULL
+        self.lock = False
         self.c_equation = new CEquation(endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
                                         to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
 
@@ -37,6 +40,7 @@ cdef class Equation:
             del self.c_equation
             self.c_equation = NULL
             self.c_database = NULL
+            self.lock = False
 
     cdef void update_owner_database(self):
         if self.c_database is not NULL:
@@ -46,6 +50,8 @@ cdef class Equation:
         # if c_equation belongs to a database, we need to (re)extract it from the database 
         # every time we need to access one of its properties since processes like estimation
         # can modify the equation
+        if self.lock:
+            return
         if self.c_database is not NULL:
             if self.ptr_owner and self.c_equation is not NULL:
                 del self.c_equation
@@ -213,6 +219,66 @@ cdef class Equation:
     def equal(self, other: Equation) -> bool:
         self.extract_eq_from_database()
         return self.c_equation == other.c_equation
+
+    def _str_(self) -> str:
+        self.extract_eq_from_database()
+        self.lock = True  # prevent extract_eq_from_database() to be executed
+
+        sample = self.get_sample()
+        tests = self.get_tests()
+        indent = " " * len("Equation(")
+
+        s = [f"endogenous = {self.get_endogenous()}"]
+        s += [f"lec = {self.get_lec()}"]
+        s += [f"method = {self.get_method()}"]
+        if len(sample):
+            s+= [f"sample = {sample}"]
+        if self.get_comment():
+            s += [f"comment = {self.get_comment()}"]
+        if self.get_block():
+            s += [f"block = {self.get_block()}"]
+        if self.get_instruments():
+            s += [f"instruments = {self.get_instruments()}"]
+        if tests['corr'] > 0.0:
+            indent_tests = " " * len("tests = ")
+            s += ["tests = " + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+                                for key, value in self.get_tests().items())]
+        if self.get_formated_date('dd-mm-yyyy'):
+            s += [f"date = {self.get_formated_date('dd-mm-yyyy')}"]
+
+        s = "Equation(" + f",\n{indent}".join(s) + ")"
+        self.lock = False  # allow extract_eq_from_database() to be executed again
+        return s
+
+    def _repr_(self) -> str:
+        self.extract_eq_from_database()
+        self.lock = True  # prevent extract_eq_from_database() to be executed
+
+        sample = self.get_sample()
+        tests = self.get_tests()
+        indent = " " * len("Equation(")
+
+        s = [f"endogenous = {repr(self.get_endogenous())}"]
+        s += [f"lec = {repr(self.get_lec())}"]
+        s += [f"method = {repr(self.get_method())}"]
+        if len(sample):
+            s+= [f"from_period = '{sample.get_start()}'", f"to_period = '{sample.get_end()}'"]
+        if self.get_comment():
+            s += [f"comment = {repr(self.get_comment())}"]
+        if self.get_block():
+            s += [f"block = {repr(self.get_block())}"]
+        if self.get_instruments():
+            s += [f"instruments = {repr(self.get_instruments())}"]
+        if tests['corr'] > 0.0:
+            indent_tests = " " * len("tests = {")
+            s += ["tests = {" + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+                                for key, value in self.get_tests().items()) + "}"]
+        if self.get_formated_date('dd-mm-yyyy'):
+            s += [f"date = {repr(self.get_formated_date('dd-mm-yyyy'))}"]
+
+        s = "Equation(" + f",\n{indent}".join(s) + ")" 
+        self.lock = False  # allow extract_eq_from_database() to be executed again
+        return s
 
     def __hash__(self) -> int:
         self.extract_eq_from_database()
