@@ -159,6 +159,7 @@ class Variables(IodeDatabase):
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
         instance._cython_instance = CythonVariables()
+        instance = cls._get_instance(instance)
         return instance
 
     def _get_periods_bounds(self) -> Tuple[int, int]:
@@ -206,6 +207,7 @@ class Variables(IodeDatabase):
         cython_last_period = last_period._cython_instance if last_period is not None else None
         instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy, 
                                                                             cython_first_period, cython_last_period)
+        instance = self._subset_(instance, copy)
         return instance
 
     def copy(self, pattern: str=None) -> Self:
@@ -2010,6 +2012,9 @@ class Variables(IodeDatabase):
         if key_periods is not None:
             raise RuntimeError("Cannot select period(s) when deleting (a) variable(s)")
         self._cython_instance.remove_objects(names)
+        for subsets in self.list_subsets:
+            names_subset = [name for name in names if name in subsets]
+            subsets._cython_instance.remove_entries(names_subset)
 
     def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Self], 
                       op: BinaryOperation, copy_self: bool) -> Self:

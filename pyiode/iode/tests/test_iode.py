@@ -192,6 +192,25 @@ def test_type_copy_iode_objects():
     table_C8_1 = tables["C8_1"]
     assert isinstance(table_C8_1.copy(), Table)
 
+def test_database_delete():
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    cmt_subset = comments["A*"]
+    var_subset = variables["A*"]
+
+    # delete a comment
+    del comments["AOUC"]
+    assert "AOUC" not in comments
+    assert "AOUC" not in cmt_subset
+    assert comments.get_names("A*") == cmt_subset.names
+
+    # delete a variable
+    del variables["AOUC"]
+    assert "AOUC" not in variables
+    assert "AOUC" not in var_subset
+    assert variables.get_names("A*") == var_subset.names
+
 # Equations
 # ---------
 

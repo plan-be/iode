@@ -66,6 +66,7 @@ class Tables(IodeDatabase):
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
         instance._cython_instance = CythonTables()
+        instance = cls._get_instance(instance)
         return instance
 
     def _load(self, filepath: str):
@@ -74,6 +75,7 @@ class Tables(IodeDatabase):
     def _subset(self, pattern: str, copy: bool) -> Self:
         instance = Tables.get_instance()
         instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        instance = self._subset_(instance, copy)
         return instance
 
     def get_title(self, key: Union[str, int]) -> str:
