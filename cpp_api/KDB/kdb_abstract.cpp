@@ -283,6 +283,26 @@ void KDBAbstract::remove(const std::string& name)
     }
 }
 
+// remove only the entry (= handle) at the given position, not the object in memory
+void KDBAbstract::remove_entry(const int pos)
+{
+    // throw exception if object with passed position is not valid
+    std::string name = get_name(pos);
+    remove_entry(name);
+}
+
+// remove only the entry (= handle) at the given position, not the object in memory
+void KDBAbstract::remove_entry(const std::string& name)
+{
+    // throw exception if object with passed name does not exist
+    int pos = get_position(name);
+    if(pos < 0) 
+        return;
+
+    KDB* kdb = get_database();
+    K_del_entry(kdb, pos);
+}
+
 // Other methods
 
 void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
