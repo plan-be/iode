@@ -170,6 +170,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         int rename(string& old_name, string& new_name) except +
         bool contains(string& name) except +
         void remove(string& name) except +
+        void remove_entry(string& name) except +
 
         void merge(KDBAbstract& other, bool overwrite) except +
         void copy_from(string& input_file, string& objects_names) except +

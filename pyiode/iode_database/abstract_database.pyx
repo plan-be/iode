@@ -180,3 +180,7 @@ cdef class CythonIodeDatabase:
     def remove_objects(self, names: List[str]):
         for name in names:
             self.abstract_db_ptr.remove(name.encode())
+
+    def remove_entries(self, names: List[str]):
+        for name in names:
+            self.abstract_db_ptr.remove_entry(name.encode())
