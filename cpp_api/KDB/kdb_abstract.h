@@ -172,6 +172,10 @@ public:
 
     void remove(const std::string& name);
 
+    void remove_entry(const int pos);
+
+    void remove_entry(const std::string& name);
+
     // Other methods
 
     void merge(const KDBAbstract& other, const bool overwrite=true);
