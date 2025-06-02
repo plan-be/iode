@@ -12,6 +12,7 @@ Contents
 
    install
    introduction
+   lec_language
    tutorial
    api
    equivalence
