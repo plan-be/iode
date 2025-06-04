@@ -44,35 +44,35 @@ class TableCell:
 
     If one expression is not followed by a number, then the value 1 is used for the number.
 
-    The expressions can contain:
+    The expressions can contain::
 
-    Syntax          Meaning                     Example
-    ---------------------------------------------------
-    #y1 or #y2      year of column              80
-    #Y1 or #Y2      year of column              1980
-    #p              periodicity                 q
-    #P              periodicity                 Q
-    #M1 or #M2      sub-period  Monthly         February
-                                Quarterly       IV
-                                Yearly          -
-                                Other           52
-    #m1 or #m2      sub-period  Monthly         Feb
-                                Quarterly       iv
-                                Annual          -
-                                Other           52
-    #r1 or #r2      sub-period  Monthly         ix
-                                Quarterly       iv
-                                Yearly          -
-                                Other           52
-    #R1 or #R2      sub-period  Monthly         IX
-                                Quarterly       IV
-                                Yearly          -
-                                Other           52
-    #n1 or #n2      sub-period                  7
-    #N1 or #N2      sub-period                  11
-    #o              period transaction          /
-    #O              period operation            Growth Rates
-    #F or #F        files used                  [1-2]
+        Syntax          Meaning                     Example
+        ---------------------------------------------------
+        #y1 or #y2      year of column              80
+        #Y1 or #Y2      year of column              1980
+        #p              periodicity                 q
+        #P              periodicity                 Q
+        #M1 or #M2      sub-period  Monthly         February
+                                    Quarterly       IV
+                                    Yearly          -
+                                    Other           52
+        #m1 or #m2      sub-period  Monthly         Feb
+                                    Quarterly       iv
+                                    Annual          -
+                                    Other           52
+        #r1 or #r2      sub-period  Monthly         ix
+                                    Quarterly       iv
+                                    Yearly          -
+                                    Other           52
+        #R1 or #R2      sub-period  Monthly         IX
+                                    Quarterly       IV
+                                    Yearly          -
+                                    Other           52
+        #n1 or #n2      sub-period                  7
+        #N1 or #N2      sub-period                  11
+        #o              period transaction          /
+        #O              period operation            Growth Rates
+        #F or #F        files used                  [1-2]
 
     For the ease of writing, the following macros are defined::
 
@@ -747,18 +747,62 @@ class TableLine:
 
 class Table:
     r"""
-    IODE tables are objects designed to present variables and scalars (results or data) in the
-    form of tables of figures or graphs. They are defined as a set of lines of various types
-    (title, formula, dividers, etc.). These lines contain formulas that will be calculated when 
-    printed, based on the values in the series, for example after a simulation. 
-    IODE tables therefore do not contain numbers, but rather the formulas that will be used to calculate 
-    the values to be printed in the tables.
+    One of the most frequently performed operations during a simulation exercise 
+    is the display of tables of results and charts. 
+
+    Each IODE *table* is a set of lines. A line is composed of two parts (in general):
+
+    - a *text* part, which will be the title of the line
+    - a *formula* part, which will allow the calculation of the numerical values 
+      to be placed in the *computed table*::
+
+        TABLE TITLE    
+        -----------    
+        Gross National Product      GNP    
+        Unemployment                UL    
+        External Balance            X-I
+
+        
+    The lines are actually of several types: 
+
+    - *TITLE* lines (centered on the page width), 
+    - *CELL* lines (title + formula), 
+    - *SEPARATOR* lines
+    - *MODE* lines
+    - *FILES* lines
+    - *DATE* lines
+
+    A table is designed to be "*computed*" over different periods, described by a 
+    "*generalized sample*" such as::
+
+        1980Y1:10               --> 10 observations from 1980Y1
+        1980Y1, 1985Y1, 1990:5  --> 1980, 1985, then 5 observations from 1990Y1
+        80/79:5                 --> 5 growth rates from 1980
+        ...
+
+
+    It can also contain values from different files::
+
+        (1990:5)[1,2,1-2]   --> values from 1990 to 1994 for files
+                                1, 2, and for the difference between the two files.
+
+
+    The *computed table* can be:
+
+    - displayed on screen
+    - printed
+    - exported as a chart
+    - exported to a file (in CSV, HTML, ...)
+    - (Python) converted to a Pandas DataFrame or an larray Array
+
+    *Tables* can very well be used in a project that does not include an econometric model: 
+    the only information used by tables are *variables* and possibly *scalars*.
 
     Each line in a table has a set of attributes, the most important of which is its type. 
-    This type determines how the line will be printed, and the possible contents of the line definition. 
-    The other attributes concern the type of characters to be used when printing and the framing of the line. 
-    The table also contains graphic attributes that concern the layout of the graphic that will eventually 
-    be built with this table. 
+    This type determines how the line will be printed, and the possible contents of the 
+    line definition. The other attributes concern the type of characters to be used when 
+    printing and the framing of the line. The table also contains graphic attributes that 
+    concern the layout of the graphic that will eventually be built with this table. 
 
     Attributes
     ----------

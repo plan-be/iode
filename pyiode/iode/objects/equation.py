@@ -17,7 +17,21 @@ from iode.iode_cython import Equation as CythonEquation
 
 class Equation:
     r"""
-    IODE equation.
+    An *equation* represents an equality mixing *variables* and *scalars* (coefficients) 
+    and is part of a model. Each equation is composed of the following elements:
+
+    - the *LEC* form (the formula scripting language in IODE)
+    - a free comment (title of the equation)
+    - the method by which it was estimated (if applicable)
+    - the possible estimation period
+    - the names of equations estimated simultaneously (block)
+    - the instruments used for the estimation
+
+    All these definition elements are present in each equation, but may be left empty 
+    if not applicable.
+
+    The name of an equation is that of its endogenous variable. 
+    An equation can never be renamed, but it can be deleted and redefined with a new name.
 
     Attributes
     ----------
@@ -352,7 +366,7 @@ class Equation:
         >>> scalars["acaf2"] = 0., 1.
         >>> scalars["acaf4"] = 0., 1.
 
-        >>> # estimate the ACQF equation
+        >>> # estimate the ACAF equation
         >>> success = eq_ACAF.estimate("1980Y1", "1996Y1")
         Estimating : iteration 1 (||eps|| = 0.173205)
         <BLANKLINE>
@@ -368,7 +382,7 @@ class Equation:
         Scalar(-7.96505e-06, 1, 1.48247e-06)
         >>> scalars["acaf4"]
         Scalar(-0.0085027, 1, 0.00208257)
-        >>> equations["ACAF"]                           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> eq_ACAF                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
                 method = 'LSQ',
