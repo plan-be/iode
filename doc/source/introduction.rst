@@ -53,7 +53,7 @@ To avoid the tedious work of re-encoding *lists*, these are managed as standalon
 *Lists* are also used in formulas to shorten writing, or passed as parameters to *IODE functions*, etc.
 
 Each object of one of the seven types is identified by a name of up to 20 characters. 
-They always start with a letter or an underscore '_'. Their are written in lowercase for *scalars* and in uppercase 
+They always start with a letter or an underscore '_'. Their names are written in lowercase for *scalars* and in uppercase 
 for other objects (so as to distinguish *scalars* and *variables* in *LEC* formulas).
 
 Comments
