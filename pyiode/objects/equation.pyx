@@ -13,6 +13,7 @@ from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport B_EqsStepWise
 from pyiode.objects.equation cimport hash_value as hash_value_eq
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
+from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
 
 
 cdef class Equation:
@@ -47,15 +48,17 @@ cdef class Equation:
             self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
 
     cdef void extract_eq_from_database(self):
+        cdef string endo
         # if c_equation belongs to a database, we need to (re)extract it from the database 
         # every time we need to access one of its properties since processes like estimation
         # can modify the equation
         if self.lock:
             return
         if self.c_database is not NULL:
+            endo = self.c_equation.get_endo()
             if self.ptr_owner and self.c_equation is not NULL:
                 del self.c_equation
-            self.c_equation = self.c_database.get(self.c_equation.get_endo())
+            self.c_equation = self.c_database.get(endo)
             self.ptr_owner = True
 
     @staticmethod
@@ -96,7 +99,8 @@ cdef class Equation:
         return lhs.decode(), rhs.decode() 
 
     def estimate(self, from_period: str=None, to_period: str=None) -> bool:
-        self.extract_eq_from_database()
+        cdef CEquation* c_global_equation = NULL
+        cdef string eq_name = self.c_equation.get_endo()
 
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
@@ -106,7 +110,16 @@ cdef class Equation:
                 to_period = c_sample.end_period().to_string().decode()
         
         try:
-            cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
+            # NOTE: In the C API, the estimation is made on equations stored in the global equations workspace. 
+            cpp_eqs_estimate(eq_name, from_period.encode(), to_period.encode())
+            
+            # copy tests values and estimation date from the global equations workspace
+            c_global_equation = cpp_global_equations.get(eq_name)
+            self.c_equation.set_sample(from_period.encode(), to_period.encode())
+            self.c_equation.date = c_global_equation.date
+            memcpy(&self.c_equation.tests, &c_global_equation.tests, EQS_NBTESTS * sizeof(float))
+            del c_global_equation
+            
             return True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
@@ -117,6 +130,8 @@ cdef class Equation:
         cdef bytes b_arg
         cdef char* c_arg = NULL
         cdef int res
+        cdef CEquation* c_global_equation = NULL
+        cdef string eq_name = self.c_equation.get_endo()
         
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
@@ -130,6 +145,15 @@ cdef class Equation:
         c_arg = b_arg
         
         res = B_EqsStepWise(c_arg)
+
+        # copy tests values and estimation date from the global equations workspace
+        if res == 0:
+            c_global_equation = cpp_global_equations.get(eq_name)
+            self.c_equation.set_sample(from_period.encode(), to_period.encode())
+            self.c_equation.date = c_global_equation.date
+            memcpy(&self.c_equation.tests, &c_global_equation.tests, EQS_NBTESTS * sizeof(float))
+            del c_global_equation
+
         return res == 0
 
     def get_endogenous(self) -> str:

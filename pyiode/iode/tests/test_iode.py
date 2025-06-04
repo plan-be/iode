@@ -18,6 +18,7 @@ except ImportError:
 
 import logging
 from pathlib import Path
+from datetime import datetime
 
 # GLOBALS
 SAMPLE_DATA_DIR = Path(SAMPLE_DATA_DIR).absolute()
@@ -48,26 +49,6 @@ def test_sample():
 
     with pytest.raises(TypeError, match=r"Sample.__init__\(\) missing 1 required positional argument: 'start_period'"):
         Sample()
-
-# Iode Objects
-# ------------
-
-# Equation
-# --------
-
-def test_equation():
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-
-    eq_ACAF = equations["ACAF"]
-    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
-    assert round(eq_ACAF.tests["r2"], 10) == 0.8217613697
-    
-    scalars[eq_ACAF.coefficients] = Scalar(0., 1.)
-    eq_ACAF.estimate_step_wise("1980Y1", "1996Y1", "acaf2 > 0", "r2")
-    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
-    assert round(eq_ACAF.tests["r2"], 10) == -0.8659535050
 
 # Iode Databases
 # --------------
@@ -956,6 +937,76 @@ def test_estimation(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert success
+
+    # ======== test step-wise estimation ========
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    scalars.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+    assert eq_ACAF.lec == '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
+    scalars["acaf1"] = 0., 1.
+    scalars["acaf2"] = 0., 1.
+    scalars["acaf4"] = 0., 1.
+    success = eq_ACAF.estimate("1980Y1", "2000Y1") 
+    assert success
+    assert round(scalars["acaf1"].value, 8) == 0.01506459
+    assert round(scalars["acaf1"].std, 8) == 0.00118455
+    assert round(scalars["acaf2"].value, 8) == -6.91e-06
+    assert round(scalars["acaf2"].std, 8) == 1.08e-06
+    assert round(scalars["acaf4"].value, 8) == -0.00915675
+    assert round(scalars["acaf4"].std, 8) == 0.00209541
+    assert str(eq_ACAF.sample) == "1980Y1:2000Y1"
+    assert eq_ACAF.date == datetime.now().strftime("%d-%m-%Y")
+    assert eq_ACAF.tests == equations["ACAF"].tests
+    assert round(eq_ACAF.tests["r2"], 10) == 0.7938754559
+    assert round(eq_ACAF.tests["fstat"], 10) == 34.6629257202
+
+
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    eq_ACAF = equations["ACAF"]
+    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
+    assert str(eq_ACAF.sample) == "1980Y1:1996Y1"
+    assert round(eq_ACAF.tests["r2"], 10) == 0.8217613697
+    assert round(eq_ACAF.tests["fstat"], 10) == 32.2731933594
+
+    scalars[eq_ACAF.coefficients] = Scalar(0., 1.)
+    success = eq_ACAF.estimate("1980Y1", "2000Y1")
+    assert success
+    assert round(scalars["acaf1"].value, 8) == 0.01506459
+    assert round(scalars["acaf1"].std, 8) == 0.00118455
+    assert round(scalars["acaf2"].value, 8) == -6.91e-06
+    assert round(scalars["acaf2"].std, 8) == 1.08e-06
+    assert round(scalars["acaf4"].value, 8) == -0.00915675
+    assert round(scalars["acaf4"].std, 8) == 0.00209541
+    assert str(eq_ACAF.sample) == "1980Y1:2000Y1"
+    assert eq_ACAF.date == datetime.now().strftime("%d-%m-%Y")
+    assert eq_ACAF.tests == equations["ACAF"].tests
+    assert round(eq_ACAF.tests["r2"], 10) == 0.7938754559
+    assert round(eq_ACAF.tests["fstat"], 10) == 34.6629257202
+
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    scalars[eq_ACAF.coefficients] = Scalar(0., 1.)
+    success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1", "acaf2 > 0", "r2")
+    assert success
+    assert round(scalars["acaf1"].value, 8) == 0.0
+    assert round(scalars["acaf1"].std, 8) == 0.0
+    assert round(scalars["acaf2"].value, 8) == 5.77e-06
+    assert round(scalars["acaf2"].std, 8) == 1.27e-06
+    assert round(scalars["acaf4"].value, 8) == -0.0104115
+    assert round(scalars["acaf4"].std, 8) == 0.00643766
+    assert str(eq_ACAF.sample) == "1980Y1:2000Y1"
+    assert eq_ACAF.date == datetime.now().strftime("%d-%m-%Y")
+    assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
+    assert eq_ACAF.tests["fstat"] == equations["ACAF"].tests["fstat"]
+    assert round(eq_ACAF.tests["r2"], 10) == -1.0582152605
+    assert round(eq_ACAF.tests["fstat"], 10) == -9.7687015533
 
 
 # Simulation

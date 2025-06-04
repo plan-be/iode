@@ -301,10 +301,12 @@ class EditAndEstimateEquations:
 
     @sample.setter
     def sample(self, value: Union[str, slice, Tuple[Union[str, Period], Union[str, Period]], Sample]):
+        if value is None:
+            raise ValueError("New sample value cannot be None")
         if isinstance(value, str):
             if ':' not in value:
                 raise ValueError(f"Missing colon ':' in the definition of the estimation sample. "
-                                 f"Got value '{value}'")
+                                 f"Got value '{value}'.")
             from_period, to_period = value.split(':')
         elif isinstance(value, slice):
             sample = self.sample

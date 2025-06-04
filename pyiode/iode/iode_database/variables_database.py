@@ -6135,6 +6135,8 @@ class Variables(IodeDatabase):
         if self._is_subset_over_periods:
             raise RuntimeError("Changing the sample on a subset of the Variables workspace is not allowed.") 
 
+        if value is None:
+            raise ValueError("New sample value cannot be None")
         if isinstance(value, str):
             if ':' not in value:
                 raise ValueError(f"sample: Missing colon ':' in the definition of the new sample. Got value '{value}'.")
