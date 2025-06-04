@@ -14,8 +14,18 @@ from iode.iode_cython import Scalar as CythonScalar
 
 class Scalar:
     r"""
-    IODE Scalars are dimensionless variables defined by a single value. 
-    They can be the estimated coefficients in an equation or constant values over time (relax = 0).
+    *Scalars* are essentially estimated coefficients of econometric *equations*. 
+    For this reason, each scalar contains in its definition:
+
+    - its *value*
+    - the *relaxation* parameter, set to 0 to lock the coefficient during estimation
+    - its *standard deviation*, result of the last estimation
+
+    Only the *values* of the *scalars* are relevant when calculating a *LEC* expression. 
+    The other two values (relaxation and standard deviation) are only meaningful for estimation.
+
+    The names of *scalars* must be in lowercase so that *variables* are distinct 
+    from *scalars* in *LEC* formulas.
 
     Attributes
     ----------

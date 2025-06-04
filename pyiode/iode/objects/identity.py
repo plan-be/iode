@@ -11,13 +11,17 @@ from iode.iode_cython import Identity as CythonIdentity
 
 class Identity:
     r"""
-    IODE Identities are formulas (LEC expressions) used to construct series based on other variables. 
-    The name of an identity is the one of the series that will be built.
+    An *identity* is an expression written in the *LEC* language that allows the construction of a 
+    new statistical series based on already defined series. In general, *identities* are executed
+    in groups to create or update a set of *variables*. *Identities* can be executed for a specific 
+    range of periods, or for all periods defined in the workspace.
+
+    *Identities* should not be confused with *equations*. They are not part of a model.
 
     Parameters
     ----------
     lec: str
-        formula (LEC expression) used to construct a series.
+        formula (*LEC* expression) used to construct a series.
 
     Examples
     --------
