@@ -159,7 +159,19 @@ class Equations(IodeDatabase):
                 method = 'LSQ',
                 from_period = '1980Y1',
                 to_period = '1996Y1',
-                block = 'ACAF')
+                block = 'ACAF',
+                tests = {corr = 1,
+                        dw = 2.32935,
+                        fstat = 32.2732,
+                        loglik = 83.8075,
+                        meany = 0.00818467,
+                        r2 = 0.821761,
+                        r2adj = 0.796299,
+                        ssres = 5.19945e-05,
+                        stderr = 0.00192715,
+                        stderrp = 23.5458,
+                        stdev = 0.0042699},
+                date = '12-06-1998')
         >>> # update last equation
         >>> equations.i[-1] = "ZZF_ := ZZF_[-1] + 1"
         >>> equations.i[-1]             # doctest: +NORMALIZE_WHITESPACE
@@ -402,7 +414,19 @@ class Equations(IodeDatabase):
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
-                 block = 'ACAF')
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
         >>> # update block and sample of a block of equations to estimation (dictionary)
         >>> estim_sample = "2000Y1:2010Y1"
         >>> block = "ACAF; ACAG; AOUC"
@@ -424,7 +448,19 @@ class Equations(IodeDatabase):
                  method = 'MAX_LIKELIHOOD',
                  from_period = '1990Y1',
                  to_period = '2015Y1',
-                 block = 'ACAF')
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
 
         >>> # c) add/update several equations at once        
         >>> # 1) using a dict of values

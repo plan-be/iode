@@ -132,10 +132,6 @@ cdef class Equation:
         res = B_EqsStepWise(c_arg)
         return res == 0
 
-    cdef void reset_date_and_tests(self):
-        self.c_equation.date = 0L
-        memset(&self.c_equation.tests, 0, EQS_NBTESTS * sizeof(float))
-
     def get_endogenous(self) -> str:
         return self.c_equation.get_endo().decode()
 
@@ -146,7 +142,6 @@ cdef class Equation:
     def set_lec(self, value: str):
         value = value.strip()
         self.c_equation.set_lec(value.encode())
-        self.reset_date_and_tests()
         self.update_owner_database()
 
     def get_method(self) -> str:
@@ -155,7 +150,6 @@ cdef class Equation:
 
     def set_method(self, value: int):
         self.c_equation.set_method(<IodeEquationMethod>(value))
-        self.reset_date_and_tests()
         self.update_owner_database()
 
     def get_sample(self) -> Sample:
@@ -165,7 +159,6 @@ cdef class Equation:
 
     def set_sample(self, from_period: str, to_period: str):
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
-        self.reset_date_and_tests()
         self.update_owner_database()
 
     def get_comment(self) -> str:
@@ -183,7 +176,6 @@ cdef class Equation:
 
     def set_instruments(self, value: str):
         self.c_equation.set_instruments(value.encode())
-        self.reset_date_and_tests()
         self.update_owner_database()
 
     def get_block(self) -> str:
@@ -192,7 +184,6 @@ cdef class Equation:
 
     def set_block(self, value: str):
         self.c_equation.set_block(value.encode())
-        self.reset_date_and_tests()
         self.update_owner_database()
 
     def get_tests(self) -> Dict[str, float]:
