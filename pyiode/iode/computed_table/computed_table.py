@@ -1,7 +1,7 @@
 import sys
 import warnings
 from pathlib import Path
-from typing import Any, Tuple, List, Union
+from typing import Any, Tuple, List, Dict, Union
 if sys.version_info.minor >= 11:
     from typing import Self
 else:
@@ -19,7 +19,7 @@ except ImportError:
 from iode.time.sample import Sample
 
 from iode.iode_cython import ComputedTable as CythonComputedTable
-from iode.iode_cython import TableGraphGrid, TableGraphAlign, TableGraphAxis
+from iode.iode_cython import TableGraphGrid, TableGraphAlign, TableGraphAxis, TableGraphType
 
 
 class ComputedTable:
@@ -608,162 +608,146 @@ class ComputedTable:
         return self._cython_instance.get_graph_alignment()
 
     @property
-    def nb_plotting_series(self) -> int:
+    def plot_data(self) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
         r"""
-        Number of series to plot.
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Table, tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.tbl
-        46 objects loaded
-        >>> # simple time series (one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
-        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
-        --------------------------------------------------------...----------------------
-        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
-        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
-        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
-        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
-        <BLANKLINE>
-        >>> computed_table.nb_plotting_series
-        8
-        """
-        return self.nb_lines * self.nb_operations_between_files
-
-    def plotting_series_name(self, row: int, op_files: int) -> str:
-        r"""
-        Name of the series to plot. 
-
-        Parameters
-        ----------
-        row : int
-            The row passed as position (int).
-        op_files : int
-            The files operation passed as position (int).
-
-        Returns
-        -------
-        str
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Table, tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.tbl
-        46 objects loaded
-        >>> # simple time series (one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
-        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
-        --------------------------------------------------------...----------------------
-        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
-        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
-        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
-        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
-        <BLANKLINE>
-        >>> computed_table.plotting_series_name(0, 0)
-        'Output potentiel [1]'
-        >>> computed_table.plotting_series_name(2, 1)
-        'Intensité de capital [2]'
-        >>> computed_table.plotting_series_name(3, 0)
-        'Productivité totale des facteurs [1]'
-        """
-        if row >= self.nb_lines:
-            raise ValueError(f"row must be less than {self.nb_lines}")
-        if op_files >= self.nb_operations_between_files:
-            raise ValueError(f"op_files must be less than {self.nb_operations_between_files}")
-
-        return self._cython_instance.plotting_series_name(row, op_files)
-
-    def plotting_series_values(self, row: int, op_files: int) -> Tuple[np.ndarray, np.ndarray]:
-        r"""
-        Get the x and y values of a series to plot.
-
-        Parameters
-        ----------
-        row : int
-            The row of the series to plot.
-        op_files : int
-            The operation between files to plot.
-
-        Returns
-        -------
-        tuple(np.ndarray, np.ndarray)
-            The x and y values of the series to plot.
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Table, tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading .../fun.tbl
-        46 objects loaded
-        >>> # simple time series (one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
-        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
-        --------------------------------------------------------...----------------------
-        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
-        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
-        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
-        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
-        <BLANKLINE>
-        >>> x, y = computed_table.plotting_series_values(0, 0)  
-        >>> x
-        array([ 2010.,  2011.,  2012.,  2013.,  2014.])
-        >>> y           # doctest: +NORMALIZE_WHITESPACE
-        array([ 6936.11201678,  7045.34306763,  7161.54144319,  7302.29025433,
-                7460.11525977])
-        >>> x, y = computed_table.plotting_series_values(2, 1)
-        >>> y           # doctest: +NORMALIZE_WHITESPACE
-        array([ 0.37778214,  0.37005591,  0.36297298,  0.35620692,  0.34945039])
-        >>> x, y = computed_table.plotting_series_values(3, 0)
-        >>> y           # doctest: +NORMALIZE_WHITESPACE
-        array([ 1.09774397,  1.10872141,  1.11980863,  1.13100671,  1.14231678])
-        """
-        if row >= self.nb_lines:
-            raise ValueError(f"row must be less than {self.nb_lines}")
-        if op_files >= self.nb_operations_between_files:
-            raise ValueError(f"op_files must be less than {self.nb_operations_between_files}")
+        Returns a dictionary containing the data to be plotted.
+        The keys are the series names, and the values are tuples containing the x and y data as numpy arrays.
+        The x data corresponds to the periods, and the y data corresponds to the values for each series.
         
-        return self._cython_instance.plotting_series_values(row, op_files)
-
-    @property
-    def plotting_series_names(self) -> List[str]:
-        r"""
-        Names of the series to plot.
-
         Returns
         -------
-        list(str)
+        Dict[str, Tuple[np.ndarray, np.ndarray]]
+            A dictionary where keys are series names and values are tuples of (x_data, y_data).
+        
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables, variables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> series = computed_table.plot_data
+        >>> x_data = series['Output potentiel'][0]
+        >>> f"x_data={x_data.tolist()}"                                 # doctest: +NORMALIZE_WHITESPACE
+        'x_data=[2000.0, 2001.0, 2002.0, 2003.0, 2004.0, 2005.0]'
+        >>> for series_name, (x_data, y_data) in series.items():        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        ...     print(f"{series_name}: y_data={np.round(y_data, 6).tolist()}")
+        Output potentiel: y_data=[5495.212782, 5627.858893, ..., 5966.199911, 6103.631844]
+        Stock de capital: y_data=[8083.551748, 8359.890816, ..., 9175.810569, 9468.886506]
+        Intensité de capital: y_data=[0.503166, 0.489608, ..., 0.448077, 0.434914]
+        Productivité totale des facteurs: y_data=[0.993773, 1.003711, ..., 1.034124, 1.044466]
+        """
+        series = {}
+        for row in range(self.nb_lines):
+            for op_files in range(self.nb_operations_between_files):
+                series_name = self._cython_instance.plotting_series_name(row, op_files)
+                x_data, y_data = self._cython_instance.plotting_series_values(row, op_files)
+                series[series_name] = (x_data, y_data)
+        return series
+
+    def plot(self, title: str=None, plot_type: Union[str, TableGraphType]=TableGraphType.LINE, 
+             grid: Union[str, TableGraphGrid]=TableGraphGrid.MAJOR, y_log=False, y_min: float=None, 
+             y_max: float=None, legend: bool=True, show: bool=True):
+        r"""
+        Plot the computed table.
+
+        Parameters
+        ----------
+        title : str, optional
+            The title of the plot. If not provided, no title is set.
+        plot_type : str or TableGraphType, optional
+            The type of plot to create. Options are 'line', 'scatter', or 'bar'. 
+            Default is 'line'.
+        grid : str or TableGraphGrid, optional
+            The type of grid to use in the plot. Options are 'none', 'minor', or 'major'. 
+            Default is 'major'.
+        y_log : bool, optional
+            If True, the Y-axis will be set to a logarithmic scale. 
+            Default is False.
+        y_min : float, optional
+            The minimum value for the Y-axis. If None, the Y-axis will adapt to the data.
+        y_max : float, optional
+            The maximum value for the Y-axis. If None, the Y-axis will adapt to the data.
+        legend : bool, optional
+            If True, a legend will be displayed on the plot. 
+            Default is True.
+        show : bool, optional
+            If True, the plot will be displayed immediately. 
+            If False, the plot will not be shown until `plt.show()` is called.
+            Default is True.
+            
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+            The matplotlib figure containing the plot of the computed table.
 
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Table, tables
+        >>> from iode import Table, tables, variables
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
-        46 objects loaded
-        >>> # simple time series (one extra file) - 5 observations
-        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5")
-        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-           line title \ period[file]     |  10[1]   |  10[2]   |...|  14[1]   |  14[2]
-        --------------------------------------------------------...----------------------
-        Output potentiel                 |  6936.11 |  6797.39 |...|  7460.12 |  7310.91
-        Stock de capital                 | 11293.85 | 11067.97 |...| 12263.95 | 12018.67
-        Intensité de capital             |     0.39 |     0.38 |...|     0.36 |     0.35
-        Productivité totale des facteurs |     1.10 |     1.08 |...|     1.14 |     1.12
-        <BLANKLINE>
-        >>> computed_table.plotting_series_names                # doctest: +ELLIPSIS
-        ['Output potentiel [1]', ..., 'Productivité totale des facteurs [2]']
+        46 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+
+        >>> # simple time series (current workspace) - 6 observations
+        >>> computed_table = tables["C8_1"].compute("2000:6")
+        >>> ax = computed_table.plot()                         # doctest: +SKIP
         """
-        return [self.plotting_series_name(row, fileop) for row in range(self.nb_lines) 
-                for fileop in range(self.nb_operations_between_files)]
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Matplotlib is required for plotting. Please install it.")
+
+        if isinstance(plot_type, str):
+            plot_type = TableGraphType[plot_type.upper()]
+        if isinstance(grid, str):
+            grid = TableGraphGrid[grid.upper()]
+         
+        fig, ax = plt.subplots()
+        ax.set_xlabel('periods')
+        ax.set_ylabel('values')
+        if title:
+            ax.set_title(title)
+
+        series = self.plot_data
+        for series_name, (x_data, y_data) in series.items():
+            if plot_type == TableGraphType.LINE:
+                ax.plot(x_data, y_data, label=series_name)
+            elif plot_type == TableGraphType.SCATTER:
+                ax.scatter(x_data, y_data, label=series_name)
+            elif plot_type == TableGraphType.BAR:
+                ax.bar(x_data, y_data, width=0.1, label=series_name)
+        
+        if y_log:
+            ax.set_yscale('log')
+
+        ax.set_ylim(y_min, y_max)
+        
+        if grid == TableGraphGrid.NONE:
+            ax.grid(False)
+        elif grid == TableGraphGrid.MINOR:
+            ax.grid(True, which='minor', linestyle=':', linewidth=0.5)
+        elif grid == TableGraphGrid.MAJOR:
+            ax.grid(True, which='major', linestyle='-', linewidth=0.75)
+
+        if legend:
+            # Legend outside
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))  
+
+        plt.tight_layout()
+        if show:
+            plt.show()
+        
+        return ax
 
     def is_editable(self, row: Union[int, str], column: Union[int, str]) -> bool:
         r"""

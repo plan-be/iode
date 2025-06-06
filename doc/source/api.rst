@@ -427,6 +427,8 @@ Properties and methods specific to Variables
    Variables.from_array
    Variables.to_array
 
+   Variables.plot
+
    Variables.convert_file
    Variables.export_as_file
 
@@ -540,6 +542,8 @@ TABLE
    Table.__delitem__
    Table.__iadd__
 
+   Table.plot
+
 .. autosummary::
    :toctree: _generated
 
@@ -592,10 +596,6 @@ COMPUTED TABLE
    ComputedTable.gridy
    ComputedTable.graph_axis
    ComputedTable.graph_alignment
-   ComputedTable.nb_plotting_series
-   ComputedTable.plotting_series_name
-   ComputedTable.plotting_series_names
-   ComputedTable.plotting_series_values
 
    ComputedTable.is_editable
    ComputedTable.to_array
@@ -604,6 +604,9 @@ COMPUTED TABLE
    ComputedTable.__setitem__
    
    ComputedTable.print_to_file
+
+   ComputedTable.plot
+   ComputedTable.plot_data
 
 ****
 TIME
