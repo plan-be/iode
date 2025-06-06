@@ -14,8 +14,6 @@ class PlotTableDialog(PlotDialog):
                  title: str=None, parent=None):
         super().__init__(chart_type, grid, log_scale, y_min, y_max, title, parent)
         
-        for row in range(computed_table.nb_lines):
-            for op_files in range(computed_table.nb_operations_between_files):
-                series_name = computed_table.plotting_series_name(row, op_files)
-                x, y = computed_table.plotting_series_values(row, op_files)
-                self.add_series(series_name, x, y)
+        series = computed_table.plot_data
+        for series_name, (x, y) in series.items():
+            self.add_series(series_name, x, y)
