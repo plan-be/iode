@@ -7802,6 +7802,134 @@ class Variables(IodeDatabase):
         if res < 0:
             raise RuntimeError(f"Cannot export the variables file '{variables_file}'")
 
+    def plot(self, names: Union[str, List[str]]=None, periods: Union[str, List[str]]=None, plot_type: str='line',
+             title: str=None, xlabel: str='periods', ylabel: str='values', grid: str='major', y_log: bool=False, 
+             y_min: float=None, y_max: float=None, legend: bool=True, show: bool=True):
+        r"""
+        Plot the variables defined by `names` for the periods defined by `periods`.
+
+        If `names` is a string, it is considered as a *pattern* and the function will plot 
+        all variables matching the pattern. The following characters in *pattern* have a 
+        special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        If `names` is None, plot all variables of the (subset of the) current database.
+
+        Parameters
+        ----------
+        names: str or list of str, optional
+            pattern or list of names of the variables to plot.
+            If None, plot all variables of the (subset of the) current database.
+            Defaults to None.
+        periods: str or list of str, optional
+            pattern or list of periods to plot.
+            If None, plot all periods of the (subset of the) current database.
+            Defaults to None.
+        plot_type: str, optional
+            type of the plot. Possible values are 'line', 'bar', 'scatter'.
+            Defaults to 'line'.
+        title: str, optional
+            title of the plot. Defaults to None.
+        xlabel: str, optional
+            label for x-axis. Defaults to 'periods'.
+        ylabel: str, optional
+            label for y-axis. Defaults to 'values'.
+        grid: str, optional
+            grid type to use. Possible values are 'major', 'minor' or 'none'.
+            Defaults to 'major'.
+        y_log: bool, optional
+            whether to use logarithmic scale for y-axis. 
+            Defaults to False.
+        y_min: float, optional
+            minimum value for y-axis. If None, the minimum value is automatically determined.
+        y_max: float, optional
+            maximum value for y-axis. If None, the maximum value is automatically determined.
+        legend: bool, optional
+            whether to show legend. Defaults to True.
+        show : bool, optional
+            If True, the plot will be displayed immediately. 
+            If False, the plot will not be shown until `plt.show()` is called.
+            Default is True.
+            
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+            The Axes object containing the plot.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> ax = variables.plot("ACAF;ACAG", "2000Y1;2010Y1", title="ACAF and ACAG variables")   # doctest: +SKIP
+        """
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Matplotlib is required for plotting. Please install it.")
+
+        grid = grid.lower()
+        if grid not in ['major', 'minor', 'none']:
+            raise ValueError(f"Invalid grid type '{grid}'. Possible values are 'major', 'minor' or 'none'.")
+        
+        plot_type = plot_type.lower()
+        if plot_type not in ['line', 'bar', 'scatter']:
+            raise ValueError(f"Invalid plot type '{plot_type}'. Possible values are 'line', 'bar', 'scatter'.")
+
+        if names is None:
+            names = '*'
+        subset_vars = self[names, periods]
+
+        x_data = subset_vars.periods_as_float
+        y_data = subset_vars.to_numpy()
+        names = subset_vars.names
+        
+        fig, ax = plt.subplots()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        if title:
+            ax.set_title(title)
+
+        if plot_type == 'line':
+            for i, name in enumerate(names):
+                ax.plot(x_data, y_data[i], label=name)
+        elif plot_type == 'bar':
+            for i, name in enumerate(names):
+                ax.bar(x_data, y_data[i], label=name, width=0.1)
+        elif plot_type == 'scatter':
+            for i, name in enumerate(names):
+                ax.scatter(x_data, y_data[i], label=name)
+
+        if y_log:
+            ax.set_yscale('log')
+
+        ax.set_ylim(y_min, y_max)
+        
+        if grid == 'none':
+            ax.grid(False)
+        elif grid == 'minor':
+            ax.grid(True, which='minor', linestyle=':', linewidth=0.5)
+        elif grid == 'major':
+            ax.grid(True, which='major', linestyle='-', linewidth=0.75)
+
+        # Legend outside
+        if legend:
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))  
+
+        plt.tight_layout()
+        if show:
+            plt.show()
+        
+        return ax
+
     def _str_header(self) -> str:
         s = super()._str_header() 
         s += f"sample: {self.sample}\n"

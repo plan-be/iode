@@ -1837,6 +1837,95 @@ class Table:
             return None
         return computed_table
 
+    def plot(self, title: str=None, plot_type: Union[str, TableGraphType]=TableGraphType.LINE, 
+             grid: Union[str, TableGraphGrid]=TableGraphGrid.MAJOR, y_log=False, y_min: float=None, 
+             y_max: float=None, legend: bool=True, show: bool=True):
+        r"""
+        Plot the table using the sample of the variables workspace.
+        
+        Parameters
+        ----------
+        title: str, optional
+            Title of the plot.
+            If None, the title of the table is used.
+            Default to None.
+        plot_type: str or TableGraphType, optional
+            Type of the plot.
+            Can be one of 'line', 'scatter', or 'bar'.
+            Default to 'line'.
+        grid: str or TableGraphGrid, optional
+            Type of the grid to be used in the plot.
+            Can be one of 'major', 'minor', or 'none'.
+            Default to 'major'.
+        y_log: bool, optional
+            If True, the y-axis will be in logarithmic scale.
+            Default to False.
+        y_min: float, optional
+            Minimum value for the y-axis.
+            If None, the minimum value is automatically determined.
+            Default to None.
+        y_max: float, optional
+            Maximum value for the y-axis.
+            If None, the maximum value is automatically determined.
+            Default to None.
+        legend: bool, optional
+            whether to show legend. Defaults to True.
+        show : bool, optional
+            If True, the plot will be displayed immediately. 
+            If False, the plot will not be shown until `plt.show()` is called.
+            Default is True.
+        
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+            The matplotlib Axes object containing the plot.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, tables, variables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.tbl
+        46 objects loaded
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> tables["C8_1"]                                  # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  |                                    |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+
+        >>> ax = tables["C8_1"].plot()                          # doctest: +SKIP
+        """
+        from iode import variables
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Matplotlib is required for plotting. Please install it.")
+        
+        sample = variables.sample
+        generalized_sample = f"{str(sample.start)}:{sample.nb_periods}"
+        computed_table = self.compute(generalized_sample)
+        if computed_table is None:
+            warnings.warn(f"Could not compute the table with title '{self.title.strip()}' for plotting.")
+        ax = computed_table.plot(title=title, plot_type=plot_type, grid=grid, y_log=y_log, 
+                                 y_min=y_min, y_max=y_max, legend=legend, show=show)
+        return ax
+
     def copy(self) -> Self:
         r"""
         Return a copy of the current Table.
