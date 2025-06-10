@@ -12,6 +12,7 @@ Improvements
 
   * DOC: added the :ref:`Introduction <introduction>` section to the online documentation
   * DOC: added the :ref:`LEC language <lec_language>` section to the online documentation
+  * DOC: added the :ref:`IODE Reports <iode_reports>` section to the online documentation
   * DOC: added the :ref:`Command Line Interface (iodecmd) <cli>` section to the online documentation
 
   * PYTHON: added the boolean argument *compress* to the save() method of comments, ..., variables (same as $WsSaveCmp)

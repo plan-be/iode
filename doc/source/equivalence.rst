@@ -3,13 +3,15 @@
 .. currentmodule:: iode
 
 
-################################################
-Equivalence IODE Report Commands and IODE Python
-################################################
+#################################################
+Equivalence Between IODE Report and Python Syntax
+#################################################
 
-*********************************************************
-Equivalence Between IODE Report Functions and IODE Python
-*********************************************************
+.. _report_funcs_equivalence:
+
+****************************************************
+Equivalence Between IODE Report And Python Functions
+****************************************************
 
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | IODE Report Functions                | Python Equivalent                                                                                                                   |            
@@ -138,9 +140,11 @@ Equivalence Between IODE Report Functions and IODE Python
 .. [#f3] Assuming module ``time`` is imported.
 
 
-********************************************************
-Equivalence Between IODE Report Commands and IODE Python
-********************************************************
+.. _report_commands_equivalence:
+
+***********************************************************
+Equivalence Between IODE Report Commands and Python Methods
+***********************************************************
 
 ==========
 Workspaces
