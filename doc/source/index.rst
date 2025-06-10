@@ -16,6 +16,7 @@ Contents
    tutorial
    api
    equivalence
+   cli
 
 Indices and tables
 ==================
