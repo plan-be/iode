@@ -13,6 +13,7 @@ Contents
    install
    introduction
    lec_language
+   iode_reports
    tutorial
    api
    equivalence
