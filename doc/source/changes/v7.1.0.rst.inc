@@ -28,6 +28,9 @@ Improvements
   * PYTHON: added the :meth:`Equation.estimate_stepwise` and :meth:`Equations.estimate_stepwise` methods to estimate 
     an equation and searches for the best possible test values for all possible combinations of coefficients 
     (same as `$EqsStepWise`)
+  * PYTHON: added the :meth:`Table.plot` and :meth:`ComputedTable.plot` methods to plot a (computed) 
+    table (same as `$ViewGr`)
+  * PYTHON: added the :meth:`Variables.plot` method to plot a selection of variables
 
 Fixed Bugs 
 ----------
