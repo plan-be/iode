@@ -159,52 +159,7 @@ builds the tables, prints them, and ends execution with a beep sound::
 The produced report also contains any error messages.
 
 
-.. _reports_execution_commands:
-
-Execution Commands
-------------------
-
-These commands can be preceded by either the ``$`` or ``#`` character and control the execution 
-flow of the report.
-
-The available execution commands (keywords) are:
-
-- ``$abort`` : interrupts the report (current and upper levels)
-- ``$ask`` : prompts a question
-- ``$beep`` : produces a beep sound
-- ``$chdir`` : changes the current directory
-- ``$debug`` : indicates the file and line currently being executed
-- ``$define`` : defines a macro
-- ``$foreach`` : loops over a list of values
-- ``$goto`` : (un)conditional branch to a label
-- ``$incrtime`` : increments the variable `t` (default is 1) for the calculation of LEC formulas defined in the report
-- ``$indent`` : enables or disables indentation of accepted instructions
-- ``$label`` : marks a branch point
-- ``$maximize`` : maximizes the IODE window
-- ``$minimize`` : minimizes the IODE window
-- ``$mkdir`` : creates a new directory
-- ``$multiline``: enables or disables writing a command over multiple lines
-- ``$msg`` : displays a message and waits for a key press
-- ``$next`` : ends a loop
-- ``$noparsing``: enables or disables parsing of text between backquotes
-- ``$procdef`` : defines a procedure
-- ``$procend`` : ends the definition of a procedure
-- ``$procexec`` : executes a procedure
-- ``$onerror`` : action to take in case of error
-- ``$prompt`` : defines a macro by prompting the user
-- ``$quit`` : exits IODE
-- ``$quitode`` : exits IODE
-- ``$repeat`` : loops over the arguments
-- ``$repeatstring`` : defines the characters to be replaced in `$repeat`
-- ``$return`` : exits the current report
-- ``$rmdir`` : deletes an empty directory
-- ``$settime`` : sets the variable `t` for the calculation of LEC formulas defined in the report
-- ``$shift`` : shifts the report arguments one position to the left
-- ``$show`` : displays a message at the bottom of the screen
-- ``$sleep`` : pauses the process for a short period
-- ``$system`` : executes a system command
-- ``$vseps`` : redefines the separators used by the functions `@vdrop()`, `@vtake()`, and `@vcount()`.
-
+.. include:: reports_execution_commands.rst
 
 .. _reports_functions:
 
