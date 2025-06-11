@@ -501,6 +501,8 @@ generate_stub_files.py
 !/archives/nsis/*template*.nsi
 
 # DOC
+/doc/**/*.txt
+
 /doc/source/conf.py
 /doc/source/_autosummary
 /doc/source/_generated
