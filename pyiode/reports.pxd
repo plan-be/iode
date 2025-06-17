@@ -2,6 +2,12 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from pyiode.time.period cimport PERIOD
+
+cdef extern from "api/iode.h":
+    cdef PERIOD RP_PER
+    cdef int RP_settime(char* arg)
+    cdef int RP_incrtime(char* arg)
 
 # functions written in rep_list.h are intended to be only used in the GUI, not by users
 cdef extern from "cpp_api/report/rep_list.h":

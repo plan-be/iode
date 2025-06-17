@@ -41,7 +41,7 @@ from .iode_database.tables_database import Tables, tables
 from .iode_database.variables_database import Variables, variables
 
 # Reports
-from .reports import execute_report, execute_command
+from .reports import execute_report, execute_command, set_t, increment_t
 
 # Printing
 from .write import (write_close, write_destination, write_flush, write, write_code_block, write_enum, 
@@ -91,7 +91,7 @@ __all__ = [
     'load_extra_files', 'reset_extra_files', 
 
     # Reports
-    'execute_report', 'execute_command', 
+    'execute_report', 'execute_command', 'set_t', 'increment_t', 
 
     # Printing
     'write_close', 'write_destination', 'write_flush', 'write', 'write_code_block', 'write_enum', 

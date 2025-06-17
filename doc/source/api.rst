@@ -696,7 +696,8 @@ REPORTS
 
    execute_report
    execute_command
-
+   set_t
+   increment_t
 
 ************************
 GRAPHICAL USER INTERFACE
