@@ -33,6 +33,8 @@ Improvements
   * PYTHON: added the :meth:`Table.plot` and :meth:`ComputedTable.plot` methods to plot a (computed) 
     table (same as `$ViewGr`)
   * PYTHON: added the :meth:`Variables.plot` method to plot a selection of variables
+  * PYTHON: added the :func:`set_t` and :func:`increment_t` functions to set or increment the special period `t` 
+    (fixes :issue:`#978`)
 
 Fixed Bugs 
 ----------

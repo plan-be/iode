@@ -1,12 +1,59 @@
 from pathlib import Path
 from typing import Union, List
 
+from iode.iode_cython import cython_set_time, cython_increment_time
 from iode.iode_cython import cython_build_command_functions_list 
 from iode.iode_cython import cython_build_lec_functions_list
 from iode.iode_cython import cython_build_report_functions_list
 from iode.iode_cython import cython_execute_command
 from iode.iode_cython import cython_execute_report
 
+from iode.time.period import Period
+
+
+def set_t(time: Union[str, Period]):
+    """
+    Set the value of *t* in `{report expressions}`.
+
+    Parameters
+    ----------
+    time: str or Period
+        Period to set. If str, it must be a valid IODE period (e.g. "2000Y1", "2005Y1", etc.)
+
+    Examples
+    --------
+    >>> from iode.reports import set_t, execute_command
+    >>> set_t("2000Y1")
+    >>> execute_command("value of t: {t@T}")
+    iode> value of t: 2000Y1
+    """
+    if isinstance(time, Period):
+        time = str(time)
+    elif not isinstance(time, str):
+        raise TypeError("'time' must be a string or a Period object.")
+    cython_set_time(time)
+
+def increment_t(increment: int):
+    """
+    Increment the value of *t* in `{report expressions}` by a given number of periods.
+
+    Parameters
+    ----------
+    increment: int
+        Number of periods to increment *t* by. 
+        For example, if *t* is "2000Y1" and increment is 1, then *t* will become "2001Y1".
+
+    Examples
+    --------
+    >>> from iode.reports import set_t, increment_t, execute_command
+    >>> set_t("2000Y1")
+    >>> increment_t(1)
+    >>> execute_command("value of t: {t@T}")
+    iode> value of t: 2001Y1
+    """
+    if not isinstance(increment, int):
+        raise TypeError("'increment' must be an integer.")
+    cython_increment_time(increment)
 
 def build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     r"""
@@ -132,6 +179,13 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
 
     >>> # execute report
     >>> execute_report(create_var_rep, ["A", "B", "C", "D"])    # doctest: +ELLIPSIS
+    iode> $WsClearVar
+    iode> $WsSample 2000Y1 2005Y1
+    iode> $DataCalcVar A t+1
+    iode> $DataCalcVar B t-1
+    iode> $DataCalcVar C A/B
+    iode> $DataCalcVar D grt A
+    iode> $WsSaveVar ...test_var.av
     Saving ...test_var.av
 
     >>> # check content of file test_var.av
@@ -178,12 +232,19 @@ def execute_command(command: Union[str, List[str]]):
 
     >>> # execute IODE command one by one
     >>> execute_command("$WsClearVar")
+    iode> $WsClearVar
     >>> execute_command("$WsSample 2000Y1 2005Y1")
+    iode> $WsSample 2000Y1 2005Y1
     >>> execute_command("$DataCalcVar A t+1")
+    iode> $DataCalcVar A t+1
     >>> execute_command("$DataCalcVar B t-1")
+    iode> $DataCalcVar B t-1
     >>> execute_command("$DataCalcVar C A/B")
+    iode> $DataCalcVar C A/B
     >>> execute_command("$DataCalcVar D grt A")
+    iode> $DataCalcVar D grt A
     >>> execute_command(f"$WsSaveVar {result_var_file}")    # doctest: +ELLIPSIS
+    iode> $WsSaveVar ...test_var.av
     Saving ...test_var.av
 
     >>> # check content of file test_var.av
