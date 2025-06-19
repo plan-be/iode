@@ -2555,9 +2555,17 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
                  "$WsClearVar\n"
                  "$WsLoadVar %s\n", fullfilename);
 
-    rc = B_ReportLine(cmd);
+    rc = B_ReportLine(cmd, 1);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(KV_WS->k_nb, 394);
+
+    rc = B_ReportLine("$settime 2000Y1", 0);
+    EXPECT_EQ(rc, 0);
+    EXPECT_STREQ(PER_pertoa(&RP_PER, NULL), "2000Y1");
+
+    rc = B_ReportLine("$incrtime 2", 0);
+    EXPECT_EQ(rc, 0);
+    EXPECT_STREQ(PER_pertoa(&RP_PER, NULL), "2002Y1");
 
     U_test_reset_kmsg_msgs();
 }

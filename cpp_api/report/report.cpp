@@ -23,7 +23,7 @@ void execute_report(const std::string& filepath, const std::vector<std::string>&
 
 void execute_report_line(const std::string& commands)
 {
-    int success = B_ReportLine(to_char_array(commands));
+    int success = B_ReportLine(to_char_array(commands), 0);
     if(success != 0)
         throw std::runtime_error("Execution of report command(s):\n" + commands + "\n\nhas failed");
 }

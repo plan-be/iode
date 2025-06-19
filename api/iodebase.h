@@ -918,7 +918,7 @@ extern int RP_expand(char** line, char* buf);
 extern int RP_ReportExec_tbl(REPFILE *rf);
 extern int RP_ReportExec_1(char* file);
 extern int B_ReportExec(char* arg);
-extern int B_ReportLine(char* line);
+extern int B_ReportLine(char* line, int cleanup);
 
 /* b_rep_defs.c */
 extern int RP_macro_createdb();

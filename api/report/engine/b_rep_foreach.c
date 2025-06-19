@@ -93,11 +93,11 @@ static int RP_foreach_next_index(char *name)
     }
     // Place le premier élément dans l'index de la boucle
     sprintf(buf, "$define %s @vtake(1,%%FOREACH__%s%%)", name, name);
-    B_ReportLine(buf);
+    B_ReportLine(buf, 1);
 
     // Drop le premier indice
     sprintf(buf, "$define FOREACH__%s @vdrop(1,%%FOREACH__%s%%)", name, name);
-    B_ReportLine(buf);
+    B_ReportLine(buf, 1);
 
     return(n - 1);
 }
@@ -129,7 +129,7 @@ int RP_foreach(char* arg)
 
     // Crée un define identique avec comme nom FOREACH__<nom>
     sprintf(buf, "$define FOREACH__%s %%%s%%", name, name);
-    B_ReportLine(buf);
+    B_ReportLine(buf, 1);
 
     // Place la première valeur dans name et supprime cette valeur de la liste
     // Si la liste est vide, saute à la fin ($next name)

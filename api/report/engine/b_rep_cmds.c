@@ -131,7 +131,7 @@ int RP_repeat(char* buf)
     for(i = 0 ; args[i] ; i++) {
         strcpy(cmd, line + pos1 + 1); // Commande
         SCR_replace(cmd, RP_RPTSTR, args[i]);
-        rc = B_ReportLine(cmd);
+        rc = B_ReportLine(cmd, 1);
         if(rc) break;
     }
     //SCR_free(cmd);
