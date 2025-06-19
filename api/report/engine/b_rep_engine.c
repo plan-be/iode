@@ -181,7 +181,7 @@ int RP_expand(char** line, char* buf);
 int RP_ReportExec_tbl(REPFILE *rf);
 int RP_ReportExec_1(char* file);
 int B_ReportExec(char* arg);
-int B_ReportLine(char* line);
+int B_ReportLine(char* line, int cleanup);
 
 
 // Function implementation
@@ -1434,7 +1434,7 @@ done:
  *  @return     int             0 on success, report error code on error
  */
 
-int B_ReportLine(char* line)
+int B_ReportLine(char* line, int cleanup)
 {
     unsigned char       **argv = NULL, **o_argv,
                           **SCR_vtomsq();
@@ -1454,7 +1454,7 @@ int B_ReportLine(char* line)
     }
 
     // Premier rapport ? (d�but de session de rapport)
-    if(RP_DEPTH == 0) {
+    if(RP_DEPTH == 0 && cleanup) {
         RP_T = 0;
         memset(&RP_PER, 0, sizeof(PERIOD));
     }
@@ -1487,7 +1487,7 @@ done:
     RP_ARG0 = o_arg0;
 
     // Si fin des rapports vide les macros
-    if(RP_DEPTH == 0) {
+    if(RP_DEPTH == 0 && cleanup) {
         K_free(RP_MACRO); // Macros ($define) are saved in the KDB RP_MACROS
         RP_MACRO = NULL;
     }

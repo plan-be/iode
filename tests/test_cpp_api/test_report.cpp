@@ -37,6 +37,12 @@ TEST_F(ReportTest, REPORT_LINE)
     execute_report_line(commands);
     EXPECT_EQ(Variables.count(), 394);
 
+    execute_report_line("$settime 2000Y1");
+    EXPECT_EQ(Period(RP_PER), Period("2000Y1"));
+
+    execute_report_line("$incrtime 2");
+    EXPECT_EQ(Period(RP_PER), Period("2002Y1"));
+
     // U_test_reset_kmsg_msgs();
 }
 

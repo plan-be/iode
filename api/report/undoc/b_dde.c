@@ -427,7 +427,7 @@ char *IodeDdeGetReportRC(char *szItem)
     char    *res;
     int     rc;
 
-    rc = B_ReportLine(szItem);
+    rc = B_ReportLine(szItem, 1);
     res = SCR_malloc(30);
     sprintf(res, "%d", rc);
     return(res);
@@ -679,7 +679,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
     SCR_upper(szTopic);
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeSetWS(szItem, szBuffer));
     if(strcmp(szTopic, "PLAY") == 0) return(IodeDdePlay(szItem, szBuffer));
-    if(strcmp(szTopic, "REP") == 0)  return(B_ReportLine(szBuffer));
+    if(strcmp(szTopic, "REP") == 0)  return(B_ReportLine(szBuffer, 1));
 
     type = IodeDdeType(szTopic);
     if(type < 0 || type > 6) return(-1);
