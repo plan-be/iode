@@ -149,9 +149,6 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         # ask to compute the hash of all databases
         self.ask_compute_hash.emit(True)
 
-        # add the command to execute in the output panel
-        self.output.append("> " + cmd)
-
         # reset the input command line
         self.setText("")
 
