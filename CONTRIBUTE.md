@@ -412,7 +412,6 @@ The script `meta.yaml` is used by conda-build to build the conda packages.
 The are located in the sub-directories *condarecipe/<package>* from the top directories *pyiode* and *gui*. First, make sure you have the conda-build tool installed on your system (*conda install conda-build*). To build the conda packages for *iode* and *iode_gui*, you have to run the following commands:
 ```bash 
 root_dir_iode> cd pyiode
-pyiode> conda activate py3xx
 pyiode> conda build . --python=3.xx --no-anaconda-upload
 ```
 where `3.xx` is the Python version used during the build.
