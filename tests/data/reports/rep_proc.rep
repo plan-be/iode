@@ -5,7 +5,7 @@
 #   
 #  Example: rep_proc data output
 #
-$debug 1
+
 $indent
 $goto continue {%0% >= 2}
     $show Syntax: rep_proc input_dir output_dir
