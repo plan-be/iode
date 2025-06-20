@@ -147,6 +147,7 @@ int     RP_RT = 0;                  // Indicates what to do on error: 0: continu
 int     RP_PRINT = 2;               // Indicates how to use error messages: 2 = print and display messages, 1 = print only, 0 = ignore
 PERIOD  RP_PER;                     // current PERIOD for LEC evaluations {lec}
 int     RP_DEBUG = 0;               // Debug level for reports (0=no debug, 1=std debug, 2=full debug)// JMP 06-08-98 
+int     RP_STDOUT = 0;              // If set, the report is written to stdout (default to 0 -> write to file specified by the user)
 
 // Global working variables
 // ------------------------
@@ -1244,12 +1245,17 @@ int RP_ReportExec_tbl(REPFILE *rf)
         // Reads the next line and expands the %macros%, {lec}, @fns()
         rc = RP_readline(rf, &line, 1);
         
-        // Display the expanded line via kmsg() if RP_DEBUG is not null
-        if(RP_DEBUG) {
+        // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
+        if(RP_DEBUG || RP_STDOUT) {
             SCR_strlcpy(filename, rf->filename, 255);
             SCR_strlcpy(debug_line, line, 1023);
             SCR_strip(debug_line);
-            if(debug_line[0]) kmsg("%s[%d] - %s", filename, rf->curline, debug_line); // JMP 14/2/2013
+            if(debug_line[0]) {
+                if(RP_DEBUG)
+                    kmsg("%s[%d] - %s", filename, rf->curline, debug_line); // JMP 14/2/2013
+                else if(RP_STDOUT)
+                    kmsg("iode> %s", debug_line);
+            }
         }
 
         // EOF or readline has failed => goto done

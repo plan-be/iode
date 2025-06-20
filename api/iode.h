@@ -1314,6 +1314,7 @@ extern char*   RP_RPTSTR;           // Repeat string used by the command $repeat
 extern char*   RP_VSEPS;            // Separators allowed in report @functions
 extern int     RP_RT;               // Indicates what to do on error (0-ignore, -2=return, -3=ABORT, -4=QUITODE)
 extern int     RP_ARG0;             // Position of the first argument in RP_ARGV (can be changed by a call to $shift)
+extern int     RP_STDOUT;           // If set, the report is written to stdout (default to 0 -> write to file specified by the user)
 extern int     RP_DEBUG;            // Debug level: 0=no debug, 1=std debug, 2=full debug
 extern int     RP_ALLOW_INDENT;     // If set, indentation is allowed in reports
 extern int     RP_ALLOW_MULTILINE;  // If set, accepts instruction on multiple lines (non breaking char = '\')
