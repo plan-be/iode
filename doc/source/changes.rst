@@ -3,6 +3,8 @@
 
 .. include:: ./changes/v7.1.0.rst.inc
 
+.. include:: ./changes/v7.0.2.rst.inc
+
 .. include:: ./changes/v7.0.1.rst.inc
 
 .. include:: ./changes/v7.0.0.rst.inc
