@@ -991,3 +991,9 @@ The result produced is as follows::
     print : 1  
     print : 2  
     print : 3
+
+Python equivalent functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get the Python equivalent of the above commands, refers to the 
+:ref:`Equivalence Between IODE Report Execution Commands And Python Functions <report_execution_commands_equivalence>` table.
