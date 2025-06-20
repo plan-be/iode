@@ -3,7 +3,6 @@ $ --------------------------------
 $ Syntax: rep_fns input_dir output_dir
 $ Example: rep_fns data output
 
-$debug 1
 $indent
 $goto continue {%0% >= 2}
     $show Syntax: rep_fns input_dir output_dir
