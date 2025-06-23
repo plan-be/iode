@@ -59,7 +59,8 @@ Identity& Identity::operator=(const Identity& other)
 
 bool Identity::operator==(const Identity& other) const
 {
-    return this->get_lec() == other.get_lec();
+    return K_cmp_idt(static_cast<IDT*>(const_cast<Identity*>(this)), 
+                     static_cast<IDT*>(const_cast<Identity*>(&other))) == 0;
 }
 
 std::vector<std::string> Identity::get_coefficients_list(const bool create_if_not_exit)
