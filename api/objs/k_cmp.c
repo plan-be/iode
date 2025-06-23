@@ -32,32 +32,10 @@ static int K_cmplg(char* p1, char* p2, char* name)
     else return(0);
 }
 
-/**
- *  Compares 2 packed equations. 
- *  
- *  The function compares:
- *      - the compiled LEC form (the text of the LEC expression may differ as long as the compiled versions are equal).
- *      - the estimation method if present
- *      - the estimation SAMPLE if defined
- *      - the estimation block of simultaneous equations
- *      - the metric instruments if any
- *  
- *  @param [in] p1      char*   pointer to the first packed EQ.
- *  @param [in] p2      char*   pointer to the second packed EQ.
- *  @param [in] name    char*   name of the equation.
- *  @return             int     0 if all elements are equal, 1 if at least one is different.
- *  
- *  @note the estimation results are not compared (statistical tests).
- */
-
-static int K_cmpeqs(char* p1, char* p2, char* name)
+int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
 {
     int     rc = 1;
-    EQ      *eq1 = NULL, *eq2 = NULL;
     CLEC    *cl1 = NULL, *cl2 = NULL;
-
-    eq1 = K_eunpack(p1, name);
-    eq2 = K_eunpack(p2, name);
 
     if(eq1 == NULL || eq2 == NULL) goto done;
 
@@ -79,14 +57,67 @@ static int K_cmpeqs(char* p1, char* p2, char* name)
     rc = 0;
 
 done :
-    E_free(eq1);
-    E_free(eq2);
     SCR_free(cl1);
     SCR_free(cl2);
 
     return(rc);
 }
 
+/**
+ *  Compares 2 packed equations. 
+ *  
+ *  The function compares:
+ *      - the compiled LEC form (the text of the LEC expression may differ as long as the compiled versions are equal).
+ *      - the estimation method if present
+ *      - the estimation SAMPLE if defined
+ *      - the estimation block of simultaneous equations
+ *      - the metric instruments if any
+ *  
+ *  @param [in] p1      char*   pointer to the first packed EQ.
+ *  @param [in] p2      char*   pointer to the second packed EQ.
+ *  @param [in] name    char*   name of the equation.
+ *  @return             int     0 if all elements are equal, 1 if at least one is different.
+ *  
+ *  @note the estimation results are not compared (statistical tests).
+ */
+
+static int K_cmpeqs(char* p1, char* p2, char* name)
+{
+    int     rc;
+    EQ      *eq1 = NULL, *eq2 = NULL;
+
+    eq1 = K_eunpack(p1, name);
+    eq2 = K_eunpack(p2, name);
+
+    rc = K_cmp_eqs(eq1, eq2, name);
+
+done :
+    E_free(eq1);
+    E_free(eq2);
+
+    return(rc);
+}
+
+int K_cmp_idt(IDT* idt1, IDT* idt2)
+{
+    int     rc = 1;
+    CLEC    *cl1 = NULL, *cl2 = NULL;
+
+    cl1 = L_cc(idt1->lec);
+    cl2 = L_cc(idt2->lec);
+
+    if(cl1 == NULL || cl2 == NULL ||
+            cl1->tot_lg != cl2->tot_lg ||
+            memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
+
+    rc = 0;
+
+done :
+    SCR_free(cl1);
+    SCR_free(cl2);
+
+    return(rc);
+}
 
 /**
  *  Compares 2 packed identities. 
@@ -123,9 +154,51 @@ done :
     return(rc);
 }
 
+int K_cmp_scl(SCL* scl1, SCL* scl2)
+{
+    int rc;
+    char* p1 = NULL; 
+    char* p2 = NULL;
+
+    if(scl1 == NULL || scl2 == NULL) 
+        return 1;
+
+    rc = K_spack(&p1, (char*) scl1);
+    rc = K_spack(&p2, (char*) scl2);
+    if(p1 == NULL || p2 == NULL || rc)
+        return 1;
+        
+    rc = K_cmplg(p1, p2, NULL);
+
+    SCR_free(p1);
+    SCR_free(p2);
+    return rc;
+}
+
+int K_cmp_tbl(TBL* tbl1, TBL* tbl2)
+{
+    int rc;
+    char* p1 = NULL; 
+    char* p2 = NULL;
+
+    if(tbl1 == NULL || tbl2 == NULL) 
+        return 1;
+
+    rc = K_tpack(&p1, (char*) tbl1);
+    rc = K_tpack(&p2, (char*) tbl2);
+    if(p1 == NULL || p2 == NULL || rc)
+        return 1;
+    
+    rc = K_cmplg(p1, p2, NULL);
+
+    SCR_free(p1);
+    SCR_free(p2);
+    return rc;
+}
+
+
 // Threshold for VAR comparisons 
 double K_CMP_EPS = 1e-7;
-
 
 /**
  *  Compares 2 double values. 
@@ -151,6 +224,17 @@ static int K_cmpvar_1(double v1, double v2)
     return(1);
 }
 
+int K_cmp_var(VAR var1, VAR var2)
+{
+    int i;
+    int nb = KSMPL(KV_WS)->s_nb;
+
+    for(i = 0 ; i < nb ; i++)
+        if(K_cmpvar_1(var1[i], var2[i])) 
+            return(1);
+
+    return(0);
+}
 
 /**
  *  Compares 2 variables on the current WS sample. 
