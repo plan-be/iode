@@ -415,15 +415,8 @@ std::pair<std::string, std::string> Equation::split_equation()
 
 bool Equation::operator==(const Equation& other) const
 {
-    if (strcmp(this->endo, other.endo) != 0) return false;
-    if (strcmp(this->lec, other.lec) != 0) return false;
-    if (this->method != other.method) return false;
-    if (memcmp(&(this->smpl), &(other.smpl), sizeof(SAMPLE)) != 0) return false;
-    if (strcmp(this->cmt, other.cmt) != 0) return false;
-    if (strcmp(this->blk, other.blk) != 0) return false;
-    if (strcmp(this->instr, other.instr) != 0) return false;
-
-    return true;
+    return K_cmp_eqs(static_cast<EQ*>(const_cast<Equation*>(this)), 
+                     static_cast<EQ*>(const_cast<Equation*>(&other)), this->endo) == 0;
 }
 
 std::size_t hash_value(const Equation& equation)
