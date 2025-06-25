@@ -1,7 +1,7 @@
 from .base_delegate import BaseDelegate
 from iode_gui.util.double_validator import IodeDoubleValidator
 
-from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QModelIndex, QLocale
 from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
 from PySide6.QtGui import QDoubleValidator
 
@@ -36,7 +36,10 @@ class ScalarsDelegate(BaseDelegate):
         if index.column() == 0:
             editor.setValidator(IodeDoubleValidator(parent=editor))
         elif index.column() == 1:
-            editor.setValidator(QDoubleValidator(0., 1., 10))
+            # set the locale for the validator to ensure dot as decimal separator
+            validator = QDoubleValidator(0., 1., 10)
+            validator.setLocale(QLocale("C"))
+            editor.setValidator(validator)
         else:
             editor = None
 
