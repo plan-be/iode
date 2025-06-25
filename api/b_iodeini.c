@@ -20,7 +20,11 @@
  *      char* ODE_INIFILE       Name of the iode.ini file
  */
 
-#include "iode.h"
+#include <Windows.h>
+#include "scr4/s_prost.h"       // SCR_free, SCR_stracpy, SCR_strip
+#include "scr4/s_prodir.h"      // SCR_split_dir
+#include "scr4/s_proini.h"      // IniReadTxtParm, IniWriteParm
+#include "b_iodeini.h"
 
 
 char* ODE_INIFILE = 0;          // Name of the iode.ini file

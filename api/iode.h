@@ -10,7 +10,7 @@
  *      - declarations of functions
  *      - declarations of variables
  *
- *  This file should be included in all IODE api based C/C++ developement.
+ *  This file should be included in all IODE api based C/C++ development.
  *
  */
 
@@ -60,25 +60,8 @@
 #endif
  
 /******************************* DEFINES **********************************/
-// ALD 23/11/2023
-#include "version.h"
 
-#define K_VERSION  "1.0"
-#define OK_MAX_NAME  10
-#define K_MAX_NAME   20  /* IODE64K */
-
-// ALD 18/11/2022
-#define I_DEFAULT_FILENAME  "ws"
-
-// JMP 23/5/2019 (from b_rep.c for b_proc.c)
-#define LINELENGTH 102400
-
-#define OK_MAX_FILE  64
-#define K_MAX_FILE  512
-#define K_MAX_DESC  64
-//#define K_CHUNCK    1024 /* JMP 11-03-07 */
-#define K_CHUNCK    (64 * 1024)
-#define LMAGIC      32
+#include "constants.h"
 
 enum IodeCase
 {
@@ -457,18 +440,6 @@ enum IodeEquationAscii
 
 
 #define MAX_MODE    (COL_BASE - COL_DIFF + 1)
-
-/*----------------------- PRINTERS ----------------------------*/
-#define W_GDI   A2M_DESTGDIPRT
-#define W_A2M   A2M_DESTA2M
-#define W_MIF   A2M_DESTFRM
-#define W_HTML  A2M_DESTHTML
-#define W_RTF   A2M_DESTRTF
-#define W_CSV   A2M_DESTCSV
-#define W_DUMMY A2M_DESTDUMMY
-//#define W_DISP  A2M_DESTGDIEMF
-//#define W_DISP  A2M_DESTGDIWMF
-#define W_DISP  A2M_DESTTCHRT
 
 /*--------------- VAR_MODE parameters ------------------------*/
 enum IodeVarMode
@@ -1339,16 +1310,6 @@ extern char    k_ext[][4];
 extern char     *COL_OPERS[];
 // extern char     *COL_OPERS_TEXTS[][3]; // unused - replaced by KLG_OPERS_TEXTS
 
-extern char     W_filename[];
-extern FILE     *W_fd;
-extern int      W_gdiask;
-extern int      W_a2mapp;
-extern int      W_rtfhelp;
-extern int      W_htmlhelp;
-extern int      W_gdiorient;
-extern int      W_gdiduplex;
-extern char     W_gdiprinter[80];
-
 extern KDB      *K_WS[7];
 extern KDB      *K_RWS[7][5];
 extern int      K_PWS[7];
@@ -1427,11 +1388,6 @@ extern  int     STATIC_BUF_LG;
 
 extern  int     B_dest;
 extern  char    *B_outfile;
-extern double   A2M_GWIDTH;
-extern double   A2M_GHEIGHT;
-extern int      A2M_BOXWIDTH;
-extern int      A2M_BACKBRUSH;
-extern int      A2M_BACKCOLOR;
 
 /*----------------- LEC ----------------------*/
 extern  int     L_errno;
