@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QLocale
 from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDoubleValidator
 
@@ -31,10 +31,16 @@ class MenuComputeSimulation(MixinSettingsDialog):
         self.ui.comboBox_sort_algorithm.addItems(SIMULATION_SORT_ALGORITHMS)
         self.ui.comboBox_sort_algorithm.setCurrentIndex(0)
 
-        self.ui.lineEdit_convergence.setValidator(QDoubleValidator(self))
+        convergence_validator = QDoubleValidator(self)
+        # set the locale for the validator to ensure dot as decimal separator
+        convergence_validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_convergence.setValidator(convergence_validator)
         self.ui.lineEdit_convergence.setText("0.001")
 
-        self.ui.lineEdit_relaxation.setValidator(QDoubleValidator(0.0, 1.0, 2, self))
+        relaxation_validator = QDoubleValidator(0.0, 1.0, 2, self)
+        # set the locale for the validator to ensure dot as decimal separator
+        relaxation_validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_relaxation.setValidator(relaxation_validator)
         self.ui.lineEdit_relaxation.setText("1.0")
 
         self.ui.spinBox_max_iterations.setValue(100)

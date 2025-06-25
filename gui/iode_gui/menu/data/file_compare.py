@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QLocale
 from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDoubleValidator
 
@@ -22,7 +22,10 @@ class MenuDataFileCompare(MixinSettingsDialog):
         self.ui.comboBox_iode_types.addItems(v_iode_type_names)
         self.ui.comboBox_iode_types.setCurrentIndex(0)   
 
-        self.ui.lineEdit_threshold.setValidator(QDoubleValidator(self))
+        validator = QDoubleValidator(self)
+        # set the locale for the validator to ensure dot as decimal separator
+        validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_threshold.setValidator(validator)
         self.ui.lineEdit_list_ws_only.setText("OLD")
         self.ui.lineEdit_list_file_only.setText("NEW")
         self.ui.lineEdit_list_both_equal.setText("SAME")

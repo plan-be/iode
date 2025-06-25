@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, Signal
+from PySide6.QtCore import Slot, Signal, QLocale
 from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
 from PySide6.QtGui import QDoubleValidator
 
@@ -49,8 +49,15 @@ class MenuGraphVariables(MixinSettingsDialog):
         self.ui.comboBox_language.addItems(v_table_lang_names)
         self.ui.comboBox_language.setCurrentIndex(0)
 
-        self.ui.lineEdit_min_Y.setValidator(QDoubleValidator(self.ui.lineEdit_min_Y))
-        self.ui.lineEdit_max_Y.setValidator(QDoubleValidator(self.ui.lineEdit_max_Y))
+        min_Y_validator = QDoubleValidator(self.ui.lineEdit_min_Y)
+        # set the locale for the validator to ensure dot as decimal separator
+        min_Y_validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_min_Y.setValidator(min_Y_validator)
+
+        max_Y_validator = QDoubleValidator(self.ui.lineEdit_max_Y)
+        # set the locale for the validator to ensure dot as decimal separator
+        max_Y_validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_max_Y.setValidator(max_Y_validator)
 
         self.load_settings()
 

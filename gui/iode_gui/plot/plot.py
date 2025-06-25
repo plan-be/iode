@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QLocale
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, 
                                QCheckBox, QLineEdit, QPushButton, QMessageBox)
 from PySide6.QtGui import QDoubleValidator
@@ -72,7 +72,10 @@ class PlotDialog(QDialog):
         self.y_min_input = QLineEdit()
         self.y_min_input.setPlaceholderText("Min")
         self.y_min_input.editingFinished.connect(self.update_y_limits)
-        self.y_min_input.setValidator(QDoubleValidator(self.y_min_input))
+        y_min_validator = QDoubleValidator(self.y_min_input)
+        # set the locale for the validator to ensure dot as decimal separator
+        y_min_validator.setLocale(QLocale("C"))
+        self.y_min_input.setValidator(y_min_validator)
         if y_min:
             self.y_min_input.setText(str(y_min))
         controls_layout.addWidget(self.y_min_input)
@@ -81,7 +84,10 @@ class PlotDialog(QDialog):
         self.y_max_input = QLineEdit()
         self.y_max_input.setPlaceholderText("Max")
         self.y_max_input.editingFinished.connect(self.update_y_limits)
-        self.y_max_input.setValidator(QDoubleValidator(self.y_max_input))
+        y_max_validator = QDoubleValidator(self.y_max_input)
+        # set the locale for the validator to ensure dot as decimal separator
+        y_max_validator.setLocale(QLocale("C"))
+        self.y_max_input.setValidator(y_max_validator)
         if y_max:
             self.y_max_input.setText(str(y_max))
         controls_layout.addWidget(self.y_max_input)

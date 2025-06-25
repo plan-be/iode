@@ -1,4 +1,6 @@
 from PySide6.QtCore import QUrl, QDir
+from PySide6.QtCore import QLocale
+
 import iode_gui.${PY_RESOURCE_FILENAME}
 from iode_gui import DOC_DIR as GUI_DOC_DIR
 from iode import DOC_DIR
@@ -9,6 +11,8 @@ IODE_VERSION_MINOR = ${PROJECT_VERSION_MINOR}
 IODE_VERSION_PATCH = ${PROJECT_VERSION_PATCH}
 
 ORGANIZATION_NAME = "${IODE_COMPANY}"
+
+QLocale.setDefault(QLocale("C"))
 
 NAN_REP = "--"
 MAX_PRECISION_NUMBERS = 10
