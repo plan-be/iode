@@ -39,7 +39,8 @@
  *  
  */
 
-#include "iode.h"
+#include "b_a2mini.h"
+#include "b_iodeini.h"
 #include <s_a2m.h>
 
 // Variables
@@ -160,7 +161,7 @@ void B_A2mGetRtfParms()
 //    B_A2mGetGnlParms();
     char title[512];
 
-    A2M_NUMBERS      = B_IniReadYN  ("A2MRTF", "PARANUM",       0);;    
+    A2M_NUMBERS      = B_IniReadYN  ("A2MRTF", "PARANUM",       0);    
     A2M_FONTSIZE     = B_IniReadNum ("A2MRTF", "FONTSIZE",      10);
     A2M_FONTFAMILY   = B_IniReadChar("A2MRTF", "FONTFAMILY",    'H');
     A2M_FONTINCR     = B_IniReadNum ("A2MRTF", "FONTINCR",      2);

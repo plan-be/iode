@@ -96,8 +96,8 @@
  *  
  */
 
-#include "iode.h"
-#include <s_a2m.h>
+#include "write.h"
+#include "api/b_a2mini.h"
 
 // ====================================================================================================
 // Function prototypes
