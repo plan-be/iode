@@ -3,7 +3,6 @@ import sys
 import inspect
 from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import QLocale
 
 from typing import Union, List, Optional
 from pathlib import Path
@@ -53,11 +52,6 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         app = QApplication(sys.argv)
         app.setOrganizationName(ORGANIZATION_NAME)
         app.setApplicationName("IODE")
-
-    # force to use '.' as a decimal point
-    loc = QLocale()
-    loc.setNumberOptions(QLocale.c().numberOptions())
-    QLocale.setDefault(loc)
 
     pixmap = QPixmap(":/images/iode_splash_screen.png")
     splash = QSplashScreen(pixmap)
