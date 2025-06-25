@@ -1,3 +1,6 @@
+#pragma once
+#include "s_ini.h"
+
 #ifdef SCRCPP
 extern "C" {
 #endif
