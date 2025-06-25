@@ -1,3 +1,7 @@
+#pragma once
+#include <stdio.h>
+#include "s_strs.h"
+
 #ifdef SCRCPP
 extern "C" {
 #endif
