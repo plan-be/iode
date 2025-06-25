@@ -15,7 +15,7 @@
  *      void W_print_tb(char* title, int nc) Starts a new table in A2M format
  */
 
-#include "iode.h"
+#include "write.h"
 
 
 /**

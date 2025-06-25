@@ -779,41 +779,17 @@ extern int COL_exec(TBL *,int ,COLS *);
 /* b_api.c */
 #include "iodeapi.h"
 
-/* b_iodeini.c */
-extern char* ODE_INIFILE;
-extern void B_IodeIniFile();
-extern int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft);
-extern int B_IniWriteText(char* section, char* parm, char* val);
-extern int B_IniReadChar(char* section, char* parm, char dft);
-extern int B_IniWriteChar(char* section, char* parm, char val);
-extern int B_IniReadNum(char* section, char* parm, int dft);
-extern int B_IniWriteNum(char* section, char* parm, int val);
-extern int B_IniReadYN(char* section, char* parm, int dft);
-extern int B_IniWriteYN(char* section, char* parm, int val);
+#include "b_iodeini.h"
 
+#ifdef __cplusplus
+}
+#endif
 
-/* b_a2mini.c */
-extern void B_A2mGetGnlParms();
-extern void B_A2mSaveGnlParms();
-extern void B_A2mSetRtfTitle(U_ch* title);
-extern void B_A2mSetRtfCopy(U_ch* title);
-extern void B_A2mGetRtfParms();
-extern void B_A2mSaveRtfParms();
-extern void B_A2mGetHtmlParms();
-extern void B_A2mSaveHtmlParms();
-extern void B_A2mGetGIFParms();
-extern void B_A2mSaveGIFParms();
-extern void B_A2mGetCsvParms();
-extern void B_A2mSaveCsvParms();
-extern void B_A2mGetMifParms();
-extern void B_A2mSaveMifParms();
-extern void B_A2mGetGdiParms();
-extern void B_A2mSaveGdiParms();
-extern void B_A2mGetAllParms();
-extern void B_A2mSaveAllParms();
-//extern void K_load_iode_ini();
-//extern void K_save_iode_ini();
+#include "b_a2mini.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* b_args.c */
 extern char **B_ainit_chk(char *,ADEF *,int );
@@ -1450,16 +1426,6 @@ extern int B_WsTrendStd(char *);
 //extern int HP_calc(double *,double *,int , double, int);  // JMP 12-4-2019
 //extern void HP_test(double *,double *,int ,int *,int *);
 
-/* w_wrt1.c */
-extern void W_print_enum(int );
-extern void W_print_cmd(int );
-extern void W_print_par(int );
-extern void W_print_tit(int );
-extern void W_print_pg_header(char* arg);
-extern void W_print_pg_footer(char* arg);
-extern void W_print_rtf_topic(char* arg);
-extern void W_print_tb(char* title, int nc);
-
 /* sb_file.c */
 //extern void SB_FileOpen(void);
 //extern void C_FileOpen(void);
@@ -1797,29 +1763,10 @@ extern int IODE_CDECL B_WindowMaximize();
 extern int IODE_CDECL B_exec_system(char *arg);
 extern int IODE_CDECL B_shellexec(char *arg);
 
-/* w_wrt.c (MSC) */
-extern int W_dest(char *filename,int type);
-// extern int W_InitParms();
-// extern int W_open();
-extern int W_close();
-extern int W_flush();
-extern int W_putc(int ch);
-//extern int W_isempty(char *buf);
-extern int W_record(char *str);
-extern int W_InitDisplay();
-extern int W_EndDisplay(char *title,int x,int y,int w,int h);
-// extern int W_SavePrinterSettings();
-// extern int W_ResetPrinterSettings();
-// extern int W_SetPrinterSettings();
-extern int W_printf(char *fmt,...);
-extern int W_printfDbl(char* fmt, ...);
-extern int W_printfRepl(char* fmt, ...);
-extern int W_printfReplEsc(char* fmt, ...);
-extern int W_printfEx(int dup, int ch1, int ch2, char *fmt, va_list args);
-
 // interface
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );
 
+#include "write/write.h"
 
 #ifdef __cplusplus
 }
