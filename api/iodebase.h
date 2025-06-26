@@ -786,31 +786,12 @@ extern int COL_exec(TBL *,int ,COLS *);
 #endif
 
 #include "b_a2mini.h"
+#include "b_args.h"
+#include "b_errors.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* b_args.c */
-extern char **B_ainit_chk(char *,ADEF *,int );
-extern char **B_vtom_chk(char *,int );
-extern int B_loop(char **,int (*)(),char *);
-extern int B_ainit_loop(char *,int (*)(),char *);
-extern int B_get_arg0(char *,char *,int );
-extern int B_argpos(char *,int );
-
-/* b_errors */
-extern void B_seterror(char *,...);
-extern void B_seterrn(int , ...);
-
-extern void B_add_error(char* msg);
-extern char* B_get_last_error(void);
-extern void B_display_last_error(void);
-extern void B_print_last_error(void);
-extern void B_clear_last_error(void);
-//extern void B_reset_error(void);
-extern char *B_msg(int );
-extern int B_get1int(char *);
 
 /* b_dir.c */
 //extern int C_dir_edit_fn(char *,char *,SCRSTAT *);
