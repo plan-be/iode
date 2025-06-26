@@ -55,7 +55,7 @@ extensions = [
     'myst_parser'
 ]
 
-extlinks = {'issue': ('https://github.com/sphinx-doc/sphinx/issues/%s', 'issue %s')}
+extlinks = {'issue': ('https://github.com/plan-be/iode/issues/%s', 'issue %s')}
 
 # scan all found documents for autosummary directives, and to generate stub pages for each.
 # The new files will be placed in the directories specified in the :toctree: options of the directives.
