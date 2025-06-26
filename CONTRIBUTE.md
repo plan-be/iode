@@ -251,13 +251,13 @@ To install the `twine` package, type:
 root_dir_iode> conda install twine
 ```
 
-Once installed, run Twine to upload all of the archives under dist:
+Once installed, run Twine to upload the archives under dist:
 ```bash
-root_dir_iode> twine upload --repository testpypi dist/*
+root_dir_iode>cd pyiode
+pyiode> twine upload --repository testpypi dist/iode-<version>*
 ```
 You will be prompted for a username and password. For the username, use `__token__`. 
-For the password, use the token value, including the `pypi-` prefix.
-
+For the password, use the token value, including the `pypi-` prefix:
 ```bash
 Uploading distributions to https://test.pypi.org/legacy/
 Enter your username: __token__
@@ -269,7 +269,7 @@ Uploading example_package_YOUR_USERNAME_HERE-0.0.1.tar.gz
 
 You can use pip to install your package and verify that it works
 ```bash
-root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps <project_name_from_pyproject.toml>
+root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps iode
 ```
 
 ## Uploading the distribution archives to PyPI
@@ -277,14 +277,15 @@ root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps <
 See explanation [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/#next-steps).
 
 1. Register an account on https://pypi.org.
-2. Use 
+2. Use:
 ```bash
-root_dir_iode> twine upload dist/* 
+root_dir_iode>cd pyiode
+pyiode> twine upload dist/iode-<version>* 
 ```
-to upload your package and enter your credentials for the account you registered on PyPI.
-3. Install your package from the PyPI using 
+to upload the `iode` package and enter your credentials for the account you registered on PyPI.
+3. Install the `iode` package from the PyPI using 
 ```bash
-root_dir_iode> pip install <project_name_from_pyproject.toml>
+root_dir_iode> pip install iode
 ```
 
 ## How to overwrite pypi package when doing upload from command line?
@@ -337,6 +338,7 @@ You can combine the two above process by typing:
 ```bash
 gui> python -m build --sdist --wheel
 ```
+
 ## Testing the distribution archives
 
 Once the SDist tarfile and Wheel files have been generated, the `iode-gui` package can be 
@@ -350,6 +352,23 @@ Then, run *iode-gui* from any terminal:
 root_dir_iode> iode-gui
 ```
 which should open a window with the GUI of IODE.
+
+## Uploading the distribution archives to TestPyPI
+
+Run Twine to upload the archives under dist:
+```bash
+root_dir_iode>cd gui
+gui> twine upload --repository testpypi dist/iode_gui-<version>*
+```
+You will be prompted for a username and password.
+
+## Uploading the distribution archives to PyPI
+
+Run Twine to upload the archives under dist:
+```bash
+root_dir_iode>cd gui
+gui> twine upload dist/iode_gui-<version>* 
+```
 
 # Working On An Issue
 
