@@ -1,7 +1,7 @@
 #include "scr.h"
 
 /* ==================================================================
-     V‚rification de la cl‚ d'activation et de la date limite
+     VÃ©rification de la clÃ© d'activation et de la date limite
    ================================================================== */
 
 C_check_ak()

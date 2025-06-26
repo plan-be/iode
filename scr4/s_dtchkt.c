@@ -22,10 +22,10 @@ extern char     SCR_TIME_FMT[];
 
 
 /* ====================================================================
-Transforme une heure formatt�e dans string en long. Le format est celui
-d�fini dans la variable globale SCR_TIME_FMT.
+Transforme une heure formattée dans string en long. Le format est celui
+défini dans la variable globale SCR_TIME_FMT.
 
-&RT un long repr�sentant l'heure
+&RT un long représentant l'heure
 &EX
     SCR_time_to_long("12:53:12");
 &TX
@@ -39,13 +39,13 @@ char *string ;
 }
 
 /* ====================================================================
-Transforme une heure formatt�e dans string en long. Le format est celui
-d�fini dans le param�tre fmt.
+Transforme une heure formattée dans string en long. Le format est celui
+défini dans le paramétre fmt.
 
 Seuls les deux premiers h, s et m sont pris en compte dans le calcul.
 Ainsi le format "hhH.mm" sur "24H.30" donnera 243000.
 
-&RT un long repr�sentant l'heure (hhmmss)
+&RT un long représentant l'heure (hhmmss)
 &EX
     SCR_ftime_to_long("12:30", "hh-mm");
 
@@ -98,7 +98,7 @@ char    *fmt;
 }
 
 /* ====================================================================
-V�rifie qu'une heure est correcte. L'heure doit �tre comprise entre 00
+Vérifie qu'une heure est correcte. L'heure doit étre comprise entre 00
 et 23, les minutes et les secondes entre 00 et 59.
 
 &RT 0 en cas d'heure correcte, -1 sinon.
@@ -118,7 +118,7 @@ long    hour;
 }
 
 /* ====================================================================
-V�rifie qu'une heure formatt�e est correcte.
+Vérifie qu'une heure formattée est correcte.
 
 &RT 0 en cas d'heure correcte, -1 sinon
 &SA SCR_check_date()

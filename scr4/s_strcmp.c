@@ -1,10 +1,10 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Compare deux strings sans tenir compte des diff‚rences entre minuscules
+Compare deux strings sans tenir compte des diffÃ©rences entre minuscules
 et majuscules.
 
-&RT -1 si le str1 est "plus petit" que str2, 0 en cas d'‚galit‚, 1 si
+&RT -1 si le str1 est "plus petit" que str2, 0 en cas d'Ã©galitÃ©, 1 si
     str1 est plus grand que str2.
 
 =======================================================================*/
@@ -16,10 +16,10 @@ U_ch    *str1, *str2;
 }
 
 /* ====================================================================
-Compare deux strings sur lg caractŠres sans tenir compte des diff‚rences
+Compare deux strings sur lg caractÃ¨res sans tenir compte des diffÃ©rences
 entre minuscules et majuscules.
 
-&RT -1 si le str1 est "plus petit" que str2, 0 en cas d'‚galit‚, 1 si
+&RT -1 si le str1 est "plus petit" que str2, 0 en cas d'Ã©galitÃ©, 1 si
     str1 est plus grand que str2.
 
 =======================================================================*/

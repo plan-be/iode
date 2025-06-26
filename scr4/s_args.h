@@ -6,19 +6,19 @@
 
 typedef struct   _adef_ {
     char    *a_arg;         /* Argument */
-    char    *a_args;        /* Paramätres (texte libre, 9 caractäres) */
-    char    *a_desc;        /* Description (texte libre, 15 caractäres) */
+    char    *a_args;        /* Param√®tres (texte libre, 9 caract√®res) */
+    char    *a_desc;        /* Description (texte libre, 15 caract√®res) */
     int     a_req,          /* Requis (1) ou non (0) */
-	    a_min,          /* Nombre min de paramätres */
-	    a_max;          /* Nombre max de paramätres */
+	    a_min,          /* Nombre min de param√®tres */
+	    a_max;          /* Nombre max de param√®tres */
 #ifdef SCRPROTO
     int    (*a_check)(int, char **);
     int    (*a_exec)(int, char **);
 #else
-    int    (*a_check)();    /* Fonction de vÇrification (A_check) */
-    int    (*a_exec)();     /* Fonction d'exÇcution (A_exec) */
+    int    (*a_check)();    /* Fonction de v√©rification (A_check) */
+    int    (*a_exec)();     /* Fonction d'ex√©cution (A_exec) */
 #endif
-    char   *a_dft;          /* Valeur par dÇfaut */
+    char   *a_dft;          /* Valeur par d√©faut */
 } ADEF;
 
 /* VARIABLES DECLARATION */

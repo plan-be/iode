@@ -8,11 +8,11 @@
 char    *OMyEngine = 0, *OMyCharSet = 0, *OMyDbName = 0; /* JMP 05-02-11 */
 
 /* ====================================================================
-Imprime dans le fichier dÇcrit par fd la ligne courante d'un dataset.
-Le format est identique Ö l'output de scr4 -dump, soit un ligne avec
-les champs sÇparÇs par des '|'.
+Imprime dans le fichier d√©crit par fd la ligne courante d'un dataset.
+Le format est identique √† l'output de scr4 -dump, soit un ligne avec
+les champs s√©par√©s par des '|'.
 
-&EN OCSR *ocsr : pointeur vers un curseur retournÇ par OQuery()
+&EN OCSR *ocsr : pointeur vers un curseur retourn√© par OQuery()
 
 &EX
     voir OQuery().
@@ -88,11 +88,11 @@ OPrintRowFd(FILE *fd, OCSR *ocsr)
 }
 
 /* ====================================================================
-Imprime dans le fichier dÇcrit par fd la ligne courante d'un dataset sous
+Imprime dans le fichier d√©crit par fd la ligne courante d'un dataset sous
 forme d'une instruction INSERT INTO.
 
 &EN FILE *fd : descripteur du fichier output
-&EN OCSR *ocsr : pointeur vers un curseur retournÇ par OQuery()
+&EN OCSR *ocsr : pointeur vers un curseur retourn√© par OQuery()
 &EN int synt : 0 pour SQL standard, 1 pour MyQql, 2 pour Access
 
 &EX
@@ -199,10 +199,10 @@ OPrintInsertRowFd(FILE *fd, OCSR *ocsr, char *tblname, int strip, int synt)
 
 /* ====================================================================
 Imprime dans le standard output la ligne courante d'un dataset.
-Le format est identique Ö l'output de scr4 -dump, soit un ligne avec
-les champs sÇparÇs par des '|'.
+Le format est identique √† l'output de scr4 -dump, soit un ligne avec
+les champs s√©par√©s par des '|'.
 
-&EN OCSR *ocsr : pointeur vers un curseur retournÇ par OQuery()
+&EN OCSR *ocsr : pointeur vers un curseur retourn√© par OQuery()
 
 &EX
     voir OQuery().
@@ -219,7 +219,7 @@ OPrintRow(OCSR *ocsr)
 /* ====================================================================
 Imprime dans le standard output la ligne courante d'un dataset sous forme d'une instruction INSERT INTO.
 
-&EN OCSR *ocsr : pointeur vers un curseur retournÇ par OQuery()
+&EN OCSR *ocsr : pointeur vers un curseur retourn√© par OQuery()
 
 &EX
     voir OQuery().
@@ -272,12 +272,12 @@ Imprime dans le standard output la commande pour dropper une table
 La syntaxe peut varier en fonction
 de la valeur de synt (MySQL, ...).
 
-&EN FILE *fd : file descriptor ouvert en Çcriture
+&EN FILE *fd : file descriptor ouvert en √©criture
 &EN char *table : nom de la table ou NULL. Si nul, toutes les
-    tables sont imprimÇes
+    tables sont imprim√©es
 &EN int synt : 0 pour syntaxe std, 1 pour MySql
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 =======================================================================*/
 
 ODisplayDropTableFd(FILE *fd, char *table, int synt)
@@ -295,17 +295,17 @@ ODisplayDropTableFd(FILE *fd, char *table, int synt)
 }
 
 /* ====================================================================
-Imprime dans le standard output la dÇfinition d'une ou de toutes
+Imprime dans le standard output la d√©finition d'une ou de toutes
 les tables d'un DSN dans le format SQL. La syntaxe peut varier en fonction
 de la valeur de synt (MySQL, ...).
 
-&EN FILE *fd : file descriptor ouvert en Çcriture
+&EN FILE *fd : file descriptor ouvert en √©criture
 &EN ODSN *odsn : Data Source ouverte
 &EN char *table : nom de la table ou NULL. Si nul, toutes les
-    tables sont imprimÇes
+    tables sont imprim√©es
 &EN int synt : 0 pour syntaxe std, 1 pour MySql
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     odsn = OOpenDSN("testdsn", "jmp", "123");
@@ -362,14 +362,14 @@ ODisplayCreateTableFd(FILE *fd, ODSN *odsn, char *table, int synt)
 }
 
 /* ====================================================================
-Imprime dans le standard output la dÇfinition d'une ou de toutes
+Imprime dans le standard output la d√©finition d'une ou de toutes
 les tables d'un DSN dans le format SQL.
 
 &EN ODSN *odsn : Data Source ouverte
 &EN char *table : nom de la table ou NULL. Si nul, toutes les
-    tables sont imprimÇes
+    tables sont imprim√©es
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     odsn = OOpenDSN("testdsn", "jmp", "123");
@@ -396,15 +396,15 @@ ODisplayCreateIndexFieldFd(FILE *fd, OIDXFLD *ofld, int synt)
 }
 
 /* ====================================================================
-Imprime dans le standard output la dÇfinition des index d'une table
+Imprime dans le standard output la d√©finition des index d'une table
 d'un DSN dans le format SQL.
 
-&EN FILE *fd : file descriptor ouvert en Çcriture
+&EN FILE *fd : file descriptor ouvert en √©criture
 &EN ODSN *odsn : Data Source ouverte
 &EN char *table : nom de la table ou NULL. Si nul, tous les
-    index de toutes les tables sont imprimÇs
+    index de toutes les tables sont imprim√©s
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     odsn = OOpenDSN("testdsn", "jmp", "123");
@@ -468,14 +468,14 @@ ODisplayCreateIndicesFd(FILE *fd, ODSN *odsn, char *table, int synt)
 }
 
 /* ====================================================================
-Imprime dans le standard output la dÇfinition d'une ou de toutes
+Imprime dans le standard output la d√©finition d'une ou de toutes
 les tables d'un DSN dans le format SQL.
 
 &EN ODSN *odsn : Data Source ouverte
 &EN char *table : nom de la table ou NULL. Si nul, toutes les
-    tables sont imprimÇes
+    tables sont imprim√©es
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     odsn = OOpenDSN("testdsn", "jmp", "123");
@@ -488,17 +488,17 @@ ODisplayCreateIndices(ODSN *odsn, char *table)
     return(ODisplayCreateIndicesFd(stdout, odsn, table, 0));
 }
 /* ====================================================================
-Imprime dans le standard output la dÇfinition d'une ou de toutes
+Imprime dans le standard output la d√©finition d'une ou de toutes
 les tables d'un DSN dans le format des ISAM de SCR/AL1. Le DSN
-est ouvert et fermÇ par cette fonction.
+est ouvert et ferm√© par cette fonction.
 
 &EN char *dsn : nom de la Data Source
 &EN char *user : login name
 &EN char *passwd : mot de passe
 &EN char *table : nom de la table ou NULL. Si nul, toutes les
-    tables sont imprimÇes
+    tables sont imprim√©es
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     ODisplayTable("test", "", "", NULL);
@@ -597,14 +597,14 @@ ODisplayFieldSCR(OCOL *ocol, int k)
 
 /* ====================================================================
 Imprime dans le standard output les informations de version
-d'un DSN donnÇ.
-Le DSN est ouvert et fermÇ par cette fonction.
+d'un DSN donn√©.
+Le DSN est ouvert et ferm√© par cette fonction.
 
 &EN char *dsn : nom de la Data Source
 &EN char *user : login name
 &EN char *passwd : mot de passe
 
-&RT 0 en cas de succäs, -1 en cas d'erreur
+&RT 0 en cas de succ√®s, -1 en cas d'erreur
 
 &EX
     ODisplayDSNInfos("test", "", "", NULL);
@@ -682,19 +682,19 @@ OSqlQP2Ascii(U_ch *in, U_ch *out)
 }
 
 /* ====================================================================
-ExÇcute les commandes SQL regroupÇes dans un fichier ASCII.
-Une commande peut àtre spÇcifiÇe par ligne.
+Ex√©cute les commandes SQL regroup√©es dans un fichier ASCII.
+Une commande peut √™tre sp√©cifi√©e par ligne.
 
-Chaque ligne du fichier est dÇcodÇe Quoted-Printable.
+Chaque ligne du fichier est d√©cod√©e Quoted-Printable.
 &EN ODSN *odsn : DSN ouvert
 &EN char *filename : nom du fichier de commandes
 &EN int Verbose : 1 pour un affichage des messages pour chaque ligne
-&EN int maxerr : nbre d'erreurs max apräs quoi il faut arràter ou -1
+&EN int maxerr : nbre d'erreurs max apr√®s quoi il faut arr√™ter ou -1
     pour ne jamais stopper.
 
-Les lignes sont limitÇes Ö 10239 caractäres.
+Les lignes sont limit√©es √† 10239 caract√®res.
 
-&RT 0 en cas de succäs pour toutes les commandes, -1 en cas d'erreur
+&RT 0 en cas de succ√®s pour toutes les commandes, -1 en cas d'erreur
 
 &EX
     voir OQuery().

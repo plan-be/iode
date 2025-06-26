@@ -1,7 +1,7 @@
 #include <scr4w.h>  
 
 /* ===============================================================
-Retourne le handle vers la fenˆtre principale de l'application courante.
+Retourne le handle vers la fenÃªtre principale de l'application courante.
 
 &RT hWndDOS ou hMainWnd, selon la version DOSW32 ou SCRW32
 ================================================================== */

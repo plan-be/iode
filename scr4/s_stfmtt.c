@@ -1,15 +1,15 @@
 #include "s_strs.h"
 /* ====================================================================
-Formatte un string in suivant un format fmt donnÇ. Le rÇsultat out est
-un string transformÇ de longueur Çgale Ö celle de fmt.
+Formatte un string in suivant un format fmt donn√©. Le r√©sultat out est
+un string transform√© de longueur √©gale √† celle de fmt.
 
-Les caractäres reconnus dans le format sont : 'X', 'x', '9', '0'.
-Ils signifient qu'aux seules positions de ces caractäres seront placÇs
-dans leur ordre d'apparition les caractäres trouvÇs dans in. Seul cas
-particulier : le caractäre '0' qui sera remplacÇ par une '0' si le
-caractäre correspondant de in est blanc.
+Les caract√®res reconnus dans le format sont : 'X', 'x', '9', '0'.
+Ils signifient qu'aux seules positions de ces caract√®res seront plac√©s
+dans leur ordre d'apparition les caract√®res trouv√©s dans in. Seul cas
+particulier : le caract√®re '0' qui sera remplac√© par une '0' si le
+caract√®re correspondant de in est blanc.
 
-Les longueurs des strings ne sont pas vÇrifiÇes.
+Les longueurs des strings ne sont pas v√©rifi√©es.
 
 &RT le pointeur vers out
 &EX

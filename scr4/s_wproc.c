@@ -160,7 +160,7 @@ WscrMenuSelect(HWND hWnd, HMENU hMenu, UINT uItem, UINT uFlags)
 
 WscrMenuChar(HWND hWnd, HMENU hMenu, UINT ch, UINT uFlags)
 {
-//    PG_display_error("char %d press‚", ch);
+//    PG_display_error("char %d pressÃ©", ch);
     return(0);
 }
 

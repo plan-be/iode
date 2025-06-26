@@ -1,14 +1,14 @@
 #include "s_strs.h"
 /* ====================================================================
 Prolonge un string avec des blancs de telle sorte que la longueur du
-string devienne lg. Les blancs commmencent Ö partir du premier caractäre
-plus petit que ' ' rencontrÇ.
+string devienne lg. Les blancs commmencent √† partir du premier caract√®re
+plus petit que ' ' rencontr√©.
 
-Place un '\0' Ö la fin du string (str[lg] = '\0').
+Place un '\0' √† la fin du string (str[lg] = '\0').
 
-Si la longueur de str est supÇrieure Ö lg, str est tronquÇ.
+Si la longueur de str est sup√©rieure √† lg, str est tronqu√©.
 
-&RT le string transformÇ
+&RT le string transform√©
 &EX
     char    buf[20];
 

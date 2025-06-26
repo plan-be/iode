@@ -2,7 +2,7 @@
 
 
 /* ====================================================================
-Ecrit dans l'‚cran le texte text (null terminated string) centr‚
+Ecrit dans l'Ã©cran le texte text (null terminated string) centrÃ©
 dans nc colonnes. La position est line, col.
 
 &SA SCR_write()

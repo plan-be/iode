@@ -2,12 +2,12 @@
 
 /* ===================================================================
 Fonction d'initialisation du processus de substitution des arguments
-commen‡ant par $. Cette fonction sera par exemple utilis‚e pour charger
-en m‚moire les strings … substituer … partir d'un fichier ext‚rieur.
+commenÃ§ant par $. Cette fonction sera par exemple utilisÃ©e pour charger
+en mÃ©moire les strings Ã  substituer Ã  partir d'un fichier extÃ©rieur.
 
-A_iexpand() est appel‚e en d‚but des fonctions A_init() et A_initv().
-Sa valeur de retour n'est pas test‚e. Son paramŠtre est le tableau
-des arguments … traiter.
+A_iexpand() est appelÃ©e en dÃ©but des fonctions A_init() et A_initv().
+Sa valeur de retour n'est pas testÃ©e. Son paramÃ¨tre est le tableau
+des arguments Ã  traiter.
 =======================================================================*/
 
 A_iexpand(args)

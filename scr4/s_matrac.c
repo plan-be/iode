@@ -1,17 +1,17 @@
 #include "s_mat.h"
 
 /* ====================================================================
-Calcule la trace de m1 (carr‚e) et stocke le r‚sultat dans m2 (matrice de
+Calcule la trace de m1 (carrÃ©e) et stocke le rÃ©sultat dans m2 (matrice de
 1 ligne).
 
 &RT
-Si m2 est nul, une matrice de dimension (1, nc1) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant).
-Si m2 n'est pas nul, le r‚sultat y est stock‚ et m2 est
-retourn‚. Les dimensions de m2 doivent ˆtre correctes sans quoi
+Si m2 est nul, une matrice de dimension (1, nc1) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant).
+Si m2 n'est pas nul, le rÃ©sultat y est stockÃ© et m2 est
+retournÃ©. Les dimensions de m2 doivent Ãªtre correctes sans quoi
 la fonction retourne un pointeur null et la variable M_errno est
-positionn‚e.
+positionnÃ©e.
 
 &EX
     res = M_trace(0l, m1);

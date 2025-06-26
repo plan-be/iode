@@ -1,14 +1,14 @@
 #include "scr.h"
 
 /* ======================================================================
-Cette fonction modifie le nom du device ou du fichier associÇ Ö un
-PRINTER. Le nom est strippÇ par la fonction et remplace l'ancien nom.
+Cette fonction modifie le nom du device ou du fichier associ√© √† un
+PRINTER. Le nom est stripp√© par la fonction et remplace l'ancien nom.
 
-&NO Le nom ne peut dÇpasser la zone associÇe au nom dans la dÇfinition
-    initiale du PRINTER (FILE "tmp" ne suffit pas en gÇnÇral car
-    il n'y a que trois caractäres disponibles).
-    Cette fonction a ÇtÇ modifiÇe le 05-01-96 pour Çviter certains
-    dÇpassements de buffer.
+&NO Le nom ne peut d√©passer la zone associ√©e au nom dans la d√©finition
+    initiale du PRINTER (FILE "tmp" ne suffit pas en g√©n√©ral car
+    il n'y a que trois caract√®res disponibles).
+    Cette fonction a √©t√© modifi√©e le 05-01-96 pour √©viter certains
+    d√©passements de buffer.
 
 &EX
      PR_set_name(my_pr, pg_config_PRNAME);

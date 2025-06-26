@@ -2,15 +2,15 @@
 #include "scr.h"
 
 /* ====================================================================
-InsŠre une OPTION dans un MENU cr‚‚ … l'aide d'une des fonctions
+InsÃ¨re une OPTION dans un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
 d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-L'option se place en position opt_nb. Pour ajouter en d‚but de MENU,
-utiliser opt_nb = 0. Le texte de l'option est allou‚ dans la fonction.
-La fonction sprintf est utilis‚e pour construire le texte.
+L'option se place en position opt_nb. Pour ajouter en dÃ©but de MENU,
+utiliser opt_nb = 0. Le texte de l'option est allouÃ© dans la fonction.
+La fonction sprintf est utilisÃ©e pour construire le texte.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_insert_option(mn, 0, "%20s - %ld", client, montant);
@@ -36,14 +36,14 @@ char    *text, *s2, *s3, *s4, *s5, *s6, *s7;
 
 
 /* ====================================================================
-Ajoute une OPTION … la fin d'un MENU cr‚‚ … l'aide d'une des fonctions
+Ajoute une OPTION Ã  la fin d'un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
 d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-Le texte de l'option est allou‚ dans la fonction. La fonction sprintf
-est utilis‚e pour construire le texte.
+Le texte de l'option est allouÃ© dans la fonction. La fonction sprintf
+est utilisÃ©e pour construire le texte.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_add_set_option_text(mn, "%20s - %ld", client, montant);
@@ -60,14 +60,14 @@ char    *s1, *s2, *s3, *s4, *s5, *s6, *s7;
     return(0);
 }
 /* =+====== MN_SET_OPTION_TEXT ====================================
-Change le texte d'une OPTION d'un MENU cr‚‚ … l'aide d'une des
+Change le texte d'une OPTION d'un MENU crÃ©Ã© Ã  l'aide d'une des
 fonctions d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-Le texte de l'option est allou‚ dans la fonction. La fonction sprintf
-est utilis‚e pour construire le texte.
+Le texte de l'option est allouÃ© dans la fonction. La fonction sprintf
+est utilisÃ©e pour construire le texte.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_set_option_text(mn, 3, "%20s - %ld", client, montant);
@@ -91,14 +91,14 @@ char    *s1, *s2, *s3, *s4, *s5, *s6, *s7;
 }
 
 /* =+====== MN_set_title ==============================================
-    Change ou fixe le titre d'un MENU cr‚‚ … l'aide d'une des fonctions
+    Change ou fixe le titre d'un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
     d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-    L'espace m‚moire de l'ancien titre est lib‚r‚.
-    La fonction fait appel … sprintf() pour construire le titre.
+    L'espace mÃ©moire de l'ancien titre est libÃ©rÃ©.
+    La fonction fait appel Ã  sprintf() pour construire le titre.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_set_title(mn, "Name : %s, %s", name, firstname);
@@ -119,14 +119,14 @@ char    *s1, *s2, *s3, *s4, *s5, *s6, *s7;
 }
 
 /* =+====== MN_set_footnote =====================================
-    Change ou fixe la footnote d'un MENU cr‚‚ … l'aide d'une des
+    Change ou fixe la footnote d'un MENU crÃ©Ã© Ã  l'aide d'une des
     fonctions d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-    L'espace m‚moire de l'ancienne footnote est lib‚r‚.
-    La fonction fait appel … sprintf() pour construire le texte.
+    L'espace mÃ©moire de l'ancienne footnote est libÃ©rÃ©.
+    La fonction fait appel Ã  sprintf() pour construire le texte.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_set_footnote(mn, "Total : %ld lignes", nb_lines);

@@ -28,26 +28,26 @@ int     A2M_RTF_TOCLEVEL, A2M_RTF_TOCPLEVEL, A2M_RTF_TOCNB;
 U_ch    *A2M_RTF_TOCTXT;
 
 /* ================================================================
-Interpr�te le contenu d'un fichier a2m et g�n�re un fichier .rtf et
-�ventuellement d'autres pour obtenir un input pour la cr�ation d'un
+Interpréte le contenu d'un fichier a2m et génére un fichier .rtf et
+éventuellement d'autres pour obtenir un input pour la création d'un
 fichier d'aide Win32.
 
-&EN a2mfile = nom du fichier a2m � interpr�ter
-&EN outfile = nom du fichier rtf � g�n�rer
-&EN wh      = 1 pour g�n�rer un fichier d'aide, 0 pour un fichier
+&EN a2mfile = nom du fichier a2m à interpréter
+&EN outfile = nom du fichier rtf à générer
+&EN wh      = 1 pour générer un fichier d'aide, 0 pour un fichier
 	      rtf normal
 
-&RT La fonction retourne 0 si le processus s'est bien d�roul�, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien déroulé, -1 sinon.
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-l'impression et la lecture du fichier a2m. Pour que ces param�tres
+---------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramétres
 soient pris en compte par le programme A2mToRtf(), il faut appeler la
 fonction A2mRtfReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -57,34 +57,34 @@ d'interpr�tation et d'impression.
 &TX
 
 &TI Variables globales
-������������������
-Les variables globales d�crites dans le fichier .ini peuvent �galement
-�tre modifi�es dans le programme.
+------------------
+Les variables globales décrites dans le fichier .ini peuvent également
+étre modifiées dans le programme.
 
-&IT Variables influen�ant la lecture du fichier
-������������������������������������������
-Ces variables sont d�finies dans la secion [A2M] du fichier ini.
+&IT Variables influenéant la lecture du fichier
+------------------------------------------
+Ces variables sont définies dans la secion [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caract�re d'escape (enrichissements et caract�res
-    sp�ciaux) : '\'par d�faut
-&EN int A2M_CMDCH = caract�re de commande ('.' par d�faut)
-    sp�ciaux)
-&EN int A2M_DEFCH = caract�re pr�fixant les macros ('&' par d�faut)
-&EN int A2M_SEPCH = caract�re de s�paration des cellules ('&' par d�faut)
+&EN int A2M_ESCCH = caractére d'escape (enrichissements et caractéres
+    spéciaux) : '\'par défaut
+&EN int A2M_CMDCH = caractére de commande ('.' par défaut)
+    spéciaux)
+&EN int A2M_DEFCH = caractére préfixant les macros ('&' par défaut)
+&EN int A2M_SEPCH = caractére de séparation des cellules ('&' par défaut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d�faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par défaut ("par_0")
 
-&IT Variables influen�ant le fichier g�n�r�
-���������������������������������������
-Ces variables sont d�finies dans la section [RTF] du fichier .ini.
+&IT Variables influenéant le fichier généré
+---------------------------------------
+Ces variables sont définies dans la section [RTF] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d�faut des caract�res dans les
-    paragraphes (10 pts par d�faut)
-&EN int A2M_FONTFAMILY = police de caract�re par d�faut ('H', 'T' ou 'C')
-&EN int A2M_FONTINCR = incr�ment de taille de caract�res (2 par d�faut)
-&EN int A2M_TFONTSIZE = taille par d�faut des caract�res dans les
-    tableaux (8 pts par d�faut)
+&EN int A2M_FONTSIZE = taille par défaut des caractéres dans les
+    paragraphes (10 pts par défaut)
+&EN int A2M_FONTFAMILY = police de caractére par défaut ('H', 'T' ou 'C')
+&EN int A2M_FONTINCR = incrément de taille de caractéres (2 par défaut)
+&EN int A2M_TFONTSIZE = taille par défaut des caractéres dans les
+    tableaux (8 pts par défaut)
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -107,7 +107,7 @@ Ces variables sont d�finies dans la section [RTF] du fichier .ini.
 
 &EN int A2M_RTF_TCOLOR = 1 (dft) pour impression en couleur des
     tableaux, 0 en B/W
-&EN int A2M_RTF_TBORDER = �paisseur des cadres des tableaux (1 par dft)
+&EN int A2M_RTF_TBORDER = épaisseur des cadres des tableaux (1 par dft)
 &EN U_ch *A2M_RTF_TITLE = titre du fichier d'aide (si wh == 1)
 &EN U_ch *A2M_RTF_COPYRIGHT = texte du Copyright de l'aide (si wh == 1)
 &EN int A2M_RTF_TCOL1 = largeur de la colonne 1 des tableaux en mm
@@ -120,22 +120,22 @@ Ces variables sont d�finies dans la section [RTF] du fichier .ini.
 &EN int A2M_RTF_VLINES = 1 pour des lignes verticales dans les tableaux
     (dft 0) ;
 
-&NO Certains param�tres ne sont pas g�r�s par le compilateur d'aide
+&NO Certains paramétres ne sont pas gérés par le compilateur d'aide
     de Windows 95, notamment dans les attributs des tableaux.
 
-&TI G�n�rer une aide Windows 95
-���������������������������
-Si on souhaite g�n�rer une aide sous Windows 95, les fichiers suivants
-sont g�n�r�s par le programme A2mToRtf() :
+&TI Générer une aide Windows 95
+---------------------------
+Si on souhaite générer une aide sous Windows 95, les fichiers suivants
+sont générés par le programme A2mToRtf() :
 
 &EN .rtf = fichier contenant le texte de l'aide
-&EN .cnt = fichier contenant la structure de l'aide (table des mati�res)
-&EN .hpj = fichier contenant les param�tres de g�n�ration
+&EN .cnt = fichier contenant la structure de l'aide (table des matiéres)
+&EN .hpj = fichier contenant les paramétres de génération
 
 Pour construire le fichier d'aide, il faut disposer du compilateur
-d'aide de Microsot : hcw.exe. Le processus se d�roule comme suit :
+d'aide de Microsot : hcw.exe. Le processus se déroule comme suit :
 
-&EN cr�er le ou les fichiers a2m
+&EN créer le ou les fichiers a2m
 &EN contruire l'aide :
 &CO
     A2mToRtf("myfile.a2m", "myhelp.rtf", 1)
@@ -150,9 +150,9 @@ d'aide de Microsot : hcw.exe. Le processus se d�roule comme suit :
 &TX
 
 &RT
-&EN 0 en cas de succ�s
-&EN -1 si le fichier ne peut �tre ouvert
-&EN -2 si les fichiers output n'ont p� �tre cr��s
+&EN 0 en cas de succés
+&EN -1 si le fichier ne peut étre ouvert
+&EN -2 si les fichiers output n'ont pé étre créés
 
 &SA A2mRtfReadIni(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
@@ -186,7 +186,7 @@ int     wh;
 
     A2mFreeTopics();  /* JMP 24-05-99 */
     rc = A2mRtfEnd(outfile);
-    A2mClose(af); /* JMP 12-04-07 : d�plac� pour avoir le catalogue sinon free avant dump */
+    A2mClose(af); /* JMP 12-04-07 : déplacé pour avoir le catalogue sinon free avant dump */
     return(rc);
 }
 
@@ -924,23 +924,23 @@ A2mRtfStyles()
 }
 
 /* ================================================================
-Fixe la valeur des variables globales avant l'interp�tation d'un fichier
-a2m et la g�n�ration d'un fichier rtf en se basant sur les d�finitions du
-fichier .ini associ�.
+Fixe la valeur des variables globales avant l'interpétation d'un fichier
+a2m et la génération d'un fichier rtf en se basant sur les définitions du
+fichier .ini associé.
 
-Les sections [A2M] et [RTF] du fichier .ini sont interpr�t�es.
+Les sections [A2M] et [RTF] du fichier .ini sont interprétées.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-la lecture du fichier a2m etla g�nration du fichier rtf. Pour que ces
-param�tres soient pris en compte par le programme A2mToRtf(), il faut
+---------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+la lecture du fichier a2m etla génration du fichier rtf. Pour que ces
+paramétres soient pris en compte par le programme A2mToRtf(), il faut
 appeler la fonction A2mRtfReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>

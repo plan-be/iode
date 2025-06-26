@@ -3,7 +3,7 @@
 
 /* ====================================================================
 Retourne dans res le nom absolu du fichier file du directory dir.
-Cette fonction ‚vite de placer 2 / dans le nom absolu.
+Cette fonction Ã©vite de placer 2 / dans le nom absolu.
 
 &RT pointeur vers res
 &EX

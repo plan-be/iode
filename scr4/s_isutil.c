@@ -2,7 +2,7 @@
 
 /*NH*/
 /************ Ensemble de fonctions utilitaires sur les ISAM extraites
-    de s_isam.c et placÇes dans scr4o
+    de s_isam.c et plac√©es dans scr4o
 *********************************************************************/
 
 IS_get_max_field(is, fld_nb, ptr)
@@ -20,22 +20,22 @@ char    *ptr;
 
 /* ====================================================================
 Copie la valeur d'un champ du record courant d'un ISAM dans un pointeur.
-Aucune vÇrification n'est effectuÇe sur la longueur ou le type des
+Aucune v√©rification n'est effectu√©e sur la longueur ou le type des
 champs.
 
-Si le record courant a ÇtÇ modifiÇ depuis sa lecture, c'est la valeur
-modifiÇe qui est utilisÇe.
+Si le record courant a √©t√© modifi√© depuis sa lecture, c'est la valeur
+modifi√©e qui est utilis√©e.
 
 &EX
     char    name[51];
 
     IS_get_field(is_client, 0, name);
 &TX
-&SA IS_get_read_field(), IS_set_field(), SCR_get_*(), accäs aux valeurs
+&SA IS_get_read_field(), IS_set_field(), SCR_get_*(), acc√®s aux valeurs
 directes des ISAM
 =======================================================================*/
 
-char *IS_get_field(is, fld_nb, ptr) /* BP_M 15-12-1999  Modif pour compatibilitÇ v2 */
+char *IS_get_field(is, fld_nb, ptr) /* BP_M 15-12-1999  Modif pour compatibilit√© v2 */
 ISAM    *is;
 int     fld_nb;
 char    *ptr;
@@ -49,11 +49,11 @@ char    *ptr;
 
 /* ====================================================================
 Copie la valeur d'un champ du record courant d'un ISAM dans un pointeur.
-Aucune vÇrification n'est effectuÇe sur la longueur ou le type des
+Aucune v√©rification n'est effectu√©e sur la longueur ou le type des
 champs.
 
-Màme si le record courant a ÇtÇ modifiÇ depuis sa lecture, c'est la valeur
-du fichier qui est utilisÇe.
+M√™me si le record courant a √©t√© modifi√© depuis sa lecture, c'est la valeur
+du fichier qui est utilis√©e.
 
 
 &EX
@@ -61,7 +61,7 @@ du fichier qui est utilisÇe.
 
     IS_get_read_field(is_client, 0, name);
 &TX
-&SA IS_get_field(), IS_set_field(), SCR_get_*(), accäs aux valeurs
+&SA IS_get_field(), IS_set_field(), SCR_get_*(), acc√®s aux valeurs
 directes des ISAM
 =======================================================================*/
 
@@ -78,10 +78,10 @@ char    *ptr;
 }
 
 /* ====================================================================
-Fixe la valeur d'un champ du record courant d'un ISAM Ö partir d'un
+Fixe la valeur d'un champ du record courant d'un ISAM √† partir d'un
 pointeur.
 
-Aucune vÇrification n'est effectuÇe sur la longueur ou le type des
+Aucune v√©rification n'est effectu√©e sur la longueur ou le type des
 champs. Si l'espace du pointeur est trop petit, on peut en UNIX obtenir
 un "segmentation violation".
 
@@ -91,7 +91,7 @@ un "segmentation violation".
     strcpy(name, "Durand");
     IS_set_field(is_client, 0, name);
 &TX
-&SA IS_get_read_field(), IS_get_field(), SCR_get_*(), accäs aux valeurs
+&SA IS_get_read_field(), IS_get_field(), SCR_get_*(), acc√®s aux valeurs
 directes des ISAM
 =======================================================================*/
 
@@ -239,8 +239,8 @@ ISAM    *is;
 
 /* ====================================================================
 Annule tous les champs du record de l'ISAM is en fixant toutes les
-valeurs des champs Ö 0. Les champs de type caractäre sont Çgalement
-fixÇs Ö 0 et non Ö blanc.
+valeurs des champs √† 0. Les champs de type caract√®re sont √©galement
+fix√©s √† 0 et non √† blanc.
 
 &SA IS_empty_field()
 =======================================================================*/
@@ -264,8 +264,8 @@ ISAM    *is;
 
 /* ====================================================================
 Annule le champ isf_nb du record de l'ISAM is en fixant la valeur
-de ce champ Ö 0. Les champs de type caractäre sont Çgalement
-fixÇs Ö 0 et non Ö blanc.
+de ce champ √† 0. Les champs de type caract√®re sont √©galement
+fix√©s √† 0 et non √† blanc.
 
 &SA IS_empty_rec()
 =======================================================================*/

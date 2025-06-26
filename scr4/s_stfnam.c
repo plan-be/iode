@@ -1,7 +1,7 @@
 #include "scr4.h"
 
 /* ====================================================================
-Transforme un nom de fichier en format Unix en remplaáant les
+Transforme un nom de fichier en format Unix en rempla√ßant les
 BACKSLASH (\) par des SLASH (/).
 
 &EN filename = pointeur vers le nom du fichier
@@ -23,11 +23,11 @@ U_ch   *filename;
 }
 
 /* ====================================================================
-Transforme un nom de fichier en fonction du systäme cible (Unix ou DOS)
-en remplaáant les BACKSLASH (\) ou les SLASH (/) par des SLASH (/) ou
+Transforme un nom de fichier en fonction du syst√®me cible (Unix ou DOS)
+en rempla√ßant les BACKSLASH (\) ou les SLASH (/) par des SLASH (/) ou
 des BACKSLASH (\).
 
-La fonction s'adapte au systäme courant.
+La fonction s'adapte au syst√®me courant.
 
 &EN filename = pointeur vers le nom du fichier
 
@@ -52,13 +52,13 @@ U_ch   *filename;
 }
 
 /* ====================================================================
-Transforme un nom de fichier en fonction du systäme cible (Unix ou DOS)
-en remplaáant les BACKSLASH (\) ou les SLASH (/) par des SLASH (/) ou
+Transforme un nom de fichier en fonction du syst√®me cible (Unix ou DOS)
+en rempla√ßant les BACKSLASH (\) ou les SLASH (/) par des SLASH (/) ou
 des BACKSLASH (\).
 
-Cette fonction supprime Çgalement les doubles // ou \\ sauf en dÇbut de nom.
+Cette fonction supprime √©galement les doubles // ou \\ sauf en d√©but de nom.
 
-La fonction s'adapte au systäme courant.
+La fonction s'adapte au syst√®me courant.
 
 &EN filename = pointeur vers le nom du fichier
 

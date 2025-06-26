@@ -124,13 +124,13 @@ HANDLE WscrGetFont(int attr)
 
 
 /* ========================================================================
-Calcule la position et la taille d'un champ d'une page ou de la page entiäre.
+Calcule la position et la taille d'un champ d'une page ou de la page enti√®re.
 
-&EN pg : PAGE concernÇe
-&EN fld_nb : numÇro du champ ou
-&EN2 -1 pour la position de la PAGE entiäre
-&EN x = pointeur vers la position, en pixels, du coin supÇrieur gauche du champ ou de la page
-&EN y = pointeur vers la position, en pixels, du coin supÇrieur gauche du champ ou de la page
+&EN pg : PAGE concern√©e
+&EN fld_nb : num√©ro du champ ou
+&EN2 -1 pour la position de la PAGE enti√®re
+&EN x = pointeur vers la position, en pixels, du coin sup√©rieur gauche du champ ou de la page
+&EN y = pointeur vers la position, en pixels, du coin sup√©rieur gauche du champ ou de la page
 &EN w = pointeur vers la largeur, en pixels
 &EN h = pointeur vers la hauteur, en pixels
 

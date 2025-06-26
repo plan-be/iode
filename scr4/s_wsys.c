@@ -5,38 +5,38 @@
 #include <process.h>
 
 /* ========================================================================
-CrÇe un groupe Windows et y ajoute un ÇlÇment. Cette version du programme
-est compatible Windows 3.x. Sous Windows 95, elle crÇe un raccourci
-pour l'ÇlÇment ajoutÇ et ajoute un point dans le menu DÇmarrer/Programmes.
+Cr√©e un groupe Windows et y ajoute un √©l√©ment. Cette version du programme
+est compatible Windows 3.x. Sous Windows 95, elle cr√©e un raccourci
+pour l'√©l√©ment ajout√© et ajoute un point dans le menu D√©marrer/Programmes.
 
-La fonction WscrAddGroupItem() exploite les fonctionnalitÇs DDE de
+La fonction WscrAddGroupItem() exploite les fonctionnalit√©s DDE de
 PROGMAN.
 
-&EN groupname = nom du groupe (Ö ouvrir ou crÇer)
-&EN cmd = commande Ö exÇcuter, y compris ses paramätres Çventuels.
-    Cette commande ne peut contenir de virgules ni de parenthäses.
+&EN groupname = nom du groupe (√† ouvrir ou cr√©er)
+&EN cmd = commande √† ex√©cuter, y compris ses param√®tres √©ventuels.
+    Cette commande ne peut contenir de virgules ni de parenth√®ses.
 
-&EN title = titre de l'icìne de l'ÇlÇment ajoutÇ
-&EN startdir = directory de dÇpart. A prÇciser si possible. Si cette
-    valeur n'est pas fixÇe (""), le directory est extrait (par Windows)
+&EN title = titre de l'ic√¥ne de l'√©l√©ment ajout√©
+&EN startdir = directory de d√©part. A pr√©ciser si possible. Si cette
+    valeur n'est pas fix√©e (""), le directory est extrait (par Windows)
     de la valeur de cmd. Si cmd contient un argument, le nom extrait est
     incorrect.
 
 &EN show = affichage du groupe
-&EN2 0 pour une fenàtre minimisÇe
-&EN2 1 pour une fenàtre normale
+&EN2 0 pour une fen√™tre minimis√©e
+&EN2 1 pour une fen√™tre normale
 
-Il est Ö noter que la fenàtre du groupe reste apparente apräs crÇation
-du groupe. L'utilisateur doit lui-màme la quitter s'il le souhaite.
+Il est √† noter que la fen√™tre du groupe reste apparente apr√®s cr√©ation
+du groupe. L'utilisateur doit lui-m√™me la quitter s'il le souhaite.
 
-D'autre part, aucune valeur de retour ne permet de vÇifier la bonne
-exÇcution des commandes.
+D'autre part, aucune valeur de retour ne permet de v√©ifier la bonne
+ex√©cution des commandes.
 
-Sous Windows 95, un point est ajoutÇ par cette commande dans le menu
-DÇmarrer/Programmes avec le contenu du groupe.
+Sous Windows 95, un point est ajout√© par cette commande dans le menu
+D√©marrer/Programmes avec le contenu du groupe.
 
-Sous Windows NT, la commande peut àtre inopÇrante en raison des
-prÇrogatives insuffisante de l'utilisateur.
+Sous Windows NT, la commande peut √™tre inop√©rante en raison des
+pr√©rogatives insuffisante de l'utilisateur.
 
 &EX
     WscrAddGroupItem("IODE", "\\iode\\iodew32.exe", "IODE for Win32",
@@ -71,18 +71,18 @@ WscrAddGroupItem(U_ch *groupname, U_ch *cmd, U_ch *title,
 }
 
 /* ========================================================================
-DÇtruit un groupe Windows. Cette version du programme
+D√©truit un groupe Windows. Cette version du programme
 est compatible Windows 3.x.
 
-La fonction WscrAddGroupItem() permet de crÇer des groupes et d'y ajouter des ÇlÇments.
+La fonction WscrAddGroupItem() permet de cr√©er des groupes et d'y ajouter des √©l√©ments.
 
-&EN groupname = nom du groupe (Ö ouvrir ou crÇer)
+&EN groupname = nom du groupe (√† ouvrir ou cr√©er)
 
-Aucune valeur de retour ne permet de vÇifier la bonne exÇcution des
+Aucune valeur de retour ne permet de v√©ifier la bonne ex√©cution des
 commandes.
 
-Sous Windows NT, la commande peut àtre inopÇrante en raison des
-prÇrogatives insuffisante de l'utilisateur.
+Sous Windows NT, la commande peut √™tre inop√©rante en raison des
+pr√©rogatives insuffisante de l'utilisateur.
 
 &EX
     WscrDeleteGroup("IODE");
@@ -102,29 +102,29 @@ WscrDeleteGroup(U_ch *groupname)
 }
 
 /* ========================================================================
-Cette fonction gÇnÇralise par WscrRegisterFileType().
+Cette fonction g√©n√©ralise par WscrRegisterFileType().
 
 Enregistre un Mime type et l'extension d'un fichier dans la base de
-registres de Windows 95 ou NT. Associe Çventuellement une icìne et/ou un
+registres de Windows 95 ou NT. Associe √©ventuellement une ic√¥ne et/ou un
 programme pour ouvrir le fichier dans l'explorateur Windows.
 
 &EN mime = mime type ("application/x-iodevar"). Si nul, pas
 	   d'enregistrement de mime type.
 &EN ext = extension du fichier (".var")
-&EN code = code associÇ au type de fichier ("IODE.VAR")
-&EN descr = description affichÇ dans l'explorateur ("Iode Variables")
-&EN icon = localisation de l'icìne associÇe Ö ce type de fichier
+&EN code = code associ√© au type de fichier ("IODE.VAR")
+&EN descr = description affich√© dans l'explorateur ("Iode Variables")
+&EN icon = localisation de l'ic√¥ne associ√©e √† ce type de fichier
     ("C:\\WINDOWS\\SYSTEM\\cool.dll,24")
-&EN opencmd = programme Ö lancer pour ouvrir le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe %1")
-&EN newcmd = programme Ö lancer pour crÇer le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe -c %1")
-&EN printcmd = programme Ö lancer pour imprimer le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe -p %1")
+&EN opencmd = programme √† lancer pour ouvrir le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe %1")
+&EN newcmd = programme √† lancer pour cr√©er le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe -c %1")
+&EN printcmd = programme √† lancer pour imprimer le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe -p %1")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 
-&NO L'existence des associations n'est pas vÇrifiÇe.
+&NO L'existence des associations n'est pas v√©rifi√©e.
 ================================================================== */
 
 WscrRegisterMimeType(char *mime, char *ext, char *code, char *descr,
@@ -206,29 +206,29 @@ err:
 }
 
 /* ========================================================================
-Cette fonction est gÇnÇralisÇe par WscrRegisterMimeType().
+Cette fonction est g√©n√©ralis√©e par WscrRegisterMimeType().
 
 Enregistre l'extension d'un nom de fichier dans la base de
-registres de Windows 95 ou NT. Associe Çventuellement une icìne et/ou un
+registres de Windows 95 ou NT. Associe √©ventuellement une ic√¥ne et/ou un
 programme pour ouvrir le fichier dans l'explorateur Windows.
 
 &EN mime = mime type ("application/x-iodevar"). Si nul, pas
 	   d'enregistrement de mime type.
 &EN ext = extension du fichier (".var")
-&EN code = code associÇ au type de fichier ("IODE.VAR")
-&EN descr = description affichÇ dans l'explorateur ("Iode Variables")
-&EN icon = localisation de l'icìne associÇe Ö ce type de fichier
+&EN code = code associ√© au type de fichier ("IODE.VAR")
+&EN descr = description affich√© dans l'explorateur ("Iode Variables")
+&EN icon = localisation de l'ic√¥ne associ√©e √† ce type de fichier
     ("C:\\WINDOWS\\SYSTEM\\cool.dll,24")
-&EN opencmd = programme Ö lancer pour ouvrir le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe %1")
-&EN newcmd = programme Ö lancer pour crÇer le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe -c %1")
-&EN printcmd = programme Ö lancer pour imprimer le fichier avec des
-    paramätres Çventuels ("C:\\iode\\iode.exe -p %1")
+&EN opencmd = programme √† lancer pour ouvrir le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe %1")
+&EN newcmd = programme √† lancer pour cr√©er le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe -c %1")
+&EN printcmd = programme √† lancer pour imprimer le fichier avec des
+    param√®tres √©ventuels ("C:\\iode\\iode.exe -p %1")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 
-&NO L'existence des associations n'est pas vÇrifiÇe.
+&NO L'existence des associations n'est pas v√©rifi√©e.
 ================================================================== */
 WscrRegisterFileType(char *ext, char *code, char *descr,
 	    char *icon, char *opencmd, char *newcmd, char *printcmd)
@@ -238,16 +238,16 @@ WscrRegisterFileType(char *ext, char *code, char *descr,
 }
 
 /* ========================================================================
-DÇsenregistre un type de fichier dans la base de registres de Windows 95.
+D√©senregistre un type de fichier dans la base de registres de Windows 95.
 
 &EN ext = extension du fichier (".var")
-&EN code = code associÇ au type de fichier ("IODE.VAR")
+&EN code = code associ√© au type de fichier ("IODE.VAR")
 
 Si ext est NULL ou vide, l'action n'a pas lieu et la fonction retourne
 0. Si code est NULL ou vide, l'action n'a pas lieu et la fonction
 retourne 0.
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 ================================================================== */
 
 WscrRegisterDeleteFileType(char *ext, char *code)
@@ -256,17 +256,17 @@ WscrRegisterDeleteFileType(char *ext, char *code)
 }
 
 /* ========================================================================
-DÇsenregistre un mime type dans la base de registres de Windows 95 ou NT.
+D√©senregistre un mime type dans la base de registres de Windows 95 ou NT.
 
 &EN ext = extension du fichier (".var")
-&EN code = code associÇ au type de fichier ("IODE.VAR")
+&EN code = code associ√© au type de fichier ("IODE.VAR")
 &EN mime = mime type ("application/x-iodevar")
 
 Si ext est NULL ou vide, l'action n'a pas lieu et la fonction retourne
 0. Si code est NULL ou vide, l'action n'a pas lieu et la fonction
 retourne 0.
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 ================================================================== */
 
 WscrRegisterDeleteMimeType(char *ext, char *code, char *mime)
@@ -317,16 +317,16 @@ WscrRegDeleteKey(char *key)
 }
 
 /* ========================================================================
-Enregistre le programme de dÇsinstallation dans le Control Panel de
+Enregistre le programme de d√©sinstallation dans le Control Panel de
 Windows 95.
 
-&EN code = code associÇ au logiciel ("IODE")
-&EN title = titre Ö faire apparaåtre lors de la dÇsinstallation
+&EN code = code associ√© au logiciel ("IODE")
+&EN title = titre √† faire appara√Ætre lors de la d√©sinstallation
     ("IODE version 5")
-&EN prog= programme de dÇsinstallation (+ paramätres)
+&EN prog= programme de d√©sinstallation (+ param√®tres)
     ("C:\\IODE\\uninstall.exe")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 ================================================================== */
 
 WscrRegisterUninstall(char *code, char *title, char *exe)
@@ -344,12 +344,12 @@ WscrRegisterUninstall(char *code, char *title, char *exe)
 }
 
 /* ========================================================================
-DÇsenregistre les entrÇes pour la dÇsinstallation dans le Control Panel
+D√©senregistre les entr√©es pour la d√©sinstallation dans le Control Panel
 de Windows 95.
 
-&EN code = code associÇ au logiciel ("IODE")
+&EN code = code associ√© au logiciel ("IODE")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 ================================================================== */
 
 WscrRegisterDeleteUninstall(char *code)
@@ -363,14 +363,14 @@ WscrRegisterDeleteUninstall(char *code)
 }
 
 /* ========================================================================
-Enregistre des donnÇes propres Ö une application dans la base de
+Enregistre des donn√©es propres √† une application dans la base de
 registres de Windows 95.
 
 &EN ApplCode = code de l'application ("IODE")
 &EN ApplVar = nom de la variable ("LastDirectory")
 &EN VarValue = valeur de la variable ("c:\\usr\\iode\\maribel")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 &SA WscrRegisterGetApplData(), WscrRegisterDeleteApplData()
 ================================================================== */
 
@@ -387,15 +387,15 @@ WscrRegisterSetApplData(char *ApplCode, char *ApplVar, char *VarValue)
 }
 
 /* ========================================================================
-Recherche des donnÇes propres Ö une application dans la base de
+Recherche des donn√©es propres √† une application dans la base de
 registres de Windows 95.
 
 &EN ApplCode = code de l'application ("IODE")
 &EN ApplVar = nom de la variable ("LastDirectory")
 &EN VarValue = valeur de la variable ("c:\\usr\\iode\\maribel"). Le buffer
-    doit àtre assez grand pour contenir la valeur
+    doit √™tre assez grand pour contenir la valeur
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 &SA WscrRegisterSetApplData(), WscrRegisterDeleteApplData()
 ================================================================== */
 
@@ -414,14 +414,14 @@ WscrRegisterGetApplData(char *ApplCode, char *ApplVar, char *VarValue)
 }
 
 /* ========================================================================
-DÇtruit toutes les donnÇes propres Ö une application dans la base de
+D√©truit toutes les donn√©es propres √† une application dans la base de
 registres de Windows 95.
 
 &EN ApplCode = code de l'application ("IODE")
 &EN ApplVar = nom de la variable ("LastDirectory")
 &EN VarValue = valeur de la variable ("c:\\usr\\iode\\maribel")
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 &SA WscrRegisterGetApplData(), WscrRegisterSetApplData()
 ================================================================== */
 
@@ -436,15 +436,15 @@ WscrRegisterDeleteApplData(char *ApplCode)
 }
 
 /* ========================================================================
-Recherche une clÇ REGSZ dans la partie HKEY_LOCAL_MACHINE de la base de
+Recherche une cl√© REGSZ dans la partie HKEY_LOCAL_MACHINE de la base de
 registres de Windows.
 
-&EN KeyName = Nom de la clÇ "Software\\Microsoft\\Windows\\CurrentVersion\\...\\WinWord.exe")
+&EN KeyName = Nom de la cl√© "Software\\Microsoft\\Windows\\CurrentVersion\\...\\WinWord.exe")
 &EN VarValue = valeur de la variable ("c:\\Program Files\\Microsoft Office\\winword.exe").
 
-Le buffer doit àtre assez grand pour contenir la valeur de VarValue.
+Le buffer doit √™tre assez grand pour contenir la valeur de VarValue.
 
-&RT -1 en cas d'erreur et 0 en cas de succäs
+&RT -1 en cas d'erreur et 0 en cas de succ√®s
 &SA WscrRegisterSetApplData(), WscrRegisterDeleteApplData()
 ================================================================== */
 
@@ -470,7 +470,7 @@ WscrRegisterGetValue(char *KeyName, char *VarValue)
 
 
 /* ===============================================================
-ExÇcute une commande via WinExec sans attendre de retour
+Ex√©cute une commande via WinExec sans attendre de retour
 ================================================================== */
 
 WscrWinExec(char *cmd)
@@ -479,7 +479,7 @@ WscrWinExec(char *cmd)
 }
 
 /* ===============================================================
-ExÇcute une commande via WinExec sans attendre de retour (MINIMIZE)
+Ex√©cute une commande via WinExec sans attendre de retour (MINIMIZE)
 ================================================================== */
 
 WscrWinExecMin(char *cmd)
@@ -488,7 +488,7 @@ WscrWinExecMin(char *cmd)
 }
 
 /* ===============================================================
-ExÇcute une commande via spawn en bloquant le process appelant
+Ex√©cute une commande via spawn en bloquant le process appelant
 ================================================================== */
 
 WscrSystem(char *cmd)
@@ -502,10 +502,10 @@ WscrSystem(char *cmd)
 
 
 /* ===============================================================
-Retourne le nom du directory de Windows. Le buffer windir doit àtre au
-moins de 128 caractäres.
+Retourne le nom du directory de Windows. Le buffer windir doit √™tre au
+moins de 128 caract√®res.
 
-&RT 0 en cas de succäs, une valeur non nulle sinon.
+&RT 0 en cas de succ√®s, une valeur non nulle sinon.
 ================================================================== */
 
 WscrGetWindowsDir(char *windir)
@@ -515,9 +515,9 @@ WscrGetWindowsDir(char *windir)
 
 /* ===============================================================
 Retourne le nom du directory system de Windows. Le buffer sysdir doit
-àtre au moins de 128 caractäres.
+√™tre au moins de 128 caract√®res.
 
-&RT 0 en cas de succäs, une valeur non nulle sinon.
+&RT 0 en cas de succ√®s, une valeur non nulle sinon.
 ================================================================== */
 
 WscrGetSystemDir(char *sysdir)
@@ -527,18 +527,18 @@ WscrGetSystemDir(char *sysdir)
 
 
 /* ===============================================================
-ExÇcute une commande via CreateProcess en bloquant le process appelant.
-Tous les Çvänements destinÇs au process appelant sont bloquÇs pendant la
-pÇriode d'exÇcution du sous-programme.
+Ex√©cute une commande via CreateProcess en bloquant le process appelant.
+Tous les √©v√®nements destin√©s au process appelant sont bloqu√©s pendant la
+p√©riode d'ex√©cution du sous-programme.
 
 Cette commande fonctionne pour les fichiers .bat, .exe, ..., y compris
-en 16 bits. Des paramätres peuvent àtre passÇs dans cmd.
+en 16 bits. Des param√®tres peuvent √™tre pass√©s dans cmd.
 
-Cette crÇe un nouveau VDM (Virtual DOS Machine), ce qui permet
-de gÇrer correctement les portes COM:, LPT1: sous Win95 et Win98.
+Cette cr√©e un nouveau VDM (Virtual DOS Machine), ce qui permet
+de g√©rer correctement les portes COM:, LPT1: sous Win95 et Win98.
 
 
-&RT 0 en cas de succäs, -1 si le process n'a pu àtre crÇÇ.
+&RT 0 en cas de succ√®s, -1 si le process n'a pu √™tre cr√©√©.
 
 &EX
     WscrCreateProcess("mytest.bat DIR1 c:\\tmp");
@@ -582,19 +582,19 @@ char    *cmd;
 }
 
 /* ===============================================================
-ExÇcute un programme console (ou autre) 16 ou 32 bits via CreateProcess
-en bloquant le process appelant. Tous les Çvänements destinÇs au process
-appelant sont bloquÇs pendant la pÇriode d'exÇcution du sous-programme.
+Ex√©cute un programme console (ou autre) 16 ou 32 bits via CreateProcess
+en bloquant le process appelant. Tous les √©v√®nements destin√©s au process
+appelant sont bloqu√©s pendant la p√©riode d'ex√©cution du sous-programme.
 
 Cette commande fonctionne pour les fichiers .bat, .exe, ..., y compris
-en 16 bits. Des paramätres peuvent àtre passÇs dans cmd.
+en 16 bits. Des param√®tres peuvent √™tre pass√©s dans cmd.
 
 Ne fonctionne pas pour des commandes interne au shell comme copy ou del.
 
-&EN cmd : commande Ö exÇcuter
-&EN win : avec (1) ou sans (1) fenàtre
+&EN cmd : commande √† ex√©cuter
+&EN win : avec (1) ou sans (1) fen√™tre
 
-&RT 0 en cas de succäs, -1 si le process n'a pu àtre crÇÇ.
+&RT 0 en cas de succ√®s, -1 si le process n'a pu √™tre cr√©√©.
 
 &EX
     WscrCreateConsoleProcess("mytest.bat DIR1 c:\\tmp", 0);
@@ -643,15 +643,15 @@ int     win;
 }
 
 /* ===============================================================
-ExÇcute le programme associÇ au fichier passÇ comme argument. Les associations sont
-celles de Windows. Par exemple, un fichier .htm dÇmarrera le browser par dÇfaut.
+Ex√©cute le programme associ√© au fichier pass√© comme argument. Les associations sont
+celles de Windows. Par exemple, un fichier .htm d√©marrera le browser par d√©faut.
 
-&EN filename : nom du fichier Ö "Çditer"
+&EN filename : nom du fichier √† "√©diter"
 
-RT 0 en cas de succäs, -1 si le process n'a pu àtre crÇÇ.
+RT 0 en cas de succ√®s, -1 si le process n'a pu √™tre cr√©√©.
 
 &EX
-    WscrShellExec("index.htm");   Lance le browser par dÇfaut
+    WscrShellExec("index.htm");   Lance le browser par d√©faut
     WscrShellExec("readme.txt");  Lance notepad
 
 &TX
@@ -673,13 +673,13 @@ char    *filename;
 }
 
 /* ===============================================================
-VÇrifie l'existence de fonctions dans une DLL et retourne le pointeur vers
-la fonction le cas ÇchÇant.
+V√©rifie l'existence de fonctions dans une DLL et retourne le pointeur vers
+la fonction le cas √©ch√©ant.
 
 &EN dll : nom de la dll
-&EN fn : fonction recherchÇe
+&EN fn : fonction recherch√©e
 
-RT 0 en cas de succäs, -1 si une des fonctions manquent
+RT 0 en cas de succ√®s, -1 si une des fonctions manquent
 
 &EX
     WscrGetDllFnPtr("Winspool.lib", "GetDefaultPrinterA");

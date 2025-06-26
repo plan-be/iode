@@ -2,10 +2,10 @@
 
 /* ====================================================================
 Standardise dans res le nom de directory dir en supprimant le / ou le \ qui
-se trouve … la fin sauf dans le cas du root directory (/ ou a:\).
-De plus, cette fonction supprime le blancs en d‚but et fin du nom du directory.
+se trouve Ã  la fin sauf dans le cas du root directory (/ ou a:\).
+De plus, cette fonction supprime le blancs en dÃ©but et fin du nom du directory.
 
-dir et res peuvent ˆtre confondus. En DOS, le nom est mis en minuscules.
+dir et res peuvent Ãªtre confondus. En DOS, le nom est mis en minuscules.
 
 &EX
     SCR_dir_std(res, "  C:\  ") : res vaut "c:\"

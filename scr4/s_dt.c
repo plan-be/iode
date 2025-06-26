@@ -12,7 +12,7 @@ int     DT_MONTHS[] = {0,31,59,90,120,151,181,212,243,273,304,334} ;
 int     DT_DAYS[]   = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 /* ====================================================================
-Retourne l'ann�e d'une date.
+Retourne l'année d'une date.
 &EX
     DT_year(19900315L) vaut 1990
 &TX
@@ -51,10 +51,10 @@ long    date;
 }
 
 /* ====================================================================
-Retourne le nombre de jours �coul�s entre le premier janvier 1900 et
+Retourne le nombre de jours écoulés entre le premier janvier 1900 et
 date.
 
-date est pr�sent� sous forme de long : YYYYMMDD. Par exemple 19911010.
+date est présenté sous forme de long : YYYYMMDD. Par exemple 19911010.
 
 &RT le nombre de jours (long)
 &EX
@@ -75,9 +75,9 @@ long    date;
 }
 
 /* ====================================================================
-Transforme en date un nombre de jours �coul�s (day) depuis le 1/1/1900.
+Transforme en date un nombre de jours écoulés (day) depuis le 1/1/1900.
 
-Le r�sultat est pr�sent� sous forme d'un long : YYYYMMDD (19911231).
+Le résultat est présenté sous forme d'un long : YYYYMMDD (19911231).
 &RT la date correspondant au nombre de jours
 &EX
     DT_num_date(30000L);
@@ -107,9 +107,9 @@ long    day;
     return(DT_dmy_date(d));
 }
 /* ====================================================================
-Indique si l'ann�e donn�e sous forme d'un long est bissextile ou non.
+Indique si l'année donnée sous forme d'un long est bissextile ou non.
 
-&RT 0 si l'ann�e n'est pas bissextile, 1 sinon.
+&RT 0 si l'année n'est pas bissextile, 1 sinon.
 &EX
 	DT_bix(1990L);
 &TX
@@ -157,7 +157,7 @@ long    d[];
 }
 
 /* ====================================================================
-Retourne le jour de la semaine correspondant � la date donn�e
+Retourne le jour de la semaine correspondant à la date donnée
 &RT un entier compris entre 1 (lundi) et 7 (dimanche)
 &EX
     DT_day_w(19911031L)
@@ -172,9 +172,9 @@ long    date;
 }
 
 /* ====================================================================
-Ajoute � une date (YYYYMMDD) un nombre de mois. Si le jour n'appartient
-pas au nouveau mois, il est ramen� au dernier jour du mois. nbm peut
-�tre n�gatif.
+Ajoute à une date (YYYYMMDD) un nombre de mois. Si le jour n'appartient
+pas au nouveau mois, il est ramené au dernier jour du mois. nbm peut
+étre négatif.
 
 &RT la nouvelle date (YYYYMMDD)
 &EX
@@ -215,7 +215,7 @@ int     nbm;
 }
 
 /* ====================================================================
-Ajoute � une date (YYYYMMDD) un nombre de jours.
+Ajoute à une date (YYYYMMDD) un nombre de jours.
 
 &RT la nouvelle date (YYYYMMDD)
 &SA DT_add_months()
@@ -229,23 +229,23 @@ int     nbd;
 }
 
 /* ====================================================================
-Modifie une date (YYYYMMDD) en fonction d'un calendrier sp�cifique. dayr
+Modifie une date (YYYYMMDD) en fonction d'un calendrier spécifique. dayr
 peut prendre les valeurs suivantes :
 
 &EN 0 : pas de changement de date
 &EN 1 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui pr�c�de est retourn�
+	25/12, le jour de semaine qui précéde est retourné
 &EN 2 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui pr�c�de est retourn� sauf si il ne
-	fait pas partie du m�me mois que la date d'origine. Dans ce cas,
-	la r�gle du cas 3 est utilis�.
+	25/12, le jour de semaine qui précéde est retourné sauf si il ne
+	fait pas partie du méme mois que la date d'origine. Dans ce cas,
+	la régle du cas 3 est utilisé.
 &EN 3 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui suit est retourn�
+	25/12, le jour de semaine qui suit est retourné
 &EN 4 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui suit est retourn� sauf si il ne
-	fait pas partie du m�me mois que la date d'origine. Dans ce cas,
-	la r�gle du cas 1 est utilis�.
-&RT la date modifi�e (�ventuellement) sous le format YYYYMMDD
+	25/12, le jour de semaine qui suit est retourné sauf si il ne
+	fait pas partie du méme mois que la date d'origine. Dans ce cas,
+	la régle du cas 1 est utilisé.
+&RT la date modifiée (éventuellement) sous le format YYYYMMDD
 &EX
     DT_bus(19910101, 0) vaut 19910101
     DT_bus(19910101, 1) vaut 19901231
@@ -288,10 +288,10 @@ ag:
 
 
 /* ====================================================================
-Indique si une date correspond � un jour de travail ou non. Cette
-fonction peut �tre modifi�e par l'utilisateur pour r�pondre � ses
-contraintes. Elles est utilis�e dans DT_bus().
-&RT 1 si le jour est f�ri�, 0 sinon.
+Indique si une date correspond à un jour de travail ou non. Cette
+fonction peut étre modifiée par l'utilisateur pour répondre à ses
+contraintes. Elles est utilisée dans DT_bus().
+&RT 1 si le jour est férié, 0 sinon.
 &SA DT_bus()
 ======================================================================= */
 DT_leave(date)
@@ -306,9 +306,9 @@ long    date;
     return(0);
 }
 /* ====================================================================
-Retourne la diff�rence de mois entre deux dates (sans tenir compte des
+Retourne la différence de mois entre deux dates (sans tenir compte des
 jours).
-&RT le nombre de mois de diff�rence
+&RT le nombre de mois de différence
 &EX
     DT_diff_months(19900201, 19900131) vaut 1
     DT_diff_months(19900201, 19910228) vaut -12
@@ -327,7 +327,7 @@ long    d1, d2;
 }
 
 /* ====================================================================
-Retourne le nombre de jours �coul�s entre deux dates (YYYYMMDD).
+Retourne le nombre de jours écoulés entre deux dates (YYYYMMDD).
 &EX
     DT_diff_dates(19900201L, 19900131L) vaut 1
 &TX
@@ -360,10 +360,10 @@ long    vd1[3];
 /* ====================================================================
 Retourne le nombre de jours entre deux dates dans un calendrier 30 jours
 par mois. Dans ce type de calendrier, tous les mois ont 30 jours, y
-compris f�vrier et tout se passe comme si le 31 n'existait pas et �tait
-remplac� par le 30. De m�me le 28 f�vrier est compt� comme 30�me jour,
-sauf les ann�es bissextiles o� c'est le 29 f�vrier qui est compt� comme
-300�me jour.
+compris février et tout se passe comme si le 31 n'existait pas et était
+remplacé par le 30. De méme le 28 février est compté comme 30éme jour,
+sauf les années bissextiles oé c'est le 29 février qui est compté comme
+300éme jour.
 &RT Le nombre de jour (long)
 &EX
     DT_diff_30(19900201L, 19900130L)  vaut 1 et non 2
@@ -388,7 +388,7 @@ long    d2, d1;
 
 /* ====================================================================
 Transforme une date "normale" (format YYYYMMDD) en format julien
-(YYYYDDD) o� 1990001 repr�sente le 1er janvier 1990.
+(YYYYDDD) oé 1990001 représente le 1er janvier 1990.
 
 &EX
     DT_dat_julian(19900101L) vaut 1990001L
@@ -511,7 +511,7 @@ long    dt, tim;
 
 
 /* ====================================================================
-Retourne le nombre de secondes �coul�es depuis le 1/1/1980.
+Retourne le nombre de secondes écoulées depuis le 1/1/1980.
 
 &EX
     cursec = DT_secs_1180(SCR_current_date(), SCR_current_time());
@@ -545,7 +545,7 @@ long    dt, tim;
 
 
 /* ====================================================================
-Retourne le nombre de secondes �coul�es depuis le 1/1/2000
+Retourne le nombre de secondes écoulées depuis le 1/1/2000
 
 ----------------------------------------------------------------------- */
 
@@ -557,18 +557,18 @@ long DT_current_sec_2000()
 
 
 /* ====================================================================
-Retourne le num�ro de la semaine d'une date donn�e (ISO-8601).
+Retourne le numéro de la semaine d'une date donnée (ISO-8601).
 
-R�gles :
-&EN Les semaines vont de lundi � dimanche.
-&EN La semaine num�ro 1 est celle qui contient le premier jeudi de l'ann�e. Elle
-peut donc commencer l'ann�e pr�c�dente.
-&EN Week 0 : les premiers jours peuvent �tre de la semaine 0, ce qui signifie qu'ils sont
-consid�r�s de la 53e semaine de l'ann�e pr�c�dente.
-&EN Week 53 : la semaine 53 peut �tre soit r�ellement la 53e, soit la premi�re de l'ann�e suivante
-&EN Le num�ro de la semaine est <= 53  -> � corriger
-&EN L'existence d'une semaine 53 d�pend de la position du premier jeudi de
-l'ann�e suivante.
+Régles :
+&EN Les semaines vont de lundi à dimanche.
+&EN La semaine numéro 1 est celle qui contient le premier jeudi de l'année. Elle
+peut donc commencer l'année précédente.
+&EN Week 0 : les premiers jours peuvent étre de la semaine 0, ce qui signifie qu'ils sont
+considérés de la 53e semaine de l'année précédente.
+&EN Week 53 : la semaine 53 peut étre soit réellement la 53e, soit la premiére de l'année suivante
+&EN Le numéro de la semaine est <= 53  -> à corriger
+&EN L'existence d'une semaine 53 dépend de la position du premier jeudi de
+l'année suivante.
 
 ----------------------------------------------------------------------- */
 
@@ -576,7 +576,7 @@ DT_week_number(long date)
 {
     long    jday, wday1, w;
 
-    // day_nb = num�ro du jour dans l'ann�e (via julian date)
+    // day_nb = numéro du jour dans l'année (via julian date)
     jday = DT_date_julian(date) % 1000;
 
     // wday1 = jour de la semaine du 1er janvier
@@ -594,7 +594,7 @@ DT_week_number(long date)
    return(w);
 }
 
-/* Conneries �crites par BP... (en Suisse pour compter des secondes ????) */
+/* Conneries écrites par BP... (en Suisse pour compter des secondes ????) */
 
 int TM_3(long hr, long *h3)
 {

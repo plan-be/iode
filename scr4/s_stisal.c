@@ -1,13 +1,13 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Indique si un caractäre est une lettre (majuscule ou minuscule ou
-accentuÇe).
+Indique si un caract√®re est une lettre (majuscule ou minuscule ou
+accentu√©e).
 
 &RT 1 si c'est le cas, 0 sinon
 &EX
     SCR_is_alpha('0') vaut 0
-    SCR_is_alpha('Ç') vaut 1
+    SCR_is_alpha('√©') vaut 1
     SCR_is_alpha('A') vaut 1
     SCR_is_alpha('_') vaut 0
 &TX
@@ -25,12 +25,12 @@ int     ch;
 }
 
 /* ====================================================================
-Indique si un caractäre est un chiffre.
+Indique si un caract√®re est un chiffre.
 
 &RT 1 si c'est le cas, 0 sinon
 &EX
     SCR_is_num('0') vaut 1
-    SCR_is_num('Ç') vaut 0
+    SCR_is_num('√©') vaut 0
     SCR_is_num('.') vaut 0
 &TX
 &SA SCR_is_anum(), SCR_is_alpha()
@@ -44,13 +44,13 @@ int     ch;
 }
 
 /* ====================================================================
-Indique si un caractäre est une lettre (majuscule ou minuscule ou
-accentuÇe) ou un chiffre.
+Indique si un caract√®re est une lettre (majuscule ou minuscule ou
+accentu√©e) ou un chiffre.
 
 &RT 1 si c'est le cas, 0 sinon
 &EX
     SCR_is_anum('0') vaut 1
-    SCR_is_anum('Ç') vaut 1
+    SCR_is_anum('√©') vaut 1
     SCR_is_anum('A') vaut 1
     SCR_is_anum('!') vaut 0
     SCR_is_anum('_') vaut 0

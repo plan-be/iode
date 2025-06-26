@@ -1,8 +1,8 @@
 #include "scr.h"
 
 /* ======================================================================
-Retourne le pointeur vers le texte du iäme champ (de type STRING) qui
-suit l'OBJ obj passÇ comme argument. Ce champ est toujours terminÇ par
+Retourne le pointeur vers le texte du i√®me champ (de type STRING) qui
+suit l'OBJ obj pass√© comme argument. Ce champ est toujours termin√© par
 un 0.
 
 Les valeurs directes sont plus concises et plus performantes.
@@ -10,11 +10,11 @@ Les valeurs directes sont plus concises et plus performantes.
 &EX
     sprintf(title, "Nom : %s", PG_vtext(pg_client_name, 0));
 
-	Çquivaut Ö
+	√©quivaut √†
 
     sprintf(title, "Nom : %s", pg_client_NAME);
 &TX
-&RT pointeur vers le premier caractäre du champ
+&RT pointeur vers le premier caract√®re du champ
 ------------------------------------------------------------------------ */
 unsigned char *PG_vtext(obj, i)
 OBJ obj;
@@ -23,7 +23,7 @@ OBJ obj;
 }
 
 /* ======================================================================
-Change l'attribut input/output du iäme champ qui suit l'objet obj d'une
+Change l'attribut input/output du i√®me champ qui suit l'objet obj d'une
 PAGE. type peut valoir :
 
 &EN SCR_INPUT  : champ input
@@ -36,8 +36,8 @@ PAGE. type peut valoir :
 &TX
 
 &NO
-    Les champs de la PAGE doivent àtre en mÇmoire. Utilisez le mot-clÇ
-    FLD_MEM dans la dÇfition de la page.
+    Les champs de la PAGE doivent √™tre en m√©moire. Utilisez le mot-cl√©
+    FLD_MEM dans la d√©fition de la page.
 ------------------------------------------------------------------------ */
 PG_set_vio(obj, i, type)
 OBJ     obj;
@@ -54,7 +54,7 @@ int     type;
 
 /* BP_M 07-01-2010 16:01 */
 /* ======================================================================
-Retourne l'attribut input/output du iäme champ qui suit l'objet obj d'une
+Retourne l'attribut input/output du i√®me champ qui suit l'objet obj d'une
 PAGE.
 
 &EN SCR_INPUT  : champ input
@@ -67,8 +67,8 @@ PAGE.
 &TX
 
 &NO
-    Les champs de la PAGE doivent àtre en mÇmoire. Utilisez le mot-clÇ
-    FLD_MEM dans la dÇfition de la page.
+    Les champs de la PAGE doivent √™tre en m√©moire. Utilisez le mot-cl√©
+    FLD_MEM dans la d√©fition de la page.
 ------------------------------------------------------------------------ */
 PG_get_vio(obj, i)
 OBJ     obj;
@@ -113,7 +113,7 @@ char    *text;
 
 
 /* ======================================================================
-Change l'attribut couleur du iäme champ qui suit l'objet obj d'une
+Change l'attribut couleur du i√®me champ qui suit l'objet obj d'une
 PAGE. attr peut valoir :
 
 &EN DEFAULT
@@ -137,8 +137,8 @@ PAGE. attr peut valoir :
 &TX
 
 &NO
-    Les champs de la PAGE doivent àtre en mÇmoire. Utilisez le mot-clÇ
-    FLD_MEM dans la dÇfition de la page.
+    Les champs de la PAGE doivent √™tre en m√©moire. Utilisez le mot-cl√©
+    FLD_MEM dans la d√©fition de la page.
 ------------------------------------------------------------------------ */
 PG_set_vattr(obj, i, attr)
 OBJ     obj;
@@ -152,7 +152,7 @@ int     attr;
 
 
 /* ======================================================================
-Affiche le iäme champ qui suit l'objet obj d'une PAGE.
+Affiche le i√®me champ qui suit l'objet obj d'une PAGE.
 
 &EX
     PG_display_vobj(pg_client_chaff, 2);
@@ -168,7 +168,7 @@ int     i;
 }
 
 /* ======================================================================
-Edite le iäme champ qui suit l'objet obj d'une PAGE.
+Edite le i√®me champ qui suit l'objet obj d'une PAGE.
 
 &EX
     PG_edit_vobj(pg_client_chaff, 0);
@@ -202,12 +202,12 @@ int     i;
 
 
 /* ======================================================================
-Change la valeur par dÇfaut du iäme champ qui suit l'objet obj d'une
-PAGE. Ce champ doit avoir une valeur par dÇfaut dÇjÖ dÇfinie dans la
+Change la valeur par d√©faut du i√®me champ qui suit l'objet obj d'une
+PAGE. Ce champ doit avoir une valeur par d√©faut d√©j√† d√©finie dans la
 PAGE originale (source SCR). Dans le cas contraire, la fonction est sans
 effet.
 
-La copie de text est limitÇe Ö la longueur de la valeur par dÇfaut
+La copie de text est limit√©e √† la longueur de la valeur par d√©faut
 d'origine.
 
 &EX
@@ -239,7 +239,7 @@ unsigned char   *text;
 
 
 /* ======================================================================
-Vide le iäme champ qui suit l'objet obj d'une PAGE, quelqu'en soit le
+Vide le i√®me champ qui suit l'objet obj d'une PAGE, quelqu'en soit le
 type (0 ou blancs).
 ------------------------------------------------------------------------ */
 
@@ -254,10 +254,10 @@ int     i;
 
 
 /* ======================================================================
-Fixe Ö type l'attribut input/output de tous les champs du groupe grpnb
+Fixe √† type l'attribut input/output de tous les champs du groupe grpnb
 de la PAGE pg.
-Le numÇro du groupe correspond Ö l'ordre d'apparition dans la dÇfinition
-de la PAGE. Le groupe 0 correspond aux champs n'appartenant Ö aucun
+Le num√©ro du groupe correspond √† l'ordre d'apparition dans la d√©finition
+de la PAGE. Le groupe 0 correspond aux champs n'appartenant √† aucun
 groupe.
 
 Les types reconnus sont :
@@ -272,8 +272,8 @@ Les types reconnus sont :
 &TX
 
 &NO
-    Les champs de la PAGE doivent àtre en mÇmoire. Utilisez le mot-clÇ
-    FLD_MEM dans la dÇfition de la page.
+    Les champs de la PAGE doivent √™tre en m√©moire. Utilisez le mot-cl√©
+    FLD_MEM dans la d√©fition de la page.
 ------------------------------------------------------------------------ */
 PG_set_grpio(pg, grpnb, type)
 PAGE    *pg;

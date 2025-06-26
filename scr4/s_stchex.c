@@ -1,9 +1,9 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Remplace l'extension d'un nom de fichier. Le r‚sultat est sauv‚ dans une
-variable pass‚e par l'utilisateur. L'extension est toujours ajout‚e, que
-le nom de fichier initial possŠde ou non une extension.
+Remplace l'extension d'un nom de fichier. Le rÃ©sultat est sauvÃ© dans une
+variable passÃ©e par l'utilisateur. L'extension est toujours ajoutÃ©e, que
+le nom de fichier initial possÃ¨de ou non une extension.
 
 &RT pointeur vers res.
 &EX
@@ -18,7 +18,7 @@ le nom de fichier initial possŠde ou non une extension.
     SCR_change_ext(res, "test.dat", "");
     printf("'%s'\n", res);
 
-    r‚sultat :
+    rÃ©sultat :
 
 	'test.dat'
 	'test.dat'

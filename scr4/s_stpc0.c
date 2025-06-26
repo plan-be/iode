@@ -24,7 +24,7 @@ char    *filename;
 Lit la ligne suivante et retourne :
     -1 : fin de fichier
     0  : correspond au prname
-    1  : ligne de d‚finition != prname
+    1  : ligne de dÃ©finition != prname
     2  : ligne de commande
 */
 

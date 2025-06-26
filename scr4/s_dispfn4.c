@@ -1,10 +1,10 @@
 #include "scr.h"
 
 /* =======================================================================
-Affiche tous les champs de la PAGE pg dans l'IMAGE de l'Çcran ou
+Affiche tous les champs de la PAGE pg dans l'IMAGE de l'√©cran ou
 l'image SCR_TMP_IMAGE.
 
-Cette fonction est compatible Windows et mode caractäre.
+Cette fonction est compatible Windows et mode caract√®re.
 
 &SA PG_display_flds(), PGd_display_field()
 =========================================================================*/

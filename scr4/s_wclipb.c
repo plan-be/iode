@@ -3,15 +3,15 @@
 #include "scr4w.h"
 
 /* =======================================================================
-Place sur dans le clipboard un buffer de texte. Ce buffer ne doit pas ˆtre
-statique: il est r‚allou‚ par la fonction. Le pr‚c‚dent texte dans le
+Place sur dans le clipboard un buffer de texte. Ce buffer ne doit pas Ãªtre
+statique: il est rÃ©allouÃ© par la fonction. Le prÃ©cÃ©dent texte dans le
 clipboard est perdu.
 
-Si le texte contient plusieurs lignes, elles doivent ˆtre s‚par‚es par
-des \n. S'il y a plusieurs colonnes, elles seront s‚par‚es par des \t.
+Si le texte contient plusieurs lignes, elles doivent Ãªtre sÃ©parÃ©es par
+des \n. S'il y a plusieurs colonnes, elles seront sÃ©parÃ©es par des \t.
 
 &RT
-&EN 0 si l'op‚ration est r‚ussie.
+&EN 0 si l'opÃ©ration est rÃ©ussie.
 &EN -1 en cas d'erreur (clipboard inaccessible, memoire indisponible.
 
 &SA WscrClipGet(), WscrClipIsData()
@@ -64,14 +64,14 @@ WscrClipIsData()
 }
 
 /* =======================================================================
-Retourne dans un buffer allou‚ le contenu du clipboard.
-Ce buffer doit ˆtre lib‚r‚ par le programme appelant: il ne s'agit pas
+Retourne dans un buffer allouÃ© le contenu du clipboard.
+Ce buffer doit Ãªtre libÃ©rÃ© par le programme appelant: il ne s'agit pas
 d'un pointeur direct vers le clipboard.
 
 &RT
-&EN pointeur vers un buffer allou‚ de texte. S'il y a plusieurs lignes,
-    elles sont s‚par‚es par des \n. S'il y a plusieurs colonnes, elles
-    sont s‚par‚es par des \t.
+&EN pointeur vers un buffer allouÃ© de texte. S'il y a plusieurs lignes,
+    elles sont sÃ©parÃ©es par des \n. S'il y a plusieurs colonnes, elles
+    sont sÃ©parÃ©es par des \t.
 &EN NULL si le clipboard est vide ou s'il contient autre chose que du texte.
 
 &SA WscrClipSet(), WscrClipIsData()

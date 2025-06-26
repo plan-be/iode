@@ -10,34 +10,34 @@ int     A_NB_VAL, A_NB_OPEN, A_D = 0;
 
 
 /* =======================================================================
-    Initialise une liste d'arguments : le string pr‚sent‚ est d‚compos‚
-    en une suite de "mots" et plac‚ dans le tableau A_VAL allou‚.
+    Initialise une liste d'arguments : le string prÃ©sentÃ© est dÃ©composÃ©
+    en une suite de "mots" et placÃ© dans le tableau A_VAL allouÃ©.
 
-    Les s‚parateurs entre les mots sont par d‚faut les blancs, les tabs,
+    Les sÃ©parateurs entre les mots sont par dÃ©faut les blancs, les tabs,
     les virgules et les returns (\n). La variable char *A_SEPS est un
-    pointeur vers la liste des s‚parateurs et peut ˆtre modifi‚e par
+    pointeur vers la liste des sÃ©parateurs et peut Ãªtre modifiÃ©e par
     l'utilisateur.
 
-    Lorsque @filename est rencontr‚, le fichier filename est utilis‚
+    Lorsque @filename est rencontrÃ©, le fichier filename est utilisÃ©
     pour poursuivre la liste des arguments. A la fin du fichier, la
     lecture de la suite du string continue.
 
-    Lorsque $nom est rencontr‚, la fonction A_expand() … d‚finir par
-    l'utilisateur est appel‚ et son output est utilis‚ pour la suite des
+    Lorsque $nom est rencontrÃ©, la fonction A_expand() Ã  dÃ©finir par
+    l'utilisateur est appelÃ© et son output est utilisÃ© pour la suite des
     arguments. La lecture du string reprend ensuite. La fonction
-    utilisateur A_iexpand() est appel‚e en d‚but de processus pour
+    utilisateur A_iexpand() est appelÃ©e en dÃ©but de processus pour
     permettre l'initialisation du processus de traduction des macros. Si
-    ces deux fonctions ne sont pas d‚finies par l'utilisateur, le
-    programme utilise deux fonctions par d‚faut.
+    ces deux fonctions ne sont pas dÃ©finies par l'utilisateur, le
+    programme utilise deux fonctions par dÃ©faut.
 
     La fonction alloue un tableau de pointeur A_VAL de type char **. Ce
-    tableau est termin‚ par un pointeur NULL. Le nombre d'arguments est
-    indiqu‚ par la variable A_NB_VAL.
+    tableau est terminÃ© par un pointeur NULL. Le nombre d'arguments est
+    indiquÃ© par la variable A_NB_VAL.
 
-    Le tableau A_VAL est retourn‚ par la fonction, permettant …
-    l'utilisateur d'effectuer plusieurs fois A_init dans le mˆme
-    programme avec des arguments diff‚rents. Au prochain appel, A_VAL
-    est r‚initialis‚ pour la nouvelle interpr‚tation, mais pas d‚truit
+    Le tableau A_VAL est retournÃ© par la fonction, permettant Ã 
+    l'utilisateur d'effectuer plusieurs fois A_init dans le mÃªme
+    programme avec des arguments diffÃ©rents. Au prochain appel, A_VAL
+    est rÃ©initialisÃ© pour la nouvelle interprÃ©tation, mais pas dÃ©truit
     (pas de free).
 
 &EX
@@ -45,7 +45,7 @@ int     A_NB_VAL, A_NB_OPEN, A_D = 0;
 
 	A_init("-iv file1, *.c file2");
 
-    R‚sultat :
+    RÃ©sultat :
 
 	A_VAL === {
 	    "-iv",
@@ -73,10 +73,10 @@ char    *string;
 
 /* ====================================================================
     Initialise une liste d'arguments. L'objet et le fonctionnement
-    de la fonction est semblable … A_init(), mais au lieu de recevoir
-    un seul string, cette fonction re‡oit un tableau de strings du
-    type des arguments de la fonction main(). Ce tableau doit ˆtre
-    termin‚ par un pointeur NULL.
+    de la fonction est semblable Ã  A_init(), mais au lieu de recevoir
+    un seul string, cette fonction reÃ§oit un tableau de strings du
+    type des arguments de la fonction main(). Ce tableau doit Ãªtre
+    terminÃ© par un pointeur NULL.
 
 &EX
 	#include <s_args.h>
@@ -227,9 +227,9 @@ char    *arg;
 
 #ifdef DOS
 /* ====================================================================
-Cette fonction v‚rifie simplement qu'un string (normalement un nom de
-fichier) contient des "wild cards", c'est-…-dire des caractŠres
-permettant de reprendre plusieurs fichiers sous un mˆme nom (*.c par
+Cette fonction vÃ©rifie simplement qu'un string (normalement un nom de
+fichier) contient des "wild cards", c'est-Ã -dire des caractÃ¨res
+permettant de reprendre plusieurs fichiers sous un mÃªme nom (*.c par
 exemple).
 
 &RT 1 si le string contient * ou ? et 0 sinon.
@@ -327,7 +327,7 @@ int     ch;
 }
 
 /* =====================================================================
-    LibŠre l'espace allou‚ pour le stockage des arguments par A_init()
+    LibÃ¨re l'espace allouÃ© pour le stockage des arguments par A_init()
     ou A_initv().
 
 &EX
@@ -347,9 +347,9 @@ U_ch    **args;
 }
 
 /* ======================================================================
-    Recherche un string dans une table d'arguments g‚n‚r‚ par A_init()
-    ou A_initv(). La position du string dans cette table est retourn‚e si
-    le string est pr‚sent. La fonction retourne -1 sinon.
+    Recherche un string dans une table d'arguments gÃ©nÃ©rÃ© par A_init()
+    ou A_initv(). La position du string dans cette table est retournÃ©e si
+    le string est prÃ©sent. La fonction retourne -1 sinon.
 
 &EX
     args = A_initv(argv);
@@ -375,10 +375,10 @@ char    *string;
 }
 
 /*======================================================================
-    Recherche dans la liste des arguments g‚n‚r‚e par A_init() ou
-    A_initv() le nombre de paramŠtres … partir d'une position donn‚e
-    (calcul‚e par exemple … l'aide de A_find()),
-    c'est-…-dire le nombre de strings ne commen‡ant pas par '-'.
+    Recherche dans la liste des arguments gÃ©nÃ©rÃ©e par A_init() ou
+    A_initv() le nombre de paramÃ¨tres Ã  partir d'une position donnÃ©e
+    (calculÃ©e par exemple Ã  l'aide de A_find()),
+    c'est-Ã -dire le nombre de strings ne commenÃ§ant pas par '-'.
 
     Si la position est hors des la liste des arguments, retourne -1.
 
@@ -422,11 +422,11 @@ int     pos;
 }
 
 /* =======================================================================
-    Recherche l'argument -h dans la liste cr‚‚e … l'aide de A_init() ou
-    A_initv() et ex‚cute la fonction pass‚e comme argument si -h est
-    pr‚sent.
+    Recherche l'argument -h dans la liste crÃ©Ã©e Ã  l'aide de A_init() ou
+    A_initv() et exÃ©cute la fonction passÃ©e comme argument si -h est
+    prÃ©sent.
 
-    Si -h est pr‚sent, retourne -1, sinon retourne 0.
+    Si -h est prÃ©sent, retourne -1, sinon retourne 0.
 
 &EX
 	#include <s_args.h>

@@ -1,20 +1,20 @@
 #include "scr.h"
 
 /* ====================================================================
-VÇrifie que le record courant de l'ISAM is satisfait aux conditions
-exprimÇes par les deux records limites from et to.
+V√©rifie que le record courant de l'ISAM is satisfait aux conditions
+exprim√©es par les deux records limites from et to.
 
 Soit un champ de l'ISAM.
 
 &EN S'il est vide dans from ET dans to, ce champ n'est pas retenu
-    pour la vÇrification : quelle qu'en soit la valeur, elle sera
-    considÇrÇe comme bonne.
+    pour la v√©rification : quelle qu'en soit la valeur, elle sera
+    consid√©r√©e comme bonne.
 
-&EN S'il est dÇfini dans from OU dans to, sa valeur dans from est une
-    borne infÇrieure, sa valeur dans to est la borne supÇrieure. Si la
-    borne infÇrieure est vide, tous les records infÇrieurs ou Çgaux Ö la
-    seconde borne vÇrifient le critäre. Si la borne supÇrieure est vide,
-    tous les records supÇrieurs ou Çgaux Ö la premiäre borne seront
+&EN S'il est d√©fini dans from OU dans to, sa valeur dans from est une
+    borne inf√©rieure, sa valeur dans to est la borne sup√©rieure. Si la
+    borne inf√©rieure est vide, tous les records inf√©rieurs ou √©gaux √† la
+    seconde borne v√©rifient le crit√®re. Si la borne sup√©rieure est vide,
+    tous les records sup√©rieurs ou √©gaux √† la premi√®re borne seront
     valables. Si les deux bornes sont vides, tous les records seront
     retenus.
 

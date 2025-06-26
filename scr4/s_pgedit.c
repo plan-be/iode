@@ -2,10 +2,10 @@
 
 /* ======================================================================
 Place dans le champ EDITOR fld_nb de la page pg le texte text. L'ancien
-texte est lib‚r‚. Le nouveau n'est cependant pas allou‚. Le s‚parateur de
-lignes doit ˆtre \n.
+texte est libÃ©rÃ©. Le nouveau n'est cependant pas allouÃ©. Le sÃ©parateur de
+lignes doit Ãªtre \n.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 ------------------------------------------------------------------------- */
 SCR_set_field_editor(pg, fld_nb, text)
 PAGE    *pg;

@@ -9,7 +9,7 @@ long    SCR_libsn = 942L;
 int     SCR_vers_done = 0;
 
 /* ==================================================================
-	SN:001 = Librairie g‚n‚rale SCR4C
+	SN:001 = Librairie gÃ©nÃ©rale SCR4C
    ================================================================== */
 
 SCR_version()

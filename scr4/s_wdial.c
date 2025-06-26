@@ -281,7 +281,7 @@ char    *tel, *user, *pwd;
     if(WscrRasLoadDll()) return(-1);
     WscrRasHangUp();
 
-    Debug("Paramätres de WscrRasConnect: %s - %s - %s\n", tel, user, pwd);
+    Debug("Param√®tres de WscrRasConnect: %s - %s - %s\n", tel, user, pwd);
 
     memset(&rdp, 0, sizeof(RASDIALPARAMS));
 
@@ -294,12 +294,12 @@ char    *tel, *user, *pwd;
 
 
     if(strncmp(tel, "..", 2) == 0) {
-	Debug("NumÇro de tÇlÇphone avec .. : %s\n", tel);
+	Debug("Num√©ro de t√©l√©phone avec .. : %s\n", tel);
 	strcpy(rdp.szPhoneNumber, tel + 2);
 	rdp.szEntryName[0] = 0;
     }
     else {
-	Debug("EntrÇe dans le phonebook : %s\n", tel);
+	Debug("Entr√©e dans le phonebook : %s\n", tel);
 	strcpy(rdp.szEntryName, tel);
     }
 

@@ -1,8 +1,8 @@
 #include "s_strs.h"
 
 /* ====================================================================
-D‚truit les caractŠres inf‚rieurs ou ‚gaux … blanc de la fin d'un
-string. Le caractŠres '\0' se place aprŠs le dernier caractŠre sup‚rieur
+DÃ©truit les caractÃ¨res infÃ©rieurs ou Ã©gaux Ã  blanc de la fin d'un
+string. Le caractÃ¨res '\0' se place aprÃ¨s le dernier caractÃ¨re supÃ©rieur
 au blanc.
 
 La modification a lieu sur place.
@@ -37,13 +37,13 @@ unsigned char *str;
 
 
 /* ====================================================================
-D‚truit les caractŠres inf‚rieurs ou ‚gaux … blanc de la fin d'un
-string de longueur lg. Le caractŠres '\0' se place aprŠs le dernier caractŠre sup‚rieur
+DÃ©truit les caractÃ¨res infÃ©rieurs ou Ã©gaux Ã  blanc de la fin d'un
+string de longueur lg. Le caractÃ¨res '\0' se place aprÃ¨s le dernier caractÃ¨re supÃ©rieur
 au blanc.
 
 La modification a lieu sur place.
 
-Si tous les caractŠres sont > ' ', il n'y a pas de modification.
+Si tous les caractÃ¨res sont > ' ', il n'y a pas de modification.
 
 &RT le pointeur vers le string input.
 &TX

@@ -9,16 +9,16 @@ int WDDE_NB_TRIES = 5;
 DWORD   idInst = 0;
 
 /* ===================================================================
-Cette fonction d‚termine le sch‚ma de gestion des TIMEOUT lors de
-requˆtes au serveur DDE.
+Cette fonction dÃ©termine le schÃ©ma de gestion des TIMEOUT lors de
+requÃªtes au serveur DDE.
 
-&EN ~cnbsecs~C : dur‚e du TIMEOUT en millisecondes
+&EN ~cnbsecs~C : durÃ©e du TIMEOUT en millisecondes
 &EN ~cnbtries~C : nombre d'essais
 
 Les essais seront cumulatifs : premier essai avec ~cnbsecs~C
-millisecondes d'attente, deuxiŠme avec 2 * ~cnbsecs~C ms d'attente, etc.
+millisecondes d'attente, deuxiÃ¨me avec 2 * ~cnbsecs~C ms d'attente, etc.
 
-Par d‚faut, ces valeurs sont respectivement de 4000 msecs et 5 essais.
+Par dÃ©faut, ces valeurs sont respectivement de 4000 msecs et 5 essais.
 
 &SA WscrDdeConnect(), WscrDdeGet(), WscrDdeSet(), WscrDdeExecute()
 ==================================================================== */
@@ -31,17 +31,17 @@ WscrDdeSetTimeOut(int msecs, int nbtries)
 }
 
 /* ===================================================================
-Cette fonction ‚tablit une conversation avec un serveur DDE et ex‚cute
+Cette fonction Ã©tablit une conversation avec un serveur DDE et exÃ©cute
 des fonctions de ce serveur. Elle permet par exemple de lancer Word ou
 Excel et de charger un fichier, de l'imprimer, puis de quitter le
 programme.
 
 &EN Service = identification du serveur
 &EN Topic = sujet
-&EN Cmd = commande … ex‚cuter
+&EN Cmd = commande Ã  exÃ©cuter
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur de connexion au serveur
-    ou de retour erronn‚ du serveur.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur de connexion au serveur
+    ou de retour erronnÃ© du serveur.
 
 &EX
     PrintWordFile(char *filename)
@@ -98,7 +98,7 @@ unsigned char* cmd;
 }
 
 /* ===================================================================
-Cette fonction termine une conversation d‚marr‚e par WscrDdeConnect().
+Cette fonction termine une conversation dÃ©marrÃ©e par WscrDdeConnect().
 
 &SA WscrDdeConnect(), WscrDdeGetItem() et WscrDdeSetItem()
 ==================================================================== */
@@ -113,14 +113,14 @@ HCONV   hConv;
 }
 
 /* ===================================================================
-Cette fonction interroge un serveur pr‚alablement connect‚ par
-WscrDdeConnect() et demande l'information d‚crite dans szItem.
+Cette fonction interroge un serveur prÃ©alablement connectÃ© par
+WscrDdeConnect() et demande l'information dÃ©crite dans szItem.
 
 &EN hConv = handle de conversation obtenu par WscrDdeConnect()
-&EN szItem = sp‚cification des donn‚es demand‚es.
+&EN szItem = spÃ©cification des donnÃ©es demandÃ©es.
 
-&RT La valeur de retour est un pointeur allou‚ contenant la valeur
-    demand‚e ou NULL en cas d'erreur.
+&RT La valeur de retour est un pointeur allouÃ© contenant la valeur
+    demandÃ©e ou NULL en cas d'erreur.
 
 &SA WscrDdeConnect(), WscrDdeSetItem(), WscrDdeEnd(), WscrDdeGet()
 ==================================================================== */
@@ -166,14 +166,14 @@ char    *szItem;
 }
 
 /* ===================================================================
-Cette fonction envoie une donn‚e vers un serveur pr‚alablement connect‚
+Cette fonction envoie une donnÃ©e vers un serveur prÃ©alablement connectÃ©
 par WscrDdeConnect().
 
 &EN hConv = handle de conversation obtenu par WscrDdeConnect()
-&EN szItem = sp‚cification des donn‚es … fixer par le serveur
-&EN ptr = pointeur vers le string … envoyer vers le serveur
+&EN szItem = spÃ©cification des donnÃ©es Ã  fixer par le serveur
+&EN ptr = pointeur vers le string Ã  envoyer vers le serveur
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 
 &SA WscrDdeConnect(), WscrDdeGetItem(), WscrDdeEnd(), WscrDdeSet()
 ==================================================================== */
@@ -206,14 +206,14 @@ unsigned char* ptr;
 }
 
 /* ===================================================================
-Cette fonction ‚tablit une conversation avec un serveur, effectue une
-requˆte et coupe la conversation.
+Cette fonction Ã©tablit une conversation avec un serveur, effectue une
+requÃªte et coupe la conversation.
 
 &EN szService = identification du serveur
 &EN szTopic = sujet
-&EN szItem = sp‚cification des donn‚es
+&EN szItem = spÃ©cification des donnÃ©es
 
-&RT pointeur allou‚ vers le r‚sultat de la requˆte ou NULL en cas d'erreur
+&RT pointeur allouÃ© vers le rÃ©sultat de la requÃªte ou NULL en cas d'erreur
 
 &EX
     char *cells;
@@ -241,15 +241,15 @@ char *szService, *szTopic, *szItem;
 }
 
 /* ===================================================================
-Cette fonction ‚tablit une conversation avec un serveur, envoie des
-donn‚es au serveur et coupe la conversation.
+Cette fonction Ã©tablit une conversation avec un serveur, envoie des
+donnÃ©es au serveur et coupe la conversation.
 
 &EN szService = identification du serveur
 &EN szTopic = sujet
-&EN szItem = sp‚cification des donn‚es … fixer
-&EN ptr = valeur des donn‚es
+&EN szItem = spÃ©cification des donnÃ©es Ã  fixer
+&EN ptr = valeur des donnÃ©es
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 
 &EX
     char *cells;
@@ -277,15 +277,15 @@ char *szService, *szTopic, *szItem;
 }
 
 /* ===================================================================
-Cette fonction d‚marre une conversation avec un serveur DDE. Elle
-indique le service et le topic pour lesquels une ou des requˆtes vont
-ˆtre effectu‚es.
+Cette fonction dÃ©marre une conversation avec un serveur DDE. Elle
+indique le service et le topic pour lesquels une ou des requÃªtes vont
+Ãªtre effectuÃ©es.
 
-Cette fonction doit ˆtre utilis‚e si plusieurs requˆtes cons‚cutives
-doivent ˆtre lanc‚es. Si ce n'est pas le cas, on pr‚fŠrera les fonctions
+Cette fonction doit Ãªtre utilisÃ©e si plusieurs requÃªtes consÃ©cutives
+doivent Ãªtre lancÃ©es. Si ce n'est pas le cas, on prÃ©fÃ¨rera les fonctions
 WscrDdeGet() et WscrDdeSet().
 
-&RT Handle de conversation qui devra ˆtre pass‚ aux fonctions
+&RT Handle de conversation qui devra Ãªtre passÃ© aux fonctions
     WscrDdeEnd(), WscrDdeGetItem() et WscrDdeSetItem().
 
 

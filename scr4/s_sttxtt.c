@@ -1,19 +1,19 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Imprime le texte str (string termin‚ par 0) en coupant les lignes … une
-longueur lg. La premiŠre ligne commence par le titre d‚fini dans title.
-Les lignes suivantes commencent par des blancs en nombre ‚gal … la
+Imprime le texte str (string terminÃ© par 0) en coupant les lignes Ã  une
+longueur lg. La premiÃ¨re ligne commence par le titre dÃ©fini dans title.
+Les lignes suivantes commencent par des blancs en nombre Ã©gal Ã  la
 longueur de title.
 
-La fonction d'impression est pass‚e comme paramŠtre : elle est appel‚e
+La fonction d'impression est passÃ©e comme paramÃ¨tre : elle est appelÃ©e
 avec un string comme argument.
 
-Les coupures de lignes se font sur les caractŠres trouv‚s dans le string
+Les coupures de lignes se font sur les caractÃ¨res trouvÃ©s dans le string
 seps.
 
-Les blancs de d‚but de ligne sont supprim‚s. Les mots plus longs
-que (lg - strlen(title)) sont coup‚s sur plusieurs lignes.
+Les blancs de dÃ©but de ligne sont supprimÃ©s. Les mots plus longs
+que (lg - strlen(title)) sont coupÃ©s sur plusieurs lignes.
 
 &EX
     PrintPays("Pays : ",

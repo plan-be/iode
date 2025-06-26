@@ -5,14 +5,14 @@ extern int SCR_ISLD_QUIET;      /* BP_M 06-01-2000 */
 
 /* ======================================================================
 Importe un fichier ASCII et place les records lus dans l'ISAM is.
-L'ISAM doit exister. Le fichier ascii est en principe construit … l'aide de
+L'ISAM doit exister. Le fichier ascii est en principe construit Ã  l'aide de
 la fonction IS_dump_rec(). Chaque ligne contient un record. Chaque champ est
-s‚par‚ du suivant par un pipe (|).
+sÃ©parÃ© du suivant par un pipe (|).
 
 Cette fonction envoie des messages dans le standard output. Elle est
-utilis‚e par scr4 avec l'option -load.
+utilisÃ©e par scr4 avec l'option -load.
 
-&RT -1 si un des fichiers ne peut ˆtre ouvert. 0 sinon.
+&RT -1 si un des fichiers ne peut Ãªtre ouvert. 0 sinon.
 &SA IS_dump_rec()
 ------------------------------------------------------------------------- */
 long IS_load_rec(is, filename)       /* BP_M 06-01-2000 */

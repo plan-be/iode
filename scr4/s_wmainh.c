@@ -2,7 +2,7 @@
 
 #if defined(SCRW32) || defined(DOSW32)
 /* ===============================================================
-Retourne le handle vers la fenˆtre principale de l'application courante.
+Retourne le handle vers la fenÃªtre principale de l'application courante.
 
 &RT hWndDOS ou hMainWnd, selon la version DOSW32 ou SCRW32
 ================================================================== */

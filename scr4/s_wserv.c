@@ -120,40 +120,40 @@ void WINAPI WscrServiceMain(DWORD dwNumServiceArgs, LPTSTR * lpServiceArgs)
     if(SRV_DEBUG) Debug("[%s] Service Stopped\n", SRV_NAME);
 }
 /* ========================================================================
-Lancement d'un service. Il s'agit de la fonction qui ex‚cute le service (et
-pas de celle qui d‚marre le service). Le service doit ˆtre install‚.
+Lancement d'un service. Il s'agit de la fonction qui exÃ©cute le service (et
+pas de celle qui dÃ©marre le service). Le service doit Ãªtre installÃ©.
 
-Cette fonction doit ˆtre lanc‚e par le programme principal du service.
+Cette fonction doit Ãªtre lancÃ©e par le programme principal du service.
 
 
 &EN char *ServiceName : nom symbolique de service (ex. "S4issrv") qui doi
-&EN int  (*fn)() : pointeur vers la fonction utilisateur qui ex‚cute le service lui-mˆme.
+&EN int  (*fn)() : pointeur vers la fonction utilisateur qui exÃ©cute le service lui-mÃªme.
 
 &IT Fonction utilisateur
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 La fonction utilisateur est la fonction principale du service. Elle ne prend
 pas d'argument. Sa valeur de retour sera le code retour du service.
 
-Le service ‚tant g‚r‚ par le Service Control Manager (SCM), il faut un
+Le service Ã©tant gÃ©rÃ© par le Service Control Manager (SCM), il faut un
 minimum de collaboration entre la fonction utilisateur et le SCM.
 
-Pour un maximum de simplicit‚, cette collaboration est ‚tablie (dans
-SCR/AL1) via deux variables partag‚es :
+Pour un maximum de simplicitÃ©, cette collaboration est Ã©tablie (dans
+SCR/AL1) via deux variables partagÃ©es :
 
-&EN int SRV_RUNNING g‚r‚e par le SCM qui indique l'‚tat du service (d‚marr‚ ou
-    stopp‚). Au moment de l'appel de la fonction utilisateur, SRV_RUNNING
+&EN int SRV_RUNNING gÃ©rÃ©e par le SCM qui indique l'Ã©tat du service (dÃ©marrÃ© ou
+    stoppÃ©). Au moment de l'appel de la fonction utilisateur, SRV_RUNNING
     vaut toujours 1.
 
-&EN int SRV_FNRUNNING g‚r‚e par la fonction utilisateur qui indique si la
+&EN int SRV_FNRUNNING gÃ©rÃ©e par la fonction utilisateur qui indique si la
     fonction est toujours en cours.
 
 Ainsi,
 
-&EN la fonction utilisateur sait si elle doit s'arrˆter (dŠs que
-    SRV_RUNNING devient 0, ce qui indique que le service demande l'arrˆt)
+&EN la fonction utilisateur sait si elle doit s'arrÃªter (dÃ¨s que
+    SRV_RUNNING devient 0, ce qui indique que le service demande l'arrÃªt)
 
 &EN le SCM attend que SRV_FNRUNNING soit nulle (ce qui indique que la
-    fonction s'est termin‚e correctement)
+    fonction s'est terminÃ©e correctement)
 
 &EX
 int MyServiceFunction()
@@ -167,7 +167,7 @@ int MyServiceFunction()
 	if(SRV_RUNNING == 0) break; // SCM veut stopper le service
 	}
 
-    SRV_FNRUNNING = 0; // SCM peut s'arrˆter
+    SRV_FNRUNNING = 0; // SCM peut s'arrÃªter
     Debug("End of MyServiceFunction\n");
     return(0);
 }

@@ -1,51 +1,51 @@
 #include "scr.h"
 
 /* ====================================================================
-Lit tout le fichier is dans l'ordre de l'index cmp_nb … partir du
-premier record qui satisfait aux contraintes indiqu‚es dans la page pg.
-Pour chaque record s‚lectionn‚, la fonction utilisateur fn est appel‚e,
+Lit tout le fichier is dans l'ordre de l'index cmp_nb Ã  partir du
+premier record qui satisfait aux contraintes indiquÃ©es dans la page pg.
+Pour chaque record sÃ©lectionnÃ©, la fonction utilisateur fn est appelÃ©e,
 permettant un traitement quelconque de ce record. Pour les records
-rejet‚s, la fonction est ‚galement appel‚, avec un paramŠtre indiquant
-que le record est rejet‚.
+rejetÃ©s, la fonction est Ã©galement appelÃ©, avec un paramÃ¨tre indiquant
+que le record est rejetÃ©.
 
 Si disp n'est pas nul, un compteur indiquant le nombre de records lus et
-s‚lectionn‚s apparaŒt dans le bas de l'‚cran. Ce compteur est rafraŒchi
-toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaŒt pas.
+sÃ©lectionnÃ©s apparaÃ®t dans le bas de l'Ã©cran. Ce compteur est rafraÃ®chi
+toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaÃ®t pas.
 
 Si stop vaut 1, la frappe de n'importe quelle touche en cours de
-traitement arrˆte celui-ci et il est demand‚ … l'utilisateur s'il faut
-ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'… la
+traitement arrÃªte celui-ci et il est demandÃ© Ã  l'utilisateur s'il faut
+ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'Ã  la
 fin du fichier.
 
-rev permet, s'il vaut 1, d'inverser la s‚lection de records : tous ceux
-qui r‚pondent aux critŠres sont rejet‚s, tous les autres sont
-s‚lectionn‚s.
+rev permet, s'il vaut 1, d'inverser la sÃ©lection de records : tous ceux
+qui rÃ©pondent aux critÃ¨res sont rejetÃ©s, tous les autres sont
+sÃ©lectionnÃ©s.
 
 La PAGE pg peut contenir un nombre quelconque de champs de l'ISAM is.
 Pour chaque champ de is, on trouvera 0, 1 ou 2 occurences dans la PAGE.
 
-La s‚lection des records s'effectue comme suit : tous les champs de
-l'ISAM pr‚sents dans la PAGE servent de "masque", de critŠre de s‚lection.
+La sÃ©lection des records s'effectue comme suit : tous les champs de
+l'ISAM prÃ©sents dans la PAGE servent de "masque", de critÃ¨re de sÃ©lection.
 
 Soit un champ de l'ISAM.
 
-&EN S'il n'apparaŒt pas dans la PAGE, ce champ ne servira pas de filtre :
-    quelle qu'en soit la valeur, elle sera consid‚r‚e comme bonne.
+&EN S'il n'apparaÃ®t pas dans la PAGE, ce champ ne servira pas de filtre :
+    quelle qu'en soit la valeur, elle sera considÃ©rÃ©e comme bonne.
 
-&EN S'il apparaŒt une fois, soit il est sp‚cifi‚, soit il ne l'est pas
-    (valeur nulle ou blancs). Lorsqu'il est sp‚cifi‚, seuls les records
-    ayant la mˆme valeur pour le champ seront s‚lectionn‚s. S'il n'est
-    pas sp‚cifi‚, toute valeur est bonne pour ce champ.
+&EN S'il apparaÃ®t une fois, soit il est spÃ©cifiÃ©, soit il ne l'est pas
+    (valeur nulle ou blancs). Lorsqu'il est spÃ©cifiÃ©, seuls les records
+    ayant la mÃªme valeur pour le champ seront sÃ©lectionnÃ©s. S'il n'est
+    pas spÃ©cifiÃ©, toute valeur est bonne pour ce champ.
 
-&EN S'il apparaŒt 2 fois, la premiŠre valeur sert de borne inf‚rieure de
-    s‚lection, la derniŠre comme borne sup‚rieure. Si la borne
-    inf‚rieure est vide, tous les records inf‚rieurs ou ‚gaux … la
-    seconde borne seront retenus. Si la borne sup‚rieure est vide, tous
-    les records sup‚rieurs ou ‚gaux … la premiŠre borne seront repris.
+&EN S'il apparaÃ®t 2 fois, la premiÃ¨re valeur sert de borne infÃ©rieure de
+    sÃ©lection, la derniÃ¨re comme borne supÃ©rieure. Si la borne
+    infÃ©rieure est vide, tous les records infÃ©rieurs ou Ã©gaux Ã  la
+    seconde borne seront retenus. Si la borne supÃ©rieure est vide, tous
+    les records supÃ©rieurs ou Ã©gaux Ã  la premiÃ¨re borne seront repris.
     Si les deux bornes sont vides, tous les records seront retenus.
 
-La s‚lection s'effectue en ne retenant que les records qui satisfont …
-TOUS les critŠres d‚finis dans la PAGE pg.
+La sÃ©lection s'effectue en ne retenant que les records qui satisfont Ã 
+TOUS les critÃ¨res dÃ©finis dans la PAGE pg.
 
 La fonction utilisateur fn est du type suivant :
 &CO
@@ -59,26 +59,26 @@ La fonction utilisateur fn est du type suivant :
 &TX
 Si le pointeur de fonction fn est nul, il n'y a pas d'appel de fonction.
 
-&EN is est le pointeur vers l'ISAM trait‚.
+&EN is est le pointeur vers l'ISAM traitÃ©.
 &EN nbread et nbfound sont respectivement le nombre de records lus et
-    s‚lectionn‚s.
-&EN success est 0 en cas de rejet du record, 1 en cas de succŠs, 2 … la
+    sÃ©lectionnÃ©s.
+&EN success est 0 en cas de rejet du record, 1 en cas de succÃ¨s, 2 Ã  la
     fin du fichier.
 
-La fonction fn est appel‚e aprŠs la lecture de chaque record,
-s‚lectionn‚ ou non. De plus, elle est appel‚e aprŠs le dernier record,
+La fonction fn est appelÃ©e aprÃ¨s la lecture de chaque record,
+sÃ©lectionnÃ© ou non. De plus, elle est appelÃ©e aprÃ¨s le dernier record,
 permettant au programme de fermer des fichiers, de terminer une
 impression, etc.
 
 &TI Valeur de retour de fn
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-La fonction fn peut retourner 3 valeurs diff‚rentes :
+La fonction fn peut retourner 3 valeurs diffÃ©rentes :
 
 &EN 0 : la lecture peut continuer
-&EN 1 : la lecture continue, mais la fonction a rejet‚ la s‚lection. Le
-    compteur s'adaptera en cons‚quence.
-&EN toute autre valeur indique que la lecture soit s'arrˆter.
+&EN 1 : la lecture continue, mais la fonction a rejetÃ© la sÃ©lection. Le
+    compteur s'adaptera en consÃ©quence.
+&EN toute autre valeur indique que la lecture soit s'arrÃªter.
 
 &EX
     PrintClients_1(is, nbread, nbfound, success)
@@ -115,7 +115,7 @@ La fonction fn peut retourner 3 valeurs diff‚rentes :
     }
 &TX
 
-&RT le nombre de records s‚lectionn‚s (long).
+&RT le nombre de records sÃ©lectionnÃ©s (long).
 &SA SC_scan_isam()
 =======================================================================*/
 
@@ -147,18 +147,18 @@ int     disp, stop, rev;
 }
 
 /* ======================================================================
-Fonction de lecture d'un ISAM et de s‚lection de records. Cette fonction
-est identique … SC_scan_page_gn() avec les paramŠtres stop et rev de
-cette derniŠre fix‚s … 1 et 0 :
+Fonction de lecture d'un ISAM et de sÃ©lection de records. Cette fonction
+est identique Ã  SC_scan_page_gn() avec les paramÃ¨tres stop et rev de
+cette derniÃ¨re fixÃ©s Ã  1 et 0 :
 &CO
 
     SC_scan_page(pg, is, cmp_nb, fn, disp)
 
-	est identique …
+	est identique Ã 
 
     SC_scan_page_gn(pg, is, cmp_nb, fn, disp, 1, 0)
 &TX
-&RT le nombre de records s‚lectionn‚s (long)
+&RT le nombre de records sÃ©lectionnÃ©s (long)
 &SA SC_scan_page_gn(), SC_scan_isam()
 ------------------------------------------------------------------------ */
 long SC_scan_page(pg, is, cmp_nb, fn, disp)
@@ -193,9 +193,9 @@ char    **from, **to;
 
 
 /* ====================================================================
-V‚rifie que le record courant de l'ISAM is satisfait aux conditions
-exprim‚es dans la PAGE pg. Voir SC_scan_page_gn() pour une discussion
-sur la s‚lection des records en fonction des valeurs des champs de la
+VÃ©rifie que le record courant de l'ISAM is satisfait aux conditions
+exprimÃ©es dans la PAGE pg. Voir SC_scan_page_gn() pour une discussion
+sur la sÃ©lection des records en fonction des valeurs des champs de la
 PAGE pg.
 
 &RT 0 s'il y satisfait, -1 sinon

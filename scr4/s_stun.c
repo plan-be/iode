@@ -16,8 +16,8 @@ int           *nb;
 
 
 /* ====================================================================
-R‚union de deux tableaux de ptrs vers des char **. Les ‚l‚ments
-communs ne sont repris qu'une seule fois dans le tableau r‚sultat.
+RÃ©union de deux tableaux de ptrs vers des char **. Les Ã©lÃ©ments
+communs ne sont repris qu'une seule fois dans le tableau rÃ©sultat.
 
 &RT
 La fonction retourne un unsigned char **.
@@ -50,7 +50,7 @@ err:
 }
 
 /* ====================================================================
-R‚union de deux tableaux de ptrs vers des char **. Si des ‚l‚ments
+RÃ©union de deux tableaux de ptrs vers des char **. Si des Ã©lÃ©ments
 sont communs aux deux listes, ils sont repris tous les deux.
 
 &RT
@@ -88,16 +88,16 @@ unsigned char **tbl2;
 
 
 /* ====================================================================
-R‚union de deux listes.
+RÃ©union de deux listes.
 
-Les listes sont des "strings" contenant des ‚l‚ments s‚par‚s par un
-caractŠre s‚parateur. Les deux chaŒnes sont pass‚es en argument, ainsi
-qu'une chaŒne contenant les caractŠres s‚parateurs.
+Les listes sont des "strings" contenant des Ã©lÃ©ments sÃ©parÃ©s par un
+caractÃ¨re sÃ©parateur. Les deux chaÃ®nes sont passÃ©es en argument, ainsi
+qu'une chaÃ®ne contenant les caractÃ¨res sÃ©parateurs.
 
 
 &RT
-La fonction retourne un pointeur de type unsigned char sur une liste allou‚e
-contenant la r‚union des ‚l‚ments des deux listes pass‚es en arguments.
+La fonction retourne un pointeur de type unsigned char sur une liste allouÃ©e
+contenant la rÃ©union des Ã©lÃ©ments des deux listes passÃ©es en arguments.
 
 
 &EX
@@ -106,9 +106,9 @@ contenant la r‚union des ‚l‚ments des deux listes pass‚es en arguments.
     unsigned char *string2 = "Carina Lena Fabienne Martine";
 
     str2 = SCR_union_tbl(string1, string2, " ,;");
-    printf("ChaŒne 1 : %s\n", string1);
-    printf("ChaŒne 2 : %s\n", string2);
-    printf("R‚union  : %s\n\n", str2);
+    printf("ChaÃ®ne 1 : %s\n", string1);
+    printf("ChaÃ®ne 2 : %s\n", string2);
+    printf("RÃ©union  : %s\n\n", str2);
     SCR_free(str2);
 &TX
 &SA SCR_free(), SCR_dif_tbl(), SCR_inter_tbl()

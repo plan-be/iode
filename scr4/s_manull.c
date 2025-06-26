@@ -1,9 +1,9 @@
 #include "s_mat.h"
 /* ====================================================================
-Annule tous les ‚l‚ments d'une matrice  m1 (nl1 x nc1).
+Annule tous les Ã©lÃ©ments d'une matrice  m1 (nl1 x nc1).
 &RT
-Si la matrice n'exista pas, la variable M_errno est positionn‚e
-et retourn‚e, sinon la fonction retourne 0.
+Si la matrice n'exista pas, la variable M_errno est positionnÃ©e
+et retournÃ©e, sinon la fonction retourne 0.
 
 &EX
     M_clear(m1);

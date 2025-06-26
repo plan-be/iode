@@ -1,13 +1,13 @@
 #include "s_cpp.h"
 
 /* ================================================================
-Saute les caractäres suivants dans le fichier dÇcrit par cpp jusqu'au
-premier diffÇrent de SPACE et de TAB. Le caractäre suivant est retournÇ,
-mais sera relu lors du prochain appel Ö CppGetc().
+Saute les caract√®res suivants dans le fichier d√©crit par cpp jusqu'au
+premier diff√©rent de SPACE et de TAB. Le caract√®re suivant est retourn√©,
+mais sera relu lors du prochain appel √† CppGetc().
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
-&RT le caractäre non SPACE et non TAB suivant
+&RT le caract√®re non SPACE et non TAB suivant
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipToChars()
 ================================================================ */
@@ -26,15 +26,15 @@ CPPFILE *cpp;
 }
 
 /* ================================================================
-Saute les caractäres suivants dans le fichier dÇcrit par cpp jusqu'au
-premier appartenant Ö la chaåne chs (ou Ö la fin du fichier).
-Ce caractäre est retournÇ par la fonction mais ne le sera plus par
-l'appel suivant Ö CppGetc().
+Saute les caract√®res suivants dans le fichier d√©crit par cpp jusqu'au
+premier appartenant √† la cha√Æne chs (ou √† la fin du fichier).
+Ce caract√®re est retourn√© par la fonction mais ne le sera plus par
+l'appel suivant √† CppGetc().
 
-&EN cpp = pointeur retournÇ par CppOpen()
-&EN chs = chaåne de caractäres terminÇ par un zÇro
+&EN cpp = pointeur retourn√© par CppOpen()
+&EN chs = cha√Æne de caract√®res termin√© par un z√©ro
 
-&RT le premier caractäre appartenant Ö chs ou EOF
+&RT le premier caract√®re appartenant √† chs ou EOF
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipSpaces()
 ================================================================ */
@@ -52,14 +52,14 @@ U_ch    *chs;
 }
 
 /* ================================================================
-Lit les caractäres suivants dans le fichier dÇcrit par cpp jusqu'au
-premier appartenant Ö la chaåne chs (ou Ö la fin du fichier).
-Le premier caractäre appartenant Ö chs n'est pas consommÇ.
+Lit les caract√®res suivants dans le fichier d√©crit par cpp jusqu'au
+premier appartenant √† la cha√Æne chs (ou √† la fin du fichier).
+Le premier caract√®re appartenant √† chs n'est pas consomm√©.
 
-&EN cpp = pointeur retournÇ par CppOpen()
-&EN chs = chaåne de caractäres terminÇ par un zÇro
+&EN cpp = pointeur retourn√© par CppOpen()
+&EN chs = cha√Æne de caract√®res termin√© par un z√©ro
 
-&RT un pointeur allouÇ vers la chaåne lue ou 0 si aucun caractäre n'est
+&RT un pointeur allou√© vers la cha√Æne lue ou 0 si aucun caract√®re n'est
 lu (fin de fichier ou ligne vide).
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipSpaces()
@@ -88,11 +88,11 @@ U_ch    *chs;
 }
 
 /* ================================================================
-Lit la ligne suivante dans le fichier dÇcrit par cpp.
+Lit la ligne suivante dans le fichier d√©crit par cpp.
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
-&RT buffer allouÇ contenant la ligne lue
+&RT buffer allou√© contenant la ligne lue
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadToChars()
 ================================================================ */
@@ -108,12 +108,12 @@ CPPFILE *cpp;
 }
 
 /* ================================================================
-Saute les caractäres suivants dans le fichier dÇcrit par cpp jusqu'Ö
-la fin de la ligne courante (ou Ö la fin du fichier).
-Ce caractäre est retournÇ par la fonction et "consommÇ" (il ne sera pas
-returnÇ lors de l'appel suivant Ö CppGetc()).
+Saute les caract√®res suivants dans le fichier d√©crit par cpp jusqu'√†
+la fin de la ligne courante (ou √† la fin du fichier).
+Ce caract√®re est retourn√© par la fonction et "consomm√©" (il ne sera pas
+return√© lors de l'appel suivant √† CppGetc()).
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
 &RT '\n' ou EOF
 
@@ -128,13 +128,13 @@ CPPFILE *cpp;
 }
 
 /* ================================================================
-Lit les caractäres suivants dans le fichier dÇcrit par cpp. La lecture
-s'arràte däs que le caractäre lu n'appartient plus Ö la suite chs.
+Lit les caract√®res suivants dans le fichier d√©crit par cpp. La lecture
+s'arr√™te d√®s que le caract√®re lu n'appartient plus √† la suite chs.
 
-&EN cpp = pointeur retournÇ par CppOpen()
-&EN chs = table des caractäres acceptÇs
-&EN str = pointeur vers un buffer de taille Çgale au moins Ö maxlg
-    caractäres
+&EN cpp = pointeur retourn√© par CppOpen()
+&EN chs = table des caract√®res accept√©s
+&EN str = pointeur vers un buffer de taille √©gale au moins √† maxlg
+    caract√®res
 &EN maxlg = taille maximum du mot.
 
 
@@ -151,9 +151,9 @@ s'arràte däs que le caractäre lu n'appartient plus Ö la suite chs.
 &TX
 
 &REM
-Si le string dÇpasse maxlg caractäres, la fonction retourne et la suite du
-texte sera lue lors des appels suivants. Un mot peut donc àtre de la
-sorte coupÇ en deux.
+Si le string d√©passe maxlg caract√®res, la fonction retourne et la suite du
+texte sera lue lors des appels suivants. Un mot peut donc √™tre de la
+sorte coup√© en deux.
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadLong()
 ================================================================ */
@@ -178,13 +178,13 @@ int     maxlg;
 }
 
 /* ================================================================
-Lit le "mot" suivant dans le fichier dÇcrit par cpp. Un mot est une
-suite de caractäres alphanumÇriques (y compris le caractäre de
+Lit le "mot" suivant dans le fichier d√©crit par cpp. Un mot est une
+suite de caract√®res alphanum√©riques (y compris le caract√®re de
 soulignement '_').
 
-&EN cpp = pointeur retournÇ par CppOpen()
-&EN str = pointeur vers un buffer de taille Çgale au moins Ö maxlg
-    caractäres
+&EN cpp = pointeur retourn√© par CppOpen()
+&EN str = pointeur vers un buffer de taille √©gale au moins √† maxlg
+    caract√®res
 &EN maxlg = taille maximum du mot.
 
 
@@ -201,8 +201,8 @@ soulignement '_').
 &TX
 
 &REM
-Si le mot dÇpasse maxlg caractäres, la fonction retourne et la suite du
-mot sera lue lors des appels suivants. Un mot est donc de la sorte coupÇ
+Si le mot d√©passe maxlg caract√®res, la fonction retourne et la suite du
+mot sera lue lors des appels suivants. Un mot est donc de la sorte coup√©
 en deux.
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadLong()
@@ -228,16 +228,16 @@ int     maxlg;
 }
 
 /* ================================================================
-Lit l'entier suivant dans le fichier dÇcrit par cpp.  Les espaces
-sont prÇalablement sautÇs par la fonction.
+Lit l'entier suivant dans le fichier d√©crit par cpp.  Les espaces
+sont pr√©alablement saut√©s par la fonction.
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
 &RT entier lu
 
 &REM
-Un entier ne peut pas dÇpasser 50 caractäres. Si plusieurs signes - se
-trouvent dans le màme nombre, ils sont tous lus.
+Un entier ne peut pas d√©passer 50 caract√®res. Si plusieurs signes - se
+trouvent dans le m√™me nombre, ils sont tous lus.
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadWord()
 ================================================================ */
@@ -254,15 +254,15 @@ CPPFILE *cpp;
 }
 
 /* ================================================================
-Lit le nombre rÇel suivant dans le fichier dÇcrit par cpp. Les espaces
-sont prÇalablement sautÇs par la fonction.
+Lit le nombre r√©el suivant dans le fichier d√©crit par cpp. Les espaces
+sont pr√©alablement saut√©s par la fonction.
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
 &RT le nombre lu
 
 &REM
-Un nombre ne peut pas dÇpasser 50 caractäres.
+Un nombre ne peut pas d√©passer 50 caract√®res.
 
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadWord()
 ================================================================ */
@@ -282,13 +282,13 @@ CPPFILE *cpp;
 
 
 /* ================================================================
-Lit le string suivant dans le fichier dÇcrit par cpp. Un string est une
-suite de caractäres quelconques Ö l'exclusion de SPACE, TAB et NEWLINE.
-Däs qu'un de ces trois caractäres est lu, le string est terminÇ.
+Lit le string suivant dans le fichier d√©crit par cpp. Un string est une
+suite de caract√®res quelconques √† l'exclusion de SPACE, TAB et NEWLINE.
+D√®s qu'un de ces trois caract√®res est lu, le string est termin√©.
 
-&EN cpp = pointeur retournÇ par CppOpen()
-&EN str = pointeur vers un buffer de taille Çgale au moins Ö maxlg
-    caractäres
+&EN cpp = pointeur retourn√© par CppOpen()
+&EN str = pointeur vers un buffer de taille √©gale au moins √† maxlg
+    caract√®res
 &EN maxlg = taille maximum string
 
 &RT longueur du string lu
@@ -304,9 +304,9 @@ Däs qu'un de ces trois caractäres est lu, le string est terminÇ.
 &TX
 
 &REM
-Si le string dÇpasse maxlg caractäres, la fonction retourne et la suite
+Si le string d√©passe maxlg caract√®res, la fonction retourne et la suite
 du string sera lue lors des appels suivants. Un string est donc de la
-sorte coupÇ en deux.
+sorte coup√© en deux.
 
 &SA CppOpen(), CppGetc(), CppReadWord(), CppReadLong()
 ================================================================ */
@@ -331,15 +331,15 @@ int     maxlg;
 }
 
 /* ================================================================
-Lit le texte suivant dans le fichier dÇcrit par cpp. Le texte doit àtre
-terminÇ par le caractäre QUOTE ("), NEWLINE (\n) ou EOF (-1).
-Si le string contient un QUOTE ou un NEWLINE, ceux-ci doivent àtre
-prÇcÇdÇs par le caractäre BACKSLASH (\) dÇfini dans la variable globale
+Lit le texte suivant dans le fichier d√©crit par cpp. Le texte doit √™tre
+termin√© par le caract√®re QUOTE ("), NEWLINE (\n) ou EOF (-1).
+Si le string contient un QUOTE ou un NEWLINE, ceux-ci doivent √™tre
+pr√©c√©d√©s par le caract√®re BACKSLASH (\) d√©fini dans la variable globale
 CPP_EOLCH.
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
-&RT Un pointeur allouÇ (malloc) vers un buffer contenant le texte lu
+&RT Un pointeur allou√© (malloc) vers un buffer contenant le texte lu
 
 &EX
     CPPFILE *cpp;
@@ -354,7 +354,7 @@ CPP_EOLCH.
 &TX
 
 &REM
-Le caractäre QUOTE d'ouverture du string doit àtre lu avant d'entrer dans
+Le caract√®re QUOTE d'ouverture du string doit √™tre lu avant d'entrer dans
 la fonction.
 
 &SA CppOpen(), CppGetc(), CppReadWord(), CppReadString()

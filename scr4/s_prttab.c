@@ -1,9 +1,9 @@
 #include "scr.h"
 
 /* ======================================================================
-Effectue d'abord un TAB. Si le TAB d‚place le curseur (dans la ligne
+Effectue d'abord un TAB. Si le TAB dÃ©place le curseur (dans la ligne
 courante), la fonction se termine. Sinon, un LINEFEED et un VTAB sont
-g‚n‚r‚s pour d‚placer le curseur en colonne 0 dans le VTAB suivant dans
+gÃ©nÃ©rÃ©s pour dÃ©placer le curseur en colonne 0 dans le VTAB suivant dans
 le PAGE.
 
 &SA PR_tab(), PR_vtab()
@@ -18,17 +18,17 @@ PR_pg_tab()
 
 /* ======================================================================
 Positionne le curseur dans la page courante dans la prochaine colonne
-suivant la colonne courante et d‚finie dans la liste des TABS fournie
-lors de la d‚finition du PRINTER.
+suivant la colonne courante et dÃ©finie dans la liste des TABS fournie
+lors de la dÃ©finition du PRINTER.
 
-S'il n'y a pas de TABS d‚finis dans PRINTER, un TAB est plac‚ dans
+S'il n'y a pas de TABS dÃ©finis dans PRINTER, un TAB est placÃ© dans
 chaque colonne multiple de 8.
 
-Si le curseur d‚passe le dernier TAB de la ligne, il n'est pas d‚plac‚.
+Si le curseur dÃ©passe le dernier TAB de la ligne, il n'est pas dÃ©placÃ©.
 &EX
 
 &TX
-&RT 1 si un d‚placement a eu lieu, 0 sinon
+&RT 1 si un dÃ©placement a eu lieu, 0 sinon
 &SA PR_pg_tab(), PR_vtab()
 ------------------------------------------------------------------------ */
 PR_tab()
@@ -50,14 +50,14 @@ PR_tab()
 
 /* ======================================================================
 Positionne le curseur dans la page courante dans la prochaine ligne
-suivant la ligne courante et d‚finie dans la liste des VTABS fournie
-lors de la d‚finition du PRINTER.
+suivant la ligne courante et dÃ©finie dans la liste des VTABS fournie
+lors de la dÃ©finition du PRINTER.
 
-S'il n'y a pas de VTABS d‚finis dans PRINTER, un VTAB est plac‚ dans
+S'il n'y a pas de VTABS dÃ©finis dans PRINTER, un VTAB est placÃ© dans
 chaque ligne.
 
-Si le curseur d‚passe le dernier VTAB de la page, une saut de page est
-automatiquement g‚n‚r‚.
+Si le curseur dÃ©passe le dernier VTAB de la page, une saut de page est
+automatiquement gÃ©nÃ©rÃ©.
 
 &SA PR_pg_tab(), PR_tab()
 ------------------------------------------------------------------------ */

@@ -6,11 +6,11 @@ Lecture d'un fichier via interface http.
 
 &EN host : nom ou addresse ip du host
 &EN port : port 
-&EN filename : fichier à rechercher
+&EN filename : fichier Ã  rechercher
 
-Cette fonction ne gère pas les cas autres qu'un fichier texte. 
+Cette fonction ne gÃ§re pas les cas autres qu'un fichier texte. 
 
-Les CRLF sont remplacés par des CR dans le string retourné. 
+Les CRLF sont remplacÃ©s par des CR dans le string retournÃ©. 
 C'est ok pour un fichier de texte normal, mais sans doute pas pour des fichiers binaires.
 
 &EX
@@ -55,7 +55,7 @@ char *SCR_HttpGetFile(char *host, int port, char *filename)
 	ptr = buf;
 	rc = WSockBWrite(sock, ptr, strlen(ptr));
 	
-	// Lecture de la réponse
+	// Lecture de la rÃ©ponse
 	rc = WSockRead(sock, buf, HTTP_BUFSIZE);
 	buf[HTTP_BUFSIZE] = 0;
 	if(rc < 0) goto fin;

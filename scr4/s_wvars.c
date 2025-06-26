@@ -4,7 +4,7 @@ HWND    hMainWnd = 0;
 HANDLE  hInst, hPrevInst, hAccel = 0;
 U_ch    *WSCRMainTitle = "Application SCR4/W";       /* JMP 04-02-97 */
 U_ch    *WSCRQueryEnd  = "Quitter l'application ?"; /* JMP 04-02-97 */
-//int     WSCR_FONTHEIGHT = 12;          // reporté dans s_wobjs.c
+//int     WSCR_FONTHEIGHT = 12;          // reportÃ© dans s_wobjs.c
 //char    *WSCR_FONTNAME = "Terminal";   // Idem
 
 U_ch    **WSCRArgv; /* BP_M 12-12-2009 14:08 */

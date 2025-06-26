@@ -945,7 +945,7 @@ WscrDlgInit(HWND hWnd, PAGE *pg, int props)
     if(PG_EXEC_DISP_FN) ACT_exec_nu(pg->pg_disp_act);
     Wpg2Dlg(hWnd, pg);
 
-    if(!props) {   // Si TOOLBAR associ‚ … l'objet et pas PROPS
+    if(!props) {   // Si TOOLBAR associÃ© Ã  l'objet et pas PROPS
         if(pg->pg_nb_tb) {
             WscrMoveDlgChildren(hWnd, 0, 25);
             WscrCreateToolbar(hWnd, (WTOOLBAR *)SCR_PTR(pg->pg_toolb[0]));

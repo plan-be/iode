@@ -1,19 +1,19 @@
 #include "s_mat.h"
 /* ====================================================================
-Extrait de la matrice m1 (nl1 x nc1) une matrice m2 (nl x nc) …
+Extrait de la matrice m1 (nl1 x nc1) une matrice m2 (nl x nc) Ã 
 partir de la ligne l incluse ( l := 0, .. , nl1 - 1) et de la
 colonne c incluse ( c := 0, .. , nc1 - 1).
 
 
 &RT
-Si m2 est nul, une matrice de dimension (nl, nc) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant).
-Si m2 n'est pas nul, le r‚sultat y est stock‚ et m2 est
-retourn‚. Les dimensions doivent ˆtre correctes (les dimensions de m2
-doivent effectivement ˆtre incluses dans m1) sans quoi les
-op‚rations ne sont pas effectu‚es, la variable globale M_errno est
-positionn‚e, et la fonction retourne un pointeur nul.
+Si m2 est nul, une matrice de dimension (nl, nc) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant).
+Si m2 n'est pas nul, le rÃ©sultat y est stockÃ© et m2 est
+retournÃ©. Les dimensions doivent Ãªtre correctes (les dimensions de m2
+doivent effectivement Ãªtre incluses dans m1) sans quoi les
+opÃ©rations ne sont pas effectuÃ©es, la variable globale M_errno est
+positionnÃ©e, et la fonction retourne un pointeur nul.
 
 &EX
     M_extr( ext, mat, 2, 3, 2, 2);

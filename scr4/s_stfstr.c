@@ -2,15 +2,15 @@
 
 /* ===========================================================
 Recherche le string str de longeur lg dans le fichier filename et
-retourne la position du d‚but du string.
+retourne la position du dÃ©but du string.
 
 
-&RT -1 si le string ne put ˆtre trouv‚
-    -2 si le fichier ne peut ˆtre ouvert en lecture
-    position si le string est trouv‚.
+&RT -1 si le string ne put Ãªtre trouvÃ©
+    -2 si le fichier ne peut Ãªtre ouvert en lecture
+    position si le string est trouvÃ©.
 
-&NO Les cas d‚licats comme la recherche de "12123" dans "1212123"
-    sont correctement trait‚s.
+&NO Les cas dÃ©licats comme la recherche de "12123" dans "1212123"
+    sont correctement traitÃ©s.
 
 ============================================================== */
 

@@ -121,7 +121,7 @@ Retourne le nombre de lignes du BC bc courant.
 	PG_display_flds_no_cmp(ap_bc_adr);
     }
 &TX
-&SA BC_get_lbc_field(), accäs aux valeurs directes des BC
+&SA BC_get_lbc_field(), acc√®s aux valeurs directes des BC
 =======================================================================*/
 
 BC_nb_lbcs(bc)
@@ -132,12 +132,12 @@ BC  *bc;
 
 
 /* ====================================================================
-Retourne le pointeur vers le record ISAM mÇmorisÇ correspondant Ö la
+Retourne le pointeur vers le record ISAM m√©moris√© correspondant √† la
 ligne i du BC bc.
 
 Si la ligne i n'existe pas, retourne un pointeur nul.
 
-&SA BC_get_lbc_field(), BC_lpg_rec(), accäs aux valeurs directes des BC
+&SA BC_get_lbc_field(), BC_lpg_rec(), acc√®s aux valeurs directes des BC
 =======================================================================*/
 
 char *BC_lbc_rec(bc, i)
@@ -152,12 +152,12 @@ int     i;
 }
 
 /* ====================================================================
-Retourne le pointeur vers le record de la LPG mÇmorisÇ correspondant Ö
+Retourne le pointeur vers le record de la LPG m√©moris√© correspondant √†
 la ligne i du BC bc.
 
 Si la ligne i n'existe pas, retourne un pointeur nul.
 
-&SA BC_get_lbc_field(), BC_lbc_rec(), accäs aux
+&SA BC_get_lbc_field(), BC_lbc_rec(), acc√®s aux
     valeurs directes des BC
 =======================================================================*/
 
@@ -173,18 +173,18 @@ int     i;
 }
 
 /* ====================================================================
-Copie Ö l'adresse ptr la valeur du champ fld_nb du record ISAM
-correspondant Ö la ligne line_nb du BC bc. Aucune vÇrification n'est
-effectuÇe sur la longueur ou le type du champ.
+Copie √† l'adresse ptr la valeur du champ fld_nb du record ISAM
+correspondant √† la ligne line_nb du BC bc. Aucune v√©rification n'est
+effectu√©e sur la longueur ou le type du champ.
 
-Si la ligne line_nb n'existe pas, il n'y a pas de copie effectuÇe.
+Si la ligne line_nb n'existe pas, il n'y a pas de copie effectu√©e.
 
 &EX
     char    name[51];
 
     BC_get_lbc_field(bc_client, 0, 0, name);
 &TX
-&SA IS_get_field(), IS_set_field(), SCR_get_*(), accäs aux valeurs
+&SA IS_get_field(), IS_set_field(), SCR_get_*(), acc√®s aux valeurs
     directes des BC
 =======================================================================*/
 

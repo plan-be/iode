@@ -1,21 +1,21 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Construit un tableau de strings … partir du string str
-termin‚ par 0. Chaque string g‚n‚r‚ correspond … une ligne de texte
-de maximum lg caractŠres termin‚e par un des s‚parateurs d‚finis dans
+Construit un tableau de strings Ã  partir du string str
+terminÃ© par 0. Chaque string gÃ©nÃ©rÃ© correspond Ã  une ligne de texte
+de maximum lg caractÃ¨res terminÃ©e par un des sÃ©parateurs dÃ©finis dans
 seps.
 
-Les blancs de d‚but de ligne sont supprim‚s. Les mots plus longs
-que lg sont coup‚s sur plusieurs lignes.
+Les blancs de dÃ©but de ligne sont supprimÃ©s. Les mots plus longs
+que lg sont coupÃ©s sur plusieurs lignes.
 
-La fonction alloue le tableau r‚sultat ainsi que toutes les lignes …
+La fonction alloue le tableau rÃ©sultat ainsi que toutes les lignes Ã 
 l'aide de SCR_malloc().
 
-Le string input doit se terminer par un caractŠre nul. Le tableau
-r‚sultat se termine par un pointeur nul.
+Le string input doit se terminer par un caractÃ¨re nul. Le tableau
+rÃ©sultat se termine par un pointeur nul.
 
-&RT pointeur vers le tableau r‚sultat allou‚
+&RT pointeur vers le tableau rÃ©sultat allouÃ©
 &EX
     PrintList(string)
     unsigned char   *string;

@@ -9,21 +9,21 @@ char    *DT_MONTHS_NAMES[] = {
 char    *DT_DAYS_NAMES = "Mo Tu Wd Th Fr Sa Su";     /* BP_M 25-10-95 */
 
 /* ====================================================================
-Affiche un petit calendrier dans l'Çcran et permet de visualiser les
-mois et les annÇes qui entourent la date donnÇe.
+Affiche un petit calendrier dans l'√©cran et permet de visualiser les
+mois et les ann√©es qui entourent la date donn√©e.
 
-&EN date indique le mois qui s'affiche au dÇpart
-&EN bline indique la ligne du bord supÇrieur du calendrier
+&EN date indique le mois qui s'affiche au d√©part
+&EN bline indique la ligne du bord sup√©rieur du calendrier
 &EN bcol indique la colonne du bord gauche du calendrier
 
-L'Çditeur reconnaåt les touches suivantes :
+L'√©diteur reconna√Æt les touches suivantes :
 
-&EN UP ou PGUP : retour en arriäre de une annÇe
-&EN DOWN ou PGDN : avance d'une annÇe
-&EN LEFT : retour en arriäre d'un mois
+&EN UP ou PGUP : retour en arri√®re de une ann√©e
+&EN DOWN ou PGDN : avance d'une ann√©e
+&EN LEFT : retour en arri√®re d'un mois
 &EN RIGHT : avance d'un mois
-&EN ESCAPE : quitte l'Çdition du calendrier
-&EN Touche de l'application : quitte l'Çdition du calendrier
+&EN ESCAPE : quitte l'√©dition du calendrier
+&EN Touche de l'application : quitte l'√©dition du calendrier
 
 &EX
     OPTION "Calendar" {C_FN DT_calendar(SCR_current_date(), 2, 2);}

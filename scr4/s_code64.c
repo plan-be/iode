@@ -18,7 +18,7 @@ Code un buffer en base64.
 &EN lg : longueur du buffer input
 &EN out : buffer ouput
 
-Le buffer r‚sultat (out) doit ˆtre suffisamment grand pour contenir 1+ (4 x lg) / 3 bytes.
+Le buffer rÃ©sultat (out) doit Ãªtre suffisamment grand pour contenir 1+ (4 x lg) / 3 bytes.
 
 &EX
     SCR_code64(pg->pg_rec, pg->pg_rec_len, buf);
@@ -73,15 +73,15 @@ SCR_code64(U_ch *in, int lg, U_ch *out)
 }
 
 /******************************************************************************
-Decode un buffer cod‚ en base64 par SCR_code64().
+Decode un buffer codÃ© en base64 par SCR_code64().
 
-&EN in : buffer input (cod‚ 64)
+&EN in : buffer input (codÃ© 64)
 &EN lg : longueur du buffer output (!!)
-&EN out : buffer output (d‚cod‚)
+&EN out : buffer output (dÃ©codÃ©)
 
-Le buffer r‚sultat (out) doit ˆtre suffisamment grand pour contenir lg bytes.
+Le buffer rÃ©sultat (out) doit Ãªtre suffisamment grand pour contenir lg bytes.
 Attention, lg est bien la longueur du buffer AVANT codage (celle de out,
-donc aprŠs d‚codage).
+donc aprÃ¨s dÃ©codage).
 
 &EX
     SCR_code64(pg->pg_rec, pg->pg_rec_len, buf);

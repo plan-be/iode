@@ -1,9 +1,9 @@
 #include "s_ydvlp.h"
 
 /* ====================================================================
-Retourne un string d‚crivant la position actuelle de la lecture dans le
-fichier ou dans le string interpr‚t‚. Le message retourn‚ se pr‚sente
-diff‚remment suivant le type de texte lu :
+Retourne un string dÃ©crivant la position actuelle de la lecture dans le
+fichier ou dans le string interprÃ©tÃ©. Le message retournÃ© se prÃ©sente
+diffÃ©remment suivant le type de texte lu :
 
 &EN fichier : filename[line; col]
 &EN string  : (string)[pos]

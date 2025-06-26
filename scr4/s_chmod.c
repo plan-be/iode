@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 
 /* ========================================================================
-Modifie les attributs d'accŠs d'un fichier.
+Modifie les attributs d'accÃ¨s d'un fichier.
 
 &EN filename : Name of existing file.
 &EN pmode : Permission setting for file.
@@ -18,7 +18,7 @@ A return value of -1 indicates that the specified file could not be found.
 
 
 &IT DOS-Windows
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 The SCR_chmod() function changes the permission setting of the file
 specified by filename. The permission setting controls read and write access
 to the file. The integer expression pmode contains one or both of the

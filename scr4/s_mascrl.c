@@ -60,7 +60,7 @@ int         M_LC;
 #define FBEG              (*(SCRL->sc_fbeg))
 #define FEND              (*(SCRL->sc_fend))
 
-/*** FIN DÈplacement de s_scroll.h pour les problËmes de compilation le 8/12/2011 ***/
+/*** FIN D√©placement de s_scroll.h pour les probl√ßmes de compilation le 8/12/2011 ***/
 
 
 /*NH*/
@@ -147,7 +147,7 @@ int     i;
 /*NH*/
 M_scroll_init(scrol, fn)
 SCROLL *scrol;
-int  (*fn)();  /* Fn d'Çdition d'une cellule */
+int  (*fn)();  /* Fn d'√©dition d'une cellule */
 {
     old_scroll = SCRL;
     SCRL = scrol;
@@ -185,56 +185,56 @@ int  (*fn)();  /* Fn d'Çdition d'une cellule */
 
 
 /* ====================================================================
-Visualisation d'une matrice sous forme d'un tableau dÇroulant.
+Visualisation d'une matrice sous forme d'un tableau d√©roulant.
 
-Le contenu de la matrice est Çditable, l'utilisateur doit pour ce faire
-dÇfinir sa fonction d'Çdition (voir manuel de la librairie s_scroll).
+Le contenu de la matrice est √©ditable, l'utilisateur doit pour ce faire
+d√©finir sa fonction d'√©dition (voir manuel de la librairie s_scroll).
 
-On passe en paramätre: le pointeur sur la matrice Ö Çditer, un pointeur sur
-une structure SCROLL allouÇe, un pointeur sur le titre (ou NULL si pas de
+On passe en param√®tre: le pointeur sur la matrice √† √©diter, un pointeur sur
+une structure SCROLL allou√©e, un pointeur sur le titre (ou NULL si pas de
 titre), un pointeur sur un tableau contenant les titres des lignes et
-colonnes (ou NULL pour les titres par dÇfaut), et enfin un pointeur sur la
-fonction d'Çdition d'une cellule (ou NULL si non Çditable).
+colonnes (ou NULL pour les titres par d√©faut), et enfin un pointeur sur la
+fonction d'√©dition d'une cellule (ou NULL si non √©ditable).
 
-Les titres des lignes et colonnes sont passÇs dans deux tableaux de chaånes
+Les titres des lignes et colonnes sont pass√©s dans deux tableaux de cha√Ænes
 dans lesquels on trouve tous les titres des lignes et tous les titres de
-colonnes dans l'ordre, ces tableaux de chaånes doivent àtre terminÇs par
+colonnes dans l'ordre, ces tableaux de cha√Ænes doivent √™tre termin√©s par
 NULL.
 
-Les titres par dÇfaut sont les numÇros de lignes et de colonnes.
+Les titres par d√©faut sont les num√©ros de lignes et de colonnes.
 
-Les valeurs lc0 et lc reprÇsentent les largeurs des premiäre et autres
-colonnes de la matrice en caractäres.
+Les valeurs lc0 et lc repr√©sentent les largeurs des premi√®re et autres
+colonnes de la matrice en caract√®res.
 
-Les touches d'Çdition suivantes sont dÇfinies:
+Les touches d'√©dition suivantes sont d√©finies:
 
-   - ESCAPE : quitte l'Çdition
-   - ENTER  : Çdition de la cellule courante
-   - UP, DOWN : dÇplace le curseur vers la cellule supÇrieure ou
-     infÇrieure
-   - PGUP, PGDN : dÇplace le curseur d'un Çcran vers le haut ou le bas
-   - LEFT, RIGHT : dÇplace le curseur vers la cellule de gauche ou de
+   - ESCAPE : quitte l'√©dition
+   - ENTER  : √©dition de la cellule courante
+   - UP, DOWN : d√©place le curseur vers la cellule sup√©rieure ou
+     inf√©rieure
+   - PGUP, PGDN : d√©place le curseur d'un √©cran vers le haut ou le bas
+   - LEFT, RIGHT : d√©place le curseur vers la cellule de gauche ou de
      droite
-   - TAB et Shift-TAB : dÇplace le curseur d'un Çcran vers la droite ou
+   - TAB et Shift-TAB : d√©place le curseur d'un √©cran vers la droite ou
      la gauche
-   - HOME : place le curseur en premiäre colonne de la ligne courante
-   - CTRL + HOME : place le curseur en premiäre ligne de la colonne courante
+   - HOME : place le curseur en premi√®re colonne de la ligne courante
+   - CTRL + HOME : place le curseur en premi√®re ligne de la colonne courante
    - END : place le curseur en derniere colonne de la ligne courante
    - CTRL + END : place le curseur en derniere ligne de la colonne courante
    - Alt-R : inverse le tableau
-   - Alt-M : DÇplace le tableau dans les limites de l'Çcran suivant
-     les touches curseur utilisÇes ensuite. L'Çdition reprend apräs que
-     ENTER ait ÇtÇ pressÇ.
-   - Alt-Z : Change la taille du tableau dans les limites de l'Çcran
-     suivant les touches curseur utilisÇes ensuite. L'Çdition reprend
-     apräs que ENTER ait ÇtÇ pressÇ.
+   - Alt-M : D√©place le tableau dans les limites de l'√©cran suivant
+     les touches curseur utilis√©es ensuite. L'√©dition reprend apr√®s que
+     ENTER ait √©t√© press√©.
+   - Alt-Z : Change la taille du tableau dans les limites de l'√©cran
+     suivant les touches curseur utilis√©es ensuite. L'√©dition reprend
+     apr√®s que ENTER ait √©t√© press√©.
    - Lettre ou chiffre : positionne le curseur sur la prochaine ligne
-     dont le titre commence par le caractäre pressÇ.
+     dont le titre commence par le caract√®re press√©.
    - touche globale de l'application (Alt-X par exemple) : quitte
-     l'Çdition et exÇcute la fonction associÇe.
+     l'√©dition et ex√©cute la fonction associ√©e.
 
 
-ATTENTION: si la fonction M_scroll est utilisÇe en dehors d'un environnement
+ATTENTION: si la fonction M_scroll est utilis√©e en dehors d'un environnement
 SCR, il faut :
     -lier le programme avec scr4m.lib et s_strs.lib
     -initialiser le programme avec SCR_init() et le terminer avec SCR_end().
@@ -242,7 +242,7 @@ Il faut de plus lier le programme avec s_scroll.lib et inclure s_scroll.h.
 
 
 &RT
-nÇant
+n√©ant
 
 &EX
 
@@ -297,14 +297,14 @@ nÇant
 
 
 M_scroll(m1, title, ltitle, ctitle, fn, lc0, lc)
-MAT *m1;             /* matrice Ö Çditer */
-char *title;         /* titre gÇnÇral */
+MAT *m1;             /* matrice √† √©diter */
+char *title;         /* titre g√©n√©ral */
 char **ltitle;       /* tableau des titres de lignes ou NULL */
 char **ctitle;       /* tableau des titres colonnes ou NULL */
-int  (*fn)();        /* Fn d'Çdition d'une cellule */
+int  (*fn)();        /* Fn d'√©dition d'une cellule */
 int  lc0, lc;        /* Largeur de la colonne 1 et des autres  JMP38 21-09-92 */
 {
-    SCROLL *scrol;        /* pointeur vers une structure scrol allouÇe */
+    SCROLL *scrol;        /* pointeur vers une structure scrol allou√©e */
 
     if(m1 == NULL) return(-1);
     scrol = (SCROLL *) SCR_malloc(sizeof(SCROLL));

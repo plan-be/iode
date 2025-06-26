@@ -2,12 +2,12 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Relative Path : retourne le nom relatif d'un fichier Ö un directory
+Relative Path : retourne le nom relatif d'un fichier √† un directory
 quelconque. file contient le nom du fichier, dir celui du directory, res
-le rÇsultat.
+le r√©sultat.
 
 En cas d'erreur, res est vide et la variable DOS errno indique l'origine
-du probläme (Drive not ready, etc). La fonction retourne un pointeur nul.
+du probl√®me (Drive not ready, etc). La fonction retourne un pointeur nul.
 Cette fonction utilise SCR_fullpath().
 
 &RT pointeur vers le nom relatif du fichier (res) ou NULL en cas d'erreur.

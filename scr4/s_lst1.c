@@ -4,21 +4,21 @@
 #include "s_lst.h"
 
 /* ======================================================================
-CrÇe une structure LST destinÇe Ö contenir une liste d'ÇlÇments
+Cr√©e une structure LST destin√©e √† contenir une liste d'√©l√©ments
 quelconques de taille el_size.
 
-La liste crÇÇe contient 0 ÇlÇment. Elle est organisÇe en tableaux,
-chacun contenant tbl_size ÇlÇments, occupant donc el_size * tbl_size
-ÇlÇments contigus en mÇmoire.
+La liste cr√©√©e contient 0 √©l√©ment. Elle est organis√©e en tableaux,
+chacun contenant tbl_size √©l√©ments, occupant donc el_size * tbl_size
+√©l√©ments contigus en m√©moire.
 
-La liste peut àtre dÇsallouÇe par LST_free().
+La liste peut √™tre d√©sallou√©e par LST_free().
 
 &EX
 
 
 &TX
 &PRO <s_lst.h>
-&RT pointeur vers la structure LST allouÇe
+&RT pointeur vers la structure LST allou√©e
 &SA LST_free(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
@@ -48,10 +48,10 @@ int     tbl_size, el_size;
 }
 
 /* ======================================================================
-DÇsalloue une structure LST.
+D√©salloue une structure LST.
 
-Tous les sous-tableaux sont dÇsallouÇs. Les ÇlÇments de la liste ne sont
-pas traitÇs.
+Tous les sous-tableaux sont d√©sallou√©s. Les √©l√©ments de la liste ne sont
+pas trait√©s.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
@@ -77,7 +77,7 @@ LST     *lst;
 }
 
 /* ======================================================================
-Ajoute un ÇlÇment Ö la fin de la liste lst. Cet ÇlÇment est nul.
+Ajoute un √©l√©ment √† la fin de la liste lst. Cet √©l√©ment est nul.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
@@ -108,10 +108,10 @@ LST     *lst;
 }
 
 /* ======================================================================
-Ajoute n ÇlÇments apräs l'ÇlÇment after de la liste lst.
-Tous les ÇlÇments sont initialisÇs Ö 0.
+Ajoute n √©l√©ments apr√®s l'√©l√©ment after de la liste lst.
+Tous les √©l√©ments sont initialis√©s √† 0.
 
-Pour ajouter au dÇbut de la liste, after peut valoir -1L.
+Pour ajouter au d√©but de la liste, after peut valoir -1L.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add1(), LST_set(), LST_del(), LST_get(), LST_move()
@@ -136,7 +136,7 @@ long    after, n;
 }
 
 /* ======================================================================
-DÇtruit n ÇlÇments Ö partir de l'ÇlÇment from.
+D√©truit n √©l√©ments √† partir de l'√©l√©ment from.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_set(), LST_get(), LST_move()
@@ -169,7 +169,7 @@ long    from, n;
 }
 
 /* ======================================================================
-DÇplace les n ÇlÇments Ö partir de from apräs l'ÇlÇmÇnt after.
+D√©place les n √©l√©ments √† partir de from apr√®s l'√©l√©m√©nt after.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get()
@@ -194,7 +194,7 @@ long    from, after, n;
 }
 
 /* ======================================================================
-Retourne un pointeur vers l'ÇlÇment n de la liste lst.
+Retourne un pointeur vers l'√©l√©ment n de la liste lst.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_move()
@@ -213,8 +213,8 @@ long    n;
 }
 
 /* ======================================================================
-Fixe la valeur de l'ÇlÇment n de la liste lst. ptr est un pointeur vers
-cet ÇlÇment, et non sa valeur. Ainsi, dans le cas d'une liste de char *
+Fixe la valeur de l'√©l√©ment n de la liste lst. ptr est un pointeur vers
+cet √©l√©ment, et non sa valeur. Ainsi, dans le cas d'une liste de char *
 par exemple, on aura :
 
 &EX
@@ -246,9 +246,9 @@ void    *ptr;
 }
 
 /* ======================================================================
-Supprime les ÇlÇments de fin de liste qui sont nuls : si le dernier de la
-liste est nul, le supprime, et ainsi de suite jusqu'Ö avoir avoir rencontrÇ
-un ÇlÇment non nul.
+Supprime les √©l√©ments de fin de liste qui sont nuls : si le dernier de la
+liste est nul, le supprime, et ainsi de suite jusqu'√† avoir avoir rencontr√©
+un √©l√©ment non nul.
 
 &PRO <s_lst.h>
 &SA LST_create(), LST_add(), LST_get(), LST_del(), LST_move()
@@ -273,12 +273,12 @@ LST     *lst;
 }
 
 /* ======================================================================
-Retourne le nombre d'ÇlÇments de la liste lst.
+Retourne le nombre d'√©l√©ments de la liste lst.
 &EX
     if(LST_nb(lst) == 0) return;
     LST_save_file("test", lst);
 &TX
-&RT le nombre d'ÇlÇments actuel de la liste
+&RT le nombre d'√©l√©ments actuel de la liste
 ------------------------------------------------------------------------- */
 LST_nb(lst)
 LST *lst;

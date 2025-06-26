@@ -1,12 +1,12 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Alloue un string de la mˆme longueur que in et copie in dans le nouveau
+Alloue un string de la mÃªme longueur que in et copie in dans le nouveau
 string.
 
 Si in est nul, retourne NULL.
 
-&RT le pointeur vers le string allou‚. NULL en cas de m‚moire
+&RT le pointeur vers le string allouÃ©. NULL en cas de mÃ©moire
 insuffisante ou si in est nul.
 &EX
     new = SCR_stracpy("test");
@@ -26,10 +26,10 @@ unsigned char    *in;
 
 
 /* ====================================================================
-Free *old et le r‚alloue pour y stocker in. Utilise SCR_stracpy() …
+Free *old et le rÃ©alloue pour y stocker in. Utilise SCR_stracpy() Ã 
 cette fin.
 
-&RT le pointeur vers le string allou‚. NULL en cas de m‚moire
+&RT le pointeur vers le string allouÃ©. NULL en cas de mÃ©moire
 insuffisante.
 &EX
     char    *ptr = NULL;
@@ -47,9 +47,9 @@ unsigned char    **old, *cnew;
 }
 
 /* ====================================================================
-ConcatŠne deux strings et alloue le r‚sultat.
+ConcatÃ¨ne deux strings et alloue le rÃ©sultat.
 
-&RT le pointeur vers le string allou‚. NULL en cas de m‚moire
+&RT le pointeur vers le string allouÃ©. NULL en cas de mÃ©moire
 insuffisante ou si in et add sont vides ou nuls.
 &EX
     new = SCR_stracat("Coucou", "test");
@@ -76,15 +76,15 @@ unsigned char    *in, *add;
 }
 
 /* ====================================================================
-Ajoute au string allou‚ in le string add. Le r‚sultat est allou‚.
-Le string in est lib‚r‚.
+Ajoute au string allouÃ© in le string add. Le rÃ©sultat est allouÃ©.
+Le string in est libÃ©rÃ©.
 
-&RT le pointeur vers le string allou‚. NULL en cas de m‚moire
+&RT le pointeur vers le string allouÃ©. NULL en cas de mÃ©moire
 insuffisante ou si in et add sont nuls.
 &EX
     in = SCR_strapcy("coucou");
     new = SCR_stracat(in, "test");
-    // ne pas faire free(in) car d‚j… lib‚r‚ dans SCR_stracat().
+    // ne pas faire free(in) car dÃ©jÃ  libÃ©rÃ© dans SCR_stracat().
 &TX
 =======================================================================*/
 

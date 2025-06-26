@@ -46,7 +46,7 @@ extern int WSOCK_FORCE_IOMODE;
 /* =======================================================================
     Se connecte au serveur ftp 'srv' et retourne le socket de connexion
     srv : IN : Serveur
-    post : IN : port TCP/IP. Si le port est 0, la valeur par dÇfaut est 21
+    post : IN : port TCP/IP. Si le port est 0, la valeur par d√©faut est 21
     user : IN : Login de l'utilisateur
     pass : IN : Mot de passe de l'utilisateur
 
@@ -120,7 +120,7 @@ ScrFtpConnect(char *srv, int port, char *user, char *pass)
     Ferme une connexion TCP/IP sur un serveur FTP
     socket : IN : Socket de connexion
     return : 0 : si ok
-	     -1 : si la commande QUIT n'est pas acceptÇe
+	     -1 : si la commande QUIT n'est pas accept√©e
 	     -2 : si la valeur de retour de QUIT est une erreur
 ================================================================== */
 
@@ -143,11 +143,11 @@ ScrFtpClose(int socket)
 }
 
 /* ==========================================================================
-    Change le rÇpertoire courant sur le serveur FTP
+    Change le r√©pertoire courant sur le serveur FTP
     socket : IN : socket de connexion
-    dir    : IN : rÇpertoire de destination
+    dir    : IN : r√©pertoire de destination
     return : 0 : si ok
-	     -1 : Si la commande de changement de rÇpertoire n'est pas valide ou
+	     -1 : Si la commande de changement de r√©pertoire n'est pas valide ou
 		  si le repertoire de destination n'existe pas
 ============================================================================= */
 
@@ -167,11 +167,11 @@ ScrFtpChdir(int socket, char *dir)
 }
 
 /* ==========================================================================
-    CrÈe le sous-repertoire dir sur le serveur FTP
+    Cr√©e le sous-repertoire dir sur le serveur FTP
     socket : IN : socket de connexion
-    dir    : IN : sous-rÇpertoire ‡ crÈer
+    dir    : IN : sous-r√©pertoire √† cr√©er
     return : 0 : si ok
-	     -1 : Si le rÈpertoire n'a pu Ítre crÈÈ
+	     -1 : Si le r√©pertoire n'a pu √õtre cr√©√©
 ============================================================================= */
 
 ScrFtpMkdir(int socket, char *dir)
@@ -192,9 +192,9 @@ ScrFtpMkdir(int socket, char *dir)
 
 /* ================================================================================
    Envoie un fichier 'file' sur le socket ftp avec le 'to'
-   si to est nul, file est utilisÇ comme nom
-   Renvoie une valeur nÇgative si le transfert a ÇchouÇ
-   Renvoie le nombre de bytes envoyÇs si le le transfert c'est dÇroulÇ correctement
+   si to est nul, file est utilis√© comme nom
+   Renvoie une valeur n√©gative si le transfert a √©chou√©
+   Renvoie le nombre de bytes envoy√©s si le le transfert c'est d√©roul√© correctement
 =================================================================================== */
 
 ScrFtpPutFile(int socket, char *file, char *to)
@@ -205,7 +205,7 @@ ScrFtpPutFile(int socket, char *file, char *to)
     U_ch    **tbl;
 
     msg[0] = 0;
-    // Ouvre de fichier Ö envoyer   /* BP_M 11-01-2011 12:06 */
+    // Ouvre de fichier √† envoyer   /* BP_M 11-01-2011 12:06 */
     fd = ISC_fopen(file, "rb");
     if(fd == 0) {
 	rc = -11;
@@ -238,8 +238,8 @@ ScrFtpPutFile(int socket, char *file, char *to)
 	rc = -4;
 	goto ended;
     }
-    // Le message reáu du serveur contient l'adresse IP et le port TCP/IP
-    // oó se connecter et envoyer les donnÇes
+    // Le message re√ßu du serveur contient l'adresse IP et le port TCP/IP
+    // o√π se connecter et envoyer les donn√©es
     for(i = 20 ; SCRFTP_BUF[i] ; i++)
 	if(SCRFTP_BUF[i] == '(') break;
     if(SCRFTP_BUF[i] == 0) {
@@ -265,9 +265,9 @@ ScrFtpPutFile(int socket, char *file, char *to)
     ports = atoi(tbl[4]) * 256 + atoi(tbl[5]);
     sprintf(buf, "%s.%s.%s.%s", tbl[0], tbl[1],  tbl[2],  tbl[3]);
     SCR_free_tbl(tbl);
-    // Force le connect Ö ne pas faire d'ioctl
+    // Force le connect √† ne pas faire d'ioctl
     WSOCK_FORCE_IOMODE = 1;
-    // Se connecte au serveur de donnÇes
+    // Se connecte au serveur de donn√©es
     send_sock = WSockConnect(buf, ports);
     WSOCK_FORCE_IOMODE = 0;
 
@@ -276,8 +276,8 @@ ScrFtpPutFile(int socket, char *file, char *to)
 	goto ended;
     }
 
-    // Envoi au serveur FTP l'ordre d'attendre les donnÇes sur le canal de rÇception
-    // Et crÇe un fichier du nom 'file'
+    // Envoi au serveur FTP l'ordre d'attendre les donn√©es sur le canal de r√©ception
+    // Et cr√©e un fichier du nom 'file'
     if(to == 0) to = file;
     sprintf(buf, "STOR %s\r\n", to);
     rc = ScrFtpWrite(socket, buf);
@@ -332,11 +332,11 @@ ended:
 
 /* ================================================================================
    Copie file dans to sur le serveur ftp ouvert (socket).
-   Commence par changer de directory si le premier caractËre de to est / ou \.
-   Essaie de crÈer les dir intermÈdiaires qui n'existent pas.
+   Commence par changer de directory si le premier caract√®re de to est / ou \.
+   Essaie de cr√©er les dir interm√©diaires qui n'existent pas.
 
-   Renvoie une valeur nÇgative si le transfert a ÇchouÇ
-   Renvoie le nombre de bytes envoyÇs si le le transfert c'est dÇroulÇ correctement,
+   Renvoie une valeur n√©gative si le transfert a √©chou√©
+   Renvoie le nombre de bytes envoy√©s si le le transfert c'est d√©roul√© correctement,
     un code < 0 sinon
 =================================================================================== */
 
@@ -345,7 +345,7 @@ ScrFtpPutFileInDir(int socknb, char *file, char *to)
     int     i, rc = 0;
     U_ch    **tbl;
 
-    // explose en rÈpertoires
+    // explose en r√©pertoires
     tbl = SCR_vtoms(to, "/\\");
     rc = ScrFtpChdir(socknb, "/");
     if(rc) return(rc);
@@ -368,8 +368,8 @@ ScrFtpPutFileInDir(int socknb, char *file, char *to)
 }
 
 /* =========================================================================
-   Lit un rÇpertoire sur le serveur ftp et revoit une structure SCRSTAT *
-   le nom, la taille et le type de fichier est indiquÇ
+   Lit un r√©pertoire sur le serveur ftp et revoit une structure SCRSTAT *
+   le nom, la taille et le type de fichier est indiqu√©
    Retourne 0 si erreur
    Retourne un pointeur vers un tableau de pointeur SCRSTAT
 ============================================================================ */
@@ -412,8 +412,8 @@ SCRSTAT **ScrFtpDir(int socket, char *dir)
 	goto ended;
     }
 
-    // Le message reáu du serveur contient l'adresse IP et le port TCP/IP
-    // oó se connecter et envoyer les donnÇes
+    // Le message re√ßu du serveur contient l'adresse IP et le port TCP/IP
+    // o√π se connecter et envoyer les donn√©es
     for(i = 20 ; SCRFTP_BUF[i] ; i++)
 	if(SCRFTP_BUF[i] == '(') break;
     if(SCRFTP_BUF[i] == 0) {
@@ -439,9 +439,9 @@ SCRSTAT **ScrFtpDir(int socket, char *dir)
     ports = atoi(tbl[4]) * 256 + atoi(tbl[5]);
     sprintf(buf, "%s.%s.%s.%s", tbl[0], tbl[1],  tbl[2],  tbl[3]);
     SCR_free_tbl(tbl);
-    // Force le connect Ö ne pas faire d'ioctl
+    // Force le connect √† ne pas faire d'ioctl
     WSOCK_FORCE_IOMODE = 1;
-    // Se connecte au serveur de donnÇes
+    // Se connecte au serveur de donn√©es
     recv_sock = WSockConnect(buf, ports);
     WSOCK_FORCE_IOMODE = 0;
 
@@ -450,7 +450,7 @@ SCRSTAT **ScrFtpDir(int socket, char *dir)
 	goto ended;
     }
 
-    // Envoi au serveur FTP l'ordre de renvoyer sur le canal de donnÇes la liste des fichiers dir rÇpertoire
+    // Envoi au serveur FTP l'ordre de renvoyer sur le canal de donn√©es la liste des fichiers dir r√©pertoire
     sprintf(buf, "LIST %s\r\n", dir);
     rc = ScrFtpWrite(socket, buf);
     if(rc != 0) {
@@ -517,8 +517,8 @@ ended:
 }
 
 /* ==============================================================
-    Lit un fichier 'file' sur le socket ftp et le crÇe dans to
-    si act = 1 : le fichier est ÇffacÇ du serveur
+    Lit un fichier 'file' sur le socket ftp et le cr√©e dans to
+    si act = 1 : le fichier est √©ffac√© du serveur
 ================================================================= */
 ScrFtpGetFile(int socket, char *file, char *to, int act)
 {
@@ -553,8 +553,8 @@ ScrFtpGetFile(int socket, char *file, char *to, int act)
 	goto ended;
     }
 
-    // Le message reáu du serveur contient l'adresse IP et le port TCP/IP
-    // oó se connecter et envoyer les donnÇes
+    // Le message re√ßu du serveur contient l'adresse IP et le port TCP/IP
+    // o√π se connecter et envoyer les donn√©es
     for(i = 20 ; SCRFTP_BUF[i] ; i++)
 	if(SCRFTP_BUF[i] == '(') break;
     if(SCRFTP_BUF[i] == 0) {
@@ -580,9 +580,9 @@ ScrFtpGetFile(int socket, char *file, char *to, int act)
     ports = atoi(tbl[4]) * 256 + atoi(tbl[5]);
     sprintf(buf, "%s.%s.%s.%s", tbl[0], tbl[1],  tbl[2],  tbl[3]);
     SCR_free_tbl(tbl);
-    // Force le connect Ö ne pas faire d'ioctl
+    // Force le connect √† ne pas faire d'ioctl
     WSOCK_FORCE_IOMODE = 1;
-    // Se connecte au serveur de donnÇes
+    // Se connecte au serveur de donn√©es
     recv_sock = WSockConnect(buf, ports);
     WSOCK_FORCE_IOMODE = 0;
 
@@ -591,8 +591,8 @@ ScrFtpGetFile(int socket, char *file, char *to, int act)
 	goto ended;
     }
 
-    // Envoi au serveur FTP l'ordre d'attendre les donnÇes sur le canal de rÇception
-    // Et crÇe un fichier du nom 'file'
+    // Envoi au serveur FTP l'ordre d'attendre les donn√©es sur le canal de r√©ception
+    // Et cr√©e un fichier du nom 'file'
     sprintf(buf, "RETR %s\r\n", file);
     rc = ScrFtpWrite(socket, buf);
     if(rc != 0) {
@@ -609,7 +609,7 @@ ScrFtpGetFile(int socket, char *file, char *to, int act)
 	goto ended;
     }
 
-    // Ouvre de fichier Ö crÇer
+    // Ouvre de fichier √† cr√©er
     if(to == 0) to = file;
     fd = ISC_fopen(to, "wb+");
     if(fd == 0) {
@@ -655,9 +655,9 @@ ended:
 /* ==============================================================
     Efface un fichier 'file' sur le socket ftp
     socket : IN : socket de connexion
-    file   : IN : fichier Ö effacer
+    file   : IN : fichier √† effacer
     return : 0 : si ok
-	     -1 : Si l'envoi de la commande Ö ÇchouÇ
+	     -1 : Si l'envoi de la commande √† √©chou√©
 	     -2 : Si le fichier n'existe pas
 ================================================================= */
 ScrFtpDelFile(int socket, char *file)
@@ -677,13 +677,13 @@ ScrFtpDelFile(int socket, char *file)
 }
 
 /* ==============================================================
-    Retoure le rÇpertoire courant sur le serveur
+    Retoure le r√©pertoire courant sur le serveur
     socket : IN : socket de connexion
-    res    : OUT: rÇpertoire courant du serveur FTP
-		  si res est nul, la valeur retournÇe est allouÇe
-		  sinon res doit àtre assez long pour contenir le rÇsultat
+    res    : OUT: r√©pertoire courant du serveur FTP
+		  si res est nul, la valeur retourn√©e est allou√©e
+		  sinon res doit √™tre assez long pour contenir le r√©sultat
     return : 0 : si ok
-	     -1 : Si l'envoi de la commande Ö ÇchouÇ
+	     -1 : Si l'envoi de la commande √† √©chou√©
 	     -2 : Si le fichier n'existe pas
 ================================================================= */
 char *ScrFtpPwd(int socket, char *res)
@@ -719,7 +719,7 @@ char *ScrFtpPwd(int socket, char *res)
     filein : IN : Nom d'origine
     fileout: IN : Nouveau nom
     return : 0 : si ok
-	     -1 : Si l'envoi de la commande Ö ÇchouÇ
+	     -1 : Si l'envoi de la commande √† √©chou√©
 	     -2 : Si le fichier n'existe pas
 ================================================================= */
 ScrFtpRenameFile(int socket, char *filein, char *fileout)

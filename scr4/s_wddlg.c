@@ -48,16 +48,16 @@ HANDLE WDDlgGetFont(int attr)
 }
 
 /* ========================================================================
-Change la police de caractäre du contrìle fld_nb de la boåte wddlg. Cette
-fonction peut àtre appelÇe avant l'Çdition ou en cours d'Çdition (dans
+Change la police de caract√®re du contr√¥le fld_nb de la bo√Æte wddlg. Cette
+fonction peut √™tre appel√©e avant l'√©dition ou en cours d'√©dition (dans
 une fonction utilisateur).
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 
-&EN fld_nb = numÇro du contrìle concernÇ ou -1 pour changer le font
-    de tous les contrìles
-&EN font = font normal par dÇfaut ou choisi parmi :
+&EN fld_nb = num√©ro du contr√¥le concern√© ou -1 pour changer le font
+    de tous les contr√¥les
+&EN font = font normal par d√©faut ou choisi parmi :
 &EN2 SCR_BOLD
 &EN2 SCR_ITALIC
 &EN2 SCR_BOLDITALIC
@@ -99,16 +99,16 @@ WDDlgSetFont1(WDDLG *wddlg, int fld_nb, int font)
 }
 
 /* ========================================================================
-Change l'accessibilitÇ du contrìle fld_nb de la boåte wddlg. Cette
-fonction peut àtre appelÇe avant l'Çdition ou en cours d'Çdition (dans
+Change l'accessibilit√© du contr√¥le fld_nb de la bo√Æte wddlg. Cette
+fonction peut √™tre appel√©e avant l'√©dition ou en cours d'√©dition (dans
 une fonction utilisateur).
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 
-&EN fld_nb = numÇro du contrìle concernÇ ou -1 pour changer l'accäs de tous
-    les contrìles
-&EN io = accäs choisi parmi :
+&EN fld_nb = num√©ro du contr√¥le concern√© ou -1 pour changer l'acc√®s de tous
+    les contr√¥les
+&EN io = acc√®s choisi parmi :
 &EN2 SCR_INPUT
 &EN2 SCR_OUTPUT
 
@@ -145,18 +145,18 @@ WDDlgSetIo1(WDDLG *wddlg, int fld_nb, int io)
 }
 
 /* ========================================================================
-Fixe la position des tabs du contrìle fld_nb LISTBOX de la
-boåte wddlg. Cette fonction peut àtre appelÇe avant l'Çdition ou en
-cours d'Çdition (dans une fonction utilisateur). Si une seule tabulation
-est passÇe, elle est rÇpÇtÇe automatiquement. Par dÇfaut, on a une
-tabulation tous les 16 points de boåte de dialogue, soit
-    plus ou moins tous les 4 caractäres.
+Fixe la position des tabs du contr√¥le fld_nb LISTBOX de la
+bo√Æte wddlg. Cette fonction peut √™tre appel√©e avant l'√©dition ou en
+cours d'√©dition (dans une fonction utilisateur). Si une seule tabulation
+est pass√©e, elle est r√©p√©t√©e automatiquement. Par d√©faut, on a une
+tabulation tous les 16 points de bo√Æte de dialogue, soit
+    plus ou moins tous les 4 caract√®res.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle LISTBOX
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le LISTBOX
 &EN ntabs = nombre de tabulations
-&EN tabs = pointeur vers un tableau de positions en unitÇs de boåte de
+&EN tabs = pointeur vers un tableau de positions en unit√©s de bo√Æte de
     dialogue
 
 &EX
@@ -200,13 +200,13 @@ WDDLG *WDDlgGetDlg(HWND hWnd)
 }
 
 /* ========================================================================
-Affiche le champ fld_nb de la boåte de dialogue wddlg. Cette fonction
-doit àtre appelÇe par les fonctions utilisateurs qui modifient le
-contenu des contrìles en cours d'Çdition.
+Affiche le champ fld_nb de la bo√Æte de dialogue wddlg. Cette fonction
+doit √™tre appel√©e par les fonctions utilisateurs qui modifient le
+contenu des contr√¥les en cours d'√©dition.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro d'ordre du contrìle Ö afficher
+    des contr√¥les
+&EN fld_nb = num√©ro d'ordre du contr√¥le √† afficher
 
 &EX
     TestFn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
@@ -214,9 +214,9 @@ contenu des contrìles en cours d'Çdition.
 	static int  i = 0;
 
 	if(fld_nb == 1 && nNotif == WDDLG_CHANGED) { // LISTBOX
-	    // Change la valeur d'un contrìle statique texte
+	    // Change la valeur d'un contr√¥le statique texte
 	    sprintf(testtext, "Passage %d", i++);
-	    // Affiche les champs modifiÇs
+	    // Affiche les champs modifi√©s
 	    WDDlgDisplayField(wddlg, fld_nb);
 	    }
 
@@ -293,12 +293,12 @@ WDDlgDisplayField(WDDLG *wddlg, int fld_nb)
 }
 
 /* ========================================================================
-Affiche tous les champs de la boåte de dialogue wddlg. Cette fonction
-doit àtre appelÇe par les fonctions utilisateurs qui modifient le
-contenu des contrìles en cours d'Çdition.
+Affiche tous les champs de la bo√Æte de dialogue wddlg. Cette fonction
+doit √™tre appel√©e par les fonctions utilisateurs qui modifient le
+contenu des contr√¥les en cours d'√©dition.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 
 &EX
     TestFn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
@@ -306,9 +306,9 @@ contenu des contrìles en cours d'Çdition.
 	static int  i = 0;
 
 	if(fld_nb == 1 && nNotif == WDDLG_CHANGED) { // LISTBOX
-	    // Change la valeur d'un contrìle statique texte
+	    // Change la valeur d'un contr√¥le statique texte
 	    sprintf(testtext, "Passage %d", i++);
-	    // Affiche les champs modifiÇs
+	    // Affiche les champs modifi√©s
 	    WDDlgDisplayFlds(wddlg);
 	    }
 
@@ -607,20 +607,20 @@ fin:
 }
 
 /* ============ FONCTIONS DE CREATION ET DE MODIFICATION ===========
-CrÇe une structure de dÇfinition d'une boåte de dialogue dynamique.
+Cr√©e une structure de d√©finition d'une bo√Æte de dialogue dynamique.
 
-&EN x = position, en pixels, du coin supÇrieur gauche de la boåte de
-    dialogue. Si cette valeur est nÇgative, la boåte est centrÇe
+&EN x = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
+    dialogue. Si cette valeur est n√©gative, la bo√Æte est centr√©e
     horizontalement.
-&EN y = position, en pixels, du coin supÇrieur gauche de la boåte de
-    dialogue. Si cette valeur est nÇgative, la boåte est centrÇe
+&EN y = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
+    dialogue. Si cette valeur est n√©gative, la bo√Æte est centr√©e
     verticalement.
-&EN cx = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
+&EN cx = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
     dialogue.
-&EN cy = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
+&EN cy = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
     dialogue.
-&EN title (optionnel) = titre de la boåte de dialogue. Si title est nul
-    il n'y a pas de titre dans la boåte de dialogue.
+&EN title (optionnel) = titre de la bo√Æte de dialogue. Si title est nul
+    il n'y a pas de titre dans la bo√Æte de dialogue.
 
 &EX
 TestDialog()
@@ -652,7 +652,7 @@ TestDialog()
 }
 &TX
 
-&RT pointeur vers la structure allouÇe
+&RT pointeur vers la structure allou√©e
 &SA WDDlgFree(), WDDlgAdd*(), WDDlgEdit(), WDDlgSelect()
 ==================================================================== */
 
@@ -832,44 +832,44 @@ WDDlgAddChild(WDDLG *wddlg, WORD type, DWORD lStyle, int x, int y,
 }
 
 /* ===================================================================
-Ajoute un bouton Ö une boåte de dialogue dynamique.
+Ajoute un bouton √† une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
-&EN text = pointeur vers le texte du bouton (valeur du contrìle)
-&EN fn = pointeur vers la fonction utilisateur de gestion des Çvänements
-    du contrìle
-&EN attr = attribut supplÇmentaire, combinaison de :
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
+&EN text = pointeur vers le texte du bouton (valeur du contr√¥le)
+&EN fn = pointeur vers la fonction utilisateur de gestion des √©v√®nements
+    du contr√¥le
+&EN attr = attribut suppl√©mentaire, combinaison de :
 &EN2 0 pour un bouton normal,
-&EN2 WDDLG_DEFBUTTON pour un bouton "par dÇfaut"
-&EN2 WDDLG_HIDDEN pour cacher le contrìle
+&EN2 WDDLG_DEFBUTTON pour un bouton "par d√©faut"
+&EN2 WDDLG_HIDDEN pour cacher le contr√¥le
 
 &IT Syntaxe de fn
-ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 
 La fonction utilisateur a la syntaxe suivante :
 &CO
     int fn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
 &TX
-oó :
+o√π :
 &EN wddlg est le pointeur vers la structure WDDLG courante
-&EN fld_nb est le numÇro du contrìle courant (oó s'est produit
-    l'Çvänement)
-&EN txt est la valeur du contrìle (= text de WDDlgAddButton)
-&EN nNotif est le message Windows reáu dans le contrìle
+&EN fld_nb est le num√©ro du contr√¥le courant (o√π s'est produit
+    l'√©v√®nement)
+&EN txt est la valeur du contr√¥le (= text de WDDlgAddButton)
+&EN nNotif est le message Windows re√ßu dans le contr√¥le
 
-Les messages suivants donnent lieu Ö un passage par cette fonction dans
+Les messages suivants donnent lieu √† un passage par cette fonction dans
 le cas des boutons :
 
-&EN WDDLG_CLICKED : bouton cliquÇ
-&EN WDDLG_KILLFOCUS : le bouton est quittÇ (touche TAB par exemple)
+&EN WDDLG_CLICKED : bouton cliqu√©
+&EN WDDLG_KILLFOCUS : le bouton est quitt√© (touche TAB par exemple)
 &EN WDDLG_SETFOCUS : le focus arrive sur ce bouton
 
-Si la valeur de retour de la fonction est 0, l'Çdition continue. Sinon,
-la boåte de dialogue est quittÇe et la valeur de fn est retournÇe par
+Si la valeur de retour de la fonction est 0, l'√©dition continue. Sinon,
+la bo√Æte de dialogue est quitt√©e et la valeur de fn est retourn√©e par
 la fonction WDDlgEdit().
 
 &EX
@@ -895,47 +895,47 @@ WDDlgAddButton(WDDLG *wddlg, int x, int y, int cx, int cy,
 }
 
 /* ===================================================================
-Ajoute une LISTBOX Ö une boåte de dialogue dynamique.
+Ajoute une LISTBOX √† une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
 &EN opts = pointeur vers un tableau de textes
 &EN sel = pointeur vers un tableau de char contenant 0 pour les options
-    non sÇlectionnÇes et 1 pour les options sÇlectionnÇes
-&EN fn = pointeur vers la fonction utilisateur de gestion des Çvänements
-    du contrìle
-&EN attr = attribut supplÇmentaire : combinaison de :
-&EN2 0 pour une LISTBOX Ö sÇlection unique
-&EN2 WDDLG_MULTISEL pour une LISTBOX Ö sÇlections multiples
-&EN2 WDDLG_HIDDEN pour cacher le contrìle
+    non s√©lectionn√©es et 1 pour les options s√©lectionn√©es
+&EN fn = pointeur vers la fonction utilisateur de gestion des √©v√®nements
+    du contr√¥le
+&EN attr = attribut suppl√©mentaire : combinaison de :
+&EN2 0 pour une LISTBOX √† s√©lection unique
+&EN2 WDDLG_MULTISEL pour une LISTBOX √† s√©lections multiples
+&EN2 WDDLG_HIDDEN pour cacher le contr√¥le
 
 &IT Syntaxe de fn
-ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 
 La fonction utilisateur a la syntaxe suivante :
 &CO
     int fn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
 &TX
-oó :
+o√π :
 &EN wddlg est le pointeur vers la structure WDDLG courante
-&EN fld_nb est le numÇro du contrìle courant (oó s'est produit
-    l'Çvänement)
-&EN txt est la valeur du contrìle (= sel de WDDlgAddListbox)
-&EN nNotif est le message Windows reáu dans le contrìle
+&EN fld_nb est le num√©ro du contr√¥le courant (o√π s'est produit
+    l'√©v√®nement)
+&EN txt est la valeur du contr√¥le (= sel de WDDlgAddListbox)
+&EN nNotif est le message Windows re√ßu dans le contr√¥le
 
-Les messages suivants donnent lieu Ö un passage par cette fonction dans
+Les messages suivants donnent lieu √† un passage par cette fonction dans
 le cas des LISTBOX :
 
 &EN WDDLG_DBLCLK    : double clic sur une option
 &EN WDDLG_KILLFOCUS : perte du focus
 &EN WDDLG_SETFOCUS  : gain du focus
-&EN WDDLG_CHANGED : changement de sÇlection
+&EN WDDLG_CHANGED : changement de s√©lection
 
-Si la valeur de retour de la fonction est 0, l'Çdition continue. Sinon,
-la boåte de dialogue est quittÇe et la valeur de fn est retournÇe par
+Si la valeur de retour de la fonction est 0, l'√©dition continue. Sinon,
+la bo√Æte de dialogue est quitt√©e et la valeur de fn est retourn√©e par
 la fonction WDDlgEdit().
 
 &EX
@@ -973,14 +973,14 @@ WDDlgAddListbox(WDDLG *wddlg, int x, int y, int cx, int cy, U_ch **opts,
 }
 
 /* ===================================================================
-Ajoute un contrìle statique (texte) Ö une boåte de dialogue dynamique.
+Ajoute un contr√¥le statique (texte) √† une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
-&EN text = pointeur vers le texte du contrìle
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
+&EN text = pointeur vers le texte du contr√¥le
 
 &EX
     wddlg = WDDlgCreate(5, 5, 100, 220, 0L);
@@ -995,7 +995,7 @@ WDDlgAddStatic(WDDLG *wddlg, int x, int y, int cx, int cy,
 {
     DWORD   lStyle;
 
-    if(text == 0) // Controle spÇcial pointeur wddlg
+    if(text == 0) // Controle sp√©cial pointeur wddlg
 	lStyle = WS_CHILD | SS_NOTIFY;
     else
 	lStyle = SS_LEFTNOWORDWRAP | WS_CHILD | WS_VISIBLE | WS_GROUP ;
@@ -1005,13 +1005,13 @@ WDDlgAddStatic(WDDLG *wddlg, int x, int y, int cx, int cy,
 }
 
 /* ===================================================================
-Ajoute un icìne dans une boåte de dialogue dynamique.
-Si fn est non nulle, le contrìle est "clickable".
+Ajoute un ic√¥ne dans une bo√Æte de dialogue dynamique.
+Si fn est non nulle, le contr√¥le est "clickable".
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
 &EN res = identifiant de la ressource
 
 &EX
@@ -1042,13 +1042,13 @@ WDDlgAddIcon(WDDLG *wddlg, int x, int y, int res,
 }
 
 /* ===================================================================
-Ajoute un BITMAP dans une boåte de dialogue dynamique.
-Si fn est non nulle, le contrìle est "clickable".
+Ajoute un BITMAP dans une bo√Æte de dialogue dynamique.
+Si fn est non nulle, le contr√¥le est "clickable".
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
 &EN res = identifiant de la ressource
 
 &EX
@@ -1075,13 +1075,13 @@ WDDlgAddBmp(WDDLG *wddlg, int x, int y, int res,
 }
 
 /* ===================================================================
-Ajoute un GROUPBOX dans une boåte de dialogue dynamique.
+Ajoute un GROUPBOX dans une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille, en coordonnÇes de boåte de dialogue, du
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille, en coordonn√©es de bo√Æte de dialogue, du
     group box
 &EN title = titre du groupbox
 
@@ -1103,42 +1103,42 @@ WDDlgAddGroupbox(WDDLG *wddlg, int x, int y, int cx, int cy, U_ch *title)
 }
 
 /* ===================================================================
-Ajoute un contrìle d'Çdition de texte d'une seule ligne Ö une boåte de
+Ajoute un contr√¥le d'√©dition de texte d'une seule ligne √† une bo√Æte de
 dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
-&EN text = pointeur vers le texte du contrìle (valeur du contrìle)
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
+&EN text = pointeur vers le texte du contr√¥le (valeur du contr√¥le)
 &EN maxlen = longueur maximum du texte
-&EN fn = pointeur vers la fonction utilisateur de gestion des Çvänements
-    du contrìle
-&EN attr = attribut supplÇmentaire (non utilisÇ)
+&EN fn = pointeur vers la fonction utilisateur de gestion des √©v√®nements
+    du contr√¥le
+&EN attr = attribut suppl√©mentaire (non utilis√©)
 
 &IT Syntaxe de fn
-ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 
 La fonction utilisateur a la syntaxe suivante :
 &CO
     int fn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
 &TX
-oó :
+o√π :
 &EN wddlg est le pointeur vers la structure WDDLG courante
-&EN fld_nb est le numÇro du contrìle courant (oó s'est produit
-    l'Çvänement)
-&EN txt est la valeur du contrìle (= text de WDDlgAddButton)
-&EN nNotif est le message Windows reáu dans le contrìle
+&EN fld_nb est le num√©ro du contr√¥le courant (o√π s'est produit
+    l'√©v√®nement)
+&EN txt est la valeur du contr√¥le (= text de WDDlgAddButton)
+&EN nNotif est le message Windows re√ßu dans le contr√¥le
 
-Les messages suivants donnent lieu Ö un passage par cette fonction dans
-le cas des contrìle d'Çdition :
+Les messages suivants donnent lieu √† un passage par cette fonction dans
+le cas des contr√¥le d'√©dition :
 
-&EN WDDLG_KILLFOCUS : le contrìle est quittÇ (touche TAB par exemple)
-&EN WDDLG_SETFOCUS : le focus arrive sur ce contrìle
+&EN WDDLG_KILLFOCUS : le contr√¥le est quitt√© (touche TAB par exemple)
+&EN WDDLG_SETFOCUS : le focus arrive sur ce contr√¥le
 
-Si la valeur de retour de la fonction est 0, l'Çdition continue. Sinon,
-la boåte de dialogue est quittÇe et la valeur de fn est retournÇe par
+Si la valeur de retour de la fonction est 0, l'√©dition continue. Sinon,
+la bo√Æte de dialogue est quitt√©e et la valeur de fn est retourn√©e par
 la fonction WDDlgEdit().
 
 &EX
@@ -1162,15 +1162,15 @@ WDDlgAddEdit(WDDLG *wddlg, int x, int y, int cx, int cy,
 }
 
 /* ===================================================================
-Ajoute un slider horizontal dans une boåte de dialogue dynamique.
+Ajoute un slider horizontal dans une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
-&EN pos = pointeur vers la valeur du contrìle (entier)
-&EN nMin et nMax = borne des valeurs du contrìle
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
+&EN pos = pointeur vers la valeur du contr√¥le (entier)
+&EN nMin et nMax = borne des valeurs du contr√¥le
 
 &EX
     wddlg = WDDlgCreate(5, 5, 100, 220, 0L);
@@ -1190,15 +1190,15 @@ WDDlgAddHSlider(WDDLG *wddlg, int x, int y, int cx, int cy, int *pos,
 }
 
 /* ===================================================================
-Ajoute un "progress bar" dans une boåte de dialogue dynamique.
+Ajoute un "progress bar" dans une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
-&EN pos = pointeur vers la valeur du contrìle (entier)
-&EN nMin et nMax = borne des valeurs du contrìle
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
+&EN pos = pointeur vers la valeur du contr√¥le (entier)
+&EN nMin et nMax = borne des valeurs du contr√¥le
 
 &EX
     wddlg = WDDlgCreate(5, 5, 100, 220, 0L);
@@ -1233,13 +1233,13 @@ WDDlgAddCombobox(WDDLG *wddlg, int x, int y, int cx, int cy,
 }
 
 /* ===================================================================
-Edite une boåte de dialogue dynamique construite Ö l'aide de
+Edite une bo√Æte de dialogue dynamique construite √† l'aide de
 WDDlgCreate() et WDDlgAdd*().
 
-&RT DiffÇrentes valeurs sont possibles selon la maniäre choisie
-    pour quitter l'Çdition.
+&RT Diff√©rentes valeurs sont possibles selon la mani√®re choisie
+    pour quitter l'√©dition.
 &EN 0 : si ENTER
-&EN -1 : si ESCAPE, Alt+F4, cliquer le "x" dans le coin supÇrieur droit
+&EN -1 : si ESCAPE, Alt+F4, cliquer le "x" dans le coin sup√©rieur droit
     ou retour via une fonction utilisateur
 &EN autres valeurs = codes retour des fonctions utilisateurs
 
@@ -1271,10 +1271,10 @@ WDDlgEdit(WDDLG *wddlg)
 }
 
 /* ===================================================================
-Affiche une boåte de dialogue dynamique construite Ö l'aide de
+Affiche une bo√Æte de dialogue dynamique construite √† l'aide de
 WDDlgCreate() et WDDlgAdd*().
 
-&RT 0 si la fenàtre est crÇÇe, -1 sinon
+&RT 0 si la fen√™tre est cr√©√©e, -1 sinon
 
 &EX
     WDDLG   *wddlg;
@@ -1308,10 +1308,10 @@ WDDlgDisplay(WDDLG *wddlg)
 }
 
 /* ===================================================================
-Ferme une boåte de dialogue dynamique construite Ö l'aide de
-WDDlgCreate() et WDDlgAdd*() et affichÇe par WDDlgDisplay().
+Ferme une bo√Æte de dialogue dynamique construite √† l'aide de
+WDDlgCreate() et WDDlgAdd*() et affich√©e par WDDlgDisplay().
 
-&RT -1 si la fenàtre n'existe pas
+&RT -1 si la fen√™tre n'existe pas
 
 &EX
     WDDLG   *wddlg;
@@ -1341,8 +1341,8 @@ WDDlgUnDisplay(WDDLG *wddlg)
 }
 
 /* ===================================================================
-Libäre l'espace allouÇ pour la crÇation d'une boåte de dialogue
-dynamique construite Ö l'aide de WDDlgCreate() et WDDlgAdd*().
+Lib√®re l'espace allou√© pour la cr√©ation d'une bo√Æte de dialogue
+dynamique construite √† l'aide de WDDlgCreate() et WDDlgAdd*().
 
 &SA WDDlgCreate(), WDDlgAdd*(), WDDlgEdit(), WDDlgSelect()
 ==================================================================== */
@@ -1408,56 +1408,56 @@ WDDlgSelectAllFn(WDDLG *wddlg, int i, char *a, int k)
 }
 
 /* ========================================================================
-Affiche une liste d'options dans une boåte de dialogue dynamique et
-permet d'en sÇlectionner une ou plusieurs. Cette fonction fait appel au
-groupe de fonctions WDDlg. La sÇlection s'opäre dans une LISTBOX standard
+Affiche une liste d'options dans une bo√Æte de dialogue dynamique et
+permet d'en s√©lectionner une ou plusieurs. Cette fonction fait appel au
+groupe de fonctions WDDlg. La s√©lection s'op√®re dans une LISTBOX standard
 de Windows.
 
-La boåte de dialogue proposÇe contient une LISTBOX et deux ou trois
-boutons : Ok, Cancel et Select All si les sÇlections multiples sont
+La bo√Æte de dialogue propos√©e contient une LISTBOX et deux ou trois
+boutons : Ok, Cancel et Select All si les s√©lections multiples sont
 permises (selon la valeur de sels).
 
-Attention aux coordonnÇes utilisÇes : la position (x, y) est exprimÇe en
-coordonÇes Çcran (pixels), tandis que la taille (cx, cy) est exprimÇe en
-coordonnÇes de boåte de dialogue. Ces derniäres reprÇsentent la taille
-moyenne d'un caractäre dans la police utilisÇe dans la boåte de dialogue
-divisÇe par 4 horizontalement, par 8 verticalement.
+Attention aux coordonn√©es utilis√©es : la position (x, y) est exprim√©e en
+coordon√©es √©cran (pixels), tandis que la taille (cx, cy) est exprim√©e en
+coordonn√©es de bo√Æte de dialogue. Ces derni√®res repr√©sentent la taille
+moyenne d'un caract√®re dans la police utilis√©e dans la bo√Æte de dialogue
+divis√©e par 4 horizontalement, par 8 verticalement.
 
-On peut quitter la sÇlection par ENTER, ESCAPE, Alt+F4, double click sur
+On peut quitter la s√©lection par ENTER, ESCAPE, Alt+F4, double click sur
 une option, click sur Ok ou Cancel.
 
-&EN title (optionnel) = titre de la boåte de dialogue. Si title est nul
-    il n'y a pas de titre dans la boåte de dialogue.
-&EN opts = tableau de pointeurs vers les options Ö afficher. Les options
+&EN title (optionnel) = titre de la bo√Æte de dialogue. Si title est nul
+    il n'y a pas de titre dans la bo√Æte de dialogue.
+&EN opts = tableau de pointeurs vers les options √† afficher. Les options
     peuvent contenir des tabulations pour organiser la LISTBOX en
     colonnes
-&EN sels (optionnel) = tableau de caractäres, 0 pour option non
-    sÇlectionnÇe, 1 pour option sÇlectionnÇe. Le nombre d'ÇlÇments de
-    sels doit correspondre Ö celui de opts. Si sels est nul, la
-    sÇlection ne peut àtre multiple et la valeur de retour de la
-    fonction indique l'option sÇlectionnÇe.
+&EN sels (optionnel) = tableau de caract√®res, 0 pour option non
+    s√©lectionn√©e, 1 pour option s√©lectionn√©e. Le nombre d'√©l√©ments de
+    sels doit correspondre √† celui de opts. Si sels est nul, la
+    s√©lection ne peut √™tre multiple et la valeur de retour de la
+    fonction indique l'option s√©lectionn√©e.
 
-&EN x = position, en pixels, du coin supÇrieur gauche de la boåte de
+&EN x = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
     dialogue
-&EN y = position, en pixels, du coin supÇrieur gauche de la boåte de
+&EN y = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
     dialogue
-&EN cx = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
-    dialogue. PrÇvoir 60 points minimum pour les boutons sans sÇlection
-    multiple et 100 points avec sÇlection multiple (un bouton de plus).
+&EN cx = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
+    dialogue. Pr√©voir 60 points minimum pour les boutons sans s√©lection
+    multiple et 100 points avec s√©lection multiple (un bouton de plus).
 
-&EN cy = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
-    dialogue. PrÇvoir 16 points supplÇmentaires en hauteur pour les
+&EN cy = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
+    dialogue. Pr√©voir 16 points suppl√©mentaires en hauteur pour les
     boutons.
 
-&EN ntabs (optionnel) = nombre de tabs dÇfinis
-&EN tabs (optionnel) = position des tabs dans la LISTBOX (exprimÇs en
-    coordonnÇes de la boåte de dialogue). Par dÇfaut, un tab est placÇ
-    tous les 16 points (soit plus ou moins 4 caractäres).
+&EN ntabs (optionnel) = nombre de tabs d√©finis
+&EN tabs (optionnel) = position des tabs dans la LISTBOX (exprim√©s en
+    coordonn√©es de la bo√Æte de dialogue). Par d√©faut, un tab est plac√©
+    tous les 16 points (soit plus ou moins 4 caract√®res).
 
 &RT
-&EN -1 si terminÇ par ESCAPE, bouton "Cancel" ou Alt-F4
-&EN 0 si sÇlection multiple et ENTER, bouton "Ok" ou double click
-&EN numÇro de l'option choisie si sÇlection simple (0, 1, etc)
+&EN -1 si termin√© par ESCAPE, bouton "Cancel" ou Alt-F4
+&EN 0 si s√©lection multiple et ENTER, bouton "Ok" ou double click
+&EN num√©ro de l'option choisie si s√©lection simple (0, 1, etc)
 
 &EX
 
@@ -1471,7 +1471,7 @@ une option, click sur Ok ou Cancel.
 	int     x, y, w, h;
 
 	WscrGetFldPos(pg, fld_nb, &x, &y, &w, &h);
-	// La PAGE pg doit àtre active !! //
+	// La PAGE pg doit √™tre active !! //
 	return(WDDlgSelect(0L, opts, 0L, x, y + h, w/2, 140, 3, nTabs));
     }
 
@@ -1522,54 +1522,54 @@ WDDlgSelect(U_ch *title, U_ch **opts, char *sels, int x, int y,
 
 
 /* ========================================================================
-Affiche une liste d'options dans une boåte de dialogue dynamique et
-permet d'en sÇlectionner une ou plusieurs. Cette fonction fait appel au
-groupe de fonctions WDDlg. La sÇlection s'opäre dans une "LISTVIEW",
-c'est-Ö-dire dans un tableau comportant une ligne de titre et
+Affiche une liste d'options dans une bo√Æte de dialogue dynamique et
+permet d'en s√©lectionner une ou plusieurs. Cette fonction fait appel au
+groupe de fonctions WDDlg. La s√©lection s'op√®re dans une "LISTVIEW",
+c'est-√†-dire dans un tableau comportant une ligne de titre et
 dont les colonnes ont une largeur modifiable par l'utilisateur.
 
-La boåte de dialogue proposÇe contient une LISTVIEW et deux ou trois
-boutons : Ok, Cancel et Select All si les sÇlections multiples sont
+La bo√Æte de dialogue propos√©e contient une LISTVIEW et deux ou trois
+boutons : Ok, Cancel et Select All si les s√©lections multiples sont
 permises (selon la valeur de sels).
 
-Attention aux coordonnÇes utilisÇes : la position (x, y) est exprimÇe en
-coordonÇes Çcran (pixels), tandis que la taille (cx, cy) est exprimÇe en
-coordonnÇes de boåte de dialogue. Ces derniäres reprÇsentent la taille
-moyenne d'un caractäre dans la police utilisÇe dans la boåte de dialogue
-divisÇe par 4 horizontalement, par 8 verticalement.
+Attention aux coordonn√©es utilis√©es : la position (x, y) est exprim√©e en
+coordon√©es √©cran (pixels), tandis que la taille (cx, cy) est exprim√©e en
+coordonn√©es de bo√Æte de dialogue. Ces derni√®res repr√©sentent la taille
+moyenne d'un caract√®re dans la police utilis√©e dans la bo√Æte de dialogue
+divis√©e par 4 horizontalement, par 8 verticalement.
 
-On peut quitter la sÇlection par ENTER, ESCAPE, Alt+F4, double click sur
+On peut quitter la s√©lection par ENTER, ESCAPE, Alt+F4, double click sur
 une option, click sur Ok ou Cancel.
 
-&EN title (optionnel) = titre de la boåte de dialogue. Si title est nul
-    il n'y a pas de titre dans la boåte de dialogue.
-&EN opts = tableau de pointeurs vers les options Ö afficher. Les options
+&EN title (optionnel) = titre de la bo√Æte de dialogue. Si title est nul
+    il n'y a pas de titre dans la bo√Æte de dialogue.
+&EN opts = tableau de pointeurs vers les options √† afficher. Les options
     doit contenir des tabulations pour organiser la LISTVIEW en
-    colonnes. La premiäre option contient les titres de colonnes.
-&EN sels (optionnel) = tableau de caractäres, 0 pour option non
-    sÇlectionnÇe, 1 pour option sÇlectionnÇe. Le nombre d'ÇlÇments de
-    sels doit correspondre Ö celui de opts. Si sels est nul, la
-    sÇlection ne peut àtre multiple et la valeur de retour de la
-    fonction indique l'option sÇlectionnÇe.
+    colonnes. La premi√®re option contient les titres de colonnes.
+&EN sels (optionnel) = tableau de caract√®res, 0 pour option non
+    s√©lectionn√©e, 1 pour option s√©lectionn√©e. Le nombre d'√©l√©ments de
+    sels doit correspondre √† celui de opts. Si sels est nul, la
+    s√©lection ne peut √™tre multiple et la valeur de retour de la
+    fonction indique l'option s√©lectionn√©e.
 
-&EN x = position, en pixels, du coin supÇrieur gauche de la boåte de
+&EN x = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
     dialogue
-&EN y = position, en pixels, du coin supÇrieur gauche de la boåte de
+&EN y = position, en pixels, du coin sup√©rieur gauche de la bo√Æte de
     dialogue
-&EN cx = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
-    dialogue. PrÇvoir 60 points minimum pour les boutons sans sÇlection
-    multiple et 100 points avec sÇlection multiple (un bouton de plus).
+&EN cx = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
+    dialogue. Pr√©voir 60 points minimum pour les boutons sans s√©lection
+    multiple et 100 points avec s√©lection multiple (un bouton de plus).
 
-&EN cy = taille, en coordonnÇes de boåte de dialogue (!), de la boåte de
-    dialogue. PrÇvoir 16 points supplÇmentaires en hauteur pour les
+&EN cy = taille, en coordonn√©es de bo√Æte de dialogue (!), de la bo√Æte de
+    dialogue. Pr√©voir 16 points suppl√©mentaires en hauteur pour les
     boutons.
 
 &RT
-&EN -1 si terminÇ par ESCAPE, bouton "Cancel" ou Alt-F4
-&EN 0 si sÇlection multiple et ENTER, bouton "Ok" ou double click
-&EN numÇro de l'option choisie si sÇlection simple (0, 1, etc)
+&EN -1 si termin√© par ESCAPE, bouton "Cancel" ou Alt-F4
+&EN 0 si s√©lection multiple et ENTER, bouton "Ok" ou double click
+&EN num√©ro de l'option choisie si s√©lection simple (0, 1, etc)
 
-&NO La largeur des colonnes est fixÇe automatiquement en fonction
+&NO La largeur des colonnes est fix√©e automatiquement en fonction
     des textes des options (pas des titres).
 
 &EX
@@ -1583,7 +1583,7 @@ une option, click sur Ok ou Cancel.
 	int     x, y, w, h;
 
 	WscrGetFldPos(pg, fld_nb, &x, &y, &w, &h);
-	// La PAGE pg doit àtre active !! //
+	// La PAGE pg doit √™tre active !! //
 	return(WDDlgLVSelect(0L, opts, 0L, x, y + h, w/2, 140));
     }
 &TX
@@ -1632,49 +1632,49 @@ WDDlgLVSelect(U_ch *title, U_ch **opts, char *sels, int x, int y,
 
 
 /* ===================================================================
-Ajoute un contrìle LISTVIEW Ö une boåte de dialogue dynamique.
+Ajoute un contr√¥le LISTVIEW √† une bo√Æte de dialogue dynamique.
 
-&EN wddlg = pointeur vers la structure de dÇfinition de la boåte de
-    dialogue dynamique crÇÇe par WDDlgCreate()
-&EN (x, y) = position, en coordonnÇes de boåte de dialogue, du coin
-    supÇrieur gauche du contrìle
-&EN (cx, cy) = taille du contrìle, en coordonnÇes de boåte de dialogue
+&EN wddlg = pointeur vers la structure de d√©finition de la bo√Æte de
+    dialogue dynamique cr√©√©e par WDDlgCreate()
+&EN (x, y) = position, en coordonn√©es de bo√Æte de dialogue, du coin
+    sup√©rieur gauche du contr√¥le
+&EN (cx, cy) = taille du contr√¥le, en coordonn√©es de bo√Æte de dialogue
 &EN opts = pointeur vers un tableau de textes
 &EN sel = pointeur vers un tableau de char contenant 0 pour les options
-    non sÇlectionnÇes et 1 pour les options sÇlectionnÇes
-&EN fn = pointeur vers la fonction utilisateur de gestion des Çvänements
-    du contrìle
-&EN attr = attribut supplÇmentaire
-&EN2 0 pour une LISTVIEW Ö sÇlection unique, combinaison de:
-&EN2 WDDLG_MULTISEL pour une LISTVIEW Ö sÇlections multiples
-&EN2 WDDLG_HIDDEN pour cacher le contrìle
+    non s√©lectionn√©es et 1 pour les options s√©lectionn√©es
+&EN fn = pointeur vers la fonction utilisateur de gestion des √©v√®nements
+    du contr√¥le
+&EN attr = attribut suppl√©mentaire
+&EN2 0 pour une LISTVIEW √† s√©lection unique, combinaison de:
+&EN2 WDDLG_MULTISEL pour une LISTVIEW √† s√©lections multiples
+&EN2 WDDLG_HIDDEN pour cacher le contr√¥le
 
 &IT Syntaxe de fn
-ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 
 La fonction utilisateur a la syntaxe suivante :
 &CO
     int fn(WDDLG *wddlg, int fld_nb, char *txt, int nNotif)
 &TX
-oó :
+o√π :
 &EN wddlg est le pointeur vers la structure WDDLG courante
-&EN fld_nb est le numÇro du contrìle courant (oó s'est produit
-    l'Çvänement)
-&EN txt est la valeur du contrìle (= sel de WDDlgAddListview)
-&EN nNotif est le message Windows reáu dans le contrìle
+&EN fld_nb est le num√©ro du contr√¥le courant (o√π s'est produit
+    l'√©v√®nement)
+&EN txt est la valeur du contr√¥le (= sel de WDDlgAddListview)
+&EN nNotif est le message Windows re√ßu dans le contr√¥le
 
-Les messages suivants donnent lieu Ö un passage par cette fonction dans
+Les messages suivants donnent lieu √† un passage par cette fonction dans
 le cas des LISTBOX :
 
 &EN WDDLG_DBLCLK    : double clic sur une option
 &EN WDDLG_KILLFOCUS : perte du focus
 &EN WDDLG_SETFOCUS  : gain du focus
-&EN WDDLG_CHANGED : changement de sÇlection. Ce message est reáu Ö
+&EN WDDLG_CHANGED : changement de s√©lection. Ce message est re√ßu √†
     plusieurs reprises lors d'un changement d'option. A n'utiliser
     qu'avec attention.
 
-Si la valeur de retour de la fonction est 0, l'Çdition continue. Sinon,
-la boåte de dialogue est quittÇe et la valeur de fn est retournÇe par
+Si la valeur de retour de la fonction est 0, l'√©dition continue. Sinon,
+la bo√Æte de dialogue est quitt√©e et la valeur de fn est retourn√©e par
 la fonction WDDlgEdit().
 
 &EX
@@ -1782,17 +1782,17 @@ WDDlgLVCalcNc(WDDLG *wddlg, int fld_nb)
 }
 
 /* ========================================================================
-Fixe la largeur des colonnes du contrìle fld_nb LISTVIEW de la
-boåte wddlg. Cette fonction peut àtre appelÇe avant l'Çdition ou en
-cours d'Çdition (dans une fonction utilisateur). Par dÇfaut, les
-colonnes ont une largeur calculÇe en fonction des textes.
+Fixe la largeur des colonnes du contr√¥le fld_nb LISTVIEW de la
+bo√Æte wddlg. Cette fonction peut √™tre appel√©e avant l'√©dition ou en
+cours d'√©dition (dans une fonction utilisateur). Par d√©faut, les
+colonnes ont une largeur calcul√©e en fonction des textes.
 
-Si ntabs est insuffisant, les colonnes non dimensionnÇes restent
-calculÇes automatiquement.
+Si ntabs est insuffisant, les colonnes non dimensionn√©es restent
+calcul√©es automatiquement.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle LISTVIEW
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le LISTVIEW
 &EN ntabs = nombre de tabulations
 &EN tabs = pointeur vers un tableau de positions en pixels
 
@@ -1928,10 +1928,10 @@ WDDlgNotifyHandler(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 /* ================================================================
-Cache un contrìle.
+Cache un contr√¥le.
 
-&EN wddlg = pointeur vers la boåte de dialogue
-&EN fld_nb = numÇro du contrìle
+&EN wddlg = pointeur vers la bo√Æte de dialogue
+&EN fld_nb = num√©ro du contr√¥le
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgShowField()
 ================================================================== */
@@ -1945,10 +1945,10 @@ WDDlgHideField(WDDLG *wddlg, int fld_nb)
 }
 
 /* ================================================================
-Rend un contrìle apparent.
+Rend un contr√¥le apparent.
 
-&EN wddlg = pointeur vers la boåte de dialogue
-&EN fld_nb = numÇro du contrìle
+&EN wddlg = pointeur vers la bo√Æte de dialogue
+&EN fld_nb = num√©ro du contr√¥le
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgHideField()
 ================================================================== */
@@ -1992,12 +1992,12 @@ WDDlgResize(WDDLG *wddlg, int x, int y, int cx, int cy)
 }
 
 /* ========================================================================
-CrÇe une boåte de dialogue dynamique temporaire pour poser une question.
-La rÇponse se trouve dans le buffer rep.
+Cr√©e une bo√Æte de dialogue dynamique temporaire pour poser une question.
+La r√©ponse se trouve dans le buffer rep.
 
-&EN title = titre de la boåte de dialogue
-&EN qu = question Ö poser
-&EN rep = buffer contenant la rÇponse
+&EN title = titre de la bo√Æte de dialogue
+&EN qu = question √† poser
+&EN rep = buffer contenant la r√©ponse
 &EN lg = taille maximum de rep
 
 &SA WDDlgCreate(), WDDlgEdit()
@@ -2039,15 +2039,15 @@ WDDlgAsk(U_ch *title, U_ch *qu, U_ch *rep, int lg)
 }
 
 /* ========================================================================
-Fixe la fonction Ö exÇcuter lorsque la touche ESCAPE est pressÇe pendant
-l'Çdition de la boåte de dialogue. Cette fonction doit retourner une
-valeur non nulle pour que la boåte de dialogue soit quittÇe par ESCAPE
+Fixe la fonction √† ex√©cuter lorsque la touche ESCAPE est press√©e pendant
+l'√©dition de la bo√Æte de dialogue. Cette fonction doit retourner une
+valeur non nulle pour que la bo√Æte de dialogue soit quitt√©e par ESCAPE
 et nulle sinon.
 
-Par dÇfaut, ESCAPE quitte la boåte de dialogue.
+Par d√©faut, ESCAPE quitte la bo√Æte de dialogue.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 &EN fn = pointeur vers une fonction
 
 &IT Prototype de fn
@@ -2067,16 +2067,16 @@ WDDlgSetEscFn(WDDLG *wddlg, int (*fn)(WDDLG *, int, char *, int))
 
 
 /* ========================================================================
-Fixe la fonction Ö exÇcuter lorsque la touche ENTER est pressÇe pendant
-l'Çdition de la boåte de dialogue. Cette fonction doit retourner une
-valeur non nulle pour que la boåte de dialogue soit quittÇe par ESCAPE
+Fixe la fonction √† ex√©cuter lorsque la touche ENTER est press√©e pendant
+l'√©dition de la bo√Æte de dialogue. Cette fonction doit retourner une
+valeur non nulle pour que la bo√Æte de dialogue soit quitt√©e par ESCAPE
 et nulle sinon.
 
-Par dÇfaut, ENTER exÇcute le bouton par dÇfaut. En l'absence de bouton
-de ce type, ENTER quitte la boåte de dialogue.
+Par d√©faut, ENTER ex√©cute le bouton par d√©faut. En l'absence de bouton
+de ce type, ENTER quitte la bo√Æte de dialogue.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 &EN fn = pointeur vers une fonction
 
 &IT Prototype de fn
@@ -2096,16 +2096,16 @@ WDDlgSetOkFn(WDDLG *wddlg, int (*fn)(WDDLG *, int, char *, int))
 
 
 /* ========================================================================
-Fixe la fonction Ö exÇcuter lors du dÇbut de l'Çdition de la boåte de
+Fixe la fonction √† ex√©cuter lors du d√©but de l'√©dition de la bo√Æte de
 dialogue wddlg. Cette fonction doit retourner une valeur non nulle pour
-que la boåte de dialogue ne soit pas ÇditÇe et nulle pour que l'Çdition
-dÇbute.
+que la bo√Æte de dialogue ne soit pas √©dit√©e et nulle pour que l'√©dition
+d√©bute.
 
-La fonction est exÇcutÇe avant la crÇation de la fenàtre.
+La fonction est ex√©cut√©e avant la cr√©ation de la fen√™tre.
 
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 &EN fn = pointeur vers une fonction
 
 &IT Prototype de fn
@@ -2124,13 +2124,13 @@ WDDlgSetBeginFn(WDDLG *wddlg, int (*fn)(WDDLG *, int, char *, int))
 }
 
 /* ========================================================================
-Fixe la fonction Ö exÇcuter lors du la fin  de l'Çdition
-de la boåte de dialogue wddlg. Cette fonction doit retourner une
-valeur nulle pour que la boåte de dialogue puisse àtre quittÇe
-et non nulle pour que l'Çdition se poursuive.
+Fixe la fonction √† ex√©cuter lors du la fin  de l'√©dition
+de la bo√Æte de dialogue wddlg. Cette fonction doit retourner une
+valeur nulle pour que la bo√Æte de dialogue puisse √™tre quitt√©e
+et non nulle pour que l'√©dition se poursuive.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
+    des contr√¥les
 &EN fn = pointeur vers une fonction
 
 &IT Prototype de fn
@@ -2149,12 +2149,12 @@ WDDlgSetEndFn(WDDLG *wddlg, int (*fn)(WDDLG *, int, char *, int))
 }
 
 /* ========================================================================
-Retourne la position de l'option sÇlectionnÇe dans la LISTBOX
-fld_nb de la boåte wddlg.
+Retourne la position de l'option s√©lectionn√©e dans la LISTBOX
+fld_nb de la bo√Æte wddlg.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle LISTBOX
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le LISTBOX
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgAdd*(), WDDlgSet*()
 ================================================================== */
@@ -2166,13 +2166,13 @@ WDDlgGetCurSel(WDDLG *wddlg, int fld_nb)
 }
 
 /* ========================================================================
-Fixe la position de l'option sÇlectionnÇe dans la LISTBOX
-fld_nb de la boåte wddlg.
+Fixe la position de l'option s√©lectionn√©e dans la LISTBOX
+fld_nb de la bo√Æte wddlg.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle LISTBOX
-&EN opt_nb = numÇro de l'option Ö sÇlectionner
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le LISTBOX
+&EN opt_nb = num√©ro de l'option √† s√©lectionner
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgAdd*(), WDDlgSet*()
 ================================================================== */
@@ -2185,12 +2185,12 @@ WDDlgSetCurSel(WDDLG *wddlg, int fld_nb, int opt_nb)
 }
 
 /* ========================================================================
-Change le texte de l'option opt_nb de la LISTBOX fld_nb de la boåte wddlg.
+Change le texte de l'option opt_nb de la LISTBOX fld_nb de la bo√Æte wddlg.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle LISTBOX
-&EN opt_nb = numÇro de l'option Ö changer
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le LISTBOX
+&EN opt_nb = num√©ro de l'option √† changer
 &EN txt : nouveau texte de l'option
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgAdd*(), WDDlgSet*()
@@ -2208,11 +2208,11 @@ WDDlgLBChangeText(WDDLG *wddlg, int fld_nb, int opt_nb, U_ch * txt)
 }
 
 /* ========================================================================
-Fixe le focus sur le champ fld_nb de la boåte wddlg.
+Fixe le focus sur le champ fld_nb de la bo√Æte wddlg.
 
 &EN wddlg = pointeur vers la structure WDDLG contenant la description
-    des contrìles
-&EN fld_nb = numÇro du contrìle
+    des contr√¥les
+&EN fld_nb = num√©ro du contr√¥le
 
 &SA WDDlgCreate(), WDDlgEdit(), WDDlgAdd*(), WDDlgSet*()
 ================================================================== */
@@ -2269,8 +2269,8 @@ U_ch **WDDlgSplitText(U_ch *txt, int w)
 }
 
 /*NH
-Retourne la longueur d'un string en coordonnÇes de boite de dialogue
-Retourne 0 si hMainWnd n'est pas dÇfinie.
+Retourne la longueur d'un string en coordonn√©es de boite de dialogue
+Retourne 0 si hMainWnd n'est pas d√©finie.
 */
 
 WDDlgTxtSizeLg(U_ch *txt, int lg)
@@ -2303,12 +2303,12 @@ WDDlgTxtSize(U_ch *txt)
 }
 
 /* ========================================================================
-CrÇe une boåte de dialogue dynamique temporaire avec une question et plusieurs boutons.
+Cr√©e une bo√Æte de dialogue dynamique temporaire avec une question et plusieurs boutons.
 
-&RT NumÇro du bouton sÇlectionnÇ ou -1 (1 pour le premier, etc).
+&RT Num√©ro du bouton s√©lectionn√© ou -1 (1 pour le premier, etc).
 
-&EN title = titre de la boåte de dialogue
-&EN qu = question Ö poser
+&EN title = titre de la bo√Æte de dialogue
+&EN qu = question √† poser
 &EN buts = tableau de texte pour les boutons
 
 &SA WDDlgCreate(), WDDlgEdit()
@@ -2369,11 +2369,11 @@ WDDlgMsgBox(U_ch *title, U_ch *qu, U_ch **buts)     /* BP_M 13-02-2003 16:20 */
 
 
 /* ========================================================================
-CrÇe une boåte de dialogue modeless avec un texte variable dans msg.
+Cr√©e une bo√Æte de dialogue modeless avec un texte variable dans msg.
 
 &RT pointeur vers une structure WDDLG
 
-&EN title = titre de la boåte de dialogue
+&EN title = titre de la bo√Æte de dialogue
 &EN msg = pointeur vers le texte du message
 
 &SA WDDlgDisplay(), WDDlgUndisplay, WDDlgFree()
@@ -2393,19 +2393,19 @@ WDDLG *WDDlgCreateInfoBox(U_ch *title, U_ch *msg)
 
 
 /* ========================================================================
-Affiche le menu mn sous forme d'une ListView. La fenàtre ListView est
-indÇpendante. Elle est placÇe relativement Ö la PAGE pg et au champ fld_nb.
+Affiche le menu mn sous forme d'une ListView. La fen√™tre ListView est
+ind√©pendante. Elle est plac√©e relativement √† la PAGE pg et au champ fld_nb.
 
-&EN mn : menu de rÇfÇrence
-&EN sep : caractäre de sÇparation des colonnes. Dans chaque ligne du menu,
-on a un nombre identique de colonnes sÇparÇes par ce caractäre.
-&EN istitle : indique si la premiäre option du menu contient le titre Ö afficher comme
+&EN mn : menu de r√©f√©rence
+&EN sep : caract√®re de s√©paration des colonnes. Dans chaque ligne du menu,
+on a un nombre identique de colonnes s√©par√©es par ce caract√®re.
+&EN istitle : indique si la premi√®re option du menu contient le titre √† afficher comme
     titre du ListView
-&EN pg : page de rÇfÇrence pour le positionnement
-&EN fld_nb : champ de rÇfÇrence dans la page ou -1 pour placer en haut Ö gauche de la page
+&EN pg : page de r√©f√©rence pour le positionnement
+&EN fld_nb : champ de r√©f√©rence dans la page ou -1 pour placer en haut √† gauche de la page
 
-Une seule option peut àtre sÇlectionnÇe. Le fait de presser ENTER retourne
-le numÇro de l'option courante. ESCAPE retourne -1.
+Une seule option peut √™tre s√©lectionn√©e. Le fait de presser ENTER retourne
+le num√©ro de l'option courante. ESCAPE retourne -1.
 
 
 &EX
@@ -2415,7 +2415,7 @@ le numÇro de l'option courante. ESCAPE retourne -1.
 	extern  MENU *testmn;
 
 	opt = WscrMenuLV(testmn, '|', 1, stp_lpmail, 0);
-	PG_display_error("Option sÇlectionnÇe : %d", opt);
+	PG_display_error("Option s√©lectionn√©e : %d", opt);
     }
 
 &TX

@@ -1,6 +1,6 @@
 #include "scr4w.h"
 
-/* 1. Assurer la compatibilit‚ entre DOS et Windows */
+/* 1. Assurer la compatibilitÃ© entre DOS et Windows */
 
 SCR_MessageBox(title, msg, buts)
 unsigned char   *title, *msg, *buts[];
@@ -239,7 +239,7 @@ WscrPG_edit(PAGE *pg, int req)
     PG_read_flds(pg);
     if(ACT_exec_nu(pg->pg_begin_act) != 0) return(-3);
 
-    // .... Check champ ‚ditable
+    // .... Check champ Ã©ditable
     // ....
 
     objnb = WscrFindPgNb(pg);

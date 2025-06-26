@@ -1,6 +1,6 @@
 #include <scr4.h>
 /* ====================================================================
-Fonction d'initialisation d'une page HTML. G‚n‚re les sections
+Fonction d'initialisation d'une page HTML. GÃ©nÃ©re les sections
 <HEAD> et <TITLE>.
 
 &EN html = FILE *
@@ -11,7 +11,7 @@ Fonction d'initialisation d'une page HTML. G‚n‚re les sections
     {
 	FILE    *html = stdout;
 	U_ch    **mtype = SCR_vtom("Type1,Type2,Type3", ',');
-	U_ch    **mlang = SCR_vtom("Fran‡ais,N‚erlandais,Anglais", ',');
+	U_ch    **mlang = SCR_vtom("FranÃ§ais,NÃ©erlandais,Anglais", ',');
 
 	HtmlInit(html, "Automatic form generation");
 	fprintf(html, "<Body>\n");
@@ -41,7 +41,7 @@ char    *title;
 }
 
 /* ====================================================================
-Fermeture d'une page HTML. G‚n‚re la section <Address>.
+Fermeture d'une page HTML. GÃ©nÃ©re la section <Address>.
 
 &EN html = FILE *
 &EN footer = contenu de la section <Address>
@@ -62,7 +62,7 @@ char    *footer;
 }
 
 /* ====================================================================
-Initialisation d'un FORM. La m‚thode utilis‚e pour ex‚cuter le FORM est
+Initialisation d'un FORM. La mÃ©thode utilisÃ©e pour exÃ©cuter le FORM est
 "POST".
 
 &EN html = FILE *
@@ -87,8 +87,8 @@ char    *action;
 Fin d'un FORM dans une page HTML.
 
 &EN html = FILE *
-&EN submit = texte du bouton destin‚ … ex‚cuter le FORM
-&EN reset = texte du bouton destin‚ … remettre les valeurs par d‚faut
+&EN submit = texte du bouton destinÃ© Ã  exÃ©cuter le FORM
+&EN reset = texte du bouton destinÃ© Ã  remettre les valeurs par dÃ©faut
 dans le FORM
 
 &EX
@@ -109,8 +109,8 @@ char    *submit, *reset;
 }
 
 /* ====================================================================
-Bouton suppl‚mentaire dans une page HTML. Cette fonction doit ˆtre
-pr‚c‚d‚e d'un HtmlFormInit().
+Bouton supplÃ©mentaire dans une page HTML. Cette fonction doit Ãªtre
+prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du bouton dans le FORM
@@ -134,8 +134,8 @@ U_ch    *text, *name;
 }
 
 /* ====================================================================
-Champ hidden dans un FORM d'une page HTML. Cette fonction doit ˆtre
-pr‚c‚d‚e d'un HtmlFormInit().
+Champ hidden dans un FORM d'une page HTML. Cette fonction doit Ãªtre
+prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du champ dans le FORM
@@ -158,7 +158,7 @@ U_ch    *name, *text;
 
 /* ====================================================================
 Champ mot de passe dans un FORM d'une page HTML. Cette fonction doit
-ˆtre pr‚c‚d‚e d'un HtmlFormInit(). La longueur est fix‚e … 15 caractŠres.
+Ãªtre prÃ©cÃ©dÃ©e d'un HtmlFormInit(). La longueur est fixÃ©e Ã  15 caractÃ¨res.
 
 &EN html = FILE *
 &EN name = nom du champ
@@ -180,15 +180,15 @@ U_ch    *name;
 
 /* ====================================================================
 Champ texte d'une ligne dans un FORM d'une page HTML. Cette fonction
-doit ˆtre pr‚c‚d‚e d'un HtmlFormInit().
+doit Ãªtre prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du champ
 &EN lg = longueur maximum du champ
-&EN value = texte par d‚faut
+&EN value = texte par dÃ©faut
 
-Si le champ d‚passe 64 caractŠres, la partie visible est limit‚e … 64
-caractŠres.
+Si le champ dÃ©passe 64 caractÃ¨res, la partie visible est limitÃ©e Ã  64
+caractÃ¨res.
 
 &EX
 &TX
@@ -213,12 +213,12 @@ int     lg;
 
 /* ====================================================================
 Champ de type Radio button dans un FORM d'une page HTML. Cette fonction
-doit ˆtre pr‚c‚d‚e d'un HtmlFormInit().
+doit Ãªtre prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du champ
 &EN options = tableaux de pointeurs vers le texte des options
-&EN choice = choix par d‚faut
+&EN choice = choix par dÃ©faut
 
 &EX
 &TX
@@ -250,12 +250,12 @@ int     choice;
 
 /* ====================================================================
 Champ de type Menu dans un FORM d'une page HTML. Cette fonction
-doit ˆtre pr‚c‚d‚e d'un HtmlFormInit().
+doit Ãªtre prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du champ
 &EN options = tableaux de pointeurs vers le texte des options
-&EN choice = choix par d‚faut
+&EN choice = choix par dÃ©faut
 
 &EX
 &TX
@@ -284,16 +284,16 @@ int     choice;
 
 /* ====================================================================
 Champ texte de plusieurs lignes dans un FORM d'une page HTML. Cette
-fonction doit ˆtre pr‚c‚d‚e d'un HtmlFormInit().
+fonction doit Ãªtre prÃ©cÃ©dÃ©e d'un HtmlFormInit().
 
 &EN html = FILE *
 &EN name = nom du champ
-&EN value = texte par d‚faut
+&EN value = texte par dÃ©faut
 &EN nl = nombre de lignes visibles
 &EN nc = nombre de colonnes visibles
 
-Le champ est normalement accompagn‚ de scrollbar horizontaux et verticaux.
-Si longueur n'est pas limit‚e.
+Le champ est normalement accompagnÃ© de scrollbar horizontaux et verticaux.
+Si longueur n'est pas limitÃ©e.
 
 &EX
 &TX

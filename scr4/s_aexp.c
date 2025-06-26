@@ -3,24 +3,24 @@
 char *(*A_expand_super)(char* );
 
 /* ==================================================================
-Fonction appelÇe par A_init() et A_initv() pour remplacer les macros
-commenáant par $. 
+Fonction appel√©e par A_init() et A_initv() pour remplacer les macros
+commen√ßant par $. 
 
-Par dÈfaut, cette fonction ne fait rien. On peut implÈmenter une fonction alternative :
-- soit en rÈÈcrivant la fonction
+Par d√©faut, cette fonction ne fait rien. On peut impl√©menter une fonction alternative :
+- soit en r√©√©crivant la fonction
 - soit en assignant un pointeur de fonction ) A_expand_super
 
-Lorsque la fonction d'initialisation des paramätres en rencontre un dont
-la premiäre lettre est $, elle appelle la fonction A_expand() qui doit
-retourner la valeur de remplacement correspondante. Par dÇfaut, la
-fonction A_expand() retourne un pointeur nul, ce qui laisse inchangÇ
-tout paramätre commenáant par un $.
+Lorsque la fonction d'initialisation des param√®tres en rencontre un dont
+la premi√®re lettre est $, elle appelle la fonction A_expand() qui doit
+retourner la valeur de remplacement correspondante. Par d√©faut, la
+fonction A_expand() retourne un pointeur nul, ce qui laisse inchang√©
+tout param√®tre commen√ßant par un $.
 
-La substitution est rÇcursive jusqu'Ö un maximum de 10 niveaux
+La substitution est r√©cursive jusqu'√† un maximum de 10 niveaux
 d'imbrication.
 
 A la fin de la fonction d'initialisation, si un argument commence toujours
-par $, un message d'erreur est envoyÇ et la fonction retourne -1;
+par $, un message d'erreur est envoy√© et la fonction retourne -1;
 
 &EX
     char *A_expand(text)

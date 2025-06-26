@@ -7,28 +7,28 @@
 int A_NO_EXPANDSTAR_DFT = 0; /* JMP 12-11-2012 */
 
 /* ==================================================================
-Fonction appel‚e par A_init() et A_initv() pour remplacer les noms
-contenant une ‚toile (*) en DOS.
+Fonction appelÃ©e par A_init() et A_initv() pour remplacer les noms
+contenant une Ã©toile (*) en DOS.
 
-Lorsque la fonction d'initialisation des paramŠtres en rencontre un
+Lorsque la fonction d'initialisation des paramÃ¨tres en rencontre un
 contenant *, elle appelle la fonction A_expandstar() qui doit
-se charger d'ajouter … la liste des arguments tous ceux correspondant.
+se charger d'ajouter Ã  la liste des arguments tous ceux correspondant.
 
-Par d‚faut, la fonction A_expandstar() ajoute tous les fichiers
-correspondant au masque … l'aide de la fonction A_add1(arg).
+Par dÃ©faut, la fonction A_expandstar() ajoute tous les fichiers
+correspondant au masque Ã  l'aide de la fonction A_add1(arg).
 
-Si la fonction retourne 0, l'argument a ‚t‚ trait‚. Si la fonction
-retourne une autre valeur, l'argument n'a pas ‚t‚ trait‚ et est
-conserv‚ tel quel dans le tableau A_VAL r‚sultat.
+Si la fonction retourne 0, l'argument a Ã©tÃ© traitÃ©. Si la fonction
+retourne une autre valeur, l'argument n'a pas Ã©tÃ© traitÃ© et est
+conservÃ© tel quel dans le tableau A_VAL rÃ©sultat.
 
-Cette fonction peut ˆtre remplac‚e par une fonction utilisateur.
+Cette fonction peut Ãªtre remplacÃ©e par une fonction utilisateur.
 Pour faciliter le travail, la fonction A_expandstar_dft()
-peut ˆtre appel‚e: elle effectue le travail par d‚faut de
+peut Ãªtre appelÃ©e: elle effectue le travail par dÃ©faut de
 A_expandstar().
 
 &IT A_NO_EXPANDSTAR_DFT
 
-Si la variable globale A_NO_EXPANDSTAR_DFT est non nulle, il n'y a oas d'appel à la fonction par défaut
+Si la variable globale A_NO_EXPANDSTAR_DFT est non nulle, il n'y a oas d'appel Ã  la fonction par dÃ©faut
 A_expandstar_dft().
 
 &SA A_init(), A_initv(), A_expand(), A_iexpand(), A_expandstar_dft()

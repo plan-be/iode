@@ -38,12 +38,12 @@ typedef char SCRFILE[SCR_FILE_LG + 1];
 typedef struct _scrstatpre458_ {
     char            ss_name[63 + 1]; /* Nom du fichier */
     long            ss_size;       /* Taille en bytes du fichier */
-    long            ss_ctime;      /* Heure de crÇation hhmmss (UNIX) */
-    long            ss_cdate;      /* Date de crÇation yyyymmdd (UNIX) */
-    long            ss_mtime;      /* Heure de derniäre modification hhmmss */
-    long            ss_mdate;      /* Date de derniäre modification  yyyymmdd */
-    long            ss_atime;      /* Heure de derniäre accäs (UNIX) hhmmss */
-    long            ss_adate;      /* Date de derniäre accäs (UNIX) yyyymmdd */
+    long            ss_ctime;      /* Heure de cr√©ation hhmmss (UNIX) */
+    long            ss_cdate;      /* Date de cr√©ation yyyymmdd (UNIX) */
+    long            ss_mtime;      /* Heure de derni√®re modification hhmmss */
+    long            ss_mdate;      /* Date de derni√®re modification  yyyymmdd */
+    long            ss_atime;      /* Heure de derni√®re acc√®s (UNIX) hhmmss */
+    long            ss_adate;      /* Date de derni√®re acc√®s (UNIX) yyyymmdd */
     unsigned short  ss_mode;       /* Attribut du fichier */
     short           ss_uid;        /* Owner id (UNIX) */
     short           ss_gid;        /* Group id (UNIX) */
@@ -53,42 +53,42 @@ typedef struct _scrstatpre458_ {
 typedef struct _scrstat_ {
     char            ss_name[SCR_STAT_NAME_LG + 1]; /* Nom du fichier */
     long            ss_size;       /* Taille en bytes du fichier */
-    long            ss_ctime;      /* Heure de crÇation hhmmss (UNIX) */
-    long            ss_cdate;      /* Date de crÇation yyyymmdd (UNIX) */
-    long            ss_mtime;      /* Heure de derniäre modification hhmmss */
-    long            ss_mdate;      /* Date de derniäre modification  yyyymmdd */
-    long            ss_atime;      /* Heure de derniäre accäs (UNIX) hhmmss */
-    long            ss_adate;      /* Date de derniäre accäs (UNIX) yyyymmdd */
+    long            ss_ctime;      /* Heure de cr√©ation hhmmss (UNIX) */
+    long            ss_cdate;      /* Date de cr√©ation yyyymmdd (UNIX) */
+    long            ss_mtime;      /* Heure de derni√®re modification hhmmss */
+    long            ss_mdate;      /* Date de derni√®re modification  yyyymmdd */
+    long            ss_atime;      /* Heure de derni√®re acc√®s (UNIX) hhmmss */
+    long            ss_adate;      /* Date de derni√®re acc√®s (UNIX) yyyymmdd */
     unsigned short  ss_mode;       /* Attribut du fichier */
     short           ss_uid;        /* Owner id (UNIX) */
     short           ss_gid;        /* Group id (UNIX) */
     short           ss_nlink;      /* Nb links (UNIX) */
 
-    /* Nouvelles donnÇes */ /* JMP 25-10-02 */
-    long            ssx_ctime;      /* time_t de crÇation (UNIX) */
-    long            ssx_mtime;      /* time_t de derniäre modification */
-    long            ssx_atime;      /* time_t de derniäre accäs (UNIX) */
+    /* Nouvelles donn√©es */ /* JMP 25-10-02 */
+    long            ssx_ctime;      /* time_t de cr√©ation (UNIX) */
+    long            ssx_mtime;      /* time_t de derni√®re modification */
+    long            ssx_atime;      /* time_t de derni√®re acc√®s (UNIX) */
     unsigned long   ssx_crc32;      /* crc32 du fichier */
 } SCRSTAT;
 
 typedef struct _scrstat401_ {
     char            ss_name[127 + 1]; /* Nom du fichier */
     long            ss_size;       /* Taille en bytes du fichier */
-    long            ss_ctime;      /* Heure de crÇation hhmmss (UNIX) */
-    long            ss_cdate;      /* Date de crÇation yyyymmdd (UNIX) */
-    long            ss_mtime;      /* Heure de derniäre modification hhmmss */
-    long            ss_mdate;      /* Date de derniäre modification  yyyymmdd */
-    long            ss_atime;      /* Heure de derniäre accäs (UNIX) hhmmss */
-    long            ss_adate;      /* Date de derniäre accäs (UNIX) yyyymmdd */
+    long            ss_ctime;      /* Heure de cr√©ation hhmmss (UNIX) */
+    long            ss_cdate;      /* Date de cr√©ation yyyymmdd (UNIX) */
+    long            ss_mtime;      /* Heure de derni√®re modification hhmmss */
+    long            ss_mdate;      /* Date de derni√®re modification  yyyymmdd */
+    long            ss_atime;      /* Heure de derni√®re acc√®s (UNIX) hhmmss */
+    long            ss_adate;      /* Date de derni√®re acc√®s (UNIX) yyyymmdd */
     unsigned short  ss_mode;       /* Attribut du fichier */
     short           ss_uid;        /* Owner id (UNIX) */
     short           ss_gid;        /* Group id (UNIX) */
     short           ss_nlink;      /* Nb links (UNIX) */
 
-    /* Nouvelles donnÇes */ /* JMP 25-10-02 */
-    long            ssx_ctime;      /* time_t de crÇation (UNIX) */
-    long            ssx_mtime;      /* time_t de derniäre modification */
-    long            ssx_atime;      /* time_t de derniäre accäs (UNIX) */
+    /* Nouvelles donn√©es */ /* JMP 25-10-02 */
+    long            ssx_ctime;      /* time_t de cr√©ation (UNIX) */
+    long            ssx_mtime;      /* time_t de derni√®re modification */
+    long            ssx_atime;      /* time_t de derni√®re acc√®s (UNIX) */
     unsigned long   ssx_crc32;      /* crc32 du fichier */
 } SCRSTAT401;
 

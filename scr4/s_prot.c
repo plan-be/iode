@@ -1,17 +1,17 @@
 /*====================================================================
-Fonction utilisateur permettant de vÇrifier les droits d'accäs.
+Fonction utilisateur permettant de v√©rifier les droits d'acc√®s.
 
-AppelÇe lors :
-&EN de l'affichage et de l'Çdition des OPTIONS des MENUS
-&EN de l'affichage et de l'Çdition des OPTIONS des A_BARS
-&EN de l'exÇcution des actions
+Appel√©e lors :
+&EN de l'affichage et de l'√©dition des OPTIONS des MENUS
+&EN de l'affichage et de l'√©dition des OPTIONS des A_BARS
+&EN de l'ex√©cution des actions
 
 Syntaxe :
 &CO
     SCR_check_prot(char *prot);
 
 &TX
-&RT 0 si droits accordÇs, -1 sinon
+&RT 0 si droits accord√©s, -1 sinon
 ==================================================================== */
 
 SCR_check_prot(char *prot)

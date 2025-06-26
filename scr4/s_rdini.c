@@ -3,13 +3,13 @@
 
 /* ====================================================================
 Ouvre un fichier au format .ini et retourne un pointeur vers
-une structure INIFILE allouÇe.
+une structure INIFILE allou√©e.
 
-&EN filename indique le nom du fichier Ö ouvrir.
-&EN usection vaut 1 si les titres des sections doivent àtre
-    automatiquement transposÇs en majuscules.
-&EN uparam indique la màme chose pour les lignes
-    de paramätres internes aux sections.
+&EN filename indique le nom du fichier √† ouvrir.
+&EN usection vaut 1 si les titres des sections doivent √™tre
+    automatiquement transpos√©s en majuscules.
+&EN uparam indique la m√™me chose pour les lignes
+    de param√®tres internes aux sections.
 
 &RT pointeur vers une structure INIFILE
 
@@ -75,7 +75,7 @@ int     uparam;
 
 /* ====================================================================
 Ferme un fichier au format .ini ouvert par IniOpen() ou IniOpenSection().
-Libäre la structure INIFILE allouÇe.
+Lib√®re la structure INIFILE allou√©e.
 
 &EX
     DwReadRules(filename)
@@ -121,8 +121,8 @@ INIFILE     *inif;
 }
 
 /* ====================================================================
-Retient le dernier ÇlÇment lu par IniRead() pour le prochain appel
-Ö IniRead().
+Retient le dernier √©l√©ment lu par IniRead() pour le prochain appel
+√† IniRead().
 
 &SA IniOpen(), UniRead(), IniClose(), IniOpenSection()
 =======================================================================*/
@@ -136,14 +136,14 @@ INIFILE    *inif;
 }
 
 /* ====================================================================
-Lit la ligne suivante dans le fichier .ini dÇcrit par la structure
-INIFILE inif. Retourne le type d'ÇlÇment lu :
+Lit la ligne suivante dans le fichier .ini d√©crit par la structure
+INIFILE inif. Retourne le type d'√©l√©ment lu :
 
 &EN INI_SECTION : lignes du type [.....]
 &EN INI_PARAM  : autres lignes
 
-Les lignes vides ou commenáant par un ; sont sautÇes. Les blancs
-en dÇbut ou en fin de lignes sont ignorÇs (SQZ).
+Les lignes vides ou commen√ßant par un ; sont saut√©es. Les blancs
+en d√©but ou en fin de lignes sont ignor√©s (SQZ).
 
 &SA IniOpen(), UniClose(), IniUnRead(), IniOpenSection()
 =======================================================================*/
@@ -203,16 +203,16 @@ U_ch     *txt;
 }
 
 /* ====================================================================
-Ouvre le fichier filename du type .ini et se positionne sur la premiäre
+Ouvre le fichier filename du type .ini et se positionne sur la premi√®re
 section dont le nom est section.
 
-&EN filename indique le nom du fichier Ö ouvrir.
-&EN section est le nom de la section Ö rechercher
-&EN usection vaut 1 si les titres des sections doivent àtre
-    automatiquement transposÇs en majuscules (dans ce cas section doit
-    àtre en majuscules)
-&EN uparam indique la màme chose pour les lignes
-    de paramätres internes aux sections.
+&EN filename indique le nom du fichier √† ouvrir.
+&EN section est le nom de la section √† rechercher
+&EN usection vaut 1 si les titres des sections doivent √™tre
+    automatiquement transpos√©s en majuscules (dans ce cas section doit
+    √™tre en majuscules)
+&EN uparam indique la m√™me chose pour les lignes
+    de param√®tres internes aux sections.
 
 &PROTO
     #include <s_ini.h>
@@ -291,21 +291,21 @@ int     usection, uparam;
 }
 
 /* ====================================================================
-Ouvre le fichier filename du type .ini et se positionne sur la premiäre
-section dont le nom est section. Le nom de la section doit àtre
+Ouvre le fichier filename du type .ini et se positionne sur la premi√®re
+section dont le nom est section. Le nom de la section doit √™tre
 fourni en majuscules.
 
-Tous les paramätres de la section sont lus et stockÇs dans un tableau
-de pointeur allouÇ qui est retournÇ par la fonction. Ce tableau est
-terminÇ par un pointeur nul.
+Tous les param√®tres de la section sont lus et stock√©s dans un tableau
+de pointeur allou√© qui est retourn√© par la fonction. Ce tableau est
+termin√© par un pointeur nul.
 
-Le fichier est fermÇ par la fonction.
+Le fichier est ferm√© par la fonction.
 
-&EN filename indique le nom du fichier Ö ouvrir.
-&EN section est le nom de la section Ö rechercher
+&EN filename indique le nom du fichier √† ouvrir.
+&EN section est le nom de la section √† rechercher
 
-En cas d'erreur (fichier non trouvÇ ou section non prÇsente), un
-pointeur nul est retournÇ par la fonction.
+En cas d'erreur (fichier non trouv√© ou section non pr√©sente), un
+pointeur nul est retourn√© par la fonction.
 
 &PROTO
     #include <s_ini.h>
@@ -348,9 +348,9 @@ char    *filename, *section;
 }
 
 /* ====================================================================
-Lit la section courante dans le fichier ouvert dÇcrit par la structure
-INIFILE inif. Les lignes de paramätres sont retournÇes dans un tableau
-de pointeurs allouÇ par la fonction et terminÇ par un pointeur nul.
+Lit la section courante dans le fichier ouvert d√©crit par la structure
+INIFILE inif. Les lignes de param√®tres sont retourn√©es dans un tableau
+de pointeurs allou√© par la fonction et termin√© par un pointeur nul.
 
 &PROTO
     #include <s_ini.h>
@@ -414,9 +414,9 @@ INIFILE *inif;
 }
 
 /* ====================================================================
-Retourne le nom du fichier .ini ouvert dÇfini par la structure INIFILE
+Retourne le nom du fichier .ini ouvert d√©fini par la structure INIFILE
 et la ligne courante dans ce fichier.
-Le pointeur retournÇ est une valeur statique (non modifiable).
+Le pointeur retourn√© est une valeur statique (non modifiable).
 
 &PROTO
     #include <s_ini.h>
@@ -439,17 +439,17 @@ INIFILE *inif;
 }
 
 /* ====================================================================
-Lit dans le fichier filename la valeur du paramätre parm de la section
-section. La dÇfinition du paramätre est stockÇ dans le buffer val dont
-la longueur est au minimum de lg caractäres.
+Lit dans le fichier filename la valeur du param√®tre parm de la section
+section. La d√©finition du param√®tre est stock√© dans le buffer val dont
+la longueur est au minimum de lg caract√®res.
 
 &EN filename = nom du fichier .ini
-&EN section = section (en majuscules) dont le paramätre dit àtre lu
-&EN parm = paramätre Ö lire
-&EN val = pointeur destinÇ Ö contenir la valeur du paramätre
-&EN lg = longueur maximum du paramätre
+&EN section = section (en majuscules) dont le param√®tre dit √™tre lu
+&EN parm = param√®tre √† lire
+&EN val = pointeur destin√© √† contenir la valeur du param√®tre
+&EN lg = longueur maximum du param√®tre
 
-&RT 0 si le paramätre est trouvÇ, -1 sinon
+&RT 0 si le param√®tre est trouv√©, -1 sinon
 
 &PROTO
     #include <s_ini.h>
@@ -472,7 +472,7 @@ la longueur est au minimum de lg caractäres.
     if(IniReadTxtParm("a2m.ini", "HTML", "FONTSIZE", buf, 80) == 0)
 	printf("HTML Font size=%s\n", buf);
     else
-	printf("HTML Font size non prÇsent dans a2m.ini\n");
+	printf("HTML Font size non pr√©sent dans a2m.ini\n");
 &TX
 
 &SA IniOpen(), IniClose(), IniReadNumParm(), IniReadSection()
@@ -514,16 +514,16 @@ int     lg;
 }
 
 /* ====================================================================
-Lit dans le fichier filename la valeur du paramätre parm de la section
-section. La dÇfinition du paramätre est stockÇ dans l'entier dont le
-pointeur est passÇ dans val.
+Lit dans le fichier filename la valeur du param√®tre parm de la section
+section. La d√©finition du param√®tre est stock√© dans l'entier dont le
+pointeur est pass√© dans val.
 
 &EN filename = nom du fichier .ini
-&EN section = section (en majuscules) dont le paramätre dit àtre lu
-&EN parm = paramätre Ö lire
-&EN val = pointeur vers un entier destinÇ Ö contenir la valeur lue
+&EN section = section (en majuscules) dont le param√®tre dit √™tre lu
+&EN parm = param√®tre √† lire
+&EN val = pointeur vers un entier destin√© √† contenir la valeur lue
 
-&RT 0 si le paramätre est trouvÇ, -1 sinon
+&RT 0 si le param√®tre est trouv√©, -1 sinon
 
 &PROTO
     #include <s_ini.h>
@@ -546,7 +546,7 @@ pointeur est passÇ dans val.
     if(IniReadNumParm("a2m.ini", "HTML", "FONTSIZE", &fontsize) == 0)
 	printf("HTML Font size=%d\n", fontsize);
     else
-	printf("HTML Font size non prÇsent dans a2m.ini\n");
+	printf("HTML Font size non pr√©sent dans a2m.ini\n");
 &TX
 
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection()
@@ -567,16 +567,16 @@ int     *num;
 }
 
 /* ====================================================================
-Lit dans le fichier filename la valeur du paramätre parm de la section
-section. La dÇfinition du paramätre est stockÇ dans le double dont le
-pointeur est passÇ dans val.
+Lit dans le fichier filename la valeur du param√®tre parm de la section
+section. La d√©finition du param√®tre est stock√© dans le double dont le
+pointeur est pass√© dans val.
 
 &EN filename = nom du fichier .ini
-&EN section = section (en majuscules) dont le paramätre dit àtre lu
-&EN parm = paramätre Ö lire
-&EN val = pointeur vers un double destinÇ Ö contenir la valeur lue
+&EN section = section (en majuscules) dont le param√®tre dit √™tre lu
+&EN parm = param√®tre √† lire
+&EN val = pointeur vers un double destin√© √† contenir la valeur lue
 
-&RT 0 si le paramätre est trouvÇ, -1 sinon
+&RT 0 si le param√®tre est trouv√©, -1 sinon
 
 &PROTO
     #include <s_ini.h>
@@ -599,7 +599,7 @@ pointeur est passÇ dans val.
     if(IniReadRealParm("a2m.ini", "HTML", "COLUMNWIDTH", &width) == 0)
 	printf("HTML Col Width=%lf\n", width);
     else
-	printf("HTML Col Width non prÇsent dans a2m.ini\n");
+	printf("HTML Col Width non pr√©sent dans a2m.ini\n");
 &TX
 
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection(), IniReadNumParm()
@@ -620,15 +620,15 @@ double  *num;
 }
 
 /* ====================================================================
-Lit dans le fichier filename la valeur du paramätre parm de la section
-section. Cette valeur est interprÇtÇe comme Yes ou No. La valeur
-calculÇe est retournÇe par la fonction.
+Lit dans le fichier filename la valeur du param√®tre parm de la section
+section. Cette valeur est interpr√©t√©e comme Yes ou No. La valeur
+calcul√©e est retourn√©e par la fonction.
 
 &EN filename = nom du fichier .ini
-&EN section = section (en majuscules) dont le paramätre dit àtre lu
-&EN parm = paramätre Ö lire
+&EN section = section (en majuscules) dont le param√®tre dit √™tre lu
+&EN parm = param√®tre √† lire
 
-&RT 1 si la valeur du paramätre est yes, oui, ja ou 1 (en minuscules)
+&RT 1 si la valeur du param√®tre est yes, oui, ja ou 1 (en minuscules)
     ou majuscules et 0 sinon
 
 &PROTO
@@ -686,17 +686,17 @@ char    *buf, *parm;
 }
 
 /* ====================================================================
-Remplace dans un fichier .ini la valeur d'un paramätre.
+Remplace dans un fichier .ini la valeur d'un param√®tre.
 
 &EN filename = nom du fichier .ini
-&EN section = section (en majuscules) dont le paramätre dit àtre lu
-&EN parm = paramätre Ö lire
+&EN section = section (en majuscules) dont le param√®tre dit √™tre lu
+&EN parm = param√®tre √† lire
 &EN val = nouvelle valeur
 
 &RT
 &EN 0 en cas de remplacement
-&EN -1 en cas d'erreur Ö la lecture ou Ö la crÇation du fichier
-&EN -2 en cas de non remplacement (paramätre non trouvÇ)
+&EN -1 en cas d'erreur √† la lecture ou √† la cr√©ation du fichier
+&EN -2 en cas de non remplacement (param√®tre non trouv√©)
 
 
 &PROTO
@@ -739,7 +739,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    }
 		strcpy(bufo, buf);
 		if(IniIsSection(buf, 0L)) {
-		    /* C'Çtait la bonne, c'est une nouvelle section qui commence : on ajoute une ligne */
+		    /* C'√©tait la bonne, c'est une nouvelle section qui commence : on ajoute une ligne */
 		    if(ok != 0) {
 			sprintf(buf, "%s=%s\n", parm, val);         /* JMP 03-10-02 */
 			ISC_fwrite(buf, (int)strlen(buf), 1, fdo);       /* JMP 03-10-02 */
@@ -748,7 +748,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    goto next;
 		    }
 		if(IniIsParm(buf, parm)) {
-		    /* C'est le bon paramätre : on le remplace */
+		    /* C'est le bon param√®tre : on le remplace */
 		    /* ISC_fprintf(fdo, "%s=%s\n", parm, val); */
 		    sprintf(buf, "%s=%s\n", parm, val);
 		    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
@@ -756,7 +756,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    break;
 		    }
 		else {
-		    /* C'est un autre paramätre : on continue */
+		    /* C'est un autre param√®tre : on continue */
 		    /* ISC_fprintf(fdo, "%s\n", bufo);       */
 		    sprintf(buf, "%s\n", bufo);
 		    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
@@ -770,7 +770,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 	    }
 	}
     if(ok == -2) {
-	/* On n'a pas trouvÇ la section /* JMP 03-10-02 */
+	/* On n'a pas trouv√© la section /* JMP 03-10-02 */
 	sprintf(buf, "\n[%s]\n", section);
 	ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 	sprintf(buf, "%s=%s\n", parm, val);
@@ -786,7 +786,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 Lit le nom de toutes les sections du fichier filename du type .ini.
 Retourne un tableau de pointeurs vers les noms des sections.
 
-&EN filename indique le nom du fichier Ö ouvrir.
+&EN filename indique le nom du fichier √† ouvrir.
 
 &PROTO
     #include <s_ini.h>

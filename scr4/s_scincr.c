@@ -6,10 +6,10 @@ PAGE    *SC_PG = 0;
 
 /* ====================================================================
 Initialise l'affichage d'un compteur. Dans le cas d'une application
-SCR, la page de compteur est scr_incr dÇfinie dans scr.f.
+SCR, la page de compteur est scr_incr d√©finie dans scr.f.
 
 Dans le cas d'une application non FULLSCREEN, le compteur est simplement
-affichÇ sur la ligne courante de l'Çcran.
+affich√© sur la ligne courante de l'√©cran.
 
 &EX
     SC_init_display();
@@ -48,7 +48,7 @@ int     disp;
 
 
 /* ====================================================================
-Termine l'affichage d'un compteur dÇbutÇ par SC_init_display().
+Termine l'affichage d'un compteur d√©but√© par SC_init_display().
 
 Dans le cas d'une application fullscreen, affiche le dernier champ de la
 PAGE scr_incr, attend un touche, puis efface la PAGE.
@@ -81,7 +81,7 @@ SC_end_display()
 
 
 /* ====================================================================
-IncrÇmente le compteur initialisÇ par SC_init_display() en plaáant
+Incr√©mente le compteur initialis√© par SC_init_display() en pla√ßant
 dans les champs de la PAGE scr_incr les valeurs nb_read et nb_found.
 
 &EX
@@ -109,10 +109,10 @@ long    nb_read, nb_found;
 }
 
 /* ====================================================================
-VÇrifie qu'une touche aÇtÇ pressÇe. Si c'est la cas, demande
+V√©rifie qu'une touche a√©t√© press√©e. Si c'est la cas, demande
 confirmation (question text) et retourne -1 si confirmation.
 
-&RT 0 si pas de touche pressÇe, -1 si touche pressÇe et confirmation.
+&RT 0 si pas de touche press√©e, -1 si touche press√©e et confirmation.
 
 &SA SC_init_display(), SC_end_display()
 =======================================================================*/

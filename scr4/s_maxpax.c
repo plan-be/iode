@@ -1,16 +1,16 @@
 #include "s_mat.h"
 /* ====================================================================
 Soient les matrices X (nl1 x nc1) et A (nl1 x nl1), la fonction calcule
-le produit X'A X ( X' nc1 x nl1 ‚tant la transpos‚e de X),
-et stocke le r‚sultat dans m3 (nc1 x nc1).
+le produit X'A X ( X' nc1 x nl1 Ã©tant la transposÃ©e de X),
+et stocke le rÃ©sultat dans m3 (nc1 x nc1).
 
 &RT
-Si m3 est nul, une matrice de dimension (nc1, nc1) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant).
-Si m3 n'est pas nul, le r‚sultat y est stock‚ et m3 est
-retourn‚. Les dimensions de m3 doivent ˆtre correctes sinon l'op‚ration
-n'est pas effectu‚e , la variable M_errno est positionn‚e et la
+Si m3 est nul, une matrice de dimension (nc1, nc1) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant).
+Si m3 n'est pas nul, le rÃ©sultat y est stockÃ© et m3 est
+retournÃ©. Les dimensions de m3 doivent Ãªtre correctes sinon l'opÃ©ration
+n'est pas effectuÃ©e , la variable M_errno est positionnÃ©e et la
 fonction retourne un pointeur nul.
 
 &EX

@@ -3,16 +3,16 @@
 /* ====================================================================
 Fixe l'attribut TOGGLE d'une option. Les valeurs possibles sont
 
-&EN 0 : l'option n'est pas s‚lectionnable par ENTER
-&EN 1 : l'option est s‚lectionnable par ENTER, mais n'est pas
-    s‚lectionn‚e
-&EN 2 : l'option est s‚lectionnable par ENTER et est s‚lectionn‚e
+&EN 0 : l'option n'est pas sÃ©lectionnable par ENTER
+&EN 1 : l'option est sÃ©lectionnable par ENTER, mais n'est pas
+    sÃ©lectionnÃ©e
+&EN 2 : l'option est sÃ©lectionnable par ENTER et est sÃ©lectionnÃ©e
 
-Pour rappel, une option TOGGLE (s‚lectionnable par ENTER) est suivie
-d'un signe sp‚cial en fin de ligne si elle est s‚lectionn‚e.
+Pour rappel, une option TOGGLE (sÃ©lectionnable par ENTER) est suivie
+d'un signe spÃ©cial en fin de ligne si elle est sÃ©lectionnÃ©e.
 
 &EX
-    MN_set_toggle(mn, 0, 1) : d‚s‚lectionne l'option 0
+    MN_set_toggle(mn, 0, 1) : dÃ©sÃ©lectionne l'option 0
 &TX
 &SA MN_get_toggle()
 ======================================================================= */
@@ -29,13 +29,13 @@ int     opt_nb, toggle;
 Recherche l'attribut TOGGLE courant d'une option. Les valeurs possibles
 sont
 
-&EN 0 : l'option n'est pas s‚lectionnable par ENTER
-&EN 1 : l'option est s‚lectionnable par ENTER, mais n'est pas
-    s‚lectionn‚e
-&EN 2 : l'option est s‚lectionnable par ENTER et est s‚lectionn‚e
+&EN 0 : l'option n'est pas sÃ©lectionnable par ENTER
+&EN 1 : l'option est sÃ©lectionnable par ENTER, mais n'est pas
+    sÃ©lectionnÃ©e
+&EN 2 : l'option est sÃ©lectionnable par ENTER et est sÃ©lectionnÃ©e
 
-Pour rappel, une option TOGGLE (s‚lectionnable par ENTER) est suivie
-d'un signe sp‚cial en fin de ligne si elle est s‚lectionn‚e.
+Pour rappel, une option TOGGLE (sÃ©lectionnable par ENTER) est suivie
+d'un signe spÃ©cial en fin de ligne si elle est sÃ©lectionnÃ©e.
 
 &EX
     if(MN_get_toggle(mn, i) == 2) DeleteObject(i);
@@ -51,7 +51,7 @@ int     opt_nb;
 }
 
 /* ====================================================================
-Fixe l'option courante d'un MENU. La fonction v‚rifie que l'option
+Fixe l'option courante d'un MENU. La fonction vÃ©rifie que l'option
 courante est dans les limites du MENU.
 
 &SA MN_get_choice()
@@ -80,11 +80,11 @@ MENU    *mn;
 }
 
 /* ====================================================================
-D‚truit une OPTION dans un MENU cr‚‚ … l'aide d'une des fonctions
+DÃ©truit une OPTION dans un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
 d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 &EX
     MN_del_option(mn, 0);

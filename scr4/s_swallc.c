@@ -8,44 +8,44 @@ void *SW_nrealloc_doc(void *old_ptr,unsigned int old_count,unsigned int new_coun
 #undef ALLOCDOCNULL
 
 /*
-Fonction d'allocation d'un bloc de m‚moire de size bytes. La taille
+Fonction d'allocation d'un bloc de mÃ©moire de size bytes. La taille
 maximum d'un bloc est de 16K - 4 (SW_BLK_SIZE - 4), soit 16380 bytes.
-size est arrondi au nombre pair de bytes sup‚rieur.
+size est arrondi au nombre pair de bytes supÃ©rieur.
 
 
-Pour obtenir le pointeur en m‚moire, utilisez SW_getptr.
+Pour obtenir le pointeur en mÃ©moire, utilisez SW_getptr.
 
 Le nombre maximum d'allocation est de 32000.
 
-Si la machine dispose de m‚moire ‚tendue et que le driver EMS est
-install‚, la m‚moire EMS est utilis‚e en premier pour les allocations.
-Ensuite, la m‚moire conventionnelle est utilis‚e tant qu'il reste
-SW_MIN_MEM bytes libres. Cette variable peut ˆtre modifi‚e par
+Si la machine dispose de mÃ©moire Ã©tendue et que le driver EMS est
+installÃ©, la mÃ©moire EMS est utilisÃ©e en premier pour les allocations.
+Ensuite, la mÃ©moire conventionnelle est utilisÃ©e tant qu'il reste
+SW_MIN_MEM bytes libres. Cette variable peut Ãªtre modifiÃ©e par
 l'utilisateur.
 
-Enfin, un fichier est cr‚‚ sur disque pour contenir les blocs
-suppl‚mentaires. La variable d'environnement SWAPFILE contient le nom de
+Enfin, un fichier est crÃ©Ã© sur disque pour contenir les blocs
+supplÃ©mentaires. La variable d'environnement SWAPFILE contient le nom de
 ce fichier qui peut se trouver sur n'importe quel disque. Si SWAPFILE
-n'est pas d‚fini, le fichier se trouvera sur le disque courant sous le
+n'est pas dÃ©fini, le fichier se trouvera sur le disque courant sous le
 nom SWAPFILE.SW.
 
-&RT SWHDL identifiant la partie de m‚moire contenant l'espace.
+&RT SWHDL identifiant la partie de mÃ©moire contenant l'espace.
 
 &TI Remarques
 
 &EN pour utiliser les fonctions d'allocation et de free, il faut
-    initialiser le systŠme … l'aide de SW_init
+    initialiser le systÃ¨me Ã  l'aide de SW_init
 
 &EN pour terminer, utilisez la fonction SW_end. Si cela n'est pas
-    fait, la m‚moire EMS n'est plus utilisable avant d'avoir reboot‚ le
-    systŠme et le fichier SWAPFILE reste sur disque.
+    fait, la mÃ©moire EMS n'est plus utilisable avant d'avoir rebootÃ© le
+    systÃ¨me et le fichier SWAPFILE reste sur disque.
 
-&EN en cas de d‚passement de m‚moire disque, le systŠme s'arrˆte et
+&EN en cas de dÃ©passement de mÃ©moire disque, le systÃ¨me s'arrÃªte et
     affiche le message "Panic : memory full".
 
-&EN utilisez SW_getptr … chaque fois que vous devez utiliser un bloc
-    m‚moire, ceux-ci pouvant … tout moment ˆtre d‚plac‚s sur disque ou
-    en m‚moire ‚tendue.
+&EN utilisez SW_getptr Ã  chaque fois que vous devez utiliser un bloc
+    mÃ©moire, ceux-ci pouvant Ã  tout moment Ãªtre dÃ©placÃ©s sur disque ou
+    en mÃ©moire Ã©tendue.
 
 &SA SW_realloc(), SW_free(), SW_nalloc()
 */
@@ -190,14 +190,14 @@ SWHDL SW_find_free_item() {
 }
 
 /*
-Cette fonction libŠre un espace allou‚ par SW_alloc. Deux appels … cette
-fonction pour le mˆme item ne posent pas de problŠme.
+Cette fonction libÃ¨re un espace allouÃ© par SW_alloc. Deux appels Ã  cette
+fonction pour le mÃªme item ne posent pas de problÃ¨me.
 
-item est l'identifiant retourn‚ par SW_alloc.
+item est l'identifiant retournÃ© par SW_alloc.
 
 Il n'est pas utile d'appeler cette fonction avant SW_end : le fait de
-terminer la session libŠre tous les blocs allou‚s, que ce soit en
-m‚moire conventionnelle, EMS ou fichier.
+terminer la session libÃ¨re tous les blocs allouÃ©s, que ce soit en
+mÃ©moire conventionnelle, EMS ou fichier.
 
 &SA SW_alloc(), SW_realloc()
 */
@@ -229,17 +229,17 @@ SWHDL   item;
 }
 
 /*
-Fonction de r‚allocation fonctionnant suivant le mˆme principe que la
-fonction standard realloc. item est le num‚ro de l'item d‚j… allou‚ et
+Fonction de rÃ©allocation fonctionnant suivant le mÃªme principe que la
+fonction standard realloc. item est le numÃ©ro de l'item dÃ©jÃ  allouÃ© et
 size le nouveau nombre de bytes.
 
-L'ancien bloc de m‚moire est sauv‚ dans un bloc temporaire, lib‚r‚ et un
-nouveau bloc est allou‚ dans lequel est recopi‚ le bloc temporaire. Le
-num‚ro de l'item est en g‚n‚ral le mˆme que le pr‚c‚dent, mais le
-pointeur retourn‚ par SW_getptr peut changer, mˆme si le nouveau nombre
-de bytes est inf‚rieur ou ‚gal … l'ancien.
+L'ancien bloc de mÃ©moire est sauvÃ© dans un bloc temporaire, libÃ©rÃ© et un
+nouveau bloc est allouÃ© dans lequel est recopiÃ© le bloc temporaire. Le
+numÃ©ro de l'item est en gÃ©nÃ©ral le mÃªme que le prÃ©cÃ©dent, mais le
+pointeur retournÃ© par SW_getptr peut changer, mÃªme si le nouveau nombre
+de bytes est infÃ©rieur ou Ã©gal Ã  l'ancien.
 
-&RT nouvel item correspondant … la nouvelle allocation
+&RT nouvel item correspondant Ã  la nouvelle allocation
 
 &SA SW_alloc(), SW_free(), SW_getptr()
 */
@@ -292,22 +292,22 @@ SWSIZE  size;
 }
 
 /*
-Cette fonction retourne un char * pointant vers la z“ne m‚moire
+Cette fonction retourne un char * pointant vers la zÃ´ne mÃ©moire
 contenant le premier byte de item.
 
-Il est indispensable de faire appel … cette fonction … chaque
-utilisation de item, car la z“ne m‚moire peut … tout moment ˆtre
-d‚plac‚e sur fichier ou en m‚moire ‚tendue.
+Il est indispensable de faire appel Ã  cette fonction Ã  chaque
+utilisation de item, car la zÃ´ne mÃ©moire peut Ã  tout moment Ãªtre
+dÃ©placÃ©e sur fichier ou en mÃ©moire Ã©tendue.
 
-On a cependant la garantie qu'au moins les 2 derniers blocs m‚moire
-appel‚s sont r‚ellement en m‚moire, ce qui permet des copies de blocs.
+On a cependant la garantie qu'au moins les 2 derniers blocs mÃ©moire
+appelÃ©s sont rÃ©ellement en mÃ©moire, ce qui permet des copies de blocs.
 
-La fonction procŠde comme suit : si le bloc m‚moire auquel appartient
-l'item est en m‚moire, elle retourne simplement le pointeur. Si ce n'est
-pas le cas, le bloc le plus ancien est report‚ en EMS ou sur fichier et
-le bloc contenant l'item demand‚ est ramen‚ … sa place en m‚moire
+La fonction procÃ¨de comme suit : si le bloc mÃ©moire auquel appartient
+l'item est en mÃ©moire, elle retourne simplement le pointeur. Si ce n'est
+pas le cas, le bloc le plus ancien est reportÃ© en EMS ou sur fichier et
+le bloc contenant l'item demandÃ© est ramenÃ© Ã  sa place en mÃ©moire
 conventionnelle ou dans le Page Frame de l'EMS. Le pointeur peut alors
-ˆtre retourn‚.
+Ãªtre retournÃ©.
 
 &SA SW_alloc(), SW_realloc()
 */
@@ -336,13 +336,13 @@ SWHDL   item;
 }
 
 /*
-Cette fonction effectue une allocation standard en m‚moire
-conventionnelle … l'aide de malloc. S'il n'y a pas assez de m‚moire
-disponible, les blocs cr‚‚s par SW_alloc() sont d‚plac‚s en EMS ou sur
-fichier et lib‚r‚s, pour permettre d'allouer quand-mˆme la m‚moire
-demand‚e.
+Cette fonction effectue une allocation standard en mÃ©moire
+conventionnelle Ã  l'aide de malloc. S'il n'y a pas assez de mÃ©moire
+disponible, les blocs crÃ©Ã©s par SW_alloc() sont dÃ©placÃ©s en EMS ou sur
+fichier et libÃ©rÃ©s, pour permettre d'allouer quand-mÃªme la mÃ©moire
+demandÃ©e.
 
-La m‚moire allou‚e est mise … z‚ro.
+La mÃ©moire allouÃ©e est mise Ã  zÃ©ro.
 
 &SA SW_alloc(), SW_nrealloc(), SW_nfree()
 */
@@ -389,13 +389,13 @@ char *SW_nalloc_doc(unsigned int size, char *file, int line) {
 }
 
 /*
-Cette fonction effectue une r‚allocation standard en m‚moire
-conventionnelle … l'aide de realloc(). S'il n'y a pas assez de m‚moire
-disponible, les blocs cr‚‚s par SW_alloc sont d‚plac‚s en EMS ou sur
-fichier et lib‚r‚s, pour permettre d'allouer quand-mˆme la m‚moire
-demand‚e.
+Cette fonction effectue une rÃ©allocation standard en mÃ©moire
+conventionnelle Ã  l'aide de realloc(). S'il n'y a pas assez de mÃ©moire
+disponible, les blocs crÃ©Ã©s par SW_alloc sont dÃ©placÃ©s en EMS ou sur
+fichier et libÃ©rÃ©s, pour permettre d'allouer quand-mÃªme la mÃ©moire
+demandÃ©e.
 
-La m‚moire suppl‚mentaire allou‚e est mise … z‚ro.
+La mÃ©moire supplÃ©mentaire allouÃ©e est mise Ã  zÃ©ro.
 
 &SA SW_nalloc(), SW_nfree(), SW_realloc()
 */
@@ -454,8 +454,8 @@ int             line;
 }
 
 /*
-Cette fonction libŠre une allocation standard en m‚moire conventionnelle
-… l'aide de free, sauf si le pointeur pass‚ est nul.
+Cette fonction libÃ¨re une allocation standard en mÃ©moire conventionnelle
+Ã  l'aide de free, sauf si le pointeur passÃ© est nul.
 */
 
 int SW_nfree(ptr)

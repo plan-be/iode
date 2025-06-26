@@ -2,12 +2,12 @@
 #include "s_html.h"
 
 /*==================================================================
-Fonction appel‚e pour afficher les messages HTML provenant des fonctions
+Fonction appelÃ©e pour afficher les messages HTML provenant des fonctions
 HtmlToc(), HtmlReplace() et HtmlSplit().
 
-Cette fonction peut ˆtre remplac‚e par une fonction utilisateur.
+Cette fonction peut Ãªtre remplacÃ©e par une fonction utilisateur.
 
-Par d‚faut, la fonction de librairie vaut simplement:
+Par dÃ©faut, la fonction de librairie vaut simplement:
 
 &CO
     SCR_comment(msg);

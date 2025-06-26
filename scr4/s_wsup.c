@@ -15,7 +15,7 @@ int     (*fn)()
 {
     return((SCRSTAT *)0);
 }
-Programm‚ JMP 12-05-00 */
+ProgrammÃ© JMP 12-05-00 */
 
 /* SCREEN and KEYB */
 SCR_init_term() {return(0);}        /* JMP 05-05-00 */
@@ -91,7 +91,7 @@ char *TarError() {return("Not imlemented");}
 U_ch   *MMT_HLPF10 = 0;
 
 
-/********* A l'‚tude .... **********/
+/********* A l'Ã©tude .... **********/
 
 SCR_mini_init()     {return(0);}
 /*SCR_mini_end()    {return(0);} /* JMP 13-09-97 */

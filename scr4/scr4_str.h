@@ -93,10 +93,10 @@ typedef struct _sbar {
 	    sb_orient,      /* 0 = vertical, 1 = horizontal */
 	    sb_nlv,         /* nbre lignes (ou colonnes) du scrollbar */
 	    sb_nbi,         /* Nombre d'infos dans une page */
-	    sb_l1v,         /* PremiŠre ligne marqu‚e du scroll */
-	    sb_nls,         /* nombre de lignes marqu‚es de scroll */
-	    sb_c1,          /* caractŠre de remplissage 1 */
-	    sb_c2,          /* caractŠre de remplissage 2 */
+	    sb_l1v,         /* PremiÃ¨re ligne marquÃ©e du scroll */
+	    sb_nls,         /* nombre de lignes marquÃ©es de scroll */
+	    sb_c1,          /* caractÃ¨re de remplissage 1 */
+	    sb_c2,          /* caractÃ¨re de remplissage 2 */
 	    sb_attr;        /* attribut du scroll (couleur) */
 } S_BAR;
 
@@ -217,13 +217,13 @@ typedef struct _isamsrch_ {         /* JMP 11-12-98 */
 } ISAMBUF;
 
 typedef struct _isnexts_ {
-    short   isn_nba;    /* Nombre de records allou‚s */
+    short   isn_nba;    /* Nombre de records allouÃ©s */
     short   isn_nb;     /* Nombre de records corrects */
     short   isn_cur;    /* Prochain record */
-    short   isn_rcur;   /* Current r‚el dans isam */
+    short   isn_rcur;   /* Current rÃ©el dans isam */
     short   isn_len;    /* Longeur total du record, y compris les tables jointes */
     short   _b1;
-    char    isn_recs[1];  /* isn_nba * is->is_rec_len caractŠres */
+    char    isn_recs[1];  /* isn_nba * is->is_rec_len caractÃ¨res */
     char    _b3[3];
 
 } ISNEXTS;
@@ -255,7 +255,7 @@ typedef struct isam {                             /* ISAM description */
     char           *is_rrrec;            /* reread record */
 
     /* BP_M 02-10-97 */
-    char           *is_maxrec;           /* Record contenant les valeurs maximum … trouver */
+    char           *is_maxrec;           /* Record contenant les valeurs maximum Ã  trouver */
 
     U_sh           is_rec_len;           /* len of the record */
     short          is_open_type;         /* type of opening */
@@ -285,9 +285,9 @@ typedef struct isam {                             /* ISAM description */
     ISFINFO        *is_info;
     long           is_recno;             /* current record "number" */
     VFIELD         *is_vfld;             /* BP_M 12-09-1997 */
-    U_ch           is_isimem;            /* is_info en m‚moire */ /* BP_M 15-01-97 */
+    U_ch           is_isimem;            /* is_info en mÃ©moire */ /* BP_M 15-01-97 */
     short          __b2[3];
-    long           is_ext_size;          /* pour INFORMIX : taille minimum de r‚allocation sur disque */   /* BP_M 08-12-1998 */
+    long           is_ext_size;          /* pour INFORMIX : taille minimum de rÃ©allocation sur disque */   /* BP_M 08-12-1998 */
 
     short          is_cmp_len;           /* Max COMPOSITE Length */
     short          is_nb_isbs;           /* Number of ISAM Buffers */
@@ -296,10 +296,10 @@ typedef struct isam {                             /* ISAM description */
     short          is_isb_search;        /* Current buffer search in ISAMBUFs or -1 */
     U_sh           is_isb_sync;          /* Max seconds while ISAMBUF remain correct */
     short          __b4;
-    char           *is_db_string;        /* String de connection … la base de donn‚es */ /* BP_M 14-06-1999 */
-    U_sh           is_objnb;             /* Num‚ro de l'objet dans la FILE_TABLE */ /* JMP 02-12-99 */
-    U_sh           is_nb_nexts;          /* Nbre de records … lire en mode client */
-    ISNEXTS        *is_nexts;            /* Records lus … l'avance en mode client */
+    char           *is_db_string;        /* String de connection Ã  la base de donnÃ©es */ /* BP_M 14-06-1999 */
+    U_sh           is_objnb;             /* NumÃ©ro de l'objet dans la FILE_TABLE */ /* JMP 02-12-99 */
+    U_sh           is_nb_nexts;          /* Nbre de records Ã  lire en mode client */
+    ISNEXTS        *is_nexts;            /* Records lus Ã  l'avance en mode client */
     U_sh           is_limit;             /* BP_M 26-9-02 */
     short          __b6;
     char           reserved[2];          /* JMP 02-12-99 */
@@ -321,8 +321,8 @@ typedef struct draw {
     short  drw_nb_line;
     U_ch   drw_size;
     U_ch   drw_attr;
-    short  drw_fld;     /* BP_M 08-04-1997 */ /* num‚ro du champs de r‚f‚rence */
-    U_ch   drw_grp;     /* BP_M 10-04-1997 */ /* num‚ro du groupe auquel il appartient */
+    short  drw_fld;     /* BP_M 08-04-1997 */ /* numÃ©ro du champs de rÃ©fÃ©rence */
+    U_ch   drw_grp;     /* BP_M 10-04-1997 */ /* numÃ©ro du groupe auquel il appartient */
 } DRAW;
 
 typedef struct _draws {
@@ -387,7 +387,7 @@ typedef struct field {
 						> 0 < 127 si 1er d'un groupe
 						> 100 < 255 si membre d'un groupe
 					     */
-    U_ch            fld_grp       ;         /* donne le num‚ro du groupe */ /* BP_M 08-04-1997 */
+    U_ch            fld_grp       ;         /* donne le numÃ©ro du groupe */ /* BP_M 08-04-1997 */
     U_ch            fld_qkey      ;          /* 4.01 */
     U_sh            fld_begin_act /*: MAXBF14*/;         /* function called when entering */
     U_sh            fld_end_act   /*: MAXBF14*/;         /*       "    "     "   exiting  */
@@ -398,7 +398,7 @@ typedef struct field {
     U_sh            fld_next      /*: 9*/;          /* 4.01 */
     unsigned char   *fld_dtext;                 /* pointer to the default txt */
     ISFLD           *fld_isam;
-    short           *fld_acmp;                  /* num‚ro des champs o— appliquer le CODEISAM */
+    short           *fld_acmp;                  /* numÃ©ro des champs oÃ¹ appliquer le CODEISAM */
     short           fld_type;                   /* type (DATE, INTEGER, REAL, NATURAL) */
     short           fld_cmt;                    /* POSITION OF COMMENT */
     short           fld_dir_type;               /* BP_M 23-01-97 */
@@ -526,15 +526,15 @@ typedef struct page {
     U_ch            pg_conf_delete  : 1;
     U_ch            pg_box          : 2;   /* type of box (0, 1 or 2) */
 
-    U_ch            pg_operation    : 4;   /* op‚ration en cours sur cette page */
-    U_ch            pg_shadow       : 3;   /* ombre … la page 1 2 3 ou 4 */
+    U_ch            pg_operation    : 4;   /* opÃ©ration en cours sur cette page */
+    U_ch            pg_shadow       : 3;   /* ombre Ã  la page 1 2 3 ou 4 */
     U_ch            pg_closebox     : 1;   /* Close Box */ /* JMP41 18-01-93 */
 
-    U_ch            pg_abort        : 1;   /* Page quitt‚e par abort */ /* JMP_M 4.19 11-05-95 */
+    U_ch            pg_abort        : 1;   /* Page quittÃ©e par abort */ /* JMP_M 4.19 11-05-95 */
     U_ch            pg_impreq       : 1;   /* Importation de required de l'ISAM */ /* JMP_M 4.19 11-05-95 */
     U_ch            pg_imptoday     : 1;   /* Importation de today de l'ISAM */ /* JMP_M 4.19 11-05-95 */
-    U_ch            pg_name_mem     : 1;   /* garde les noms en m‚moire */
-    U_ch            pg_prof         : 1;   /* page … sauver dans le profile *//* JMP 21-02-92 */
+    U_ch            pg_name_mem     : 1;   /* garde les noms en mÃ©moire */
+    U_ch            pg_prof         : 1;   /* page Ã  sauver dans le profile *//* JMP 21-02-92 */
     U_ch            pg_ncp          : 4;   /* WIN_NCP */
     U_sh            pg_begin_act /*: MAXBF14*/;  /* function called when entering */
     U_sh            pg_end_act   /*: MAXBF14*/;  /*       "    "     "   exiting  */
@@ -543,9 +543,9 @@ typedef struct page {
     U_sh            pg_fnks      /*: MAXBF14*/;  /* pointer to the first fnkey */
     U_sh            pg_menu      /*: MAXBF14*/;
     U_sh            pg_isam      /*: MAXBF14*/;
-    U_sh            pg_fld_idx   /*: MAXBF12*/;  /* num‚ro du champ contenant le num‚ro de l'index de recherche */
-    U_sh            pg_fld_cond  /*: MAXBF12*/;  /* num‚ro du champ contenant la cond de recherche (SCR_GE, SCR_EQ, SCR_LE) */ /* JMP_M 4.19 31-05-95 */
-    U_sh            pg_fld_count /*: MAXBF12*/;  /* num‚ro du champ contenant un compteur de lecture */ /* JMP_M 4.19 31-05-95 */
+    U_sh            pg_fld_idx   /*: MAXBF12*/;  /* numÃ©ro du champ contenant le numÃ©ro de l'index de recherche */
+    U_sh            pg_fld_cond  /*: MAXBF12*/;  /* numÃ©ro du champ contenant la cond de recherche (SCR_GE, SCR_EQ, SCR_LE) */ /* JMP_M 4.19 31-05-95 */
+    U_sh            pg_fld_count /*: MAXBF12*/;  /* numÃ©ro du champ contenant un compteur de lecture */ /* JMP_M 4.19 31-05-95 */
     short           pg_last_key;        /* last key used */
     short           pg_back;            /* background of the page (0=no) */
     short           pg_fill;            /* must the page be filled (char) */
@@ -580,7 +580,7 @@ typedef struct page {
     U_sh            pg_abort_act;       /* function called by SC_CLOSE */
     U_ch            pg_hline : 1;       /* WIN_HLINE */
     U_ch            pg_vline : 1;       /* WIN_VLINE */
-    U_ch            pg_tabenter     : 1;   /* g‚rer le enter comme un tab en mode Windows */ /* BP_M 25-10-1999 */
+    U_ch            pg_tabenter     : 1;   /* gÃ©rer le enter comme un tab en mode Windows */ /* BP_M 25-10-1999 */
     U_ch            pg_nlp_f ;          /* WIN_NLPFLD */
     U_ch            pg_nlp_t ;          /* WIN_NLPTXT */
     U_ch            pg_nlp_v ;          /* WIN_NLPVLINE */
@@ -592,7 +592,7 @@ typedef struct page {
     short           pg_w_w;
     short           pg_w_h;
 
-    U_sh            pg_nu;              /* JMP : num‚ro de la page */
+    U_sh            pg_nu;              /* JMP : numÃ©ro de la page */
     char            *pg_wdg;            /* JMP : widget de la page */
     char            *pg_swdg;           /* JMP : listview pour MPAGE et BC*/
     U_sh            pg_status;          /* JMP : status dans MPAGE et BC */
@@ -628,14 +628,14 @@ typedef struct mpage {
     U_ch   mp_create : 1;          /* records may be created */
     U_ch   mp_buf_size :7;         /* number of records simult. in mp_buf */
     U_ch   mp_delete : 1;          /* records may be deleted */
-    U_ch   mp_operation:4;         /* op‚ration en cours dans le MPAGE */
+    U_ch   mp_operation:4;         /* opÃ©ration en cours dans le MPAGE */
     U_ch   mp_search : 1;          /* records may be searched */
     U_ch   mp_cmt    : 1;          /* comment YES or NO */ /* JMP 29-09-91 */
     U_ch   mp_in_search : 1;       /* search operation ? */ /* JMP_M 4.19 13-06-95 */
     U_ch   mp_lpg_mem   : 1;       /* little page in mem ? */ /* JMP_M 4.20 15-06-95 */
     U_ch   mp_use_ref    : 1;      /* initialise with ref_rec */ /* JMP_M 4.20 15-06-95 */
     U_ch   mp_auto_create: 1;      /* create if no record ? */ /* JMP_M 4.20 15-06-95 */
-    U_ch   mp_type_win : 1;        /* Type d'‚dition en mode Windows */ /* BP_M 05-10-1999 */
+    U_ch   mp_type_win : 1;        /* Type d'Ã©dition en mode Windows */ /* BP_M 05-10-1999 */
     U_sh   mp_apg       /*: MAXBF14*/;    /* pointer to the "around  page" */
     U_sh   mp_lpg       /*: MAXBF14*/;    /* pointer to the "little page" */
     U_sh   mp_bpg       /*: MAXBF14*/;    /* page to modify or view one rec "big page" */
@@ -662,13 +662,13 @@ typedef struct mpage {
     VIEW    *mp_views;              /* JMP_M 4.20 14-06-95 */
     U_sh    mp_nb_tcol;             /* Number of title column *//* BP_M 22-01-97 */
     MPTCOL  *mp_tcol;               /* Title of column */       /* BP_M 22-01-97 */
-    U_sh    mp_nu;                  /* JMP : num‚ro de l'objet */
+    U_sh    mp_nu;                  /* JMP : numÃ©ro de l'objet */
     char    *mp_wdg;                /* JMP : widget de l'objet */
     int     mp_tot_len_rec;         /* BP_M 29-02-2008 : Longueur total du record ISAM y compris les tables join */
     U_sh    mp_bpg_view  /*: MAXBF14*/;    /* page to view one rec "big page" */
     U_sh    mp_bpg_mod   /*: MAXBF14*/;    /* page to modify one rec "big page" */
     short   mp_save_rec;
-    U_sh    mp_link_fn;             /* Action ex‚cut‚e aprŠs chaque cr‚ation/modification/Destruction d'une ligne */
+    U_sh    mp_link_fn;             /* Action exÃ©cutÃ©e aprÃ¨s chaque crÃ©ation/modification/Destruction d'une ligne */
 } MPAGE;
 
 typedef struct _sfld_ {
@@ -782,8 +782,8 @@ typedef struct bcom {
     U_ch    bc_operation: 2;    /* operation en  cours sur ce BC */
     U_ch    bc_lpg_op   : 2;    /* operation en  cours sur les lignes de ce BC */ /* BP 17-12-1991 19:17 */
     U_ch    bc_cmt      : 1;    /* comment YES or NO */ /* JMP 29-09-91 */
-    U_ch    bc_insert_lbc : 1;  /* possibilit‚ de inserer des lignes de bon */    /* BP 23-12-1991 09:34 */
-    U_ch    bc_lpg_mem : 1;     /* lpg en m‚moire */   /* JMP_M 4.19 10-06-95 */
+    U_ch    bc_insert_lbc : 1;  /* possibilitÃ© de inserer des lignes de bon */    /* BP 23-12-1991 09:34 */
+    U_ch    bc_lpg_mem : 1;     /* lpg en mÃ©moire */   /* JMP_M 4.19 10-06-95 */
     U_ch    bc_is_sbar : 1;     /* scrollbar */   /* JMP_M 4.19 10-06-95 */
     U_ch    bc_auto_create : 1;  /* scrollbar */   /* JMP_M 4.19 10-06-95 */
     U_ch    bc_no_mark : 1;     /* cannot mark lbcs, copy, ... */  /* JMP_M 4.21 01-09-95 */
@@ -800,14 +800,14 @@ typedef struct bcom {
     long    bc_cmt_pos;         /* comment position in .cmt file */ /* JMP 29-09-91 */
     S_BAR   *bc_sbar;           /* Scroll bar for LBC */ /* JMP_M 4.19 10-06-95 */
     U_ch    *bc_help;           /* Help topic */ /* JMP_M 4.19 10-06-95 */
-    short   bc_mark_1;          /* D‚but des marques */ /* JMP_M 4.19 10-06-95 */
+    short   bc_mark_1;          /* DÃ©but des marques */ /* JMP_M 4.19 10-06-95 */
     short   bc_mark_2;          /* Fin des marques   */ /* JMP_M 4.19 10-06-95 */
     short   bc_nb_views;          /* JMP_M 4.20 14-06-95 */
     VIEW    *bc_views;            /* JMP_M 4.20 14-06-95 */
     U_sh    bc_nb_tcol;             /* BP_M 23-01-97 */
     MPTCOL  *bc_tcol;               /* BP_M 22-01-97 */
     short   bc_index;               /* BP_M 23-01-97 */
-    U_sh    bc_nu;                  /* JMP : num‚ro de l'objet */
+    U_sh    bc_nu;                  /* JMP : numÃ©ro de l'objet */
     char    *bc_wdg;                /* JMP : widget de l'objet */
 } BC;
 
@@ -852,14 +852,14 @@ typedef struct _pr_def {
 
 typedef struct _PRTDEF_             /* JMP 30-08-98 */
 {
-    U_ch    *prd_name;     /* Nom systŠme de l'imprimante */
+    U_ch    *prd_name;     /* Nom systÃ¨me de l'imprimante */
     U_ch    *prd_descr;    /* Description */
     U_ch    *prd_command;  /* Commande pour lancer le Job */
-    U_ch    *prd_eol;      /* Valeur du caractŠre End Of Line */
-    U_ch    *prd_eop;      /* Valeur du caractŠre End Of Page */
-    U_ch    *prd_eof;      /* Valeur du caractŠre End Of File */
-    char    prd_graph;     /* CaractŠres semi-graphiques */
-    char    prd_charset;   /* CaractŠres (ANSI ou ASCII) support‚s */
+    U_ch    *prd_eol;      /* Valeur du caractÃ¨re End Of Line */
+    U_ch    *prd_eop;      /* Valeur du caractÃ¨re End Of Page */
+    U_ch    *prd_eof;      /* Valeur du caractÃ¨re End Of File */
+    char    prd_graph;     /* CaractÃ¨res semi-graphiques */
+    char    prd_charset;   /* CaractÃ¨res (ANSI ou ASCII) supportÃ©s */
     char    prd_mode;      /* Mode (RAW, GDI ou FILE) */
 } PRTDEV;
 
@@ -946,11 +946,11 @@ typedef struct _appl {
 
 typedef struct _rifld {
     short   rf_type;                /* type SCR_TYPE_PAGE | SCR_TYPE_ISAM */
-    U_sh    rf_ptr     /* : MAXBF14*/;       /* pointeur sur l'‚l‚ment */
+    U_sh    rf_ptr     /* : MAXBF14*/;       /* pointeur sur l'Ã©lÃ©ment */
     U_sh    rf_num     /* : MAXBF12*/;       /* numero du field */
     U_sh    rf_nbapp   /* : MAXBF14*/;       /* nombre d'application */
     U_sh    rf_cond         ;       /* condition de recherche */
-    short   *rf_apply;     /* appliquer pour les champs num‚ro */
+    short   *rf_apply;     /* appliquer pour les champs numÃ©ro */
 } RIFLD;
 
 typedef struct _rfld {
@@ -959,14 +959,14 @@ typedef struct _rfld {
     unsigned char       *rf_val1;           /* pointeur sur les valeurs */
     unsigned char       *rf_val2;           /* pointeur sur les valeurs */
     short               rf_nbi;             /* nombre d'isam ou page */
-    RIFLD               *rf_fld;            /* pointeur sur les ‚l‚ments */
-    U_sh                rf_disp_act  : MAXBF14;  /* action execut‚e avant le display */
+    RIFLD               *rf_fld;            /* pointeur sur les Ã©lÃ©ments */
+    U_sh                rf_disp_act  : MAXBF14;  /* action executÃ©e avant le display */
     U_sh                rf_nl        : 8 ;  /* nbr of lines */
     U_sh                rf_nc        : 8 ;  /* nbr of columns */
     U_sh                rf_attributes: 8 ;  /* color or REVERSE, ... */
     U_sh                rf_case      : 2 ;  /* case */
     U_sh                rf_center    : 3 ;  /* center */
-    U_sh                rf_nb_dec    : 4;   /* nombre de d‚cimal */
+    U_sh                rf_nb_dec    : 4;   /* nombre de dÃ©cimal */
     unsigned char       *rf_txt;            /* text du champ */
     unsigned char       *rf_fmt;            /* format  */
 } RFLD;
@@ -1064,9 +1064,9 @@ typedef struct _ecmt {
 typedef struct _mmtfn_ {
     short   key;        /* touche fonction */
 #ifdef SCRPROTO
-    int     (*fn)(void); /* fonction … ex‚cuter ou pointeur nul */
+    int     (*fn)(void); /* fonction Ã  exÃ©cuter ou pointeur nul */
 #else
-    int     (*fn)();    /* fonction … ex‚cuter ou pointeur nul */
+    int     (*fn)();    /* fonction Ã  exÃ©cuter ou pointeur nul */
 #endif
     char    *txt;       /* libelle de la touche */
 } MMTFN;
@@ -1104,7 +1104,7 @@ typedef struct _tpgs_ {
     short   tp_applied;        /* APPLY Action done */
     short   tp_last_key;       /* last key used */ /* JMP 21-08-97 */
     IMAGE   *tp_im;            /* background image */ /* JMP 21-08-97 */
-    U_sh    tp_nu;             /* JMP : num‚ro de l'objet */
+    U_sh    tp_nu;             /* JMP : numÃ©ro de l'objet */
     char    *tp_wdg;           /* JMP : widget de l'objet */
     char    reserved[4];       /* JMP 21-08-97 */
 } TPAGES;
@@ -1159,7 +1159,7 @@ typedef struct _wsockclt_ {
     int     (*fn)(int);
 } WSOCKCLT;
 
-/****** WSOCK1 pour g‚rer plusieurs sockets en // dans la mˆme session ****/
+/****** WSOCK1 pour gÃ©rer plusieurs sockets en // dans la mÃªme session ****/
 typedef struct _wsock1_ {
     int     cltsock;
     int     srvsock;

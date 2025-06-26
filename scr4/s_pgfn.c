@@ -2,9 +2,9 @@
 
 /* ======================================================================
 Retourne sous forme d'un long la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type integer ou natural.
+champ doit Ãªtre du type integer ou natural.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT la valeur du champ
 ------------------------------------------------------------------------- */
 long SCR_get_field_long(pg, fld_nb)
@@ -18,9 +18,9 @@ int     fld_nb;
 }
 /* ======================================================================
 Retourne sous forme d'un int la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type MENU.
+champ doit Ãªtre du type MENU.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT la valeur du champ
 ------------------------------------------------------------------------- */
 SCR_get_field_short(pg, fld_nb)
@@ -35,9 +35,9 @@ int     fld_nb;
 
 /* ======================================================================
 Retourne sous forme d'un double la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type real.
+champ doit Ãªtre du type real.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT la valeur du champ
 ------------------------------------------------------------------------- */
 double SCR_get_field_double(pg, fld_nb)
@@ -52,9 +52,9 @@ int     fld_nb;
 
 /* ======================================================================
 Copie dans text la valeur du champ fld_nb de la page pg. Ce champ doit
-ˆtre du type string.
+Ãªtre du type string.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT un pointeur vers text
 ------------------------------------------------------------------------- */
 char *SCR_get_field_text(pg, fld_nb, text)
@@ -69,10 +69,10 @@ char    *text;
 
 /* ======================================================================
 Copie dans le champ fld_nb de la page pg le texte text. Ce champ doit
-ˆtre du type string. Des blancs sont ajout‚s si text est trop court. Si text
-est trop long, les caractŠres exc‚dentaires sont supprim‚s.
+Ãªtre du type string. Des blancs sont ajoutÃ©s si text est trop court. Si text
+est trop long, les caractÃ¨res excÃ©dentaires sont supprimÃ©s.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT un pointeur vers text
 ------------------------------------------------------------------------- */
 SCR_set_field_text(pg, fld_nb, text)
@@ -99,9 +99,9 @@ unsigned char    *text;
 
 /* ======================================================================
 Fixe la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type real.
+champ doit Ãªtre du type real.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 ------------------------------------------------------------------------- */
 SCR_set_field_double(pg, fld_nb, val)
 PAGE    *pg;
@@ -114,9 +114,9 @@ double  val;
 
 /* ======================================================================
 Fixe la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type integer ou natural.
+champ doit Ãªtre du type integer ou natural.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 ------------------------------------------------------------------------- */
 SCR_set_field_long(pg, fld_nb, val)
 PAGE    *pg;
@@ -129,9 +129,9 @@ long    val;
 
 /* ======================================================================
 Fixe la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type menu.
+champ doit Ãªtre du type menu.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 ------------------------------------------------------------------------- */
 SCR_set_field_short(pg, fld_nb, val)
 PAGE    *pg;
@@ -387,8 +387,8 @@ char    *txt;
 }
 
 /* ======================================================================
-Alloue un string correspondant … la valeur format‚e d'un champ. Cette
-fonction retourne un pointeur vers le champ allou‚.
+Alloue un string correspondant Ã  la valeur formatÃ©e d'un champ. Cette
+fonction retourne un pointeur vers le champ allouÃ©.
 
 &EX
     PAGE pg {
@@ -407,7 +407,7 @@ fonction retourne un pointeur vers le champ allou‚.
 	printf("2: CCP : %s\n", pg_CCP);
     }
 
-    R‚sultat de PrintCcp() :
+    RÃ©sultat de PrintCcp() :
 
 	1: CCP : 123-1234567-12
 	2: CCP : 123123456712
@@ -781,7 +781,7 @@ PAGE    *pg;
 /* ===========================================================
     Set l'io de tous les champs d'une page
     IN : pg : Pointeur d'une page
-	 io : io … attribuer … tous les champs
+	 io : io Ã  attribuer Ã  tous les champs
    =========================================================== */
 PG_set_all_io(PAGE *pg, int io)
 {

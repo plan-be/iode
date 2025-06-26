@@ -39,7 +39,7 @@ int     flag_cmp;
 	case SCR_CHECK_BOX:     /* BP_M 19-01-97 */
 /*            if(SCR_CHECK_BOX_CHAR == 0) SCR_CHECK_BOX_CHAR = "X";
 	    if(SCR_CHECK_BOX_TXT  == 0) SCR_CHECK_BOX_TXT = "[%c]";
---> reportÇ dans base_init /* JMP 06-02-97 */
+--> report√© dans base_init /* JMP 06-02-97 */
 	    if(edtxt[0] == ' ') c = ' ';
 	    else                c = SCR_CHECK_BOX_CHAR[0];
 	    sprintf(radiob, SCR_CHECK_BOX_TXT, c);
@@ -48,7 +48,7 @@ int     flag_cmp;
 	case SCR_TYPE_RADIO:    /* BP_M 21-01-97 */
 /*            if(SCR_RADIO_CHAR == 0) SCR_RADIO_CHAR = ".";
 	    if(SCR_RADIO_TXT  == 0) SCR_RADIO_TXT = "(%c)";
---> reportÇ dans base_init /* JMP 06-02-97 */
+--> report√© dans base_init /* JMP 06-02-97 */
 	    j = PG_calc_nummer_radio(pg, fld_nb);
 	    i = atoi(edtxt);
 	    if(i == j) c = SCR_RADIO_CHAR[0];

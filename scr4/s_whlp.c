@@ -10,7 +10,7 @@ extern int SCR_WIN_HELP_ACTIF;          /* BP_M 20-02-2003 12:23 */
 /*NH
 Retourne le type du fichier d'aide.
 &RT
-    0 : pas de type d‚fini
+    0 : pas de type dÃ©fini
     1 : .hlp
     2 : .chm
 */

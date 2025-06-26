@@ -2,10 +2,10 @@
 
 
 /* ====================================================================
-Diff‚rences de deux tables de pointeurs.
+DiffÃ©rences de deux tables de pointeurs.
 
 &RT
-La fonction retourne un unsigned char ** avec les ‚l‚ments de tbl1
+La fonction retourne un unsigned char ** avec les Ã©lÃ©ments de tbl1
 non compris dans tbl2.
 
 
@@ -39,16 +39,16 @@ err:
 
 
 /* ====================================================================
-Diff‚rences de deux listes.
+DiffÃ©rences de deux listes.
 
-Les listes sont des "strings" contenant des ‚l‚ments s‚par‚s par un
-caractŠre s‚parateur. Les deux chaŒnes sont pass‚es en argument, ainsi
-qu'une chaŒne contenant les caractŠres s‚parateurs.
+Les listes sont des "strings" contenant des Ã©lÃ©ments sÃ©parÃ©s par un
+caractÃ¨re sÃ©parateur. Les deux chaÃ®nes sont passÃ©es en argument, ainsi
+qu'une chaÃ®ne contenant les caractÃ¨res sÃ©parateurs.
 
 
 &RT
-La fonction retourne un pointeur de type unsigned char sur une liste allou‚e
-contenant les ‚l‚ments de str1 non pr‚sents dans str2.
+La fonction retourne un pointeur de type unsigned char sur une liste allouÃ©e
+contenant les Ã©lÃ©ments de str1 non prÃ©sents dans str2.
 
 
 &EX
@@ -57,9 +57,9 @@ contenant les ‚l‚ments de str1 non pr‚sents dans str2.
     unsigned char *string2 = "Carina Lena Fabienne Martine";
 
     str3 = SCR_dif_tbl(string1, string2, " ,;");
-    printf("ChaŒne 1 : %s\n", string1);
-    printf("ChaŒne 2 : %s\n", string2);
-    printf("Diff‚rence: %s\n\n", str3);
+    printf("ChaÃ®ne 1 : %s\n", string1);
+    printf("ChaÃ®ne 2 : %s\n", string2);
+    printf("DiffÃ©rence: %s\n\n", str3);
     SCR_free(str3);
 &TX
 &SA SCR_free(), SCR_inter_tbl(), SCR_union_tbl()

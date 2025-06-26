@@ -73,11 +73,11 @@ char    *filename,
 
 
 /******************************************************************************
-CrÇe une nouvelle session. Cette session reste active pendant secs secondes.
+Cr√©e une nouvelle session. Cette session reste active pendant secs secondes.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions. Si cette variable est vide, la session
-est crÇÇe dans le rÇpertoire courant.
+est cr√©√©e dans le r√©pertoire courant.
 
 
 
@@ -89,7 +89,7 @@ est crÇÇe dans le rÇpertoire courant.
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
 
 &TX
@@ -136,9 +136,9 @@ WscrSessionCreate(long secs)
 }
 
 /******************************************************************************
-DÇtruit un session.
+D√©truit un session.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
 
@@ -150,7 +150,7 @@ servant de support aux sessions.
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
     WscrSessionDelete(sessnb);
 &TX
@@ -180,15 +180,15 @@ WscrSessionDelete(long session)
 }
 
 /******************************************************************************
-VÇrifie la validitÇ d'une session.
+V√©rifie la validit√© d'une session.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
 &RT
 &EN 0 : 0k
-&EN -1 : session non trouvÇe
-&EN -2 : session expirÇe
+&EN -1 : session non trouv√©e
+&EN -2 : session expir√©e
 
 
 &EX
@@ -199,7 +199,7 @@ servant de support aux sessions.
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
 
 &TX
@@ -224,7 +224,7 @@ WscrSessionCheck(long session)
     csec = DT_current_sec();
     if(csec > asec + secs) {
 	fclose(fd);
-	return(-2); // DÇlai dÇpassÇ
+	return(-2); // D√©lai d√©pass√©
 	}
     scr_sess_ASEC = csec;
     if(IS_rewrite(scr_sess)) return(-3);
@@ -234,7 +234,7 @@ WscrSessionCheck(long session)
     sprintf(buf, "%sSS%ld.ses", WSCR_SESSION_DIR, session);
     fd = fopen(buf, "r+");
     if(fd == 0) {
-	Debug("WscrSessionCheck(%ld); fichier de session non trouvÇ\n", session);
+	Debug("WscrSessionCheck(%ld); fichier de session non trouv√©\n", session);
 	return(-1);
     }
     fscanf(fd, "%10ld,%10ld,%10ld,%10ld", &crdate, &crtime, &asec, &secs);
@@ -242,7 +242,7 @@ WscrSessionCheck(long session)
     csec = DT_current_sec();
     if(csec > asec + secs) {
 	fclose(fd);
-	return(-2); // DÇlai dÇpassÇ
+	return(-2); // D√©lai d√©pass√©
 	}
 
     fseek(fd, 0L, 0);
@@ -253,20 +253,20 @@ WscrSessionCheck(long session)
 }
 
 /******************************************************************************
-Ajoute une variable Ö une session. Si cette variable existe, elle est remplacÇe.
-La variable ne peut dÇpasser 7500 bytes. Celle-ci est codÇe en base 64 pour
+Ajoute une variable √† une session. Si cette variable existe, elle est remplac√©e.
+La variable ne peut d√©passer 7500 bytes. Celle-ci est cod√©e en base 64 pour
 permettre le stockage sur n'importe quel support dans le futur (SQL p.exe).
 
 Le nom de la variable est case insensitive.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
-&NO Dans le cas des strings, il est prÇfÇrable de donner la longueur de toute la
-variable, y compris le zÇro de fin. Sinon, la valeur lue par la suite ne contiendra
-pas le zÇro final.
+&NO Dans le cas des strings, il est pr√©f√©rable de donner la longueur de toute la
+variable, y compris le z√©ro de fin. Sinon, la valeur lue par la suite ne contiendra
+pas le z√©ro final.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (session non trouvÇe ou incorrecte)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (session non trouv√©e ou incorrecte)
 
 &EX
     long    sessnb;
@@ -276,7 +276,7 @@ pas le zÇro final.
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
     WscrSessionSetCookie(sessnb, "NOM", "Jean-Marc Paul", 15);
     WscrSessionDelete(sessnb);
@@ -337,11 +337,11 @@ WscrSessionSetCookie(long session, char *name, U_ch *value, int length)
 /******************************************************************************
 Lit une variable et sa longueur dans une session. Le nom est case insensitive.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (session non trouvÇe ou
-incorrecte, ou variable non trouvÇe)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (session non trouv√©e ou
+incorrecte, ou variable non trouv√©e)
 
 &EX
     long    sessnb;
@@ -353,7 +353,7 @@ incorrecte, ou variable non trouvÇe)
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
     WscrSessionSetCookie(sessnb, "NOM", "Jean-Marc Paul", 15);
     WscrSessionGetCookie(sessnb, "NOM", buf, &lg);
@@ -393,20 +393,20 @@ WscrSessionGetCookie(long session, char *name, char *value, int *length)
 
     SCR_free_tbl(tbl);
     if(i == nb || pos < 0) {
-	Debug("WscrSessionGetCookie(%ld, %s); page non trouvÇe dans le fichier de session\n", session, name);
+	Debug("WscrSessionGetCookie(%ld, %s); page non trouv√©e dans le fichier de session\n", session, name);
 	return(-1);
     }
     return(0);
 }
 
 /******************************************************************************
-DÇtruit une variable dans une session. Le nom est case insensitive.
+D√©truit une variable dans une session. Le nom est case insensitive.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (session non trouvÇe ou
-incorrecte, ou variable non trouvÇe)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (session non trouv√©e ou
+incorrecte, ou variable non trouv√©e)
 
 &EX
     long    sessnb;
@@ -418,7 +418,7 @@ incorrecte, ou variable non trouvÇe)
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
     WscrSessionSetCookie(sessnb, "NOM", "Jean-Marc Paul", 15);
     WscrSessionGetCookie(sessnb, "NOM", buf, &lg);
@@ -463,16 +463,16 @@ WscrSessionDelCookie(long session, char *name)
 
 /******************************************************************************
 Ajoute une PAGE (le record) une session. Si cette PAGE existe das la
-session, elle est remplacÇe. La taille du record de la page ne peut dÇpasser
-7500 bytes. Celle-ci est codÇe en base 64 pour permettre le stockage sur
+session, elle est remplac√©e. La taille du record de la page ne peut d√©passer
+7500 bytes. Celle-ci est cod√©e en base 64 pour permettre le stockage sur
 n'importe quel support dans le futur (SQL p.exe).
 
 Le nom de la PAGE est case insensitive.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (session non trouvÇe ou incorrecte)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (session non trouv√©e ou incorrecte)
 
 &EX
     long    sessnb;
@@ -482,7 +482,7 @@ servant de support aux sessions.
     switch(WscrSessionCheck(sessnb)) {
 	case 0  : printf("Session OK\n"); break;
 	case -1 : printf("Session inexistante\n"); break;
-	case -2 : printf("DÇlai expirÇ\n"); break;
+	case -2 : printf("D√©lai expir√©\n"); break;
 	}
     WscrSessionSavePage(sessnb, mypage);
     WscrSessionDelete(sessnb);
@@ -501,12 +501,12 @@ WscrSessionSavePage(long session, PAGE *pg)
     char    *name;
 
     if(session <= 0) {
-	Debug("WscrSessionSavePage(); Pas de numÇro de session\n");
+	Debug("WscrSessionSavePage(); Pas de num√©ro de session\n");
 	return(-1);
     }
     name = SCR_find_ptr_name(pg);
     if(name == 0) {
-	Debug("WscrSessionSavePage(); page *pg: non trouvÇe\n");
+	Debug("WscrSessionSavePage(); page *pg: non trouv√©e\n");
 	return(-1);
     }
     return(WscrSessionSetCookie(session, name,
@@ -518,10 +518,10 @@ WscrSessionSavePage(long session, PAGE *pg)
 Lit une PAGE (le record) d'une session.
 Le nom de la PAGE est case insensitive.
 
-La variable WSCR_SESSION_DIR contient un pointeur vers le prÇfixe du nom des fichiers
+La variable WSCR_SESSION_DIR contient un pointeur vers le pr√©fixe du nom des fichiers
 servant de support aux sessions.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (session non trouvÇe ou incorrecte)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (session non trouv√©e ou incorrecte)
 
 &EX
     WSCR_SESSION_DIR = "c:\\tmp\\";
@@ -541,12 +541,12 @@ WscrSessionLoadPage(long session, PAGE *pg)
     char    *name;
     int     lg, rc;
     if(session <= 0) {
-	Debug("WscrSessionLoadPage(%ld, pg); mauvais numÇro de session\n", session);
+	Debug("WscrSessionLoadPage(%ld, pg); mauvais num√©ro de session\n", session);
 	return(-1);
     }
     name = SCR_find_ptr_name(pg);
     if(name == 0) {
-	Debug("WscrSessionLoadPage(%ld, pg); Page non rÇfÇrencÇe\n", session);
+	Debug("WscrSessionLoadPage(%ld, pg); Page non r√©f√©renc√©e\n", session);
 	return(-1);
     }
     rc = WscrSessionGetCookie(session, name, pg->pg_rec, &lg);

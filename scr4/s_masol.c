@@ -1,25 +1,25 @@
 #include "s_mat.h"
 
 /* ====================================================================
-RÇsolution d'un systäme d'Çquations linÇaires par la mÇthode
-gaussienne d'Çlimination.
-Le systäme s'Çcrit sous une forme matricielle:
-    m1 * m3 = m2 oó
-    m1 est la matrice carrÇe du systäme (nl1 x nc1),
+R√©solution d'un syst√®me d'√©quations lin√©aires par la m√©thode
+gaussienne d'√©limination.
+Le syst√®me s'√©crit sous une forme matricielle:
+    m1 * m3 = m2 o√π
+    m1 est la matrice carr√©e du syst√®me (nl1 x nc1),
     m2 est une matrice nl1 x 1,
-    m3 est la matrice rÇsultat nl1 x 1.
+    m3 est la matrice r√©sultat nl1 x 1.
 
 &RT
-Si m3 est nul, une matrice de dimension (nl1, 1) est allouÇe et
-retournÇe (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace mÇmoire insuffisant). Si m3 n'est pas nul,
-le rÇsultat y est stockÇ et m3 est retournÇ.
-Les dimensions de m1, m2 et m3 doivent àtre correctes sans quoi le systäme
-n'est pas rÇsolu , la variable M_errno est positionnÇe et la
+Si m3 est nul, une matrice de dimension (nl1, 1) est allou√©e et
+retourn√©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace m√©moire insuffisant). Si m3 n'est pas nul,
+le r√©sultat y est stock√© et m3 est retourn√©.
+Les dimensions de m1, m2 et m3 doivent √™tre correctes sans quoi le syst√®me
+n'est pas r√©solu , la variable M_errno est positionn√©e et la
 fonction retourne un pointeur nul.
-Si le systäme n'a pas de solution rÇelle, la variable M_errno est
-positionnÇe et la fonction retourne un pointeur nul.
-Les matrices sources sont modifiÇes.
+Si le syst√®me n'a pas de solution r√©elle, la variable M_errno est
+positionn√©e et la fonction retourne un pointeur nul.
+Les matrices sources sont modifi√©es.
 
 &EX
     M_solve(m3, m1, m2);

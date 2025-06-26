@@ -1,12 +1,12 @@
 #include "s_mat.h"
 
 /* ====================================================================
-Cr‚e une matrice carr‚e scale * diagonale (kroneker) de dimention dim.
+CrÃ©e une matrice carrÃ©e scale * diagonale (kroneker) de dimention dim.
 
 &RT
-Une matrice carr‚e de dimension (dim x dim) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant ou de dimention nulle).
+Une matrice carrÃ©e de dimension (dim x dim) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant ou de dimention nulle).
 
 &EX
     M_diag(3 , 8.25);

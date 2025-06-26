@@ -854,7 +854,7 @@ int     pos;
 
         if(ch == ' ') {         // JMP 6/1/2022 pour accepter les tableaux | 21|... sans avoir 21 colonnes
             tc->atc_ncells = 0; // Si le char 1 == ' ' on le skippe et on ne prend pas l'entier qui
-        }                        // suit comme le #cols ‡ regrouper (span)
+        }                        // suit comme le #cols √† regrouper (span)
         else {
             CppUngetc(af->af_cpp, ch);
             tc->atc_ncells = (short)CppReadLong(af->af_cpp);
@@ -2016,7 +2016,7 @@ U_ch    *txt;
             memcpy(tmp, txt + pos + 3, len);
             tmp[len] = 0;
 
-            // Add image path Ö filename si dÇfini                  /* JMP 24-09-10 */
+            // Add image path √† filename si d√©fini                  /* JMP 24-09-10 */
             if(A2M_IMGPATH && A2M_IMGPATH[0]) {                     /* JMP 24-09-10 */
                 if(A2M_IMGPATH[strlen(A2M_IMGPATH) - 1] != '\\')    /* JMP 24-09-10 */
                     strcat(A2M_IMGPATH, "\\");                      /* JMP 24-09-10 */
@@ -2144,7 +2144,7 @@ U_ch    *txt;
 
 /* =====================================================================
 Cette fonction construit dans un buffer statique un message indiquant le
-fichier et la ligne et la colonne dans ce fichier oó en est arrivÇe la
+fichier et la ligne et la colonne dans ce fichier o√π en est arriv√©e la
 lecture du fichier a2m ouvert.
 
 &EN af  = descripteur du fichier a2m ouvert

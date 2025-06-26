@@ -1,19 +1,19 @@
 #include "s_mat.h"
 /* ====================================================================
-Effectue des op‚rations de base sur les ‚l‚ments de deux matrices
-m1 et m2 de mˆme dimensions et stocke le r‚sultat dans m3.
+Effectue des opÃ©rations de base sur les Ã©lÃ©ments de deux matrices
+m1 et m2 de mÃªme dimensions et stocke le rÃ©sultat dans m3.
 
-Les op‚rations sont '+', '-', '*' ou '/'.
+Les opÃ©rations sont '+', '-', '*' ou '/'.
 
 &RT
-Si m3 est nul, une matrice de dimension (nl1, nc1) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant).
-Si m3 n'est pas nul, le r‚sultat y est stock‚ et m3 est
-retourn‚. Les dimensions doivent ˆtre correctes sans quoi les
-op‚rations ne sont pas effectu‚es, la variable globale M_errno est
-positionn‚e, et la fonction retourne un pointeur nul.
-Attention, les op‚rateurs  '*' et '/' ne sont pas un produit ou
+Si m3 est nul, une matrice de dimension (nl1, nc1) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant).
+Si m3 n'est pas nul, le rÃ©sultat y est stockÃ© et m3 est
+retournÃ©. Les dimensions doivent Ãªtre correctes sans quoi les
+opÃ©rations ne sont pas effectuÃ©es, la variable globale M_errno est
+positionnÃ©e, et la fonction retourne un pointeur nul.
+Attention, les opÃ©rateurs  '*' et '/' ne sont pas un produit ou
 une division matricielle.
 
 &EX

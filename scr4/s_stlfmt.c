@@ -2,11 +2,11 @@
 
 /* ====================================================================
 Calcule la longueur du string extrait d'un format : effectue la somme de
-tous les '0', '9', 'X' et 'x' prÇsents dans le format.
+tous les '0', '9', 'X' et 'x' pr√©sents dans le format.
 
-&RT le nombre de caractäres du string dÇformattÇ
+&RT le nombre de caract√®res du string d√©formatt√©
 &EX
-    SCR_fmt_lg("NumÇro : 9990-XX-00")
+    SCR_fmt_lg("Num√©ro : 9990-XX-00")
 
     vaut 8
 &TX

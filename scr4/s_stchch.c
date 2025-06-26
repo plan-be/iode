@@ -1,7 +1,7 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Remplace un caractŠre (ch1) par un autre (ch2) dans un Zstring (str).
+Remplace un caractÃ¨re (ch1) par un autre (ch2) dans un Zstring (str).
 
 Le tableau input doit se terminer par un pointeur nul.
 

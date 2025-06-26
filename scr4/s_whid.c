@@ -17,16 +17,16 @@ WINAPI WscrHiddenProc(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 }
 
 /* =======================================================================
-Cr‚e une fenˆtre cach‚e permettant d'‚changer des messages entre processus
-sur une mˆme machine.
+CrÃ©e une fenÃªtre cachÃ©e permettant d'Ã©changer des messages entre processus
+sur une mÃªme machine.
 
-Il faut cr‚er une boucle de messages pour que cette fenˆtre puisse recevoir
-les messages de l'application. Le plus simple est en g‚n‚ral de cr‚er un
-thread s‚par‚, dans lequel la boucle de messages pourra se d‚rouler.
+Il faut crÃ©er une boucle de messages pour que cette fenÃªtre puisse recevoir
+les messages de l'application. Le plus simple est en gÃ©nÃ©ral de crÃ©er un
+thread sÃ©parÃ©, dans lequel la boucle de messages pourra se dÃ©rouler.
 
-&RT handle vers la fenˆtre cr‚e ou 0 en cas de problŠme.
+&RT handle vers la fenÃªtre crÃ©e ou 0 en cas de problÃ¨me.
 
-&EN fn : fonction utilisateur qui re‡oit les messages de la fenˆtre
+&EN fn : fonction utilisateur qui reÃ§oit les messages de la fenÃªtre
     et agit en fonction
 
 Cette fonction a la syntaxe suivante :
@@ -35,15 +35,15 @@ Cette fonction a la syntaxe suivante :
     int fn(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 &TX
 
-Les arguments re‡us sont :
-&EN hWnd : handle de la fenˆtre
+Les arguments reÃ§us sont :
+&EN hWnd : handle de la fenÃªtre
 &EN wMsg : message (entier)
-&EN wParam : paramŠtre (entier)
-&EN lParam : paramŠtre (long)
+&EN wParam : paramÃ¨tre (entier)
+&EN lParam : paramÃ¨tre (long)
 
-La fonction fn retourne 0 si le message n'est pas trait‚ (il s'agit d'un
-message de Windows) et 1 si le message est trait‚. Dans le cas o— le message
-n'est pas trait‚ par la fonction, il est pass‚ … une fonction standard de
+La fonction fn retourne 0 si le message n'est pas traitÃ© (il s'agit d'un
+message de Windows) et 1 si le message est traitÃ©. Dans le cas oÃ¹ le message
+n'est pas traitÃ© par la fonction, il est passÃ© Ã  une fonction standard de
 Windows.
 
 &EX
@@ -107,12 +107,12 @@ HWND WscrCreateHiddenWindow(WSCRPROCFN fn)
 }
 
 /* =======================================================================
-Cr‚e une boucle de message. Cette boucle se termine quand la valeur
-point‚e par stop n'est plus nulle. Cette fonction est blocante pour le reste
+CrÃ©e une boucle de message. Cette boucle se termine quand la valeur
+pointÃ©e par stop n'est plus nulle. Cette fonction est blocante pour le reste
 du thread courant.
 
 &EN int *stop : pointeur vers la valeur qui indique si la boucle doit
-    se poursuivre (0) ou s'arrˆter (autre valeur).
+    se poursuivre (0) ou s'arrÃªter (autre valeur).
 
 &RT valeur de *stop
 &SA WscrCreateHiddenWindow(), WscrDeleteHiddenWindow(), WscrAddTaskBarIcon()
@@ -130,7 +130,7 @@ WscrMessageLoop(int *stop)
 }
 
 /* =======================================================================
-D‚truit la fenˆtre cach‚e cr‚‚e par WscrCreateHiddenWindow().
+DÃ©truit la fenÃªtre cachÃ©e crÃ©Ã©e par WscrCreateHiddenWindow().
 
 &SA WscrCreateHiddenWindow(), WscrMessageLoop(), WscrAddTaskBarIcon()
 ======================================================================= */

@@ -16,7 +16,7 @@ extern char *SCR_transfile;
 
 /* ==============================================================
     Ouverture du fichier des historiques de transaction
-    pas de paramätre
+    pas de param√®tre
    ============================================================== */
 
 IS_init_history()               /* BP 08-10-91 10:42 */
@@ -61,7 +61,7 @@ IS_open_trans_()        /* BP_M 01-03-2003 10:43 */
 
 /* ==============================================================
     Fermeture du fichier des historiques de transaction
-    pas de paramätre
+    pas de param√®tre
    ============================================================== */
 
 IS_end_history()
@@ -255,8 +255,8 @@ ISAM    *is;
 }
 
 /* ================================================================
-	ExÇcution d'une requàte sql sans isam
-	IN : sql : requàte sql
+	Ex√©cution d'une requ√™te sql sans isam
+	IN : sql : requ√™te sql
    ================================================================ */
 
 IS_trans_sql_nois(char *sql)
@@ -320,7 +320,7 @@ IS_trans_delete_db(ISAM *is)
 }
 
 /* ================================================================
-	Set un nouveau nom Ö une table
+	Set un nouveau nom √† une table
 	IN : is : structure ISAM
 	IN : name : char * nouveau nom
    ================================================================ */

@@ -28,19 +28,19 @@ char  *M_ERR_TEXT[] = {
 
 /* ====================================================================
 Alloue une matrice de nl lignes et nc colonnes et retourne le pointeur
-vers la matrice allouÇe.
+vers la matrice allou√©e.
 
 Les allocations utilisent la librairie s_swap.lib pour stocker les
-donnÇes du tableau. Si la constante symbolique NOSWAP est dÇfinie,
-l'allocation se fait en mÇmoire conventionnelle, sinon elle est faite
+donn√©es du tableau. Si la constante symbolique NOSWAP est d√©finie,
+l'allocation se fait en m√©moire conventionnelle, sinon elle est faite
 en EMS.
 
-La valeur nc ne peut dÇpasser 2000. La valeur de nl ne peut dÇpasser 16000.
+La valeur nc ne peut d√©passer 2000. La valeur de nl ne peut d√©passer 16000.
 
-&RT Le pointeur vers la matrice (MAT *) est retournÇ. Ce pointeur est
-    nul en cas de limite mÇmoire et en cas de dimention incorrecte (nulle),
-    la variable globale M_errno est positionnÇe.
-    Les ÇlÇments de la matrice sont initialisÇs Ö 0.0.
+&RT Le pointeur vers la matrice (MAT *) est retourn√©. Ce pointeur est
+    nul en cas de limite m√©moire et en cas de dimention incorrecte (nulle),
+    la variable globale M_errno est positionn√©e.
+    Les √©l√©ments de la matrice sont initialis√©s √† 0.0.
 
 &EX
     MAT     *m1;
@@ -97,7 +97,7 @@ memerr:
 
 
 /* ====================================================================
-Libäre l'espace allouÇ pour une matrice.
+Lib√®re l'espace allou√© pour une matrice.
 Si le pointeur est nul, la fonction est sans effet.
 &EX MAT     *m1;
     ...
@@ -122,7 +122,7 @@ MAT     *m1;
 /*NH*/
 
 /*
-    transfäre un vecteur du swap en mÇmoire conv.
+    transf√®re un vecteur du swap en m√©moire conv.
 */
 MREAL* M_vswp_to_cnv(row2, row1, dim)     /* dest , source */
 MREAL    *row2;
@@ -136,7 +136,7 @@ int     dim;
 /*NH*/
 
 /*
-    transfäre de mÇmoire conv. vers swap
+    transf√®re de m√©moire conv. vers swap
 */
 VECT M_vcnv_to_swp(row2, row1, dim)     /* dest , source */
 VECT    row2;
@@ -197,7 +197,7 @@ MAT     *m1;
 
 /*NH*/
 /*
-    transfäre un vecteur du swap en mÇmoire conv.
+    transf√®re un vecteur du swap en m√©moire conv.
 */
 MREAL* M_vswp_to_cnv(row2, row1, dim)     /* dest , source */
 MREAL    *row2;
@@ -211,7 +211,7 @@ int     dim;
 
 /*NH*/
 /*
-    transfäre de mÇmoire conv. vers swap
+    transf√®re de m√©moire conv. vers swap
 */
 VECT M_vcnv_to_swp(row2, row1, dim)     /* dest , source */
 VECT    row2;
@@ -227,16 +227,16 @@ int     dim;
 
 
 /* ====================================================================
-Alloue un vecteur de nc elem. en mÇmoire conventionnelle et retourne
+Alloue un vecteur de nc elem. en m√©moire conventionnelle et retourne
 un pointeur sur ce vecteur.
 
 L'allocation utilise la librairie s_swap.lib.
 
 
-&RT Le pointeur vers le vecteur (MREAL *) est retournÇ. Ce pointeur est
-    nul en cas de limite mÇmoire.
-    La variable globale M_errno est positionnÇe.
-    Les ÇlÇments du vecteur sont initialisÇs Ö 0.0.
+&RT Le pointeur vers le vecteur (MREAL *) est retourn√©. Ce pointeur est
+    nul en cas de limite m√©moire.
+    La variable globale M_errno est positionn√©e.
+    Les √©l√©ments du vecteur sont initialis√©s √† 0.0.
 
 
 
@@ -273,7 +273,7 @@ memerr:
 
 
 /* ====================================================================
-Libäre l'espace allouÇ pour un vecteur en mÇmoire conventionnelle.
+Lib√®re l'espace allou√© pour un vecteur en m√©moire conventionnelle.
 Si le pointeur est nul, la fonction est sans effet.
 
 &EX

@@ -1,17 +1,17 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Vector to Matrix : cr‚e un tableau de pointeurs … partir d'un string
-termin‚ par 0. Les s‚parateurs de lignes sont les caractŠres contenus
-dans le string seps. La fonction alloue le tableau r‚sultat ainsi que
-toutes les lignes … l'aide de SCR_malloc().
+Vector to Matrix : crÃ©e un tableau de pointeurs Ã  partir d'un string
+terminÃ© par 0. Les sÃ©parateurs de lignes sont les caractÃ¨res contenus
+dans le string seps. La fonction alloue le tableau rÃ©sultat ainsi que
+toutes les lignes Ã  l'aide de SCR_malloc().
 
 Le tableau input doit se terminer par un pointeur nul. Le tableau
-r‚sultat se termine par un pointeur nul.
+rÃ©sultat se termine par un pointeur nul.
 
 La fonction inverse est SCR_mtov().
 
-&RT pointeur vers le tableau r‚sultat allou‚
+&RT pointeur vers le tableau rÃ©sultat allouÃ©
 &EX
     PrintList(string)
     unsigned char   *string;
@@ -62,16 +62,16 @@ unsigned char    *str,
 
 
 /* ====================================================================
-Vector to Matrix : cr‚e un tableau de pointeurs … partir d'un string
-termin‚ par 0. Le s‚parateur de lignes est sep. La fonction alloue le
-tableau r‚sultat ainsi que toutes les lignes … l'aide de SCR_malloc().
+Vector to Matrix : crÃ©e un tableau de pointeurs Ã  partir d'un string
+terminÃ© par 0. Le sÃ©parateur de lignes est sep. La fonction alloue le
+tableau rÃ©sultat ainsi que toutes les lignes Ã  l'aide de SCR_malloc().
 
-Le string input doit se terminer par un caractŠre nul. Le tableau
-r‚sultat se termine par un pointeur nul.
+Le string input doit se terminer par un caractÃ¨re nul. Le tableau
+rÃ©sultat se termine par un pointeur nul.
 
 La fonction inverse est SCR_mtov().
 
-&RT pointeur vers le tableau r‚sultat allou‚
+&RT pointeur vers le tableau rÃ©sultat allouÃ©
 &EX
     PrintList(string)
     unsigned char   *string;
@@ -110,22 +110,22 @@ int             sep;
 
 
 /* ====================================================================
-Vector to Matrix : cr‚e un tableau de pointeurs … partir d'un string
-termin‚ par 0. Les s‚parateurs de lignes sont les caractŠres contenus
-dans le string seps. La fonction alloue le tableau r‚sultat ainsi que
-toutes les lignes … l'aide de SCR_malloc().
+Vector to Matrix : crÃ©e un tableau de pointeurs Ã  partir d'un string
+terminÃ© par 0. Les sÃ©parateurs de lignes sont les caractÃ¨res contenus
+dans le string seps. La fonction alloue le tableau rÃ©sultat ainsi que
+toutes les lignes Ã  l'aide de SCR_malloc().
 
-&EN unsigned char *str : tableau de caractŠres
-&EN unsigned char *seps : s‚parateurs de liste
-&EN int           supdbl : 1 pour que les doubles s‚parateurs
-    ne g‚nŠre qu'un seul ‚l‚ment, 0 pour garder une ligne par s‚parateur
+&EN unsigned char *str : tableau de caractÃ¨res
+&EN unsigned char *seps : sÃ©parateurs de liste
+&EN int           supdbl : 1 pour que les doubles sÃ©parateurs
+    ne gÃ©nÃ¨re qu'un seul Ã©lÃ©ment, 0 pour garder une ligne par sÃ©parateur
 
 Le tableau input doit se terminer par un pointeur nul. Le tableau
-r‚sultat se termine par un pointeur nul.
+rÃ©sultat se termine par un pointeur nul.
 
 La fonction inverse est SCR_mtov().
 
-&RT pointeur vers le tableau r‚sultat allou‚
+&RT pointeur vers le tableau rÃ©sultat allouÃ©
 &EX
     PrintList(string)
     unsigned char   *string;
@@ -270,23 +270,23 @@ int              supdbl;
 }
 
 /* ====================================================================
-Vector to Matrix : cr‚e un tableau de pointeurs … partir d'un string
-termin‚ par 0. Les s‚parateurs de lignes sont les caractŠres contenus
-dans le string seps. La fonction alloue le tableau r‚sultat ainsi que
-toutes les lignes … l'aide de SCR_malloc().
+Vector to Matrix : crÃ©e un tableau de pointeurs Ã  partir d'un string
+terminÃ© par 0. Les sÃ©parateurs de lignes sont les caractÃ¨res contenus
+dans le string seps. La fonction alloue le tableau rÃ©sultat ainsi que
+toutes les lignes Ã  l'aide de SCR_malloc().
 
-&EN unsigned char *str : tableau de caractŠres
-&EN unsigned char *seps : s‚parateurs de liste
-&EN int           supdbl : 1 pour que les doubles s‚parateurs
-    ne g‚nŠre qu'un seul ‚l‚ment, 0 pour garder une ligne par s‚parateur
+&EN unsigned char *str : tableau de caractÃ¨res
+&EN unsigned char *seps : sÃ©parateurs de liste
+&EN int           supdbl : 1 pour que les doubles sÃ©parateurs
+    ne gÃ©nÃ¨re qu'un seul Ã©lÃ©ment, 0 pour garder une ligne par sÃ©parateur
 
 Le tableau input doit se terminer par un pointeur nul. Le tableau
-r‚sultat se termine par un pointeur nul.
+rÃ©sultat se termine par un pointeur nul.
 
-Les strings entre doubles quotes (") ne sont pas s‚par‚s, mˆme s'il
-contiennent un s‚parateur.
+Les strings entre doubles quotes (") ne sont pas sÃ©parÃ©s, mÃªme s'il
+contiennent un sÃ©parateur.
 
-&RT pointeur vers le tableau r‚sultat allou‚
+&RT pointeur vers le tableau rÃ©sultat allouÃ©
 &EX
     PrintList(string)
     unsigned char   *string;
@@ -310,7 +310,7 @@ contiennent un s‚parateur.
 &TX
 &SA SCR_vtom(), SCR_vtoms(), SCR_vtoms2(), SCR_mtov(), SCR_free_tbl(), SCR_copy_tbl()
 
-TODO: ERREUR: à corriger pour les args entre "abc","def" => "abc",NULL,"def" 
+TODO: ERREUR: Ã  corriger pour les args entre "abc","def" => "abc",NULL,"def" 
 =======================================================================*/
 
 unsigned char **SCR_vtoms3(str, seps, supdbl)
@@ -324,7 +324,7 @@ int              supdbl;
     if(str == 0) return(tbl);
     while(1) {
 	if(supdbl) {                           /* JMP 02-09-98 */
-	    // Saute les s‚parateurs en d‚but de str
+	    // Saute les sÃ©parateurs en dÃ©but de str
 	    for(i = 0 ; str[i] ; i++)
 		if(!U_is_in(str[i], seps)) break; /* SKIP SEPS */
 	    }
@@ -340,7 +340,7 @@ int              supdbl;
 	    continue;
 	    }
 
-	/* JMP 13-01-11  : Pq ajouter un argument vide … la fin ?
+	/* JMP 13-01-11  : Pq ajouter un argument vide Ã  la fin ?
 	if(str[i] == 0) {
 	    if(supdbl == 0)
 		SCR_add_ptr_lg_0(&tbl, &ntbl, "", 1, 0); /* JMP 07-06-96

@@ -554,7 +554,7 @@ BC      *bc;
 		    break;
 		    }
 		switch(insert_pos) {
-		    case 0 : /* aprŠs la ligne courante */
+		    case 0 : /* aprÃ¨s la ligne courante */
 			BC_add_bcl(bc, cline);
 			BC_isam_to_bcl(bc, cline + 1);
 			break;
@@ -562,7 +562,7 @@ BC      *bc;
 			BC_add_bcl(bc, cline - 1);
 			BC_isam_to_bcl(bc, cline);
 			break;
-		    case 2 : /* … la fin */                 /* JMP_M 4.21 11-10-95 */
+		    case 2 : /* Ã  la fin */                 /* JMP_M 4.21 11-10-95 */
 			BC_add_bcl(bc, bc->bc_nb_lbc);      /* JMP_M 4.21 11-10-95 */
 			BC_isam_to_bcl(bc, bc->bc_nb_lbc);  /* JMP_M 4.21 11-10-95 */
 			break;                              /* JMP_M 4.21 11-10-95 */
@@ -1016,7 +1016,7 @@ long    count;
 }
 
 /*
-   Permet de faire ex‚cuter la display_fn de la lpg d'un BC avant de
+   Permet de faire exÃ©cuter la display_fn de la lpg d'un BC avant de
    copier le contenu du record de la page dans le buffer du BC
 */
 
@@ -1640,14 +1640,14 @@ GMSGC
 	    if(ACT_exec_nu(bc->bc_beg_act) != 0) break;
 	    if(bc->bc_operation == 1 && !create) {
 		if(BC_write_bc(bc) != 0) {    /* JMP_M 4.20 14-06-95 */
-		    if(rc == 0) break; /* APG quitt‚e normalement */
+		    if(rc == 0) break; /* APG quittÃ©e normalement */
 		    GMSGR(0);
 		    }
 		create = 1;
 		}
 	    else
 		if(BC_rewrite_bc(bc) != 0) { /* JMP_M 4.20 14-06-95 */
-		    if(rc == 0) break; /* APG quitt‚e normalement */
+		    if(rc == 0) break; /* APG quittÃ©e normalement */
 		    GMSGR(0);
 		    }
 

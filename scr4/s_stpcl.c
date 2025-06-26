@@ -4,19 +4,19 @@
 extern FILE     *PC_FD;
 
 /* ====================================================================
-Recherche dans le fichier filename toutes les lignes de d‚finition et
+Recherche dans le fichier filename toutes les lignes de dÃ©finition et
 retourne un tableau de pointeurs vers les champs fld_nb de chaque
-ligne de d‚finition.
+ligne de dÃ©finition.
 
-Les paramŠtres fld_select et fld_vals permettent de s‚lectionner un
-nombre d'entr‚es limit‚es : fld_select est le num‚ro du champ sur
-lequel s'effectue la s‚lection et fld_vals est un string contenant les
-valeurs que peut avoir la premiŠre lettre de ce champ. Si fld_val est
-NULL ou vide, ou fld_select est < 0, toutes les lignes sont s‚lectionn‚es.
+Les paramÃ¨tres fld_select et fld_vals permettent de sÃ©lectionner un
+nombre d'entrÃ©es limitÃ©es : fld_select est le numÃ©ro du champ sur
+lequel s'effectue la sÃ©lection et fld_vals est un string contenant les
+valeurs que peut avoir la premiÃ¨re lettre de ce champ. Si fld_val est
+NULL ou vide, ou fld_select est < 0, toutes les lignes sont sÃ©lectionnÃ©es.
 
-&RT un tableau contenant les champs num‚ro fld_nb de chaque ligne de
-    d‚finition. Ce tableau est nul en cas d'erreur (fichier non trouv‚,
-    pas de ligne de d‚finition trouv‚e)
+&RT un tableau contenant les champs numÃ©ro fld_nb de chaque ligne de
+    dÃ©finition. Ce tableau est nul en cas d'erreur (fichier non trouvÃ©,
+    pas de ligne de dÃ©finition trouvÃ©e)
 &EX
 
     PrintFile(filename)
@@ -40,18 +40,18 @@ NULL ou vide, ou fld_select est < 0, toutes les lignes sont s‚lectionn‚es.
 &SA PC_exec(), PC_infos(), SCR_free_tbl();
 
 &TI Description du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Le fichier contient trois types de lignes :
 
-&EN lignes de description commen‡ant par un + et contenant un ensemble
-    de champs s‚par‚s par des :
-&EN lignes de commandes suivant la ligne de d‚finition et contenant
-    ‚ventuellement des paramŠtres %1, %2 et %3
-&EN lignes de commentaires commen‡ant par un ##
+&EN lignes de description commenÃ§ant par un + et contenant un ensemble
+    de champs sÃ©parÃ©s par des :
+&EN lignes de commandes suivant la ligne de dÃ©finition et contenant
+    Ã©ventuellement des paramÃ¨tres %1, %2 et %3
+&EN lignes de commentaires commenÃ§ant par un ##
 
-Par exemple, un fichier de d‚finition des imprimantes install‚es sur le
-systŠme peut ˆtre du type suivant :
+Par exemple, un fichier de dÃ©finition des imprimantes installÃ©es sur le
+systÃ¨me peut Ãªtre du type suivant :
 
 &CO
     +ps402:PS:1:Agfa P400PS laserprinter 2th floor
@@ -73,22 +73,22 @@ systŠme peut ˆtre du type suivant :
     ##+lpt2:FASCII:1:Standard DOS Printer on lpt2:
     ##    copy %1 lpt1
 &TX
-Les lignes de d‚finition sont ici d‚coup‚es en 4 champs :
+Les lignes de dÃ©finition sont ici dÃ©coupÃ©es en 4 champs :
 
 &EN le nom logique de l'imprimante
 &EN le langage de l'imprimante (PS=Postscript, etc)
-&EN le nombre de paramŠtres requis
+&EN le nombre de paramÃ¨tres requis
 &EN la description en langage clair de l'imprimante
 
-Les lignes qui suivent sont les commandes … ex‚cuter pour imprimer
+Les lignes qui suivent sont les commandes Ã  exÃ©cuter pour imprimer
 un fichier.
 
-Le caractŠre + de d‚but de ligne peut ˆtre modifi‚ par l'utilisateur
-en rempla‡ant le pointeur PC_BEG par un string au choix.
+Le caractÃ¨re + de dÃ©but de ligne peut Ãªtre modifiÃ© par l'utilisateur
+en remplaÃ§ant le pointeur PC_BEG par un string au choix.
 
-De mˆme, le s‚parateur peut ˆtre red‚fini en pla‡ant dans la
-variable PC_SEPS un pointeur vers la liste des caractŠres accept‚s comme
-s‚parateurs de champ.
+De mÃªme, le sÃ©parateur peut Ãªtre redÃ©fini en plaÃ§ant dans la
+variable PC_SEPS un pointeur vers la liste des caractÃ¨res acceptÃ©s comme
+sÃ©parateurs de champ.
 =======================================================================*/
 
 char **PC_list(filename, fld_nb, fld_select, fld_vals, maxparms)

@@ -1,19 +1,19 @@
 #include "scr.h"
 
 /* ======================================================================
-Imprime une PAGE Ö la position actuelle du curseur dans la page
-d'impression. Si la page contient un cadre, ce cadre est imprimÇ.
+Imprime une PAGE √† la position actuelle du curseur dans la page
+d'impression. Si la page contient un cadre, ce cadre est imprim√©.
 
 S'il n'y a pas assez de place restant sur la page courante, un saut de
-page est forcÇ.
+page est forc√©.
 
-Apräs l'impression de la PAGE, le curseur d'impression est placÇ dans la
-màme ligne, mais Ö droite de la PAGE imprimÇ.
+Apr√®s l'impression de la PAGE, le curseur d'impression est plac√© dans la
+m√™me ligne, mais √† droite de la PAGE imprim√©.
 
 &NO
-    La position de la PAGE dans l'Çcran (line et col) sont prises en
-    compte pour dÇcaler la page Ö l'impression. La fonction
-    PR_page_clf() rÇsoud ce probläme.
+    La position de la PAGE dans l'√©cran (line et col) sont prises en
+    compte pour d√©caler la page √† l'impression. La fonction
+    PR_page_clf() r√©soud ce probl√®me.
 &EX
     PR_page(pg1);
 &TX
@@ -70,18 +70,18 @@ PAGE *pg;
 
 
 /* ======================================================================
-Imprime une PAGE Ö la position actuelle du curseur + c colonnes dans la
-page d'impression. Si la page contient un cadre, ce cadre est imprimÇ.
+Imprime une PAGE √† la position actuelle du curseur + c colonnes dans la
+page d'impression. Si la page contient un cadre, ce cadre est imprim√©.
 
 S'il n'y a pas assez de place restant sur la page courante, un saut de
-page est forcÇ.
+page est forc√©.
 
-Apräs l'impression de la PAGE, le curseur d'impression est placÇ en
-premiäre colonne sous la PAGE imprimÇe.
+Apr√®s l'impression de la PAGE, le curseur d'impression est plac√© en
+premi√®re colonne sous la PAGE imprim√©e.
 
 &NO
-    La position de la PAGE dans l'Çcran (line et col) ne sont pas prises
-    en compte pour dÇcaler la page Ö l'impression. La fonction PR_page()
+    La position de la PAGE dans l'√©cran (line et col) ne sont pas prises
+    en compte pour d√©caler la page √† l'impression. La fonction PR_page()
     par contre les utilise.
 
 &EX

@@ -4,10 +4,10 @@
 #include "s_args.h"
 
 /* ===================================================================
-    V‚rifie que les strings pass‚s dans argv sont tous des noms de
+    VÃ©rifie que les strings passÃ©s dans argv sont tous des noms de
     fichiers existant.
-    Cette fonction peut ˆtre utilis‚e dans la d‚finition d'une structure
-    ADEF … passer comme argument … A_check().
+    Cette fonction peut Ãªtre utilisÃ©e dans la dÃ©finition d'une structure
+    ADEF Ã  passer comme argument Ã  A_check().
 
 &SA A_check()
 ======================================================================*/

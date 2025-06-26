@@ -3,14 +3,14 @@
 
 /* ====================================================================
 Ouvre une liste d'ISAM. Cette liste doit se terminer par un pointeur
-NULL. Lorsqu'un des fichiers ne peut ˆtre ouvert, un message est affich‚
-… l'‚cran et les fichiers d‚j… ouverts sont referm‚s.
+NULL. Lorsqu'un des fichiers ne peut Ãªtre ouvert, un message est affichÃ©
+Ã  l'Ã©cran et les fichiers dÃ©jÃ  ouverts sont refermÃ©s.
 
 La fonction fait pour chaque fichier l'appel suivant :
 &CO
 	IS_open(is, SCR_UPDATE, SCR_NO_LOCK);
 &TX
-&RT 0 en cas de succŠs, -1 sinon.
+&RT 0 en cas de succÃ¨s, -1 sinon.
 &EX
     if(IS_open_files(is_clients, is_produits, 0L) != 0)
 	return(-1);
@@ -53,7 +53,7 @@ ISAM    *is1, *is2, *is3, *is4, *is5, *is6, *is7, *is8, *is9, *is10;
 Ferme une liste de fichiers. La liste de pointeurs vers ISAM doit se
 terminer par un pointeur nul.
 
-La fonction fait appel … IS_close() pour chaque fichier.
+La fonction fait appel Ã  IS_close() pour chaque fichier.
 
 &EX
     IS_close_files(is_clients, is_produits, 0L);
@@ -83,19 +83,19 @@ ISAM    *is1, *is2, *is3, *is4, *is5, *is6, *is7, *is8, *is9, *is10;
 }
 
 /* ====================================================================
-V‚rifie que des ISAMS peuvent ˆtre ouverts en mise … jour. Tous les
-fichiers de la liste sont ouverts, puis ferm‚s. Les fichiers qui ne
-peuvent ˆtre ouverts sont indiqu‚s par un message.
+VÃ©rifie que des ISAMS peuvent Ãªtre ouverts en mise Ã  jour. Tous les
+fichiers de la liste sont ouverts, puis fermÃ©s. Les fichiers qui ne
+peuvent Ãªtre ouverts sont indiquÃ©s par un message.
 
-La fonction fait appel …
+La fonction fait appel Ã 
 &CO
 	IS_open(is, SCR_UPDATE, SCR_NO_LOCK)
 &TX
-pour ouvrir le fichier, puis …
+pour ouvrir le fichier, puis Ã 
 &CO
 	IS_close(is[i]);
 &TX
-&RT 0 en cas de succŠs, -1 sinon.
+&RT 0 en cas de succÃ¨s, -1 sinon.
 &EX
     if(IS_check_open(is1, is2, 0L)) return(-1);
 &TX

@@ -49,47 +49,47 @@ char    *fld_name;
 }
 
 /* ====================================================================
-Imprime le contenu d'un fichier en rempla‡ant les champs indiqu‚s
+Imprime le contenu d'un fichier en remplaÃ§ant les champs indiquÃ©s
 dans le fichier par des $nom ou ##nom par leur valeur dans une PAGE.
 
-Cette PAGE doit contenir le mot-cl‚ NAME_MEM pour que les noms des
-champs soient conserv‚s en m‚moire au run time, et donc utilisables
+Cette PAGE doit contenir le mot-clÃ© NAME_MEM pour que les noms des
+champs soient conservÃ©s en mÃ©moire au run time, et donc utilisables
 par la fonction PR_file.
 
-Les champs non trouv‚s dans la PAGE sont remplac‚s par le nom pr‚sent
+Les champs non trouvÃ©s dans la PAGE sont remplacÃ©s par le nom prÃ©sent
 dans le fichier.
 
-Les noms de champs sont pr‚c‚d‚s d'un $ ou d'un ##. Dans le premier cas
-le champ est extrait comme il est d‚fini dans la page. Dans le second cas,
-le texte du champ est stripp‚ (les blancs de fin ne sont pas imprim‚s).
+Les noms de champs sont prÃ©cÃ©dÃ©s d'un $ ou d'un ##. Dans le premier cas
+le champ est extrait comme il est dÃ©fini dans la page. Dans le second cas,
+le texte du champ est strippÃ© (les blancs de fin ne sont pas imprimÃ©s).
 
-Certaines variables ind‚pendantes de la PAGE de r‚f‚rence peuvent ‚galement
-ˆtre imprim‚es. Leur syntaxe est $.nom o— nom vaut :
+Certaines variables indÃ©pendantes de la PAGE de rÃ©fÃ©rence peuvent Ã©galement
+Ãªtre imprimÃ©es. Leur syntaxe est $.nom oÃ¹ nom vaut :
 
-&EN PG : num‚ro de la page courante
-&EN NB : num‚ro du record courant (dans le cas de PR_listing())
+&EN PG : numÃ©ro de la page courante
+&EN NB : numÃ©ro du record courant (dans le cas de PR_listing())
 &EN DATE : date en format dd-mm-yy
 &EN LDATE : date en format dd-mm-yyyy
 &EN TIME : heure
-&EN SUITE : mot (suite) … partir du second record, rien au premier
-&EN VERVOLG : mot (vervolg) … partir du second record, rien au premier
-&EN CNT : mot (cnt) … partir du second record, rien au premier
+&EN SUITE : mot (suite) Ã  partir du second record, rien au premier
+&EN VERVOLG : mot (vervolg) Ã  partir du second record, rien au premier
+&EN CNT : mot (cnt) Ã  partir du second record, rien au premier
 
 Pour imprimer un $, un \ ou un ##, il suffit de les doubler.
 
-Un saut de page forc‚ peut ˆtre obtenu par \f ou par le caractŠre Formfeed
+Un saut de page forcÃ© peut Ãªtre obtenu par \f ou par le caractÃ¨re Formfeed
 dans le fichier.
 
-Les attributs peuvent ˆtre modifi‚s par les caractŠres suivants
-(pr‚c‚d‚s de \, p.ex. \C) :
+Les attributs peuvent Ãªtre modifiÃ©s par les caractÃ¨res suivants
+(prÃ©cÃ©dÃ©s de \, p.ex. \C) :
 
 &EN B : bold
 &EN U : soulignement
-&EN C : condens‚
-&EN E : ‚largi
+&EN C : condensÃ©
+&EN E : Ã©largi
 &EN N : normal
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_file retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_file retourne -1. Sinon
     la fonction retourne 0
 
 &EX
@@ -110,35 +110,35 @@ PAGE    *pg;
 }
 
 /* ====================================================================
-Fonction semblable … PR_file() mais … caractŠre plus g‚n‚ral : elle
-permet d'ajouter trois paramŠtres lors de l'impression :
+Fonction semblable Ã  PR_file() mais Ã  caractÃ¨re plus gÃ©nÃ©ral : elle
+permet d'ajouter trois paramÃ¨tres lors de l'impression :
 
-&EN col qui indique en quelle colonne le texte d‚fini par le fichier
-    doit ˆtre imprim‚ (valable pour les ‚tiquettes)
+&EN col qui indique en quelle colonne le texte dÃ©fini par le fichier
+    doit Ãªtre imprimÃ© (valable pour les Ã©tiquettes)
 
-&EN nl qui indique le nombre de lignes maximum … imprimer (si ce nombre
+&EN nl qui indique le nombre de lignes maximum Ã  imprimer (si ce nombre
     vaut -1, il n'y a pas de limite). A nouveau, ceci est surtout utile
-    pour des ‚tiquettes
+    pour des Ã©tiquettes
 
-&EN first_ch permet de s‚lectionner les lignes … imprimer dans le fichier
-    filename. Seules les lignes qui commencent par ce caractŠre sont
-    imprim‚es (majuscules ou minuscules). Si ce caractŠre est nul, toutes
-    les lignes sont s‚lectionn‚es.
+&EN first_ch permet de sÃ©lectionner les lignes Ã  imprimer dans le fichier
+    filename. Seules les lignes qui commencent par ce caractÃ¨re sont
+    imprimÃ©es (majuscules ou minuscules). Si ce caractÃ¨re est nul, toutes
+    les lignes sont sÃ©lectionnÃ©es.
 
-Dans le cas o— first_ch est sp‚cifi‚, les lignes dont le premier
-caractŠre est identique … first_ch et est majuscule sont de toute
-fa‡on imprim‚es. Celle dont le premier cacactŠre est identique, mais
-en minuscule, ne sont imprim‚es que dans 2 cas : soit si aucun champ
-n'est pr‚sent dans cette ligne, soit si au moins un champ de la ligne
+Dans le cas oÃ¹ first_ch est spÃ©cifiÃ©, les lignes dont le premier
+caractÃ¨re est identique Ã  first_ch et est majuscule sont de toute
+faÃ§on imprimÃ©es. Celle dont le premier cacactÃ¨re est identique, mais
+en minuscule, ne sont imprimÃ©es que dans 2 cas : soit si aucun champ
+n'est prÃ©sent dans cette ligne, soit si au moins un champ de la ligne
 est non vide.
 
-Lorsque un des caractŠres verticaux semi-graphiques (simple ou double) ou
-le caractŠre de hachurage de mt, ou le caractŠre pipe (|) apparaissent
-dans une ligne, le pointeur d'impression est remplac‚ … cet endroit
-quelque soit la longueur des champs pr‚c‚dents.
+Lorsque un des caractÃ¨res verticaux semi-graphiques (simple ou double) ou
+le caractÃ¨re de hachurage de mt, ou le caractÃ¨re pipe (|) apparaissent
+dans une ligne, le pointeur d'impression est remplacÃ© Ã  cet endroit
+quelque soit la longueur des champs prÃ©cÃ©dents.
 
-Le caractŠre ampersand a le mˆme effet, mais n'est pas imprim‚ sauf s'il
-est doubl‚.
+Le caractÃ¨re ampersand a le mÃªme effet, mais n'est pas imprimÃ© sauf s'il
+est doublÃ©.
 
 La fonction
 &CO
@@ -149,7 +149,7 @@ vaut simplement
 	PR_file_col(filename, pg, 0, -1, 0)
 &TX
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_file retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_file retourne -1. Sinon
     la fonction retourne 0
 
 &EX

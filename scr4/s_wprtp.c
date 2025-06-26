@@ -2,12 +2,12 @@
 #include "scr4w.h"
 
 /* ======================================================================
-Edite les propriÇtÇs de l'imprimante PrinterName.
+Edite les propri√©t√©s de l'imprimante PrinterName.
 
 &EN PrinterName : pointeur vers le buffer qui contient le nom de
     l'imprimante.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 

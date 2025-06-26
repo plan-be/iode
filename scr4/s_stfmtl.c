@@ -1,18 +1,18 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Formatte un long l suivant un format fmt donn�. Le r�sultat out est
-un string transform� de longueur �gale � celle de fmt.
+Formatte un long l suivant un format fmt donné. Le résultat out est
+un string transformé de longueur égale à celle de fmt.
 
-Les caract�res reconnus dans le format sont : 'X', 'x', '9', '0'.
-Ils signifient qu'aux seules positions de ces caract�res seront plac�s
-dans leur ordre d'apparition les caract�res r�sultant du formattage
+Les caractéres reconnus dans le format sont : 'X', 'x', '9', '0'.
+Ils signifient qu'aux seules positions de ces caractéres seront placés
+dans leur ordre d'apparition les caractéres résultant du formattage
 de l.
 
-Seul cas particulier : le caract�re '0' qui sera remplac� par une '0' si
-le caract�re correspondant de in est ' '.
+Seul cas particulier : le caractére '0' qui sera remplacé par une '0' si
+le caractére correspondant de in est ' '.
 
-Les longueurs des strings ne sont pas v�rifi�es.
+Les longueurs des strings ne sont pas vérifiées.
 
 &RT le pointeur vers out
 &EX

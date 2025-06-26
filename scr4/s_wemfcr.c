@@ -75,43 +75,43 @@ HDC WprEMFCreatehDC(U_ch *filename, int w, int h, U_ch *pictname)
 
 /* ======================================================================
 Initialise un processus d'impression dans un fichier ou un handle en
-m‚moire de type Windows Enhanced MetaFile.
+mÃ©moire de type Windows Enhanced MetaFile.
 
-&EN filename = nom du fichier r‚sultat (l'extension EMF n'est pas ajout‚e
-    automatiquement) ou 0 pour cr‚er un EMF en m‚moire. Le handle sur le
-    EMF m‚moire sera retourn‚ dans ce cas par le fonction WprEMFEnd().
-    Cette valeur devra ˆtre lib‚r‚e par le programmeur
+&EN filename = nom du fichier rÃ©sultat (l'extension EMF n'est pas ajoutÃ©e
+    automatiquement) ou 0 pour crÃ©er un EMF en mÃ©moire. Le handle sur le
+    EMF mÃ©moire sera retournÃ© dans ce cas par le fonction WprEMFEnd().
+    Cette valeur devra Ãªtre libÃ©rÃ©e par le programmeur
     (DeleteEnhMetaFile(hEmf)).
 
-&EN w = largeur en mm de la fenˆtre de dessin. Les marges sont comprises
+&EN w = largeur en mm de la fenÃªtre de dessin. Les marges sont comprises
     dans cette largeur.
 
-&EN h = hauteur en mm de la fenˆtre de dessin. Les marges sont comprises
+&EN h = hauteur en mm de la fenÃªtre de dessin. Les marges sont comprises
     dans cette valeur.
 
-&EN pictname = nom du document (affich‚ dans le titre de la fenˆtre). Si
-    nul, il n'y a pas de nom associ‚.
+&EN pictname = nom du document (affichÃ© dans le titre de la fenÃªtre). Si
+    nul, il n'y a pas de nom associÃ©.
 
-La fonction cr‚e les diff‚rentes ressources n‚cessaires … l'impression
-et initialise toutes les variables n‚cessaires.
+La fonction crÃ©e les diffÃ©rentes ressources nÃ©cessaires Ã  l'impression
+et initialise toutes les variables nÃ©cessaires.
 
-&EN Cr‚e les BRUSHES
-&EN Cr‚e les PENS
-&EN fixe le font par d‚faut … Times 10 Pts
+&EN CrÃ©e les BRUSHES
+&EN CrÃ©e les PENS
+&EN fixe le font par dÃ©faut Ã  Times 10 Pts
 
-Les variables globales suivantes sont d‚finies par la fonction :
+Les variables globales suivantes sont dÃ©finies par la fonction :
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
 &EN int WprHORZRES : nombre de pixels en X
 &EN int WprVERTRES : nombre de pixels en Y
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 
 &SA WprPrinterInit(), WprWMFInit(), WprEMFEnd(), WscrEMFCreate()
 
-&NO Les sauts de pages ‚ventuels surchargent simplement le dessin,
-    une seule "page" ‚tant disponible.
+&NO Les sauts de pages Ã©ventuels surchargent simplement le dessin,
+    une seule "page" Ã©tant disponible.
 ========================================================================= */
 
 WprEMFInit(char *filename, int w, int h, U_ch *pictname)
@@ -137,40 +137,40 @@ WprEMFInit(char *filename, int w, int h, U_ch *pictname)
 
 /* ======================================================================
 Initialise un processus d'impression dans un fichier ou un handle en
-m‚moire de type Windows MetaFile.
+mÃ©moire de type Windows MetaFile.
 
-&EN filename = nom du fichier r‚sultat (l'extension WMF n'est pas ajout‚e
-    automatiquement) ou 0 pour cr‚er un WMF en m‚moire. Le handle sur le
-    WMF m‚moire sera retourn‚ dans ce cas par le fonction WprWMFEnd().
-    Cette valeur devra ˆtre lib‚r‚e par le programmeur
+&EN filename = nom du fichier rÃ©sultat (l'extension WMF n'est pas ajoutÃ©e
+    automatiquement) ou 0 pour crÃ©er un WMF en mÃ©moire. Le handle sur le
+    WMF mÃ©moire sera retournÃ© dans ce cas par le fonction WprWMFEnd().
+    Cette valeur devra Ãªtre libÃ©rÃ©e par le programmeur
     (DeleteMetaFile(hWmf)).
 
-&EN w = largeur en mm de la fenˆtre de dessin. Les marges sont comprises
+&EN w = largeur en mm de la fenÃªtre de dessin. Les marges sont comprises
     dans cette largeur.
 
-&EN h = hauteur en mm de la fenˆtre de dessin. Les marges sont comprises
+&EN h = hauteur en mm de la fenÃªtre de dessin. Les marges sont comprises
     dans cette valeur.
 
-La fonction cr‚e les diff‚rentes ressources n‚cessaires … l'impression
-et initialise toutes les variables n‚cessaires.
+La fonction crÃ©e les diffÃ©rentes ressources nÃ©cessaires Ã  l'impression
+et initialise toutes les variables nÃ©cessaires.
 
-&EN Cr‚e les BRUSHES
-&EN Cr‚e les PENS
-&EN fixe le font par d‚faut … Times 10 Pts
+&EN CrÃ©e les BRUSHES
+&EN CrÃ©e les PENS
+&EN fixe le font par dÃ©faut Ã  Times 10 Pts
 
-Les variables globales suivantes sont d‚finies par la fonction :
+Les variables globales suivantes sont dÃ©finies par la fonction :
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
 &EN int WprHORZRES : nombre de pixels en X
 &EN int WprVERTRES : nombre de pixels en Y
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 
 &SA WprPrinterInit(), WprEMFInit(), WprWMFEnd()
 
-&NO Les sauts de pages ‚ventuels surchargent simplement le dessin,
-    une seule "page" ‚tant disponible.
+&NO Les sauts de pages Ã©ventuels surchargent simplement le dessin,
+    une seule "page" Ã©tant disponible.
 ========================================================================= */
 
 WprWMFInit(char *filename, int w, int h)
@@ -182,11 +182,11 @@ WprWMFInit(char *filename, int w, int h)
 
 /* ======================================================================
 Termine le processus d'impression dans un Enhanced Windows MetaFile.
-Selon qu'un nom de fichier ait ‚t‚ fourni … la fonction
-d'initialisation, cr‚e un fichier ou retourne un handle vers un EMF en
-m‚moire.
+Selon qu'un nom de fichier ait Ã©tÃ© fourni Ã  la fonction
+d'initialisation, crÃ©e un fichier ou retourne un handle vers un EMF en
+mÃ©moire.
 
-On peut utiliser le handle retourn‚ pour un affichage dans une fenˆtre.
+On peut utiliser le handle retournÃ© pour un affichage dans une fenÃªtre.
 
 &EX
     #include <scr4w.h>
@@ -199,8 +199,8 @@ On peut utiliser le handle retourn‚ pour un affichage dans une fenˆtre.
     WscrEMFCreate(HMainWnd, 0L, hEmf);
 &TX
 
-La fenˆtre cr‚‚e par la fonction WscrEMFCreate() d‚truit le Handle hEmf
-lorsqu'on la quitte. L'utilisateur n'a donc pas … s'en pr‚occuper dans
+La fenÃªtre crÃ©Ã©e par la fonction WscrEMFCreate() dÃ©truit le Handle hEmf
+lorsqu'on la quitte. L'utilisateur n'a donc pas Ã  s'en prÃ©occuper dans
 le cas de l'exemple. Dans d'autres cas, il faut utiliser la fonction de
 l'API Win32
 
@@ -208,14 +208,14 @@ l'API Win32
     DeleteEnhMetaFile(hEmf);
 &TX
 
-pour lib‚rer le HANDLE hEmf.
+pour libÃ©rer le HANDLE hEmf.
 
 &RT
-&EN Si un fichier est cr‚‚, la valeur de retour est nulle
-&EN Si un handle est cr‚‚, la valeur de retour est ce handle
+&EN Si un fichier est crÃ©Ã©, la valeur de retour est nulle
+&EN Si un handle est crÃ©Ã©, la valeur de retour est ce handle
 
-La fonction libŠre l'espace allou‚ par les diff‚rentes ressources
-allou‚es.
+La fonction libÃ¨re l'espace allouÃ© par les diffÃ©rentes ressources
+allouÃ©es.
 
 &SA WprEMFInit(), WscrEMFCreate()
 ========================================================================= */
@@ -242,11 +242,11 @@ HENHMETAFILE WprEMFEnd()
 
 /* ======================================================================
 Termine le processus d'impression dans un Windows MetaFile. Selon qu'un
-nom de fichier ait ‚t‚ fourni … la fonction d'initialisation, cr‚e un
-fichier ou retourne un handle vers un WMF en m‚moire.
+nom de fichier ait Ã©tÃ© fourni Ã  la fonction d'initialisation, crÃ©e un
+fichier ou retourne un handle vers un WMF en mÃ©moire.
 
-L'extension .wmf est fix‚e pour le fichier r‚sultat (si un nom de
-fichier a ‚t‚ pass‚ … la fonction WprWMFInit().
+L'extension .wmf est fixÃ©e pour le fichier rÃ©sultat (si un nom de
+fichier a Ã©tÃ© passÃ© Ã  la fonction WprWMFInit().
 
 &EX
     #include <scr4w.h>
@@ -263,9 +263,9 @@ Il faut utiliser la fonction de l'API Win32
 &CO
     DeleteMetaFile(hWmf);
 &TX
-pour lib‚rer le HANDLE hWmf.
+pour libÃ©rer le HANDLE hWmf.
 
-On peut utiliser le handle retourn‚ pour un affichage dans une fenˆtre.
+On peut utiliser le handle retournÃ© pour un affichage dans une fenÃªtre.
 
 &EX
     #include <scr4w.h>
@@ -278,16 +278,16 @@ On peut utiliser le handle retourn‚ pour un affichage dans une fenˆtre.
     WscrWMFCreate(HMainWnd, 0L, hWmf);
 &TX
 
-La fenˆtre cr‚‚e par la fonction WscrWMFCreate() d‚truit automatiquement
-le Handle hWmf … la fin de son existence. L'utilisateur n'a donc pas …
-s'en pr‚occuper dans le cas de l'exemple.
+La fenÃªtre crÃ©Ã©e par la fonction WscrWMFCreate() dÃ©truit automatiquement
+le Handle hWmf Ã  la fin de son existence. L'utilisateur n'a donc pas Ã 
+s'en prÃ©occuper dans le cas de l'exemple.
 
 &RT
-&EN Si un fichier est cr‚‚, la valeur de retour est nulle
-&EN Si un handle est cr‚‚, la valeur de retour est ce handle
+&EN Si un fichier est crÃ©Ã©, la valeur de retour est nulle
+&EN Si un handle est crÃ©Ã©, la valeur de retour est ce handle
 
-La fonction libŠre l'espace allou‚ pour les diff‚rentes ressources
-n‚cessaires.
+La fonction libÃ¨re l'espace allouÃ© pour les diffÃ©rentes ressources
+nÃ©cessaires.
 
 &SA WprWMFInit()
 ========================================================================= */

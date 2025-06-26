@@ -21,12 +21,12 @@ int     flag;
 
 /* ====================================================================
 Vide la PAGE ou la TPAGES de son contenu en remettant toutes les valeurs
-des champs Ö leur valeur par dÇfaut. Ces valeurs sont 0 pour les champs
-numÇriques, date, etc, et vides pour les champs de type caractäre.
-Cependant, si une valeur par dÇfaut est dÇfinie pouru n champ donnÇ,
-c'est cette valeur qui y est placÇe.
+des champs √† leur valeur par d√©faut. Ces valeurs sont 0 pour les champs
+num√©riques, date, etc, et vides pour les champs de type caract√®re.
+Cependant, si une valeur par d√©faut est d√©finie pouru n champ donn√©,
+c'est cette valeur qui y est plac√©e.
 
-Apräs cette opÇration, la RESET_FN est exÇcutÇe, permettant de modifier
+Apr√®s cette op√©ration, la RESET_FN est ex√©cut√©e, permettant de modifier
 les valeurs en fonction du contexte.
 
 &SA PG_reset_all() et action PG_RESET
@@ -41,12 +41,12 @@ PAGE    *pg;
 
 /* ====================================================================
 Vide la PAGE ou la TPAGES de son contenu en remettant toutes les valeurs
-des champs Ö des valeurs vides ou nulles (Ö la diffÇrence de PG_reset()
-qui place les valeurs par dÇfaut s'il y en a). Ces valeurs sont 0 pour
-les champs numÇriques, date, etc, et vides pour les champs de type
-caractäre.
+des champs √† des valeurs vides ou nulles (√† la diff√©rence de PG_reset()
+qui place les valeurs par d√©faut s'il y en a). Ces valeurs sont 0 pour
+les champs num√©riques, date, etc, et vides pour les champs de type
+caract√®re.
 
-Apräs cette opÇration, la RESET_FN est exÇcutÇe, permettant de modifier
+Apr√®s cette op√©ration, la RESET_FN est ex√©cut√©e, permettant de modifier
 les valeurs en fonction du contexte.
 
 &SA PG_reset() et action PG_RESET

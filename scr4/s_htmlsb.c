@@ -6,25 +6,25 @@
 #endif
 
 /* ===================================================================
-Cette fonction balaie un ensemble de fichiers HTML, ‚ventuellement
-r‚cursivement et remplace des portions de chacun des fichiers par le
+Cette fonction balaie un ensemble de fichiers HTML, Ã©ventuellement
+rÃ©cursivement et remplace des portions de chacun des fichiers par le
 contenu du fichier replfile.
 
-&EN from = d‚limiteur de d‚but de section
-&EN to = d‚limiteur de fin de section
-&EN replfile = fichier rempla‡ant la section
-&EN files = fichier … balayer (avec * ou ? ‚ventuellement). Ce nom peut
-    ‚galement ˆtre celui d'un directory.
+&EN from = dÃ©limiteur de dÃ©but de section
+&EN to = dÃ©limiteur de fin de section
+&EN replfile = fichier remplaÃ§ant la section
+&EN files = fichier Ã  balayer (avec * ou ? Ã©ventuellement). Ce nom peut
+    Ã©galement Ãªtre celui d'un directory.
 
 &EN Recursive = traitement des fichiers dans les sous-directories
 
 &EN Backup = prise d'un backup pour chaque fichier avant traitement. Si
     c'est la cas, le fichier backup a pour extension .bak.
 
-&EN Silent = 0 pour ‚viter un message par fichier, 1 sinon
+&EN Silent = 0 pour Ã©viter un message par fichier, 1 sinon
 
-Cette fonction est utilis‚e par exemple pour remplacer des barres de
-navigations de fa‡on automatique, typiquement de la fa‡on suivante :
+Cette fonction est utilisÃ©e par exemple pour remplacer des barres de
+navigations de faÃ§on automatique, typiquement de la faÃ§on suivante :
 
 &CO
     HtmlReplace("<!STARTHEADER>", "<!ENDHEADER>", "head.ht1",
@@ -68,11 +68,11 @@ et foot.ht1:
     <!ENDFOOTER>
 &TX
 
-Le traitement continue tant que cela est possible, mˆme si certains
-fichiers ne peuvent ˆtre ouverts.
+Le traitement continue tant que cela est possible, mÃªme si certains
+fichiers ne peuvent Ãªtre ouverts.
 
 &RT
-&EN 0 en cas de succŠs,
+&EN 0 en cas de succÃ¨s,
 &EN -1 en cas d'erreur(s)
 
 &SA HtmlSplit(), HtmlToc(), HtmlMessage()

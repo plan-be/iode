@@ -2,28 +2,28 @@
 #include <string.h>
 
 /* ====================================================================
-Cette fonction est … exploiter en connexion avec le programme scr4_app.
-Elle positionne le pointeur d‚crit par le FILE descriptor fd au d‚but
-des donn‚es concat‚n‚es en fin de fichier.
+Cette fonction est Ã  exploiter en connexion avec le programme scr4_app.
+Elle positionne le pointeur dÃ©crit par le FILE descriptor fd au dÃ©but
+des donnÃ©es concatÃ©nÃ©es en fin de fichier.
 
-fd d‚crit le fichier (qui doit ˆtre ouvert en lecture) et n est le
-nombre de fichiers concat‚n‚s qui doivent ˆtre saut‚s.
+fd dÃ©crit le fichier (qui doit Ãªtre ouvert en lecture) et n est le
+nombre de fichiers concatÃ©nÃ©s qui doivent Ãªtre sautÃ©s.
 
-Ainsi, si on a ajout‚ 3 fichiers au fichier data, soient f1 f2 et f3, il
+Ainsi, si on a ajoutÃ© 3 fichiers au fichier data, soient f1 f2 et f3, il
 faut, pour trouver la position de f1 utiliser la fonction avec le
-paramŠtre 3, pour f2, avec le paramŠtre 2, pour f3 avec le paramŠtre 1.
+paramÃ¨tre 3, pour f2, avec le paramÃ¨tre 2, pour f3 avec le paramÃ¨tre 1.
 
-Au retour de la fonction, fd est positionn‚ sur le d‚but des donn‚es.
+Au retour de la fonction, fd est positionnÃ© sur le dÃ©but des donnÃ©es.
 
-Si n est nul, le fichier est repositionn‚ au d‚but et la fonction
+Si n est nul, le fichier est repositionnÃ© au dÃ©but et la fonction
 retourne 0.
 
-&RT position (long) de l'ensemble n de donn‚es dans le fichier, ou
-    -1 si fd est nul ou que le "magic number" n'est pas trouv‚
-    en tˆte du fichier concat‚n‚.
+&RT position (long) de l'ensemble n de donnÃ©es dans le fichier, ou
+    -1 si fd est nul ou que le "magic number" n'est pas trouvÃ©
+    en tÃªte du fichier concatÃ©nÃ©.
 
 &EX
-    1. Cr‚ation des donn‚es
+    1. CrÃ©ation des donnÃ©es
     -----------------------
     scr4_app myprog.exe data1
     scr4_app myprog.exe data2
@@ -70,28 +70,28 @@ fin:
 }
 
 /* ====================================================================
-Cette fonction est … exploiter en connexion avec le programme scr4_app.
-Elle calcule la taille d'un fichier concat‚n‚.
+Cette fonction est Ã  exploiter en connexion avec le programme scr4_app.
+Elle calcule la taille d'un fichier concatÃ©nÃ©.
 
-fd d‚crit le fichier (qui doit ˆtre ouvert en lecture) et n est le
-nombre de fichiers concat‚n‚s qui doivent ˆtre saut‚s.
+fd dÃ©crit le fichier (qui doit Ãªtre ouvert en lecture) et n est le
+nombre de fichiers concatÃ©nÃ©s qui doivent Ãªtre sautÃ©s.
 
-Ainsi, si on a ajout‚ 3 fichiers au fichier data, soient f1 f2 et f3, il
+Ainsi, si on a ajoutÃ© 3 fichiers au fichier data, soient f1 f2 et f3, il
 faut, pour trouver la taille, de f1 utiliser la fonction avec le
-paramŠtre 3, pour f2, avec le paramŠtre 2, pour f3 avec le paramŠtre 1.
+paramÃ¨tre 3, pour f2, avec le paramÃ¨tre 2, pour f3 avec le paramÃ¨tre 1.
 
-Au retour de la fonction, fd est positionn‚ au d‚but des donn‚es
+Au retour de la fonction, fd est positionnÃ© au dÃ©but des donnÃ©es
 correspondant au fichier n.
 
-Si n est nul, le fichier est repositionn‚ au d‚but et la fonction
+Si n est nul, le fichier est repositionnÃ© au dÃ©but et la fonction
 retourne 0.
 
-&RT taille (long) de l'ensemble n de donn‚es dans le fichier, ou
-    -1 si fd est nul ou que le "magic number" n'est pas trouv‚
-    en tˆte du fichier concat‚n‚.
+&RT taille (long) de l'ensemble n de donnÃ©es dans le fichier, ou
+    -1 si fd est nul ou que le "magic number" n'est pas trouvÃ©
+    en tÃªte du fichier concatÃ©nÃ©.
 
 &EX
-    1. Cr‚ation des donn‚es
+    1. CrÃ©ation des donnÃ©es
     -----------------------
     scr4_app myprog.exe data1
     scr4_app myprog.exe data2

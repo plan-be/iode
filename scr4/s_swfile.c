@@ -35,8 +35,8 @@ int     SW_HANDLE = -1;
 extern  char    *getenv(const char*);
 
 /*NH*/
-/*  Cr�ation du fichier de swap : la varaible d'environnement SWAPFILE
-    contient le nom du disque et du fichier � utiliser.
+/*  Création du fichier de swap : la varaible d'environnement SWAPFILE
+    contient le nom du disque et du fichier à utiliser.
 */
 
 SW_open()

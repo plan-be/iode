@@ -155,7 +155,7 @@ A2MGRF *go;
 /*NH*/
 A2mGIFEnd()
 {
-    /* Interlacé */
+    /* InterlacÃ© */
     if(A2M_GIF_INTER)
 	gdImageInterlace(GIF_im, 1);
     /* Write GIF */
@@ -205,7 +205,7 @@ U_ch    *a2mfile, *outfile;
     return(rc);
 }
 
-/* reçoit un objet graphique et un nom de fichier output */
+/* reÃ§oit un objet graphique et un nom de fichier output */
 int A2mGIF_HTML(A2MGRF *go, U_ch* filename)
 {
     int rc=0;
@@ -331,7 +331,7 @@ int props;
     else return(style);
 }
 
-A2mGIFGrfLine(axis, x1, y1, x2, y2, props)  // unités en points
+A2mGIFGrfLine(axis, x1, y1, x2, y2, props)  // unitÃ©s en points
 double  x1, y1, x2, y2;
 int     axis, props;
 {

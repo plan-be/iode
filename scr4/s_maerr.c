@@ -3,8 +3,8 @@
 
 /* ====================================================================
 Gestion des messages d'erreur: la fonction retourne un pointeur sur
-le dernier message d'erreur d‚sign‚ par la variable globale M_errno.
-La variable globale M_errno est ensuite r‚initialis‚e … 0 (no error).
+le dernier message d'erreur dÃ©signÃ© par la variable globale M_errno.
+La variable globale M_errno est ensuite rÃ©initialisÃ©e Ã  0 (no error).
 
 &RT Pointeur char* sur le dernier message d'erreur.
 

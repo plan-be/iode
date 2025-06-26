@@ -2,7 +2,7 @@
 /* ====================================================================
 Retourne la position d'un string sstr dans le string str.
 
-&RT la position du premier caractäre s'il est trouvÇ, -1 sinon.
+&RT la position du premier caract√®re s'il est trouv√©, -1 sinon.
 &EX
     U_index("filename.txt", ".txt")
 	vaut

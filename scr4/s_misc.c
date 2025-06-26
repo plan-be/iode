@@ -4,11 +4,11 @@
 
 
 /* ====================================================================
-Retourne un attribut (en principe) inverse de celui pass‚ comme
+Retourne un attribut (en principe) inverse de celui passÃ© comme
 argument. Ainsi, REVERSE devient BOLD, et tout autre attribut devient
 REVERSE.
 
-&RT L'attribut invers‚
+&RT L'attribut inversÃ©
 &SA SCR_dim_attr()
 =======================================================================*/
 SCR_invert_attr(attr)
@@ -22,14 +22,14 @@ int     attr;
 }
 
 /* ====================================================================
-Fonction de modification d'attribut (diminution d'intensit‚) :
+Fonction de modification d'attribut (diminution d'intensitÃ©) :
 
 &EN SCR_REVERSE devient SCR_YELLOW
 &EN SCR_YELLOW  devient SCR_REVERSE
 &EN SCR_BOLD    devient SCR_DEFAULT
 &EN les autres deviennent SCR_BOLD
 
-&RT L'attribut diminu‚
+&RT L'attribut diminuÃ©
 &SA SCR_invert_attr()
 =======================================================================*/
 

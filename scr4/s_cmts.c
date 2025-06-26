@@ -7,9 +7,9 @@ int     SCR_scmt_keys[SCR_SCMT_MAX];
 char    *SCR_scmt_txts[SCR_SCMT_MAX];
 
 /* ====================================================================
-D‚finit le texte du commentaire.
+DÃ©finit le texte du commentaire.
 
-Si txt est NULL, le commentaire annul‚ est effac‚.
+Si txt est NULL, le commentaire annulÃ© est effacÃ©.
 &EX
     SCR_scmt_txt("F3=Quitter F10=Sauver");
 &TX
@@ -24,8 +24,8 @@ char    *txt;
 }
 
 /* ====================================================================
-LibŠre l'espace allou‚ par des appels pr‚c‚dents … SCR_scmt_add_key().
-Cette fonction est appel‚e par SCR_comment().
+LibÃ¨re l'espace allouÃ© par des appels prÃ©cÃ©dents Ã  SCR_scmt_add_key().
+Cette fonction est appelÃ©e par SCR_comment().
 
 &SA SCR_scmt_txt(), SCR_scmt_display(), SCR_scmt_add_key()
 ======================================================================= */
@@ -40,11 +40,11 @@ SCR_scmt_free()
 }
 
 /* ====================================================================
-Ajoute une touche fonction dans la liste des touches d‚finies. A cette
-touche peut ˆtre associ‚ un commentaire.
+Ajoute une touche fonction dans la liste des touches dÃ©finies. A cette
+touche peut Ãªtre associÃ© un commentaire.
 
 La fonction SCR_scmt_display() affiche le commentaire courant et
-exploite les infos d‚finies par SCR_scmt_add_key pour afficher
+exploite les infos dÃ©finies par SCR_scmt_add_key pour afficher
 en video inverse le texte des touches fonctions.
 
 La fonction SCR_scmt_menu() affiche les touches sous forme d'un
@@ -70,11 +70,11 @@ char    *txt;
 }
 
 /* ====================================================================
-D‚finit la table de touches fonctions et de commentaires structur‚s.
-La table doit ˆtre termin‚e par un 0.
+DÃ©finit la table de touches fonctions et de commentaires structurÃ©s.
+La table doit Ãªtre terminÃ©e par un 0.
 
 La fonction SCR_scmt_display() affiche le commentaire courant et
-exploite les infos d‚finies par SCR_scmt_add_keys pour afficher
+exploite les infos dÃ©finies par SCR_scmt_add_keys pour afficher
 en video inverse le texte des touches fonctions.
 
 La fonction SCR_scmt_menu() affiche les touches sous forme d'un
@@ -159,7 +159,7 @@ char    *txt, *buf;
 
 /*NH
     Calcule les positions et les longueurs des champs.
-    Retourne le nombre affichable dans la fenˆtre de comment.
+    Retourne le nombre affichable dans la fenÃªtre de comment.
 */
 
 SCR_scmt_lgs_pos(lgs, pos)

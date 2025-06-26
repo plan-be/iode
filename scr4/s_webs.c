@@ -1,65 +1,65 @@
 /*NH JMP 2/8/2014
 
 TODO
-    !!! UTF-8 !!! Message => fichiers SCR en UTF-8 ou codage des ‚changes en UTF-8 ?
+    !!! UTF-8 !!! Message => fichiers SCR en UTF-8 ou codage des Ã©changes en UTF-8 ?
 	WebSocket connection to 'ws://localhost:12346/' failed:
 	Could not decode a text frame as UTF-8.
   X disconnect
     binary data
     ping / pong
-    link scr act_functions => ex‚cutable sp‚cifique
+    link scr act_functions => exÃ©cutable spÃ©cifique
   X cleanup code
   X sha1 -> scr + doc
     struct / client instead of globals (for threads)
     replacer WSock* par fns de base
-    int‚grer dans s4issrv avec primitives JS  :
+    intÃ©grer dans s4issrv avec primitives JS  :
 	load objs, init_database, link pg -> html, ...
 */
 
 /*
 WcrWebSockets : server WebSockets
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Ce groupe de fonctions impl‚mente en C une version limit‚e des "WebSockets".
-Il s'agit de d‚finir, du cot‚ serveur, les fonctions minimales permettant de g‚rer de maniŠre suffisante un serveur websocket.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Ce groupe de fonctions implÃ©mente en C une version limitÃ©e des "WebSockets".
+Il s'agit de dÃ©finir, du cotÃ© serveur, les fonctions minimales permettant de gÃ©rer de maniÃ¨re suffisante un serveur websocket.
 
-&TI Int‚rˆt des WebSockets
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Contrairement … Ajax, les WebSockets permettent de cr‚er une connexion full duplex entre un client et un serveur. DŠs que la connexion est ‚tablie, le contexte cot‚ serveur reste actif en permanence et la performance de ce type de serveur, en tout cas du point de vue du client, est beaucoup plus grande que ce qui peut ˆtre imagin‚ … travers l'impl‚mentation du protocole stateless comme http qui n‚cessite une reconnexion … chaque nouvelle requˆte.
+&TI IntÃ©rÃªt des WebSockets
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Contrairement Ã  Ajax, les WebSockets permettent de crÃ©er une connexion full duplex entre un client et un serveur. DÃ¨s que la connexion est Ã©tablie, le contexte cotÃ© serveur reste actif en permanence et la performance de ce type de serveur, en tout cas du point de vue du client, est beaucoup plus grande que ce qui peut Ãªtre imaginÃ© Ã  travers l'implÃ©mentation du protocole stateless comme http qui nÃ©cessite une reconnexion Ã  chaque nouvelle requÃªte.
 
-Dans le cadre de SCR/AL1,  il est parfaitement concevable de d‚marrer c“t‚ serveur une application qui charge en m‚moire l'ensemble des objets d'une application, utilise toutes les fonctionnalit‚s d'SCR/AL1, notamment les actions, pour alimenter une page ou un isam, et d'exporter les r‚sultats … l'int‚rieur mˆme du browser.
+Dans le cadre de SCR/AL1,  il est parfaitement concevable de dÃ©marrer cÃ´tÃ© serveur une application qui charge en mÃ©moire l'ensemble des objets d'une application, utilise toutes les fonctionnalitÃ©s d'SCR/AL1, notamment les actions, pour alimenter une page ou un isam, et d'exporter les rÃ©sultats Ã  l'intÃ©rieur mÃªme du browser.
 
-&TI Impl‚mentation
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Le programmeur peut se contenter d'appeler une fonction d'initialisation du serveur, fonction … laquelle il devra passer un pointeur vers la fonction qui impl‚mente r‚ellement les fonctionnalit‚s du c“t‚ du serveur. Cette fonction re‡oit deux arguments :
-&EN char * qui repr‚sente ce qui ‚tait envoy‚ par le client au serveur et
-&EN char ** qui contient le r‚sultat allou‚ de la commande.
+&TI ImplÃ©mentation
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Le programmeur peut se contenter d'appeler une fonction d'initialisation du serveur, fonction Ã  laquelle il devra passer un pointeur vers la fonction qui implÃ©mente rÃ©ellement les fonctionnalitÃ©s du cÃ´tÃ© du serveur. Cette fonction reÃ§oit deux arguments :
+&EN char * qui reprÃ©sente ce qui Ã©tait envoyÃ© par le client au serveur et
+&EN char ** qui contient le rÃ©sultat allouÃ© de la commande.
 
-Deux cas doivent ˆtre distingu‚s : serveur multiprocess, serveur multithread.
+Deux cas doivent Ãªtre distinguÃ©s : serveur multiprocess, serveur multithread.
 
-Dans les deux cas une mˆme fonction va ˆtre appel‚e. Cette fonction, WscrWebSocketServerInit(), aura comme paramŠtres :
+Dans les deux cas une mÃªme fonction va Ãªtre appelÃ©e. Cette fonction, WscrWebSocketServerInit(), aura comme paramÃ¨tres :
 
 &EN la fonction utilisateur principale
-&EN le port d'‚coute
-&EN le nom du process … lancer s'il s'agit d'un serveur multi-process, NULL pour le cas des serveurs multi-thread.
+&EN le port d'Ã©coute
+&EN le nom du process Ã  lancer s'il s'agit d'un serveur multi-process, NULL pour le cas des serveurs multi-thread.
 
-Il faut bien noter qu'une bonne partie des variables d‚finies dans le cadre des websockets sont des variables globales. Il est donc souvent plus appropri‚ de travailler avec un serveur multiprocess qu'avec un serveur multithread.
+Il faut bien noter qu'une bonne partie des variables dÃ©finies dans le cadre des websockets sont des variables globales. Il est donc souvent plus appropriÃ© de travailler avec un serveur multiprocess qu'avec un serveur multithread.
 
-Dans le cas du serveur multiprocesseur, une fonction suppl‚mentaire sera appel‚e, mais uniquement dans le cas o— le socket est d‚j… cr‚‚ par l'appel d'un client au serveur. Cette fonction, WscrWebSocketInstanceInit(), cr‚er une instance du process qui sera … l'‚coute et qui r‚pondra … toutes les requˆtes du client. Elle prend comme paramŠtre le socket ouvert et le pointeur de fonction serveur.
+Dans le cas du serveur multiprocesseur, une fonction supplÃ©mentaire sera appelÃ©e, mais uniquement dans le cas oÃ¹ le socket est dÃ©jÃ  crÃ©Ã© par l'appel d'un client au serveur. Cette fonction, WscrWebSocketInstanceInit(), crÃ©er une instance du process qui sera Ã  l'Ã©coute et qui rÃ©pondra Ã  toutes les requÃªtes du client. Elle prend comme paramÃ¨tre le socket ouvert et le pointeur de fonction serveur.
 
 &EN int WscrWebSocketServerInit(int (*fn)(U_ch *, U_ch **), int port, char *progname)
 &EN int WscrWebSocketInstanceInit(int sock, int (*fn)(U_ch *, U_ch **))
 
 &TI Fonction serveur
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-La fonction serveur prend de paramŠtres et retourne un entier :
-&EN  le premier paramŠtre est un pointeur vers le string envoy‚ par les clients aux serveurs
-&EN le second paramŠtre est un charrette l'‚toile allou‚e par la fonction et qui sera renvoy‚ comme r‚ponse au client.  Ce pointeur est automatiquement lib‚r‚ par la fonction appelante.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+La fonction serveur prend de paramÃ¨tres et retourne un entier :
+&EN  le premier paramÃ¨tre est un pointeur vers le string envoyÃ© par les clients aux serveurs
+&EN le second paramÃ¨tre est un charrette l'Ã©toile allouÃ©e par la fonction et qui sera renvoyÃ© comme rÃ©ponse au client.  Ce pointeur est automatiquement libÃ©rÃ© par la fonction appelante.
 
-Lorsque cette fonction retourne une valeur n‚gative le serveur est ferm‚. Dans tous les autres cas la boucle se poursuit.
+Lorsque cette fonction retourne une valeur nÃ©gative le serveur est fermÃ©. Dans tous les autres cas la boucle se poursuit.
 
 &IT Exemple
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-l'exemple qui suit propose une impl‚mentation d'un serveur fonctionnant selon le choix de l'utilisateur en mode multiprocess ou en mode multi-thread.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+l'exemple qui suit propose une implÃ©mentation d'un serveur fonctionnant selon le choix de l'utilisateur en mode multiprocess ou en mode multi-thread.
 
 &CO
 main(argc, argv)
@@ -78,11 +78,11 @@ char    *argv[];
     }
 
     if(sock < 0) {
-	// D‚marrage du serveur : attente de connexion avant fork ou thread
+	// DÃ©marrage du serveur : attente de connexion avant fork ou thread
 	rc = WscrWebSocketServerInit(MyWebSocketFn, port, (TOrP ? argv[0] : NULL));
     }
     else {
-	// Connexion ‚tablie, lancement de la fonction WebSocket()
+	// Connexion Ã©tablie, lancement de la fonction WebSocket()
 	Debug("\n*** Starting server instance - pid=%d - sock = %d\n", getpid(), sock);
 	rc = WscrWebSocketInstanceInit(sock, MyWebSocketFn);
     }
@@ -92,9 +92,9 @@ char    *argv[];
 
 &TX
 
-&TI Impl‚mentation c“t‚ client
-ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Le protocole websocket est d‚fini … peu prŠs dans tous les browsers.  L'exemple qui suit montre comment se connecter … un serveur, puis envoyer des commandes et recevoir des r‚ponses du serveur.  Il est th‚oriquement possible de cr‚er un client websocket penser. L'int‚rˆt d'une telle fonctionnalit‚ semble limit‚ dans la mesure o— le but principal est pr‚cis‚ment de pouvoir utiliser des fonctions ‚crites en C ou les autres langages directement … travers un browser.
+&TI ImplÃ©mentation cÃ´tÃ© client
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Le protocole websocket est dÃ©fini Ã  peu prÃ¨s dans tous les browsers.  L'exemple qui suit montre comment se connecter Ã  un serveur, puis envoyer des commandes et recevoir des rÃ©ponses du serveur.  Il est thÃ©oriquement possible de crÃ©er un client websocket penser. L'intÃ©rÃªt d'une telle fonctionnalitÃ© semble limitÃ© dans la mesure oÃ¹ le but principal est prÃ©cisÃ©ment de pouvoir utiliser des fonctions Ã©crites en C ou les autres langages directement Ã  travers un browser.
 
 
 &CO
@@ -349,7 +349,7 @@ int WscrWebSocketMsg(U_ch *msg, int opcode)
     long    len;
     U_ch    lenbytes[10];
 
-    // Alloue la taille pour le r‚sultat
+    // Alloue la taille pour le rÃ©sultat
     len = strlen(msg);
     SCR_free(WEBS_RESPONSE);
     WEBS_RESPONSE = SCR_malloc(len + 10);
@@ -522,7 +522,7 @@ int WscrWebSocketLoop(int sock) {
 /* =================================================================================
 Fonction principale de lancement d'un serveur WebSocket.
 &EN attend une connexion sur un port (dft 5557)
-&EN d‚marre un nouveau process ou un nouveau thread selon le choix.
+&EN dÃ©marre un nouveau process ou un nouveau thread selon le choix.
 
 &EN int (*fn)(U_ch *, U_ch **) = function called at each incoming request from the client
 &EN port = connection port
@@ -537,7 +537,7 @@ int WscrWebSocketServerInit(int (*fn)(U_ch *, U_ch **), int port, char *progname
 
     if(port <= 0) port = 5557;
 
-    // D‚marrage du serveur : attente de connexion
+    // DÃ©marrage du serveur : attente de connexion
     Debug("\n*** Starting Server - pid=%d\n", getpid());
 
     if(progname) {
@@ -558,14 +558,14 @@ int WscrWebSocketServerInit(int (*fn)(U_ch *, U_ch **), int port, char *progname
 /* =================================================================================
 Version multi-process de WscrWebServer.
 
-D‚marre une instance d'un sous process WebSocket lanc‚ par WscrWebSocketServerInit().
-La connexion a d‚j… ‚t‚ ‚tablie et ce process prend en charge,
-… travers la fonction fn(), la gestion des requests du client.
+DÃ©marre une instance d'un sous process WebSocket lancÃ© par WscrWebSocketServerInit().
+La connexion a dÃ©jÃ  Ã©tÃ© Ã©tablie et ce process prend en charge,
+Ã  travers la fonction fn(), la gestion des requests du client.
 
-Cette fonction doit ˆtre appel‚e dans le main() lorsque le paramŠtre -s socknb est pass‚.
+Cette fonction doit Ãªtre appelÃ©e dans le main() lorsque le paramÃ¨tre -s socknb est passÃ©.
 
 &EN fn(U_ch *, U_ch **) = function called at each request from client
-&EN sock = socket connect‚
+&EN sock = socket connectÃ©
 ------------------------------------------------------------------------------------ */
 
 int WscrWebSocketInstanceInit(int sock, int (*fn)(U_ch *, U_ch **))

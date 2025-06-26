@@ -2,7 +2,7 @@
 
 /* ======================================================================
 Cette fonction modifie la taille de la page d'impression d'un
-PRINTER. Cette fonction ne peut ˆtre utilis‚e en cours d'utilisation
+PRINTER. Cette fonction ne peut Ãªtre utilisÃ©e en cours d'utilisation
 du PRINTER!
 
 &EX

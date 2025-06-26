@@ -2,19 +2,19 @@
 
 
 /* ====================================================================
-Effectue des opÇrations de base sur une colonne d'une matrice.
+Effectue des op√©rations de base sur une colonne d'une matrice.
 
-Les opÇrations sont '+', '*', 'm' ou 's', soit l'addition, le produit, la
-moyenne et l'Çcart-type estimÇ des ÇlÇments de la colonne.
+Les op√©rations sont '+', '*', 'm' ou 's', soit l'addition, le produit, la
+moyenne et l'√©cart-type estim√© des √©l√©ments de la colonne.
 
-On passe en paramätre un pointeur sur la matrice Ö traiter, l'indice de la
-colonne et l'opÇrateur.
+On passe en param√®tre un pointeur sur la matrice √† traiter, l'indice de la
+colonne et l'op√©rateur.
 &RT
 La fonction retourne un MREAL.
 
-Si m1 est nul, la variable globale est positionnÇe et la fonction retourne
-0.0. Il en va de màme pour le calcul de l'Çcart type pour une matrice d'une
-seule ligne ou lorsque l'opÇrateur n'est pas connu.
+Si m1 est nul, la variable globale est positionn√©e et la fonction retourne
+0.0. Il en va de m√™me pour le calcul de l'√©cart type pour une matrice d'une
+seule ligne ou lorsque l'op√©rateur n'est pas connu.
 
 &EX
     M_cstat(m3, 2, 's');
@@ -72,19 +72,19 @@ int op;
 
 
 /* ====================================================================
-Effectue des opÇrations de base sur une ligne d'une matrice.
+Effectue des op√©rations de base sur une ligne d'une matrice.
 
-Les opÇrations sont '+', '*', 'm' ou 's', soit l'addition, le produit, la
-moyenne et l'Çcart-type estimÇ des ÇlÇments de la ligne.
+Les op√©rations sont '+', '*', 'm' ou 's', soit l'addition, le produit, la
+moyenne et l'√©cart-type estim√© des √©l√©ments de la ligne.
 
-On passe en paramätre un pointeur sur la matrice Ö traiter, l'indice de la
-ligne et l'opÇrateur.
+On passe en param√®tre un pointeur sur la matrice √† traiter, l'indice de la
+ligne et l'op√©rateur.
 &RT
 La fonction retourne un MREAL.
 
-Si m1 est nul, la variable globale est positionnÇe et la fonction retourne
-0.0. Il en va de màme pour le calcul de l'Çcart type pour une matrice d'une
-seule colonne ou lorsque l'opÇrateur n'est pas connu.
+Si m1 est nul, la variable globale est positionn√©e et la fonction retourne
+0.0. Il en va de m√™me pour le calcul de l'√©cart type pour une matrice d'une
+seule colonne ou lorsque l'op√©rateur n'est pas connu.
 
 &EX
     M_lstat(m3, 2, 's');

@@ -2,30 +2,30 @@
 
 
 /* ====================================================================
-Calcul du dÇterminant d'une matrice m1 carrÇe nl1 x nc1 par la mÇthode
+Calcul du d√©terminant d'une matrice m1 carr√©e nl1 x nc1 par la m√©thode
 de balayage.
 
 &CO
     Soit la matrice A(aij); i,j: 1...n.
-    On calcule procäde Ö la triangulation:
+    On calcule proc√®de √† la triangulation:
 
 		    P = amm                m := 2...n
 		    q = aim / P            i := 1...m-1
 		    aij = aij - q * amj    i := 1...m-1
 
     On obtient aij = 0 pour i < j.
-    Le dÇterminant est calculÇ par det = a11 * a22 * ... * ann.
-    Pendant tout le calcul, P <> 0, sinon la mÇthode n'est pas
+    Le d√©terminant est calcul√© par det = a11 * a22 * ... * ann.
+    Pendant tout le calcul, P <> 0, sinon la m√©thode n'est pas
     applicable.
 &TX
 
 &RT
 Si m1 est nul ou de dimension incorrecte, la fonction retourne 0 et
-la variable M_errno est positionnÇe. Sinon la fonction retourne la valeur
-(MREAL) du dÇterminant.
-Si la martice n'est pas rÇguliäre, la variable M_errno est positionnÇe et
+la variable M_errno est positionn√©e. Sinon la fonction retourne la valeur
+(MREAL) du d√©terminant.
+Si la martice n'est pas r√©guli√®re, la variable M_errno est positionn√©e et
 la fonction retourne un (MREAL) nul.
-La matrice source n'est pas modifiÇe.
+La matrice source n'est pas modifi√©e.
 
 &EX
     value = M_det_1(m1);
@@ -98,16 +98,16 @@ MREAL    *det;
 
 
 /* ====================================================================
-Calcul du dÇterminant d'une matrice m1 carrÇe nl1 x nc1 par la mÇthode
+Calcul du d√©terminant d'une matrice m1 carr√©e nl1 x nc1 par la m√©thode
 du pivot.
 
 &RT
 Si m1 est nul ou de dimension incorrecte, la fonction retourne 0 et
-la variable M_errno est positionnÇe. Sinon la fonction retourne la valeur
-(MREAL) du dÇterminant.
-Si la martice n'est pas rÇguliäre, la variable M_errno est positionnÇe et
+la variable M_errno est positionn√©e. Sinon la fonction retourne la valeur
+(MREAL) du d√©terminant.
+Si la martice n'est pas r√©guli√®re, la variable M_errno est positionn√©e et
 la fonction retourne un (MREAL) nul.
-La matrice est modifiÇe.
+La matrice est modifi√©e.
 
 &EX
     value = M_det_2(m1);

@@ -2,14 +2,14 @@
 #include "s_strs.h"
 
 /* =================================================================
-Lit et alloue un string dans le fichier d‚crit par fd. Ce fichier a ‚t‚
-pr‚alablement construit … l'aide des fonctions SCR_Dump*().
+Lit et alloue un string dans le fichier dÃ©crit par fd. Ce fichier a Ã©tÃ©
+prÃ©alablement construit Ã  l'aide des fonctions SCR_Dump*().
 
-Si le string lu dans le fichier est de longueur nulle, *txt est fix‚
-… 0.
+Si le string lu dans le fichier est de longueur nulle, *txt est fixÃ©
+Ã  0.
 
 &EN fd : file descriptor
-&EN txt : pointeur vers le pointeur destin‚ … contenir le string
+&EN txt : pointeur vers le pointeur destinÃ© Ã  contenir le string
 
 &RT -1 en cas de fin de fichier ou d'erreur de lecture, 0 sinon
 
@@ -31,15 +31,15 @@ unsigned char   **txt;
 }
 
 /* =================================================================
-Lit un string static (ou d‚j… allou‚, la taille n'‚tant pas v‚rifi‚e)
-dans le fichier d‚crit par fd. Ce fichier a ‚t‚ pr‚alablement construit
-… l'aide des fonctions SCR_Dump*().
+Lit un string static (ou dÃ©jÃ  allouÃ©, la taille n'Ã©tant pas vÃ©rifiÃ©e)
+dans le fichier dÃ©crit par fd. Ce fichier a Ã©tÃ© prÃ©alablement construit
+Ã  l'aide des fonctions SCR_Dump*().
 
-Si le string lu dans le fichier est de longueur nulle, txt[0] est fix‚
-… 0.
+Si le string lu dans le fichier est de longueur nulle, txt[0] est fixÃ©
+Ã  0.
 
 &EN fd : file descriptor
-&EN txt : pointeur vers le pointeur destin‚ … contenir le string
+&EN txt : pointeur vers le pointeur destinÃ© Ã  contenir le string
 
 &RT -1 en cas de fin de fichier ou d'erreur de lecture, 0 sinon
 
@@ -61,11 +61,11 @@ unsigned char   *txt;
 }
 
 /* =================================================================
-Lit un short dans le fichier d‚crit par fd. Ce fichier a ‚t‚
-pr‚alablement construit … l'aide des fonctions SCR_Dump*().
+Lit un short dans le fichier dÃ©crit par fd. Ce fichier a Ã©tÃ©
+prÃ©alablement construit Ã  l'aide des fonctions SCR_Dump*().
 
 &EN fd : file descriptor
-&EN a : pointeur vers un short destin‚ … recevoir la valeur
+&EN a : pointeur vers un short destinÃ© Ã  recevoir la valeur
 
 &RT -1 en cas de fin de fichier ou d'erreur de lecture, 0 sinon
 
@@ -81,10 +81,10 @@ short   *a;
 }
 
 /* =================================================================
-Sauve le string txt (termin‚ par 0) dans le fichier d‚crit par fd.
+Sauve le string txt (terminÃ© par 0) dans le fichier dÃ©crit par fd.
 
 &EN fd : file descriptor
-&EN txt : pointeur vers le string. Peut ˆtre nul.
+&EN txt : pointeur vers le string. Peut Ãªtre nul.
 
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
@@ -105,10 +105,10 @@ unsigned char   *txt;
 }
 
 /* =================================================================
-Sauve le short a dans le fichier d‚crit par fd.
+Sauve le short a dans le fichier dÃ©crit par fd.
 
 &EN fd : file descriptor
-&EN a : valeur … stocker
+&EN a : valeur Ã  stocker
 
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */

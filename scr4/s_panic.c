@@ -11,13 +11,13 @@
 #endif
 
 /*==================================================================
-Fonction appel�e en cas d'erreur de SCR_malloc() ou SCR_realloc().
+Fonction appelée en cas d'erreur de SCR_malloc() ou SCR_realloc().
 
-Cette fonction peut �tre replac�e par une fonction utilisateur,
+Cette fonction peut étre replacée par une fonction utilisateur,
 permettant par exemple de sauver le travail en cours avant de
-quitter le syst�me.
+quitter le systéme.
 
-La fonction de librairie effectue les op�rations suivantes :
+La fonction de librairie effectue les opérations suivantes :
 
 &CO
     fprintf(stderr, "\n\nMemory full. Exit(2)\n");

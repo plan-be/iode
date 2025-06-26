@@ -4,12 +4,12 @@
 
 /* ========================================================================
 Retourne la version de l'OS sous forme d'un entier et optionnellement
-dans un format caractäre.
+dans un format caract√®re.
 
-&EN version = contient apräs l'appel un texte reprenant l'OS, la version
-    et le "build number". Version peut àtre nulle auquel cas seule la
+&EN version = contient apr√®s l'appel un texte reprenant l'OS, la version
+    et le "build number". Version peut √™tre nulle auquel cas seule la
     valeur de retour de la fonction indique l'OS. Si version est non
-    nulle, sa taille doit àtre assez grande (256 caractäres). La valeur
+    nulle, sa taille doit √™tre assez grande (256 caract√®res). La valeur
     de retour est par exemple :
 
 &EN2 "Win3x 3.xx.xxxx"
@@ -51,12 +51,12 @@ WscrGetOSVersion(char *version)
 
 /* ========================================================================
 Retourne la version de l'OS sous forme d'un entier et optionnellement
-dans un format caractäre. Remplace WscrGetOSVersion().
+dans un format caract√®re. Remplace WscrGetOSVersion().
 
-&EN version = contient apräs l'appel un texte reprenant l'OS, la version
-    et le "build number". Version peut àtre nulle auquel cas seule la
+&EN version = contient apr√®s l'appel un texte reprenant l'OS, la version
+    et le "build number". Version peut √™tre nulle auquel cas seule la
     valeur de retour de la fonction indique l'OS. Si version est non
-    nulle, sa taille doit àtre assez grande (256 caractäres). La valeur
+    nulle, sa taille doit √™tre assez grande (256 caract√®res). La valeur
     de retour est par exemple :
 
 &EN2 "Win3x 3.xx.xxxx"
@@ -95,7 +95,7 @@ WscrGetOSVersionEx(char *version)
 		      osv.dwBuildNumber & 0xFFFF,
 		      osv.szCSDVersion);
 
-    // Version en numÇrique
+    // Version en num√©rique
     Platform = osv.dwPlatformId;
     MinorV = osv.dwMinorVersion;
     MajorV = osv.dwMajorVersion;

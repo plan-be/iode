@@ -17,16 +17,16 @@ char    SCR_BASE_PATH[64] = ".:/usr/lib/scr:/usr/scr";
 #endif
 
 /* ====================================================================
-Recherche un fichier sur base d'un "PATH" donn�. Le path est un string
-contenant des noms de directories s�par�s par des ; en DOS et des : en
-UNIX. D�s que le fichier est trouv� dans un des directories, le nom
-complet est retourn� dans un buffer statique qui contient la derni�re
+Recherche un fichier sur base d'un "PATH" donné. Le path est un string
+contenant des noms de directories séparés par des ; en DOS et des : en
+UNIX. Dés que le fichier est trouvé dans un des directories, le nom
+complet est retourné dans un buffer statique qui contient la derniére
 valeur.
 
 Si le nom du fichier commence par "." ou "/" ou "\", la recherche n'a
-pas lieu : le nom de fichier est consid�r� comme compl�tement d�termin�.
+pas lieu : le nom de fichier est considéré comme complétement déterminé.
 
-&RT une pointeur vers un buffer statique si le fichier est trouv�. NULL
+&RT une pointeur vers un buffer statique si le fichier est trouvé. NULL
 sinon.
 &EX
     char    *pt;
@@ -37,7 +37,7 @@ sinon.
 	return(-1);
 	}
     else {
-	printf("Premier fichier trouv� : %s\n", pt);
+	printf("Premier fichier trouvé : %s\n", pt);
 	return(0);
 	}
 &TX
@@ -91,21 +91,21 @@ char    *file;
 }
 
 /* ====================================================================
-Recherche un fichier sur base du "PATH" de SCR/AL1. Le path est d�fini
+Recherche un fichier sur base du "PATH" de SCR/AL1. Le path est défini
 par la variable globale SCR_PATH. Si cette variable est vide ou que le
-fichier n'est pas trouv� dans les directory d�finis, la variable
-d'environnement PATH est utilis�e. Si PATH ne contient pas le fichier,
-la variable C SCR_BASE_PATH du syst�me est utilis�e.
-La valeur par d�faut est :
+fichier n'est pas trouvé dans les directory définis, la variable
+d'environnement PATH est utilisée. Si PATH ne contient pas le fichier,
+la variable C SCR_BASE_PATH du systéme est utilisée.
+La valeur par défaut est :
 
 &CO
     en DOS  : ".;\\;c:\\;c:\\scr";
     en UNIX : ".:/usr/lib/scr";
 &TX
 
-La fonction SCR_search_path() est utilis�e pour rechercher le fichier.
+La fonction SCR_search_path() est utilisée pour rechercher le fichier.
 
-&RT une pointeur vers un buffer statique si le fichier est trouv�. NULL
+&RT une pointeur vers un buffer statique si le fichier est trouvé. NULL
 sinon.
 &EX
     char    *pt;
@@ -116,7 +116,7 @@ sinon.
 	return(-1);
 	}
     else {
-	printf("Premier fichier trouv� : %s\n", pt);
+	printf("Premier fichier trouvé : %s\n", pt);
 	return(0);
 	}
 &TX

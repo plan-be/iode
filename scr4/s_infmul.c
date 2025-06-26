@@ -54,13 +54,13 @@ int     b;
 }
 
 /* ===================================================================
-Effectue la multiplication d'un entier a par un entier b en arithm‚tique
-de pr‚cision infinie.
+Effectue la multiplication d'un entier a par un entier b en arithmÃ©tique
+de prÃ©cision infinie.
 
-Chaque entier est repr‚sent‚ par une chaŒne de caractŠres num‚riques de
+Chaque entier est reprÃ©sentÃ© par une chaÃ®ne de caractÃ¨res numÃ©riques de
 longueur arbitraire.
 
-&RT res contient le r‚sultat.
+&RT res contient le rÃ©sultat.
 
 &EX
     InfMult("300000000000", "3000000000", res);

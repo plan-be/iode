@@ -1,14 +1,14 @@
 #include "s_strs.h"
 
 /* ======================================================================
-V‚rifie l'exactitude d'un num‚ro bancaire. Si le num‚ro est nul,
-il est consid‚r‚ comme correct. Le num‚ro ne doit pas contenir
-de caractŠre de s‚paration entre les z“nes.
+VÃ©rifie l'exactitude d'un numÃ©ro bancaire. Si le numÃ©ro est nul,
+il est considÃ©rÃ© comme correct. Le numÃ©ro ne doit pas contenir
+de caractÃ¨re de sÃ©paration entre les zÃ´nes.
 
 &EX
     SCR_check_bank("123123456712");
 &TX
-&RT 0 au cas o— le num‚ro est correct, -1 sinon.
+&RT 0 au cas oÃ¹ le numÃ©ro est correct, -1 sinon.
 ------------------------------------------------------------------------- */
 
 SCR_check_bank(ccp)

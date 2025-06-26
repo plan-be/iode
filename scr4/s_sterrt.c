@@ -9,10 +9,10 @@ FILE    *fd_msg = 0;
 
 /* ====================================================================
 Cette fonction retourne un message sur base d'un nom de message et d'un
-num�ro de langue dans le fichier ouvert fd_msg.
+numéro de langue dans le fichier ouvert fd_msg.
 
-Il s'agit d'une g�n�ralisation de la fonction SCR_get_err_txt_lang() au
-cas des messages d�finis par un mot-cl� au lieu d'un num�ro.
+Il s'agit d'une généralisation de la fonction SCR_get_err_txt_lang() au
+cas des messages définis par un mot-clé au lieu d'un numéro.
 
 &SA SCR_search_file(), SCR_err_txt(), SCR_get_err_txt(),
     SCR_err_txt_lang(), SCR_get_err_txt_lang(), SCR_err_txt_t(),
@@ -73,12 +73,12 @@ fin:
 }
 
 /* ====================================================================
-Retourne un message sur base d'un nom de message, et du num�ro de langue
-courante d�finie par la variable SCR_ERR_LANG. Ce message est lu dans le
+Retourne un message sur base d'un nom de message, et du numéro de langue
+courante définie par la variable SCR_ERR_LANG. Ce message est lu dans le
 fichier ouvert fd_msg.
 
-Il s'agit d'une g�n�ralisation de la fonction SCR_get_err_txt() au
-cas des messages d�finis par un mot-cl� au lieu d'un num�ro.
+Il s'agit d'une généralisation de la fonction SCR_get_err_txt() au
+cas des messages définis par un mot-clé au lieu d'un numéro.
 
 &SA SCR_search_file(), SCR_err_txt(), SCR_get_err_txt(),
     SCR_err_txt_lang(), SCR_get_err_txt_lang(), SCR_err_txt_t(),
@@ -93,11 +93,11 @@ U_ch    *keyw;
 }
 
 /* ====================================================================
-Retourne un message sur base d'un nom de message et d'un num�ro de
+Retourne un message sur base d'un nom de message et d'un numéro de
 langue.
 
-Il s'agit d'une g�n�ralisation de la fonction SCR_err_txt_lang() au
-cas des messages d�finis par un mot-cl� au lieu d'un num�ro.
+Il s'agit d'une généralisation de la fonction SCR_err_txt_lang() au
+cas des messages définis par un mot-clé au lieu d'un numéro.
 
 &SA SCR_search_file(), SCR_err_txt(), SCR_get_err_txt(),
     SCR_err_txt_lang(), SCR_get_err_txt_lang(), SCR_err_txt_t(),
@@ -135,19 +135,19 @@ int     lang;
 
 /* ====================================================================
 Retourne un message sur base d'un nom et de la langue courante
-d�finie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
+définie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
 ASCII dont le nom se trouve dans la variable SCR_ERR_NAME. Cette
-variable vaut par d�faut "scr_err.txt". Le nom peut cependant �tre
-chang� par l'utilisateur.
+variable vaut par défaut "scr_err.txt". Le nom peut cependant étre
+changé par l'utilisateur.
 
-Le fichier r�el est recherch� � l'aide de la fonction SCR_search_file().
+Le fichier réel est recherché à l'aide de la fonction SCR_search_file().
 
 &RT Un pointeur vers un buffer statique contenant le dernier message
-    lu. 2 buffers sont successivement utilis�s de fa�on � permettre des
+    lu. 2 buffers sont successivement utilisés de faéon à permettre des
     expressions du type
 
-Il s'agit d'une g�n�ralisation de la fonction SCR_err_txt() au
-cas des messages d�finis par un mot-cl� au lieu d'un num�ro.
+Il s'agit d'une généralisation de la fonction SCR_err_txt() au
+cas des messages définis par un mot-clé au lieu d'un numéro.
 
 &SA SCR_search_file(), SCR_err_txt(), SCR_get_err_txt(),
     SCR_err_txt_lang(), SCR_get_err_txt_lang(), SCR_get_err_txt_t(),
@@ -161,7 +161,7 @@ U_ch    *keyw;
 }
 
 /* ====================================================================
-Retourne un message sur base d'un num�ro de message et d'un num�ro de
+Retourne un message sur base d'un numéro de message et d'un numéro de
 langue dans le fichier ouvert fd_msg. Le message est lu dans un fichier
 ASCII dont la structure est la suivante :
 
@@ -172,22 +172,22 @@ ASCII dont la structure est la suivante :
       ...
 &TX
 
-Chaque record commence par un nom (ou num�ro) identifiant le message,
-suivi d'une barre verticale qui sert de s�parateur, suivi par le message
-lui-m�me dans la langue 0, suivi du s�parateur, etc.
+Chaque record commence par un nom (ou numéro) identifiant le message,
+suivi d'une barre verticale qui sert de séparateur, suivi par le message
+lui-méme dans la langue 0, suivi du séparateur, etc.
 
-La fonction SCR_get_err_txt_lang() se positionne au d�but du fichier,
-recherche le num�ro indiqu�, lit le message dans la langue courante
-d�finie par la variable SCR_ERR_LANG et retourne ce message dans une
-variable statique. La longueur de chaque message ne peut exc�der 80
-caract�res.
+La fonction SCR_get_err_txt_lang() se positionne au début du fichier,
+recherche le numéro indiqué, lit le message dans la langue courante
+définie par la variable SCR_ERR_LANG et retourne ce message dans une
+variable statique. La longueur de chaque message ne peut excéder 80
+caractéres.
 
 Pour placer des blancs en fin de ligne, on peut terminer celle-ci par le
-caract�re |. Ce caract�re est supprim� du string s'il se trouve en fin
+caractére |. Ce caractére est supprimé du string s'il se trouve en fin
 de ligne.
 
 &RT Un pointeur vers un buffer statique contenant le dernier message
-    lu. 2 buffers sont successivement utilis�s de fa�on � permettre des
+    lu. 2 buffers sont successivement utilisés de faéon à permettre des
     expressions du type
 
 &CO
@@ -210,8 +210,8 @@ int     val, lang;
 }
 
 /* ====================================================================
-Retourne un message sur base d'un num�ro et de la langue courante
-d�finie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
+Retourne un message sur base d'un numéro et de la langue courante
+définie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
 ASCII dont la structure est la suivante :
 
 &CO
@@ -221,18 +221,18 @@ ASCII dont la structure est la suivante :
       ...
 &TX
 
-Chaque record commence par un nom (ou num�ro) identifiant le message,
-suivi d'une barre verticale qui sert de s�parateur, suivi par le message
-lui-m�me dans la langue 0, suivi du s�parateur, etc.
+Chaque record commence par un nom (ou numéro) identifiant le message,
+suivi d'une barre verticale qui sert de séparateur, suivi par le message
+lui-méme dans la langue 0, suivi du séparateur, etc.
 
 Le nom du fichier se trouve dans la variable SCR_ERR_NAME. Cette
-variable vaut par d�faut "scr_err.txt". Le nom peut cependant �tre
-chang� par l'utilisateur.
+variable vaut par défaut "scr_err.txt". Le nom peut cependant étre
+changé par l'utilisateur.
 
-Le fichier r�el est recherch� � l'aide de la fonction SCR_search_file().
+Le fichier réel est recherché à l'aide de la fonction SCR_search_file().
 
 &RT Un pointeur vers un buffer statique contenant le dernier message
-    lu. 2 buffers sont successivement utilis�s de fa�on � permettre des
+    lu. 2 buffers sont successivement utilisés de faéon à permettre des
     expressions du type
 
 &CO
@@ -254,16 +254,16 @@ int     val, lang;
 }
 
 /* ====================================================================
-Retourne un message sur base d'un num�ro de message, du num�ro de langue
-courante d�finie par la variable SCR_ERR_LANG. Ce message est lu dans le
-fichier ouvert fd_msg. La fonction est �quivalente �
+Retourne un message sur base d'un numéro de message, du numéro de langue
+courante définie par la variable SCR_ERR_LANG. Ce message est lu dans le
+fichier ouvert fd_msg. La fonction est équivalente é
 
 &CO
     SCR_get_err_txt_lang(fd_msg, val, SCR_ERR_LANG);
 &TX
 
 &RT Un pointeur vers un buffer statique contenant le dernier message
-    lu. 2 buffers sont utilis�s en alternance de fa�on � permettre des
+    lu. 2 buffers sont utilisés en alternance de faéon à permettre des
     expressions du type :
 
 &CO
@@ -283,22 +283,22 @@ int     val;
 }
 
 /* ====================================================================
-Retourne un message sur base d'un num�ro et de la langue courante
-d�finie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
+Retourne un message sur base d'un numéro et de la langue courante
+définie par la variable SCR_ERR_LANG. Le message est lu dans un fichier
 ASCII dont le nom se trouve dans la variable SCR_ERR_NAME. Cette
-variable vaut par d�faut "scr_err.txt". Le nom peut cependant �tre
-chang� par l'utilisateur.
+variable vaut par défaut "scr_err.txt". Le nom peut cependant étre
+changé par l'utilisateur.
 
-Cette fonction est �quivalente � :
+Cette fonction est équivalente à :
 
 &CO
     SCR_err_txt_lang(val, SCR_ERR_LANG);
 &TX
 
-Le fichier r�el est recherch� � l'aide de la fonction SCR_search_file().
+Le fichier réel est recherché à l'aide de la fonction SCR_search_file().
 
 &RT Un pointeur vers un buffer statique contenant le dernier message
-    lu. 2 buffers sont successivement utilis�s de fa�on � permettre des
+    lu. 2 buffers sont successivement utilisés de faéon à permettre des
     expressions du type
 
 &CO

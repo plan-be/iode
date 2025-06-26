@@ -216,7 +216,7 @@ int     key;
 /*NH*/
 MP_move(mp, diff)
 MPAGE   *mp;
-int     diff; // Difference par rapport … la pos courante
+int     diff; // Difference par rapport Ã  la pos courante
 {
     mp->mp_c_line = diff;
     MP_display_lpg(mp, mp->mp_c_line, 1);
@@ -559,7 +559,7 @@ int     rec_nb;
 
 
 /*
-   Permet de faire ex‚cuter la display_fn de la lpg d'une MPAGE avant de
+   Permet de faire exÃ©cuter la display_fn de la lpg d'une MPAGE avant de
    copier le contenu du record de la page dans le buffer de le MPAGE
 */
 
@@ -630,15 +630,15 @@ MPAGE   *mp;
 }
 
 /* ======================================================================
-Reconstruit le buffer des records affich‚s dans une MPAGE. Cette fonction
-doit ˆtre utilis‚e aprŠs cr‚ation, modification ou destruction de records
+Reconstruit le buffer des records affichÃ©s dans une MPAGE. Cette fonction
+doit Ãªtre utilisÃ©e aprÃ¨s crÃ©ation, modification ou destruction de records
 en cours d'utilisation d'une MPAGE.
 
 Par exemple, si une touche fonction demande la construction d'un record (en
-C), l'‚diteur de MPAGE ne peut en ˆtre inform‚. Cette fonction force la
-reconstruction de la fenˆtre de la MPAGE.
+C), l'Ã©diteur de MPAGE ne peut en Ãªtre informÃ©. Cette fonction force la
+reconstruction de la fenÃªtre de la MPAGE.
 
-&NO Cette fonction doit ˆtre utilis‚e avec pr‚caution.
+&NO Cette fonction doit Ãªtre utilisÃ©e avec prÃ©caution.
 ------------------------------------------------------------------------- */
 MP_rebuild_buf(mp)
 MPAGE   *mp;
@@ -813,7 +813,7 @@ ISAM    *is1, *is2;
 
 /* ====================================================================
 Remplace l'index de recherche de la MPAGE. Si la valeur de cmp_nb
-est n‚gative, l'affichage se fera dans l'ordre physique de la base.
+est nÃ©gative, l'affichage se fera dans l'ordre physique de la base.
 
 &SA MP_set_ref(), MP_set_cond(), MP_set_isam()
 ======================================================================= */
@@ -829,7 +829,7 @@ int     cmp_nb;
 /* ====================================================================
 Remplace la condition de recherche de la MPAGE. cond vaut SCR_GE, SCR_LE,
 SCR_EQ, SCR_EQ1, ... Dans le cas de SCR_LE, l'ordre d'affichage sera
-invers‚.
+inversÃ©.
 
 &SA MP_set_index(), MP_set_ref(), MP_set_isam()
 ======================================================================= */

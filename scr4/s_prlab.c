@@ -9,12 +9,12 @@ int     PR_LABEL_ONL,
 long    PR_LABEL_NB;
 
 /* ======================================================================
-SÇlectionne une imprimante pour l'impression d'Çtiquettes. Le papier
-contient nh Çtiquettes de front et nv de haut (normalement 1 pour
+S√©lectionne une imprimante pour l'impression d'√©tiquettes. Le papier
+contient nh √©tiquettes de front et nv de haut (normalement 1 pour
 le papier en continu, chacune de nl lignes et nc colonnes.
 
-Le PRINTER pr est momentanÇment modifiÇ pour prendre en compte les
-caractÇristiques dÇfinies. Il est restaurÇ lors de l'appel Ö
+Le PRINTER pr est momentan√©ment modifi√© pour prendre en compte les
+caract√©ristiques d√©finies. Il est restaur√© lors de l'appel √†
 PR_label_send().
 
 &EX
@@ -61,8 +61,8 @@ PR_label_pos()
 
 
 /* ======================================================================
-Imprime la page pg et son contenu sur l'Çtiquette suivante selon la
-dÇfinition opÇrÇe par l'appel Ö PR_label_select().
+Imprime la page pg et son contenu sur l'√©tiquette suivante selon la
+d√©finition op√©r√©e par l'appel √† PR_label_select().
 
 &EX
     Voir PR_label_select().
@@ -79,15 +79,15 @@ PAGE    *pg;
 }
 
 /* ======================================================================
-Imprime le fichier filename apräs interprÇtation de son contenu
-sur l'Çtiquette suivante selon la dÇfinition opÇrÇe par l'appel Ö
-PR_label_select(). Le fonctionnement est identique Ö celui de PR_file(),
-Ö ceci präs que les lignes excÇdant nl (dÇfinies par PR_label_select())
-ne sont pas imprimÇes et que les retours Ö la marge sont liÇs Ö
-l'Çtiquette courante.
+Imprime le fichier filename apr√®s interpr√©tation de son contenu
+sur l'√©tiquette suivante selon la d√©finition op√©r√©e par l'appel √†
+PR_label_select(). Le fonctionnement est identique √† celui de PR_file(),
+√† ceci pr√®s que les lignes exc√©dant nl (d√©finies par PR_label_select())
+ne sont pas imprim√©es et que les retours √† la marge sont li√©s √†
+l'√©tiquette courante.
 
-Seules les lignes commenáant par le caractäre ch sont imprimÇes. Si ch
-est nul, toutes les lignes du fichier sont imprimÇes.
+Seules les lignes commen√ßant par le caract√®re ch sont imprim√©es. Si ch
+est nul, toutes les lignes du fichier sont imprim√©es.
 
 &EX
     Voir PR_label_select().
@@ -110,11 +110,11 @@ int     ch;
 
 
 /* ======================================================================
-Termine l'impression d'Çtiquettes effectuÇe Ö l'aide de PR_label_select(),
+Termine l'impression d'√©tiquettes effectu√©e √† l'aide de PR_label_select(),
 et PR_label_pg() ou PR_label_file().
 
-La dÇfinition de l'imprimante momentanÇment modifiÇe par PR_label_select()
-est restaurÇe par cette fonction.
+La d√©finition de l'imprimante momentan√©ment modifi√©e par PR_label_select()
+est restaur√©e par cette fonction.
 
 &EX
     Voir PR_label_select().

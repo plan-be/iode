@@ -1,19 +1,19 @@
 #include "s_strs.h"
 /* ====================================================================
-DÇformatte un long formattÇ dans in suivant un format fmt donnÇ. Le
-rÇsultat est un long.
+D√©formatte un long formatt√© dans in suivant un format fmt donn√©. Le
+r√©sultat est un long.
 
-Les caractäres reconnus dans le format sont : 'X', 'x', '9', '0'.
-Ils signifient qu'aux seules positions de ces caractäres seront extraits
-dans leur ordre d'apparition les chiffres trouvÇs dans in. Seul cas
-particulier : le caractäre '0' qui sera remplacÇ par une '0' si le
-caractäre correspondant de in est ' '.
+Les caract√®res reconnus dans le format sont : 'X', 'x', '9', '0'.
+Ils signifient qu'aux seules positions de ces caract√®res seront extraits
+dans leur ordre d'apparition les chiffres trouv√©s dans in. Seul cas
+particulier : le caract√®re '0' qui sera remplac√© par une '0' si le
+caract√®re correspondant de in est ' '.
 
-Les longueurs des strings ne sont pas vÇrifiÇes.
+Les longueurs des strings ne sont pas v√©rifi√©es.
 
 &RT le pointeur vers out
 &EX
-    SCR_ufmt_long("NumÇro : 9990-XX-00", "NumÇro : 123-123-123");
+    SCR_ufmt_long("Num√©ro : 9990-XX-00", "Num√©ro : 123-123-123");
 
 	donne
 

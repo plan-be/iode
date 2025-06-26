@@ -1,10 +1,10 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Supprime tous les caractäres non alphanumÇriques (lettres, chiffres, ou ceux
-de la liste chars) d'un string. Le string est terminÇ par un '\0'.
+Supprime tous les caract√®res non alphanum√©riques (lettres, chiffres, ou ceux
+de la liste chars) d'un string. Le string est termin√© par un '\0'.
 
-&RT le string strippÇ
+&RT le string stripp√©
 &EX
     printf("'%s'\n", SCR_asqz(" Jean - Marc   ", "-"));
     printf("'%s'\n", SCR_asqz("\nscr_3.a2m   ", "_."));
@@ -32,9 +32,9 @@ unsigned char *text, *chars;
 }
 
 /* ====================================================================
-Supprime tous les blancs d'un string. Le string est terminÇ par un '\0'.
+Supprime tous les blancs d'un string. Le string est termin√© par un '\0'.
 
-&RT le string strippÇ
+&RT le string stripp√©
 &EX
     printf("'%s'\n", SCR_sqz(" Jean - Marc   "));
 

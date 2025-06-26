@@ -4,7 +4,7 @@
 // unsigned char SCR_UTF8_TBL[] = {
 
     // /* 80 =128 */
-    // /* C c */    0x87, «
+    // /* C c */    0x87, √É
     // /* u " */    0xbc,
     // /* e ' */    0xa9,
     // /* a ^ */    0xa2,
@@ -47,7 +47,7 @@
     // /* n ~ */    0xb1,
     // /* N ~ */    0x91,
     // /* a _ */    0, // ??
-    // /* ∞   */    0,
+    // /* ‚ñë   */    0,
     // /* ? inv */    0,
     // /* not */    0xac,  // C2
     // /* nad */    0,
@@ -196,8 +196,8 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* u ' */    {0xC3, 0xba, 0},
     /* n ~ */    {0xC3, 0xb1, 0},
     /* N ~ */    {0xC3, 0x91, 0},
-    /* ß   */    {0xC2, 0xA7, 0},
-    /* ∞   */    {0xC2, 0xB0, 0},
+    /* ¬∫   */    {0xC2, 0xA7, 0},
+    /* ‚ñë   */    {0xC2, 0xB0, 0},
     /* ? inv */  {0xC2, 0xBF, 0},
     /* not */    {0xC2, 0xAC, 0},
     /* nad */    {0},
@@ -213,7 +213,7 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* gr  */    {0xC2, 0xB2, 0},
     /* gr  */    {0xC2, 0xB3, 0},
     /* gr  */    {0xC2, 0xB4, 0},
-    /* A¥  */    {0xC3, 0x81, 0},
+    /* A‚î§  */    {0xC3, 0x81, 0},
     /* A^  */    {0xC3, 0x82, 0},
     /* A`  */    {0xC3, 0x80, 0},
     /* gr  */    {0xC2, 0xB8, 0},
@@ -232,7 +232,7 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* gr  */    {0xC3, 0x82, 0},
     /* gr  */    {0xC3, 0x83, 0},
     /* gr  */    {0xC3, 0x84, 0},
-    /* µ  */     {0xC3, 0x85, 0},
+    /* √Å  */     {0xC3, 0x85, 0},
     /* pi  */    {0xC3, 0x86, 0},
     /* gr  */    {0xC3, 0x87, 0},
     /* gr  */    {0xC3, 0x88, 0},
@@ -249,12 +249,12 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* gr  */    {0xC3, 0x90, 0},
     /* gr  */    {0xC3, 0x91, 0},
     /* E ^ */    {0xC3, 0x8A, 0},
-    /* E®  */    {0xC3, 0x8B, 0},
+    /* E¬ø  */    {0xC3, 0x8B, 0},
     /* E`  */    {0xC3, 0x88, 0},
     /* gr  */    {0xC3, 0x95, 0},
-    /* I¥  */    {0xC3, 0x8D, 0},
+    /* I‚î§  */    {0xC3, 0x8D, 0},
     /* I^  */    {0xC3, 0x8E, 0},
-    /* I®  */    {0xC3, 0x8F, 0},
+    /* I¬ø  */    {0xC3, 0x8F, 0},
     /* gr  */    {0xC3, 0x99, 0},
     /* gr  */    {0xC3, 0x9A, 0},
     /* gr  */    {0xC3, 0x9B, 0},
@@ -265,7 +265,7 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
 
 
     /* E0 =224 */
-    /* O¥ */  {0xC3, 0x93, 0},
+    /* O‚î§ */  {0xC3, 0x93, 0},
     /* beta  */  {0xCE, 0xB2, 0},
     /* I^    */  {0xC3, 0x94, 0},
     /* O`   */  {0xC3, 0x92, 0},
@@ -274,13 +274,13 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* mu    */  {0xCE, 0xBC, 0},
     /* gamma */  {0xCE, 0xB3, 0},
     /* PHI   */  {0xCE, 0xA6, 0},
-    /* U¥ */    {0xC3, 0x9A, 0},
+    /* U‚î§ */    {0xC3, 0x9A, 0},
     /* U^    */  {0xC3, 0x9B, 0},
     /* U` */   {0xC3, 0x99, 0},
     /* infini*/  {0xE2, 0x88, 0x9E, 0},
     /* infini/*/ {0xE2, 0x88, 0x9E, 0},
     /* inclut */ {0xE2, 0x88, 0x88, 0},
-    /* ¥  */    {0xC2, 0xB4, 0},
+    /* ‚î§  */    {0xC2, 0xB4, 0},
 
     /* F0 =240 */
     /* ==     x */  {0xE2, 0x89, 0xA1, 0},
@@ -292,7 +292,7 @@ unsigned char SCR_OEM_UTF8_TBL[][4] = {
     /* divis. x */  {0xC3, 0xB7, 0},
     /* +-=    x */  {0xE2, 0x89, 0x88, 0},
     /* degree x */  {0xC2, 0xB0, 0},
-    /* ® */      {0xC2, 0xA8, 0},
+    /* ¬ø */      {0xC2, 0xA8, 0},
     /* . cent*/   {0xE2, 0x88, 0xA9, 0},
     /* sqrt   x */  {0xE2, 0x88, 0x9A, 0},
     /* n exp */  {0xE2, 0x88, 0xA9, 0},
@@ -347,8 +347,8 @@ unsigned char SCR_ANSI_UTF8_TBL[][4] = {
     /* u ' */    {0xC3, 0xba, 0},
     /* n ~ */    {0xC3, 0xb1, 0},
     /* N ~ */    {0xC3, 0x91, 0},
-    /* ß   */    {0xC2, 0xA7, 0},
-    /* ∞   */    {0xC2, 0xB0, 0},
+    /* ¬∫   */    {0xC2, 0xA7, 0},
+    /* ‚ñë   */    {0xC2, 0xB0, 0},
     /* ? inv */  {0xC2, 0xBF, 0},
     /* not */    {0xC2, 0xAC, 0},
     /* nad */    {0},
@@ -364,7 +364,7 @@ unsigned char SCR_ANSI_UTF8_TBL[][4] = {
     /* gr  */    {0xC2, 0xB2, 0},
     /* gr  */    {0xC2, 0xB3, 0},
     /* gr  */    {0xC2, 0xB4, 0},
-    /* µ  */     {0xC2, 0xB5, 0},
+    /* √Å  */     {0xC2, 0xB5, 0},
     /* pi  */    {0xC2, 0xB6, 0},
     /* gr  */    {0xC2, 0xB7, 0},
     /* gr  */    {0xC2, 0xB8, 0},
@@ -383,7 +383,7 @@ unsigned char SCR_ANSI_UTF8_TBL[][4] = {
     /* gr  */    {0xC3, 0x82, 0},
     /* gr  */    {0xC3, 0x83, 0},
     /* gr  */    {0xC3, 0x84, 0},
-    /* µ  */     {0xC3, 0x85, 0},
+    /* √Å  */     {0xC3, 0x85, 0},
     /* pi  */    {0xC3, 0x86, 0},
     /* gr  */    {0xC3, 0x87, 0},
     /* gr  */    {0xC3, 0x88, 0},
@@ -455,10 +455,10 @@ unsigned char SCR_ANSI_UTF8_TBL[][4] = {
 
 
 /* ================================================================
-Transforme un caractäre ASCII-PC en caractäre UTF-8. 
-Le rÈsultat est stockÈ dans un buffer statique retournÈ par la fonction.
+Transforme un caract√®re ASCII-PC en caract√®re UTF-8. 
+Le r√©sultat est stock√© dans un buffer statique retourn√© par la fonction.
 
-&RT le caractäre traduit
+&RT le caract√®re traduit
 &SA SCR_AnsiToUTF8Char(), SCR_AnsiToOemChar(), SCR_OemToAnsiChar(),
 SCR_OemToAnsi(), SCR_AnsiToOem(), SCR_AnsiToUTF8(), SCR_OemToUTF8()
 
@@ -475,10 +475,10 @@ unsigned char *SCR_OemToUTF8Char(int ch)
 }
 
 /* ================================================================
-Transforme un caractäre ASCII-PC en caractäre UTF-8. 
-Le rÈsultat est stockÈ dans un buffer statique retournÈ par la fonction.
+Transforme un caract√®re ASCII-PC en caract√®re UTF-8. 
+Le r√©sultat est stock√© dans un buffer statique retourn√© par la fonction.
 
-&RT le caractäre traduit
+&RT le caract√®re traduit
 &SA SCR_OemToUTF8Char(), SCR_AnsiToOemChar(), SCR_OemToAnsiChar(),
 SCR_OemToAnsi(), SCR_AnsiToOem(), SCR_AnsiToUTF8(), SCR_OemToUTF8()
 
@@ -495,9 +495,9 @@ unsigned char *SCR_AnsiToUTF8Char(int ch)
 }
 
 /* ================================================================
-Calcule la longueur en bytes d'une chÓne OEM traduite en UTF8.
+Calcule la longueur en bytes d'une ch¬Øne OEM traduite en UTF8.
 
-&RT la longueyur nÈcessaire pour stocker le rÈsultat de la translation.
+&RT la longueyur n√©cessaire pour stocker le r√©sultat de la translation.
 =================================================================== */
 
 int SCR_OemToUTF8Length(unsigned char *str)
@@ -512,9 +512,9 @@ int SCR_AnsiToUTF8Length(unsigned char *str)
 
 
 /* ================================================================
-Calcule la longueur en bytes d'une chÓne OEM traduite en UTF8.
+Calcule la longueur en bytes d'une ch¬Øne OEM traduite en UTF8.
 
-&RT la longueyur nÈcessaire pour stocker le rÈsultat de la translation.
+&RT la longueyur n√©cessaire pour stocker le r√©sultat de la translation.
 =================================================================== */
 
 int SCR_OemAnsiToUTF8Length(unsigned char *str, int oemansi)

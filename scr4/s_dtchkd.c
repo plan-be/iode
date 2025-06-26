@@ -22,10 +22,10 @@ extern char     SCR_DATE_FMT[];
 long SCR_Y2K_EPOCH = 0L; /* JMP 28-11-98 */
 
 /* ====================================================================
-Transforme une date formatt�e dans string en long. Le format est celui
-d�fini dans la variable globale SCR_DATE_FMT.
+Transforme une date formattée dans string en long. Le format est celui
+défini dans la variable globale SCR_DATE_FMT.
 
-&RT un long repr�sentant la date
+&RT un long représentant la date
 &EX
     SCR_date_to_long("21/02/1991");
 &TX
@@ -39,30 +39,30 @@ char *string ;
 }
 
 /* ====================================================================
-Transforme une date formatt�e dans string en long. Le format est celui
-d�fini dans le param�tre fmt.
+Transforme une date formattée dans string en long. Le format est celui
+défini dans le paramétre fmt.
 
-&RT un long repr�sentant la date (yyyymmss)
+&RT un long représentant la date (yyyymmss)
 &EX
     SCR_fdate_to_long("02-21-91", "mm-dd-yy");
 &TX
 
 La variable SCR_Y2K_PIVOT permet de modifier le comportement lors de la
-transformation de date � 2 chiffres pour l'ann�e.
+transformation de date à 2 chiffres pour l'année.
 
 &SY
    int SCR_Y2K_PIVOT = 75;
 &TX
 
-Pour conna�tre le si�cle � indiquer dans une date dont l'ann�e n'est
-connue que par les deux derniers chiffres, on choisit le si�cle comme
+Pour connaétre le siécle à indiquer dans une date dont l'année n'est
+connue que par les deux derniers chiffres, on choisit le siécle comme
 suit :
 
 &CO
     soit
-	YY l'ann�e introduite,
+	YY l'année introduite,
     on prend :
-	date = si�cle_ courant + YY;
+	date = siécle_ courant + YY;
 	si date << date_courante - SCR_Y2K_PIVOT ans
 	alors date += ans;
 	sinon si date >>= date_courante + 100 ans)
@@ -169,7 +169,7 @@ char    *fmt;
 	dt[1] = m;
     }
 
-    /* Si dans le format il n'y a rien pour le jour, le laisser � 1 */
+    /* Si dans le format il n'y a rien pour le jour, le laisser à 1 */
     if(d <= 0) {
 	if(nbd != 0) d = dt[0]; /* JMP 05-02-01 */  /* BP_M 06-07-2003 */
 	else         d = 1;
@@ -230,8 +230,8 @@ char    *fmt;
 }
 
 /* ====================================================================
-V�rifie qu'une date est correcte. Le mois doit �tre compris entre 01 et
-12, le jour entre 1 et 31,  l'ann�e n'est pas v�rifi�e.
+Vérifie qu'une date est correcte. Le mois doit étre compris entre 01 et
+12, le jour entre 1 et 31,  l'année n'est pas vérifiée.
 
 &RT 0 en cas d'heure correcte, -1 sinon
 &SA SCR_check_fmt_date()
@@ -261,8 +261,8 @@ long    date;
 }
 
 /* ====================================================================
-V�rifie qu'une date formatt�e est correcte. Le mois doit �tre compris
-entre 01 et 12, le jour entre 1 et 31, l'ann�e n'est pas v�rifi�e.
+Vérifie qu'une date formattée est correcte. Le mois doit étre compris
+entre 01 et 12, le jour entre 1 et 31, l'année n'est pas vérifiée.
 
 &RT 0 en cas de date correcte, -1 sinon
 &SA SCR_check_date()

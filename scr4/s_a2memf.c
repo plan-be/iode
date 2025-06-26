@@ -58,25 +58,25 @@ int     w, h;
 
 
 /* ================================================================
-InterprŠte le contenu d'un fichier a2m et g‚nŠre un fichier au format
+InterprÃ¨te le contenu d'un fichier a2m et gÃ©nÃ¨re un fichier au format
 Enhanced MetaFile de Windows.
 
-&EN a2mfile = nom du fichier a2m … imprimer
-&EN outfile = nom du fichier EMF r‚sultat
+&EN a2mfile = nom du fichier a2m Ã  imprimer
+&EN outfile = nom du fichier EMF rÃ©sultat
 &EN w = largeur en mm du dessin
 &EN h = hauteur en mm du dessin
 
-&RT La fonction retourne 0 si le processus s'est bien d‚roul‚, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien dÃ©roulÃ©, -1 sinon.
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-l'impression et la lecture du fichier a2m. Pour que ces paramŠtres
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramÃ¨tres
 soient pris en compte par le programme A2mToGdiEMF(), il faut appeler la
 fonction A2mGdiReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -86,35 +86,35 @@ d'interpr‚tation et d'impression.
 &TX
 
 &TI Variables globales
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les variables globales d‚crites dans le fichier .ini peuvent ‚galement
-ˆtre modifi‚es dans le programme.
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Les variables globales dÃ©crites dans le fichier .ini peuvent Ã©galement
+Ãªtre modifiÃ©es dans le programme.
 
-&IT Variables influen‡ant la lecture du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [A2M] du fichier ini.
+&IT Variables influenÃ§ant la lecture du fichier
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la section [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caractŠre d'escape (enrichissements et caractŠres
-    sp‚ciaux) : '\'par d‚faut
-&EN int A2M_CMDCH = caractŠre de commande ('.' par d‚faut)
-    sp‚ciaux)
-&EN int A2M_DEFCH = caractŠre pr‚fixant les macros ('&' par d‚faut)
-&EN int A2M_SEPCH = caractŠre de s‚paration des cellules ('&' par d‚faut)
+&EN int A2M_ESCCH = caractÃ¨re d'escape (enrichissements et caractÃ¨res
+    spÃ©ciaux) : '\'par dÃ©faut
+&EN int A2M_CMDCH = caractÃ¨re de commande ('.' par dÃ©faut)
+    spÃ©ciaux)
+&EN int A2M_DEFCH = caractÃ¨re prÃ©fixant les macros ('&' par dÃ©faut)
+&EN int A2M_SEPCH = caractÃ¨re de sÃ©paration des cellules ('&' par dÃ©faut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d‚faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par dÃ©faut ("par_0")
 
-&IT Variables influen‡ant l'impression
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [GDI] du fichier .ini.
+&IT Variables influenÃ§ant l'impression
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la section [GDI] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d‚faut des caractŠres dans les
-    paragraphes (10 pts par d‚faut)
-&EN int A2M_FONTINCR = incr‚ment de taille de caractŠres (2 par d‚faut)
-&EN int A2M_TFONTSIZE = taille par d‚faut des caractŠres dans les
-    tableaux (8 pts par d‚faut)
-&EN U_ch *A2M_PGHEAD = titre de page ("" par d‚faut)
-&EN U_ch *A2M_PGFOOT = pied de page ("" par d‚faut)
+&EN int A2M_FONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    paragraphes (10 pts par dÃ©faut)
+&EN int A2M_FONTINCR = incrÃ©ment de taille de caractÃ¨res (2 par dÃ©faut)
+&EN int A2M_TFONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    tableaux (8 pts par dÃ©faut)
+&EN U_ch *A2M_PGHEAD = titre de page ("" par dÃ©faut)
+&EN U_ch *A2M_PGFOOT = pied de page ("" par dÃ©faut)
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -136,16 +136,16 @@ Ces variables sont d‚finies dans la section [GDI] du fichier .ini.
 &EN2 0-2 = 0%
 
 &EN int A2M_GDI_COLOR = 1 (dft) pour impression en couleur, 0 en B/W
-&EN int A2M_GDI_TBORDER = ‚paisseur des cadres des tableaux (2 par dft)
+&EN int A2M_GDI_TBORDER = Ã©paisseur des cadres des tableaux (2 par dft)
 &EN int A2M_GDI_LMARG = marge de gauche de la page (12 pts par dft)
 &EN int A2M_GDI_RMARG = marge de droite de la page (12 pts par dft)
 &EN int A2M_GDI_TMARG = marge de haut de la page (12 pts par dft)
 &EN int A2M_GDI_BMARG = marge de bas de la page (12 pts par dft)
 
 &RT
-&EN 0 en cas de succŠs
-&EN -1 si le fichier ne peut ˆtre ouvert
-&EN -2 si le fichier EMF ne peut ˆtre cr‚‚
+&EN 0 en cas de succÃ¨s
+&EN -1 si le fichier ne peut Ãªtre ouvert
+&EN -2 si le fichier EMF ne peut Ãªtre crÃ©Ã©
 
 &SA A2mGdiReadIni(), A2mToGdiPrinter(), A2mToRtf(), A2mToMif(),
     A2mToHtml(), A2mPrintError()
@@ -179,11 +179,11 @@ int     w, h;
 }
 
 /* ========================================================
-Cette fonction traduit le graphique d‚fini dans le fichier a2mfile
+Cette fonction traduit le graphique dÃ©fini dans le fichier a2mfile
 en un fichier EMF outfile.
 
 &EN a2mfile = fichier a2m ne contenant qu'un graphique.
-&EN outfile = fichier EMF r‚sultat
+&EN outfile = fichier EMF rÃ©sultat
 
 ===========================================================*/
 

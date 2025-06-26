@@ -854,7 +854,7 @@ int     invert;
     /* EMPTY PAGE */
     if(mp->mp_buf_def[mp->mp_line0 + line] != 'Y') {
 	MP_empty_lpg_dw(mp, lpg, line,
-	    (line == 0 || mp->mp_buf_def[mp->mp_line0 + line - 1] == 'Y') ? 'Ä' : ' ');
+	    (line == 0 || mp->mp_buf_def[mp->mp_line0 + line - 1] == 'Y') ? 'â”€' : ' ');
 	return(0);
 	}
 
@@ -913,7 +913,7 @@ char MP_counter[] = "|/-\\";
 #ifdef DOS
 char MP_counter[] = ".oO0";
 #else
-char MP_counter[] = "°±²Û";
+char MP_counter[] = "â–‘â–’â–“â–ˆ";
 #endif
 */
 
@@ -1034,8 +1034,8 @@ MPAGE   *mp;
 /*
     Return : -1 : quit MP_edit
     sinon  : bit 0 : lostcmt
-	     bit 1 : touche bouff‚e
-	     bit 2 : action utilisateur impr‚visible (record key ..)
+	     bit 1 : touche bouffÃ©e
+	     bit 2 : action utilisateur imprÃ©visible (record key ..)
 */
 
 #define MPDEF_LOSTCMT 1  /* 0 0 1 */

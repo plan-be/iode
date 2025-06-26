@@ -4,62 +4,62 @@
 #include <scr.h>
 
 typedef struct _scroll {
-    /* El‚ments modifiables par l'utilisateur */
+    /* ElÃ©ments modifiables par l'utilisateur */
     int     sc_ncl;     /* Entier (client) */
-    char    *sc_pcl;    /* Pointeur vers une donn‚e client */
+    char    *sc_pcl;    /* Pointeur vers une donnÃ©e client */
     U_ch    *sc_cmt;    /* Comment */
-    YYKEYS  *sc_scmts;  /* Commentaires structur‚s (null term. list)*/
+    YYKEYS  *sc_scmts;  /* Commentaires structurÃ©s (null term. list)*/
     U_ch    *sc_help;   /* Topic du help */
-    int     sc_ipl,     /* Ligne sup‚rieure de la fenˆtre dans l'‚cran */
-	    sc_ipc;     /* Colonne gauche de la fenˆtre dans l'‚cran */
-    int     sc_inlc,    /* Nombre de lignes total de la fenˆtre */
-	    sc_incc;    /* Nombre de colonnes total de la fenˆtre */
+    int     sc_ipl,     /* Ligne supÃ©rieure de la fenÃªtre dans l'Ã©cran */
+	    sc_ipc;     /* Colonne gauche de la fenÃªtre dans l'Ã©cran */
+    int     sc_inlc,    /* Nombre de lignes total de la fenÃªtre */
+	    sc_incc;    /* Nombre de colonnes total de la fenÃªtre */
     int     sc_iattr,   /* Attribut d'affichage */
-	    sc_irattr,  /* Attribut invers‚ (cellule courante) */
+	    sc_irattr,  /* Attribut inversÃ© (cellule courante) */
 	    sc_ilc0,    /* Longueur de la colonne de titres */
 	    sc_irlen;   /* Longueur des colonnes en rotate */
     int     sc_norot;   /* Rotate possible ? !!! 0 = oui, 1 = non !!! */
     int     sc_nohsb;   /* Horiz. scroll bar ? !!! 0 = oui, 1 = non !!! */
-    int     sc_ir;      /* Indicateur de rotation courante de la fenˆtre */
+    int     sc_ir;      /* Indicateur de rotation courante de la fenÃªtre */
     int     sc_noltit;  /* Pas de titre de lignes */
-    int     sc_noctit;  /* Pas de titre de colonnes (2 lignes gagn‚es) */
+    int     sc_noctit;  /* Pas de titre de colonnes (2 lignes gagnÃ©es) */
 
 
-    /* El‚ments modifi‚s par le programme */
-    IMAGE   *sc_im;     /* Image de l'‚cran */
-    int     sc_icl,     /* ligne courante dans l'‚cran */
-	    sc_icc;     /* colonne courante dans l'‚cran */
-    int     sc_icl0,    /* ligne de la premiŠre cellule dans l'‚cran */
-	    sc_icc0;    /* colonne de la premiŠre cellule dans l'‚cran */
+    /* ElÃ©ments modifiÃ©s par le programme */
+    IMAGE   *sc_im;     /* Image de l'Ã©cran */
+    int     sc_icl,     /* ligne courante dans l'Ã©cran */
+	    sc_icc;     /* colonne courante dans l'Ã©cran */
+    int     sc_icl0,    /* ligne de la premiÃ¨re cellule dans l'Ã©cran */
+	    sc_icc0;    /* colonne de la premiÃ¨re cellule dans l'Ã©cran */
     int     sc_inl,     /* nbre de lignes visibles */
 	    sc_inc;     /* nbre de colonnes visibles */
     int     sc_iml,     /* ligne maximum */
 	    sc_imc;     /* colonne maximum */
-    int     sc_ins;     /* nombre de lignes s‚lectionn‚e */
-    int     *sc_ias;    /* tableau des lignes s‚lectionn‚es */
+    int     sc_ins;     /* nombre de lignes sÃ©lectionnÃ©e */
+    int     *sc_ias;    /* tableau des lignes sÃ©lectionnÃ©es */
     S_BAR   sc_vbar;    /* Scrollbar horizontal */
     S_BAR   sc_hbar;    /* Scrollbar vertical */
     int     sc_max;     /* Scroll Maximized ? */
-    int     sc_ocl,     /* Pr‚c‚dente line courante (old current line) */
-	    sc_occ,     /* Pr‚c‚dente col  courante (old current col ) */
-	    sc_onl,     /* Pr‚c‚dent nb lines (old nl) */
-	    sc_onc;     /* Pr‚c‚dent nb cols (old nc) */
+    int     sc_ocl,     /* PrÃ©cÃ©dente line courante (old current line) */
+	    sc_occ,     /* PrÃ©cÃ©dente col  courante (old current col ) */
+	    sc_onl,     /* PrÃ©cÃ©dent nb lines (old nl) */
+	    sc_onc;     /* PrÃ©cÃ©dent nb cols (old nc) */
 
-    /* Fonctions … d‚finir par l'utilisateur */
+    /* Fonctions Ã  dÃ©finir par l'utilisateur */
 #ifdef SCRPROTO
-    char    *(*sc_ftitle)(struct _scroll *),           /* Fn retournant le titre g‚n‚ral */
+    char    *(*sc_ftitle)(struct _scroll *),           /* Fn retournant le titre gÃ©nÃ©ral */
 	    *(*sc_fctitle)(struct _scroll *, int),     /* Fn retournant le titre d'un colonne */
 	    *(*sc_fltitle)(struct _scroll *, int),     /* Fn retournant le titre d'une ligne */
 	    *(*sc_ftext)(struct _scroll *, int, int);  /* Fn retournant le texte d'une cellule */
     int     (*sc_fnl)(struct _scroll *),               /* Fn retournant le nombre de lignes */
 	    (*sc_fnc)(struct _scroll *),               /* Fn retournant le nombre de colonnes */
 	    (*sc_flen)(struct _scroll *, int);         /* Fn retournant la largeur d'une col */
-    int     (*sc_fedit)(struct _scroll *, int, int),   /* Fn d'‚dition d'une cellule */
+    int     (*sc_fedit)(struct _scroll *, int, int),   /* Fn d'Ã©dition d'une cellule */
 	    (*sc_fdel)(struct _scroll *, int, int),    /* Fn de destruction d'une cellule */
-	    (*sc_fins)(struct _scroll *, int, int);    /* Fn de cr‚ation d'une cellule */
-    int     (*sc_ffn)(struct _scroll *, int, int, int),/* Fn ex‚cut‚e pour une touche fonction */
-	    (*sc_fbeg)(struct _scroll *, int *, int *),/* Fn de d‚but d'‚dition */
-	    (*sc_fend)(struct _scroll *, int, int),    /* Fn de fin d'‚dition */
+	    (*sc_fins)(struct _scroll *, int, int);    /* Fn de crÃ©ation d'une cellule */
+    int     (*sc_ffn)(struct _scroll *, int, int, int),/* Fn exÃ©cutÃ©e pour une touche fonction */
+	    (*sc_fbeg)(struct _scroll *, int *, int *),/* Fn de dÃ©but d'Ã©dition */
+	    (*sc_fend)(struct _scroll *, int, int),    /* Fn de fin d'Ã©dition */
 	    (*sc_fattr)(struct _scroll *, int, int),   /* Attribut (SCR_BLUE, ..) de la cellule *//* JMP 19-11-93 */
 	    (*sc_flattr)(struct _scroll *, int),       /* Attribut (SCR_BLUE, ..) du titre ligne*//* JMP 19-11-93 */
 	    (*sc_fcattr)(struct _scroll *, int),       /* Attribut (SCR_BLUE, ..) du titre col  *//* JMP 19-11-93 */
@@ -68,19 +68,19 @@ typedef struct _scroll {
 	    (*sc_fcalign)(struct _scroll *, int),      /* Alignement (0=left, 1=Center, 2=Right)(SCR_BLUE, ..) du titre col  */ /* JMP 02-06-97 */
 	    (*sc_fdisp)(struct _scroll *, int, int);      /* Fn avant display cellule  *//* JMP 19-11-93 */
 #else
-    char    *(*sc_ftitle)(),    /* Fn retournant le titre g‚n‚ral */
+    char    *(*sc_ftitle)(),    /* Fn retournant le titre gÃ©nÃ©ral */
 	    *(*sc_fctitle)(),   /* Fn retournant le titre d'un colonne */
 	    *(*sc_fltitle)(),   /* Fn retournant le titre d'une ligne */
 	    *(*sc_ftext)();     /* Fn retournant le texte d'une cellule */
     int     (*sc_fnl)(),        /* Fn retournant le nombre de lignes */
 	    (*sc_fnc)(),        /* Fn retournant le nombre de colonnes */
 	    (*sc_flen)();       /* Fn retournant la largeur d'une col */
-    int     (*sc_fedit)(),      /* Fn d'‚dition d'une cellule */
+    int     (*sc_fedit)(),      /* Fn d'Ã©dition d'une cellule */
 	    (*sc_fdel)(),       /* Fn de destruction d'une cellule */
-	    (*sc_fins)();       /* Fn de cr‚ation d'une cellule */
-    int     (*sc_ffn)(),        /* Fn ex‚cut‚e pour une touche fonction */
-	    (*sc_fbeg)(),       /* Fn de d‚but d'‚dition */
-	    (*sc_fend)(),       /* Fn de fin d'‚dition */
+	    (*sc_fins)();       /* Fn de crÃ©ation d'une cellule */
+    int     (*sc_ffn)(),        /* Fn exÃ©cutÃ©e pour une touche fonction */
+	    (*sc_fbeg)(),       /* Fn de dÃ©but d'Ã©dition */
+	    (*sc_fend)(),       /* Fn de fin d'Ã©dition */
 	    (*sc_fattr)(),      /* Attribut (SCR_BLUE, ..) de la cellule *//* JMP 19-11-93 */
 	    (*sc_flattr)(),     /* Attribut (SCR_BLUE, ..) du titre ligne*//* JMP 19-11-93 */
 	    (*sc_fcattr)(),     /* Attribut (SCR_BLUE, ..) du titre col  *//* JMP 19-11-93 */
@@ -90,10 +90,10 @@ typedef struct _scroll {
 	    (*sc_fdisp)();      /* Fn avant display cellule  *//* JMP 19-11-93 */
 #endif /* SCRPROTO */
 
-    char    reserved[16];       /* reserv‚ */
+    char    reserved[16];       /* reservÃ© */
 } SCROLL;
 
-/*** Déplacement de s_scroll.h pour les problèmes de compilation le 8/12/2011 
+/*** DÃ©placement de s_scroll.h pour les problÃ§mes de compilation le 8/12/2011 
 #define DATA        (SCRL->sc_pcl)
 
 #define PL          (SCRL->sc_ipl)          // position on the screen 
@@ -140,7 +140,7 @@ typedef struct _scroll {
 #define FBEG              (*(SCRL->sc_fbeg))
 #define FEND              (*(SCRL->sc_fend))
 
- FIN Déplacement de s_scroll.h pour les problèmes de compilation le 8/12/2011 ***/
+ FIN DÃ©placement de s_scroll.h pour les problÃ§mes de compilation le 8/12/2011 ***/
 
 extern SCROLL  *SCRL;
 extern int      SCRL_end;

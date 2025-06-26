@@ -1,13 +1,13 @@
 #include "scr4.h"
 
 /* ===================================================================
-Effectue l'addition d'un entier a et d'un entier b en arithm‚tique
-de pr‚cision infinie.
+Effectue l'addition d'un entier a et d'un entier b en arithmÃ©tique
+de prÃ©cision infinie.
 
-Chaque entier est repr‚sent‚ par une chaŒne de caractŠres num‚riques de
+Chaque entier est reprÃ©sentÃ© par une chaÃ®ne de caractÃ¨res numÃ©riques de
 longueur arbitraire.
 
-&RT res contient le r‚sultat.
+&RT res contient le rÃ©sultat.
 
 &EX
     InfAdd("399999999999999999999999999", "1", res);

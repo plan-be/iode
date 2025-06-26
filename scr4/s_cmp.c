@@ -4,21 +4,21 @@ extern int     SCR_APPLYCMP_IFEMPTY;    /* BP_M 12-12-2009 16:28 */
 extern int     SCR_NOT_APPLY_JOIN;  /* BP_M 12-12-2009 16:28 */
 
 /* ======================================================================
-Applique les CODES associÇs Ö un champ d'une PAGE :
+Applique les CODES associ√©s √† un champ d'une PAGE :
 
 &EN Recherche dans l'ISAM CODE le record correspondant (ou le suivant si la
-condition est CIRC ou GE) Ö la valeur du champ de la PAGE. Si la condition
-est EQ, un record Çgal doit àtre trouvÇ (pour ce qui concerne le champ
-recherchÇ).
+condition est CIRC ou GE) √† la valeur du champ de la PAGE. Si la condition
+est EQ, un record √©gal doit √™tre trouv√© (pour ce qui concerne le champ
+recherch√©).
 
 &EN Copie dans la PAGE les valeurs des autres champs de l'ISAM CODE.
 
-&EN Recommence l'opÇration pour les autres CODES dÇfinis dans ce màme champ.
+&EN Recommence l'op√©ration pour les autres CODES d√©finis dans ce m√™me champ.
 
-En cas d'erreur, un message est affichÇ (record non trouvÇ, ISAM vide ou
+En cas d'erreur, un message est affich√© (record non trouv√©, ISAM vide ou
 inaccessible, etc).
 
-&RT 0 en cas de succäs, -1 sinon
+&RT 0 en cas de succ√®s, -1 sinon
 &SA SCR_apply_all_cmp()
 ------------------------------------------------------------------------ */
 
@@ -137,9 +137,9 @@ int     fld_nb;
 }
 
 /* ======================================================================
-Applique la fonction SCR_apply_cmp() Ö tous les champs de la PAGE contenant
-le mot-clÇ CODE.
-&RT 0 en cas de succäs, -1 sinon
+Applique la fonction SCR_apply_cmp() √† tous les champs de la PAGE contenant
+le mot-cl√© CODE.
+&RT 0 en cas de succ√®s, -1 sinon
 &SA SCR_apply_cmp(), SCR_display_cmp()
 ------------------------------------------------------------------------- */
 
@@ -174,11 +174,11 @@ PAGE    *pg;
 }
 
 /* ======================================================================
-ExÇcute la fonction SCR_display_cmp() pour chaque champ CODE de la PAGE.
+Ex√©cute la fonction SCR_display_cmp() pour chaque champ CODE de la PAGE.
 &EX
-    SCR_apply_all_cmp(pg);     --> exÇcute tous les CODES de la PAGE
-    SCR_display_all_cmp(pg);   --> affiche dans l'Çcran les champs
-				   modifiÇs
+    SCR_apply_all_cmp(pg);     --> ex√©cute tous les CODES de la PAGE
+    SCR_display_all_cmp(pg);   --> affiche dans l'√©cran les champs
+				   modifi√©s
 
 &TX
 &SA SCR_apply_all_cmp(), SCR_display_cmp()
@@ -194,12 +194,12 @@ PAGE    *pg;
 }
 
 /* ======================================================================
-Affiche tous les champs susceptibles d'àtre modifiÇs par la fonction
-SCR_apply_cmp(pg, fld_nb), c'est-Ö-dire tous ceux faisant partie d'un des
+Affiche tous les champs susceptibles d'√™tre modifi√©s par la fonction
+SCR_apply_cmp(pg, fld_nb), c'est-√†-dire tous ceux faisant partie d'un des
 ISAM dont le champ fld_nb est CODE.
 &EX
     SCR_apply_cmp(pg, fld_nb);    --> pas d'affichage
-    SCR_display_cmp(pg, fld_nb);  --> affichage des champs modifiÇs dans
+    SCR_display_cmp(pg, fld_nb);  --> affichage des champs modifi√©s dans
 				      la PAGE pg
 &TX
 &SA SCR_display_all_cmp(), SCR_apply_cmp()

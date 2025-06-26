@@ -340,7 +340,7 @@ extern "C" {
     extern int A2M_GDI_RMARG;
     extern int A2M_GDI_TMARG;
     extern int A2M_GDI_BMARG;
-    extern int A2M_GDI_TWIDTH_FIXED; /* JMP 21-03-05  : Si 0 (dft), ‚largi les colonnes au min du paragraphe, si 1, reste fixe*/
+    extern int A2M_GDI_TWIDTH_FIXED; /* JMP 21-03-05  : Si 0 (dft), Ã©largi les colonnes au min du paragraphe, si 1, reste fixe*/
     
     /* Public GIF specific */
     extern int A2M_GIF_BGCOLOR[3];

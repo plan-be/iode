@@ -21,10 +21,10 @@ HWND WscrStatusCreate(HWND hWnd)
 }
 
 /* =================================================================
-Change le message de la ligne d'‚tat de la fenˆtre hWnd. Si hWnd est
-nul, affiche dans la derniŠre fenˆtre Popup de l'application en cours.
+Change le message de la ligne d'Ã©tat de la fenÃªtre hWnd. Si hWnd est
+nul, affiche dans la derniÃ¨re fenÃªtre Popup de l'application en cours.
 
-Si une telle fenˆtre n'existe pas, retourne sans afficher.
+Si une telle fenÃªtre n'existe pas, retourne sans afficher.
 ==================================================================== */
 
 WscrStatusSetText(HWND hWnd, U_ch *text)

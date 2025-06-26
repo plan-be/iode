@@ -1,10 +1,10 @@
 #include "scr.h"
 
 /* =======================================================================
-Affiche le champs fld_nb de la PAGE pg dans l'IMAGE de l'Çcran ou
+Affiche le champs fld_nb de la PAGE pg dans l'IMAGE de l'√©cran ou
 l'image SCR_TMP_IMAGE.
 
-Cette fonction est compatible Windows et mode caractäre.
+Cette fonction est compatible Windows et mode caract√®re.
 
 &SA PG_display_field(), PGd_display_flds()
 =========================================================================*/

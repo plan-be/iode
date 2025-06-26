@@ -3,12 +3,12 @@
 /* ====================================================================
 Dump du contenu d'une matrice.
 
-On passe en paramätres: le file descriptor du fichier output (stdout, ...),
-le pointeur sur la matrice Ö imprimer et un titre gÇnÇral.
+On passe en param√®tres: le file descriptor du fichier output (stdout, ...),
+le pointeur sur la matrice √† imprimer et un titre g√©n√©ral.
 
 
 &RT
-nÇant (0)
+n√©ant (0)
 
 &EX FILE *fd;
     MAT  *m1;

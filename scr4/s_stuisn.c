@@ -1,8 +1,8 @@
 #include "s_strs.h"
 /* =+=================================================================
-Recherche un caractäre dans un string.
+Recherche un caract√®re dans un string.
 
-&RT 1 si le caractäre est trouvÇ, 0 sinon.
+&RT 1 si le caract√®re est trouv√©, 0 sinon.
 &EX
     U_is_in(text[i], ".;:,?! ");
 &TX

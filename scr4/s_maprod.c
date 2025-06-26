@@ -2,14 +2,14 @@
 
 /* ====================================================================
 Effectue le produit des deux matrices m1 (nl1 x nc1) et m2 (nl2 x nc2).
-Le r‚sultat est stock‚ dans m3 (nl1 * nc2).
+Le rÃ©sultat est stockÃ© dans m3 (nl1 * nc2).
 
-Si m3 est nul, une matrice de dimension (nl1, nc2) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant). Si m3 n'est pas nul,
-le r‚sultat y est stock‚ et m3 est retourn‚.
-Les dimensions de m3 doivent ˆtre correctes sans quoi le
-produit n'est pas calcul‚ , la variable M_errno est positionn‚e et la
+Si m3 est nul, une matrice de dimension (nl1, nc2) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant). Si m3 n'est pas nul,
+le rÃ©sultat y est stockÃ© et m3 est retournÃ©.
+Les dimensions de m3 doivent Ãªtre correctes sans quoi le
+produit n'est pas calculÃ© , la variable M_errno est positionnÃ©e et la
 fonction retourne un pointeur nul.
 
 &EX

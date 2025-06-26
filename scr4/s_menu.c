@@ -40,10 +40,10 @@ OPTION    *opt;
 }
 
 /* =========MN_CREATE ============================================
-    Cr‚e un nouveau menu en allouant l'espace n‚cessaire et en
-    initialisant les valeurs par d‚faut : BOX 1, BACK DEFAULT.
+    CrÃ©e un nouveau menu en allouant l'espace nÃ©cessaire et en
+    initialisant les valeurs par dÃ©faut : BOX 1, BACK DEFAULT.
 
-    Retourne un pointeur vers la structure allou‚e.
+    Retourne un pointeur vers la structure allouÃ©e.
 &EX
     mn = MN_create();
 &TX
@@ -76,12 +76,12 @@ OPTION      *opt;
 }
 
 /* =+====== MN_FREE =============================================
-    LibŠre l'espace allou‚ pour un menu cr‚‚ … l'aide d'une des
-    fonctions de cr‚ation MN_create(), MN_auto_create(), ...
+    LibÃ¨re l'espace allouÃ© pour un menu crÃ©Ã© Ã  l'aide d'une des
+    fonctions de crÃ©ation MN_create(), MN_auto_create(), ...
 
-    Les options, titre et footnote du MENU sont ‚galement lib‚r‚s.
+    Les options, titre et footnote du MENU sont Ã©galement libÃ©rÃ©s.
 
-&NO Cette fonction ne peut jamais ˆtre utilis‚e sur un MENU d‚fini comme
+&NO Cette fonction ne peut jamais Ãªtre utilisÃ©e sur un MENU dÃ©fini comme
 objet SCR dans un fichier source.
 
 &SA MN_create()
@@ -118,13 +118,13 @@ MENU    *mn;
 
 
 /* =+====== MN_ADD_OPTION ============================================
-    Ajoute une option … un MENU cr‚‚ … l'aide d'une des fonctions
+    Ajoute une option Ã  un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
     d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-    La valeur retourn‚e est un pointeur vers la nouvelle option.
+    La valeur retournÃ©e est un pointeur vers la nouvelle option.
 
-&NO Cette fonction peut ˆtre utilis‚e en cours d'‚dition du MENU, mais
-jamais sur un MENU d‚fini comme objet SCR dans un fichier source.
+&NO Cette fonction peut Ãªtre utilisÃ©e en cours d'Ã©dition du MENU, mais
+jamais sur un MENU dÃ©fini comme objet SCR dans un fichier source.
 
 
 &SA MN_auto_create(), MN_set_option_text()
@@ -160,16 +160,16 @@ MENU    *mn;
     return(opt);
 }
 /* =+=======MN_END ==================================================
-Termine la d‚finition d'un MENU cr‚‚ … l'aide d'une des fonctions
+Termine la dÃ©finition d'un MENU crÃ©Ã© Ã  l'aide d'une des fonctions
 d'allocation de MENU MN_create(), MN_auto_create(), etc.
 
-Le nombre de colonnes est ajust‚e sur les textes des OPTIONS, de la
-footnote et du titre. Le nombre de lignes visibles est limit‚ … la
-taille de l'‚cran et au nombre d'options.
+Le nombre de colonnes est ajustÃ©e sur les textes des OPTIONS, de la
+footnote et du titre. Le nombre de lignes visibles est limitÃ© Ã  la
+taille de l'Ã©cran et au nombre d'options.
 
-La lettre qui permettra de se positionner ou de d‚clencher l'action
-d'une option est fix‚e comme ‚tant la premiŠre non blanche de l'option
-si cette lettre n'a pas encore ‚t‚ fix‚e.
+La lettre qui permettra de se positionner ou de dÃ©clencher l'action
+d'une option est fixÃ©e comme Ã©tant la premiÃ¨re non blanche de l'option
+si cette lettre n'a pas encore Ã©tÃ© fixÃ©e.
 
 &EX
     EditProducts(prod, prices)
@@ -238,7 +238,7 @@ MN_option_end()
 }
 
 /* ====================================================================
-Cr‚e un MENU dynamique et fixe directement la ligne, la colonne, la
+CrÃ©e un MENU dynamique et fixe directement la ligne, la colonne, la
 couleur et le nombre de lignes visibles.
 
 &EX
@@ -288,13 +288,13 @@ int     line, col, back, nb_line;
 }
 
 /* ====================================================================
-Recherche le num‚ro de l'option correspondant au texte txt dans le MENU
-mn. Le texte de chaque option est localement stripp‚ (les blancs de fin
-sont supprim‚s) et justifi‚ … gauche. De mˆme en ce qui concerne le
-texte pass‚ comme argument … la fonction.
+Recherche le numÃ©ro de l'option correspondant au texte txt dans le MENU
+mn. Le texte de chaque option est localement strippÃ© (les blancs de fin
+sont supprimÃ©s) et justifiÃ© Ã  gauche. De mÃªme en ce qui concerne le
+texte passÃ© comme argument Ã  la fonction.
 
-La fonction retourne -1 si le texte n'est pas trouv‚ dans le MENU. Elle
-retourne le num‚ro de l'option sinon (premiŠre option = 0).
+La fonction retourne -1 si le texte n'est pas trouvÃ© dans le MENU. Elle
+retourne le numÃ©ro de l'option sinon (premiÃ¨re option = 0).
 
 &EX
     MN_search_option(mn, " Impression sur LPT1:");
@@ -331,15 +331,15 @@ unsigned char    *txt;
 }
 
 /* ====================================================================
-Cr‚e un MENU dynamique et fixe directement la ligne, la colonne, la
-couleur, le nombre de lignes visibles, l'‚paisseur du cadre (BOX) et les
+CrÃ©e un MENU dynamique et fixe directement la ligne, la colonne, la
+couleur, le nombre de lignes visibles, l'Ã©paisseur du cadre (BOX) et les
 options du menu.
 
 text est un tableau de pointeurs vers le texte des options. Le dernier
-‚l‚ment du tableau doit ˆtre un pointeur nul ou un pointeur vers un
+Ã©lÃ©ment du tableau doit Ãªtre un pointeur nul ou un pointeur vers un
 string vide ("").
 
-La fonction MN_end() est appel‚e en fin de fonction pour ajuster le MENU.
+La fonction MN_end() est appelÃ©e en fin de fonction pour ajuster le MENU.
 
 &EX
     EditProducts(prod)

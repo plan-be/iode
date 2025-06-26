@@ -3,10 +3,10 @@
 
 
 /* ======================================================================
-Calcule un cl‚ d'activation sur base d'un string quelconque. La valeur
-retourn‚e est un long positif.
+Calcule un clÃ© d'activation sur base d'un string quelconque. La valeur
+retournÃ©e est un long positif.
 
-&RT long contenant une cl‚ codifiant key
+&RT long contenant une clÃ© codifiant key
 ------------------------------------------------------------------------- */
 
 long KEY_calc(key)

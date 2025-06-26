@@ -5,23 +5,23 @@ extern unsigned char  AR_CH;
 
 /* ====================================================================
 Retourne la liste des fichiers contenus dans un fichier d'archives
-construit Ö l'aide de la fonction AR_add().
+construit √† l'aide de la fonction AR_add().
 
-Le rÇsultat est un tableau de structures ARLIST contenant pour chaque
-entrÇe la dÇfinition d'un fichier archivÇ :
+Le r√©sultat est un tableau de structures ARLIST contenant pour chaque
+entr√©e la d√©finition d'un fichier archiv√© :
 &CO
     typedef struct _arlist_ {
-	long    ar_rsize,       Taille rÇelle
-		ar_psize,       Taille packÇe
+	long    ar_rsize,       Taille r√©elle
+		ar_psize,       Taille pack√©e
 		ar_date;        Date de sauvetage YYYYMMDD
 	char    ar_name[51];    Nom du fichier
     } ARLIST;
 &TX
 Le tableau se termine par un pointeur NULL pour undiquer qu'il
-est terminÇ. La fonction SCR_free_tbl() permet de libÇrer l'espace.
+est termin√©. La fonction SCR_free_tbl() permet de lib√©rer l'espace.
 
 &RT NULL en cas d'erreur. La variable AR_ERRNO indique le code d'erreur
-    et la fonction AR_error() fournit un texte. En cas de succäs,
+    et la fonction AR_error() fournit un texte. En cas de succ√®s,
     un tableau de structures ARLIST.
 
 &EX

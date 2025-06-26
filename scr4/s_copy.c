@@ -12,7 +12,7 @@ Duplicie un fichier avec ou sans bufferisation (de l'output).
 
 &EN in = filename input
 &EN out = filename output
-&EN buf : -1 pour non bufferis‚, 0 pour la bufferisation par d‚faut,
+&EN buf : -1 pour non bufferisÃ©, 0 pour la bufferisation par dÃ©faut,
 	  n pour une bufferisation sur n bytes
 
 &RT

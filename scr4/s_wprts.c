@@ -101,7 +101,7 @@ cas, le code de retour est -1.
     WscrGetPrinterDuplex("My Printer");
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*(), WscrGetPrinter*()
 ========================================================================= */
 
@@ -195,7 +195,7 @@ Dans ce cas, le code de retour est -1.
     WscrSetPrinterOrientation("My Printer", 1);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -206,7 +206,7 @@ WscrSetPrinterOrientation(char *PrinterName, int orient)
 }
 
 /* ======================================================================
-DÇfinit la taille du papier de l'imprimante PrinterName.
+D√©finit la taille du papier de l'imprimante PrinterName.
 Cette fonction n'est pas disponible sur toutes les imprimantes.
 Dans ce cas, le code de retour est -1.
 
@@ -231,7 +231,7 @@ Dans ce cas, le code de retour est -1.
     WscrSetPrinterPaperSize("My Printer", 0);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -260,21 +260,21 @@ WscrSetPrinterPaperSize(char *PrinterName, int psize)
 }
 
 /* ======================================================================
-DÇfinit le facteur de compression de l'impression pour l'imprimante
-PrinterName. En imprimant Ö 50% par exemple, on peut imprimer deux fois
+D√©finit le facteur de compression de l'impression pour l'imprimante
+PrinterName. En imprimant √† 50% par exemple, on peut imprimer deux fois
 plus dans les deux directions.
 
 Cette fonction n'est pas disponible sur toutes les imprimantes. Dans ce
 cas, le code de retour est -1.
 
 &EN PrinterName : nom de l'imprimante.
-&EN scale : valeur de l'Çchelle
+&EN scale : valeur de l'√©chelle
 
 &EX
     WscrSetPrinterScale("My Printer", 72);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -284,7 +284,7 @@ WscrSetPrinterScale(char *PrinterName, int scale)
 }
 
 /* ======================================================================
-DÇfinit le nombre de copies Ö imprimer pour l'impression sur
+D√©finit le nombre de copies √† imprimer pour l'impression sur
 l'imprimante PrinterName.
 
 Cette fonction n'est pas disponible sur toutes les imprimantes. Dans ce
@@ -297,7 +297,7 @@ cas, le code de retour est -1.
     WscrSetPrinterCopies("My Printer", 5);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -307,23 +307,23 @@ WscrSetPrinterCopies(char *PrinterName, int copies)
 }
 
 /* ======================================================================
-DÇfinit la qualitÇ d'impression sur l'imprimante PrinterName.
+D√©finit la qualit√© d'impression sur l'imprimante PrinterName.
 
 Cette fonction n'est pas disponible sur toutes les imprimantes. Dans ce
 cas, le code de retour est -1.
 
 &EN PrinterName : nom de l'imprimante.
 &EN qualaty :
-&EN2 0 : qualitÇ maximum
-&EN2 1 : qualitÇ moyenne
-&EN2 2 : qualitÇ faible
-&EN2 3 : qualitÇ brouillon
+&EN2 0 : qualit√© maximum
+&EN2 1 : qualit√© moyenne
+&EN2 2 : qualit√© faible
+&EN2 3 : qualit√© brouillon
 
 &EX
     WscrSetPrinterQuality("My Printer", 0);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -355,7 +355,7 @@ cas, le code de retour est -1.
     WscrSetPrinterColor("My Printer", 1);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -386,7 +386,7 @@ cas, le code de retour est -1.
     WscrSetPrinterDuplex("My Printer", 1);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -417,7 +417,7 @@ cas, le code de retour est -1.
     WscrSetPrinterCollate("My Printer", 1);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
@@ -433,19 +433,19 @@ WscrSetPrinterCollate(char *PrinterName, int collate)
 }
 
 /* ======================================================================
-Interroge le driver de PrinterName et retourne la source de papier par dÇfaut.
+Interroge le driver de PrinterName et retourne la source de papier par d√©faut.
 
 &EN PrinterName : nom de l'imprimante.
 
 &RT
 &EN -1 = erreur
-&EN >= 0 : numÇro de la source de papier (dÇpend de l'imprimante)
+&EN >= 0 : num√©ro de la source de papier (d√©pend de l'imprimante)
 
 &EX
     WscrGetPrinterSource("My Printer");
 &TX
 
-&RT >= 0 en cas de succäs, -1 en cas d'erreur.
+&RT >= 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*(), WscrGetPrinter*()
 ========================================================================= */
 
@@ -456,19 +456,19 @@ WscrGetPrinterSource(char *PrinterName)
 
 
 /* ======================================================================
-Indique la source de papier Ö utiliser sur l'imprimante PrinterName.
+Indique la source de papier √† utiliser sur l'imprimante PrinterName.
 
 Cette fonction n'est pas disponible sur toutes les imprimantes. Dans ce
 cas, le code de retour est -1.
 
 &EN PrinterName : nom de l'imprimante.
-&EN source : entier indiquant la source (dÇpend de l'imprimante)
+&EN source : entier indiquant la source (d√©pend de l'imprimante)
 
 &EX
     WscrSetPrinterSource("My Printer", 2);
 &TX
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA WscrSetPrinter*()
 ========================================================================= */
 
