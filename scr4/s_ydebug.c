@@ -1,15 +1,15 @@
 #include "s_yy.h"
 
 /* ====================================================================
-Fonction de debugging d‚clench‚e par la directive ##debug dans un
-programme analys‚ par YY_read(), YY_lex() ou YY_lex2().
+Fonction de debugging dÃ©clenchÃ©e par la directive ##debug dans un
+programme analysÃ© par YY_read(), YY_lex() ou YY_lex2().
 
-Cette fonction peut ˆtre remplac‚e par une fonction utilisateur. Elle
-est appel‚e avec pour argument le pointeur vers le fichier ouvert
+Cette fonction peut Ãªtre remplacÃ©e par une fonction utilisateur. Elle
+est appelÃ©e avec pour argument le pointeur vers le fichier ouvert
 (YYFILE *).
 
-Par d‚faut, elle affiche le nom du fichier, la ligne courante suivis du
-message debug et de la m‚moire disponible.
+Par dÃ©faut, elle affiche le nom du fichier, la ligne courante suivis du
+message debug et de la mÃ©moire disponible.
 ======================================================================= */
 
 

@@ -40,25 +40,25 @@ char    *txt, *a, *b, *c, *d, *e;
 
 /* =====================================================================
 Cette fonction permet d'accumuler des messages dans un fichier local (en
-g‚n‚ral … des fins de test ou de debugging. Elle prend des paramŠtres
-comparables … ceux de ~cprintf()~C.
+gÃ©nÃ©ral Ã  des fins de test ou de debugging. Elle prend des paramÃ¨tres
+comparables Ã  ceux de ~cprintf()~C.
 
-Sa syntaxe est identique … celle de printf. Elle ‚crit par d‚faut dans
+Sa syntaxe est identique Ã  celle de printf. Elle Ã©crit par dÃ©faut dans
 le fichier ~cdebug.win~C.
 
-Le fichier est … chaque fois ouvert et ferm‚ pour permettre d'arrˆter le
-programme n'importe tout en conservant les r‚sultats dans le fichier.
-Cela peut ˆtre un facteur de lenteur dans les applications.
+Le fichier est Ã  chaque fois ouvert et fermÃ© pour permettre d'arrÃªter le
+programme n'importe tout en conservant les rÃ©sultats dans le fichier.
+Cela peut Ãªtre un facteur de lenteur dans les applications.
 
 La variable globale
 &CO
     int DebugActif
 &TX
 permet d'annuler temporairement l'output dans un fichier. Il suffit de
-fixer sa valeur … 0.
+fixer sa valeur Ã  0.
 
 &TI Nom du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 On peut changer le nom du fichier en fixant la variable
 &CO
     char  *DebugFilename;
@@ -66,8 +66,8 @@ On peut changer le nom du fichier en fixant la variable
 Si cette variable est nulle, le fichier est ~cdebug.win~C. Sinon, elle
 contient le nom du fichier contenant les messages.
 
-Comme le fichier est … chaque appel ouvert et ferm‚, on peut sans problŠme
-changer le nom du fichier … n'importe quel moment.
+Comme le fichier est Ã  chaque appel ouvert et fermÃ©, on peut sans problÃ¨me
+changer le nom du fichier Ã  n'importe quel moment.
 ========================================================*/
 
 int Debug(txt, a, b, c, d, e)
@@ -87,8 +87,8 @@ char    *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Cette fonction effectue un Debug() en for‡ant localement DebugActif … 1 et
-en remettant … la valeur initiale aprŠs le traitement.
+Cette fonction effectue un Debug() en forÃ§ant localement DebugActif Ã  1 et
+en remettant Ã  la valeur initiale aprÃ¨s le traitement.
 ========================================================*/
 
 int DebugForce(txt, a, b, c, d, e)
@@ -106,17 +106,17 @@ int DebugCPU  = 0;
 int DebugCPUT = -1;
 
 /* =====================================================================
-D‚marre une s‚quence DebugB() .. DebugE(). Cette fonction m‚morise le
-temps CPU de fa‡on … pouvoir imprimer le temps ‚coul‚ entre DebugB() et
+DÃ©marre une sÃ©quence DebugB() .. DebugE(). Cette fonction mÃ©morise le
+temps CPU de faÃ§on Ã  pouvoir imprimer le temps Ã©coulÃ© entre DebugB() et
 DebugE().
 
 &EX
     DebugB("Impression de %s ...", "toto.txt");
     PrintFile("toto.txt");
-    DebugE("temin‚e");
+    DebugE("teminÃ©e");
 
-    R‚sultat :
-	Impression de toto.txt ...termin‚e [12 ms]
+    RÃ©sultat :
+	Impression de toto.txt ...terminÃ©e [12 ms]
 
 &TX
 
@@ -138,16 +138,16 @@ char    *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Termine une s‚quence DebugB() .. DebugE(). Cette fonction utilise
-l'information m‚moris‚e par DebugB() pour afficher le temps CPU ‚coul‚.
+Termine une sÃ©quence DebugB() .. DebugE(). Cette fonction utilise
+l'information mÃ©morisÃ©e par DebugB() pour afficher le temps CPU Ã©coulÃ©.
 
 &EX
     DebugB("Impression de %s ...", "toto.txt");
     PrintFile("toto.txt");
-    DebugE("temin‚e");
+    DebugE("teminÃ©e");
 
-    R‚sultat :
-	Impression de toto.txt ...termin‚e [12 ms]
+    RÃ©sultat :
+	Impression de toto.txt ...terminÃ©e [12 ms]
 
 &TX
 
@@ -167,18 +167,18 @@ char    *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Termine une s‚quence DebugB() .. DebugE[n](). Cette fonction utilise
-l'information m‚moris‚e par DebugB() pour afficher le temps CPU ‚coul‚.
+Termine une sÃ©quence DebugB() .. DebugE[n](). Cette fonction utilise
+l'information mÃ©morisÃ©e par DebugB() pour afficher le temps CPU Ã©coulÃ©.
 
-A la diff‚rence de DebugE(), il n'y a pas de \n en fin de ligne.
+A la diffÃ©rence de DebugE(), il n'y a pas de \n en fin de ligne.
 
 &EX
     DebugB("Impression de %s ...", "toto.txt");
     PrintFile("toto.txt");
-    DebugE("temin‚e\n");
+    DebugE("teminÃ©e\n");
 
-    R‚sultat :
-	Impression de toto.txt ...termin‚e [12 ms]
+    RÃ©sultat :
+	Impression de toto.txt ...terminÃ©e [12 ms]
 
 &TX
 
@@ -198,17 +198,17 @@ char    *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Termine une s‚quence DebugB() .. DebugET(). Cette fonction utilise
-l'information m‚moris‚e par DebugB() pour afficher le temps CPU ‚coul‚ et
-le temps total depuis le premier appel … DebugB().
+Termine une sÃ©quence DebugB() .. DebugET(). Cette fonction utilise
+l'information mÃ©morisÃ©e par DebugB() pour afficher le temps CPU Ã©coulÃ© et
+le temps total depuis le premier appel Ã  DebugB().
 
 &EX
     DebugB("Impression de %s ...", "toto.txt");
     PrintFile("toto.txt");
-    DebugE("temin‚e");
+    DebugE("teminÃ©e");
 
-    R‚sultat :
-	Impression de toto.txt ...termin‚e [12/1200 ms]
+    RÃ©sultat :
+	Impression de toto.txt ...terminÃ©e [12/1200 ms]
 
 &TX
 
@@ -228,11 +228,11 @@ char    *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Cette fonction imprime en hexad‚cimal dans le fichier debug (voir Debug())
+Cette fonction imprime en hexadÃ©cimal dans le fichier debug (voir Debug())
 le contenu du string str de longueur lg.
 
-&EN char *title : texte … placer avant la valeur hexa
-&EN unsigned char *str : string … imprimer (ou pointeur vers une variable)
+&EN char *title : texte Ã  placer avant la valeur hexa
+&EN unsigned char *str : string Ã  imprimer (ou pointeur vers une variable)
 &EN int lg : longueur de str
 
 La variable
@@ -240,10 +240,10 @@ La variable
     int DebugActif
 &TX
 permet d'annuler temporairement l'output dans un fichier. Il suffit de
-fixer sa valeur … 0.
+fixer sa valeur Ã  0.
 
 &TI Nom du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 On peut changer le nom du fichier en fixant la variable
 &CO
     char  *DebugFilename;
@@ -251,13 +251,13 @@ On peut changer le nom du fichier en fixant la variable
 Si cette variable est nulle, le fichier est ~cdebug.win~C. Sinon, elle
 contient le nom du fichier contenant les messages.
 
-Comme le fichier est … chaque appel ouvert et ferm‚, on peut sans problŠme
-changer le nom du fichier … n'importe quel moment.
+Comme le fichier est Ã  chaque appel ouvert et fermÃ©, on peut sans problÃ¨me
+changer le nom du fichier Ã  n'importe quel moment.
 
 &EX
     DebugHexa("Valeur du double : ", &dbl, sizeof(double));
 
-    R‚sultat :
+    RÃ©sultat :
 	Valeur du double : 12eaf2df267e129a
 
 &TX
@@ -278,18 +278,18 @@ int DebugHexa(char *title, unsigned char *str, int lg)
 
 /* =====================================================================
 Cette fonction imprime dans le fichier filename
-le contenu d‚fini par le format txt et les paramŠtres a, b, c,  d et e.
+le contenu dÃ©fini par le format txt et les paramÃ¨tres a, b, c,  d et e.
 
-&EN char *filename : nom du fichier r‚sultat
+&EN char *filename : nom du fichier rÃ©sultat
 &EN char *txt : format d'impression (fprintf)
-&EN char *a, *b, *c, *d, *e : paramŠtres optionnels de txt
+&EN char *a, *b, *c, *d, *e : paramÃ¨tres optionnels de txt
 
 La variable
 &CO
     int DebugActif
 &TX
 permet d'annuler temporairement l'output dans un fichier. Il suffit de
-fixer sa valeur … 0.
+fixer sa valeur Ã  0.
 
 &EX
     DebugFile("dump.txt", "Valeur du double : %lf\n", &dbl);
@@ -313,12 +313,12 @@ char    *filename, *txt, *a, *b, *c, *d, *e;
 }
 
 /* =====================================================================
-Cette fonction imprime en hexad‚cimal dans le fichier filename
+Cette fonction imprime en hexadÃ©cimal dans le fichier filename
 le contenu du string str de longueur lg.
 
-&EN char *filename : nom du fichier r‚sultat
-&EN char *title : texte … placer avant la valeur hexa
-&EN unsigned char *str : string … imprimer (ou pointeur vers une variable)
+&EN char *filename : nom du fichier rÃ©sultat
+&EN char *title : texte Ã  placer avant la valeur hexa
+&EN unsigned char *str : string Ã  imprimer (ou pointeur vers une variable)
 &EN int lg : longueur de str
 
 La variable
@@ -326,7 +326,7 @@ La variable
     int DebugActif
 &TX
 permet d'annuler temporairement l'output dans un fichier. Il suffit de
-fixer sa valeur … 0.
+fixer sa valeur Ã  0.
 
 &EX
     DebugFileHexa("dump.txt", "Valeur du double : %lf\n", &dbl);

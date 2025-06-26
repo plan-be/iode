@@ -1,10 +1,10 @@
 #include "s_a2m.h"
 
 /*********************************************************************
- Fonctions et vars par d‚faut qui peuvent ˆtre remplac‚es par des fonctions
-    sp‚cifiques au logiciel appelant (par exemple IODE et chart.cpp
+ Fonctions et vars par dÃ©faut qui peuvent Ãªtre remplacÃ©es par des fonctions
+    spÃ©cifiques au logiciel appelant (par exemple IODE et chart.cpp
 
-  A2mFrGrfPrepare : construit les brushes et les pens n‚cessaires
+  A2mFrGrfPrepare : construit les brushes et les pens nÃ©cessaires
 *********************************************************************/
 
 int     A2MNBRPEN   = 12;

@@ -157,7 +157,7 @@ typedef struct _swstat_ {
 /* ======================= VARS =============================== */
 
 #ifdef SCRCPP 
-// JMP 12/05/2021. Pour utiliser les vars en C++, il faut des déclarer extern "C"  
+// JMP 12/05/2021. Pour utiliser les vars en C++, il faut des d├®clarer extern "C"  
 extern "C" {
 #endif 
 

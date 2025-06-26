@@ -168,7 +168,7 @@ Si lg est nul, calcule sur la longueur de tout le fichier.
 
 &RT :
 &EN crc32 si Ok,
-&EN 0 si fichier non trouv‚ ou si lg sup‚rieur … la taille du fichier.
+&EN 0 si fichier non trouvÃ© ou si lg supÃ©rieur Ã  la taille du fichier.
 
 &SA ScrFileCrc32()
 ==================================================================== */
@@ -219,7 +219,7 @@ Si lg est nul, calcule sur la longueur de tout le fichier.
 
 &RT :
 &EN crc32 si Ok,
-&EN 0 si fichier non trouv‚
+&EN 0 si fichier non trouvÃ©
 
 &SA ScrFileCrc32Lg()
 ==================================================================== */

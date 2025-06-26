@@ -141,24 +141,24 @@ char    *fld_name;
 }
 
 /* ====================================================================
-Fonction semblable … PR_file() mais g‚n‚ralis‚e de telle sorte que
-l'utilisateur ait le choix de la fonction … ex‚cuter pour obtenir
-le texte … imprimer pour chaque champ rencontr‚ dans le fichier filename.
-Dans le cas de PR_file(), ce texte ‚tait celui du champ de la page
-de r‚f‚rence.
+Fonction semblable Ã  PR_file() mais gÃ©nÃ©ralisÃ©e de telle sorte que
+l'utilisateur ait le choix de la fonction Ã  exÃ©cuter pour obtenir
+le texte Ã  imprimer pour chaque champ rencontrÃ© dans le fichier filename.
+Dans le cas de PR_file(), ce texte Ã©tait celui du champ de la page
+de rÃ©fÃ©rence.
 
-Le contenu d'un fichier est imprim‚ en rempla‡ant les champs indiqu‚s
-dans le fichier par des $nom ou ##nom par le texte retourn‚ par la
-fonction utilisateur, fonction qui re‡oit le nom du champ comme
-paramŠtre.
+Le contenu d'un fichier est imprimÃ© en remplaÃ§ant les champs indiquÃ©s
+dans le fichier par des $nom ou ##nom par le texte retournÃ© par la
+fonction utilisateur, fonction qui reÃ§oit le nom du champ comme
+paramÃ¨tre.
 
 
-&EN filename est un fichier Ascii contenant le texte … imprimer et
-    des s‚quences sp‚ciales d‚crites plus bas.
+&EN filename est un fichier Ascii contenant le texte Ã  imprimer et
+    des sÃ©quences spÃ©ciales dÃ©crites plus bas.
 
-&EN fn est un pointeur vers fonction. Cette fonction re‡oit comme
-    argument le nom du champ rencontr‚ dans le fichier et retourne
-    le texte … imprimer … la place du champ. Sa syntaxe est la suivante :
+&EN fn est un pointeur vers fonction. Cette fonction reÃ§oit comme
+    argument le nom du champ rencontrÃ© dans le fichier et retourne
+    le texte Ã  imprimer Ã  la place du champ. Sa syntaxe est la suivante :
 &CO
     unsigned char *fn(unsigned char *fld_name);
 
@@ -177,34 +177,34 @@ paramŠtre.
     }
 &TX
 
-&EN col qui indique en quelle colonne le texte d‚fini par le fichier
-    doit ˆtre imprim‚ (valable pour les ‚tiquettes)
+&EN col qui indique en quelle colonne le texte dÃ©fini par le fichier
+    doit Ãªtre imprimÃ© (valable pour les Ã©tiquettes)
 
-&EN nl qui indique le nombre de lignes maximum … imprimer (si ce nombre
+&EN nl qui indique le nombre de lignes maximum Ã  imprimer (si ce nombre
     vaut -1, il n'y a pas de limite). A nouveau, ceci est surtout utile
-    pour des ‚tiquettes
+    pour des Ã©tiquettes
 
-&EN first_ch permet de s‚lectionner les lignes … imprimer dans le fichier
-    filename. Seules les lignes qui commencent par ce caractŠre sont
-    imprim‚es (majuscules ou minuscules). Si ce caractŠre est nul, toutes
-    les lignes sont s‚lectionn‚es.
+&EN first_ch permet de sÃ©lectionner les lignes Ã  imprimer dans le fichier
+    filename. Seules les lignes qui commencent par ce caractÃ¨re sont
+    imprimÃ©es (majuscules ou minuscules). Si ce caractÃ¨re est nul, toutes
+    les lignes sont sÃ©lectionnÃ©es.
 
-Dans le cas o— first_ch est sp‚cifi‚, les lignes dont le premier
-caractŠre est identique … first_ch et est majuscule sont de toute
-fa‡on imprim‚es. Celle dont le premier caractŠre est identique, mais
-en minuscule, ne sont imprim‚es que dans 2 cas : soit si aucun champ
-n'est pr‚sent dans cette ligne, soit si au moins un champ de la ligne
+Dans le cas oÃ¹ first_ch est spÃ©cifiÃ©, les lignes dont le premier
+caractÃ¨re est identique Ã  first_ch et est majuscule sont de toute
+faÃ§on imprimÃ©es. Celle dont le premier caractÃ¨re est identique, mais
+en minuscule, ne sont imprimÃ©es que dans 2 cas : soit si aucun champ
+n'est prÃ©sent dans cette ligne, soit si au moins un champ de la ligne
 est non vide.
 
-Lorsque un des caractŠres verticaux semi-graphiques (simple ou double) ou
-le caractŠre de hachurage de mt, ou le caractŠre pipe (|) apparaissent
-dans une ligne, le pointeur d'impression est remplac‚ … cet endroit
-quelque soit la longueur des champs pr‚c‚dents.
+Lorsque un des caractÃ¨res verticaux semi-graphiques (simple ou double) ou
+le caractÃ¨re de hachurage de mt, ou le caractÃ¨re pipe (|) apparaissent
+dans une ligne, le pointeur d'impression est remplacÃ© Ã  cet endroit
+quelque soit la longueur des champs prÃ©cÃ©dents.
 
-Le caractŠre ampersand a le mˆme effet, mais n'est pas imprim‚ sauf s'il
-est doubl‚.
+Le caractÃ¨re ampersand a le mÃªme effet, mais n'est pas imprimÃ© sauf s'il
+est doublÃ©.
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_mail_col retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_mail_col retourne -1. Sinon
     la fonction retourne 0
 
 &EX
@@ -301,9 +301,9 @@ unsigned char   *repl, *by;
 		PR_clear_line(PR_CURRENT->pr_cline, PR_CURRENT->pr_ccol);
 		break;
 
-	    case 179 : /* '³' */
-	    case 186 : /* 'º' */
-	    case 177 : /* '±' */
+	    case 179 : /* 'â”‚' */
+	    case 186 : /* 'â•‘' */
+	    case 177 : /* 'â–’' */
 	    case 124 : /* '|' */
 		PR_goto(-1, col + PR_FILE_POS - 1);
 		PR_clear_line(PR_CURRENT->pr_cline, PR_CURRENT->pr_ccol);
@@ -376,8 +376,8 @@ fin:
 
 /* ====================================================================
 Cette fonction est un cas particulier de PR_mail_col() : l'impression
-commence toujours en col 0, il n'y a pas de caractŠre de d‚but de ligne
-pour limiter l'impression, et le nombre de lignes n'est pas limit‚.
+commence toujours en col 0, il n'y a pas de caractÃ¨re de dÃ©but de ligne
+pour limiter l'impression, et le nombre de lignes n'est pas limitÃ©.
 
 La fonction
 &CO
@@ -388,7 +388,7 @@ vaut simplement
 	PR_mail_col(filename, fnptr, 0, -1, 0)
 &TX
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_mail retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_mail retourne -1. Sinon
     la fonction retourne 0
 
 &EX

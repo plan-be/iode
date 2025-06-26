@@ -82,7 +82,7 @@ unsigned char SCR_HLINE_CHS[] = {' ', SCR_H_BAR1, SCR_H_BAR2};
 unsigned char SCR_VLINE_CHS[] = {' ', SCR_V_BAR1, SCR_V_BAR2};
 
 /* ====================================================================
-Dessine une ligne horizontale de poids 1, 2 ou 3 (blanc) Ö partir de la
+Dessine une ligne horizontale de poids 1, 2 ou 3 (blanc) √† partir de la
 position (line, col) pendant nc colonnes.
 =======================================================================*/
 
@@ -99,7 +99,7 @@ int     nc;
     return(SCR_fill(SCR_HLINE_CHS[type], line, col, 1, nc));
 }
 /* ====================================================================
-Dessine une ligne verticale de poids 1, 2 ou 3 (blanc) Ö partir de la
+Dessine une ligne verticale de poids 1, 2 ou 3 (blanc) √† partir de la
 position (line, col) pendant nl lignes.
 =======================================================================*/
 
@@ -164,7 +164,7 @@ int     corner;
 }
 
 /* ====================================================================
-Dessine un rectangle de poids 1, 2 ou 3 (blanc) Ö partir de la position
+Dessine un rectangle de poids 1, 2 ou 3 (blanc) √† partir de la position
 (line, col) et de dimension (nl, nc).
 =======================================================================*/
 
@@ -196,7 +196,7 @@ int     nc;
     return(0);
 }
 /* ====================================================================
-Remplit un rectangle avec le caractäre ch Ö partir de la position (line,
+Remplit un rectangle avec le caract√®re ch √† partir de la position (line,
 col) et de dimension (nl, nc).
 =======================================================================*/
 
@@ -229,12 +229,12 @@ int     ch, dir;
 }
 
 /* ====================================================================
-Balaie une partie d'Çcran en tenant de remplacer les caractäres
-semi-graphiques de dÇfinition de lignes par des coins correspondant aux
+Balaie une partie d'√©cran en tenant de remplacer les caract√®res
+semi-graphiques de d√©finition de lignes par des coins correspondant aux
 croisements.
 
-La partie d'Çcran traitÇe est un rectangle qui commence en position
-(line, col) et possäde une taille de (nl x nc) caractäres.
+La partie d'√©cran trait√©e est un rectangle qui commence en position
+(line, col) et poss√®de une taille de (nl x nc) caract√®res.
 =======================================================================*/
 
 SCR_auto_table(line, col, nl, nc)
@@ -302,10 +302,10 @@ int nc;
 
 /*NH*/
 /* ===================================================================
-    Retourne le caractäre semi-graphique ch modifiÇ en fonction de ses
-    voisins. Si ch n'est pas un caractäre semi-graphique, il n'est pas
-    modifiÇ. S'il est semi-graphique, il est calculÇ en fonction des 4
-    caractäres l, r, u et d qui l'entourent.
+    Retourne le caract√®re semi-graphique ch modifi√© en fonction de ses
+    voisins. Si ch n'est pas un caract√®re semi-graphique, il n'est pas
+    modifi√©. S'il est semi-graphique, il est calcul√© en fonction des 4
+    caract√®res l, r, u et d qui l'entourent.
 
 ====================================================================== */
 
@@ -329,13 +329,13 @@ int     ch, l, r, u, d;
 unsigned char SCR_SHADOWS[3] = {219, 223, 220};
 
 /* ====================================================================
-RÇalise des ombrages autour de rectangles dans l'Çcran.
+R√©alise des ombrages autour de rectangles dans l'√©cran.
 
 Les arguments sont :
 
 &EN type vaut entre 0 et 4.
 &EN orient : orientation de l'ombrage (inactif)
-&EN line et col : coin supÇrieur gauche du rectangle
+&EN line et col : coin sup√©rieur gauche du rectangle
 &EN nl et nc : taille du rectangle
 &EN attr : attribut de l'ombrage
 =======================================================================*/

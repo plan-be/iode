@@ -3,7 +3,7 @@
 /* ======================================================================
 Transforme tous les champs texte d'un ISAM d'Ansi vers Oem.
 
-&RT -1 si le fichier ne peut ˆtre ouvert, 0 sinon.
+&RT -1 si le fichier ne peut Ãªtre ouvert, 0 sinon.
 &SA IS_o2a_rec()
 ------------------------------------------------------------------------- */
 IS_a2o_rec(is)
@@ -62,7 +62,7 @@ ISAM    *is;
 /* ======================================================================
 Transforme tous les champs texte d'un ISAM d'Oem vers Ansi
 
-&RT -1 si le fichier ne peut ˆtre ouvert, 0 sinon.
+&RT -1 si le fichier ne peut Ãªtre ouvert, 0 sinon.
 &SA IS_o2a_rec()
 ------------------------------------------------------------------------- */
 IS_o2a_rec(is)

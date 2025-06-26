@@ -8,8 +8,8 @@ int     JCurSection = 0, JRefs = 1, JPrevNext = 0;
 int     JTitFiles[8], JVerbose = 0, JLevel = 2;
 
 /* ===================================================================
-Cette fonction balaie le fichier HTML htmlfile et le d‚coupe sur base des
-tags <H*>. Les fichiers g‚n‚r‚s ont pour noms:
+Cette fonction balaie le fichier HTML htmlfile et le dÃ©coupe sur base des
+tags <H*>. Les fichiers gÃ©nÃ©rÃ©s ont pour noms:
 
 &EN resfile pour le fichier principal
 &EN resfile1...n pour les fichiers secondaires
@@ -17,67 +17,67 @@ tags <H*>. Les fichiers g‚n‚r‚s ont pour noms:
 Par exemple si resfile vaut myres, on aura myres.htm, myres1.htm, etc.
 
 &IT Arguments
-ÄÄÄÄÄÄÄÄÄ
-&EN htmlfile : nom du fichier … analyser
+â”€â”€â”€â”€â”€â”€â”€â”€â”€
+&EN htmlfile : nom du fichier Ã  analyser
 &EN resfile : racine des noms de fichiers extraits (sans extension)
-&EN level : niveau Hn de d‚coupe en sous-fichiers
+&EN level : niveau Hn de dÃ©coupe en sous-fichiers
 &EN title : titre de chaque fichier HTML
 &EN body : image background des fichiers extraits
-&EN back : image de l'ic“ne back pr‚c‚dant le titre
+&EN back : image de l'icÃ´ne back prÃ©cÃ©dant le titre
 &EN prevnext : indique s'il faut une barre de navigation automatique
-&EN verbose : affiche l'‚tat d'avancement
-&EN style : fichier contenant les styles … incorporer
+&EN verbose : affiche l'Ã©tat d'avancement
+&EN style : fichier contenant les styles Ã  incorporer
 
-A chaque <H*> rencontr‚ de niveau inf‚rieur ou ‚gal … level, le fichier
-principal contient le texte du titre li‚ par un hyperlien au
+A chaque <H*> rencontrÃ© de niveau infÃ©rieur ou Ã©gal Ã  level, le fichier
+principal contient le texte du titre liÃ© par un hyperlien au
 sous-fichier correspondant. Ce sous-fichier contient tout le texte entre
-les tags Hn de mˆme niveau.
+les tags Hn de mÃªme niveau.
 
 Les fichiers extraits sont des fichiers HTML avec:
 
-&EN un titre si title est d‚fini
+&EN un titre si title est dÃ©fini
 
-&EN pour le tag Body, si body est d‚fini, l'image correspondante en
+&EN pour le tag Body, si body est dÃ©fini, l'image correspondante en
     background, sinon le tag Body du fichier htmlfile
 
 &EN les tags STARTHEADER et ENDHEADER
 
-&EN si prevnext est non nul, des r‚f‚rences vers le fichier pr‚c‚dent,
+&EN si prevnext est non nul, des rÃ©fÃ©rences vers le fichier prÃ©cÃ©dent,
     le suivant et le fichier principal entre les tags STARTCMT et ENDCMT
 
-&EN si title est d‚fini, le titre pr‚c‚d‚ de l'image dont le nom se
-    trouve dans back si back est d‚fini, avec un hyperlien vers le
+&EN si title est dÃ©fini, le titre prÃ©cÃ©dÃ© de l'image dont le nom se
+    trouve dans back si back est dÃ©fini, avec un hyperlien vers le
     fichier principal
 
-&EN une ligne par titre de niveau inf‚rieur avec hyperlien vers le fichier
-    correspondant … chacun
+&EN une ligne par titre de niveau infÃ©rieur avec hyperlien vers le fichier
+    correspondant Ã  chacun
 
-&EN le titre du fichier courant (contenu du tag Hn qui a donn‚ lieu …
+&EN le titre du fichier courant (contenu du tag Hn qui a donnÃ© lieu Ã 
     l'extraction
 
-&EN le texte du fichier principal jusqu'au tag Hn suivant de mˆme niveau
+&EN le texte du fichier principal jusqu'au tag Hn suivant de mÃªme niveau
 
 &EN les tags STARTFOOTER et ENDFOOTER
 
-Dans les fichiers g‚n‚r‚s, chaque fois qu'un tag Hn est rencontr‚, il
-est automatiquement pr‚c‚d‚ d'un tag NAME, pour pourvoir ˆtre r‚f‚renc‚
-avec plus de pr‚cision lors de l'extraction de la table des matiŠres.
+Dans les fichiers gÃ©nÃ©rÃ©s, chaque fois qu'un tag Hn est rencontrÃ©, il
+est automatiquement prÃ©cÃ©dÃ© d'un tag NAME, pour pourvoir Ãªtre rÃ©fÃ©rencÃ©
+avec plus de prÃ©cision lors de l'extraction de la table des matiÃ¨res.
 
-Les fichiers g‚n‚r‚s contiennent des tags sp‚ciaux :
+Les fichiers gÃ©nÃ©rÃ©s contiennent des tags spÃ©ciaux :
 
-&EN !STARTHEADER ... !ENDHEADER en d‚but de fichier
-&EN !STARTCMT ... !ENDCMT en d‚but de fichier
+&EN !STARTHEADER ... !ENDHEADER en dÃ©but de fichier
+&EN !STARTCMT ... !ENDCMT en dÃ©but de fichier
 &EN !STARTFOOTER ... !ENDFOOTER en fin de fichier
 
 Ces tags pourront par la suite servir d'indication au programme scr4_sbs
-ou … la fonction HtmlReplace().
+ou Ã  la fonction HtmlReplace().
 
-Cette fonction est exploit‚e par l'utilitaire scr4_spl.
+Cette fonction est exploitÃ©e par l'utilitaire scr4_spl.
 
 &RT
-&EN 0 en cas de succŠs,
-&EN -1 si le fichier resfile n'a pu ˆtre cr‚‚
-&EN -2 si un des fichiers r‚f‚renc‚s n'a p– ˆtre ouvert
+&EN 0 en cas de succÃ¨s,
+&EN -1 si le fichier resfile n'a pu Ãªtre crÃ©Ã©
+&EN -2 si un des fichiers rÃ©fÃ©rencÃ©s n'a pÃ» Ãªtre ouvert
 
 &SA HtmlToc(), HtmlReplace(), HtmlMessage()
 ====================================================================== */

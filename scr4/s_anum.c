@@ -27,9 +27,9 @@ FILE    *fd;
 
 /* ====================================================================
 Lit dans le fichier filename.num la valeur qui s'y trouve et retourne
-cette valeur. Utilis‚ dans les ISAM dont un champ est AUTO.
+cette valeur. UtilisÃ© dans les ISAM dont un champ est AUTO.
 
-&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouv‚
+&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouvÃ©
 
 &SA SCR_auto_num()
 =======================================================================*/
@@ -52,9 +52,9 @@ char    *filename;
 
 /* ====================================================================
 Lit dans le fichier filename.num la valeur qui s'y trouve et retourne
-cette valeur. Utilis‚ dans les ISAM dont un champ est AUTO.
+cette valeur. UtilisÃ© dans les ISAM dont un champ est AUTO.
 
-&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouv‚
+&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouvÃ©
 
 &SA SCR_auto_num()
 =======================================================================*/
@@ -66,9 +66,9 @@ char    *filename;
 
 /* ====================================================================
 Lit dans le fichier filename.num la valeur qui s'y trouve et retourne
-cette valeur. Utilis‚ dans les ISAM dont un champ est AUTO.
+cette valeur. UtilisÃ© dans les ISAM dont un champ est AUTO.
 
-&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouv‚
+&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouvÃ©
 
 &SA SCR_auto_num()
 =======================================================================*/
@@ -82,11 +82,11 @@ char    *filename;
 Ecrit dans le fichier filename.num la valeur num.
 
 En Unix, cette fonction fait appel au system call locking() ou lockf()
-pour s'assurer de l'accŠs exclusif au num‚ro … lire, et donc de
-l'unicit‚ du num‚ro dans un systŠme multi-utilisateurs. AprŠs 10 essais
+pour s'assurer de l'accÃ¨s exclusif au numÃ©ro Ã  lire, et donc de
+l'unicitÃ© du numÃ©ro dans un systÃ¨me multi-utilisateurs. AprÃ¨s 10 essais
 de locking, la fonction retourne -1L.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &EX
     SCR_set_auto_num(is_client->is_filename, 234L);
 &TX
@@ -102,16 +102,16 @@ long    auton;
 
 /* ====================================================================
 Lit dans le fichier filename.num la valeur qui s'y trouve et retourne
-cette valeur plus un. Utilis‚ dans les ISAM dont un champ est AUTO.
+cette valeur plus un. UtilisÃ© dans les ISAM dont un champ est AUTO.
 
-La valeur du fichier est incr‚ment‚e.
+La valeur du fichier est incrÃ©mentÃ©e.
 
 En Unix, cette fonction fait appel au system call locking() ou lockf()
-pour s'assurer de l'accŠs exclusif au num‚ro … lire, et donc de
-l'unicit‚ du num‚ro dans un systŠme multi-utilisateurs. AprŠs 10 essais
+pour s'assurer de l'accÃ¨s exclusif au numÃ©ro Ã  lire, et donc de
+l'unicitÃ© du numÃ©ro dans un systÃ¨me multi-utilisateurs. AprÃ¨s 10 essais
 de locking, la fonction retourne -1L.
 
-&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouv‚
+&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouvÃ©
 &EX
     SCR_set_long(pclient_num, SCR_auto_num("is_client"));
 &TX
@@ -151,11 +151,11 @@ fin:
 Ecrit dans le fichier filename.num la valeur num.
 
 En Unix, cette fonction fait appel au system call locking() ou lockf()
-pour s'assurer de l'accŠs exclusif au num‚ro … lire, et donc de
-l'unicit‚ du num‚ro dans un systŠme multi-utilisateurs. AprŠs 10 essais
+pour s'assurer de l'accÃ¨s exclusif au numÃ©ro Ã  lire, et donc de
+l'unicitÃ© du numÃ©ro dans un systÃ¨me multi-utilisateurs. AprÃ¨s 10 essais
 de locking, la fonction retourne -1L.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &EX
     SCR_set_auto_num(is_client->is_filename, 234L);
 &TX

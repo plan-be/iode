@@ -18,9 +18,9 @@ int     SENDMAIL_CONTENTTYPE = 0;   /* JMP 19/2/2015 */
 
 
 /*NH============================================================================
-Envoie des donnÇes (ou une commande) sur le socket ouvert par SendMailConnect().
+Envoie des donn√©es (ou une commande) sur le socket ouvert par SendMailConnect().
 
-&EN char    *rec : record Ö envoyer
+&EN char    *rec : record √† envoyer
 &RT
 &EN 0 : Ok
 &EN -1 : erreur
@@ -47,7 +47,7 @@ char    *rec;
 }
 
 /*NH============================================================================
-Lit la rÇponse du serveur SMTP sur le socket ouvert par SendMailConnect().
+Lit la r√©ponse du serveur SMTP sur le socket ouvert par SendMailConnect().
 
 &RT
 &EN code de retour du serveur
@@ -56,7 +56,7 @@ Lit la rÇponse du serveur SMTP sur le socket ouvert par SendMailConnect().
 En cas d'erreur de transmission, le message d'erreur se trouve dans la
 variable globale SENDMAIL_ERROR.
 
-La variable globale char *SENDMAIL_BUF contient le texte retournÇ par le
+La variable globale char *SENDMAIL_BUF contient le texte retourn√© par le
 serveur.
 
 &SA SendMailConnect(), SendMailData(), SendMailStartData(), SendMailWriteData()
@@ -88,28 +88,28 @@ char    *cmd;
 
 
 /*============================================================================
-Connecte au serveur SMTP server via le port port. Les paramätres host et
-user sont seulement indicatifs et ne sont en gÇnÇral pas traitÇs par le
+Connecte au serveur SMTP server via le port port. Les param√®tres host et
+user sont seulement indicatifs et ne sont en g√©n√©ral pas trait√©s par le
 serveur.
 
 &EN char *server : nom du serveur (ex. "smtp.xon.be")
-&EN int port     : numÇro du port (ex. : 25)
+&EN int port     : num√©ro du port (ex. : 25)
 &EN char *host   : nom du host source (ex. "heaven.be")
 &EN char *user   : user source (ex. "god@heaven.be")
 
-&EN Si la variable globale - SENDMAIL_PASSWD - est complätÇe, le programme enverra
+&EN Si la variable globale - SENDMAIL_PASSWD - est compl√®t√©e, le programme enverra
     la commande d'authentification SMTP - AUTH PLAIN - avec le login et le mot de passe
-    encodÇ en base64
+    encod√© en base64
 
 &RT
-&EN 0 : connexion opÇrÇe sans probläme
-&EN -1 : erreur Ö l'initialisation
-&EN -2 : erreur Ö la crÇation du socket
+&EN 0 : connexion op√©r√©e sans probl√®me
+&EN -1 : erreur √† l'initialisation
+&EN -2 : erreur √† la cr√©ation du socket
 &EN -3 : host not found
 &EN -4 : erreur au connect
 &EN -5 : code retour du serveur SMTP incorrect
-&EN -6 : erreur retournÇe par le serveur SMTP (HELO)
-&EN -7 : erreur retournÇe par le serveur SMTP (MAIL FROM)
+&EN -6 : erreur retourn√©e par le serveur SMTP (HELO)
+&EN -7 : erreur retourn√©e par le serveur SMTP (MAIL FROM)
 
 Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
 
@@ -205,11 +205,11 @@ int     port;
 }
 
 /*============================================================================
-DÇconnecte du serveur SMTP ouvert par SendMailConnect().
+D√©connecte du serveur SMTP ouvert par SendMailConnect().
 
 &RT
-&EN 0 : dÇconnexion opÇrÇe sans probläme
-&EN -1 : erreur (connexion effectuÇe)
+&EN 0 : d√©connexion op√©r√©e sans probl√®me
+&EN -1 : erreur (connexion effectu√©e)
 
 Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
 
@@ -233,12 +233,12 @@ SendMailClose()
 /*============================================================================
 Ajoute des destinataires pour le message.
 
-&EN char *dest = liste des destinataires sÇparÇs par des virgules,
+&EN char *dest = liste des destinataires s√©par√©s par des virgules,
     points-virgules ou blancs.
 
 &RT
-&EN 0 : dÇconnexion opÇrÇe sans probläme
-&EN -1 : erreur (connexion effectuÇe)
+&EN 0 : d√©connexion op√©r√©e sans probl√®me
+&EN -1 : erreur (connexion effectu√©e)
 
 Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
 
@@ -272,7 +272,7 @@ char    *dest;
 }
 
 /*============================================================================
-PrÇpare l'envoi d'un message.
+Pr√©pare l'envoi d'un message.
 
 &RT
 &EN 0 : Ok
@@ -339,11 +339,11 @@ U_ch    *data;
 }
 
 /*============================================================================
-Envoie le message. Ce message contiendra les Çventuels Subject, To ... qui
-seront traitÇs par l'Agent Pop. Cette fonction appelle SendMailStartData(),
+Envoie le message. Ce message contiendra les √©ventuels Subject, To ... qui
+seront trait√©s par l'Agent Pop. Cette fonction appelle SendMailStartData(),
 SendMailWriteData() et SendMailEndData().
 
-&EN U_ch **data : tableau de strings terminÇ par un NULL contenant les
+&EN U_ch **data : tableau de strings termin√© par un NULL contenant les
     lignes du message.
 
 &RT
@@ -371,7 +371,7 @@ U_ch    **data;
 
 /*============================================================================
 Envoie un fichier dans la zone DATA du message. La zone DATA est ouverte et
-fermÇe par cette fonction (un seul fichier peut donc àtre envoyÇ).
+ferm√©e par cette fonction (un seul fichier peut donc √™tre envoy√©).
 
 &EN char *filename;
 
@@ -434,25 +434,25 @@ char    *filename;
 char    *SMTP_BOUNDARY = "----------NextPart_1a2z3e4r5t6";
 
 /*============================================================================
-DÇmarre une session SMTP. CrÇe le socket et envoie les premiäres
-informations jusqu'au dÇbut de la section DATA.
+D√©marre une session SMTP. Cr√©e le socket et envoie les premi√®res
+informations jusqu'au d√©but de la section DATA.
 
 &EN char *smtpsrv : serveur SMTP      ("mail.xon.be")
 &EN int  port     : port SMTP         (25)
-&EN char *fromadr : adresse de l'expÇditeur avec le nom de domaine (jmp@xon.be)
-&EN char *fromname : nom de l'expÇditeur
-&EN char *toadr   : adresse(s) destination sÇparÇes par des virgules
+&EN char *fromadr : adresse de l'exp√©diteur avec le nom de domaine (jmp@xon.be)
+&EN char *fromname : nom de l'exp√©diteur
+&EN char *toadr   : adresse(s) destination s√©par√©es par des virgules
 &EN char *subject : titre du message
 
 &RT
 &EN 0 : Ok
-&EN -1 : erreur Ö l'initialisation
-&EN -2 : erreur Ö la crÇation du socket
+&EN -1 : erreur √† l'initialisation
+&EN -2 : erreur √† la cr√©ation du socket
 &EN -3 : host not found
 &EN -4 : erreur au connect
 &EN -5 : code retour du serveur SMTP incorrect
-&EN -6 : erreur retournÇe par le serveur SMTP (HELO)
-&EN -7 : erreur retournÇe par le serveur SMTP (MAIL FROM)
+&EN -6 : erreur retourn√©e par le serveur SMTP (HELO)
+&EN -7 : erreur retourn√©e par le serveur SMTP (MAIL FROM)
 &EN -8 : erreur en cours de transmission
 
 Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
@@ -468,7 +468,7 @@ Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
 
     // Si on veut un texte libre comme attach 1 (vu souvent comme body)
     if(SendMailStartAttachTxt()) goto err;
-    SendMailAddAttachTxtLine("DÇbut de mon texte", 1);
+    SendMailAddAttachTxtLine("D√©but de mon texte", 1);
     SendMailAddAttachTxtLine("------------------", 1);
     SendMailAddAttachTxtLine("Line 1\nLigne 2\nLigne 3", 1);
     SendMailAddAttachTxtLine("---\nFin.", 1);
@@ -557,27 +557,27 @@ SendMailInitEx(char *smtpsrv, int port, char *fromaddr,
 }
 
 /*============================================================================
-DÇmarre une session SMTP. CrÇe le socket et envoie les premiäres
-informations jusqu'au dÇbut de la section DATA.
+D√©marre une session SMTP. Cr√©e le socket et envoie les premi√®res
+informations jusqu'au d√©but de la section DATA.
 
 &EN char *smtpsrv : serveur SMTP      ("mail.xon.be")
-&EN char *fromadr : adresse de l'expÇditeur avec le nom de domaine (jmp@xon.be)
-&EN char *fromname : nom de l'expÇditeur
-&EN char *toadr   : adresse(s) destination sÇparÇes par des virgules
+&EN char *fromadr : adresse de l'exp√©diteur avec le nom de domaine (jmp@xon.be)
+&EN char *fromname : nom de l'exp√©diteur
+&EN char *toadr   : adresse(s) destination s√©par√©es par des virgules
 &EN char *subject : titre du message
 
-La porte du serveur SMTP est dÇfinie par la variable globale int SENDMAIL_PORT. Par dÇfaut,
-celle-ci est fixÇe Ö 25.
+La porte du serveur SMTP est d√©finie par la variable globale int SENDMAIL_PORT. Par d√©faut,
+celle-ci est fix√©e √† 25.
 
 &RT
 &EN 0 : Ok
-&EN -1 : erreur Ö l'initialisation
-&EN -2 : erreur Ö la crÇation du socket
+&EN -1 : erreur √† l'initialisation
+&EN -2 : erreur √† la cr√©ation du socket
 &EN -3 : host not found
 &EN -4 : erreur au connect
 &EN -5 : code retour du serveur SMTP incorrect
-&EN -6 : erreur retournÇe par le serveur SMTP (HELO)
-&EN -7 : erreur retournÇe par le serveur SMTP (MAIL FROM)
+&EN -6 : erreur retourn√©e par le serveur SMTP (HELO)
+&EN -7 : erreur retourn√©e par le serveur SMTP (MAIL FROM)
 &EN -8 : erreur en cours de transmission
 
 Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
@@ -592,7 +592,7 @@ Le message d'erreur se trouve dans la variable globale SENDMAIL_ERROR.
 
     // Si on veut un texte libre comme attach 1 (vu souvent comme body)
     if(SendMailStartAttachTxt()) goto err;
-    SendMailAddAttachTxtLine("DÇbut de mon texte", 1);
+    SendMailAddAttachTxtLine("D√©but de mon texte", 1);
     SendMailAddAttachTxtLine("------------------", 1);
     SendMailAddAttachTxtLine("Line 1\nLigne 2\nLigne 3", 1);
     SendMailAddAttachTxtLine("---\nFin.", 1);
@@ -628,7 +628,7 @@ SendMailInit(char *smtpsrv, char *fromaddr,
 }
 
 /*============================================================================
-Termine une session SMTP dÇmarrÇe par SendMailInit().
+Termine une session SMTP d√©marr√©e par SendMailInit().
 
 &RT
 &EN 0 : Ok
@@ -655,12 +655,12 @@ SendMailEnd()
 }
 
 /*============================================================================
-DÇmarre un nouvel attachment de type texte. Le contenu de cet attachment
-doit àtre alimentÇ par la fonction SendMailAddAttachTxtLine().
-Il s'agit en gÇnÇral du premier attachment d'un mail qui constituera le corps
+D√©marre un nouvel attachment de type texte. Le contenu de cet attachment
+doit √™tre aliment√© par la fonction SendMailAddAttachTxtLine().
+Il s'agit en g√©n√©ral du premier attachment d'un mail qui constituera le corps
 du message.
 
-Attention, cette fonction ne peut àtre utilisÇe qu'apräs SendMailInit().
+Attention, cette fonction ne peut √™tre utilis√©e qu'apr√®s SendMailInit().
 
 
 &EN 0 : Ok
@@ -689,10 +689,10 @@ SendMailStartAttachTxt()
 }
 
 /*============================================================================
-Ajoute un ligne Ö l'attachment courant commencÇ par l'appel Ö SendMailStartAttachTxt().
+Ajoute un ligne √† l'attachment courant commenc√© par l'appel √† SendMailStartAttachTxt().
 
-&EN char *txt : texte Ö envoyer
-&EN int convertansi : 1 pour convertir d'Oem Ö Ansi, 0 sans conversion
+&EN char *txt : texte √† envoyer
+&EN int convertansi : 1 pour convertir d'Oem √† Ansi, 0 sans conversion
 
 
 &EN 0 : Ok
@@ -719,21 +719,21 @@ SendMailAddAttachTxtLine(char *txt, int convertansi)
 
 
 /*============================================================================
-Attache un fichier au mail dÇmarrÇ par SendMailInit(). Un nombre quelconque
-de fichiers peuvent àtre attachÇs. L'encodage peut se faire selon les trois modes standards :
+Attache un fichier au mail d√©marr√© par SendMailInit(). Un nombre quelconque
+de fichiers peuvent √™tre attach√©s. L'encodage peut se faire selon les trois modes standards :
 &EN 8 bits
 &EN base64
 &EN Quoted Printable
 
-Attention, cette fonction ne peut àtre utilisÇe qu'apräs SendMailInit().
+Attention, cette fonction ne peut √™tre utilis√©e qu'apr√®s SendMailInit().
 
 
-&EN char *filename = nom du fichier Ö attacher
+&EN char *filename = nom du fichier √† attacher
 &EN char *contenttype = type de fichier (mime type)
 	(ex. "text/plain" ou "image/gif", "application/octet-stream")
 &EN int encoding = codage de l'attachment
 &EN2 0 : 8 bits
-&EN2 1 ou 64 : base64 (1 pour la compatibilitÇ)
+&EN2 1 ou 64 : base64 (1 pour la compatibilit√©)
 &EN2 2 : Quoted Printable
 &EN int convertansi = convertit automatiquement d'Ascii en Ansi
 &EN isbody : si 1, n'indique pas "Content-Disposition: attachment", ni le nom du fichier
@@ -970,7 +970,7 @@ char    *argv[];
 
     // Si on veut un texte libre comme attach 1 (vu souvent comme body)
     if(SendMailStartAttachTxt()) goto err;
-    SendMailAddAttachTxtLine("DÇbut de mon texte", 1);
+    SendMailAddAttachTxtLine("D√©but de mon texte", 1);
     SendMailAddAttachTxtLine("------------------", 1);
     SendMailAddAttachTxtLine("Line 1\nLigne 2\nLigne 3", 1);
     SendMailAddAttachTxtLine("---\nFin.", 1);
@@ -1043,14 +1043,14 @@ char    *argv[];
     SendMailWriteData("Content-Transfer-Encoding: 8bit");
     SendMailWriteData("Content-Disposition: attachment;");
     SendMailWriteData(" ");
-    SendMailWriteData("EnvoyÈ par SCR/AL1, Gni gni gni!");
+    SendMailWriteData("Envoy√© par SCR/AL1, Gni gni gni!");
     SendMailWriteData(" ");
     SendMailWriteData("--Coucou1234");
     SendMailWriteData("Content-Type: text/plain;");
     SendMailWriteData("Content-Transfer-Encoding: 8bit");
     SendMailWriteData("Content-Disposition: attachment;");
     SendMailWriteData(" ");
-    SendMailWriteData("Voici mon texte attachÈ 2222");
+    SendMailWriteData("Voici mon texte attach√© 2222");
     SendMailWriteData(" ");
     SendMailWriteData("--Coucou1234");
     SendMailWriteData("Content-Type: image/gif;");

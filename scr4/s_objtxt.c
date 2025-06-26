@@ -3,11 +3,11 @@
 int  IS_REC_RREC = 0;
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
-Si le texte est plus long que le champ, seules le nombre de caractäres
-du champ est copiÇ. S'il est plus court, le champ est prolongÇ par des
+Si le texte est plus long que le champ, seules le nombre de caract√®res
+du champ est copi√©. S'il est plus court, le champ est prolong√© par des
 blancs.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -39,9 +39,9 @@ void    *val;
 
 
 /* ======================================================================
-Place un texte dans un objet. L'objet peut àtre un champ d'ISAM ou de
-PAGE. Si le texte est trop grand pour le champ, il est tronquÇ. S'il est
-trop court, il est prolongÇ avec des blancs.
+Place un texte dans un objet. L'objet peut √™tre un champ d'ISAM ou de
+PAGE. Si le texte est trop grand pour le champ, il est tronqu√©. S'il est
+trop court, il est prolong√© avec des blancs.
 
 &TX
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()

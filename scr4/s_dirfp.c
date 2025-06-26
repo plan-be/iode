@@ -6,11 +6,11 @@
 #endif
 
 /* ====================================================================
-Full Path : retourne le nom complet d'un fichier Ö partir d'un nom
-relatif. name contient le nom du fichier, res le rÇsultat.
+Full Path : retourne le nom complet d'un fichier √† partir d'un nom
+relatif. name contient le nom du fichier, res le r√©sultat.
 
 En cas d'erreur, res est vide et la variable DOS errno indique l'origine
-du probläme (Drive not ready, etc).
+du probl√®me (Drive not ready, etc).
 
 &RT pointeur vers le nom complet du fichier (res) ou NULL en cas d'erreur.
 &EX

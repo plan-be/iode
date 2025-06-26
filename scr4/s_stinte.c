@@ -5,7 +5,7 @@
 Intersection de deux tableaux de pointeurs.
 
 &RT
-La fonction retourne un unsigned char ** avec les ‚l‚ments communs
+La fonction retourne un unsigned char ** avec les Ã©lÃ©ments communs
 aux deux tableaux tbl1 et tbl2.
 
 
@@ -40,14 +40,14 @@ err:
 /* ====================================================================
 Intersection de deux listes.
 
-Les listes sont des "strings" contenant des ‚l‚ments s‚par‚s par un
-caractŠre s‚parateur. Les deux chaŒnes sont pass‚es en argument, ainsi
-qu'une chaŒne contenant les caractŠres s‚parateurs.
+Les listes sont des "strings" contenant des Ã©lÃ©ments sÃ©parÃ©s par un
+caractÃ¨re sÃ©parateur. Les deux chaÃ®nes sont passÃ©es en argument, ainsi
+qu'une chaÃ®ne contenant les caractÃ¨res sÃ©parateurs.
 
 
 &RT
-La fonction retourne un pointeur de type unsigned char sur une liste allou‚e
-contenant la partie commune des deux listes pass‚es en arguments.
+La fonction retourne un pointeur de type unsigned char sur une liste allouÃ©e
+contenant la partie commune des deux listes passÃ©es en arguments.
 
 
 &EX
@@ -56,8 +56,8 @@ contenant la partie commune des deux listes pass‚es en arguments.
     unsigned char *string2 = "Carina Lena Fabienne Martine";
 
     str1 = SCR_inter_tbl(string1, string2, " ,;");
-    printf("ChaŒne 1 : %s\n", string1);
-    printf("ChaŒne 2 : %s\n", string2);
+    printf("ChaÃ®ne 1 : %s\n", string1);
+    printf("ChaÃ®ne 2 : %s\n", string2);
     printf("Intersection : %s\n\n", str1);
     SCR_free(str1);
 &TX

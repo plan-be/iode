@@ -1,14 +1,14 @@
 #include "s_mat.h"
 /* ====================================================================
-Rempli les ‚l‚ments de la matrice dest … lartir de la ligne l et de la
-colonne c avec les ‚l‚ments de la matrice source.
+Rempli les Ã©lÃ©ments de la matrice dest Ã  lartir de la ligne l et de la
+colonne c avec les Ã©lÃ©ments de la matrice source.
 
-La matrice destination doit avoir ‚t‚ allou‚e avec les dimentions ad‚quates.
-Les ‚l‚ments qui "d‚borderaient" de lka matrice destination sont ‚limin‚s.
+La matrice destination doit avoir Ã©tÃ© allouÃ©e avec les dimentions adÃ©quates.
+Les Ã©lÃ©ments qui "dÃ©borderaient" de lka matrice destination sont Ã©liminÃ©s.
 &RT
 La fonction retourne un pointeur sur la matrice dest. Si une des matrices
-est identifi‚e par un pointeur NULL, la variable globale M_errno est
-positionnn‚e et la fonction retourne un pointeur NULL.
+est identifiÃ©e par un pointeur NULL, la variable globale M_errno est
+positionnnÃ©e et la fonction retourne un pointeur NULL.
 
 &EX
     M_set(dest, src, l, c);

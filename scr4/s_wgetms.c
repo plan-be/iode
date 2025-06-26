@@ -9,7 +9,7 @@
 #include "scr4w.h"
 
 /* ===============================================================
-Retourne le nombre de milli secondes depuis le d‚marrage du programme.
+Retourne le nombre de milli secondes depuis le dÃ©marrage du programme.
 ================================================================== */
 
 long WscrGetMS()

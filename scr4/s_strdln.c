@@ -2,15 +2,15 @@
 #include <stdio.h>
 
 /* ====================================================================
-Lit une ligne dans le fichier ouvert pointÇ par fd. La ligne lue
-est stockÇe dans le buffer buf de longueur maximum lg. Si la longueur
-de la ligne excäde lg caractäres, les derniers caractäres sont sautÇs.
+Lit une ligne dans le fichier ouvert point√© par fd. La ligne lue
+est stock√©e dans le buffer buf de longueur maximum lg. Si la longueur
+de la ligne exc√®de lg caract√®res, les derniers caract√®res sont saut√©s.
 
-Le caractäre \n est lu mais n'est pas stockÇ dans buf. buf se termine
-par le caractäre \0.
+Le caract√®re \n est lu mais n'est pas stock√© dans buf. buf se termine
+par le caract√®re \0.
 
 &RT la longueur de la ligne lue ou -1 si la fin du fichier est atteinte
-    avant qu'un caractäre ne soit lu.
+    avant qu'un caract√®re ne soit lu.
 &EX
     while(1) {
 	if(SCR_read_line(fd, buf, 130) < 0) break;

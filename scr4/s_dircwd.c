@@ -24,10 +24,10 @@ void far SCR_harderror() {
 Retourne dans dir le directory courant sur drive. drive vaut 0 pour
 le disque courant, 1, pour A:, ...
 
-&RT En cas d'erreur, retourne NULL et fixe dir[0] … 0.
+&RT En cas d'erreur, retourne NULL et fixe dir[0] Ã  0.
     Sinon retourne un pointeur vers dir.
 
-&NO En Unix, drive n'est pas utilis‚.
+&NO En Unix, drive n'est pas utilisÃ©.
 &SA SCR_fullpath()
 ======================================================================= */
 

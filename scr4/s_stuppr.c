@@ -1,7 +1,7 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Indique si un caractŠre est majuscule (A-Z).
+Indique si un caractÃ¨re est majuscule (A-Z).
 
 &RT 1 si c'est le cas, 0 sinon
 &EX
@@ -21,19 +21,19 @@ int     ch;
 }
 
 /* ====================================================================
-Met un caractŠre en majuscule s'il s'agit d'une lettre uniquement. La
-macro toupper(ch) disponible dans la librairie standard C ne v‚rifie pas
-toujours que le caractŠre input est une lettre minuscule avant de
-transformer le caractŠre.
+Met un caractÃ¨re en majuscule s'il s'agit d'une lettre uniquement. La
+macro toupper(ch) disponible dans la librairie standard C ne vÃ©rifie pas
+toujours que le caractÃ¨re input est une lettre minuscule avant de
+transformer le caractÃ¨re.
 
 &REM
-Les caractŠres accentu‚s sont ‚galement transform‚s en majuscules (‚->E).
+Les caractÃ¨res accentuÃ©s sont Ã©galement transformÃ©s en majuscules (Ã©->E).
 
-&RT le caractŠre transform‚
+&RT le caractÃ¨re transformÃ©
 &EX
     SCR_upper_char('a') vaut 'A'
-    SCR_upper_char('ƒ') vaut 'A'
-    SCR_upper_char('‡') vaut 'C'
+    SCR_upper_char('Ã¢') vaut 'A'
+    SCR_upper_char('Ã§') vaut 'C'
     SCR_upper_char('C') vaut 'C'
     SCR_upper_char('\n') vaut '\n'
 &TX
@@ -47,46 +47,46 @@ int     ch;
     if(ch >= 'a' && ch <= 'z') return(ch - 'a' + 'A'); /* JMP 14-06-96 */
     switch(ch) {
 	case 210 /* E^ */ : /* BP_M 05-06-2010 12:20 */
-	case 211 /* Eù */ :
+	case 211 /* EÂ¨ */ :
 	case 212 /* E` */ :
 	case 144 /* E' */ :
-	case 130 /* ‚ */ :          /* JMP 29-09-91 */
-	case 138 /* Š */ :
-	case 137 /* ‰ */ :
-	case 136 /* ˆ */ : return('E');
-	case 160 /*   */ :
-	case 133 /* … */ :
-	case 131 /* ƒ */ :
-	case 181 /* Aï*/ :
+	case 130 /* Ã© */ :          /* JMP 29-09-91 */
+	case 138 /* Ã¨ */ :
+	case 137 /* Ã« */ :
+	case 136 /* Ãª */ : return('E');
+	case 160 /* Ã¡ */ :
+	case 133 /* Ã  */ :
+	case 131 /* Ã¢ */ :
+	case 181 /* AÂ´*/ :
 	case 183 /* A`*/ :
 	case 182 /* A^*/ :
-	case 142 /* Aù*/ :
-	case 132 /* „ */ : return('A');
-	case 214 /* Iï*/ :
+	case 142 /* AÂ¨*/ :
+	case 132 /* Ã¤ */ : return('A');
+	case 214 /* IÂ´*/ :
 	case 222 /* I`*/ :
 	case 215 /* I^*/ :
-	case 216 /* Iù*/ :
-	case 161 /* ¡ */ :
-	case 141 /*  */ :
-	case 140 /* Œ */ :
-	case 139 /* ‹ */ : return('I');
-	case 224 /* Oï*/ :
+	case 216 /* IÂ¨*/ :
+	case 161 /* Ã­ */ :
+	case 141 /* Ã¬ */ :
+	case 140 /* Ã® */ :
+	case 139 /* Ã¯ */ : return('I');
+	case 224 /* OÂ´*/ :
 	case 227 /* O`*/ :
 	case 226 /* O^*/ :
-	case 153 /* Où*/ :
-	case 162 /* ¢ */ :
-	case 149 /* • */ :
-	case 148 /* ” */ :
-	case 147 /* “ */ : return('O');
-	case 233 /* Uï*/ :
+	case 153 /* OÂ¨*/ :
+	case 162 /* Ã³ */ :
+	case 149 /* Ã² */ :
+	case 148 /* Ã¶ */ :
+	case 147 /* Ã´ */ : return('O');
+	case 233 /* UÂ´*/ :
 	case 235 /* U`*/ :
 	case 234 /* U^*/ :
-	case 154 /* Uù*/ :
-	case 163 /* £ */ :
-	case 150 /* – */ :
-	case 151 /* — */ :
-	case 129 /*  */ : return('U');
-	case 135 /* ‡ */ : return('C');
+	case 154 /* UÂ¨*/ :
+	case 163 /* Ã© */ :
+	case 150 /* Ã» */ :
+	case 151 /* Ã¹ */ :
+	case 129 /* Ã¼ */ : return('U');
+	case 135 /* Ã§ */ : return('C');
 	default  : return(ch);
 	}
 }
@@ -94,11 +94,11 @@ int     ch;
 
 /* ====================================================================
 Met un string en majuscules. La modification a lieu sur place. Les
-accents sont ‚galement transform‚s.
+accents sont Ã©galement transformÃ©s.
 
-&RT le string transform‚
+&RT le string transformÃ©
 &EX
-    SCR_upper("AprŠs") vaut "APRES'
+    SCR_upper("AprÃ¨s") vaut "APRES'
 &TX
 &SA SCR_lower_char(), SCR_upper_char(), SCR_lower()
 =======================================================================*/

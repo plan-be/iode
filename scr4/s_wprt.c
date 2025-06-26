@@ -54,28 +54,28 @@ COLORREF WprCOLORS[] = {
 /* ======================================================================
 Initialise un processus d'impression.
 
-&EN hWndOwner = 0 ou HWND de la fenàtre päre
-&EN dlg = 1 si la fenàtre de sÇlection de paramätres de l'imprimante
-    doit àtre ouverte, 0 sinon. Dans ce cas, l'imprimante par dÇfaut
-    de Windows est utilisÇe dans ses paramätres actuels.
-&EN docname = nom du document (affichÇ dans le print spooler)
+&EN hWndOwner = 0 ou HWND de la fen√™tre p√®re
+&EN dlg = 1 si la fen√™tre de s√©lection de param√®tres de l'imprimante
+    doit √™tre ouverte, 0 sinon. Dans ce cas, l'imprimante par d√©faut
+    de Windows est utilis√©e dans ses param√®tres actuels.
+&EN docname = nom du document (affich√© dans le print spooler)
 
-La fonction crÇe les diffÇrentes ressources nÇcessaires Ö l'impression
-et initialise toutes les variables nÇcessaires.
+La fonction cr√©e les diff√©rentes ressources n√©cessaires √† l'impression
+et initialise toutes les variables n√©cessaires.
 
-&EN CrÇe les BRUSHES
-&EN CrÇe les PENS
-&EN fixe le font par dÇfaut Ö Times 10 Pts
+&EN Cr√©e les BRUSHES
+&EN Cr√©e les PENS
+&EN fixe le font par d√©faut √† Times 10 Pts
 
-Les variables globales suivantes sont dÇfinies par la fonction :
+Les variables globales suivantes sont d√©finies par la fonction :
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
 &EN int WprHORZRES : nombre de pixels par page en X
 &EN int WprVERTRES : nombre de pixels par page en Y
 
-&RT 0 en cas de succäs, -1 en cas d'erreur ou si l'utilisateur utilise
-    CANCEL pour quitter la boåte de dialogue de sÇlection de
+&RT 0 en cas de succ√®s, -1 en cas d'erreur ou si l'utilisateur utilise
+    CANCEL pour quitter la bo√Æte de dialogue de s√©lection de
     l'impression.
 
 ========================================================================= */
@@ -193,8 +193,8 @@ WprAllInit()
 /* ======================================================================
 Termine le processus d'impression et envoie le job vers l'imprimante.
 
-La fonction libäre l'espace allouÇ par les diffÇrentes ressources
-nÇcessaires Ö l'impression.
+La fonction lib√®re l'espace allou√© par les diff√©rentes ressources
+n√©cessaires √† l'impression.
 
 &SA WprPrinterInit()
 ========================================================================= */
@@ -326,22 +326,22 @@ WprDeleteFonts()
 }
 
 /* ======================================================================
-Cette fonction dÇfinit la police de caractäres qui sera utilisÇe lors
+Cette fonction d√©finit la police de caract√®res qui sera utilis√©e lors
 des impressions suivantes.
 
-&EN family  = 'C', 'T' ou 'A' (dÇfaut 'A') pour Courier, Times ou Arial
+&EN family  = 'C', 'T' ou 'A' (d√©faut 'A') pour Courier, Times ou Arial
 &EN pty     = taille en points de la police (defaut 10)
 &EN bold    = 1 si bold, 0 sinon
 &EN italic  = 1 si italic, 0 sinon
-&EN underl  = 1 si soulignÇ, 0 sinon, 2 si strikethrough, 3 si soulignÇ et
+&EN underl  = 1 si soulign√©, 0 sinon, 2 si strikethrough, 3 si soulign√© et
     strikethrough
 
-Le choix de la police s'opäre en fonction de ce qui est disponible
-sur l'unitÇ de destination).
+Le choix de la police s'op√®re en fonction de ce qui est disponible
+sur l'unit√© de destination).
 
-Les polices utilisÇes sont conservÇes pendant toute la durÇe de
-l'impression de faáon Ö optimiser la vitesse de basculement d'une police
-Ö l'autre.
+Les polices utilis√©es sont conserv√©es pendant toute la dur√©e de
+l'impression de fa√ßon √† optimiser la vitesse de basculement d'une police
+√† l'autre.
 
 ========================================================================= */
 
@@ -470,12 +470,12 @@ int WprFormFeedEx()
 /* ======================================================================
 Imprime le texte txt en position x, y sans changer l'alignement courant.
 
-&EN x est l'abscisse du dÇbut (gauche) du texte
-&EN y est l'ordonnÇe de la ligne de base du texte
-&EN txt est un string terminÇ par un 0 (code ASCII).
+&EN x est l'abscisse du d√©but (gauche) du texte
+&EN y est l'ordonn√©e de la ligne de base du texte
+&EN txt est un string termin√© par un 0 (code ASCII).
 
-Les coordonnÇes sont exprimÇes en pixels. Les variables globales
-suivantes indiquent la taille du papier et la dÇfinition de l'impression:
+Les coordonn√©es sont exprim√©es en pixels. Les variables globales
+suivantes indiquent la taille du papier et la d√©finition de l'impression:
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
@@ -494,14 +494,14 @@ WprPrintStringNoAlign(int x, int y, U_ch *txt)
 
 /* ======================================================================
 Imprime le texte txt en position x, y. Cette fonction change l'alignement
-en le fixant Ö la ligne de base, cadrÇ Ö gauche.
+en le fixant √† la ligne de base, cadr√© √† gauche.
 
-&EN x est l'abscisse du coin infÇrieur gauche du texte
-&EN y est l'ordonnÇe du coin infÇrieur gauche du texte
-&EN txt est un string terminÇ par un 0 (code ASCII).
+&EN x est l'abscisse du coin inf√©rieur gauche du texte
+&EN y est l'ordonn√©e du coin inf√©rieur gauche du texte
+&EN txt est un string termin√© par un 0 (code ASCII).
 
-Les coordonnÇes sont exprimÇes en pixels. Les variables globales
-suivantes indiquent la taille du papier et la dÇfinition de l'impression:
+Les coordonn√©es sont exprim√©es en pixels. Les variables globales
+suivantes indiquent la taille du papier et la d√©finition de l'impression:
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
@@ -519,7 +519,7 @@ WprPrintString(int x, int y, U_ch *txt)
 
 /* ======================================================================
 Change l'alignement horizontal du texte pour la prochaine impression.
-Le texte sera cadrÇ Ö gauche.
+Le texte sera cadr√© √† gauche.
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -532,7 +532,7 @@ WprHCenterLeft()
 
 /* ======================================================================
 Change l'alignement horizontal du texte pour la prochaine impression.
-Le texte sera cadrÇ Ö droite
+Le texte sera cadr√© √† droite
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -545,7 +545,7 @@ WprHCenterRight()
 
 /* ======================================================================
 Change l'alignement horizontal du texte pour la prochaine impression.
-Le texte sera centrÇ autour du point de rÇfÇrence.
+Le texte sera centr√© autour du point de r√©f√©rence.
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -558,7 +558,7 @@ WprHCenterCenter()
 
 /* ======================================================================
 Change l'alignement vertical du texte pour la prochaine impression.
-Le point de rÇfÇrence indiquera le bord supÇrieur.
+Le point de r√©f√©rence indiquera le bord sup√©rieur.
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -571,7 +571,7 @@ WprVCenterTop()
 
 /* ======================================================================
 Change l'alignement vertical du texte pour la prochaine impression.
-Le point de rÇfÇrence indiquera le bord infÇrieur.
+Le point de r√©f√©rence indiquera le bord inf√©rieur.
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -584,7 +584,7 @@ WprVCenterBottom()
 
 /* ======================================================================
 Change l'alignement vertical du texte pour la prochaine impression.
-Le point de rÇfÇrence indiquera la ligne de base.
+Le point de r√©f√©rence indiquera la ligne de base.
 
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
@@ -598,12 +598,12 @@ WprVCenterBaseline()
 /* ======================================================================
 Calcule la largeur et la hauteur du texte txt dans la police courante.
 
-&EN txt est un string terminÇ par un 0 (code ASCII).
+&EN txt est un string termin√© par un 0 (code ASCII).
 &EN w est un pointeur vers la largeur du texte
 &EN h est un pointeur vers la hauteur du texte
 
-Les valeurs retournÇes sont exprimÇes en pixels. Les variables globales
-suivantes indiquent la taille du papier et la dÇfinition de l'impression:
+Les valeurs retourn√©es sont exprim√©es en pixels. Les variables globales
+suivantes indiquent la taille du papier et la d√©finition de l'impression:
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
@@ -629,8 +629,8 @@ WprGetStringWidth(U_ch *txt, long *w, long *h)
 Dessine un rectangle avec la plume (PEN), la couleur et la brosse
 (BRUSH) courantes.
 
-&EN x = abscisse du coin supÇrieur gauche
-&EN y = ordonnÇe du coin supÇrieur gauche
+&EN x = abscisse du coin sup√©rieur gauche
+&EN y = ordonn√©e du coin sup√©rieur gauche
 &EN w = largeur
 &EN h = hauteur
 
@@ -643,11 +643,11 @@ WprRectangle(int x, int y, int w, int h)
 }
 
 /* ======================================================================
-Dessine une sÇrie de segments de lignes reliÇs entre eux en connectant
+Dessine une s√©rie de segments de lignes reli√©s entre eux en connectant
 les points sucessifs.
-La plume et la couleur courantes sont utilisÇes.
+La plume et la couleur courantes sont utilis√©es.
 
-&EN pts = tableaux de coordonnÇes (x, y) exprimÇs en pixels
+&EN pts = tableaux de coordonn√©es (x, y) exprim√©s en pixels
 &EN npts = nombre de points
 
 &SA WprSetPen(), WprSetColor(), WprLine()
@@ -662,12 +662,12 @@ WprPolyline(long *pts, int npts)
 /* ======================================================================
 Dessine le segment de l'arc inclus dans un rectangle (ellipse) compris
 entre deux points.
-La plume et la couleur courantes sont utilisÇes.
+La plume et la couleur courantes sont utilis√©es.
 
-&EN (left, top) = coordonnÇes du coin supÇrieur gauche du rectangle
-&EN (right, bottom) = coordonnÇes du coin infÇrieur droit du rectangle
-&EN (x0, y0) = coordonnÇes du point de dÇpart
-&EN (x1, y1) = coordonnÇes du point d'arrivÇe
+&EN (left, top) = coordonn√©es du coin sup√©rieur gauche du rectangle
+&EN (right, bottom) = coordonn√©es du coin inf√©rieur droit du rectangle
+&EN (x0, y0) = coordonn√©es du point de d√©part
+&EN (x1, y1) = coordonn√©es du point d'arriv√©e
 
 &SA WprSetPen(), WprSetColor(), WprLine(), WprRectangle()
 ========================================================================= */
@@ -680,10 +680,10 @@ WprArc(int left, int top, int right, int bot, int x0, int y0, int x1, int y1)
 
 /* ======================================================================
 Dessine une ligne entre deux points.
-La plume et la couleur courantes sont utilisÇes.
+La plume et la couleur courantes sont utilis√©es.
 
-&EN x0, y0 = coordonnÇes du point de dÇpart
-&EN x1, y1 = coordonnÇes du point de fin
+&EN x0, y0 = coordonn√©es du point de d√©part
+&EN x1, y1 = coordonn√©es du point de fin
 
 ========================================================================= */
 
@@ -695,8 +695,8 @@ WprLine(int x0, int y0, int x1, int y1)
 }
 
 /* ======================================================================
-SÇlectionne la couleur utilisÇe pour les textes et les brosses (BRUSH)
-suivantes. Les couleurs sont dÇfinies comme suit :
+S√©lectionne la couleur utilis√©e pour les textes et les brosses (BRUSH)
+suivantes. Les couleurs sont d√©finies comme suit :
 
 &EN i = 0 : RGB(  0,   0,   0) = BLACK
 &EN i = 1 : RGB(255, 255, 255) = WHITE
@@ -707,7 +707,7 @@ suivantes. Les couleurs sont dÇfinies comme suit :
 &EN i = 6 : RGB(255,   0, 255) = MAGENTA
 &EN i = 7 : RGB(255, 255,   0) = YELLOW
 
-La couleur des seules brosses 3 Ö 8 sont modifiables.
+La couleur des seules brosses 3 √† 8 sont modifiables.
 ========================================================================= */
 
 WprSetColor(int i)
@@ -728,23 +728,23 @@ WORD WprBR10[] = {0xEE, 0xFF, 0xFF, 0xFF, 0xBB, 0xFF, 0xFF, 0xFF};
 */
 
 /* ======================================================================
-SÇlectionne la brosse (BRUSH) de dessin pour les rectangles et ellipses
+S√©lectionne la brosse (BRUSH) de dessin pour les rectangles et ellipses
 suivants. Les brosses disponibles sont :
 
 &EN brush = 0 pour une brosse transparente,
 &EN brush = 1 pour une brosse pleine blanche,
 &EN brush = 2 pour une brosse pleine noire,
-&EN brush = 3 pour une brosse hachurÇe 1 pixel/64,
-&EN brush = 4 pour une brosse hachurÇe 2 pixels/64,
-&EN brush = 5 pour une brosse hachurÇe 4 pixels/64,
-&EN brush = 6 pour une brosse hachurÇe 8 pixels/64,
-&EN brush = 7 pour une brosse hachurÇe 16 pixels/64,
-&EN brush = 8 pour une brosse hachurÇe 32 pixels/64,
+&EN brush = 3 pour une brosse hachur√©e 1 pixel/64,
+&EN brush = 4 pour une brosse hachur√©e 2 pixels/64,
+&EN brush = 5 pour une brosse hachur√©e 4 pixels/64,
+&EN brush = 6 pour une brosse hachur√©e 8 pixels/64,
+&EN brush = 7 pour une brosse hachur√©e 16 pixels/64,
+&EN brush = 8 pour une brosse hachur√©e 32 pixels/64,
 
-La couleur des brosses 3 Ö 8 sont dÇfinies par la fonction WprSetColor().
+La couleur des brosses 3 √† 8 sont d√©finies par la fonction WprSetColor().
 
-&REM Si le numÇro de la brosse n'est pas dÇfini, une brosse nulle est
-sÇlectionnÇe.
+&REM Si le num√©ro de la brosse n'est pas d√©fini, une brosse nulle est
+s√©lectionn√©e.
 ========================================================================= */
 
 WprSetBrush(int brush)
@@ -868,7 +868,7 @@ WprFindPen(int type, int width, int color)
 }
 
 /* ======================================================================
-SÇlectionne une plume de pour les tracÇs suivants.
+S√©lectionne une plume de pour les trac√©s suivants.
 &EN type vaut :
 &EN2 0 : plume nulle
 &EN2 1 : plume continue

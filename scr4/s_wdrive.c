@@ -3,13 +3,13 @@
 // #include <windows.h>
 
 /* ========================================================================
-Windows Only. Fournit le nom d'un volume local (disque non montÇ).
+Windows Only. Fournit le nom d'un volume local (disque non mont√©).
 
-&EN drive = lettre pour accÇder au drive : ("C:", "A:", ...)
-&EN volname = nom du drive retournÇ en cas de succäs, sinon '' (buffer de 128 bytes requis)
-&EN volsn   = long numÇro de sÇrie du disque par la fonction en cas de succäs
+&EN drive = lettre pour acc√©der au drive : ("C:", "A:", ...)
+&EN volname = nom du drive retourn√© en cas de succ√®s, sinon '' (buffer de 128 bytes requis)
+&EN volsn   = long num√©ro de s√©rie du disque par la fonction en cas de succ√®s
 
-&RT : 0 en cas de succäs, -1 sinon
+&RT : 0 en cas de succ√®s, -1 sinon
 ================================================================== */
 
 int WscrGetDriveInfos(U_ch *drive, U_ch *volname, unsigned long * volsn)

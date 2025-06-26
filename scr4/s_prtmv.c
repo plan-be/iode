@@ -2,7 +2,7 @@
 
 /* ======================================================================
 Descend le curseur de val lignes. Si la nouvelle position sort de la
-page, un saut de page est gÇnÇrÇ.
+page, un saut de page est g√©n√©r√©.
 
 &SA PR_up(), PR_left(), PR_right()
 ------------------------------------------------------------------------ */
@@ -20,7 +20,7 @@ int     val;
 
 /* ======================================================================
 Remonte le curseur de val lignes. Si la nouvelle position sort de la
-page, la ligne est fixÇe Ö 0.
+page, la ligne est fix√©e √† 0.
 
 &SA PR_up(), PR_left(), PR_right()
 ------------------------------------------------------------------------ */
@@ -36,8 +36,8 @@ int     val;
 }
 
 /* ======================================================================
-DÇplace le curseur de val caractäres vers la gauche. Si la nouvelle
-position sort de la page, la colonne est fixÇe Ö 0.
+D√©place le curseur de val caract√®res vers la gauche. Si la nouvelle
+position sort de la page, la colonne est fix√©e √† 0.
 
 &SA PR_up(), PR_down(), PR_right()
 ------------------------------------------------------------------------ */
@@ -53,8 +53,8 @@ int     val;
 }
 
 /* ======================================================================
-DÇplace le curseur de val caractäres vers la droite. Si la nouvelle
-position sort de la page, un saut de ligne est gÇnÇrÇ.
+D√©place le curseur de val caract√®res vers la droite. Si la nouvelle
+position sort de la page, un saut de ligne est g√©n√©r√©.
 
 &SA PR_up(), PR_down(), PR_left()
 ------------------------------------------------------------------------ */

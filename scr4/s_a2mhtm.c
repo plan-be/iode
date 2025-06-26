@@ -23,10 +23,10 @@ int     A2M_HTML_IMGBORDER = -1;  /* JMP 29-06-02 */
 int     A2M_HTML_OEMTOANSI = 1;     /* JMP 16-08-10 */
 int     A2M_HTML_NOINLINESTYLE = 0;    /* JMP 25-09-10 */
 
-char    *A2M_HTML_TABLECLASS = 0; //  0 = D�faut class, "" = no class, "classname" = user class
-char    *A2M_HTML_TRCLASS = 0; //  0 = D�faut class, "" = no class, "classname" = user class
-char    *A2M_HTML_THCLASS = 0; //  0 = D�faut class, "" = no class, "classname" = user class
-char    *A2M_HTML_TDCLASS = 0; //  0 = D�faut class, "" = no class, "classname" = user class
+char    *A2M_HTML_TABLECLASS = 0; //  0 = Défaut class, "" = no class, "classname" = user class
+char    *A2M_HTML_TRCLASS = 0; //  0 = Défaut class, "" = no class, "classname" = user class
+char    *A2M_HTML_THCLASS = 0; //  0 = Défaut class, "" = no class, "classname" = user class
+char    *A2M_HTML_TDCLASS = 0; //  0 = Défaut class, "" = no class, "classname" = user class
 
 /* Private */
 FILE    *A2M_fdhtm, *A2M_fdhhc, *A2M_fdhhk, *A2M_fdtoc;
@@ -47,24 +47,24 @@ int     A2M_HTML_INTOPIC = 0, A2M_HTML_GREEK = 0;
 
 
 /* ================================================================
-Interpr�te le contenu d'un fichier a2m et g�n�re un fichier .htm.
+Interpréte le contenu d'un fichier a2m et génére un fichier .htm.
 
-&EN a2mfile = nom du fichier a2m � interpr�ter
-&EN outfile = nom du fichier htm � g�n�rer
+&EN a2mfile = nom du fichier a2m à interpréter
+&EN outfile = nom du fichier htm à générer
 &EN wh = 0 pour un fichier HTML simple, 1 pour un fichier pour
     Html Help
 
-&RT La fonction retourne 0 si le processus s'est bien d�roul�, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien déroulé, -1 sinon.
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-l'impression et la lecture du fichier a2m. Pour que ces param�tres
+---------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramétres
 soient pris en compte par le programme A2mToHtml(), il faut appeler la
 fonction A2mHtmlReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -74,34 +74,34 @@ d'interpr�tation et d'impression.
 &TX
 
 &TI Variables globales
-������������������
-Les variables globales d�crites dans le fichier .ini peuvent �galement
-�tre modifi�es dans le programme.
+------------------
+Les variables globales décrites dans le fichier .ini peuvent également
+étre modifiées dans le programme.
 
-&IT Variables influen�ant la lecture du fichier
-������������������������������������������
-Ces variables sont d�finies dans la secion [A2M] du fichier ini.
+&IT Variables influenéant la lecture du fichier
+------------------------------------------
+Ces variables sont définies dans la secion [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caract�re d'escape (enrichissements et caract�res
-    sp�ciaux) : '\'par d�faut
-&EN int A2M_CMDCH = caract�re de commande ('.' par d�faut)
-    sp�ciaux)
-&EN int A2M_DEFCH = caract�re pr�fixant les macros ('&' par d�faut)
-&EN int A2M_SEPCH = caract�re de s�paration des cellules ('&' par d�faut)
+&EN int A2M_ESCCH = caractére d'escape (enrichissements et caractéres
+    spéciaux) : '\'par défaut
+&EN int A2M_CMDCH = caractére de commande ('.' par défaut)
+    spéciaux)
+&EN int A2M_DEFCH = caractére préfixant les macros ('&' par défaut)
+&EN int A2M_SEPCH = caractére de séparation des cellules ('&' par défaut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d�faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par défaut ("par_0")
 
-&IT Variables influen�ant le fichier g�n�r�
-���������������������������������������
-Ces variables sont d�finies dans la section [HTML] du fichier .ini.
+&IT Variables influenéant le fichier généré
+---------------------------------------
+Ces variables sont définies dans la section [HTML] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d�faut des caract�res dans les
-    paragraphes (10 pts par d�faut)
-&EN int A2M_FONTINCR = incr�ment de taille de caract�res (2 par d�faut)
-&EN int A2M_TFONTSIZE = taille par d�faut des caract�res dans les
-    tableaux (8 pts par d�faut)
-&EN int A2M_FONTFAMILY = police de caract�re par d�faut ('H', 'T' ou 'C')
+&EN int A2M_FONTSIZE = taille par défaut des caractéres dans les
+    paragraphes (10 pts par défaut)
+&EN int A2M_FONTINCR = incrément de taille de caractéres (2 par défaut)
+&EN int A2M_TFONTSIZE = taille par défaut des caractéres dans les
+    tableaux (8 pts par défaut)
+&EN int A2M_FONTFAMILY = police de caractére par défaut ('H', 'T' ou 'C')
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -124,20 +124,20 @@ Ces variables sont d�finies dans la section [HTML] du fichier .ini.
 
 &EN int A2M_HTML_TCOLOR = 1 (dft) pour impression en couleur des
     tableaux, 0 en B/W
-&EN int A2M_HTML_TBORDER = �paisseur des cadres des tableaux (1 par dft)
+&EN int A2M_HTML_TBORDER = épaisseur des cadres des tableaux (1 par dft)
 &EN U_ch *A2M_HTML_TITLE = titre du fichier html
 &EN U_ch *A2M_HTML_BODY = contenu du tag <BODY> du fichier HTML
-&EN int A2M_HTML_LTGT = 0 si les caract�res < et > doivent appara�tre
-    comme tel en HTML (&lt;) et non interpr�t�s comme tag (on mettra 0
+&EN int A2M_HTML_LTGT = 0 si les caractéres < et > doivent apparaétre
+    comme tel en HTML (&lt;) et non interprétés comme tag (on mettra 0
     dans ce cas).
 &EN int A2M_HTML_TTITLE = 1 pour inclure le titre des tableaux dans le tableau
-&EN int A2M_HTML_AUTOLINK = 0 pour supprimer la cr�ation automatique de liens
-    par l'analyse des sujets d'aide (acc�l�re le traitement)
+&EN int A2M_HTML_AUTOLINK = 0 pour supprimer la création automatique de liens
+    par l'analyse des sujets d'aide (accélére le traitement)
 
 &RT
-&EN 0 en cas de succ�s
-&EN -1 si le fichier ne peut �tre ouvert
-&EN -2 si les fichiers output n'ont pu �tre cr��s
+&EN 0 en cas de succés
+&EN -1 si le fichier ne peut étre ouvert
+&EN -2 si les fichiers output n'ont pu étre créés
 
 
 &SA A2mHtmlReadIni(), A2mToRtf(), A2mToMif(), A2mToMif(), A2mPrintError()
@@ -151,8 +151,8 @@ int     wh;
 }
 
 /*
-    Fonction identique � A2mToHtml() mais sans inclure de sections
-    HEAD et BODY dans le fichier r�sultat.
+    Fonction identique à A2mToHtml() mais sans inclure de sections
+    HEAD et BODY dans le fichier résultat.
 */
 
 int A2mToHtmlStrip(char* a2mfile, char* outfile, int strp, int wh)
@@ -1068,7 +1068,7 @@ int     ch;
           case 239    :
           case 240    : txt = "\"";       break; // double quote
           case 248    : txt = "&#176;";   break; // degree
-          case '�'    : txt = "&#176;";   break; // degree
+          case 'é'    : txt = "&#176;";   break; // degree
           default     :
         if(A2M_HTML_LTGT == 0 && ch == '<') txt = "&lt;";
         else if(A2M_HTML_LTGT == 0 && ch == '>') txt = "&gt;";
@@ -1238,7 +1238,7 @@ A2MTBL  *at;
     }
 
     for(i = 0 ; i < at->at_nl ; i++) {
-        // <TD> or <TH> ? + Classe par d�faut en fonction thead ou pas
+        // <TD> or <TH> ? + Classe par défaut en fonction thead ou pas
         if(at->at_tls[i].atl_hbf == 1) {
             tdh = "TD";
             baseclass = A2M_HTML_TDCLASS;
@@ -1259,7 +1259,7 @@ A2MTBL  *at;
             fprintf(A2M_fdhtm, " BGCOLOR=\"%s\"", A2M_HTMLCOLORS[col]);
         fprintf(A2M_fdhtm, ">\n");
 
-        // Ligne de s�p dans le tableau
+        // Ligne de sép dans le tableau
         if(at->at_tls[i].atl_type) {
             fprintf(A2M_fdhtm, "  <%s class=\"A2mTRLine\" COLSPAN=%d><HR></%s></TR>\n", tdh, at->at_nc, tdh);
             continue;
@@ -1438,23 +1438,23 @@ int A2mHtmlPrintFNotes()
 }
 
 /* ================================================================
-Fixe la valeur des variables globales avant l'interp�tation d'un fichier
-a2m et la g�n�ration d'un fichier html en se basant sur les d�finitions du
-fichier .ini associ�.
+Fixe la valeur des variables globales avant l'interpétation d'un fichier
+a2m et la génération d'un fichier html en se basant sur les définitions du
+fichier .ini associé.
 
-Les sections [A2M] et [HTML] du fichier .ini sont interpr�t�es.
+Les sections [A2M] et [HTML] du fichier .ini sont interprétées.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-la lecture du fichier a2m etla g�nration du fichier html. Pour que ces
-param�tres soient pris en compte par le programme A2mToHtml(), il faut
+---------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+la lecture du fichier a2m etla génration du fichier html. Pour que ces
+paramétres soient pris en compte par le programme A2mToHtml(), il faut
 appeler la fonction A2mHtmlReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>

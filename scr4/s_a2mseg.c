@@ -47,7 +47,7 @@ A2MFILE *af;
 	sprintf(buf, ".pardef cmde_%d copy=cmd_0 lmargin=%d\n", i, A2M_DFT_LMARGIN + 16 + 8 * i);
 	CppRecord(cpp, buf);
 	}
-    // Courrier … la marge
+    // Courrier Ã  la marge
     for(i = A2M_MAXPARLEVEL ; i > 0 ; i--) {
 	sprintf(buf, ".pardef cmd_%d copy=cmd_0\n", i);
 	CppRecord(cpp, buf);
@@ -140,7 +140,7 @@ A2MFILE *af;
 	CppRecord(cpp, buf);
 	}
 
-    // Para std : ts align‚s sur la marge
+    // Para std : ts alignÃ©s sur la marge
     for(i = A2M_MAXPARLEVEL ; i > 0 ; i--) {
 	sprintf(buf, ".pardef par_%d copy=par_0\n", i);
 	CppRecord(cpp, buf);
@@ -214,8 +214,8 @@ A2MFNT  *fnt;
 }
 
 
-/* G‚nŠre des segments de strings avec des s‚parateurs
-    uniquement o— c'est permis et adaptation des fonts */
+/* GÃ©nÃ¨re des segments de strings avec des sÃ©parateurs
+    uniquement oÃ¹ c'est permis et adaptation des fonts */
 
 int A2mSplitStrs(ap)
 A2MPAR  *ap;

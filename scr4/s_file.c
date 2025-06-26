@@ -13,37 +13,37 @@ int     FI_cmtlg = 0;
 
 /* ====================================================================
 Analyse le fichier inname et retourne son type en fonction des
-paramŠtres pass‚s dans tbl. Un commentaire de longueur maximum lg peut
-ˆtre retourn‚ dans cmt si cette variable n'est pas nulle.
+paramÃ¨tres passÃ©s dans tbl. Un commentaire de longueur maximum lg peut
+Ãªtre retournÃ© dans cmt si cette variable n'est pas nulle.
 
-Le tableau pass‚ comme premier paramŠtre indique les diff‚rents
+Le tableau passÃ© comme premier paramÃ¨tre indique les diffÃ©rents
 formats de fichiers reconnus. Le format de chaque ligne du tableau
-est d‚termin‚ par le premier caractŠre:
+est dÃ©terminÃ© par le premier caractÃ¨re:
 
-&EN s'il s'agit d'un chiffre, il indique que le format est d‚termin‚
-par le contenu du fichier. Le chiffre est un d‚placement par rapport au
-d‚but du fichier. AprŠs le chiffre se trouve l'entr‚e que l'on trouve
-… cette position dans le fichier: string, short, long, ... Ensuite vient
-la valeur de l'entr‚e. Si cette valeur correspond … ce qui est lu,
-le type de fichier est trouv‚.
+&EN s'il s'agit d'un chiffre, il indique que le format est dÃ©terminÃ©
+par le contenu du fichier. Le chiffre est un dÃ©placement par rapport au
+dÃ©but du fichier. AprÃ¨s le chiffre se trouve l'entrÃ©e que l'on trouve
+Ã  cette position dans le fichier: string, short, long, ... Ensuite vient
+la valeur de l'entrÃ©e. Si cette valeur correspond Ã  ce qui est lu,
+le type de fichier est trouvÃ©.
 
-&EN s'il s'agit du caractŠre >> suivi d'un nombre, cela signifie que
-le type d‚j… trouv‚ pr‚c‚demment est compl‚t‚ par une information qui
-se trouve nn caractŠres plus loin dans le fichier (voir IODE).
+&EN s'il s'agit du caractÃ¨re >> suivi d'un nombre, cela signifie que
+le type dÃ©jÃ  trouvÃ© prÃ©cÃ©demment est complÃ©tÃ© par une information qui
+se trouve nn caractÃ¨res plus loin dans le fichier (voir IODE).
 
 &EN s'il s'agit d'un ., cela signifie que l'extension du fichier
-d‚termine son type. L'extension est indiqu‚e aprŠs le point.
+dÃ©termine son type. L'extension est indiquÃ©e aprÃ¨s le point.
 
-Si le type ne peut ˆtre d‚termin‚ par les donn‚es de tbl, la fonction
-recherche elle-mˆme des indications dans le fichier. Dans ce cas,
-une valeur n‚gative est retourn‚e par la fonction, valeur correspondant
-… des define du fichier s_file.h.
+Si le type ne peut Ãªtre dÃ©terminÃ© par les donnÃ©es de tbl, la fonction
+recherche elle-mÃªme des indications dans le fichier. Dans ce cas,
+une valeur nÃ©gative est retournÃ©e par la fonction, valeur correspondant
+Ã  des define du fichier s_file.h.
 
-&RT num‚ro de l'entr‚e dans tbl si une entr‚e correspond ou valeur
-    pr‚d‚finie sinon
+&RT numÃ©ro de l'entrÃ©e dans tbl si une entrÃ©e correspond ou valeur
+    prÃ©dÃ©finie sinon
 
-&IT Valeurs pr‚d‚finies
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+&IT Valeurs prÃ©dÃ©finies
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 &CO
     #define FI_DIR         -1
     #define FI_DATA        -2
@@ -106,7 +106,7 @@ une valeur n‚gative est retourn‚e par la fonction, valeur correspondant
 &TX
 
 &NO
-En Unix, de nombreuses d‚finitions de formats peuvent ˆtre trouv‚es
+En Unix, de nombreuses dÃ©finitions de formats peuvent Ãªtre trouvÃ©es
 dans le fichier /etc/magic.
 =======================================================================*/
 

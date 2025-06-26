@@ -4,10 +4,10 @@
 /* ====================================================================
 Copie une matrice dans une autre, les deux matrices doivent exister.
 
-&RT Le pointeur (MAT *) vers la matrice cible est retournÇ.
-    Ce pointeur est nul en cas de matrice non allouÇe ou
+&RT Le pointeur (MAT *) vers la matrice cible est retourn√©.
+    Ce pointeur est nul en cas de matrice non allou√©e ou
     en cas de dimentions incorrectes, la variable globale M_errno
-    est positionnÇe.
+    est positionn√©e.
 
 &EX
     MAT     *m1, *m2;
@@ -48,11 +48,11 @@ MAT     *m2, *m1;
 
 
 /* ====================================================================
-CrÇe une seconde matrice copie de la premiäre.
+Cr√©e une seconde matrice copie de la premi√®re.
 
-&RT Le pointeur (MAT *) vers la matrice copie est retournÇ. Ce pointeur est
-    nul en cas d'Çchec (mÇmoire insuffisante).
-    La variable globale M_errno est positionnÇe.
+&RT Le pointeur (MAT *) vers la matrice copie est retourn√©. Ce pointeur est
+    nul en cas d'√©chec (m√©moire insuffisante).
+    La variable globale M_errno est positionn√©e.
 
 &EX
     MAT     *m1, *m2;

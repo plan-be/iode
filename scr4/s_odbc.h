@@ -16,7 +16,7 @@ typedef struct _odsn_ {
     char        *passwd; /* Password */
     char        *dbms;   /* DMBS */
     char        *dbmsvers; /* DMBS Version */
-    char        *filename; /* Nom du fichier (si d‚fini) */
+    char        *filename; /* Nom du fichier (si dÃ©fini) */
     int         prev[2];   /* IS_prev possible(static, dynamic)  */
 } ODSN;
 
@@ -30,12 +30,12 @@ typedef struct _ocol_ {
     int         scrtype;     /* Type SCR de la colonne */
     int         Ctype;       /* Type C de la colonne */
     int         Clen;        /* Longueur C de la colonne */
-    int         Cvar;        /* 1 si champ variable (Cptr allou‚) */
+    int         Cvar;        /* 1 si champ variable (Cptr allouÃ©) */
     char        *Cptr;       /* Pointeur vers la valeur */
     char        *Cvptr;      /* Pointeur vers la valeur (si Cvar) */
     int         len;         /* Buffer len */
     int         nc;          /* Char len (display) */
-    int         nullable;    /* Nuls accept‚s */
+    int         nullable;    /* Nuls acceptÃ©s */
     long        datalen;     /* Taille de la valeur de retour (bind) */
 } OCOL;
 
@@ -63,10 +63,10 @@ typedef struct _oidx_ {
 
 typedef struct _ocsr_ {
     ODSN        *odsn;   /* Definition de la database */
-    OTBL        *otbl;   /* Definition de la table r‚sultat du Query */
+    OTBL        *otbl;   /* Definition de la table rÃ©sultat du Query */
     SQLHSTMT    hstmt;   /* Handle sur le statement de base */
     char        *ptr;    /* Pointeur sur le "record" */
-    long        currec; /* num‚ro du record courant */
+    long        currec; /* numÃ©ro du record courant */
 //    int         tmp;     /* Buffer pour le param de bind */
 } OCSR;
 

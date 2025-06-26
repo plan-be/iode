@@ -2,38 +2,38 @@
 
 /* ====================================================================
 Copie la database is2 dans is1, record par record, sur la longueur la
-plus petite des deux fichiers. Le record de is1 est initialement fix‚ …
-0 pour ‚viter que des r‚sidus de buffer se placent dans les records.
+plus petite des deux fichiers. Le record de is1 est initialement fixÃ© Ã 
+0 pour Ã©viter que des rÃ©sidus de buffer se placent dans les records.
 
-Le paramŠtre stop d‚cide si le processus s'arrˆte (1) ou non (0) en cas
-d'erreur. Un message est affich‚ avant l'arrˆt ‚ventuel.
+Le paramÃ¨tre stop dÃ©cide si le processus s'arrÃªte (1) ou non (0) en cas
+d'erreur. Un message est affichÃ© avant l'arrÃªt Ã©ventuel.
 
-Le paramŠtre disp permet d'afficher (1) ou non (0) un compteur avec le
-nombre de records copi‚s.
+Le paramÃ¨tre disp permet d'afficher (1) ou non (0) un compteur avec le
+nombre de records copiÃ©s.
 
 Le pointeur de fonction fn permet de filtrer les records avant de les
-‚crire. La fonction fn est appel‚e comme suit :
+Ã©crire. La fonction fn est appelÃ©e comme suit :
 &CO
     fn(is1, is2);
 &TX
-Si fn retourne 0, le record est copi‚. Sinon, il est saut‚.
+Si fn retourne 0, le record est copiÃ©. Sinon, il est sautÃ©.
 
 La lecture de is2 se fait dans l'ordre physique du fichier.
 
 &TI Utilisation
-ÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-Cette fonction est utilis‚e pour agrandir ou diminuer la taille des
-records d'un ISAM, ou encore pour recr‚er une database contenant des
-index DUP qui ne devraient pas s'y trouver (aprŠs une modification des
+Cette fonction est utilisÃ©e pour agrandir ou diminuer la taille des
+records d'un ISAM, ou encore pour recrÃ©er une database contenant des
+index DUP qui ne devraient pas s'y trouver (aprÃ¨s une modification des
 INDEX par exemple).
 
-&RT Nombre de records copi‚s correctement.
+&RT Nombre de records copiÃ©s correctement.
 &EX
     long nb_recs;
 
     nb_recs = IS_copy_fn(is_newprod, is_prod, 0, 0, select);
-    printf("%ld records de prod copi‚s dans newprod\n", nb_recs);
+    printf("%ld records de prod copiÃ©s dans newprod\n", nb_recs);
 &TX
 &SA IS_copy_fn(), IS_create_dbase()
 =======================================================================*/
@@ -94,28 +94,28 @@ ended:
 
 /* ====================================================================
 Copie la database is2 dans is1, record par record, sur la longueur la
-plus petite des deux fichiers. Le record de is1 est initialement fix‚ …
-0 pour ‚viter que des r‚sidus de buffer se placent dans les records.
+plus petite des deux fichiers. Le record de is1 est initialement fixÃ© Ã 
+0 pour Ã©viter que des rÃ©sidus de buffer se placent dans les records.
 
-Le paramŠtre stop d‚cide si le processus s'arrˆte (1) ou non (0) en cas
-d'erreur. Un message est affich‚ avant l'arrˆt ‚ventuel.
+Le paramÃ¨tre stop dÃ©cide si le processus s'arrÃªte (1) ou non (0) en cas
+d'erreur. Un message est affichÃ© avant l'arrÃªt Ã©ventuel.
 
-Le paramŠtre disp permet d'afficher (1) ou non (0) un compteur avec le
-nombre de records copi‚s.
+Le paramÃ¨tre disp permet d'afficher (1) ou non (0) un compteur avec le
+nombre de records copiÃ©s.
 
 &TI Utilisation
-ÄÄÄÄÄÄÄÄÄÄÄ
-Cette fonction est utilis‚e pour agrandir ou diminuer la taille des
-records d'un ISAM, ou encore pour recr‚er une database contenant des
-index DUP qui ne devraient pas s'y trouver (aprŠs une modification des
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Cette fonction est utilisÃ©e pour agrandir ou diminuer la taille des
+records d'un ISAM, ou encore pour recrÃ©er une database contenant des
+index DUP qui ne devraient pas s'y trouver (aprÃ¨s une modification des
 INDEX par exemple).
 
-&RT  Nombre de records copi‚s correctement.
+&RT  Nombre de records copiÃ©s correctement.
 &EX
     long nb_recs;
 
     nb_recs = IS_copy(is_newprod, is_prod, 0, 0);
-    printf("%ld records de prod copi‚s dans newprod\n", nb_recs);
+    printf("%ld records de prod copiÃ©s dans newprod\n", nb_recs);
 &TX
 &SA IS_copy_fn(), IS_create_dbase()
 =======================================================================*/
@@ -128,27 +128,27 @@ int     stop, disp;
 }
 
 /* ====================================================================
-Duplicie la database is dans un ISAM de mˆme structure et de nom toname.
+Duplicie la database is dans un ISAM de mÃªme structure et de nom toname.
 
-Le paramŠtre stop d‚cide si le processus s'arrˆte (1) ou non (0) en cas
-d'erreur. Un message est affich‚ avant l'arrˆt ‚ventuel.
+Le paramÃ¨tre stop dÃ©cide si le processus s'arrÃªte (1) ou non (0) en cas
+d'erreur. Un message est affichÃ© avant l'arrÃªt Ã©ventuel.
 
-Le paramŠtre disp permet d'afficher (1) ou non (0) un compteur avec le
-nombre de records copi‚s.
+Le paramÃ¨tre disp permet d'afficher (1) ou non (0) un compteur avec le
+nombre de records copiÃ©s.
 
 &TI Utilisation
-ÄÄÄÄÄÄÄÄÄÄÄ
-Cette fonction est utilis‚e pour agrandir ou diminuer la taille des
-records d'un ISAM, ou encore pour recr‚er une database contenant des
-index DUP qui ne devraient pas s'y trouver (aprŠs une modification des
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Cette fonction est utilisÃ©e pour agrandir ou diminuer la taille des
+records d'un ISAM, ou encore pour recrÃ©er une database contenant des
+index DUP qui ne devraient pas s'y trouver (aprÃ¨s une modification des
 INDEX par exemple).
 
-&RT  Nombre de records copi‚s correctement.
+&RT  Nombre de records copiÃ©s correctement.
 &EX
     long nb_recs;
 
     nb_recs = IS_dup_dbase(is_prod, "newprod", 0, 0);
-    printf("%ld records de prod copi‚s dans newprod\n", nb_recs);
+    printf("%ld records de prod copiÃ©s dans newprod\n", nb_recs);
 &TX
 &SA IS_copy_fn(), IS_create_dbase()
 =======================================================================*/

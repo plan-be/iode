@@ -23,14 +23,14 @@ char     SCR_DATE_FMT[15] = "dd/mm/yyyy";
 /* ====================================================================
 Retourne la date de la machine sous forme d'un long.
 
-&EN Les unit�s et les dizaines repr�sentent le jour du mois (01-31).
-&EN Les centaines et les milliers repr�sentent le mois (01-12)
-&EN Les dizaines de milliers et centaines de milliers repr�sentent
-    l'ann�e dans le si�cle
-&EN Les millions et dizaines de millions le si�cle
+&EN Les unités et les dizaines représentent le jour du mois (01-31).
+&EN Les centaines et les milliers représentent le mois (01-12)
+&EN Les dizaines de milliers et centaines de milliers représentent
+    l'année dans le siécle
+&EN Les millions et dizaines de millions le siécle
 
-Cette fa�on de repr�senter les dates est utilis�e dans les databases.
-Elle pr�sente l'avantage de classer facilement en ordre croissant les
+Cette faéon de représenter les dates est utilisée dans les databases.
+Elle présente l'avantage de classer facilement en ordre croissant les
 champs de date.
 
 &RT la valeur de la date machine en format long
@@ -70,13 +70,13 @@ long _SCR_current_date()
 /* ====================================================================
 Retourne l'heure de la machine sous forme d'un long.
 
-&EN Les unit�s et les dizaines repr�sentent les secondes
+&EN Les unités et les dizaines représentent les secondes
 &EN Les centaines et les milliers la minute
-&EN Les dizaines de milliers et centaines de milliers repr�sentent
+&EN Les dizaines de milliers et centaines de milliers représentent
     l'heure
 
-Cette fa�on de repr�senter les heures est utilis�e dans les databases.
-Elle pr�sente l'avantage de classer facilement en ordre croissant les
+Cette faéon de représenter les heures est utilisée dans les databases.
+Elle présente l'avantage de classer facilement en ordre croissant les
 champs TIME.
 
 &RT la valeur de l'heure machine en format long
@@ -112,14 +112,14 @@ long _SCR_current_time()
 }
 
 /* ====================================================================
-Formatte dans string un long (val) repr�sentant une date. Le format est
-d�fini dans la variable globale SCR_DATE_FMT[15] qui peut �ventuellement
-�tre adapt�e (voir SCR_long_to_fdate()). Par d�faut, ce format vaut
+Formatte dans string un long (val) représentant une date. Le format est
+défini dans la variable globale SCR_DATE_FMT[15] qui peut éventuellement
+étre adaptée (voir SCR_long_to_fdate()). Par défaut, ce format vaut
 
 &CO
     "dd/mm/yyyy"
 &TX
-&RT un pointeur vers string (r�sultat du formattage)
+&RT un pointeur vers string (résultat du formattage)
 &EX
     SCR_long_to_date(19901231, buf);
 
@@ -136,14 +136,14 @@ char *SCR_long_to_date(long val, char* string)
 }
 
 /* ====================================================================
-Formatte dans string un long (val) repr�sentant une heure. Le format est
-d�fini dans la variable globale SCR_TIME_FMT[15] qui peut �ventuellement
-�tre adapt�e (voir SCR_long_to_ftime()). Par d�faut, ce format vaut
+Formatte dans string un long (val) représentant une heure. Le format est
+défini dans la variable globale SCR_TIME_FMT[15] qui peut éventuellement
+étre adaptée (voir SCR_long_to_ftime()). Par défaut, ce format vaut
 
 &CO
     "hh/mm/ss"
 &TX
-&RT un pointeur vers string (r�sultat du formattage)
+&RT un pointeur vers string (résultat du formattage)
 &EX
     SCR_long_to_time(235900, buf);
 
@@ -160,19 +160,19 @@ char *SCR_long_to_time(long val, char* string)
 }
 
 /* ====================================================================
-Formatte dans str un long (val) repr�sentant une date. Le format est
-d�fini dans le param�tre fmt.
+Formatte dans str un long (val) représentant une date. Le format est
+défini dans le paramétre fmt.
 
-Le format peut contenir n'importe quels caract�res. Seuls les y, Y, m,
-M, d et D sont interpr�t�s. Les autres sont laiss�s comme tels.
-Les Y (y) sont remplac�s par les derniers chiffres de l'ann�e, les M (m)
+Le format peut contenir n'importe quels caractéres. Seuls les y, Y, m,
+M, d et D sont interprétés. Les autres sont laissés comme tels.
+Les Y (y) sont remplacés par les derniers chiffres de l'année, les M (m)
 par les chiffres du mois et les D (d) par ceux du jour. L'ordre
 d'apparition des lettres dans le format n'a pas d'importance.
 
-Les Y au-del� du quatri�me sont laiss�s tel quels. Les M au-del� du 2�me
-et les D au-del� du deuxi�me de m�me.
+Les Y au-delé du quatriéme sont laissés tel quels. Les M au-delé du 2éme
+et les D au-delé du deuxiéme de méme.
 
-&RT un pointeur vers str (r�sultat du formattage)
+&RT un pointeur vers str (résultat du formattage)
 &EX
     SCR_long_to_fdate(19901231L, buf, "mm-dd-yy");
 
@@ -222,19 +222,19 @@ char *SCR_long_to_fdate(long date, char* str, char* fmt)
 }
 
 /* ====================================================================
-Formatte dans str un long (val) repr�sentant une heure. Le format est
-d�fini dans le param�tre fmt.
+Formatte dans str un long (val) représentant une heure. Le format est
+défini dans le paramétre fmt.
 
-Le format peut contenir n'importe quels caract�res. Seuls les H, h, m,
-M, s et S sont interpr�t�s. Les autres sont laiss�s comme tels.
-Les H (h) sont remplac�s par les chiffres de l'heure, les M (m)
+Le format peut contenir n'importe quels caractéres. Seuls les H, h, m,
+M, s et S sont interprétés. Les autres sont laissés comme tels.
+Les H (h) sont remplacés par les chiffres de l'heure, les M (m)
 par les chiffres des minutes et les S (s) par ceux des secondes. L'ordre
 d'apparition des lettres dans le format n'a pas d'importance.
 
 Seuls les deux premiers h, s et m sont pris en compte dans le calcul.
 Ainsi le format "hhH.mm" sur 243000 donnera "24H.30".
 
-&RT un pointeur vers str (r�sultat du formattage)
+&RT un pointeur vers str (résultat du formattage)
 &EX
     SCR_long_to_fdate(235902L, buf, "hh:mm(ss)");
 
@@ -301,9 +301,9 @@ int SCR_date_upper_char(int ch)
 }
 
 /* ====================================================================
-Retourne le nombre de secondes �coul�es depuis minuit.
+Retourne le nombre de secondes écoulées depuis minuit.
 
-&EN time est pr�sent� sous forme de long : HHMMSS. Par exemple 143652.
+&EN time est présenté sous forme de long : HHMMSS. Par exemple 143652.
 
 &RT le nombre de secondes (long)
 &EX
@@ -322,9 +322,9 @@ long DT_time_num(long date)
 }
 
 /* ====================================================================
-Retourne l'heure � partir d'un nombre de secondes.
+Retourne l'heure à partir d'un nombre de secondes.
 
-&EN nbs est un nombre de secondes � partir de minuit
+&EN nbs est un nombre de secondes à partir de minuit
 
 &RT l'heure en format HHMMSS
 &EX

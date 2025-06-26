@@ -650,7 +650,7 @@ LzhDecode()  /* Decoding/Uncompressing */
 
 
 
-/* ========== Fonctions g‚n‚rales d'interface ========== */
+/* ========== Fonctions gÃ©nÃ©rales d'interface ========== */
 
 #ifndef SCRCPP
 long    (*LZH_sizfn)();
@@ -710,25 +710,25 @@ LzhAllocGnl()
     return(0);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction g‚n‚rale de compactage de donn‚es bas‚e sur l'algorithme de
-Lempel-Zev et sur la m‚thode de Huffmann.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction gÃ©nÃ©rale de compactage de donnÃ©es basÃ©e sur l'algorithme de
+Lempel-Zev et sur la mÃ©thode de Huffmann.
 
 Cette fonction prend 3 pointeurs vers des fonctions en argument :
 
-&EN la premiŠre fonction (getfn) doit retourner un int qui est le
-    caractŠre suivant de la chaŒne … compacter. Elle retourne -1
-    pour indiquer la fin de la chaŒne.
+&EN la premiÃ¨re fonction (getfn) doit retourner un int qui est le
+    caractÃ¨re suivant de la chaÃ®ne Ã  compacter. Elle retourne -1
+    pour indiquer la fin de la chaÃ®ne.
 
-&EN la deuxiŠme stocke le caractŠre suivant dans la chaŒne compact‚e
+&EN la deuxiÃ¨me stocke le caractÃ¨re suivant dans la chaÃ®ne compactÃ©e
     (putfn)
 
-&EN la troisiŠme retourne la longueur totale de la chaŒne … compacter
+&EN la troisiÃ¨me retourne la longueur totale de la chaÃ®ne Ã  compacter
 
 &RT Le code retour est nul sauf en cas d'erreur
 
-Dans le cas du compactage d'un fichier, les fonctions peuvent ˆtre par
-exemple d‚finies comme suit :
+Dans le cas du compactage d'un fichier, les fonctions peuvent Ãªtre par
+exemple dÃ©finies comme suit :
 
 &CO
     FILE    *LZH_infile, *LZH_outfile;
@@ -755,7 +755,7 @@ exemple d‚finies comme suit :
     }
 
 &TX
-et l'appel … la fonction d'encodage :
+et l'appel Ã  la fonction d'encodage :
 &CO
     LzhEncodeFile(filein, fileout)
     char    *filein, *fileout;
@@ -776,14 +776,14 @@ et l'appel … la fonction d'encodage :
 	return(rc);
     }
 &TX
-&NO Rien n'empˆche donc de ne compacter qu'une partie de fichier ou
-    de stocker dans le fichier r‚sultat d'autres donn‚es comme le
+&NO Rien n'empÃªche donc de ne compacter qu'une partie de fichier ou
+    de stocker dans le fichier rÃ©sultat d'autres donnÃ©es comme le
     nom du fichier en clair. De plus, on peut facilement encrypter
-    les donn‚es compact‚es en intervenant au niveau de la fonction
+    les donnÃ©es compactÃ©es en intervenant au niveau de la fonction
     putfn.
 
 &SA LzhDecodeGnl(), LzhEncodeFile(), LzhEncodeStr()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 LzhEncodeGnl(getfn, putfn, sizfn)
 int     (*getfn)(), (*putfn)();
@@ -800,24 +800,24 @@ long    (*sizfn)();
     return(rc);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction g‚n‚rale de d‚compactage de donn‚es bas‚e sur l'algorithme de
-Lempel-Zev et sur la m‚thode de Huffmann. Les donn‚es trait‚es par cette
-fonction sont celles compact‚es … l'aide de la fonction LzhEncodeGnl().
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction gÃ©nÃ©rale de dÃ©compactage de donnÃ©es basÃ©e sur l'algorithme de
+Lempel-Zev et sur la mÃ©thode de Huffmann. Les donnÃ©es traitÃ©es par cette
+fonction sont celles compactÃ©es Ã  l'aide de la fonction LzhEncodeGnl().
 
 Cette fonction prend 2 pointeurs vers des fonctions en argument :
 
-&EN la premiŠre fonction (getfn) doit retourner un int qui est le
-    caractŠre suivant de la chaŒne compact‚e. Elle retourne -1
-    pour indiquer la fin de la chaŒne.
+&EN la premiÃ¨re fonction (getfn) doit retourner un int qui est le
+    caractÃ¨re suivant de la chaÃ®ne compactÃ©e. Elle retourne -1
+    pour indiquer la fin de la chaÃ®ne.
 
-&EN la deuxiŠme stocke le caractŠre suivant dans la chaŒne d‚compact‚e
+&EN la deuxiÃ¨me stocke le caractÃ¨re suivant dans la chaÃ®ne dÃ©compactÃ©e
     (putfn)
 
 &RT Le code retour est nul sauf en cas d'erreur
 
-Dans le cas du compactage d'un fichier, les fonctions peuvent ˆtre par
-exemple d‚finies comme pour LzhEncodeGnl(). La fonction de d‚codage de
+Dans le cas du compactage d'un fichier, les fonctions peuvent Ãªtre par
+exemple dÃ©finies comme pour LzhEncodeGnl(). La fonction de dÃ©codage de
 fichier est par exemple :
 
 &CO
@@ -842,7 +842,7 @@ fichier est par exemple :
 &TX
 
 &SA LzhEncodeGnl(), LzhEncodeFile(), LzhEncodeStr()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 LzhDecodeGnl(getfn, putfn)
 int     (*getfn)(), (*putfn)();

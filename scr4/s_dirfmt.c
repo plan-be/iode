@@ -15,12 +15,12 @@ char            *txt;
 }
 
 /* ====================================================================
-Formatte le mode d'un fichier (retournÇ par SCR_stat() et autres fonctions)
+Formatte le mode d'un fichier (retourn√© par SCR_stat() et autres fonctions)
 dans le format Unix (drwxrwxrwx par exemple). txt contient en output
-un string de 10 caractäres terminÇ par un 0.
+un string de 10 caract√®res termin√© par un 0.
 
-Cette fonction est appropriÇe pour tous les types de fichiers, DOS
-ou UNIX. Le premier caractäre peut valoir :
+Cette fonction est appropri√©e pour tous les types de fichiers, DOS
+ou UNIX. Le premier caract√®re peut valoir :
 
 &EN - = fichier normal
 &EN d = directory
@@ -29,7 +29,7 @@ ou UNIX. Le premier caractäre peut valoir :
 &EN c = character special file (en Unix)
 &EN v = Volume label (en DOS)
 
-Des define standards pour tous les attributs sont dÇfinis dans le fichier
+Des define standards pour tous les attributs sont d√©finis dans le fichier
 s_dir.h.
 
 &RT void

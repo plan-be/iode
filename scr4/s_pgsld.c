@@ -2,9 +2,9 @@
 
 /* ======================================================================
 Affiche une page et attend la frappe d'une touche. Le commentaire
-affich‚ est d‚fini dans le fichier scr_err.txt (501).
+affichÃ© est dÃ©fini dans le fichier scr_err.txt (501).
 
-&RT la valeur de la touche press‚e
+&RT la valeur de la touche pressÃ©e
 ------------------------------------------------------------------------- */
 int PG_display_slide(pg)
 PAGE    *pg;
@@ -15,10 +15,10 @@ PAGE    *pg;
 
 /* ======================================================================
 Affiche une page et attend la frappe d'une touche. Le commentaire
-… afficher est d‚fini dans cmt. Si cmt est nul, le texte repris dans
-le fichier scr_err.txt (501) est affich‚.
+Ã  afficher est dÃ©fini dans cmt. Si cmt est nul, le texte repris dans
+le fichier scr_err.txt (501) est affichÃ©.
 
-&RT la valeur de la touche press‚e
+&RT la valeur de la touche pressÃ©e
 ------------------------------------------------------------------------- */
 int PG_display_slide_cmt(pg, cmt)
 PAGE    *pg;
@@ -40,7 +40,7 @@ JMP 19-05-95*/
 
     /* BP_M 03-11-2001 01:06 */
     /*    while(SCR_hit_key()) SCR_get_key();     /* BP_M 03-11-2001 01:06
-    /* Report‚ avant PG_display_im() JMP 15-01-03 */
+    /* ReportÃ© avant PG_display_im() JMP 15-01-03 */
 
     PG_disable(pg);
     SCR_clear_key();            /* JMP 15-01-03 */

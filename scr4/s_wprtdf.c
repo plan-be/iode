@@ -2,12 +2,12 @@
 #include "scr4w.h"
 
 /* ======================================================================
-Fournit la liste de toutes les imprimantes d‚finies sur le systŠme
+Fournit la liste de toutes les imprimantes dÃ©finies sur le systÃ¨me
 courant sous forme d'un tableau de noms (char **).
 
-Seul le nom de chaque imprimante est retourn‚.
+Seul le nom de chaque imprimante est retournÃ©.
 
-&RT tableau allou‚ de pointeurs termin‚ par un 0.
+&RT tableau allouÃ© de pointeurs terminÃ© par un 0.
 
 &EX
     ListPrinters()
@@ -55,12 +55,12 @@ char **WscrListPrinters()
 }
 
 /* ======================================================================
-Fournit le nom du printer par d‚faut.
+Fournit le nom du printer par dÃ©faut.
 
 &EN PrinterName : pointeur vers le buffer qui contiendra le nom de
     l'imprimante en sortie.
 
-&RT num‚ro de l'imprimante par d‚faut (dans l'ordre des noms fournis par
+&RT numÃ©ro de l'imprimante par dÃ©faut (dans l'ordre des noms fournis par
     WscrListPrinters()), -1 en cas d'erreur.
 
 &EX
@@ -116,13 +116,13 @@ WscrGetDefaultPrinter(char *PrinterName)
 }
 
 /* ======================================================================
-Fixe le nom du printer par d‚faut. Attention, peut ne pas fonctionner
+Fixe le nom du printer par dÃ©faut. Attention, peut ne pas fonctionner
 sous NT 4.0.
 
 &EN PrinterName : pointeur vers le buffer qui contient le nom de
     l'imprimante.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur.
 &SA WscrSetPrinter*(), WscrPrinterProperties()
 ========================================================================= */
 

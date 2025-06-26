@@ -2,14 +2,14 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Divise un nom de fichier en directory et fichier en Çtudiant
+Divise un nom de fichier en directory et fichier en √©tudiant
 le nom du path fourni. Retourne dans dir le nom du directory et
-dans file les "wildcards" correspondant aux fichiers spÇcifiÇs.
+dans file les "wildcards" correspondant aux fichiers sp√©cifi√©s.
 
-&NO Cette fonction ne vÇrifie pas l'existence du fichier ou du directory.
+&NO Cette fonction ne v√©rifie pas l'existence du fichier ou du directory.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (directory contenant * ou ?,
-    directory supÇrieur n'existant pas, drive incorrect, ...)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (directory contenant * ou ?,
+    directory sup√©rieur n'existant pas, drive incorrect, ...)
 &EX
     Si le directory \usr\ode existe :
       SCR_split_name("\usr\ode\toto", dir, file)

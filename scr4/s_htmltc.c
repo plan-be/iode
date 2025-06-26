@@ -6,30 +6,30 @@ char    JInputDir[128];
 char    *JTarget = 0;
 
 /* ===================================================================
-Cette fonction balaie un fichier HTML et les sous-fichiers r‚f‚renc‚s et
-g‚nŠre une table des matiŠres avec les r‚f‚rences vers les
+Cette fonction balaie un fichier HTML et les sous-fichiers rÃ©fÃ©rencÃ©s et
+gÃ©nÃ¨re une table des matiÃ¨res avec les rÃ©fÃ©rences vers les
 sous-fichiers sur base des tags <Hn> (qui indiquent les niveaux de
 chapitres dans les fichiers HTML).
 
 Le titre de chaque chapitre est repris avec le lien vers le
-sous-fichier et si un tag NAME est pr‚sent, vers la position
+sous-fichier et si un tag NAME est prÃ©sent, vers la position
 dans ce sous-fichier.
 
 
 &EN htmlfile = fichier input HTML
-&EN resfile = fichier HTML contenant la Table des matiŠres
-&EN maxlevel = niveau de titre maximum pour la table des matiŠres
-&EN target = fenˆtre target pour chaque topic
+&EN resfile = fichier HTML contenant la Table des matiÃ¨res
+&EN maxlevel = niveau de titre maximum pour la table des matiÃ¨res
+&EN target = fenÃªtre target pour chaque topic
 &EN
 
-Le fichier r‚sultat n'est pas un fichier HTML complet dans la mesure o—
-il est destin‚ … ˆtre par la suite int‚gr‚ dans un fichier plus grand.
+Le fichier rÃ©sultat n'est pas un fichier HTML complet dans la mesure oÃ¹
+il est destinÃ© Ã  Ãªtre par la suite intÃ©grÃ© dans un fichier plus grand.
 
-Le fichier d‚bute par un tag sp‚cial !STARTTOC et se termine par
+Le fichier dÃ©bute par un tag spÃ©cial !STARTTOC et se termine par
 un autre: !ENDTOC. Ces deux tags pourront par la suite servir
-d'indication au programme scr4_sbs ou … la fonction HtmlReplace().
+d'indication au programme scr4_sbs ou Ã  la fonction HtmlReplace().
 
-Le fichier r‚sultat contient la table des matiŠres dans le format
+Le fichier rÃ©sultat contient la table des matiÃ¨res dans le format
 suivant:
 
 &CO
@@ -43,16 +43,16 @@ suivant:
     <!ENDTOC>
 &TX
 
-Il est ensuite ais‚ de remplacer par le contenu de ce fichier une
-section pr‚alablement cr‚‚e dans un fichier html (par exemple … l'aide
+Il est ensuite aisÃ© de remplacer par le contenu de ce fichier une
+section prÃ©alablement crÃ©Ã©e dans un fichier html (par exemple Ã  l'aide
 de la fonction HtmlReplace().
 
-Cette fonction est exploit‚e par l'utilitaire scr4_toc.
+Cette fonction est exploitÃ©e par l'utilitaire scr4_toc.
 
 &RT
-&EN 0 en cas de succŠs,
-&EN -1 si le fichier resfile n'a pu ˆtre cr‚‚
-&EN -2 si un des fichiers r‚f‚renc‚s n'a p– ˆtre ouvert
+&EN 0 en cas de succÃ¨s,
+&EN -1 si le fichier resfile n'a pu Ãªtre crÃ©Ã©
+&EN -2 si un des fichiers rÃ©fÃ©rencÃ©s n'a pÃ» Ãªtre ouvert
 
 &SA HtmlSplit(), HtmlReplace(), HtmlMessage()
 ====================================================================== */

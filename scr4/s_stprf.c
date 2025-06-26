@@ -3,7 +3,7 @@
 #include <s_strs.h>
 
 /* ======================================================================
-Cr‚e le fichier filename et y stocke le string construit avec
+CrÃ©e le fichier filename et y stocke le string construit avec
 fprintf(a1, a2, ...).
 
 &EX
@@ -25,13 +25,13 @@ char    *filename, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10;
 }
 
 /* ======================================================================
-Cr‚e le fichier filename et y stocke le tableau de strings tbl.
-Ce tableau est termin‚ par un pointeur nul.
+CrÃ©e le fichier filename et y stocke le tableau de strings tbl.
+Ce tableau est terminÃ© par un pointeur nul.
 
-Si le tableau ne contient aucun string, le fichier n'est pas cr‚‚ et la valeur
+Si le tableau ne contient aucun string, le fichier n'est pas crÃ©Ã© et la valeur
 de retour est 0;
 
-&EN filename : fichier r‚sultat
+&EN filename : fichier rÃ©sultat
 &EN tbl : tableau de pointeurs vers des strings
 &EN fmt : format d'impression
 
@@ -39,7 +39,7 @@ de retour est 0;
     tbl = SCR_vtom("toto,tata,titi", ',');
     SCR_printf_tbl("myfile", tbl, "'%s'\n");
 &TX
-&RT -1 en cas d'erreur, 0 sinon (mˆme si le fichier n'est pas cr‚‚).
+&RT -1 en cas d'erreur, 0 sinon (mÃªme si le fichier n'est pas crÃ©Ã©).
 ------------------------------------------------------------------------- */
 
 SCR_printf_tbl(filename, tbl, fmt)
@@ -67,7 +67,7 @@ Copie  le contenu du fichier filename dans le stream fd.
 
 &EN fd : FILE * (output)
 &EN filename : fichier source
-&RT -1 en cas d'erreur, 0 sinon (mˆme si le fichier n'est pas cr‚‚).
+&RT -1 en cas d'erreur, 0 sinon (mÃªme si le fichier n'est pas crÃ©Ã©).
 ------------------------------------------------------------------------- */
 
 SCR_dumpf_file(fd, filename)

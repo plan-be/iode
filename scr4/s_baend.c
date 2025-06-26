@@ -4,10 +4,10 @@
 Termine une application SCR/AL1 en fermant tous les ISAM qui ne le
 seraient pas et le fichier .cmt.
 
-Elle sera utilis‚e … la place de SCR_end() dans le cas des applications
-ne n‚cessitant pas d'‚cran. C'est la pendant de SCR_mini_init().
+Elle sera utilisÃ©e Ã  la place de SCR_end() dans le cas des applications
+ne nÃ©cessitant pas d'Ã©cran. C'est la pendant de SCR_mini_init().
 
-Cette fonction est appel‚e par SCR_end().
+Cette fonction est appelÃ©e par SCR_end().
 
 &SA SCR_end()
 ======================================================================= */

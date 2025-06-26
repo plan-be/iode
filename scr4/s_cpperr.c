@@ -1,14 +1,14 @@
 #include "s_cpp.h"
 
 /* ================================================================
-Fonction appel‚e par les fonctions Cpp*() en cas d'erreur. Cette
-fonction affiche par d‚faut dans le stdout (printf) le fichier, la ligne
-et le caractŠre courants, suivi du message msg.
+Fonction appelÃ©e par les fonctions Cpp*() en cas d'erreur. Cette
+fonction affiche par dÃ©faut dans le stdout (printf) le fichier, la ligne
+et le caractÃ¨re courants, suivi du message msg.
 
-Elle peut (doit) ˆtre remplac‚e par le programmeur en fonction de
+Elle peut (doit) Ãªtre remplacÃ©e par le programmeur en fonction de
 l'environnement de programmation (Windows, ...).
 
-&EN cpp = pointeur retourn‚ par CppOpen()
+&EN cpp = pointeur retournÃ© par CppOpen()
 &EN msg = message d'erreur
 
 &SA CppOpen(), CppClose()

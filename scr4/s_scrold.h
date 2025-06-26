@@ -46,5 +46,5 @@
 #define FBEG              (*(SCRL->sc_fbeg))
 #define FEND              (*(SCRL->sc_fend))
 
-/*** FIN Déplacement de s_scroll.h pour les problèmes de compilation le 8/12/2011 ***/
+/*** FIN DÃ©placement de s_scroll.h pour les problÃ§mes de compilation le 8/12/2011 ***/
 

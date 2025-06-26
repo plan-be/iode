@@ -44,7 +44,7 @@ U_sh WscrMode32ToSCRSTAT(char *filename)
 #endif
 
 /* ====================================================================
-Fonction identique Ö SCR_stat_ex() mais qui lit un groupe de fichiers en une fois.
+Fonction identique √† SCR_stat_ex() mais qui lit un groupe de fichiers en une fois.
 
 &EN ss : pointeur vers un tableau de structures SCRSTAT
 &EN crc : calcul ou non du CRC
@@ -54,7 +54,7 @@ les valeurs et les place dans ss[i]->ss_size, ...
 
 Si ss[i]->ss_name[0] <= ' ', ne lit rien.
 
-&RT -1 en cas d'erreur, 0 en cas de succäs
+&RT -1 en cas d'erreur, 0 en cas de succ√®s
 
 &SA structure SCRSTAT, SCR_dir(), SCR_stat_ex(), ISC_mstat_ex()
 ======================================================================= */
@@ -90,19 +90,19 @@ SCR_mstat_ex(SCRSTAT **ss, int crc)
 }
 
 /* ====================================================================
-Fonction identique Ö SCR_stat() mais avec 4 champs suppplÇmentaires.
+Fonction identique √† SCR_stat() mais avec 4 champs supppl√©mentaires.
 
 &EN ssx_atime : access time dans le format standard (nbre de sec depuis le 1/1/1970)
 &EN ssx_ctime : creation time dans le format standard (nbre de sec depuis le 1/1/1970)
 &EN ssx_mtime : modification time dans le format standard (nbre de sec depuis le 1/1/1970)
-&EN ssx_crc32 : crc32 du fichier si le paramätre crc est non nul
+&EN ssx_crc32 : crc32 du fichier si le param√®tre crc est non nul
 
 Lit les attributs du fichier filename (taille, mode, ...), en standardise
 les valeurs et les place dans la structure SCRSTAT pointeur par ss.
 
-&NO Le nom du fichier n'est PAS placÇ dans ss->ss_name par cette fonction.
+&NO Le nom du fichier n'est PAS plac√© dans ss->ss_name par cette fonction.
 
-&RT -1 en cas d'erreur, 0 en cas de succäs
+&RT -1 en cas d'erreur, 0 en cas de succ√®s
 &EX
     SCRSTATEX     ssx;
 
@@ -182,11 +182,11 @@ int         crc;
 
 /* ====================================================================
 Lit les attributs du fichier filename (taille, mode, ...), en standardise
-les valeurs et les place dans la structure SCRSTAT pointÇe par ss.
+les valeurs et les place dans la structure SCRSTAT point√©e par ss.
 
-&NO Le nom du fichier n'est PAS placÇ dans ss->ss_name par cette fonction.
+&NO Le nom du fichier n'est PAS plac√© dans ss->ss_name par cette fonction.
 
-&RT -1 en cas d'erreur, 0 en cas de succäs
+&RT -1 en cas d'erreur, 0 en cas de succ√®s
 &EX
     SCRSTAT     ss;
 

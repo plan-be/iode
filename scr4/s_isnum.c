@@ -191,14 +191,14 @@ IS_check_autonum()
 
 
 /* ====================================================================
-Fixe le champ AUTO ‚ventuel du record de l'ISAM. Pour ce faire, se base
+Fixe le champ AUTO Ã©ventuel du record de l'ISAM. Pour ce faire, se base
 sur la valeur inscrite dans le fichier .num de la database ou, dans le cas
 d'une database relationnelle, dans la table scr_auto_num.
 
-&RT 0 en cas de r‚ussite (pas de fichier .num ou valeur incorrecte dans
+&RT 0 en cas de rÃ©ussite (pas de fichier .num ou valeur incorrecte dans
 ce fichier) , -1 sinon.
 
-&NO Cette fonction est appel‚e par IS_write() avant l'‚criture
+&NO Cette fonction est appelÃ©e par IS_write() avant l'Ã©criture
 proprement dite.
 
 &EX
@@ -279,9 +279,9 @@ long    l;
 
 /* ====================================================================
 Lit dans le fichier filename.num la valeur qui s'y trouve et retourne
-cette valeur. Utilis‚ dans les ISAM dont un champ est AUTO.
+cette valeur. UtilisÃ© dans les ISAM dont un champ est AUTO.
 
-&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouv‚
+&RT valeur du fichier (long) ou -1 si le fichier n'est pas trouvÃ©
 
 &SA SCR_auto_num()
 =======================================================================*/
@@ -302,13 +302,13 @@ long    l;
 
 /*NH*/
 /* ====================================================================
-Fixe le champ AUTO ‚ventuel du record de l'ISAM. Pour ce faire, se base
+Fixe le champ AUTO Ã©ventuel du record de l'ISAM. Pour ce faire, se base
 sur la valeur inscrite dans le fichier .num de la database.
 
-&RT 0 en cas de r‚ussite (pas de fichier .num ou valeur incorrecte dans
+&RT 0 en cas de rÃ©ussite (pas de fichier .num ou valeur incorrecte dans
 ce fichier) , -1 sinon.
 
-&NO Cette fonction est appel‚e par IS_write() avant l'‚criture
+&NO Cette fonction est appelÃ©e par IS_write() avant l'Ã©criture
 proprement dite.
 
 &EX

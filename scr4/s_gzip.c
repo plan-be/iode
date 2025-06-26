@@ -1,23 +1,23 @@
 #include "scr4.h"
 #include "s_gzutil.h"
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de compactage de string bas‚e sur l'algorithme de PkZip.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de compactage de string basÃ©e sur l'algorithme de PkZip.
 
-&EN instr est le string … compacter. instr peut
-    contenir des z‚ros.
+&EN instr est le string Ã  compacter. instr peut
+    contenir des zÃ©ros.
 &EN inlen est la longueur de instr
-&EN outstr est un pointeur vers le string r‚sultat
-    allou‚ par la fonction.
+&EN outstr est un pointeur vers le string rÃ©sultat
+    allouÃ© par la fonction.
 &EN outlen est un pointeur vers sa longueur.
 
-Le string r‚sultat contient :
+Le string rÃ©sultat contient :
 &EN la longueur du string d'origine (long)
-&EN le string compact‚ (char *)
+&EN le string compactÃ© (char *)
 
-&RT 0 en cas de succŠs, -4 en cas de manque de m‚moire.
+&RT 0 en cas de succÃ¨s, -4 en cas de manque de mÃ©moire.
 &SA GzipDecodeStr()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen)
 {
     int             rc;
@@ -36,19 +36,19 @@ int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** out
     return(0);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de d‚compactage de string compact‚ … laide de GzipEncodeStr.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de dÃ©compactage de string compactÃ© Ã  laide de GzipEncodeStr.
 
-&EN instr est le string input g‚n‚r‚ par GzipEncodeStr().
-&EN inlen est la longueur de string compact‚
-&EN outstr est un pointeur vers le string r‚sultat qui doit ˆtre
+&EN instr est le string input gÃ©nÃ©rÃ© par GzipEncodeStr().
+&EN inlen est la longueur de string compactÃ©
+&EN outstr est un pointeur vers le string rÃ©sultat qui doit Ãªtre
     suffisamment grand (*(long *)instr contient la taille input)
 
-&EN outlen est un pointeur vers la longueur du r‚sultat
+&EN outlen est un pointeur vers la longueur du rÃ©sultat
 
-&RT 0 en cas de succŠs, < 0 en cas d'erreur
+&RT 0 en cas de succÃ¨s, < 0 en cas d'erreur
 &SA GZipEncodeStrNA(), GzipDecodeStr()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipDecodeStrNA(instr, inlen, outstr)
 unsigned char   *instr, *outstr;
 unsigned long   inlen;
@@ -61,19 +61,19 @@ unsigned long   inlen;
     return(rc);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de d‚compactage de string compact‚ … laide de GzipEncodeStr.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de dÃ©compactage de string compactÃ© Ã  laide de GzipEncodeStr.
 
-&EN instr est le string input g‚n‚r‚ par GzipEncodeStr().
-&EN inlen est la longueur de string compact‚
+&EN instr est le string input gÃ©nÃ©rÃ© par GzipEncodeStr().
+&EN inlen est la longueur de string compactÃ©
 &EN outstr est un pointeur
-vers le string r‚sultat qui est allou‚ via SCR_malloc().
+vers le string rÃ©sultat qui est allouÃ© via SCR_malloc().
 
-&EN outlen est un pointeur ves la longueur du r‚sultat
+&EN outlen est un pointeur ves la longueur du rÃ©sultat
 
-&RT 0 en cas de succŠs, < 0 en cas d'erreur
+&RT 0 en cas de succÃ¨s, < 0 en cas d'erreur
 &SA GZipEncodeStr()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 int GzipDecodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen)
 {
     int             rc;
@@ -89,17 +89,17 @@ int GzipDecodeStr(unsigned char* instr, unsigned long inlen, unsigned char** out
 }
 
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de cr‚ation d'un fichier compact‚ par l'algorithme de PkZip.
-Les appels suivants … GzipWrite() ‚criront dans le fichier en compactant.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de crÃ©ation d'un fichier compactÃ© par l'algorithme de PkZip.
+Les appels suivants Ã  GzipWrite() Ã©criront dans le fichier en compactant.
 
-SCR_GZIP_LEVEL d‚termine le niveau de compression (1-9).
+SCR_GZIP_LEVEL dÃ©termine le niveau de compression (1-9).
 
 &EN filename : nom du fichier
 
-&RT GZFILE * cas de succŠs, NULL en cas d'erreur
+&RT GZFILE * cas de succÃ¨s, NULL en cas d'erreur
 &SA GzipOpen(), GzipRead(), GzipWrite(), GzipSeek()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GZIPFILE *GzipCreate(filename)
 unsigned char   *filename;
 {
@@ -115,20 +115,20 @@ unsigned char   *filename;
     return((GZIPFILE *) gzf);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction d'ouverture d'un fichier compact‚ cr‚‚ par la fonction GzipCreate() et
-des appels successifs … GzipWrite() et/ou GzipPutc().
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction d'ouverture d'un fichier compactÃ© crÃ©Ã© par la fonction GzipCreate() et
+des appels successifs Ã  GzipWrite() et/ou GzipPutc().
 
-Les appels suivants … GzipRead() et GzipGetc() liront dans le fichier compact‚.
+Les appels suivants Ã  GzipRead() et GzipGetc() liront dans le fichier compactÃ©.
 
-Si le fichier ouvert n'est pas compact‚, la lecture se fait comme avec
+Si le fichier ouvert n'est pas compactÃ©, la lecture se fait comme avec
 fopen() et fread().
 
 &EN filename : nom du fichier
 
-&RT GZFILE * cas de succŠs, NULL en cas d'erreur
+&RT GZFILE * cas de succÃ¨s, NULL en cas d'erreur
 &SA GzipOpen(), GzipRead(), GzipWrite(), GzipSeek()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GZIPFILE *GzipOpen(filename)
 unsigned char   *filename;
 {
@@ -145,14 +145,14 @@ unsigned char   *filename;
     return((GZIPFILE *) gzf);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Fonction de fermeture d'un fichier ouvert par la fonction GzipCreate() ou GzipOpen().
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipCreate() ou GzipOpen()
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipCreate() ou GzipOpen()
 
 &RT 0
 &SA GzipOpen(), GzipCreate()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipClose(gzf)
 GZIPFILE    *gzf;
 {
@@ -161,16 +161,16 @@ GZIPFILE    *gzf;
 }
 
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction d'‚criture dans un fichier cr‚‚ par la fonction GzipCreate().
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction d'Ã©criture dans un fichier crÃ©Ã© par la fonction GzipCreate().
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipCreate()
-&EN buf  : pointeur vers le buffer … ‚crire (comprim‚) dans le fichier
-&EN len : longueur de bytes du buffer (non comprim‚)
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipCreate()
+&EN buf  : pointeur vers le buffer Ã  Ã©crire (comprimÃ©) dans le fichier
+&EN len : longueur de bytes du buffer (non comprimÃ©)
 
-&RT Nombre de bytes ‚crits (non compact‚s).
+&RT Nombre de bytes Ã©crits (non compactÃ©s).
 &SA GzipCreate(), GzipPutc()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipWrite(gzf, buf, len)
 GZIPFILE        *gzf;
 const voidp     buf;
@@ -179,16 +179,16 @@ unsigned int    len;
     return(gzwrite((gzFile) gzf, (const voidp) buf, len));
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Fonction de lecture dans un fichier ouvert par la fonction GzipOpen().
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipOpen()
-&EN buf  : pointeur vers le buffer destin‚ … recevoir len bytes
-&EN len : nombre de bytes … lire du buffer (non comprim‚)
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipOpen()
+&EN buf  : pointeur vers le buffer destinÃ© Ã  recevoir len bytes
+&EN len : nombre de bytes Ã  lire du buffer (non comprimÃ©)
 
-&RT Nombre de bytes lus (non compact‚s).
+&RT Nombre de bytes lus (non compactÃ©s).
 &SA GzipOpen(), GzipGetc(), GzipSeek()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipRead(gzf, buf, len)
 GZIPFILE        *gzf;
 U_ch            *buf;
@@ -197,20 +197,20 @@ unsigned int    len;
     return(gzread((gzFile) gzf, (void *) buf, len));
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Fonction de positionnement dans un fichier ouvert par la fonction GzipOpen()
 (et pas GzipCreate()).
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipOpen()
-&EN offset : position relative (voir whence) (non comprim‚)
-&EN whence : 0 : relative au d‚but du fichier, 1: relative au caractŠre courant
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipOpen()
+&EN offset : position relative (voir whence) (non comprimÃ©)
+&EN whence : 0 : relative au dÃ©but du fichier, 1: relative au caractÃ¨re courant
 
-Les op‚rations ont lieu comme si on travaillait sur un fichier non comprim‚.
-Cette fonction peut ˆtre trŠs lente.
+Les opÃ©rations ont lieu comme si on travaillait sur un fichier non comprimÃ©.
+Cette fonction peut Ãªtre trÃ¨s lente.
 
-&RT -1 en cas d'erreur, la position nouvelle depuis le d‚but du fichier si Ok
+&RT -1 en cas d'erreur, la position nouvelle depuis le dÃ©but du fichier si Ok
 &SA GzipOpen(), GzipGetc(), GzipRead()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 long GzipSeek(gzf, offset, whence)
 GZIPFILE        *gzf;
 long            offset;
@@ -219,30 +219,30 @@ int             whence;
     return(gzseek((gzFile) gzf, (z_off_t)offset, whence));
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Fonction de lecture dans un fichier ouvert par la fonction GzipOpen().
-Cette fonction lit le byte suivant dans le fichier (non comprim‚).
+Cette fonction lit le byte suivant dans le fichier (non comprimÃ©).
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipOpen()
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipOpen()
 
-&RT CaractŠre lu ou -1 en cas de fin de fichier ou d'erreur
+&RT CaractÃ¨re lu ou -1 en cas de fin de fichier ou d'erreur
 &SA GzipOpen(), GzipRead(), GzipSeek()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipGetc(gzf)
 GZIPFILE    *gzf;
 {
     return(gzgetc((gzFile) gzf));
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction d'‚criture d'un byte dans un fichier cr‚‚ par la fonction GzipCreate().
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction d'Ã©criture d'un byte dans un fichier crÃ©Ã© par la fonction GzipCreate().
 
-&EN GZIPFILE * : file descriptor cr‚‚ par un appel … GzipCreate()
-&EN ch : caractŠre … placer dans le fichier
+&EN GZIPFILE * : file descriptor crÃ©Ã© par un appel Ã  GzipCreate()
+&EN ch : caractÃ¨re Ã  placer dans le fichier
 
-&RT Le caractŠre ‚crit ou -1 en cas d'erreur
+&RT Le caractÃ¨re Ã©crit ou -1 en cas d'erreur
 &SA GzipCreate(), GzipWrite()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 GzipPutc(gzf, ch)
 GZIPFILE    *gzf;
 int         ch;

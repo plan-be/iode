@@ -1,12 +1,12 @@
 #include "s_strs.h"
 /* =+=================================================================
-Centre un string sur lui-mˆme en ‚quilibrant le nombre de blancs
-… gauche et … droite. En cas de nombre impair de blancs … r‚partir, il
-y aura un blanc de plus … droite qu'… gauche.
+Centre un string sur lui-mÃªme en Ã©quilibrant le nombre de blancs
+Ã  gauche et Ã  droite. En cas de nombre impair de blancs Ã  rÃ©partir, il
+y aura un blanc de plus Ã  droite qu'Ã  gauche.
 
-La longueur du string n'est pas modifi‚e.
+La longueur du string n'est pas modifiÃ©e.
 
-&RT un pointeur vers le string modifi‚
+&RT un pointeur vers le string modifiÃ©
 &EX
     printf("'%s'\n", U_center_text("Jean-Marc   "));
 

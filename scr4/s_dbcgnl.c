@@ -20,23 +20,23 @@ static int _tmpg_SCR_GZIP_LEVEL      = -1000;
 static int _tmpg_ISC_COMPRESS        = -1000;
 
 /* ========================================================================
-Initialise une communication avec le serveur s4issrv (crÇe un socket et se
-connecte au serveur s4issrv). Cette fonction suffit s'il n'y a pas d'accäs
-base de donnÇes. Sinon, il y a lieu d'utiliser ISC_init_database().
+Initialise une communication avec le serveur s4issrv (cr√©e un socket et se
+connecte au serveur s4issrv). Cette fonction suffit s'il n'y a pas d'acc√®s
+base de donn√©es. Sinon, il y a lieu d'utiliser ISC_init_database().
 
-Le nom du serveur et de la porte sont dÇterminÇs de la faáon suivante :
+Le nom du serveur et de la porte sont d√©termin√©s de la fa√ßon suivante :
 
-&EN Si la variable SCR_ISC_SERVER (char *) est dÇfinie et non vide, elle contient
+&EN Si la variable SCR_ISC_SERVER (char *) est d√©finie et non vide, elle contient
     le nom de la machine serveur sous forme d'une adresse IP ou d'un nom de
-    host. Si elle n'est pas dÇfinie, la variable d'environnement
-    SCR_ISC_SERVER est utilisÇe. Si celle-ci n'est pas non plus dÇfinie, le
-    host local est utilisÇ ("localhost").
+    host. Si elle n'est pas d√©finie, la variable d'environnement
+    SCR_ISC_SERVER est utilis√©e. Si celle-ci n'est pas non plus d√©finie, le
+    host local est utilis√© ("localhost").
 
 &EN Un raisonnement identique est valable pour la variable SCR_ISC_PORT
-    (int) qui indique le numÇro de la porte Ö ouvrir. Par dÇfaut, cette
-    valeur est fixÇe Ö 5000.
+    (int) qui indique le num√©ro de la porte √† ouvrir. Par d√©faut, cette
+    valeur est fix√©e √† 5000.
 
-Les variables globales DebugActif, ISC_COMPRESS et SCR_GZIP_LEVEL sont passÇes
+Les variables globales DebugActif, ISC_COMPRESS et SCR_GZIP_LEVEL sont pass√©es
 au serveur par cette fonction.
 
 En sortie, la variable ISC_SERVER_VERS (int) contient la version du serveur s4issrv.
@@ -45,26 +45,26 @@ D'autre part, si la variable
 &CO
     char *SCR_ISC_LOGIN
 &TX
-n'est pas nulle, elle est envoyÇe au serveur pour authentification de
+n'est pas nulle, elle est envoy√©e au serveur pour authentification de
 l'utilisateur. Cette variable a le format :
 &CO
-    "login/key" oó key est un entier long positif
+    "login/key" o√π key est un entier long positif
 &TX
 
-Le login et la clÇ sont dÇfinis sur le serveur dans le fichier scr4_iss.ini.
+Le login et la cl√© sont d√©finis sur le serveur dans le fichier scr4_iss.ini.
 
 En sortie, la variable SCR_ISC_ERRNO contient une des valeurs suivantes :
 
 &EN 0 : Ok
 &EN -1 : connexion impossible
 &EN -2 : user inconnu
-&EN -3 : clÇ d'accäs incorrecte
+&EN -3 : cl√© d'acc√®s incorrecte
 
 &RT
-&EN 0 en cas de succäs,
+&EN 0 en cas de succ√®s,
 &EN -1 : connexion impossible
 &EN -2 : user inconnu
-&EN -3 : clÇ d'accäs incorrecte
+&EN -3 : cl√© d'acc√®s incorrecte
 
 &SA ISC_end(), ISC_init_database()
 ================================================================== */
@@ -148,7 +148,7 @@ ISC_init2(char *srv, int port)
 }
 
 /* ========================================================================
-Termine une communication initialisÇe par ISC_init() avec le serveur s4issrv.
+Termine une communication initialis√©e par ISC_init() avec le serveur s4issrv.
 
 &SA ISC_init(), ISC_end_database()
 ================================================================== */
@@ -173,12 +173,12 @@ ISC_end()
 }
 
 /* ========================================================================
-Envoie vers le serveur les variables globales. Doit àtre utilisÇe apräs ume
+Envoie vers le serveur les variables globales. Doit √™tre utilis√©e apr√®s ume
 modification d'une de celles-ci.
 
-Les variables globales transfÇrÇes sont : DebugActif, ISC_COMPRESS et SCR_GZIP_LEVEL.
+Les variables globales transf√©r√©es sont : DebugActif, ISC_COMPRESS et SCR_GZIP_LEVEL.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 
 &SA ISC_init(), ISC_init_database()
 ================================================================== */
@@ -221,21 +221,21 @@ ended:
 extern unsigned char *WSOCK_CRYPTBUF;
 
 /*NH ========================================================================
-Envoie le login vers le serveur. Fixe en consÇquence la clÇ d'encryptage.
-Cette fonction est utilisÇ par ISC_init().
+Envoie le login vers le serveur. Fixe en cons√©quence la cl√© d'encryptage.
+Cette fonction est utilis√© par ISC_init().
 
-Le login est dÇfini par la variable globale
+Le login est d√©fini par la variable globale
 &CO
     char *SCR_ISC_LOGIN;
 &TX
 Si cette variable est nulle ou vide, la variable d'environnement SCR_ISC_LOGIN est lue et
-est utilisÇe si elle est dÇfinie pour l'envoi du login.
+est utilis√©e si elle est d√©finie pour l'envoi du login.
 
 &RT
-&EN 0 en cas de succäs,
+&EN 0 en cas de succ√®s,
 &EN -1 en cas d'erreur.
-&EN -3 en cas de clÇ incorrecte
-&EN -100 en cas d'accäs interdit
+&EN -3 en cas de cl√© incorrecte
+&EN -100 en cas d'acc√®s interdit
 
 &SA ISC_init(), ISC_init_database()
 ================================================================== */
@@ -277,7 +277,7 @@ ISC_set_user(int sock)
 	    ISC_SRV_TIME = ISC_read_long();
 	    /* Lit l'algo du serveur */
 	    ISC_SRV_ALGO = ISC_read_rc();
-	    /* Lit et vÇrifie le buffer encryptÇ */
+	    /* Lit et v√©rifie le buffer encrypt√© */
 	    ISC_read_rec(buf);
 	    WSOCK_CRYPTKEY = ISC_SRV_TIME ^ atol(login + pos + 1);
 	    WSockDecryptEx(buf, buf, strlen(WSOCK_CRYPTBUF), 10);
@@ -354,38 +354,38 @@ ISC_filedn(char *srvfile, char *localfile)
 }
 
 /* ========================================================================
-ISC_access() vÇrifie si le processus serait autorisÇ Ö lire, Çcrire, exÇcuter, ou tester
-l'existence d'un fichier (ou d'un autre objet appartenant au systäme de fichiers),
+ISC_access() v√©rifie si le processus serait autoris√© √† lire, √©crire, ex√©cuter, ou tester
+l'existence d'un fichier (ou d'un autre objet appartenant au syst√®me de fichiers),
 dont le nom est filename.
 
-&EN filename : nom du fichier Ö tester
-&EN mode : masque constituÇ d'un ou plusieurs arguments liÇs par un OU binaire ( | )
-R_OK (4), W_OK (2), X_OK (1).Les requàtes R_OK, W_OK et X_OK servent respectivement
-Ö tester la lecture, l'Çcriture, et l'exÇcution du fichier.
+&EN filename : nom du fichier √† tester
+&EN mode : masque constitu√© d'un ou plusieurs arguments li√©s par un OU binaire ( | )
+R_OK (4), W_OK (2), X_OK (1).Les requ√™tes R_OK, W_OK et X_OK servent respectivement
+√† tester la lecture, l'√©criture, et l'ex√©cution du fichier.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&NO Sous Unix, le test est effectuÇ avec les User-ID et Group-ID rÇels du processus,
-plutìt qu'avec les IDs effectifs qui sont utilisÇs lorsque l'on tente l'opÇration.
-Ceci permet aux programmes Set-UID de dÇterminer les autorisations de l'utilisateur
-ayant invoquÇ le programme.
+&NO Sous Unix, le test est effectu√© avec les User-ID et Group-ID r√©els du processus,
+plut√¥t qu'avec les IDs effectifs qui sont utilis√©s lorsque l'on tente l'op√©ration.
+Ceci permet aux programmes Set-UID de d√©terminer les autorisations de l'utilisateur
+ayant invoqu√© le programme.
 
 
-&NO Sous Linux, un fichier DOS (partition montÇe) peut àtre considÇrÇ comme exÇcutable,
-alors que l'appel systäme execve(2) Çchouera Çvidemment.
+&NO Sous Linux, un fichier DOS (partition mont√©e) peut √™tre consid√©r√© comme ex√©cutable,
+alors que l'appel syst√®me execve(2) √©chouera √©videmment.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (voir errno dans ce cas)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (voir errno dans ce cas)
 ================================================================== */
 
 ISC_access(char *filename, int mode)
@@ -400,7 +400,7 @@ ISC_access(char *filename, int mode)
     // Connecte au serveur
     if(ISC_switch_server(filename)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(access(srvfile, mode));
@@ -417,23 +417,23 @@ ISC_access(char *filename, int mode)
 /* ========================================================================
 Change le nom d'un fichier sur une machine.
 
-&EN oldname : nom du fichier (avec Çventuellement serveur:port!)
+&EN oldname : nom du fichier (avec √©ventuellement serveur:port!)
 &EN newname : nouveau nom du fichier (sans serveur:port!)
 
-Si oldname ou newname est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si oldname ou newname est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 
 =========================================================================== */
 int ISC_rename(char *oldname, char *newname)
@@ -449,7 +449,7 @@ int ISC_rename(char *oldname, char *newname)
     // Connecte au serveur
     if(ISC_switch_server(oldname)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(oldname, oserver, &port, osrvfile);
     ISC_split_filename(newname, nserver, &port, nsrvfile);
     if(oserver[0] == 0) {
@@ -463,25 +463,25 @@ int ISC_rename(char *oldname, char *newname)
 }
 
 /* ========================================================================
-Local copy : copie le fichier from dans to. Ces fichiers doivent se trouver sur la màme machine.
+Local copy : copie le fichier from dans to. Ces fichiers doivent se trouver sur la m√™me machine.
 
-&EN from : nom du fichier (avec Çventuellement serveur:port!)
+&EN from : nom du fichier (avec √©ventuellement serveur:port!)
 &EN to : nouveau nom du fichier (sans serveur:port!)
 
-Si from est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si from est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 =========================================================================== */
 
 ISC_local_copy(char *from, char *to)
@@ -497,7 +497,7 @@ ISC_local_copy(char *from, char *to)
     // Connecte au serveur
     if(ISC_switch_server(from)) return(-1);
 
-    /* DÇtermine le serveur et la porte */
+    /* D√©termine le serveur et la porte */
     ISC_split_filename(from, oserver, &port, osrvfile);
     ISC_split_filename(to,   nserver, &port, nsrvfile);
 
@@ -511,23 +511,23 @@ ISC_local_copy(char *from, char *to)
 }
 
 /* ========================================================================
-DÇtruit un fichier.
+D√©truit un fichier.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 ================================================================== */
 
 int ISC_unlink(char *filename)
@@ -542,7 +542,7 @@ int ISC_unlink(char *filename)
     // Connecte au serveur
     if(ISC_switch_server(filename)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(unlink(srvfile));
@@ -555,25 +555,25 @@ int ISC_unlink(char *filename)
 }
 
 /* ========================================================================
-Retourne les informations sur le fichier filename. Fonction remplacÇe par ISC_stat_ex()
+Retourne les informations sur le fichier filename. Fonction remplac√©e par ISC_stat_ex()
 dans la version 4.58.
 
 Voir SCR_stat().
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA SCR_stat()
 ================================================================== */
 ISC_stat(char *filename, SCRSTAT *ss)
@@ -586,7 +586,7 @@ ISC_stat(char *filename, SCRSTAT *ss)
     char    server[80], srvfile[256];
     SCRSTATPRE458 ss458;
 
-    // Annule les ÇlÇments de la structure
+    // Annule les √©l√©ments de la structure
     memset(&ss458, 0, sizeof(SCRSTATPRE458));
     ss->ss_mode = 0;
     ss->ss_size = 0;
@@ -600,7 +600,7 @@ ISC_stat(char *filename, SCRSTAT *ss)
     // Connecte au serveur
     if(ISC_switch_server(filename)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(SCR_stat(srvfile, ss));
@@ -638,20 +638,20 @@ SCR_statdir401_2_last(SCRSTAT401 *ss401, SCRSTAT *ss)
 /* ========================================================================
 Retourne les informations sur le fichier filename. Voir SCR_stat_ex().
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA SCR_stat_ex(), ISC_stat()
 ================================================================== */
 ISC_stat_ex(char *filename, SCRSTAT *ss, int crc)
@@ -664,7 +664,7 @@ ISC_stat_ex(char *filename, SCRSTAT *ss, int crc)
     char    server[80], srvfile[256];
     SCRSTAT401 ss401;
 
-    // Annule les ÇlÇments de la structure
+    // Annule les √©l√©ments de la structure
     memset(&ss401, 0, sizeof(SCRSTAT401));
     ss->ss_mode = 0;
     ss->ss_size = 0;
@@ -678,7 +678,7 @@ ISC_stat_ex(char *filename, SCRSTAT *ss, int crc)
     // Connecte au serveur
     if(ISC_switch_server(filename)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(SCR_stat_ex(srvfile, ss, crc));  /* JMP 26-02-03 */
@@ -701,27 +701,27 @@ ISC_stat_ex(char *filename, SCRSTAT *ss, int crc)
 }
 
 /* ========================================================================
-Compläte les structures ~cSCRSTAT ss~C dont le seul nom (ss_name) est passÇ
-comme argument. Si ~ccrc~C vaut ~c1~C, le CRC32 est calculÇ pour chaque fichier.
+Compl√®te les structures ~cSCRSTAT ss~C dont le seul nom (ss_name) est pass√©
+comme argument. Si ~ccrc~C vaut ~c1~C, le CRC32 est calcul√© pour chaque fichier.
 
-Le premier nom de la table ss est utilisÇ pour dÇterminer le serveur et la
+Le premier nom de la table ss est utilis√© pour d√©terminer le serveur et la
 porte si les fichiers ne sont pas locaux. Tous les fichiers doivent donc se
-trouver sur le màme serveur.
+trouver sur le m√™me serveur.
 
-Si le premier ss_name est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si le premier ss_name est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA SCR_stat_ex(), ISC_stat()
 ================================================================== */
 ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
@@ -740,7 +740,7 @@ ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
 //    nb = SCR_tbl_size(ss);
     if(nb <= 0) return(0);
 
-    // Annule les ÇlÇments de la structure
+    // Annule les √©l√©ments de la structure
     for(i = 0 ; ss[i] ; i++) {
 	ss[i]->ss_mode = 0;
 	ss[i]->ss_size = 0;
@@ -759,7 +759,7 @@ ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
     if(ss[i] == 0) return(0);
     if(ISC_switch_server(ss[i]->ss_name)) return(-1);
 
-    // DÇtermine le serveur et la porte (premier ÇlÇment ss_name)
+    // D√©termine le serveur et la porte (premier √©l√©ment ss_name)
     ISC_split_filename(ss[i]->ss_name, server, &port, srvfile);
     /* BP_M 14-12-2009 11:56 */
     if(server[0] == 0) {
@@ -771,7 +771,7 @@ ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
     rc = ISC_printf("%d %d %d %d", ISS_MSTATEX, nb, namesize, crc);
     if(rc < 0) return(rc);
 
-    // CrÇer buffer et stripper les noms (pas de serveur, port)
+    // Cr√©er buffer et stripper les noms (pas de serveur, port)
     buf = SCR_malloc(namesize * nb);
     for(i = 0, j = 0 ; ss[i] ; i++) {
 	if(ss[i]->ss_name[0] == 0) continue;
@@ -786,7 +786,7 @@ ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
     SCR_free(buf);
     if(rc < 0) return(rc);
 
-    // Lire taille du buffer de retour (Ö partir de ss_size, dÇpend du serveur)
+    // Lire taille du buffer de retour (√† partir de ss_size, d√©pend du serveur)
     rstatsize = ISC_read_rc();
     lstatsize = sizeof(SCRSTAT) - namesize;
 
@@ -819,23 +819,23 @@ ISC_mstat_ex(SCRSTAT **ss, int crc)
 Calcule le CRC32 d'un fichier local ou distant sur les premiers lg bytes.
 Si lg est <= 0, retourne le crc32 de tout le fichier.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
 
-&RT crc32 du fichier en cas de succäs, -1 en cas d'erreur de transmission, 0
-    en cas d'erreur serveur (fichier non trouvÇ).
+&RT crc32 du fichier en cas de succ√®s, -1 en cas d'erreur de transmission, 0
+    en cas d'erreur serveur (fichier non trouv√©).
 ================================================================== */
 unsigned long ISC_getcrc32_lg(char *filename, long lg)
 {
@@ -849,7 +849,7 @@ unsigned long ISC_getcrc32_lg(char *filename, long lg)
     // Connecte au serveur
     if(ISC_switch_server(filename)) return(crc);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(ScrFileCrc32Lg(srvfile, lg));
@@ -865,22 +865,22 @@ unsigned long ISC_getcrc32_lg(char *filename, long lg)
 /* ========================================================================
 Calcule le CRC32 d'un fichier local ou distant.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
-&RT crc32 du fichier en cas de succäs, -1 en cas d'erreur de transmission, 0
-    en cas d'erreur serveur (fichier non trouvÇ).
+&RT crc32 du fichier en cas de succ√®s, -1 en cas d'erreur de transmission, 0
+    en cas d'erreur serveur (fichier non trouv√©).
 ================================================================== */
 
 unsigned long ISC_getcrc32(char *filename)
@@ -897,7 +897,7 @@ unsigned long ISC_getcrc32(char *filename)
     if(ISC_switch_server(filename)) return(crc);
 //Debug("2\n");
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(filename, server, &port, srvfile);
     if(server[0] == 0) {
 	return(ScrFileCrc32(srvfile));
@@ -916,40 +916,40 @@ unsigned long ISC_getcrc32(char *filename)
 /* ========================================================================
 ISC_fopen() ouvre le fichier filename et lui associe un flux, exactement comme fopen()
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte. On reáoit alors un numÇro de flux virtuel
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te. On re√ßoit alors un num√©ro de flux virtuel
 qui a son correspondant sur le process serveur.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\myfile
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-L'argument mode pointe vers une chaåne commenáant par l'une des sÇquences suivantes (d'autres caractäres peuvent suivre la sÇquence) :
+L'argument mode pointe vers une cha√Æne commen√ßant par l'une des s√©quences suivantes (d'autres caract√®res peuvent suivre la s√©quence) :
 
-&EN r : Ouvre le fichier en lecture. Le pointeur de flux est placÇ au dÇbut du fichier.
-&EN r+: Ouvre le fichier en lecture et Çcriture. Le pointeur de flux est placÇ au dÇbut du fichier.
-&EN w : Ouvre le fichier en Çcriture. Le fichier est crÇÇ s'il n'existait pas. S'il existait dÇjÖ, sa longueur est ramenÇe Ö 0. Le pointeur de flux est placÇ au dÇbut du fichier.
-&EN w+ :Ouvre le fichier en lecture et Çcriture. Le fichier est crÇÇ s'il n'existait pas. S'il existait deja, sa longueur est ramenÇe Ö 0. Le pointeur de flux est placÇ au dÇbut du fichier.
-&EN a : Ouvre le fichier en Çcriture. Le fichier est crÇÇ s'il n'existait pas. Le pointeur de flux est placÇ Ö la fin du fichier.
-&EN a+ : Ouvre le fichier en lecture et Çcriture. Le fichier est crÇÇ s'il n'existait pas. Le pointeur de flux est placÇ Ö la fin du fichier.
+&EN r : Ouvre le fichier en lecture. Le pointeur de flux est plac√© au d√©but du fichier.
+&EN r+: Ouvre le fichier en lecture et √©criture. Le pointeur de flux est plac√© au d√©but du fichier.
+&EN w : Ouvre le fichier en √©criture. Le fichier est cr√©√© s'il n'existait pas. S'il existait d√©j√†, sa longueur est ramen√©e √† 0. Le pointeur de flux est plac√© au d√©but du fichier.
+&EN w+ :Ouvre le fichier en lecture et √©criture. Le fichier est cr√©√© s'il n'existait pas. S'il existait deja, sa longueur est ramen√©e √† 0. Le pointeur de flux est plac√© au d√©but du fichier.
+&EN a : Ouvre le fichier en √©criture. Le fichier est cr√©√© s'il n'existait pas. Le pointeur de flux est plac√© √† la fin du fichier.
+&EN a+ : Ouvre le fichier en lecture et √©criture. Le fichier est cr√©√© s'il n'existait pas. Le pointeur de flux est plac√© √† la fin du fichier.
 
-La chaåne mode peut Çgalement inclure la lettre ``b'' comme 3äme caractere,
-ou màme entre les deux caractäres d'une des sÇquences Ö 2 lettres vues ci-dessus.
-Ce mode sert uniquement Ö assurer la compatibilitÇ avec DOS/Windows.
+La cha√Æne mode peut √©galement inclure la lettre ``b'' comme 3√®me caractere,
+ou m√™me entre les deux caract√®res d'une des s√©quences √† 2 lettres vues ci-dessus.
+Ce mode sert uniquement √† assurer la compatibilit√© avec DOS/Windows.
 
 &RT
 &EN 0 : erreur : la variable SCR_ISC_ERRNO contient le code de l'erreur
 &EN2 -2 : trop de fichiers ouverts sur le serveur
-&EN2 -3 : fichier non trouvÇ
-&EN2 -100 : accäs rejetÇ
+&EN2 -3 : fichier non trouv√©
+&EN2 -100 : acc√®s rejet√©
 &EN valeur positive : pointeur (fichier local) ou pseudo-pointeur (fichier distant) vers le
-flux associÇ au fichier
+flux associ√© au fichier
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1005,7 +1005,7 @@ FILE *ISC_fopen(char *filename, char *mode)
 /* ========================================================================
 ISC_fclose() ferme le flux fd ouvert par ISC_fopen().
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1041,7 +1041,7 @@ int ISC_fclose(FILE *fd)
 /*========================================================================
 ISC_fread() lit dans buf les nb blocs de lg bytes sur le flux fd ouvert par ISC_fopen().
 
-&RT Nombre de blocs de lg bytes lus en cas de succäs, -1 en cas d'erreur.
+&RT Nombre de blocs de lg bytes lus en cas de succ√®s, -1 en cas d'erreur.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1084,9 +1084,9 @@ int ISC_fread(char *buf, int lg, int nb, FILE *fd)
 #endif
 }
 /*========================================================================
-ISC_fwrite() Çcrit nb blocs de lg bytes contenus dans buf sur le flux fd ouvert par ISC_fopen().
+ISC_fwrite() √©crit nb blocs de lg bytes contenus dans buf sur le flux fd ouvert par ISC_fopen().
 
-&RT Nombre de blocs de lg bytes Çcrits en cas de succäs, -1 en cas d'erreur.
+&RT Nombre de blocs de lg bytes √©crits en cas de succ√®s, -1 en cas d'erreur.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1118,7 +1118,7 @@ int ISC_fwrite(char *buf, int lg, int nb, FILE *fd)
 #endif
 }
 /*========================================================================
-ISC_ungetc() place dans un buffer temporaire le caractäre ch qui sera relus lors du prochain appel Ö ISC_getc().
+ISC_ungetc() place dans un buffer temporaire le caract√®re ch qui sera relus lors du prochain appel √† ISC_getc().
 fd est un flux ouvert par ISC_fopen().
 
 &RT 0.
@@ -1147,9 +1147,9 @@ int ISC_ungetc(int ch, FILE *fd)
 }
 
 /*========================================================================
-ISC_getc() lit le prochain caractäre sur le flux fd ouvert par ISC_fopen().
+ISC_getc() lit le prochain caract√®re sur le flux fd ouvert par ISC_fopen().
 
-&RT le caractäre lu ou -1 si fin de fichier ou probläme.
+&RT le caract√®re lu ou -1 si fin de fichier ou probl√®me.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1195,9 +1195,9 @@ int ISC_getc(FILE *fd)
 #endif
 }
 /*========================================================================
-ISC_fflush() force l'Çcriture des bytes bufferisÇs sur le flux fd ouvert par ISC_fopen().
+ISC_fflush() force l'√©criture des bytes bufferis√©s sur le flux fd ouvert par ISC_fopen().
 
-&RT 0 en cas de succäs, -1 en cas d'Çchec.
+&RT 0 en cas de succ√®s, -1 en cas d'√©chec.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1225,15 +1225,15 @@ ISC_fflush(FILE *fd)
 }
 
 /*========================================================================
-La fonction ISC_fseek fixe l'indicateur de position du flux pointÇ par stream.
-La nouvelle position, mesurÇe en octets, est obtenue en additionnant offset octets
-au point de dÇpart indique par from.
+La fonction ISC_fseek fixe l'indicateur de position du flux point√© par stream.
+La nouvelle position, mesur√©e en octets, est obtenue en additionnant offset octets
+au point de d√©part indique par from.
 
 Si from vaut SEEK_SET, SEEK_CUR, ou SEEK_END,
-le point de dÇpart correspond respectivement au dÇbut du fichier,
-Ö la position actuelle, ou Ö la fin du fichier.
+le point de d√©part correspond respectivement au d√©but du fichier,
+√† la position actuelle, ou √† la fin du fichier.
 
-&RT 0 en cas de succäs, -1 en cas d'Çchec (voir errno).
+&RT 0 en cas de succ√®s, -1 en cas d'√©chec (voir errno).
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1259,7 +1259,7 @@ ISC_fseek(FILE *fd, long offset, int from)
 /*========================================================================
 La fonction ISC_tell retourne la position courante dans le flux fd ouvert par ISC_fopen().
 
-&RT position en cas de succäs, -1 en cas d'Çchec (voir errno).
+&RT position en cas de succ√®s, -1 en cas d'√©chec (voir errno).
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1309,12 +1309,12 @@ ISC_feof(FILE *fd)
 #endif
 }
 /*========================================================================
-La fonction ISC_flock bloque les accäs au fichier pointÇ par le flux
-fd ouvert par ISC_fopen() Ö partir de la position courante pour lg bytes.
+La fonction ISC_flock bloque les acc√®s au fichier point√© par le flux
+fd ouvert par ISC_fopen() √† partir de la position courante pour lg bytes.
 
-ISC_unlock() dÇbloque l'accäs.
+ISC_unlock() d√©bloque l'acc√®s.
 
-&RT 0 en cas de succäs, -1 en cas d'Çchec (voir errno).
+&RT 0 en cas de succ√®s, -1 en cas d'√©chec (voir errno).
 &SA ISC_funlock(), ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1340,12 +1340,12 @@ ISC_flock(FILE *fd, long size)
 }
 
 /*========================================================================
-La fonction ISC_funlock supprime le lock effectuÇ par ISC_flock() sur le
-fichier pointÇ par le flux
+La fonction ISC_funlock supprime le lock effectu√© par ISC_flock() sur le
+fichier point√© par le flux
 fd ouvert par ISC_fopen(). Il y a lieu de se repositionner au point
-oó ISC_flock() a ÇtÇ lancÇ avant d'appeler ISC_funlock().
+o√π ISC_flock() a √©t√© lanc√© avant d'appeler ISC_funlock().
 
-&RT 0 en cas de succäs, -1 en cas d'Çchec (voir errno).
+&RT 0 en cas de succ√®s, -1 en cas d'√©chec (voir errno).
 &SA ISC_flock(), ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
@@ -1371,7 +1371,7 @@ ISC_funlock(FILE *fd, long size)
 }
 
 /*========================================================================
-ISC_putc() Çcrit le caractäre ch sur le flux fd ouvert par ISC_fopen().
+ISC_putc() √©crit le caract√®re ch sur le flux fd ouvert par ISC_fopen().
 
 &RT 0.
 &SA ISC_fopen(), ISC_fflush(), ISC_fclose(), ISC_fread(),
@@ -1413,23 +1413,23 @@ int ISC_putc(int ch, FILE *fd)
 }
 
 /* ======================================================================
-ExÇcute une commande sur la machine locale ou sur le serveur distant.
+Ex√©cute une commande sur la machine locale ou sur le serveur distant.
 
-La commande est lancÇe Ö partir de la fonction system(). Cette fonction
-dÇmarre un nouveau shell pour exÇcuter la commande.
+La commande est lanc√©e √† partir de la fonction system(). Cette fonction
+d√©marre un nouveau shell pour ex√©cuter la commande.
 
-Si cmd est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si cmd est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!myprog.exe
 &TX
-pour exÇcuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour ex√©cuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 &SA ISC_wait(), ISC_winexec(), ISC_system()
 ------------------------------------------------------------------------- */
@@ -1458,25 +1458,25 @@ ISC_system(char *cmd)
 }
 
 /* ======================================================================
-ExÇcute une commande sur la machine locale ou sur le serveur distant.
+Ex√©cute une commande sur la machine locale ou sur le serveur distant.
 
-La commande est lancÇe
+La commande est lanc√©e
 
-&EN sous Linux, Ö partir de la fonction system(), comme ISC_system()
-&EN sous Windows, Ö partir de WinExec().
+&EN sous Linux, √† partir de la fonction system(), comme ISC_system()
+&EN sous Windows, √† partir de WinExec().
 
-Si cmd est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si cmd est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!myprog.exe
 &TX
-pour exÇcuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour ex√©cuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 &SA ISC_wait(), ISC_winexec(), ISC_system()
 ------------------------------------------------------------------------- */
@@ -1505,25 +1505,25 @@ ISC_winexec(char *cmd)
 }
 
 /* ======================================================================
-ExÇcute une commande sur la machine locale ou sur le serveur distant.
+Ex√©cute une commande sur la machine locale ou sur le serveur distant.
 
-La commande est lancÇe
+La commande est lanc√©e
 
-&EN sous Linux, Ö partir de la fonction system(), comme ISC_system()
+&EN sous Linux, √† partir de la fonction system(), comme ISC_system()
 &EN sous Windows, sous forme d'un process console
 
-Si cmd est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si cmd est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!myprog.exe
 &TX
-pour exÇcuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour ex√©cuter le programme myprog sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 &SA ISC_wait(), ISC_winexec(), ISC_system()
 ------------------------------------------------------------------------- */
@@ -1553,37 +1553,37 @@ ISC_wait(char *cmd)
 
 /* ======================================================================
 Retourne une table de pointeurs vers des structures SCRSTAT correspondant
-aux spÇcifications donnÇes dans path (par ex. *c*). Les noms sont classÇs
-par ordre alphabÇtique, mais les directories sont tous placÇs au dÇbut. La
-table est terminÇe par un pointeur nul.
+aux sp√©cifications donn√©es dans path (par ex. *c*). Les noms sont class√©s
+par ordre alphab√©tique, mais les directories sont tous plac√©s au d√©but. La
+table est termin√©e par un pointeur nul.
 
-Si path est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si path est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\*.c
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-Le paramätre add_dir indique la sÇlection Ö effectuer sur les directory :
+Le param√®tre add_dir indique la s√©lection √† effectuer sur les directory :
 
-&EN 0 pour une sÇlection normale (directory et fichiers)
-&EN 1 pour une sÇlection de tous les directory et des seuls fichiers
-    correspondant Ö path
-&EN 2 pour une sÇlection des seuls fichiers, sans les directory
-&EN 3 pour une sÇlection des seuls directory
+&EN 0 pour une s√©lection normale (directory et fichiers)
+&EN 1 pour une s√©lection de tous les directory et des seuls fichiers
+    correspondant √† path
+&EN 2 pour une s√©lection des seuls fichiers, sans les directory
+&EN 3 pour une s√©lection des seuls directory
 
 Les variables dir et filename contiennent en output le nom absolu du
-directory scannÇ et le masque de recherche. Elles doivent avoir une taille
+directory scann√© et le masque de recherche. Elles doivent avoir une taille
 suffisante.
 
-La table est allouÇ Ö l'aide de SCR_add_ptr(). L'espace occupÇ est
-libÇrÇ par SCR_free_tbl().
+La table est allou√© √† l'aide de SCR_add_ptr(). L'espace occup√© est
+lib√©r√© par SCR_free_tbl().
 
 &EX
     SCRSTAT     **ss;
@@ -1598,8 +1598,8 @@ libÇrÇ par SCR_free_tbl().
 	printf("Name : %s - size : %ld\n", ss[i]->ss_name, ss[i]->ss_size);
     SCR_free_tbl(ss);
 &TX
-&RT une table de SCRSTAT * contenant les fichiers sÇlectionnÇs et terminÇ
-    par un pointeur nul. Si aucun fichier n'est trouvÇ, retourne NULL
+&RT une table de SCRSTAT * contenant les fichiers s√©lectionn√©s et termin√©
+    par un pointeur nul. Si aucun fichier n'est trouv√©, retourne NULL
 
 &SA SCR_dir_ex(), ISC_dir_ex(), SCR_dir()
 ------------------------------------------------------------------------- */
@@ -1651,40 +1651,40 @@ SCRSTAT **ISC_dir(char *path, int add_dir, char *dir, char *filename)
 
 /* ======================================================================
 Retourne une table de pointeurs vers des structures SCRSTAT correspondant
-aux spÇcifications donnÇes dans path (par ex. *c*). Les noms sont classÇs
-par ordre alphabÇtique, mais les directories sont tous placÇs au dÇbut. La
-table est terminÇe par un pointeur nul.
+aux sp√©cifications donn√©es dans path (par ex. *c*). Les noms sont class√©s
+par ordre alphab√©tique, mais les directories sont tous plac√©s au d√©but. La
+table est termin√©e par un pointeur nul.
 
-Si path est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si path est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
 Par exemple :
 &CO
 	192.168.2.1:6000!c:\usr\*.c
 &TX
-pour opÇrer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
-est lancÇ sur la porte 6000.
+pour op√©rer sur le fichier distant sur la machine 192.168.2.1 sur laquelle s4issrv
+est lanc√© sur la porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-Le paramätre add_dir indique la sÇlection Ö effectuer sur les directory :
+Le param√®tre add_dir indique la s√©lection √† effectuer sur les directory :
 
-&EN 0 pour une sÇlection normale (directory et fichiers)
-&EN 1 pour une sÇlection de tous les directory et des seuls fichiers
-    correspondant Ö path
-&EN 2 pour une sÇlection des seuls fichiers, sans les directory
-&EN 3 pour une sÇlection des seuls directory
+&EN 0 pour une s√©lection normale (directory et fichiers)
+&EN 1 pour une s√©lection de tous les directory et des seuls fichiers
+    correspondant √† path
+&EN 2 pour une s√©lection des seuls fichiers, sans les directory
+&EN 3 pour une s√©lection des seuls directory
 
 Les variables dir et filename contiennent en output le nom absolu du
-directory scannÇ et le masque de recherche. Elles doivent avoir une taille
+directory scann√© et le masque de recherche. Elles doivent avoir une taille
 suffisante.
 
-La valeur de crc dÇtermine le fait de calculer ou non le crc32 de chaque
+La valeur de crc d√©termine le fait de calculer ou non le crc32 de chaque
 fichier (voir SCR_stat_ex()).
 
-La table est allouÇ Ö l'aide de SCR_add_ptr(). L'espace occupÇ est
-libÇrÇ par SCR_free_tbl().
+La table est allou√© √† l'aide de SCR_add_ptr(). L'espace occup√© est
+lib√©r√© par SCR_free_tbl().
 
 &EX
     SCRSTAT     **ss;
@@ -1699,8 +1699,8 @@ libÇrÇ par SCR_free_tbl().
 	printf("Name : %s - crc32 : %u\n", ss[i]->ss_name, ss[i]->ssx_crc32);
     SCR_free_tbl(ss);
 &TX
-&RT une table de SCRSTAT * contenant les fichiers sÇlectionnÇs et terminÇ
-    par un pointeur nul. Si aucun fichier n'est trouvÇ, retourne NULL
+&RT une table de SCRSTAT * contenant les fichiers s√©lectionn√©s et termin√©
+    par un pointeur nul. Si aucun fichier n'est trouv√©, retourne NULL
 
 &SA SCR_dir_ex(), ISC_dir(), SCR_dir()
 ------------------------------------------------------------------------- */
@@ -1784,24 +1784,24 @@ SCRSTAT **ISC_dir_ex(char *path, int add_dir, char *dir, char *filename, int crc
 }
 
 /* ========================================================================
-CrÇe le rÇpertoire dir.
+Cr√©e le r√©pertoire dir.
 
-Si dir est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si dir est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour opÇrer sur le rÇpertoire
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour op√©rer sur le r√©pertoire
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&EN dir : nom du rÇpertoire Ö crÇer
+&EN dir : nom du r√©pertoire √† cr√©er
 
-&NO Sous Linux ou Unix, le rÇpertoire est crÇÇ avec les attributs 777
-    modifiÇ par le umask courant.
+&NO Sous Linux ou Unix, le r√©pertoire est cr√©√© avec les attributs 777
+    modifi√© par le umask courant.
 
-&RT 0 en cas de succäs, -1 en cas de probläme
+&RT 0 en cas de succ√®s, -1 en cas de probl√®me
 &SA ISC_rmdir()
 ================================================================== */
 
@@ -1833,19 +1833,19 @@ ISC_mkdir(char *dir)
 /* ========================================================================
 Change le directory courant.
 
-Si dir est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si dir est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour opÇrer sur le rÇpertoire
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour op√©rer sur le r√©pertoire
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&EN dir : nom du nouveau rÇpertoire courant
+&EN dir : nom du nouveau r√©pertoire courant
 
-&RT 0 en cas de succäs, -1 en cas de probläme
+&RT 0 en cas de succ√®s, -1 en cas de probl√®me
 &SA ISC_rmdir(), ISC_mkdir()
 ================================================================== */
 
@@ -1874,21 +1874,21 @@ ISC_chdir(char *dir)
 }
 
 /* ========================================================================
-DÇtruit le rÇpertoire dir.
+D√©truit le r√©pertoire dir.
 
-Si dir est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si dir est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour opÇrer sur le rÇpertoire
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\mydir~C pour op√©rer sur le r√©pertoire
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
-&EN dir : nom du rÇpertoire Ö dÇtruire
+&EN dir : nom du r√©pertoire √† d√©truire
 
-&RT 0 en cas de succäs, -1 en cas de probläme
+&RT 0 en cas de succ√®s, -1 en cas de probl√®me
 &SA ISC_mkdir()
 ================================================================== */
 
@@ -1941,7 +1941,7 @@ ISC_switch_server(char *filename)
 }
 
 /*NH*/
-/* DÇcoupe un nom de fichier avec nom de serveur
+/* D√©coupe un nom de fichier avec nom de serveur
 //   Ex :   fullname                  server         port      srvfile
 //        www.plan.be:5000!c:\toto   www.plan.be     5000       c:\toto
 //        c:\toto                       ''            0         c:\toto
@@ -1983,16 +1983,16 @@ ISC_split_filename(char *fullname, char *server, int *port, char *srvfile)
 }
 
 /* ====================================================================
-Lit une ligne dans le fichier ouvert (Çventuellement sur le serveur distant
-via ISC_fopen()) pointÇ par fd. La ligne lue est stockÇe dans le buffer buf
-de longueur maximum lg. Si la longueur de la ligne excäde lg caractäres, les
-derniers caractäres sont sautÇs.
+Lit une ligne dans le fichier ouvert (√©ventuellement sur le serveur distant
+via ISC_fopen()) point√© par fd. La ligne lue est stock√©e dans le buffer buf
+de longueur maximum lg. Si la longueur de la ligne exc√®de lg caract√®res, les
+derniers caract√®res sont saut√©s.
 
-Le caractäre \n est lu mais n'est pas stockÇ dans buf. buf se termine
-par le caractäre \0.
+Le caract√®re \n est lu mais n'est pas stock√© dans buf. buf se termine
+par le caract√®re \0.
 
 &RT la longueur de la ligne lue ou -1 si la fin du fichier est atteinte
-    avant qu'un caractäre ne soit lu.
+    avant qu'un caract√®re ne soit lu.
 &EX
     FILE *fd;
 
@@ -2030,13 +2030,13 @@ int ISC_read_line(FILE* fd, unsigned char* buf, int lg)
 Copie le fichier from dans le fichier to.
 
 Un seul des deux fichiers peut se trouver sur le serveur distant. Si le
-rÇpertoire de to n'existe pas, il est crÇÇ.
+r√©pertoire de to n'existe pas, il est cr√©√©.
 
 &RT
-&EN -1 si from ne peut àtre ouvert
-&EN -2 si to ne peut àtre crÇÇ
+&EN -1 si from ne peut √™tre ouvert
+&EN -2 si to ne peut √™tre cr√©√©
 &EN -3 si erreur d'envoi TCP/IP
-&EN nbre de caractäres copiÇs si Ok
+&EN nbre de caract√®res copi√©s si Ok
 &EX
     ISC_copy_1file("10.0.0.1:5001!myfile.txt", "myfile.txt");
 &TX
@@ -2083,36 +2083,36 @@ extern int SCR_COPY_FILE_NB_TRY;
 
 /* ====================================================================
 Copie le fichier ~bfrom~B dans le fichier ~bto~B en minimisant les transferts : si
-le transfert prÇcÇdent s'est plantÇ en cours de route, il est repris Ö son
-point d'arràt.
+le transfert pr√©c√©dent s'est plant√© en cours de route, il est repris √† son
+point d'arr√™t.
 
-Si ~bfrom~B est un fichier qui s'accroåt au fil du temps (comme un fichier de
-log par exemple), seules les nouvelles donnÇes sont copiÇes.
+Si ~bfrom~B est un fichier qui s'accro√Æt au fil du temps (comme un fichier de
+log par exemple), seules les nouvelles donn√©es sont copi√©es.
 
-&IT MÇthodes
+&IT M√©thodes
 
 Si les 2 fichiers existent et que le crc des deux fichiers est identique,
-seules les dates d'accäs et de modification sont modifiÇes. Le mode du
-fichier est Çgalement adaptÇ.
+seules les dates d'acc√®s et de modification sont modifi√©es. Le mode du
+fichier est √©galement adapt√©.
 
-Sinon, si le fichier to.s4~~ existe, il est comparÇ Ö from. En cas d'ÇgalitÇ, il
-est movÇ dans le fichier to. S'il est plus court, on compare les CRC32 des
+Sinon, si le fichier to.s4~~ existe, il est compar√© √† from. En cas d'√©galit√©, il
+est mov√© dans le fichier to. S'il est plus court, on compare les CRC32 des
 fichiers partiels pour limiter la copie.
 
-Si to.s4~~ n'existe pas ou ne correspond plus Ö from, on compare les CRC du
-dÇbut de from avec celui de to. En cas d'ÇgalitÇ, to est copiÇ dans to.s4~~
-et ce dernier est complÇtÇ. Sinon, tout le transfert de from est effectuÇ.
+Si to.s4~~ n'existe pas ou ne correspond plus √† from, on compare les CRC du
+d√©but de from avec celui de to. En cas d'√©galit√©, to est copi√© dans to.s4~~
+et ce dernier est compl√©t√©. Sinon, tout le transfert de from est effectu√©.
 
-Finalement, le fichier to.s4~~ est movÇ dans to et les dates et heures,
-ainsi que le mode est fixÇ Ö celui de la source.
+Finalement, le fichier to.s4~~ est mov√© dans to et les dates et heures,
+ainsi que le mode est fix√© √† celui de la source.
 
 &NO Sous Linux ou Unix, il n'est pas possible de changer les attributs d'un
-    fichier appartenant Ö une partition Windows. De màme, on ne peut fixer
-    les temps d'accäs et de modification sur une partition Windows (FAT32 en
-    tout cas). Il est donc possible qu'une opÇration ne soit pas complÇtÇe
+    fichier appartenant √† une partition Windows. De m√™me, on ne peut fixer
+    les temps d'acc√®s et de modification sur une partition Windows (FAT32 en
+    tout cas). Il est donc possible qu'une op√©ration ne soit pas compl√©t√©e
     parfaitement (mode ou time incorrect) lors d'une copie en Linux vers une
-    partition Windows. Cela n'empàche pas la copie proprement dite d'àtre
-    effectuÇe.
+    partition Windows. Cela n'emp√™che pas la copie proprement dite d'√™tre
+    effectu√©e.
 
 &EX
     ISC_copy_1file_resume("localhost:6000!toto", "tata");
@@ -2121,20 +2121,20 @@ ainsi que le mode est fixÇ Ö celui de la source.
 &TX
 
 &NO
-Les deux fichiers peut se trouver sur un serveur distant diffÇrent. Si le
-rÇpertoire de to n'existe pas, il est crÇÇ.
+Les deux fichiers peut se trouver sur un serveur distant diff√©rent. Si le
+r√©pertoire de to n'existe pas, il est cr√©√©.
 
 &RT
-&EN -1 si from ne peut àtre ouvert
-&EN -2 si to ne peut àtre crÇÇ
+&EN -1 si from ne peut √™tre ouvert
+&EN -2 si to ne peut √™tre cr√©√©
 &EN -3 si erreur d'envoi TCP/IP
-&EN -4 si le time de to ne peut àtre fixÇ
+&EN -4 si le time de to ne peut √™tre fix√©
 &EN -5 si rename to.s4~~ impossible
 &EN -6 si chmod(to) impossible
-&EN nbre de caractäres copiÇs si Ok, en particulier 0 si
-&EN2 fichier to existe et est Çgal Ö from
-&EN2 fichier to existe et est Çgal Ö from et que seule la date est modifiÇe
-&EN2 si to;s4~~ existe, est Çgal Ö from et est copiÇ dans to avec la date de from
+&EN nbre de caract√®res copi√©s si Ok, en particulier 0 si
+&EN2 fichier to existe et est √©gal √† from
+&EN2 fichier to existe et est √©gal √† from et que seule la date est modifi√©e
+&EN2 si to;s4~~ existe, est √©gal √† from et est copi√© dans to avec la date de from
 &EX
     ISC_copy_1file_resume("10.0.0.1:5001!myfile.txt", "myfile.txt", 1);
 &TX
@@ -2155,7 +2155,7 @@ beg:
 
     if(ISC_stat_ex(from, &ssfrom, chkcrc)) return(-1);   // From not found
     if(ISC_stat_ex(to, &ssto, chkcrc) == 0) {            // To exists
-	/* VÇrifier que les fichiers sont dÇjÖ identiques */
+	/* V√©rifier que les fichiers sont d√©j√† identiques */
 	if((chkcrc && ssto.ssx_crc32 == ssfrom.ssx_crc32 &&
 		      ssto.ss_size == ssfrom.ss_size)
 		    ||
@@ -2163,7 +2163,7 @@ beg:
 			    ssto.ss_size == ssfrom.ss_size)) {
 	    // To == from
 	    if(//ssto.ssx_atime == ssfrom.ssx_atime && /* JMP 11-04-03 */
-	       ssto.ssx_mtime == ssfrom.ssx_mtime && // nÇcessaire si CHKCRC
+	       ssto.ssx_mtime == ssfrom.ssx_mtime && // n√©cessaire si CHKCRC
 	       ssto.ss_mode == ssfrom.ss_mode)
 		    return(ssto.ss_size);   /* BP_M 21-09-2011 11:31 */ // Dates et mode identiques
 	    if(!(ssto.ss_mode & 0200) && ISC_chmod(to, 0666)) return(-6);
@@ -2173,7 +2173,7 @@ beg:
 	    }
 	}
 
-    /* vÇrifier que le fichier to.s4~ est Çgal dans son dÇbut si chkcrc */
+    /* v√©rifier que le fichier to.s4~ est √©gal dans son d√©but si chkcrc */
     sprintf(totmp, "%s.s4~", to);
     if(chkcrc) {
 	if(ISC_stat_ex(totmp, &sstotmp, chkcrc) == 0) {       // Totmp exists
@@ -2194,12 +2194,12 @@ beg:
 		    usetmp = 1;                            // on peut utiliser tmp
 		    }
 		else
-		    ISC_unlink(totmp);                     // Fichiers diffÇrents
+		    ISC_unlink(totmp);                     // Fichiers diff√©rents
 		}
 	    }
 	}
 
-    /* VÇrifier que to est utilisable (Çgal dans son dÇbut Ö from)si chkcrc  */
+    /* V√©rifier que to est utilisable (√©gal dans son d√©but √† from)si chkcrc  */
     if(chkcrc && usetmp && ssto.ss_size > 0 && ssto.ss_size < ssfrom.ss_size) {   // size(To) < size(from)
 	crcfromlg = ISC_getcrc32_lg(from, ssto.ss_size);
 	if(crcfromlg == ssto.ssx_crc32) {            // CRC partiels identiques
@@ -2214,14 +2214,14 @@ beg:
 	ISC_close_all_connect();
 	nb_try ++;
 	ISC_copy_1file_pause(nb_try);
-//      Debug("ISC_copy_1file_resume(%s, %s) - > connexion plantÇe: fopen fdfrom: essai %d\n", from, to, nb_try);
+//      Debug("ISC_copy_1file_resume(%s, %s) - > connexion plant√©e: fopen fdfrom: essai %d\n", from, to, nb_try);
 	if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	return(-1);
     }
     if(fromseek)
 	ISC_fseek(fdfrom, fromseek, SEEK_SET);
 
-    // Ouvrir totmp et placer Ö la fin
+    // Ouvrir totmp et placer √† la fin
     ISC_create_dirs(totmp);
 
     if(!chkcrc || fromseek == 0)
@@ -2235,7 +2235,7 @@ beg:
 	ISC_close_all_connect();
 	nb_try ++;
 	ISC_copy_1file_pause(nb_try);
-//      Debug("ISC_copy_1file_resume(%s, %s) - > connexion plantÇe: fopen fdto: essai %d\n", from, to, nb_try);
+//      Debug("ISC_copy_1file_resume(%s, %s) - > connexion plant√©e: fopen fdto: essai %d\n", from, to, nb_try);
 	if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	return(-2);
     }
@@ -2263,7 +2263,7 @@ beg:
 		    if(SCR_GZIP_LEVEL < 9) SCR_GZIP_LEVEL++;
 		    else SCR_GZIP_LEVEL = 0;
 
-//                  Debug("ISC_copy_1file_resume(%s, %s, %d) - > connexion plantÇe Ö la lecture: essai %d\n", from, to, chkcrc, nb_try);
+//                  Debug("ISC_copy_1file_resume(%s, %s, %d) - > connexion plant√©e √† la lecture: essai %d\n", from, to, chkcrc, nb_try);
 		    ISC_copy_1file_pause(nb_try);
 		    chkcrc = 1;
 		    if(nb_try < SCR_COPY_FILE_NB_TRY)
@@ -2285,7 +2285,7 @@ beg:
 	    if(SCR_GZIP_LEVEL < 9) SCR_GZIP_LEVEL++;
 	    else SCR_GZIP_LEVEL = 0;
 	    ISC_copy_1file_pause(nb_try);
-//          Debug("ISC_copy_1file_resume(%s, %s, %d) - > connexion plantÇe: ISC_putc: essai %d\n", from, to, chkcrc, nb_try);
+//          Debug("ISC_copy_1file_resume(%s, %s, %d) - > connexion plant√©e: ISC_putc: essai %d\n", from, to, chkcrc, nb_try);
 	    if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	    rc = -3;
 	    break;
@@ -2299,7 +2299,7 @@ beg:
 
 
 
-    // DÇtruit to, puis Renomme totmp en to et fixe les heures et les attributs
+    // D√©truit to, puis Renomme totmp en to et fixe les heures et les attributs
     if(!(ssto.ss_mode & 0200)) ISC_chmod(to, 0666);
     ISC_unlink(to);
 
@@ -2334,7 +2334,7 @@ beg:
     if(nb_try == SCR_COPY_FILE_NB_TRY) return(-6);
 
 
-    // Retourne le nombre de bytes Çcrits
+    // Retourne le nombre de bytes √©crits
     return(rc);
 }
 
@@ -2350,7 +2350,7 @@ ISC_copy_1file_resume_2(char *from, char *to, SCRSTAT *ssfrom, SCRSTAT *ssto)
 beg:
     nbytes = rc = fromseek = 0;
 
-    /* Si màme taille et modtime, seulement chmod */
+    /* Si m√™me taille et modtime, seulement chmod */
     if(ssfrom->ss_size   == ssto->ss_size &&
        ssfrom->ssx_mtime == ssto->ssx_mtime) {
 	    if(ssto->ss_mode == ssfrom->ss_mode) return(0);
@@ -2359,14 +2359,14 @@ beg:
 	    return(ssfrom->ss_size);    /* BP_M 21-09-2011 14:54 */
 	    }
 
-    /* Si ~~s4 existe, vÇrifier le dÇbut. Si ident, continuer */
+    /* Si ~~s4 existe, v√©rifier le d√©but. Si ident, continuer */
     sprintf(totmp, "%s.s4~", to);
     if(ISC_stat_ex(totmp, &sstotmp, 1) == 0) {       // Totmp exists
 	crcfromlg = ISC_getcrc32_lg(from, sstotmp.ss_size);
 	if(crcfromlg == sstotmp.ssx_crc32)        // CRC partiels identiques
 	    fromseek = sstotmp.ss_size;
 	else
-	    ISC_unlink(totmp);                     // Fichiers diffÇrents
+	    ISC_unlink(totmp);                     // Fichiers diff√©rents
 	}
 
     // Ouvrir from et placer sur le byte correspondant a la taille de totmp
@@ -2374,7 +2374,7 @@ beg:
     if(fdfrom == 0) {
 	ISC_close_all_connect();
 	nb_try ++;
-	Debug("ISC_copy_1file_resume(%s, %s) - > connexion plantÇe ISC_fopen(from): essai %d\n", from, to, nb_try);
+	Debug("ISC_copy_1file_resume(%s, %s) - > connexion plant√©e ISC_fopen(from): essai %d\n", from, to, nb_try);
 	ISC_copy_1file_pause(nb_try);
 	if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	return(-1);
@@ -2382,7 +2382,7 @@ beg:
     if(fromseek)
 	ISC_fseek(fdfrom, fromseek, SEEK_SET);
 
-    // Ouvrir totmp et placer Ö la fin
+    // Ouvrir totmp et placer √† la fin
     ISC_create_dirs(totmp);
 
     if(fromseek == 0)
@@ -2395,7 +2395,7 @@ beg:
 	ISC_fclose(fdfrom);
 	ISC_close_all_connect();
 	nb_try ++;
-	Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plantÇe ISC_fopen(fdto): essai %d\n", from, to, nb_try);
+	Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plant√©e ISC_fopen(fdto): essai %d\n", from, to, nb_try);
 	ISC_copy_1file_pause(nb_try);
 	if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	return(-2);
@@ -2424,7 +2424,7 @@ beg:
 		    nb_try ++;
 		    if(SCR_GZIP_LEVEL < 9) SCR_GZIP_LEVEL++;
 		    else SCR_GZIP_LEVEL = 0;
-		    Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plantÇe Ö la lecture: essai %d\n", from, to, nb_try);
+		    Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plant√©e √† la lecture: essai %d\n", from, to, nb_try);
 		    ISC_copy_1file_pause(nb_try);
 		    if(nb_try < SCR_COPY_FILE_NB_TRY)
 			goto beg;
@@ -2444,7 +2444,7 @@ beg:
 	    nb_try ++;
 	    if(SCR_GZIP_LEVEL < 9) SCR_GZIP_LEVEL++;
 	    else SCR_GZIP_LEVEL = 0;
-	    Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plantÇe ISC_putc(): essai %d\n", from, to, nb_try);
+	    Debug("ISC_copy_1file_resume_2(%s, %s) - > connexion plant√©e ISC_putc(): essai %d\n", from, to, nb_try);
 	    ISC_copy_1file_pause(nb_try);
 	    if(nb_try < SCR_COPY_FILE_NB_TRY) goto beg;
 	    rc = -4;
@@ -2458,7 +2458,7 @@ beg:
     ISC_fflush(fdto);   /* BP_M 05-11-2009 15:50 */
     ISC_fclose(fdto);
 
-    // DÇtruit to, puis Renomme totmp en to et fixe les heures et les attributs
+    // D√©truit to, puis Renomme totmp en to et fixe les heures et les attributs
     if(!(ssto->ss_mode & 0200)) ISC_chmod(to, 0666);
     ISC_unlink(to);
 
@@ -2492,7 +2492,7 @@ beg:
     }
     if(nb_try == SCR_COPY_FILE_NB_TRY) return(-6);
 
-    // Retourne le nombre de bytes Çcrits
+    // Retourne le nombre de bytes √©crits
     return(rc);
 }
 
@@ -2503,30 +2503,30 @@ ISC_copy_1file_pause(int nb_try)
 }
 
 /* ====================================================================
-CrÇe les "sur-directory" du fichier filename sur la machine locale ou sur une
+Cr√©e les "sur-directory" du fichier filename sur la machine locale ou sur une
 machine distante.
 
-&EN filename : nom d'un fichier Ö crÇer
+&EN filename : nom d'un fichier √† cr√©er
 &RT
 &EN -1 en cas d'erreur
 &EN 0 si Ok
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour opÇrer sur le fichier
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour op√©rer sur le fichier
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 &EX
     ISC_create_dirs("c:\\usr\\essai\\myfile.txt");
     ISC_copy_1file("10.0.0.1:5001!myfile.txt", "c:\\usr\\essai\\myfile.txt");
 &TX
-La premiäre fonction s'assure de l'existence du rÇpertoire c:\\usr\\essai et
-le crÇe s'il n'existe pas.
+La premi√®re fonction s'assure de l'existence du r√©pertoire c:\\usr\\essai et
+le cr√©e s'il n'existe pas.
 
 &SA ISC_*()
 =======================================================================*/
@@ -2556,7 +2556,7 @@ ISC_create_dirs(char *filename)
 }
 
 /* ========================================================================
-Envoie un string apräs formattage sur fd.
+Envoie un string apr√®s formattage sur fd.
 
 &RT Code retour de ISC_fwrite()
 &SA ISC_fwrite()
@@ -2576,7 +2576,7 @@ char    *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9;
 /* ========================================================================
 Retourne l'heure du systeme distant ou local.
 
-&RT l'heure en format hhmmss en cas de succäs, -1 en cas d'erreur.
+&RT l'heure en format hhmmss en cas de succ√®s, -1 en cas d'erreur.
 &SA SCR_current_time()
 ================================================================== */
 long ISC_gettime(char *serverport)
@@ -2591,7 +2591,7 @@ long ISC_gettime(char *serverport)
     // Connecte au serveur
     if(ISC_switch_server(serverport)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(serverport, server, &port, srvfile);
     if(server[0] == 0) {
 	return(_SCR_current_time());
@@ -2604,9 +2604,9 @@ long ISC_gettime(char *serverport)
 }
 
 /* ========================================================================
-Retourne la date du systäme distant ou local.
+Retourne la date du syst√®me distant ou local.
 
-&RT La date en format yyyymmdd en cas de succäs, -1 en cas d'erreur.
+&RT La date en format yyyymmdd en cas de succ√®s, -1 en cas d'erreur.
 &SA SCR_current_date()
 ================================================================== */
 long ISC_getdate(char *serverport)
@@ -2620,7 +2620,7 @@ long ISC_getdate(char *serverport)
     // Connecte au serveur
     if(ISC_switch_server(serverport)) return(-1);
 
-    // DÇtermine le serveur et la porte (
+    // D√©termine le serveur et la porte (
     ISC_split_filename(serverport, server, &port, srvfile);
     if(server[0] == 0) {
 	return(_SCR_current_date());
@@ -2635,13 +2635,13 @@ long ISC_getdate(char *serverport)
 }
 
 /* ========================================================================
-Retourne le niveau d'accäs actuel au serveur s4issrv courant.
+Retourne le niveau d'acc√®s actuel au serveur s4issrv courant.
 
 &RT
 &EN -1 : pas de connexion
-&EN 0 : accäs limitÇ aux fonctions de base
-&EN 1 : accäs complet
-&EN 2 : accäs complet avec identification
+&EN 0 : acc√®s limit√© aux fonctions de base
+&EN 1 : acc√®s complet
+&EN 2 : acc√®s complet avec identification
 ================================================================== */
 ISC_getaccess()
 {
@@ -2660,26 +2660,26 @@ ISC_getaccess()
 }
 
 /* ========================================================================
-Change l'heure d'accäs et de modification d'un fichier.
+Change l'heure d'acc√®s et de modification d'un fichier.
 
 Attention, il faut que fichier ne soit pas readonly pour que cela fonctionne.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour opÇrer sur le fichier
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour op√©rer sur le fichier
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
 &EN filename : nom fichier
 &EN actime : nombre de secondes depuis le 1/1/1970  (format de stat)
 &EN modtime : nombre de secondes depuis le 1/1/1970 (format de stat)
 
-RT 0 en cas de succäs, -1 en cas de probläme
+RT 0 en cas de succ√®s, -1 en cas de probl√®me
 
 &RT
 &EN -1 : erreur
@@ -2710,36 +2710,36 @@ ISC_set_file_time(char *filename, long actime, long modtime)
 }
 
 /* ========================================================================
-Set les attributs (mode) du fichier filename selon la dÇfinition Unix (p.ex. 0644
+Set les attributs (mode) du fichier filename selon la d√©finition Unix (p.ex. 0644
 pour -rw-r--r--).
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour opÇrer sur le fichier
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour op√©rer sur le fichier
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 &EN filename : nom fichier
 &EN attr : attributs du fichier en mode Unix 0644 par exemple pour -rw-r--r--.
 
-L'Çquivalent le plus proche est utilisÇ en Windows pour les attributs correspondant en Unix.
+L'√©quivalent le plus proche est utilis√© en Windows pour les attributs correspondant en Unix.
 
 Ainsi un fichier Hidden devient --w--w--w-, un fichier READONLY devient -r--r--r--.
 
 &NO Sous Linux ou Unix, il n'est pas possible de changer les attributs d'un
-    fichier appartenant Ö une partition Windows.
+    fichier appartenant √† une partition Windows.
 
-&RT 0 en cas de succäs, -1 en cas de probläme
+&RT 0 en cas de succ√®s, -1 en cas de probl√®me
 
 &RT
 &EN -1 : erreur
-&EN 0 : accäs limitÇ aux fonctions de base
-&EN 1 : accäs complet
-&EN 2 : accäs complet avec identification
+&EN 0 : acc√®s limit√© aux fonctions de base
+&EN 1 : acc√®s complet
+&EN 2 : acc√®s complet avec identification
 ================================================================== */
 
 ISC_chmod(char *filename, int attr)
@@ -2763,22 +2763,22 @@ ISC_chmod(char *filename, int attr)
 
 
 /* ====================================================================
-Full Path : retourne le nom complet d'un fichier Ö partir d'un nom
-relatif. filename contient le nom du fichier, res le rÇsultat.
+Full Path : retourne le nom complet d'un fichier √† partir d'un nom
+relatif. filename contient le nom du fichier, res le r√©sultat.
 
-Si filename est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si filename est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour opÇrer sur le fichier
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour op√©rer sur le fichier
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
 En cas d'erreur, res est vide et la variable DOS errno indique l'origine
-du probläme (Drive not ready, etc).
+du probl√®me (Drive not ready, etc).
 
 &RT pointeur vers le nom complet du fichier (res) ou NULL en cas d'erreur.
 &EX
@@ -2818,24 +2818,24 @@ char    *filename, *res;
 }
 
 /* ====================================================================
-Retourne dans dirname le nom du directory courant sur la machine oó tourne s4issrv.
-Drive n'est utilisÇ qu'en Windows sur la machine locale.
+Retourne dans dirname le nom du directory courant sur la machine o√π tourne s4issrv.
+Drive n'est utilis√© qu'en Windows sur la machine locale.
 
-Si dirname est prÇfixÇ par un nom d'hìte suivi d'une porte, suivi du
-sÇparateur ! en DOS, @@ en Unix, l'opÇration est effectuÇe via le serveur
-s4issrv (scr4_iss en Linux) tournant sur l'hìte.
+Si dirname est pr√©fix√© par un nom d'h√¥te suivi d'une porte, suivi du
+s√©parateur ! en DOS, @@ en Unix, l'op√©ration est effectu√©e via le serveur
+s4issrv (scr4_iss en Linux) tournant sur l'h√¥te.
 
-Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour opÇrer sur le fichier
-distant sur la machine 192.168.2.1 sur laquelle s4issrv est lancÇ sur la
+Par exemple : ~c192.168.2.1:6000!c:\usr\myfile~C pour op√©rer sur le fichier
+distant sur la machine 192.168.2.1 sur laquelle s4issrv est lanc√© sur la
 porte 6000.
 
-S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
+S'il n'y a pas de nom de machine, l'op√©ration a lieu sur la machine locale.
 
 
 En cas d'erreur, res est vide et la variable DOS errno indique l'origine
-du probläme (Drive not ready, etc).
+du probl√®me (Drive not ready, etc).
 
-&RT pointeur vers le nom du rÇpertoire courant ou NULL en cas d'erreur.
+&RT pointeur vers le nom du r√©pertoire courant ou NULL en cas d'erreur.
 &TX
 &SA ISC_dir(), SCR_getcwd(), SCR_relpath()
 ======================================================================= */
@@ -2873,7 +2873,7 @@ ISC_setcwd(char *cwd)
 /* ========================================================================
 Change le nom du fichier Debug.win sur le serveur
 
-&RT 0 en cas de succäs, -1 en cas d'erreur.
+&RT 0 en cas de succ√®s, -1 en cas d'erreur.
 ================================================================== */
 
 ISC_set_debug_name(char *name)
@@ -2897,11 +2897,11 @@ ISC_set_debug_name(char *name)
 Remplace les ALIAS dans un fichier
    ex1:TOTO=fnac.evere.xon.be:5555
        SERVEUR=$TOTO
-   --> apräs la fontion
+   --> apr√®s la fontion
 	    TOTO=fnac.evere.xon.be:5555
    ex2:TOTO=$.COMAGA                // Indique qu'il faut aller chercher la variable d'environnement COMAGA
        SERVEUR=$TOTO.xon.be
-   --> apräs la fontion si COMAGA=NIV
+   --> apr√®s la fontion si COMAGA=NIV
 	    TOTO=NIV
 	    SERVEUR=NIV.xon.be
 
@@ -2987,7 +2987,7 @@ Remplace les GROUP de la section [REPLICA_GROUP]
 	DSN=$MAGA
 	DIRECTORY=$LDIR.$MAGA;$ODIR.$MAGA
 
-   --> apräs la fonction
+   --> apr√®s la fonction
 	[REPLICA_GROUP1]
 	DSN=LIP
 	DIRECTORY=$LDIR.LIP;$ODIR.LIP
@@ -3134,7 +3134,7 @@ SCR_replace_txt_file(char *file, char *from, char *to)
     return(0);
 }
 
-// dÇplacement de fonctions Ö vÇrifier
+// d√©placement de fonctions √† v√©rifier
 
 IS_end_database_1(int i)
 {

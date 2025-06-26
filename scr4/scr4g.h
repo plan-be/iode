@@ -57,7 +57,7 @@ extern int          GSCR_NB_COLORS;
 extern GXPM         *GSCR_PIXMAPS;
 extern int          GSCR_NB_PIXMAPS;
 
-/****************** Prototypes sp‚cifiques … Gtk/Gnome ***************/
+/****************** Prototypes spÃ©cifiques Ã  Gtk/Gnome ***************/
 GtkWidget *GscrCreateApp();
 GnomeUIInfo *GapCreateMenu(MENU *mn);
 GnomeUIInfo *GapCreateApplMenu(APPL *ap);

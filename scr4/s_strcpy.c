@@ -1,8 +1,8 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Fonction identique … strcpy, mais copie dans l'ordre inverse des bytes.
-Cette fonction permet par exemple d'effectuer un shift … droite d'une
+Fonction identique Ã  strcpy, mais copie dans l'ordre inverse des bytes.
+Cette fonction permet par exemple d'effectuer un shift Ã  droite d'une
 partie de string.
 
 &RT le pointeur vers le string out.

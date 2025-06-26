@@ -24,45 +24,45 @@ int     A2M_MD_PREV = 0;
 char* A2mMDacatff(char* txt1, char* txt2);
 
 /* ================================================================
-InterprŠte le contenu d'un fichier a2m et g‚nŠre un fichier .md.
+InterprÃ¨te le contenu d'un fichier a2m et gÃ©nÃ¨re un fichier .md.
 
-&EN a2mfile = nom du fichier a2m … interpr‚ter
-&EN outfile = nom du fichier md … g‚n‚rer
+&EN a2mfile = nom du fichier a2m Ã  interprÃ©ter
+&EN outfile = nom du fichier md Ã  gÃ©nÃ©rer
 
-&RT La fonction retourne 0 si le processus s'est bien d‚roul‚, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien dÃ©roulÃ©, -1 sinon.
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 
 &TI Variables globales
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les variables globales d‚crites dans le fichier .ini peuvent ‚galement
-ˆtre modifi‚es dans le programme.
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Les variables globales dÃ©crites dans le fichier .ini peuvent Ã©galement
+Ãªtre modifiÃ©es dans le programme.
 
-&IT Variables influen‡ant la lecture du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la secion [A2M] du fichier ini.
+&IT Variables influenÃ§ant la lecture du fichier
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la secion [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caractŠre d'escape (enrichissements et caractŠres
-    sp‚ciaux) : '\'par d‚faut
-&EN int A2M_CMDCH = caractŠre de commande ('.' par d‚faut)
-    sp‚ciaux)
-&EN int A2M_DEFCH = caractŠre pr‚fixant les macros ('&' par d‚faut)
-&EN int A2M_SEPCH = caractŠre de s‚paration des cellules ('&' par d‚faut)
+&EN int A2M_ESCCH = caractÃ¨re d'escape (enrichissements et caractÃ¨res
+    spÃ©ciaux) : '\'par dÃ©faut
+&EN int A2M_CMDCH = caractÃ¨re de commande ('.' par dÃ©faut)
+    spÃ©ciaux)
+&EN int A2M_DEFCH = caractÃ¨re prÃ©fixant les macros ('&' par dÃ©faut)
+&EN int A2M_SEPCH = caractÃ¨re de sÃ©paration des cellules ('&' par dÃ©faut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d‚faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par dÃ©faut ("par_0")
 
-&IT Variables influen‡ant le fichier g‚n‚r‚
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [HTML] du fichier .ini.
+&IT Variables influenÃ§ant le fichier gÃ©nÃ©rÃ©
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la section [HTML] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d‚faut des caractŠres dans les
-    paragraphes (10 pts par d‚faut)
-&EN int A2M_FONTINCR = incr‚ment de taille de caractŠres (2 par d‚faut)
-&EN int A2M_TFONTSIZE = taille par d‚faut des caractŠres dans les
-    tableaux (8 pts par d‚faut)
-&EN int A2M_FONTFAMILY = police de caractŠre par d‚faut ('H', 'T' ou 'C')
+&EN int A2M_FONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    paragraphes (10 pts par dÃ©faut)
+&EN int A2M_FONTINCR = incrÃ©ment de taille de caractÃ¨res (2 par dÃ©faut)
+&EN int A2M_TFONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    tableaux (8 pts par dÃ©faut)
+&EN int A2M_FONTFAMILY = police de caractÃ¨re par dÃ©faut ('H', 'T' ou 'C')
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -85,20 +85,20 @@ Ces variables sont d‚finies dans la section [HTML] du fichier .ini.
 
 &EN int A2M_MD_TCOLOR = 1 (dft) pour impression en couleur des
     tableaux, 0 en B/W
-&EN int A2M_MD_TBORDER = ‚paisseur des cadres des tableaux (1 par dft)
+&EN int A2M_MD_TBORDER = Ã©paisseur des cadres des tableaux (1 par dft)
 &EN U_ch *A2M_MD_TITLE = titre du fichier html
 &EN U_ch *A2M_MD_BODY = contenu du tag <BODY> du fichier HTML
-&EN int A2M_MD_LTGT = 0 si les caractŠres < et > doivent apparaŒtre
-    comme tel en HTML (&lt;) et non interpr‚t‚s comme tag (on mettra 0
+&EN int A2M_MD_LTGT = 0 si les caractÃ¨res < et > doivent apparaÃ®tre
+    comme tel en HTML (&lt;) et non interprÃ©tÃ©s comme tag (on mettra 0
     dans ce cas).
 &EN int A2M_MD_TTITLE = 1 pour inclure le titre des tableaux dans le tableau
-&EN int A2M_MD_AUTOLINK = 0 pour supprimer la cr‚ation automatique de liens
-    par l'analyse des sujets d'aide (acc‚lŠre le traitement)
+&EN int A2M_MD_AUTOLINK = 0 pour supprimer la crÃ©ation automatique de liens
+    par l'analyse des sujets d'aide (accÃ©lÃ¨re le traitement)
 
 &RT
-&EN 0 en cas de succŠs
-&EN -1 si le fichier ne peut ˆtre ouvert
-&EN -2 si les fichiers output n'ont pu ˆtre cr‚‚s
+&EN 0 en cas de succÃ¨s
+&EN -1 si le fichier ne peut Ãªtre ouvert
+&EN -2 si les fichiers output n'ont pu Ãªtre crÃ©Ã©s
 
 
 &SA A2mToRtf(), A2mToMif(), A2mToMif(), A2mPrintError()
@@ -207,7 +207,7 @@ int A2mMDEnd(char* outfile)
     fclose(A2M_fdmd);
     str_md = A2mReadFile(outfile);
     
-    // Recrée le fichier .md
+    // RecrÃ©e le fichier .md
     A2M_fdmd = fopen(outfile, "w+");
     if(A2M_fdmd == 0) return(-2);
     
@@ -479,9 +479,9 @@ int A2mMDPrintAttr(A2MPAR* ap, int n, A2MFNT* fntt)
 }
 
 /**
- *  @brief Retourne le caractère escapé si nécessaire
+ *  @brief Retourne le caractÃ¨re escapÃ© si nÃ©cessaire
  *  
- *  @param [in] ch   int    le caractère à escaper
+ *  @param [in] ch   int    le caractÃ¨re Ã  escaper
  *  @param [in] code int    1 si on est dans une section code et qu'il ne faut pas l'escaper
  *  @return          char*  buffer STATIC avec le resultat
  *  
@@ -564,7 +564,7 @@ U_ch* A2mMDCalcStr(A2MPAR* ap, int n, A2MFNT  *fntt, int tbl, int code)
     case A2M_TEXT :
         for(i = 0 ; as->as_txt[i] ; i++) {
             txt = SCR_strafcat(txt, A2mMDCalcCharSTATIC(as->as_txt[i], code || A2M_MD_CURFONT.af_family == 1)); 
-                     // code || A2M_MD_CURFONT.af_family == 1 : Pas de translation des char spéciaux si dans un PRE ou dans un ~c..~C
+                     // code || A2M_MD_CURFONT.af_family == 1 : Pas de translation des char spÃ©ciaux si dans un PRE ou dans un ~c..~C
         }        
         return(txt);
 
@@ -667,7 +667,7 @@ U_ch *A2mMDCalcPar(A2MPAR* ap, int tbl, int tcol)
             txt = SCR_strafcat(txt, "\n");
         
         if(tag[0] == 'H') {
-            bullets = 0; // Début de la ligne "   - "
+            bullets = 0; // DÃ©but de la ligne "   - "
             for(i = 0 ; i < atol(1 + tag) ; i++) { 
                 txt     = SCR_strafcat(txt, "#");
                 if(i > 0) bullets = SCR_strafcat(bullets, "  ");
@@ -675,7 +675,7 @@ U_ch *A2mMDCalcPar(A2MPAR* ap, int tbl, int tcol)
             
             tit = A2mMDCalcStrs(ap, &fntd, tbl, 0);
             
-            // bullets = pour la TOC à la fin
+            // bullets = pour la TOC Ã  la fin
             bullets = SCR_strafcat(bullets, "- [");
             bullets = SCR_strafcat(bullets, tit);
             sprintf(buf, "](#T%d)", A2M_MD_NB_TOPICS + 1);
@@ -798,7 +798,7 @@ int A2mMDPrintTbl(A2MTBL* at)
 
     // BODY
     for(i = 0 ; i < at->at_nl ; i++) {
-        // <TD> or <TH> ? + Classe par défaut en fonction thead ou pas
+        // <TD> or <TH> ? + Classe par dÃ©faut en fonction thead ou pas
         
         // Ligne dans le tableau 
         if(at->at_tls[i].atl_type != 0) continue; // .tl, .theader, ...
@@ -811,7 +811,7 @@ int A2mMDPrintTbl(A2MTBL* at)
         }
         fprintf(A2M_fdmd, "|\n");
         
-        // Si première ligne => |----|
+        // Si premiÃ§re ligne => |----|
         if(firstline == 1) {
             for(j = 0 ; j < at->at_nc ; j++) {
                 tc = at->at_tls[i].atl_tcs + j;

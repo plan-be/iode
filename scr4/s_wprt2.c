@@ -11,38 +11,38 @@ extern int  WprCurLine, WprCurCol;
 extern HDC  WprhDC;
 
 /* ======================================================================
-Initialise un processus d'impression en mode caractäre.
+Initialise un processus d'impression en mode caract√®re.
 
-&EN hWndOwner = 0 ou HWND de la fenàtre päre
-&EN dlg = 1 si la fenàtre de sÇlection de paramätres de l'imprimante
-    doit àtre ouverte, 0 sinon. Dans ce cas, l'imprimante par dÇfaut
-    de Windows est utilisÇe dans ses paramätres actuels.
-&EN docname = nom du document (affichÇ dans le print spooler)
+&EN hWndOwner = 0 ou HWND de la fen√™tre p√®re
+&EN dlg = 1 si la fen√™tre de s√©lection de param√®tres de l'imprimante
+    doit √™tre ouverte, 0 sinon. Dans ce cas, l'imprimante par d√©faut
+    de Windows est utilis√©e dans ses param√®tres actuels.
+&EN docname = nom du document (affich√© dans le print spooler)
 
-La fonction crÇe les diffÇrentes ressources nÇcessaires Ö l'impression
-et initialise toutes les variables nÇcessaires.
+La fonction cr√©e les diff√©rentes ressources n√©cessaires √† l'impression
+et initialise toutes les variables n√©cessaires.
 
-&EN CrÇe les BRUSHES
-&EN CrÇe les PENS
-&EN fixe le font par dÇfaut Ö Courier 10 Pts
+&EN Cr√©e les BRUSHES
+&EN Cr√©e les PENS
+&EN fixe le font par d√©faut √† Courier 10 Pts
 
-Les variables globales suivantes sont dÇfinies par la fonction :
+Les variables globales suivantes sont d√©finies par la fonction :
 
 &EN int WprLOGX    : nombre de pixels par pouce en X
 &EN int WprLOGY    : nombre de pixels par pouce en Y
 &EN int WprHORZRES : nombre de pixels par page en X
 &EN int WprVERTRES : nombre de pixels par page en Y
-&EN int WprMARGL   : nombre de pixels marge de gauche (4 caractäres
+&EN int WprMARGL   : nombre de pixels marge de gauche (4 caract√®res
 		     Courier 10)
 &EN int WprMARGT   : nombre de pixels marge du haut (0)
 &EN int WprNL      : nombre de lignes de texte en Courier 10
 &EN int WprNC      : nombre de colonnes de texte en Courier 10
 
-Les valeurs de WprMARGT et WprMARGL peuvent àtre modifiÇes par
-l'utilisateur apräs l'appel de cette fonction.
+Les valeurs de WprMARGT et WprMARGL peuvent √™tre modifi√©es par
+l'utilisateur apr√®s l'appel de cette fonction.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur ou si l'utilisateur utilise
-    CANCEL pour quitter la boåte de dialogue de sÇlection de
+&RT 0 en cas de succ√®s, -1 en cas d'erreur ou si l'utilisateur utilise
+    CANCEL pour quitter la bo√Æte de dialogue de s√©lection de
     l'impression.
 
 ========================================================================= */
@@ -63,15 +63,15 @@ WprChInit(HWND hWndOwner, int dlg, char *docname)
 }
 
 /* ======================================================================
-Termine le processus d'impression en mode caractäre et envoie le job
+Termine le processus d'impression en mode caract√®re et envoie le job
 vers l'imprimante.
 
-Cette fonction prend l'hypothäse que la derniäre page a ÇtÇ prÇalablement
-envoyÇe par un formfeed antÇrieur (c'est le cas lors de l'utilisation des
+Cette fonction prend l'hypoth√®se que la derni√®re page a √©t√© pr√©alablement
+envoy√©e par un formfeed ant√©rieur (c'est le cas lors de l'utilisation des
 fonctions du groupe PR_*).
 
-La fonction libäre l'espace allouÇ par les diffÇrentes ressources
-nÇcessaires Ö l'impression.
+La fonction lib√®re l'espace allou√© par les diff√©rentes ressources
+n√©cessaires √† l'impression.
 ========================================================================= */
 
 WprChEnd()
@@ -84,10 +84,10 @@ WprChEnd()
 }
 
 /* ======================================================================
-Effectue un saut Ö la ligne (fonction d'impression Windows en mode
-caractäre).
+Effectue un saut √† la ligne (fonction d'impression Windows en mode
+caract√®re).
 
-&EN n = nombre de lignes Ö sauter.
+&EN n = nombre de lignes √† sauter.
 ========================================================================= */
 
 WprChNewLine(int n)
@@ -100,8 +100,8 @@ WprChNewLine(int n)
 }
 
 /* ======================================================================
-Imprime la page courante et prÇpare une nouvelle page (fonction
-d'impression Windows en mode caractäre).
+Imprime la page courante et pr√©pare une nouvelle page (fonction
+d'impression Windows en mode caract√®re).
 ========================================================================= */
 
 WprChFormFeed()
@@ -126,21 +126,21 @@ WprChFlushBuf()
 }
 
 /* ======================================================================
-Imprime un string codÇ Ascii (fonction d'impression Windows en mode
-caractäre). L'impression a lieu Ö la position courante dans la page.
+Imprime un string cod√© Ascii (fonction d'impression Windows en mode
+caract√®re). L'impression a lieu √† la position courante dans la page.
 
-&EN txt = pointeur vers un string terminÇ par un 0.
+&EN txt = pointeur vers un string termin√© par un 0.
 
-Les caractäres semi-graphiques de la table ASCII-437 sont imprimÇs en
+Les caract√®res semi-graphiques de la table ASCII-437 sont imprim√©s en
 utilisant les primitives graphiques de l'imprimante.
 
-Les caractäres suivants sont interprÇtÇs:
+Les caract√®res suivants sont interpr√©t√©s:
 
-&EN TAB : aligne sur 8 caractäres
-&EN NEWLINE : saut Ö la ligne
-&EN FORMFEED : saut Ö la page
-&EN SPACE : si deux blancs successifs sont dÇtectÇs, un rÇalignement
-    a lieu en fonction de la taille moyenne d'un caractäre.
+&EN TAB : aligne sur 8 caract√®res
+&EN NEWLINE : saut √† la ligne
+&EN FORMFEED : saut √† la page
+&EN SPACE : si deux blancs successifs sont d√©tect√©s, un r√©alignement
+    a lieu en fonction de la taille moyenne d'un caract√®re.
 ========================================================================= */
 
 WprChPrintString(U_ch *txt)

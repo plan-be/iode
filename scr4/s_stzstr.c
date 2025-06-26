@@ -1,12 +1,12 @@
 #include "s_strs.h"
 /* ====================================================================
-Remplace la fin d'un string par des '\0' Ö partir de la position du
-premier caractäre < ' '.
+Remplace la fin d'un string par des '\0' √† partir de la position du
+premier caract√®re < ' '.
 
-Le dernier caractäre du string (ptr[len - 1]) est toujours fixÇ Ö 0.
-Cette fonction est utilisÇe pour les ZSTRING dans les ISAM.
+Le dernier caract√®re du string (ptr[len - 1]) est toujours fix√© √† 0.
+Cette fonction est utilis√©e pour les ZSTRING dans les ISAM.
 
-&RT le string modifiÇ
+&RT le string modifi√©
 &SA SCR_strip()
 =======================================================================*/
 

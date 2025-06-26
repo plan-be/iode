@@ -120,7 +120,7 @@ WSOCKCLT *WSockCreateWSC(int WinSock, int ClientSock, int (*fn)(int))
 }
 
 /*NH
-Fonction appel‚e par le Thread Client
+Fonction appelÃ©e par le Thread Client
 */
 long WINAPI WSockClient(WSOCKCLT *wsc)
 {
@@ -230,36 +230,36 @@ long WINAPI WSockClientProc(char *subcmd, int cltsock)
 
 /* =================================================================
 Fonction serveur.
-D‚marre un socket c“t‚ serveur (STREAM).
+DÃ©marre un socket cÃ´tÃ© serveur (STREAM).
 
 
 &EN port : porte
 &EN fn : fonction utilisateur (NULL si multi process)
-&EN subcmd (Windows seul) : commande … lancer (multi-process) avec %d … la place
-    du num‚ro de socket ouvert. NULL si pas multi-process
+&EN subcmd (Windows seul) : commande Ã  lancer (multi-process) avec %d Ã  la place
+    du numÃ©ro de socket ouvert. NULL si pas multi-process
 &EN bThread : 0 si single thread server, 1 si multi-thread ou multi-process en Unix
 &EN nqueue : taille de la file d'attente maximum sur le socket serveur
 
 
-EN Unix, les threads ne sont pas impl‚ment‚s. Seules les versions
-multi-process et mono-process sont op‚rationnelles pour l'instant.
+EN Unix, les threads ne sont pas implÃ©mentÃ©s. Seules les versions
+multi-process et mono-process sont opÃ©rationnelles pour l'instant.
 
-On utilise la mˆme syntaxe en Windows multi-thread et en Unix multi-process :
+On utilise la mÃªme syntaxe en Windows multi-thread et en Unix multi-process :
 
 &CO
    WSockStartServer(port, fn, 0, 1, n);
 &TX
-Le premier 0 indique pas de commande … lancer, le second multi-thread.
+Le premier 0 indique pas de commande Ã  lancer, le second multi-thread.
 &RT
 
-&EN 0 en cas de succŠs
-&EN -1 : erreur … l'initialisation
-&EN -2 : erreur … la cr‚ation du socket initial
+&EN 0 en cas de succÃ¨s
+&EN -1 : erreur Ã  l'initialisation
+&EN -2 : erreur Ã  la crÃ©ation du socket initial
 &EN -3 : erreur au bind
 &EN -4 : erreur au listen
-&EN -5 : erreur … accept
-&EN -6 : erreur … la cr‚ation d'un sous thread
-&EN -7 : erreur … la cr‚ation d'un sous process
+&EN -5 : erreur Ã  accept
+&EN -6 : erreur Ã  la crÃ©ation d'un sous thread
+&EN -7 : erreur Ã  la crÃ©ation d'un sous process
 
 &IT Serveur multi-thread
 &CO
@@ -294,9 +294,9 @@ Le premier 0 indique pas de commande … lancer, le second multi-thread.
 
 &IT Serveur multi-process
 
-Ce programme lanc‚ sans argument d‚marre le serveur qui attend une
-connexion. Lors d'une connexion, il se lance avec comme paramŠtres -s
-et le num‚ro du socket cr‚‚. La fonction FileServer n'est utilis‚e que
+Ce programme lancÃ© sans argument dÃ©marre le serveur qui attend une
+connexion. Lors d'une connexion, il se lance avec comme paramÃ¨tres -s
+et le numÃ©ro du socket crÃ©Ã©. La fonction FileServer n'est utilisÃ©e que
 dans ce second cas.
 
 &CO
@@ -312,13 +312,13 @@ dans ce second cas.
 	int     rc, port = 5000;
 	char    buf[120];
 
-	// Connexion ‚tablie, lancement de la fonction FileServer()
+	// Connexion Ã©tablie, lancement de la fonction FileServer()
 	if(argc > 2 && strcmp(argv[1], "-s") == 0) {
 	    printf("\n*** Connecting child for socket %d\n", atoi(argv[2]));
 	    rc = WSockStartServerProc(atoi(argv[2]), FileServer);
 	    exit(rc);
 	    }
-	// D‚marrage du serveur : attente de connexion
+	// DÃ©marrage du serveur : attente de connexion
 	else {
 
 	    printf("\n*** Starting Server - pid=%d\n", getpid());
@@ -456,7 +456,7 @@ int WSockStartServer(int port, int (*fn)(int), char* subcmd, int bThread, int nq
 			fn(ClientSock);
 			goto cleanup;
 
-		    default : // pŠre
+		    default : // pÃ¨re
 		       closesocket(ClientSock);
 		       break;
 		    }
@@ -485,14 +485,14 @@ cleanup :
 
 /* =================================================================
 Fonction serveur.
-Branche sur un socket client pour lequel une connexion vient d'ˆtre
-cr‚‚e. Un exemple peut ˆtre trouv‚ dans la fonction WSockStartServer()
+Branche sur un socket client pour lequel une connexion vient d'Ãªtre
+crÃ©Ã©e. Un exemple peut Ãªtre trouvÃ© dans la fonction WSockStartServer()
 
-&EN cltsock : num‚ro du socket
+&EN cltsock : numÃ©ro du socket
 &EN fn : fonction utilisateur
 
 &RT
-&EN -1 : erreur … l'initialisation
+&EN -1 : erreur Ã  l'initialisation
 &EN valeur de retour de fn sinon
 
 &SA WSockStartServer()

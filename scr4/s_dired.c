@@ -16,35 +16,35 @@ SCRSTAT *ss;
 
 /* ======================================================================
 Lit les fichiers correspondant au masque path et les affiche dans un menu.
-La sÇlection des fichiers dÇcoule de la valeur de add_dir:
+La s√©lection des fichiers d√©coule de la valeur de add_dir:
 
-&EN 0 pour une sÇlection normale (directory et fichiers)
-&EN 1 pour une sÇlection de tous les directories et des seuls fichiers
-    correspondant Ö path
-&EN 2 pour une sÇlection des seuls fichiers, sans les directory
-&EN 3 pour une sÇlection des seuls directory
+&EN 0 pour une s√©lection normale (directory et fichiers)
+&EN 1 pour une s√©lection de tous les directories et des seuls fichiers
+    correspondant √† path
+&EN 2 pour une s√©lection des seuls fichiers, sans les directory
+&EN 3 pour une s√©lection des seuls directory
 
 Les variables dir et file contiennent en output le nom absolu du directory
-scannÇ et le masque de recherche. Elles doivent avoir une taille suffisante.
+scann√© et le masque de recherche. Elles doivent avoir une taille suffisante.
 
-Le MENU est placÇ en ligne line, colonne col, sur un nombre de lignes nl.
+Le MENU est plac√© en ligne line, colonne col, sur un nombre de lignes nl.
 L'attribut de fond est attr.
 
-fn est un pointeur de fonction qui permet de filtrer les fichiers trouvÇs :
+fn est un pointeur de fonction qui permet de filtrer les fichiers trouv√©s :
 cette fonction a la syntaxe suivante :
 
 &CO
     int fn(char *text, char * dirname, SCRSTAT *ss);
 &TX
 
-oó
-&EN dirname est le nom du directory scannÇ (IN) dÇrivÇ de path,
+o√π
+&EN dirname est le nom du directory scann√© (IN) d√©riv√© de path,
 &EN SCRSTAT le pointeur vers une structure contenant les informations sur le
 fichier courant
-&EN text (OUT) le texte Ö placer dans le menu.
+&EN text (OUT) le texte √† placer dans le menu.
 
 &RT pointeur vers une structure SCRSTAT statique avec le fichier
-    sÇlectionnÇ. NULL si pas de sÇlection (sortie par ESCAPE).
+    s√©lectionn√©. NULL si pas de s√©lection (sortie par ESCAPE).
 
 &SA SCR_dir_edit()
 ------------------------------------------------------------------------- */
@@ -91,37 +91,37 @@ int     (*fn)();
 }
 
 /* ======================================================================
-Lit les fichiers correspondant au masque path et les affiche dans un menu, Ö
+Lit les fichiers correspondant au masque path et les affiche dans un menu, √†
 l'aide de la fonction SCR_dir_edit_1().
 
-Si le fichier sÇlectionnÇ est un directory, ce directory est ÇditÇ Ö son
-tour, Ö nouveau par un appel Ö SCR_dir_edit_1().
+Si le fichier s√©lectionn√© est un directory, ce directory est √©dit√© √† son
+tour, √† nouveau par un appel √† SCR_dir_edit_1().
 
 Les variables dir et file contiennent en output le nom absolu du dernier
-directory scannÇ et le masque de recherche. Elles doivent avoir une taille
+directory scann√© et le masque de recherche. Elles doivent avoir une taille
 suffisante.
 
-Le MENU est placÇ en ligne line, colonne col, sur un nombre de lignes nl.
+Le MENU est plac√© en ligne line, colonne col, sur un nombre de lignes nl.
 L'attribut de fond est attr.
 
-fn est un pointeur de fonction qui permet de filtrer les fichiers trouvÇs :
+fn est un pointeur de fonction qui permet de filtrer les fichiers trouv√©s :
 cette fonction a la syntaxe suivante :
 
 &CO
     int fn(char *text, char * dirname, SCRSTAT *ss);
 &TX
 
-oó
-&EN dirname est le nom du directory scannÇ (IN) dÇrivÇ de path,
+o√π
+&EN dirname est le nom du directory scann√© (IN) d√©riv√© de path,
 &EN SCRSTAT le pointeur vers une structure contenant les informations sur le
 fichier courant
-&EN text (OUT) le texte Ö placer dans le menu.
+&EN text (OUT) le texte √† placer dans le menu.
 
 
-Cette fonction est utilisÇe dans les champs de type DIR.
+Cette fonction est utilis√©e dans les champs de type DIR.
 
 &RT pointeur vers une structure SCRSTAT statique avec le fichier
-    sÇlectionnÇ. NULL si pas de sÇlection (sortie par ESCAPE).
+    s√©lectionn√©. NULL si pas de s√©lection (sortie par ESCAPE).
 
 &SA SCR_dir_edit_1(), SCR_dir(), ...
 ------------------------------------------------------------------------- */
@@ -146,31 +146,31 @@ int     (*fn)();
 }
 
 /* ======================================================================
-Lit les fichiers correspondant au masque path et les affiche dans un menu, Ö
+Lit les fichiers correspondant au masque path et les affiche dans un menu, √†
 l'aide de la fonction SCR_dir_edit().
 
-Le nom absolu du fichier choisi est retournÇ dans res qui doit àtre de
+Le nom absolu du fichier choisi est retourn√© dans res qui doit √™tre de
 taille suffisante.
 
-Le MENU est placÇ en ligne line, colonne col, sur un nombre de lignes nl.
+Le MENU est plac√© en ligne line, colonne col, sur un nombre de lignes nl.
 L'attribut de fond est attr.
 
-fn est un pointeur de fonction qui permet de filtrer les fichiers trouvÇs :
+fn est un pointeur de fonction qui permet de filtrer les fichiers trouv√©s :
 cette fonction a la syntaxe suivante :
 
 &CO
     int fn(char *text, char * dirname, SCRSTAT *ss);
 &TX
 
-oó
-&EN dirname est le nom du directory scannÇ (IN) dÇrivÇ de path,
+o√π
+&EN dirname est le nom du directory scann√© (IN) d√©riv√© de path,
 &EN SCRSTAT le pointeur vers une structure contenant les informations sur le
 fichier courant
-&EN text (OUT) le texte Ö placer dans le menu.
+&EN text (OUT) le texte √† placer dans le menu.
 
-Cette fonction est utilisÇe dans les champs de type DIR.
+Cette fonction est utilis√©e dans les champs de type DIR.
 
-&RT 0 si un fichier est sÇlectionnÇ, -1 sinon (et res[0] = 0)
+&RT 0 si un fichier est s√©lectionn√©, -1 sinon (et res[0] = 0)
 
 &SA SCR_dir_edit(), SCR_dir(), ...
 ------------------------------------------------------------------------- */

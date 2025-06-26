@@ -1,15 +1,15 @@
 
 /* =============================================================
-Cette fonction retourne l'espace m‚moire disponible en bytes.
+Cette fonction retourne l'espace mÃ©moire disponible en bytes.
 
-&NO En DOS, la valeur ne correspond pas … l'espace total libre : il
-s'agit d'un minimum disponible qui correspond au pointeur le plus ‚loign‚
-allou‚ et pas encore lib‚r‚.
+&NO En DOS, la valeur ne correspond pas Ã  l'espace total libre : il
+s'agit d'un minimum disponible qui correspond au pointeur le plus Ã©loignÃ©
+allouÃ© et pas encore libÃ©rÃ©.
 
 &EX
-    printf("M‚moire libre : %ld\n", SCR_free_mem());
+    printf("MÃ©moire libre : %ld\n", SCR_free_mem());
 &TX
-&PO Cette fonction ne fournit un r‚sultat qu'en DOS avec les
+&PO Cette fonction ne fournit un rÃ©sultat qu'en DOS avec les
     compilateur Turbo C ou Watcom C. Dans tous les autres cas, elle
     retourne une valeur nulle.
 
@@ -87,16 +87,16 @@ long SCR_free_mem()
 #else
 
 /* =============================================================
-Cette fonction retourne l'espace m‚moire disponible en bytes.
+Cette fonction retourne l'espace mÃ©moire disponible en bytes.
 
-&NO En DOS, la valeur ne correspond pas … l'espace total libre : il
-s'agit d'un minimum disponible qui correspond au pointeur le plus ‚loign‚
-allou‚ et pas encore lib‚r‚.
+&NO En DOS, la valeur ne correspond pas Ã  l'espace total libre : il
+s'agit d'un minimum disponible qui correspond au pointeur le plus Ã©loignÃ©
+allouÃ© et pas encore libÃ©rÃ©.
 
 &EX
-    printf("M‚moire libre : %ld\n", SCR_free_mem());
+    printf("MÃ©moire libre : %ld\n", SCR_free_mem());
 &TX
-&PO Cette fonction ne fournit un r‚sultat qu'en DOS avec les
+&PO Cette fonction ne fournit un rÃ©sultat qu'en DOS avec les
     compilateur Turbo C ou Watcom C. Dans tous les autres cas, elle
     retourne une valeur nulle.
 

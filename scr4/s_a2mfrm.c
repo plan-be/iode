@@ -6,7 +6,7 @@
 extern int A2MGRFBARCURRENT;
 extern int A2MGRFBARNB;
 
-/* Param�tre g�n�ral */
+/* Paramétre général */
 
 /********** PARAMETRES ************/
 
@@ -87,23 +87,23 @@ char    *outfile;
 }
 
 /* ================================================================
-Interpr�te le contenu d'un fichier a2m et g�n�re un fichier .mif (Frame
+Interpréte le contenu d'un fichier a2m et génére un fichier .mif (Frame
 Maker).
 
-&EN a2mfile = nom du fichier a2m � interpr�ter
-&EN outfile = nom du fichier mif � g�n�rer
+&EN a2mfile = nom du fichier a2m à interpréter
+&EN outfile = nom du fichier mif à générer
 
-&RT La fonction retourne 0 si le processus s'est bien d�roul�, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien déroulé, -1 sinon.
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-l'impression et la lecture du fichier a2m. Pour que ces param�tres
+-------------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramétres
 soient pris en compte par le programme A2mToMif(), il faut appeler la
 fonction A2mFrmReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -113,34 +113,34 @@ d'interpr�tation et d'impression.
 &TX
 
 &TI Variables globales
-������������������
-Les variables globales d�crites dans le fichier .ini peuvent �galement
-�tre modifi�es dans le programme.
 
-&IT Variables influen�ant la lecture du fichier
-������������������������������������������
-Ces variables sont d�finies dans la secion [A2M] du fichier ini.
+Les variables globales décrites dans le fichier .ini peuvent également
+étre modifiées dans le programme.
 
-&EN int A2M_ESCCH = caract�re d'escape (enrichissements et caract�res
-    sp�ciaux) : '\'par d�faut
-&EN int A2M_CMDCH = caract�re de commande ('.' par d�faut)
-    sp�ciaux)
-&EN int A2M_DEFCH = caract�re pr�fixant les macros ('&' par d�faut)
-&EN int A2M_SEPCH = caract�re de s�paration des cellules ('&' par d�faut)
+&IT Variables influenéant la lecture du fichier
+-----------------------------------------------
+Ces variables sont définies dans la secion [A2M] du fichier ini.
+
+&EN int A2M_ESCCH = caractére d'escape (enrichissements et caractéres
+    spéciaux) : '\'par défaut
+&EN int A2M_CMDCH = caractére de commande ('.' par défaut)
+    spéciaux)
+&EN int A2M_DEFCH = caractére préfixant les macros ('&' par défaut)
+&EN int A2M_SEPCH = caractére de séparation des cellules ('&' par défaut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d�faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par défaut ("par_0")
 
-&IT Variables influen�ant le fichier g�n�r�
-���������������������������������������
-Ces variables sont d�finies dans la section [MAKER] du fichier .ini.
+&IT Variables influenéant le fichier généré
+-------------------------------------------
+Ces variables sont définies dans la section [MAKER] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d�faut des caract�res dans les
-    paragraphes (10 pts par d�faut)
-&EN int A2M_FONTINCR = incr�ment de taille de caract�res (2 par d�faut)
-&EN int A2M_FONTFAMILY = police de caract�re par d�faut ('H', 'T' ou 'C')
-&EN int A2M_TFONTSIZE = taille par d�faut des caract�res dans les
-    tableaux (8 pts par d�faut)
+&EN int A2M_FONTSIZE = taille par défaut des caractéres dans les
+    paragraphes (10 pts par défaut)
+&EN int A2M_FONTINCR = incrément de taille de caractéres (2 par défaut)
+&EN int A2M_FONTFAMILY = police de caractére par défaut ('H', 'T' ou 'C')
+&EN int A2M_TFONTSIZE = taille par défaut des caractéres dans les
+    tableaux (8 pts par défaut)
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -163,7 +163,7 @@ Ces variables sont d�finies dans la section [MAKER] du fichier .ini.
 
 &EN int A2M_FRM_TCOLOR = 1 (dft) pour impression en couleur des
     tableaux, 0 en B/W
-&EN int A2M_FRM_TBORDER = �paisseur des cadres des tableaux (1 par dft)
+&EN int A2M_FRM_TBORDER = épaisseur des cadres des tableaux (1 par dft)
 &EN int A2M_FRM_TCOL1 = largeur de la colonne 1 des tableaux en mm
 	(dft 60)
 &EN int A2M_FRM_TCOLN = largeur des autres colonnes des tableaux en mm
@@ -172,14 +172,14 @@ Ces variables sont d�finies dans la section [MAKER] du fichier .ini.
     tableaux (dft 0)
 &EN int A2M_FRM_VLINES = 1 pour des lignes verticales dans les tableaux
     (dft 0)
-&EN int A2M_FRM_REF = 1 g�n�rer des r�f�rences dans le texte associ� aux
+&EN int A2M_FRM_REF = 1 générer des références dans le texte associé aux
     images, 0 sinon (dft 1)
 &EN int A2M_FRM_TTITLE = 1 pour inclure le titre des tableaux dans le tableau
 
 &RT
-&EN 0 en cas de succ�s
-&EN -1 si le fichier ne peut �tre ouvert
-&EN -2 si les fichiers output n'ont p� �tre cr��s
+&EN 0 en cas de succés
+&EN -1 si le fichier ne peut étre ouvert
+&EN -2 si les fichiers output n'ont pé étre créés
 
 &SA A2mFrmReadIni(), A2mToRtf(), A2mToGdi(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
@@ -1240,23 +1240,23 @@ A2MPPR  *pp;
 }
 
 /* ================================================================
-Fixe la valeur des variables globales avant l'interp�tation d'un fichier
-a2m etla g�n�ration d'un fichier mif en se basant sur les d�finitions du
-fichier .ini associ�.
+Fixe la valeur des variables globales avant l'interpétation d'un fichier
+a2m etla génération d'un fichier mif en se basant sur les définitions du
+fichier .ini associé.
 
-Les sections [A2M] et [MAKER] du fichier .ini sont interpr�t�es.
+Les sections [A2M] et [MAKER] du fichier .ini sont interprétées.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d�crite dans un chapitre sp�cifique.
+La syntaxe des fichiers a2m est décrite dans un chapitre spécifique.
 
 &TI Fichier a2m.ini
-���������������
-Le fichier a2m.ini (ou un autre) contient des param�tres pour
-la lecture du fichier a2m et la g�n�ration du fichier mif. Pour que ces
-param�tres soient pris en compte par le programme A2mToMif(), il faut
+-------------------
+Le fichier a2m.ini (ou un autre) contient des paramétres pour
+la lecture du fichier a2m et la génération du fichier mif. Pour que ces
+paramétres soient pris en compte par le programme A2mToMif(), il faut
 appeler la fonction A2mFrmReadIni(filename) avant de lancer la fonction
-d'interpr�tation et d'impression.
+d'interprétation et d'impression.
 
 &CO
     #include <s_a2m.h>

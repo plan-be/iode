@@ -1,14 +1,14 @@
 #include "scr.h"
 
 /* ======================================================================
-Retourne le num‚ro d'un objet dont le pointeur est pass‚ comme argument.
+Retourne le numÃ©ro d'un objet dont le pointeur est passÃ© comme argument.
 &EX
     int     act_nb;
 
     act_nb = SCR_find_ptr_nu(editclt);
 
 &TX
-&RT le num‚ro de l'objet ou -1 si le pointeur n'est pas trouv‚
+&RT le numÃ©ro de l'objet ou -1 si le pointeur n'est pas trouvÃ©
 &SA SCR_find_ptr_name()
 ------------------------------------------------------------------------- */
 

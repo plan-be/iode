@@ -3,20 +3,20 @@
 extern int  IS_REC_RREC;
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
-Il n'y a pas de vÇrification de type! VÇrifiez donc soigneusement le
-type des champs utilisÇs.
+Il n'y a pas de v√©rification de type! V√©rifiez donc soigneusement le
+type des champs utilis√©s.
 
-Cette fonction doit avoir connaissance de l'OBJ utilisÇ. Il faut donc
-placer dans le champ en question DEF_OBJ pour en obtenir la dÇfinition
-dans les fichiers .c gÇnÇrÇs par scr4_e.
+Cette fonction doit avoir connaissance de l'OBJ utilis√©. Il faut donc
+placer dans le champ en question DEF_OBJ pour en obtenir la d√©finition
+dans les fichiers .c g√©n√©r√©s par scr4_e.
 
 &NO
-L'assignation directe est une mÇthode qui demande moins de code et ne
-nÇcessite pas de dÇfinition des OBJ. De plus, les conversions de types
-sont gÇrÇes par la compilateur C. Par consÇquent, on utilisera les
+L'assignation directe est une m√©thode qui demande moins de code et ne
+n√©cessite pas de d√©finition des OBJ. De plus, les conversions de types
+sont g√©r√©es par la compilateur C. Par cons√©quent, on utilisera les
 assignations par valeurs directes lorsque c'est possible.
 
 &EX
@@ -33,7 +33,7 @@ assignations par valeurs directes lorsque c'est possible.
 
     SCR_get_vchar(is_client_langue, 0)
 
-	Çquivaut Ö
+	√©quivaut √†
 
     is_client_LANGUE
 
@@ -51,7 +51,7 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -67,7 +67,7 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -92,7 +92,7 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -108,7 +108,7 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Lit la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -133,20 +133,20 @@ int     i;
     return(s);
 }
 /* ======================================================================
-Fixe la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Fixe la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
-Il n'y a pas de vÇrification de type! VÇrifiez donc soigneusement le
-type des champs utilisÇs.
+Il n'y a pas de v√©rification de type! V√©rifiez donc soigneusement le
+type des champs utilis√©s.
 
-Cette fonction doit avoir connaissance de l'OBJ utilisÇ. Il faut donc
-placer dans le champ en question DEF_OBJ pour en obtenir la dÇfinition
-dans les fichiers .c gÇnÇrÇs par scr4_e.
+Cette fonction doit avoir connaissance de l'OBJ utilis√©. Il faut donc
+placer dans le champ en question DEF_OBJ pour en obtenir la d√©finition
+dans les fichiers .c g√©n√©r√©s par scr4_e.
 
 &NO
-L'assignation directe est une mÇthode qui demande moins de code et ne
-nÇcessite pas de dÇfinition des OBJ. De plus, les conversions de types
-sont gÇrÇes par la compilateur C. Par consÇquent, on utilisera les
+L'assignation directe est une m√©thode qui demande moins de code et ne
+n√©cessite pas de d√©finition des OBJ. De plus, les conversions de types
+sont g√©r√©es par la compilateur C. Par cons√©quent, on utilisera les
 assignations par valeurs directes lorsque c'est possible.
 
 &EX
@@ -160,7 +160,7 @@ assignations par valeurs directes lorsque c'est possible.
 
     SCR_set_vchar(is_client_langue, 0, 'F')
 
-	Çquivaut Ö
+	√©quivaut √†
 
     is_client_LANGUE = 'F'
 
@@ -180,7 +180,7 @@ int     val;
 }
 
 /* ======================================================================
-Fixe la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Fixe la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -197,7 +197,7 @@ double  d;
 }
 
 /* ======================================================================
-Fixe la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Fixe la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -218,7 +218,7 @@ double  f;
 }
 
 /* ======================================================================
-Fixe la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Fixe la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -235,7 +235,7 @@ long    l;
 }
 
 /* ======================================================================
-Fixe la valeur du iäme champ qui suit l'objet passÇ comme argument. Cet
+Fixe la valeur du i√®me champ qui suit l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_vchar(), SCR_set_vchar(), SCR_rget_vchar()
@@ -266,7 +266,7 @@ short   s;
 }
 
 /* ======================================================================
-Lit la valeur de l'objet de PAGE passÇ comme argument. Cet objet doit àtre
+Lit la valeur de l'objet de PAGE pass√© comme argument. Cet objet doit √™tre
 un MENU.
 
 &SA SCR_get_short()
@@ -281,7 +281,7 @@ OBJ     obj;
 }
 
 /* ======================================================================
-Fixe la valeur du champ de l'objet passÇ comme argument. Cet
+Fixe la valeur du champ de l'objet pass√© comme argument. Cet
 objet peut faire partie d'une PAGE ou d'un ISAM.
 
 &SA SCR_get_menu()
@@ -296,7 +296,7 @@ int     i;
 }
 
 /* ======================================================================
-Change le MENU associÇ au champ de l'objet passÇ comme argument. Cet
+Change le MENU associ√© au champ de l'objet pass√© comme argument. Cet
 objet doit faire partie d'une PAGE.
 
 &SA SCR_get_menu()

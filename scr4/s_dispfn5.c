@@ -28,8 +28,8 @@ int     flag;
 /*NH*/
 /* =+====== PG_find_val_radio ==================================
     retourne la valeur du groupe radio
-    retourne -1 si le num‚ro du champs ne correspond pas
-    … un champ radio
+    retourne -1 si le numÃ©ro du champs ne correspond pas
+    Ã  un champ radio
    ============================================================== */
 
 PG_find_val_radio(pg, nfld)     /* BP_M 21-01-97 */
@@ -47,8 +47,8 @@ int     nfld;
 
 /*NH*/
 /* =+====== PG_find_first_radio ================================
-    retourne le num‚ro du premier champ d'un groupe radio
-    retourne -1 si pas trouv‚
+    retourne le numÃ©ro du premier champ d'un groupe radio
+    retourne -1 si pas trouvÃ©
    ============================================================== */
 
 PG_find_first_radio(pg, nfld)   /* BP_M 21-01-97 */
@@ -71,7 +71,7 @@ int     nfld;
 
 /*NH*/
 /* =+====== PG_display_group_radio =============================
-    Retourne le num‚ro d'ordre d'un champ dans un groupe radio
+    Retourne le numÃ©ro d'ordre d'un champ dans un groupe radio
    ============================================================== */
 
 PG_calc_nummer_radio(pg, fld_nb)        /* BP_M 21-01-97 */

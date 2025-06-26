@@ -13,7 +13,7 @@
 #define M_PI        3.14159265358979323846
 #endif
 
-/* mots cl‚s */
+/* mots clÃ©s */
 
 #define     C_TOKEN_SUP 10
 #define     C_OP        C_TOKEN_SUP+1
@@ -34,7 +34,7 @@
 #define     C_DIV       C_OPERATOR+5
 #define     C_EXP       C_OPERATOR+6
 
-/* op‚rateurs sur registres */
+/* opÃ©rateurs sur registres */
 
 #define     C_ADD_AS    C_OPERATOR+7
 #define     C_DIM_AS    C_OPERATOR+8

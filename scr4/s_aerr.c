@@ -2,16 +2,16 @@
 
 /*
      Affiche le message d'erreur en provenance d'une des fonctions de la
-     librairie. Cette fonction peut ˆtre remplac‚e par une fonction
-     utilisateur pour peu que l'on garde la mˆme syntaxe.
+     librairie. Cette fonction peut Ãªtre remplacÃ©e par une fonction
+     utilisateur pour peu que l'on garde la mÃªme syntaxe.
 
-    Il suffit pour ce faire de d‚finir la fonction dans une des sources
-    C. Lors du link, comme la fonction apparaŒtra dans un module objet
-    avant la librairie, elle aura priorit‚ et remplacera donc la
-    fonction par d‚faut de la librairie.
+    Il suffit pour ce faire de dÃ©finir la fonction dans une des sources
+    C. Lors du link, comme la fonction apparaÃ®tra dans un module objet
+    avant la librairie, elle aura prioritÃ© et remplacera donc la
+    fonction par dÃ©faut de la librairie.
 
     La fonction de la librairie se contente d'imprimer dans le stderr le
-    message pass‚ comme argument.
+    message passÃ© comme argument.
 
 &EX
     A_error(txt)

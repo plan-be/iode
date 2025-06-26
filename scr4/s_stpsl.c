@@ -7,15 +7,15 @@ extern float PS_MARGV, PS_MARGH, PS_FONTSIZE, PS_SPACING;
 int  PS_NVL, PS_NHL, PS_V, PS_H;
 
 /* ======================================================================
-Transforme un fichier ASCII PC-8 dÇfinissant des Çtiquettes en Postscript.
-Chaque Çtiquette commence par un signe < et se termine par un signe >.
-Les caractäres en dehors des Çtiquettes sont ignorÇs.
+Transforme un fichier ASCII PC-8 d√©finissant des √©tiquettes en Postscript.
+Chaque √©tiquette commence par un signe < et se termine par un signe >.
+Les caract√®res en dehors des √©tiquettes sont ignor√©s.
 
-Les paramätres sont semblables Ö ceux de PS_text() :
+Les param√®tres sont semblables √† ceux de PS_text() :
 
 &EN ifl : input filename. Si nul, stdin.
 &EN ofl : output filename. Si nul, stdout.
-&EN font : police de caractäre. Si nul, "Helvetica"
+&EN font : police de caract√®re. Si nul, "Helvetica"
 &EN size : taille en points. Si nul, vaut 10.0.
 &EN margv : marge verticale en points. Si nul, vaut 30.0
 &EN margh : marge horizontale en points. Si nul, vaut 20.0
@@ -23,17 +23,17 @@ Les paramätres sont semblables Ö ceux de PS_text() :
 
 En plus :
 
-&EN nvl : nombre d'Çtiquettes verticalement
-&EN nhl : nombre d'Çtiquettes horizontalement
+&EN nvl : nombre d'√©tiquettes verticalement
+&EN nhl : nombre d'√©tiquettes horizontalement
 
-Le papier est divisÇ en rectangles correspondant Ö ces paramätres.
+Le papier est divis√© en rectangles correspondant √† ces param√®tres.
 
-L'interligne est calculÇ comme size + spacing.
+L'interligne est calcul√© comme size + spacing.
 
 &EX
     PS_labels("tmp", "lpt1", 8, 2, "Courier", 12.0, 30.0, 20.0, 2.0);
 &TX
-&RT -1 en cas d'erreur (fichier non trouvÇ), 0 sinon.
+&RT -1 en cas d'erreur (fichier non trouv√©), 0 sinon.
 &SA PS_text()
 ------------------------------------------------------------------------- */
 

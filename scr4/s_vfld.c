@@ -21,9 +21,9 @@ long    len;
 
 /* ====================================================================
 Fixe la valeur d'un champ de longueur variable du record courant d'un
-ISAM Ö partir d'un pointeur.
+ISAM √† partir d'un pointeur.
 
-Aucune vÇrification n'est effectuÇe sur le type des
+Aucune v√©rification n'est effectu√©e sur le type des
 champs.
 
 &EX
@@ -32,7 +32,7 @@ champs.
     strcpy(name, "Durand");
     IS_set_vfield(is_client, 0, name, (long)(strlen(name) + 1));
 &TX
-&SA IS_get_vfield(), IS_set_field(), SCR_get_*(), accäs aux valeurs
+&SA IS_get_vfield(), IS_set_field(), SCR_get_*(), acc√®s aux valeurs
 directes des ISAM
 =======================================================================*/
 
@@ -178,10 +178,10 @@ char    **ptr;
 Retourne dans *ptr le pointeur vers la valeur d'un champ de longueur
 variable du record courant d'un ISAM.
 
-Si le record courant a ÇtÇ modifiÇ depuis sa lecture, c'est la valeur
-modifiÇe qui est utilisÇe.
+Si le record courant a √©t√© modifi√© depuis sa lecture, c'est la valeur
+modifi√©e qui est utilis√©e.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur (ISAM de longueur fixe)
+&RT 0 en cas de succ√®s, -1 en cas d'erreur (ISAM de longueur fixe)
 
 &EX
     char    *name;

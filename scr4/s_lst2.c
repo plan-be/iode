@@ -133,12 +133,12 @@ FILE    *fdvec;
 
 
 /* ======================================================================
-Transforme un vecteur de texte en une liste de strings allouÇs. Les
-sÇpÇrateurs de lignes sont contenus dans seps : däs qu'un de ces caractäres
-est rencontrÇ, une ligne de texte est stockÇe (et allouÇe) dans la liste.
+Transforme un vecteur de texte en une liste de strings allou√©s. Les
+s√©p√©rateurs de lignes sont contenus dans seps : d√®s qu'un de ces caract√®res
+est rencontr√©, une ligne de texte est stock√©e (et allou√©e) dans la liste.
 
 &PRO <s_lst.h>
-&RT pointeur vers la liste crÇÇe
+&RT pointeur vers la liste cr√©√©e
 &SA LST_ltov(), LST_free_text(), LST_get(), LST_set()
 ------------------------------------------------------------------------- */
 
@@ -158,11 +158,11 @@ unsigned char   *vec, *seps;
 }
 
 /* ======================================================================
-Transforme une liste lst de strings (terminÇs par des 0) en un seul string,
-en sÇparant les strings originaux par seps.
+Transforme une liste lst de strings (termin√©s par des 0) en un seul string,
+en s√©parant les strings originaux par seps.
 
 &PRO <s_lst.h>
-&RT pointeur vers le string crÇÇ et allouÇ dans la fonction
+&RT pointeur vers le string cr√©√© et allou√© dans la fonction
 &SA LST_vtol(), LST_free_text(), LST_get(), LST_set()
 ------------------------------------------------------------------------- */
 
@@ -223,7 +223,7 @@ unsigned char   *seps;
 }
 
 /* ======================================================================
-Libäre une liste de strings allouÇs en SWAP.
+Lib√®re une liste de strings allou√©s en SWAP.
 &PRO <s_lst.h>
 &EX
     PrintFile(filename)
@@ -269,13 +269,13 @@ LST     *lst;
 }
 
 /* ======================================================================
-Lit le fichier filename et retourne une liste de strings allouÇs en SWAP, Ö
-raison d'un ÇlÇment de liste par ligne du fichier.
+Lit le fichier filename et retourne une liste de strings allou√©s en SWAP, √†
+raison d'un √©l√©ment de liste par ligne du fichier.
 &PRO <s_lst.h>
 &EX
     Voir LST_free_text()
 &TX
-&RT la liste allouÇe ou 0 si le fichier n'est pas accessible
+&RT la liste allou√©e ou 0 si le fichier n'est pas accessible
 &SA LST_save_file() LST_free_text()
 ------------------------------------------------------------------------- */
 
@@ -307,11 +307,11 @@ Sauve dans le fichier filename la liste de strings lst (strings en SWAP).
 &EX
     LST     *lst;
 
-    lst = LST_vtol("Titre,Nom,PrÇnom", ",");
+    lst = LST_vtol("Titre,Nom,Pr√©nom", ",");
     LST_save_file("test", lst);
     LST_free_text(lst);
 &TX
-&RT 0 si le fichier est correctement crÇÇ, -1 sinon
+&RT 0 si le fichier est correctement cr√©√©, -1 sinon
 &SA LST_read_file()
 ------------------------------------------------------------------------- */
 LST_save_file(filename, lst)

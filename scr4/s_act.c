@@ -3,13 +3,13 @@
 extern int     SCR_flag_fork;  /* BP_M 12-12-2009 13:49 */
 
 /* ====================================================================
-Chaque action SCR, comme tout autre objet, est identifi‚e par un num‚ro.
-C'est ce num‚ro qui est stock‚ dans les structures d‚finissant les
-objets. ACT_exec_nu() sera utilis‚e lorsqu'une action doit ˆtre ex‚cut‚e
-et qu'on en connaŒt que le num‚ro.
+Chaque action SCR, comme tout autre objet, est identifiÃ©e par un numÃ©ro.
+C'est ce numÃ©ro qui est stockÃ© dans les structures dÃ©finissant les
+objets. ACT_exec_nu() sera utilisÃ©e lorsqu'une action doit Ãªtre exÃ©cutÃ©e
+et qu'on en connaÃ®t que le numÃ©ro.
 
 &EX
-    Ex‚cution de la DELETE_FN de l'isam is :
+    ExÃ©cution de la DELETE_FN de l'isam is :
 
 	ACT_exec_nu(is->is_delete_act);
 &TX
@@ -42,10 +42,10 @@ int     nu;
 }
 
 /* ====================================================================
-Ex‚cute une action SCR.
+ExÃ©cute une action SCR.
 
 &EX
-    Ex‚cution de l'action start d‚finie dans les sources SCR :
+    ExÃ©cution de l'action start dÃ©finie dans les sources SCR :
 
 	ACTION start {
 	    C_FN my_init();

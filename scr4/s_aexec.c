@@ -1,33 +1,33 @@
 #include "s_args.h"
 
 /* ======================================================================
-    Ex‚cute les fonctions sp‚cifi‚es dans le tableau de structure ADEF.
-    L'ex‚cution a lieu dans l'ordre de la table des ADEF's.
+    ExÃ©cute les fonctions spÃ©cifiÃ©es dans le tableau de structure ADEF.
+    L'exÃ©cution a lieu dans l'ordre de la table des ADEF's.
 
-    Les fonctions ex‚cut‚es re‡oivent deux paramŠtres semblables aux
+    Les fonctions exÃ©cutÃ©es reÃ§oivent deux paramÃ¨tres semblables aux
     argc et argv de la fonction main d'un programme.
 
 &CO
 	fn(argc, argv)
 &TX
-    Le premier ‚l‚ment du tableau argv est toujours l'argument
-    d‚fini (-af par exemple). Les suivants sont ceux fournis par l'appel
+    Le premier Ã©lÃ©ment du tableau argv est toujours l'argument
+    dÃ©fini (-af par exemple). Les suivants sont ceux fournis par l'appel
     au programme. Le nombre d'arguments comprend toujours l'argument
-    lui-mˆme.
+    lui-mÃªme.
 
-    A la diff‚rence de argv du main, un pointeur NULL ne termine pas la
+    A la diffÃ©rence de argv du main, un pointeur NULL ne termine pas la
     liste des arguments.
 
     Si la ligne du tableau des ADEF's contient un pointeur NULL, aucune
-    fonction n'est ex‚cut‚e.
+    fonction n'est exÃ©cutÃ©e.
 
-    Si une ligne du tableau des ADEF's ne contient pas de paramŠtre (NULL),
-    la fonction s'ex‚cute avec 0 argument.
+    Si une ligne du tableau des ADEF's ne contient pas de paramÃ¨tre (NULL),
+    la fonction s'exÃ©cute avec 0 argument.
 
-    Si l'argument n'est pas pr‚sent, mais qu'il a une valeur par d‚faut,
-    la fonction est ex‚cut‚e avec pour argument la valeur par d‚faut.
-    S'il n'est pas pr‚sent et qu'il n'y a pas de valeur par d‚faut,
-    la fonction ne s'ex‚cute pas.
+    Si l'argument n'est pas prÃ©sent, mais qu'il a une valeur par dÃ©faut,
+    la fonction est exÃ©cutÃ©e avec pour argument la valeur par dÃ©faut.
+    S'il n'est pas prÃ©sent et qu'il n'y a pas de valeur par dÃ©faut,
+    la fonction ne s'exÃ©cute pas.
 ======================================================================= */
 
 int A_exec(args, adef)

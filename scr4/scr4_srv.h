@@ -1,7 +1,7 @@
 #ifndef _SCR4_SRV_H_
 #define _SCR4_SRV_H_
 
-// #define SCR_ISC_VERSION  xxx report‚ dans scr4.h
+// #define SCR_ISC_VERSION  xxx reportÃ© dans scr4.h
 
 ///////////////////// SERVER ET CLIENT ////////////////////
 

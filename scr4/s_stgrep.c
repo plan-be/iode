@@ -1,28 +1,28 @@
 #include "s_strs.h"
 
 /* =====================================================================
-Teste si string est conforme Ö l'image dÇcrite dans pattern.
-pattern contient des caractäres spÇciaux pour indiquer des positions
+Teste si string est conforme √† l'image d√©crite dans pattern.
+pattern contient des caract√®res sp√©ciaux pour indiquer des positions
 libres.
 
 ecase est 1 si la recherche doit respecter les majuscules/minuscules, et
 0 sinon.
 
-Les caractäres spÇciaux entrant dans pattern sont :
+Les caract√®res sp√©ciaux entrant dans pattern sont :
 &CO
-    * : n'importe quelle suite de caractäres (màme vide)
-    ? : un et un seul caractäre (quelconque)
-    @ : n'importe quel caractäre alphanumÇrique
-    & : n'importe quel caractäre non alphanumÇrique
-    | : n'importe quel caractäre alphanumÇrique ou aucun en dÇbut et fin
+    * : n'importe quelle suite de caract√®res (m√™me vide)
+    ? : un et un seul caract√®re (quelconque)
+    @ : n'importe quel caract√®re alphanum√©rique
+    & : n'importe quel caract√®re non alphanum√©rique
+    | : n'importe quel caract√®re alphanum√©rique ou aucun en d√©but et fin
 	de string
-    ! : n'importe quel caractäre non alphanumÇrique ou aucun en dÇbut
+    ! : n'importe quel caract√®re non alphanum√©rique ou aucun en d√©but
 	et fin de string
-    \ placÇ devant un des caractäres spÇciaux supprime sa signification
+    \ plac√© devant un des caract√®res sp√©ciaux supprime sa signification
 &TX
 
 
-&RT La fonction retourne 0 si string correspond Ö la description pattern et
+&RT La fonction retourne 0 si string correspond √† la description pattern et
 -1 sinon
 
 &EX

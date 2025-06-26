@@ -98,18 +98,18 @@ Transforme un fichier ASCII PC-8 en Postscript.
 
 &EN ifl : input filename. Si nul, stdin.
 &EN ofl : output filename. Si nul, stdout.
-&EN font : police de caractäre. Si nul, "Helvetica"
+&EN font : police de caract√®re. Si nul, "Helvetica"
 &EN size : taille en points. Si nul, vaut 10.0.
 &EN margv : marge verticale en points. Si nul, vaut 30.0
 &EN margh : marge horizontale en points. Si nul, vaut 20.0
 &EN spacing : interligne en points. Si nul, vaut 2.0
 
-L'interligne est calculÇ comme size + spacing.
+L'interligne est calcul√© comme size + spacing.
 
 &EX
     PS_text("tmp", "lpt1", "Courier", 12.0, 30.0, 20.0, 1.0, 0);
 &TX
-&RT -1 en cas d'erreur (fichier non trouvÇ), 0 sinon.
+&RT -1 en cas d'erreur (fichier non trouv√©), 0 sinon.
 &SA PS_labels()
 ------------------------------------------------------------------------- */
 

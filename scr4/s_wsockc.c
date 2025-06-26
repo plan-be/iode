@@ -73,15 +73,15 @@ int      WSOCK_FORCE_IOMODE = 0;
 
 /* =================================================================
 Fonction client.
-Connecte Ö un serveur (STREAM).
+Connecte √† un serveur (STREAM).
 
 &EN servername: nom du host
 &EN port : porte
 
 &RT
-&EN >= 0 = identifiant (numÇro) du socket crÇÇ
-&EN -1 : erreur Ö l'initialisation
-&EN -2 : erreur Ö la crÇation du socket
+&EN >= 0 = identifiant (num√©ro) du socket cr√©√©
+&EN -1 : erreur √† l'initialisation
+&EN -2 : erreur √† la cr√©ation du socket
 &EN -3 : host not found
 &EN -4 : erreur au connect
 ================================================================= */
@@ -159,13 +159,13 @@ cleanup:
 }
 
 /* =================================================================
-Fonction client. Ferme le socket client cltsock et dÇsalloue
+Fonction client. Ferme le socket client cltsock et d√©salloue
 l'environnement Windows Socket.
 
-&EN cltsock : numÇro du socket client
+&EN cltsock : num√©ro du socket client
 
 &NO Ne pas utiliser dans le cas d'un serveur : le serveur se charge des
-opÇrations de dÇbut et de fin.
+op√©rations de d√©but et de fin.
 
 =================================================================*/
 
@@ -188,11 +188,11 @@ WSockClose(int cltsock)
 /* =================================================================
 Fonction client et serveur. Retourne l'adresse IP et le nom de la machine partenaire dans la communication en cours.
 
-&EN cltsock : numÇro du socket client
-&EN ip      : adresse IP formattÇe ("193.190.190.10")
+&EN cltsock : num√©ro du socket client
+&EN ip      : adresse IP formatt√©e ("193.190.190.10")
 &EN name    : nom de la machine ("JMP") ou string vide
 
-&RT 0 en cas de succäs, code d'erreur sinon
+&RT 0 en cas de succ√®s, code d'erreur sinon
 =================================================================*/
 
 WSockGetPeer(int cltsock, char *ip, char *name)
@@ -215,15 +215,15 @@ WSockGetPeer(int cltsock, char *ip, char *name)
 
 /* =================================================================
 Fonction serveur et client.
-Vide le buffer d'Çcriture.
+Vide le buffer d'√©criture.
 
-&EN sock : numÇro du socket
+&EN sock : num√©ro du socket
 
-La variable WSOCK_BUFSIZE dÇfinit la taille d'un buffer.
+La variable WSOCK_BUFSIZE d√©finit la taille d'un buffer.
 
 &RT
 &EN -1 : erreur
-&EN 0 : succäs
+&EN 0 : succ√®s
 ================================================================= */
 
 WSockFlush(int sock)
@@ -242,17 +242,17 @@ WSockFlush(int sock)
 
 /* =================================================================
 Fonction serveur et client.
-Bufferise les Çcritures. WSockFlush() vide le buffer.
+Bufferise les √©critures. WSockFlush() vide le buffer.
 
-&EN sock : numÇro du socket
-&EN txt : buffer Ö Çcrire
-&EN lg : nombre de bytes Ö Çcrire
+&EN sock : num√©ro du socket
+&EN txt : buffer √† √©crire
+&EN lg : nombre de bytes √† √©crire
 
-La variable WSOCK_BUFSIZE permet de bufferiser les Çcritures.
+La variable WSOCK_BUFSIZE permet de bufferiser les √©critures.
 
 &RT
 &EN -1 : erreur
-&EN 0 : succäs
+&EN 0 : succ√®s
 ================================================================= */
 
 WSockBWrite(int sock, char *txt, int lg)
@@ -268,7 +268,7 @@ WSockBWrite(int sock, char *txt, int lg)
 
     if(txt == 0) txt = "";
 //    if(txt[0] == 0) return(0);  /* JMP 05-11-01 */
-    if(lg <= 0) lg = (int)strlen(txt) + 1;     // ???!!!??? Probläme pour les strings NULLS
+    if(lg <= 0) lg = (int)strlen(txt) + 1;     // ???!!!??? Probl√®me pour les strings NULLS
 
     if(WSOCKS[cursock].wsock_buflen + lg > WSOCK_BUFSIZE) {
         rc = WSockFlush(sock);
@@ -301,17 +301,17 @@ int WSockDebugBuf(unsigned char *buf, int lg)
 
 /* ==================================================================
 Fonction serveur et client.
-Ecrit sur le socket dÇcrit par cltsock.
+Ecrit sur le socket d√©crit par cltsock.
 
-&EN cltsock : numÇro du socket
-&EN txt : buffer Ö Çcrire
-&EN lg : nombre de bytes Ö Çcrire
+&EN cltsock : num√©ro du socket
+&EN txt : buffer √† √©crire
+&EN lg : nombre de bytes √† √©crire
 
-La variable WSOCK_BUFSIZE permet de bufferiser les Çcritures.
+La variable WSOCK_BUFSIZE permet de bufferiser les √©critures.
 
 &RT
 &EN -1 : erreur
-&EN 0 : succäs
+&EN 0 : succ√®s
 ===================================================================== */
 
 WSockWrite(int cltsock, char *txt, int lg)
@@ -349,11 +349,11 @@ WSockWrite(int cltsock, char *txt, int lg)
 
 /* =================================================================
 Fonction serveur et client.
-Bufferise un record prÇcÇdÇ de sa longueur sur le socket cltsock.
-La longueur est d'abord envoyÇe dans les 4 premiers bytes, puis le
-record lui-màme.
+Bufferise un record pr√©c√©d√© de sa longueur sur le socket cltsock.
+La longueur est d'abord envoy√©e dans les 4 premiers bytes, puis le
+record lui-m√™me.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : record
 &EN lg  : longueur du record
 
@@ -382,10 +382,10 @@ WSockBWriteRecord(int cltsock, char *txt, int lg)
 /* =================================================================
 Fonction serveur et client.
 Ecrit un record sur le socket cltsock.
-La longueur est d'abord envoyÇe dans les 4 premiers bytes, puis le
-record lui-màme.
+La longueur est d'abord envoy√©e dans les 4 premiers bytes, puis le
+record lui-m√™me.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : record
 &EN lg  : longueur du record
 
@@ -405,15 +405,15 @@ WSockWriteRecord(int cltsock, char *txt, int lg)
 
 /* =================================================================
 Fonction serveur et client.
-Formatte et bufferise sur le socket dÇcrit par cltsock.
+Formatte et bufferise sur le socket d√©crit par cltsock.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN format : format d'envoi (printf)
-&EN a1, a2, ... : paramätres du format
+&EN a1, a2, ... : param√®tres du format
 
 &RT
-&EN -1 : erreur Ö l'initialisation
-&EN 0 : succäs
+&EN -1 : erreur √† l'initialisation
+&EN 0 : succ√®s
 ================================================================= */
 
 WSockBPrintf(cltsock, format, a1, a2, a3, a4, a5, a6, a7, a8, a9)
@@ -430,15 +430,15 @@ char    *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9;
 
 /* =================================================================
 Fonction serveur et client.
-Ecrit sur le socket dÇcrit par cltsock.
+Ecrit sur le socket d√©crit par cltsock.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN format : format d'envoi (printf)
-&EN a1, a2, ... : paramätres du format
+&EN a1, a2, ... : param√®tres du format
 
 &RT
-&EN -1 : erreur Ö l'initialisation
-&EN 0 : succäs
+&EN -1 : erreur √† l'initialisation
+&EN 0 : succ√®s
 ================================================================= */
 
 WSockPrintf(cltsock, format, a1, a2, a3, a4, a5, a6, a7, a8, a9)
@@ -478,12 +478,12 @@ ISC_check_read()
 /* =================================================================
 Fonction serveur et client.
 Lit maximum lg bytes sur le socket cltsock.
-Si le nombre de bytes lus est < lg, un 0 est ajoutÇ apräs le dernier byte
+Si le nombre de bytes lus est < lg, un 0 est ajout√© apr√®s le dernier byte
 lu.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
-&EN lg  : nombre max. de bytes Ö lire
+&EN lg  : nombre max. de bytes √† lire
 
 &RT
 &EN < 0 : erreur
@@ -568,7 +568,7 @@ WSockRead(int cltsock, char *txt, int lg)
                 SCR_sleep(1);
                 return(0);
             }
-            if(CHECK_READ == 1 && nb_try < 10000) {  // DÇlai total de max 1.5s
+            if(CHECK_READ == 1 && nb_try < 10000) {  // D√©lai total de max 1.5s
                 if(nb_try > 9000)
                     SCR_sleep(10);
                 nb_try ++;
@@ -621,7 +621,7 @@ next:
 
     if(CHECK_READ) {
         if(rc == 10 && memcmp(txt, "S4", 2) == 0 && memcmp(txt + 8, "S4", 2) == 0) {
-            Debug("S4C: Demande du serveur - vÇrification de la connexion OK - %.10s\n", txt);
+            Debug("S4C: Demande du serveur - v√©rification de la connexion OK - %.10s\n", txt);
             WSockWrite(cltsock, txt, 10);
         }
         if(rc == 8 && memcmp(txt, "S4STOPS4", 8) == 0) {
@@ -632,7 +632,7 @@ next:
         }
         if(rc == 7 && memcmp(txt, "S4MSGS4", 7) == 0) {
             WSockWrite(cltsock, "S4MSGS4OK", 9);
-            Debug("S4C: RÇception d'un message du serveur\n");
+            Debug("S4C: R√©ception d'un message du serveur\n");
             msg_txt = SCR_malloc(4096);
             WSockReadRecord(cltsock, msg_txt);
             if(!msg)
@@ -644,7 +644,7 @@ next:
     if(WSOCK_DEBUG > 1) {
         //Debug("Avant debugbuf\n");
         WSockDebugBuf(txt, rc);
-        //Debug("Apräs debugbuf\n");
+        //Debug("Apr√®s debugbuf\n");
     }
 //    if(WSOCK_DEBUG) DebugE("Ok (rc=%2.2d)", rc);
 //  DebugE("Ok (rc=%2.2d)", rc);
@@ -657,9 +657,9 @@ Fonction serveur et client.
 Lit maximum lg sur le socket cltsock mais ne "consomme" pas les bytes. La prochaine
 lecture sur le socket contiendra toujours les bytes lus.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
-&EN lg  : nombre max. de bytes Ö lire
+&EN lg  : nombre max. de bytes √† lire
 
 &RT
 &EN < 0 : erreur
@@ -689,13 +689,13 @@ WSockPeek(int cltsock, char *txt, int lg)
 Fonction serveur et client.
 Lit exactement lg bytes sur le socket cltsock.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
-&EN lg  : nombre exact de bytes Ö lire
+&EN lg  : nombre exact de bytes √† lire
 
 &RT
 &EN < 0 : erreur
-&EN 0 : succäs
+&EN 0 : succ√®s
 ================================================================= */
 
 WSockReadLgBytes(int cltsock, char *txt, int lg)
@@ -722,7 +722,7 @@ Fonction serveur et client.
 Lit un record dont la longueur est contenue dans les 4 premiers bytes
 sur socket cltsock.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
 &EN lg  : nombre de bytes lus
 
@@ -751,7 +751,7 @@ Fonction serveur et client.
 Lit et alloue un record dont la longueur est contenue dans les 4 premiers bytes
 sur socket cltsock.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
 &EN lg  : nombre de bytes lus
 
@@ -779,10 +779,10 @@ WSockReadRecordAlloc(int cltsock, char **txt)
 
 /* =================================================================
 Fonction serveur et client.
-Lit un Zstring dans txt. Txt doit àtre de taille suffisante (en tout
-cas, min 20 bytes). Le string ne peut excÇder 2048 bytes.
+Lit un Zstring dans txt. Txt doit √™tre de taille suffisante (en tout
+cas, min 20 bytes). Le string ne peut exc√©der 2048 bytes.
 
-&EN cltsock : numÇro du socket
+&EN cltsock : num√©ro du socket
 &EN txt : buffer
 
 &RT
@@ -816,7 +816,7 @@ Retourne l'adresse IP d'un host.
 
 &RT
 &EN 0 : 0k
-&EN -1 : erreur Ö l'initialisation de winsock
+&EN -1 : erreur √† l'initialisation de winsock
 &EN -3 : host not found
 ================================================================= */
 
@@ -852,7 +852,7 @@ Retourne le nom de la machine courante ainsi que son adresse IP.
 
 &RT
 &EN 0 : 0k
-&EN -1 : erreur Ö l'initialisation de winsock
+&EN -1 : erreur √† l'initialisation de winsock
 &EN -3 : host not found
 ================================================================= */
 
@@ -878,15 +878,15 @@ cleanup:
 
 /************************* CRYPTAGE ****************************************
 
-Fonctions de cryptage-dÇcryptage dÇpendant :
-    1. de la position dans le stream des Çchanges (le codage de 'a' change)
-    2. de la seconde de dÇmarrage de la connexion (le codage change dans le temps)
-    3. du caractäre prÇcÇdent                     (le codage change selon ce qui prÇcäde)
-    4. de tables de cryptage alÇatoires
-    5. une clÇ d'encryptage
+Fonctions de cryptage-d√©cryptage d√©pendant :
+    1. de la position dans le stream des √©changes (le codage de 'a' change)
+    2. de la seconde de d√©marrage de la connexion (le codage change dans le temps)
+    3. du caract√®re pr√©c√©dent                     (le codage change selon ce qui pr√©c√®de)
+    4. de tables de cryptage al√©atoires
+    5. une cl√© d'encryptage
 ****************************************************************************/
 
-unsigned char *WSOCK_CRYPTBUF = "abcedfghijklm123sdfezjfsd123x'{(ÇÖá";
+unsigned char *WSOCK_CRYPTBUF = "abcedfghijklm123sdfezjfsd123x'{(√©√†√ß";
 
 static unsigned char WSOCK_CRTB[][256] = {
     81, 129, 218, 119,  23, 141, 192, 131, 186,  46, 249, 174,  84, 245, 187, 164,

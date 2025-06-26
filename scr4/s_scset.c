@@ -25,22 +25,22 @@ int     success;
 
 /* ======================================================================
 Fixe la valeur de certains champs de tous les records existant de l'ISAM
-is. rec indique les champs … fixer et leur valeur.
+is. rec indique les champs Ã  fixer et leur valeur.
 
 Si disp n'est pas nul, un compteur indiquant le nombre de records lus
-apparaŒt dans le bas de l'‚cran. Ce compteur est rafraŒchi
-toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaŒt pas.
+apparaÃ®t dans le bas de l'Ã©cran. Ce compteur est rafraÃ®chi
+toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaÃ®t pas.
 
 Si stop vaut 1, la frappe de n'importe quelle touche en cours de
-traitement arrˆte celui-ci et il est demand‚ … l'utilisateur s'il faut
-ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'… la
+traitement arrÃªte celui-ci et il est demandÃ© Ã  l'utilisateur s'il faut
+ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'Ã  la
 fin du fichier.
 
-&TI S‚lection des records
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-La s‚lection des records s'effectue comme suit : tous les champs de
-l'ISAM d‚finis par une valeur non vide (nulle ou blanche) dans rec
-sont remplac‚s par la valeur indiqu‚e dans rec.
+&TI SÃ©lection des records
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+La sÃ©lection des records s'effectue comme suit : tous les champs de
+l'ISAM dÃ©finis par une valeur non vide (nulle ou blanche) dans rec
+sont remplacÃ©s par la valeur indiquÃ©e dans rec.
 
 &EX
     char    *old, tmp[256];
@@ -48,7 +48,7 @@ sont remplac‚s par la valeur indiqu‚e dans rec.
     old = is_client->is_rec;
     is_client->is_rec = tmp;
     memset(tmp, 0, 256);        ---> record nul
-    is_client_VAL = 1000;       ---> champ val fix‚ … 1000
+    is_client_VAL = 1000;       ---> champ val fixÃ© Ã  1000
     is_client->is_rec = old;    ---> remise en place de l'ancien record
     SC_set_isam_gn(is_client, rec, 1, 1);
 &TX
@@ -84,20 +84,20 @@ is. pg indique la PAGE dont les champs doivent remplacer ceux
 actuellement dans l'ISAM.
 
 Si disp n'est pas nul, un compteur indiquant le nombre de records lus
-apparaŒt dans le bas de l'‚cran. Ce compteur est rafraŒchi
-toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaŒt pas.
+apparaÃ®t dans le bas de l'Ã©cran. Ce compteur est rafraÃ®chi
+toutes les disp lectures. Si disp vaut 0, ce compteur n'apparaÃ®t pas.
 
 Si stop vaut 1, la frappe de n'importe quelle touche en cours de
-traitement arrˆte celui-ci et il est demand‚ … l'utilisateur s'il faut
-ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'… la
+traitement arrÃªte celui-ci et il est demandÃ© Ã  l'utilisateur s'il faut
+ou non continuer. Si stop vaut 0, le processus se poursuit jusqu'Ã  la
 fin du fichier.
 
-&TI S‚lection des records
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-La s‚lection des records s'effectue comme suit : tous les champs de
-l'ISAM d‚finis par une valeur non vide (nulle ou blanche) dans les
-champs de la PAGE pg sont remplac‚s par la valeur indiqu‚e dans rec.
-Ceux qui n'apparaissent pas dans la PAGE ne sont pas modifi‚s.
+&TI SÃ©lection des records
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+La sÃ©lection des records s'effectue comme suit : tous les champs de
+l'ISAM dÃ©finis par une valeur non vide (nulle ou blanche) dans les
+champs de la PAGE pg sont remplacÃ©s par la valeur indiquÃ©e dans rec.
+Ceux qui n'apparaissent pas dans la PAGE ne sont pas modifiÃ©s.
 
 &EX
     PG_edit_window(pg_client_modif);

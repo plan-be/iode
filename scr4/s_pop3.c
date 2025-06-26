@@ -93,7 +93,7 @@ int     size;
 	    buf = SCR_realloc(buf, 1, size, size + POP3_STDBUFSIZE);
 	    }
 
-/*** ANCIENNE VERSION ERRONEE INCIDENTS SILMM \r\n.\r coupÇ sur 2 records
+/*** ANCIENNE VERSION ERRONEE INCIDENTS SILMM \r\n.\r coup√© sur 2 records
 	pos = U_index(rec, "\r\n.\r");
 	if(pos >= 0) {
 	    rec[pos] = 0;
@@ -165,7 +165,7 @@ int     chk;
 	return(-1);
 	}
 
-    // Changement dynamique de la taille du packet si dÇlai > MAXDELAY ou < 1sec
+    // Changement dynamique de la taille du packet si d√©lai > MAXDELAY ou < 1sec
     cpu = WscrGetMS() - cpu;
     if(err > 128 && cpu > 0) { // Seulement si plus de 128 bytes lus
 	if(prev <= 0.0) {
@@ -207,7 +207,7 @@ int     chk;
 	}
 */
 
-    // Check OK si demandÇ
+    // Check OK si demand√©
     if(chk && memcmp(rec, "+OK", 3)) {
 	SCR_strlcpy(POP3_ERROR, rec, 80);
 	return(-2);
@@ -216,21 +216,21 @@ int     chk;
 }
 
 /*============================================================================
-Connecte au POP3 serveur sur la porte port (par dÇfaut 110) sous le login
+Connecte au POP3 serveur sur la porte port (par d√©faut 110) sous le login
 user avec le mot de passe pass.
 
 &EN char *server : nom du serveur (ex. "pop3.plan.be")
 &EN char *user   : nom de login   (ex. "jmp")
 &EN char *pass   : mot de passe   (ex. "123456")
-&EN int port     : porte POP3. Si <= 0, fixÇe Ö 110.
+&EN int port     : porte POP3. Si <= 0, fix√©e √† 110.
 
 &RT
-&EN si > 0 : entier indiquant le numÇro de socket ouvert
+&EN si > 0 : entier indiquant le num√©ro de socket ouvert
 &EN -1 : connexion au serveur impossible
 &EN -2 : erreur de transmission
-&EN -3 : erreur retournÇe par le serveur
+&EN -3 : erreur retourn√©e par le serveur
 
-La variable POP3_ERROR contient le message d'erreur Çventuel.
+La variable POP3_ERROR contient le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -277,13 +277,13 @@ int     port;
 /*============================================================================
 Termine un session POP3.
 
-&EN int sock : socket retournÇ par Pop3Connect()
+&EN int sock : socket retourn√© par Pop3Connect()
 
 &RT
 &EN 0 : Ok
-&EN -1 : erreur Ö la fermeture ou socket non ouvert.
+&EN -1 : erreur √† la fermeture ou socket non ouvert.
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -305,13 +305,13 @@ int     sock;
 /*============================================================================
 Retourne le nombre de message en attente sur le socket sock.
 
-&EN int sock : socket retournÇ par Pop3Connect()
+&EN int sock : socket retourn√© par Pop3Connect()
 
 &RT
-&EN entier >= 0 : nbre de messages sur le serveur pour l'utilisateur donnÇ
-&EN -1 : erreur retournÇe par le serveur
+&EN entier >= 0 : nbre de messages sur le serveur pour l'utilisateur donn√©
+&EN -1 : erreur retourn√©e par le serveur
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -369,7 +369,7 @@ POP3MSG *msg;
 }
 
 /*NH
-Retourne le nbre de lignes des headers non compris la derniäre ligne blanche
+Retourne le nbre de lignes des headers non compris la derni√®re ligne blanche
 */
 
 Pop3ReadBeg(POP3MSG *msg, U_ch **tbl)
@@ -387,7 +387,7 @@ Pop3ReadBeg(POP3MSG *msg, U_ch **tbl)
 	    return(j);
 	    }
 
-	// met en minuscule les lignes de dÇbut /* JMP 23-03-2004 */
+	// met en minuscule les lignes de d√©but /* JMP 23-03-2004 */
 	if(strlen(tbl[j]) >= lgtmp) {
 	    SCR_free(tmp);
 	    lgtmp = strlen(tbl[j]) + 512;
@@ -478,7 +478,7 @@ Pop3Findttach(POP3MSG *msg, U_ch **tbl)
     int     j;
 
     if(msg->boundary == 0) return(-1);
-    /* Cherche le dÇbut */
+    /* Cherche le d√©but */
     for(j = 0 ; tbl[j] ; j++) {
 	if(strncmp(tbl[j], msg->boundary, strlen(msg->boundary)) == 0) return(j);
 	}
@@ -538,7 +538,7 @@ POP3MSG *msg;
     j = U_pos(' ', buf2 + 4);
     msg->size = atoi(buf2 + j + 5);
 
-    /* Lecture compläte du texte du message */
+    /* Lecture compl√®te du texte du message */
     sprintf(buf, "RETR %d\r\n", i);
     txt = Pop3CmdDotReadMsg(sock, buf, msg->size);  /* JMP 03-10-2003 */
     DebugE("Fini ...");
@@ -561,9 +561,9 @@ POP3MSG *msg;
 }
 
 /*============================================================================
-Libäre une structure POP3MSG et toutes les sous-structures.
+Lib√®re une structure POP3MSG et toutes les sous-structures.
 
-&EN msg = un message allouÇ par Pop3GetMsg(), Pop3GetMsgs(), Pop3GetHeader()
+&EN msg = un message allou√© par Pop3GetMsg(), Pop3GetMsgs(), Pop3GetHeader()
     ou Pop3GetHeaders().
 
 &RT 0
@@ -597,9 +597,9 @@ Pop3FreeMsg(POP3MSG *msg)
 }
 
 /*============================================================================
-Libäre un tableau de structures POP3MSG.
+Lib√®re un tableau de structures POP3MSG.
 
-&EN msgs = tableau de pointeur retournÇ par une des fonctions de
+&EN msgs = tableau de pointeur retourn√© par une des fonctions de
 Pop3GetHeaders() ou Pop3GetMsgs().
 
 &RT 0
@@ -622,14 +622,14 @@ Pop3FreeMsgs(POP3MSG **msgs)
 /*============================================================================
 Lit le header du message msgnb sur le socket sock ouvert via Pop3Connect().
 
-&EN int msgnb : numÇro d'ordre du message. Le premier message est le numÇro 1 (et pas 0!).
-&EN int sock : socket retournÇ par Pop3Connect()
+&EN int msgnb : num√©ro d'ordre du message. Le premier message est le num√©ro 1 (et pas 0!).
+&EN int sock : socket retourn√© par Pop3Connect()
 
 &RT
 &EN 0 : Erreur (voir POP3_ERROR)
-&EN structure POP3MSG allouÇe
+&EN structure POP3MSG allou√©e
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -653,13 +653,13 @@ POP3MSG *Pop3GetHeader(int sock, int msgnb)
 /*============================================================================
 Lit les headers de tous les messages sur le socket ouvert via Pop3Connect().
 
-&EN int sock : socket retournÇ par Pop3Connect()
+&EN int sock : socket retourn√© par Pop3Connect()
 
 &RT
 &EN 0 : Erreur (voir POP3_ERROR)
-&EN Tableau pointeurs vers des structures POP3MSG terminÇe par un NULL
+&EN Tableau pointeurs vers des structures POP3MSG termin√©e par un NULL
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -683,15 +683,15 @@ POP3MSG **Pop3GetHeaders(int sock)
 /*============================================================================
 Lit le message msgnb sur la session pop3 sock ouverte par Pop3Connect().
 
-&EN int sock : socket retournÇ par Pop3Connect()
-&EN int msgnb : numÇro du message (commenáant Ö 1)
+&EN int sock : socket retourn√© par Pop3Connect()
+&EN int msgnb : num√©ro du message (commen√ßant √† 1)
 
 &RT
 
 &EN 0 : Erreur (voir POP3_ERROR)
-&EN structure POP3MSG allouÇe
+&EN structure POP3MSG allou√©e
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -714,13 +714,13 @@ POP3MSG *Pop3GetMsg(int sock, int msgnb)
 /*============================================================================
 Lit les messages sur le socket ouvert via Pop3Connect().
 
-&EN int sock : socket retournÇ par Pop3Connect()
+&EN int sock : socket retourn√© par Pop3Connect()
 
 &RT
 &EN 0 : Erreur (voir POP3_ERROR)
-&EN Tableau de pointeurs vers des structures POP3MSG terminÇ par un NULL
+&EN Tableau de pointeurs vers des structures POP3MSG termin√© par un NULL
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -742,17 +742,17 @@ POP3MSG **Pop3GetMsgs(int sock)
 }
 
 /*============================================================================
-Detruit le message msgnb sur le serveur. Il ne sera rÇellement dÇtruit que
+Detruit le message msgnb sur le serveur. Il ne sera r√©ellement d√©truit que
 lors de la fin normale de la session.
 
-&EN int sock : socket retournÇ par Pop3Connect()
-&EN int msgnb : numÇro du message (commenáant Ö 1)
+&EN int sock : socket retourn√© par Pop3Connect()
+&EN int msgnb : num√©ro du message (commen√ßant √† 1)
 
 &RT
 &EN -1 : Erreur (voir POP3_ERROR)
 &EN 0 : Ok
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -781,27 +781,27 @@ Pop3HexToDec(U_ch *line)
 
 
 /*============================================================================
-DÇtache le body d'un message et le sauve dans un fichier.
+D√©tache le body d'un message et le sauve dans un fichier.
 
 &EN attach : POP3MSG * lu par Pop3ReadMsg() ou sous message (attach)
-&EN char *filename : nom du fichier rÇsultat ou 0 ou string vide. Si 0 ou
-    string vide, la piäce est sauvÇe sous le nom qu'elle avait Ö l'envoi du
-    message mais dans le rÇpertoire courant. Si elle n'avait pas de nom,
-    elle n'est pas sauvÇe.
+&EN char *filename : nom du fichier r√©sultat ou 0 ou string vide. Si 0 ou
+    string vide, la pi√®ce est sauv√©e sous le nom qu'elle avait √† l'envoi du
+    message mais dans le r√©pertoire courant. Si elle n'avait pas de nom,
+    elle n'est pas sauv√©e.
 
-Le type de dÇcodage est basÇ sur le contenu de l'attachment. Sont gÇrÇs :
-&EN base64, mais pose probläme avec Outlook et les fichiers .doc et autres qui contiennent
-    de l'information "cachÇe" et pas seulement le fichier .doc attachÇ
+Le type de d√©codage est bas√© sur le contenu de l'attachment. Sont g√©r√©s :
+&EN base64, mais pose probl√®me avec Outlook et les fichiers .doc et autres qui contiennent
+    de l'information "cach√©e" et pas seulement le fichier .doc attach√©
 &EN quoted-printable
-&EN 7bit (pas de dÇcodage)
-&EN 8bit (pas de dÇcodage)
+&EN 7bit (pas de d√©codage)
+&EN 8bit (pas de d√©codage)
 
 &RT
 &EN 0 si Ok
-&EN -1 si message non dÇfini
+&EN -1 si message non d√©fini
 &EN -2 si filename est nul et pas de nom de fichier dans le message
 &EN -3 si l'attachment est vide
-&EN -4 si le fichier cible ne peut àtre ouvert
+&EN -4 si le fichier cible ne peut √™tre ouvert
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -851,7 +851,7 @@ Pop3DetachBody(POP3MSG *attach, char *filename)
 			j += 2;
 			putc(ch, fd);
 			}
-		    else // saut de ligne skippÇ
+		    else // saut de ligne skipp√©
 			skip = 1;
 		    }
 		else
@@ -870,28 +870,28 @@ Pop3DetachBody(POP3MSG *attach, char *filename)
 }
 
 /*============================================================================
-DÇtache une piäce jointe et la sauve dans un fichier.
+D√©tache une pi√®ce jointe et la sauve dans un fichier.
 
 &EN msg : POP3MSG * lu par Pop3ReadMsg();
-&EN int attachnb : numÇro de l'attachment ou -1 s'il faut dÇtacher le body du message
-&EN char *filename : nom du fichier rÇsultat ou 0 ou string vide. Si 0 ou
-    string vide, la piäce est sauvÇe sous le nom qu'elle avait Ö l'envoi du
-    message mais dans le rÇpertoire courant. Si elle n'avait pas de nom,
-    elle n'est pas sauvÇe.
+&EN int attachnb : num√©ro de l'attachment ou -1 s'il faut d√©tacher le body du message
+&EN char *filename : nom du fichier r√©sultat ou 0 ou string vide. Si 0 ou
+    string vide, la pi√®ce est sauv√©e sous le nom qu'elle avait √† l'envoi du
+    message mais dans le r√©pertoire courant. Si elle n'avait pas de nom,
+    elle n'est pas sauv√©e.
 
-Le type de dÇcodage est basÇ sur le contenu de l'attachment. Sont gÇrÇs :
-&EN base64, mais pose probläme avec Outlook et les fichiers .doc et autres qui contiennent
-    de l'information "cachÇe" et pas seulement le fichier .doc attachÇ
+Le type de d√©codage est bas√© sur le contenu de l'attachment. Sont g√©r√©s :
+&EN base64, mais pose probl√®me avec Outlook et les fichiers .doc et autres qui contiennent
+    de l'information "cach√©e" et pas seulement le fichier .doc attach√©
 &EN quoted-printable
-&EN 7bit (pas de dÇcodage)
-&EN 8bit (pas de dÇcodage)
+&EN 7bit (pas de d√©codage)
+&EN 8bit (pas de d√©codage)
 
 &RT
 &EN 0 si Ok
-&EN -1 si message non dÇfini ou pas de piäces jointes
+&EN -1 si message non d√©fini ou pas de pi√®ces jointes
 &EN -2 si filename est nul et pas de nom de fichier dans le message
 &EN -3 si l'attachment est vide
-&EN -4 si le fichier cible ne peut àtre ouvert
+&EN -4 si le fichier cible ne peut √™tre ouvert
 
 &SA Pop3Connect(), Pop3Close(), Pop3Nb(), Pop3GetHeaders(), Pop3GetMsgs(),
     Pop3GetHeader(), Pop3GetMsg(), Pop3FreeMsg(), Pop3Session(), Pop3Detach()
@@ -950,7 +950,7 @@ Pop3Detach(POP3MSG *msg, int attachnb, char *filename)
 			j += 2;
 			putc(ch, fd);
 			}
-		    else // saut de ligne skippÇ
+		    else // saut de ligne skipp√©
 			skip = 1;
 		    }
 		else
@@ -970,20 +970,20 @@ Pop3Detach(POP3MSG *msg, int attachnb, char *filename)
 
 
 /*============================================================================
-Session compläte de lecture de message sur un serveur POP3.
+Session compl√®te de lecture de message sur un serveur POP3.
 Ouvre la session, lit les messages et ferme la session.
 
 &EN char *server : nom du serveur (ex. "pop3.plan.be")
 &EN char *user   : nom de login   (ex. "jmp")
 &EN char *pass   : mot de passe   (ex. "123456")
-&EN int port     : porte POP3. Si <= 0, fixÇe Ö 110.
+&EN int port     : porte POP3. Si <= 0, fix√©e √† 110.
 
 &RT
 
 &EN 0 : Erreur (voir POP3_ERROR)
 &EN Tableau de structures POP3MSG
 
-La variable POP3_ERROR contient  le message d'erreur Çventuel.
+La variable POP3_ERROR contient  le message d'erreur √©ventuel.
 
 &EX
     main(argc, argv)

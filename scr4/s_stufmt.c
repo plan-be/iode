@@ -1,20 +1,20 @@
 #include "s_strs.h"
 
 /* ====================================================================
-DÇformatte un string in suivant un format fmt donnÇ. Le rÇsultat out est
-un string transformÇ de longueur infÇrieure ou Çgale Ö celle de fmt.
+D√©formatte un string in suivant un format fmt donn√©. Le r√©sultat out est
+un string transform√© de longueur inf√©rieure ou √©gale √† celle de fmt.
 
-Les caractäres reconnus dans le format sont : 'X', 'x', '9', '0'.
-Ils signifient qu'aux seules positions de ces caractäres seront extraits
-dans leur ordre d'apparition les caractäres trouvÇs dans in. Seul cas
-particulier : le caractäre '0' qui sera remplacÇ par une '0' si le
-caractäre correspondant de in est ' '.
+Les caract√®res reconnus dans le format sont : 'X', 'x', '9', '0'.
+Ils signifient qu'aux seules positions de ces caract√®res seront extraits
+dans leur ordre d'apparition les caract√®res trouv√©s dans in. Seul cas
+particulier : le caract√®re '0' qui sera remplac√© par une '0' si le
+caract√®re correspondant de in est ' '.
 
-Les longueurs des strings ne sont pas vÇrifiÇes.
+Les longueurs des strings ne sont pas v√©rifi√©es.
 
 &RT le pointeur vers out
 &EX
-    SCR_ufmt_text(out, "NumÇro : 9990-XX-00", "1234-AB-C ");
+    SCR_ufmt_text(out, "Num√©ro : 9990-XX-00", "1234-AB-C ");
 
 	donne
 

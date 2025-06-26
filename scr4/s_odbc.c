@@ -20,11 +20,11 @@ int     ODebugDetail = 0;   // JMP 08/12/2021 : moved from s_dbbvars.c
                             // JMP 15/03/2023 : remis dans s_dbvars.c sinon s_dbc ne le connait pas 
 
 /* ====================================================================
-Initialise une session ODBC. Cette fonction doit ˆtre appel‚e avant
+Initialise une session ODBC. Cette fonction doit Ãªtre appelÃ©e avant
 toute utilisation des autres fonctions du groupe ODBC.
-Elle peut ˆtre appel‚e plusieurs fois cons‚cutivement.
+Elle peut Ãªtre appelÃ©e plusieurs fois consÃ©cutivement.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur.
 &SA OEnd()
 =======================================================================*/
 
@@ -52,11 +52,11 @@ err:
 
 
 /* ====================================================================
-Termine une session ODBC. Cette fonction doit ˆtre appel‚e pour cl“turer
+Termine une session ODBC. Cette fonction doit Ãªtre appelÃ©e pour clÃ´turer
 proprement l'utilisation d'ODBC.
-Elle peut ˆtre appel‚e plusieurs fois cons‚cutivement.
+Elle peut Ãªtre appelÃ©e plusieurs fois consÃ©cutivement.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur.
 &SA OInit()
 =======================================================================*/
 
@@ -73,15 +73,15 @@ OEnd()
 
 /* ====================================================================
 Ouvre une Data Source. Le nom de l'utilisateur et son mot de passe doivent
-ˆtre pass‚s s'ils sont d‚finis. S'ils ne sont pas d‚finis sur la
-source szDBName, ces valeurs ne sont pas utilis‚es.
+Ãªtre passÃ©s s'ils sont dÃ©finis. S'ils ne sont pas dÃ©finis sur la
+source szDBName, ces valeurs ne sont pas utilisÃ©es.
 
-&EN char *szDBName : nom de la source (d‚finie dans le gestionnaire ODBC)
+&EN char *szDBName : nom de la source (dÃ©finie dans le gestionnaire ODBC)
 &EN char *szUserName : login name
 &EN char *szPassword : password
 
 &RT Pointeur vers une structure ODSN qui contient les
-    informations n‚cessaires … l'exploitation du DSN ou pointeur nul
+    informations nÃ©cessaires Ã  l'exploitation du DSN ou pointeur nul
     en cas d'erreur.
 
 &EX
@@ -150,12 +150,12 @@ ODSN *OOpenDSN(char *szDBName, char *szUserName, char *szPassword)
 }
 
 /* ====================================================================
-Ferme une Data Source. odsn peut ˆtre nul.
+Ferme une Data Source. odsn peut Ãªtre nul.
 
-&EN ODSN *odsn : pointeur vers une structure allou‚e par OOpenDSN().
+&EN ODSN *odsn : pointeur vers une structure allouÃ©e par OOpenDSN().
 
 &RT Pointeur vers une structure ODSN qui contient les
-    informations n‚cessaires … l'exploitation du DSN ou pointeur nul
+    informations nÃ©cessaires Ã  l'exploitation du DSN ou pointeur nul
     en cas d'erreur.
 
 &EX
@@ -192,9 +192,9 @@ OCloseDSN(ODSN *odsn)
 }
 
 /* ====================================================================
-Construit une structure contenant la d‚finition d'une table.
+Construit une structure contenant la dÃ©finition d'une table.
 
-&EN ODSN *odsn : pointeur vers un DSN retourn‚ par OOpenDSN()
+&EN ODSN *odsn : pointeur vers un DSN retournÃ© par OOpenDSN()
 &EN char *tblname : nom de la table
 
 &RT Pointeur vers une structure OTBL qui contient les
@@ -381,9 +381,9 @@ fin:
 }
 
 /* ====================================================================
-LibŠre l'espace allou‚ pour la d‚finition d'une table par OGetTableInfo().
+LibÃ¨re l'espace allouÃ© pour la dÃ©finition d'une table par OGetTableInfo().
 
-&EN OTBL *otbl : pointeur vers un OTBL retourn‚ par OGetTableInfo()
+&EN OTBL *otbl : pointeur vers un OTBL retournÃ© par OGetTableInfo()
 
 &RT 0
 
@@ -415,9 +415,9 @@ OFreeOTBL(OTBL *otbl)
 }
 
 /* ====================================================================
-LibŠre l'espace allou‚ pour la d‚finition des index d'une table par OGetTableIndices().
+LibÃ¨re l'espace allouÃ© pour la dÃ©finition des index d'une table par OGetTableIndices().
 
-&EN OIDX *oidx : pointeur vers un OIDX retourn‚ par OGetTableIndices()
+&EN OIDX *oidx : pointeur vers un OIDX retournÃ© par OGetTableIndices()
 
 &RT 0
 
@@ -442,16 +442,16 @@ OFreeOIDX(OIDX *oidx)
 }
 
 /* ====================================================================
-Fonction identique … OQuery(), mais retourne optionnellement les noms des
-champs de la requˆte dans la structure retourn‚e (ocsr->otbl->ocol[i].name).
+Fonction identique Ã  OQuery(), mais retourne optionnellement les noms des
+champs de la requÃªte dans la structure retournÃ©e (ocsr->otbl->ocol[i].name).
 
-&EN ODSN *odsn : pointeur vers un DSN retourn‚ par OOpenDSN()
-&EN char *qury : requˆte SQL
+&EN ODSN *odsn : pointeur vers un DSN retournÃ© par OOpenDSN()
+&EN char *qury : requÃªte SQL
 &EN int withnames : 1 pour lire les noms des colonnes, 0 sinon (comme OQuery())
 
 &RT Pointeur vers une structure OCSR qui contient les
-    informations sur les colonnes de la table r‚sultant de le
-    requˆte, y compris le nom des colonnes. Pointeur nul en cas d'erreur.
+    informations sur les colonnes de la table rÃ©sultant de le
+    requÃªte, y compris le nom des colonnes. Pointeur nul en cas d'erreur.
 
 &SA ONext(), OPrevious(), OSql(), OBindCol(), OGetCol(), OQuery()
 =======================================================================*/
@@ -539,35 +539,35 @@ OCSR *OQueryWithNames(ODSN *odsn, char *qury, int withnames)
 }
 
 /* ====================================================================
-Effectue une recherche (SELECT) et cr‚e un "curseur" sur le
-dataset r‚sultat. Bien que n'importe quelle requˆte puisse ˆtre
-ex‚cut‚e par cette fonction, il est pr‚f‚rable de ne l'utiliser
-que pour les SELECT. La fonction OSql() permet d'ex‚cuter une
-requˆte quelconque.
+Effectue une recherche (SELECT) et crÃ©e un "curseur" sur le
+dataset rÃ©sultat. Bien que n'importe quelle requÃªte puisse Ãªtre
+exÃ©cutÃ©e par cette fonction, il est prÃ©fÃ©rable de ne l'utiliser
+que pour les SELECT. La fonction OSql() permet d'exÃ©cuter une
+requÃªte quelconque.
 
-Le r‚sultat est obtenu sous forme d'un dataset dans lequel on
-peut se d‚placer … l'aide de ONext() ou OPrevious() (selon le
-driver, cette derniŠre fonction peut ne pas fonctionner).
+Le rÃ©sultat est obtenu sous forme d'un dataset dans lequel on
+peut se dÃ©placer Ã  l'aide de ONext() ou OPrevious() (selon le
+driver, cette derniÃ¨re fonction peut ne pas fonctionner).
 
-Ce dataset est static. Il ne connaŒt donc pas les modifications
-apport‚es par un autre utilisateur aux records de la base de
-donn‚es.
+Ce dataset est static. Il ne connaÃ®t donc pas les modifications
+apportÃ©es par un autre utilisateur aux records de la base de
+donnÃ©es.
 
 Pour obtenir le pointeur sur la valeur d'une colonne, il suffit
 d'appeler la fonction OGetCol(). Si on ignore le type de la
-colonne, celui-ci peut ˆtre obtenu en consultant la structure
+colonne, celui-ci peut Ãªtre obtenu en consultant la structure
 ocsr->otbl.
 
 Aucun enregistrement n'est lu par la fonction OQuery(). Il faut
 appeler ONext() pour que le premier enregistrement (s'il y en a
 un) soit lu.
 
-&EN ODSN *odsn : pointeur vers un DSN retourn‚ par OOpenDSN()
-&EN char *qury : requˆte SQL
+&EN ODSN *odsn : pointeur vers un DSN retournÃ© par OOpenDSN()
+&EN char *qury : requÃªte SQL
 
 &RT Pointeur vers une structure OCSR qui contient les
-    informations sur les colonnes de la table r‚sultant de le
-    requˆte. Pointeur nul en cas d'erreur.
+    informations sur les colonnes de la table rÃ©sultant de le
+    requÃªte. Pointeur nul en cas d'erreur.
 
 &EX
     ODSN    *odsn = 0;
@@ -602,32 +602,32 @@ OCSR *OQuery(ODSN *odsn, char *qury)
 }
 
 /* ====================================================================
-D‚termine l'adresse … laquelle les fonctions ONext() et
+DÃ©termine l'adresse Ã  laquelle les fonctions ONext() et
 OPrevious() vont placer les valeurs des colonnes d'un dataset
-r‚sultant de OQuery().
-Ces valeurs sont ‚galement utilis‚es par les fonctions OWrite()
+rÃ©sultant de OQuery().
+Ces valeurs sont Ã©galement utilisÃ©es par les fonctions OWrite()
 et ORewrite().
 
-&EN OCSR *ocsr : pointeur retourn‚ par OQuery()
-&EN int colnb : num‚ro de la colonne (indice 0) … modifier
-&EN char *ptr : adresse o— stocker la valeur
+&EN OCSR *ocsr : pointeur retournÃ© par OQuery()
+&EN int colnb : numÃ©ro de la colonne (indice 0) Ã  modifier
+&EN char *ptr : adresse oÃ¹ stocker la valeur
 
-Une valeur par d‚faut est fix‚e par la fonction OQuery().
+Une valeur par dÃ©faut est fixÃ©e par la fonction OQuery().
 
-L'appel suivant … OGetCol() fournira le nouveau pointeur.
+L'appel suivant Ã  OGetCol() fournira le nouveau pointeur.
 
 Dans le cas de champs de longueur variable (p.ex. LONGVARTEXT),
-une valeur interne est conserv‚e pour permettre une allocation …
+une valeur interne est conservÃ©e pour permettre une allocation Ã 
 chaque lecture du buffer. OBindCol() est donc inutile dans ce
 cas.
 
-&NO Le pointeur ptr doit ˆtre statique ou allou‚. Il ne faut pas
+&NO Le pointeur ptr doit Ãªtre statique ou allouÃ©. Il ne faut pas
     utiliser une variable locale. De plus, pour les champs de
-    texte, l'espace doit ˆtre suffisant (y compris un caractŠre nul
+    texte, l'espace doit Ãªtre suffisant (y compris un caractÃ¨re nul
     en fin de string).
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur. La fonction OError()
-    peut ˆtre appel‚e pour obtenir un message d'erreur complet.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur. La fonction OError()
+    peut Ãªtre appelÃ©e pour obtenir un message d'erreur complet.
 
 &EX
     static char szClientName[50];
@@ -666,18 +666,18 @@ OBindCol(OCSR *ocsr, int colnb, char *ptr)
 }
 
 /* ====================================================================
-D‚termine l'adresse de la valeur de la colonne colnb du dataset
-d‚fini par ocsr. Les fonctions ONext() et OPrevious() vont placer
+DÃ©termine l'adresse de la valeur de la colonne colnb du dataset
+dÃ©fini par ocsr. Les fonctions ONext() et OPrevious() vont placer
 les valeurs des colonnes dans ces adresses. Ces adresses peuvent
-ˆtre modifi‚es soit par la fonction OBindCol(), soit par le fait
+Ãªtre modifiÃ©es soit par la fonction OBindCol(), soit par le fait
 qu'elles soient de longueur variable, auquel cas ONext() et
-OPrevious() r‚allouent le buffer.
+OPrevious() rÃ©allouent le buffer.
 
-Dans le cas de colonnes de longueur variable, la valeur peut ˆtre
+Dans le cas de colonnes de longueur variable, la valeur peut Ãªtre
 nulle.
 
-&EN OCSR *ocsr : pointeur retourn‚ par OQuery()
-&EN int colnb : num‚ro de la colonne (indice 0) … modifier
+&EN OCSR *ocsr : pointeur retournÃ© par OQuery()
+&EN int colnb : numÃ©ro de la colonne (indice 0) Ã  modifier
 
 &RT pointeur vers la valeur.
 
@@ -727,7 +727,7 @@ OGetColVar(OCSR *ocsr, int colnb)
 
 /* BP_M 19-10-2009 20:40 */
 /* ==================================================================
-    Attribue un nouveau pointeur … un champs MEMO
+    Attribue un nouveau pointeur Ã  un champs MEMO
 
 =======================================================================*/
 OSetPtrVCol(OCSR *ocsr, int colnb, char *ptr)
@@ -773,19 +773,19 @@ OGetVCols(OCSR *ocsr)
 }
 
 /* ====================================================================
-Lit l'enregistrement suivant dans le dataset cr‚‚ par la fonction
-OQuery(). Les valeurs des colonnes sont adapt‚es au nouvel
+Lit l'enregistrement suivant dans le dataset crÃ©Ã© par la fonction
+OQuery(). Les valeurs des colonnes sont adaptÃ©es au nouvel
 enregistrement.
 
 Pour obtenir le pointeur sur la valeur d'une colonne, il suffit
 d'appeler la fonction OGetCol(). Si on ignore le type de la
-colonne, celui-ci peut ˆtre obtenu en consultant la structure
+colonne, celui-ci peut Ãªtre obtenu en consultant la structure
 ocsr->otbl.
 
-&EN OCSR *ocsr : pointeur vers un OCSR retourn‚ par OQuery()
+&EN OCSR *ocsr : pointeur vers un OCSR retournÃ© par OQuery()
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur. La fonction OError()
-    peut ˆtre appel‚e pour obtenir un message d'erreur complet.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur. La fonction OError()
+    peut Ãªtre appelÃ©e pour obtenir un message d'erreur complet.
 
 &EX
     voir OQuery().
@@ -800,19 +800,19 @@ ONext(OCSR *ocsr)
 }
 
 /* ====================================================================
-Lit l'enregistrement pr‚c‚dent dans le dataset cr‚‚ par la fonction
-OQuery(). Les valeurs des colonnes sont adapt‚es au nouvel
+Lit l'enregistrement prÃ©cÃ©dent dans le dataset crÃ©Ã© par la fonction
+OQuery(). Les valeurs des colonnes sont adaptÃ©es au nouvel
 enregistrement.
 
 Pour obtenir le pointeur sur la valeur d'une colonne, il suffit
 d'appeler la fonction OGetCol(). Si on ignore le type de la
-colonne, celui-ci peut ˆtre obtenu en consultant la structure
+colonne, celui-ci peut Ãªtre obtenu en consultant la structure
 ocsr->otbl.
 
-&EN OCSR *ocsr : pointeur vers un OCSR retourn‚ par OQuery()
+&EN OCSR *ocsr : pointeur vers un OCSR retournÃ© par OQuery()
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur. La fonction OError()
-    peut ˆtre appel‚e pour obtenir un message d'erreur complet.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur. La fonction OError()
+    peut Ãªtre appelÃ©e pour obtenir un message d'erreur complet.
 
 &EX
     voir OQuery().
@@ -828,11 +828,11 @@ OPrevious(OCSR *ocsr)
 
 
 /* ====================================================================
-LibŠre le "curseur" allou‚ par OQuery().
+LibÃ¨re le "curseur" allouÃ© par OQuery().
 
-&EN OCSR *ocsr : pointeur vers un OCSR retourn‚ par OQuery()
+&EN OCSR *ocsr : pointeur vers un OCSR retournÃ© par OQuery()
 
-&RT 0 en cas de succŠs, -1 si ocstr est nul.
+&RT 0 en cas de succÃ¨s, -1 si ocstr est nul.
 
 &EX
     voir OQuery().
@@ -871,13 +871,13 @@ OFreeOCSR(OCSR *ocsr)
 }
 
 /* ====================================================================
-Ex‚cute la commande SQL sql.
+ExÃ©cute la commande SQL sql.
 
 &EN ODSN *odsn : pointeur vers un Data Source ouvert par OOpenDSN()
 &EN char *sql : commande sql
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur. La fonction OError()
-    peut ˆtre appel‚e pour obtenir un message d'erreur complet.
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur. La fonction OError()
+    peut Ãªtre appelÃ©e pour obtenir un message d'erreur complet.
 
 &EX
     ODSN    *odsn = 0;
@@ -1104,19 +1104,19 @@ undef: /* JMP 29-10-01 */
 }
 
 /* ====================================================================
-Ex‚cute les commandes SQL regroup‚es dans un fichier ASCII.
-Une commande peut ˆtre sp‚cifi‚e par ligne.
-Si la ligne commence par le caractŠre '+', il s'agit d'un SELECT et
-le r‚sultat de la recherche est affich‚e dans le standard output.
+ExÃ©cute les commandes SQL regroupÃ©es dans un fichier ASCII.
+Une commande peut Ãªtre spÃ©cifiÃ©e par ligne.
+Si la ligne commence par le caractÃ¨re '+', il s'agit d'un SELECT et
+le rÃ©sultat de la recherche est affichÃ©e dans le standard output.
 
 &EN char *filename : nom du fichier de commandes
 &EN char *dsn : nom de la Data Source
 &EN char *user : login name
-&EN char *pwd : mot de passe ‚ventuel
+&EN char *pwd : mot de passe Ã©ventuel
 &EN int Verbose : 1 pour un affichage des messages pour chaque ligne
 
 
-&RT 0 en cas de succŠs pour toutes les commandes, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s pour toutes les commandes, -1 en cas d'erreur
 
 &EX
     voir OQuery().
@@ -1216,12 +1216,12 @@ OGetInfos(ODSN *odsn)
 }
 
 /* ====================================================================
-Retourne la commande SQL tranform‚e par le driver avant l'envoi
-au serveur. Cette fonction ne doit pas ˆtre utilis‚e avant
-l'ex‚cution d'une commande SQL. Elle sert uniquement … des fins
+Retourne la commande SQL tranformÃ©e par le driver avant l'envoi
+au serveur. Cette fonction ne doit pas Ãªtre utilisÃ©e avant
+l'exÃ©cution d'une commande SQL. Elle sert uniquement Ã  des fins
 de debugging.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 =======================================================================*/
 
 OSqlNative(ODSN *odsn, char *sqlin, char *sqlout, int maxlg)
@@ -1235,12 +1235,12 @@ OSqlNative(ODSN *odsn, char *sqlin, char *sqlout, int maxlg)
 
 
 /* ====================================================================
-Ajoute un DSN systŠme dans le gestionnaire ODBC pour un fichier
+Ajoute un DSN systÃ¨me dans le gestionnaire ODBC pour un fichier
 ACCESS.
 
-&EN char *dsn : nom du DSN systŠme
+&EN char *dsn : nom du DSN systÃ¨me
 &EN char *descr : description du DSN
-&EN char *file : fichier mdb d‚finissant le DSN
+&EN char *file : fichier mdb dÃ©finissant le DSN
 
 &CO
     //Fixer le nom du DSN ODBC
@@ -1249,7 +1249,7 @@ ACCESS.
     if(IS_init_database()) {
 	// Ouverture my_db impossible, donc essai d'installation
 	OAddMsAccessDSN("my_db",
-			"Base de donn‚es test",
+			"Base de donnÃ©es test",
 			"c:\\usr\\my_app\\my_db.mdb");
 	// Retest d'ouverture
 	if(IS_init_database()) {
@@ -1261,7 +1261,7 @@ ACCESS.
 	}
 &TX
 
-&RT -1 en cas d'erreur, 0 en cas de succŠs
+&RT -1 en cas d'erreur, 0 en cas de succÃ¨s
     Avant 4.56 : le code de retour est toujours 1 (code d'erreur) bien que la fonction
     fonctionne correctement
 =======================================================================*/
@@ -1343,7 +1343,7 @@ char *OGetOtblCol(OTBL *otbl, int colnb)
 
 /* ====================================================================
 Retourne la valeur maximum du champ fldname de type entier de la table
-tblname satisfaisant … la WHERE CLAUSE where.
+tblname satisfaisant Ã  la WHERE CLAUSE where.
 
 &EN ODSN *odsn : Data Source
 &EN char *tblname : nom de la table
@@ -1351,10 +1351,10 @@ tblname satisfaisant … la WHERE CLAUSE where.
 &EN char *where : WHERE CLAUSE
 
 Cette fonction utilise SELECT MAX() pour obtenir l'information. Tous les
-systŠmes ne supportent pas cette fonction scalaire.
+systÃ¨mes ne supportent pas cette fonction scalaire.
 
 &EX
-    printf("Nombre de clients avec impay‚ : %ld\n",
+    printf("Nombre de clients avec impayÃ© : %ld\n",
 	    OGetCountWhere(MyDSN, "mytable", "impaye > 0"));
 &TX
 
@@ -1382,7 +1382,7 @@ long OGetMaxValue(ODSN *odsn, char *tblname, char *fldname, char *where)
     return(total);
 }
 /* ====================================================================
-Retourne le nombre de records satisfaisant … la WHERE CLAUSE where dans
+Retourne le nombre de records satisfaisant Ã  la WHERE CLAUSE where dans
 la table tblname.
 
 &EN ODSN *odsn : Data Source
@@ -1390,11 +1390,11 @@ la table tblname.
 &EN char *where : WHERE CLAUSE
 
 Cette fonction utilise SELECT COUNT(*) pour obtenir
-l'information. Tous les systŠmes ne supportent pas cette fonction
+l'information. Tous les systÃ¨mes ne supportent pas cette fonction
 scalaire.
 
 &EX
-    printf("Nombre de clients avec impay‚ : %ld\n",
+    printf("Nombre de clients avec impayÃ© : %ld\n",
 	    OGetCountWhere(MyDSN, "mytable", "impaye > 0"));
 &TX
 
@@ -1452,10 +1452,10 @@ long OGetCountWhere(ODSN *odsn, char *tblname, char *where)
 }
 
 /* ====================================================================
-Retourne un double, seul champ de la requˆte query.
+Retourne un double, seul champ de la requÃªte query.
 
 &EN ODSN *odsn : Data Source
-&EN char *query : requˆte retournant un seul champ double
+&EN char *query : requÃªte retournant un seul champ double
 
 
 &EX
@@ -1463,7 +1463,7 @@ Retourne un double, seul champ de la requˆte query.
 	    OQueryDouble(MyDSN, "Select sum(total * 0.21) from mytable");
 &TX
 
-&RT le r‚sultat de la requˆte ou SCR_NAN en cas d'erreur
+&RT le rÃ©sultat de la requÃªte ou SCR_NAN en cas d'erreur
 =======================================================================*/
 
 double OQueryDouble(ODSN *odsn, char *query)
@@ -1485,10 +1485,10 @@ double OQueryDouble(ODSN *odsn, char *query)
 
 
 /* ====================================================================
-Retourne un long, seul champ de la requˆte query.
+Retourne un long, seul champ de la requÃªte query.
 
 &EN ODSN *odsn : Data Source
-&EN char *query : requˆte retournant un seul champ long
+&EN char *query : requÃªte retournant un seul champ long
 
 
 &EX
@@ -1496,7 +1496,7 @@ Retourne un long, seul champ de la requˆte query.
 	    OQueryLong(MyDSN, "Select count(*) from mytable");
 &TX
 
-&RT le r‚sultat de la requˆte ou SCR_NAN en cas d'erreur
+&RT le rÃ©sultat de la requÃªte ou SCR_NAN en cas d'erreur
 =======================================================================*/
 
 long OQueryLong(ODSN *odsn, char *query)
@@ -1518,17 +1518,17 @@ long OQueryLong(ODSN *odsn, char *query)
 
 
 /* ====================================================================
-Retourne un int, seul champ de la requˆte query.
+Retourne un int, seul champ de la requÃªte query.
 
 &EN ODSN *odsn : Data Source
-&EN char *query : requˆte retournant un seul champ long
+&EN char *query : requÃªte retournant un seul champ long
 
 &EX
     printf("Nbre de ventes : %lf\n",
 	    OQueryShort(MyDSN, "Select count(*) from mytable");
 &TX
 
-&RT le r‚sultat de la requˆte ou -1 en cas d'erreur
+&RT le rÃ©sultat de la requÃªte ou -1 en cas d'erreur
 =======================================================================*/
 
 OQueryShort(ODSN *odsn, char *query)
@@ -1556,7 +1556,7 @@ Retourne le nombre de records dans la table tblname.
 &EN char *tblname : nom de la table
 
 Cette fonction utilise SELECT COUNT(*) pour obtenir
-l'information. Tous les systŠmes ne supportent pas cette fonction
+l'information. Tous les systÃ¨mes ne supportent pas cette fonction
 scalaire.
 
 &RT le nombre d'enregistrements ou -1L en cas d'erreur
@@ -1778,17 +1778,17 @@ OFormatFld(char *buf, OCSR *ocsr, int fldnb)
 
 
 /* ====================================================================
-Ajoute ou remplace les records d‚finis dans le fichier csv csvfile.
+Ajoute ou remplace les records dÃ©finis dans le fichier csv csvfile.
 
-&EN char *filename : nom du fichier csv. PremiŠre ligne = nom des fields
+&EN char *filename : nom du fichier csv. PremiÃ¨re ligne = nom des fields
 &EN char *dsn : nom de la Data Source
-&EN char *table : nom de la table … modifier
+&EN char *table : nom de la table Ã  modifier
 &EN char *user : login name
-&EN char *pwd : mot de passe ‚ventuel
+&EN char *pwd : mot de passe Ã©ventuel
 &EN int Verbose : 1 pour un affichage des messages pour chaque ligne
 
 
-&RT 0 en cas de succŠs pour toutes les commandes, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s pour toutes les commandes, -1 en cas d'erreur
 
 &EX
     voir OQuery().
@@ -1842,7 +1842,7 @@ OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, in
 	    if(buf[i] != ' ') break;
 	if(buf[i] == 0 || buf[i] == '#') continue;
 
-	// Cr‚‚e la VALUES clause
+	// CrÃ©Ã©e la VALUES clause
 	tbl = SCR_vtoms3(buf, ";", 0);
 	if(SCR_tbl_size(tbl) != SCR_tbl_size(fldnames)) {
 	    if(Verbose) Wprintf("\n ***** Line %d : incorrect # of fields \n\n", linenb);
@@ -1893,7 +1893,7 @@ OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, in
 	    sprintf(set + strlen(set), " %s=%s", fldnames[i], fldval);
 	}
 
-	// Essaie de cr‚er l'enregistrement
+	// Essaie de crÃ©er l'enregistrement
 	switch(insrepl) {
 	    case 0 : // Insertion seule
 		sprintf(sql, "INSERT INTO %s (%s) VALUES (%s)", table, fldlist, values);

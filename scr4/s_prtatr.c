@@ -1,13 +1,13 @@
 #include "scr.h"
 
 /* ======================================================================
-Cette fonction indique que la suite de l'impression doit ˆtre faite en
-BOLD. Les ESCAPE SEQUENCES correspondant aux diff‚rents attributs sont
-d‚finis dans le PRINTER.
+Cette fonction indique que la suite de l'impression doit Ãªtre faite en
+BOLD. Les ESCAPE SEQUENCES correspondant aux diffÃ©rents attributs sont
+dÃ©finis dans le PRINTER.
 
 Le BOLD reste actif jusqu'au changement d'attribut par une des commandes
 UNDERLINE, ENLARGED, NORMAL ou CONDENSED. L'attribut est
-automatiquement chang‚ lors de l'impression d'une PAGE contenant des
+automatiquement changÃ© lors de l'impression d'une PAGE contenant des
 champs aux attributs particuliers (BOLD, UNDERLINE, ...).
 
 &SA PR_enlarged(), PR_condensed(), PR_underline(), PR_normal()
@@ -20,13 +20,13 @@ PR_bold()
 }
 
 /* ======================================================================
-Cette fonction indique que la suite de l'impression doit ˆtre faite en
-caractŠres ‚largis. Les ESCAPE SEQUENCES correspondant aux diff‚rents
-attributs sont d‚finis dans le PRINTER.
+Cette fonction indique que la suite de l'impression doit Ãªtre faite en
+caractÃ¨res Ã©largis. Les ESCAPE SEQUENCES correspondant aux diffÃ©rents
+attributs sont dÃ©finis dans le PRINTER.
 
 Le ENLARGED reste actif jusqu'au changement d'attribut par une des
 commandes UNDERLINE, BOLD, ENLARGED, NORMAL ou CONDENSED.
-L'attribut est automatiquement chang‚ lors de l'impression d'une PAGE
+L'attribut est automatiquement changÃ© lors de l'impression d'une PAGE
 contenant des champs aux attributs particuliers (BOLD, UNDERLINE, ...).
 
 &SA PR_bold(), PR_condensed(), PR_underline(), PR_normal()
@@ -38,13 +38,13 @@ PR_enlarged()
 }
 
 /* ======================================================================
-Cette fonction indique que la suite de l'impression doit ˆtre faite en
-caractŠres condens‚s. Les ESCAPE SEQUENCES correspondant aux diff‚rents
-attributs sont d‚finis dans le PRINTER.
+Cette fonction indique que la suite de l'impression doit Ãªtre faite en
+caractÃ¨res condensÃ©s. Les ESCAPE SEQUENCES correspondant aux diffÃ©rents
+attributs sont dÃ©finis dans le PRINTER.
 
 Le CONDENSED reste actif jusqu'au changement d'attribut par une des
 commandes UNDERLINE, BOLD, ENLARGED, NORMAL ou CONDENSED.
-L'attribut est automatiquement chang‚ lors de l'impression d'une PAGE
+L'attribut est automatiquement changÃ© lors de l'impression d'une PAGE
 contenant des champs aux attributs particuliers (BOLD, UNDERLINE, ...).
 
 &SA PR_bold(), PR_enlarged(), PR_underline(), PR_normal()
@@ -55,13 +55,13 @@ PR_condensed()
     return(0);
 }
 /* ======================================================================
-Cette fonction indique que la suite de l'impression doit ˆtre faite en
-caractŠres soulign‚s. Les ESCAPE SEQUENCES correspondant aux diff‚rents
-attributs sont d‚finis dans le PRINTER.
+Cette fonction indique que la suite de l'impression doit Ãªtre faite en
+caractÃ¨res soulignÃ©s. Les ESCAPE SEQUENCES correspondant aux diffÃ©rents
+attributs sont dÃ©finis dans le PRINTER.
 
 Le soulignement reste actif jusqu'au changement d'attribut par une des
 commandes BOLD, ENLARGED, NORMAL ou CONDENSED. L'attribut est
-automatiquement chang‚ lors de l'impression d'une PAGE contenant des
+automatiquement changÃ© lors de l'impression d'une PAGE contenant des
 champs aux attributs particuliers (BOLD, UNDERLINE, ...).
 
 &SA PR_bold(), PR_enlarged(), PR_condensed(), PR_normal()
@@ -73,13 +73,13 @@ PR_underline()
 }
 
 /* ======================================================================
-Cette fonction indique que la suite de l'impression doit ˆtre faite en
-caractŠres normaux. Les ESCAPE SEQUENCES correspondant aux diff‚rents
-attributs sont d‚finis dans le PRINTER.
+Cette fonction indique que la suite de l'impression doit Ãªtre faite en
+caractÃ¨res normaux. Les ESCAPE SEQUENCES correspondant aux diffÃ©rents
+attributs sont dÃ©finis dans le PRINTER.
 
-Les caractŠres reste normaux jusqu'au changement d'attribut par une des
+Les caractÃ¨res reste normaux jusqu'au changement d'attribut par une des
 commandes UNDERLINE, BOLD, ENLARGED, NORMAL ou CONDENSED.
-L'attribut est automatiquement chang‚ lors de l'impression d'une PAGE
+L'attribut est automatiquement changÃ© lors de l'impression d'une PAGE
 contenant des champs aux attributs particuliers (BOLD, UNDERLINE, ...).
 
 &SA PR_bold(), PR_enlarged(), PR_condensed(), PR_underline()

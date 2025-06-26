@@ -1,15 +1,15 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Indique si un caractäre est minuscule.
+Indique si un caract√®re est minuscule.
 
 &REM
-Les caractäres accentuÇs sont considÇrÇs comme des minuscules.
+Les caract√®res accentu√©s sont consid√©r√©s comme des minuscules.
 
 &RT 1 s'il s'agit d'une minuscule, 0 sinon
 &EX
     SCR_is_lower('a') vaut 1
-    SCR_is_lower('É') vaut 1
+    SCR_is_lower('√¢') vaut 1
     SCR_is_lower('A') vaut 0
     SCR_is_lower('\n') vaut 0
 &TX
@@ -25,12 +25,12 @@ int     ch;
 
 
 /* ====================================================================
-Met un caractäre en minuscule s'il s'agit d'une lettre uniquement. La
-macro tolower(ch) disponible dans la librairie standard C ne vÇrifie pas
-toujours que le caractäre input est une lettre majuscule avant de
-transformer le caractäre.
+Met un caract√®re en minuscule s'il s'agit d'une lettre uniquement. La
+macro tolower(ch) disponible dans la librairie standard C ne v√©rifie pas
+toujours que le caract√®re input est une lettre majuscule avant de
+transformer le caract√®re.
 
-&RT le caractäre transformÇ
+&RT le caract√®re transform√©
 &EX
     SCR_lower_char('A') vaut 'a'
     SCR_lower_char('1') vaut '1'
@@ -50,9 +50,9 @@ int     ch;
 /* ====================================================================
 Met un string en minuscules. La modification a lieu sur place.
 
-&RT le string transformÇ
+&RT le string transform√©
 &EX
-    SCR_lower("Apräs") vaut "apräs'
+    SCR_lower("Apr√®s") vaut "apr√®s'
 &TX
 &SA SCR_lower_char(), SCR_upper_char(), SCR_upper()
 =======================================================================*/

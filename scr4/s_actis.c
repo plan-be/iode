@@ -1,17 +1,17 @@
 #include "scr.h"
 
 /* ======================================================================
-Edite la PAGE pg et cr‚e un nouveau record l'ISAM d‚fini par cette PAGE. Si
-la touche de fonction utilis‚e pour quitter la PAGE est F10, sauve le
-record d‚fini dans la PAGE dans l'ISAM.
+Edite la PAGE pg et crÃ©e un nouveau record l'ISAM dÃ©fini par cette PAGE. Si
+la touche de fonction utilisÃ©e pour quitter la PAGE est F10, sauve le
+record dÃ©fini dans la PAGE dans l'ISAM.
 
-A la diff‚rence de PG_create_rec(), cette fonction n'affiche pas la PAGE pg
-et demande le pointeur vers l'ISAM … ‚diter. La PAGE reste affich‚e aprŠs
+A la diffÃ©rence de PG_create_rec(), cette fonction n'affiche pas la PAGE pg
+et demande le pointeur vers l'ISAM Ã  Ã©diter. La PAGE reste affichÃ©e aprÃ¨s
 la fonction.
 
 Voir ACTION PG_CREATE_REC pour plus d'explications
 
-&RT 0 en cas de succŠs, -1 sinon
+&RT 0 en cas de succÃ¨s, -1 sinon
 &SA PG_CREATE_REC
 ------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ Recherche le record suivant dans l'ordre courant de recherche dans l'ISAM
 is.  Affiche le nouveau record dans la PAGE pg.
 
 Voir ACTION NEXT_REC pour plus d'explications
-&RT 0 en cas de succŠs, -1 sinon
+&RT 0 en cas de succÃ¨s, -1 sinon
 &SA NEXT_REC, PREV_REC
 ------------------------------------------------------------------------- */
 
@@ -62,11 +62,11 @@ ISAM    *is;
 
 
 /* ======================================================================
-Recherche le record pr‚c‚dent dans l'ordre courant de recherche dans l'ISAM
+Recherche le record prÃ©cÃ©dent dans l'ordre courant de recherche dans l'ISAM
 is.  Affiche le nouveau record dans la PAGE pg.
 
 Voir ACTION PREV_REC pour plus d'explications
-&RT 0 en cas de succŠs, -1 sinon
+&RT 0 en cas de succÃ¨s, -1 sinon
 &SA NEXT_REC, PREV_REC
 ------------------------------------------------------------------------- */
 
@@ -91,11 +91,11 @@ ISAM    *is;
 
 
 /* ======================================================================
-D‚truit le record suivant dans l'ordre courant de recherche dans l'ISAM
+DÃ©truit le record suivant dans l'ordre courant de recherche dans l'ISAM
 is.
 
 Voir ACTION DELETE_REC pour plus d'explications
-&RT 0 en cas de succŠs, -1 sinon
+&RT 0 en cas de succÃ¨s, -1 sinon
 &SA NEXT_REC, PREV_REC, DELETE_REC
 ------------------------------------------------------------------------- */
 
@@ -422,16 +422,16 @@ int     cmp_nb;
 
 
 /* ======================================================================
-Edite les champs index de l'ISAM is d‚finis dans la PAGE pg pour :
+Edite les champs index de l'ISAM is dÃ©finis dans la PAGE pg pour :
 
-&EN d‚terminer l'index de recherche
-&EN indiquer la valeur … trouver
+&EN dÃ©terminer l'index de recherche
+&EN indiquer la valeur Ã  trouver
 
 Recherche le record correspondant aux informations introduites.
 
 Voir ACTION SEARCH_REC pour plus d'explications
 
-&RT 0 en cas de succŠs, -1 sinon
+&RT 0 en cas de succÃ¨s, -1 sinon
 &SA NEXT_REC, PREV_REC, MODIFY_REC, PREV_REC
 ------------------------------------------------------------------------- */
 
@@ -455,7 +455,7 @@ ISAM    *is;
 }
 
 /* ===================================================
-Edite un ISAM … l'aide de l'objet scr_ap_isam d‚fini dans scr.f.
+Edite un ISAM Ã  l'aide de l'objet scr_ap_isam dÃ©fini dans scr.f.
  =================================================== */
 
 AP_edit_isam(pg)
@@ -467,12 +467,12 @@ PAGE    *pg;
 
     ap = (APPL *)AP_read("scr_ap_isam");
     if(ap == 0) {
-	PG_display_error("Attention : L'application scr_ap_isam n'est pas d‚finie");
+	PG_display_error("Attention : L'application scr_ap_isam n'est pas dÃ©finie");
 	return(-1);
     }
 
     if(pg->pg_isam == 0) {
-	PG_display_error("Attention : Pas d'ISAM par d‚fault");
+	PG_display_error("Attention : Pas d'ISAM par dÃ©fault");
 	return(-1);
     }
 

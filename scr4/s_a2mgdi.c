@@ -12,7 +12,7 @@ A2mToGdiPrinter()
 #include <scr4w.h>
 #include "s_a2m.h"
 
-/* Variables g‚n‚rales */
+/* Variables gÃ©nÃ©rales */
 int     A2M_GDI_CURX, A2M_GDI_CURY, A2M_GDI_H, A2M_GDI_W;
 int     A2M_GDI_TWIDTH_FIXED = 0; /* JMP 21-03-05 */
 int     A2M_GDI_CURPAGE, A2M_GDI_MARGX, A2M_GDI_MARGY, A2M_GDI_MARGX2, A2M_GDI_MARGY2;
@@ -21,7 +21,7 @@ A2MOBJ  **A2M_OBJS;
 int     A2M_NBOBJS = 0;
 extern int A2M_CUROBJ;
 
-/******** ParamŠtres *************/
+/******** ParamÃ¨tres *************/
 int A2M_GDI_COLOR = 1, A2M_GDI_TBORDER = 2;
 int A2M_GDI_LMARG = 12;
 int A2M_GDI_RMARG = 12;
@@ -72,29 +72,29 @@ A2mGdiAllEnd()
 }
 
 /* ================================================================
-InterprŠte le contenu d'un fichier a2m et l'imprime sur une imprimante
-d‚finie dans le systŠme Win32.
+InterprÃ¨te le contenu d'un fichier a2m et l'imprime sur une imprimante
+dÃ©finie dans le systÃ¨me Win32.
 
-&EN hWndOwner = fenˆtre propri‚taire de la tƒche
-&EN Dlg = 0 pour ne pas afficher la boŒte de dialogue de configuration
+&EN hWndOwner = fenÃªtre propriÃ©taire de la tÃ¢che
+&EN Dlg = 0 pour ne pas afficher la boÃ®te de dialogue de configuration
     de l'imprimante, 1 pour l'afficher. Dans ce dernier cas, l'impression
-    peut se faire sur une imprimante sp‚cifique.
+    peut se faire sur une imprimante spÃ©cifique.
 &EN JobTitle = nom du job
-&EN a2mfile = nom du fichier a2m … imprimer
+&EN a2mfile = nom du fichier a2m Ã  imprimer
 
-&RT La fonction retourne 0 si le processus s'est bien d‚roul‚, -1 sinon.
-    Si le job est annul‚ par l'utilisateur (Dlg == 1 et Cancel), la
+&RT La fonction retourne 0 si le processus s'est bien dÃ©roulÃ©, -1 sinon.
+    Si le job est annulÃ© par l'utilisateur (Dlg == 1 et Cancel), la
     fonction retourne aussi -1.
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-l'impression et la lecture du fichier a2m. Pour que ces paramŠtres
+-------------------
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramÃ¨tres
 soient pris en compte par le programme A2mToGdiPrinter(), il faut
 appeler la fonction A2mGdiReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -104,36 +104,36 @@ d'interpr‚tation et d'impression.
 &TX
 
 &TI Variables globales
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les variables globales d‚crites dans le fichier .ini peuvent ‚galement
-ˆtre modifi‚es dans le programme.
+----------------------
+Les variables globales dÃ©crites dans le fichier .ini peuvent Ã©galement
+Ãªtre modifiÃ©es dans le programme.
 
-&IT Variables influen‡ant la lecture du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [A2M] du fichier ini.
+&IT Variables influenÃ§ant la lecture du fichier
+-----------------------------------------------
+Ces variables sont dÃ©finies dans la section [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caractŠre d'escape (enrichissements et caractŠres
-    sp‚ciaux) : '\'par d‚faut
-&EN int A2M_CMDCH = caractŠre de commande ('.' par d‚faut)
-    sp‚ciaux)
-&EN int A2M_DEFCH = caractŠre pr‚fixant les macros ('&' par d‚faut)
-&EN int A2M_SEPCH = caractŠre de s‚paration des cellules ('&' par d‚faut)
+&EN int A2M_ESCCH = caractÃ¨re d'escape (enrichissements et caractÃ¨res
+    spÃ©ciaux) : '\'par dÃ©faut
+&EN int A2M_CMDCH = caractÃ¨re de commande ('.' par dÃ©faut)
+    spÃ©ciaux)
+&EN int A2M_DEFCH = caractÃ¨re prÃ©fixant les macros ('&' par dÃ©faut)
+&EN int A2M_SEPCH = caractÃ¨re de sÃ©paration des cellules ('&' par dÃ©faut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d‚faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par dÃ©faut ("par_0")
 
-&IT Variables influen‡ant l'impression
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [GDI] du fichier .ini.
+&IT Variables influenÃ§ant l'impression
+--------------------------------------
+Ces variables sont dÃ©finies dans la section [GDI] du fichier .ini.
 
-&EN int A2M_FONTSIZE = taille par d‚faut des caractŠres dans les
-    paragraphes (10 pts par d‚faut)
-&EN int A2M_FONTFAMILY = police de caractŠre par d‚faut ('H', 'T' ou 'C')
-&EN int A2M_FONTINCR = incr‚ment de taille de caractŠres (2 par d‚faut)
-&EN int A2M_TFONTSIZE = taille par d‚faut des caractŠres dans les
-    tableaux (8 pts par d‚faut)
-&EN U_ch *A2M_PGHEAD = titre de page ("" par d‚faut)
-&EN U_ch *A2M_PGFOOT = pied de page ("" par d‚faut)
+&EN int A2M_FONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    paragraphes (10 pts par dÃ©faut)
+&EN int A2M_FONTFAMILY = police de caractÃ¨re par dÃ©faut ('H', 'T' ou 'C')
+&EN int A2M_FONTINCR = incrÃ©ment de taille de caractÃ¨res (2 par dÃ©faut)
+&EN int A2M_TFONTSIZE = taille par dÃ©faut des caractÃ¨res dans les
+    tableaux (8 pts par dÃ©faut)
+&EN U_ch *A2M_PGHEAD = titre de page ("" par dÃ©faut)
+&EN U_ch *A2M_PGFOOT = pied de page ("" par dÃ©faut)
 &EN int A2M_TSHADING_COL[2] = couleurs de la brosse de hachurage des
     titres([0]) et corps([1]) des tableaux
 &EN2 0 = noir
@@ -155,17 +155,17 @@ Ces variables sont d‚finies dans la section [GDI] du fichier .ini.
 &EN2 0-2 = 0%
 
 &EN int A2M_GDI_COLOR = 1 (dft) pour impression en couleur, 0 en B/W
-&EN int A2M_GDI_TBORDER = ‚paisseur des cadres des tableaux (2 par dft)
+&EN int A2M_GDI_TBORDER = Ã©paisseur des cadres des tableaux (2 par dft)
 &EN int A2M_GDI_LMARG = marge de gauche de la page (12 pts par dft)
 &EN int A2M_GDI_RMARG = marge de droite de la page (12 pts par dft)
 &EN int A2M_GDI_TMARG = marge de haut de la page (12 pts par dft)
 &EN int A2M_GDI_BMARG = marge de bas de la page (12 pts par dft)
 
 &RT
-&EN 0 en cas de succŠs
-&EN -1 si le fichier ne peut ˆtre ouvert
-&EN -2 si l'imprimante n'a p– ˆtre initialis‚e ou si l'utilisateur
-    a press‚ sur Cancel dans le panneau d'impression
+&EN 0 en cas de succÃ¨s
+&EN -1 si le fichier ne peut Ãªtre ouvert
+&EN -2 si l'imprimante n'a pÃ» Ãªtre initialisÃ©e ou si l'utilisateur
+    a pressÃ© sur Cancel dans le panneau d'impression
 
 &SA A2mGdiReadIni(), A2mToGdiEMF, A2mToRtf(), A2mToMif(),
     A2mToHtml(), A2mPrintError()
@@ -1042,21 +1042,21 @@ A2mPageFoot()
 
 /* ================================================================
 Fixe la valeur des variables globales avant l'impression d'un fichier
-a2m en se basant sur les d‚finitions du fichier .ini associ‚.
+a2m en se basant sur les dÃ©finitions du fichier .ini associÃ©.
 
-Les sections [A2M] et [GDI] du fichier .ini sont interpr‚t‚es.
+Les sections [A2M] et [GDI] du fichier .ini sont interprÃ©tÃ©es.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-l'impression et la lecture du fichier a2m. Pour que ces paramŠtres
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramÃ¨tres
 soient pris en compte par le programme A2mToGdi(), il faut appeler la
 fonction A2mGdiReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>

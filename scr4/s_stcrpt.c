@@ -1,8 +1,8 @@
 
 /* ====================================================================
-Encrypte le vecteur de caractäres buf de longueur len. La base de
-l'encodage est le long key qui sera fourni Ö la fonction inverse pour un
-dÇcryptage correct.
+Encrypte le vecteur de caract√®res buf de longueur len. La base de
+l'encodage est le long key qui sera fourni √† la fonction inverse pour un
+d√©cryptage correct.
 
 La fonction inverse est SCR_decrypt().
 
@@ -29,8 +29,8 @@ long            key;
 }
 
 /* ====================================================================
-Decrypte le vecteur de caractäres buf de longueur len. La base du
-dÇcodage est le long key qui a ÇtÇ fourni Ö la fonction inverse
+Decrypte le vecteur de caract√®res buf de longueur len. La base du
+d√©codage est le long key qui a √©t√© fourni √† la fonction inverse
 SCR_crypt().
 
 &SA SCR_crypt()

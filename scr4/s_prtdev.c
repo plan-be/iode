@@ -2,20 +2,20 @@
 
 /* ======================================================================
 Cette fonction modifie le nom (name) et le type (FILE, PRINTER ou
-DIRECT) du device ou du fichier associÇ Ö un PRINTER. Le nom est strippÇ
-par la fonction et remplace l'ancien nom. Elle se comporte diffÇremment
-en DOS et en UNIX : en UNIX, s'il s'agit d'un printer, il est replacÇ
-par "lp -s -dname", ce qui Çvite Ö l'utilisateur de connaåtre la syntaxe
+DIRECT) du device ou du fichier associ√© √† un PRINTER. Le nom est stripp√©
+par la fonction et remplace l'ancien nom. Elle se comporte diff√©remment
+en DOS et en UNIX : en UNIX, s'il s'agit d'un printer, il est replac√©
+par "lp -s -dname", ce qui √©vite √† l'utilisateur de conna√Ætre la syntaxe
 de lp.
 
-&EN type dÇfinit la destination
+&EN type d√©finit la destination
 &EN2 0 = FILE
 &EN2 1 = PRINTER
 &EN2 2 = DIRECT (uniquement sous Windows)
 
-&NO Le nom (Çventuellement prÇcÇdÇ de "lp -s -d") ne peut dÇpasser la
-    zone associÇe au nom dans la dÇfinition initiale du PRINTER (FILE
-    "tmp" ne suffit pas en gÇnÇral car il n'y a que trois caractäres
+&NO Le nom (√©ventuellement pr√©c√©d√© de "lp -s -d") ne peut d√©passer la
+    zone associ√©e au nom dans la d√©finition initiale du PRINTER (FILE
+    "tmp" ne suffit pas en g√©n√©ral car il n'y a que trois caract√®res
     disponibles).
 
 &EX

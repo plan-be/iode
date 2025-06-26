@@ -32,8 +32,8 @@
 
 /*****************************************************************/
 /*  to swap or not to swap in EMS ? */
-/*  Les matrices sont stock�es en EMS par d�faut, la d�finition de la
-constante symbolique NOSWAP impose le stockage des matrices en m�moire
+/*  Les matrices sont stockées en EMS par défaut, la définition de la
+constante symbolique NOSWAP impose le stockage des matrices en mémoire
 conventionnelle */
 
 #ifdef NOSWAP

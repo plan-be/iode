@@ -31,19 +31,19 @@ int     fn, nb;
 #endif
 
 /* =====================================================================
-R‚initialise l'imprimante parallŠle nb (1 pour lpt1, 2 pour lpt2, 3 pour
-lpt3). Cette fonction peut ˆtre utilis‚e avant de lancer une impression
-sur une imprimante parallŠle. En effet, en cas d'absence d'imprimante,
-le programme en cours se bloque et ne peut bien souvent ˆtre relanc‚ que
-par un reboot du systŠme.
+RÃ©initialise l'imprimante parallÃ¨le nb (1 pour lpt1, 2 pour lpt2, 3 pour
+lpt3). Cette fonction peut Ãªtre utilisÃ©e avant de lancer une impression
+sur une imprimante parallÃ¨le. En effet, en cas d'absence d'imprimante,
+le programme en cours se bloque et ne peut bien souvent Ãªtre relancÃ© que
+par un reboot du systÃ¨me.
 
-Si l'imprimante est connect‚e et online, la fonction retourne 0. Si elle
+Si l'imprimante est connectÃ©e et online, la fonction retourne 0. Si elle
 n'a plus de papier, le code retour est 1. Si aucune imprimante n'est
-pr‚sente ou si une autre erreur est d‚tect‚e, le code retour est -1.
+prÃ©sente ou si une autre erreur est dÃ©tectÃ©e, le code retour est -1.
 
 &RT La fonction retourne 0 si l'imprimante est disponible, 1 s'il
     manque de papier, -1 en cas d'erreur (pas de connexion, time out,
-    imprimante occup‚e)
+    imprimante occupÃ©e)
 
 &EX
     if(PciParalInit(1)) {
@@ -74,19 +74,19 @@ int     nb;
 
 
 /* =====================================================================
-Teste l'imprimante parallŠle nb (1 pour lpt1, 2 pour lpt2, 3 pour lpt3).
-Cette fonction peut ˆtre utilis‚e avant de lancer une impression
-sur une imprimante parallŠle. En effet, en cas d'absence d'imprimante,
-le programme en cours se bloque et ne peut bien souvent ˆtre relanc‚ que
-par un reboot du systŠme.
+Teste l'imprimante parallÃ¨le nb (1 pour lpt1, 2 pour lpt2, 3 pour lpt3).
+Cette fonction peut Ãªtre utilisÃ©e avant de lancer une impression
+sur une imprimante parallÃ¨le. En effet, en cas d'absence d'imprimante,
+le programme en cours se bloque et ne peut bien souvent Ãªtre relancÃ© que
+par un reboot du systÃ¨me.
 
-Si l'imprimante est connect‚e et online, la fonction retourne 0. Si elle
+Si l'imprimante est connectÃ©e et online, la fonction retourne 0. Si elle
 n'a plus de papier, le code retour est 1. Si aucune imprimante n'est
-pr‚sente ou si une autre erreur est d‚tect‚e, le code retour est -1.
+prÃ©sente ou si une autre erreur est dÃ©tectÃ©e, le code retour est -1.
 
 &RT La fonction retourne 0 si l'imprimante est disponible, 1 s'il
     manque de papier, -1 en cas d'erreur (pas de connexion, time out,
-    imprimante occup‚e)
+    imprimante occupÃ©e)
 
 &EX
     if(PciParalTest(1)) {
@@ -115,7 +115,7 @@ int     nb;
 }
 
 /* =====================================================================
-Teste la disponibilit‚ de l'imprimante parallŠle dont le nom est
+Teste la disponibilitÃ© de l'imprimante parallÃ¨le dont le nom est
 fourni dans name. Si ce nom commence par
 
 &EN LPT1
@@ -124,19 +124,19 @@ fourni dans name. Si ce nom commence par
 &EN PRN
 
 (en majuscule ou minuscule), la fonction teste l'imprimante
-correspondante … l'aide de PciParalTest().
+correspondante Ã  l'aide de PciParalTest().
 
-Si l'imprimante est connect‚e et online, la fonction retourne 0. Si elle
+Si l'imprimante est connectÃ©e et online, la fonction retourne 0. Si elle
 n'a plus de papier, le code retour est 1. Si aucune imprimante n'est
-pr‚sente ou si une autre erreur est d‚tect‚e, le code retour est -1.
+prÃ©sente ou si une autre erreur est dÃ©tectÃ©e, le code retour est -1.
 
-Si le nom n'est pas celui d'une imprimante parallŠle, elle retourne
-0 ‚galement.
+Si le nom n'est pas celui d'une imprimante parallÃ¨le, elle retourne
+0 Ã©galement.
 
 
 &RT La fonction retourne 0 si l'imprimante est disponible, 1 s'il
     manque de papier, -1 en cas d'erreur (pas de connexion, time out,
-    imprimante occup‚e)
+    imprimante occupÃ©e)
 
 &EX
     RC_set_prname(pr, name)

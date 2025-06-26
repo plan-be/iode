@@ -4,13 +4,13 @@
 extern FILE     *PC_FD;
 
 /* ====================================================================
-Recherche dans le fichier filename la dÇfinition de l'item prname et
-exÇcute les commandes associÇs en remplaáant les paramätres par les
+Recherche dans le fichier filename la d√©finition de l'item prname et
+ex√©cute les commandes associ√©s en rempla√ßant les param√®tres par les
 valeurs arg1, arg2 et arg3.
 
-Le fichier est dÇcrit dans la fonction PC_list().
+Le fichier est d√©crit dans la fonction PC_list().
 
-&RT 0 en cas de succäs, -1 si l'item n'est pas trouvÇ
+&RT 0 en cas de succ√®s, -1 si l'item n'est pas trouv√©
 &EX
     PC_exec("printcap", "ps401", "toto.ps", NULL, NULL);
 &TX

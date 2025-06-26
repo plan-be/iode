@@ -70,18 +70,18 @@ HFILE   *hfd;
 
 
 /* ==================================================================
-Recherche le mot-clÇ tag dans le dernier tar HTML lu par JLex() ou
-JHRead(). Le mot-clÇ peut àtre en majuscules ou minuscules dans tag ou
+Recherche le mot-cl√© tag dans le dernier tar HTML lu par JLex() ou
+JHRead(). Le mot-cl√© peut √™tre en majuscules ou minuscules dans tag ou
 dans le tag HTML lu. Il n'y a pas de distinction entre majuscules et
 minuscules.
 
-&EN hfd : HFILE * retournÇ par JHopen()
-&EN tag = mot-clÇ Ö rechercher
+&EN hfd : HFILE * retourn√© par JHopen()
+&EN tag = mot-cl√© √† rechercher
 
-Si le tag est trouvÇ, la valeur suivant le tag= est sauvÇe dans
-l'ÇlÇment h_val de la structure hfd.
+Si le tag est trouv√©, la valeur suivant le tag= est sauv√©e dans
+l'√©l√©ment h_val de la structure hfd.
 
-&RT 0 si le mot est trouvÇ, -1 sinon
+&RT 0 si le mot est trouv√©, -1 sinon
 
 &EX
     HFILE   *hfd;
@@ -92,7 +92,7 @@ l'ÇlÇment h_val de la structure hfd.
     type = JHLex(hfd);
     if(type == JH_A) {
 	if(JHYYFind(hfd, "HREF") == 0)
-	    printf("RÇfÇrence = %s\n", hfd->h_val);
+	    printf("R√©f√©rence = %s\n", hfd->h_val);
 	}
     ...
     JHClose(hfd);
@@ -132,7 +132,7 @@ U_ch    *tag;
 
 
 /* ==================================================================
-Ouvre un fichier HTML pour interprÇtation Ö l'aide des fonctions JH*().
+Ouvre un fichier HTML pour interpr√©tation √† l'aide des fonctions JH*().
 
 &EN filename : nom du fichier HTML
 
@@ -179,10 +179,10 @@ char    *filename;
 }
 
 /* ==================================================================
-Ferme un fichier HTML ouvert Ö l'aide de JHOpen(). Libäre l'espace
-allouÇ par les fonctions de lecture.
+Ferme un fichier HTML ouvert √† l'aide de JHOpen(). Lib√®re l'espace
+allou√© par les fonctions de lecture.
 
-&EN hfd : HFILE * retournÇ par JHOpen()
+&EN hfd : HFILE * retourn√© par JHOpen()
 
 &EX
     HFILE   *hfd;
@@ -215,11 +215,11 @@ HFILE   *hfd;
 }
 
 /* ==================================================================
-Lit l'entrÇe suivante dans le fichier HTML ouvert par JHOpen() Ö l'aide
+Lit l'entr√©e suivante dans le fichier HTML ouvert par JHOpen() √† l'aide
 de la fonction JHRead(). S'il ne s'agit pas d'un tag, retourne 0. Sinon,
-interpräte ensuite le tag et retourne une valeur l'identifiant.
+interpr√®te ensuite le tag et retourne une valeur l'identifiant.
 
-&EN hfd : HFILE * retournÇ par JHopen()
+&EN hfd : HFILE * retourn√© par JHopen()
 
 &RT
 &EN 0 pour du texte simple
@@ -249,11 +249,11 @@ interpräte ensuite le tag et retourne une valeur l'identifiant.
 &EN pour U         :  JH_U,
 &EN pour VAR       :  JH_VAR,
 
-Les màmes valeurs en nÇgatif sont retournÇes pour un tag de fin:
+Les m√™mes valeurs en n√©gatif sont retourn√©es pour un tag de fin:
 &EN pour /A  :  -JH_A,
 &EN pour /B  :  -JH_B,
 
-Ces constantes sont dÇfinies dans s_html.h.
+Ces constantes sont d√©finies dans s_html.h.
 
 Le texte lu ou le tag HTML se trouvent en sortie dans le buffer
 hfd->h_buf.
@@ -308,10 +308,10 @@ HFILE   *hfd;
 }
 
 /* ==================================================================
-Lit l'entrÇe suivante dans le fichier HTML ouvert par JHOpen().
-Deux ÇlÇments sont distinguÇs : texte et tag HTML.
+Lit l'entr√©e suivante dans le fichier HTML ouvert par JHOpen().
+Deux √©l√©ments sont distingu√©s : texte et tag HTML.
 
-&EN hfd : HFILE * retournÇ par JHOpen()
+&EN hfd : HFILE * retourn√© par JHOpen()
 
 &RT
 &EN 0 pour du texte simple
@@ -373,10 +373,10 @@ HFILE   *hfd;
 }
 
 /* ==================================================================
-Retient la derniäre valeur lue de faáon Ö pouvoir la retourner lors du
+Retient la derni√®re valeur lue de fa√ßon √† pouvoir la retourner lors du
 prochain appel de JHRead() ou JHLex().
 
-&EN hfd : HFILE * retournÇ par JHOpen()
+&EN hfd : HFILE * retourn√© par JHOpen()
 
 &SA JHOpen(), JHLex(), JHRead(), JHClose()
 ===================================================================== */

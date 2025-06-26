@@ -89,18 +89,18 @@ err:
     return(-1);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de compactage de fichier bas‚e sur l'algorithme de
-Lempel-Zev et sur la m‚thode de Huffmann.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de compactage de fichier basÃ©e sur l'algorithme de
+Lempel-Zev et sur la mÃ©thode de Huffmann.
 
-Le nom du fichier … compacter est pass‚ comme argument : filein. Le
-fichier r‚sultat porte le mˆme nom sauf en ce qui concerne le dernier
-caractŠre qui est remplac‚ par un point d'exclamation. Si fileout n'est
+Le nom du fichier Ã  compacter est passÃ© comme argument : filein. Le
+fichier rÃ©sultat porte le mÃªme nom sauf en ce qui concerne le dernier
+caractÃ¨re qui est remplacÃ© par un point d'exclamation. Si fileout n'est
 pas NULL, le fichier output porte ce nom.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &SA LzhDecodeFile(), LzhEncodeStr(), LzhEncodeGnl()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 LzhEncodeFile(filein, fileout)
 char    *filein, *fileout;
@@ -114,41 +114,41 @@ char    *filein, *fileout;
     return(rc);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de d‚compactage de fichier bas‚e sur l'algorithme de Lempel-Zev
-et sur la m‚thode de Huffmann. Le fichier trait‚ doit ˆtre le r‚sultat
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de dÃ©compactage de fichier basÃ©e sur l'algorithme de Lempel-Zev
+et sur la mÃ©thode de Huffmann. Le fichier traitÃ© doit Ãªtre le rÃ©sultat
 de la fonction LzhEncodeFile().
 
-Le nom du fichier compact‚ est pass‚ comme argument : filein. Le fichier
-d‚compact‚ porte le mˆme nom sauf en ce qui concerne le dernier
-caractŠre qui reprend sa valeur d'avant le compactage. Si fileout n'est
+Le nom du fichier compactÃ© est passÃ© comme argument : filein. Le fichier
+dÃ©compactÃ© porte le mÃªme nom sauf en ce qui concerne le dernier
+caractÃ¨re qui reprend sa valeur d'avant le compactage. Si fileout n'est
 pas NULL, le fichier output porte ce nom.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &SA LzhEncodeFile(), LzhDecodeStr(), LzhDecodeGnl()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 LzhDecodeFile(filein, fileout)
 char    *filein, *fileout;
 {
     return(LzhDecodeAppFile(filein, fileout, 0)); /* JMP 29-11-97 */
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de d‚compactage de fichier bas‚e sur l'algorithme de Lempel-Zev
-et sur la m‚thode de Huffmann. Le fichier trait‚ doit ˆtre le r‚sultat
-de la fonction LzhEncodeFile(). Si le paramŠtre pos est positif,
-il indique que le fichier … d‚compact‚ est concat‚n‚ au fichier
-filein … l'aide de scr4_app … la position pos … partir de la fin
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de dÃ©compactage de fichier basÃ©e sur l'algorithme de Lempel-Zev
+et sur la mÃ©thode de Huffmann. Le fichier traitÃ© doit Ãªtre le rÃ©sultat
+de la fonction LzhEncodeFile(). Si le paramÃ¨tre pos est positif,
+il indique que le fichier Ã  dÃ©compactÃ© est concatÃ©nÃ© au fichier
+filein Ã  l'aide de scr4_app Ã  la position pos Ã  partir de la fin
 du fichier infile.
 
-Le nom du fichier compact‚ est pass‚ comme argument : filein. Le fichier
-d‚compact‚ porte le mˆme nom sauf en ce qui concerne le dernier
-caractŠre qui reprend sa valeur d'avant le compactage. Si fileout n'est
+Le nom du fichier compactÃ© est passÃ© comme argument : filein. Le fichier
+dÃ©compactÃ© porte le mÃªme nom sauf en ce qui concerne le dernier
+caractÃ¨re qui reprend sa valeur d'avant le compactage. Si fileout n'est
 pas NULL, le fichier output porte ce nom.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &SA LzhEncodeFile(), LzhDecodeStr(), LzhDecodeGnl(), LzhDecodeFile()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 LzhDecodeAppFile(filein, fileout, pos)
 char    *filein, *fileout;
 int     pos;

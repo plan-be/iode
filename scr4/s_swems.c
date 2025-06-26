@@ -16,7 +16,7 @@ EMSDEF  EMS_DEF;
 Initialise la structure globale EMS_DEF.
 
 &RT nombre de pages EMS disponibles ou -1 si toutes les
-pages sont dÇjÖ utilisÇes ou si le driver EMM n'est pas installÇ.
+pages sont d√©j√† utilis√©es ou si le driver EMM n'est pas install√©.
 
 &SA EMS_end()
 */
@@ -59,7 +59,7 @@ EMS_init()
 }
 
 /*
-Libäre toutes les pages EMS allouÇes.
+Lib√®re toutes les pages EMS allou√©es.
 
 &RT -1 en cas d'erreur, 0 sinon.
 */
@@ -103,9 +103,9 @@ int     logp, physp;
 }
 
 /*
-Retourne un pointeur statique un des messages d'erreur du systäme EMS.
-Le numÇro de la derniäre erreur se trouve dans la structure globale
-EMS_DEF et peut àtre obtenu par
+Retourne un pointeur statique un des messages d'erreur du syst√®me EMS.
+Le num√©ro de la derni√®re erreur se trouve dans la structure globale
+EMS_DEF et peut √™tre obtenu par
 &CO
     EMS_DEF.swerrno
 &TX
@@ -155,10 +155,10 @@ int     n;
 }
 
 /*
-VÇrifie qu'un driver EMM est installÇ (en gÇnÇral via le fichier
+V√©rifie qu'un driver EMM est install√© (en g√©n√©ral via le fichier
 config.sys).
 
-&RT 1 si EMS installÇ, 0 sinon.
+&RT 1 si EMS install√©, 0 sinon.
 */
 
 EMS_inst()
@@ -181,7 +181,7 @@ main()
 	}
     printf("Nombre de pages total  : %d\n", EMS_DEF.nb_pages);
     printf("Nombre de pages libres : %d\n", EMS_DEF.nb_free);
-    printf("Pointeur premiäre page : %p\n", EMS_DEF.ptr);
+    printf("Pointeur premi√®re page : %p\n", EMS_DEF.ptr);
     printf("Version EMM driver     : %d\n", EMS_DEF.ver);
     EMS_end();
 }

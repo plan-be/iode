@@ -1,7 +1,7 @@
 #include "scr.h"
 
 /*NH*/
-/* Check que l'index to n'est pas dÇpassÇ */
+/* Check que l'index to n'est pas d√©pass√© */
 SC_check_index(is, to, to_def, cmp_nb, direct) /* JMP_M 4.19 31-05-95 */
 ISAM    *is;
 char    *to, *to_def;
@@ -29,7 +29,7 @@ int     cmp_nb, direct;                        /* JMP_M 4.19 31-05-95 */
 }
 
 /*NH*/
-/* Check que le record correspond aux critäres */
+/* Check que le record correspond aux crit√®res */
 SC_check_rec(is, from, to, from_def, to_def)
 ISAM    *is;
 char    *from, *to,

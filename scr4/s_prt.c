@@ -121,24 +121,24 @@ int     line, col;
 }
 
 /* ======================================================================
-Cette fonction termine une impression. Si aucun PRINTER n'est s‚lectionn‚
-ou qu'aucune instruction d'impression n'a ‚t‚ envoy‚e, cet appel n'a
+Cette fonction termine une impression. Si aucun PRINTER n'est sÃ©lectionnÃ©
+ou qu'aucune instruction d'impression n'a Ã©tÃ© envoyÃ©e, cet appel n'a
 aucun effet. Dans le cas contraire, le string de terminaison (END) du
-PRINTER est envoy‚ en fin d'impression.
+PRINTER est envoyÃ© en fin d'impression.
 
 &IT DOS
-ÄÄÄ
+â”€â”€â”€
 En DOS, le fichier ou le device dont le nom est fourni dans la
-d‚finition du PRINTER par le mot-cl‚ FILE ou PRINTER est ouvert dŠs la
-premiŠre impression de la session. S'il s'agit d'une imprimante,
-l'impression commence donc dŠs qu'une page est prˆte. S'il s'agit d'un
+dÃ©finition du PRINTER par le mot-clÃ© FILE ou PRINTER est ouvert dÃ¨s la
+premiÃ¨re impression de la session. S'il s'agit d'une imprimante,
+l'impression commence donc dÃ¨s qu'une page est prÃªte. S'il s'agit d'un
 fichier, le fichier est construit page par page.
 
 &IT Unix
-ÄÄÄÄ
-Dans un systŠme multi-tƒche, l'imprimante n'est pas ouverte pour
+â”€â”€â”€â”€
+Dans un systÃ¨me multi-tÃ¢che, l'imprimante n'est pas ouverte pour
 l'utilisation exclusive du programme. Un "pipe" est ouvert en UNIX vers
-lequel est dirig‚ l'output d'impression page par page.
+lequel est dirigÃ© l'output d'impression page par page.
 
 &EX
      PR_select(pr1);
@@ -197,8 +197,8 @@ PR_send()
 }
 
 /* ======================================================================
-D‚finit un nouveau printer courant. Cette fonction n'a d'autre effet que
-ce fixer une variable globale. Aucune ouverture r‚elle n'a lieu … ce
+DÃ©finit un nouveau printer courant. Cette fonction n'a d'autre effet que
+ce fixer une variable globale. Aucune ouverture rÃ©elle n'a lieu Ã  ce
 stade.
 &EX
     PR_select(pr1);
@@ -400,9 +400,9 @@ PR_cr()
 
 /* ======================================================================
 Positionne le curseur en position absolue. Si la position nouvelle sort
-de la page, elle est fix‚e … la derniŠre ligne (et/ou colonne) de la page.
+de la page, elle est fixÃ©e Ã  la derniÃ¨re ligne (et/ou colonne) de la page.
 
-Une valeur n‚gative ne change pas la valeur courante dans le printer.
+Une valeur nÃ©gative ne change pas la valeur courante dans le printer.
 
 &EX
     PR_goto(10, 15);  Place en colonne 15, ligne 10
@@ -424,8 +424,8 @@ int     l, c;
 }
 
 /* ======================================================================
-Imprime un caractŠre … la position courante du curseur et avance
-celui-ci d'un caractŠre … droite.
+Imprime un caractÃ¨re Ã  la position courante du curseur et avance
+celui-ci d'un caractÃ¨re Ã  droite.
 
 &EX
     PR_char('a');
@@ -475,7 +475,7 @@ PR_formfeed()
 
 /* ======================================================================
 Place le curseur en colonne 0 de la ligne suivante de la page courante.
-Si le curseur est en derniŠre ligne, g‚nŠre un saut de page.
+Si le curseur est en derniÃ¨re ligne, gÃ©nÃ¨re un saut de page.
 
 &SA PR_lf()
 ------------------------------------------------------------------------ */
@@ -491,8 +491,8 @@ PR_linefeed()
 }
 
 /* ======================================================================
-G‚nŠre n linefeed(). Si un saut de page a lieu pour l'un des linefeed,
-les linefeed suivants ont quand-mˆme lieu (su rla page suivante).
+GÃ©nÃ¨re n linefeed(). Si un saut de page a lieu pour l'un des linefeed,
+les linefeed suivants ont quand-mÃªme lieu (su rla page suivante).
 
 &SA PR_linefeed()
 ------------------------------------------------------------------------ */
@@ -504,8 +504,8 @@ PR_lf(n)
 }
 
 /* ======================================================================
-V‚rifie qu'il reste assez de place sur la page courante d'impression
-pour imprimer au moins nl lignes. Si ce n'est pas le cas, g‚nŠre un saut
+VÃ©rifie qu'il reste assez de place sur la page courante d'impression
+pour imprimer au moins nl lignes. Si ce n'est pas le cas, gÃ©nÃ¨re un saut
 de page.
 
 &EX
@@ -526,8 +526,8 @@ int     nl;             /* Number of lines in block */
 }
 
 /* ======================================================================
-Imprime un string … la position courante du curseur dans la page
-d'impression et souligne ce string. Le curseur est ensuite positionn‚
+Imprime un string Ã  la position courante du curseur dans la page
+d'impression et souligne ce string. Le curseur est ensuite positionnÃ©
 sous la ligne de soulignement en colonne 0.
 
 &EX

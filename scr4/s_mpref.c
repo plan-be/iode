@@ -1,18 +1,18 @@
 #include "scr.h"
 
 /* =+=== MP_SET_REF ============================================
-Fixe le champ du record de r‚f‚rence de la MPAGE mp. Cette
-fonction a la mˆme syntaxe et les mˆmes limites que IS_set_field() :
-aucune v‚rification de type ou de longueur n'est effectu‚e.
+Fixe le champ du record de rÃ©fÃ©rence de la MPAGE mp. Cette
+fonction a la mÃªme syntaxe et les mÃªmes limites que IS_set_field() :
+aucune vÃ©rification de type ou de longueur n'est effectuÃ©e.
 
-Le contenu du record de r‚f‚rence de la MPAGE d‚termine le d‚but
-de la recherche pr‚c‚dent l'affichage des records dans la MPAGE.
+Le contenu du record de rÃ©fÃ©rence de la MPAGE dÃ©termine le dÃ©but
+de la recherche prÃ©cÃ©dent l'affichage des records dans la MPAGE.
 Lorsque la APG contient des champs, les valeurs de la APG sont
-utilis‚es pour fixer les valeurs du record de r‚f‚rence.
+utilisÃ©es pour fixer les valeurs du record de rÃ©fÃ©rence.
 
-Si ce n'est pas le cas, on peut d‚terminer … l'aide de cette fonction
-le d‚but de la recherche. Des "defines" sont d‚finis comme dans le cas
-des ISAM pour effectuer plus facilement la mˆme op‚ration.
+Si ce n'est pas le cas, on peut dÃ©terminer Ã  l'aide de cette fonction
+le dÃ©but de la recherche. Des "defines" sont dÃ©finis comme dans le cas
+des ISAM pour effectuer plus facilement la mÃªme opÃ©ration.
 
 &EX
     ISAM is_cmds {
@@ -40,9 +40,9 @@ des ISAM pour effectuer plus facilement la mˆme op‚ration.
 ============================================================= */
 
 MP_set_ref(mp, fld_nb, val)
-MPAGE   *mp;    /* MPAGE … traiter */
-int     fld_nb; /* Num‚ro du champ de l'ISAM implicite */
-char    *val;   /* Valeur … donner au champ */
+MPAGE   *mp;    /* MPAGE Ã  traiter */
+int     fld_nb; /* NumÃ©ro du champ de l'ISAM implicite */
+char    *val;   /* Valeur Ã  donner au champ */
 {
     char    *is_rec;
     ISAM    *is  = (ISAM *)SCR_PTR(mp->mp_isam);

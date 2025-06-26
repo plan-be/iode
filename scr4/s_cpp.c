@@ -4,28 +4,28 @@
 int     CPP_DIRCH  = '#', CPP_DEFCH = '&', CPP_EOLCH = '#';
 
 /* ================================================================
-Ouvre un fichier en mode interprÇtation. L'interprÇteur gäre les
+Ouvre un fichier en mode interpr√©tation. L'interpr√©teur g√®re les
 fichiers inclus (include) et les macros (define).
 
 &EN filename = nom du fichier
 &EN type :
 &EN2 0 pour un fichier normal,
 &EN2 1 pour le stdin,
-&EN3 2 pour un string. Si filename est dÇfini, le string Ö interprÇter
-    est initialisÇ avec le contenu de filename. Sinon, la fonction
-    CppRecord() ou CppRecordLILO() sera utilisÇe avant lecture.
+&EN3 2 pour un string. Si filename est d√©fini, le string √† interpr√©ter
+    est initialis√© avec le contenu de filename. Sinon, la fonction
+    CppRecord() ou CppRecordLILO() sera utilis√©e avant lecture.
 
-Trois variables contenant les caractäres spÇciaux reconnus par les
-fonctions du groupe Cpp peuvent àtre (re-)dÇfinies Ö tout moment.
+Trois variables contenant les caract√®res sp√©ciaux reconnus par les
+fonctions du groupe Cpp peuvent √™tre (re-)d√©finies √† tout moment.
 
-&EN int CPP_DIRCH qui indique le dÇbut d'une directive ('#' par dÇfaut)
-&EN int CPP_DEFCH qui indique le dÇbut d'une macro ('&' par dÇfaut)
-&EN int CPP_EOLCH qui permet de prolonger une macro Ö la ligne suivante
-    ('#' par dÇfaut)
+&EN int CPP_DIRCH qui indique le d√©but d'une directive ('#' par d√©faut)
+&EN int CPP_DEFCH qui indique le d√©but d'une macro ('&' par d√©faut)
+&EN int CPP_EOLCH qui permet de prolonger une macro √† la ligne suivante
+    ('#' par d√©faut)
 
 &IT Directives
-ƒƒƒƒƒƒƒƒƒƒ
-Les directives suivantes sont interprÇtÇes :
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+Les directives suivantes sont interpr√©t√©es :
 
 &EN #include "filename"
 &EN #define MacroName MacroDefinition
@@ -34,15 +34,15 @@ Les directives suivantes sont interprÇtÇes :
 &EN #else
 &EN #endif
 
-Pour qu'une telle ligne ne soit pas interprÇtÇe, il suffit de placer
-un point-virgule (;) apräs le caractäre #.
+Pour qu'une telle ligne ne soit pas interpr√©t√©e, il suffit de placer
+un point-virgule (;) apr√®s le caract√®re #.
 
 &IT Macros
-ƒƒƒƒƒƒ
-Le nom des macros peuvent àtre quelconque mais ne doit pas contenir
-de caractäres autres qu'alphanumÇriques ou de soulignement (_).
+‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+Le nom des macros peuvent √™tre quelconque mais ne doit pas contenir
+de caract√®res autres qu'alphanum√©riques ou de soulignement (_).
 
-L'utilisation des macros se fait Ö l'aide du caractäre & suivi du
+L'utilisation des macros se fait √† l'aide du caract√®re & suivi du
 nom de la macro :
 
 &CO
@@ -51,11 +51,11 @@ nom de la macro :
     &UINT i;
 &TX
 
-Pour annuler l'interprÇtation d'une macro, il suffit de placer un
-point-virgule (;) apräs le caractäre &.
+Pour annuler l'interpr√©tation d'une macro, il suffit de placer un
+point-virgule (;) apr√®s le caract√®re &.
 
-Le sÇparateur qui suit le nom de la macro peut àtre quelconque. S'il
-s'agit d'un point-virgule (;), ce caractäre est consommÇ.
+Le s√©parateur qui suit le nom de la macro peut √™tre quelconque. S'il
+s'agit d'un point-virgule (;), ce caract√®re est consomm√©.
 
 &CO
     #define TX unsigned short
@@ -63,7 +63,7 @@ s'agit d'un point-virgule (;), ce caractäre est consommÇ.
     &TX x,y
     &TX;x,y
 &TX
-Donne Ö l'interprÇtation
+Donne √† l'interpr√©tation
 &CO
     &;TX x,y
     unsigned short x,y
@@ -71,11 +71,11 @@ Donne Ö l'interprÇtation
 &TX
 
 Pour prolonger le texte d'une macro sur plusieurs lignes, il suffit de
-placer en fin de ligne le caractäre #. La ligne suivante ne sera pas
-interprÇtÇe (sauf en ce qui concerne les "sous-macros" utilisÇes) et fera
+placer en fin de ligne le caract√®re #. La ligne suivante ne sera pas
+interpr√©t√©e (sauf en ce qui concerne les "sous-macros" utilis√©es) et fera
 partie de la macro.
 
-Pour placer le caractäre # en fin de macro, il suffit de le doubler en
+Pour placer le caract√®re # en fin de macro, il suffit de le doubler en
 fin de ligne.
 
 &CO
@@ -85,22 +85,22 @@ fin de ligne.
     &PAR1 texte1
     &PAR2 texte2
 &TX
-Donne Ö l'interprÇtation
+Donne √† l'interpr√©tation
 &CO
     .par1 par_1
      texte1
     .par1 par2# texte2
 &TX
 
-Si une macro n'est pas dÇfinie, le texte du fichier n'est pas
-interprÇtÇ. Ainsi:
+Si une macro n'est pas d√©finie, le texte du fichier n'est pas
+interpr√©t√©. Ainsi:
 
 &CO
     #define A AVAL
     &A
     &B
 &TX
-Donne Ö l'interprÇtation
+Donne √† l'interpr√©tation
 &CO
     AVAL
     &B
@@ -152,10 +152,10 @@ int     type;
 }
 
 /* ================================================================
-Ferme le fichier prÇalablement ouvert par CppOpen() et libäre les
-buffers associÇs.
+Ferme le fichier pr√©alablement ouvert par CppOpen() et lib√®re les
+buffers associ√©s.
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
 &SA CppOpen()
 ================================================================ */
@@ -185,11 +185,11 @@ Place le string buf dans le stream du fichier cpp ouvert.
 La lecture suivante retournera buf[0], ensuite buf[1], etc.
 
 &EN cpp = descripteur du fichier ouvert
-&EN buf = string terminÇ par un 0
+&EN buf = string termin√© par un 0
 
-Les appels successifs Ö CppRecord() placent les strings selon la
-mÇthode LIFO (last in, first out). L'exemple suivant explicite la
-mÇthode.
+Les appels successifs √† CppRecord() placent les strings selon la
+m√©thode LIFO (last in, first out). L'exemple suivant explicite la
+m√©thode.
 
 &EX
     CPPFILE *cpp;
@@ -207,15 +207,15 @@ mÇthode.
 
     ...
 &TX
-RÇsultat :
+R√©sultat :
 &CO
     1 : C  (LIFO)
     2 : B  (LIFO)
     3 : A  (LIFO)
-    4 : 1  (Premier caractäre de la chaåne)
-    5 : 2  (deuxiäme)
-    6 : 3  (troisiäme)
-    7 : 4  (quatriäme)
+    4 : 1  (Premier caract√®re de la cha√Æne)
+    5 : 2  (deuxi√®me)
+    6 : 3  (troisi√®me)
+    7 : 4  (quatri√®me)
 &TX
 
 &SA CppGetc(), CppUngetc(), CppOpen(), CppClose(), CppRecordLILO()
@@ -240,12 +240,12 @@ U_ch    *buf;
 
 /* ================================================================
 Place le string buf dans le stream du fichier cpp ouvert selon
-la mÇthode LILO (Last In, First Out).
+la m√©thode LILO (Last In, First Out).
 
 &EN cpp = descripteur du fichier ouvert
-&EN buf = string terminÇ par un 0
+&EN buf = string termin√© par un 0
 
-L'exemple suivant explicite la mÇthode.
+L'exemple suivant explicite la m√©thode.
 
 &EX
     CPPFILE *cpp;
@@ -263,12 +263,12 @@ L'exemple suivant explicite la mÇthode.
 
     ...
 &TX
-RÇsultat :
+R√©sultat :
 &CO
-    4 : 1  (Premier caractäre de la chaåne)
-    5 : 2  (deuxiäme)
-    6 : 3  (troisiäme)
-    7 : 4  (quatriäme)
+    4 : 1  (Premier caract√®re de la cha√Æne)
+    5 : 2  (deuxi√®me)
+    6 : 3  (troisi√®me)
+    7 : 4  (quatri√®me)
     3 : A  (LILO)
     2 : B  (LILO)
     1 : C  (LILO)
@@ -313,15 +313,15 @@ int     lg;
 }
 
 /* ================================================================
-Place le caractäre ch dans le stream du fichier cpp ouvert.
-La lecture suivante retournera ce caractäre.
+Place le caract√®re ch dans le stream du fichier cpp ouvert.
+La lecture suivante retournera ce caract√®re.
 
-Contrairement Ö la fonction ungetc(), plusieurs CppUngetc() peuvent
-àtre appelÇs successivement. Les caractäres seront retournÇs selon
-la mÇthode LIFO comme pour CppRecord().
+Contrairement √† la fonction ungetc(), plusieurs CppUngetc() peuvent
+√™tre appel√©s successivement. Les caract√®res seront retourn√©s selon
+la m√©thode LIFO comme pour CppRecord().
 
 &EN cpp = descripteur du fichier ouvert
-&EN ch = caractäre Ö enregistrer
+&EN ch = caract√®re √† enregistrer
 
 &EX
     CPPFILE *cpp;
@@ -338,7 +338,7 @@ la mÇthode LIFO comme pour CppRecord().
 
     ...
 &TX
-RÇsultat :
+R√©sultat :
 &CO
     1 : 3  (LIFO)
     2 : 2  (LIFO)
@@ -392,36 +392,36 @@ CPPFILE *cpp;
 }
 
 /* ================================================================
-Lit le caractäre suivant dans le fichier dÇcrit par cpp. Ce caractäre
-peut provenir d'un CppRecord() ou CppUngetc() prÇcÇdent.
+Lit le caract√®re suivant dans le fichier d√©crit par cpp. Ce caract√®re
+peut provenir d'un CppRecord() ou CppUngetc() pr√©c√©dent.
 
-Si le fichier contient des directives, ces directives sont interprÇtÇes
-par la fonction CppGetc() et le caractäres retournÇ dÇpend des actions
-dÇterminÇes par les directives.
+Si le fichier contient des directives, ces directives sont interpr√©t√©es
+par la fonction CppGetc() et le caract√®res retourn√© d√©pend des actions
+d√©termin√©es par les directives.
 
-Trois cas sont Ö prendre en considÇration :
+Trois cas sont √† prendre en consid√©ration :
 
-&EN La directive include (commenáant par le caractäre dÇfini dans
-    CPP_DIRCH) en dÇbut de ligne. Le fichier indiquÇ est ouvert et
-    le premier caractäre du sous-fichier est retournÇ (sauf si
-    on se trouve dans un des trois cas dÇcrits ici). A la fin du
-    sous-fichier, la lecture se poursuit Ö la ligne suivante du fichier
+&EN La directive include (commen√ßant par le caract√®re d√©fini dans
+    CPP_DIRCH) en d√©but de ligne. Le fichier indiqu√© est ouvert et
+    le premier caract√®re du sous-fichier est retourn√© (sauf si
+    on se trouve dans un des trois cas d√©crits ici). A la fin du
+    sous-fichier, la lecture se poursuit √† la ligne suivante du fichier
     principal.
 
-&EN La directive define (commenáant par le caractäre dÇfini dans
-    CPP_DIRCH) en dÇbut de ligne. La dÇfinition est lue et s'ajoute Ö la
-    table des defines. Le caractäre suivant dans le fichier est retournÇ
+&EN La directive define (commen√ßant par le caract√®re d√©fini dans
+    CPP_DIRCH) en d√©but de ligne. La d√©finition est lue et s'ajoute √† la
+    table des defines. Le caract√®re suivant dans le fichier est retourn√©
     par la fonction.
 
-&EN Un define (commenáant par le caractäre dÇfini dans CPP_DEFCH). Le
-    caractäre retournÇ est le premier de la valeur dÇfinie du define.
+&EN Un define (commen√ßant par le caract√®re d√©fini dans CPP_DEFCH). Le
+    caract√®re retourn√© est le premier de la valeur d√©finie du define.
 
 
-&IT Paramätres
+&IT Param√®tres
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
-&RT Le caractäre suivant dans le fihier cpp.
+&RT Le caract√®re suivant dans le fihier cpp.
 
 &EX
     CPPFILE *cpp;
@@ -594,9 +594,9 @@ U_ch    *str;
 }
 
 /*NH ================================================================
-Libäre l'espace allouÇ par les define.
+Lib√®re l'espace allou√© par les define.
 
-Cette fonction est pas appelÇe par CppClose();
+Cette fonction est pas appel√©e par CppClose();
 
 &EX
     CPPFILE *cpp;
@@ -626,9 +626,9 @@ int CppFreeDefines()
 }
 
 /* ================================================================
-Definit une macro. L'espace nÇcessaire pour stocker name et txt est
-allouÇ par la fonction. Cet espace sera libÇrÇ par l'appel Ö
-CppFreeDefines(). La fonction CppClose() ne libäre pas cet espace.
+Definit une macro. L'espace n√©cessaire pour stocker name et txt est
+allou√© par la fonction. Cet espace sera lib√©r√© par l'appel √†
+CppFreeDefines(). La fonction CppClose() ne lib√®re pas cet espace.
 
 &EN name = nom de la macro
 &EN txt = texte de la macro
@@ -741,13 +741,13 @@ CPPFILE *cpp;
 
 /* ================================================================
 Retourne dans un buffer statique un texte indiquant le fichier, la ligne
-et le caractäre courants. Le format est :
+et le caract√®re courants. Le format est :
 
 &CO
     nom_du_fichier[line;col]
 &TX
 
-&EN cpp = pointeur retournÇ par CppOpen()
+&EN cpp = pointeur retourn√© par CppOpen()
 
 &SA CppOpen(), CppClose(), CppError()
 ================================================================ */

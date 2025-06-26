@@ -1,9 +1,9 @@
 #include "s_strs.h"
 /* =+=================================================================
 Supprime tous les blancs d'un string. Prolonge ensuite le string par des
-blancs de telle sorte que sa longueur reste inchang‚e.
+blancs de telle sorte que sa longueur reste inchangÃ©e.
 
-&RT un pointeur vers le string modifi‚
+&RT un pointeur vers le string modifiÃ©
 &EX
     printf("'%s'\n", U_sqz_text(" Jean - Marc "));
 

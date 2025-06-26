@@ -2,11 +2,11 @@
 #include <scr4w.h>
 
 /* =======================================================================
-Ajoute une ic“ne dans la barre de tƒches de Windows, … c“t‚ de l'horloge.
-Plusieurs ic“nes peuvent ˆtre associ‚es … la mˆme fenˆtre.
+Ajoute une icÃ´ne dans la barre de tÃ¢ches de Windows, Ã  cÃ´tÃ© de l'horloge.
+Plusieurs icÃ´nes peuvent Ãªtre associÃ©es Ã  la mÃªme fenÃªtre.
 
-&EN hWnd : handle de la fenˆtre mŠre
-&EN IconNb : num‚ro de l'ic“ne (d‚fini dans le fichier .rc)
+&EN hWnd : handle de la fenÃªtre mÃ¨re
+&EN IconNb : numÃ©ro de l'icÃ´ne (dÃ©fini dans le fichier .rc)
 &EN lpszTip : tooltip
 
 &SA WscrDeleteTaskBarIcon(), WscrChangeTaskBarTooltip()
@@ -37,10 +37,10 @@ WscrAddTaskBarIcon(HWND hWnd, int IconNb, LPSTR lpszTip)
 }
 
 /* =======================================================================
-D‚truit l'ic“ne associ‚e … une fenˆtre dans la barre de tƒches de Windows.
+DÃ©truit l'icÃ´ne associÃ©e Ã  une fenÃªtre dans la barre de tÃ¢ches de Windows.
 
-&EN hWnd : handle de la fenˆtre mŠre
-&EN IconNb : num‚ro de l'ic“ne (d‚fini dans le fichier .rc)
+&EN hWnd : handle de la fenÃªtre mÃ¨re
+&EN IconNb : numÃ©ro de l'icÃ´ne (dÃ©fini dans le fichier .rc)
 
 &SA WscrDeleteTaskBarIcon(), WscrChangeTaskBarTooltip()
 ======================================================================= */
@@ -60,12 +60,12 @@ WscrDeleteTaskBarIcon(HWND hwnd, UINT IconNb)
 }
 
 /* =======================================================================
-Change le tooltip d'une ic“ne associ‚e … une fenˆtre dans la barre de tƒches
+Change le tooltip d'une icÃ´ne associÃ©e Ã  une fenÃªtre dans la barre de tÃ¢ches
 de Windows.
 
-&EN hWnd : handle de la fenˆtre mŠre
-&EN IconNb : num‚ro de l'ic“ne (d‚fini dans le fichier .rc)
-&EN lpszTip : nouveau texte du tooltip (peut ˆtre une adresse volatile)
+&EN hWnd : handle de la fenÃªtre mÃ¨re
+&EN IconNb : numÃ©ro de l'icÃ´ne (dÃ©fini dans le fichier .rc)
+&EN lpszTip : nouveau texte du tooltip (peut Ãªtre une adresse volatile)
 
 &SA WscrDeleteTaskBarIcon(), WscrAddTaskBarIcon()
 ======================================================================= */

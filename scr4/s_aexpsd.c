@@ -5,7 +5,7 @@
 #include <dos.h>
 
 /* ==================================================================
-Fonction appel‚e par A_expandstar() lors du processus d'initialisation
+Fonction appelÃ©e par A_expandstar() lors du processus d'initialisation
 des arguments (A_init() et A_initv()).
 
 &SA A_init(), A_initv(), A_expand(), A_iexpand(), A_expandstar()

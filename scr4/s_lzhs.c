@@ -35,17 +35,17 @@ long LzhSizStr()
     return((long)LZH_inlen);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de compactage de string bas‚e sur l'algorithme de Lempel-Zev et
-sur la m‚thode de Huffmann.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de compactage de string basÃ©e sur l'algorithme de Lempel-Zev et
+sur la mÃ©thode de Huffmann.
 
-instr est le string … compacter et inlen sa longueur. instr peut
-contenir des z‚ros. outstr est un pointeur vers le string r‚sultat
-allou‚ par la fonction. outlen est un pointeur vers sa longueur.
+instr est le string Ã  compacter et inlen sa longueur. instr peut
+contenir des zÃ©ros. outstr est un pointeur vers le string rÃ©sultat
+allouÃ© par la fonction. outlen est un pointeur vers sa longueur.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &SA LzhEncodeFile(), LzhDecodeStr(), LzhEncodeGnl()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 LzhEncodeStr(instr, inlen, outstr, outlen)
 unsigned char   *instr, **outstr;
 unsigned        inlen, *outlen;
@@ -69,19 +69,19 @@ unsigned        inlen, *outlen;
     return(rc);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Fonction de d‚compactage de string bas‚e sur l'algorithme de Lempel-Zev
-et sur la m‚thode de Huffmann. Le fichier trait‚ doit ˆtre le r‚sultat
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Fonction de dÃ©compactage de string basÃ©e sur l'algorithme de Lempel-Zev
+et sur la mÃ©thode de Huffmann. Le fichier traitÃ© doit Ãªtre le rÃ©sultat
 de la fonction LzhEncodeStr().
 
 instr est le string input et inlen sa longueur. Ce string est le
-r‚sultat de l'appel … la fonction LzhEncodeStr(). outstr est un pointeur
-vers le string r‚sultat qui est allou‚ via malloc par la fonction. La
-longueur du r‚sultat est stock‚e dans outlen.
+rÃ©sultat de l'appel Ã  la fonction LzhEncodeStr(). outstr est un pointeur
+vers le string rÃ©sultat qui est allouÃ© via malloc par la fonction. La
+longueur du rÃ©sultat est stockÃ©e dans outlen.
 
-&RT 0 en cas de succŠs, -1 en cas d'erreur
+&RT 0 en cas de succÃ¨s, -1 en cas d'erreur
 &SA LzhEncodeFile(), LzhDecodeStr(), LzhDecodeGnl()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 LzhDecodeStr(instr, inlen, outstr, outlen)
 unsigned char   *instr, **outstr;
 unsigned        inlen, *outlen;

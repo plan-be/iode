@@ -38,7 +38,7 @@ typedef struct _arlist_ {
 typedef struct _m_ring_
 {
     int compt;      /*nb car dans tampon */
-    int debut;      /*caract�re � prendre */
+    int debut;      /*caractére à prendre */
     int taille;     /*taille tampon */
     char *tampon;   /*adresse tampon */
 } M_RING;
@@ -56,11 +56,11 @@ typedef struct _pcfdisk_ {
 } PCFDISK;
 
 typedef struct _pcinfos_ {
-    short   fpu;                /* 1 si un processeur math. est pr�sent */
+    short   fpu;                /* 1 si un processeur math. est présent */
     short   nbfdisks;           /* Nbre de disques logiques (fixes) */
     PCFDISK fdisks[MAXFDISKS];  /* Infos sur chaque disque */
-    short   lpts[3];            /* Etat de chaque imprimante parall�le */
-    short   nbcoms;             /* Nombre de portes s�ries COMx */
+    short   lpts[3];            /* Etat de chaque imprimante paralléle */
+    short   nbcoms;             /* Nombre de portes séries COMx */
 } PCINFOS;
 
 /* === ALLOC DOC === */

@@ -6,20 +6,20 @@ int      SW_ACTIVE = 0;
 /*
     Fonction d'initialisation du swapping. Cette fonction
     alloue tout l'espace EMS disponible s'il y en a et
-    utilise cet espace pour y placer les blocs Ö allouer.
+    utilise cet espace pour y placer les blocs √† allouer.
 
-    Si le paramätre ems est null, la mÇmoire EMS n'est pas
-    utilisÇe.
+    Si le param√®tre ems est null, la m√©moire EMS n'est pas
+    utilis√©e.
 
     Remarques :
 
-&EN il est impÇratif d'utiliser cette fonction avant
-    de commencer Ö utiliser les fonctions de swapping.
+&EN il est imp√©ratif d'utiliser cette fonction avant
+    de commencer √† utiliser les fonctions de swapping.
 
 &EN terminez toujours la session de swapping par SW_end().
-    Sans cela, la mÇmoire EMS n'est pas rendue disponible et le fichier
-    Çventuel de SWAP n'est pas dÇtruit. De plus, toutes les allocations
-    internes du systäme restent actives.
+    Sans cela, la m√©moire EMS n'est pas rendue disponible et le fichier
+    √©ventuel de SWAP n'est pas d√©truit. De plus, toutes les allocations
+    internes du syst√®me restent actives.
 
 &SA SW_end()
 */
@@ -85,10 +85,10 @@ fin:
 }
 
 /* ====================================================================
-Fonction indiquant que l'on n'a plus besoin du systäme EMS. Cette
-fonction libäre tous les segments de mÇmoire conventionnelle utilisÇs
-par le systäme de swapping, dÇtruit le fichier de swap (SWAPFILE.SW) et
-libäre les pages EMS.
+Fonction indiquant que l'on n'a plus besoin du syst√®me EMS. Cette
+fonction lib√®re tous les segments de m√©moire conventionnelle utilis√©s
+par le syst√®me de swapping, d√©truit le fichier de swap (SWAPFILE.SW) et
+lib√®re les pages EMS.
 
 &SA SW_init()
 ====================================================================== */
@@ -119,12 +119,12 @@ void SW_end()
 /*NH*/
 /*
     Cette fonction termine le programme est cas d'erreur de Swap.
-    Elle utilise la fonction exit() avec comme paramätre le code
+    Elle utilise la fonction exit() avec comme param√®tre le code
     d'erreur et affiche un message correspondant. Vous pouvez
-    remplacer cette fonction par une fonction Ö vous en n'oubliant
-    toutefois pas l'appel Ö <SW_end> avant de sortir.
+    remplacer cette fonction par une fonction √† vous en n'oubliant
+    toutefois pas l'appel √† <SW_end> avant de sortir.
 
-    Les diffÇrents codes d'erreur sont les suivants :
+    Les diff√©rents codes d'erreur sont les suivants :
 
 	code 1 : File creation error
 
@@ -216,10 +216,10 @@ int     blk_nb;
 
 /*
     Cette fonction retourne le nombre de bytes disponibles dans le
-    systäme de swap. Ce nombre contient la somme de tous les bytes
-    restant dans les blocs dÇjÖ allouÇs. Elle contient donc
+    syst√®me de swap. Ce nombre contient la somme de tous les bytes
+    restant dans les blocs d√©j√† allou√©s. Elle contient donc
     l'espace restant en EMS. La partie fichier y est aussi comprise :
-    Si un espace disque a ÇtÇ allouÇ, puis libÇrÇ, ce nombre
+    Si un espace disque a √©t√© allou√©, puis lib√©r√©, ce nombre
     de bytes est pris en compte dans le total.
 */
 
@@ -237,7 +237,7 @@ long    SW_coreleft()
 
 /*
     Cette fonction stocke dans la structure st les informations
-    sur l'utilisation de la mÇmoire Ö l'aide des fonctions du
+    sur l'utilisation de la m√©moire √† l'aide des fonctions du
     package.
 */
 

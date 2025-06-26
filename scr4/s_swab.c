@@ -22,14 +22,14 @@
 
 
 /*==================================================================
-Fonction appel‚e en cas d'erreur de swap. code est un num‚ro
+Fonction appelÃ©e en cas d'erreur de swap. code est un numÃ©ro
 d'erreur et text est un message indiquant le type d'erreur.
 
-Cette fonction peut ˆtre replac‚e par une fonction utilisateur,
+Cette fonction peut Ãªtre replacÃ©e par une fonction utilisateur,
 permettant par exemple de sauver le travail en cours avant de
-quitter le systŠme.
+quitter le systÃ¨me.
 
-La fonction de librairie effectue les op‚rations suivantes :
+La fonction de librairie effectue les opÃ©rations suivantes :
 
 &CO
     fprintf(stderr, "\nSwap panic : %s\n", text);

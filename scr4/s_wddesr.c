@@ -37,34 +37,34 @@ int     (*WDdePokeFn)();
 Fonction d'initialisation d'un serveur DDE. Cette fonction n'est
 exploitable que sous Windows 32.
 
-Cette fonction doit ˆtre lanc‚e dŠs que le serveur peut ˆtre appel‚. En
-g‚n‚ral, elle est ex‚cut‚e dans WscrMain().
+Cette fonction doit Ãªtre lancÃ©e dÃ¨s que le serveur peut Ãªtre appelÃ©. En
+gÃ©nÃ©ral, elle est exÃ©cutÃ©e dans WscrMain().
 
-Ses paramŠtres indiquent … toutes les autres applications les services
-qui sont rendus disponibles et les fonctions utilisateur … utiliser pour
-r‚pondre aux requˆtes.
+Ses paramÃ¨tres indiquent Ã  toutes les autres applications les services
+qui sont rendus disponibles et les fonctions utilisateur Ã  utiliser pour
+rÃ©pondre aux requÃªtes.
 
-&EN service = nom du service. En g‚n‚ral, le service a pour nom
-    le programme lui-mˆme.
+&EN service = nom du service. En gÃ©nÃ©ral, le service a pour nom
+    le programme lui-mÃªme.
 
 &EN topic = tableau de strings reprenant tous les topics qui peuvent
-    ˆtre exploit‚s par le serveur. Ces informations sont rendues
+    Ãªtre exploitÃ©s par le serveur. Ces informations sont rendues
     de la sorte disponibles pour tous les autres applicatifs.
 
-&EN Request = pointeur vers la fonction utilisateur exploit‚e lorsqu'une
-    requˆte est faite au serveur
+&EN Request = pointeur vers la fonction utilisateur exploitÃ©e lorsqu'une
+    requÃªte est faite au serveur
 
-&EN Poke = pointeur vers une fonction utilisateur ex‚cut‚e lorsqu'un applicatif
-    veut ex‚cut‚e une requˆte de type "poke", c'est-…-dire passer de
+&EN Poke = pointeur vers une fonction utilisateur exÃ©cutÃ©e lorsqu'un applicatif
+    veut exÃ©cutÃ©e une requÃªte de type "poke", c'est-Ã -dire passer de
     l'information au serveur en vue par exemple d'un enregistrement par
     celui-ci.
 
 &TI Fonction Request()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-La fonction Request() r‚pond … une demande: elle renvoie normalement
-une valeur au programme appelant. Mais rien n'empˆche de lui faire
-ex‚cuter n'importe quelle fonction dans le programme serveur.
+La fonction Request() rÃ©pond Ã  une demande: elle renvoie normalement
+une valeur au programme appelant. Mais rien n'empÃªche de lui faire
+exÃ©cuter n'importe quelle fonction dans le programme serveur.
 
 La fonction Request() a pour syntaxe :
 
@@ -72,17 +72,17 @@ La fonction Request() a pour syntaxe :
     char *Request(char *topic, char *item)
 &TX
 
-Le topic est n‚cessairement l'un de ceux pass‚s comme paramŠtre
-d'initialisation du serveur (le systŠme filtre les topics inexistants).
-L'item est n'importe quel texte pass‚ par le programme appelant.
+Le topic est nÃ©cessairement l'un de ceux passÃ©s comme paramÃ¨tre
+d'initialisation du serveur (le systÃ¨me filtre les topics inexistants).
+L'item est n'importe quel texte passÃ© par le programme appelant.
 
-Le r‚sultat de la fonction doit ˆtre nul est cas d'erreur ou un string
-allou‚ en cas de r‚ponse. Ce string est lib‚r‚ par le systŠme et doit
-donc imp‚rativement ˆtre allou‚.
+Le rÃ©sultat de la fonction doit Ãªtre nul est cas d'erreur ou un string
+allouÃ© en cas de rÃ©ponse. Ce string est libÃ©rÃ© par le systÃ¨me et doit
+donc impÃ©rativement Ãªtre allouÃ©.
 
 
 &IT Exemple
-ÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€
 
 &CO
     char *MyRequest(char *topic, char *item)
@@ -104,7 +104,7 @@ donc imp‚rativement ˆtre allou‚.
 &TX
 
 &TI Fonction Poke()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 L'objectif de la fonction Poke est de changer des valeurs dans le
 programme serveur, par exemple en ajoutant un record ou en modifiant
@@ -116,15 +116,15 @@ La fonction Poke() a pour syntaxe :
     int Poke(char *topic, char *item, char *data)
 &TX
 
-Le topic est l'un de ceux pass‚s comme paramŠtre d'initialisation du
-serveur. L'item est n'importe quel texte pass‚ par le programme
-appelant. data est la valeur modifi‚e ou … fixer.
+Le topic est l'un de ceux passÃ©s comme paramÃ¨tre d'initialisation du
+serveur. L'item est n'importe quel texte passÃ© par le programme
+appelant. data est la valeur modifiÃ©e ou Ã  fixer.
 
-Le r‚sultat de la fonction doit ˆtre 0 en cas de succŠs, -1 en cas
+Le rÃ©sultat de la fonction doit Ãªtre 0 en cas de succÃ¨s, -1 en cas
 d'erreur.
 
 &IT Exemple
-ÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€
 
 &CO
     int Poke(char *topic, char *item, char *data)
@@ -184,8 +184,8 @@ int     (*Poke)(char *, char *, char *)
 }
 
 /* ===================================================================
-Cette fonction termine le service initialis‚ par WscrDdeServer().
-Elle est ex‚cut‚e normalement dans le fonction WscrEnd().
+Cette fonction termine le service initialisÃ© par WscrDdeServer().
+Elle est exÃ©cutÃ©e normalement dans le fonction WscrEnd().
 
 &SA WscrDdeServer()
 ==================================================================== */

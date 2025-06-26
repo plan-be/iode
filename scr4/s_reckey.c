@@ -5,20 +5,20 @@ int *SCR_REC_KEYS = 0;
 int SCR_NB_REC_KEYS = 0, SCR_NB_ALLOC_KEYS = 0;
 
 /* ====================================================================
-Enregistre une touche (caractŠre ou touche fonction dans le buffer du
-clavier. Cette fonction permet donc d'automatiser certaines op‚rations
-en prenant la main sur le clavier. Les touches sont stock‚es suivant le
-principe LIFO (dernier arriv‚, premier sorti).
+Enregistre une touche (caractÃ¨re ou touche fonction dans le buffer du
+clavier. Cette fonction permet donc d'automatiser certaines opÃ©rations
+en prenant la main sur le clavier. Les touches sont stockÃ©es suivant le
+principe LIFO (dernier arrivÃ©, premier sorti).
 
-&EN int key : touche … enregister
+&EN int key : touche Ã  enregister
 &EN int enter : si touche = '\n', valeur de remplacement (p.ex SCR_A_N)
 &EN int tab : si touche = '\t', valeur de remplacement (p.ex SCR_TAB)
 
-Les macros d‚finissant les touches sont reprises dans le fichier
+Les macros dÃ©finissant les touches sont reprises dans le fichier
 "scr4_key.h".
 
-Un nombre maximum de SCR_MAX_REC_KEYS (200) touches peuvent ˆtre
-enregistr‚es.
+Un nombre maximum de SCR_MAX_REC_KEYS (200) touches peuvent Ãªtre
+enregistrÃ©es.
 
 &EX
     SCR_record_key(SCR_ENTER);
@@ -49,16 +49,16 @@ int     key;
 }
 
 /* ====================================================================
-Enregistre une touche (caractŠre ou touche fonction dans le buffer du
-clavier. Cette fonction permet donc d'automatiser certaines op‚rations
-en prenant la main sur le clavier. Les touches sont stock‚es suivant le
-principe LIFO (dernier arriv‚, premier sorti).
+Enregistre une touche (caractÃ¨re ou touche fonction dans le buffer du
+clavier. Cette fonction permet donc d'automatiser certaines opÃ©rations
+en prenant la main sur le clavier. Les touches sont stockÃ©es suivant le
+principe LIFO (dernier arrivÃ©, premier sorti).
 
-Les macros d‚finissant les touches sont reprises dans le fichier
+Les macros dÃ©finissant les touches sont reprises dans le fichier
 "scr4_key.h".
 
-Un nombre maximum de SCR_MAX_REC_KEYS (200) touches peuvent ˆtre
-enregistr‚es.
+Un nombre maximum de SCR_MAX_REC_KEYS (200) touches peuvent Ãªtre
+enregistrÃ©es.
 
 &EX
     SCR_record_key(SCR_ENTER);
@@ -75,11 +75,11 @@ int     key;
 
 /* ====================================================================
 Enregistre un string dans le buffer de
-clavier. Cette fonction permet donc d'automatiser certaines op‚rations
-en prenant la main sur le clavier. Les touches sont stock‚es suivant le
-principe LIFO (dernier arriv‚, premier sorti).
+clavier. Cette fonction permet donc d'automatiser certaines opÃ©rations
+en prenant la main sur le clavier. Les touches sont stockÃ©es suivant le
+principe LIFO (dernier arrivÃ©, premier sorti).
 
-&EN unsigned char *text: texte … enregister
+&EN unsigned char *text: texte Ã  enregister
 &EN int enter : valeur de remplacement de '\n' dans text (p.ex SCR_A_N)
 &EN int tab : valeur de remplacement  '\t' dans text (p.ex SCR_TAB)
 
@@ -103,12 +103,12 @@ int             enter, tab;
 
 /* ====================================================================
 Enregistre un string dans le buffer de
-clavier. Cette fonction permet donc d'automatiser certaines op‚rations
-en prenant la main sur le clavier. Les touches sont stock‚es suivant le
-principe LIFO (dernier arriv‚, premier sorti).
+clavier. Cette fonction permet donc d'automatiser certaines opÃ©rations
+en prenant la main sur le clavier. Les touches sont stockÃ©es suivant le
+principe LIFO (dernier arrivÃ©, premier sorti).
 
-Un nombre maximum de SCR_MAX_REC_KEYS (200) caractŠres peuvent ˆtre
-enregistr‚es.
+Un nombre maximum de SCR_MAX_REC_KEYS (200) caractÃ¨res peuvent Ãªtre
+enregistrÃ©es.
 
 &EX
     SCR_record_text("SCR4/AL1");

@@ -5,21 +5,21 @@ extern unsigned char  AR_CH;
 
 /* ====================================================================
 Extrait une liste de fichier (files) au nombre de n d'un fichier arname
-crÇÇ Ö l'aide de AR_add(). Le pointeur vers fonction fn permet de
-passer Ö une fonction utilisateur les informations sur le dÇroulement
+cr√©√© √† l'aide de AR_add(). Le pointeur vers fonction fn permet de
+passer √† une fonction utilisateur les informations sur le d√©roulement
 du processus.
 
-fn est appelÇe Ö chaque caractäre lu dans un fichier. Sa syntaxe est :
+fn est appel√©e √† chaque caract√®re lu dans un fichier. Sa syntaxe est :
 
 &CO
     fn(char *filename, long nb_read, long nb_total)
 &TX
 
-Le fichier d'archive est balayÇ jusqu'Ö la fin. Si aucun fichier n'est
-spÇcifiÇ, tous les fichiers de l'archive sont extraits. Si un fichier
-se prÇsente plusieurs fois, c'est le dernier qui est restaurÇ.
+Le fichier d'archive est balay√© jusqu'√† la fin. Si aucun fichier n'est
+sp√©cifi√©, tous les fichiers de l'archive sont extraits. Si un fichier
+se pr√©sente plusieurs fois, c'est le dernier qui est restaur√©.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur. La variable AR_ERRNO
+&RT 0 en cas de succ√®s, -1 en cas d'erreur. La variable AR_ERRNO
     indique le code d'erreur et la fonction AR_error() fournit
     un texte.
 &EX

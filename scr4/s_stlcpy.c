@@ -1,11 +1,11 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Copie un string dans un autre en limitant le nombre de caractŠres … copier.
-Si in est plus grand que le nombre de caractŠres sp‚cifi‚s, seuls les n
-premiers sont copi‚s dans out. out[n] est fix‚ … 0.
+Copie un string dans un autre en limitant le nombre de caractÃ¨res Ã  copier.
+Si in est plus grand que le nombre de caractÃ¨res spÃ©cifiÃ©s, seuls les n
+premiers sont copiÃ©s dans out. out[n] est fixÃ© Ã  0.
 
-Si in est nul, out[0] est fix‚ … 0.
+Si in est nul, out[0] est fixÃ© Ã  0.
 
 &RT le pointeur vers le string out.
 &EX

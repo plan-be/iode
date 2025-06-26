@@ -20,8 +20,8 @@ int     len;
     if(tydb == ODBC) tydb = SCR_TYPE_DB;  /* JMP 08-02-11 */
 
     if(tydb == mysql)                               rest = "\\\"'";                  /* JMP 06-02-11 */
-    else if(tydb != ODBC && tydb != CTREE4)         rest = "\\\"@#^๕$*";             /* JMP 06-02-11 */
-    else                                            rest = ""; // rest = "\\\"๕$%";  /* JMP 06-02-11 */
+    else if(tydb != ODBC && tydb != CTREE4)         rest = "\\\"@#^ยง$*";             /* JMP 06-02-11 */
+    else                                            rest = ""; // rest = "\\\"ยง$%";  /* JMP 06-02-11 */
 
     for(i = 0 ; i < len && txt[i] ; i++, pos++) {
 	if(txt[i] == '\'') {    /* BP_M 26-06-2007 */

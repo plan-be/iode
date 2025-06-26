@@ -44,11 +44,11 @@ ISAM    *is;
 }
 
 /* ======================================================================
-Edite le record courant de l'ISAM is dÇfini Ö partir de la page pg.
-Sauve le record modifiÇ.
+Edite le record courant de l'ISAM is d√©fini √† partir de la page pg.
+Sauve le record modifi√©.
 
 Voir ACTION MODIFY_REC pour plus d'explications
-&RT 0 en cas de succäs, -1 sinon
+&RT 0 en cas de succ√®s, -1 sinon
 &SA NEXT_REC, PREV_REC, DELETE_REC, MODIFY_REC
 ------------------------------------------------------------------------- */
 
@@ -76,12 +76,12 @@ ISAM    *is;
 
 
 /* ======================================================================
-Edite la PAGE pg et crÇe un nouveau record l'ISAM dÇfini par cette PAGE. Si
-la touche de fonction utilisÇe pour quitter la PAGE est F10, sauve le
-record dÇfini dans la PAGE dans l'ISAM.
+Edite la PAGE pg et cr√©e un nouveau record l'ISAM d√©fini par cette PAGE. Si
+la touche de fonction utilis√©e pour quitter la PAGE est F10, sauve le
+record d√©fini dans la PAGE dans l'ISAM.
 
 Voir ACTION PG_CREATE_REC pour plus d'explications
-&RT 0 en cas de succäs, -1 sinon
+&RT 0 en cas de succ√®s, -1 sinon
 &SA PG_CREATE_REC
 ------------------------------------------------------------------------- */
 

@@ -2,14 +2,14 @@
 
 /* ================================================================
     Affiche tableau sur base de la structure ADEF. Le titre du
-    tableau est passÇ comme premier argument Ö la fonction.
+    tableau est pass√© comme premier argument √† la fonction.
 
-    Si le tableau dÇpasse 20 lignes, le programme affiche le
+    Si le tableau d√©passe 20 lignes, le programme affiche le
     message
 &CO
 	printf("Press ENTER to continue");
 &TX
-    apräs 20 lignes et reprend apräs rÇception de la touche ENTER.
+    apr√®s 20 lignes et reprend apr√®s r√©ception de la touche ENTER.
 =================================================================== */
 
 int A_usage(title, adef)

@@ -60,8 +60,8 @@ int     line,
     return(im);
 }
 /* ====================================================================
-Sauve une partie de l'‚cran dans une structure IMAGE.
-&RT le pointeur vers la structure allou‚e
+Sauve une partie de l'Ã©cran dans une structure IMAGE.
+&RT le pointeur vers la structure allouÃ©e
 &EX
     IMAGE   *im;
 
@@ -92,7 +92,7 @@ int     line,
 }
 
 /* ====================================================================
-Affiche une IMAGE dans l'‚cran.
+Affiche une IMAGE dans l'Ã©cran.
 &EX
     IMAGE   *im;
 

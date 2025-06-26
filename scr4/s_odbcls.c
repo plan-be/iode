@@ -11,7 +11,7 @@ extern SQLINTEGER  OLongBuf;
 
 /* ====================================================================
 Retourne la liste de toutes les Data Sources disponibles sur le
-systäme.
+syst√®me.
 
 &RT tableau de pointeurs vers le nom des DSN ou NULL en cas d'erreur.
 

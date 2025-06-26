@@ -1,8 +1,8 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Remplace l'extension d'un nom de fichier si le nom n'en possŠde pas. Le
-r‚sultat est sauv‚ dans une variable pass‚e par l'utilisateur.
+Remplace l'extension d'un nom de fichier si le nom n'en possÃ¨de pas. Le
+rÃ©sultat est sauvÃ© dans une variable passÃ©e par l'utilisateur.
 
 &RT pointeur vers res.
 &EX
@@ -15,7 +15,7 @@ r‚sultat est sauv‚ dans une variable pass‚e par l'utilisateur.
     SCR_cat_ext(res, "test.", "dat");
     printf("'%s'\n", res);
 
-    r‚sultat :
+    rÃ©sultat :
 
 	'test.dat'
 	'test.idx'

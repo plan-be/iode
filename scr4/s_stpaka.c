@@ -7,7 +7,7 @@ extern unsigned char  AR_CH;
 Ajoute n fichiers (contenus dans le tableau files) dans le fichier
 d'archive arname.
 
-&RT 0 en cas de succäs, -1 en cas d'erreur. La variable AR_ERRNO
+&RT 0 en cas de succ√®s, -1 en cas d'erreur. La variable AR_ERRNO
     indique le code d'erreur et la fonction AR_error() fournit
     un texte.
 &EX

@@ -1,9 +1,9 @@
 #include "scr.h"
 
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Retourne un pointeur vers un buffer statique contenant le nom
-du device d‚fini par disk et type.
+du device dÃ©fini par disk et type.
 
 disk vaut 0 pour le lecteur A: et 1 pour B:
 
@@ -18,7 +18,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 
 &RT buffer statique contenant le nom du device
 &SA STD_doscpin(), STD_doscpout(), STD_dosformat()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 char *STD_unit(disk, type)
 int     disk,  type;
 {
@@ -40,8 +40,8 @@ int     disk,  type;
     return(buf);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Copie le fichier from vers une disquette DOS dans l'unit‚ unit et type type
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Copie le fichier from vers une disquette DOS dans l'unitÃ© unit et type type
 sous le nom to.
 
 unit vaut 0 pour le lecteur A: et 1 pour B:
@@ -55,7 +55,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_dosformat()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 STD_doscpout(from, to, unit, type)
 char    *from, *to;
 int     unit, type;
@@ -77,8 +77,8 @@ int     unit, type;
     return(0);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-Copie le fichier from … partir d'une disquette DOS dans l'unit‚ unit et
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Copie le fichier from Ã  partir d'une disquette DOS dans l'unitÃ© unit et
 type type sous le nom to.
 
 unit vaut 0 pour le lecteur A: et 1 pour B:
@@ -92,7 +92,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 
 &RT void
 &SA STD_doscpout(), STD_unit(), STD_dosformat()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 STD_doscpin(from, to, unit, type)
 char    *from, *to;
 int     unit, type;
@@ -114,9 +114,9 @@ int     unit, type;
     return(0);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Formatte une disquette au format DOS (si la commande dosformat existe
-sur le systŠme UNIX).
+sur le systÃ¨me UNIX).
 
 unit vaut 0 pour le lecteur A: et 1 pour B:
 
@@ -127,11 +127,11 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
     STD_dosformat(0, 2)
 &TX
 
-&NO Cette fonction n'effectue aucune op‚ration sous DOSWIN
+&NO Cette fonction n'effectue aucune opÃ©ration sous DOSWIN
 
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_doscpout()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 STD_dosformat(unit, type)
 int     unit, type;
 {
@@ -148,22 +148,22 @@ int     unit, type;
     return(0);
 }
 
-/* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Lance un sous-shell (command.com en DOS et /bin/sh en unix). Ce shell
-se termine par exit. L'‚cran est vid‚ et un message indique …
+se termine par exit. L'Ã©cran est vidÃ© et un message indique Ã 
 l'utilisateur comment revenir au programme.
 
-AprŠs exit, l'application reprend … l'endroit o— elle avait ‚t‚ quitt‚e.
+AprÃ¨s exit, l'application reprend Ã  l'endroit oÃ¹ elle avait Ã©tÃ© quittÃ©e.
 
 &EX
     STD_subshell();
 &TX
 
-&NO Cette fonction n'effectue aucune op‚ration sous DOSWIN
+&NO Cette fonction n'effectue aucune opÃ©ration sous DOSWIN
 
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_dosformat()
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 STD_subshell()
 {
 #ifdef DOS

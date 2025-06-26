@@ -4,13 +4,13 @@
 extern FILE     *PC_FD;
 
 /* ====================================================================
-Recherche dans le fichier filename la d‚finition de l'item prname et
-retourne un tableau contenant tous les champs de d‚finition de
-l'item trouv‚.
+Recherche dans le fichier filename la dÃ©finition de l'item prname et
+retourne un tableau contenant tous les champs de dÃ©finition de
+l'item trouvÃ©.
 
-Le fichier est d‚crit dans la fonction PC_list().
+Le fichier est dÃ©crit dans la fonction PC_list().
 
-&RT un pointeur vers le tableau allou‚, NULL en cas d'erreur
+&RT un pointeur vers le tableau allouÃ©, NULL en cas d'erreur
 &EX
     char    **def;
 

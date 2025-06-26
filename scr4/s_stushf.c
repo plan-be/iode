@@ -1,13 +1,13 @@
 #include "s_strs.h"
 
 /* =+=================================================================
-D‚place le texte de n caractŠres … l'int‚rieur du string lui-mˆme.
-La longueur du string n'est pas modifi‚e. Une valeur positive de n
-indique un d‚placement vers la gauche, une valeur positive vers la
-droite. Les caractŠres en exc‚dent sont perdus. Des blancs sont ajout‚s
-en fin (n > 0) ou en d‚but (n < 0) pour compl‚ter le string.
+DÃ©place le texte de n caractÃ¨res Ã  l'intÃ©rieur du string lui-mÃªme.
+La longueur du string n'est pas modifiÃ©e. Une valeur positive de n
+indique un dÃ©placement vers la gauche, une valeur positive vers la
+droite. Les caractÃ¨res en excÃ©dent sont perdus. Des blancs sont ajoutÃ©s
+en fin (n > 0) ou en dÃ©but (n < 0) pour complÃ©ter le string.
 
-&RT un pointeur vers le string modifi‚
+&RT un pointeur vers le string modifiÃ©
 &EX
     printf("'%s'\n", U_shift_text("Jean-Marc  ", 2));
     printf("'%s'\n", U_shift_text("Jean-Marc  ", -2));

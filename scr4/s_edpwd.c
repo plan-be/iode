@@ -3,7 +3,7 @@
 char    SCR_MY_PWD[] = "SERVERLVD";
 
 /* ====================================================================
-Edite une PAGE contenant un mot de passe et vÇrifie celui-ci. S'il n'y a
+Edite une PAGE contenant un mot de passe et v√©rifie celui-ci. S'il n'y a
 pas de champ PASSWD dans la PAGE, la fonction retourne -1.
 
 Si le mot de passe est vide, la fonction retourne directement 0.
@@ -11,16 +11,16 @@ Le processus est le suivant :
 
 &EN Affichage de la PAGE et saisie des champs.
 
-&EN Le premier champ de type PASSWD est lu et comparÇ (apräs strip)
-    au mot de passe pwd passÇ comme argument. Si le champ correspond,
-    la PAGE est quittÇe et la fonction se termine. Sinon, un message
-    est affichÇ et l'Çdition reprend.
+&EN Le premier champ de type PASSWD est lu et compar√© (apr√®s strip)
+    au mot de passe pwd pass√© comme argument. Si le champ correspond,
+    la PAGE est quitt√©e et la fonction se termine. Sinon, un message
+    est affich√© et l'√©dition reprend.
 
-&EN Si la touche par laquelle la PAGE d'Çdition a ÇtÇ quittÇe est key,
-    l'Çdition se termine et la fonction SCR_end() est appelÇe pour
+&EN Si la touche par laquelle la PAGE d'√©dition a √©t√© quitt√©e est key,
+    l'√©dition se termine et la fonction SCR_end() est appel√©e pour
     quitter l'application.
 
-&EN Apräs nbtry essais, la fonction SCR_end() est appelÇe pour quitter
+&EN Apr√®s nbtry essais, la fonction SCR_end() est appel√©e pour quitter
     l'application
 
 &SA PG_edit_window(), PG_change_pwd()
@@ -69,7 +69,7 @@ int             key, nbtry;
 }
 
 /* ====================================================================
-Edite une PAGE contenant l'ancien et le nouveau mot de passe. VÇrifie
+Edite une PAGE contenant l'ancien et le nouveau mot de passe. V√©rifie
 celui-ci. S'il n'y a pas au moins 3 champs PASSWD dans la PAGE, la fonction
 retourne -1.
 
@@ -77,16 +77,16 @@ Le processus est le suivant :
 
 &EN Affichage de la PAGE et saisie des champs.
 
-&EN Le premier champ de type PASSWD est lu et comparÇ (apräs strip)
-    au mot de passe pwd passÇ comme argument. Si le champ correspond,
-    le 2äme et le 3äme PASSWD doivent àtre Çgaux. Le 2äme est alors copiÇ
-    dans pwd, la PAGE est quittÇe et la fonction se termine. Sinon, un
-    message est affichÇ et l'Çdition reprend.
+&EN Le premier champ de type PASSWD est lu et compar√© (apr√®s strip)
+    au mot de passe pwd pass√© comme argument. Si le champ correspond,
+    le 2√®me et le 3√®me PASSWD doivent √™tre √©gaux. Le 2√®me est alors copi√©
+    dans pwd, la PAGE est quitt√©e et la fonction se termine. Sinon, un
+    message est affich√© et l'√©dition reprend.
 
-&EN Si la touche permettant de quitter la PAGE d'Çdition est key, l'Çdition
+&EN Si la touche permettant de quitter la PAGE d'√©dition est key, l'√©dition
     se termine et la fonction retourne 0.
 
-&EN Apräs nbtry essais, la fonction SCR_end() est appelÇe pour quitter
+&EN Apr√®s nbtry essais, la fonction SCR_end() est appel√©e pour quitter
     l'application
 
 &SA PG_edit_window(), PG_edit_pwd()

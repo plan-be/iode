@@ -1,6 +1,6 @@
 #include "scr4.h"
 
-/* Si cette variable est … 0 le programme fait pas de PG_reset_all avant le PG_search */
+/* Si cette variable est Ã  0 le programme fait pas de PG_reset_all avant le PG_search */
 extern int  SCR_RESET_BEFORE_PGSEARCH; /* JMP 15-01-99 */
 extern int SCR_PGSEARCH_NOEDIT;  /* BP_M 05-10-1999 */
 

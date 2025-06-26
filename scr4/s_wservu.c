@@ -3,14 +3,14 @@
 #include "scr4w.h"
 
 /* ========================================================================
-Installe un service Windows. Ce service est compos‚ d'un programme
-ex‚cutable et d'une s‚rie de caract‚ristiques :
+Installe un service Windows. Ce service est composÃ© d'un programme
+exÃ©cutable et d'une sÃ©rie de caractÃ©ristiques :
 
-&EN char *ProgName : nom complet de l'ex‚cutable
+&EN char *ProgName : nom complet de l'exÃ©cutable
 &EN char *ServiceName : nom symbolique de service (ex. "S4issrv")
 &EN char *ServiceTitle : nom complet du service (ex. "Serveur ISAM SCR4/AL1")
 &EN char *ServiceDescr : description du service (ex. "Serveur de bases et de fichier SCR4/AL1")
-&EN char *autostart : 1 pour installer le service avec l'option auto start, 0 pour un d‚marrage manuel.
+&EN char *autostart : 1 pour installer le service avec l'option auto start, 0 pour un dÃ©marrage manuel.
 
 &EX
     for(i = 1; i < argc; i++) {
@@ -75,7 +75,7 @@ WscrServiceInstall(char *ProgName, char *ServiceName, char *ServiceTitle,
 }
 
 /* ========================================================================
-Supprime (d‚sinstalle) un service Windows.
+Supprime (dÃ©sinstalle) un service Windows.
 
 &EN char *ServiceName : nom symbolique de service (ex. "S4issrv")
 
@@ -103,7 +103,7 @@ WscrServiceRemove(char *ServiceName)
 }
 
 /* ========================================================================
-D‚marre un service Windows.
+DÃ©marre un service Windows.
 
 &EN char *ServiceName : nom symbolique de service (ex. "S4issrv")
 

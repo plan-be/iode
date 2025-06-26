@@ -3,24 +3,24 @@
 
 
 /* ==================================================================
-Ouvre un ‚cran de s‚lection de couleurs.
+Ouvre un Ã©cran de sÃ©lection de couleurs.
 
-&EN hOwner est le handle de la fenˆtre appelante. Si on ignore
-    cette valeur, on peut passer 0 comme paramŠtre. La derniŠre
-    fenˆtre active de l'application deviendra owner.
+&EN hOwner est le handle de la fenÃªtre appelante. Si on ignore
+    cette valeur, on peut passer 0 comme paramÃ¨tre. La derniÃ¨re
+    fenÃªtre active de l'application deviendra owner.
 
-&EN dftcol d‚finit la couleur par d‚faut (ou la couleur courante
+&EN dftcol dÃ©finit la couleur par dÃ©faut (ou la couleur courante
     dans votre application)
 
 &EN custcols est un pointeur optionnel vers un tableau de 16 couleurs
-    personnalis‚es (COLORREF *). Si ce pointeur est nul, la d‚finition
-    des couleurs personnalis‚es est rendu inactive.
+    personnalisÃ©es (COLORREF *). Si ce pointeur est nul, la dÃ©finition
+    des couleurs personnalisÃ©es est rendu inactive.
 
 &RT
-La fonction retourne la couleur s‚lectionn‚e. Si la boŒte de dialogue a
-‚t‚ quitt‚e par CANCEL, la couleur d'origine dftcol est retourn‚e.
+La fonction retourne la couleur sÃ©lectionnÃ©e. Si la boÃ®te de dialogue a
+Ã©tÃ© quittÃ©e par CANCEL, la couleur d'origine dftcol est retournÃ©e.
 
-Le tableau custcols est ‚galement modifi‚ s'il est d‚fini.
+Le tableau custcols est Ã©galement modifiÃ© s'il est dÃ©fini.
 
 ===================================================================== */
 
@@ -54,41 +54,41 @@ COLORREF WscrChooseColor(HWND hOwner, COLORREF dftcol, COLORREF *custcols)
 
 
 /* ==================================================================
-Ouvre un ‚cran de s‚lection de fichier. Cette fonction est utilis‚e
+Ouvre un Ã©cran de sÃ©lection de fichier. Cette fonction est utilisÃ©e
 pour les champs DIR des pages.
 
-&EN hOwner est le handle de la fenˆtre appelante. Si on ignore
-    cette valeur, on peut passer 0 comme paramŠtre. La derniŠre
-    fenˆtre active de l'application deviendra owner.
+&EN hOwner est le handle de la fenÃªtre appelante. Si on ignore
+    cette valeur, on peut passer 0 comme paramÃ¨tre. La derniÃ¨re
+    fenÃªtre active de l'application deviendra owner.
 
-&EN title d‚finit le titre de la fenˆtre ("Ouverture de fichier" par ex.)
-    Si title est NULL, un titre type est propos‚.
+&EN title dÃ©finit le titre de la fenÃªtre ("Ouverture de fichier" par ex.)
+    Si title est NULL, un titre type est proposÃ©.
 
-&EN opensave indique s'il s'agit d'un fichier … ouvrir ou … sauver:
+&EN opensave indique s'il s'agit d'un fichier Ã  ouvrir ou Ã  sauver:
     0 indique open, 1 indique save. Dans le cas d'une ouverture, le
     fichier doit exister, dans le cas d'un sauvetage, seul le
     directory doit exister. D'autre part, le texte des boutons de
-    confirmation et des titres par d‚faut sont diff‚rents : Ouverture ou
+    confirmation et des titres par dÃ©faut sont diffÃ©rents : Ouverture ou
     Sauvetage selon le cas.
 
-&EN infile contient le nom par d‚faut du fichier. Le directory initial
-    pour la s‚lection sera automatiquement plac‚ sur celui de ce fichier.
+&EN infile contient le nom par dÃ©faut du fichier. Le directory initial
+    pour la sÃ©lection sera automatiquement placÃ© sur celui de ce fichier.
 
-&EN outfile contient le nom s‚lectionn‚. Si aucune s‚lection n'a ‚t‚ op‚r‚e,
-    le nom par d‚faut (infile) est copi‚ dans outfile. Ce buffer doit
-    pouvoir contenir 255 caractŠres!
+&EN outfile contient le nom sÃ©lectionnÃ©. Si aucune sÃ©lection n'a Ã©tÃ© opÃ©rÃ©e,
+    le nom par dÃ©faut (infile) est copiÃ© dans outfile. Ce buffer doit
+    pouvoir contenir 255 caractÃ¨res!
 
-&EN ftypes contient les types de fichiers accept‚s dans un string
-    s‚par‚ par des pipes (|). Chaque type est pr‚sent‚ comme une paire de
-    strings s‚par‚s par des |, dont le premier indique le texte … faire
-    apparaŒtre dans le Combobox et le second le ou les types de fichiers
+&EN ftypes contient les types de fichiers acceptÃ©s dans un string
+    sÃ©parÃ© par des pipes (|). Chaque type est prÃ©sentÃ© comme une paire de
+    strings sÃ©parÃ©s par des |, dont le premier indique le texte Ã  faire
+    apparaÃ®tre dans le Combobox et le second le ou les types de fichiers
     correspondants. Si ftypes est NULL, tous les fichiers sont admis
-    et le texte All Files est affich‚.
-    Si plus d'un type correspond … un texte, les types doivent ˆtre
-    s‚par‚s par des points-virgules (;).
+    et le texte All Files est affichÃ©.
+    Si plus d'un type correspond Ã  un texte, les types doivent Ãªtre
+    sÃ©parÃ©s par des points-virgules (;).
 
 &NO
-    ftypes DOIT se terminer par un |, sans quoi il est ignor‚.
+    ftypes DOIT se terminer par un |, sans quoi il est ignorÃ©.
 
 &EX
     char outfile[256];
@@ -98,7 +98,7 @@ pour les champs DIR des pages.
 &TX
 
 &RT
-    La fonction retourne -1 si la s‚lection ne s'est pas op‚r‚e
+    La fonction retourne -1 si la sÃ©lection ne s'est pas opÃ©rÃ©e
     (Cancel, ...).
 
 ===================================================================== */
@@ -155,19 +155,19 @@ U_ch    *title, *infile, *outfile, *ftypes;
 }
 
 /* ==================================================================
-Ouvre un ‚cran de s‚lection de polices de caractŠres.
+Ouvre un Ã©cran de sÃ©lection de polices de caractÃ¨res.
 
-&EN hOwner est le handle de la fenˆtre appelante. Si on ignore
-    cette valeur, on peut passer 0 comme paramŠtre. La derniŠre
-    fenˆtre active de l'application deviendra owner.
+&EN hOwner est le handle de la fenÃªtre appelante. Si on ignore
+    cette valeur, on peut passer 0 comme paramÃ¨tre. La derniÃ¨re
+    fenÃªtre active de l'application deviendra owner.
 
-&EN logfont est un pointeur vers une structure LOGFONT qui d‚finit
-    une police. Cette structure sert … initialiser les valeurs propos‚es
-    … l'‚cran et re‡oit en fin de traitement les nouvelles valeurs
-    s‚lectionn‚es.
+&EN logfont est un pointeur vers une structure LOGFONT qui dÃ©finit
+    une police. Cette structure sert Ã  initialiser les valeurs proposÃ©es
+    Ã  l'Ã©cran et reÃ§oit en fin de traitement les nouvelles valeurs
+    sÃ©lectionnÃ©es.
 
 &RT
-    La fonction retourne -1 si la s‚lection ne s'est pas op‚r‚e
+    La fonction retourne -1 si la sÃ©lection ne s'est pas opÃ©rÃ©e
     (Cancel, ...).
 
 ===================================================================== */

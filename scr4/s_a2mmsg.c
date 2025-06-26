@@ -5,12 +5,12 @@
 void (*A2mMessage_super)(char*); // if not null, replaces the default implementation A2mMessage()
 
 /*==================================================================
-Fonction appel‚e pour afficher les messages en cours d'impression des
+Fonction appelÃ©e pour afficher les messages en cours d'impression des
 fichiers A2M provenant des fonctions A2mToMif(), etc.
 
-Cette fonction peut ˆtre remplac‚e par une fonction utilisateur.
+Cette fonction peut Ãªtre remplacÃ©e par une fonction utilisateur.
 
-Par d‚faut, la fonction de librairie vaut simplement:
+Par dÃ©faut, la fonction de librairie vaut simplement:
 
 &CO
     SCR_comment(msg);

@@ -80,7 +80,7 @@ int     pos, ch;
 }
 
 /* ====================================================================
-Saute la suite du texte jusqu'au prochain caractäre non considÇrÇ comme
+Saute la suite du texte jusqu'au prochain caract√®re non consid√©r√© comme
 espace. Les espaces sont :
 
 &EN les blancs,
@@ -90,7 +90,7 @@ espace. Les espaces sont :
 &EN les Carriage Return,
 &EN les FormFeed
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant.
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant.
 &SA YY_skip_to_eol(), YY_skip_to_char(), YY_read_to_char(),
     YY_read_to_string()
 =======================================================================*/
@@ -109,15 +109,15 @@ YYFILE  *yy;
 
 
 /* ====================================================================
-Retient le dernier ÇlÇment lu pour lui permettre d'àtre relu lors de la
+Retient le dernier √©l√©ment lu pour lui permettre d'√™tre relu lors de la
 prochaine utilisation de YY_lex() ou de YY_read(). Cette fonction n'a
 d'effet que pour YY_lex() et YY_read().
 
 Cela permet de simplifier les analyses syntaxiques dans le cas ou une
-ÇlÇment logique n'est pas terminÇ par un caractäre spÇcial. Ainsi, pour
-la lecture de sÇries statistiques, il suffit d'utiliser de lire tant que
-des nombres sont trouvÇs, puis de faire YY_unread() pour laisser le
-dernier ÇlÇment lu disponible pour la lecture suivante.
+√©l√©ment logique n'est pas termin√© par un caract√®re sp√©cial. Ainsi, pour
+la lecture de s√©ries statistiques, il suffit d'utiliser de lire tant que
+des nombres sont trouv√©s, puis de faire YY_unread() pour laisser le
+dernier √©l√©ment lu disponible pour la lecture suivante.
 
 &EX
     switch(YY_lex()) {
@@ -139,10 +139,10 @@ YYFILE  *yy;
 }
 
 /* ====================================================================
-Saute la suite du texte jusqu'au prochain \n ou jusqu'Ö la fin du
+Saute la suite du texte jusqu'au prochain \n ou jusqu'√† la fin du
 fichier (to End Of Line).
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant.
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant.
 
 &SA YY_skip_spaces(), YY_skip_to_char(), YY_read_to_char(),
     YY_read_to_string()
@@ -156,10 +156,10 @@ YYFILE  *yy;
 }
 
 /* ====================================================================
-Saute la suite du texte jusqu'au prochain caractäre spÇcifiÇ ou jusqu'Ö la
+Saute la suite du texte jusqu'au prochain caract√®re sp√©cifi√© ou jusqu'√† la
 fin du fichier.
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant.
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant.
 
 &SA YY_skip_spaces(), YY_skip_to_eol(), YY_read_to_char(),
     YY_read_to_string()
@@ -179,19 +179,19 @@ int     c;
 }
 
 /* ====================================================================
-Lit la suite du texte jusqu'au caractäre spÇcifiÇ ou jusqu'Ö la fin du
-fichier ou jusqu'Ö ce que YY_MAX_STRING_LG caractäres ne soient lus.
+Lit la suite du texte jusqu'au caract√®re sp√©cifi√© ou jusqu'√† la fin du
+fichier ou jusqu'√† ce que YY_MAX_STRING_LG caract√®res ne soient lus.
 
-Les caractäres lus sont placÇs dans le buffer yy->yy_text.
-Le caractäre limite n'est pas placÇ dans ce buffer.
+Les caract√®res lus sont plac√©s dans le buffer yy->yy_text.
+Le caract√®re limite n'est pas plac√© dans ce buffer.
 
-Si la taille du buffer (YY_MAX_STRING_LG) est dÇpassÇe, la lecture
-continue mais les caractäres ne sont pas sauvÇs dans yy->yy_text,
-màme si le caractäre dÇsirÇ n'a pas ÇtÇ rencontrÇ.
+Si la taille du buffer (YY_MAX_STRING_LG) est d√©pass√©e, la lecture
+continue mais les caract√®res ne sont pas sauv√©s dans yy->yy_text,
+m√™me si le caract√®re d√©sir√© n'a pas √©t√© rencontr√©.
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant.
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant.
 
-&RT le dernier caractäre lu.
+&RT le dernier caract√®re lu.
 
 &SA YY_skip_to_eol(), YY_skip_spaces(), YY_read_to_char(),
     YY_read_to_string(), YY_read_to_chars()
@@ -221,20 +221,20 @@ unsigned char   *chars;
 }
 
 /* ====================================================================
-Lit la suite du texte jusqu'Ö l'un des caractäres spÇcifiÇs ou jusqu'Ö
-la fin du fichier ou jusqu'Ö ce que YY_MAX_STRING_LG caractäres ne
+Lit la suite du texte jusqu'√† l'un des caract√®res sp√©cifi√©s ou jusqu'√†
+la fin du fichier ou jusqu'√† ce que YY_MAX_STRING_LG caract√®res ne
 soient lus.
 
-Les caractäres lus sont placÇs dans le buffer yy->yy_text.
-Le caractäre limite n'est pas placÇ dans ce buffer.
+Les caract√®res lus sont plac√©s dans le buffer yy->yy_text.
+Le caract√®re limite n'est pas plac√© dans ce buffer.
 
-Si la taille du buffer (YY_MAX_STRING_LG) est dÇpassÇe, la lecture
-continue mais les caractäres ne sont pas sauvÇs dans yy->yy_text,
-màme si le caractäre dÇsirÇ n'a pas ÇtÇ rencontrÇ.
+Si la taille du buffer (YY_MAX_STRING_LG) est d√©pass√©e, la lecture
+continue mais les caract√®res ne sont pas sauv√©s dans yy->yy_text,
+m√™me si le caract√®re d√©sir√© n'a pas √©t√© rencontr√©.
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant.
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant.
 
-&RT le dernier caractäre lu.
+&RT le dernier caract√®re lu.
 
 &SA YY_skip_to_eol(), YY_skip_spaces(), YY_read_to_char(),
     YY_read_to_string()
@@ -259,16 +259,16 @@ unsigned char *chars;
 }
 
 /* ====================================================================
-Lit la suite du texte jusqu'au string spÇcifiÇ ou jusqu'Ö la fin du
-fichier ou jusqu'Ö ce que YY_MAX_STRING_LG caractäres ne soient lus.
+Lit la suite du texte jusqu'au string sp√©cifi√© ou jusqu'√† la fin du
+fichier ou jusqu'√† ce que YY_MAX_STRING_LG caract√®res ne soient lus.
 
-Les caractäres lus sont placÇs dans le buffer yy->yy_text.
-Le string limite n'est pas placÇ dans ce buffer.
+Les caract√®res lus sont plac√©s dans le buffer yy->yy_text.
+Le string limite n'est pas plac√© dans ce buffer.
 
-Si la taille du buffer (YY_MAX_STRING_LG) est dÇpassÇe, la lecture
-continue jusqu'au string dÇsirÇ. Un message d'erreur en affichÇ.
+Si la taille du buffer (YY_MAX_STRING_LG) est d√©pass√©e, la lecture
+continue jusqu'au string d√©sir√©. Un message d'erreur en affich√©.
 
-Le pointeur vers le texte est placÇ sur le premier caractäre suivant le
+Le pointeur vers le texte est plac√© sur le premier caract√®re suivant le
 string cible.
 
 &SA YY_skip_to_eol(), YY_skip_spaces(), YY_read_to_char(),
@@ -301,48 +301,48 @@ unsigned char   *str;
 }
 
 /* ====================================================================
-Lit le prochain ÇlÇment du texte. Le type est retournÇ et la valeur
-est sauvÇe dans la structure YYFILE. La liste suivante reprend les types
-possibles et l'ÇlÇment de la structure YYFILE qui les contient.
+Lit le prochain √©l√©ment du texte. Le type est retourn√© et la valeur
+est sauv√©e dans la structure YYFILE. La liste suivante reprend les types
+possibles et l'√©l√©ment de la structure YYFILE qui les contient.
 
-Les strings et les lettres peuvent contenir des caractäres spÇciaux du
-type de ceux acceptÇs en C ('\n', '\033', '^X', ...)
+Les strings et les lettres peuvent contenir des caract√®res sp√©ciaux du
+type de ceux accept√©s en C ('\n', '\033', '^X', ...)
 
-Le type est toujours sauvÇ dans yy->yy_type.
+Le type est toujours sauv√© dans yy->yy_type.
 
 &EN YY_EOF : fin de fichier
 
-&EN YY_LONG (123) : entier (toujours positif) sauvÇ dans yy->yy_long
+&EN YY_LONG (123) : entier (toujours positif) sauv√© dans yy->yy_long
 
-&EN YY_DOUBLE (1.23) : rÇel contenant un point dÇcimal ou au format
-    exponentiel (1E10) sauvÇ dans yy->yy_double
+&EN YY_DOUBLE (1.23) : r√©el contenant un point d√©cimal ou au format
+    exponentiel (1E10) sauv√© dans yy->yy_double
 
-&EN YY_STRING ("xxxxx") : string entourÇ de doubles quotes sauvÇ dans
+&EN YY_STRING ("xxxxx") : string entour√© de doubles quotes sauv√© dans
     yy->yy_text
 
-&EN YY_SPECIAL (*) : caractäre non alphabÇtique sauvÇ dans
+&EN YY_SPECIAL (*) : caract√®re non alphab√©tique sauv√© dans
     yy->yy_text[0]
 
 &EN YY_COMMENT : commentaire compris entre YY_B_COMMENT et
-    YY_E_COMMENT et non sauvÇ dans la structure
+    YY_E_COMMENT et non sauv√© dans la structure
 
-&EN YY_LETTER ('\033') : lettre entre simple quotes sauvÇ dans
+&EN YY_LETTER ('\033') : lettre entre simple quotes sauv√© dans
     yy->yy_text[0]
 
-&EN YY_WORD (TITLE) : mot (commenáant par une lettre et ne contenant que
-    des chiffres, des lettres ou le caractäre _) sauvÇ dans yy->yy_text
+&EN YY_WORD (TITLE) : mot (commen√ßant par une lettre et ne contenant que
+    des chiffres, des lettres ou le caract√®re _) sauv√© dans yy->yy_text
 
-&EN YY_UNKNOWN : directive incorrectement placÇe (##endif sans ##ifdef
+&EN YY_UNKNOWN : directive incorrectement plac√©e (##endif sans ##ifdef
     par exemple)
 
-&EN YY_MEMORY_FULL en cas de problämes d'allocation en gÇnÇral suite Ö
+&EN YY_MEMORY_FULL en cas de probl√®mes d'allocation en g√©n√©ral suite √†
     un ##include file
 
-&EN YY_ERROR : directive inconnue ou erreur dans la dÇfinition des
+&EN YY_ERROR : directive inconnue ou erreur dans la d√©finition des
     directives
 
 
-&RT type de l'ÇlÇment lu
+&RT type de l'√©l√©ment lu
 &EX
     if(YY_read(yy) != YY_STRING)
 	fprintf(stderr, "%s :string expected\n", YY_error(yy));

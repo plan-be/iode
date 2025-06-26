@@ -13,21 +13,21 @@ char    *filename, *res;
 }
 
 /* ======================================================================
-Fonction de sauvetage de profil et d'un mot de passe ‚ventuel. Le fichier
+Fonction de sauvetage de profil et d'un mot de passe Ã©ventuel. Le fichier
 filename contiendra les valeurs des champs de toutes les pages et les
-options courantes de tous les menus dont la d‚finition inclus le mot-cl‚
+options courantes de tous les menus dont la dÃ©finition inclus le mot-clÃ©
 PROFILE. Il contiendra en plus le mot de passe passwd si celui-ci n'est pas
 nul.
 
-Cette fonction peut ˆtre lanc‚e … la fin du programme ou … n'importe quel
+Cette fonction peut Ãªtre lancÃ©e Ã  la fin du programme ou Ã  n'importe quel
 moment dans le cours d'une application.
 
-Lors de la cr‚ation de ce fichier, toutes les pages sont successivement
-sauv‚es. Les options courantes des menus sont ‚galement sauv‚es. De plus, le
-num‚ro de version de SCR/AL1 est indiqu‚ dans le fichier.
+Lors de la crÃ©ation de ce fichier, toutes les pages sont successivement
+sauvÃ©es. Les options courantes des menus sont Ã©galement sauvÃ©es. De plus, le
+numÃ©ro de version de SCR/AL1 est indiquÃ© dans le fichier.
 
-Le fichier de profile a toujours l'extension .prf. Celle-ci est forc‚e, mˆme
-si une autre extension est donn‚e dans le paramŠtre filename.
+Le fichier de profile a toujours l'extension .prf. Celle-ci est forcÃ©e, mÃªme
+si une autre extension est donnÃ©e dans le paramÃ¨tre filename.
 
 &EX
     main()
@@ -40,7 +40,7 @@ si une autre extension est donn‚e dans le paramŠtre filename.
 	SCR_end();
     }
 &TX
-&RT -1 si le fichier ne peut ˆtre cr‚‚, 0 sinon
+&RT -1 si le fichier ne peut Ãªtre crÃ©Ã©, 0 sinon
 &SA SCR_prof_save(), SCR_prof_load_pwd(), SCR_prof_load()
 ------------------------------------------------------------------------- */
 
@@ -84,17 +84,17 @@ char    *filename, *passwd;
 /* ======================================================================
 Fonction de sauvetage de profil. Le fichier filename contiendra les valeurs
 des champs de toutes les pages et les options courantes de tous les menus
-dont la d‚finition inclus le mot-cl‚ PROFILE.
+dont la dÃ©finition inclus le mot-clÃ© PROFILE.
 
-Cette fonction peut ˆtre lanc‚e … la fin du programme ou … n'importe quel
+Cette fonction peut Ãªtre lancÃ©e Ã  la fin du programme ou Ã  n'importe quel
 moment dans le cours d'une application.
 
-Lors de la cr‚ation de ce fichier, toutes les pages sont successivement
-sauv‚es. Les options courantes des menus sont ‚galement sauv‚es. De plus, le
-num‚ro de version de SCR/AL1 est indiqu‚ dans le fichier.
+Lors de la crÃ©ation de ce fichier, toutes les pages sont successivement
+sauvÃ©es. Les options courantes des menus sont Ã©galement sauvÃ©es. De plus, le
+numÃ©ro de version de SCR/AL1 est indiquÃ© dans le fichier.
 
-Le fichier de profile a toujours l'extension .prf. Celle-ci est forc‚e, mˆme
-si une autre extension est donn‚e dans le paramŠtre filename.
+Le fichier de profile a toujours l'extension .prf. Celle-ci est forcÃ©e, mÃªme
+si une autre extension est donnÃ©e dans le paramÃ¨tre filename.
 
 &EX
     main()
@@ -107,7 +107,7 @@ si une autre extension est donn‚e dans le paramŠtre filename.
 	SCR_end();
     }
 &TX
-&RT -1 si le fichier ne peut ˆtre cr‚‚, 0 sinon
+&RT -1 si le fichier ne peut Ãªtre crÃ©Ã©, 0 sinon
 &SA SCR_prof_load(), SCR_prof_load_pwd(), SCR_prof_save_pwd()
 ------------------------------------------------------------------------- */
 
@@ -197,7 +197,7 @@ char    *passwd;
 
 /* ======================================================================
 Tente d'ouvrir le fichier de profile filename. L'extension .prf est toujours
-forc‚e. C‚rifie ‚galement le num‚ro de version SCR/AL1 et la magic number
+forcÃ©e. CÃ©rifie Ã©galement le numÃ©ro de version SCR/AL1 et la magic number
 d'un fichier .prf.
 
 &EX
@@ -213,7 +213,7 @@ d'un fichier .prf.
     }
 &TX
 &RT un FILE * vers le fichier ouvert ou (FILE *)0 si le fichier ne
-    peut ˆtre ouvert ou est d'un type incorrect.
+    peut Ãªtre ouvert ou est d'un type incorrect.
 &SA SCR_prof_load(), SCR_prof_save()
 ------------------------------------------------------------------------- */
 
@@ -244,27 +244,27 @@ char    *filename;
 }
 
 /* ======================================================================
-Fonction de chargement de profil. Le fichier filename, construit … l'aide de
+Fonction de chargement de profil. Le fichier filename, construit Ã  l'aide de
 la fonction SCR_prof_filename() contient les valeurs des champs de toutes
-les pages et les options courantes de tous les menus dont la d‚finition
-inclus le mot-cl‚ PROFILE. Il contient en plus un mot de passe.
+les pages et les options courantes de tous les menus dont la dÃ©finition
+inclus le mot-clÃ© PROFILE. Il contient en plus un mot de passe.
 
-Normalement, le fichier est le r‚sultat de la fonction SCR_prof_save_pwd().
+Normalement, le fichier est le rÃ©sultat de la fonction SCR_prof_save_pwd().
 
-Cette fonction peut ˆtre lanc‚e aprŠs l'appel … SCR_init() dans le programme
-principal d'une application. Elle peut ‚galement ˆtre utilis‚e … n'importe
+Cette fonction peut Ãªtre lancÃ©e aprÃ¨s l'appel Ã  SCR_init() dans le programme
+principal d'une application. Elle peut Ã©galement Ãªtre utilisÃ©e Ã  n'importe
 quel moment dans le cours d'une application.
 
-Lors de l'interpr‚tation de ce fichier, toutes les pages sont successivement
-lues et analys‚es. Si la longueur totale des champs ne correspond pas … la
-longueur trouv‚e dans le fichier, la lecture du profile s'arrˆte et les
-pages et les menus qui suivent ne sont pas charg‚s. De plus, le num‚ro de
-version de SCR/AL1 doit correspondre … celui encrypt‚ dans le programme.
-Cette stat‚gie est mise en place pour ‚viter les "plantages" dus aux
+Lors de l'interprÃ©tation de ce fichier, toutes les pages sont successivement
+lues et analysÃ©es. Si la longueur totale des champs ne correspond pas Ã  la
+longueur trouvÃ©e dans le fichier, la lecture du profile s'arrÃªte et les
+pages et les menus qui suivent ne sont pas chargÃ©s. De plus, le numÃ©ro de
+version de SCR/AL1 doit correspondre Ã  celui encryptÃ© dans le programme.
+Cette statÃ©gie est mise en place pour Ã©viter les "plantages" dus aux
 modifications d'un programme.
 
-Le fichier de profile a toujours l'extension .prf. Celle-ci est forc‚e, mˆme
-si une autre extension est donn‚e dans le paramŠtre filename.
+Le fichier de profile a toujours l'extension .prf. Celle-ci est forcÃ©e, mÃªme
+si une autre extension est donnÃ©e dans le paramÃ¨tre filename.
 
 &EX
     main()
@@ -277,9 +277,9 @@ si une autre extension est donn‚e dans le paramŠtre filename.
 	SCR_end();
     }
 &TX
-&RT -1 si le fichier n'est pas trouv‚ ou que la version SCR/AL1 est
-    incorrecte, 0 si le fichier peut ˆtre interpr‚t‚. Si toutes les pages ne
-    sont pas charg‚es, le code retour est 0.
+&RT -1 si le fichier n'est pas trouvÃ© ou que la version SCR/AL1 est
+    incorrecte, 0 si le fichier peut Ãªtre interprÃ©tÃ©. Si toutes les pages ne
+    sont pas chargÃ©es, le code retour est 0.
 
 &SA SCR_prof_save_pwd(), SCR_prof_save(), SCR_prof_load()
 ------------------------------------------------------------------------- */
@@ -351,25 +351,25 @@ fin:
 }
 
 /* ======================================================================
-Fonction de chargement de profil. Le fichier filename, construit … l'aide de
+Fonction de chargement de profil. Le fichier filename, construit Ã  l'aide de
 la fonction SCR_prof_save() contient les valeurs des champs de toutes les
-pages et les options courantes de tous les menus dont la d‚finition inclus
-le mot-cl‚ PROFILE.
+pages et les options courantes de tous les menus dont la dÃ©finition inclus
+le mot-clÃ© PROFILE.
 
-Cette fonction peut ˆtre lanc‚e aprŠs l'appel … SCR_init() dans le programme
-principal d'une application. Elle peut ‚galement ˆtre utilis‚e … n'importe
+Cette fonction peut Ãªtre lancÃ©e aprÃ¨s l'appel Ã  SCR_init() dans le programme
+principal d'une application. Elle peut Ã©galement Ãªtre utilisÃ©e Ã  n'importe
 quel moment dans le cours d'une application.
 
-Lors de l'interpr‚tation de ce fichier, toutes les pages sont successivement
-lues et analys‚es. Si la longueur totale des champs ne correspond pas … la
-longueur trouv‚e dans le fichier, la lecture du profile s'arrˆte et les
-pages et les menus qui suivent ne sont pas charg‚s. De plus, le num‚ro de
-version de SCR/AL1 doit correspondre … celui encrypt‚ dans le programme.
-Cette stat‚gie est mise en place pour ‚viter les "plantages" dus aux
+Lors de l'interprÃ©tation de ce fichier, toutes les pages sont successivement
+lues et analysÃ©es. Si la longueur totale des champs ne correspond pas Ã  la
+longueur trouvÃ©e dans le fichier, la lecture du profile s'arrÃªte et les
+pages et les menus qui suivent ne sont pas chargÃ©s. De plus, le numÃ©ro de
+version de SCR/AL1 doit correspondre Ã  celui encryptÃ© dans le programme.
+Cette statÃ©gie est mise en place pour Ã©viter les "plantages" dus aux
 modifications d'un programme.
 
-Le fichier de profile a toujours l'extension .prf. Celle-ci est forc‚e, mˆme
-si une autre extension est donn‚e dans le paramŠtre filename.
+Le fichier de profile a toujours l'extension .prf. Celle-ci est forcÃ©e, mÃªme
+si une autre extension est donnÃ©e dans le paramÃ¨tre filename.
 
 &EX
     main()
@@ -382,9 +382,9 @@ si une autre extension est donn‚e dans le paramŠtre filename.
 	SCR_end();
     }
 &TX
-&RT -1 si le fichier n'est pas trouv‚ ou que la version SCR/AL1 est
-    incorrecte, 0 si le fichier peut ˆtre interpr‚t‚. Si toutes les pages ne
-    sont pas charg‚es, le code retour est 0.
+&RT -1 si le fichier n'est pas trouvÃ© ou que la version SCR/AL1 est
+    incorrecte, 0 si le fichier peut Ãªtre interprÃ©tÃ©. Si toutes les pages ne
+    sont pas chargÃ©es, le code retour est 0.
 
 &SA SCR_prof_save(), SCR_prof_load_pwd(), SCR_prof_save_pwd()
 ------------------------------------------------------------------------- */
@@ -416,8 +416,8 @@ char    *passwd;
 
 
 /* ======================================================================
-Remet les valeurs par d‚faut dans toutes les PAGES et les MENUS contenant le
-mot-cl‚ PROFILE.
+Remet les valeurs par dÃ©faut dans toutes les PAGES et les MENUS contenant le
+mot-clÃ© PROFILE.
 &SA SCR_prof_load(), SCR_prof_save()
 ------------------------------------------------------------------------- */
 SCR_prof_reset()

@@ -1,16 +1,16 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Matrix to Vector : cr‚e un vecteur avec la matrice de pointeurs tbl. Le
-s‚parateur de lignes est sep. Le vecteur est constitu‚ de toutes les
-lignes du tableau s‚par‚es par sep. La fonction alloue le vecteur
-r‚sultat … l'aide de SCR_malloc().
+Matrix to Vector : crÃ©e un vecteur avec la matrice de pointeurs tbl. Le
+sÃ©parateur de lignes est sep. Le vecteur est constituÃ© de toutes les
+lignes du tableau sÃ©parÃ©es par sep. La fonction alloue le vecteur
+rÃ©sultat Ã  l'aide de SCR_malloc().
 
 Le tableau input doit se terminer par un pointeur nul.
 
 La fonction inverse est SCR_vtom().
 
-&RT pointeur vers la vecteur r‚sultat allou‚
+&RT pointeur vers la vecteur rÃ©sultat allouÃ©
 &EX
     char    *tbl[] = {
 	"Jean",
@@ -40,14 +40,14 @@ int             sep;
 }
 
 /* ====================================================================
-Matrix to Vector : cr‚e un vecteur avec la matrice de pointeurs tbl. Le
-s‚parateur de lignes est seps et peut contenir plusieurs caractŠres. Le
-vecteur est constitu‚ de toutes les lignes du tableau s‚par‚es par seps.
-La fonction alloue le vecteur r‚sultat … l'aide de SCR_malloc().
+Matrix to Vector : crÃ©e un vecteur avec la matrice de pointeurs tbl. Le
+sÃ©parateur de lignes est seps et peut contenir plusieurs caractÃ¨res. Le
+vecteur est constituÃ© de toutes les lignes du tableau sÃ©parÃ©es par seps.
+La fonction alloue le vecteur rÃ©sultat Ã  l'aide de SCR_malloc().
 
 Le tableau input doit se terminer par un pointeur nul.
 
-&RT pointeur vers la vecteur r‚sultat allou‚
+&RT pointeur vers la vecteur rÃ©sultat allouÃ©
 &EX
     char    *tbl[] = {
 	"Jean",

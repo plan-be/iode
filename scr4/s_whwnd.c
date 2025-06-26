@@ -136,7 +136,7 @@ WscrResizeDlgChildren(HWND hWnd)
 }
 
 /* ============================================================
-RamŠne la taille d'une fenˆtre au minimum pour contenir
+RamÃ¨ne la taille d'une fenÃªtre au minimum pour contenir
 le menu, le toolbar, le status bar et le titre.
 ============================================================ */
 
@@ -180,20 +180,20 @@ WscrShrinkWindow(HWND hWnd)
 
 
 /* ============================================================
-D‚place une fenˆtre par rapport … une autre.
+DÃ©place une fenÃªtre par rapport Ã  une autre.
 
-&EN hWnd : handle de la fenˆtre … d‚placer
-&EN hParent : handle de la fenˆtre de r‚f‚rence ou 0 pour l'‚cran
+&EN hWnd : handle de la fenÃªtre Ã  dÃ©placer
+&EN hParent : handle de la fenÃªtre de rÃ©fÃ©rence ou 0 pour l'Ã©cran
 &EN x : position en x
-&EN2 x = 10000 : coin gauche de la fenˆtre parent
-&EN2 x = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 x = 10002 : coin droit de la fenˆtre parent
-&EN2 autre : d‚calage par rapport … la valeur actuelle
+&EN2 x = 10000 : coin gauche de la fenÃªtre parent
+&EN2 x = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 x = 10002 : coin droit de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport Ã  la valeur actuelle
 &EN y : position en y
-&EN2 y = 10000 : bord sup‚rieur de la fenˆtre parent
-&EN2 y = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 y = 10002 : bord inf‚rieur de la fenˆtre parent
-&EN2 autre : d‚calage par rapport au bord sup‚rieur du parent
+&EN2 y = 10000 : bord supÃ©rieur de la fenÃªtre parent
+&EN2 y = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 y = 10002 : bord infÃ©rieur de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport au bord supÃ©rieur du parent
 
 &SA WscrMoveAnimateWindow(), WscrCalcMoveWindow()
 ============================================================ */
@@ -208,21 +208,21 @@ WscrMoveWindow(HWND hWnd, HWND hParent, int x, int y)
 }
 
 /* ============================================================
-D‚place une fenˆtre par rapport … une autre en plusieurs pas successifs …
+DÃ©place une fenÃªtre par rapport Ã  une autre en plusieurs pas successifs Ã 
 partir de la position initiale.
 
-&EN hWnd : handle de la fenˆtre … d‚placer
-&EN hParent : handle de la fenˆtre de r‚f‚rence ou 0 pour l'‚cran
+&EN hWnd : handle de la fenÃªtre Ã  dÃ©placer
+&EN hParent : handle de la fenÃªtre de rÃ©fÃ©rence ou 0 pour l'Ã©cran
 &EN x : position en x
-&EN2 x = 10000 : coin gauche de la fenˆtre parent
-&EN2 x = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 x = 10002 : coin droit de la fenˆtre parent
-&EN2 autre : d‚calage par rapport … la valeur actuelle
+&EN2 x = 10000 : coin gauche de la fenÃªtre parent
+&EN2 x = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 x = 10002 : coin droit de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport Ã  la valeur actuelle
 &EN y : position en y
-&EN2 y = 10000 : bord sup‚rieur de la fenˆtre parent
-&EN2 y = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 y = 10002 : bord inf‚rieur de la fenˆtre parent
-&EN2 autre : d‚calage par rapport au bord sup‚rieur du parent
+&EN2 y = 10000 : bord supÃ©rieur de la fenÃªtre parent
+&EN2 y = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 y = 10002 : bord infÃ©rieur de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport au bord supÃ©rieur du parent
 
 &SA WscrMoveWindow(), WscrCalcMoveWindow()
 ============================================================ */
@@ -248,21 +248,21 @@ WscrMoveAnimateWindow(HWND hWnd, HWND hParent, int x, int y)
 }
 
 /* ============================================================
-Calcule le d‚placement d'une fenˆtre par rapport … une autre.
+Calcule le dÃ©placement d'une fenÃªtre par rapport Ã  une autre.
 
-&EN hWnd : handle de la fenˆtre … d‚placer
-&EN hParent : handle de la fenˆtre de r‚f‚rence ou 0 pour l'‚cran
+&EN hWnd : handle de la fenÃªtre Ã  dÃ©placer
+&EN hParent : handle de la fenÃªtre de rÃ©fÃ©rence ou 0 pour l'Ã©cran
 &EN x : position en x
-&EN2 x = 10000 : coin gauche de la fenˆtre parent
-&EN2 x = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 x = 10002 : coin droit de la fenˆtre parent
-&EN2 autre : d‚calage par rapport … la valeur actuelle
+&EN2 x = 10000 : coin gauche de la fenÃªtre parent
+&EN2 x = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 x = 10002 : coin droit de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport Ã  la valeur actuelle
 &EN y : position en y
-&EN2 y = 10000 : bord sup‚rieur de la fenˆtre parent
-&EN2 y = 10001 : centr‚ par rapport … la fenˆtre parent
-&EN2 y = 10002 : bord inf‚rieur de la fenˆtre parent
-&EN2 autre : d‚calage par rapport au bord sup‚rieur du parent
-&EN rect : pointeur vers un RECT contenant la nouvelle position de la fenˆtre.
+&EN2 y = 10000 : bord supÃ©rieur de la fenÃªtre parent
+&EN2 y = 10001 : centrÃ© par rapport Ã  la fenÃªtre parent
+&EN2 y = 10002 : bord infÃ©rieur de la fenÃªtre parent
+&EN2 autre : dÃ©calage par rapport au bord supÃ©rieur du parent
+&EN rect : pointeur vers un RECT contenant la nouvelle position de la fenÃªtre.
 
 &SA WscrMoveAnimateWindow(), WscrMoveWindow()
 ============================================================ */

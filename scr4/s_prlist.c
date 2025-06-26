@@ -41,10 +41,10 @@ int     first_ch;
 
 /* ====================================================================
 Initialise le processus d'impression de PR_listing(). Cette fonction
-peut cependant ˆtre utilis‚e seule ou en conjonction avec PR_listing_1()
-pour des impressions sp‚cifiques.
+peut cependant Ãªtre utilisÃ©e seule ou en conjonction avec PR_listing_1()
+pour des impressions spÃ©cifiques.
 
-Elle cr‚e les variables utiles … PR_listing_1() et PR_listing_eop().
+Elle crÃ©e les variables utiles Ã  PR_listing_1() et PR_listing_eop().
 
 &EX
     if(PR_listing_0(p_is_fact, "fact.pr")) return(-1);
@@ -63,7 +63,7 @@ Elle cr‚e les variables utiles … PR_listing_1() et PR_listing_eop().
     PR_send();
 &TX
 
-&RT -1 si aucun isam n'est trouv‚ dans la page de r‚f‚rence pg_ref, 0
+&RT -1 si aucun isam n'est trouvÃ© dans la page de rÃ©fÃ©rence pg_ref, 0
     sinon.
 
 &SA SC_scan_page(), SC_scan_isam(), PR_file_col(),
@@ -88,11 +88,11 @@ char    *file;
 }
 
 /* ====================================================================
-Force un saut de page bas‚ sur un fichier de d‚finion (.pr). Cette
-fonction n'est utilisable qu'aprŠs appel … PR_listing_0().
+Force un saut de page basÃ© sur un fichier de dÃ©finion (.pr). Cette
+fonction n'est utilisable qu'aprÃ¨s appel Ã  PR_listing_0().
 
-Elle imprime les lignes pr‚fix‚es par 'F', effectue un saut de page et
-imprime les lignes pr‚fix‚es par 'H'.
+Elle imprime les lignes prÃ©fixÃ©es par 'F', effectue un saut de page et
+imprime les lignes prÃ©fixÃ©es par 'H'.
 
 &EX
     if(PR_listing_0(p_is_fact, "fact.pr")) return(-1);
@@ -112,7 +112,7 @@ imprime les lignes pr‚fix‚es par 'H'.
     PR_send();
 &TX
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_file retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_file retourne -1. Sinon
     la fonction retourne 0
 
 &SA SC_scan_page(), SC_scan_isam(), PR_file_col(),
@@ -129,14 +129,14 @@ PR_listing_eop()
 
 /* ====================================================================
 Fonction centrale d'impression de PR_listing(). Cette fonction
-peut cependant ˆtre utilis‚e en conjonction avec PR_listing_0()
-pour des impressions sp‚cifiques.
+peut cependant Ãªtre utilisÃ©e en conjonction avec PR_listing_0()
+pour des impressions spÃ©cifiques.
 
-&NO Cette fonction n'est utilisable qu'aprŠs appel … PR_listing_0().
+&NO Cette fonction n'est utilisable qu'aprÃ¨s appel Ã  PR_listing_0().
 
-Elle imprime les lignes pr‚fix‚es par 'B' avant la premiŠre impression.
-Ensuite, elle imprime en d‚but de chaque page les lignes pr‚fix‚es par 'H'.
-Les sauts de pages sont g‚r‚s par cette fonction.
+Elle imprime les lignes prÃ©fixÃ©es par 'B' avant la premiÃ¨re impression.
+Ensuite, elle imprime en dÃ©but de chaque page les lignes prÃ©fixÃ©es par 'H'.
+Les sauts de pages sont gÃ©rÃ©s par cette fonction.
 
 &EX
     if(PR_listing_0(p_is_fact, "fact.pr")) return(-1);
@@ -155,7 +155,7 @@ Les sauts de pages sont g‚r‚s par cette fonction.
     PR_send();
 &TX
 
-&RT -1 si aucun isam n'est trouv‚ dans la page de r‚f‚rence pg_ref, 0
+&RT -1 si aucun isam n'est trouvÃ© dans la page de rÃ©fÃ©rence pg_ref, 0
     sinon.
 
 &SA SC_scan_page(), SC_scan_isam(), PR_file_col(),
@@ -212,43 +212,43 @@ int     success;
 
 
 /* ====================================================================
-Cette fonction permet d'imprimer un ISAM ou une partie d'ISAM en g‚rant les
+Cette fonction permet d'imprimer un ISAM ou une partie d'ISAM en gÃ©rant les
 sauts de page, etc, et ce en utilisant essentiellement SC_scan_page() ou
 SC_scan_isam() et PR_file_nl().
 
-Les paramŠtres sont les suivants :
+Les paramÃ¨tres sont les suivants :
 
 &EN pr : printer destination de l'impression
 
-&EN pg_ref : PAGE de r‚f‚rence dont l'ISAM scann‚ est d‚duit
+&EN pg_ref : PAGE de rÃ©fÃ©rence dont l'ISAM scannÃ© est dÃ©duit
 
-&EN pg_scan : PAGE de s‚lection ‚ventuelle. En cas de pointeur nul,
-    tout l'ISAM est scann‚
+&EN pg_scan : PAGE de sÃ©lection Ã©ventuelle. En cas de pointeur nul,
+    tout l'ISAM est scannÃ©
 
-&EN cmp : ordre de lecture (num‚ro d'indice)
+&EN cmp : ordre de lecture (numÃ©ro d'indice)
 
-&EN file : fichier ascii … interpr‚ter et … imprimer.
+&EN file : fichier ascii Ã  interprÃ©ter et Ã  imprimer.
 
-Le premier caractŠre des lignes du fichier file sert … d‚terminer
-… quel moment la ligne doit ˆtre imprim‚e :
+Le premier caractÃ¨re des lignes du fichier file sert Ã  dÃ©terminer
+Ã  quel moment la ligne doit Ãªtre imprimÃ©e :
 
-&EN B (Begin)  en d‚but d'impression
+&EN B (Begin)  en dÃ©but d'impression
 &EN E (End)    en fin d'impression
-&EN H (Header) en d‚but de page
+&EN H (Header) en dÃ©but de page
 &EN F (Footer) en fin de page
 &EN T (Text)   sur chaque record
 
-Pour la syntaxe de d‚finition du fichier ASCII, il faut se reporter
-… la fonction PR_file_nl().
+Pour la syntaxe de dÃ©finition du fichier ASCII, il faut se reporter
+Ã  la fonction PR_file_nl().
 
-La display_fn de la page de r‚f‚rence est ex‚cut‚e aprŠs ISAM_TO_PAGE et
-avant l'impression. Cette possibilit‚ permet d'adapter les champs calcul‚s
-de la PAGE de r‚f‚rence et de les utiliser dans le fichier de d‚finition
+La display_fn de la page de rÃ©fÃ©rence est exÃ©cutÃ©e aprÃ¨s ISAM_TO_PAGE et
+avant l'impression. Cette possibilitÃ© permet d'adapter les champs calculÃ©s
+de la PAGE de rÃ©fÃ©rence et de les utiliser dans le fichier de dÃ©finition
 d'impression.
 
 &EX
 FICHIER INPUT : PROD.PR
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 B  $.LDATE                                              - $.PG -
 B                      LISTING DES PRODUITS
@@ -262,13 +262,13 @@ E
 E  Nombre de produits : $.NB
 
 APPEL EN C
-ÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     PR_listing(my_pr, p_is_prod, (PAGE *)0, 0, "prod.pr");
 
 
 RESULTAT
-ÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€
 
   12-01-1992                                           - 1 -
 		      LISTING DES PRODUITS
@@ -290,7 +290,7 @@ RESULTAT
 
 &TX
 
-&RT Si le fichier ne peut ˆtre ouvert, PR_file retourne -1. Sinon
+&RT Si le fichier ne peut Ãªtre ouvert, PR_file retourne -1. Sinon
     la fonction retourne 0
 
 &SA SC_scan_page(), SC_scan_isam(), PR_file_col()

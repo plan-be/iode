@@ -139,7 +139,7 @@ ISC_inbuf_read()
     extern  long last_check_live;
 
     /* BP_M 09-12-2010 15:43 */
-    // Le contrìle du socket a ÇtÇ dÇplacÇ en dÇbut de fonction
+    // Le contr√¥le du socket a √©t√© d√©plac√© en d√©but de fonction
     i = ISC_check_socket(ISC_SOCKET);
     if(i < 0) {
 	Debug("ISC_inbuf_read: ISC_check_socket = %d error\n", i);
@@ -158,12 +158,12 @@ ISC_inbuf_read()
     }
 //  else
 //      Debug("ISC_inbuf_read: lecture de '%ld' bytes\n", lg);
-    /* Replacer les data au dÇbut de INBUF */
+    /* Replacer les data au d√©but de INBUF */
     if(ISC_S4C[i]->inpos > 0) memcpy(ISC_S4C[i]->inbuf, ISC_S4C[i]->inbuf + ISC_S4C[i]->inpos, ISC_S4C[i]->inlg - ISC_S4C[i]->inpos);
     ISC_S4C[i]->inlg -= ISC_S4C[i]->inpos;
     ISC_S4C[i]->inpos = 0;
 
-    /* Ajouter Çventuellement l'espace dans INBUF */
+    /* Ajouter √©ventuellement l'espace dans INBUF */
     rlg = lg;
     if(rlg < 0) rlg = -lg;
     if(ISC_S4C[i]->inmaxlg < rlg + ISC_S4C[i]->inlg) {

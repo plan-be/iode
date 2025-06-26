@@ -4,16 +4,16 @@
 int SCR_ADD_PTR_CHUNCK = 1; /* JMP 13-11-2012 */
 
 /* ====================================================================
-Ajoute un pointeur dans une table tbl de ntbl pointeurs en r‚allouant
+Ajoute un pointeur dans une table tbl de ntbl pointeurs en rÃ©allouant
 cette table et alloue l'espace requis pour le stockage du string txt
-(non n‚cessairement termin‚ par un z‚ro) de longueur lg additionn‚
+(non nÃ©cessairement terminÃ© par un zÃ©ro) de longueur lg additionnÃ©
 de n bytes nuls.
 
 Si lg ou txt sont nuls, ajoute un pointeur NULL en fin de table.
 
-Les valeurs de tbl et ntbl sont modifi‚es par le programme.
+Les valeurs de tbl et ntbl sont modifiÃ©es par le programme.
 
-Le tableau ainsi allou‚ peut ˆtre lib‚r‚ par SCR_free_tbl().
+Le tableau ainsi allouÃ© peut Ãªtre libÃ©rÃ© par SCR_free_tbl().
 
 &RT -1 en cas d'erreur (Memroy full). 0 sinon.
 &EX
@@ -72,15 +72,15 @@ U_ch    *txt;
 }
 
 /* ====================================================================
-Ajoute un pointeur dans une table tbl de ntbl pointeurs en r‚allouant
+Ajoute un pointeur dans une table tbl de ntbl pointeurs en rÃ©allouant
 cette table et alloue l'espace requis pour le stockage du string txt
-(non n‚cessairement termin‚ par un z‚ro) de longueur lg.
+(non nÃ©cessairement terminÃ© par un zÃ©ro) de longueur lg.
 
 Si lg ou txt sont nuls, ajoute un pointeur NULL en fin de table.
 
-Les valeurs de tbl et ntbl sont modifi‚es par le programme.
+Les valeurs de tbl et ntbl sont modifiÃ©es par le programme.
 
-Le tableau ainsi allou‚ peut ˆtre lib‚r‚ par SCR_free_tbl().
+Le tableau ainsi allouÃ© peut Ãªtre libÃ©rÃ© par SCR_free_tbl().
 
 &RT -1 en cas d'erreur (Memroy full). 0 sinon.
 &EX
@@ -118,15 +118,15 @@ U_ch    *txt;
 }
 
 /* ====================================================================
-Ajoute un pointeur dans une table tbl de ntbl pointeurs en r‚allouant
+Ajoute un pointeur dans une table tbl de ntbl pointeurs en rÃ©allouant
 cette table et alloue l'espace requis pour le stockage du string txt
-termin‚ par un z‚ro.
+terminÃ© par un zÃ©ro.
 
 Si txt est null, ajoute un pointeur NULL en fin de table.
 
-Les valeurs de tbl et ntbl sont modifi‚es par le programme.
+Les valeurs de tbl et ntbl sont modifiÃ©es par le programme.
 
-Le tableau ainsi allou‚ peut ˆtre lib‚r‚ par SCR_free_tbl().
+Le tableau ainsi allouÃ© peut Ãªtre libÃ©rÃ© par SCR_free_tbl().
 
 &RT -1 en cas d'erreur (Memroy full). 0 sinon.
 &EX
@@ -166,7 +166,7 @@ U_ch    *txt;
 
 
 /* ====================================================================
-LibŠre l'espace allou‚ pour un tableau g‚n‚r‚ … l'aide de SCR_add_ptr(),
+LibÃ¨re l'espace allouÃ© pour un tableau gÃ©nÃ©rÃ© Ã  l'aide de SCR_add_ptr(),
 SCR_vtom(), SCR_vtoms() et SCR_text().
 
 &EX
@@ -199,7 +199,7 @@ U_ch    **tbl;
 
 
 /* ====================================================================
-Compte le nombre de lignes d'un tableau de pointeurs (allou‚ par
+Compte le nombre de lignes d'un tableau de pointeurs (allouÃ© par
 SCR_add_ptr).
 
 &SA SCR_add_ptr_lg(), SCR_add_ptr(), SCR_free_tbl()
@@ -217,7 +217,7 @@ U_ch    **tbl;
 
 /* ====================================================================
 Copie un tableau de pointeurs vers des strings. Les strings sont
-‚galement copi‚s (et allou‚s).
+Ã©galement copiÃ©s (et allouÃ©s).
 
 &SA SCR_add_ptr(), SCR_free_tbl(), SCR_tbl_size(), SCR_stracpy()
 =======================================================================*/

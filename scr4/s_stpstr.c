@@ -1,10 +1,10 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Compte la longueur du string strippÇ Ö l'aide de la fonction SCR_pstrip().
-Les caractäres Ö supprimer sont Ö spÇcifier dans le second argument de
-la fonction. Il faut mettre l'espace dans les caractäres de ponctuation
-si on dÇsire supprimer les blancs.
+Compte la longueur du string stripp√© √† l'aide de la fonction SCR_pstrip().
+Les caract√®res √† supprimer sont √† sp√©cifier dans le second argument de
+la fonction. Il faut mettre l'espace dans les caract√®res de ponctuation
+si on d√©sire supprimer les blancs.
 
 &EX
 	SCR_pstrip_lg("Titre .......? ", ". :?")
@@ -13,7 +13,7 @@ si on dÇsire supprimer les blancs.
 
 	5
 &TX
-&RT La longueur Ö conserver dans le string
+&RT La longueur √† conserver dans le string
 &SA SCR_pstrip()
 ======================================================================= */
 
@@ -31,10 +31,10 @@ unsigned char *buf,
 }
 
 /* ====================================================================
-Supprime les caractäres de ponctuation de la fin d'un string. Les
-caractäres Ö supprimer sont Ö spÇcifier dans le second argument de la
-fonction. Il faut mettre l'espace dans les caractäres de ponctuation si
-on dÇsire supprimer les blancs.
+Supprime les caract√®res de ponctuation de la fin d'un string. Les
+caract√®res √† supprimer sont √† sp√©cifier dans le second argument de la
+fonction. Il faut mettre l'espace dans les caract√®res de ponctuation si
+on d√©sire supprimer les blancs.
 
 &EX
 
@@ -44,7 +44,7 @@ on dÇsire supprimer les blancs.
 
 	"Titre"
 &TX
-&RT Le string strippÇ
+&RT Le string stripp√©
 &SA SCR_pstrip_lg()
 ======================================================================= */
 

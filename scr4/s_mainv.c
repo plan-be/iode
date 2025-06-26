@@ -1,8 +1,8 @@
 #include "s_mat.h"
 
 /* ====================================================================
-Invertion d'une matrice m1 carr‚e nl1 x nc1 par la m‚thode de balayage.
-Le r‚sultat est stock‚ dans m2 carr‚e nl1 x nc1.
+Invertion d'une matrice m1 carrÃ©e nl1 x nc1 par la mÃ©thode de balayage.
+Le rÃ©sultat est stockÃ© dans m2 carrÃ©e nl1 x nc1.
 
 &CO
     Soit la matrice A(aij); i,j: 1...n.
@@ -15,19 +15,19 @@ Le r‚sultat est stock‚ dans m2 carr‚e nl1 x nc1.
 		aii = aii - 1          i := 1...n
 
     Pendant tout le calcul, P <> 0, sinon la matrice non invertible par
-    cette m‚thode.
+    cette mÃ©thode.
 &TX
 
 &RT
-    Si m2 est nul, une matrice de dimension (nl1, nc1) est allou‚e et
-    retourn‚e (la fonction retourne un pointeur nul et positionne
-    M_errno en cas d'espace m‚moire insuffisant). Si m2 n'est pas nul,
-    le r‚sultat y est stock‚ et m2 est retourn‚. Les dimensions de m1 et
-    m2 doivent ˆtre correctes sans quoi l'inverse calcul‚ , la variable
-    M_errno est positionn‚e et la fonction retourne un pointeur nul. Si
-    la matrice n'est pas inversible, la variable M_errno est positionn‚e
+    Si m2 est nul, une matrice de dimension (nl1, nc1) est allouÃ©e et
+    retournÃ©e (la fonction retourne un pointeur nul et positionne
+    M_errno en cas d'espace mÃ©moire insuffisant). Si m2 n'est pas nul,
+    le rÃ©sultat y est stockÃ© et m2 est retournÃ©. Les dimensions de m1 et
+    m2 doivent Ãªtre correctes sans quoi l'inverse calculÃ© , la variable
+    M_errno est positionnÃ©e et la fonction retourne un pointeur nul. Si
+    la matrice n'est pas inversible, la variable M_errno est positionnÃ©e
     et la fonction retourne un pointeur nul. La matrice source n'est pas
-    modifi‚e.
+    modifiÃ©e.
 
 &EX
     M_inv_1(m2, m1);
@@ -109,7 +109,7 @@ err:
 
 
 /*NH*/
-/* invertion par m‚thode pivot */
+/* invertion par mÃ©thode pivot */
 /*
    This test for errors in the value of dim
 */
@@ -137,23 +137,23 @@ MAT     *m2, *m1;
 
 
 /* ====================================================================
-Invertion d'une matrice m1 carr‚e nl1 x nc1 par la m‚thode du pivot.
-Le r‚sultat est stock‚ dans m2 carr‚e nl1 x nc1.
+Invertion d'une matrice m1 carrÃ©e nl1 x nc1 par la mÃ©thode du pivot.
+Le rÃ©sultat est stockÃ© dans m2 carrÃ©e nl1 x nc1.
 
 &RT
-Si m2 est nul, une matrice de dimension (nl1, nc1) est allou‚e et
-retourn‚e (la fonction retourne un pointeur nul et positionne M_errno
-en cas d'espace m‚moire insuffisant). Si m2 n'est pas nul,
-le r‚sultat y est stock‚ et m2 est retourn‚.
-Les dimensions de m1 et m2 doivent ˆtre correctes sans quoi l'inverse
-calcul‚ , la variable M_errno est positionn‚e et la
+Si m2 est nul, une matrice de dimension (nl1, nc1) est allouÃ©e et
+retournÃ©e (la fonction retourne un pointeur nul et positionne M_errno
+en cas d'espace mÃ©moire insuffisant). Si m2 n'est pas nul,
+le rÃ©sultat y est stockÃ© et m2 est retournÃ©.
+Les dimensions de m1 et m2 doivent Ãªtre correctes sans quoi l'inverse
+calculÃ© , la variable M_errno est positionnÃ©e et la
 fonction retourne un pointeur nul.
-Si la martice n'est pas inversible, la variable M_errno est positionn‚e et
+Si la martice n'est pas inversible, la variable M_errno est positionnÃ©e et
 la fonction retourne un pointeur nul.
 Attention, la fonction travaille sur trois matrices nl1 x nc1, dont une est
-allou‚e en cours de process. Il faut donc s'assurer que l'espace n‚cessaire
+allouÃ©e en cours de process. Il faut donc s'assurer que l'espace nÃ©cessaire
 est disponible.
-La matrice m1 n'est pas modifi‚e.
+La matrice m1 n'est pas modifiÃ©e.
 
 &EX
     M_inv_2(m2, m1);

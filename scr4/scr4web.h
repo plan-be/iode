@@ -9,11 +9,11 @@ typedef struct _s5page {
     U_ch            pg_search       : 1; /* records may be searched */
     U_ch            pg_conf_create  : 1;
     U_ch            pg_conf_delete  : 1;
-    U_ch            pg_operation    : 4;   /* op‚ration en cours sur cette page */
-    U_ch            pg_abort        : 1;   /* Page quitt‚e par abort */ /* JMP_M 4.19 11-05-95 */
+    U_ch            pg_operation    : 4;   /* opÔÇÜration en cours sur cette page */
+    U_ch            pg_abort        : 1;   /* Page quittÔÇÜe par abort */ /* JMP_M 4.19 11-05-95 */
     U_ch            pg_impreq       : 1;   /* Importation de required de l'ISAM */ /* JMP_M 4.19 11-05-95 */
     U_ch            pg_imptoday     : 1;   /* Importation de today de l'ISAM */ /* JMP_M 4.19 11-05-95 */
-    U_ch            pg_prof         : 1;   /* page … sauver dans le profile *//* JMP 21-02-92 */
+    U_ch            pg_prof         : 1;   /* page ÔÇª sauver dans le profile *//* JMP 21-02-92 */
     U_sh            pg_begin_act /*: MAXBF14*/;  /* function called when entering */
     U_sh            pg_end_act   /*: MAXBF14*/;  /*       "    "     "   exiting  */
     U_sh            pg_disp_act  /*: MAXBF14*/;  /*                      display */
@@ -29,7 +29,7 @@ typedef struct _s5page {
     short           pg_nb_tb;           /* BP_M 24-01-97 */
     U_sh            *pg_toolb;          /* BP_M 24-01-97 */
     U_sh            pg_abort_act;       /* function called by SC_CLOSE */
-    U_sh            pg_nu;              /* JMP : num‚ro de la page */
+    U_sh            pg_nu;              /* JMP : numÔÇÜro de la page */
 } S5PAGE;
 
 typedef struct _s5isfld {
@@ -72,7 +72,7 @@ typedef struct _s5field {
     U_sh            fld_menu      /*: MAXBF14*/;
     U_sh            fld_if_alfa   /*: MAXBF14*/;
     S5ISFLD         *fld_isam;
-    short           *fld_acmp;                  /* num‚ro des champs o— appliquer le CODEISAM */
+    short           *fld_acmp;                  /* numÔÇÜro des champs oÔÇö appliquer le CODEISAM */
     short           fld_type;                   /* type (DATE, INTEGER, REAL, NATURAL) */
 
 } S5FIELD;

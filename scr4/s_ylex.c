@@ -64,17 +64,17 @@ int         nbkeys;
 }
 
 /* ====================================================================
-Fonction presque identique … YY_lex(). Cette fonction permet cependant
-de remplacer la table de mots-cl‚s d‚finie … l'ouverture du texte
+Fonction presque identique Ã  YY_lex(). Cette fonction permet cependant
+de remplacer la table de mots-clÃ©s dÃ©finie Ã  l'ouverture du texte
 (YY_open()) par une table alternative, valable uniquement pour l'appel
 courant.
 
 &NO
-    La table des mots-cl‚s doit ˆtre class‚e par l'utilisateur par ordre
-    alphab‚tique.
+    La table des mots-clÃ©s doit Ãªtre classÃ©e par l'utilisateur par ordre
+    alphabÃ©tique.
 
-&RT le type de l'‚l‚ment suivant du texte ou la valeur de l'entier
-correspondant au mot-cl‚ lu dans la table des YYKEYS.
+&RT le type de l'Ã©lÃ©ment suivant du texte ou la valeur de l'entier
+correspondant au mot-clÃ© lu dans la table des YYKEYS.
 &SA YY_read(), YY_unread(), YY_lex()
 =======================================================================*/
 
@@ -109,36 +109,36 @@ again :
 }
 
 /* ====================================================================
-Lit le prochain ‚l‚ment du texte. Le type est retourn‚ et la valeur
-est sauv‚e dans la structure YYFILE. La liste suivante reprend les types
-possibles et l'‚l‚ment de la structure YYFILE qui les contient.
+Lit le prochain Ã©lÃ©ment du texte. Le type est retournÃ© et la valeur
+est sauvÃ©e dans la structure YYFILE. La liste suivante reprend les types
+possibles et l'Ã©lÃ©ment de la structure YYFILE qui les contient.
 
-Cette fonction appelle d'abord YY_read(). Trois types retourn‚s par
-YY_read() sont trait‚s par YY_lex().
+Cette fonction appelle d'abord YY_read(). Trois types retournÃ©s par
+YY_read() sont traitÃ©s par YY_lex().
 
-Si le type retourn‚ par YY_read() est YY_COMMENT, YY_lex() lit l'‚l‚ment
+Si le type retournÃ© par YY_read() est YY_COMMENT, YY_lex() lit l'Ã©lÃ©ment
 suivant sans retourner de valeur.
 
 Si le type est YY_WORD, YY_lex() commence par mettre le mot en majuscule
 si YY_CASE_SENSITIVE vaut 1. Ensuite, YY_lex() compare le mot lu avec
-les mots d‚finis dans la table de YYKEYS pass‚es … l'ouverture du texte
-(voir YY_open()). Si le mot est trouv‚, la valeur de l'entier
-correspondant … ce mot est retourn‚. Sinon, la valeur YY_WORD est
-retourn‚e.
+les mots dÃ©finis dans la table de YYKEYS passÃ©es Ã  l'ouverture du texte
+(voir YY_open()). Si le mot est trouvÃ©, la valeur de l'entier
+correspondant Ã  ce mot est retournÃ©. Sinon, la valeur YY_WORD est
+retournÃ©e.
 
 Enfin, si le type est YY_SPECIAL, YY_lex() tente de retrouver le
-caractŠre dans la table des YYKEYS et retourne le cas ‚ch‚ant la valeur
-de l'entier correspondant. Les suites de caractŠres sp‚ciaux d‚finis
-dans la table des YYKEYS sont trait‚es de la mˆme fa‡on : YY_lex() lit
-tant qu'il trouve un d‚but de s‚quence correcte dans la table. Ainsi,
-"??" ou "{" peuvent ˆtre des mots-cl‚s.
+caractÃ¨re dans la table des YYKEYS et retourne le cas Ã©chÃ©ant la valeur
+de l'entier correspondant. Les suites de caractÃ¨res spÃ©ciaux dÃ©finis
+dans la table des YYKEYS sont traitÃ©es de la mÃªme faÃ§on : YY_lex() lit
+tant qu'il trouve un dÃ©but de sÃ©quence correcte dans la table. Ainsi,
+"??" ou "{" peuvent Ãªtre des mots-clÃ©s.
 
 &NO
-    La table des mots-cl‚s doit ˆtre class‚e par l'utilisateur par ordre
-    alphab‚tique.
+    La table des mots-clÃ©s doit Ãªtre classÃ©e par l'utilisateur par ordre
+    alphabÃ©tique.
 
-&RT le type de l'‚l‚ment suivant du texte ou la valeur de l'entier
-correspondant au mot-cl‚ lu dans la table des YYKEYS.
+&RT le type de l'Ã©lÃ©ment suivant du texte ou la valeur de l'entier
+correspondant au mot-clÃ© lu dans la table des YYKEYS.
 &SA YY_read(), YY_unread(), YY_lex2()
 =======================================================================*/
 

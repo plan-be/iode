@@ -1,8 +1,8 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Supprime les caractŠres exc‚dentaires dans un string : chaque ch
-recontr‚ dans txt est supprim‚ si le caractŠre qui le suite fait
+Supprime les caractÃ¨res excÃ©dentaires dans un string : chaque ch
+recontrÃ© dans txt est supprimÃ© si le caractÃ¨re qui le suite fait
 partie du string str.
 
 La modification a lieu sur place.

@@ -10,7 +10,7 @@
 // Global variables
 
 
-// g_hhk ó handle of the hook procedure
+// g_hhk Â¾ handle of the hook procedure
 
 HWND    g_hwndTT, g_hwndDlg;
 HHOOK   g_hhk;

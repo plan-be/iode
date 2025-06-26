@@ -1,11 +1,11 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Change le nom d'un fichier. Cette fonction assure la compatibiliÇ entre
-le DOS et certaines versions anciennes de UNIX (XENIX) qui ne possädent
+Change le nom d'un fichier. Cette fonction assure la compatibili√© entre
+le DOS et certaines versions anciennes de UNIX (XENIX) qui ne poss√®dent
 pas le system call rename.
 
-&RT 0 en cas de succäs, -1 sinon.
+&RT 0 en cas de succ√®s, -1 sinon.
 =======================================================================*/
 
 SCR_rename(fold, fnew)

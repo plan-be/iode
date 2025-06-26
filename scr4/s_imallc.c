@@ -1,10 +1,10 @@
 #include "scr.h"
 
 /* ====================================================================
-Alloue l'espace nÇcessaire au stockage d'une image de nl lignes et nc
-caractäres. L'image est vide.
+Alloue l'espace n√©cessaire au stockage d'une image de nl lignes et nc
+caract√®res. L'image est vide.
 
-&RT le pointeur vers l'IMAGE crÇÇe
+&RT le pointeur vers l'IMAGE cr√©√©e
 &SA SCR_save_image(), SCR_free_image()
 =======================================================================*/
 
@@ -30,7 +30,7 @@ int     nl, nc;
 
 
 /* ====================================================================
-Libäre l'espace allouÇ par SCR_save_image() ou SCR_alloc_image().
+Lib√®re l'espace allou√© par SCR_save_image() ou SCR_alloc_image().
 &EX
     IMAGE   *im;
 

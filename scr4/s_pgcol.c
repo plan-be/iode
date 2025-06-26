@@ -3,9 +3,9 @@
 /* ===================================================================
 Fixe la couleur de tous les champs d'une PAGE ainsi que le fond de PAGE.
 
-&NO La PAGE concern‚e doit avoir ses champs en m‚moire (FLD_MEM) pour
+&NO La PAGE concernÃ©e doit avoir ses champs en mÃ©moire (FLD_MEM) pour
     garder ses attributs lors de l'affichage. De plus, il n'est plus
-    possible de revenir aux valeurs ant‚rieures des attributs.
+    possible de revenir aux valeurs antÃ©rieures des attributs.
 
 =================================================================== */
 

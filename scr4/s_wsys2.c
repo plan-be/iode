@@ -25,15 +25,15 @@ int WscrGetPid()
 }
 
 /* ===============================================================
-Fournit un nom de fichier inexistant dans le r�pertoire donn� dans dirname.
-Le nom r�sultat est pr�fix� par scr4.
+Fournit un nom de fichier inexistant dans le répertoire donné dans dirname.
+Le nom résultat est préfixé par scr4.
 
-Limite : seulement impl�ment� en Windows
+Limite : seulement implémenté en Windows
 
 &EN dirname : nom du directory
-&EN filename : nom fichier r�sultat
+&EN filename : nom fichier résultat
 
-RT 0 en cas de succ�s, -1 en cas de probl�me
+RT 0 en cas de succés, -1 en cas de probléme
 ================================================================== */
 
 int WscrTempFilenameInDir(char *dirname, char *filename)
@@ -61,14 +61,14 @@ int WscrTempFilenameInDir(char *dirname, char *filename)
 }
 
 /* ===============================================================
-Fournit un nom de fichier inexistant dans le r�pertoire temp de Windows.
-Le nom est pr�fix� par scr4.
+Fournit un nom de fichier inexistant dans le répertoire temp de Windows.
+Le nom est préfixé par scr4.
 
-Limite : seulement impl�ment� en Windows
+Limite : seulement implémenté en Windows
 
 &EN filename : nom fichier
 
-RT 0 en cas de succ�s, -1 en cas de probl�me
+RT 0 en cas de succés, -1 en cas de probléme
 ================================================================== */
 
 int WscrTempFilename(char *filename)
@@ -98,14 +98,14 @@ int WscrTempFilename(char *filename)
 }
 
 /* ===============================================================
-Fournit le nom du r�pertoire temp
+Fournit le nom du répertoire temp
 
-&EN le nom du r�pertoire temporaire de Windows
+&EN le nom du répertoire temporaire de Windows
 &EN "c:" si impossible ou DOS
 &EN "." si Unix
-&EN filename : nom du r�pertoire
+&EN filename : nom du répertoire
 
-RT 0 en cas de succ�s, -1 en cas de probl�me
+RT 0 en cas de succés, -1 en cas de probléme
 ================================================================== */
 
 int WscrTempPath(char *dirbuf)
@@ -128,18 +128,18 @@ int WscrTempPath(char *dirbuf)
 
 
 /* ===============================================================
-Modifie les dates et heures d'acc�s et de modification du fichier filename.
+Modifie les dates et heures d'accés et de modification du fichier filename.
 
-Les acc�s suffisants doivent �tre donn�s � l'utilisateur du programme.
+Les accés suffisants doivent étre donnés à l'utilisateur du programme.
 
-&NO Sous Linux, il est impossible de fixer l'heure et la date d'acc�s d'un fichier
-    d'une partition  FAT32 mont�e.
+&NO Sous Linux, il est impossible de fixer l'heure et la date d'accés d'un fichier
+    d'une partition  FAT32 montée.
 
 &EN filename : nom fichier
 &EN actime : nombre de secondes depuis le 1/1/1970  (format de stat)
 &EN modtime : nombre de secondes depuis le 1/1/1970 (format de stat)
 
-RT 0 en cas de succ�s, -1 en cas de probl�me
+RT 0 en cas de succés, -1 en cas de probléme
 ================================================================== */
 
 
@@ -154,7 +154,7 @@ int WscrSetFileTime(char *filename, long actime, long modtime)
 
     tb.actime  = actime;
     tb.modtime = modtime;
-    rc = utime(filename, &tb); /* JMP 26-02-2004  � la place de _utime pour les 16 bits ???? */
+    rc = utime(filename, &tb); /* JMP 26-02-2004  à la place de _utime pour les 16 bits ???? */
 #endif
     return(rc);
 }

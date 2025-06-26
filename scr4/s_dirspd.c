@@ -3,9 +3,9 @@
 
 /* ====================================================================
 Divise un nom de fichier en directory et fichier en prenant en
-compte les diff‚rences entre le root directory et les autres.
+compte les diffÃ©rences entre le root directory et les autres.
 
-&NO Cette fonction ne v‚rifie pas l'existence du fichier ou du directory.
+&NO Cette fonction ne vÃ©rifie pas l'existence du fichier ou du directory.
 
 &EX
     strcpy(dir, "\\usr\\ode\\toto");

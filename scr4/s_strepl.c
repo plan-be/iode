@@ -68,10 +68,10 @@ unsigned char   *txt, *repl, *by, *chars;
 }
 
 /* ====================================================================
-Calcule la longueur du string rÇsultant du remplacement de toutes les
+Calcule la longueur du string r√©sultant du remplacement de toutes les
 occurences du string repl par le string by dans txt.
 
-&RT longueur nÇcessaire
+&RT longueur n√©cessaire
 
 &SA U_index(), SCR_areplace()
 =======================================================================*/
@@ -115,9 +115,9 @@ unsigned char   *txt, *repl, *by, *chars;
 
 /* ====================================================================
 Remplace toutes les occurences du string repl par le string by dans
-txt. Le rÇsultat est allouÇ dans la fonction. txt est inchangÇ.
+txt. Le r√©sultat est allou√© dans la fonction. txt est inchang√©.
 
-&RT le pointeur vers le string allouÇ.
+&RT le pointeur vers le string allou√©.
 
 &EX
     char    buf[100];
@@ -140,9 +140,9 @@ unsigned char   *txt, *repl, *by;
 
 /* ====================================================================
 Remplace toutes les occurences du mot repl par le string by dans
-txt. Le rÇsultat est allouÇ dans la fonction. txt est inchangÇ.
+txt. Le r√©sultat est allou√© dans la fonction. txt est inchang√©.
 
-&RT le pointeur vers le string allouÇ.
+&RT le pointeur vers le string allou√©.
 
 &EX
     char    buf[100];
@@ -166,10 +166,10 @@ unsigned char   *txt, *repl, *by;
 /* ====================================================================
 Remplace toutes les occurences du mot repl par le string by dans le
 string txt. txt doit contenir assez d'espace pour les modifications
-apportÇes par le remplacement.
+apport√©es par le remplacement.
 
-Les seuls replacements sont ceux pour lesquels repl est entourÇs de
-caractäres autres que les lettres, les chiffres et le caractäre '_'.
+Les seuls replacements sont ceux pour lesquels repl est entour√©s de
+caract√®res autres que les lettres, les chiffres et le caract√®re '_'.
 
 &RT le pointeur vers le string txt
 
@@ -204,7 +204,7 @@ unsigned char   *txt, *repl, *by;
 /* ====================================================================
 Remplace toutes les occurences du string repl par le string by dans le
 string str. str doit contenir assez d'espace pour les modifications
-apportÇes par le remplacement.
+apport√©es par le remplacement.
 
 &RT le pointeur vers le string str.
 

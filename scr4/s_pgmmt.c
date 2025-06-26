@@ -2,11 +2,11 @@
 
 /* ======================================================================
 Change le titre du champ EDITOR fld_nb de la page pg. Ce titre ne doit pas
-d‚passer 40 caractŠres.
+dÃ©passer 40 caractÃ¨res.
 
 Ne fonctionne pas dans la version WINDOWS.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 ------------------------------------------------------------------------- */
 SCR_set_field_editor_title(pg, fld_nb, title)
 PAGE    *pg;
@@ -24,9 +24,9 @@ U_ch    *title;
 
 /* ======================================================================
 Retourne la valeur du champ fld_nb de la page pg. Ce
-champ doit ˆtre du type EDITOR.
+champ doit Ãªtre du type EDITOR.
 &NO
-    Il n'y a pas de v‚rification de type !
+    Il n'y a pas de vÃ©rification de type !
 &RT un pointeur vers le champ
 ------------------------------------------------------------------------- */
 unsigned char *SCR_get_field_editor(pg, fld_nb)
@@ -43,10 +43,10 @@ int     fld_nb;
 
 
 /* ======================================================================
-Fixe la valeur du champ de PAGE pass‚ comme argument. Cet objet doit ˆtre
-de type EDITOR. Le pointeur vers le texte pass‚ doit ˆtre allou‚ et pouvoir
-ˆtre lib‚r‚ par l'‚diteur … l'aide de la fonction SCR_free(). L'ancienne
-valeur de ce champ est lib‚r‚e par la fonction.
+Fixe la valeur du champ de PAGE passÃ© comme argument. Cet objet doit Ãªtre
+de type EDITOR. Le pointeur vers le texte passÃ© doit Ãªtre allouÃ© et pouvoir
+Ãªtre libÃ©rÃ© par l'Ã©diteur Ã  l'aide de la fonction SCR_free(). L'ancienne
+valeur de ce champ est libÃ©rÃ©e par la fonction.
 
 &SA SCR_get_editor()
 ------------------------------------------------------------------------ */
@@ -59,7 +59,7 @@ U_ch    *text;
 }
 
 /* ======================================================================
-Lit la valeur du champ de PAGE pass‚ comme argument. Cet objet doit ˆtre
+Lit la valeur du champ de PAGE passÃ© comme argument. Cet objet doit Ãªtre
 de type EDITOR. Retourne le pointeur vers le texte correspondant.
 
 &SA SCR_set_editor()
@@ -71,7 +71,7 @@ OBJ obj;
 }
 
 /* ======================================================================
-LibŠre dans une PAGE la m‚moire (allou‚e) utilis‚e par les champs EDITOR.
+LibÃ¨re dans une PAGE la mÃ©moire (allouÃ©e) utilisÃ©e par les champs EDITOR.
 ------------------------------------------------------------------------- */
 PG_free_editor(pg)
 PAGE    *pg;

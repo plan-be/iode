@@ -3,17 +3,17 @@
 extern int  IS_REC_RREC;
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
-Il n'y a pas de vÇrification de type! VÇrifiez donc soigneusement le
-type des champs utilisÇs.
+Il n'y a pas de v√©rification de type! V√©rifiez donc soigneusement le
+type des champs utilis√©s.
 
-Cette fonction doit avoir connaissance de l'OBJ utilisÇ. Il faut donc
-placer dans le champ en question DEF_OBJ pour en obtenir la dÇfinition
-dans les fichiers .c gÇnÇrÇs par scr4_e.
+Cette fonction doit avoir connaissance de l'OBJ utilis√©. Il faut donc
+placer dans le champ en question DEF_OBJ pour en obtenir la d√©finition
+dans les fichiers .c g√©n√©r√©s par scr4_e.
 
 &SA SCR_get_vchar(), SCR_set_vchar()
 ------------------------------------------------------------------------ */
@@ -26,9 +26,9 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
 &SA SCR_rget_vchar()
@@ -42,9 +42,9 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
 &SA SCR_rget_vchar()
@@ -58,9 +58,9 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
 &SA SCR_rget_vchar()
@@ -75,9 +75,9 @@ int     i;
 
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
 &SA SCR_rget_vchar()
@@ -91,9 +91,9 @@ int     i;
 }
 
 /* ======================================================================
-Lit la valeur lue dans le record ISAM du iäme champ qui suit l'objet
-passÇ comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
-par exemple de vÇrifier si un champ a ÇtÇ modifiÇ (en mÇmoire) depuis la
+Lit la valeur lue dans le record ISAM du i√®me champ qui suit l'objet
+pass√© comme argument. Cet objet doit faire partie d'un ISAM. Cela permet
+par exemple de v√©rifier si un champ a √©t√© modifi√© (en m√©moire) depuis la
 lecture du record.
 
 &SA SCR_rget_vchar()
@@ -111,45 +111,45 @@ char    *txt;
 
 /* ====================================================================
 Entame une recherche dans l'ISAM dont fait partie l'objet obj. Cet objet
-doit àtre un index de l'ISAM. La recherceh s'effectue suivant l'ordre de cet
+doit √™tre un index de l'ISAM. La recherceh s'effectue suivant l'ordre de cet
 index.
 
 cond est la condition de recherche.
 
 La recherche commence en fonction de la valeur des champs de l'index de
-recherche placÇs dans le record de l'ISAM. Ces valeurs peuvent àtre
-fixÇes par les fonctions IS_set_field(), SCR_set_*(), etc.
+recherche plac√©s dans le record de l'ISAM. Ces valeurs peuvent √™tre
+fix√©es par les fonctions IS_set_field(), SCR_set_*(), etc.
 
 cond peut prendre les valeurs suivantes :
 
-&EN SCR_GE : recherche les records supÇrieurs ou Çgaux
-&EN SCR_LE : recherche les records infÇrieurs ou Çgaux
-&EN SCR_EQ : recherche les records Çgaux
-&EN SCR_EQ1 : recherche les records dont le premier champ de la clÇ
+&EN SCR_GE : recherche les records sup√©rieurs ou √©gaux
+&EN SCR_LE : recherche les records inf√©rieurs ou √©gaux
+&EN SCR_EQ : recherche les records √©gaux
+&EN SCR_EQ1 : recherche les records dont le premier champ de la cl√©
 	      est identique
-&EN SCR_EQ2 : recherche les records dont les 2 premiers champ de la clÇ
+&EN SCR_EQ2 : recherche les records dont les 2 premiers champ de la cl√©
 	      est identique
-&EN SCR_EQ3 : recherche les records dont les 3 premiers champ de la clÇ
+&EN SCR_EQ3 : recherche les records dont les 3 premiers champ de la cl√©
 	      est identique
-&EN SCR_EQ4 : recherche les records dont les 4 premiers champ de la clÇ
+&EN SCR_EQ4 : recherche les records dont les 4 premiers champ de la cl√©
 	      est identique
-&EN SCR_EQ5 : recherche les records dont les 5 premiers champ de la clÇ
+&EN SCR_EQ5 : recherche les records dont les 5 premiers champ de la cl√©
 	      est identique
 &EN SCR_FIRST: recherche le premier record de la database dans l'ordre
     de l'index sans tenir compte de la valeur de l'index
 &EN SCR_LAST: recherche le dernier record de la database dans l'ordre
     de l'index sans tenir compte de la valeur de l'index
 &EN SCR_DB : recherche le premier record de la database dans l'ordre
-    physique des enregistrements (mÇthode la plus rapide pour lire tout un
+    physique des enregistrements (m√©thode la plus rapide pour lire tout un
     fichier).
 
-Si la recherche aboutit, le record est placÇ dans l'ISAM et le pointeur
-de l'ISAM est placÇ Ö cette position de l'ISAM pour les recherches
-ultÇrieures (IS_next(), IS_prev()) et pour les rewrites (IS_rewrite()).
+Si la recherche aboutit, le record est plac√© dans l'ISAM et le pointeur
+de l'ISAM est plac√© √† cette position de l'ISAM pour les recherches
+ult√©rieures (IS_next(), IS_prev()) et pour les rewrites (IS_rewrite()).
 
-La READ_FN de l'ISAM est exÇcutÇe apräs lecture du record.
+La READ_FN de l'ISAM est ex√©cut√©e apr√®s lecture du record.
 
-&RT 0 si un record est trouvÇ et que la READ_FN de l'ISAM retourne 0, -1
+&RT 0 si un record est trouv√© et que la READ_FN de l'ISAM retourne 0, -1
 sinon.
 &EX
     PrintClientsCommune(commune)
@@ -188,7 +188,7 @@ int     cond;
 
 
 /* ======================================================================
-Retourne un pointeur vers la valeur du champ d'ISAM dÇfini par l'objet obj.
+Retourne un pointeur vers la valeur du champ d'ISAM d√©fini par l'objet obj.
 La valeur est la valeur du record courant de l'ISAM.
 &EX
     printf("Nom : %s\n", IS_text(is_client_name));
@@ -209,12 +209,12 @@ OBJ     obj;
 
 /* ======================================================================
 Remplace un lien entre le champ d'une PAGE et un champ d'un ISAM. obj est
-l'objet dÇfinissant le champ de la PAGE, isf celui dÇfinissant le champ
-de l'ISAM. Un champ d'une page pouvant àtre liÇ Ö plusieurs champs
+l'objet d√©finissant le champ de la PAGE, isf celui d√©finissant le champ
+de l'ISAM. Un champ d'une page pouvant √™tre li√© √† plusieurs champs
 d'ISAM, nb en indique la position.
 
 &NO Il s'agit du remplacement d'un lien par un autre! Un lien doit donc
-dÇjÖ exister au dÇpart dans les sources de la PAGE.
+d√©j√† exister au d√©part dans les sources de la PAGE.
 
 &EX
     page.f :
@@ -251,16 +251,16 @@ OBJ     isf;
 }
 
 /* ======================================================================
-Remplace le type de vÇrification Ö opÇrer sur un champ lors du SCAN
+Remplace le type de v√©rification √† op√©rer sur un champ lors du SCAN
 d'une PAGE dans un ISAM. Trois types de recherche sont valables :
 
-&EN SCR_ISF_CHECK       : vÇrifie uniquement si le champ n'est pas vide
-&EN SCR_ISF_CHECKALWAYS : vÇrifie toujours
-&EN SCR_ISF_CHECKNEVER  : ne vÇrifie jamais
+&EN SCR_ISF_CHECK       : v√©rifie uniquement si le champ n'est pas vide
+&EN SCR_ISF_CHECKALWAYS : v√©rifie toujours
+&EN SCR_ISF_CHECKNEVER  : ne v√©rifie jamais
 
-&NO Les champs doivent se trouver en mÇmoire pour que cette opÇration
-    puisse avoir lieu, soit via FLD_MEM dans la dÇfinition, soit
-    en cours d'Çdition de la PAGE, soit via la fonction PG_read_flds(pg);
+&NO Les champs doivent se trouver en m√©moire pour que cette op√©ration
+    puisse avoir lieu, soit via FLD_MEM dans la d√©finition, soit
+    en cours d'√©dition de la PAGE, soit via la fonction PG_read_flds(pg);
 
 &EX
     page.f :

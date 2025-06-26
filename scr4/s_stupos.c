@@ -1,9 +1,9 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Retourne la position d'un caractäre ch dans un string str.
+Retourne la position d'un caract√®re ch dans un string str.
 
-&RT la position du caractäre s'il est trouvÇ, -1 sinon.
+&RT la position du caract√®re s'il est trouv√©, -1 sinon.
 &EX
     U_pos('.', "filename.txt");
 &TX

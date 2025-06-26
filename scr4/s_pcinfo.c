@@ -8,10 +8,10 @@
 
 /* =====================================================================
 Recherche la taille d'un disque et l'espace disponible sur ce disque (ou
-disquette). Le numÇro du disque est 0 pour le disque courant, 1 pour A:,
+disquette). Le num√©ro du disque est 0 pour le disque courant, 1 pour A:,
 2 pour B:, etc.
 
-Les valeurs sont retournÇes dans les arguments total et free.
+Les valeurs sont retourn√©es dans les arguments total et free.
 
 &RT La fonction retourne -1 si le disque n'est pas accessible, 0 sinon.
 
@@ -62,14 +62,14 @@ unsigned long   *total, *free;
 
 /* =====================================================================
 Recherche la taille d'un disque et l'espace disponible sur ce disque (ou
-disquette). Le numÇro du disque est 0 pour le disque courant, 1 pour A:,
+disquette). Le num√©ro du disque est 0 pour le disque courant, 1 pour A:,
 2 pour B:, etc.
 
-Les valeurs sont retournÇes dans les arguments total, free, KBtotal et
+Les valeurs sont retourn√©es dans les arguments total, free, KBtotal et
 KBfree.
 
 Cette fonction est une extension de la fonction PciGetDriveInfo()
-pour le cas de disques supÇrieurs Ö 2 GB.
+pour le cas de disques sup√©rieurs √† 2 GB.
 
 &RT La fonction retourne -1 si le disque n'est pas accessible, 0 sinon.
 
@@ -130,11 +130,11 @@ typedef struct _pcd_ {
 } PCD;
 
 /* =====================================================================
-Analyse le PC et retourne dans une structure PCINFOS diffÇrentes
+Analyse le PC et retourne dans une structure PCINFOS diff√©rentes
 informations utiles notamment pour une installation de programme.
 
-La structure PCINFOS doit àtre passÇe comme paramätre et est modifiÇe
-par la fonction. Ses ÇlÇments sont dÇfinis comme suit :
+La structure PCINFOS doit √™tre pass√©e comme param√®tre et est modifi√©e
+par la fonction. Ses √©l√©ments sont d√©finis comme suit :
 
 &CO
 ##define MAXFDISKS  26
@@ -148,11 +148,11 @@ typedef struct _pcfdisk_ {
 } PCFDISK;
 
 typedef struct _pcinfos_ {
-    short   fpu;                 1 si un processeur math. est prÇsent
+    short   fpu;                 1 si un processeur math. est pr√©sent
     short   nbfdisks;            Nbre de disques logiques (fixes)
     PCFDISK fdisks[MAXFDISKS];   Infos sur chaque disque
-    short   lpts[3];             Etat de chaque imprimante paralläle
-    short   nbcoms;              Nombre de portes sÇries COMx
+    short   lpts[3];             Etat de chaque imprimante parall√®le
+    short   nbcoms;              Nombre de portes s√©ries COMx
 } PCINFOS;
 &TX
 

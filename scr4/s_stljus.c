@@ -1,11 +1,11 @@
 #include "s_strs.h"
 
 /* =+====== U_ljust_text =============================================
-Justifie un texte Ö gauche : dÇplace dans le string les caractäres Ö
-partir du premier non espace de telle sorte que le permier caractäre ne
-soit pas un espace. La longueur du string n'est pas modifiÇe.
+Justifie un texte √† gauche : d√©place dans le string les caract√®res √†
+partir du premier non espace de telle sorte que le permier caract√®re ne
+soit pas un espace. La longueur du string n'est pas modifi√©e.
 
-&RT un pointeur vers le string justifiÇ
+&RT un pointeur vers le string justifi√©
 &EX
     printf("'%s'\n", U_ljust_text(" Jean-Marc "));
 

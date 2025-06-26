@@ -3,15 +3,15 @@
 /* ====================================================================
 Impression d'une matrice dans un fichier au format tableau A2M.
 
-On passe en paramätres: le file descriptor du fichier output, le pointeur
-sur la matrice Ö imprimer, un titre gÇnÇral, un tableau contenant les titres
+On passe en param√®tres: le file descriptor du fichier output, le pointeur
+sur la matrice √† imprimer, un titre g√©n√©ral, un tableau contenant les titres
 de lignes et un tableau comprenant les titres de colonnes.
 
 
 
 &RT
-La fonction retourne EOF en cas d'erreur d'accäs au fichier output et 0 en
-cas de succäs.
+La fonction retourne EOF en cas d'erreur d'acc√®s au fichier output et 0 en
+cas de succ√®s.
 
 &EX FILE *fd;
     MAT  *m1;
@@ -73,14 +73,14 @@ char **t_col;
 /* ====================================================================
 Impression d'une matrice dans un fichier au format tableau A2M.
 
-On passe en paramätres: le file descriptor du fichier output, le pointeur
-sur la matrice Ö imprimer et un titre.
+On passe en param√®tres: le file descriptor du fichier output, le pointeur
+sur la matrice √† imprimer et un titre.
 
-Chaque ligne et colonne sont imprimÇes avec un titre correspondant Ö
-leur numÇro d'ordre..
+Chaque ligne et colonne sont imprim√©es avec un titre correspondant √†
+leur num√©ro d'ordre..
 &RT
-La fonction retourne EOF en cas d'erreur d'accäs au fichier output et 0 en
-cas de succäs.
+La fonction retourne EOF en cas d'erreur d'acc√®s au fichier output et 0 en
+cas de succ√®s.
 
 &EX FILE *fd;
     MAT  *m1;
@@ -109,7 +109,7 @@ char *title;
     if(fprintf(fd, "&%dL\\b%s\\B\n", nc_tbl, title) == EOF) return(EOF);
     if(fprintf(fd, ".tl\n") == EOF) return(EOF);
 
-    /* premiere ligne = n¯ colonnes */
+    /* premiere ligne = n¬∞ colonnes */
 
     if(fprintf(fd,"&1L ") == EOF) return(EOF);
 

@@ -12,22 +12,22 @@ int     A2M_CSV_NA = 1;
 FILE    *A2M_fdcsv;
 
 /* ================================================================
-InterprŠte le contenu d'un fichier a2m et g‚nŠre un fichier .csv.
+InterprÃ¨te le contenu d'un fichier a2m et gÃ©nÃ¨re un fichier .csv.
 
-&EN a2mfile = nom du fichier a2m … interpr‚ter
-&EN outfile = nom du fichier csv … g‚n‚rer
+&EN a2mfile = nom du fichier a2m Ã  interprÃ©ter
+&EN outfile = nom du fichier csv Ã  gÃ©nÃ©rer
 
-&RT La fonction retourne 0 si le processus s'est bien d‚roul‚, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien dÃ©roulÃ©, -1 sinon.
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour la
-g‚n‚ration du fichier csv et la lecture du fichier a2m. Pour que ces
-paramŠtres soient pris en compte par le programme A2mToCsv(), il faut
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour la
+gÃ©nÃ©ration du fichier csv et la lecture du fichier a2m. Pour que ces
+paramÃ¨tres soient pris en compte par le programme A2mToCsv(), il faut
 appeler la fonction A2mCsvReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et de g‚n‚ration.
+d'interprÃ©tation et de gÃ©nÃ©ration.
 
 &CO
     #include <s_a2m.h>
@@ -37,36 +37,36 @@ d'interpr‚tation et de g‚n‚ration.
 &TX
 
 &TI Variables globales
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les variables globales d‚crites dans le fichier .ini peuvent ‚galement
-ˆtre modifi‚es dans le programme.
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Les variables globales dÃ©crites dans le fichier .ini peuvent Ã©galement
+Ãªtre modifiÃ©es dans le programme.
 
-&IT Variables influen‡ant la lecture du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la secion [A2M] du fichier ini.
+&IT Variables influenÃ§ant la lecture du fichier
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la secion [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caractŠre d'escape (enrichissements et caractŠres
-    sp‚ciaux) : '\'par d‚faut
-&EN int A2M_CMDCH = caractŠre de commande ('.' par d‚faut)
-    sp‚ciaux)
-&EN int A2M_DEFCH = caractŠre pr‚fixant les macros ('&' par d‚faut)
-&EN int A2M_SEPCH = caractŠre de s‚paration des cellules ('&' par d‚faut)
+&EN int A2M_ESCCH = caractÃ¨re d'escape (enrichissements et caractÃ¨res
+    spÃ©ciaux) : '\'par dÃ©faut
+&EN int A2M_CMDCH = caractÃ¨re de commande ('.' par dÃ©faut)
+    spÃ©ciaux)
+&EN int A2M_DEFCH = caractÃ¨re prÃ©fixant les macros ('&' par dÃ©faut)
+&EN int A2M_SEPCH = caractÃ¨re de sÃ©paration des cellules ('&' par dÃ©faut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
 
-&IT Variable influen‡ant le fichier g‚n‚r‚
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [CSV] du fichier .ini.
+&IT Variable influenÃ§ant le fichier gÃ©nÃ©rÃ©
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la section [CSV] du fichier .ini.
 
-&EN int A2M_CSV_SEP = s‚parateur de cellules (d‚faut ';')
+&EN int A2M_CSV_SEP = sÃ©parateur de cellules (dÃ©faut ';')
 &EN int A2M_CSV_NA  = remplace le texte "--" par "#N/A"
-&EN int A2M_CSV_QUOTE = caractŠre encadrant le texte des cellules
-			(d‚faut '"');
+&EN int A2M_CSV_QUOTE = caractÃ¨re encadrant le texte des cellules
+			(dÃ©faut '"');
 
 &RT
-&EN 0 en cas de succŠs
-&EN -1 si le fichier ne peut ˆtre ouvert
-&EN -2 si le fichier output n'a pu ˆtre cr‚‚
+&EN 0 en cas de succÃ¨s
+&EN -1 si le fichier ne peut Ãªtre ouvert
+&EN -2 si le fichier output n'a pu Ãªtre crÃ©Ã©
 
 
 &SA A2mCsvReadIni(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
@@ -252,23 +252,23 @@ char    *filename;
 }
 
 /* ================================================================
-Fixe la valeur des variables globales avant l'interp‚tation d'un fichier
-a2m et la g‚n‚ration d'un fichier csv en se basant sur les d‚finitions
-du fichier .ini associ‚.
+Fixe la valeur des variables globales avant l'interpÃ©tation d'un fichier
+a2m et la gÃ©nÃ©ration d'un fichier csv en se basant sur les dÃ©finitions
+du fichier .ini associÃ©.
 
-Les sections [A2M] et [CSV] du fichier .ini sont interpr‚t‚es.
+Les sections [A2M] et [CSV] du fichier .ini sont interprÃ©tÃ©es.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-la lecture du fichier a2m etla g‚n‚ration du fichier csv. Pour que ces
-paramŠtres soient pris en compte par le programme A2mToCsv(), il faut
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+la lecture du fichier a2m etla gÃ©nÃ©ration du fichier csv. Pour que ces
+paramÃ¨tres soient pris en compte par le programme A2mToCsv(), il faut
 appeler la fonction A2mCsvReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>

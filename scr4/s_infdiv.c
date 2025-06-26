@@ -12,10 +12,10 @@ char    *a, *b;
 }
 
 /* ===================================================================
-Effectue la division d'un entier par un autre en arithm‚tique de
-pr‚cision infinie.
+Effectue la division d'un entier par un autre en arithmÃ©tique de
+prÃ©cision infinie.
 
-Chaque entier est repr‚sent‚ par une chaŒne de caractŠres num‚riques de
+Chaque entier est reprÃ©sentÃ© par une chaÃ®ne de caractÃ¨res numÃ©riques de
 longueur arbitraire.
 
 &RT res contient le dividende et reste le reste.

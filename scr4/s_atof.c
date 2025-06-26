@@ -5,9 +5,9 @@
 #endif
 
 /* ===========================================================
-    Modifie sur place un texte contenant un float formattÇ selon les
-    dÇfinitions locales des dÇcimales. NÇcessaire en Unix/Fr. En effet, la
-    fonction atof("1.12") retourne 1.0 en version franáaise. A noter que,
+    Modifie sur place un texte contenant un float formatt√© selon les
+    d√©finitions locales des d√©cimales. N√©cessaire en Unix/Fr. En effet, la
+    fonction atof("1.12") retourne 1.0 en version fran√ßaise. A noter que,
     dans ce cas, sprintf(toto, "%lf", 20.5) donne "20,5"
 
     Ne fait rien en Windows ou DOS.
@@ -29,8 +29,8 @@ SCR_localisestring(char *txt)
 }
 
 /* ===========================================================
-    Pour des raisons de portabilitÇs avec UnixWare
-    il faut controler si dans le texte passer Ö atof il n'y Ö pas une
+    Pour des raisons de portabilit√©s avec UnixWare
+    il faut controler si dans le texte passer √† atof il n'y √† pas une
     virgule car avec unixware et Linux en Fr
 	sprintf(toto, "%lf", 20.5)
 	donne

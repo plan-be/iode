@@ -21,12 +21,12 @@ int     YY_CASE_SENSITIVE = 0;
 
 
 /* ====================================================================
-Ouvre un fichier ou un string pour l'interprÇter Ö l'aide des fonctions
-de la librairie s_yy. Le paramätre filename donne le nom du fichier ou
-le pointeur vers le string Ö interprÇter.
+Ouvre un fichier ou un string pour l'interpr√©ter √† l'aide des fonctions
+de la librairie s_yy. Le param√®tre filename donne le nom du fichier ou
+le pointeur vers le string √† interpr√©ter.
 
 type indique s'il s'agit d'un fichier (YY_FILE), du standard input
-(YY_STDIN) ou d'un string en mÇmoire (YY_MEM). Ces valeurs sont dÇfinies
+(YY_STDIN) ou d'un string en m√©moire (YY_MEM). Ces valeurs sont d√©finies
 dans s_yy.h :
 
 &EN YY_FILE         0
@@ -34,16 +34,16 @@ dans s_yy.h :
 &EN YY_STDIN        2
 
 table est un pointeur vers un tableau de structures YYKEYS qui
-contiennent les dÇfinitions des mots-clÇs reconnus dans l'application.
-size est le nombre d'ÇlÇments de cette table.
+contiennent les d√©finitions des mots-cl√©s reconnus dans l'application.
+size est le nombre d'√©l√©ments de cette table.
 
 YY_open() alloue une structure YYFILE qui contiendra toutes les
-informations utiles en cours de traitement. Cette structure sera libÇrÇe
+informations utiles en cours de traitement. Cette structure sera lib√©r√©e
 par YY_close().
 
-&RT pointeur vers une structure allouÇe YYFILE ou NULL si le fichier
-n'est pas trouvÇ ou que la mÇmoire disponible est insuffisante. Dans ce
-dernier cas un message est envoyÇ vers le stderr.
+&RT pointeur vers une structure allou√©e YYFILE ou NULL si le fichier
+n'est pas trouv√© ou que la m√©moire disponible est insuffisante. Dans ce
+dernier cas un message est envoy√© vers le stderr.
 &EX
     ##include <s_yy.h>
 
@@ -187,9 +187,9 @@ YYFILE  *yy;
 }
 
 /* ====================================================================
-Ferme le fichier ouvert Ö l'aide de YY_open() et libäre l'espace allouÇ
-pour la structure YYFILE corespondante (y compris les dÇfinitions
-trouvÇes en cours d'interprÇtation du fichier).
+Ferme le fichier ouvert √† l'aide de YY_open() et lib√®re l'espace allou√©
+pour la structure YYFILE corespondante (y compris les d√©finitions
+trouv√©es en cours d'interpr√©tation du fichier).
 
 &SA YY_open()
 =======================================================================*/
@@ -205,14 +205,14 @@ YYFILE  *yy;
 }
 
 /* ====================================================================
-Enregistre une suite de caractäres dans la structure YYFILE. Ces
-caractäres seront les premiers Ö àtre lus par la suite suivant une
-mÇthode LIFO (Last In First Out). Plusieurs enregistrements successifs
-peuvent àtre rÇalisÇs, y compris s'il reste des caractäres dans le
+Enregistre une suite de caract√®res dans la structure YYFILE. Ces
+caract√®res seront les premiers √† √™tre lus par la suite suivant une
+m√©thode LIFO (Last In First Out). Plusieurs enregistrements successifs
+peuvent √™tre r√©alis√©s, y compris s'il reste des caract√®res dans le
 buffer d'enregistrement.
 
-En cas de dÇpassement (YY_MAX_RECORD) de buffer, les caractäres
-excÇdentaires sont ignorÇs et un message est envoyÇ vers le stderr.
+En cas de d√©passement (YY_MAX_RECORD) de buffer, les caract√®res
+exc√©dentaires sont ignor√©s et un message est envoy√© vers le stderr.
 
 &EX
     YY_record(yy, "F3 {ABORT}");
@@ -265,10 +265,10 @@ unsigned char *txt;
 }
 
 /* ====================================================================
-Replace un caractäre dans le texte. Ce caractäre sera le premier lu lors
-du prochain appel Ö une des fonctions de lecture.
+Replace un caract√®re dans le texte. Ce caract√®re sera le premier lu lors
+du prochain appel √† une des fonctions de lecture.
 
-YY_ungetc() fait appel Ö YY_record().
+YY_ungetc() fait appel √† YY_record().
 &EX
     YY_ungetc('a', yy);
 &TX
@@ -289,29 +289,29 @@ YYFILE  *yy;
 }
 
 /* ====================================================================
-Lit le caractäre suivant dans le texte. Avant de "consommmer" les
-caractäres de texte, le buffer constituÇ par les appels Ö YY_record() ou
-YY_ungetc() est consultÇ. S'il n'est pas vide, il est utilisÇ. Dans le
+Lit le caract√®re suivant dans le texte. Avant de "consommmer" les
+caract√®res de texte, le buffer constitu√© par les appels √† YY_record() ou
+YY_ungetc() est consult√©. S'il n'est pas vide, il est utilis√©. Dans le
 cas contraire, la suite du texte est lue.
 
 La position dans le fichier est maintenue par cette fonction (ligne et
-colonne). Certains caractäres sont traitÇs de faáon spÇciale :
+colonne). Certains caract√®res sont trait√©s de fa√ßon sp√©ciale :
 
-&EN TAB : transformÇ en une suite de blancs (alignÇs sur 8 colonnes), de
-    sorte que plusieurs appels successifs Ö YY_getc() peuvent retourner
+&EN TAB : transform√© en une suite de blancs (align√©s sur 8 colonnes), de
+    sorte que plusieurs appels successifs √† YY_getc() peuvent retourner
     un blanc pour un seul TAB dans le fichier.
 
-&EN RETURN (\r) : ignorÇ
+&EN RETURN (\r) : ignor√©
 
-&EN \032 (fin de fichier en DOS) : ignorÇ
+&EN \032 (fin de fichier en DOS) : ignor√©
 
-Cette fonction est utilisÇe par les autres fonctions de lecture
+Cette fonction est utilis√©e par les autres fonctions de lecture
 (YY_read(), YY_lex(), etc).
 
 &NO Cette fonction est la fonction de lecture de plus bas niveau : elle
-    ne gäre pas les directives! Seules YY_read() et YY_lex() le font.
+    ne g√®re pas les directives! Seules YY_read() et YY_lex() le font.
 
-&RT le caractäre suivant ou YY_EOF en cas de fin de fichier (ou de
+&RT le caract√®re suivant ou YY_EOF en cas de fin de fichier (ou de
     string).
 &SA YY_record(), YY_ungetc(), YY_read(), YY_lex()
 =======================================================================*/

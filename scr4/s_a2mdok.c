@@ -36,7 +36,7 @@ int     A2M_DOKU_TOCLEVEL = 1;
 
 int     A2M_DOKU_IMGWIDTH = 0;
 char    *A2M_DOKU_IMGDIR = "wiki";
-char    *A2M_DOKU_PREFX = "section_"; // Préfixe des documents ss topics
+char    *A2M_DOKU_PREFX = "section_"; // PrÃ©fixe des documents ss topics
 int     A2M_DOKU_UTF8 = 1;
 
 // Work vars
@@ -46,22 +46,22 @@ int     A2M_DOKU_CURLEVEL = 0;
 
 
 /* ================================================================
-InterprŠte le contenu d'un fichier a2m et g‚nŠre un fichier .txt en format DokuWiki.
+InterprÃ¨te le contenu d'un fichier a2m et gÃ©nÃ¨re un fichier .txt en format DokuWiki.
 
-&EN a2mfile = nom du fichier a2m … interpr‚ter
-&EN outfile = nom du fichier htm … g‚n‚rer
+&EN a2mfile = nom du fichier a2m Ã  interprÃ©ter
+&EN outfile = nom du fichier htm Ã  gÃ©nÃ©rer
 
-&RT La fonction retourne 0 si le processus s'est bien d‚roul‚, -1 sinon.
+&RT La fonction retourne 0 si le processus s'est bien dÃ©roulÃ©, -1 sinon.
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-l'impression et la lecture du fichier a2m. Pour que ces paramŠtres
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+l'impression et la lecture du fichier a2m. Pour que ces paramÃ¨tres
 soient pris en compte par le programme A2mToHtml(), il faut appeler la
 fonction A2mDokuReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>
@@ -71,39 +71,39 @@ d'interpr‚tation et d'impression.
 &TX
 
 &TI Variables globales
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les variables globales d‚crites dans le fichier .ini peuvent ‚galement
-ˆtre modifi‚es dans le programme.
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Les variables globales dÃ©crites dans le fichier .ini peuvent Ã©galement
+Ãªtre modifiÃ©es dans le programme.
 
-&IT Variables influen‡ant la lecture du fichier
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la secion [A2M] du fichier ini.
+&IT Variables influenÃ§ant la lecture du fichier
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la secion [A2M] du fichier ini.
 
-&EN int A2M_ESCCH = caractŠre d'escape (enrichissements et caractŠres
-    sp‚ciaux) : '\'par d‚faut
-&EN int A2M_CMDCH = caractŠre de commande ('.' par d‚faut)
-    sp‚ciaux)
-&EN int A2M_DEFCH = caractŠre pr‚fixant les macros ('&' par d‚faut)
-&EN int A2M_SEPCH = caractŠre de s‚paration des cellules ('&' par d‚faut)
+&EN int A2M_ESCCH = caractÃ¨re d'escape (enrichissements et caractÃ¨res
+    spÃ©ciaux) : '\'par dÃ©faut
+&EN int A2M_CMDCH = caractÃ¨re de commande ('.' par dÃ©faut)
+    spÃ©ciaux)
+&EN int A2M_DEFCH = caractÃ¨re prÃ©fixant les macros ('&' par dÃ©faut)
+&EN int A2M_SEPCH = caractÃ¨re de sÃ©paration des cellules ('&' par dÃ©faut)
 &EN int A2M_LFON = conserve les linefeed (1) ou non (0)
 &EN int A2M_BLON = conserve les blancs (1) ou non (0)
-&EN char A2M_CURTAG[41] = paragraphe par d‚faut ("par_0")
+&EN char A2M_CURTAG[41] = paragraphe par dÃ©faut ("par_0")
 
-&IT Variables influen‡ant le fichier g‚n‚r‚
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Ces variables sont d‚finies dans la section [HTML] du fichier .ini.
+&IT Variables influenÃ§ant le fichier gÃ©nÃ©rÃ©
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Ces variables sont dÃ©finies dans la section [HTML] du fichier .ini.
 
 &EN U_ch *A2M_DOKU_TITLE = titre du fichier txt (?)
-&EN int A2M_DOKU_LTGT = 0 si les caractŠres < et > doivent apparaŒtre
-    comme tel en HTML (&lt;) et non interpr‚t‚s comme tag (on mettra 0
+&EN int A2M_DOKU_LTGT = 0 si les caractÃ¨res < et > doivent apparaÃ®tre
+    comme tel en HTML (&lt;) et non interprÃ©tÃ©s comme tag (on mettra 0
     dans ce cas).
-&EN int A2M_DOKU_AUTOLINK = 0 pour supprimer la cr‚ation automatique de liens
-    par l'analyse des sujets d'aide (acc‚lŠre le traitement)
+&EN int A2M_DOKU_AUTOLINK = 0 pour supprimer la crÃ©ation automatique de liens
+    par l'analyse des sujets d'aide (accÃ©lÃ¨re le traitement)
 
 &RT
-&EN 0 en cas de succŠs
-&EN -1 si le fichier ne peut ˆtre ouvert
-&EN -2 si les fichiers output n'ont pu ˆtre cr‚‚s
+&EN 0 en cas de succÃ¨s
+&EN -1 si le fichier ne peut Ãªtre ouvert
+&EN -2 si les fichiers output n'ont pu Ãªtre crÃ©Ã©s
 
 
 &SA A2mDokuReadIni(), A2mToRtf(), A2mToMif(), A2mToMif(), A2mPrintError()
@@ -141,7 +141,7 @@ char    *a2mfile, *outfile;
 }
 
 /*NH*/
-// Header de chaque fichier généré
+// Header de chaque fichier gÃ©nÃ©rÃ©
 
 A2mDokuPre(fd)
 FILE    *fd;
@@ -239,7 +239,7 @@ A2mDokuTopicFilename(char *title, char *topicname, int topicnb)
     char    *word, res[256];
 
     strcpy(topicname, title);
-    SCR_upper(topicname);  // é -> E
+    SCR_upper(topicname);  // Ã  -> E
     SCR_lower(topicname);  // E -> e
 
     for(i = j = 0 ; topicname[i] ;  i++) {
@@ -784,11 +784,11 @@ A2MTBL  *at;
     // Lignes
     for(i = 0 ; i < at->at_nl ; i++) {
         tdh = (at->at_tls[i].atl_hbf == 1) ? "|" : "^";
-        if(at->at_tls[i].atl_type) { // Ligne de sépration : TODO
+        if(at->at_tls[i].atl_type) { // Ligne de sÃ©pration : TODO
             //
             continue;
         }
-        fprintf(A2M_fdtxt, "%s", tdh); // Séparateur début de la ligne
+        fprintf(A2M_fdtxt, "%s", tdh); // SÃ©parateur dÃ©but de la ligne
 
         // Ligne normale -> boucle sur nc
         for(j = 0 ; j < at->at_nc ; j++) {
@@ -932,23 +932,23 @@ A2mDokuFNote(char *txt)
 
 
 /* ================================================================
-Fixe la valeur des variables globales avant l'interp‚tation d'un fichier
-a2m et la g‚n‚ration d'un fichier html en se basant sur les d‚finitions du
-fichier .ini associ‚.
+Fixe la valeur des variables globales avant l'interpÃ©tation d'un fichier
+a2m et la gÃ©nÃ©ration d'un fichier html en se basant sur les dÃ©finitions du
+fichier .ini associÃ©.
 
-Les sections [A2M] et [HTML] du fichier .ini sont interpr‚t‚es.
+Les sections [A2M] et [HTML] du fichier .ini sont interprÃ©tÃ©es.
 
 &EN filename = nom du fichier .ini
 
-La syntaxe des fichiers a2m est d‚crite dans un chapitre sp‚cifique.
+La syntaxe des fichiers a2m est dÃ©crite dans un chapitre spÃ©cifique.
 
 &TI Fichier a2m.ini
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Le fichier a2m.ini (ou un autre) contient des paramŠtres pour
-la lecture du fichier a2m etla g‚nration du fichier html. Pour que ces
-paramŠtres soient pris en compte par le programme A2mToHtml(), il faut
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+Le fichier a2m.ini (ou un autre) contient des paramÃ¨tres pour
+la lecture du fichier a2m etla gÃ©nration du fichier html. Pour que ces
+paramÃ¨tres soient pris en compte par le programme A2mToHtml(), il faut
 appeler la fonction A2mDokuReadIni(filename) avant de lancer la fonction
-d'interpr‚tation et d'impression.
+d'interprÃ©tation et d'impression.
 
 &CO
     #include <s_a2m.h>

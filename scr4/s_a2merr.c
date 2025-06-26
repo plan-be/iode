@@ -1,20 +1,20 @@
 #include "s_a2m.h"
 
 /* =====================================================================
-Fonction appel‚e par les fonctions A2m*() en cas d'erreur. Elle
-affiche par d‚faut dans le stdout (printf) le fichier, la ligne
-et le caractŠre courants, suivi du message msg.
+Fonction appelÃ©e par les fonctions A2m*() en cas d'erreur. Elle
+affiche par dÃ©faut dans le stdout (printf) le fichier, la ligne
+et le caractÃ¨re courants, suivi du message msg.
 
-Cette fonction peut ˆtre remplac‚e par une fonction utilisateur pour peu
-que l'on garde la mˆme syntaxe.
+Cette fonction peut Ãªtre remplacÃ©e par une fonction utilisateur pour peu
+que l'on garde la mÃªme syntaxe.
 
-Il suffit pour ce faire de d‚finir la fonction dans une des sources C.
-Lors du link, comme la fonction apparaŒtra dans un module objet avant la
-librairie, elle aura priorit‚ et remplacera donc la fonction par d‚faut
+Il suffit pour ce faire de dÃ©finir la fonction dans une des sources C.
+Lors du link, comme la fonction apparaÃ®tra dans un module objet avant la
+librairie, elle aura prioritÃ© et remplacera donc la fonction par dÃ©faut
 de la librairie.
 
 La fonction de la librairie se contente d'imprimer dans le stdout le
-message pass‚ comme argument.
+message passÃ© comme argument.
 
 
 &EN af  = descripteur du fichier a2m ouvert
