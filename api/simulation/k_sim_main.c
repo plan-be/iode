@@ -2,7 +2,7 @@
  * @header4iode
  *
  *   The Gauss-Seidel algorithm
- *   ��������������������������
+ *   ==========================
  *  
  *  A macroeconomic model is a system of nonlinear equations that must be solved with respect 
  *  to its endogenous variables, say {yi}. 
@@ -291,10 +291,10 @@ static int K_interdep_2(int t)
     // Stage 2
     KSIM_NORM = 0.0;
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
-        if(IODE_IS_A_NUMBER(KSIM_XK[j])) { // Valeur pr�c�dente d�finie
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) { // Valeur précédente définie
             d = KSIM_XK[j] - KSIM_XK1[j]; // Diff between iterations
 
-            // Calcule la 'norme' = fabs de la diff�rence relative entre 2 it.
+            // Calcule la 'norme' = fabs de la différence relative entre 2 it.
             //   ou de la diff entre 2 it.
             if(!IODE_IS_0(KSIM_XK[j]))
                 pd = min(fabs(1 - KSIM_XK1[j] / KSIM_XK[j]), fabs(d));
@@ -741,7 +741,7 @@ static void K_lstorder_1(char* lstname, int eq1, int eqn)
                     maxl = 1000;
     extern  KDB*    KSIM_DBV;
 
-    // D�truit la liste cible et les sous-listes
+    // Détruit la liste cible et les sous-listes
     sprintf(buf, "%s*", lstname);
     //B_DataDelete(buf, LISTS); // Old version usign B_*() fns
     lst_todel = K_expand(LISTS, NULL, buf, '*');

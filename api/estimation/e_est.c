@@ -214,11 +214,11 @@ static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
     int     i, j;
     double  x;
 
-    // Pour tte �quation
+    // Pour toute équation
     for(i = 0 ; i < E_NEQ ; i++) {
         if(E_scl_in_eq(coef_nb, i)) {
-            // Si le scalaire i est dans l'�q : calculer le RHS (pour chaque ann�e)
-            //  et sauver la d�riv�e dans la matrice E_G  : (f(x + h) - f(x)) / h
+            // Si le scalaire i est dans l'éq : calculer le RHS (pour chaque année)
+            // et sauver la dérivée dans la matrice E_G  : (f(x + h) - f(x)) / h
             for(j = 0 ; j < E_T ; j++) {
                 x = E_rhs_ij(i, j);
                 if(x >= MAXFLOAT) x = IODE_NAN;
@@ -258,10 +258,10 @@ static int E_jacobian()
     int     i, j;
 
     for(i = 0, j = 0 ; i < E_NC ; i++) {
-        if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0) {      // Uniquement pour les coef estim�s (relax <> 0)
+        if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0) {      // Uniquement pour les coef estimés (relax <> 0)
             oldc = KSVAL(E_DBS, E_C_NBS[i])->val;       // Stocke l'ancienne valeur du coef
             if(fabs(oldc) < 1e-15) oldc = 0.1;          //   ou 0.1 si coef proche de nul
-            KSVAL(E_DBS, E_C_NBS[i])->val = oldc * (1.0 + h); // coef augment� de h pourcents
+            KSVAL(E_DBS, E_C_NBS[i])->val = oldc * (1.0 + h); // coef augmenté de h pourcents
             if(0 != E_mod_residuals(i, j, oldc * h)) {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
                 KSVAL(E_DBS, E_C_NBS[i])->val = oldc;   // remet l'ancienne valeur du coef

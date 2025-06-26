@@ -287,17 +287,17 @@ unsigned char **KL_expand(char *str)
         if(tbl[i][0] == '$') {
             pos = K_find(K_WS[LISTS], tbl[i] + 1);
             if(pos >= 0) {
-                SCR_free(tbl[i]); // plus besoin car remplac� par sa valeur
+                SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
                 tbl2 = KL_expand(KLVAL(K_WS[LISTS], pos));
                 nb2 = SCR_tbl_size(tbl2);
-                // Insertion dans tbl de la liste � la place de tbl[i]
+                // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);
-                // d�caler ceux qui suivent i (nb -i - 1 �ls) de nb2 places vers la droite
+                // décaler ceux qui suivent i (nb -i - 1 éléments) de nb2 places vers la droite
                 memcpy(tbl + i + nb2, tbl + i + 1, sizeof(char *) * (nb - i - 1));
-                // recopier tbl2 � la place de i et suivants
+                // recopier tbl2 à la place de i et suivants
                 memcpy(tbl + i, tbl2, sizeof(char *) * nb2);
                 nb += nb2 - 1; // -1 car on remplace le courant
-                SCR_free(tbl2); // pas tbl_free car ptrs copi�s dans tbl
+                SCR_free(tbl2); // pas tbl_free car ptrs copiés dans tbl
             }
         }
     }

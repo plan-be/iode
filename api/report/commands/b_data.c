@@ -562,7 +562,7 @@ int B_DataUpdate(char* arg, int type)
     A_free(args);
     SCR_free(per);
     if(rc >= 0) rc = 0;
-    if(rc < 0) rc = -1; // Pour �viter return dans les rapports si rc = -2
+    if(rc < 0) rc = -1; // Pour éviter return dans les rapports si rc = -2
     return(rc);
 }
 

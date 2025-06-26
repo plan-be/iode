@@ -188,7 +188,7 @@ static void K_xdrPACK(unsigned char* ptr, int mode)
 
 //// CLEC transformation ////
 
-// declare static function ‘K_xdrCLEC_sub’()
+// declare static function 'K_xdrCLEC_sub()'
 // to avoid error: static declaration of 'K_xdrCLEC_sub' follows non-static declaration
 static void K_xdrCLEC_sub(char* expr, int lg, int mode);
 

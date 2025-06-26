@@ -49,7 +49,7 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
 
     if(yt == NULL || gt == NULL  || a == NULL) goto err;
 
-    // Prépare a matrix (weights)
+    // Prépare la matrice (weights)
     for(j = 0; j < 3; j ++) {
         MATE(a, 0, j) = lambda * y1[j];
         MATE(a, nb - 1, nb - 1 - j) = lambda * y1[j];

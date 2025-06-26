@@ -157,12 +157,12 @@ PERIOD  *PER_addper(PERIOD *period, int shift)
     }
     else {
         shiftper = per.p_s + shift;
-        if(shiftper <= 0) { // ann�e recule
+        if(shiftper <= 0) { // année recule
             backw = 1 + (-shiftper) / nb_per;
             per.p_y -= backw;
             per.p_s = backw * nb_per + shiftper;
         }
-        else { // ann�e inchang�e
+        else { // année inchangée
             per.p_s = shiftper;
         }
     }

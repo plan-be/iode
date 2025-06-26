@@ -223,13 +223,13 @@ double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
     CLEC        *cl;
     char        **scl = NULL, **eqs = NULL;
 
-    // Cr�e le tableau d'�quations � partir de arg (il faut qu'une seule eqs!!)
+    // Crée le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
     eqs = B_ainit_chk(eqname, NULL, 0);         
     if(eqs == NULL) return(0.0);
     pos = K_find(K_WS[EQUATIONS], eqs[0]);
     if(pos < 0) return(0.0);
 
-    // Construit le tableau de scalaires contenus dans l'�quation eqs
+    // Construit le tableau de scalaires contenus dans l'équation eqs
     eq = KEVAL(K_WS[EQUATIONS], pos);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);

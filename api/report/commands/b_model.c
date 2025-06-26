@@ -462,7 +462,7 @@ int B_ModelSimulateSaveNIters(char *arg)
  */
 int B_ModelSimulateSaveNorms(char *arg)
 {
-    extern double   *KSIM_NORMS;	// Norme de convergence par ann�e JMP 21/3/2012
+    extern double   *KSIM_NORMS;	// Norme de convergence par année JMP 21/3/2012
 
     return(B_CreateVarFromVecOfDoubles(arg, KSIM_NORMS));
 }

@@ -962,7 +962,7 @@ int RP_fneval(char** res, char* str)
     int     i, rc = 0;
 
     *res = 0;
-    // tbl = SCR_vtoms3(str, "(,", 1); // Bugg� si on a fn("ssdff","sdfsdf")
+    // tbl = SCR_vtoms3(str, "(,", 1); // Buggé si on a fn("ssdff","sdfsdf")
     tbl = SCR_vtomsq(str, "(,", '"');  // JMP 20/10/2022
     
     // Find the function name (in lowercase)
@@ -1459,7 +1459,7 @@ int B_ReportLine(char* line, int cleanup)
         goto done;
     }
 
-    // Premier rapport ? (d�but de session de rapport)
+    // Premier rapport ? (début de session de rapport)
     if(RP_DEPTH == 0 && cleanup) {
         RP_T = 0;
         memset(&RP_PER, 0, sizeof(PERIOD));
@@ -1470,20 +1470,20 @@ int B_ReportLine(char* line, int cleanup)
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
-    // Cr�e une struct REPFILE
+    // Crée une struct REPFILE
     rf = (REPFILE *) RP_alloc(sizeof(REPFILE));
-    rf->filename = RP_stracpy("temp.rep");// JMP 4/02/09
+    rf->filename = RP_stracpy("temp.rep"); // JMP 4/02/09
     rf->tbl = RP_vtom(line, '\n');
     rf->curline = 0;
     rf->nblines = RP_tbl_size(rf->tbl); // JMP 4/02/09
 
-    // Ex�cute la ligne (non expand�e � ce stade)
+    // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);
 
-    // Lib�re : rf et remet CUR_REPFILE � 0
+    // Libére : rf et remet CUR_REPFILE à 0
     RP_free_repfile(rf);
 
-    // Remonte un niveau de profondeur d'ex�cution des rapports
+    // Remonte un niveau de profondeur d'exécution des rapports
     RP_DEPTH --;
 
 done:

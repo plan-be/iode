@@ -523,15 +523,15 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
     /* if NO value after AND before t, return IODE_NAN */
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
 
-    /* Valeurs apparent‚es */
+    /* Valeurs apparentées */
     ayt = L_exec_sub(expr2, len2, t, stack);
     if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
     ay[0] = ay[1] = IODE_NAN; /* JMP 19-07-07 */
     if(vt[0] >= 0)   ay[0] = L_exec_sub(expr2, len2, vt[0], stack);
     if(vt[1] < nobs) ay[1] = L_exec_sub(expr2, len2, vt[1], stack);
 
-    // Deux valeurs trouv‚es dans la s‚rie initiale
-    // !! Les deux valeurs doivent exister dans la s‚rie apparent‚e
+    // Deux valeurs trouvées dans la série initiale
+    // !! Les deux valeurs doivent exister dans la série apparentée
     if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) {
         if(vt[0] < t && vt[1] > t) {
             /*            return(ayt * (vy[0] / ay[0] + vy[1] / ay[1]) / 2); */
@@ -550,12 +550,12 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
             return(ayt * (vy[j] / ay[j]));
         }
     }
-    // Seule la valeur en t0 est d‚finie : res(t) <- APP(t) * (ORIG(t0) / APP(t0))
+    // Seule la valeur en t0 est définie : res(t) <- APP(t) * (ORIG(t0) / APP(t0))
     if(IODE_IS_A_NUMBER(ay[0])) {
         if(fabs(ay[0]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
         return(ayt * (vy[0] / ay[0]));
     }
-    // Seule la valeur en t1 est d‚finie : res(t) <- APP(t) * (ORIG(t1) / APP(t1))
+    // Seule la valeur en t1 est définie : res(t) <- APP(t) * (ORIG(t1) / APP(t1))
     if(IODE_IS_A_NUMBER(ay[1])) {
         if(fabs(ay[1]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
         return(ayt * (vy[1] / ay[1]));
@@ -586,7 +586,7 @@ L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
     /* if NO value after AND before t, return IODE_NAN */
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
 
-    /* Valeurs apparent‚es */
+    /* Valeurs apparentées */
     ayt = L_exec_sub(expr2, len2, t, stack);
     if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
     if(vt[0] >= 0)   ay[0] = L_exec_sub(expr2, len2, vt[0], stack);
