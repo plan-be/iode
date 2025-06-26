@@ -1,3 +1,4 @@
+from PySide6.QtCore import QLocale
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QValidator, QDoubleValidator
 
@@ -29,6 +30,8 @@ class IodeDoubleValidator(QDoubleValidator):
             if decimals is None:
                 raise ValueError("decimals must be provided if bottom or top are provided")
             super().__init__(bottom, top, decimals, parent)
+        # Ensure dot as decimal separator
+        self.setLocale(QLocale("C"))
 
     def validate(self, input: str, pos: int):
         """

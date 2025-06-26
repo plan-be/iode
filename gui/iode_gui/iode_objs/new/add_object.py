@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, QLocale
 from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtGui import QDesktopServices, QDoubleValidator
 
@@ -100,7 +100,10 @@ class AddScalarDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.SCALARS
         self.ui = Ui_AddScalarDialog()
         self.ui.setupUi(self)
-        self.ui.lineEdit_value.setValidator(QDoubleValidator(parent));
+        validator = QDoubleValidator(parent)
+        # set the locale for the validator to ensure dot as decimal separator
+        validator.setLocale(QLocale("C"))
+        self.ui.lineEdit_value.setValidator(validator)
 
     @Slot()
     def add(self):
