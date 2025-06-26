@@ -831,8 +831,8 @@ int B_ExcelThousand(char *arg)
 Tells IODE to skip the currency sign when readinf Excel data (for $ExcelGetVar).
 $ExcelSetCurrency => no sep
 $ExcelSetCurrency Dollar => skip $
-$ExcelSetCurrency Pound => skip �
-$ExcelSetCurrency Euro => skip �
+$ExcelSetCurrency Pound => skip £
+$ExcelSetCurrency Euro => skip €
 $ExcelSetCurrency c => skip c (any c)
 $ExcelSetCurrency [no arg] => no sep
 */
@@ -854,12 +854,12 @@ int B_ExcelCurrency(char *arg)
 
             case 'e': /* EUR */
             case 'E':
-                SCR_sCURRENCY = '�';
+                SCR_sCURRENCY = '€';
                 break;
 
             case 'p': /* Pound */
             case 'P':
-                SCR_sCURRENCY = '�';
+                SCR_sCURRENCY = '£';
                 break;
 
             default:

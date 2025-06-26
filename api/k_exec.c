@@ -134,7 +134,7 @@ static KDB *KI_series_list(KDB* dbi)
     tbl = 0;
     ntbl = 0;
 
-    // Ajoute dans un tableau toutes les noms de vars rencontr�s **sans v�rifier les doublons (will eliminated by the call to K_add_entry() below).  
+    // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
     for(i = 0; i < KNB(dbi); i++) {
         SCR_add_ptr(&tbl, &ntbl, KONAME(dbi, i));
         clec = KICLEC(dbi, i);

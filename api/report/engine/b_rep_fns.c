@@ -543,13 +543,13 @@ U_ch    *RPF_MONTHSE[] = {
 
 U_ch    *RPF_MONTHSF[] = {
     "Janvier",
-    "F�vrier",
+    "Février",
     "Mars",
     "Avril",
     "Mai",
     "Juin",
     "Juillet",
-    "Ao�t",
+    "Août",
     "Septembre",
     "Octobre",
     "Novembre",
@@ -674,10 +674,10 @@ U_ch *RPF_srelax(U_ch** args)
  *  
  *  Examples 
  *  --------
- *      @ttitle(C8_1)           =>  "D�terminants de l'output potentiel"
+ *      @ttitle(C8_1)           =>  "Déterminants de l'output potentiel"
  *      @ttitle( c8_10)         =>  "Coin salarial parafiscal"
  *      @ttitle(C8_1 c8_10)     =>  "Table C8_1 c8_10 not found"
- *      @ttitle(C8_1, c8_10)    =>  "D�terminants de l'output potentiel
+ *      @ttitle(C8_1, c8_10)    =>  "Déterminants de l'output potentiel
  *                                  Coin salarial parafiscal"
  */
 U_ch *RPF_ttitle(U_ch** args)
@@ -947,7 +947,7 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
         if(fromto == 0) PER_pertoa(&smpl->s_p1, res);
         else            PER_pertoa(&smpl->s_p2, res);
     }
-    if(res[0] == 0) strcpy(res, " "); // pour �viter de quitter le rapport si sample vide
+    if(res[0] == 0) strcpy(res, " "); // pour éviter de quitter le rapport si sample vide
 
     return(res);
 }
@@ -1498,7 +1498,7 @@ double RPF_SimNormReal(U_ch** args)
     t = RPF_CalcPeriod(args);
     if(t < 0) return(-1.0);
 
-    // Check si d�j� simulation
+    // Check si déjà simulation
     if(KSIM_NORMS == 0) return(-1.0); // Pas encore de simulation
 
     // Return norme t
@@ -1539,7 +1539,7 @@ int RPF_SimNIterInt(U_ch** args)
     t = RPF_CalcPeriod(args);
     if(t < 0) return(-1);
 
-    // Check si d�j� simulation
+    // Check si déjà simulation
     if(KSIM_NITERS == 0) return(-1); // Pas encore de simulation
 
     // Return norme t
@@ -1583,7 +1583,7 @@ int RPF_SimCpuInt(U_ch** args)
     t = RPF_CalcPeriod(args);
     if(t < 0) return(-1);
 
-    // Check si d�j� simulation
+    // Check si déjà simulation
     if(KSIM_CPUS == 0) return(-1); // Pas encore de simulation
 
     // Return norme t

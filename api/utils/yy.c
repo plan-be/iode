@@ -50,7 +50,7 @@ ag:
                 minus = -1;
                 goto ag;
             }
-            //  YY_unread(yy); // Annul� version 6.21
+            //  YY_unread(yy); // Annulé version 6.21
 
             if(yy->yy_text[0] != '/' &&
                     yy->yy_text[0] != '.')  /* JMP 03-01-2013 */

@@ -78,7 +78,7 @@ int B_EqsStepWise(char* arg)
     from = args[0];                                              
     to = args[1];                                                
     smpl = PER_atosmpl(from, to);                                /*Calcule le sample*/
-    if(smpl == NULL) {                                           /*GŠre les erreurs de sample*/
+    if(smpl == NULL) {                                           /*Gère les erreurs de sample*/
         kerror(0,"Incorrect sample");
         SCR_free_tbl(args);
         return(1);
@@ -86,14 +86,14 @@ int B_EqsStepWise(char* arg)
 
 
     eqs = args[2];                                               
-    if(K_find(K_WS[EQUATIONS], eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
+    if(K_find(K_WS[EQUATIONS], eqs)== -1) {                            /*Gère les erreurs d'équation*/
         kerror(0,"Eqs %s not found",eqs);
         SCR_free_tbl(args);
         return(1);
     }
 
     cond = args[3];                                              
-    if(C_evallec(cond, 0)==-1)                                       /*GŠre les erreurs de condition*/
+    if(C_evallec(cond, 0)==-1)                                       /*Gère les erreurs de condition*/
     {
         SCR_free_tbl(args);
         return(1);                          
@@ -101,14 +101,14 @@ int B_EqsStepWise(char* arg)
 
     test = args[4];
     strcpy(test,SCR_lower(test));
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*GŠre les erreurs de test*/
+    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*Gère les erreurs de test*/
     {
         kerror(0,"Incorrect test name");
         SCR_free_tbl(args);
         return(1);
     }
 
-    if(check_scl_var(eqs) == -1)                                /*GŠre les erreurs de pr‚sence des scalaires et variables de l'‚quation*/
+    if(check_scl_var(eqs) == -1)                                /*Gère les erreurs de présence des scalaires et variables de l'équation*/
     {
         SCR_free_tbl(args);
         return(1);                      
@@ -120,7 +120,7 @@ int B_EqsStepWise(char* arg)
     return(0);
 }
 
-//print_result(double F,double R,double cond,char **tab_scl,int nb_scls,int combi,char *cond_string)  /*Imprime le r‚sultat d'un estimation*/
+//print_result(double F,double R,double cond,char **tab_scl,int nb_scls,int combi,char *cond_string)  /*Imprime le résultat d'un estimation*/
 //{
 //    double res[3];
 //    char *tmp;

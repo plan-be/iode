@@ -143,45 +143,45 @@ char    *COL_OPERS[] = {
 
 
 /*
-    Compile un GSAMPLE (définitions des colonnes à imprimer). 
+    Compile un GSAMPLE (dÃ©finitions des colonnes Ã  imprimer). 
     
-    Cette définition contient une liste de périodes, éventuellement affectées 
-    d'une opération (taux de croissance, différence...)  appliquées à des fichiers représentés
-    ici  par  leurs  numéros d'ordre. 
+    Cette dÃ©finition contient une liste de pÃ©riodes, Ã©ventuellement affectÃ©es 
+    d'une opÃ©ration (taux de croissance, diffÃ©rence...)  appliquÃ©es Ã  des fichiers reprÃ©sentÃ©s
+    ici  par  leurs  numÃ©ros d'ordre. 
     
-    Chaque période est séparée de la suivante par une virgule ou un point-virgule. 
-    Une colonne ou un groupe de colonnes peut être répétée : il suffit de placer après
-    la  définition de la colonne ou du groupe de colonnes un double-point (":") 
-    suivi du nombre de répétitions souhaité.
+    Chaque pÃ©riode est sÃ©parÃ©e de la suivante par une virgule ou un point-virgule. 
+    Une colonne ou un groupe de colonnes peut Ã›tre rÃ©pÃ©tÃ©e : il suffit de placer aprÃ¨s
+    la  dÃ©finition de la colonne ou du groupe de colonnes un double-point (":") 
+    suivi du nombre de rÃ©pÃ©titions souhaitÃ©.
 
-    La définition des fichiers est optionnelle et est placée
-    entre crochets. Elle s'applique à toute la définition de
-    période  qui  précède.  Les opérations possibles sur les
+    La dÃ©finition des fichiers est optionnelle et est placÃ©e
+    entre crochets. Elle s'applique Ã  toute la dÃ©finition de
+    pÃ©riode  qui  prÃ©cÃ¨de.  Les opÃ©rations possibles sur les
     fichiers sont :
 
 	- valeur absolue                        (1)
-	- différence                            (1-2)
-	- différence en pourcents               (1/2)
+	- diffÃ©rence                            (1-2)
+	- diffÃ©rence en pourcents               (1/2)
 	- somme                                 (1+2)
 	- moyenne                               (1^2)
 
-    Les opérations sur les périodes sont :
+    Les opÃ©rations sur les pÃ©riodes sont :
 
 	- valeur (75)
-	- taux de croissance sur une ou plusieurs périodes (75/74, 75/70)
+	- taux de croissance sur une ou plusieurs pÃ©riodes (75/74, 75/70)
 	- taux de croissance moyen (75//70)
-	- différence (75-74, 75-70)
-	- différence moyenne (75--70)
+	- diffÃ©rence (75-74, 75-70)
+	- diffÃ©rence moyenne (75--70)
 	- moyenne (75^74)
-	- somme de période à période consécutives (70Q1+70Q4)
+	- somme de pÃ©riode Ã  pÃ©riode consÃ©cutives (70Q1+70Q4)
 	- valeur en indice ou en base (76=70)
 
-    La   répétition   peut  s'effectuer  avec  un  incrément
-	supérieur à 1 ou < 0: il suffit de placer une étoile suivie du
-    pas  après  le  nombre  de répétitions (70:3*5 = 70, 75,
+    La   rÃ©pÃ©tition   peut  s'effectuer  avec  un  incrÃ©ment
+	supÃ©rieur Ã  1 ou < 0: il suffit de placer une Ã©toile suivie du
+    pas  aprÃ¨s  le  nombre  de rÃ©pÃ©titions (70:3*5 = 70, 75,
     80).
 
-	21-05-2012 : La   répétition   peut  s'effectuer  avec  un  incrément negatif.
+	21-05-2012 : La   rÃ©pÃ©tition   peut  s'effectuer  avec  un  incrÃ©ment negatif.
 	Dans ce cas, l'affichage se fait a l'envers (2000:3*-1 = 2000, 1999, 1998, ...)
 
     Exemples :
@@ -584,7 +584,7 @@ static int COL_read_per(YYFILE* yy, PERIOD* per)
         ch	= YY_getc(yy); // Lit la suite
     }
 
-    // 3. <n ou >n avec possible répétition (<0>1 ou <0>N comptent pour la seule période courante)
+    // 3. <n ou >n avec possible rÃ©pÃ©tition (<0>1 ou <0>N comptent pour la seule pÃ©riode courante)
 nextshift:
     if(!U_is_in(ch, "<>")) {				// JMP 21-05-2012
         YY_ungetc(ch, yy);
@@ -608,7 +608,7 @@ nextshift:
         memcpy(per, pertmp, sizeof(PERIOD));
     }
 
-    // Lit la suite des <> s'il y en a pour pouvoir écrire 2000Q5<0>1/2000Q5<0 => 2000Q2/2000Q1
+    // Lit la suite des <> s'il y en a pour pouvoir Ã©crire 2000Q5<0>1/2000Q5<0 => 2000Q2/2000Q1
     YY_skip_spaces(yy);
     ch	= YY_getc(yy); // Lit la suite
     goto nextshift;
@@ -720,7 +720,7 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
     }
 
     keyw = YY_lex(yy);
-    // incrément négatif si -
+    // incrÃ©ment nÃ©gatif si -
     if(keyw == COL_DIFF)
         sign = -1;
     else
@@ -1177,5 +1177,5 @@ int COL_find_mode(COLS* cls, int* mode, int type)
             nb = 1;
         }
     }
-    return(nb); /* nb = 0 : pas d'op‚ration, = 1 : ops */
+    return(nb); /* nb = 0 : pas d'opÃ©ration, = 1 : ops */
 }

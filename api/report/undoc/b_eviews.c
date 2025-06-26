@@ -225,7 +225,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                         var = 1;
                     }
                     else {
-                        // D�but expression ()
+                        // Début expression ()
                         parlevel++;
                         sprintf(lec + strlen(lec), "(");
                     }
@@ -361,7 +361,7 @@ EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
         lasteq += pos1 + 2;
         pos1 = U_pos(')', lasteq);
         if(pos1 < 0) return(-1);
-        lasteq += pos1 + 1; // apr�s C(...)
+        lasteq += pos1 + 1; // après C(...)
     }
 
     return(idx);

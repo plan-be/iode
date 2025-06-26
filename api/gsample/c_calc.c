@@ -138,7 +138,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 if(per == 0) break;
                 if(vy[1] == 0.0) goto err;
 
-                // Correction JMP 13/4/2018 pour taux de croissance n�gatifs
+                // Correction JMP 13/4/2018 pour taux de croissance négatifs
                 mant = vy[0] / vy[1]; // JMP 16/5/2019
                 sign = 1;
                 if(mant < 0) {

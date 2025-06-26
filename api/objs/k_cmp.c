@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @header4iode
  *
  * Function to compare 2 IODE objects.

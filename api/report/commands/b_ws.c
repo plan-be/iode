@@ -112,7 +112,7 @@ int X_findtype(char* filename)
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019
     if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
-    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas tr�s coh�rent...
+    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas trés cohérent...
 
     // Sais plus a quoi ca peut servir... => a supprimer
     for(i = 16 ; strcmp(k_ext[i], "xxx") !=0 ; i++) {

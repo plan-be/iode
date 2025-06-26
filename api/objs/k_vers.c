@@ -10,7 +10,7 @@
 #include "iode.h"
 
 /********************************************************
-Retourne un string alloué contenant le contenu du fichier
+Retourne un string allouÃ© contenant le contenu du fichier
  version.txt sur le site iode.plan.be.
 *********************************************************/
 
@@ -30,7 +30,7 @@ char *K_LastVersion()
 {
     //char *vers;
 
-    /* Annulé car le retour http ne fonctionne plus comme avant.
+    /* AnnulÃ© car le retour http ne fonctionne plus comme avant.
     vers = SCR_HttpGetFile("iode.plan.be", 80, "version.txt");
 
     //Debug("iode version => '%s'\n", vers);

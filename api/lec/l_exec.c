@@ -265,7 +265,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
 L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
 {
     int	pos; //short   pos;
-    L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionn�...) TODO: manage the stack overflow ?
+    L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
 
     // Use globals to limit the number of parameters in function calls
     L_EXEC_DBV = dbv;   

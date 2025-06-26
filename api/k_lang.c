@@ -22,7 +22,7 @@ int     K_LANG = 0;         // 0=English, 1=French, 2=Dutch
 char   *KLG_TYPE[][3] = {
     "Comments",     "Commentaires", "Commentaar",
     "Equations",    "Equations",    "Vergelijkingen",
-    "Identities",   "IdentitÇs",    "Identiteiten",
+    "Identities",   "Identit√©s",    "Identiteiten",
     "Lists",        "Listes",       "Lijsten",
     "Scalars",      "Scalaires",    "Scalairen",
     "Tables",       "Tableaux",     "Tabellen",
@@ -32,13 +32,13 @@ char   *KLG_TYPE[][3] = {
 // Months
 char    *KLG_MONTHS[][3] = {
     "January",      "Janvier",      "Januari",
-    "February",     "FÇvrier",      "Februari",
+    "February",     "F√©vrier",      "Februari",
     "March",        "Mars",         "Maart",
     "April",        "Avril",        "April",
     "May",          "Mai",          "Mei",
     "June",         "Juin",         "Juni",
     "July",         "Juillet",      "Juli",
-    "August",       "Aoñt",         "Augustus",
+    "August",       "Ao√ªt",         "Augustus",
     "September",    "Septembre",    "September",
     "October",      "Octobre",      "Oktober",
     "November",     "Novembre",     "November",
@@ -56,7 +56,7 @@ char   KLG_F_LEVEL[] = "Niveaux";
 char   KLG_N_LEVEL[] = "Niveau";
 
 char   KLG_E_DIFF[] = "Differences";
-char   KLG_F_DIFF[] = "DiffÇrences";
+char   KLG_F_DIFF[] = "Diff√©rences";
 char   KLG_N_DIFF[] = "Verschil";
 
 char   KLG_E_GRT[] = "Growth Rates";
@@ -64,7 +64,7 @@ char   KLG_F_GRT[] = "Taux de croissance";
 char   KLG_N_GRT[] = "Groeivoeten";
 
 char   KLG_E_DIFFY[] = "YoY Differences";
-char   KLG_F_DIFFY[] = "DiffÇrences Annueles";
+char   KLG_F_DIFFY[] = "Diff√©rences Annueles";
 char   KLG_N_DIFFY[] = "JoJ-Verschil";
 
 char   KLG_E_GRTY[] = "YoY Growth Rates";
@@ -72,15 +72,15 @@ char   KLG_F_GRTY[] = "Taux de croissance Annuels";
 char   KLG_N_GRTY[] = "JoJ-Groeivoeten";
 
 char   KLG_E_OBS[] = "Observed";
-char   KLG_F_OBS[] = "ObservÇ";
+char   KLG_F_OBS[] = "Observ√©";
 char   KLG_N_OBS[] = "Gegeven";
 
 char   KLG_E_CALC[] = "Computed";
-char   KLG_F_CALC[] = "CalculÇ";
+char   KLG_F_CALC[] = "Calcul√©";
 char   KLG_N_CALC[] = "Geschat";
 
 char   KLG_E_RES[] = "Residuals";
-char   KLG_F_RES[] = "RÇsidus";
+char   KLG_F_RES[] = "R√©sidus";
 char   KLG_N_RES[] = "Residus";
 
 // Legend for computed values line in estimation graphs
@@ -105,11 +105,11 @@ char   *KLG_MODES[5][3] = {
 char   *KLG_OPERS_TEXTS[][3] = {    /* JMP38 01-10-92 */
     KLG_E_LEVEL,            KLG_F_LEVEL,                  KLG_N_LEVEL,
     KLG_E_DIFF,             KLG_F_DIFF,                   KLG_N_DIFF,
-    "Average Differences",  "DiffÇrences moyennes",       "Gemiddeld verschil",
-    "Period average",       "Moyennes de pÇriode",        "Gemiddelden van periodes",
+    "Average Differences",  "Diff√©rences moyennes",       "Gemiddeld verschil",
+    "Period average",       "Moyennes de p√©riode",        "Gemiddelden van periodes",
     KLG_E_GRT,              KLG_F_GRT,                    KLG_N_GRT,
     "Average Growth Rates", "Taux de croissance moyens", "Gemiddelde groeivoeten",
-    "Sum of periods",       "Sommes de pÇriodes",         "Som van periodes",
+    "Sum of periods",       "Sommes de p√©riodes",         "Som van periodes",
     "Base year",            "En base",                    "Basis jaar"
 };
 
