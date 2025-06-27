@@ -44,8 +44,8 @@
  *      L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *      L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  */
-
-#include "iode.h"
+#include <math.h>
+#include "api/lec/lec.h"
 
 #ifdef __GNUC__
     #define _isnan isnan

@@ -7,8 +7,14 @@
  *      int KT_save_asc(KDB* kdb, char* filename)
  *      int KT_save_csv(KDB *kdb, char *filename)
  */
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/tables.h"
+#include "api/utils/yy.h"
+#include "api/ascii/ascii.h"
 
-#include "iode.h"
 
 /**
  * Table of keywords recognized by YY in the context of a TBLs ascii file (.at).

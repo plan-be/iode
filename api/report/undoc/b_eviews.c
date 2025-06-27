@@ -76,7 +76,13 @@
 
 //================================================================================================================= */
 
-#include "iode.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+
+#include "api/report/commands/commands.h"
+#include "api/report/undoc/undoc.h"
+
+
 #define EV_MAXBUF 40960
 
 // Strings found in the E-Views data files

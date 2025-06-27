@@ -22,8 +22,19 @@
  *      int B_ViewTblFile(char* arg)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
+#include "scr4/s_args.h"
 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/grep.h"
+#include "api/print/print.h"
+#include "api/write/write.h"
+
+#include "api/report/engine/engine.h"
+#include "api/report/undoc/undoc.h"
+
 
 int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table
 

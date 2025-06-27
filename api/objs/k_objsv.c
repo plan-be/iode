@@ -9,8 +9,21 @@
  */
 
 #define _IODEVARG_
-#include "iode.h"
 #include <stdarg.h>
+
+#include "api/constants.h"
+#include "api/b_errors.h"
+#include "api/objs/kdb.h"
+#include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "api/objs/objs.h"
+
 
 /**
  *  Adds an object to a KDB. The number of arguments depends on object type. 

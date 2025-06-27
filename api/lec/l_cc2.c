@@ -28,7 +28,7 @@
  *      CLEC *L_cc(char* lec)                            Compiles a LEC string. 
  */
 
-#include "iode.h"
+#include "api/lec/lec.h"
 
 /**
  * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by

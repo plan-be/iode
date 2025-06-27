@@ -30,8 +30,13 @@
  *      int EXP_vec_rcsv(EXPDEF* expdef, char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */
-
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/comments.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/conversion/export.h"
 
 /**
  *  Opens and initialise a CSV file.

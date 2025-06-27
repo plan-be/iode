@@ -18,8 +18,11 @@
  *    char *K_wrap(char *in, int lg):                wraps a string (by inserting \n) to limit each line to lg characters.
  *
  */
+#include "api/k_super.h"
+#include "api/constants.h"
+#include "api/objs/tables.h"
+#include "api/utils/yy.h"
 
-#include "iode.h"
 
 /**
  *  Reads a token on the YY stream and interprets the token as a double (double) if possible.

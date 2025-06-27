@@ -1,4 +1,3 @@
-#include "iode.h"
 /**
  *  @header4iode
  *
@@ -13,7 +12,9 @@
  *      int L_link(KDB* dbv, KDB* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns PERIOD's to the SAMPLE of dbv.
  *      void L_link_endos(KDB *dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
-
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/lec/lec.h"
 
 
 /**

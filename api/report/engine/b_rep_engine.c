@@ -134,8 +134,16 @@
  *  ------------------------
  *  See below.
  */
+#include "api/b_args.h"
+#include "api/k_super.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+#include "api/write/write.h"
 
-#include "iode.h"
+#include "api/report/engine/engine.h"
+#include "api/report/undoc/undoc.h"
+
 
 // Global parameters
 // -----------------

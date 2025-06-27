@@ -36,9 +36,16 @@
  * int B_CsvAxes(char *var)                          $CsvAxes AxisName
  * int B_CsvDec(char *dec)                           $CsvDec char
  */
- 
-#include "iode.h"
- 
+#include "scr4/s_args.h"
+#include "api/k_super.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/ascii/ascii.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+#include "api/estimation/estimation.h"
+#include "api/report/commands/commands.h"
+
 
 /**
  *  Syntax: $WsLoad<type> filename

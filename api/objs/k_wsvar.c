@@ -22,8 +22,13 @@
  *    int KV_set_at_per(char*varname, PERIOD* per, double val)                Replaces the value of varname[per] by val.
  *    int KV_set_at_aper(char*varname, char* aper, double val)                Replaces the value of varname[aper] by val.
  */
+#include "api/b_errors.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/grep.h"
+#include "api/objs/pack.h"
+#include "api/objs/variables.h"
 
-#include "iode.h"
 
 /**
  * Changes the SAMPLE of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.

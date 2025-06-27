@@ -16,13 +16,19 @@
  *   int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *
  */
- 
-#include "iode.h"
+#include "api/k_super.h"
+#include "api/b_errors.h"
+#include "api/lec/lec.h"
+#include "api/objs/objs.h"
+#include "api/objs/equations.h"
+#include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
+
 
 extern KDB          *KSIM_DBV,      // See k_sim_main.c
                     *KSIM_DBS,      // 
                     *KSIM_DBE;      // 
-extern double    *KSIM_XK,       // 
+extern double       *KSIM_XK,       // 
                     *KSIM_XK1;      // 
 
 extern int          *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order

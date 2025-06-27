@@ -9,8 +9,9 @@
  *      int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)     Hodrick-Prescott filter. 
  *      void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
  */
+#include "scr4/s_mat.h"
+#include "api/lec/lec.h"
 
-#include "iode.h"
 
 /**
  *  Hodrick-Prescott filter. 

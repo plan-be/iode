@@ -30,8 +30,6 @@ target_sources(iode_c_api PRIVATE k_lang.c) # KLANG
 target_sources(iode_c_api PRIVATE b_iodeini.c) # INI
 target_sources(iode_c_api PRIVATE b_a2mini.c) # A2M
 
-target_sources(iode_c_api PUBLIC iode.h iodebase.h iodeapi.h)
-
 # From Wikipedia (https://en.wikipedia.org/wiki/C_mathematical_functions#libm): 
 # Under POSIX systems like Linux and BSD, the mathematical functions 
 # (as declared in <math.h>) are bundled separately in the mathematical library libm.

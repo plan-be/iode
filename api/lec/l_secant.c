@@ -10,8 +10,8 @@
  *      static int L_bracket(double* x1, double* x2, int t)                             Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
  *      double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
  */
-
-#include "iode.h"
+#include <math.h>
+#include "api/lec/lec.h"
 
 #define LN_FACTOR   1.6             
 #define LN_MAXIT    20

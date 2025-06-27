@@ -6,8 +6,18 @@
  *
  *      int K_cmp(char* name, KDB* kdb1, KDB* kdb2) : compare object named name in 2 kdb.
  */ 
- 
-#include "iode.h"
+#include <math.h>
+
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "api/objs/compare.h"
 
 /**
  *  Compare the size (length) of 2 packed objects. 
@@ -91,7 +101,6 @@ static int K_cmpeqs(char* p1, char* p2, char* name)
 
     rc = K_cmp_eqs(eq1, eq2, name);
 
-done :
     E_free(eq1);
     E_free(eq2);
 

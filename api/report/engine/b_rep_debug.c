@@ -13,6 +13,7 @@
  */
 
 #include <scr4.h>
+#include "api/report/engine/engine.h"
 
 /**
  *  Sub-function of RP_debug() to create a summary message of the swap memory usage.

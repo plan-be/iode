@@ -6,7 +6,7 @@ from libcpp.vector cimport vector
 from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     # Define the TCELL structure
     cdef struct TCELL:
         char* tc_val

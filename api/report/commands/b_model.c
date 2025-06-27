@@ -17,8 +17,17 @@
  *      int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
  *      int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
  */
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/equations.h"
+#include "api/objs/lists.h"
+#include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
 
-#include "iode.h"
+#include "api/report/commands/commands.h"
+
 
 /* Model Simulation */
 

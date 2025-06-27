@@ -19,8 +19,14 @@
  *      int B_DSImportDb_1(char *arg, SAMPLE *smpl)
  *      int B_DSImportDb(char *arg)
  */ 
-  
-#include "iode.h"
+#include "scr4/scr4w.h"
+
+#include "api/b_args.h"
+#include "api/k_super.h"
+#include "api/objs/variables.h"
+
+#include "api/report/commands/commands.h"
+#include "api/report/undoc/undoc.h"
 
 
 char    *B_DSPeriod2Date(PERIOD *per, char *date, char *freq)

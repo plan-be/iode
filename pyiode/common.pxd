@@ -3,7 +3,7 @@ from libcpp.vector cimport vector
 from libcpp.map cimport map
 
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef double IODE_NAN
     cdef int IODE_NB_TYPES
     cdef char* I_DEFAULT_FILENAME
@@ -85,7 +85,7 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] v_table_langs
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef enum VariablesInitialization:
         VAR_INIT_TM1,
         VAR_INIT_TM1_A,
@@ -98,7 +98,7 @@ cdef extern from "api/iode.h":
 cdef extern from "cpp_api/common.h":
     cdef vector[string] v_simulation_initialization
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef enum IodeEquationMethod:
         EQ_LSQ,
         EQ_ZELLNER,
@@ -170,7 +170,7 @@ cdef extern from "cpp_api/objects/table.h":
         TABLE_GRAPH_SEMILOG,
         TABLE_GRAPH_PERCENT
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef enum IodeLowToHigh:
         LTOH_STOCK,
         LTOH_FLOW
@@ -183,7 +183,7 @@ cdef extern from "api/iode.h":
 cdef extern from "cpp_api/KDB/kdb_global.h":
     cdef map[char, string] mLowToHigh
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef enum IodeVarMode:
         VAR_MODE_LEVEL,
         VAR_MODE_DIFF,
@@ -194,7 +194,7 @@ cdef extern from "api/iode.h":
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef vector[string] v_var_modes
     
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef enum SimuSortAlgorithm:
         SORT_CONNEX,
         SORT_BOTH,

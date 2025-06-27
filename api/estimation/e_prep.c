@@ -11,8 +11,11 @@
  *      void E_get_SMO()                        Saves in E_SMO the relaxation parameters of each coefficient of the equation block. 
  *      void E_free_work()                      Frees all allocated variables for the last estimation.
  */
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/scalars.h"
+#include "api/estimation/estimation.h"
 
-#include "iode.h"
 
 // Functions prototypes
 static int E_prep_alloc();

@@ -59,8 +59,10 @@
  *
  *  
  */
- 
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/lec/lec.h"
+#include "api/objs/equations.h"
+#include "api/simulation/simulation.h"
 
 
 /**

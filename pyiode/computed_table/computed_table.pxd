@@ -13,7 +13,7 @@ from pyiode.time.sample cimport CSample
 from pyiode.objects.table cimport CTable
 
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef int    COL_NOP             # No operation
 
     ctypedef struct COL:

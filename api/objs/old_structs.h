@@ -1,5 +1,12 @@
 #pragma once
 
+#include "api/constants.h"
+#include "api/objs/kdb.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef char    OONAME[OK_MAX_NAME + 1];
 
@@ -50,3 +57,7 @@ typedef struct _oclec_ {
     char    pad;
     OLNAME  lnames[1];
 } OCLEC;
+
+#ifdef __cplusplus
+}
+#endif

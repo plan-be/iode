@@ -22,9 +22,12 @@
  * int B_EqsSetCmt(char* arg)                       Implementation of the report function $EqsSetCmt.
  * int B_EqsSetInstrs(char* arg)                    Implementation of the report function $EqsSetInstrs.
  */
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/estimation/estimation.h"
 
-
-#include "iode.h"
+#include "api/report/commands/commands.h"
 
 /**
  *  Extracts the first 2 args of a report command and tries to translated

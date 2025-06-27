@@ -23,8 +23,12 @@
  *      int RP_define_save_list(char **list)        Saves (pushes) a list of macros using RP_define_save() for each macro.
  *      int RP_define_restore_list(char **list)     Restores a list of macros using RP_define_restore() for each macro.
  */
- 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+
+#include "api/report/engine/engine.h"
+
 
 KDB     *RP_MACRO = NULL;   // KDB containing the macros during a report execution
 

@@ -92,8 +92,21 @@
  *      int B_DataDisplayGraph(char* arg)           This function allows you to view VARs or combinations of VARS in graphical form.
  *      int B_DataPrintGraph(char* arg)             This function allows you to print VARs or combinations of VARS in graphical form.
  */
+#include "scr4/s_args.h"
 
-#include "iode.h"
+#include "api/constants.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/lec/lec.h"
+#include "api/objs/objs.h"
+#include "api/objs/grep.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/objs/compare.h"
+#include "api/print/print.h"
+
+#include "api/report/commands/commands.h"
 
 
 /**

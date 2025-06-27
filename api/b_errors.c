@@ -14,9 +14,16 @@
  *      void B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
  *   
  */
-
-#include "iode.h"
 #include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "scr4/s_prost.h"
+
+#include "api/write/write.h"
+#include "api/k_super.h"
+#include "b_errors.h"
+
 
 char**   B_ERROR_MSG; // Table of last recorded error messages 
 int      B_ERROR_NB;  // Nb of last recorded error messages 

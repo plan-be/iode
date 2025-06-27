@@ -4,7 +4,7 @@ from libcpp cimport bool
 
 from pyiode.time.period cimport CPeriod, PERIOD
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     ctypedef struct SAMPLE:
         PERIOD s_p1
         PERIOD s_p2

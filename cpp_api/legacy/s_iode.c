@@ -5,8 +5,8 @@
  * copied/pasted from the /cli/s_iode.c directory *
  * ********************************************** */
 
-#include "api/iode.h"
 #include <stdio.h>
+#include "api/all.h"
 
 #ifdef IODEWIN
 

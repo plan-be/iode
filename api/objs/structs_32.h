@@ -1,5 +1,12 @@
 #pragma once
 
+#include "api/constants.h"
+#include "api/objs/equations.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /******************************* TYPEDEFS  particuliers 32 bits pour import/export  **********************************/
 
 typedef long PTR32; // pour garantir char  *
@@ -101,3 +108,7 @@ typedef struct _tbl32_ {
 	char    t_align;   /* G_LEFT, G_MIDDLE, G_RIGHT */
     char    t_pad[13];
 } TBL32;
+
+#ifdef __cplusplus
+}
+#endif

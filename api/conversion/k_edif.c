@@ -53,8 +53,14 @@
  *      int EXP_vec_dif(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
  *  
  */
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/comments.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/conversion/dif.h"
+#include "api/conversion/export.h"
 
-#include "iode.h"
 
 int EXP_hd_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {

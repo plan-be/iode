@@ -1,6 +1,6 @@
 #pragma once
 #include <istream>
-#include "api/iode.h"
+#include "api/all.h"
 #include "cpp_api/iode_cpp_api.h"
 
 

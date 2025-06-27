@@ -66,9 +66,10 @@
  *      L_REAL L_div0(L_REAL *stack, int nargs)
  *  
  */
-
-#include "iode.h"
+#include <math.h>
 #include <time.h>
+
+#include "api/lec/lec.h"
 
 #ifdef __GNUC__
     #define _isnan isnan

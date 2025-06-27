@@ -2,6 +2,8 @@
 
 #include "scr4/s_args.h"
 
+#include "api/constants.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

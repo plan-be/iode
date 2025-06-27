@@ -41,8 +41,14 @@
 
  *  See also defines in iode.h.
  */
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/equations.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
-#include "iode.h"
 
 /**
  *  Retrieves the nth element of a packed object based on its position in kdb. 

@@ -15,8 +15,15 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
- 
-#include "iode.h"
+#include <math.h>
+
+#include "api/k_super.h"
+#include "api/constants.h"
+#include "api/utils/time.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/conversion/dif.h"
+#include "api/conversion/import.h"
 
 extern  YYKEYS  IMP_DIF_KEYS[];
 

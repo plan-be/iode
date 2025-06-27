@@ -11,7 +11,12 @@
  *      int B_FileImportVar(char* arg)  $FileImportVar format rule infile outfile from to  [trace]
  */
 
-#include "iode.h"
+ 
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/conversion/import.h"
+
+#include "api/report/commands/commands.h"
 
 
 /**

@@ -7,8 +7,15 @@
  *      - KV_save_asc(KDB* kdb, char* filename)
  *      - int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
  */
+#include "scr4.h"
 
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+#include "api/utils/yy.h"
+#include "api/ascii/ascii.h"
+
 
 /**
  * Table of keywords recognized by YY in the context of an VAR ascii file (.av).

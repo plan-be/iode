@@ -8,8 +8,13 @@
  *     int KE_save_csv(KDB *kdb, char *filename) : not implemented
  *
  */
-
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/equations.h"
+#include "api/utils/yy.h"
+#include "api/ascii/ascii.h"
 
 /**
  * Table of keywords recognized by YY in the context of an EQS ascii file (.ae).

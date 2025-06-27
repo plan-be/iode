@@ -1,4 +1,4 @@
-#include "lec.h"
+#include "cpp_api/lec/lec.h"
 
 
 CLEC* clec_deep_copy(const CLEC* other)

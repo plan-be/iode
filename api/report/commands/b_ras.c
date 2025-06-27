@@ -9,8 +9,17 @@
  *  
  *  
  */
+#include "scr4/s_args.h"
+#include "scr4/s_mat.h"
 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+
+#include "api/report/commands/commands.h"
+
 
 static int RasSetVar(char  *name, int t, double var)
 {

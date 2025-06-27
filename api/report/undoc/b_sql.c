@@ -25,7 +25,7 @@
  *  TODO: rename b_sql.c in b_rep_sql.c
  */
  
-#include "iode.h"
+#include "api/report/undoc/undoc.h"
 
 // These functions are NOT implemented (yet) under Linux or in VC64
 #if defined(UNIX) || defined(_MSC_VER) 
