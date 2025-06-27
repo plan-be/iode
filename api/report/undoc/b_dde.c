@@ -54,9 +54,22 @@
  *      int B_ExcelNew(char *arg)
  *      int IodeFmtVal(char *buf, double val)
  */
+#include "api/b_args.h"
+#include "api/k_lang.h"
+#include "api/k_super.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "api/print/print.h"
 
-
-#include "iode.h"
+#include "api/report/commands/commands.h"
+#include "api/report/engine/engine.h"
+#include "api/report/undoc/undoc.h"
 
 
 /**************** WINDOWS : DDE **********************/

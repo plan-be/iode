@@ -14,8 +14,14 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
+#include <math.h>
 
-#include "iode.h"
+#include "api/k_super.h"
+#include "api/constants.h"
+#include "api/utils/yy.h"
+#include "api/utils/time.h"
+#include "api/conversion/dif.h"
+#include "api/conversion/import.h"
 
 /*  OLD GEM FORMAT
     Reads a GEM file: CRONOS format

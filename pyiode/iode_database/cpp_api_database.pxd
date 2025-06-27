@@ -17,7 +17,7 @@ from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.table cimport CTable
 
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     ctypedef unsigned long SWHDL
     ctypedef char OFNAME[64]
     ctypedef char FNAME[512]

@@ -8,8 +8,12 @@
  *      int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res)   Displays or prints the graphs of residuals or observed / fitted values 
  *      int E_print_results(int corr, int corru, int obs, int grobs, int grres)             Prints the estimation input and output of a block of equations. 
  */
+#include "api/objs/objs.h"
+#include "api/objs/scalars.h"
+#include "api/print/print.h"
+#include "api/write/write.h"
+#include "api/estimation/estimation.h"
 
-#include "iode.h"
 
 // Declarations
 static void E_print_parms();

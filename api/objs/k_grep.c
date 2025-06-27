@@ -11,8 +11,19 @@
  *      int K_aggr(char* pattern, char* ename, char* nname) *                                           Transforms a variable name based on an "aggregation" pattern.
  *  
  */
- 
-#include "iode.h"
+#include "scr4/s_args.h"
+#include "scr4/s_prost.h"
+
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/tables.h"
+#include "api/objs/grep.h"
+
 
 /**
  *  Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...

@@ -16,7 +16,7 @@ from libcpp.string cimport string
 
 # Declarations of extern C functions and vars
 # -------------------------------------------
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     # MISC functions
     #cdef char   *IODE_VERSION
     cdef int    IodeInit()

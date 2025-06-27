@@ -15,8 +15,20 @@
  *     int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)  Updates equation field(s). Creates the equation if it doesn't exist).
  *     int K_upd_tbl(char* name, char* arg)                         Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi-colons.
  */
+#include "scr4/s_args.h"
+#include "scr4/s_prodt.h"
 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/utils/buf.h"
+#include "api/objs/kdb.h"
+#include "api/objs/pack.h"
+#include "api/objs/grep.h"
+#include "api/objs/objs.h"
+#include "api/objs/equations.h"
+#include "api/objs/tables.h"
+
 
 int     K_WARN_DUP = 0;     // If null, adding an existing object name in a KDB does not trigger an error (used in K_add_entry())
 

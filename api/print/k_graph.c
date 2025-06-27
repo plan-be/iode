@@ -24,8 +24,13 @@
  *      int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)                   Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.
  *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
+#include "api/b_errors.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+#include "api/print/print.h"
+#include "api/write/write.h"
 
-#include "iode.h"
 
 // Function declarations
 int T_GraphTest(TBL *tbl);

@@ -1,4 +1,4 @@
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef void    kwarning(const char* fmt) noexcept
     cdef void    kpause() noexcept
     cdef void    kmsg(const char* fmt) noexcept

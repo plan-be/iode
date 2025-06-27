@@ -35,8 +35,13 @@
  *      char *EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
  *      int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/comments.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/conversion/export.h"
 
-#include "iode.h"
 
 int EXP_hd_tsp(expdef, dbv, dbc, outfile)
 EXPDEF  *expdef;

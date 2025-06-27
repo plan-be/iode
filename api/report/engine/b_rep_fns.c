@@ -113,8 +113,25 @@
  *      
  *  
  */
- 
-#include "iode.h"
+#include "scr4/s_prodir.h"
+#include "scr4/s_prost.h"
+#include "scr4/s_prodt.h"
+
+#include "api/k_super.h"
+#include "api/constants.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
+
+#include "api/report/engine/engine.h"
+#include "api/report/undoc/undoc.h"
+
 #ifdef _MSC_VER
     #include <direct.h>
 #else

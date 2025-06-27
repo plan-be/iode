@@ -8,13 +8,19 @@
  *   - L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
  */
 
-#include "iode.h"
 #include <setjmp.h>
 #include <signal.h>
 #include <time.h>
 
+#include "api/constants.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/lec/lec.h"
+#include "api/objs/variables.h"
+
 #ifdef __GNUC__
     #define _isnan isnan
+    #define _exception exception
 #endif
 
 /**
@@ -48,12 +54,14 @@ int     L_curt;         // current value of t
 
 // Math exceptions trap
 #ifdef _MSC_VER
+#include <math.h>
 int _matherr(struct _exception *e)
 {
     e->retval = (double) IODE_NAN;
     return(1);
 }
 #else
+#include <math.h>
 int matherr(struct exception *e)
 {
     e->retval = (double) IODE_NAN;

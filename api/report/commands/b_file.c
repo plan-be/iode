@@ -10,7 +10,13 @@
  *      int B_FileDelete(char* arg, int type)  $FileDelete<type> file1 [file2...]
  */
 
-#include "iode.h"
+
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/write/write.h"
+
+#include "api/report/commands/commands.h"
 
 /**
  *  Report function to copy a file. 

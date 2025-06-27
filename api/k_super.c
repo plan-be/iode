@@ -64,11 +64,21 @@
  *      int ODE_end_super(const int);    
  *  
  */ 
-
-
-#include "iode.h"
 #include <stdarg.h>
 #include <stdlib.h>
+#ifdef _MSC_VER
+    #include <Windows.h>
+#endif
+
+#include "scr4/s_args.h"
+
+#include "api/constants.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/lists.h"
+#include "api/objs/variables.h"
+#include "api/report/undoc/undoc.h"
+
 
 // Global variables
 int MSG_DISABLED = 0;    // if 1, kmsg() is disabled
@@ -537,7 +547,7 @@ int kexecsystem(const char *arg)
  */
 int kshellexec(const char *arg)
 {
-    int res;
+    int res = 0;
 
 #ifdef _MSC_VER
     SHELLEXECUTEINFO    sei;
@@ -556,7 +566,7 @@ int kshellexec(const char *arg)
 //    sei.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
 
     ShellExecuteEx(&sei);
-    return(0);
+    return(res);
 #else
     if(kshellexec_super) 
         return((*kshellexec_super)(arg));

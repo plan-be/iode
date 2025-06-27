@@ -10,7 +10,7 @@ from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.time.sample cimport CSample, SAMPLE
 from pyiode.iode_database.cpp_api_database cimport KDB
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     ctypedef char ONAME[21]
     int EQS_NBTESTS
 

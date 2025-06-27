@@ -8,8 +8,15 @@
  *  
  *  @See GB for details
  */
+#include <math.h>
+#include <string.h>
 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+
+#include "api/report/undoc/undoc.h"
 
 double  SEASON_EPS = 5.0;
 

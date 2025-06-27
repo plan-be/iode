@@ -14,8 +14,9 @@
  *      int B_SysAnsiToOem(char *arg)   $SysAnsiToOem inputfile outputfile    
  *      int B_SysOemToAnsi(char *arg)   $SysOemToAnsi inputfile outputfile
  */
+#include "api/b_errors.h"
 
-#include "iode.h"
+#include "api/report/commands/commands.h"
 
 
 /**

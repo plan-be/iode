@@ -73,8 +73,9 @@
  *      REP_PROC    **REP_PROCS       Table of pointers to existing PROCs 
  *      int         REP_NB_PROCS      Size of REP_PROCS
  */
+#include "api/b_errors.h"
 
-#include "iode.h"
+#include "api/report/engine/engine.h"
 
 
 // REP_PROC: procedure parameters and code

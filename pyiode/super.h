@@ -1,4 +1,4 @@
-#include "api/iode.h"
+#include "api/all.h"
 
 int c_kerror_super(const int level, const char* msg);
 void c_kwarning_super(const char* msg);

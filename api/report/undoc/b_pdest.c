@@ -66,8 +66,17 @@
  *      int B_PrintHtmlTHClass(char *th_class)             | $PrintHtmlTHClass class_name
  *      int B_PrintHtmlTDClass(char *td_class)             | $PrintHtmlTDClass class_name
  */
+#include "scr4/s_a2m.h"
+#include "scr4/s_args.h"
 
-#include "iode.h"
+#include "api/b_a2mini.h"
+#include "api/b_errors.h"
+#include "api/k_lang.h"
+#include "api/print/print.h"
+#include "api/write/write.h"
+
+#include "api/report/undoc/undoc.h"
+
 
 extern int     KT_CUR_TOPIC;        // A2M: Current topic id
 extern int     A2M_GIF_BGCOLOR_NB;  // GIF background color nb

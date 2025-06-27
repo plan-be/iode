@@ -61,8 +61,8 @@
  *      L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  */
-
-#include "iode.h"
+#include <math.h>
+#include "api/lec/lec.h"
 
 /* ============ TFN ============ */
 

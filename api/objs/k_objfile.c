@@ -21,14 +21,23 @@
  *      int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
  *      int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
  */
-
-#include "iode.h"
-#include "old_structs.h"
-#include "structs_32.h"
-
 #ifndef UNIX
 #include <io.h>
 #endif
+
+#include "scr4/s_prodir.h"
+
+#include "api/constants.h"
+#include "api/k_super.h"
+#include "api/b_errors.h"
+#include "api/utils/time.h"
+#include "api/ascii/ascii.h"
+#include "api/objs/xdr.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/variables.h"
+#include "api/objs/old_structs.h"
+#include "api/objs/structs_32.h"
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------

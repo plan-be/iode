@@ -13,8 +13,11 @@
  *      void wks_name(char* str, int c1, int r1, int c2, int r2)
  *  
  */
+#include "scr4/s_xdr.h"
 
-#include "iode.h"
+#include "api/conversion/import.h"
+#include "api/conversion/export.h"
+
 
 FILE    *WKS_FD;
 char    WKS_BOF[6]     = {0, 0, 2, 0, 4, 4};

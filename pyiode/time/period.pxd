@@ -1,7 +1,7 @@
 from libcpp.string cimport string
 from libcpp cimport bool
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     ctypedef struct PERIOD:
         long p_y
         long p_s

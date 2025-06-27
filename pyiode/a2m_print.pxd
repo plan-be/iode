@@ -108,7 +108,7 @@ cdef extern from "scr4/s_a2m.h":
     cdef int    A2M_CSV_QUOTE
     cdef int    A2M_CSV_NA
 
-cdef extern from "api/iode.h":
+cdef extern from "api/all.h":
     cdef double     A2M_GWIDTH
     cdef double     A2M_GHEIGHT
     cdef int        A2M_BOXWIDTH

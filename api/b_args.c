@@ -13,8 +13,14 @@
  *      int B_argpos(char* str, int ch)                         : returns the position of a char in a string. 
  *   
  */
+#include "scr4/s_prost.h"
+#include "scr4/s_strs.h"
 
-#include "iode.h"
+#include "b_args.h"
+#include "b_errors.h"
+#include "api/utils/time.h"
+#include "api/report/engine/engine.h"
+
 
 char    B_SEPS[] = " ,\n\t";        // Accepted separators for fn arguments (in report, DOS GUI..)
                                     // !! Semi-colon not accepted !!

@@ -16,9 +16,13 @@
  *      char *EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
  *      int EXP_vec_wks(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/comments.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/conversion/export.h"
 
-
-#include "iode.h"
 
 int WKS_COL = 1, WKS_ROW = 1;
 

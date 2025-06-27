@@ -8,8 +8,12 @@
  *      int KS_save_csv(KDB *kdb, char *filename)
  *
  */
-
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/scalars.h"
+#include "api/utils/yy.h"
+#include "api/ascii/ascii.h"
 
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE SCL and adds the new SCL to kdb. 

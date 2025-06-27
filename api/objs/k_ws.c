@@ -25,8 +25,10 @@
  *                                                  saved their content in ws.* files.
  *      - int K_load_RWS(int ref, char *filename)   Load a VAR file for use in GSAMPLE (print tables and graphs)
  */
- 
-#include "iode.h"
+#include "api/b_errors.h" 
+#include "api/objs/kdb.h" 
+#include "api/objs/objs.h" 
+
 
 /* Gobals */
 KDB     *K_WS[7];                           // Current workspaces
@@ -36,7 +38,7 @@ int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 }; // ??? TODO: check if still in use
 //extern  int K_AUTO_WS;
 
 /**
- *  @brief Initialises the "in mem" KDB structures adn optionnaly loads the ws.* files. 
+ *  @brief Initialises the "in mem" KDB structures adn optional loads the ws.* files. 
  *  
  *  If ws is not NULL, the files I_DEFAULT_FILENAME.* (default "ws.*"), 
  *      if they are found in the current dir, are loaded as initial values for the in memory KDBs.

@@ -112,8 +112,9 @@
  *      double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
+#include <math.h>
+#include "api/lec/lec.h"
 
-#include "iode.h"
 
 static double  L_newton_1();
 int     KSIM_NEWTON_DEBUG = 0;          //

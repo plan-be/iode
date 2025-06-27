@@ -29,8 +29,14 @@
  *      int COL_resize(TBL* tbl, COLS* cls)         Extends the number of COL's (compiled GSAMPLE) by multiplying by the number of columns in a TBL definition
  *      void COL_clear(COLS* cls)                   Resets the values in a COLS structure. 
  */
+#include <math.h>
 
-#include "iode.h"
+#include "api/k_super.h"
+#include "api/utils/time.h"
+#include "api/gsample/gsample.h"
+#include "api/lec/lec.h"
+#include "api/objs/pack.h"
+#include "api/objs/variables.h"
 
 
 /**

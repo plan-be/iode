@@ -24,8 +24,14 @@
  *      int (*K_xdrobj[])()                         Table of function pointers, one function for each object type, for translating
  *                                                  big-endian to little-endian and vice-versa
  */
- 
-#include "iode.h"
+#include "api/constants.h"
+#include "api/utils/time.h"
+#include "api/lec/lec.h"
+#include "api/objs/equations.h"
+#include "api/objs/tables.h"
+#include "api/objs/pack.h"
+#include "api/objs/xdr.h"
+
 
 #ifdef INTEL
 //  Little-endian Architecture

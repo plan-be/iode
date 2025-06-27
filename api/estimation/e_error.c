@@ -8,9 +8,11 @@
  *      void E_msg(char* fmt,...)       Displays a message using kmsg().
  *      void E_error(char* fmt,...)     Displays an estimation error message using B_seterror().
  */
-
-#include "iode.h"
 #include <stdarg.h>
+
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/estimation/estimation.h"
 
 
 /**

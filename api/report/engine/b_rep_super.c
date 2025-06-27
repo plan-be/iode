@@ -26,7 +26,7 @@
  *  See list below: int (*<function_name>_super)()
  */ 
 
-#include "iode.h"
+#include "api/report/engine/engine.h"
 #include <stdarg.h>
 
 // GUI report functions (#fn_name)
@@ -35,7 +35,6 @@
 int (*SB_FileDelete_super    )();
 int (*SB_FileRename_super    )();
 int (*SB_FileCopy_super      )();
-int (*SB_FileEdit_super      )();
 int (*SB_FileList_super      )();
 int (*SB_FileImport_super    )();
 int (*SB_ReportExec_super    )();
@@ -104,8 +103,7 @@ int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name);
 // Default implementation 
 int SB_FileDelete       () {if(SB_FileDelete_super) return((*SB_FileDelete_super)()); return(0);}   
 int SB_FileRename       () {if(SB_FileRename_super) return((*SB_FileRename_super)()); return(0);}   
-int SB_FileCopy         () {if(SB_FileCopy_super)   return((*SB_FileCopy_super)  ()); return(0);}   
-int SB_FileEdit         () {if(SB_FileEdit_super)   return((*SB_FileEdit_super)  ()); return(0);}   
+int SB_FileCopy         () {if(SB_FileCopy_super)   return((*SB_FileCopy_super)  ()); return(0);}     
 int SB_FileList         () {if(SB_FileList_super)   return((*SB_FileList_super)  ()); return(0);}   
 int SB_FileImport       () {if(SB_FileImport_super      ) return(*SB_FileImport_super     )(); else return(0);}
 int SB_ReportExec       () {if(SB_ReportExec_super      ) return(*SB_ReportExec_super     )(); else return(0);}

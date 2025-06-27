@@ -25,8 +25,15 @@
  *      int      K_NBDEC = -1;                                      Default nb of decimals
  *  
  */
- 
-#include "iode.h"
+#include "scr4/s_a2m.h"
+
+#include "api/constants.h"
+#include "api/k_lang.h"
+#include "api/b_errors.h"
+#include "api/objs/kdb.h"
+#include "api/print/print.h"
+#include "api/write/write.h"
+
 
 //char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
 int      K_NBDEC = -1;          // Default nb of decimals

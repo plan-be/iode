@@ -44,9 +44,14 @@
  *    int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)    Imports variables or comments in various formats.
  *  
  */
-
-
-#include "iode.h"
+#include "api/b_a2mini.h"
+#include "api/k_super.h"
+#include "api/utils/time.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+#include "api/write/write.h"
+#include "api/conversion/import.h"
 
 /**
  *  Interprets an ASCII file containing VAR definitions and returns a new allocated KDB of vars (or NULL on error). 

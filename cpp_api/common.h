@@ -1,7 +1,6 @@
 #pragma once
 
-#include "api/iode.h"
-#include "api/iodeapi.h"
+#include "api/all.h"
 
 extern "C" 
 {

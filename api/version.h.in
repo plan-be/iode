@@ -1,3 +1,7 @@
+#pragma once
+
+#include "api/constants.h"
+
 #define IODE_VERSION "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
 #define IODE_VERSION_MINOR ${PROJECT_VERSION_MINOR}

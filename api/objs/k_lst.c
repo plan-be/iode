@@ -11,9 +11,17 @@
  *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of TBLs and extracts all VARs and all SCLs from the LEC expressions found in the TCELLs.
  *    int KL_lst(char* name, char** lst, int chunck)        Creates a list from a table of strings. The elements in the new list are separated by semi-colons.
  *    unsigned char **KL_expand(char *str)                  Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.
- */
- 
-#include "iode.h"
+ */ 
+#include "api/b_errors.h"
+#include "api/lec/lec.h"
+#include "api/objs/kdb.h"
+#include "api/objs/objs.h"
+#include "api/objs/pack.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/tables.h"
+
 
 /**
  *  Analyses a KDB content and creates 2 lists with all VAR and all SCL found in the kdb objects (limited to IDT, EQ or TBL).

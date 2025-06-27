@@ -17,8 +17,15 @@
  *   int B_WsTrendStd(char* arg)  | $WsTrendStd VarFilename Lambda series1 series2 ...
  *     
  */
+#include <string.h>
 
-#include "iode.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
+#include "api/objs/objs.h"
+#include "api/objs/variables.h"
+
+#include "api/report/undoc/undoc.h"
+
 
 static int HP_smpl(f_smpl, ws_smpl, t_smpl, shift)
 SAMPLE  *f_smpl, *ws_smpl, **t_smpl;

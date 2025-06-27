@@ -39,7 +39,7 @@
  *  
  */
 
-#include "b_a2mini.h"
+#include "api/b_a2mini.h"
 #include "b_iodeini.h"
 #include <s_a2m.h>
 

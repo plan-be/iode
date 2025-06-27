@@ -8,8 +8,13 @@
  *     int KI_save_csv(KDB *kdb, char *filename)
  *  
  */
-
-#include "iode.h"
+#include "api/b_errors.h"
+#include "api/k_super.h"
+#include "api/objs/objs.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/utils/yy.h"
+#include "api/ascii/ascii.h"
 
 /**
  *  Loads IDTs from an ASCII file into a new KDB.

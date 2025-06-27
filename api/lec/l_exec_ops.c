@@ -34,8 +34,8 @@
  *             L_REAL L_exp(L_REAL a, L_REAL b)
  *  
  */
-
-#include "iode.h"
+#include <math.h>
+#include "api/lec/lec.h"
 
 #ifdef __GNUC__
     #define _isnan isnan
