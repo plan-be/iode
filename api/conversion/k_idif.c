@@ -21,8 +21,9 @@
  *      int IMP_end_dif()                                                   Cleanup the DIF global variables.
  *
  */
-
-#include "iode.h"
+#include "utils/time.h"
+#include "dif.h"
+#include "import.h"
 
 
 SAMPLE  *DIF_smpl = NULL;

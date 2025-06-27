@@ -34,8 +34,13 @@
  *    int B_PrintDefVar(KDB* kdb, int pos)                             | Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
  *
  */
+#include "api/report/undoc/undoc.h"
+#include "api/b_a2mini.h"
+#include "api/print/print.h"
+#include "api/objs/kdb.h"
+#include "api/objs/comments.h"
+#include "api/objs/lists.h"
 
-#include "iode.h"
 
 int     B_MULTIBAR = 0; // Graph parameter (see GB)
 int     B_TBL_TITLE;    // Specify how to print a TABLE 

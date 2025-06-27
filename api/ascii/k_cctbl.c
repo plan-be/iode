@@ -8,7 +8,8 @@
  *      int KT_save_csv(KDB *kdb, char *filename)
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/tables.h"
 
 /**
  * Table of keywords recognized by YY in the context of a TBLs ascii file (.at).

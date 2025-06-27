@@ -19,9 +19,13 @@
  *      void IodeResetMsgs()        | Reset the messages from the A2M interpretor and from the IODE functions.
  *   
  */
- 
-#include "iode.h"
-#include "iodeapi.h"
+#include "scr4/s_args.h"
+
+#include "api/b_iodeini.h"
+#include "api/k_lang.h"
+#include "api/print/print.h"
+#include "api/report/undoc/undoc.h"
+
 
 /**
  *  Initialise an IODE session.

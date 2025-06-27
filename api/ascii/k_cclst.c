@@ -9,7 +9,8 @@
  *
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/lists.h"
 
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE LST and adds the new LST to kdb. 

@@ -86,8 +86,11 @@
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
  *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
- 
-#include "iode.h"
+#include "api/lec/lec.h"
+#include "api/objs/equations.h"
+#include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
+
 
 #define KSIM_VAL(i, t)      *(KVVAL(KSIM_DBV, KSIM_POSXK[i], t))  // Value of endo[i] in period nb t
 #define KSIM_NAME(i)        (KONAME(KSIM_DBV, KSIM_POSXK[i]))     // Name  of the endogenous of equation i (possibly after endo-exo)  

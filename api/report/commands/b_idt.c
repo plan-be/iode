@@ -10,8 +10,9 @@
  *      int B_IdtExecuteSclFiles(char* arg)     $IdtExecuteSclFiles file1 [file2 ...]
  *      int B_IdtExecuteTrace(char* arg)        $IdtExecuteTrace {Yes | No}
  */
+#include "api/report/commands/commands.h"
+#include "api/objs/identities.h"
 
-#include "iode.h"
 
 // List of functions
 int B_IdtExecute(char* arg);

@@ -61,8 +61,9 @@
  *      int B_GraphDefault(char* type)                   $graphdefault {l|L|s|S|b|B} 
  *  
  */
+#include "scr4/scr4.h"
+#include "api/report/engine/engine.h"
 
-#include "iode.h"
 #ifdef _MSC_VER
     #include <direct.h>
 #endif 

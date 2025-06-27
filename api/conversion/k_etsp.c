@@ -36,7 +36,9 @@
  *      int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
 
-#include "iode.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
+#include "export.h"
 
 int EXP_hd_tsp(expdef, dbv, dbc, outfile)
 EXPDEF  *expdef;

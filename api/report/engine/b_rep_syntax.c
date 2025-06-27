@@ -19,8 +19,9 @@
  *      BFNS B_fns[]    Names of the report commands + GUI and non-GUI function pointers + type defining the allowed suffixes).
  *      RPFN RP_FNS[]   Names of the report @functions and their function pointers
  */
-
-#include "iode.h"
+#include "api/report/commands/commands.h"
+#include "api/report/undoc/undoc.h"
+#include "api/report/engine/engine.h"
 
 /* 
     Names of the report $commands + called functions in non GUI and GUI modes + type (allowed suffixes).
@@ -220,7 +221,6 @@ BFNS B_fns[] = {
     "eqssetcmt",              "EqsSetCmt",                B_EqsSetCmt,            NULL,               0,        1,
     
     "reportexec",             "ReportExec",               B_ReportExec,           SB_ReportExec,      0,        1,
-    //"reportedit",             "FileEdit",               B_FileEdit,             SB_ReportEdit,      0,        1,
     "reportedit",             "ReportEdit",               NULL,                   SB_ReportEdit,      0,        1,
     "prompt",                 "ReportPrompt",             NULL,                   SB_ReportPrompt,    0,        1,
     "minimize",               "WindowMinimize",           B_WindowMinimize,       NULL,               0,        1,

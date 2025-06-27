@@ -13,9 +13,10 @@
  * 
  *   - char *BUF_DATA : NULL or pointer to the allocated buffer
  */
-
 #include <s_swap.h>
 #include <stdio.h>
+#include "api/utils/buf.h"
+
 
 char    *BUF_DATA = NULL;
 static int     BUF_LEN = 0;

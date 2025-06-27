@@ -14,8 +14,9 @@
  *      int B_WsLtoHStock(char* arg)    $WsLtoHStock {L|C|S} Filename VarList
  *      int B_WsLtoHFlow(char* arg)     $WsLtoHFlow  {L|C|S} Filename VarList
  */
+#include "api/report/commands/commands.h"
+#include "api/objs/variables.h"
 
-#include "iode.h"
 
 // Linear Interpolation sub-functions 
 

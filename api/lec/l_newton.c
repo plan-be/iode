@@ -113,7 +113,7 @@
  *  
  */
 
-#include "iode.h"
+#include "lec.h"
 
 static double  L_newton_1();
 int     KSIM_NEWTON_DEBUG = 0;          //

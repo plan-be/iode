@@ -74,7 +74,7 @@
  *      int         REP_NB_PROCS      Size of REP_PROCS
  */
 
-#include "iode.h"
+#include "api/report/engine/engine.h"
 
 
 // REP_PROC: procedure parameters and code

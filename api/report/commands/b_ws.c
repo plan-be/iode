@@ -36,9 +36,9 @@
  * int B_CsvAxes(char *var)                          $CsvAxes AxisName
  * int B_CsvDec(char *dec)                           $CsvDec char
  */
- 
-#include "iode.h"
- 
+
+#include "b_ws.h"
+
 
 /**
  *  Syntax: $WsLoad<type> filename

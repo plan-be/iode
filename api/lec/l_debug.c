@@ -15,9 +15,11 @@
  *  TODO: replace by a "super" function 
  */
 
-#include "api/iode.h"
 #include <stdio.h>
 #include <stdarg.h>
+
+#include "api/lec/lec.h"
+
 
 char    *L_DEBUG_FILENAME = 0;  // Name of the output file
 

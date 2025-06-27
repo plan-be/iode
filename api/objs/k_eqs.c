@@ -11,7 +11,8 @@
  *      E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)           Transforms a LEC equation "in place" to add a dynamic adjustment
  *
  */
-#include "iode.h"
+#include "equations.h"
+
 
 /**
  *  Frees an EQ struct and all its elements.

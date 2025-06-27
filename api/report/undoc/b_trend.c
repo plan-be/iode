@@ -18,7 +18,7 @@
  *     
  */
 
-#include "iode.h"
+#include "api/report/undoc/undoc.h"
 
 static int HP_smpl(f_smpl, ws_smpl, t_smpl, shift)
 SAMPLE  *f_smpl, *ws_smpl, **t_smpl;

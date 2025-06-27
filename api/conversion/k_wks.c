@@ -13,8 +13,9 @@
  *      void wks_name(char* str, int c1, int r1, int c2, int r2)
  *  
  */
+#include "import.h"
+#include "export.h"
 
-#include "iode.h"
 
 FILE    *WKS_FD;
 char    WKS_BOF[6]     = {0, 0, 2, 0, 4, 4};

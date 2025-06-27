@@ -30,7 +30,7 @@
  * 
  */
 
-#include "iode.h"
+#include "lec.h"
 
 /**
  * Struct specific for equation compilation.

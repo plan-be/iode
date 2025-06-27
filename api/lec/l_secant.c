@@ -11,7 +11,7 @@
  *      double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
  */
 
-#include "iode.h"
+#include "lec.h"
 
 #define LN_FACTOR   1.6             
 #define LN_MAXIT    20

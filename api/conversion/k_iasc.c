@@ -23,8 +23,8 @@
  *      int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)               Opens an ASCII comment file for reading with the YY library functions. 
  *      int IMP_vec_casc(char* name, char** cmt)                            Reads one comment on the open YY stream.
  */
-
-#include "iode.h"
+#include "utils/time.h"
+#include "import.h"
 
 #define ASC_SMPL 1
 

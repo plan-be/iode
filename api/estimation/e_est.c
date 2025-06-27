@@ -59,8 +59,10 @@
  * MAT* E_MCORRU         Correlation matrix bw error terms of equations
  * MAT* E_DEV            Deviation between observed and calculated values
  */
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/estimation/estimation.h"
 
-#include "iode.h"
 
 // Functions prototypes
 static int E_c_gmg();

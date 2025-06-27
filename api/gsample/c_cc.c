@@ -42,8 +42,10 @@
  *      int COL_find_mode(COLS* cls, int* mode, int type)   Analyses a COLS struct and set 1 in the vector mode for each found operation
  *
  */
+#include "gsample.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
 
-#include "iode.h"
 
 // Function declarations
 static void COL_free_fils(FILS* fils);

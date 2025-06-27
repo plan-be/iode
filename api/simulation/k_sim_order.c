@@ -16,8 +16,9 @@
  *      int KE_poseq(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
  *      void KE_tri(KDB* dbe, int** predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
- 
-#include "iode.h"
+#include "api/lec/lec.h"
+#include "api/simulation/simulation.h"
+
 
 /* EQUATION ORDERING */
 int     KSIM_PRE;       // number of equations in the "prolog" block 

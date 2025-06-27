@@ -11,7 +11,7 @@
  *    int (*K_save_csv[])(): array of 7 functions to save IODE objects in csv format.
  */
 
-#include "iode.h"
+#include "ascii.h"
 
 KDB  *(*K_load_asc[])() = {
     KC_load_asc,

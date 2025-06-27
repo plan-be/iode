@@ -17,8 +17,9 @@
  *      double E_div_0(double a, double b)              Divides a by b if b is not null. If b is null, returns 0.0.
  *      double E_sqrt(double val)                       Returns the square root of val if val >= 0. If not, returns 0.0.
  */
+#include "api/objs/scalars.h"
+#include "api/estimation/estimation.h"
 
-#include "iode.h"
 
 // Function prototypes
 double M_c_line(MAT* m1, int line, int oper);

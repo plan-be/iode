@@ -9,7 +9,8 @@
  *  
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/identities.h"
 
 /**
  *  Loads IDTs from an ASCII file into a new KDB.

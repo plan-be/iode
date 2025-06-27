@@ -25,8 +25,8 @@
  *                                                  saved their content in ws.* files.
  *      - int K_load_RWS(int ref, char *filename)   Load a VAR file for use in GSAMPLE (print tables and graphs)
  */
- 
-#include "iode.h"
+#include "api/objs/kdb.h" 
+
 
 /* Gobals */
 KDB     *K_WS[7];                           // Current workspaces

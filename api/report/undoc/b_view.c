@@ -23,7 +23,7 @@
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
 
-#include "iode.h"
+#include "api/report/undoc/undoc.h"
 
 int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table
 

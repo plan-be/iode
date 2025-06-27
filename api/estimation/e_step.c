@@ -18,8 +18,10 @@
  *                                                                                  coefficient configuration that gives 
  *                                                                                  the best statistical result (for a chosen test).
  */
+#include "api/objs/equations.h"
+#include "api/objs/scalars.h"
+#include "api/estimation/estimation.h"
 
-#include "iode.h"
 
 // Function declarations
 static int E_GetScls(CLEC* clec, char*** scl);

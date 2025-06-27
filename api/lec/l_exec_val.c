@@ -21,7 +21,7 @@
  *     
  */
 
-#include "iode.h"
+#include "lec.h"
 
 
 /*---------- L_VAL_FN ---------------*/

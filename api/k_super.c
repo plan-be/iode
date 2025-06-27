@@ -64,11 +64,14 @@
  *      int ODE_end_super(const int);    
  *  
  */ 
-
-
-#include "iode.h"
 #include <stdarg.h>
 #include <stdlib.h>
+#include <windows.h>
+
+#include "scr4/s_args.h"
+#include "api/k_super.h"
+#include "api/objs/variables.h"
+
 
 // Global variables
 int MSG_DISABLED = 0;    // if 1, kmsg() is disabled

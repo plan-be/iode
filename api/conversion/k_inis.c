@@ -12,8 +12,9 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
-
-#include "iode.h"
+#include "constants.h"
+#include "utils/time.h"
+#include "import.h"
 
 
 int IMP_hd_nis(yy, smpl)

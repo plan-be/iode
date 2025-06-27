@@ -31,7 +31,9 @@
  *  
  */
 
-#include "iode.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
+#include "export.h"
 
 /**
  *  Opens and initialise a CSV file.

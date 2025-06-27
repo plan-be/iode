@@ -94,7 +94,12 @@
  *  TODO: create report functions 
  */
 
-#include "iode.h"
+#include "constants.h"
+#include "b_a2mini.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
+#include "import.h"
+#include "export.h"
 
 extern  char    **IMP_rule; // See k_rule.c
 extern  char    **IMP_pat;  // See k_rule.c

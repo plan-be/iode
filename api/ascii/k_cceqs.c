@@ -9,7 +9,8 @@
  *
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/equations.h"
 
 /**
  * Table of keywords recognized by YY in the context of an EQS ascii file (.ae).

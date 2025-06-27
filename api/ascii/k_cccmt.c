@@ -8,7 +8,8 @@
  *    int KC_save_csv(KDB *kdb, char *filename)
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/comments.h"
 
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE CMT and adds the new CMT to kdb. 

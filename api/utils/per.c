@@ -30,8 +30,9 @@
  *      double PER_per2real(PERIOD* from, int i): adds a number of sub-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).
  * 
  */
+#include <stdlib.h>
+#include "api/utils/time.h"
 
-#include "iode.h"
 
 /**
  *  Variables for period definitions: 

@@ -10,7 +10,10 @@
  *      int L_findvar(KDB* kdb, char* name)     Retrieves a variable position.
  */
 
-#include "iode.h"
+#include "lec.h"
+#include "objs/lists.h"
+#include "objs/scalars.h"
+
 
 /**
  *  Implementation of L_getvar() in the context of IODE objects. Retrieves a pointer to the first element of a VAR.

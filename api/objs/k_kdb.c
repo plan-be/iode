@@ -26,8 +26,9 @@
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
  *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
+#include "utils/time.h"
+#include "kdb.h"
 
-#include "iode.h"
 
 // Utilities 
 // ---------

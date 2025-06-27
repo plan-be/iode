@@ -22,8 +22,12 @@
  *     void K_setvers(KDB* kdb, int i, int vers): converts an IODE object from IODE objects version 1 or 2 to the current version (0).
  *  
  */
+#include "api/objs/kdb.h"
+#include "api/objs/equations.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "api/objs/objs.h"
 
-#include "iode.h"
 
 char    K_LABELS[] = "KOBJS 4.02\032";  // Version 1
 char    K_LABELD[] = "KOBJS 504d\032";  // Version 2

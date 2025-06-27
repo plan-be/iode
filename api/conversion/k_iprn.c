@@ -20,9 +20,8 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
-
-
-#include "iode.h"
+#include "constants.h"
+#include "import.h"
 
 
 double PRN_readreal(yy)

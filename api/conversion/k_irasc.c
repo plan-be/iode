@@ -18,8 +18,9 @@
  *      int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value) Reads one value in an ASCII variable file format. 
  *      int IMP_end_rasc()                                                      Frees the allocated vars during the rotated ASCII file import session.
  */
+#include "utils/time.h"
+#include "import.h"
 
-#include "iode.h"
 
 YYKEYS IMP_RASC_KEYS[] = {
     "sample",   ASC_SMPL

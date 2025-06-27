@@ -113,8 +113,14 @@
  *      
  *  
  */
- 
-#include "iode.h"
+#include "api/report/engine/engine.h"
+#include "api/constants.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
 #ifdef _MSC_VER
     #include <direct.h>
 #else

@@ -35,7 +35,7 @@
  *  
  */
 
-#include "iode.h"
+#include "lec.h"
 
 #ifdef __GNUC__
     #define _isnan isnan

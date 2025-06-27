@@ -17,8 +17,9 @@
  *      int E_GetLecName(char* lec, char* name)      : retrieves the name of the first variable in a lec expression
  *      void E_SclToReal(char* name, double* res) : Stores the content of a scalar in a vector of doubles
  */
-
-#include "iode.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/estimation/estimation.h"
 
 
 /**

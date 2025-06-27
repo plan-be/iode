@@ -17,8 +17,9 @@
  *      void E_tests2scl(EQ* eq, int j, int n, int k)                               Creates the scalars containing the results of an estimated equation
  *  
  */
-
-#include "iode.h"
+#include "api/objs/equations.h"
+#include "api/objs/scalars.h"
+#include "api/estimation/estimation.h"
 
 
 // Fns declarations

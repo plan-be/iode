@@ -67,7 +67,7 @@
  *  
  */
 
-#include "iode.h"
+#include "lec.h"
 #include <time.h>
 
 #ifdef __GNUC__

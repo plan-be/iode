@@ -18,7 +18,9 @@
  */
 
 
-#include "iode.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
+#include "export.h"
 
 int WKS_COL = 1, WKS_ROW = 1;
 

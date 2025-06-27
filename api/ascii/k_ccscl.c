@@ -9,7 +9,8 @@
  *
  */
 
-#include "iode.h"
+#include "ascii.h"
+#include "objs/scalars.h"
 
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE SCL and adds the new SCL to kdb. 

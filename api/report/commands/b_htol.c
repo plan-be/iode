@@ -11,8 +11,9 @@
  *  int B_WsHtoLMean(char* arg)     $WsHtoLMean Filename VarList
  *  int B_WsHtoLSum(char* arg)      $WsHtoLSum Filename VarList
  */
+#include "api/report/commands/commands.h"
+#include "api/objs/variables.h"
 
-#include "iode.h"
 
 // Core functions
 

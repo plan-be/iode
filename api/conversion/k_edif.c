@@ -54,7 +54,10 @@
  *  
  */
 
-#include "iode.h"
+#include "objs/kdb.h"
+#include "objs/variables.h"
+#include "export.h"
+#include "dif.h"
 
 int EXP_hd_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {

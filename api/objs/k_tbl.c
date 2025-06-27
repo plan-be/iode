@@ -25,8 +25,10 @@
  *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
  *  
  */
+#include "api/constants.h"
+#include "api/lec/lec.h"
+#include "api/objs/tables.h"
 
-#include "iode.h"
 
 int T_GRAPHDEFAULT = 0; // Replace B_GRAPHDEFAULT (JMP 12/01/2022)
 

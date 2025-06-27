@@ -70,9 +70,13 @@
  *      KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl)   Executes all identities in dbi using the input series of dbv and scalars of dbs.
  *                                                                                                                 Missing vars and scalars are collected from vfiles and sfiles.
  */
-
-
-#include "iode.h"
+#include "api/constants.h"
+#include "api/lec/lec.h"
+#include "api/objs/kdb.h"
+#include "api/objs/identities.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
+#include "api/k_exec.h"
 
 
 // Function declarations

@@ -9,7 +9,7 @@
  *      int B_EqsStepWise(char* arg) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
 
-#include "iode.h"
+#include "api/report/undoc/undoc.h"
 
 
 /**
