@@ -73,7 +73,7 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg)                                                 
 {
-    char    *from, *to, *eqs, *cond, *test;
+    char    *from, *to, *eqs, *cond, *test, *tmp;
     char**  args;
     SAMPLE  *smpl;
 
@@ -105,8 +105,10 @@ int B_EqsStepWise(char* arg)
         return(1);                          
     }
 
-    test = args[4];
-    strcpy(test,SCR_lower(test));
+    // Sanitizer -> need to make a copy of str to avoid the 
+    // strcpy-param-overlap error (from SCR_add_ptr())
+    tmp = args[4];
+    test = SCR_stracpy(SCR_lower(tmp));
     if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*Gère les erreurs de test*/
     {
         kerror(0,"Incorrect test name");
