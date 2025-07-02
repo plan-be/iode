@@ -1253,7 +1253,7 @@ class Tables(IodeDatabase):
         False
         >>> tbl[0] = original_title  # revert the change
         >>> tables["ANAKNFF"] = tbl
-        >>> original_hash == hash(tables)           # doctest: +SKIP
+        >>> original_hash == hash(tables)
         True
 
         >>> # delete a table
@@ -1262,7 +1262,7 @@ class Tables(IodeDatabase):
         >>> original_hash == hash(tables)
         False
         >>> tables["ANAKNFF"] = original_table
-        >>> original_hash == hash(tables)           # doctest: +SKIP
+        >>> original_hash == hash(tables)
         True
 
         >>> # add a table
@@ -1270,7 +1270,7 @@ class Tables(IodeDatabase):
         >>> original_hash == hash(tables)
         False
         >>> del tables["NEW"]
-        >>> original_hash == hash(tables)           # doctest: +SKIP
+        >>> original_hash == hash(tables)
         True
         """
         return super().__hash__()
