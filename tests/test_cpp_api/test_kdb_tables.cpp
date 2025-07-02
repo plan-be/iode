@@ -656,22 +656,31 @@ TEST_F(KDBTablesTest, PrintToFile)
 TEST_F(KDBTablesTest, Hash)
 {
     std::size_t hash_val = hash_value(Tables);
+    std::hash<TBL> table_hasher;
 
     // change a name
     Tables.rename("GFRPC", "NEW_NAME");
     std::size_t hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
-    std::cout << "(rename table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+    // restore original name
+    Tables.rename("NEW_NAME", "GFRPC");
+    std::size_t hash_val_restored = hash_value(Tables);
+    EXPECT_EQ(hash_val, hash_val_restored);
 
     // remove an entry
-    hash_val = hash_val_modified;
-    Tables.remove("NEW_NAME");
+    Table table = Tables.get("GFRPC");
+    Tables.remove("GFRPC");
     hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
-    std::cout << "(delete table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
-
+    // restore original entry
+    Tables.add("GFRPC", table);
+    std::size_t hash_original = table_hasher(table);
+    std::size_t hash_restored = table_hasher(*Tables.get("GFRPC"));
+    EXPECT_EQ(hash_original, hash_restored);
+    hash_val_restored = hash_value(Tables);
+    EXPECT_EQ(hash_val, hash_val_restored);
+ 
     // add an entry
-    hash_val = hash_val_modified;
     std::string def = "A title";
     std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
     bool mode = true;
@@ -680,5 +689,8 @@ TEST_F(KDBTablesTest, Hash)
     Tables.add("NEW_ENTRY", 2, def, vars, mode, files, date);
     hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);   
-    std::cout << "(new    table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+    // remove the entry
+    Tables.remove("NEW_ENTRY");
+    hash_val_restored = hash_value(Tables);
+    EXPECT_EQ(hash_val, hash_val_restored);
 }

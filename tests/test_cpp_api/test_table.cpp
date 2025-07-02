@@ -584,10 +584,12 @@ TEST_F(TablesTest, LineDate)
 TEST_F(TablesTest, Hash)
 {
     std::hash<TBL> table_hasher;
+    std::size_t hash_original;
     std::size_t hash_before;
     std::size_t hash_after;
 
     hash_before = table_hasher(*table);
+    hash_original = hash_before;
 
     // same table
     Table* same_table = Tables.get("GFRPC");
@@ -595,7 +597,14 @@ TEST_F(TablesTest, Hash)
     hash_after = table_hasher(*same_table);
     EXPECT_EQ(hash_before, hash_after);
 
+    // C++ table vs C table
+    int pos = K_find(KT_WS, "GFRPC");
+    TBL* c_table = KTVAL(KT_WS, pos);
+    std::size_t c_hash = table_hasher(*c_table);
+    EXPECT_EQ(hash_original, c_hash);
+
     // different title
+    std::string title = table->get_title(0);
     std::string new_title = "New Title";
     table->set_title(0, new_title);
     hash_after = table_hasher(*table);
@@ -605,12 +614,21 @@ TEST_F(TablesTest, Hash)
     int nb_cells = table->nb_columns();
     TableLine* line = table->get_line(5);
     hash_before = hash_after;
+    std::string cell_content = line->get_cell(0, nb_cells)->get_content(false);
     line->get_cell(0, nb_cells)->set_text("Nouvelles recettes");
     hash_after = table_hasher(*table);
     EXPECT_NE(hash_before, hash_after);
 
     hash_before = hash_after;
+    std::string lec_content = line->get_cell(1, nb_cells)->get_content(false);
     line->get_cell(1, nb_cells)->set_lec("GOSG+YDTG+IT+YSSG+COTRES+OCUG");
     hash_after = table_hasher(*table);
     EXPECT_NE(hash_before, hash_after);
+
+    // return to original title and cell content
+    table->set_title(0, title);
+    line->get_cell(0, nb_cells)->set_text(cell_content);
+    line->get_cell(1, nb_cells)->set_lec(lec_content);
+    hash_after = table_hasher(*table);
+    EXPECT_EQ(hash_original, hash_after);
 }
