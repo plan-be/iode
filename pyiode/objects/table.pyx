@@ -712,3 +712,6 @@ cdef class Table:
             s += "\n"
         
         return s
+
+    def __hash__(self) -> int:
+        return <int>hash_value_tbl(dereference(self.c_table))

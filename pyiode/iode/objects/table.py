@@ -2423,3 +2423,64 @@ class Table:
         s += f"graph_axis: '{self.graph_axis}'\n"
         s += f"graph_alignment: '{self.graph_alignment}'\n"
         return s
+
+    def __hash__(self) -> int:
+        r"""
+        Return the hash of the table. 
+
+        Returns
+        -------
+        int
+            The hash value of the table.
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, TableLineType
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded 
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.lst
+        17 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+        >>> table_title = "Table example"
+        >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
+        >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
+        >>> table = Table(2, table_title, lines_lecs, lines_titles)
+        >>> table           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1              |
+        TITLE |       "Table example"
+        ----- | ----------------------------
+        CELL  |                |     "#S"
+        ----- | ----------------------------
+        CELL  | "GOSG:"        |        GOSG
+        CELL  | "YSSG+COTRES:" | YSSG+COTRES
+        CELL  | "OCUG:"        |        OCUG
+        <BLANKLINE>
+        nb lines: 7
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> original_hash = hash(table)
+        >>> title = str(table[0])
+        >>> title
+        'Table example'
+        >>> # change the title of the table
+        >>> table[0] = "New title"
+        >>> table[0]
+        New title
+        >>> original_hash == hash(table)
+        False
+        >>> #revert changes
+        >>> table[0] = title
+        >>> original_hash == hash(table)
+        True
+        """
+        return self._cython_instance.__hash__()
