@@ -397,31 +397,42 @@ TEST_F(KDBEquationsTest, Hash)
     std::size_t hash_val = hash_value(Equations);
 
     // modify an entry
-    std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    Equations.update("ACAF", new_lec);
+    Equation eq = Equations.get("ACAF");
+    std::string lec = eq.get_lec();
+    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    Equations.update("ACAF", eq);
     std::size_t hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
-    std::cout << "(modify equation) original vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+    // restore original entry
+    eq.set_lec(lec);
+    Equations.update("ACAF", eq);
+    std::size_t hash_val_restored = hash_value(Equations);
+    EXPECT_EQ(hash_val, hash_val_restored);
 
     // remove an entry
-    hash_val = hash_val_modified;
-    Equations.remove("ACAF");
+    Equation eq2 = Equations.get("ACAG");
+    Equations.remove("ACAG");
     hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
-    std::cout << "(delete equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+    // restore original entry
+    Equations.add("ACAG", eq2);
+    hash_val_restored = hash_value(Equations);
+    EXPECT_EQ(hash_val, hash_val_restored);
 
     // add an entry
-    hash_val = hash_val_modified;
-    std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    lec = "TEST := 0";
     std::string method = "LSQ";
     std::string from = "1980Y1";
     std::string to = "1996Y1";
     std::string comment = "Equation comment";
-    std::string block = "ACAF";
+    std::string block = "TEST";
     std::string instruments = "Equation instruments";
     bool date = true;
-    Equations.add("ACAF", lec, method, from, to, comment, instruments, block, date);
+    Equations.add("TEST", lec, method, from, to, comment, instruments, block, date);
     hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);   
-    std::cout << "(new    equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+    // remove the entry
+    Equations.remove("TEST");
+    hash_val_restored = hash_value(Equations);
+    EXPECT_EQ(hash_val, hash_val_restored);
 }
