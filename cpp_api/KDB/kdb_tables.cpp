@@ -10,7 +10,9 @@ Table* KDBTables::copy_obj(Table* const original) const
 Table* KDBTables::get_unchecked(const int pos) const
 {
 	KDB* kdb = get_database();
-	// Note: KTVAL allocate a new pointer TBL*
+	// Note: - KTVAL allocate a new pointer TBL*
+	//       - static_cast<Table*>(TBL*) calls the copy constructor Table(const TBL* c_table)
+	//         which calls copy_from_TBL_obj()
 	return static_cast<Table*>(KTVAL(kdb, pos));
 }
 
