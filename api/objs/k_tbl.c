@@ -178,8 +178,9 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
     line->tl_val = SW_nalloc(nc * sizeof(TCELL));
     line->tl_graph = T_GRAPHDEFAULT; /* GB 10/03/2011 */
     for(i = 0; i < nc; i++) {
+        ((TCELL *) line->tl_val + i)->tc_type = TABLE_CELL_LEC;
         ((TCELL *) line->tl_val + i)->tc_attr = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
-        /* ((TCELL *) tbl->t_div.tl_val + i)->tc_attr; /* JMP 11-11-93 */
+        ((TCELL *) line->tl_val + i)->tc_val = NULL; 
     }
 
     return((TCELL *) line->tl_val);
