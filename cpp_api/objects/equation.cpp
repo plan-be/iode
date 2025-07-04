@@ -11,6 +11,8 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
     this->clec = clec_deep_copy(obj->clec);
     this->solved = obj->solved;
     this->method = obj->method;
+    if(this->method < 0 || this->method >= IODE_NB_EQ_METHODS)
+        this->method = EQ_LSQ;  // Default method is LSQ
     // NOTE : we can use memcpy() on SAMPLE because SAMPLE does 
     //        not contain attributes which are pointers
     memcpy(&this->smpl, &obj->smpl, sizeof(SAMPLE));
