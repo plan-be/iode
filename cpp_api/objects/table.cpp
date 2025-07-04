@@ -12,7 +12,8 @@ static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 		T_set_lec_cell(c_cell_dest, cell_src_content);
 	else 
 		T_set_string_cell(c_cell_dest, cell_src_content);
-	c_cell_dest->tc_attr = c_cell_src->tc_attr;
+	if(c_cell_src->tc_attr != 0)
+		c_cell_dest->tc_attr = c_cell_src->tc_attr;
 }
 
 TableCell::TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align, 
@@ -211,6 +212,8 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 	case TABLE_LINE_TITLE:
 		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
 		T_set_string_cell(cells_dest, cell_src_content);
+		if(cells_src->tc_attr != 0)
+			cells_dest->tc_attr = cells_src->tc_attr;
 		break;
 	case TABLE_LINE_CELL:
 		for (int col = 0; col < nb_columns; col++) 
