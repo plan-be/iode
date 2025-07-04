@@ -832,7 +832,11 @@ EQ* K_eunpack(char *pack, char *name)
     memcpy(eq->clec, P_get_ptr(pack, 1), len);
 
     eq->solved = *(char*)(P_get_ptr(pack, 2));
+
     eq->method = *(char*)(P_get_ptr(pack, 3));
+    if(eq->method < 0 || eq->method >= IODE_NB_EQ_METHODS)
+        eq->method = EQ_LSQ;    // Default method is LSQ
+    
     memcpy(&(eq->smpl), P_get_ptr(pack, 4), sizeof(SAMPLE));
 
     len = P_get_len(pack, 5);
