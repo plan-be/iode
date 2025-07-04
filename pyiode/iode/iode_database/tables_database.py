@@ -178,7 +178,7 @@ class Tables(IodeDatabase):
         DIVIS |                                  1 |
         TITLE |                "Déterminants de la croissance de K"
         ----- | ------------------------------------------------------------------
-        CELL  | ""                                 |              "#s"
+        CELL  |                                    |              "#s"
         ----- | ------------------------------------------------------------------
         CELL  | "Croissance de K "                 |                      dln KNFF
         CELL  | "Output gap "                      |    knff1*ln (QAFF_/(Q_F+Q_I))
@@ -203,7 +203,7 @@ class Tables(IodeDatabase):
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"                             
         ----- | ---------------------------------------------------------------------------------------------------------
-        CELL  | ""                                                         |                     "#S"                    
+        CELL  |                                                            |                     "#S"                    
         CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
         CELL  | "   Masse salariale totale"                                |                                         WBU_
         CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
@@ -415,7 +415,7 @@ class Tables(IodeDatabase):
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
-        CELL  | ""             |     "#S"
+        CELL  |                |     "#S"
         ----- | ----------------------------
         CELL  | "GOSG:"        |        GOSG
         CELL  | "YDTG:"        |        YDTG
@@ -447,7 +447,7 @@ class Tables(IodeDatabase):
         DIVIS | 1                                                                    |
         TITLE |                                  "New Table"
         ----- | ------------------------------------------------------------------------------
-        CELL  | ""                                                                   |   "#S"
+        CELL  |                                                                      |   "#S"
         ----- | ------------------------------------------------------------------------------
         CELL  | "Bruto exploitatie-overschot: overheid (= afschrijvingen)."          |    GOSG
         CELL  | "Overheid: geïnde indirecte belastingen."                            |    YDTG
@@ -487,7 +487,7 @@ class Tables(IodeDatabase):
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
-        CELL  | ""             |     "#S"
+        CELL  |                |     "#S"
         ----- | ----------------------------
         CELL  | "GOSG:"        |        GOSG
         CELL  | "YDTG:"        |        YDTG
@@ -553,7 +553,7 @@ class Tables(IodeDatabase):
         DIVIS | 1       |
         TITLE |  "New Table"
         ----- | --------------
-        CELL  | ""      | "#S"
+        CELL  |         | "#S"
         ----- | --------------
         CELL  | "GOSG:" | GOSG
         CELL  | "YDTG:" | YDTG
@@ -593,7 +593,7 @@ class Tables(IodeDatabase):
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
-        CELL  | ""                                                      |  "#S"
+        CELL  |                                                         |  "#S"
         ----- | ----------------------------------------------------------------
         CELL  | "Croissance de la population active"                    |  XNATY
         CELL  | "Croissance du prix du pétrole"                         |  XPOIL
@@ -619,7 +619,7 @@ class Tables(IodeDatabase):
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
-        CELL  | ""                                                      |  "#S"
+        CELL  |                                                         |  "#S"
         ----- | ----------------------------------------------------------------
         CELL  | "Croissance de la population active"                    |  XNATY
         CELL  | "Croissance du prix du pétrole"                         |  XPOIL
@@ -646,7 +646,7 @@ class Tables(IodeDatabase):
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
-        CELL  | ""                                                      |  "#S"
+        CELL  |                                                         |  "#S"
         ----- | ----------------------------------------------------------------
         CELL  | "Croissance de la population active"                    |  XNATY
         CELL  | "Croissance du prix du pétrole"                         |  XPOIL
@@ -671,7 +671,7 @@ class Tables(IodeDatabase):
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
-        CELL  | ""                                                      |  "#S"
+        CELL  |                                                         |  "#S"
         ----- | ----------------------------------------------------------------
         CELL  | "Croissance de la population active"                    |  XNATY
         CELL  | "Croissance du prix du pétrole"                         |  XPOIL
