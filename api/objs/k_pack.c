@@ -523,6 +523,27 @@ int (*K_pack[])() = {
  * in the current archicture (32|64).
  */
 
+// see T_create() for the initialization of the special 'div' line
+static void K_tcell_div_sanitize(TCELL* cell, int j)
+{
+    // if cell type not set, assume it is a LEC cell
+    if(cell->tc_type == 0){
+        cell->tc_type = TABLE_CELL_LEC;
+        cell->tc_val = NULL;
+    }
+    if(j == 0 && cell->tc_val == NULL)
+        K_ipack(&(cell->tc_val), "1");
+}
+
+static void K_tcell_sanitize(TCELL* cell, int j)
+{
+    // if cell type not set, assume it is a LEC cell
+    if(cell->tc_type == 0)
+        cell->tc_type = TABLE_CELL_LEC;
+    // if it is a string cell and its content is NULL, initialize it to an empty string
+    if(cell->tc_type == TABLE_CELL_STRING && cell->tc_val == NULL)
+        T_set_string_cell(cell, "");
+}
 
 /**
  * Unpacks a packed TBL into a TBL structure in the current architecture (32|64 bits).
@@ -562,6 +583,7 @@ static TBL* K_tunpack32(char *pack)
             memcpy(cell[j].tc_val, pcell[j].tc_val, len);
             p++;
         }
+        K_tcell_div_sanitize(cell + j, j);
     }
 
     /* lines */
@@ -584,7 +606,7 @@ static TBL* K_tunpack32(char *pack)
                 memcpy(cell, pcell, len);
                 p++;
 
-                for(j = 0; j < T_NC(tbl); j++)
+                for(j = 0; j < T_NC(tbl); j++){
                     if(cell[j].tc_val != NULL) {
                         len = P_get_len(pack, p);
                         pcell[j].tc_val = P_get_ptr(pack, p);
@@ -592,6 +614,8 @@ static TBL* K_tunpack32(char *pack)
                         memcpy(cell[j].tc_val, pcell[j].tc_val, len);
                         p++;
                     }
+                    K_tcell_sanitize(cell + j, j);
+                }
                 break;
             case TABLE_LINE_TITLE:
                 len = P_get_len(pack, p);
@@ -614,6 +638,7 @@ static TBL* K_tunpack32(char *pack)
                     memcpy(cell->tc_val, pcell->tc_val, len);
                     p++;
                 }
+                K_tcell_sanitize(cell, 0);
                 break;
         }
     }
@@ -685,7 +710,6 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     K_tline32_64((TLINE32*)&tbl32->t_div, (TLINE*)&tbl64->t_div);
 }
 
-
 /**
  * Unpacks a packed TBL into a TBL structure in the 64 bits architecture.
  * @note Only used in 64 bit architecture.
@@ -719,6 +743,7 @@ static TBL* K_tunpack64(char *pack)
             cell[j].tc_val = P_alloc_get_ptr(pack, p);
             p++;
         }
+        K_tcell_div_sanitize(cell + j, j);
     }
     
     /* lines */
@@ -741,6 +766,7 @@ static TBL* K_tunpack64(char *pack)
                         cell[j].tc_val = P_alloc_get_ptr(pack, p);
                         p++;
                     }
+                    K_tcell_sanitize(cell + j, j);
                 }
                 break;
 
@@ -754,6 +780,7 @@ static TBL* K_tunpack64(char *pack)
                     cell[0].tc_val = (char *)P_alloc_get_ptr(pack, p);
                     p++;
                 }
+                K_tcell_sanitize(cell, 0);
                 break;
         }
     }
