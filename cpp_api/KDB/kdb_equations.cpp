@@ -18,6 +18,8 @@ Equation* KDBEquations::get_unchecked(const int pos) const
     if (c_eq->clec == NULL)
         throw std::runtime_error("Failed to compute LEC expression '" + std::string(c_eq->lec) + 
                     "' of equation named '" + std::string(c_eq->endo) + "'");
+	// Note: static_cast<Equation*>(EQ*) calls the copy constructor Equation(const EQ* c_eq)
+	//       which calls copy_from_EQ_obj()
     return static_cast<Equation*>(c_eq);
 }
 
