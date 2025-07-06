@@ -1,5 +1,8 @@
 message(STATUS "======== start archives targets ========")
 
+# set(IODE_API_TARGET archives_api)
+# add_subdirectory("api_06_07_2025")
+
 set(IODE_CLI_TARGET archives_cpp_cli)
 add_subdirectory("cli")
 
