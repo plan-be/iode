@@ -25,8 +25,7 @@
 #include "api/conversion/import.h"
 
 
-double PRN_readreal(yy)
-YYFILE  *yy;
+double PRN_readreal(YYFILE* yy)
 {
     double    val;
     int     minus = 1;
@@ -49,7 +48,7 @@ ag:
 
         case YY_STRING :
         case YY_WORD   :
-            if(strcmp("NA", yy->yy_text) != 0)
+            if(strcmp("NA", (char*) yy->yy_text) != 0)
                 YY_unread(yy);
             return(IODE_NAN);
         default :
@@ -60,11 +59,7 @@ ag:
     return(val);
 }
 
-int IMP_vec_prn(yy, name, dim, vector)
-YYFILE  *yy;
-char    *name;
-int     dim;
-double    *vector;
+int IMP_vec_prn(YYFILE* yy, char* name, int dim, double* vector)
 {
     int i, key;
 
@@ -75,11 +70,11 @@ double    *vector;
                 return(-1);
             case YY_WORD :
             case YY_STRING :
-                if(strcmp(yy->yy_text, "na") == 0) continue;
+                if(strcmp((char*) yy->yy_text, "na") == 0) continue;
 
-                SCR_strlcpy(name, yy->yy_text, 79); /* JMP 13-02-2013 */
+                SCR_strlcpy((unsigned char*) name, yy->yy_text, 79); /* JMP 13-02-2013 */
                 name[80] = '\0';
-                if(key == YY_STRING) SCR_asqz(name, "_");
+                if(key == YY_STRING) SCR_asqz((unsigned char*) name, (unsigned char*) "_");
 
                 for(i = 0; i < dim; i++) vector[i] = PRN_readreal(yy);
                 return(0);
@@ -88,24 +83,22 @@ double    *vector;
 }
 
 IMPDEF IMP_PRN = {
-    NULL,
-    0,
-    NULL,
-    IMP_vec_prn,
-    NULL,
-    NULL
+    NULL,           // imp_keys
+    0,              // imp_dim
+    NULL,           // imp_hd_fn
+    NULL,           // imp_hd_sample_fn
+    IMP_vec_prn,    // imp_vec_var_fn
+    NULL,           // imp_vec_cmt_fn
+    NULL            // imp_elem_fn
 };
 
 // COMMENTS
 
 YYFILE  *PYY;
 
-IMP_hd_cprn(impdef, file, lang)
-IMPDEF  *impdef;
-char    *file;
-int     lang;
+int IMP_hd_cprn(IMPDEF* impdef, char* file, int lang)
 {
-    SCR_strip(file);
+    SCR_strip((unsigned char*) file);
     PYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
 
     if(PYY == 0) {
@@ -116,9 +109,7 @@ int     lang;
     return(0);
 }
 
-IMP_vec_cprn(name, cmt)
-char    *name;
-char    **cmt;
+int IMP_vec_cprn(char* name, char** cmt)
 {
     YYFILE  *yy = PYY;
     int     key;
@@ -127,7 +118,7 @@ char    **cmt;
     if(key == YY_EOF) goto err;
 
     if(key == YY_WORD || key == YY_STRING) {
-        SCR_strlcpy(name, yy->yy_text, 79); /* JMP 13-02-2013 */
+        SCR_strlcpy((unsigned char*) name, yy->yy_text, 79); /* JMP 13-02-2013 */
         name[80] = '\0';
     }
     else goto err;
@@ -136,7 +127,7 @@ char    **cmt;
     if(key == YY_EOF) return(-1);
 
     if(key == YY_WORD || key == YY_STRING)
-        *cmt = SCR_stracpy(yy->yy_text);
+        *cmt = (char*) SCR_stracpy(yy->yy_text);
     else goto err;
 
     return(0);
@@ -147,14 +138,12 @@ err :
 }
 
 IMPDEF IMP_PRN_CMT = {
-    NULL,
-    0,
-    IMP_hd_cprn,
-    IMP_vec_cprn,
-    NULL,
-    NULL
+    NULL,           // imp_keys
+    0,              // imp_dim
+    IMP_hd_cprn,    // imp_hd_fn
+    NULL,           // imp_hd_sample_fn
+    NULL,           // imp_vec_var_fn
+    IMP_vec_cprn,   // imp_vec_cmt_fn
+    NULL,           // imp_elem_fn
+    NULL            // imp_end_fn
 };
-
-
-
-

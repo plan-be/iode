@@ -107,12 +107,14 @@ IMP_end_gem()
 }
 
 IMPDEF IMP_GEM = {
-    NULL,
-    0,
-    IMP_hd_gem,
-    IMP_vec_gem,
-    NULL,
-    IMP_end_gem
+    NULL,           // imp_keys
+    0,              // imp_dim
+    NULL,           // imp_hd_fn
+    IMP_hd_gem,     // imp_hd_sample_fn
+    IMP_vec_gem,    // imp_vec_var_fn
+    NULL,           // imp_vec_cmt_fn
+    NULL,           // imp_elem_fn   
+    IMP_end_gem     // imp_end_fn
 };
 
 
@@ -198,9 +200,7 @@ int     GEM_nser = 0, GEM_cser, GEM_nobs = 0;
 double    *GEM_mat = NULL;
 
 
-int IMP_hd_gem(yy, smpl)
-YYFILE  *yy;
-SAMPLE  *smpl;
+int IMP_hd_gem(YYFILE* yy, SAMPLE* smpl)
 {
 
     memcpy(&GEM_smpl, smpl, sizeof(SAMPLE));
@@ -214,8 +214,7 @@ SAMPLE  *smpl;
     return(0);
 }
 
-double GEM_read_real(yy)
-YYFILE  *yy;
+double GEM_read_real(YYFILE* yy)
 {
     double    val;
     int     minus = 1, p = 0;
@@ -238,7 +237,7 @@ ag:
             return(IODE_NAN);
 
         case YY_WORD   :
-            if(strcmp("na", yy->yy_text) != 0)
+            if(strcmp("na", (char*) yy->yy_text) != 0)
                 YY_unread(yy);
             return(IODE_NAN);
         default :
@@ -255,11 +254,7 @@ ag:
     return(val);
 }
 
-int IMP_vec_gem(yy, name, dim, vector)
-YYFILE  *yy;
-char    *name;
-int     dim;
-double    *vector;
+int IMP_vec_gem(YYFILE* yy, char* name, int dim, double* vector)
 {
     int     i, from;
 
@@ -291,31 +286,31 @@ double    *vector;
     return(0);
 }
 
-IMP_end_gem()
+int IMP_end_gem()
 {
     return(0);
 }
 
 IMPDEF IMP_GEM = {
-    NULL,
-    0,
-    IMP_hd_gem,
-    IMP_vec_gem,
-    NULL,
-    IMP_end_gem
+    NULL,               // imp_keys
+    0,                  // imp_dim
+    NULL,               // imp_hd_fn
+    IMP_hd_gem,         // imp_hd_sample_fn
+    IMP_vec_gem,        // imp_vec_var_fn
+    NULL,               // imp_vec_cmt_fn
+    NULL,               // imp_elem_fn   
+    IMP_end_gem         // imp_end_fn
 };
 
 
-GEM_readrubr(yy)
-YYFILE  *yy;
+int GEM_readrubr(YYFILE* yy)
 {
     YY_lex(yy);
-    strcpy(GEM_rubr, yy->yy_text);
+    strcpy(GEM_rubr, (char*) yy->yy_text);
     return(0);
 }
 
-GEM_name(name)
-char    *name;
+int GEM_name(char* name)
 {
     if(GEM_cser < 9) sprintf(name, "%s_0%d", GEM_rubr, GEM_cser + 1);
     else             sprintf(name, "%s_%d", GEM_rubr, GEM_cser + 1);

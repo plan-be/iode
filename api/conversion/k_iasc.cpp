@@ -31,7 +31,7 @@
 #define ASC_SMPL 1
 
 YYKEYS IMP_ASC_KEYS[] = {
-    "sample",   ASC_SMPL            // Keyword (in lowercase) for the sample definition
+    (unsigned char*) "sample",   ASC_SMPL            // Keyword (in lowercase) for the sample definition
 };
 
 
@@ -77,9 +77,9 @@ int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)
             case YY_EOF :
                 return(-1);
             case YY_WORD :
-                if(strcmp(yy->yy_text, "na") == 0) continue;
+                if(strcmp((char*) yy->yy_text, "na") == 0) continue;
 
-                SCR_strlcpy(name, yy->yy_text, 79); /* JMP 13-02-2013 */
+                SCR_strlcpy((unsigned char*) name, yy->yy_text, 79); /* JMP 13-02-2013 */
                 name[80] = '\0';
                 for(i = 0; i < dim; i++) vector[i] = K_read_real(yy);
                 return(0);
@@ -88,12 +88,14 @@ int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)
 }
 
 IMPDEF IMP_ASC = {
-    IMP_ASC_KEYS,
-    1,
-    IMP_hd_asc,
-    IMP_vec_asc,
-    NULL,
-    NULL
+    IMP_ASC_KEYS,       // imp_keys
+    1,                  // imp_dim
+    NULL,               // imp_hd_fn
+    IMP_hd_asc,         // imp_hd_sample_fn
+    IMP_vec_asc,        // imp_vec_var_fn
+    NULL,               // imp_vec_cmt_fn
+    NULL,               // imp_elem_fn
+    NULL                // imp_end_fn
 };
 
 // Ascii comments 
@@ -112,7 +114,7 @@ YYFILE  *AYY;
  
 int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)
 {
-    SCR_strip(file);
+    SCR_strip((unsigned char*) file);
     AYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
 
     if(AYY == 0) {
@@ -141,7 +143,7 @@ int IMP_vec_casc(char* name, char** cmt)
     if(key == YY_EOF) goto err;
 
     if(key == YY_WORD || key == YY_STRING) {
-        SCR_strlcpy(name, yy->yy_text, 79); /* JMP 13-02-2013 */
+        SCR_strlcpy((unsigned char*) name, yy->yy_text, 79); /* JMP 13-02-2013 */
         name[80] = '\0';
     }
     else goto err;
@@ -150,7 +152,7 @@ int IMP_vec_casc(char* name, char** cmt)
     if(key == YY_EOF) return(-1);
 
     if(key == YY_WORD || key == YY_STRING)
-        *cmt =  SCR_stracpy(yy->yy_text);
+        *cmt = (char*) SCR_stracpy(yy->yy_text);
     else goto err;
 
     return(0);
@@ -160,12 +162,12 @@ err :
 }
 
 IMPDEF IMP_ASC_CMT = {
-    NULL,
-    0,
-    IMP_hd_casc,
-    IMP_vec_casc,
-    NULL,
-    NULL
+    NULL,           // imp_keys
+    0,              // imp_dim
+    IMP_hd_casc,    // imp_hd_fn
+    NULL,           // imp_hd_sample_fn
+    NULL,           // imp_vec_var_fn
+    IMP_vec_casc,   // imp_vec_cmt_fn
+    NULL,           // imp_elem_fn
+    NULL            // imp_end_fn
 };
-
-

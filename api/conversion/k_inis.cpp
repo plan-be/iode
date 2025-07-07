@@ -16,40 +16,35 @@
 #include "api/utils/time.h"
 #include "api/conversion/import.h"
 
+#include <algorithm>    // for std::min, std::max
 
-int IMP_hd_nis(yy, smpl)
-YYFILE  *yy;
-SAMPLE  *smpl;
+
+int IMP_hd_nis(YYFILE* yy, SAMPLE* smpl)
 {
     return(0);
 }
 
-
-int IMP_vec_nis(yy, name, dim, vector)
-YYFILE  *yy;
-char    *name;
-int     dim;
-double    *vector;
+int IMP_vec_nis(YYFILE* yy, char* name, int dim, double* vector)
 {
     char    line[85], value[11], *ptr;
     int     i, lg, nb;
 
-    nb = min(6, dim);
+    nb = std::min(6, dim);
     if(YY_read_to_char(yy, '\n') == YY_EOF) return(-1);
 
-    lg = (int)strlen(yy->yy_text);
+    lg = (int)strlen((char*) yy->yy_text);
 
-    strcpy(line, yy->yy_text);
-    SCR_strlcpy(name, line, 4);                 /* JMP 13-02-2013 */
-    SCR_strlcpy(name + 4, line + 5, 3);         /* JMP 13-02-2013 */
+    strcpy(line, (char*) yy->yy_text);
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) line, 4);                 /* JMP 13-02-2013 */
+    SCR_strlcpy((unsigned char*) name + 4, (unsigned char*) line + 5, 3);         /* JMP 13-02-2013 */
     name[7] = 0;
 
     ptr = line + 15;
     lg -= 15;
     for(i = 0; i < nb && lg > 0; i++) {
-        SCR_strlcpy(value, ptr, 10);            /* JMP 13-02-2013 */
+        SCR_strlcpy((unsigned char*) value, (unsigned char*) ptr, 10);            /* JMP 13-02-2013 */
         value[10] = 0;
-        SCR_sqz(value);
+        SCR_sqz((unsigned char*) value);
         if(value[0] == '\0') vector[i] = IODE_NAN;
         else vector[i] = atof(value);
         ptr += 11;
@@ -65,10 +60,12 @@ double    *vector;
 }
 
 IMPDEF IMP_NIS = {
-    NULL,
-    0,
-    IMP_hd_nis,
-    IMP_vec_nis,
-    NULL,
-    NULL
+    NULL,           // imp_keys
+    0,              // imp_dim
+    NULL,           // imp_hd_fn
+    IMP_hd_nis,     // imp_hd_sample_fn
+    IMP_vec_nis,    // imp_vec_var_fn
+    NULL,           // imp_vec_cmt_fn
+    NULL,           // imp_elem_fn
+    NULL            // imp_end_fn
 };

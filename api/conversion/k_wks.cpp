@@ -19,15 +19,15 @@
 #include "api/conversion/export.h"
 
 
-FILE    *WKS_FD;
-char    WKS_BOF[6]     = {0, 0, 2, 0, 4, 4};
-char    WKS_CW[4]      = {8, 0, 3, 0};
-char    WKS_NAN[8]     = {0, 0, 0, 0, 0, 0, 240, 255};
-char    WKS_RANGE[8]   = {6, 0, 8, 0, 0, 0, 0, 0};
-char    WKS_LABEL[5]   = {15, 0, 0, 0, 245};
-char    WKS_NM[4]      = {11, 0, 24, 0};
-char    WKS_DOUBLE[5]  = {14, 0, 13, 0, 241};
-char    WKS_EOF[4]     = {1,0,0,0};
+FILE*            WKS_FD;
+unsigned char    WKS_BOF[6]     = {0, 0, 2, 0, 4, 4};
+unsigned char    WKS_CW[4]      = {8, 0, 3, 0};
+unsigned char    WKS_NAN[8]     = {0, 0, 0, 0, 0, 0, 240, 255};
+unsigned char    WKS_RANGE[8]   = {6, 0, 8, 0, 0, 0, 0, 0};
+unsigned char    WKS_LABEL[5]   = {15, 0, 0, 0, 245};
+unsigned char    WKS_NM[4]      = {11, 0, 24, 0};
+unsigned char    WKS_DOUBLE[5]  = {14, 0, 13, 0, 241};
+unsigned char    WKS_EOF[4]     = {1,0,0,0};
 
 
 /*
@@ -141,7 +141,7 @@ void wks_name(char* str, int c1, int r1, int c2, int r2)
             i2 = c2 - 1, j2 = r2 - 1;
 
     fwrite(WKS_NM, sizeof(WKS_NM), 1, WKS_FD);
-    SCR_strlcpy(name, str, 17);                 /* JMP 13-02-2013 */
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 17);                 /* JMP 13-02-2013 */
     name[15] = 0;
     for(i = (int)strlen(name); i < 16; i++) name[i] = 0;
     fwrite(name, 16, 1, WKS_FD);

@@ -31,14 +31,14 @@ SAMPLE  *DIF_smpl = NULL;
 char    DIF_freq;
 
 YYKEYS IMP_DIF_KEYS[] = {
-    "EOD",           DIF_EOD,
-    "TABLE",         DIF_TABLE,
-    "VECTORS",       DIF_VECTORS,
-    "TUPLES",        DIF_TUPLES,
-    "DATA",          DIF_DATA,
-    "BOT",           DIF_BOT,
-    ",",             DIF_COMMA,
-    "V",             DIF_V
+    (unsigned char*) "EOD",           DIF_EOD,
+    (unsigned char*) "TABLE",         DIF_TABLE,
+    (unsigned char*) "VECTORS",       DIF_VECTORS,
+    (unsigned char*) "TUPLES",        DIF_TUPLES,
+    (unsigned char*) "DATA",          DIF_DATA,
+    (unsigned char*) "BOT",           DIF_BOT,
+    (unsigned char*) ",",             DIF_COMMA,
+    (unsigned char*) "V",             DIF_V
 };
 
 int     DIF_nl = 0, DIF_ny = 0;
@@ -90,7 +90,7 @@ int DIF_cell(YYFILE* yy, char** str, double* value)
                 *value = (double) K_read_real(yy);
             else {
                 YY_lex(yy);
-                *str = SCR_stracpy(yy->yy_text);
+                *str = (char*) SCR_stracpy(yy->yy_text);
                 if(*str == NULL) return(-1);
             }
             YY_lex(yy);
@@ -198,7 +198,7 @@ int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)
     rc = DIF_cell(yy, &str, NULL);
     if(rc < 0 || str == NULL) return(-1);
 
-    SCR_strlcpy(name, str, 79); /* JMP 13-02-2013 */
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
     SW_nfree(str);
 
     for(i = 0; i < dim; i++) {
@@ -224,18 +224,12 @@ int IMP_end_dif()
 }
 
 IMPDEF IMP_DIF = {
-    IMP_DIF_KEYS,
-    8,
-    IMP_hd_dif,
-    IMP_vec_dif,
-    NULL,
-    IMP_end_dif
+    IMP_DIF_KEYS,       // imp_keys
+    8,                  // imp_dim
+    NULL,               // imp_hd_fn
+    IMP_hd_dif,         // imp_hd_sample_fn
+    IMP_vec_dif,        // imp_vec_var_fn
+    NULL,               // imp_vec_cmt_fn
+    NULL,               // imp_elem_fn
+    IMP_end_dif         // imp_end_fn
 };
-
-
-
-
-
-
-
-

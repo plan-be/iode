@@ -31,9 +31,7 @@ char    TXT_freq;
 int     TXT_nbper;
 int     TXT_lang;
 
-int IMP_hd_txt(yy, smpl)
-YYFILE  *yy;
-SAMPLE  *smpl;
+int IMP_hd_txt(YYFILE* yy, SAMPLE* smpl)
 {
     memcpy(&TXT_smpl, smpl, sizeof(SAMPLE));
     TXT_freq = (TXT_smpl.s_p1).p_p;
@@ -47,20 +45,17 @@ SAMPLE  *smpl;
     return(0);
 }
 
-int TXT_set(date, shift, tval, dval)
-char    *date, *tval;
-int     *shift;
-double    *dval;
+int TXT_set(char* date, int* shift, char* tval, double* dval)
 {
     PERIOD  *per;
     char    buf[21], y[5], m[3];
     int     pos;
     long    ly, lm;
 
-    SCR_strlcpy(y, date, 4);
+    SCR_strlcpy((unsigned char*) y, (unsigned char*) date, 4);
     y[4] = 0;
     ly = atoi(y);        /* JMP 13-02-2013 */
-    SCR_strlcpy(m, date + 4, 2);
+    SCR_strlcpy((unsigned char*) m, (unsigned char*) date + 4, 2);
     m[2] = 0;
     lm = atoi(m);    /* JMP 13-02-2013 */
 
@@ -78,7 +73,7 @@ double    *dval;
     *shift = PER_diff_per(per, &(TXT_smpl.s_p1));
     SW_nfree(per);
 
-    pos = U_pos(',', tval);
+    pos = U_pos(',', (unsigned char*) tval);
     if(pos>=0) tval[pos] = '.';
 
     *dval= atof(tval);
@@ -86,55 +81,47 @@ double    *dval;
     return(0);
 }
 
-int IMP_elem_txt(yy, name, shift, vector)
-YYFILE  *yy;
-char    *name;
-int     *shift;
-double    *vector;
+int IMP_elem_txt(YYFILE* yy, char* name, int* shift, double* vector)
 {
     char    buf[257], **tbl = NULL;
     long    nbper;
 
     while(1) {
         if(fgets(buf, 256, TXT_fd) == NULL)  return(-1);
-        tbl = SCR_vtoms(buf, "; ");
-        if(SCR_tbl_size(tbl) != 6) {
-            SCR_free_tbl(tbl);
+        tbl = (char**) SCR_vtoms((unsigned char*) buf, (unsigned char*) "; ");
+        if(SCR_tbl_size((unsigned char**) tbl) != 6) {
+            SCR_free_tbl((unsigned char**) tbl);
             continue;
         }
         /* The same periodicity */
         nbper = atoi(tbl[2]);
         if(nbper != TXT_nbper) {
-            SCR_free_tbl(tbl);
+            SCR_free_tbl((unsigned char**) tbl);
             continue;
         }
         else break;
     }
 
-    SCR_strlcpy(name, tbl[1], 79); /* JMP 13-02-2013 */
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[1], 79); /* JMP 13-02-2013 */
     TXT_set(tbl[3], shift, tbl[4], vector);
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char**) tbl);
     return(0);
 }
 
-
 IMPDEF IMP_TXT = {
-    NULL,
-    0,
-    IMP_hd_txt,
-    NULL,
-    IMP_elem_txt,
-    NULL
+    NULL,           // imp_keys
+    0,              // imp_dim
+    NULL,           // imp_hd_fn
+    IMP_hd_txt,     // imp_hd_sample_fn
+    NULL,           // imp_vec_var_fn
+    NULL,           // imp_vec_cmt_fn
+    IMP_elem_txt,   // imp_elem_fn
+    NULL            // imp_end_fn
 };
 
-
-
-IMP_hd_ctxt(impdef, file, lang)
-IMPDEF  *impdef;
-char    *file;
-int     lang;
+int IMP_hd_ctxt(IMPDEF* impdef, char* file, int lang)
 {
-    SCR_strip(file);
+    SCR_strip((unsigned char*) file);
     TXT_fd = fopen(file, "r");
     if(TXT_fd == NULL) return(-1);
 
@@ -148,56 +135,45 @@ int     lang;
     return(0);
 }
 
-IMP_vec_ctxt(name, cmt)
-char    *name;
-char    **cmt;
+int IMP_vec_ctxt(char* name, char** cmt)
 {
     char    buf[1025], **tbl;
     int     len;
 
     if(fgets(buf, 1024, TXT_fd) == NULL)  return(-1);
-    tbl = SCR_vtom(buf, ';');
-    if(SCR_tbl_size(tbl) < 7) {
-        SCR_free_tbl(tbl);
+    tbl = (char**) SCR_vtom((unsigned char*) buf, (int) ';');
+    if(SCR_tbl_size((unsigned char**) tbl) < 7) {
+        SCR_free_tbl((unsigned char**) tbl);
         return(-1);
     }
 
-    SCR_strlcpy(name, tbl[0], 79);              /* JMP 13-02-2013 */
-    SCR_AnsiToOem(tbl[TXT_lang], tbl[TXT_lang]);
-    SCR_sqz(tbl[5]);
-    SCR_sqz(tbl[6]);
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[0], 79);              /* JMP 13-02-2013 */
+    SCR_AnsiToOem((unsigned char*) tbl[TXT_lang], (unsigned char*) tbl[TXT_lang]);
+    SCR_sqz((unsigned char*) tbl[5]);
+    SCR_sqz((unsigned char*) tbl[6]);
     len = (int)(strlen(tbl[TXT_lang]) + strlen(tbl[5]) + strlen(tbl[6]) + 10);
     *cmt = SW_nalloc(len);
 
     sprintf(*cmt, "%s (%s, %s)",tbl[TXT_lang], tbl[5], tbl[6]);
 
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char**) tbl);
     return(0);
 }
 
-
-IMP_end_ctxt()
+int IMP_end_ctxt()
 {
     fclose(TXT_fd);
     TXT_fd = NULL;
     return(0);
 }
 
-
-
 IMPDEF IMP_TXT_CMT = {
-    NULL,
-    0,
-    IMP_hd_ctxt,
-    IMP_vec_ctxt,
-    NULL,
-    IMP_end_ctxt
+    NULL,           // imp_keys
+    0,              // imp_dim
+    IMP_hd_ctxt,    // imp_hd_fn
+    NULL,           // imp_hd_sample_fn
+    NULL,           // imp_vec_var_fn
+    IMP_vec_ctxt,   // imp_vec_cmt_fn
+    NULL,           // imp_elem_fn           
+    IMP_end_ctxt    // imp_end_fn
 };
-
-
-
-
-
-
-
-

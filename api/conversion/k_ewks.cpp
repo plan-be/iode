@@ -44,25 +44,21 @@ int EXP_hd_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
     return(0);
 }
 
-int EXP_end_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc)
+int EXP_end_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     wks_end();
     return(0);
 }
 
-
-char    *EXP_code_wks(name, code)
-char    *name, **code;
+char* EXP_code_wks(char* name, char** code)
 {
     wks_string(name, WKS_COL, WKS_ROW);
     WKS_COL ++;
-    *code = SCR_stracpy(name);
+    *code = (char*) SCR_stracpy((unsigned char*) name);
     return(*code);
 }
 
-char    *EXP_cmt_wks(dbc, name, cmt)
-KDB     *dbc;
-char    *name, **cmt;
+char* EXP_cmt_wks(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
@@ -74,10 +70,7 @@ char    *name, **cmt;
     return(*cmt = NULL);
 }
 
-char    *EXP_elem_wks(dbv, nb, t, vec)
-KDB     *dbv;
-int     nb;
-char    **vec;
+char* EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)
 {
     char    *buf = NULL;
 
@@ -87,9 +80,7 @@ char    **vec;
     return(*vec = NULL);
 }
 
-int EXP_vec_wks(expdef, code, cmt, vec)
-EXPDEF  *expdef;
-char    *code, *cmt, *vec;
+int EXP_vec_wks(EXPDEF* expdef, char* code, char* cmt, char* vec)
 {
     wks_name(code, 3, WKS_ROW, WKS_COL, WKS_ROW);
     WKS_ROW ++;
@@ -98,13 +89,12 @@ char    *code, *cmt, *vec;
 }
 
 EXPDEF EXPWKS = {
-    EXP_hd_wks,
-
-    EXP_code_wks,
-    EXP_cmt_wks,
-    EXP_elem_wks,
-    EXP_vec_wks,
-
-    EXP_end_wks,
-    NULL
+    EXP_hd_wks,         // exp_hd_fn
+    EXP_code_wks,       // exp_code_fn
+    EXP_cmt_wks,        // exp_cmt_fn
+    EXP_elem_wks,       // exp_elem_fn
+    NULL,               // exp_vec_fn
+    EXP_vec_wks,        // exp_vec_var_fn
+    EXP_end_wks,        // exp_end_fn
+    NULL                // exp_fd
 };
