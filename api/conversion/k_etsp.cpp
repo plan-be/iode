@@ -43,10 +43,7 @@
 #include "api/conversion/export.h"
 
 
-int EXP_hd_tsp(expdef, dbv, dbc, outfile)
-EXPDEF  *expdef;
-KDB     *dbv, *dbc;
-char    *outfile;
+int EXP_hd_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int     freq;
 
@@ -77,39 +74,33 @@ char    *outfile;
     return(0);
 }
 
-int EXP_end_tsp(expdef, dbv, dbc)
-EXPDEF  *expdef;
-KDB     *dbv, *dbc;
+int EXP_end_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
+    fprintf(expdef->exp_fd, " ;\n");
+    fprintf(expdef->exp_fd, "END\n");
     fclose(expdef->exp_fd);
     return(0);
 }
 
-char    *EXP_code_tsp(name, code)
-char    *name, **code;
+char* EXP_code_tsp(char* name, char** code)
 {
     return(EXP_addprepost("LOAD ", " ;\n", name, code));
 }
 
-char    *EXP_cmt_tsp(dbc, name, cmt)
-KDB     *dbc;
-char    *name, **cmt;
+char* EXP_cmt_tsp(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
     pos = K_find(dbc, name);
     if(pos >= 0)  
-        *cmt = SCR_stracpy((char *)KCVAL(dbc, pos));
+        *cmt = (char*) SCR_stracpy((unsigned char*) KCVAL(dbc, pos));
     else 
-        *cmt = SCR_stracpy(" ");
+        *cmt = (char*) SCR_stracpy((unsigned char*) " ");
     
     return(*cmt);
 }
 
-char    *EXP_elem_tsp(dbv, nb, t, vec)
-KDB     *dbv;
-int     nb;
-char    **vec;
+char* EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
@@ -120,42 +111,39 @@ char    **vec;
 
     if(*vec == NULL) olg = 0;
     else olg = (int)strlen(*vec);
-    *vec = SW_nrealloc(*vec, olg, olg + lg);
+    *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
     return(*vec);
 }
 
-int EXP_vec_tsp(expdef, code, cmt, vec)
-EXPDEF  *expdef;
-char    *code, *cmt, *vec;
+int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)
 {
     int     i;
     char    **text;
 
     fprintf(expdef->exp_fd, "%s \n", code);
     if(cmt) { /* JMP 04-03-99 */
-        text = SCR_text(cmt, " ", 75);
+        text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
         for(i = 0; text[i]; i++)  fprintf(expdef->exp_fd, "? %s\n", text[i]);
-        SCR_free_tbl(text);
+        SCR_free_tbl((unsigned char**) text);
     }
 
-    text = SCR_text(vec, " ", 80);
+    text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
     for(i = 0; text[i]; i++)  fprintf(expdef->exp_fd, "%s\n", text[i]);
-    fprintf(expdef->exp_fd, " ; \n");
-    SCR_free_tbl(text);
+    fprintf(expdef->exp_fd, " ;\n");
+    SCR_free_tbl((unsigned char**) text);
     return(0);
 }
 
 EXPDEF EXPTSP = {
-    EXP_hd_tsp,
-
-    EXP_code_tsp,
-    EXP_cmt_tsp,
-    EXP_elem_tsp,
-    EXP_vec_tsp,
-
-    EXP_end_tsp,
-    NULL
+    EXP_hd_tsp,     // exp_hd_fn
+    EXP_code_tsp,   // exp_code_fn
+    EXP_cmt_tsp,    // exp_cmt_fn
+    EXP_elem_tsp,   // exp_elem_fn
+    NULL,           // exp_vec_fn
+    EXP_vec_tsp,    // exp_vec_var_fn
+    EXP_end_tsp,    // exp_end_fn
+    NULL            // exp_fd
 };

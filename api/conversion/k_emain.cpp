@@ -123,12 +123,12 @@ static void EXP_set(char* na, char* sep)
 {
     //strcpy(EXP_SEP, sep);
     //strcpy(EXP_NA, na);
-    SCR_strlcpy(EXP_SEP, sep, sizeof(EXP_SEP) - 1);     // JMP 31/08/2022
-    SCR_strlcpy(EXP_NA, na, sizeof(EXP_NA) - 1);
+    SCR_strlcpy((unsigned char*) EXP_SEP, (unsigned char*) sep, sizeof(EXP_SEP) - 1);     // JMP 31/08/2022
+    SCR_strlcpy((unsigned char*) EXP_NA, (unsigned char*) na, sizeof(EXP_NA) - 1);
     
-    SCR_strip(EXP_SEP);
+    SCR_strip((unsigned char*) EXP_SEP);
     if(EXP_SEP[0] == 0) strcpy(EXP_SEP, " ");
-    SCR_strip(EXP_NA);
+    SCR_strip((unsigned char*) EXP_NA);
     if(EXP_NA[0] == 0) strcpy(EXP_NA, "#N/A");
 }
 
@@ -144,8 +144,8 @@ static void EXP_set(char* na, char* sep)
 void EXP_val(char* tmp, double val)
 {
     if(IODE_IS_A_NUMBER(val)) {
-        SCR_fmt_dbl(val, tmp, 20, -1);
-        SCR_sqz(tmp);
+        SCR_fmt_dbl(val, (unsigned char*) tmp, 20, -1);
+        SCR_sqz((unsigned char*) tmp);
     }
     else strcpy(tmp, EXP_NA);
 }
@@ -164,8 +164,8 @@ char *EXP_addprepost(char* pre, char* post, char* src, char** tg)
 {
     char    *buf = NULL;
 
-    buf = SCR_stracpy(src);
-    SCR_strip(buf);
+    buf = (char*) SCR_stracpy((unsigned char*) src);
+    SCR_strip((unsigned char*) buf);
     *tg = SW_nalloc((int)strlen(buf) +
                     (pre == NULL ? 0 : (int)strlen(pre)) +
                     (post == NULL ? 0 : (int)strlen(post)) + 1);
@@ -233,7 +233,7 @@ int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, ch
 
         if(expdef->exp_code_fn != NULL)
             (*(expdef->exp_code_fn))(oname, &code);
-        else code = SCR_stracpy(oname);
+        else code = (char*) SCR_stracpy((unsigned char*) oname);
 
         if(expdef->exp_cmt_fn != NULL && dbc != NULL)
             (*(expdef->exp_cmt_fn))(dbc, iname, &cmt) ;
@@ -242,8 +242,8 @@ int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, ch
             for(j = 0; j < dim; j++)
                 (*(expdef->exp_elem_fn))(dbv, i, j, &vec);
 
-        if(expdef->exp_vec_fn != NULL)
-            (*(expdef->exp_vec_fn))(expdef, code, cmt, vec);
+        if(expdef->exp_vec_var_fn != NULL)
+            (*(expdef->exp_vec_var_fn))(expdef, code, cmt, vec);
 
         SW_nfree(code);
         code = NULL;
@@ -285,8 +285,8 @@ int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile
     nl = KSMPL(dbv)->s_nb;
     nc = KNB(dbv);
 
-    if(expdef->exp_vec_fn != NULL)
-        (*(expdef->exp_vec_fn))(expdef, EXP_SEP, 0L, 0L);
+    if(expdef->exp_vec_var_fn != NULL)
+        (*(expdef->exp_vec_var_fn))(expdef, EXP_SEP, 0L, 0L);
 
     for(i = 0; i < nc; i++) {
         strcpy(iname, KONAME(dbv, i));
@@ -294,20 +294,20 @@ int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile
 
         if(expdef->exp_code_fn != NULL)
             (*(expdef->exp_code_fn))(oname, &code);
-        else code = SCR_stracpy(oname);
-        if(expdef->exp_vec_fn != NULL)
-            (*(expdef->exp_vec_fn))(expdef, code, 0L, 0L);
+        else code = (char*) SCR_stracpy((unsigned char*) oname);
+        if(expdef->exp_vec_var_fn != NULL)
+            (*(expdef->exp_vec_var_fn))(expdef, code, 0L, 0L);
         SW_nfree(code);
         code = NULL;
     }
-    if(expdef->exp_vec_fn != NULL)
-        (*(expdef->exp_vec_fn))(expdef, 0L, 0L, 0L);
+    if(expdef->exp_vec_var_fn != NULL)
+        (*(expdef->exp_vec_var_fn))(expdef, 0L, 0L, 0L);
 
     for(j = 0; j < nl; j++) {
         sprintf(oname, "%s%s",
                 PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), j), NULL), EXP_SEP);
-        if(expdef->exp_vec_fn != NULL)
-            (*(expdef->exp_vec_fn))(expdef, oname, 0L, 0L);
+        if(expdef->exp_vec_var_fn != NULL)
+            (*(expdef->exp_vec_var_fn))(expdef, oname, 0L, 0L);
 
         for(i = 0; i < nc; i++) {
             strcpy(iname, KONAME(dbv, i));
@@ -315,13 +315,13 @@ int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile
 
             if(expdef->exp_elem_fn != NULL)
                 (*(expdef->exp_elem_fn))(dbv, i, j, &code);
-            if(expdef->exp_vec_fn != NULL)
-                (*(expdef->exp_vec_fn))(expdef, code, 0L, 0L);
+            if(expdef->exp_vec_var_fn != NULL)
+                (*(expdef->exp_vec_var_fn))(expdef, code, 0L, 0L);
             SW_nfree(code);
             code = NULL;
         }
-        if(expdef->exp_vec_fn != NULL)
-            (*(expdef->exp_vec_fn))(expdef, 0L, 0L, 0L);
+        if(expdef->exp_vec_var_fn != NULL)
+            (*(expdef->exp_vec_var_fn))(expdef, 0L, 0L, 0L);
     }
 
     if(expdef->exp_end_fn != NULL
@@ -358,18 +358,19 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     EXPDEF  *expdef;
     int     rc = 0;
 
-    SCR_strip(trace);
-    SCR_strip(rule);
-    SCR_strip(out);
-    SCR_strip(vfile);
-    SCR_strip(cfile);
+    SCR_strip((unsigned char*) trace);
+    SCR_strip((unsigned char*) rule);
+    SCR_strip((unsigned char*) out);
+    SCR_strip((unsigned char*) vfile);
+    SCR_strip((unsigned char*) cfile);
 
-    SCR_strip(from);
-    SCR_strip(to);
+    SCR_strip((unsigned char*) from);
+    SCR_strip((unsigned char*) to);
     if(from[0] == 0 || to[0] == 0) smpl = NULL;
     else smpl = PER_atosmpl(from, to);
 
     if(trace[0] != 0) {
+        IMP_trace = 1;
         K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
@@ -402,7 +403,8 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     }
 
     if(cfile && cfile[0] != 0)
-        dbc = K_interpret(COMMENTS, cfile);    
+        dbc = K_interpret(COMMENTS, cfile); 
+       
     if(fmt < 4)
         rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */
     else

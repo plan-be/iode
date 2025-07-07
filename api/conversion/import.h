@@ -32,14 +32,19 @@ const static int IODE_NB_IMPORT_FORMATS = 8;
 
 /*---------------- STRUCTS ------------------ */
 
+// forward declaration
+struct _impdef_;
+
 // struct defining input file and fn pointers for one type of data format to be imported
 typedef struct _impdef_ {
-    YYKEYS  *imp_keys;          // Table of keywords (see YY group of functions in scr4 libs)
-    int     imp_dim;            // Nb of keys in imp_keys
-    int     (*imp_hd_fn)();     // Pointer to the fn to open the input file and to read its header
-    int     (*imp_vec_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
-    int     (*imp_elem_fn)();   // Pointer to the fn to read a single numerical value (a double)
-    int     (*imp_end_fn)();    // Pointer to the fn to close the input file
+    YYKEYS  *imp_keys;                                          // Table of keywords (see YY group of functions in scr4 libs)
+    int     imp_dim;                                            // Nb of keys in imp_keys
+    int     (*imp_hd_fn)(struct _impdef_*, char*, int);         // Pointer to the fn to open the input file and to read its header
+    int     (*imp_hd_sample_fn)(YYFILE*, SAMPLE*);              // Pointer to the fn to open the input file and to read its header
+    int     (*imp_vec_var_fn)(YYFILE*, char*, int, double*);    // Pointer to the fn to read full variable (i.e. a name + a series of values)
+    int     (*imp_vec_cmt_fn)(char*, char**);                   // Pointer to the fn to read full comment
+    int     (*imp_elem_fn)(YYFILE*, char*, int*, double*);      // Pointer to the fn to read a single numerical value (a double)
+    int     (*imp_end_fn)();                                    // Pointer to the fn to close the input file
 } IMPDEF;
 
 /*---------------- GLOBALS -------------------------*/

@@ -25,15 +25,14 @@
 #include "api/conversion/dif.h"
 #include "api/conversion/import.h"
 
+
 extern  YYKEYS  IMP_DIF_KEYS[];
 
 SAMPLE  BST_smpl;
 char    BST_freq;
 int     BST_nbper;
 
-int IMP_hd_bst(yy, smpl)
-YYFILE  *yy;
-SAMPLE  *smpl;
+int IMP_hd_bst(YYFILE* yy, SAMPLE* smpl)
 {
     double  value;
 
@@ -60,11 +59,7 @@ SAMPLE  *smpl;
 }
 
 
-int IMP_elem_bst(yy, name, shift, vector)
-YYFILE  *yy;
-char    *name;
-int     *shift;
-double    *vector;
+int IMP_elem_bst(YYFILE* yy, char* name, int* shift, double* vector)
 {
     char    buf[21], *str = NULL;
     long    y, s, nbper;
@@ -73,7 +68,7 @@ double    *vector;
 
     while(1) {
         if(DIF_cell(yy, &str, NULL) < 0) return(-1);
-        SCR_strlcpy(name, str, 79); /* JMP 13-02-2013 */
+        SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
 
         if(DIF_cell(yy, NULL, &value) < 0) return(-1);
         nbper = (long)floor(value);
@@ -103,12 +98,14 @@ double    *vector;
 }
 
 IMPDEF IMP_BST = {
-    IMP_DIF_KEYS,
-    8,
-    IMP_hd_bst,
-    NULL,
-    IMP_elem_bst,
-    NULL
+    IMP_DIF_KEYS,       // imp_keys
+    8,                  // imp_dim
+    NULL,               // imp_hd_fn
+    IMP_hd_bst,         // imp_hd_sample_fn
+    NULL,               // imp_vec_var_fn
+    NULL,               // imp_vec_cmt_fn
+    IMP_elem_bst,       // imp_elem_fn
+    NULL                // imp_end_fn
 };
 
 /* Cmt */
@@ -116,10 +113,7 @@ YYFILE  *FYY, *RYY, *SYY;
 KDB     *C_kdb = NULL;
 
 
-YYFILE  *IMP_open_bst(keys, dim, name, suffix)
-YYKEYS  *keys;
-int     dim;
-char    *name, *suffix;
+YYFILE* IMP_open_bst(YYKEYS* keys, int dim, char* name, char* suffix)
 {
     int     size;
     char    filename[K_MAX_FILE + 1];
@@ -132,10 +126,7 @@ char    *name, *suffix;
     return(YY_open(filename, keys, size, YY_FILE));
 }
 
-char    *IMP_addftr(cmt, rubr, lang)
-char    *cmt;
-long    rubr;
-int     lang;
+char* IMP_addftr(char* cmt, long rubr, int lang)
 {
     char    *fc = NULL, *nc = NULL, *ft;
     long    dummy, rub;
@@ -170,7 +161,7 @@ int     lang;
     }
 
     if(ft) {
-        cmt = SW_nrealloc(cmt, (int)strlen(cmt), (int)strlen(cmt) + (int)strlen(ft) + 5); /* JMP 07-04-98 */
+        cmt = (char*) SW_nrealloc(cmt, (int)strlen(cmt), (int)strlen(cmt) + (int)strlen(ft) + 5); /* JMP 07-04-98 */
         sprintf(cmt + strlen(cmt), " (%s) ", ft);
     }
 
@@ -180,8 +171,7 @@ int     lang;
     return(cmt);
 }
 
-IMP_hd_rbst(lang)
-int     lang;
+int IMP_hd_rbst(int lang)
 {
     char    *fc = NULL, *nc = NULL, *cmt = NULL; /* JMP 04-08-98 */
     long    dummy, rub, niv, ftr;
@@ -230,11 +220,10 @@ int     lang;
                 cmt = NULL;
                 break;
             case 1 :
-                cmt = SCR_stracpy(fc); /* JMP 04-08-98 */
+                cmt = (char*) SCR_stracpy((unsigned char*) fc); /* JMP 04-08-98 */
                 break;
-
             case 2 :
-                cmt = SCR_stracpy(nc); /* JMP 04-08-98 */
+                cmt = (char*) SCR_stracpy((unsigned char*) nc); /* JMP 04-08-98 */
                 break;
         }
 
@@ -251,12 +240,9 @@ int     lang;
     return(0);
 }
 
-IMP_hd_cbst(impdef, file, lang)
-IMPDEF  *impdef;
-char    *file;
-int     lang;
+int IMP_hd_cbst(IMPDEF* impdef, char* file, int lang)
 {
-    SCR_strip(file);
+    SCR_strip((unsigned char*) file);
     FYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "ftr.dif");
     RYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "rub.dif");
     SYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "ser.dif");
@@ -274,9 +260,7 @@ int     lang;
     return(0);
 }
 
-DIF_long(yy, l_val)
-YYFILE  *yy;
-long    *l_val;
+int DIF_long(YYFILE* yy, long* l_val)
 {
     double  d_val;
 
@@ -286,10 +270,7 @@ long    *l_val;
     return(0);
 }
 
-
-IMP_vec_cbst(name, cmt)
-char    *name;
-char    **cmt;
+int IMP_vec_cbst(char* name, char** cmt)
 {
     char    *str = NULL, *p_cmt[10];
     int     i, niv, r_niv, shift;
@@ -322,7 +303,7 @@ char    **cmt;
         r_niv = IMP_niv(KONAME(C_kdb, as1));
         if(niv == r_niv) {
             str = KOVAL(C_kdb, as1);
-            SCR_strfacpy(p_cmt + niv - 1, str);
+            SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
             niv --;
         }
@@ -336,7 +317,7 @@ char    **cmt;
             r_niv = IMP_niv(KONAME(C_kdb, as2));
             if(niv == r_niv) {
                 str = KOVAL(C_kdb, as2);
-                SCR_strfacpy(p_cmt + niv + shift - 1, str);
+                SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;
             }
 
@@ -344,7 +325,7 @@ char    **cmt;
         }
     }
 
-    *cmt = SCR_mtov(p_cmt, ' ');
+    *cmt = (char*) SCR_mtov((unsigned char**) p_cmt, (int) ' ');
 
     for(i = 0; i < 10 && p_cmt[i]; i++) {
         SCR_free(p_cmt[i]);
@@ -354,22 +335,21 @@ char    **cmt;
     return(0);
 }
 
-int IMP_niv(name)
-char    *name;
+int IMP_niv(char* name)
 {
     int     pos, niv;
     ONAME   oname;
     char    *str;
 
     strcpy(oname, name);
-    pos = U_pos('_', oname);
+    pos = U_pos('_', (unsigned char*) oname);
     str = oname + pos + 1;
     niv = atoi(str);
 
     return(niv);
 }
 
-IMP_end_cbst()
+int IMP_end_cbst()
 {
     K_free(C_kdb);
     YY_close(SYY);
@@ -377,22 +357,13 @@ IMP_end_cbst()
     return(0);
 }
 
-
-
-
 IMPDEF IMP_BST_CMT = {
-    IMP_DIF_KEYS,
-    8,
-    IMP_hd_cbst,
-    IMP_vec_cbst,
-    NULL,
-    IMP_end_cbst
+    IMP_DIF_KEYS,       // imp_keys
+    8,                  // imp_dim
+    IMP_hd_cbst,        // imp_hd_fn
+    NULL,               // imp_hd_sample_fn
+    NULL,               // imp_vec_var_fn
+    IMP_vec_cbst,       // imp_vec_cmt_fn
+    NULL,               // imp_elem_fn
+    IMP_end_cbst        // imp_end_fn
 };
-
-
-
-
-
-
-
-

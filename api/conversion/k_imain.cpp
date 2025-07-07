@@ -26,7 +26,7 @@
  *         YYKEYS  *imp_keys;          // Table of keywords (see YY group of functions in scr4 libs)
  *         int     imp_dim;            // Nb of keys in imp_keys 
  *         int     (*imp_hd_fn)();     // Pointer to the fn to open the input file and to read its header
- *         int     (*imp_vec_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
+ *         int     (*imp_vec_var_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
  *         int     (*imp_elem_fn)();   // Pointer to the fn to read a single numerical value (a double)
  *         int     (*imp_end_fn)();    // Pointer to the fn to close the input file
  *     } IMPDEF;
@@ -52,6 +52,11 @@
 #include "api/objs/variables.h"
 #include "api/write/write.h"
 #include "api/conversion/import.h"
+
+static int compare(const void *a, const void *b)
+{
+    return YY_strcmp((char*) a, (char*) b);
+}
 
 /**
  *  Interprets an ASCII file containing VAR definitions and returns a new allocated KDB of vars (or NULL on error). 
@@ -79,32 +84,32 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
     YY_CASE_SENSITIVE = 1;
     if(impdef->imp_keys != NULL) {
         size = impdef->imp_dim;
-        qsort(impdef->imp_keys, size, sizeof(YYKEYS), YY_strcmp);
+        qsort(impdef->imp_keys, size, sizeof(YYKEYS), compare);
     }
     else size = 0;
 
-    SCR_strip(vecfile);
+    SCR_strip((unsigned char*) vecfile);
     yy = YY_open(vecfile, impdef->imp_keys, size, YY_FILE);
     if(yy == 0) {
         kerror(0,"Cannot open '%s'", vecfile);
         return(kdb);
     }
 
-    if(impdef->imp_hd_fn != NULL
-            && (*(impdef->imp_hd_fn))(yy, smpl) < 0) goto err;
+    if(impdef->imp_hd_sample_fn != NULL
+            && (*(impdef->imp_hd_sample_fn))(yy, smpl) < 0) goto err;
 
     kdb = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
     nb = smpl->s_nb;
 
-    if(impdef->imp_vec_fn != NULL) {
+    if(impdef->imp_vec_var_fn != NULL) {
         vector = (double *) SW_nalloc(nb * sizeof(double));
         if(vector == NULL) goto err;
 
         while(1) {
             for(i = 0; i < nb; i++) vector[i] = IODE_NAN;
 
-            if((*(impdef->imp_vec_fn))(yy, iname, nb, vector) < 0) break;
+            if((*(impdef->imp_vec_var_fn))(yy, iname, nb, vector) < 0) break;
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
@@ -185,7 +190,7 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
     YY_CASE_SENSITIVE = 1;
     if(impdef->imp_keys != NULL) {
         size = impdef->imp_dim;
-        qsort(impdef->imp_keys, size, sizeof(YYKEYS), YY_strcmp);
+        qsort(impdef->imp_keys, size, sizeof(YYKEYS), compare);
     }
     else size = 0;
 
@@ -194,10 +199,10 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
 
     kdb = K_create(COMMENTS, ASIS_CASE);
 
-    if(impdef->imp_vec_fn != NULL) {
+    if(impdef->imp_vec_cmt_fn != NULL) {
 
         while(1) {
-            if((*(impdef->imp_vec_fn))(iname, &cmt) < 0) break;
+            if((*(impdef->imp_vec_cmt_fn))(iname, &cmt) < 0) break;
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) {
                 SW_nfree(cmt);
@@ -206,7 +211,7 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
 
             if(SW_BLKS[7].blk_space > 100000L) Debug("CMT:%s\n", oname);
             kmsg("Reading object %d : %s", ++cmpt, oname);
-            SCR_strip(cmt);
+            SCR_strip((unsigned char*) cmt);
             if(K_add(kdb, oname, cmt) < 0)
                 kerror(0, "Unable to create '%s'", oname);
             SW_nfree(cmt);
@@ -241,10 +246,10 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     KDB     *kdb;
     IMPDEF  *impdef;
 
-    SCR_strip(trace);
-    SCR_strip(rule);
-    SCR_strip(ode);
-    SCR_strip(asc);
+    SCR_strip((unsigned char*) trace);
+    SCR_strip((unsigned char*) rule);
+    SCR_strip((unsigned char*) ode);
+    SCR_strip((unsigned char*) asc);
 
     if(trace[0] != 0) {
         IMP_trace = 1;
@@ -312,10 +317,10 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     KDB     *kdb;
     IMPDEF  *impdef;
 
-    SCR_strip(trace);
-    SCR_strip(rule);
-    SCR_strip(ode);
-    SCR_strip(asc);
+    SCR_strip((unsigned char*) trace);
+    SCR_strip((unsigned char*) rule);
+    SCR_strip((unsigned char*) ode);
+    SCR_strip((unsigned char*) asc);
 
     if(trace[0] != 0) {
         IMP_trace = 1;
@@ -355,8 +360,8 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
              
     }
 
-    SCR_strip(from);
-    SCR_strip(to);
+    SCR_strip((unsigned char*) from);
+    SCR_strip((unsigned char*) to);
     if(from[0] == 0 || to[0] == 0)
         smpl = (SAMPLE *) SW_nalloc(sizeof(SAMPLE));
     else smpl = PER_atosmpl(from, to);

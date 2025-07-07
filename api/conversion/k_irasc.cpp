@@ -24,7 +24,7 @@
 
 
 YYKEYS IMP_RASC_KEYS[] = {
-    "sample",   ASC_SMPL
+    (unsigned char*) "sample",   ASC_SMPL
 };
 
 char    **RASC_toc = NULL;  // List of VARs in the rotated ASCII file (following the sample defn).
@@ -54,14 +54,14 @@ int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)
     while(!done) {
         switch(YY_lex(yy)) {
             case YY_EOF :
-                SCR_free_tbl(RASC_toc);
+                SCR_free_tbl((unsigned char**) RASC_toc);
                 RASC_toc = 0;
                 return(-1);
             case YY_WORD :
-                SCR_add_ptr(&RASC_toc, &nbtoc, yy->yy_text);
+                SCR_add_ptr((unsigned char***) &RASC_toc, &nbtoc, yy->yy_text);
                 break;
             default :
-                SCR_add_ptr(&RASC_toc, &nbtoc, NULL);
+                SCR_add_ptr((unsigned char***) &RASC_toc, &nbtoc, NULL);
                 YY_unread(yy);
                 done = 1;
                 break;
@@ -92,7 +92,7 @@ int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)
     if(YY_lex(yy) == YY_EOF) return(-1);
     else YY_unread(yy);
 
-    if(RASC_cv >= SCR_tbl_size(RASC_toc)) {
+    if(RASC_cv >= SCR_tbl_size((unsigned char**) RASC_toc)) {
         RASC_cv = 0;
         RASC_cy ++;
         *shift = RASC_cy;
@@ -113,17 +113,19 @@ int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)
  */
 int IMP_end_rasc()
 {
-    SCR_free_tbl(RASC_toc);
+    SCR_free_tbl((unsigned char**) RASC_toc);
     RASC_toc = 0;
     RASC_cv = RASC_cy = 0;
     return(0);
 }
 
 IMPDEF IMP_RASC = {
-    IMP_RASC_KEYS,
-    1,
-    IMP_hd_rasc,
-    NULL,
-    IMP_elem_rasc,
-    IMP_end_rasc
+    IMP_RASC_KEYS,      // imp_keys
+    1,                  // imp_dim
+    NULL,               // imp_hd_fn
+    IMP_hd_rasc,        // imp_hd_sample_fn
+    NULL,               // imp_vec_var_fn
+    NULL,               // imp_vec_cmt_fn
+    IMP_elem_rasc,      // imp_elem_fn
+    IMP_end_rasc        // imp_end_fn
 };

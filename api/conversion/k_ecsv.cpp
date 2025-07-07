@@ -38,6 +38,7 @@
 #include "api/objs/variables.h"
 #include "api/conversion/export.h"
 
+
 /**
  *  Opens and initialise a CSV file.
  *  
@@ -67,7 +68,6 @@ int EXP_hd_csv(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)
     return(0);
 }
 
-
 /**
  *  Saves the footer and closes the CSV export files.
  *  
@@ -76,12 +76,13 @@ int EXP_hd_csv(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)
  *  @param [in] KDB*    dbc         CMT KDB
  *  @return     int                 0 always
  */
-int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc)
+int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
+    // No footer needed for CSV output
+    fprintf(expdef->exp_fd, "\n");
     fclose(expdef->exp_fd);
     return(0);
 }
-
 
 /**
  *  Variable name translation for CSV output.
@@ -94,7 +95,6 @@ char *EXP_code_csv(char* name, char** code)
 {
     return(EXP_addsep(name, code));
 }
-
 
 /**
  *  Creates the CMT text + separator for CSV output. If the comment does not exist, it is replaced by an empty string.
@@ -110,13 +110,12 @@ char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)
 
     pos = K_find(dbc, name);
     if(pos >= 0)  {
-        ccmt = KCVAL(dbc, pos);        /* JMP 19-09-96 */
-        SCR_replace(ccmt, "\n", " ");  /* JMP 19-09-96 */
-        return(EXP_addsep(ccmt, cmt)); /* JMP 19-09-96 */
+        ccmt = (unsigned char*) KCVAL(dbc, pos);        /* JMP 19-09-96 */
+        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 19-09-96 */
+        return(EXP_addsep((char*) ccmt, cmt)); /* JMP 19-09-96 */
     }
     else return(EXP_addsep("", cmt));
 }
-
 
 /**
  *  Adds one element of a VAR (KDB[nb][t]) to the vector *vec of the series in CSV format. 
@@ -138,7 +137,7 @@ char *EXP_elem_csv(KDB* dbv, int nb, int t, char** vec)
 
     if(*vec == NULL) olg = 0;
     else olg = (int)strlen(*vec);
-    *vec = SW_nrealloc(*vec, olg, olg + lg);
+    *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
@@ -165,15 +164,14 @@ int EXP_vec_csv(EXPDEF* expdef, char* code, char* cmt, char* vec)
 
 // Exportation functions for CSV output
 EXPDEF EXPCSV = {
-    EXP_hd_csv,
-
-    EXP_code_csv,
-    EXP_cmt_csv,
-    EXP_elem_csv,
-
-    EXP_vec_csv,
-    EXP_end_csv,
-    NULL
+    EXP_hd_csv,     // exp_hd_fn
+    EXP_code_csv,   // exp_code_fn
+    EXP_cmt_csv,    // exp_cmt_fn
+    EXP_elem_csv,   // exp_elem_fn
+    NULL,           // exp_vec_fn
+    EXP_vec_csv,    // exp_vec_var_fn
+    EXP_end_csv,    // exp_end_fn
+    NULL            // exp_fd
 };
 
 
@@ -212,15 +210,12 @@ int EXP_vec_rcsv(EXPDEF* expdef, char* code, char* cmt, char* vec)
 }
 
 EXPDEF EXPRCSV = {
-    EXP_hd_rcsv,
-
-    EXP_code_csv,
-    EXP_cmt_csv,
-    EXP_elem_rcsv,
-    EXP_vec_rcsv,
-
-    EXP_end_csv,
-    NULL
+    EXP_hd_rcsv,        // exp_hd_fn
+    EXP_code_csv,       // exp_code_fn
+    EXP_cmt_csv,        // exp_cmt_fn
+    EXP_elem_rcsv,      // exp_elem_fn
+    NULL,               // exp_vec_fn
+    EXP_vec_rcsv,       // exp_vec_var_fn
+    EXP_end_csv,        // exp_end_fn
+    NULL                // exp_fd
 };
-
-

@@ -53,7 +53,7 @@ int IMP_readrule(char* filename)
 
     if(filename == NULL) goto done;
 
-    SCR_strip(filename);
+    SCR_strip((unsigned char*) filename);
     if(filename[0] == 0) goto done;
 
     fd = fopen(filename, "r");
@@ -69,31 +69,31 @@ int IMP_readrule(char* filename)
             if(isspace(buf[blen - 1])) buf[blen - 1] = '\0';
             else break;
         }
-        tbl = SCR_vtoms(buf, " \t");
-        if(SCR_tbl_size(tbl) != 2) {
-            SCR_free_tbl(tbl);
+        tbl = (char**) SCR_vtoms((unsigned char*) buf, (unsigned char*) " \t");
+        if(SCR_tbl_size((unsigned char**) tbl) != 2) {
+            SCR_free_tbl((unsigned char**) tbl);
             continue;
         }
 
-        SCR_add_ptr(&IMP_pat, &nbp, tbl[0]);
-        SCR_add_ptr(&IMP_rule, &nbr, tbl[1]);
-        SCR_free_tbl(tbl);
+        SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, (unsigned char*) tbl[0]);
+        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) tbl[1]);
+        SCR_free_tbl((unsigned char**) tbl);
     }
 
 done:
     if(nbr == 0 || (nbr != nbp)) {
-        SCR_free_tbl(IMP_pat);
-        SCR_free_tbl(IMP_rule);
+        SCR_free_tbl((unsigned char**) IMP_pat);
+        SCR_free_tbl((unsigned char**) IMP_rule);
         IMP_pat  = IMP_rule = NULL;
         nbp = nbr = 0;
-        SCR_add_ptr(&IMP_pat,  &nbp, "*");
+        SCR_add_ptr((unsigned char***) &IMP_pat,  &nbp, (unsigned char*) "*");
         // SCR_add_ptr(&IMP_rule, &nbr, "++++++++++");
-        SCR_add_ptr(&IMP_rule, &nbr, "++++++++++++++++++++"); /* JMP 11-08-11 */
+        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) "++++++++++++++++++++"); /* JMP 11-08-11 */
     }
 
     if(fd) fclose(fd);
-    SCR_add_ptr(&IMP_pat, &nbp, NULL);
-    SCR_add_ptr(&IMP_rule, &nbr, NULL);
+    SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, NULL);
+    SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, NULL);
     return(0);
 }
 
@@ -112,7 +112,7 @@ static int IMP_grep(char** rule, char* in)
 {
     int i, rc = -1;
 
-    for(i = 0; i < SCR_tbl_size(rule); i++) {
+    for(i = 0; i < SCR_tbl_size((unsigned char**) rule); i++) {
         rc = SCR_grep(rule[i], in, 0);
         if(rc == 0) return(i);
     }

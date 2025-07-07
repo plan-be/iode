@@ -83,7 +83,7 @@ int EXP_hd_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
     return(0);
 }
 
-int EXP_end_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc)
+int EXP_end_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     fprintf(expdef->exp_fd, "-1,0\nEOD\n");
     fclose(expdef->exp_fd);
@@ -109,7 +109,7 @@ char *EXP_cmt_dif(KDB* dbc, char* name, char **cmt)
         return(EXP_addprepost("1,0\n\"", "\"\n", "", cmt));
 }
 
-char *EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)
+char* EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
@@ -120,7 +120,7 @@ char *EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)
 
     if(*vec == NULL) olg = 0;
     else olg = (int)strlen(*vec);
-    *vec = SW_nrealloc(*vec, olg, olg + lg);
+    *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
@@ -134,15 +134,14 @@ int EXP_vec_dif(EXPDEF* expdef, char* code, char* cmt, char* vec)
 }
 
 EXPDEF EXPDIF = {
-    EXP_hd_dif,
-
-    EXP_code_dif,
-    EXP_cmt_dif,
-    EXP_elem_dif,
-    EXP_vec_dif,
-
-    EXP_end_dif,
-    NULL
+    EXP_hd_dif,     // exp_hd_fn
+    EXP_code_dif,   // exp_code_fn
+    EXP_cmt_dif,    // exp_cmt_fn
+    EXP_elem_dif,   // exp_elem_fn
+    NULL,           // exp_vec_fn
+    EXP_vec_dif,    // exp_vec_var_fn
+    EXP_end_dif,    // exp_end_fn
+    NULL            // exp_fd
 };
 
 

@@ -23,15 +23,19 @@ const static int IODE_NB_EXPORT_FORMATS = 5;
 
 /*---------------- STRUCTS ------------------ */
 
+// forward declaration
+struct _expdef_;
+
 // struct defining output File descriptor and fn pointers for one type of data format to export
 typedef struct _expdef_ {
-    int     (*exp_hd_fn)();     // Pointer to the function that creates the output file and writes the header
-    char    *(*exp_code_fn)();  // Pointer to the function to create the output object name + the separator
-    char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file
-    char    *(*exp_elem_fn)();  // Pointer to the function constructing an allocated string of one value + sep
-    int     (*exp_vec_fn)();    // Pointer to the function saving the VAR and CMT in the output file
-    int     (*exp_end_fn)();    // Pointer to the function that closes the output file after having written its footer
-    FILE    *exp_fd;            // Output file descriptor (output of fopen)
+    int     (*exp_hd_fn)(struct _expdef_*, KDB*, KDB*, char*);          // Pointer to the function that creates the output file and writes the header
+    char    *(*exp_code_fn)(char*, char**);                             // Pointer to the function to create the output object name + the separator
+    char    *(*exp_cmt_fn)(KDB*, char*, char**);                        // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file
+    char    *(*exp_elem_fn)(KDB*, int, int, char**);                    // Pointer to the function constructing an allocated string of one value + sep
+    int     (*exp_vec_fn)(struct _expdef_*, char*, int, int);           // Pointer to the function saving the VAR and CMT in the output file
+    int     (*exp_vec_var_fn)(struct _expdef_*, char*, char*, char*);   // Pointer to the function saving the VAR and CMT in the output file
+    int     (*exp_end_fn)(struct _expdef_*, KDB*, KDB*, char*);         // Pointer to the function that closes the output file after having written its footer
+    FILE    *exp_fd;                                                    // Output file descriptor (output of fopen)
 } EXPDEF;
 
 /*---------------- GLOBALS ------------------ */
