@@ -214,7 +214,7 @@ extern "C" {
 
 // WARNING: the min and max macro make conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
+#if !defined(__GNUC__) && !defined(__cplusplus)
     #ifndef min
         #define min(a, b)   (((a) < (b)) ? (a) : (b))
     #endif
