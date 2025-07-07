@@ -442,6 +442,10 @@ generate_stub_files.py
 
 # C API
 /api/version.h
+/api/**/*.py
+
+# C++ API
+/cpp_api/**/*.py
 
 # PYTHON
 /pyiode/**/*.c
