@@ -566,7 +566,9 @@ cdef class Variables(CythonIodeDatabase):
 
     @classmethod
     def export_as_file(cls, variables_file: str, rule_file: str, save_file: str, export_format: int, from_period: str, to_period: str, 
-                       comments_file: str, nan_value: str='#N/A', separator: str=';', debug_file: str=None) -> int:
+                       comments_file: str, nan_value: str, separator: str, debug_file: str) -> int:
+        if debug_file is None:
+            debug_file = ''
         res = EXP_RuleExport(debug_file.encode('utf-8'), rule_file.encode('utf-8'), save_file.encode('utf-8'), 
                              variables_file.encode('utf-8'), comments_file.encode('utf-8'), 
                              from_period.encode('utf-8'), to_period.encode('utf-8'), nan_value.encode('utf-8'), 

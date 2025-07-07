@@ -7623,8 +7623,8 @@ class Variables(IodeDatabase):
         317 objects loaded     
         >>> # check content of the saved file
         >>> # note: no comment found for variables CGU, MU and NAWRU
-        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-        ...     print(f.read())
+        >>> with open(save_file, "r") as f:         
+        ...     print(f.read())                     # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...
         code;comment;2000Y1;2001Y1;2002Y1;2003Y1;2004Y1;2005Y1;2006Y1;2007Y1;2008Y1;2009Y1;2010Y1;
         KK_AF; Ondernemingen: ontvangen kapitaaloverdrachten.; 10.046611;...;-37.827429;
@@ -7638,8 +7638,8 @@ class Variables(IodeDatabase):
         UU_NAWRU; ; 0.14141811;...;0.13964585;
         UU_WBU; Totale loonmassa (inclusief werkgeversbijdragen).; 4922.5664;...;7072.7855;
         >>> # content of the debug file
-        >>> with open(debug_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE
-        ...     print(f.read())
+        >>> with open(debug_file, "r") as f:         
+        ...     print(f.read())                     # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...
         ACAF -> KK_AF       (Rule KK_--+++++++++++++)
         ACAG -> KK_AG       (Rule KK_--+++++++++++++)
@@ -7674,8 +7674,8 @@ class Variables(IodeDatabase):
         317 objects loaded 
         >>> # check content of the saved file
         >>> # warning: the comments file is not used for rotated CSV
-        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-        ...     print(f.read())
+        >>> with open(save_file, "r") as f:
+        ...     print(f.read())                 # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...
         ; KK_AF; KK_AG; UU_CGU; UU_DPU; UU_DPUU; UU_IFU; UU_IHU; UU_MU; UU_NAWRU; UU_WBU;
         2000Y1; 10.046611; -41.534787; ... 0.42001992; 0.14141811; 4922.5664;
@@ -7711,8 +7711,8 @@ class Variables(IodeDatabase):
         Reading object 317 : ZZ_
         317 objects loaded 
         >>> # check content of the saved file
-        >>> with open(save_file, "r") as f:         # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-        ...     print(f.read())
+        >>> with open(save_file, "r") as f:         
+        ...     print(f.read())                 # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         ...
         FREQ A;
         SMPL 2000 2010 ;
@@ -7721,59 +7721,62 @@ class Variables(IodeDatabase):
         ? Ondernemingen: ontvangen kapitaaloverdrachten.
         10.046611 2.8679227 -0.92921251 -6.091565 -14.582094 -26.53879 -28.987288
         -33.378426 -38.409518 -37.46351 -37.827429
-        ;
+         ;
         LOAD KK_AG ;
         <BLANKLINE>
         ? Totale overheid: netto ontvangen kapitaaloverdrachten.
         -41.534787 18.939801 19.980815 21.020502 22.066476 23.107962 24.129637
         25.160909 26.192111 27.229955 28.253929
-        ;
+         ;
         LOAD UU_CGU ;
         <BLANKLINE>
         1383.2586 1463.8679 1539.7198 1615.7986 1672.9449 1723.928 1787.6062 1873.3473
         1987.2756 2083.4747 2173.7682
-        ;
+         ;
         LOAD UU_DPU ;
         <BLANKLINE>
         ? Nominale afschrijvingen op de kapitaalvoorraad.
         953.60012 1007.4142 1056.9933 1101.323 1143.7441 1195.2886 1252.6131 1316.011
         1402.6103 1471.9715 1531.9025
-        ;
+         ;
         LOAD UU_DPUU ;
         <BLANKLINE>
         ? Nominale afschrijvingen op de kapitaalvoorraad (aangepast:
         ? inkomensoptiek).
         954.5012 1008.3662 1057.9921 1102.3636 1144.8248 1196.418 1253.7967 1317.2545
         1403.9357 1473.3624 1533.35
-        ;
+         ;
         LOAD UU_IFU ;
         <BLANKLINE>
         ? Bruto kapitaalvorming: ondernemingen.
         1076.1795 1136.1372 1150.8846 1197.4509 1277.7354 1399.6986 1490.8074 1562.3181
         1617.3543 1602.6872 1566.9738
-        ;
+         ;
         LOAD UU_IHU ;
         <BLANKLINE>
         ? Bruto kapitaalvorming: gezinnen.
         471.00145 486.53108 514.2291 552.55878 600.62646 634.63051 655.61486 671.66908
         665.98197 697.87295 726.93744
-        ;
+         ;
         LOAD UU_MU ;
         <BLANKLINE>
         0.42001992 0.40711156 0.39212964 0.37923534 0.36772624 0.35617242 0.34370718
         0.32978662 0.31416594 0.29691377 0.27826033
-        ;
+         ;
         LOAD UU_NAWRU ;
         <BLANKLINE>
         0.14141811 0.14138538 0.14125761 0.14106277 0.14083541 0.14059196 0.14034559
         0.1401158 0.13991636 0.13975922 0.13964585
-        ;
+         ;
         LOAD UU_WBU ;
         <BLANKLINE>
         ? Totale loonmassa (inclusief werkgeversbijdragen).
         4922.5664 5138.9458 5341.3233 5556.2476 5696.1652 5814.7965 6015.8951 6295.5108
         6650.3069 6861.5824 7072.7855
-        ;
+         ;
+         ;
+        END
+        <BLANKLINE>
         """
         variables_file = check_filepath(variables_file, IodeFileType.FILE_VARIABLES, file_must_exist=True)
         rule_file = check_filepath(rule_file, IodeFileType.FILE_ANY, file_must_exist=True)
