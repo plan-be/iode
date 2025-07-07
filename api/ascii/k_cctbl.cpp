@@ -12,7 +12,6 @@
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
 #include "api/objs/tables.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 
@@ -22,43 +21,43 @@
  */
 
 YYKEYS KT_TABLE[] = {
-    "BOLD",         TABLE_CELL_BOLD,
-    "UNDERLINE",    TABLE_CELL_UNDERLINE,
-    "CENTER",       TABLE_CELL_CENTER,
-    "DATE",         TABLE_ASCII_LINE_DATE,
-    "DECIMAL",      TABLE_CELL_DECIMAL,
-    "DIM",          TABLE_ASCII_DIM,
-    "DIV",          TABLE_ASCII_DIVIDER,
-    "DUTCH",        TABLE_ASCII_DUTCH,
-    "ENGLISH",      TABLE_ASCII_ENGLISH,
-    "FILES",        TABLE_ASCII_LINE_FILES,
-    "FRENCH",       TABLE_ASCII_FRENCH,
-    "ITALIC",       TABLE_CELL_ITALIC,
-    "LEC",          TABLE_ASCII_CELL_LEC,
-    "LEFT",         TABLE_CELL_LEFT,
-    "LINE",         TABLE_ASCII_LINE_SEP,
-    "LINE BOLD",    TABLE_ASCII_BOLD_LINE,
-    "MODE",         TABLE_ASCII_LINE_MODE,
-    "NORMAL",       TABLE_CELL_NORMAL,
-    "RIGHT",        TABLE_CELL_RIGHT,
-    "TITLE",        TABLE_ASCII_LINE_TITLE,
-    "{",            TABLE_ASCII_OPEN,
-    "}",            TABLE_ASCII_CLOSE,
-    "-",            TABLE_ASCII_BREAK, /* GB 2/3/2000 */
-    "YMIN",         TABLE_ASCII_YMIN,
-    "YMAX",         TABLE_ASCII_YMAX,
-    "ZMIN",         TABLE_ASCII_ZMIN,
-    "ZMAX",         TABLE_ASCII_ZMAX,
-    "XGRID",        TABLE_ASCII_XGRID,
-    "YGRID",        TABLE_ASCII_YGRID,
-    "BOX",          TABLE_ASCII_BOX,
-    "AXIS",         TABLE_ASCII_AXIS,
-    "ALIGN",        TABLE_ASCII_ALIGN,
-    "LAXIS",        TABLE_ASCII_LEFT_AXIS,
-    "RAXIS",        TABLE_ASCII_RIGHT_AXIS,
-    "GRLINE",       TABLE_ASCII_GRAPH_LINE,
-    "GRBAR",        TABLE_ASCII_GRAPH_BAR,
-    "GRSCATTER",    TABLE_ASCII_GRAPH_SCATTER
+    (unsigned char*) "BOLD",         TABLE_CELL_BOLD,
+    (unsigned char*) "UNDERLINE",    TABLE_CELL_UNDERLINE,
+    (unsigned char*) "CENTER",       TABLE_CELL_CENTER,
+    (unsigned char*) "DATE",         TABLE_ASCII_LINE_DATE,
+    (unsigned char*) "DECIMAL",      TABLE_CELL_DECIMAL,
+    (unsigned char*) "DIM",          TABLE_ASCII_DIM,
+    (unsigned char*) "DIV",          TABLE_ASCII_DIVIDER,
+    (unsigned char*) "DUTCH",        TABLE_ASCII_DUTCH,
+    (unsigned char*) "ENGLISH",      TABLE_ASCII_ENGLISH,
+    (unsigned char*) "FILES",        TABLE_ASCII_LINE_FILES,
+    (unsigned char*) "FRENCH",       TABLE_ASCII_FRENCH,
+    (unsigned char*) "ITALIC",       TABLE_CELL_ITALIC,
+    (unsigned char*) "LEC",          TABLE_ASCII_CELL_LEC,
+    (unsigned char*) "LEFT",         TABLE_CELL_LEFT,
+    (unsigned char*) "LINE",         TABLE_ASCII_LINE_SEP,
+    (unsigned char*) "LINE BOLD",    TABLE_ASCII_BOLD_LINE,
+    (unsigned char*) "MODE",         TABLE_ASCII_LINE_MODE,
+    (unsigned char*) "NORMAL",       TABLE_CELL_NORMAL,
+    (unsigned char*) "RIGHT",        TABLE_CELL_RIGHT,
+    (unsigned char*) "TITLE",        TABLE_ASCII_LINE_TITLE,
+    (unsigned char*) "{",            TABLE_ASCII_OPEN,
+    (unsigned char*) "}",            TABLE_ASCII_CLOSE,
+    (unsigned char*) "-",            TABLE_ASCII_BREAK, /* GB 2/3/2000 */
+    (unsigned char*) "YMIN",         TABLE_ASCII_YMIN,
+    (unsigned char*) "YMAX",         TABLE_ASCII_YMAX,
+    (unsigned char*) "ZMIN",         TABLE_ASCII_ZMIN,
+    (unsigned char*) "ZMAX",         TABLE_ASCII_ZMAX,
+    (unsigned char*) "XGRID",        TABLE_ASCII_XGRID,
+    (unsigned char*) "YGRID",        TABLE_ASCII_YGRID,
+    (unsigned char*) "BOX",          TABLE_ASCII_BOX,
+    (unsigned char*) "AXIS",         TABLE_ASCII_AXIS,
+    (unsigned char*) "ALIGN",        TABLE_ASCII_ALIGN,
+    (unsigned char*) "LAXIS",        TABLE_ASCII_LEFT_AXIS,
+    (unsigned char*) "RAXIS",        TABLE_ASCII_RIGHT_AXIS,
+    (unsigned char*) "GRLINE",       TABLE_ASCII_GRAPH_LINE,
+    (unsigned char*) "GRBAR",        TABLE_ASCII_GRAPH_BAR,
+    (unsigned char*) "GRSCATTER",    TABLE_ASCII_GRAPH_SCATTER
 };
 
 
@@ -109,7 +108,7 @@ static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
                     break;
                 }
                 T_free_cell(cell);
-                if(K_ipack(&(cell->tc_val), yy->yy_text) < 0)
+                if(K_ipack(&(cell->tc_val), (char*) yy->yy_text) < 0)
                     cell->tc_val = NULL;
                 cell->tc_type = TABLE_CELL_LEC;
                 align = TABLE_CELL_DECIMAL;
@@ -120,8 +119,8 @@ static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
                 ok = 1;
                 T_free_cell(cell);
                 /*            cell->tc_attr = TABLE_CELL_LEFT; */
-                if(U_is_in('#', yy->yy_text)) cell->tc_attr = TABLE_CELL_CENTER;
-                K_stracpy(&(cell->tc_val), yy->yy_text);
+                if(U_is_in('#', (char*) yy->yy_text)) cell->tc_attr = TABLE_CELL_CENTER;
+                K_stracpy(&(cell->tc_val), (char*) yy->yy_text);
                 cell->tc_type = TABLE_CELL_STRING;
                 break;
 
@@ -418,11 +417,11 @@ KDB *KT_load_asc(char* filename)
     YY_CASE_SENSITIVE = 1;
 
     if(sorted == 0) {
-        qsort(KT_TABLE, sizeof(KT_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
+        qsort(KT_TABLE, sizeof(KT_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), compare);
         sorted = 1;
     }
 
-    SCR_strip(filename);
+    SCR_strip((unsigned char*) filename);
     yy = YY_open(filename, KT_TABLE, sizeof(KT_TABLE) / sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
     if(yy == 0) {
@@ -447,7 +446,7 @@ KDB *KT_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 if((tbl = KT_read_tbl(yy)) == NULL) {
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
@@ -509,9 +508,7 @@ void KT_align(FILE* fd, int align)
  *  
  */
  
-static void KT_grinfo(fd, axis, type)
-FILE *fd;
-char axis, type;
+static void KT_grinfo(FILE *fd, int axis, int type)
 {
     if(axis == 0) fprintf(fd, " LAXIS ");
     else          fprintf(fd, " RAXIS ");

@@ -12,7 +12,6 @@
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/scalars.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 /**
@@ -99,7 +98,7 @@ KDB *KS_load_asc(char* filename)
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    SCR_strip(filename);
+    SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, NULL, 0, (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
 
     if(yy   == 0) {
@@ -123,7 +122,7 @@ KDB *KS_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 if(KS_read_scl(kdb, yy, name) == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;

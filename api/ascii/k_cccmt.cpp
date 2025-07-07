@@ -11,7 +11,6 @@
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/comments.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 /**
@@ -35,7 +34,7 @@ static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
 
     /* READ A STRING */
     keyw = YY_lex(yy);
-    if(keyw == YY_STRING) cmt = K_wrap(yy->yy_text, 60);
+    if(keyw == YY_STRING) cmt = K_wrap((char*) yy->yy_text, 60);
     else {
         cmt = SW_nalloc(1);
         cmt[0] = '\0';
@@ -97,7 +96,7 @@ KDB *KC_load_asc(char* filename)
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    SCR_strip(filename);
+    SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, NULL, 0, (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
 
     if(yy   == 0) {
@@ -123,7 +122,7 @@ KDB *KC_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 rc = KC_read_cmt(kdb, yy, name);
                 if(rc == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
@@ -169,7 +168,7 @@ int KC_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         cmt = KCVAL(kdb, i);
-        SCR_replace(cmt, "\n", " ");  /* JMP 31-10-96 */
+        SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
         SCR_fprintf_esc(fd, cmt, 1);
         fprintf(fd, "\n");
     }

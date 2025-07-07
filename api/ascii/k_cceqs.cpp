@@ -13,7 +13,6 @@
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
 #include "api/objs/equations.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 /**
@@ -22,28 +21,28 @@
  */
  
 YYKEYS KE_TABLE[] = {
-    "{",            EQ_ASCII_OPEN,
-    "}",            EQ_ASCII_CLOSE,
-    "BLOCK",        EQ_ASCII_BLK,
-    "COMMENT",      EQ_ASCII_CMT,
-    "DATE",         EQ_ASCII_DATE,
-    "INF",          EQ_ASCII_INF,
-    "INSTRUMENTS",  EQ_ASCII_INSTR,
-    "GLS",          EQ_ASCII_GLS,
-    "LSQ",          EQ_ASCII_LSQ,
-    "SAMPLE",       EQ_ASCII_SMPL,
-    "ZELLNER",      EQ_ASCII_ZEL,
-    "MAXLIK",       EQ_ASCII_MAXLIK,
+    (unsigned char*) "{",            EQ_ASCII_OPEN,
+    (unsigned char*) "}",            EQ_ASCII_CLOSE,
+    (unsigned char*) "BLOCK",        EQ_ASCII_BLK,
+    (unsigned char*) "COMMENT",      EQ_ASCII_CMT,
+    (unsigned char*) "DATE",         EQ_ASCII_DATE,
+    (unsigned char*) "INF",          EQ_ASCII_INF,
+    (unsigned char*) "INSTRUMENTS",  EQ_ASCII_INSTR,
+    (unsigned char*) "GLS",          EQ_ASCII_GLS,
+    (unsigned char*) "LSQ",          EQ_ASCII_LSQ,
+    (unsigned char*) "SAMPLE",       EQ_ASCII_SMPL,
+    (unsigned char*) "ZELLNER",      EQ_ASCII_ZEL,
+    (unsigned char*) "MAXLIK",       EQ_ASCII_MAXLIK,
 
-    "STDEV",        EQ_ASCII_STDEV,
-    "MEANY",        EQ_ASCII_MEANY,
-    "SSRES",        EQ_ASCII_SSRES,
-    "STDERR",       EQ_ASCII_STDERR,
-    "FSTAT",        EQ_ASCII_FSTAT,
-    "R2",           EQ_ASCII_R2,
-    "R2ADJ",        EQ_ASCII_R2ADJ,
-    "DW",           EQ_ASCII_DW,
-    "LOGLIK",       EQ_ASCII_LOGLIK
+    (unsigned char*) "STDEV",        EQ_ASCII_STDEV,
+    (unsigned char*) "MEANY",        EQ_ASCII_MEANY,
+    (unsigned char*) "SSRES",        EQ_ASCII_SSRES,
+    (unsigned char*) "STDERR",       EQ_ASCII_STDERR,
+    (unsigned char*) "FSTAT",        EQ_ASCII_FSTAT,
+    (unsigned char*) "R2",           EQ_ASCII_R2,
+    (unsigned char*) "R2ADJ",        EQ_ASCII_R2ADJ,
+    (unsigned char*) "DW",           EQ_ASCII_DW,
+    (unsigned char*) "LOGLIK",       EQ_ASCII_LOGLIK
 };
 
 
@@ -251,8 +250,8 @@ KDB *KE_load_asc(char* filename)
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
-    qsort(KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS), sizeof(YYKEYS), K_compare);
-    SCR_strip(filename);
+    qsort(KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS), sizeof(YYKEYS), compare_eqs);
+    SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
     if(yy == 0) {
@@ -278,15 +277,15 @@ KDB *KE_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 eq = KE_read_eq(yy);
                 if(eq == NULL) {
                     kerror(0, "%s : equation not defined", YY_error(yy));
                     goto err;
                 }
 
-                eq->endo = SCR_stracpy(name);
-                if(eq->blk == NULL) eq->blk = SCR_stracpy(name);
+                eq->endo = (char*) SCR_stracpy((unsigned char *) name);
+                if(eq->blk == NULL) eq->blk = (char*) SCR_stracpy((unsigned char *) name);
 
                 pos = K_add(kdb, name, eq, name);
                 if(pos < 0)  {
