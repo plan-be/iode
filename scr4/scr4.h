@@ -116,6 +116,10 @@
 #include <scr4_str.h>
 #include <scr4_rd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ======== ERROR ======================================= */
 
 #define     ERR_FATAL                   2
@@ -1444,11 +1448,6 @@ extern double  atof();
 
 #ifndef SCRSUPPROTO
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus*/
-
 /* s_wprint.c */
     int Wprintf(char *, ...);
     void Werror(char *,...);
@@ -1485,11 +1484,11 @@ extern "C" {
     int ACT_functions(int);
 
     extern char *SCR_HttpGetFile(char *, int , char *); 
+#endif /* SCRSUPPROTO */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* SCRSUPPROTO */
 
 #include <s_probas.h>
 #include <s_probis.h>
