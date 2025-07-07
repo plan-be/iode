@@ -1,6 +1,10 @@
 #ifndef _S_ISC_H_
 #define _S_ISC_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 SCRSTAT **ISC_dir(char *, int , char *, char *);
 SCRSTAT **ISC_dir_ex(char *, int , char *, char *, int);
 
@@ -25,5 +29,9 @@ extern int          ISC_NB_NEXTS;           /* JMP 08-12-00 */
 extern char         SCR_ISC_SEPS[];         /* JMP 26-09-02 */
 extern char         *SCR_ISC_LOGIN;         /* JMP 22-10-02 */
 extern int          SCR_ISC_ERRNO;          /* JMP 26-10-02 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _S_ISC_H_ */
