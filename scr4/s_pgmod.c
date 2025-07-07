@@ -13,7 +13,7 @@ PAGE    *pg;
 char    *edtxt;
 int     fld_nb;
 {
-#ifndef SCRCPP
+#ifndef __cplusplus
     extern long PG_fdate_to_long(), PG_ftime_to_long();
 #endif
     int     i;

@@ -1,7 +1,7 @@
 #include "scr.h"
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 FILE_TYPE *SCR_realloc_filetable(
 char    *filename,
@@ -57,7 +57,7 @@ end:
     return   : 0
    ======================================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 FILE_TYPE *SCR_add_flt_ptr(
 char    *filename,

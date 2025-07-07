@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -47,6 +47,6 @@ extern int U_hex_to_dec(char *buf);
 extern int U_octal_to_dec(char *buf);
 extern int YY_comment(YYFILE *yy);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -59,6 +59,6 @@ extern long DT_diff_date_time(long d2, long t2, long d1, long t1);
 extern long SCR_current_date();
 extern long SCR_current_time();
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

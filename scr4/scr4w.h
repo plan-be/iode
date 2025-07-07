@@ -91,7 +91,7 @@ typedef struct _WSCROLL_ {
     char     *data;
     int      cline, ccol, line, col;
     int      seltype, sellinefrom, selcolfrom, sellineto, selcolto;
-#ifdef SCRCPP
+#ifdef __cplusplus
     int      (*getnl)(_WSCROLL_ *);
     int      (*getnc)(_WSCROLL_ *);
     int      (*getwidth)(_WSCROLL_ *, int);
@@ -157,7 +157,7 @@ typedef struct _scrwin_ {
     int     sh_pgedit;      /* Internal loop PG_EDIT  */
     HMENU   sh_hmn;         /* Menu Handle   */
     HWND    sh_hwnd;        /* Window Handle */
-#ifdef SCRCPP
+#ifdef __cplusplus
     int     (*sh_fn)(HWND, void *, int);     /* Fn pointer    */
 #else
     int     (*sh_fn)();     /* Fn pointer    */
@@ -209,7 +209,7 @@ typedef struct _wddlg_ {
     int     **tabs;
     char    **ptrs;
     char    **exts;
-#ifdef SCRCPP
+#ifdef __cplusplus
     int     (**fns)(_wddlg_ *, int, char *, UINT);
     int     (*escfn)(_wddlg_ *);
     int     (*okfn)(_wddlg_ *);

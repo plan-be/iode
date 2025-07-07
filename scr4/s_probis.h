@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -454,6 +454,6 @@ extern CTINFO *IS_get_doda(char *filename,int mode);
 
 extern char *IS_get_tblname(ISAM *is);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

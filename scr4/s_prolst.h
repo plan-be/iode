@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -23,6 +23,6 @@ extern LST *LST_read_file(char *filename);
 extern int LST_save_file(char *filename,LST *lst);
 extern int LST_fwrite(FILE *fd,unsigned char *ptr);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

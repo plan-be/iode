@@ -57,12 +57,12 @@ extern int              TarDftNextFn(), TarDftTableFn();
 
 #else /* SCRPROTO */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 extern int              (*TarNextFn)(int);
 /*extern int              TarDftNextFn(int), TarDftTableFn(TARHEAD *); */
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 

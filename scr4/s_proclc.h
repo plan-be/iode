@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -70,6 +70,6 @@ extern double CALC_pi(void);
 extern double CALC_valreg(double *s);
 extern double CALC_reg(double *s);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

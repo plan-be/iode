@@ -32,7 +32,7 @@ U_ch **WscrCreateArgv(U_ch *CmdLine)
     return(argv);
 }
 
-#if !defined(SCRCPP) && !defined(GENPROTO)
+#if !defined(__cplusplus) && !defined(GENPROTO)
 
 extern DWORD   WSCR_LASTKEY_TIME;   /* BP_M 25-03-2000 */
 
@@ -93,7 +93,7 @@ fin2:
     return(rc);
 }
 
-#endif /* SCRCPP ... */
+#endif /* __cplusplus ... */
 
 int MainInit(int argc, U_ch **argv)
 {

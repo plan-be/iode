@@ -1,7 +1,7 @@
 #pragma once
 #include "s_ini.h"
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -23,6 +23,6 @@ extern int IniReadNumParm(unsigned char *filename,unsigned char *section,unsigne
 extern int IniWriteParm(char* filename, char* section, char* parm, char* val);
 extern unsigned char **IniReadAllSections(unsigned char *filename);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

@@ -15,7 +15,7 @@ en cas d'espace mémoire insuffisant ou de dimention nulle).
 &SA M_free(), M_alloc().
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_diag(
 int     mdim,
 double  dscale

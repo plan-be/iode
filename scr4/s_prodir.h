@@ -1,7 +1,7 @@
 #pragma once
 #include "s_dir.h"
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -33,6 +33,6 @@ extern int SCR_stat_ex(char *filename,SCRSTAT *ss, int crc);
 extern int SCR_dir_std(char *res,char *dir);
 extern SCRSTAT **SCR_dir(char *path,int add_dir,char *dir,char *filename);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

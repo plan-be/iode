@@ -1,7 +1,7 @@
 #include "scr.h"
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 FILE_TYPE *SCR_flt_exist(
 void    *ptr,
 int     type

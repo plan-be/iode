@@ -9,7 +9,7 @@ char    *str, *fmt;
 long PG_fdate_to_long(txt, fmt)
 char    *txt, *fmt;
 {
-#ifndef SCRCPP
+#ifndef __cplusplus
     extern long SCR_fdate_to_long();
 #endif
 

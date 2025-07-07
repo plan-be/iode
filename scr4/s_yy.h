@@ -7,6 +7,10 @@
 
 //#include <ctype.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============= SCR_YY.H ===================================== */
 
 #define YY_MAX_STRING_LG 40000
@@ -83,21 +87,34 @@ extern char     YY_B_COMMENT[5],
                 YY_E_COMMENT[5];
 extern int      YY_CASE_SENSITIVE;
 
+#ifdef __cplusplus
+}
+#endif
+
 #ifndef SCRPROTO
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern YYFILE   *YY_open();
 extern char     *YY_error();
 extern int      YY_strcmp();
 extern YYDEF    *YY_search_def();
 
+#ifdef __cplusplus
+}
+#endif
+
 #else
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 /*extern int      YY_strcmp(char *, char *); */
 extern double   SCR_atof(char *); /* JMP 29-12-97 */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 

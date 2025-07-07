@@ -9,7 +9,7 @@
 /* Alloc doc */ // JMP 28/9/2012
 #include "s_alldoc.h"
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -90,7 +90,7 @@ extern int AR_BUFSIZE, AR_ERRNO;
 
 extern int  SCR_ADD_PTR_CHUNCK;             /* JMP 13-11-2012 */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 

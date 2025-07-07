@@ -156,7 +156,7 @@ typedef struct _swstat_ {
 
 /* ======================= VARS =============================== */
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 // JMP 12/05/2021. Pour utiliser les vars en C++, il faut des d├®clarer extern "C"  
 extern "C" {
 #endif 
@@ -175,7 +175,7 @@ extern int      SW_FILE_POS;
 extern char     SW_FILE[];
 extern int      SW_SEG_SIZE; /* JMP 27-11-07 */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif 
 
@@ -201,11 +201,11 @@ extern void     SW_Debug();
 
 #include <s_prosw.h>
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
     int Wprintf(char *, ...);
 }
-#endif /* SCRCPP */
+#endif /* __cplusplus */
 
 #endif /* SCRPROTO */
 

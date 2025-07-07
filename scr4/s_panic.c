@@ -4,7 +4,7 @@
 #include "scr4w.h"
 #endif
 
-#ifdef SCRCPP  /* JMP 07-01-98 */
+#ifdef __cplusplus  /* JMP 07-01-98 */
     extern "C" {
     void exit(int);
 }

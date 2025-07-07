@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -110,6 +110,6 @@ extern double M_lstat(MAT *m1,int l,int op);
 /* s_masol2.c */ 
 extern MAT *M_solve_2(MAT *m3,MAT *m,MAT *m4);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

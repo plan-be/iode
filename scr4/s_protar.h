@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -57,6 +57,6 @@ extern int TarDftTableFn(TARHEAD *thead);
 /* s_tarerr.c */ 
 extern char *TarError(void);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

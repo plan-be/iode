@@ -4,7 +4,7 @@ int PR_FILE_BUF, PR_FILE_POS;
 extern U_ch *PR_REPL_FROM , *PR_REPL_TO;
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 FILE *PR_file_open(
 char    *filename

@@ -1,6 +1,6 @@
 #ifdef SCRPROTO
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -49,7 +49,7 @@ extern int SW_del_seg(void);
 extern int SW_oldest_seg(void);
 extern void SW_swap_ems(int seg_nb);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 

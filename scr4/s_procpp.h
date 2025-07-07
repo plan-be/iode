@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -39,6 +39,6 @@ extern double CppReadDbl(CPPFILE *cpp);
 extern int CppReadString(CPPFILE *cpp,unsigned char *str,int maxlg);
 extern unsigned char *CppReadQuotedString(CPPFILE *cpp);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

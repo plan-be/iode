@@ -12,7 +12,7 @@ double  A2MGRFDIM[3], A2MGRF0[3], A2MGRFSCALE[3], A2MGRFORIG[3],
 	A2M_Margins[3];
 
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 int (**A2M_GRF_FNS)(...);
 #else
 int (**A2M_GRF_FNS)();

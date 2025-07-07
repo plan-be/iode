@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -34,6 +34,6 @@ extern int FI_mconvert(union VALUETYPE *p,struct FI_magic *m);
 extern int FI_mget(union VALUETYPE *p,unsigned char *s,struct FI_magic *m,int nbytes);
 extern int FI_mcheck(union VALUETYPE *p,struct FI_magic *m);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

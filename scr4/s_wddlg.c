@@ -488,7 +488,7 @@ WDDlgInit(HWND hWnd, WDDLG *wddlg)
 WDDlgCommand(HWND hWnd, UINT iId, HWND hCtl, UINT nNotif)
 {
     int     fld_nb = iId - 100, rc = 0;
-#ifdef SCRCPP
+#ifdef __cplusplus
     int     (*fn)(_wddlg_ *, int, char *, UINT);
 #else
     int     (*fn)();

@@ -6,7 +6,7 @@
     filename : IN : of the file to be searched for
    ======================================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 FILE_TYPE *SCR_find_flt(
 char    *filename
 )

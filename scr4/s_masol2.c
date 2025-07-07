@@ -33,7 +33,7 @@ d'origine, elle est cependant moins exigante en mémoire.
 
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_solve_2(
 MAT     *m3,
 MAT     *m,

@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -349,6 +349,6 @@ extern int A2mChrtPrintGrf(int hdl, A2MGRF* grf);
 
 #endif /* DOSWIN ... */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

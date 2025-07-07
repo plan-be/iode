@@ -20,7 +20,7 @@ positionnée.
 &SA M_free(), M_alloc()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_trace(
 MAT     *m2,
 MAT     *m1

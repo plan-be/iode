@@ -255,7 +255,7 @@ PAGE    *pg;
 int     fld_nb;
 char    *txt;
 {
-#ifndef SCRCPP /* JMP 06-01-98 */
+#ifndef __cplusplus /* JMP 06-01-98 */
     extern long PG_fdate_to_long(), PG_ftime_to_long();
     extern unsigned long PG_ufmt_long();
     extern unsigned char *PG_ufmt_text();

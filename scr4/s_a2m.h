@@ -77,7 +77,7 @@
 #define GR_BLACK        -1
 
 /* Device specifics */
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern int (**A2M_GRF_FNS)(...);
 #else
 extern int (**A2M_GRF_FNS)();

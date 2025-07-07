@@ -58,7 +58,7 @@ La signification des paramétres dépend de la destination :
 &SA A2mMemFlush(), A2mMemRecord(), A2mMemEnd()
 ========================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 A2MFILE *A2mMemBegin(
 int     dest,
 U_ch    *outfile,

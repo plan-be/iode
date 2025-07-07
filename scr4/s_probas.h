@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -1322,6 +1322,6 @@ extern int ED_quick_help_display(YYKEYS *ytbl);
 /* s_rprdev.c */
 extern PRTDEV **SCR_ReadPrts(char *filename);   /* JMP 30-08-98 */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
