@@ -97,7 +97,7 @@ endif()
 # global flags
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
   add_compile_options("-fPIC")
-  # add_compile_options("-w") # disable all warning
+  add_compile_options("-w") # disable all warning
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
