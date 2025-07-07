@@ -90,10 +90,6 @@ extern int AR_BUFSIZE, AR_ERRNO;
 
 extern int  SCR_ADD_PTR_CHUNCK;             /* JMP 13-11-2012 */
 
-#ifdef __cplusplus
-}
-#endif
-
 /* ==== FNS ====== */
 
 
@@ -215,6 +211,10 @@ extern int DebugET(char *, ...);
 extern int DebugHexa(char *title, unsigned char *str, int lg);
 extern int DebugFile(char* filename, char* txt, char* a, char* b, char* c, char* d, char* e);
 extern int DebugFileHexa(char *filename, char *title, unsigned char *str, int lg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <s_prost.h>
 
