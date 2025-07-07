@@ -5,7 +5,7 @@
 /********************************************************************/
 /* BUFFER CIRCULAIRE FIFO*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 M_RING *M_RING_init(
 int size
 )

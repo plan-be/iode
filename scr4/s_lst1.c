@@ -22,7 +22,7 @@ La liste peut être désallouée par LST_free().
 &SA LST_free(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 LST *LST_create(
 int     tbl_size,
 int     el_size

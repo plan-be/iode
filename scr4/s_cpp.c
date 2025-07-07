@@ -111,7 +111,7 @@ Donne à l'interprétation
 &SA CppGetc(), CppUngetc(), CppClose()
 ==================================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 CPPFILE *CppOpen(
 char    *filename,
 int     type
@@ -361,7 +361,7 @@ int     ch;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 CPPFILE *CppCurrent(
 CPPFILE *cpp

@@ -652,7 +652,7 @@ LzhDecode()  /* Decoding/Uncompressing */
 
 /* ========== Fonctions générales d'interface ========== */
 
-#ifndef SCRCPP
+#ifndef __cplusplus
 long    (*LZH_sizfn)();
 int     (*LZH_putfn)(),
 	(*LZH_getfn)();

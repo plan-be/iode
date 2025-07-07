@@ -46,13 +46,13 @@ extern  int     A_check_int();
 extern  int     A_check_access();
 #else
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 int A_cerror(char *, ...);
 }
-#else /* SCRCPP */
+#else /* __cplusplus */
 extern int A_cerror(char *, ...);
-#endif /* SCRCPP */
+#endif /* __cplusplus */
 
 #include <s_proarg.h>
 

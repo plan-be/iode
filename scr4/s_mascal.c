@@ -19,7 +19,7 @@ La matrice source n'est pas modifiée.
 &SA M_free(), M_alloc()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_scale(
 MAT     *m1,
 MAT     *m2,

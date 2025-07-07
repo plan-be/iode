@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -48,6 +48,6 @@ extern int A_check_int_1(char *parm);
 /* s_achkac.c */ 
 extern int A_check_access(int argc,char *argv[]);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

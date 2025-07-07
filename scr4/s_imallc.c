@@ -8,7 +8,7 @@ caractères. L'image est vide.
 &SA SCR_save_image(), SCR_free_image()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 IMAGE *SCR_alloc_image(
 int     nl,
 int     nc

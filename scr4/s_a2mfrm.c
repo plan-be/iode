@@ -41,7 +41,7 @@ char    *A2M_FRCOLORS[] = {
 };
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 FILE *A2mFrOpenFile(
     char    *outfile,

@@ -244,7 +244,7 @@ de bytes est inférieur ou égal à l'ancien.
 &SA SW_alloc(), SW_free(), SW_getptr()
 */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 SWHDL SW_realloc(
     SWHDL   item,
     SWSIZE  size

@@ -45,7 +45,7 @@ char  *pyk1, *pyk2;
 #endif
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 YYFILE *JHYYopen(
 HFILE   *hfd
@@ -154,7 +154,7 @@ Ouvre un fichier HTML pour interprétation à l'aide des fonctions JH*().
 &SA JHYYFind(), JHLex(), JHRead(), JHClose()
 ===================================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 HFILE *JHOpen(
 char    *filename
 )

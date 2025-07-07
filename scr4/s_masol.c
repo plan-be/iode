@@ -29,7 +29,7 @@ Les matrices sources sont modifiées.
 
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_solve(
 MAT     *m3,
 MAT     *m1,

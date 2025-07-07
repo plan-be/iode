@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "s_strs.h"
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -252,6 +252,6 @@ extern int SCR_ConvertAnsiToUTF8(char *filein, char *fileout, int isbom);
 extern int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen);
 extern int GzipDecodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

@@ -8,7 +8,7 @@ int     mode;
 {
     static int last_mode, first_call = 1;
     char    *pt;
-#ifdef SCRCPP
+#ifdef __cplusplus
     char    *SCR_search_file(char *);
 #else
     char    *SCR_search_file();  /* JMP 07-01-98 */

@@ -22,7 +22,7 @@ unsigned long    l;
 unsigned long PG_ufmt_long(fmt, txt)
 char    *fmt, *txt;
 {
-#ifndef SCRCPP
+#ifndef __cplusplus
     extern unsigned long SCR_ufmt_long();
 #endif
 

@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -44,6 +44,6 @@ extern int SCRL_change_lc0(int l,int c);
 extern int SCRL_mouse_event(SCROLL *scrl,int *nline,int *ncol,int *ol0,int *oc0);
 extern int SCRL_scmts(void);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

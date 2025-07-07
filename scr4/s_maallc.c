@@ -56,7 +56,7 @@ La valeur nc ne peut dépasser 2000. La valeur de nl ne peut dépasser 16000.
 &SA M_free() , M_alloc_vec().
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_alloc(
 int     nl,
 int     nc

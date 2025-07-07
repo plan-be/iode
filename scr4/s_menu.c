@@ -130,7 +130,7 @@ jamais sur un MENU défini comme objet SCR dans un fichier source.
 &SA MN_auto_create(), MN_set_option_text()
 ====================================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 OPTION *MN_add_option(
 MENU    *mn
 )
@@ -263,7 +263,7 @@ couleur et le nombre de lignes visibles.
 &SA MN_create(), MN_free(), MN_auto_create(), MN_add_set_option_text()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MENU *MN_create_default(
 int     line,
 int     col,
@@ -358,7 +358,7 @@ La fonction MN_end() est appelée en fin de fonction pour ajuster le MENU.
 MN_edit()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MENU *MN_auto_create(
 char    **text,
 int     line,

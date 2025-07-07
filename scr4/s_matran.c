@@ -20,7 +20,7 @@ fonction retourne un pointeur nul.
 &SA M_free(), M_alloc()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_trans(
 MAT     *m2,
 MAT     *m1

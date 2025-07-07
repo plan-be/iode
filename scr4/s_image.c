@@ -10,7 +10,7 @@
 	return : pointer to a structure IMAGE or 0 if error.
    ============================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 IMAGE *SCR_extract_image(
 IMAGE   *in_im,
 int     line,
@@ -73,7 +73,7 @@ Sauve une partie de l'écran dans une structure IMAGE.
 &SA SCR_free_image(), SCR_display_image()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 IMAGE *SCR_save_image(
 int     line,
 int     column,
@@ -168,7 +168,7 @@ Copie une image.
 &SA SCR_save_image()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 IMAGE *SCR_copy_image(
 IMAGE *in
 )

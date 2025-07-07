@@ -74,7 +74,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MPAR *A2mNewPar(
     char    *tag
@@ -374,7 +374,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mNewObj(
     int     type
@@ -507,7 +507,7 @@ char    *parname;
 
 /*NH*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadLine(
     A2MFILE *af,
@@ -532,7 +532,7 @@ int     type;
     return(ao);
 }
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadGoto(
     A2MFILE *af
@@ -555,7 +555,7 @@ A2MFILE *af;
     return(ao);
 }
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadMargins(
     A2MFILE *af
@@ -581,7 +581,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadPage(
     A2MFILE *af
@@ -602,7 +602,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadTopic(
     A2MFILE *af
@@ -632,7 +632,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadTopicAlias(
     A2MFILE *af
@@ -726,7 +726,7 @@ A2MFILE *af;
 
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadPar(
     A2MFILE *af
@@ -1458,7 +1458,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadGraph(
     A2MFILE *af
@@ -1616,7 +1616,7 @@ fin:
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mReadCmd(
     A2MFILE *af
@@ -1814,7 +1814,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MOBJ *A2mRead(
     A2MFILE *af
@@ -1870,7 +1870,7 @@ int     *nl;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MSTR **A2mAddParLine(
     A2MSTR  **as,
@@ -2190,7 +2190,7 @@ char    *partag;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MPPR *A2mCreatePpr(
     char    *partag
@@ -2334,7 +2334,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 A2MPAR *A2mTxt2Par(
     char    *tag,

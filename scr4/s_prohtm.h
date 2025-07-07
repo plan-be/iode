@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -43,6 +43,6 @@ extern int JHRefAdd(char *filename,int type,int exist);
 extern int JHRefIsProto(char *filename);
 extern unsigned char *JHRefFullPath(char *res,char *current,char *name);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,4 @@
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 extern "C" { 
 #endif 
 
@@ -64,6 +64,6 @@ extern int VF_lock(VFILE *vfd,int level);
 /* s_vfreb.c */ 
 extern int VF_db_rebuild(char *filename);
 
-#ifdef SCRCPP 
+#ifdef __cplusplus 
 } 
 #endif 

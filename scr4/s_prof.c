@@ -217,7 +217,7 @@ d'un fichier .prf.
 &SA SCR_prof_load(), SCR_prof_save()
 ------------------------------------------------------------------------- */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 FILE *SCR_prof_open(
 char    *filename
 )

@@ -132,7 +132,7 @@ WscrEditTabbedPages(HWND hwndOwner, TPAGES *tpgs)
 	psp[i].dwSize    = sizeof(PROPSHEETPAGE);
 	psp[i].dwFlags   = PSP_USETITLE | PSP_HASHELP;
 	psp[i].hInstance = hInst;
-#if defined(SCRCPP) || defined(VC) || defined(CodeGear)
+#if defined(__cplusplus) || defined(VC) || defined(CodeGear)
 	psp[i].pszTemplate = MAKEINTRESOURCE(tpgs->tp_pgsnbs[i]);
 	psp[i].pszIcon = NULL;
 #else
@@ -156,7 +156,7 @@ WscrEditTabbedPages(HWND hwndOwner, TPAGES *tpgs)
     SCR_OemToAnsi(tpgs->tp_title, tpgs->tp_title);
     psh.pszCaption = (LPSTR) tpgs->tp_title;
     psh.nPages = tpgs->tp_nb;
-#if defined(SCRCPP) || defined(VC) || defined(CodeGear)
+#if defined(__cplusplus) || defined(VC) || defined(CodeGear)
     psh.pszIcon = NULL;
     psh.nStartPage = 0;
     psh.ppsp = psp;

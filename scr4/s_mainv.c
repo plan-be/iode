@@ -37,7 +37,7 @@ Le résultat est stocké dans m2 carrée nl1 x nc1.
 
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_inv_1(
     MAT     *m2,
     MAT     *m1
@@ -163,7 +163,7 @@ La matrice m1 n'est pas modifiée.
 
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_inv_2(
     MAT     *m2,
     MAT     *m

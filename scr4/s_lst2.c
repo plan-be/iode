@@ -142,7 +142,7 @@ est rencontré, une ligne de texte est stockée (et allouée) dans la liste.
 &SA LST_ltov(), LST_free_text(), LST_get(), LST_set()
 ------------------------------------------------------------------------- */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 LST *LST_vtol(
 unsigned char   *vec,
 unsigned char   *seps
@@ -279,7 +279,7 @@ raison d'un élément de liste par ligne du fichier.
 &SA LST_save_file() LST_free_text()
 ------------------------------------------------------------------------- */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 LST *LST_read_file(
 char   *filename
 )

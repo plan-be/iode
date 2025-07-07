@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -39,6 +39,6 @@ extern long LzhSizStr(void);
 extern int LzhEncodeStr(unsigned char *instr,unsigned int inlen,unsigned char **outstr,unsigned int *outlen);
 extern int LzhDecodeStr(unsigned char *instr,unsigned int inlen,unsigned char **outstr,unsigned int *outlen);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

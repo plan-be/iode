@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -65,6 +65,6 @@ extern int WmpEndEdit(HWND hWnd,MPAGE *mp);
 extern int WscrMpNbFlds(HWND hWnd,MPAGE *mp);
 extern int WscrMpEditIsam(MPAGE *mp);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif

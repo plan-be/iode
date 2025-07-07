@@ -23,7 +23,7 @@ une division matricielle.
 &SA M_free(), M_alloc(), M_prod(), M_inv_1 ou 2 ().
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_calc(
 MAT     *m3,
 MAT     *m1,

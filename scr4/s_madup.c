@@ -23,7 +23,7 @@ Copie une matrice dans une autre, les deux matrices doivent exister.
 &SA M_dup()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT     *M_copy(
 MAT     *m2,     // Destination
 MAT     *m1      // Source
@@ -68,7 +68,7 @@ Crée une seconde matrice copie de la première.
 &SA M_copy()
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT     *M_dup(
 MAT     *m1
 )

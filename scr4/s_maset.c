@@ -16,7 +16,7 @@ positionnnée et la fonction retourne un pointeur NULL.
 &SA M_free(), M_alloc(), M_copy(), M_dup().
 ======================================================================= */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 MAT *M_set(
 MAT     *m2,
 MAT     *m1,

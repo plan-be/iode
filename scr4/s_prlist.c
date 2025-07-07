@@ -17,7 +17,7 @@ PR_file_nl(filename, first_ch)
 char    *filename;
 int     first_ch;
 {
-#ifdef SCRCPP
+#ifdef __cplusplus
     FILE            *PR_file_open(char *);
 #else
     FILE            *PR_file_open();

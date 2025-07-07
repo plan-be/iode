@@ -72,7 +72,7 @@ dernier cas un message est envoyé vers le stderr.
 &TX
 &SA YY_close()
 =======================================================================*/
-#ifdef SCRCPP
+#ifdef __cplusplus
 YYFILE *YY_open(
 char    *filename,
 YYKEYS  *table,
@@ -108,7 +108,7 @@ int     type;
      return   : 0 of OK, -1 otherwise
    ============================================================== */
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 /*NH*/
 int YY_init(
 YYFILE  *yy,

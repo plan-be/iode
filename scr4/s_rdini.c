@@ -47,7 +47,7 @@ une structure INIFILE allouée.
 &SA IniClose(), UniRead(), IniUnRead(), IniOpenSection()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 INIFILE *IniOpen(
 char    *filename,
 int     usection,
@@ -252,7 +252,7 @@ section dont le nom est section.
 &SA IniOpen(), UniClose(), IniRead(), IniUnRead(), IniReadSection()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 INIFILE *IniOpenSection(
 U_ch    *filename,
 U_ch    *section,
@@ -794,7 +794,7 @@ Retourne un tableau de pointeurs vers les noms des sections.
 &SA IniOpen(), UniClose(), IniRead(), IniUnRead(), IniReadSection()
 =======================================================================*/
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 U_ch **IniReadAllSections(
 U_ch    *filename
 )

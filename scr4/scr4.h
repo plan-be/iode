@@ -11,11 +11,7 @@
 
 /*#define PG_CMT*/
 
-#ifdef __cplusplus
-#define SCRCPP
-#endif
-
-#ifdef SCRCPP        /* JMP 12-01-98 */
+#ifdef __cplusplus        /* JMP 12-01-98 */
     #ifndef SCRPROTO
     #define SCRPROTO
     #endif
@@ -860,9 +856,9 @@
 
 /* ==== EXTERN VARS DECLARATIONS ================================= */
 
-//#ifdef SCRCPP
+//#ifdef __cplusplus
 //extern "C" {
-//#endif /* SCRCPP*/
+//#endif /* __cplusplus*/
 
 extern int          SCR_PAGE_SIZE[];
 extern int          SCR_CURRENT_COLOR;
@@ -1126,9 +1122,9 @@ extern int  MMT_BACK,
 	    MMT_COMMENT,
 	    MMT_BOXES;
 
-//#ifdef SCRCPP
+//#ifdef __cplusplus
 //}
-//#endif /* SCRCPP*/
+//#endif /* __cplusplus*/
 
 /* ==== DEFINE FOR SCR_TBL ================================= */
 
@@ -1449,9 +1445,9 @@ extern double  atof();
 #ifndef SCRSUPPROTO
 
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
-#endif /* SCRCPP*/
+#endif /* __cplusplus*/
 
 /* s_wprint.c */
     int Wprintf(char *, ...);
@@ -1489,9 +1485,9 @@ extern "C" {
     int ACT_functions(int);
 
     extern char *SCR_HttpGetFile(char *, int , char *); 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
-#endif /* SCRCPP */
+#endif /* __cplusplus */
 
 #endif /* SCRSUPPROTO */
 

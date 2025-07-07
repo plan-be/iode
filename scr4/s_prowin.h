@@ -1,4 +1,4 @@
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -511,6 +511,6 @@ extern int WscrClipSet(unsigned char *txt);
 extern int WscrClipIsData(void);
 extern unsigned char *WscrClipGet(void);
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
