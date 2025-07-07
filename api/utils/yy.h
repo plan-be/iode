@@ -18,7 +18,7 @@ extern SAMPLE *K_read_smpl(YYFILE *);
 extern int K_read_align(YYFILE* yy);
 extern void K_stracpy(char **,char *);
 extern int K_wrdef(FILE *,YYKEYS *,int );
-//extern int K_compare(YYKEYS *,YYKEYS *);
+extern int K_compare(YYKEYS *,YYKEYS *);
 extern char *K_wrap(char *,int );
 
 #ifdef __cplusplus

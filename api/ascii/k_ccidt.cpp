@@ -13,7 +13,6 @@
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 /**
@@ -53,7 +52,7 @@ KDB *KI_load_asc(char* filename)
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
-    SCR_strip(filename);
+    SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, 0L, 0,
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
     if(yy == 0) {
@@ -77,12 +76,12 @@ KDB *KI_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 if(YY_lex(yy) != YY_STRING) {
                     kerror(0, "%s : identity not defined", YY_error(yy));
                     break;
                 }
-                lec = K_wrap(yy->yy_text, 60);
+                lec = K_wrap((char*) yy->yy_text, 60);
                 if(K_add(kdb, name, lec) < 0)
                     kerror(0, "%s (%s : %s).", YY_error(yy), name, L_error());
                 else 

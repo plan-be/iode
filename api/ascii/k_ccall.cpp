@@ -13,7 +13,7 @@
 
 #include "api/ascii/ascii.h"
 
-KDB  *(*K_load_asc[])() = {
+KDB  *(*K_load_asc[])(char*) = {
     KC_load_asc,
     KE_load_asc,
     KI_load_asc,
@@ -23,7 +23,7 @@ KDB  *(*K_load_asc[])() = {
     KV_load_asc
 };
 
-int (*K_save_asc[])() = {
+int (*K_save_asc[])(KDB*, char*) = {
     KC_save_asc,
     KE_save_asc,
     KI_save_asc,
@@ -33,13 +33,13 @@ int (*K_save_asc[])() = {
     KV_save_asc
 };
 
-int (*K_save_csv[])() = {
-    KC_save_csv,
-    KE_save_csv,
-    KI_save_csv,
-    KL_save_csv,
-    KS_save_csv,
-    KT_save_csv,
+int (*K_save_csv[])(KDB*, char*, SAMPLE*, char**) = {
+    _KC_save_csv_,
+    _KE_save_csv_,
+    _KI_save_csv_,
+    _KL_save_csv_,
+    _KS_save_csv_,
+    _KT_save_csv_,
     KV_save_csv
 };
 

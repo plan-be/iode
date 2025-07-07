@@ -12,7 +12,6 @@
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 /**
@@ -41,7 +40,7 @@ static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
 
     /* READ A STRING */
     keyw = YY_lex(yy);
-    if(keyw == YY_STRING)  lst = K_wrap(yy->yy_text, 60);
+    if(keyw == YY_STRING)  lst = K_wrap((char*) yy->yy_text, 60);
     else {
         lst = SW_nalloc(1);
         lst[0] = '\0';
@@ -107,7 +106,7 @@ KDB *KL_load_asc(char* filename)
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    SCR_strip(filename);
+    SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, NULL, 0, (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
 
     if(yy   == 0) {
@@ -132,7 +131,7 @@ KDB *KL_load_asc(char* filename)
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 if(KL_read_lst(kdb, yy, name) == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;

@@ -13,7 +13,6 @@
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/variables.h"
-#include "api/utils/yy.h"
 #include "api/ascii/ascii.h"
 
 
@@ -25,7 +24,7 @@
 #define KV_SMPL     1
 
 YYKEYS KV_TABLE[] = {
-    "sample",   KV_SMPL
+    (unsigned char *) "sample",   KV_SMPL
 };
 
 
@@ -56,7 +55,7 @@ static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
     /* CONTINUE READING UNTIL END OF VALUES */
     while(1) {
         keyw = YY_lex(yy);
-        if((keyw == YY_WORD && strcmp(yy->yy_text, "na")) || keyw == YY_EOF) break;
+        if((keyw == YY_WORD && strcmp((char*) yy->yy_text, "na")) || keyw == YY_EOF) break;
     }
     YY_unread(yy);
 
@@ -134,7 +133,7 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
                     goto err;
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
-                strcpy(name, yy->yy_text);
+                strcpy(name, (char*) yy->yy_text);
                 KV_read_vec(kdb, yy, name);
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 break;
@@ -150,7 +149,6 @@ err:
     K_free(kdb);
     return((KDB *)0);
 }
-
 
 /**
  *  Loads variables from an ASCII file or from a string.
@@ -171,7 +169,7 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
     int		yytype;
 
     if(type == 0) {
-        SCR_strip(file_or_string);
+        SCR_strip((unsigned char *) file_or_string);
         yytype = (!K_ISFILE(file_or_string)) ? YY_STDIN : YY_FILE;
     }
     else {
@@ -182,7 +180,7 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
     YY_CASE_SENSITIVE = 1;
 
     if(sorted == 0) {
-        qsort(KV_TABLE, sizeof(KV_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
+        qsort(KV_TABLE, sizeof(KV_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), compare);
         sorted = 1;
     }
 
@@ -297,11 +295,11 @@ int KV_save_asc(KDB* kdb, char* filename)
  *  
  */
 
-char *KV_CSV_SEP = 0;       // cell separator     (default ",")
-char *KV_CSV_DEC = 0;       // decimal separator (default ".")
-char *KV_CSV_NAN = 0;       // NaN representation (default "")
-char *KV_CSV_AXES = 0;      // name of the axis for the variable name (default "var")
-int  KV_CSV_NBDEC = 15;     // number of decimals
+char* KV_CSV_SEP = 0;       // cell separator     (default ",")
+char* KV_CSV_DEC = 0;       // decimal separator (default ".")
+char* KV_CSV_NAN = 0;       // NaN representation (default "")
+char* KV_CSV_AXES = 0;      // name of the axis for the variable name (default "var")
+int   KV_CSV_NBDEC = 15;     // number of decimals
 
 
 /**
@@ -362,8 +360,8 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
         lst = 0;
         nb = 0;
         for(i = 0; i < KNB(kdb); i++)
-            SCR_add_ptr(&lst, &nb, KONAME(kdb, i));
-        SCR_add_ptr(&lst, &nb, 0L);
+            SCR_add_ptr((unsigned char ***) &lst, &nb, (unsigned char*) KONAME(kdb, i));
+        SCR_add_ptr((unsigned char ***) &lst, &nb, 0L);
     }
 
     // Open file
@@ -390,7 +388,7 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
 
     // Lignes suivantes
     for(i = 0 ; lst[i] ; i++) {
-        SCR_upper(lst[i]);
+        SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
         pos = K_find(kdb, lst[i]);
         if(pos >= 0) {
@@ -398,7 +396,7 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
             for(j = 0 ; j < smpl->s_nb; j++, val++) {
                 if(IODE_IS_A_NUMBER(*val)) {
                     sprintf(buf, fmt, (double)(*val));
-                    if(dec[0] != '.') SCR_replace(buf, ".", dec);
+                    if(dec[0] != '.') SCR_replace((unsigned char *) buf, (unsigned char *) ".", (unsigned char *) dec);
                 }
                 else {
                     strcpy(buf, nan);
@@ -408,7 +406,7 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
         }
         fprintf(fd, "\n");
     }
-    if(varlist == 0) SCR_free_tbl(lst);
+    if(varlist == 0) SCR_free_tbl((unsigned char **) lst);
     if(filename[0] != '-') fclose(fd);
     return(0);
 }
