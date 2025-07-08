@@ -6,9 +6,16 @@
  * ********************************************** */
 
 #include <stdio.h>
-#include "api/all.h"
+#include <stdarg.h>
 
-#ifdef IODEWIN
+#include "scr4/scr4.h"
+#include "scr4/scr4w.h"
+#include "scr4/s_a2m.h"
+#include "scr4/s_proa2m.h"
+#include "scr4/s_probas.h"
+
+#ifdef _MSC_VER
+#include "scr4/s_prowin.h"
 
 /* ==== Annulations fonction HWND ==== */
 #include <windows.h>
@@ -18,6 +25,7 @@ HWND WscrGetMainWnd()
     // JMP 14/3/2017 pour nouvelle version BC32
     return (HWND)NULL;
 }
+#endif
 
 // s_odbc
 
@@ -30,7 +38,7 @@ int A2M_GIF_TRANS;
 int A2M_GIF_FILLED;
 int A2M_GIF_FONT;
 
-int A2mGIF_HTML()
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename)
 {
     return 0;
 }
@@ -65,7 +73,7 @@ int SCR_get_key()
     return 0;
 }
 
-int SCR_confirme(char* str)
+int SCR_confirme(char* str, ...)
 {
     return printf("%s", str);
 }
@@ -81,9 +89,14 @@ int SCR_MessageBox(unsigned char* str, unsigned char* v, unsigned char* buts[])
 
 /* ==== Annulations fonctions de b_rep.c ==== */
 
-int PG_display_error(char* a, char* b, char* c, char* d, char* e, char* f, char* g, char* h, char* i, char* j, char* k, char* l, char* m, char* n)
+int PG_display_error(char* fmt, ...)
 {
-    printf(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
+    va_list args;
+    
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+
     printf("\n");
     Iode_Continue();
     return 0;
@@ -96,7 +109,7 @@ int SCR_beep()
 
 /* ==== Annulations fonctions de b_dde.c ==== */
 
-int SCR_record_text(char* szBuffer)
+int SCR_record_text(unsigned char* szBuffer)
 {
     return 0;
 }
@@ -109,5 +122,3 @@ int SCR_record_key(int key)
 /* ==== Annulations fonctions ODE_settitle ==== */
 
 void ODE_settitle() {}
-
-#endif
