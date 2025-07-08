@@ -4,6 +4,10 @@
 #include <stdio.h>
 //#include <ctype.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct   _adef_ {
     char    *a_arg;         /* Argument */
     char    *a_args;        /* Paramètres (texte libre, 9 caractères) */
@@ -29,9 +33,18 @@ extern  char    *A_SEPS;
 extern   int    A_NO_EXPANDSTAR_DFT;
 extern  char    *(*A_expand_super)(char*); // JMP 16/01/2022
 
+#ifdef __cplusplus
+}
+#endif
+
 /* FUNCTIONS DECLARATION */
 
 #ifndef SCRPROTO
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern  char    **A_init();
 extern  char    **A_initv();
 
@@ -44,6 +57,11 @@ extern  int     A_free();
 extern  int     A_exec();
 extern  int     A_check_int();
 extern  int     A_check_access();
+
+#ifdef __cplusplus
+}
+#endif
+
 #else
 
 #ifdef __cplusplus
