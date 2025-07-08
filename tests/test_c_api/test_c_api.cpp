@@ -869,23 +869,23 @@ public:
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(KV_CSV_NBDEC, 7);
+	    EXPECT_EQ(AsciiVariables::CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(KV_CSV_SEP[0], ';');
+	    EXPECT_EQ(AsciiVariables::CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KV_CSV_NAN), "--");
+	    EXPECT_EQ(std::string(AsciiVariables::CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KV_CSV_AXES), "Name");
+	    EXPECT_EQ(std::string(AsciiVariables::CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KV_CSV_DEC), ".");
+	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
 	
 	    U_test_B_WsLoad("fun", VARIABLES, 394);
 	    sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
@@ -1241,7 +1241,7 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     EXPECT_NE(kdb_tbl, nullptr);
     if(kdb_tbl) {
         sprintf(out_filename, "%s\\fun_copy.at", IODE_OUTPUT_DIR);
-        rc = KT_save_asc(kdb_tbl, out_filename);
+        rc = ascii_handlers[TABLES]->save_asc(kdb_tbl, out_filename);
         EXPECT_EQ(rc, 0);
     }
 

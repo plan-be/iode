@@ -3,9 +3,9 @@
  * 
  * Functions to load and save ascii definitions of IODE TBL objects.
  *
- *      KDB *KT_load_asc(char* filename)
- *      int KT_save_asc(KDB* kdb, char* filename)
- *      int KT_save_csv(KDB *kdb, char *filename)
+ *      KDB *load_asc(char* filename)
+ *      int save_asc(KDB* kdb, char* filename)
+ *      int save_csv(KDB *kdb, char *filename)
  */
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -13,52 +13,6 @@
 #include "api/objs/pack.h"
 #include "api/objs/tables.h"
 #include "api/ascii/ascii.h"
-
-
-/**
- * Table of keywords recognized by YY in the context of a TBLs ascii file (.at).
- * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
- */
-
-YYKEYS KT_TABLE[] = {
-    (unsigned char*) "BOLD",         TABLE_CELL_BOLD,
-    (unsigned char*) "UNDERLINE",    TABLE_CELL_UNDERLINE,
-    (unsigned char*) "CENTER",       TABLE_CELL_CENTER,
-    (unsigned char*) "DATE",         TABLE_ASCII_LINE_DATE,
-    (unsigned char*) "DECIMAL",      TABLE_CELL_DECIMAL,
-    (unsigned char*) "DIM",          TABLE_ASCII_DIM,
-    (unsigned char*) "DIV",          TABLE_ASCII_DIVIDER,
-    (unsigned char*) "DUTCH",        TABLE_ASCII_DUTCH,
-    (unsigned char*) "ENGLISH",      TABLE_ASCII_ENGLISH,
-    (unsigned char*) "FILES",        TABLE_ASCII_LINE_FILES,
-    (unsigned char*) "FRENCH",       TABLE_ASCII_FRENCH,
-    (unsigned char*) "ITALIC",       TABLE_CELL_ITALIC,
-    (unsigned char*) "LEC",          TABLE_ASCII_CELL_LEC,
-    (unsigned char*) "LEFT",         TABLE_CELL_LEFT,
-    (unsigned char*) "LINE",         TABLE_ASCII_LINE_SEP,
-    (unsigned char*) "LINE BOLD",    TABLE_ASCII_BOLD_LINE,
-    (unsigned char*) "MODE",         TABLE_ASCII_LINE_MODE,
-    (unsigned char*) "NORMAL",       TABLE_CELL_NORMAL,
-    (unsigned char*) "RIGHT",        TABLE_CELL_RIGHT,
-    (unsigned char*) "TITLE",        TABLE_ASCII_LINE_TITLE,
-    (unsigned char*) "{",            TABLE_ASCII_OPEN,
-    (unsigned char*) "}",            TABLE_ASCII_CLOSE,
-    (unsigned char*) "-",            TABLE_ASCII_BREAK, /* GB 2/3/2000 */
-    (unsigned char*) "YMIN",         TABLE_ASCII_YMIN,
-    (unsigned char*) "YMAX",         TABLE_ASCII_YMAX,
-    (unsigned char*) "ZMIN",         TABLE_ASCII_ZMIN,
-    (unsigned char*) "ZMAX",         TABLE_ASCII_ZMAX,
-    (unsigned char*) "XGRID",        TABLE_ASCII_XGRID,
-    (unsigned char*) "YGRID",        TABLE_ASCII_YGRID,
-    (unsigned char*) "BOX",          TABLE_ASCII_BOX,
-    (unsigned char*) "AXIS",         TABLE_ASCII_AXIS,
-    (unsigned char*) "ALIGN",        TABLE_ASCII_ALIGN,
-    (unsigned char*) "LAXIS",        TABLE_ASCII_LEFT_AXIS,
-    (unsigned char*) "RAXIS",        TABLE_ASCII_RIGHT_AXIS,
-    (unsigned char*) "GRLINE",       TABLE_ASCII_GRAPH_LINE,
-    (unsigned char*) "GRBAR",        TABLE_ASCII_GRAPH_BAR,
-    (unsigned char*) "GRSCATTER",    TABLE_ASCII_GRAPH_SCATTER
-};
 
 
 /**
@@ -73,8 +27,7 @@ YYKEYS KT_TABLE[] = {
  *  @return          void
  *  
  */
-
-static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
+static void read_cell(TCELL* cell, YYFILE* yy, int mode)
 {
     int     keyw, ok = 0, align = TABLE_CELL_LEFT;
 
@@ -139,7 +92,6 @@ ret :
     return;
 }
 
-
 /**
  *  Reads the TBL divisors on a YY stream. Each column of a table has its own divisor.
  *  
@@ -157,17 +109,15 @@ ret :
  *  @return          void
  *  
  */
-
-static void KT_read_div(TBL* tbl, YYFILE* yy)
+static void read_div(TBL* tbl, YYFILE* yy)
 {
     int     i;
     TCELL   *cell;
 
     cell = (TCELL *) (tbl->t_div).tl_val;
     for(i = 0; i < tbl->t_nc; i++)
-        KT_read_cell(cell + i, yy, 0);
+        read_cell(cell + i, yy, 0);
 }
-
 
 /**
  *  Reads a TBL line on a YY stream. Each line has as many Cells as the number 
@@ -201,8 +151,7 @@ static void KT_read_div(TBL* tbl, YYFILE* yy)
  *                                      -1 if the TBL cannot be created
  *  
  */
-
-static int KT_read_line(TBL* tbl, YYFILE* yy)
+static int read_line(TBL* tbl, YYFILE* yy)
 {
     int     keyw, i;
     TLINE   *c_line;
@@ -247,7 +196,7 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
                 }
                 c_line->tl_type = keyw;
                 c_line->tl_val = SW_nalloc(sizeof(TCELL));
-                KT_read_cell((TCELL *) c_line->tl_val, yy, YY_STRING);
+                read_cell((TCELL *) c_line->tl_val, yy, YY_STRING);
                 break;
 
             case TABLE_ASCII_BREAK :
@@ -284,7 +233,7 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
                 }
                 YY_unread(yy);
                 cell = T_create_cell(tbl, c_line);
-                for(i = 0; i < T_NC(tbl); i++)  KT_read_cell(cell + i, yy, 0);
+                for(i = 0; i < T_NC(tbl); i++)  read_cell(cell + i, yy, 0);
                 break;
         }
     }
@@ -299,7 +248,7 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
  *  @return             TBL*        new allocated table
  *  
  */
-static TBL *KT_read_tbl(YYFILE* yy)
+static TBL* read_tbl(YYFILE* yy)
 {
     int     keyw, dim = 2;
     TBL     *tbl = NULL;
@@ -337,7 +286,7 @@ static TBL *KT_read_tbl(YYFILE* yy)
                 break;
 
             case TABLE_ASCII_DIVIDER     :
-                KT_read_div(tbl, yy);
+                read_div(tbl, yy);
                 break;
 
             case TABLE_ASCII_BOX     :
@@ -371,7 +320,7 @@ static TBL *KT_read_tbl(YYFILE* yy)
                 break;
 
             case TABLE_ASCII_BREAK   :
-                if(KT_read_line(tbl, yy)< 0) {
+                if(read_line(tbl, yy)< 0) {
                     T_free(tbl);
                     return(NULL);
                 }
@@ -402,8 +351,7 @@ static TBL *KT_read_tbl(YYFILE* yy)
  *  @return                 KDB*    NULL or allocated KDB of TBLs
  *  
  */
-
-KDB *KT_load_asc(char* filename)
+KDB* AsciiTables::load_asc(char* filename)
 {
     static  int sorted;
 
@@ -417,12 +365,12 @@ KDB *KT_load_asc(char* filename)
     YY_CASE_SENSITIVE = 1;
 
     if(sorted == 0) {
-        qsort(KT_TABLE, sizeof(KT_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), compare);
+        qsort(TABLE, sizeof(TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), ascii_compare);
         sorted = 1;
     }
 
     SCR_strip((unsigned char*) filename);
-    yy = YY_open(filename, KT_TABLE, sizeof(KT_TABLE) / sizeof(YYKEYS),
+    yy = YY_open(filename, TABLE, sizeof(TABLE) / sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
     if(yy == 0) {
         kerror(0, "Cannot open '%s'", filename);
@@ -447,7 +395,7 @@ KDB *KT_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if((tbl = KT_read_tbl(yy)) == NULL) {
+                if((tbl = read_tbl(yy)) == NULL) {
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
                 }
@@ -468,7 +416,6 @@ err:
     return((KDB *)0);
 }
 
-
 /*------- SAVE IN ASCII -------------------*/
 
 /**
@@ -479,8 +426,7 @@ err:
  *  @return             void
  *  
  */
- 
-void KT_align(FILE* fd, int align)
+void align(FILE* fd, int align)
 {
     fprintf(fd, "\nALIGN ");
     switch(align) {
@@ -497,7 +443,6 @@ void KT_align(FILE* fd, int align)
 
 }
 
-
 /**
  *  Prints the axis position (left or right) and type (BAR or LINE) of a TBL line.
  *  
@@ -507,8 +452,7 @@ void KT_align(FILE* fd, int align)
  *  @return             void
  *  
  */
- 
-static void KT_grinfo(FILE *fd, int axis, int type)
+static void grinfo(FILE *fd, int axis, int type)
 {
     if(axis == 0) fprintf(fd, " LAXIS ");
     else          fprintf(fd, " RAXIS ");
@@ -516,7 +460,6 @@ static void KT_grinfo(FILE *fd, int axis, int type)
     if(type == 2) fprintf(fd, " GRBAR ");
     else          fprintf(fd, " GRLINE ");
 }
-
 
 /**
  *  Prints the axis (min or max, left or right) of the TBL.
@@ -526,12 +469,10 @@ static void KT_grinfo(FILE *fd, int axis, int type)
  *  @return             void
  *  
  */
- 
-static void KT_min(FILE* fd, char* str, float value)
+static void print_axis(FILE* fd, char* str, float value)
 {
     if(IODE_IS_A_NUMBER(value)) fprintf(fd, "\n%s %f ", str, value);
 }
-
 
 /**
  *  Prints the font attribute and the alignement of a cell. 
@@ -541,7 +482,7 @@ static void KT_min(FILE* fd, char* str, float value)
  *  @return             void
  *  
  */
-static void KT_print_attr(FILE* fd, int attr)
+static void print_attr(FILE* fd, int attr)
 {
     if(attr & TABLE_CELL_BOLD)      fprintf(fd, "BOLD ");
     if(attr & TABLE_CELL_ITALIC)    fprintf(fd, "ITALIC ");
@@ -554,7 +495,6 @@ static void KT_print_attr(FILE* fd, int attr)
     return;
 }
 
-
 /**
  *  Prints a table cell definition. 
  *  
@@ -563,7 +503,7 @@ static void KT_print_attr(FILE* fd, int attr)
  *  @return             void
  *  
  */
-static void KT_print_cell(FILE *fd, TCELL *cell)
+static void print_cell(FILE *fd, TCELL *cell)
 {
     if((cell->tc_val) == NULL) {
         fprintf(fd, "\"\" ");
@@ -585,9 +525,8 @@ static void KT_print_cell(FILE *fd, TCELL *cell)
             break;
     }
     if(cell->tc_val[0] != '\0') 
-        KT_print_attr(fd, cell->tc_attr);
+        print_attr(fd, cell->tc_attr);
 }
-
 
 /**
  *  Prints a TBL definition.
@@ -597,28 +536,27 @@ static void KT_print_cell(FILE *fd, TCELL *cell)
  *  @return             void
  *  
  */
-
-static void KT_print_tbl(FILE* fd, TBL* tbl)
+static void print_tbl(FILE* fd, TBL* tbl)
 {
     TCELL   *cell;
     int     i, j;
 
     /* tbl */
     fprintf(fd, "\nDIM %d\n", T_NC(tbl));
-    K_wrdef(fd, KT_TABLE, T_LANG(tbl));
+    K_wrdef(fd, TABLE, T_LANG(tbl));
     /* GB 2/3/00 */
     fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ",
             tbl->t_box, tbl->t_axis, tbl->t_gridx, tbl->t_gridy);
-    KT_align(fd, tbl->t_align);
-    KT_min(fd, "YMIN", tbl->t_ymin);
-    KT_min(fd, "YMAX", tbl->t_ymax);
-    KT_min(fd, "ZMIN", tbl->t_zmin);
-    KT_min(fd, "ZMAX", tbl->t_zmax);
+    align(fd, tbl->t_align);
+    print_axis(fd, "YMIN", tbl->t_ymin);
+    print_axis(fd, "YMAX", tbl->t_ymax);
+    print_axis(fd, "ZMIN", tbl->t_zmin);
+    print_axis(fd, "ZMAX", tbl->t_zmax);
 
     fprintf(fd, "\nDIV ");
     /* div */
     for(i = 0; i < T_NC(tbl); i++)
-        KT_print_cell(fd, (TCELL *)(tbl->t_div.tl_val) + i);
+        print_cell(fd, (TCELL *)(tbl->t_div.tl_val) + i);
 
     /* lines */
 
@@ -628,15 +566,15 @@ static void KT_print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_CELL :
                 cell = (TCELL *) tbl->t_line[j].tl_val;
                 for(i = 0; i < T_NC(tbl); i++)
-                    KT_print_cell(fd, cell + i);
+                    print_cell(fd, cell + i);
 
                 /* append GR info */
-                KT_grinfo(fd, tbl->t_line[j].tl_axis, tbl->t_line[j].tl_graph);
+                grinfo(fd, tbl->t_line[j].tl_axis, tbl->t_line[j].tl_graph);
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                K_wrdef(fd, KT_TABLE, tbl->t_line[j].tl_type);
-                KT_print_cell(fd, (TCELL *) tbl->t_line[j].tl_val);
+                K_wrdef(fd, TABLE, tbl->t_line[j].tl_type);
+                print_cell(fd, (TCELL *) tbl->t_line[j].tl_val);
                 break;
 
             case TABLE_ASCII_LINE_SEP   :
@@ -644,7 +582,7 @@ static void KT_print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                K_wrdef(fd, KT_TABLE, tbl->t_line[j].tl_type);
+                K_wrdef(fd, TABLE, tbl->t_line[j].tl_type);
                 break;
 
             default       :
@@ -654,18 +592,17 @@ static void KT_print_tbl(FILE* fd, TBL* tbl)
     fprintf(fd, "\n/* END OF TABLE */\n");
 }
 
-
 /**
  *  Saves a KDB of TBLs into an ascii file (.at) or to the stdout.
  *  
- *  @see KT_load_asc() for the syntax of the ascii tables. 
+ *  @see load_asc() for the syntax of the ascii tables. 
  *  
  *  @param [in] kdb         KDB*    KDB of TBLs
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KT_save_asc(KDB* kdb, char* filename)
+int AsciiTables::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     TBL     *tbl;
@@ -683,7 +620,7 @@ int KT_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s {", KONAME(kdb, i));
         tbl = KTVAL(kdb, i);
-        KT_print_tbl(fd, tbl);
+        print_tbl(fd, tbl);
         fprintf(fd, "}\n");
         T_free(tbl);
     }
@@ -692,13 +629,11 @@ int KT_save_asc(KDB* kdb, char* filename)
     return(0);
 }
 
-
 /* 
  * Save a KDB of TBLs in a .csv file.
  * NOT IMPLEMENTED.
  */
-
-int KT_save_csv(KDB *kdb, char *filename)
+int AsciiTables::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
 {
     return(-1);
 }

@@ -3,9 +3,9 @@
  
  * Functions to load and save ascii definitions of IODE IDT objects.
  * 
- *     KDB *KI_load_asc(char* filename)
- *     int KI_save_asc(KDB* kdb, char* filename)
- *     int KI_save_csv(KDB *kdb, char *filename)
+ *     KDB *load_asc(char* filename)
+ *     int save_asc(KDB* kdb, char* filename)
+ *     int save_csv(KDB *kdb, char *filename)
  *  
  */
 #include "api/b_errors.h"
@@ -14,6 +14,7 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/ascii/ascii.h"
+
 
 /**
  *  Loads IDTs from an ASCII file into a new KDB.
@@ -41,8 +42,7 @@
  *  TODO: what if KC_read_cmt returns an error code ?
  *  
  */
-
-KDB *KI_load_asc(char* filename)
+KDB* AsciiIdentities::load_asc(char* filename)
 {
     char    *lec = NULL;
     int     cmpt = 0;
@@ -104,15 +104,14 @@ KDB *KI_load_asc(char* filename)
 /**
  *  Saves a KDB of IDTs into an ascii file (.ac) or to the stdout.
  *  
- *  @see KI_load_asc() for the syntax. 
+ *  @see load_asc() for the syntax. 
  *  
  *  @param [in] kdb         KDB*    KDB of IDTs
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-
-int KI_save_asc(KDB* kdb, char* filename)
+int AsciiIdentities::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -139,8 +138,7 @@ int KI_save_asc(KDB* kdb, char* filename)
  * Save a KDB of IDTs in a .csv file.
  * NOT IMPLEMENTED.
  */
-
-int KI_save_csv(KDB *kdb, char *filename)
+int AsciiIdentities::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
 {
     return(-1);
 }

@@ -3,9 +3,9 @@
  *
  * Functions to load and save ascii definitions of IODE SCL objects.
  *
- *      KDB *KS_load_asc(char* filename)
- *      int KS_save_asc(KDB* kdb, char* filename)
- *      int KS_save_csv(KDB *kdb, char *filename)
+ *      KDB *load_asc(char* filename)
+ *      int save_asc(KDB* kdb, char* filename)
+ *      int save_csv(KDB *kdb, char *filename)
  *
  */
 #include "api/b_errors.h"
@@ -14,9 +14,10 @@
 #include "api/objs/scalars.h"
 #include "api/ascii/ascii.h"
 
+
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE SCL and adds the new SCL to kdb. 
- *  Subfn of KS_load_asc().
+ *  Subfn of load_asc().
  *  
  *  Reads 3 values on yy. Each token must be a number (long or double). If not : 
  *      the first value is replaced by 0.9 (value of the scalar)
@@ -29,8 +30,7 @@
  *  @return                     int     0 if the SCL is read and saved, -1 if it can't be created.
  *  
  */
-
-static int KS_read_scl(KDB* kdb, YYFILE* yy, char* name)
+static int read_scl(KDB* kdb, YYFILE* yy, char* name)
 {
     int     keyw, pos;
     SCL     scl;
@@ -58,7 +58,6 @@ static int KS_read_scl(KDB* kdb, YYFILE* yy, char* name)
     return(0);
 }
 
-
 /**
  *  Loads SCLs from an ASCII file and saves the SCLs into a new KDB.
  *  
@@ -84,11 +83,10 @@ static int KS_read_scl(KDB* kdb, YYFILE* yy, char* name)
  *                                  string containing the definition of the SCLs
  *  @return                 KDB*    new KDB of SCL or NULL on error
  *  
- *  TODO: what if KS_read_cmt returns an error code ?
+ *  TODO: what if read_cmt returns an error code ?
  *  
  */
-
-KDB *KS_load_asc(char* filename)
+KDB* AsciiScalars::load_asc(char* filename)
 {
     int     cmpt = 0;
     KDB     *kdb = 0;
@@ -123,7 +121,7 @@ KDB *KS_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(KS_read_scl(kdb, yy, name) == 0) cmpt++;
+                if(read_scl(kdb, yy, name) == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
@@ -138,7 +136,6 @@ KDB *KS_load_asc(char* filename)
     return((KDB *)0);
 }
 
-
 /**
  *  Writes the definition of a SCL to a file. IODE_NAN are represented by na.
  *  
@@ -146,7 +143,7 @@ KDB *KS_load_asc(char* filename)
  *  @param [in] scl pointer to the SCL
  *  
  */
-static void KS_print_scl(FILE* fd, SCL* scl)
+static void print_scl(FILE* fd, SCL* scl)
 {
     if(IODE_IS_A_NUMBER(scl->val)) fprintf(fd, "%.14lg ", (double)(scl->val)); /* JMP 06/10/2022 */ 
     else fprintf(fd, "na ");
@@ -161,14 +158,14 @@ static void KS_print_scl(FILE* fd, SCL* scl)
 /**
  *  Saves a KDB of SCLs into an ascii file (.as) or to the stdout.
  *  
- *  @see KS_load_asc() for the syntax. 
+ *  @see load_asc() for the syntax. 
  *  
  *  @param [in] kdb         KDB*    KDB of SCLs
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KS_save_asc(KDB* kdb, char* filename)
+int AsciiScalars::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -186,7 +183,7 @@ int KS_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         scl = KSVAL(kdb, i);
-        KS_print_scl(fd, scl);
+        print_scl(fd, scl);
         fprintf(fd, "\n");
     }
 
@@ -194,13 +191,11 @@ int KS_save_asc(KDB* kdb, char* filename)
     return(0);
 }
 
-
 /* 
  * Save a KDB of SCL in a .csv file.
  * NOT IMPLEMENTED.
  */
-
-int KS_save_csv(KDB *kdb, char *filename)
+int AsciiScalars::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
 {
     return(-1);
 }

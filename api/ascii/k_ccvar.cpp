@@ -3,9 +3,9 @@
  * 
  * Functions to load and save ascii and csv definitions of IODE VAR objects.
  *
- *      - KDB *KV_load_asc(char *filename)
- *      - KV_save_asc(KDB* kdb, char* filename)
- *      - int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
+ *      - KDB *load_asc(char *filename)
+ *      - save_asc(KDB* kdb, char* filename)
+ *      - int save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
  */
 #include "scr4.h"
 
@@ -16,20 +16,14 @@
 #include "api/ascii/ascii.h"
 
 
-/**
- * Table of keywords recognized by YY in the context of an VAR ascii file (.av).
- * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
- */
-
-#define KV_SMPL     1
-
-YYKEYS KV_TABLE[] = {
-    (unsigned char *) "sample",   KV_SMPL
-};
-
+char* AsciiVariables::CSV_SEP = 0;
+char* AsciiVariables::CSV_DEC = 0;
+char* AsciiVariables::CSV_NAN = 0;
+char* AsciiVariables::CSV_AXES = 0;
+int   AsciiVariables::CSV_NBDEC = 15;
 
 /**
- *  Reads one series on the stream YY. Subfunction of KV_load_yy().
+ *  Reads one series on the stream YY. Subfunction of load_yy().
  
  *  The series is read until the next token is neither a number nor the token "na" (not a number).
  *  The missing values till the end of the sample are fixed to na.
@@ -40,7 +34,7 @@ YYKEYS KV_TABLE[] = {
  *  @return                 int     0 on success, -1 if the var <name> cannot be created.
  *  
  */
-static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
+static int read_vec(KDB* kdb, YYFILE* yy, char* name)
 {
     int     i, keyw, pos, nb;
     double    *vec;
@@ -71,9 +65,8 @@ static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
     return(0);
 }
 
-
 /**
- *  Subfn of KV_load_asc().
+ *  Subfn of load_asc().
  *  Reads ascii definitions of IODE variables from an opened YY stream and returns a new KDB*. 
  *  
  *  
@@ -82,11 +75,11 @@ static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
  *  @see http://www.xon.be/scr4/libs1/libs157.htm for more information on YY.
  *    
  *  @param [in, out]    yy      YY*     YY stream to read data from
- *  @param [in]         ask     int     see KV_load_asc_type_ask() 
+ *  @param [in]         ask     int     see load_asc_type_ask() 
  *  @return                     KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-static KDB *KV_load_yy(YYFILE* yy, int ask)
+static KDB* load_yy(YYFILE* yy, int ask)
 {
     KDB     *kdb = 0;
     int     cmpt = 0;
@@ -102,7 +95,7 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
     //    - if ask == 1: the user must provide the sample via a call to kasksmpl()
     //    - else:        the function returns NULL
     //
-    if(YY_lex(yy) != KV_SMPL) {
+    if(YY_lex(yy) != SMPL) {
         if(!ask) {
             kerror(0,"%s Expected sample definition", YY_error(yy));
             goto err;
@@ -134,7 +127,7 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                KV_read_vec(kdb, yy, name);
+                read_vec(kdb, yy, name);
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 break;
 
@@ -161,7 +154,7 @@ err:
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
+KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask)
 {
     static  int sorted;
     KDB     *kdb = 0;
@@ -180,11 +173,11 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
     YY_CASE_SENSITIVE = 1;
 
     if(sorted == 0) {
-        qsort(KV_TABLE, sizeof(KV_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), compare);
+        qsort(TABLE, sizeof(TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), ascii_compare);
         sorted = 1;
     }
 
-    yy = YY_open(file_or_string, KV_TABLE, sizeof(KV_TABLE) / sizeof(YYKEYS), yytype);
+    yy = YY_open(file_or_string, TABLE, sizeof(TABLE) / sizeof(YYKEYS), yytype);
 
     if(yy == 0) {
         if(!type) kerror(0,"Cannot open '%s'", file_or_string);
@@ -192,7 +185,7 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
         return(kdb);
     }
 
-    kdb = KV_load_yy(yy, ask);
+    kdb = load_yy(yy, ask);
     YY_close(yy);
     return(kdb);
 }
@@ -205,11 +198,11 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-KDB *KV_load_asc(char *filename)
+KDB* AsciiVariables::load_asc(char *filename)
 {
     KDB     *kdb;
     
-    kdb = KV_load_asc_type_ask(filename, 0, 0);
+    kdb = load_asc_type_ask(filename, 0, 0);
     if(kdb && KNB(kdb) > 0) {
         char    asc_filename[1024];
         K_set_ext_asc(asc_filename, filename, VARIABLES);
@@ -219,7 +212,6 @@ KDB *KV_load_asc(char *filename)
     return(kdb);
 }
 
-
 /**
  *  Prints the representation of one value on fd. For NaN value, prints "na". 
  *  
@@ -228,7 +220,7 @@ KDB *KV_load_asc(char *filename)
  *  @return 
  *  
  */
-static void KV_print_val(FILE* fd, double val)
+static void print_val(FILE* fd, double val)
 {
     if(IODE_IS_A_NUMBER(val))
 #ifdef REALD
@@ -240,7 +232,6 @@ static void KV_print_val(FILE* fd, double val)
         fprintf(fd, "na ");
 }
 
-
 /**
  *  Saves a KDB of vars into a ascii file (.av).
  *  
@@ -249,7 +240,7 @@ static void KV_print_val(FILE* fd, double val)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KV_save_asc(KDB* kdb, char* filename)
+int AsciiVariables::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i, j;
@@ -272,7 +263,7 @@ int KV_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         val = KVVAL(kdb, i, 0);
-        for(j = 0 ; j < smpl->s_nb; j++, val++) KV_print_val(fd, *val);
+        for(j = 0 ; j < smpl->s_nb; j++, val++) print_val(fd, *val);
         fprintf(fd, "\n");
     }
 
@@ -280,38 +271,18 @@ int KV_save_asc(KDB* kdb, char* filename)
     return(0);
 }
 
-
-
 /* --------------- CSV Files -------------------- */
-
-/** 
- *  Parameters specific to csv output files. 
- *  These parameters can be modified via report commands: 
- *    - $csvdigits
- *    - $csvsep
- *    - $csvdec
- *    - $csvnan
- *    - $csvaxes
- *  
- */
-
-char* KV_CSV_SEP = 0;       // cell separator     (default ",")
-char* KV_CSV_DEC = 0;       // decimal separator (default ".")
-char* KV_CSV_NAN = 0;       // NaN representation (default "")
-char* KV_CSV_AXES = 0;      // name of the axis for the variable name (default "var")
-int   KV_CSV_NBDEC = 15;     // number of decimals
-
 
 /**
  *  Saves a KDB of variables in a csv file à la LArray.
  *  
  *  The following global variables can be modified to customize the output :
  *  
- *    - char *KV_CSV_SEP = 0;       // cell separator     (default ",")
- *    - char *KV_CSV_DEC = 0;       // decimal separator (default ".")
- *    - char *KV_CSV_NAN = 0;       // NaN representation (default "")
- *    - char *KV_CSV_AXES = 0;      // name of the axis for the variable name (default "var") or NULL for all variables
- *    - int  KV_CSV_NBDEC = 15;     // number of decimals
+ *    - char *CSV_SEP = 0;       // cell separator     (default ",")
+ *    - char *CSV_DEC = 0;       // decimal separator (default ".")
+ *    - char *CSV_NAN = 0;       // NaN representation (default "")
+ *    - char *CSV_AXES = 0;      // name of the axis for the variable name (default "var") or NULL for all variables
+ *    - int  CSV_NBDEC = 15;     // number of decimals
  *  
  *  
  *  @param [in] kdb      KDB*       KDB of vars to save
@@ -321,7 +292,7 @@ int   KV_CSV_NBDEC = 15;     // number of decimals
  *  @return 
  *  
  */
-int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
+int AsciiVariables::save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
 {
     FILE        *fd;
     int         i, j, nb, pos;
@@ -330,9 +301,9 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
     PERIOD      *per;
 
     // Parameters : sep, dec, nbdec, nan,
-    sep = KV_CSV_SEP;
-    dec = KV_CSV_DEC;
-    nan = KV_CSV_NAN;
+    sep = this->CSV_SEP;
+    dec = this->CSV_DEC;
+    nan = this->CSV_NAN;
     if(sep == 0 || sep[0] == 0) {
         sep = ",";
         sep[0] = SCR_sLIST; // JMP 27/1/2017
@@ -341,16 +312,16 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
         dec = ".";
         dec[0] = SCR_sDECIMAL; // JMP 27/1/2017
     }
-    if(KV_CSV_NBDEC < 0 || KV_CSV_NBDEC > 15)
+    if(this->CSV_NBDEC < 0 || this->CSV_NBDEC > 15)
         strcpy(fmt, "%lg");
     else
-        sprintf(fmt, "%%.%dlg", KV_CSV_NBDEC);
+        sprintf(fmt, "%%.%dlg", this->CSV_NBDEC);
     if(nan == 0) nan = "";
 
-    axes = KV_CSV_AXES;
+    axes = this->CSV_AXES;
     if(axes == 0 || axes[0] == 0) axes = "var";
 
-    // sample : if KV_CSV_SAMPLE == NULL => tout le sample
+    // sample : if CSV_SAMPLE == NULL => tout le sample
     if(smpl == 0)
         smpl = (SAMPLE *) KDATA(kdb);
 
@@ -410,4 +381,3 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
     if(filename[0] != '-') fclose(fd);
     return(0);
 }
-

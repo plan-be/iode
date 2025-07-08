@@ -3,9 +3,9 @@
  * 
  * Functions to load and save ascii definitions of IODE EQ objects.
  *
- *     KDB *KE_load_asc(char* filename)
- *     int KE_save_asc(KDB* kdb, char* filename)
- *     int KE_save_csv(KDB *kdb, char *filename) : not implemented
+ *     KDB *load_asc(char* filename)
+ *     int save_asc(KDB* kdb, char* filename)
+ *     int save_csv(KDB *kdb, char *filename) : not implemented
  *
  */
 #include "api/b_errors.h"
@@ -48,7 +48,7 @@ YYKEYS KE_TABLE[] = {
 
 /**
  *  Reads on an opened YY stream (file or string) the ascii definition of an IODE EQ. 
- *  Subfn of KE_load_asc().
+ *  Subfn of load_asc().
  *   
  *  Splits the LEC expression in multiple lines of max 60 chars.
  *  
@@ -56,7 +56,7 @@ YYKEYS KE_TABLE[] = {
  *  @return                     EQ*     a new allocated EQ or NULL on error
  *  
  */
-static EQ* KE_read_eq(YYFILE* yy)
+static EQ* read_eq(YYFILE* yy)
 {
     int     keyw;
     char    *lec;
@@ -173,7 +173,6 @@ err :
 
 }
 
-
 /**
  *  Loads EQs from an ASCII file into a new KDB.
  *  
@@ -239,9 +238,8 @@ err :
  *  @return                 KDB*    NULL or allocated KDB of EQs
  *  
  */
-KDB *KE_load_asc(char* filename)
+KDB* AsciiEquations::load_asc(char* filename)
 {
-
     KDB     *kdb = NULL;
     EQ      *eq = NULL;
     YYFILE  *yy;
@@ -250,7 +248,7 @@ KDB *KE_load_asc(char* filename)
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
-    qsort(KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS), sizeof(YYKEYS), compare_eqs);
+    qsort(KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS), sizeof(YYKEYS), ascii_eqs_compare);
     SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
@@ -278,7 +276,7 @@ KDB *KE_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                eq = KE_read_eq(yy);
+                eq = read_eq(yy);
                 if(eq == NULL) {
                     kerror(0, "%s : equation not defined", YY_error(yy));
                     goto err;
@@ -312,7 +310,6 @@ err:
     return((KDB *) 0);
 }
 
-
 /**
  *  Prints the value of a statistical test on fd. 
  *  If the value of the test is 0 or NaN , does not print anything. 
@@ -324,24 +321,23 @@ err:
  *  
  */
 
-static void KE_print_test(FILE* fd, char* txt, double val)
+static void print_test(FILE* fd, char* txt, double val)
 {
     if(val != 0 && IODE_IS_A_NUMBER(val)) fprintf(fd, "\t%s %.8lg\n", txt, val); /* JMP 05-09-2022 : .15 -> .8 */
     //if(val != 0 && IODE_IS_A_NUMBER(val)) fprintf(fd, "\t%s %lg\n", txt, val); /* JMP 05-09-2022 */
 }
 
-
 /**
  *  Saves on the stream fd the ascii representation of one EQ.
 
- *  @see KE_read_eq() the detailed syntax of an ascii equation. 
+ *  @see read_eq() the detailed syntax of an ascii equation. 
  *  
  *  @param [in, out]    fd      FILE*       output stream    
  *  @param [in]         eq      EQ*         pointer to the EQ to print  
  *  @param [in]         name    char*       equation endo (i.e. equation name)
  *  
  */
-static void KE_print_eq(FILE* fd, EQ* eq, char* name)
+static void print_eq(FILE* fd, EQ* eq, char* name)
 {
     char    from[21], to[21], *SCR_long_to_date();
 
@@ -387,20 +383,19 @@ static void KE_print_eq(FILE* fd, EQ* eq, char* name)
         
         //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);
-        KE_print_test(fd, "STDEV",  eq->tests[1]);
-        KE_print_test(fd, "MEANY",  eq->tests[2]);
-        KE_print_test(fd, "SSRES",  eq->tests[3]);
-        KE_print_test(fd, "STDERR", eq->tests[4]);
-        KE_print_test(fd, "FSTAT",  eq->tests[6]);
-        KE_print_test(fd, "R2",     eq->tests[7]);
-        KE_print_test(fd, "R2ADJ",  eq->tests[8]);
-        KE_print_test(fd, "DW",     eq->tests[9]);
-        KE_print_test(fd, "LOGLIK", eq->tests[10]);
+        print_test(fd, "STDEV",  eq->tests[1]);
+        print_test(fd, "MEANY",  eq->tests[2]);
+        print_test(fd, "SSRES",  eq->tests[3]);
+        print_test(fd, "STDERR", eq->tests[4]);
+        print_test(fd, "FSTAT",  eq->tests[6]);
+        print_test(fd, "R2",     eq->tests[7]);
+        print_test(fd, "R2ADJ",  eq->tests[8]);
+        print_test(fd, "DW",     eq->tests[9]);
+        print_test(fd, "LOGLIK", eq->tests[10]);
     }
     
     fprintf(fd, "}\n");
 }
-
 
 /**
  *  Saves a KDB of EQs into an ascii file (.ae) or to the stdout.
@@ -412,7 +407,7 @@ static void KE_print_eq(FILE* fd, EQ* eq, char* name)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KE_save_asc(KDB* kdb, char* filename)
+int AsciiEquations::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -430,7 +425,7 @@ int KE_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         eq = KEVAL(kdb, i);
-        KE_print_eq(fd, eq, KONAME(kdb, i));
+        print_eq(fd, eq, KONAME(kdb, i));
         E_free(eq);
     }
 
@@ -438,13 +433,11 @@ int KE_save_asc(KDB* kdb, char* filename)
     return(0);
 }
 
-
-
 /* 
  * Save a KDB of EQs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int KE_save_csv(KDB *kdb, char *filename)
+int AsciiEquations::save_csv(KDB *kdb, char *filename,SAMPLE* sample, char** varlist)
 {
     return(-1);
 }

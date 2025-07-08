@@ -42,6 +42,7 @@
 #include "api/b_errors.h"
 #include "api/ascii/ascii.h"
 #include "api/objs/objs.h"
+#include "api/objs/grep.h"
 #include "api/objs/variables.h"
 #include "api/estimation/estimation.h"
 #include "api/report/commands/commands.h"
@@ -64,7 +65,7 @@ int B_WsLoad(char* arg, int type)
     int     pos = K_PWS[type];
     char    buf[K_MAX_FILE + 1];
 
-    SCR_strlcpy(buf, arg, K_MAX_FILE);
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
     K_strip(buf);   /* JMP 19-04-98 */
     if(buf[0] == 0) return(0);
 
@@ -101,7 +102,7 @@ int X_findtype(char* filename)
     if(lg > 4) {
         for(i = 0 ; i < 7 ; i++) {
             if(filename[lg - 4] == '.' &&
-                    SCR_cstrcmp(k_ext[i], filename + lg - 3) == 0) return(i);
+                    SCR_cstrcmp((unsigned char*) k_ext[i], ((unsigned char*) filename) + lg - 3) == 0) return(i);
         }
     }
 
@@ -110,7 +111,7 @@ int X_findtype(char* filename)
         strcpy(buf, ".ac");
         for(i = 0 ; i < 7 ; i++) {
             buf[2] = k_ext[i][0];
-            if(SCR_cstrcmp(filename + lg - 3, buf) == 0) return(10 + i);
+            if(SCR_cstrcmp(((unsigned char*) filename) + lg - 3, (unsigned char*) buf) == 0) return(10 + i);
         }
     }
 
@@ -118,12 +119,12 @@ int X_findtype(char* filename)
     //
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019
-    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
-    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas trés cohérent...
+    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
+    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".rep") == 0) return(22); // ??? pas trés cohérent...
 
     // Sais plus a quoi ca peut servir... => a supprimer
     for(i = 16 ; strcmp(k_ext[i], "xxx") !=0 ; i++) {
-        if(lg > 4 && SCR_cstrcmp(filename + lg - 4, k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3
+        if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3
     }
 
     return(-1);
@@ -147,12 +148,11 @@ int B_WsDump(KDB* kdb, char* filename)
     ftype = X_findtype(filename);
 
     if(ftype >= 10 && ftype <= 17)
-        rc = (*K_save_asc[type])(kdb, filename);
-    //else if(ftype >= 0 && ftype <= 6)
+        rc = ascii_handlers[type]->save_asc(kdb, filename);
     else if(ftype <= 6)
         rc = K_save(kdb, filename);
     else if(ftype == FILE_CSV)
-        rc = (*K_save_csv[type])(kdb, filename, NULL, NULL);
+        rc = ascii_handlers[type]->save_csv(kdb, filename, NULL, NULL);
 
     return(rc);
 }
@@ -171,13 +171,13 @@ int B_WsSave(char* arg, int type)
 {
     char    buf[K_MAX_FILE + 1];
 
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     if(strlen(arg) >= sizeof(FNAME)) {
         B_seterror(B_msg(256));   /* File name too long */
         return(-1);
     }
-    SCR_strlcpy(buf, arg, K_MAX_FILE); /* JMP 18-04-98 */
-    SCR_strip(buf);
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
+    SCR_strip((unsigned char*) buf);
     if(buf[0] == 0) return(0);
     return(B_WsDump(K_WS[type], buf));
 }
@@ -199,8 +199,8 @@ int B_WsSave(char* arg, int type)
     extern int  K_LZH;                  /* JMP 28-05-00 */
     int         rc = 0, klzh;
 
-    SCR_strlcpy(buf, arg, K_MAX_FILE); /* JMP 18-04-98 */
-    SCR_strip(buf);
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
+    SCR_strip((unsigned char*) buf);
     if(buf[0] == 0) return(0);
     klzh = K_LZH;
     K_LZH = 2;
@@ -221,8 +221,7 @@ int B_WsSave(char* arg, int type)
 
 int B_WsExport(char* arg, int type)
 {
-
-    return((*K_save_asc[type])(K_WS[type], arg));
+    return ascii_handlers[type]->save_asc(K_WS[type], arg);
 }
 
 
@@ -250,23 +249,23 @@ int B_WsImport(char* arg, int type)
 int B_WsSample(char* arg)
 {
     char    **args;
-    SAMPLE  *new = NULL;
+    SAMPLE  *new_smpl = NULL;
     KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) goto err;
 
-    new = PER_atosmpl(args[0], args[1]);
-    if(new == 0 || new->s_nb <= 0) goto err; /* JMP 25-05-92 */
-    if(KV_sample(kdb, new) < 0) goto err;
+    new_smpl = PER_atosmpl(args[0], args[1]);
+    if(new_smpl == 0 || new_smpl->s_nb <= 0) goto err; /* JMP 25-05-92 */
+    if(KV_sample(kdb, new_smpl) < 0) goto err;
 
-    SW_nfree(new);
-    A_free(args);
+    SW_nfree(new_smpl);
+    A_free((unsigned char**) args);
     return(0);
 
 err:
-    SW_nfree(new); /* JMP 25-05-92 */
-    A_free(args);
+    SW_nfree(new_smpl); /* JMP 25-05-92 */
+    A_free((unsigned char **) args);
     B_seterror(B_msg(4));   /* New sample invalid */
     return(-1);
 }
@@ -314,7 +313,7 @@ int B_WsClearAll(char* arg)
  
 int B_WsDescr(char* arg, int type)
 {
-    SCR_strlcpy(KDESC(K_WS[type]), arg, 50);
+    SCR_strlcpy((unsigned char*) KDESC(K_WS[type]), (unsigned char*) arg, 50);
     return(0);
 }
 
@@ -334,7 +333,7 @@ int B_WsName(char* arg, int type)
     //SCR_strlcpy(KNAME(K_WS[type]), file, K_MAX_FILE - 1);	// JMP 3/6/2015
 
     // Save full name in K_WSNAME
-    K_set_kdb_name(K_WS[type], arg);  // JMP 3/6/2015
+    K_set_kdb_name(K_WS[type], (unsigned char*) arg);  // JMP 3/6/2015
     return(0);
 }
 
@@ -354,8 +353,7 @@ int B_WsCopy(char* arg, int type)
 {
     int     lg, shift = 0, rc = 0;
     char    file[K_MAX_FILE + 1], **files;
-    char    **data, **data0, *K_expand(), *lst;
-    U_ch    **SCR_inter();
+    char    **data, **data0, *lst;
     SAMPLE  *smpl = NULL;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
@@ -373,12 +371,12 @@ int B_WsCopy(char* arg, int type)
     /*    data0 = B_ainit_chk(arg + lg, NULL, 0); */
     if(data0 == 0 || data0[0] == 0) {   /* JMP 24-06-98 */
         B_seterror(B_msg(134));
-        SCR_free_tbl(files);
-        SCR_free_tbl(data0);
+        SCR_free_tbl((unsigned char**) files);
+        SCR_free_tbl((unsigned char**) data0);
         return(-1);
     }
 
-    if(type == VARIABLES && SCR_tbl_size(data0) >= 2) {
+    if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) {
         smpl = PER_atosmpl(data0[0], data0[1]);
         if(smpl != NULL) shift = 2;
         else B_clear_last_error();
@@ -389,15 +387,15 @@ int B_WsCopy(char* arg, int type)
         rc = -1;
     }
     else {
-        data = SCR_inter(data0 + shift, data0 + shift);
+        data = (char**) SCR_inter(((unsigned char**) data0) + shift, ((unsigned char**) data0) + shift);
         rc = K_copy(K_WS[type],
-                    SCR_tbl_size(files), files,
-                    SCR_tbl_size(data), data,
+                    SCR_tbl_size((unsigned char**) files), files,
+                    SCR_tbl_size((unsigned char**) data), data,
                     smpl);
-        SCR_free_tbl(data);
+        SCR_free_tbl((unsigned char**) data);
     }
-    SCR_free_tbl(data0);
-    SCR_free_tbl(files);
+    SCR_free_tbl((unsigned char**) data0);
+    SCR_free_tbl((unsigned char**) files);
     SCR_free(smpl);
 
     if(rc < 0) return(-1);
@@ -450,7 +448,7 @@ int B_WsExtrapolate(char* arg)
     KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size(args);
+    nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 2) {
         B_seterror(B_msg(130));
         goto done;
@@ -472,7 +470,7 @@ int B_WsExtrapolate(char* arg)
 
 done:
     SW_nfree(smpl);
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
@@ -492,12 +490,12 @@ int B_WsAggr(int method, char* arg)
     KDB     *kdb = K_WS[VARIABLES], *nkdb = NULL;
 
     args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size(args);
+    nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 1) {
         B_seterror(B_msg(136));
         goto done;
     }
-    pattern = SCR_stracpy(args[0]);
+    pattern = (char*) SCR_stracpy((unsigned char*) args[0]);
     nkdb = KV_aggregate(kdb, method, pattern, args[1]);
     if(nkdb) {
         KV_merge_del(kdb, nkdb, 1);
@@ -506,7 +504,7 @@ int B_WsAggr(int method, char* arg)
     
 done:
     SCR_free(pattern);
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
@@ -581,7 +579,6 @@ double *B_StatUnitRoot_1(char* arg, int print)
     int     lg, drift, trend, order, rc = -1;
     char    name[80], buf[1024];
     double    *df = NULL;
-    extern  double *E_UnitRoot();
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     drift = atoi(name);
@@ -654,7 +651,7 @@ int B_CsvSave(char* arg, int type)
 {
     int     lg, shift = 0, rc = 0;
     char    file[K_MAX_FILE + 1], file_ext[K_MAX_FILE + 1];
-    char    **data0, *K_expand(), *lst;
+    char    **data0, *lst;
     SAMPLE  *smpl = NULL;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
@@ -670,26 +667,27 @@ int B_CsvSave(char* arg, int type)
     SCR_free(lst);
     A_SEPS = oldseps; // JMP 27/09/2022   
     
-    if(SCR_tbl_size(data0) == 0) {
-        SCR_free_tbl(data0);
+    if(SCR_tbl_size((unsigned char**) data0) == 0) {
+        SCR_free_tbl((unsigned char**) data0);
         data0 = 0;
     }
 
-    if(data0 && type == VARIABLES && SCR_tbl_size(data0) >= 2) {
+    if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) {
         if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) {
             shift = 2;
             smpl = PER_atosmpl(data0[0], data0[1]);
             B_clear_last_error();
         }
-        if(SCR_tbl_size(data0) <= shift) {
-            SCR_free_tbl(data0);
+        if(SCR_tbl_size((unsigned char**) data0) <= shift) {
+            SCR_free_tbl((unsigned char**) data0);
             data0 = 0;
             shift = 0;
         }
     }
 
-    rc = (*K_save_csv[type])(K_WS[type], file_ext, smpl, data0 + shift);
-    SCR_free_tbl(data0);
+    rc = ascii_handlers[type]->save_csv(K_WS[type], file_ext, smpl, data0 + shift);
+
+    SCR_free_tbl((unsigned char**) data0);
     SCR_free(smpl);
 
     if(rc < 0) return(rc);
@@ -705,12 +703,10 @@ int B_CsvSave(char* arg, int type)
 
 int B_CsvNbDec(char *nbdec)
 {
-    extern int KV_CSV_NBDEC;
-
-    KV_CSV_NBDEC = atoi(nbdec);
-    if(KV_CSV_NBDEC > 99 || (KV_CSV_NBDEC < 0 && KV_CSV_NBDEC != -1)) {
+    AsciiVariables::CSV_NBDEC = atoi(nbdec);
+    if(AsciiVariables::CSV_NBDEC > 99 || (AsciiVariables::CSV_NBDEC < 0 && AsciiVariables::CSV_NBDEC != -1)) {
         B_seterrn(53, nbdec);
-        KV_CSV_NBDEC = 10;
+        AsciiVariables::CSV_NBDEC = 10;
         return(-1);
     }
     return(0);
@@ -725,10 +721,8 @@ int B_CsvNbDec(char *nbdec)
 
 int B_CsvSep(char *sep)
 {
-    extern char  *KV_CSV_SEP;
-
-    SCR_free(KV_CSV_SEP);
-    KV_CSV_SEP = SCR_stracpy(sep);
+    SCR_free(AsciiVariables::CSV_SEP);
+    AsciiVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
     return(0);
 }
 
@@ -741,10 +735,8 @@ int B_CsvSep(char *sep)
 
 int B_CsvNaN(char *nan)
 {
-    extern char  *KV_CSV_NAN;
-
-    SCR_free(KV_CSV_NAN);
-    KV_CSV_NAN = SCR_stracpy(nan);
+    SCR_free(AsciiVariables::CSV_NAN);
+    AsciiVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
     return(0);
 }
 
@@ -758,10 +750,8 @@ int B_CsvNaN(char *nan)
 
 int B_CsvAxes(char *var)
 {
-    extern char  *KV_CSV_AXES;
-
-    SCR_free(KV_CSV_AXES);
-    KV_CSV_AXES = SCR_stracpy(var);
+    SCR_free(AsciiVariables::CSV_AXES);
+    AsciiVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
     return(0);
 }
 
@@ -775,10 +765,8 @@ int B_CsvAxes(char *var)
 
 int B_CsvDec(char *dec)
 {
-    extern char  *KV_CSV_DEC;
-
-    SCR_free(KV_CSV_DEC);
-    KV_CSV_DEC = SCR_stracpy(dec);
+    SCR_free(AsciiVariables::CSV_DEC);
+    AsciiVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
     return(0);
 }
 

@@ -4,9 +4,6 @@
 
 extern "C" 
 {
-    // copied from api/objs/k_objfile.c
-    extern int  K_LZH;
-
     // copied from scr4/s_prosw.h
     extern char *SW_nalloc_doc(unsigned int size, char *, int);
     extern void *SW_nrealloc_doc(void *old_ptr, unsigned int old_count, unsigned int new_count, char *file, int line);
@@ -18,6 +15,9 @@ extern "C"
     extern int SCR_free_tbl(unsigned char **tbl);
     extern int SCR_tbl_size(unsigned char **tbl);
 }
+
+// copied from api/objs/k_objfile.cpp
+extern int  K_LZH;
 
 #include <string>
 #include <array>

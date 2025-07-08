@@ -39,6 +39,9 @@
 #include "api/objs/old_structs.h"
 #include "api/objs/structs_32.h"
 
+extern "C" char K_LABEL[];
+
+
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------
 
@@ -221,8 +224,8 @@ char *K_set_ext_asc(char* res, char* fname, int type)
  */
 void K_strip(char* filename)
 {
-    U_ljust_text(filename);
-    SCR_strip(filename);
+    U_ljust_text((unsigned char*) filename);
+    SCR_strip((unsigned char*) filename);
 }
 
 
@@ -273,7 +276,7 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
     else {
         rc = fread(&us, (int)sizeof(U_sh), 1, fd);
         if(rc != 1) return(-1);
-        K_xdrPINT((char *)&us);
+        K_xdrPINT((unsigned char*) &us);
         kseek(fd, -1L * sizeof(U_sh), 1);
         *len = us;
     }
@@ -393,7 +396,6 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
     //KOBJ    *kobj;
     FNAME   file;
     FILE    *fd;
-    extern  char K_LABEL[];
 
     // Next line is deleted because K_load_odbc() was implemented for a specific project
     // if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
@@ -437,7 +439,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
         ptr = SCR_fullpath(file, fullpath);
         if(ptr == 0) ptr = file;
         //strcpy(kdb->k_name, ptr);
-        K_set_kdb_name(kdb, ptr);  // JMP 3/6/2015
+        K_set_kdb_name(kdb, (unsigned char*) ptr);  // JMP 3/6/2015
     }
 
     // Load object table (32 bits == 64 bits)
@@ -468,7 +470,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
             kread(&len, sizeof(OSIZE), 1, fd);
             kread(cptr, clen, 1, fd);
             //LzhDecodeStr(cptr, clen, &aptr, &len);
-            GzipDecodeStr(cptr, clen, &aptr, &len);
+            GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
             memcpy((char *)KOBJS(kdb), aptr, len);
             SW_nfree(cptr);
             SCR_free(aptr);
@@ -487,7 +489,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
                 kread(&len, sizeof(OSIZE), 1, fd);
                 kread(cptr, clen, 1, fd);
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
-                GzipDecodeStr(cptr, clen, &aptr, &len);
+                GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
                 KOBJS(kdb)[i].o_val = SW_alloc(len);
                 ptr = SW_getptr(KOBJS(kdb)[i].o_val);
                 memcpy(ptr, aptr, len);
@@ -505,7 +507,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
                 }
                 kread(ptr, len, 1, fd);
             }
-            K_xdrobj[KTYPE(kdb)](ptr, NULL);
+            K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, NULL);
             K_setvers(kdb, i, vers);
         }
     }
@@ -519,7 +521,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
         KNB(tkdb) = 0;
         KOBJS(tkdb) = NULL;
 
-        nf = SCR_tbl_size(objs);
+        nf = SCR_tbl_size((unsigned char**) objs);
         for(i = 0; i < nf; i++) K_add_entry(tkdb, objs[i]);
 
         lpos = 0;
@@ -556,7 +558,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
                 kread(&len, sizeof(OSIZE), 1, fd);
                 kread(cptr, clen, 1, fd);
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
-                GzipDecodeStr(cptr, clen, &aptr, &len);
+                GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
                 KOBJS(tkdb)[i].o_val = SW_alloc(len);
                 ptr = SW_getptr(KOBJS(tkdb)[i].o_val);
                 memcpy(ptr, aptr, len);
@@ -569,7 +571,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
                 kread(ptr, len, 1, fd);
             }
 
-            K_xdrobj[KTYPE(tkdb)](ptr, NULL);
+            K_xdrobj[KTYPE(tkdb)]((unsigned char*) ptr, NULL);
             K_setvers(tkdb, i, vers); // JMP 10-04-98 
             lpos = pos + 1;
             i++;
@@ -735,8 +737,8 @@ KDB *K_interpret(int type, char* filename)
     if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
         if(type >= FILE_COMMENTS && type <= FILE_VARIABLES && 
             K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) {
-                kdb = (*K_load_asc[type])(filename);
-            }
+                kdb = ascii_handlers[type]->load_asc(filename);
+        }
     }
     
     if(kdb == NULL && type == ftype) 
@@ -918,7 +920,7 @@ int K_cat(KDB* ikdb, char* filename)
     if(KNB(ikdb) == 0) {
         memcpy(KDESC(ikdb), KDESC(kdb), K_MAX_DESC);
         //strcpy(KNAME(ikdb), KNAME(kdb));
-        K_set_kdb_name(ikdb, KNAMEPTR(kdb)); // JMP 3/6/2015
+        K_set_kdb_name(ikdb, (unsigned char*) KNAMEPTR(kdb)); // JMP 3/6/2015
     }
     if(KTYPE(ikdb) == VARIABLES) KV_merge_del(ikdb, kdb, 1);
     else K_merge_del(ikdb, kdb, 1);
@@ -1003,7 +1005,7 @@ static int K_cwrite(int method, char* buf, OSIZE len, int nb, FILE* fd, int minl
         return(len);
     }
 
-    GzipEncodeStr(buf, len, &cptr, &clen);
+    GzipEncodeStr((unsigned char*) buf, len, (unsigned char**) &cptr, (unsigned long*) &clen);
     if(minlen > 0 && len <= clen + sizeof(OSIZE)) {
         kwrite(buf, len, 1, fd);
         clen = -len;
@@ -1068,7 +1070,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     //kmsg("Saving %s", file); // JMP 11/01/2023 (msg already in calling function B_WsDump)
 
     if(mode) {
-        K_set_kdb_name(kdb, file); // JMP 3/6/2015
+        K_set_kdb_name(kdb, (unsigned char*) file); // JMP 3/6/2015
         //strcpy(KNAME(kdb), file);
     }
 
@@ -1101,7 +1103,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         /* XDR  OBJ */
         ptr = SW_getptr(KOBJS(kdb)[i].o_val);
         len = P_len(ptr);
-        K_xdrobj[KTYPE(kdb)](ptr, &xdr_ptr);
+        K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
         if(K_cwrite(kdb->k_compressed, xdr_ptr, len, 1, fd, 20) < 0) goto error;
         SW_nfree(xdr_ptr);
     }
@@ -1188,7 +1190,7 @@ int K_setname(char* from, char* to)
 
     kread((char *) &kdb, sizeof(KDB), 1, fd);
     // strcpy(kdb.k_name, to);
-    K_set_kdb_name(&kdb, to); // JMP 3/6/2015
+    K_set_kdb_name(&kdb, (unsigned char*) to); // JMP 3/6/2015
     kseek(fd, (long) -1L * sizeof(KDB), 1);
     kwrite((char *) &kdb, sizeof(KDB), 1, fd);
 

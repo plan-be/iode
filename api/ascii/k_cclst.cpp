@@ -3,9 +3,9 @@
  * 
  * Functions to load and save ascii definitions of IODE LST objects.
  *
- *      KDB *KL_load_asc(char* filename)
- *      int KL_save_asc(KDB* kdb, char* filename)
- *      int KL_save_csv(KDB *kdb, char *filename)
+ *      KDB *load_asc(char* filename)
+ *      int save_asc(KDB* kdb, char* filename)
+ *      int save_csv(KDB *kdb, char *filename)
  *
  */
 #include "api/b_errors.h"
@@ -13,6 +13,7 @@
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"
 #include "api/ascii/ascii.h"
+
 
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE LST and adds the new LST to kdb. 
@@ -32,8 +33,7 @@
  *                                      -1 if the LST can't be created. (call to kerror() in that case)
  *  
  */
-
-static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
+static int read_lst(KDB* kdb, YYFILE* yy, char* name)
 {
     int     keyw, pos;
     char    *lst;
@@ -65,7 +65,6 @@ static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
     return(0);
 }
 
-
 /**
  *  Loads LSTs from an ASCII file into a new KDB.
  *  
@@ -92,11 +91,10 @@ static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
  *                                  string containing the definition of the identities
  *  @return                 KDB*    new KDB of LST or NULL on error
  *  
- *  TODO: what if KL_read_lst returns an error code ?
+ *  TODO: what if read_lst returns an error code ?
  *  
  */
-
-KDB *KL_load_asc(char* filename)
+KDB* AsciiLists::load_asc(char* filename)
 {
     int     cmpt = 0;
     KDB     *kdb = 0;
@@ -132,7 +130,7 @@ KDB *KL_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(KL_read_lst(kdb, yy, name) == 0) cmpt++;
+                if(read_lst(kdb, yy, name) == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
@@ -150,14 +148,14 @@ KDB *KL_load_asc(char* filename)
 /**
  *  Saves a KDB of LSTs in an ascii file (.al) or to the stdout.
  *  
- *  @see KL_load_asc() for the syntax. 
+ *  @see load_asc() for the syntax. 
  *  
  *  @param [in] kdb         KDB*    KDB of LSTs
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KL_save_asc(KDB* kdb, char* filename)
+int AsciiLists::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -189,7 +187,7 @@ int KL_save_asc(KDB* kdb, char* filename)
  * NOT IMPLEMENTED.
  */
 
-int KL_save_csv(KDB *kdb, char *filename)
+int AsciiLists::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
 {
     return(-1);
 }
