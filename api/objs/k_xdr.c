@@ -752,7 +752,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
  *    
  */
 
-int (*K_xdrobj[])() = {
+int (*K_xdrobj[])(unsigned char*, unsigned char**) = {
     K_cxdr,
     K_exdr,
     K_ixdr,

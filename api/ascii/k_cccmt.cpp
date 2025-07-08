@@ -3,9 +3,9 @@
  * 
  * Functions to load and save ascii definitions of IODE CMT objects.
  *
- *    KDB *KC_load_asc(char* filename)
- *    int KC_save_asc(KDB* kdb, char* filename)
- *    int KC_save_csv(KDB *kdb, char *filename)
+ *    KDB *load_asc(char* filename)
+ *    int save_asc(KDB* kdb, char* filename)
+ *    int save_csv(KDB *kdb, char *filename)
  */
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -13,9 +13,10 @@
 #include "api/objs/comments.h"
 #include "api/ascii/ascii.h"
 
+
 /**
  *  Reads on an open YY stream (file or string) the ascii definition of an IODE CMT and adds the new CMT to kdb. 
- *  Subfn of KC_load_asc().
+ *  Subfn of load_asc().
  *  
  *  Reads the next token on yy. 
  *      If a string (bw "") is found, its content becomes the new content of the CMT name.
@@ -27,7 +28,7 @@
  *  @return                     int     0 if the CMT is read and saved, -1 if the CMT can't be created.
  *  
  */
-static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
+static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
 {
     int     keyw, pos;
     char    *cmt;
@@ -59,7 +60,6 @@ static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
     return(0);
 }
 
-
 /**
  *  Loads CMTs from an ASCII file into a new KDB.
  *  
@@ -83,10 +83,10 @@ static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
  *                                  string containing the definition of the comment
  *  @return                 KDB*    new KDB of CMT or NULL on error
  *  
- *  TODO: what if KC_read_cmt returns an error code ?
+ *  TODO: what if read_cmt returns an error code ?
  *  
  */
-KDB *KC_load_asc(char* filename)
+KDB* AsciiComments::load_asc(char* filename)
 {
     KDB     *kdb = 0;
     int     cmpt = 0, rc;
@@ -123,7 +123,7 @@ KDB *KC_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                rc = KC_read_cmt(kdb, yy, name);
+                rc = read_cmt(kdb, yy, name);
                 if(rc == 0) cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
@@ -149,7 +149,7 @@ KDB *KC_load_asc(char* filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int KC_save_asc(KDB* kdb, char* filename)
+int AsciiComments::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -181,7 +181,7 @@ int KC_save_asc(KDB* kdb, char* filename)
  * Save a KDB of CMTs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int KC_save_csv(KDB *kdb, char *filename)
+int AsciiComments::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
 {
     return(-1);
 }

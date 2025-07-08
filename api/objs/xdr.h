@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-extern  int  (*K_xdrobj[])();
+extern  int  (*K_xdrobj[])(unsigned char* ptr, unsigned char** xdr_ptr);
 
 /* k_xdr.c */
 extern void K_xdrPINT(unsigned char *);
