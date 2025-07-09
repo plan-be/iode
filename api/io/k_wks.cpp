@@ -15,8 +15,8 @@
  */
 #include "scr4/s_xdr.h"
 
-#include "api/conversion/import.h"
-#include "api/conversion/export.h"
+#include "api/io/import.h"
+#include "api/io/export.h"
 
 
 FILE*            WKS_FD;

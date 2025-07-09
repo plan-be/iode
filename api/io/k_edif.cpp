@@ -58,8 +58,8 @@
 #include "api/objs/comments.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
-#include "api/conversion/dif.h"
-#include "api/conversion/export.h"
+#include "api/io/dif.h"
+#include "api/io/export.h"
 
 
 int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)

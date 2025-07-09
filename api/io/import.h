@@ -5,7 +5,7 @@
 #include "api/constants.h"
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
-#include "api/conversion/dif.h"
+#include "api/io/dif.h"
 
 #include <array>    // for std::array
 #include <memory>   // for std::unique_ptr

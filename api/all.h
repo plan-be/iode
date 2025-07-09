@@ -12,9 +12,9 @@
 
 #include "api/ascii/ascii.h"
 
-#include "api/conversion/dif.h"
-#include "api/conversion/export.h"
-#include "api/conversion/import.h"
+#include "api/io/dif.h"
+#include "api/io/export.h"
+#include "api/io/import.h"
 
 #include "api/estimation/estimation.h"
 

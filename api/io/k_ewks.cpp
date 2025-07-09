@@ -21,7 +21,7 @@
 #include "api/objs/comments.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
-#include "api/conversion/export.h"
+#include "api/io/export.h"
 
 
 int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
