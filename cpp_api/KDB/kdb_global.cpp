@@ -183,23 +183,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         IMP_trace = 0;
     }
 
-    EXPDEF  *expdef;
-    switch(format) {
-        case EXPORT_CSV:
-            expdef = &EXPCSV;
-            break;
-        case EXPORT_DIF:
-            expdef = &EXPDIF;
-            break;
-        case EXPORT_WKS:
-            expdef = &EXPWKS;
-            break;
-        case EXPORT_TSP:
-            expdef = &EXPTSP;
-            break;
-        default:
-            expdef = &EXPRCSV;
-    }
+    ExportToFile* expdef = export_handlers[format].get();
 
     int res;
     if(format < EXPORT_RCSV)

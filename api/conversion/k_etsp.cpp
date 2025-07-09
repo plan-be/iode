@@ -28,12 +28,12 @@
  *  
  *  List of functions
  *  -----------------
- *      int EXP_hd_tsp(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a tsp export file.
- *      int EXP_end_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
- *      char *EXP_code_tsp(char* name, char** code)                             Variable name translation for tsp output.
- *      char *EXP_cmt_tsp(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for tsp output. 
- *      char *EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
- *      int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
+ *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a tsp export file.
+ *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
+ *      char *write_object_name(char* name, char** code)                             Variable name translation for tsp output.
+ *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for tsp output. 
+ *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
+ *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -43,29 +43,29 @@
 #include "api/conversion/export.h"
 
 
-int EXP_hd_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int     freq;
 
-    expdef->exp_fd = fopen(outfile, "w+");
+    expdef->file_descriptor = fopen(outfile, "w+");
 
     freq = PER_nb((KSMPL(dbv)->s_p1).p_p);
     switch(freq) {
         case 1:
-            fprintf(expdef->exp_fd,
+            fprintf(expdef->file_descriptor,
                     "FREQ A;\nSMPL %ld %ld ;\n",
                     (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p2).p_y);
             break;
 
         case 4:
-            fprintf(expdef->exp_fd,
+            fprintf(expdef->file_descriptor,
                     "FREQ Q;\nSMPL %ld:%ld %ld:%ld ;\n",
                     (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p1).p_s,
                     (KSMPL(dbv)->s_p2).p_y, (KSMPL(dbv)->s_p2).p_s);
             break;
 
         case 12:
-            fprintf(expdef->exp_fd,
+            fprintf(expdef->file_descriptor,
                     "FREQ M;\nSMPL %ld:%ld %ld:%ld ;\n",
                     (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p1).p_s,
                     (KSMPL(dbv)->s_p2).p_y, (KSMPL(dbv)->s_p2).p_s);
@@ -74,20 +74,20 @@ int EXP_hd_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
     return(0);
 }
 
-int EXP_end_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsTSP::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    fprintf(expdef->exp_fd, " ;\n");
-    fprintf(expdef->exp_fd, "END\n");
-    fclose(expdef->exp_fd);
+    fprintf(expdef->file_descriptor, " ;\n");
+    fprintf(expdef->file_descriptor, "END\n");
+    fclose(expdef->file_descriptor);
     return(0);
 }
 
-char* EXP_code_tsp(char* name, char** code)
+char* ExportObjsTSP::write_object_name(char* name, char** code)
 {
-    return(EXP_addprepost("LOAD ", " ;\n", name, code));
+    return(write_pre_post("LOAD ", " ;\n", name, code));
 }
 
-char* EXP_cmt_tsp(KDB* dbc, char* name, char** cmt)
+char* ExportObjsTSP::extract_comment(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
@@ -100,13 +100,13 @@ char* EXP_cmt_tsp(KDB* dbc, char* name, char** cmt)
     return(*cmt);
 }
 
-char* EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsTSP::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    EXP_val(tmp, (double)(*KVVAL(dbv, nb, t)));
-    EXP_addprepost("", " ", tmp, &buf);
+    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    write_pre_post("", " ", tmp, &buf);
     lg = (int)strlen(buf) + 1;
 
     if(*vec == NULL) olg = 0;
@@ -118,32 +118,21 @@ char* EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)
     return(*vec);
 }
 
-int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)
+int ExportObjsTSP::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
     int     i;
     char    **text;
 
-    fprintf(expdef->exp_fd, "%s \n", code);
+    fprintf(expdef->file_descriptor, "%s \n", code);
     if(cmt) { /* JMP 04-03-99 */
         text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
-        for(i = 0; text[i]; i++)  fprintf(expdef->exp_fd, "? %s\n", text[i]);
+        for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "? %s\n", text[i]);
         SCR_free_tbl((unsigned char**) text);
     }
 
     text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
-    for(i = 0; text[i]; i++)  fprintf(expdef->exp_fd, "%s\n", text[i]);
-    fprintf(expdef->exp_fd, " ;\n");
+    for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "%s\n", text[i]);
+    fprintf(expdef->file_descriptor, " ;\n");
     SCR_free_tbl((unsigned char**) text);
     return(0);
 }
-
-EXPDEF EXPTSP = {
-    EXP_hd_tsp,     // exp_hd_fn
-    EXP_code_tsp,   // exp_code_fn
-    EXP_cmt_tsp,    // exp_cmt_fn
-    EXP_elem_tsp,   // exp_elem_fn
-    NULL,           // exp_vec_fn
-    EXP_vec_tsp,    // exp_vec_var_fn
-    EXP_end_tsp,    // exp_end_fn
-    NULL            // exp_fd
-};

@@ -14,11 +14,11 @@
  *  
  *  List of functions 
  *  -----------------
- *      int DIF_skip_to(YYFILE* yy, int skey)                               Moves forward to the keyword skey or EOF or EOD.
- *      int DIF_cell(YYFILE* yy, char** str, double* value)                 Reads the next cell which can contain a real or a string.
- *      int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)                            Reads the header of a DIF file and determines the sample of the content.
- *      int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in a DIF file.
- *      int IMP_end_dif()                                                   Cleanup the DIF global variables.
+ *      int dif_skip_to(YYFILE* yy, int skey)                               Moves forward to the keyword skey or EOF or EOD.
+ *      int dif_read_cell(YYFILE* yy, char** str, double* value)                 Reads the next cell which can contain a real or a string.
+ *      int read_header(YYFILE* yy, SAMPLE* smpl)                            Reads the header of a DIF file and determines the sample of the content.
+ *      int read_variable(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in a DIF file.
+ *      int close()                                                   Cleanup the DIF global variables.
  *
  */
 #include "api/utils/yy.h"
@@ -27,30 +27,14 @@
 #include "api/conversion/import.h"
 
 
-SAMPLE  *DIF_smpl = NULL;
-char    DIF_freq;
-
-YYKEYS IMP_DIF_KEYS[] = {
-    (unsigned char*) "EOD",           DIF_EOD,
-    (unsigned char*) "TABLE",         DIF_TABLE,
-    (unsigned char*) "VECTORS",       DIF_VECTORS,
-    (unsigned char*) "TUPLES",        DIF_TUPLES,
-    (unsigned char*) "DATA",          DIF_DATA,
-    (unsigned char*) "BOT",           DIF_BOT,
-    (unsigned char*) ",",             DIF_COMMA,
-    (unsigned char*) "V",             DIF_V
-};
-
-int     DIF_nl = 0, DIF_ny = 0;
-
 /**
  *  Moves forward on the yy stream to the keyword skey or EOF or EOD.
  *  
  *  @param [in] YYFILE* yy      Open YY stream     
- *  @param [in] int     skey    keyword (defined in IMP_DIF_KEYS)
+ *  @param [in] int     skey    keyword (defined in ImportObjsDIF_KEYS)
  *  @return     int             0 if keyword found, -1 if EOF or EOD reached 
  */
-int DIF_skip_to(YYFILE* yy, int skey)
+int dif_skip_to(YYFILE* yy, int skey)
 {
     int rkey;
 
@@ -71,7 +55,7 @@ int DIF_skip_to(YYFILE* yy, int skey)
  *  @param [out]        double* value   pointer to the read double (if teh cell contains a number)
  *  @return             int             0 if a value is read, -1 if EOF or EOD is reached
  */
-int DIF_cell(YYFILE* yy, char** str, double* value)
+int dif_read_cell(YYFILE* yy, char** str, double* value)
 {
     int     type, rtype;
 
@@ -85,7 +69,7 @@ int DIF_cell(YYFILE* yy, char** str, double* value)
 
     switch(rtype) {
         case 0  :
-            if(DIF_skip_to(yy, DIF_COMMA) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_COMMA) < 0) return(-1);
             if(rtype == type)
                 *value = (double) K_read_real(yy);
             else {
@@ -97,14 +81,14 @@ int DIF_cell(YYFILE* yy, char** str, double* value)
             break;
 
         case 1  :
-            if(DIF_skip_to(yy, DIF_COMMA) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_COMMA) < 0) return(-1);
             K_read_long(yy);
             *str = K_read_str(yy);
             if(*str == NULL) return(-1);
             break;
 
         case -1 :
-            if(DIF_skip_to(yy, DIF_BOT) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
             break;
         default :
             return(-1);
@@ -121,7 +105,7 @@ int DIF_cell(YYFILE* yy, char** str, double* value)
  *  @param [out]     SAMPLE* smpl    sample of the DIF file
  *  @return          int             0 if a value is read, -1 if EOF or EOD is reached
  */
-int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsDIF::read_header(YYFILE* yy, SAMPLE* smpl)
 {
     double  value;
     char    *str;
@@ -130,20 +114,20 @@ int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)
 
     if(YY_lex(yy) != DIF_TABLE) return(-1);
 
-    if(DIF_skip_to(yy, DIF_VECTORS) < 0) return(-1);
-    if(DIF_cell(yy, NULL, &value) < 0) return(-1) ;
+    if(dif_skip_to(yy, DIF_VECTORS) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return(-1) ;
     DIF_ny = (int)value - 1;
 
-    if(DIF_skip_to(yy, DIF_TUPLES) < 0) return(-1);
-    if(DIF_cell(yy, NULL, &value) < 0)  return(-1) ;
+    if(dif_skip_to(yy, DIF_TUPLES) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0)  return(-1) ;
     DIF_nl = (int)value - 1;
 
-    if(DIF_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
 
-    DIF_cell(yy, &str, NULL);
+    dif_read_cell(yy, &str, NULL);
     SW_nfree(str);
     for(i = 0; i < DIF_ny; i++) {
-        DIF_cell(yy, &str, NULL);
+        dif_read_cell(yy, &str, NULL);
         per = PER_atoper(str); /* no valid samples defined, take input sample */
         if(per == NULL) goto done;
         SW_nfree(str);
@@ -175,7 +159,7 @@ int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)
 done :
 
     if(DIF_ny != smpl->s_nb) return(-1);
-    if(DIF_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
     return(0);
 }
 
@@ -189,25 +173,25 @@ done :
  *  @param [out]     double* vector  pointer to the values
  *  @return          int             0 if a all values have been read, -1 if EOF or EOD is reached before
  */
-int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)
+int ImportObjsDIF::read_variable(YYFILE* yy, char* name, int dim, double* vector)
 {
     int     i, rc = 0;
     char    *str = NULL;
     double  value;
 
-    rc = DIF_cell(yy, &str, NULL);
+    rc = dif_read_cell(yy, &str, NULL);
     if(rc < 0 || str == NULL) return(-1);
 
     SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
     SW_nfree(str);
 
     for(i = 0; i < dim; i++) {
-        rc = DIF_cell(yy, NULL, &value);
+        rc = dif_read_cell(yy, NULL, &value);
         if(rc < 0) return(-1);
         vector[i] = (double) value;
     }
 
-    DIF_skip_to(yy, DIF_BOT);
+    dif_skip_to(yy, DIF_BOT);
     return(0);
 }
 
@@ -216,20 +200,9 @@ int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)
  *  
  *  @return int     0 always
  */
-int IMP_end_dif()
+int ImportObjsDIF::close()
 {
     SW_nfree(DIF_smpl);
     DIF_smpl = 0;
     return(0);
 }
-
-IMPDEF IMP_DIF = {
-    IMP_DIF_KEYS,       // imp_keys
-    8,                  // imp_dim
-    NULL,               // imp_hd_fn
-    IMP_hd_dif,         // imp_hd_sample_fn
-    IMP_vec_dif,        // imp_vec_var_fn
-    NULL,               // imp_vec_cmt_fn
-    NULL,               // imp_elem_fn
-    IMP_end_dif         // imp_end_fn
-};

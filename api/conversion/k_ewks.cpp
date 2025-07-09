@@ -9,12 +9,12 @@
  *  
  *  List of functions
  *  -----------------
- *      int EXP_hd_wks(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a wks export file.
- *      int EXP_end_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
- *      char *EXP_code_wks(char* name, char** code)                             Variable name translation for wks output.
- *      char *EXP_cmt_wks(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
- *      char *EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
- *      int EXP_vec_wks(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
+ *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a wks export file.
+ *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
+ *      char *write_object_name(char* name, char** code)                             Variable name translation for wks output.
+ *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
+ *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
+ *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -24,9 +24,7 @@
 #include "api/conversion/export.h"
 
 
-int WKS_COL = 1, WKS_ROW = 1;
-
-int EXP_hd_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim, nb, i;
 
@@ -44,13 +42,13 @@ int EXP_hd_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
     return(0);
 }
 
-int EXP_end_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     wks_end();
     return(0);
 }
 
-char* EXP_code_wks(char* name, char** code)
+char* ExportObjsWKS::write_object_name(char* name, char** code)
 {
     wks_string(name, WKS_COL, WKS_ROW);
     WKS_COL ++;
@@ -58,7 +56,7 @@ char* EXP_code_wks(char* name, char** code)
     return(*code);
 }
 
-char* EXP_cmt_wks(KDB* dbc, char* name, char** cmt)
+char* ExportObjsWKS::extract_comment(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
@@ -70,7 +68,7 @@ char* EXP_cmt_wks(KDB* dbc, char* name, char** cmt)
     return(*cmt = NULL);
 }
 
-char* EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsWKS::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
     char    *buf = NULL;
 
@@ -80,21 +78,10 @@ char* EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)
     return(*vec = NULL);
 }
 
-int EXP_vec_wks(EXPDEF* expdef, char* code, char* cmt, char* vec)
+int ExportObjsWKS::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
     wks_name(code, 3, WKS_ROW, WKS_COL, WKS_ROW);
     WKS_ROW ++;
     WKS_COL = 1;
     return(0);
 }
-
-EXPDEF EXPWKS = {
-    EXP_hd_wks,         // exp_hd_fn
-    EXP_code_wks,       // exp_code_fn
-    EXP_cmt_wks,        // exp_cmt_fn
-    EXP_elem_wks,       // exp_elem_fn
-    NULL,               // exp_vec_fn
-    EXP_vec_wks,        // exp_vec_var_fn
-    EXP_end_wks,        // exp_end_fn
-    NULL                // exp_fd
-};

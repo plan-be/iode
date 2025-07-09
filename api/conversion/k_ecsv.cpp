@@ -19,15 +19,15 @@
  *  
  *  List of functions
  *  -----------------
- *      int EXP_hd_csv(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a CSV export file.
- *      int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
- *      char *EXP_code_csv(char* name, char** code)                             Variable name translation for CSV output.
- *      char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
- *      char *EXP_elem_csv(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
- *      int EXP_vec_csv(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
- *      int EXP_hd_rcsv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
- *      char *EXP_elem_rcsv(KDB* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
- *      int EXP_vec_rcsv(EXPDEF* expdef, char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
+ *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a CSV export file.
+ *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
+ *      char *write_object_name(char* name, char** code)                             Variable name translation for CSV output.
+ *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
+ *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
+ *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
+ *      int write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
+ *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
+ *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */
 #include "api/b_errors.h"
@@ -42,45 +42,45 @@
 /**
  *  Opens and initialise a CSV file.
  *  
- *  @param [in] EXPDEF* expdef      struct that contains implementation for csv output
+ *  @param [in] ExportToFile* expdef      struct that contains implementation for csv output
  *  @param [in] KDB*    dbv         VAR KDB
  *  @param [in] KDB*    dbc         CMT KDB
  *  @param [in] char*   outfile     output filename
  *  @return     int                 0 on success, -1 if outfile cannot be created  
  */
-int EXP_hd_csv(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim, i;
 
-    expdef->exp_fd = fopen(outfile, "w+");
-    if(expdef->exp_fd == 0) {
+    expdef->file_descriptor = fopen(outfile, "w+");
+    if(expdef->file_descriptor == 0) {
         B_seterror("Cannot create %s", outfile);
         return(-1);
     }
 
-    fprintf(expdef->exp_fd, "code%scomment%s", EXP_SEP, EXP_SEP);
+    fprintf(expdef->file_descriptor, "code%scomment%s", EXP_SEP, EXP_SEP);
     dim = KSMPL(dbv)->s_nb;
     for(i = 0; i < dim; i++) {
-        fprintf(expdef->exp_fd, "%s%s",
+        fprintf(expdef->file_descriptor, "%s%s",
                 PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), i), NULL), EXP_SEP);
     }
-    fprintf(expdef->exp_fd, "\n");
+    fprintf(expdef->file_descriptor, "\n");
     return(0);
 }
 
 /**
  *  Saves the footer and closes the CSV export files.
  *  
- *  @param [in] EXPDEF* expdef      struct that contains implementation for csv output
+ *  @param [in] ExportToFile* expdef      struct that contains implementation for csv output
  *  @param [in] KDB*    dbv         VAR KDB
  *  @param [in] KDB*    dbc         CMT KDB
  *  @return     int                 0 always
  */
-int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
-    fprintf(expdef->exp_fd, "\n");
-    fclose(expdef->exp_fd);
+    fprintf(expdef->file_descriptor, "\n");
+    fclose(expdef->file_descriptor);
     return(0);
 }
 
@@ -91,9 +91,9 @@ int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
  *  @param [out] char**  code    allocated coded name used has identifier in the output file
  *  @return      char*           pointer to *code
  */
-char *EXP_code_csv(char* name, char** code)
+char* ExportObjsCSV::write_object_name(char* name, char** code)
 {
-    return(EXP_addsep(name, code));
+    return(write_separator(name, code));
 }
 
 /**
@@ -103,7 +103,7 @@ char *EXP_code_csv(char* name, char** code)
  *  @param [out] char**  code    allocated string with the comment + sep
  *  @return      char*           pointer to *code
  */
-char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)
+char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
 {
     int     pos;
     U_ch    *ccmt;                     /* JMP 19-09-96 */
@@ -112,9 +112,9 @@ char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)
     if(pos >= 0)  {
         ccmt = (unsigned char*) KCVAL(dbc, pos);        /* JMP 19-09-96 */
         SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 19-09-96 */
-        return(EXP_addsep((char*) ccmt, cmt)); /* JMP 19-09-96 */
+        return(write_separator((char*) ccmt, cmt)); /* JMP 19-09-96 */
     }
-    else return(EXP_addsep("", cmt));
+    else return(write_separator("", cmt));
 }
 
 /**
@@ -126,13 +126,13 @@ char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)
  *  @param [in, out] char** vec     (re-)allocated vector of the VAR values in CSV format
  *  @return          char*          *vec
  */
-char *EXP_elem_csv(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    EXP_val(tmp, (double)(*KVVAL(dbv, nb, t)));
-    EXP_addsep(tmp, &buf);
+    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    write_separator(tmp, &buf);
     lg = (int)strlen(buf) + 1;
 
     if(*vec == NULL) olg = 0;
@@ -147,75 +147,65 @@ char *EXP_elem_csv(KDB* dbv, int nb, int t, char** vec)
 /**
  *  Saves one VAR in the csv export file.
  *  
- *  @param [in] EXPDEF* expdef  struct that contains implementation for csv output
+ *  @param [in] ExportToFile* expdef  struct that contains implementation for csv output
  *  @param [in] char*   code    code of the VAR  in csv format
  *  @param [in] char*   cmt     comment in csv format
  *  @param [in] char*   vec     values in csv format
  *  @return 
  */
-int EXP_vec_csv(EXPDEF* expdef, char* code, char* cmt, char* vec)
+int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
-    fprintf(expdef->exp_fd, "%s %s %s\n",
+    fprintf(expdef->file_descriptor, "%s %s %s\n",
             (code == NULL ? "" : code),
             (cmt == NULL  ? "" : cmt),
             (vec == NULL  ? "" : vec));
     return(0);        
 }
 
-// Exportation functions for CSV output
-EXPDEF EXPCSV = {
-    EXP_hd_csv,     // exp_hd_fn
-    EXP_code_csv,   // exp_code_fn
-    EXP_cmt_csv,    // exp_cmt_fn
-    EXP_elem_csv,   // exp_elem_fn
-    NULL,           // exp_vec_fn
-    EXP_vec_csv,    // exp_vec_var_fn
-    EXP_end_csv,    // exp_end_fn
-    NULL            // exp_fd
-};
-
 
 // =================== ROTATED CSV ==========================
 
 // Same functions as for normal CSV export. See above for details.
 
-int EXP_hd_rcsv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char*outfile)
+int ExportObjsRevertCSV::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)
 {
-    expdef->exp_fd = fopen(outfile, "w+");
-    if(expdef->exp_fd == 0) {
+    expdef->file_descriptor = fopen(outfile, "w+");
+    if(expdef->file_descriptor == 0) {
         B_seterror("Cannot create %s", outfile);
         return(-1);
     }
     return(0);
 }
 
-char *EXP_elem_rcsv(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
+{
+    return(write_separator(name, code));
+}
+
+char* ExportObjsRevertCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
     char    tmp[81], *buf = NULL;
 
-    EXP_val(tmp, (double)(*KVVAL(dbv, nb, t)));
-    EXP_addsep(tmp, &buf);
+    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    write_separator(tmp, &buf);
     if(vec) *vec = buf;
     return(buf);
 }
 
-int EXP_vec_rcsv(EXPDEF* expdef, char* code, char* cmt, char* vec)
+int ExportObjsRevertCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
     if(code == 0) {
-        fprintf(expdef->exp_fd, "\n");
+        fprintf(expdef->file_descriptor, "\n");
         return(0);
     }
-    fprintf(expdef->exp_fd, "%s ", code);
+    fprintf(expdef->file_descriptor, "%s ", code);
     return(0);
 }
 
-EXPDEF EXPRCSV = {
-    EXP_hd_rcsv,        // exp_hd_fn
-    EXP_code_csv,       // exp_code_fn
-    EXP_cmt_csv,        // exp_cmt_fn
-    EXP_elem_rcsv,      // exp_elem_fn
-    NULL,               // exp_vec_fn
-    EXP_vec_rcsv,       // exp_vec_var_fn
-    EXP_end_csv,        // exp_end_fn
-    NULL                // exp_fd
-};
+int ExportObjsRevertCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+{
+    // No footer needed for CSV output
+    fprintf(expdef->file_descriptor, "\n");
+    fclose(expdef->file_descriptor);
+    return(0);
+}

@@ -69,11 +69,11 @@ IODE offers several functions to import and export objects from and to various f
 
 ### Export {#T2}
 
-For each output format, an `EXPDEF` struct (mainly a table of function pointers) must be given as argument to one of the general functions `EXP_Ws()` or `EXP_Rev_Ws()` (found in k\_emain.c). These functions, specific to each output format, are coded in one of the files **k\_e\*.c** (for example **k\_ecvs.c** for csv output).
+For each output format, an `ExportToFile` struct (mainly a table of function pointers) must be given as argument to one of the general functions `EXP_Ws()` or `EXP_Rev_Ws()` (found in k\_emain.c). These functions, specific to each output format, are coded in one of the files **k\_e\*.c** (for example **k\_ecvs.c** for csv output).
 
 ### Import {#T3}
 
-The same logic applies to the import of object: for each import format, the general functions `IMP_InterpretVar()` and `IMP_InterpretCmt()` (defined in k\_emain.c) are to be fed with an `IMPDEF` struct (a table of function pointers).
+The same logic applies to the import of object: for each import format, the general functions `IMP_InterpretVar()` and `IMP_InterpretCmt()` (defined in k\_emain.c) are to be fed with an `ImportFromFile` struct (a table of function pointers).
 
 These functions, related to one input format, are coded in the files **k\_i\*.c** (for ex **k\_iasc.c**).
 
@@ -161,11 +161,11 @@ A set of rules can be defined to select and/or determine the name each object is
 
 |Syntax|Description|
 |:---|:---|
-|`void EXP_val(char* tmp, double val)`|Formats a double value on 20 positions in general format.|
-|`char *EXP_addprepost(char* pre, char* post, char* src, char** tg)`|Creates an allocated string formatted as \{pre\}\{src\}\{post\}.|
-|`char *EXP_addsep(char* src, char** tg)`|Creates an allocated string formatted as \{src\}\{EXP\_SEP\}.|
-|`int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in EXPDEF|
-|`int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
+|`void write_value(char* tmp, double val)`|Formats a double value on 20 positions in general format.|
+|`char *write_pre_post(char* pre, char* post, char* src, char** tg)`|Creates an allocated string formatted as \{pre\}\{src\}\{post\}.|
+|`char *write_separator(char* src, char** tg)`|Creates an allocated string formatted as \{src\}\{EXP\_SEP\}.|
+|`int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile|
+|`int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
 |`int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)`|Exports VAR files into an external format.|
 
 ### k\_ecsv.c {#T15}
@@ -194,15 +194,15 @@ Implementation of the CSV and rotated CSV export functions. See k\_emain.c for m
 
 |Syntax|Description|
 |:---|:---|
-|`int EXP_hd_csv(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a CSV export file.|
-|`int EXP_end_csv(EXPDEF* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the CSV export files.|
-|`char *EXP_code_csv(char* name, char** code)`|Variable name translation for CSV output.|
-|`char *EXP_cmt_csv(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for CSV output.|
-|`char *EXP_elem_csv(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in CSV format.|
-|`int EXP_vec_csv(EXPDEF* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the csv export file.|
-|`int EXP_hd_rcsv(EXPDEF* expdef, KDB* dbv, KDB* dbc, char*outfile)`|Opens and initialise a rotated CSV export file.|
-|`char *EXP_elem_rcsv(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in rotated CSV format.|
-|`int EXP_vec_rcsv(EXPDEF* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the rotated csv export file.|
+|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a CSV export file.|
+|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the CSV export files.|
+|`char *write_object_name(char* name, char** code)`|Variable name translation for CSV output.|
+|`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for CSV output.|
+|`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in CSV format.|
+|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the csv export file.|
+|`int write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)`|Opens and initialise a rotated CSV export file.|
+|`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in rotated CSV format.|
+|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the rotated csv export file.|
 |`int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)`|Exports VAR files into an external format.|
 
 ### k\_edif.c {#T19}
@@ -239,12 +239,12 @@ Export functions specific to DIF format.
 
 |Syntax|Description|
 |:---|:---|
-|`int EXP_hd_dif(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a DIF export file.|
-|`int EXP_end_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the DIF export files.|
-|`char *EXP_code_dif(char* name, char** code)`|Variable name translation for DIF output.|
-|`char *EXP_cmt_dif(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for DIF output.|
-|`char *EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in DIF format.|
-|`int EXP_vec_dif(EXPDEF* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the DIF export file.|
+|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a DIF export file.|
+|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the DIF export files.|
+|`char *write_object_name(char* name, char** code)`|Variable name translation for DIF output.|
+|`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for DIF output.|
+|`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in DIF format.|
+|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the DIF export file.|
 
 ### k\_etsp.c {#T22}
 
@@ -274,12 +274,12 @@ Export functions specific to TSP format.
 
 |Syntax|Description|
 |:---|:---|
-|`int EXP_hd_tsp(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a tsp export file.|
-|`int EXP_end_tsp(EXPDEF* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the tsp export files.|
-|`char *EXP_code_tsp(char* name, char** code)`|Variable name translation for tsp output.|
-|`char *EXP_cmt_tsp(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for tsp output.|
-|`char *EXP_elem_tsp(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in tsp format.|
-|`int EXP_vec_tsp(EXPDEF* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the tsp export file.|
+|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a tsp export file.|
+|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the tsp export files.|
+|`char *write_object_name(char* name, char** code)`|Variable name translation for tsp output.|
+|`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for tsp output.|
+|`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in tsp format.|
+|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the tsp export file.|
 
 ### k\_ewks.c {#T25}
 
@@ -289,12 +289,12 @@ Export functions specific to WKS format (obsolete).
 
 |Syntax|Description|
 |:---|:---|
-|`int EXP_hd_wks(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a wks export file.|
-|`int EXP_end_wks(EXPDEF* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the wks export files.|
-|`char *EXP_code_wks(char* name, char** code)`|Variable name translation for wks output.|
-|`char *EXP_cmt_wks(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for wks output.|
-|`char *EXP_elem_wks(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in wks format.|
-|`int EXP_vec_wks(EXPDEF* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the wks export file.|
+|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a wks export file.|
+|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the wks export files.|
+|`char *write_object_name(char* name, char** code)`|Variable name translation for wks output.|
+|`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for wks output.|
+|`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in wks format.|
+|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the wks export file.|
 
 ### k\_wks.c {#T27}
 
@@ -327,7 +327,7 @@ Basic functions to create a WKS (Lotus 123) files (obsolete)
 
 Functions to import variables and comments from files in various external formats.
 
-For each input format, a structure IMPDEF, which is essentially a table of function pointers, must be given as argument to one of the general functions IMP\_InterpretVar() or IMP\_InterpretCmt().
+For each input format, a structure ImportFromFile, which is essentially a table of function pointers, must be given as argument to one of the general functions IMP\_InterpretVar() or IMP\_InterpretCmt().
 
 #### Available input formats {#T31}
 
@@ -348,8 +348,8 @@ A set of rules can also be defined to select and/or determine (transform) the na
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)`|Interprets a text file containing VAR definitions|
-|`KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)`|Interprets an ASCII file containing COMMENTS definitions|
+|`KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)`|Interprets a text file containing VAR definitions|
+|`KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)`|Interprets an ASCII file containing COMMENTS definitions|
 |`int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)`|Imports variables or comments in various formats.|
 
 ### k\_iasc.c {#T34}
@@ -377,10 +377,10 @@ Functions to import variables and comments in ASCII format.
 
 |Syntax|Description|
 |:---|:---|
-|`int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) in an ASCII variable file.|
-|`int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in an ASCII variable file format.|
-|`int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)`|Opens an ASCII comment file for reading with the YY library functions.|
-|`int IMP_vec_casc(char* name, char** cmt)`|Reads one comment on the open YY stream.|
+|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) in an ASCII variable file.|
+|`int read_variable(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in an ASCII variable file format.|
+|`int read_header(ImportFromFile* impdef, char* file, int lang)`|Opens an ASCII comment file for reading with the YY library functions.|
+|`int read_comment(char* name, char** cmt)`|Reads one comment on the open YY stream.|
 
 ### k\_idif.c {#T38}
 
@@ -400,11 +400,11 @@ See also k\_edif.c for an example of DIF format.
 
 |Syntax|Description|
 |:---|:---|
-|`int DIF_skip_to(YYFILE* yy, int skey)`|Moves forward to the keyword skey or EOF or EOD.|
-|`int DIF_cell(YYFILE* yy, char** str, double* value)`|Reads the next cell which can contain a real or a string.|
-|`int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)`|Reads the header of a DIF file and determines the sample of the content.|
-|`int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in a DIF file.|
-|`int IMP_end_dif()`|Cleanup the DIF global variables.|
+|`int dif_skip_to(YYFILE* yy, int skey)`|Moves forward to the keyword skey or EOF or EOD.|
+|`int dif_read_cell(YYFILE* yy, char** str, double* value)`|Reads the next cell which can contain a real or a string.|
+|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the header of a DIF file and determines the sample of the content.|
+|`int read_variable(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in a DIF file.|
+|`int close()`|Cleanup the DIF global variables.|
 
 ### k\_ibst.c {#T41}
 
@@ -498,9 +498,9 @@ Functions to import variables in rotated ASCII format.
 
 |Syntax|Description|
 |:---|:---|
-|`int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) and the list of VARs in a rotated ASCII variable file.|
-|`int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)`|Reads one value in an ASCII variable file format.|
-|`int IMP_end_rasc()`|Frees the allocated vars during the rotated ASCII file import session.|
+|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) and the list of VARs in a rotated ASCII variable file.|
+|`int read_variable(YYFILE* yy, char* name, int* shift, double* value)`|Reads one value in an ASCII variable file format.|
+|`int close()`|Frees the allocated vars during the rotated ASCII file import session.|
 
 ### k\_itxt.c {#T56}
 

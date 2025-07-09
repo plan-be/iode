@@ -45,12 +45,12 @@
  * 
  *  List of functions
  *  -----------------
- *      int EXP_hd_dif(EXPDEF *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a DIF export file.
- *      int EXP_end_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
- *      char *EXP_code_dif(char* name, char** code)                             Variable name translation for DIF output.
- *      char *EXP_cmt_dif(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for DIF output. 
- *      char *EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
- *      int EXP_vec_dif(EXPDEF* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
+ *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a DIF export file.
+ *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
+ *      char *write_object_name(char* name, char** code)                             Variable name translation for DIF output.
+ *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for DIF output. 
+ *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
+ *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
  *  
  */
 #include "api/objs/kdb.h"
@@ -62,60 +62,57 @@
 #include "api/conversion/export.h"
 
 
-int EXP_hd_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim, nb, i;
 
-    expdef->exp_fd = fopen(outfile, "w+");
+    expdef->file_descriptor = fopen(outfile, "w+");
     dim = KSMPL(dbv)->s_nb;
     nb = KNB(dbv);
 
-    fprintf(expdef->exp_fd,
+    fprintf(expdef->file_descriptor,
             "TABLE\n0,1\n\"\"\nVECTORS\n0,%d\n\"\"\nTUPLES\n0,%d\n\"\"\n",
             dim + 2, nb + 1);
-    fprintf(expdef->exp_fd,
+    fprintf(expdef->file_descriptor,
             "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n");
 
     for(i = 0; i < dim; i++) {
-        fprintf(expdef->exp_fd, "1,0\n\"%s\"\n",
+        fprintf(expdef->file_descriptor, "1,0\n\"%s\"\n",
                 PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), i), NULL));
     }
     return(0);
 }
 
-int EXP_end_dif(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    fprintf(expdef->exp_fd, "-1,0\nEOD\n");
-    fclose(expdef->exp_fd);
+    fprintf(expdef->file_descriptor, "-1,0\nEOD\n");
+    fclose(expdef->file_descriptor);
     return(0);
 }
 
-extern  char    *EXP_addprepost();
-
-char    *EXP_code_dif(char* name, char** code)
+char* ExportObjsDIF::write_object_name(char* name, char** code)
 {
-
-    return(EXP_addprepost("-1,0\nBOT\n1,0\n\"", "\"\n", name, code));
+    return(write_pre_post("-1,0\nBOT\n1,0\n\"", "\"\n", name, code));
 }
 
-char *EXP_cmt_dif(KDB* dbc, char* name, char **cmt)
+char* ExportObjsDIF::extract_comment(KDB* dbc, char* name, char **cmt)
 {
     int pos;
 
     pos = K_find(dbc, name);
     if(pos >= 0)
-        return(EXP_addprepost("1,0\n\"", "\"\n", KCVAL(dbc, pos), cmt));
+        return(write_pre_post("1,0\n\"", "\"\n", KCVAL(dbc, pos), cmt));
     else
-        return(EXP_addprepost("1,0\n\"", "\"\n", "", cmt));
+        return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
 }
 
-char* EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsDIF::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    EXP_val(tmp, (double)(*KVVAL(dbv, nb, t)));
-    EXP_addprepost("0,", "\nV\n", tmp, &buf);
+    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    write_pre_post("0,", "\nV\n", tmp, &buf);
     lg = (int)strlen(buf) + 1;
 
     if(*vec == NULL) olg = 0;
@@ -127,21 +124,8 @@ char* EXP_elem_dif(KDB* dbv, int nb, int t, char** vec)
     return(*vec);
 }
 
-int EXP_vec_dif(EXPDEF* expdef, char* code, char* cmt, char* vec)
+int ExportObjsDIF::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
-    fprintf(expdef->exp_fd, "%s%s%s", code, cmt, vec);
+    fprintf(expdef->file_descriptor, "%s%s%s", code, cmt, vec);
     return(0);
 }
-
-EXPDEF EXPDIF = {
-    EXP_hd_dif,     // exp_hd_fn
-    EXP_code_dif,   // exp_code_fn
-    EXP_cmt_dif,    // exp_cmt_fn
-    EXP_elem_dif,   // exp_elem_fn
-    NULL,           // exp_vec_fn
-    EXP_vec_dif,    // exp_vec_var_fn
-    EXP_end_dif,    // exp_end_fn
-    NULL            // exp_fd
-};
-
-

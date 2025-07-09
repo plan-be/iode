@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*---------------- ENUMS -------------------------*/
 
 enum IodeDIFElement
@@ -17,7 +13,3 @@ enum IodeDIFElement
     DIF_V,
     DIF_TUPLES  
 };
-
-#ifdef __cplusplus
-}
-#endif

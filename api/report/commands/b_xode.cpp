@@ -38,7 +38,7 @@ int B_FileImportCmt(char* arg)
 
     empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size(args);
+    nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 5) {
         B_seterrn(67);
         rc = -1;
@@ -58,7 +58,7 @@ int B_FileImportCmt(char* arg)
                       empty_buf, empty_buf, format, lang);
 
 fin:
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -84,7 +84,7 @@ int B_FileImportVar(char* arg)
 
     empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size(args);    /* JMP 16-12-93 */
+    nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
     if(nb_args < 6) {
         B_seterrn(67);
         rc = -1;
@@ -105,8 +105,6 @@ int B_FileImportVar(char* arg)
                       from, to, format, 0);
 
 fin:
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
-
-
