@@ -25,7 +25,7 @@
 #include "api/conversion/import.h"
 
 
-double PRN_readreal(YYFILE* yy)
+double ImportObjsPRN::read_real(YYFILE* yy)
 {
     double    val;
     int     minus = 1;
@@ -59,7 +59,7 @@ ag:
     return(val);
 }
 
-int IMP_vec_prn(YYFILE* yy, char* name, int dim, double* vector)
+int ImportObjsPRN::read_variable(YYFILE* yy, char* name, int dim, double* vector)
 {
     int i, key;
 
@@ -76,27 +76,15 @@ int IMP_vec_prn(YYFILE* yy, char* name, int dim, double* vector)
                 name[80] = '\0';
                 if(key == YY_STRING) SCR_asqz((unsigned char*) name, (unsigned char*) "_");
 
-                for(i = 0; i < dim; i++) vector[i] = PRN_readreal(yy);
+                for(i = 0; i < dim; i++) vector[i] = read_real(yy);
                 return(0);
         }
     }
 }
 
-IMPDEF IMP_PRN = {
-    NULL,           // imp_keys
-    0,              // imp_dim
-    NULL,           // imp_hd_fn
-    NULL,           // imp_hd_sample_fn
-    IMP_vec_prn,    // imp_vec_var_fn
-    NULL,           // imp_vec_cmt_fn
-    NULL            // imp_elem_fn
-};
-
 // COMMENTS
 
-YYFILE  *PYY;
-
-int IMP_hd_cprn(IMPDEF* impdef, char* file, int lang)
+int ImportCommentsPRN::read_header(ImportCmtFromFile* impdef, char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
     PYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
@@ -109,7 +97,7 @@ int IMP_hd_cprn(IMPDEF* impdef, char* file, int lang)
     return(0);
 }
 
-int IMP_vec_cprn(char* name, char** cmt)
+int ImportCommentsPRN::read_comment(char* name, char** cmt)
 {
     YYFILE  *yy = PYY;
     int     key;
@@ -136,14 +124,3 @@ err :
     return(-1);
 
 }
-
-IMPDEF IMP_PRN_CMT = {
-    NULL,           // imp_keys
-    0,              // imp_dim
-    IMP_hd_cprn,    // imp_hd_fn
-    NULL,           // imp_hd_sample_fn
-    NULL,           // imp_vec_var_fn
-    IMP_vec_cprn,   // imp_vec_cmt_fn
-    NULL,           // imp_elem_fn
-    NULL            // imp_end_fn
-};

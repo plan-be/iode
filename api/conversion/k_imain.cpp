@@ -3,7 +3,7 @@
  * 
  *  Functions to import variables and comments from files in various external formats.
  *  
- *  For each input format, a structure IMPDEF, which is essentially a table of function pointers,
+ *  For each input format, a structure ImportFromFile, which is essentially a table of function pointers,
  *  must be given as argument to one of the general functions IMP_InterpretVar() or IMP_InterpretCmt().
  *  
  *  Available input formats
@@ -17,19 +17,19 @@
  *      - k_iprn.c:  Aremos prn format (obsolete)
  *      - k_itxt.c:  Belgostat format (Obsolete)
  *    
- *  IMPDEF structure
+ *  ImportFromFile structure
  *  ----------------
- *  The IMPDEF structure contains a set of keywords and function pointers that implements the 
+ *  The ImportFromFile structure contains a set of keywords and function pointers that implements the 
  *  import procedure for each specific input format. It is defined in iode.h.
  *       
  *     typedef struct _impdef_ {
  *         YYKEYS  *imp_keys;          // Table of keywords (see YY group of functions in scr4 libs)
  *         int     imp_dim;            // Nb of keys in imp_keys 
- *         int     (*imp_hd_fn)();     // Pointer to the fn to open the input file and to read its header
- *         int     (*imp_vec_var_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
- *         int     (*imp_elem_fn)();   // Pointer to the fn to read a single numerical value (a double)
- *         int     (*imp_end_fn)();    // Pointer to the fn to close the input file
- *     } IMPDEF;
+ *         int     (*read_header)();     // Pointer to the fn to open the input file and to read its header
+ *         int     (*read_variable)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
+ *         int     (*read_numerical_value)();   // Pointer to the fn to read a single numerical value (a double)
+ *         int     (*close)();    // Pointer to the fn to close the input file
+ *     } ImportFromFile;
  *
  *  
  *  Rule file
@@ -39,8 +39,8 @@
  *      
  *  List of functions 
  *  -----------------
- *    KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)              Interprets a text file containing VAR definitions
- *    KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
+ *    KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)              Interprets a text file containing VAR definitions
+ *    KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
  *    int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)    Imports variables or comments in various formats.
  *  
  */
@@ -60,20 +60,19 @@ static int compare(const void *a, const void *b)
 
 /**
  *  Interprets an ASCII file containing VAR definitions and returns a new allocated KDB of vars (or NULL on error). 
- *  The format is implicitly defined by the IMPDEF struct that contains a group of function 
+ *  The format is implicitly defined by the ImportFromFile struct that contains a group of function 
  *  pointers in line with the expected ASCII format.
  *  
- *  @param [in] IMPDEF* impdef      struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
+ *  @param [in] ImportFromFile* impdef      struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
  *  @param [in] char*   rulefile    (opt.) rule file. By default, the rule "* ++++++++++++++" is used
  *  @param [in] char*   vecfile     input ASCII file
  *  @param [in] SAMPLE* smpl        output SAMPLE (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-
-KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)
+KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)
 {
     KDB     *kdb = 0;
-    int     i, nb, size, pos, shift = 0, cmpt = 0;
+    int     i, nb, size, pos, shift = 0, cmpt = 0, rc;
     char    iname[256];
     ONAME   oname;
     double    *vector = NULL, value;
@@ -95,21 +94,24 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
         return(kdb);
     }
 
-    if(impdef->imp_hd_sample_fn != NULL
-            && (*(impdef->imp_hd_sample_fn))(yy, smpl) < 0) goto err;
+    rc = impdef->read_header(yy, smpl);
+    if(rc < 0) 
+        goto err;
 
     kdb = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
     nb = smpl->s_nb;
 
-    if(impdef->imp_vec_var_fn != NULL) {
+    if(impdef->read_variable_implemented) {
         vector = (double *) SW_nalloc(nb * sizeof(double));
         if(vector == NULL) goto err;
 
         while(1) {
             for(i = 0; i < nb; i++) vector[i] = IODE_NAN;
 
-            if((*(impdef->imp_vec_var_fn))(yy, iname, nb, vector) < 0) break;
+            rc = impdef->read_variable(yy, iname, nb, vector);
+            if(rc < 0) 
+                break;
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
@@ -118,17 +120,14 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
         }
     }
     else {
-        if(impdef->imp_elem_fn == NULL) {
-            kerror(0, "Both vector and element function unavailable");
-            goto err;
-        }
-
         while(1) {
-            if((*(impdef->imp_elem_fn))(yy, iname, &shift, &value) < 0) break;
+            rc = impdef->read_numerical_value(yy, iname, &shift, &value);
+            if(rc < 0) 
+                break;
+
             if(shift < 0 || shift > nb) continue;
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
-
 
             pos = K_find(kdb, oname);
 
@@ -147,8 +146,9 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
 
     }
 
-    if(impdef->imp_end_fn != NULL
-            && (*(impdef->imp_end_fn))() < 0) goto err;
+    rc = impdef->close();
+    if(rc < 0) 
+        goto err;
 
     YY_close(yy);
     SW_nfree(vector);
@@ -157,8 +157,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
 err:
     K_free(kdb);
     kdb = NULL;
-    kerror(0, "%s : incorrect filter (%s : offending entry)",
-           YY_error(yy), yy->yy_text);
+    kerror(0, "%s : incorrect filter (%s : offending entry)", YY_error(yy), yy->yy_text);
     YY_close(yy);
     SW_nfree(vector);
     return(kdb);
@@ -167,20 +166,19 @@ err:
 
 /**
  *  Interprets an ASCII file containing COMMENTS definitions and returns a new allocated KDB of CMTs (or NULL on error). 
- *  The format is implicitly defined by the IMPDEF struct that contains a group of function 
+ *  The format is implicitly defined by the ImportFromFile struct that contains a group of function 
  *  pointers in line with the expected ASCII format.
  *  
- *  @param [in] IMPDEF* impdef      struct containing the fn pointers to interpret the content of the ascii file
+ *  @param [in] ImportFromFile* impdef      struct containing the fn pointers to interpret the content of the ascii file
  *  @param [in] char*   rulefile    (opt.) rule file. By default, the rule "* ++++++++++++++" is used
  *  @param [in] char*   cfile       ASCII input file
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-
-KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
+KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
 {
     KDB     *kdb = NULL;
-    int     size, cmpt = 0;
+    int     size, cmpt = 0, rc;
     char    iname[256],
             *cmt = NULL;
     ONAME   oname;
@@ -194,32 +192,33 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
     }
     else size = 0;
 
-    if(impdef->imp_hd_fn != NULL
-            && (*(impdef->imp_hd_fn))(impdef, cfile, lang) < 0) goto err;
+    rc = impdef->read_header(impdef, cfile, lang);
+    if(rc < 0) 
+        goto err;
 
     kdb = K_create(COMMENTS, ASIS_CASE);
 
-    if(impdef->imp_vec_cmt_fn != NULL) {
+    while(1) {
+        rc = impdef->read_comment(iname, &cmt);
+        if(rc < 0) 
+            break;
 
-        while(1) {
-            if((*(impdef->imp_vec_cmt_fn))(iname, &cmt) < 0) break;
-
-            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) {
-                SW_nfree(cmt);
-                continue;
-            }
-
-            if(SW_BLKS[7].blk_space > 100000L) Debug("CMT:%s\n", oname);
-            kmsg("Reading object %d : %s", ++cmpt, oname);
-            SCR_strip((unsigned char*) cmt);
-            if(K_add(kdb, oname, cmt) < 0)
-                kerror(0, "Unable to create '%s'", oname);
+        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) {
             SW_nfree(cmt);
+            continue;
         }
+
+        if(SW_BLKS[7].blk_space > 100000L) Debug("CMT:%s\n", oname);
+        kmsg("Reading object %d : %s", ++cmpt, oname);
+        SCR_strip((unsigned char*) cmt);
+        if(K_add(kdb, oname, cmt) < 0)
+            kerror(0, "Unable to create '%s'", oname);
+        SW_nfree(cmt);
     }
 
-    if(impdef->imp_end_fn != NULL
-            && (*(impdef->imp_end_fn))() < 0) goto err;
+    rc = impdef->close();
+    if(rc < 0) 
+        goto err;
 
     return(kdb);
 
@@ -244,7 +243,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
 {
     int     rc = -1;
     KDB     *kdb;
-    IMPDEF  *impdef;
+    ImportCmtFromFile  *impdef;
 
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
@@ -260,37 +259,15 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
         IMP_trace = 0;
         K_WARN_DUP = 1;
     }
-    switch(fmt) {
-         case 1:
-            impdef = NULL;
-            break;
-        case 2:
-            impdef = NULL;
-            break;
-        case 3:
-            impdef = &IMP_BST_CMT;
-            break;
-        case 4:
-            impdef = NULL;
-            break;
-        case 5:
-            impdef = NULL;
-            break;
-        case 6:
-            impdef = &IMP_PRN_CMT;
-            break;
-        case 7:
-            impdef = &IMP_TXT_CMT;
-            break;
-        default:        // JMP 05/01/2023         
-            impdef = &IMP_ASC_CMT;
-            break; 
-    }
+   
+    impdef = import_comments[fmt].get();
 
-    kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
-    if(kdb != NULL) {
-        rc = K_save(kdb, ode);
-        K_free(kdb);
+    if(impdef){
+        kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
+        if(kdb != NULL) {
+            rc = K_save(kdb, ode);
+            K_free(kdb);
+        }
     }
 
     if(IMP_trace) W_close();
@@ -315,7 +292,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     int     rc = -1;
     SAMPLE  *smpl;
     KDB     *kdb;
-    IMPDEF  *impdef;
+    ImportVarFromFile  *impdef;
 
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
@@ -332,33 +309,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
         K_WARN_DUP = 1;
     }
 
-    switch(fmt) {
-        case 1:
-            impdef = &IMP_RASC;
-            break;
-        case 2:
-            impdef = &IMP_DIF;
-            break;
-        case 3:
-            impdef = &IMP_BST;
-            break;
-        case 4:
-            impdef = &IMP_NIS;
-            break;
-        case 5:
-            impdef = &IMP_GEM;
-            break;
-        case 6:
-            impdef = &IMP_PRN;
-            break;
-        case 7:
-            impdef = &IMP_TXT;
-            break;
-        default :
-            impdef = &IMP_ASC;
-            break;
-             
-    }
+    impdef = import_variables[fmt].get();
 
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);

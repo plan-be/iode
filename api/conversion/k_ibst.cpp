@@ -26,13 +26,7 @@
 #include "api/conversion/import.h"
 
 
-extern  YYKEYS  IMP_DIF_KEYS[];
-
-SAMPLE  BST_smpl;
-char    BST_freq;
-int     BST_nbper;
-
-int IMP_hd_bst(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsBST::read_header(YYFILE* yy, SAMPLE* smpl)
 {
     double  value;
 
@@ -46,20 +40,19 @@ int IMP_hd_bst(YYFILE* yy, SAMPLE* smpl)
 
     if(YY_lex(yy) != DIF_TABLE) return(-1);
 
-    if(DIF_skip_to(yy, DIF_VECTORS) < 0) return(-1);
-    if(DIF_cell(yy, NULL, &value) < 0) return(-1) ;
+    if(dif_skip_to(yy, DIF_VECTORS) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return(-1) ;
 
-    if(DIF_skip_to(yy, DIF_TUPLES) < 0) return(-1);
-    if(DIF_cell(yy, NULL, &value) < 0)  return(-1) ;
+    if(dif_skip_to(yy, DIF_TUPLES) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0)  return(-1) ;
 
-    if(DIF_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
 
     memcpy(&BST_smpl, smpl, sizeof(SAMPLE));
     return(0);
 }
 
-
-int IMP_elem_bst(YYFILE* yy, char* name, int* shift, double* vector)
+int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, double* vector)
 {
     char    buf[21], *str = NULL;
     long    y, s, nbper;
@@ -67,53 +60,39 @@ int IMP_elem_bst(YYFILE* yy, char* name, int* shift, double* vector)
     PERIOD  *per;
 
     while(1) {
-        if(DIF_cell(yy, &str, NULL) < 0) return(-1);
+        if(dif_read_cell(yy, &str, NULL) < 0) return(-1);
         SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
 
-        if(DIF_cell(yy, NULL, &value) < 0) return(-1);
+        if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
         nbper = (long)floor(value);
         if(nbper != BST_nbper) {
-            DIF_skip_to(yy, DIF_BOT);
+            dif_skip_to(yy, DIF_BOT);
             continue;
         }
         else break;
     }
 
-    if(DIF_cell(yy, NULL, &value) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
     y = (long) floor(value);
-    if(DIF_cell(yy, NULL, &value) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
     s = (long)floor(value);
     sprintf(buf, "%ld%c%ld", y, BST_freq, s);
     per = PER_atoper(buf);
     *shift = PER_diff_per(per, &(BST_smpl.s_p1));
     SW_nfree(per);
 
-    if(DIF_cell(yy, NULL, &value) < 0) return(-1);
-    if(DIF_cell(yy, NULL, &status) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &status) < 0) return(-1);
     if(status < 2) *vector = IODE_NAN;
     else *vector = value;
 
-    DIF_skip_to(yy, DIF_BOT);
+    dif_skip_to(yy, DIF_BOT);
     return(0);
 }
 
-IMPDEF IMP_BST = {
-    IMP_DIF_KEYS,       // imp_keys
-    8,                  // imp_dim
-    NULL,               // imp_hd_fn
-    IMP_hd_bst,         // imp_hd_sample_fn
-    NULL,               // imp_vec_var_fn
-    NULL,               // imp_vec_cmt_fn
-    IMP_elem_bst,       // imp_elem_fn
-    NULL                // imp_end_fn
-};
-
 /* Cmt */
-YYFILE  *FYY, *RYY, *SYY;
-KDB     *C_kdb = NULL;
 
-
-YYFILE* IMP_open_bst(YYKEYS* keys, int dim, char* name, char* suffix)
+YYFILE* ImportCommentsBST::open_file(YYKEYS* keys, int dim, char* name, char* suffix)
 {
     int     size;
     char    filename[K_MAX_FILE + 1];
@@ -126,7 +105,7 @@ YYFILE* IMP_open_bst(YYKEYS* keys, int dim, char* name, char* suffix)
     return(YY_open(filename, keys, size, YY_FILE));
 }
 
-char* IMP_addftr(char* cmt, long rubr, int lang)
+char* ImportCommentsBST::add_ftr(char* cmt, long rubr, int lang)
 {
     char    *fc = NULL, *nc = NULL, *ft;
     long    dummy, rub;
@@ -138,9 +117,9 @@ char* IMP_addftr(char* cmt, long rubr, int lang)
 
         if(DIF_long(FYY, &rub) < 0) break;
 
-        if(DIF_cell(FYY, &fc, NULL) < 0) break;
-        if(DIF_cell(FYY, &nc, NULL) < 0) break;
-        DIF_skip_to(FYY, DIF_BOT);
+        if(dif_read_cell(FYY, &fc, NULL) < 0) break;
+        if(dif_read_cell(FYY, &nc, NULL) < 0) break;
+        dif_skip_to(FYY, DIF_BOT);
 
         if(rubr == rub) break;
         SW_nfree(fc);
@@ -171,16 +150,16 @@ char* IMP_addftr(char* cmt, long rubr, int lang)
     return(cmt);
 }
 
-int IMP_hd_rbst(int lang)
+int ImportCommentsBST::sub_read_header(int lang)
 {
     char    *fc = NULL, *nc = NULL, *cmt = NULL; /* JMP 04-08-98 */
     long    dummy, rub, niv, ftr;
     char    name[80];
     int     lrub;
 
-    if(DIF_skip_to(SYY, DIF_BOT) < 0) return(-1);
-    if(DIF_skip_to(FYY, DIF_BOT) < 0) return(-1);
-    if(DIF_skip_to(RYY, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(SYY, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(FYY, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(RYY, DIF_BOT) < 0) return(-1);
 
     C_kdb = K_create(COMMENTS, ASIS_CASE);
 
@@ -193,9 +172,9 @@ int IMP_hd_rbst(int lang)
         if(DIF_long(RYY, &niv) < 0) break;
         if(DIF_long(RYY, &ftr)  < 0) break;
 
-        if(DIF_cell(RYY, &fc, NULL) < 0) break;
-        if(DIF_cell(RYY, &nc, NULL) < 0) break;
-        DIF_skip_to(RYY, DIF_BOT);
+        if(dif_read_cell(RYY, &fc, NULL) < 0) break;
+        if(dif_read_cell(RYY, &nc, NULL) < 0) break;
+        dif_skip_to(RYY, DIF_BOT);
 
         lrub = (int)floor(log10((double) rub));
         switch(lrub) {
@@ -227,7 +206,7 @@ int IMP_hd_rbst(int lang)
                 break;
         }
 
-        if(ftr) cmt = IMP_addftr(cmt, rub, lang);
+        if(ftr) cmt = add_ftr(cmt, rub, lang);
 
         if(cmt && K_add(C_kdb, name, cmt) < 0) return(-1);
 
@@ -240,37 +219,37 @@ int IMP_hd_rbst(int lang)
     return(0);
 }
 
-int IMP_hd_cbst(IMPDEF* impdef, char* file, int lang)
+int ImportCommentsBST::read_header(ImportCmtFromFile* impdef, char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
-    FYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "ftr.dif");
-    RYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "rub.dif");
-    SYY = IMP_open_bst(impdef->imp_keys, impdef->imp_dim, file, "ser.dif");
+    FYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "ftr.dif");
+    RYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "rub.dif");
+    SYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "ser.dif");
 
     if(FYY == 0 || RYY == 0 || SYY == 0) {
         kerror(0,"Cannot open '%s'", file);
         return(-1);
     }
 
-    if(IMP_hd_rbst(lang) < 0) {
-        IMP_end_cbst();
+    if(sub_read_header(lang) < 0) {
+        close();
         return(-1);
     }
 
     return(0);
 }
 
-int DIF_long(YYFILE* yy, long* l_val)
+int ImportCommentsBST::DIF_long(YYFILE* yy, long* l_val)
 {
     double  d_val;
 
-    if(DIF_cell(yy, NULL, &d_val) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &d_val) < 0) return(-1);
 
     *l_val = (long)floor(d_val);
     return(0);
 }
 
-int IMP_vec_cbst(char* name, char** cmt)
+int ImportCommentsBST::read_comment(char* name, char** cmt)
 {
     char    *str = NULL, *p_cmt[10];
     int     i, niv, r_niv, shift;
@@ -287,20 +266,20 @@ int IMP_vec_cbst(char* name, char** cmt)
         if(DIF_long(SYY, &as1) < 0) return(-1);
         if(DIF_long(SYY, &as2) < 0) return(-1);
 
-        if(DIF_cell(SYY, &str, NULL) < 0) return(-1);
+        if(dif_read_cell(SYY, &str, NULL) < 0) return(-1);
         strcpy(name, str);
         SW_nfree(str);
-        DIF_skip_to(SYY, DIF_BOT);
+        dif_skip_to(SYY, DIF_BOT);
     }
 
     as1 --;
 
-    niv = IMP_niv(KONAME(C_kdb, as1));
+    niv = get_niv(KONAME(C_kdb, as1));
     if(niv < 1 || niv > 9) return(-1);
 
     shift = niv;
     while(niv > 0 && as1 >= 0) {
-        r_niv = IMP_niv(KONAME(C_kdb, as1));
+        r_niv = get_niv(KONAME(C_kdb, as1));
         if(niv == r_niv) {
             str = KOVAL(C_kdb, as1);
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
@@ -312,9 +291,9 @@ int IMP_vec_cbst(char* name, char** cmt)
     }
 
     if(as2 > 0) {
-        niv = IMP_niv(KONAME(C_kdb, as2));
+        niv = get_niv(KONAME(C_kdb, as2));
         while(niv > 0 && as2 >= 0 && niv + shift < 10) {
-            r_niv = IMP_niv(KONAME(C_kdb, as2));
+            r_niv = get_niv(KONAME(C_kdb, as2));
             if(niv == r_niv) {
                 str = KOVAL(C_kdb, as2);
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
@@ -335,7 +314,7 @@ int IMP_vec_cbst(char* name, char** cmt)
     return(0);
 }
 
-int IMP_niv(char* name)
+int ImportCommentsBST::get_niv(char* name)
 {
     int     pos, niv;
     ONAME   oname;
@@ -349,21 +328,10 @@ int IMP_niv(char* name)
     return(niv);
 }
 
-int IMP_end_cbst()
+int ImportCommentsBST::close()
 {
     K_free(C_kdb);
     YY_close(SYY);
     YY_close(FYY);
     return(0);
 }
-
-IMPDEF IMP_BST_CMT = {
-    IMP_DIF_KEYS,       // imp_keys
-    8,                  // imp_dim
-    IMP_hd_cbst,        // imp_hd_fn
-    NULL,               // imp_hd_sample_fn
-    NULL,               // imp_vec_var_fn
-    IMP_vec_cbst,       // imp_vec_cmt_fn
-    NULL,               // imp_elem_fn
-    IMP_end_cbst        // imp_end_fn
-};

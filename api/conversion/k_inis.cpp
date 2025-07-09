@@ -19,12 +19,12 @@
 #include <algorithm>    // for std::min, std::max
 
 
-int IMP_hd_nis(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsNIS::read_header(YYFILE* yy, SAMPLE* smpl)
 {
     return(0);
 }
 
-int IMP_vec_nis(YYFILE* yy, char* name, int dim, double* vector)
+int ImportObjsNIS::read_variable(YYFILE* yy, char* name, int dim, double* vector)
 {
     char    line[85], value[11], *ptr;
     int     i, lg, nb;
@@ -58,14 +58,3 @@ int IMP_vec_nis(YYFILE* yy, char* name, int dim, double* vector)
 
     return(0);
 }
-
-IMPDEF IMP_NIS = {
-    NULL,           // imp_keys
-    0,              // imp_dim
-    NULL,           // imp_hd_fn
-    IMP_hd_nis,     // imp_hd_sample_fn
-    IMP_vec_nis,    // imp_vec_var_fn
-    NULL,           // imp_vec_cmt_fn
-    NULL,           // imp_elem_fn
-    NULL            // imp_end_fn
-};

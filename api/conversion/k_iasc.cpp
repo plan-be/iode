@@ -18,21 +18,15 @@
  *  
  *  List of functions 
  *  -----------------
- *      int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)                            Reads the sample (required) in an ASCII variable file.
- *      int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in an ASCII variable file format. 
- *      int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)               Opens an ASCII comment file for reading with the YY library functions. 
- *      int IMP_vec_casc(char* name, char** cmt)                            Reads one comment on the open YY stream.
+ *      int read_header(YYFILE* yy, SAMPLE* smpl)                            Reads the sample (required) in an ASCII variable file.
+ *      int read_variable(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in an ASCII variable file format. 
+ *      int read_header(ImportFromFile* impdef, char* file, int lang)               Opens an ASCII comment file for reading with the YY library functions. 
+ *      int read_comment(char* name, char** cmt)                            Reads one comment on the open YY stream.
  */
 #include "api/k_super.h"
 #include "api/utils/yy.h"
 #include "api/utils/time.h"
 #include "api/conversion/import.h"
-
-#define ASC_SMPL 1
-
-YYKEYS IMP_ASC_KEYS[] = {
-    (unsigned char*) "sample",   ASC_SMPL            // Keyword (in lowercase) for the sample definition
-};
 
 
 /**
@@ -42,7 +36,7 @@ YYKEYS IMP_ASC_KEYS[] = {
  *  @param [out]     SAMPLE*    smpl read SAMPLE on the YY stream
  *  @return          int        0 on success, -1 if there is an error in the sample
  */
-int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsASCII::read_header(YYFILE* yy, SAMPLE* smpl)
 {
     SAMPLE  *rsmpl;
 
@@ -56,7 +50,6 @@ int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)
     return(0);
 }
 
-
 /**
  *  Reads a VAR name and values in an ASCII variable file format. 
  *       name val1 val2... 
@@ -68,7 +61,7 @@ int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)
  *  @param [in, out]    double*  vector  read values (IODE_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the VAR name
  */
-int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)
+int ImportObjsASCII::read_variable(YYFILE* yy, char* name, int dim, double* vector)
 {
     int i;
 
@@ -85,34 +78,21 @@ int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)
                 return(0);
         }
     }
-}
+} 
 
-IMPDEF IMP_ASC = {
-    IMP_ASC_KEYS,       // imp_keys
-    1,                  // imp_dim
-    NULL,               // imp_hd_fn
-    IMP_hd_asc,         // imp_hd_sample_fn
-    IMP_vec_asc,        // imp_vec_var_fn
-    NULL,               // imp_vec_cmt_fn
-    NULL,               // imp_elem_fn
-    NULL                // imp_end_fn
-};
 
 // Ascii comments 
-YYFILE  *AYY;
-
 
 /**
  *  Opens an ASCII comment file for reading with the YY library functions. 
  *  
- *  @param [in] IMPDEF* impdef  struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
- *  @param [in] char*   file    input filename
- *  @param [in] int     lang    language (unused)
+ *  @param [in] ImportCmtFromFile* impdef  struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
+ *  @param [in] char*   file       input filename
+ *  @param [in] int     lang       language (unused)
  *  
  *  @return     int             0 on success, -1 on error
  */
- 
-int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)
+int ImportCommentsASCII::read_header(ImportCmtFromFile* impdef, char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
     AYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
@@ -125,16 +105,15 @@ int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)
     return(0);
 }
 
-
 /**
  *  Reads one comment on the open YY stream.
  *  
  *  @param [out] char*       name   read name of the comment
  *  @param [out] char**      cmt    allocated read comment
- *  @globals     YYFILE*     AYY    YY stream (opened by IMP_hd_casc())
+ *  @globals     YYFILE*     AYY    YY stream (opened by read_header())
  *  @return      int                0 on success, -1 on error   
  */
-int IMP_vec_casc(char* name, char** cmt)
+int ImportCommentsASCII::read_comment(char* name, char** cmt)
 {
     YYFILE  *yy = AYY;
     int     key;
@@ -160,14 +139,3 @@ int IMP_vec_casc(char* name, char** cmt)
 err :
     return(-1);
 }
-
-IMPDEF IMP_ASC_CMT = {
-    NULL,           // imp_keys
-    0,              // imp_dim
-    IMP_hd_casc,    // imp_hd_fn
-    NULL,           // imp_hd_sample_fn
-    NULL,           // imp_vec_var_fn
-    IMP_vec_casc,   // imp_vec_cmt_fn
-    NULL,           // imp_elem_fn
-    NULL            // imp_end_fn
-};

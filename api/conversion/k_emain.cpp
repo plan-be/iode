@@ -13,26 +13,26 @@
  *  one of the general functions EXP_Ws() or EXP_Rev_Ws() found in k_emain.c.
  *  
  *  
- *  EXPDEF structure
+ *  ExportToFile structure
  *  ----------------
- *  The EXPDEF structure contains a set of function pointers that implements the export procedure for a 
+ *  The ExportToFile structure contains a set of function pointers that implements the export procedure for a 
  *  specific output format. It is defined in iode.h.
  *  
  *      typedef struct _expdef_ { 
- *              int     (*exp_hd_fn)();     // Pointer to the function that creates the output file and writes the header
- *              char    *(*exp_code_fn)();  // Pointer to the function to create the output object name (aka code) + the separator
- *              char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
- *              char    *(*exp_elem_fn)();  // Pointer to the function constructing an allocated vector of one VAR values
- *              int     (*exp_vec_fn)();    // Pointer to the function saving the VAR and CMT in the output file
- *              int     (*exp_end_fn)();    // Pointer to the function that closes the output file after having written its footer
- *              FILE    *exp_fd;            // Output file descriptor (output of fopen)
- *      } EXPDEF
+ *              int     (*write_header)();     // Pointer to the function that creates the output file and writes the header
+ *              char    *(*write_object_name)();  // Pointer to the function to create the output object name (aka code) + the separator
+ *              char    *(*extract_comment)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
+ *              char    *(*get_variable_value)();  // Pointer to the function constructing an allocated vector of one VAR values
+ *              int     (*write_variable_and_comment)();    // Pointer to the function saving the VAR and CMT in the output file
+ *              int     (*close)();    // Pointer to the function that closes the output file after having written its footer
+ *              FILE    *file_descriptor;            // Output file descriptor (output of fopen)
+ *      } ExportToFile
  *  
- *  Function pointer exp_code_fn()
+ *  Function pointer write_object_name()
  *  ------------------------------
  *  The term "code" is a generalisation of the term "name" used for IODE objects.
  *  In the output file, a piece of information like a series or a comment will be identified by its "code".
- *  The purpose of the function (pointer) exp_code_fn() is to transform the IODE name into a "code" which 
+ *  The purpose of the function (pointer) write_object_name() is to transform the IODE name into a "code" which 
  *  will be written in the output file.
  *  
  *  
@@ -84,11 +84,11 @@
  *    
  *  List of functions 
  *  -----------------
- *      void EXP_val(char* tmp, double val)                                         Formats a double value on 20 positions in general format.  
- *      char *EXP_addprepost(char* pre, char* post, char* src, char** tg)           Creates an allocated string formatted as {pre}{src}{post}.
- *      char *EXP_addsep(char* src, char** tg)                                      Creates an allocated string formatted as {src}{EXP_SEP}.
- *      int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)      Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in EXPDEF
- *      int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.    
+ *      void write_value(char* tmp, double val)                                         Formats a double value on 20 positions in general format.  
+ *      char *write_pre_post(char* pre, char* post, char* src, char** tg)           Creates an allocated string formatted as {pre}{src}{post}.
+ *      char *write_separator(char* src, char** tg)                                      Creates an allocated string formatted as {src}{EXP_SEP}.
+ *      int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)      Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile
+ *      int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.    
  *      int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)   Exports VAR files into an external format. 
  *
  *  TODO: create report functions 
@@ -106,9 +106,6 @@
 extern  char    **IMP_rule; // See k_rule.c
 extern  char    **IMP_pat;  // See k_rule.c
 extern  int     IMP_trace;  // See k_rule.c
-
-char    EXP_SEP[11];        // Separator used in CSV
-char    EXP_NA[11];         // string to indicate a NaN value in CSV
 
 
 /**
@@ -141,7 +138,7 @@ static void EXP_set(char* na, char* sep)
  *  @param [in] char*   tmp     formatted val
  *  @param [in] double  val     input value
  */
-void EXP_val(char* tmp, double val)
+void write_value(char* tmp, double val)
 {
     if(IODE_IS_A_NUMBER(val)) {
         SCR_fmt_dbl(val, (unsigned char*) tmp, 20, -1);
@@ -160,7 +157,7 @@ void EXP_val(char* tmp, double val)
  *  @param [out] char**  tg      allocated result
  *  @return      char*           value of tg   
  */
-char *EXP_addprepost(char* pre, char* post, char* src, char** tg)
+char *write_pre_post(char* pre, char* post, char* src, char** tg)
 {
     char    *buf = NULL;
 
@@ -189,19 +186,19 @@ char *EXP_addprepost(char* pre, char* post, char* src, char** tg)
  *  @gobal [in]  char    EXP_SEP[11]    separator 
  *  @return      char*                  value of tg   
  */
-char *EXP_addsep(char* src, char** tg)
+char *write_separator(char* src, char** tg)
 {
-    return(EXP_addprepost("", EXP_SEP, src, tg));
+    return(write_pre_post("", EXP_SEP, src, tg));
 }
 
 
 /**
- *  Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in EXPDEF (see iode.h for details). 
+ *  Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile (see iode.h for details). 
  *  The output file contains one VAR by line, one period by column.
  *   
  *  A selection can be made through the rules in a rule file. 
  *  
- *  @param [in] EXPDEF* expdef      struct containing the implementation of the virtual functions used to export the data
+ *  @param [in] ExportToFile* expdef      struct containing the implementation of the virtual functions used to export the data
  *  @param [in] KDB*    dbv         input VAR KDB
  *  @param [in] KDB*    dbc         input CMT KDB
  *  @param [in] char*   rulefile    rule file
@@ -211,9 +208,9 @@ char *EXP_addsep(char* src, char** tg)
  *  @return     int                 0 on success, -1 on error
  *  
  */
-int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
 {
-    int     i, j, dim;
+    int     i, j, dim, rc;
     char    *code = NULL, *cmt = NULL, *vec = NULL;
     ONAME   iname;
     char    oname[81];
@@ -223,27 +220,25 @@ int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, ch
     if(dbv == NULL && dbc == NULL) goto err;
     if(IMP_readrule(rulefile) < 0) goto err;
 
-    if(expdef->exp_hd_fn != NULL
-            && (*(expdef->exp_hd_fn))(expdef, dbv, dbc, outfile) < 0) goto err;
+    rc = expdef->write_header(expdef, dbv, dbc, outfile);
+    if(rc < 0)
+        goto err;
 
     dim = KSMPL(dbv)->s_nb;
     for(i = 0; i < KNB(dbv); i++) {
         strcpy(iname, KONAME(dbv, i));
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
 
-        if(expdef->exp_code_fn != NULL)
-            (*(expdef->exp_code_fn))(oname, &code);
-        else code = (char*) SCR_stracpy((unsigned char*) oname);
+        expdef->write_object_name(oname, &code);
 
-        if(expdef->exp_cmt_fn != NULL && dbc != NULL)
-            (*(expdef->exp_cmt_fn))(dbc, iname, &cmt) ;
+        if(dbc != NULL)
+            expdef->extract_comment(dbc, iname, &cmt) ;
 
-        if(expdef->exp_elem_fn != NULL && dbv != NULL)
+        if(dbv != NULL)
             for(j = 0; j < dim; j++)
-                (*(expdef->exp_elem_fn))(dbv, i, j, &vec);
+                expdef->get_variable_value(dbv, i, j, &vec);
 
-        if(expdef->exp_vec_var_fn != NULL)
-            (*(expdef->exp_vec_var_fn))(expdef, code, cmt, vec);
+        expdef->write_variable_and_comment(expdef, code, cmt, vec);
 
         SW_nfree(code);
         code = NULL;
@@ -253,8 +248,9 @@ int EXP_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, ch
         vec = NULL;
     }
 
-    if(expdef->exp_end_fn != NULL
-            && (*(expdef->exp_end_fn))(expdef, dbv, dbc, outfile) < 0) goto err;
+    rc = expdef->close(expdef, dbv, dbc, outfile);
+    if(rc < 0) 
+        goto err;
 
     return(0);
 
@@ -267,9 +263,9 @@ err:
  *  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.
  *  
  */
-int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
 {
-    int     i, j, nl, nc;
+    int     i, j, nl, nc, rc;
     char    *code = NULL;
     ONAME   iname;
     char    oname[81];
@@ -279,53 +275,44 @@ int EXP_Rev_Ws(EXPDEF* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile
     if(dbv == NULL && dbc == NULL) goto err;
     if(IMP_readrule(rulefile) < 0) goto err;
 
-    if(expdef->exp_hd_fn != NULL
-            && (*(expdef->exp_hd_fn))(expdef, dbv, dbc, outfile) < 0) goto err;
+    rc = expdef->write_header(expdef, dbv, dbc, outfile);
+    if(rc < 0) 
+        goto err;
 
     nl = KSMPL(dbv)->s_nb;
     nc = KNB(dbv);
 
-    if(expdef->exp_vec_var_fn != NULL)
-        (*(expdef->exp_vec_var_fn))(expdef, EXP_SEP, 0L, 0L);
+    expdef->write_variable_and_comment(expdef, EXP_SEP, 0, 0);
 
     for(i = 0; i < nc; i++) {
         strcpy(iname, KONAME(dbv, i));
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
-
-        if(expdef->exp_code_fn != NULL)
-            (*(expdef->exp_code_fn))(oname, &code);
-        else code = (char*) SCR_stracpy((unsigned char*) oname);
-        if(expdef->exp_vec_var_fn != NULL)
-            (*(expdef->exp_vec_var_fn))(expdef, code, 0L, 0L);
+        expdef->write_object_name(oname, &code);
+        expdef->write_variable_and_comment(expdef, code, 0, 0);
         SW_nfree(code);
         code = NULL;
     }
-    if(expdef->exp_vec_var_fn != NULL)
-        (*(expdef->exp_vec_var_fn))(expdef, 0L, 0L, 0L);
+
+    expdef->write_variable_and_comment(expdef, 0, 0, 0);
 
     for(j = 0; j < nl; j++) {
-        sprintf(oname, "%s%s",
-                PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), j), NULL), EXP_SEP);
-        if(expdef->exp_vec_var_fn != NULL)
-            (*(expdef->exp_vec_var_fn))(expdef, oname, 0L, 0L);
+        sprintf(oname, "%s%s", PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), j), NULL), EXP_SEP);
+        expdef->write_variable_and_comment(expdef, oname, 0, 0);
 
         for(i = 0; i < nc; i++) {
             strcpy(iname, KONAME(dbv, i));
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
-
-            if(expdef->exp_elem_fn != NULL)
-                (*(expdef->exp_elem_fn))(dbv, i, j, &code);
-            if(expdef->exp_vec_var_fn != NULL)
-                (*(expdef->exp_vec_var_fn))(expdef, code, 0L, 0L);
+            expdef->get_variable_value(dbv, i, j, &code);
+            expdef->write_variable_and_comment(expdef, code, 0, 0);
             SW_nfree(code);
             code = NULL;
         }
-        if(expdef->exp_vec_var_fn != NULL)
-            (*(expdef->exp_vec_var_fn))(expdef, 0L, 0L, 0L);
+        expdef->write_variable_and_comment(expdef, 0, 0, 0);
     }
 
-    if(expdef->exp_end_fn != NULL
-            && (*(expdef->exp_end_fn))(expdef, dbv, dbc, outfile) < 0) goto err;
+    rc = expdef->close(expdef, dbv, dbc, outfile); 
+    if (rc < 0) 
+        goto err;
 
     return(0);
 
@@ -355,7 +342,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
 {
     KDB     *dbv = NULL, *dbc = NULL;
     SAMPLE  *smpl;
-    EXPDEF  *expdef;
+    ExportToFile  *expdef;
     int     rc = 0;
 
     SCR_strip((unsigned char*) trace);
@@ -379,22 +366,11 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         K_WARN_DUP = 1;
     }
 
-    switch(fmt) {
-        case 0:
-            expdef = &EXPCSV;
-            break;     /* JMP 28-08-98 */
-        case 1:
-            expdef = &EXPDIF;
-            break;
-        case 2:
-            expdef = &EXPWKS;
-            break;
-        case 3:
-            expdef = &EXPTSP;
-            break;
-        default:
-            expdef = &EXPRCSV;           /* JMP 28-08-98 */
-    }
+    if(fmt < 0 || fmt >= IODE_NB_EXPORT_FORMATS)
+        return(-1);
+
+    // Get the ExportToFile handler for the requested format
+    expdef = export_handlers[fmt].get();
 
     if(vfile && vfile[0] != 0) {
         dbv = K_interpret(VARIABLES, vfile);

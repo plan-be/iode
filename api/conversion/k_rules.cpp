@@ -14,10 +14,6 @@
 #include "api/conversion/import.h"
 
 
-char    **IMP_rule  = NULL;     // Rules read in a rule file
-char    **IMP_pat  = NULL;      // Patterns read in a rule file (// to IMP_rule)
-int     IMP_trace = 0;          // If not null, saves a trace of the object name modifications
-
 /**
  *  
  *  Reads a "rule file" and stores its contents in 2 global variables IMP_rule and IMP_pat.
