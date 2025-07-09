@@ -935,27 +935,27 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
     EXPECT_EQ(std::string(msg), "Illegal sample : 2010Y1 1960Y1");
 
     // 1206 -> "Estimation : NaN Generated"
-    E_error("Estimation : NaN Generated");
+    Estimation::E_error("Estimation : NaN Generated");
     msg = B_get_last_error();
     EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
 
     // 1206 -> "Estimation : NaN Generated"
-    E_error_n(6);
+    Estimation::E_error_n(6);
     msg = B_get_last_error();
     EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
 
     // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    E_error("Estimation : Equation %.80s : compiling error %.80s", "ACAF", "???");
+    Estimation::E_error("Estimation : Equation %.80s : compiling error %.80s", "ACAF", "???");
     msg = B_get_last_error();
     EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
 
     // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    E_error_n(12, "ACAF", "???");
+    Estimation::E_error_n(12, "ACAF", "???");
     msg = B_get_last_error();
     EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
 
     // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    E_msg_n(12, "ACAF", "???");
+    Estimation::E_msg_n(12, "ACAF", "???");
 }
 
 TEST_F(IodeCAPITest, Tests_BUF)
@@ -1451,7 +1451,8 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     //W_dest("test.gdi",        W_GDI);
 
     U_test_load_fun_esv("fun");
-    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
+    Estimation est("ACAF");
+    rc = est.estimate("1980Y1", "1996Y1");
     EXPECT_EQ(rc, 0);
 
     //x = U_test_calc_lec("_YRES0[1980Y1]", 0);
@@ -1468,9 +1469,9 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     W_close();
 
 
-    // E_StepWise
+    // estimate_step_wise
     smpl = PER_atosmpl("1980Y1", "1995Y1");
-    r2 = E_StepWise(smpl, "ACAF", "", "r2");
+    r2 = estimate_step_wise(smpl, "ACAF", "", "r2");
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
     SCR_free(smpl);
 

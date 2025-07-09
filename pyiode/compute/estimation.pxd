@@ -53,8 +53,6 @@ cdef extern from "cpp_api/compute/estimation.h":
         void set_instruments(const string& instruments) except +
 
         # Public methods
-        void copy_eq_tests_values() except +
-        
         CKDBScalars* get_scalars()
         void update_scalars() except +
 
@@ -70,7 +68,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         vector[double] get_fitted_values(const string& name) except +
         vector[double] get_residual_values(const string& name) except +
 
-        void estimate() except +
+        void estimate(int maxit, float epsilon) except +
         bint is_estimation_done()
 
         vector[string] save(const string& from_period, const string& to_period) except +

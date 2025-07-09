@@ -17,100 +17,12 @@
 #include "api/estimation/estimation.h"
 
 
-// Functions prototypes
-static int E_prep_alloc();
-static int E_prep_lecs(char** lecs);
-static int E_add_scls(CLEC *clec, KDB *dbs);
-static int E_prep_instrs(char** instrs);
-static int E_prep_coefs();
-void E_get_C();
-void E_put_C();
-void E_get_SMO();
-static void E_prep_reset();
-void E_free_work();
-int E_prep(char** lecs, char** instrs);
-
-
-// Global variables used by the estimation methods
-int     E_errno;        // Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS
-int     E_NEQ;          // Number of equations in the current block of equations
-int     E_NCE;          // Number of estimated coefficients in the current block of equations
-int     E_NC;           // Number of coefficients (est and non est) in the current block of equations
-int     E_NINSTR;       // Number of instruments in the estimation
-int     E_T;            // Number of periods in the estimation sample
-int     E_FROM;         // Position in E_DBV of the first period in the estimation sample
-int     *E_C_NBS;       // Positions in E_DBS of the estimated coefs
-KDB     *E_DBV;         // KDB of variables used for the estimation 
-KDB     *E_DBS;         // KDB of scalars used for the estimation
-SAMPLE  *E_SMPL;        // Current estimation sample
-char    E_MET;          // Current estimation method
-double E_CONV_TEST;  // Sum of the squares of the relative differences between 2 iterations
-double E_EPS;        // Convergence criterion (threshold) for the estimation
-CLEC    **E_CRHS;       // List of CLEC corresponding to the right members of the equations
-char    **E_LECS;       // List (block) of simultaneous equations of the current estimation
-char    **E_INSTRS;     // List of instruments (LEC formulas) of the current estimation    
-char    **E_ENDOS;      // List of endogenous vars of the current estimation
-
-// See E_prep_alloc() for description of the global MAT (=arrays) 
-MAT     *E_RHS,        
-        *E_LHS,
-        *E_U,
-        *E_G,
-        *E_VCC,
-        *E_VCCTMP,
-        *E_M,
-        *E_MTMP,
-        *E_MTMPP,
-        *E_D,
-        *E_C,               // Vector (MAT 1 col) of estimated coefficients
-        *E_SMO,             // Vector of of relaxation params
-        *E_NBCE,
-        *E_VCU,
-        *E_IVCU,
-        *E_MCU,
-        *E_GMU,
-        *E_dC,
-        *E_DF,
-        *E_UM,
-        *E_UMT,
-        *E_UMTMP,
-        *E_UVCCTMP,
-        *E_GMUTMP,
-        *E_SSRES,
-        *E_RSQUARE_ADJ,
-        *E_DW,
-        *E_LOGLIK,
-        *E_STDERR,
-        *E_MEAN_Y,
-        *E_STDEV,
-        *E_RSQUARE,
-        *E_FSTAT,
-        *E_STD_PCT,
-        *E_MCORR,
-        *E_MCORRU,
-        *E_DEV;
-
-// Texts corresponding to E_errno codes
-char    *E_ERRORS[] = {
-    "EST_NO_EQ_ERR",
-    "EST_MEM_ERR",
-    "EST_SYNTAX_ERR",
-    "EST_LINK_ERR",
-    "EST_DREG_ERR",
-    "EST_NAN_ERR",
-    "EST_VCC_SING_ERR",
-    "EST_VCU_SING_ERR",
-    "EST_GMG_SING_ERR",
-    "EST_NO_SCALARS"
-};
-
-
 /**
  *  Creates MAT struct's needed for the estimation of a block of equations.
  *  
  *  @return     int     0 or an error code (EST_MEM_ERR ::= Memory full).
  */
-static int E_prep_alloc()
+int Estimation::E_prep_alloc()
 {
     E_U             = M_alloc(E_NEQ, E_T);          // Residuals (neq x t)
     E_VCU           = M_diag(E_NEQ, 1.0);           // Variance / covariance of the residuals (neq x neq)    
@@ -171,13 +83,13 @@ static int E_prep_alloc()
  *  @return     int             0 or error code (E_errno)            
  *  
  */
-static int E_prep_lecs(char** lecs)
+int Estimation::E_prep_lecs(char** lecs)
 {
     int     i, pos, t;
     CLEC    *clec = 0;
     double  x;
 
-    E_NEQ = SCR_tbl_size(lecs);
+    E_NEQ = SCR_tbl_size((unsigned char**) lecs);
     if(E_NEQ < 1) return(E_errno = EST_NO_EQ_ERR);
 
     E_LHS = M_alloc(E_NEQ, E_T);
@@ -223,7 +135,7 @@ static int E_prep_lecs(char** lecs)
  *  @return     int             0 (TODO: check the K_add() return value)        
  *  
  */
-static int E_add_scls(CLEC *clec, KDB *dbs)
+int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
 {
     int         j;
     char        *name;
@@ -246,7 +158,7 @@ static int E_add_scls(CLEC *clec, KDB *dbs)
  *  @return     int     0 or error code (E_errno)           
  *  @global     MAT*    E_D (E_T, E_T)
  */
-static int E_prep_instrs(char** instrs)
+int Estimation::E_prep_instrs(char** instrs)
 {
     int     i, t;
     CLEC    *clec = 0;
@@ -255,7 +167,7 @@ static int E_prep_instrs(char** instrs)
 
     // Check if there are instruments. If not, return 0
     if(E_MET != 2 && E_MET != 3) return(0);
-    E_NINSTR = SCR_tbl_size(instrs);
+    E_NINSTR = SCR_tbl_size((unsigned char**) instrs);
     if(E_NINSTR < 1) return(0);
 
     // Alloc local MAT
@@ -333,7 +245,7 @@ fin:
  *  @return     int             0 on success, E_errno on error
  *  
  */
-static int E_prep_coefs()
+int Estimation::E_prep_coefs()
 {
     CLEC    *clec;
     int     i, j, pos, k;
@@ -394,7 +306,7 @@ static int E_prep_coefs()
  *  @global     int*    E_C_NBS             position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS               KDB of scalars for the estimation
  */
-void E_get_C()
+void Estimation::E_get_C()
 {
     int     i;
     double    c;
@@ -417,7 +329,7 @@ void E_get_C()
  *  @global     int*    E_C_NBS   position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS     KDB of scalars for the estimation
  */
-void E_put_C()
+void Estimation::E_put_C()
 {
     int     i;
 
@@ -434,7 +346,7 @@ void E_put_C()
  *  @global     int*    E_C_NBS        position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS          KDB of scalars for the estimation
  */
-void E_get_SMO()
+void Estimation::E_get_SMO()
 {
     int     i;
 
@@ -446,7 +358,7 @@ void E_get_SMO()
 /**
  *  Resets all global variables.
  */
-static void E_prep_reset()
+void Estimation::E_prep_reset()
 {
     E_CRHS = 0;
     E_C_NBS = 0;
@@ -495,7 +407,7 @@ static void E_prep_reset()
 /**
  *  Frees all allocated variables for the last estimation.
  */
-void E_free_work()
+void Estimation::E_free_work()
 {
     int     i;
 
@@ -543,9 +455,9 @@ void E_free_work()
     M_free(E_UVCCTMP);
     M_free(E_GMUTMP);
 
-    SCR_free_tbl(E_ENDOS);
-    SCR_free_tbl(E_LECS);
-    SCR_free_tbl(E_INSTRS);
+    SCR_free_tbl((unsigned char**) E_ENDOS);
+    SCR_free_tbl((unsigned char**) E_LECS);
+    SCR_free_tbl((unsigned char**) E_INSTRS);
     E_ENDOS = 0;
     E_LECS = 0;
     E_INSTRS = 0;
@@ -567,7 +479,7 @@ void E_free_work()
  *  @return     int             0 on success, -1 on error (E_errno contains the last error code)
  *  
  */
-int E_prep(char** lecs, char** instrs)
+int Estimation::E_prep(char** lecs, char** instrs)
 {
     E_prep_reset();
     if(E_prep_lecs(lecs)) return(-1);

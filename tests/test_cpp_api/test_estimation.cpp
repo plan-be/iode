@@ -171,6 +171,7 @@ TEST_F(EstimationTest, SetBlock)
 
 TEST_F(EstimationTest, Estimate)
 {
+    Estimation* c_estimation;
     std::string from = "1980Y1";
     std::string to = "1996Y1";
 
@@ -193,14 +194,14 @@ TEST_F(EstimationTest, Estimate)
     est.estimate();
     ASSERT_TRUE(est.is_estimation_done());
 
-    est.copy_eq_tests_values();
     est.save();
+    c_estimation = est.get_estimation();
 
     // number of coefficients 
-    EXPECT_EQ(E_NCE, 5);
+    EXPECT_EQ(c_estimation->E_NCE, 5);
 
     // number of equations
-    EXPECT_EQ(E_NEQ, 2);
+    EXPECT_EQ(c_estimation->E_NEQ, 2);
 
     // Sample
     Sample* sample = est.get_sample();
@@ -210,7 +211,7 @@ TEST_F(EstimationTest, Estimate)
     // -- ACAF;DPUH
 
     CorrelationMatrix* m_corr = est.get_correlation_matrix();
-    EXPECT_EQ(m_corr->nb_coeffs, E_NCE);
+    EXPECT_EQ(m_corr->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr->get_value(0, 0), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 1)) / 1e6, -0.935266);
@@ -262,14 +263,14 @@ TEST_F(EstimationTest, Estimate)
     est.estimate();
     ASSERT_TRUE(est.is_estimation_done());
     
-    est.copy_eq_tests_values();
     est.save();
+    c_estimation = est.get_estimation();
 
     // number of coefficients 
-    EXPECT_EQ(E_NCE, 3);
+    EXPECT_EQ(c_estimation->E_NCE, 3);
 
     // number of equations
-    EXPECT_EQ(E_NEQ, 1);
+    EXPECT_EQ(c_estimation->E_NEQ, 1);
 
     // Tests values (ACAF)
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stdev")->val) / 1e6, 0.00427);
@@ -341,7 +342,7 @@ TEST_F(EstimationTest, Estimate)
     // -- ACAF
 
     CorrelationMatrix* m_corr2 = est.get_correlation_matrix();
-    EXPECT_EQ(m_corr2->nb_coeffs, E_NCE);
+    EXPECT_EQ(m_corr2->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr2->get_value(0, 0), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(0, 1)) / 1e6, -0.936111);
@@ -361,17 +362,17 @@ TEST_F(EstimationTest, Estimate)
     est.estimate();
     ASSERT_TRUE(est.is_estimation_done());
 
-    est.copy_eq_tests_values();
     est.save();
+    c_estimation = est.get_estimation();
 
     // number of coefficients 
-    EXPECT_EQ(E_NCE, 2);
+    EXPECT_EQ(c_estimation->E_NCE, 2);
 
     // number of equations
-    EXPECT_EQ(E_NEQ, 1);
+    EXPECT_EQ(c_estimation->E_NEQ, 1);
 
     CorrelationMatrix* m_corr3 = est.get_correlation_matrix();
-    EXPECT_EQ(m_corr3->nb_coeffs, E_NCE);
+    EXPECT_EQ(m_corr3->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr3->get_value(0, 0), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr3->get_value(0, 1)) / 1e6, -0.042291);

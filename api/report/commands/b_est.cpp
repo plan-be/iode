@@ -22,12 +22,14 @@
  * int B_EqsSetCmt(char* arg)                       Implementation of the report function $EqsSetCmt.
  * int B_EqsSetInstrs(char* arg)                    Implementation of the report function $EqsSetInstrs.
  */
+
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
 #include "api/estimation/estimation.h"
-
 #include "api/report/commands/commands.h"
+
 
 /**
  *  Extracts the first 2 args of a report command and tries to translated
@@ -67,20 +69,22 @@ static char **B_EqsSplitSmplName(char* arg, SAMPLE **psmpl)
  */
 int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)
 {
-    KDB     *tdbe;
-    int     rc;
+    KDB* dbe;
+    int  rc;
 
-    if(eqs == NULL || SCR_tbl_size(eqs) == 0) {
+    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) {
         B_seterrn(40);
         return(-1);
     }
     else {
-        tdbe = K_refer(KE_WS, SCR_tbl_size(eqs), eqs);
-        if(tdbe == 0 || KNB(tdbe) == 0)                                       
+        dbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
+        if(dbe == 0 || KNB(dbe) == 0)                                       
             rc = -1;                                                          
-        else                                                                  
-            rc = KE_est_s(tdbe, KV_WS, KS_WS, smpl, eqs, 1);    // JMP 29/04/2022
-        K_free_kdb(tdbe);
+        else{
+            Estimation est(eqs, dbe, KV_WS, KS_WS, smpl);
+            rc = est.estimate();
+        }
+        K_free_kdb(dbe);
     }
 
     return(rc);
@@ -103,7 +107,7 @@ int B_EqsEstimate(char* arg)
     eqs = B_EqsSplitSmplName(arg, &smpl);
     if(smpl == 0) return(-1);
     rc = B_EqsEstimateEqs(smpl, eqs);
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(smpl);
     return(rc);
 }
@@ -135,7 +139,7 @@ int B_EqsSetSample(char* arg)
         if(rc) break;
     }
 
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(smpl);
     return(rc);
 }
@@ -172,7 +176,7 @@ int B_EqsSetMethod(char* arg)
         if(rc) break;
     }
 
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     return(rc);
 }
 
@@ -192,16 +196,15 @@ int B_EqsSetBloc(char* arg)
 {
     int     rc = 0, i;
     char    **eqs = 0, *bloc;
-    U_ch    *SCR_mtov();
 
     eqs = B_ainit_chk(arg, NULL, 0);
-    bloc = SCR_mtov(eqs, ';');
+    bloc = (char*) SCR_mtov((unsigned char**) eqs, (int) ';');
     for(i = 0 ; eqs[i] ; i++) {
         rc = K_upd_eqs(eqs[i], 0L, 0L, -1, 0L, 0L, bloc, 0L, 0);
         if(rc) break;
     }
 
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(bloc);
     return(rc);
 }

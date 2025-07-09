@@ -213,9 +213,6 @@ class EditEquationDialog(MixinSettingsDialog):
             # process estimation
             self.edit_est_eqs.estimate()
 
-            # copy the resulting values for the tests for all equations
-            self.edit_est_eqs.copy_eq_tests_values()
-
             # refresh the values for the tests of the current equation
             self.eq = self.edit_est_eqs.current_equation
             self._display_equation()

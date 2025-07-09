@@ -93,13 +93,11 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
 {
-    // frees all allocated variables for the last estimation
-    if(estimation_done) E_free_work();
-
-    if(sample)  delete sample;
-    if(kdb_eqs) delete kdb_eqs;
-    if(kdb_scl) delete kdb_scl;
-    if(m_corr)  delete m_corr;
+    if(estimation_done) delete estimation;
+    if(sample)          delete sample;
+    if(kdb_eqs)         delete kdb_eqs;
+    if(kdb_scl)         delete kdb_scl;
+    if(m_corr)          delete m_corr;
 }
 
 void EditAndEstimateEquations::set_block(const std::string& block, const std::string& current_eq_name)
@@ -219,33 +217,6 @@ void EditAndEstimateEquations::update_scalars()
     }
 }
 
-void EditAndEstimateEquations::copy_eq_tests_values()
-{
-    std::string eq_name;
-    std::array<float, EQS_NBTESTS> tests;
-
-    for(int i = 0; i < v_equations.size(); i++)
-    {
-        tests.fill(0.0);
-        tests[0] = (float) MATE(E_MCORRU,      0, i);
-        tests[1] = (float) MATE(E_STDEV,       0, i);
-        tests[2] = (float) MATE(E_MEAN_Y,      0, i);
-        tests[3] = (float) MATE(E_SSRES,       0, i);
-        tests[4] = (float) MATE(E_STDERR,      0, i);
-        tests[5] = (float) MATE(E_STD_PCT,     0, i);
-        tests[6] = (float) MATE(E_FSTAT,       0, i);
-        tests[7] = (float) MATE(E_RSQUARE,     0, i);
-        tests[8] = (float) MATE(E_RSQUARE_ADJ, 0, i);
-        tests[9] = (float) MATE(E_DW,          0, i);
-        tests[10]= (float) MATE(E_LOGLIK,      0, i);
-
-        eq_name = v_equations.at(i);
-        Equation eq = kdb_eqs->get(eq_name);
-        eq.set_tests(tests);
-        kdb_eqs->update(eq_name, eq);
-    }
-}
-
 void EditAndEstimateEquations::update_current_equation(const std::string& lec, const std::string& comment)
 {
     if(lec.empty()) 
@@ -261,22 +232,24 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
     kdb_eqs->update(name, eq);
 }
 
-void EditAndEstimateEquations::estimate()
+void EditAndEstimateEquations::estimate(int maxit, double eps)
 {
+    if(maxit <= 0)
+        maxit = DEFAULT_MAXIT;
+    
+    if(eps <= 0.0)
+        eps = DEFAULT_EPS;
+
     // clear C API errors stack
     B_clear_last_error();
 
     // frees all allocated variables for the last estimation
     if(estimation_done)
-        E_free_work();
+        delete estimation;
     estimation_done = false;
 
     // endos
-    char** c_endos = vector_to_double_char(v_equations);
-
-    // instruments    
-    std::vector<std::string> v_instrs = split(instruments,';');
-    char** c_instrs = vector_to_double_char(v_instrs);    
+    char** c_endos = vector_to_double_char(v_equations);   
     
     // list of LEC expressions for each equation of the vector v_equations
     // NOTE: equations are stored in the local database kdb_eqs 
@@ -289,9 +262,26 @@ void EditAndEstimateEquations::estimate()
     }
     char** c_lecs = vector_to_double_char(v_lecs);
 
-    // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in E_free_work()
-    int res = E_est(c_endos, c_lecs, Variables.get_database(), kdb_scl->get_database(), sample, 
-                    this->method, c_instrs, ESTIMATION_MAXIT, ESTIMATION_EPS);
+    // copy the values of class attributes 'block', 'method' and 'instruments' 
+    // to each local equation 
+    for(const std::string& eq_name: v_equations) 
+    {
+        Equation eq = kdb_eqs->get(eq_name);
+        eq.set_block(block);
+        eq.set_method(method);
+        eq.set_instruments(instruments);
+        kdb_eqs->update(eq_name, eq);
+    }
+
+    // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
+    // the Estimation destructor
+    KDB* dbe = kdb_eqs->get_database();
+    KDB* dbs = kdb_scl->get_database();
+    KDB* dbv = Variables.get_database();
+    int i_method = (int) method;
+    
+    estimation = new Estimation(c_endos, dbe, dbv, dbs, sample, i_method, maxit, eps);
+    int res = estimation->estimate();
 
     if(res == 0)
     {
@@ -299,7 +289,7 @@ void EditAndEstimateEquations::estimate()
         std::vector<std::string> v_coeffs = kdb_scl->get_names();
 
         if(m_corr) delete m_corr;
-        m_corr = new CorrelationMatrix(v_coeffs, E_MCORR); 
+        m_corr = new CorrelationMatrix(v_coeffs, estimation->get_MCORR()); 
     }
     else
     {
@@ -339,7 +329,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     for(int i = 0; i < v_equations.size(); i++) 
     {
         eq_name = v_equations[i];
-        Equation eq = kdb_eqs->get(eq_name);
+        Equation eq = kdb_eqs->get(eq_name);    // get the equation from the local database
         eq.set_block(block);
         eq.set_method(method);
         eq.set_instruments(instruments);
@@ -348,14 +338,6 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
         {
             eq.set_sample(est_from, est_to);
             eq.update_date();
-
-            // create the Scalars containing the results of an estimated equation
-            E_tests2scl(&eq, i, E_T, E_NCE);
-
-            // create the Variables containing the fitted, observed and residual values
-            E_savevar("_YCALC", i, E_RHS);
-            E_savevar("_YOBS", i, E_LHS); 
-            E_savevar("_YRES", i, E_U);   
         }
         else
         {
@@ -364,6 +346,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
             eq.reset_date();
         }
 
+        // update/add the equation in the global database
         if(Equations.contains(eq_name))
             Equations.update(eq_name, eq);
         else
@@ -379,29 +362,33 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     return v_new_eqs;
 }
 
-void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
+void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to, 
+                  int maxit, double eps)
 {
-    std::string error_msg = "Could not estimate equation(s) " + eqs;
     // clear C API errors stack
     B_clear_last_error();
 
     Sample* sample = Variables.get_sample();
     if(sample->nb_periods() == 0)
-        throw std::runtime_error(error_msg + ": No sample is defined");
-    std::string from_ = (from.empty()) ? sample->start_period().to_string() : from;
-    std::string to_ = (to.empty()) ? sample->end_period().to_string() : to;
+        throw std::runtime_error("Could not perform estimation: No estimation sample is defined");
+    std::string from_period = (from.empty()) ? sample->start_period().to_string() : from;
+    std::string to_period = (to.empty()) ? sample->end_period().to_string() : to;
 
-    int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
+    Estimation estimation(to_char_array(eqs), KE_WS, KV_WS, KS_WS, to_char_array(from_period), 
+                          to_char_array(to_period), -1, maxit, eps);
+    int res = estimation.estimate();
     if(res != 0)
     {
+        std::string error_msg = "Could not estimate equation(s) '" + eqs + "' from '" + from + "' to '" + to + "'";
         std::string last_error = get_last_error();
         if(!last_error.empty())
-            throw std::runtime_error(error_msg + " from '" + from + "' to '" + to + "'\n" + last_error);
+            throw std::runtime_error(error_msg + ":\n" + last_error);
     }
 }
 
-void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from, const std::string& to)
+void eqs_estimate(const std::vector<std::string>& v_eqs, const std::string& from, const std::string& to, 
+                  int maxit, double eps)
 {
-    std::string s_eqs = join(eqs, ",");
-    eqs_estimate(s_eqs, from, to);
+    std::string eqs = join(v_eqs, ";");
+    eqs_estimate(eqs, from, to, maxit, eps);
 }

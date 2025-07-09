@@ -21,18 +21,6 @@
 #include "api/estimation/estimation.h"
 
 
-// Function prototypes
-double M_c_line(MAT* m1, int line, int oper);
-double E_div_0(double a, double b);
-double E_sqrt(double val);
-static void E_deg_freed();
-static double E_c_umu();
-static int E_c_loglik();
-static E_c_mcorr();
-static int E_c_mcorru();
-static int E_c_ttests();
-int E_output();
-
 /**
  *  Adds, substracts or multiplies all elements of a matrix line.
  *  
@@ -40,9 +28,8 @@ int E_output();
  *  @param [in] int  line   line to reduce
  *  @param [in] int  oper   operator : '+', '-' or '*'
  *  @return     double      result of the operator on all elements of m1[line]
- *  
  */
-double  M_c_line(MAT* m1, int line, int oper)
+double Estimation::M_c_line(MAT* m1, int line, int oper)
 {
     double  res = 0.0;
     int     i;
@@ -74,7 +61,7 @@ double  M_c_line(MAT* m1, int line, int oper)
  *  @param [in] double  b   denominator
  *  @return     double      0.0 if b is null, a / b if not
  */
-double  E_div_0(double a, double b)
+double Estimation::E_div_0(double a, double b)
 {
     if(b == 0) return(0.0);
 
@@ -85,11 +72,8 @@ double  E_div_0(double a, double b)
 /**
  *  Returns the square root of val if val >= 0. If not, returns 0.0.
  */
-double E_sqrt(double val)
+double Estimation::E_sqrt(double val)
 {
-#ifndef WATCOM
-    double  sqrt();
-#endif
     if(val < 0)
         return(0.0);
     else
@@ -103,9 +87,8 @@ double E_sqrt(double val)
  *  If it appears in 1 equation only, DF = T - number of estimated coefficients in this equation.
  *  
  *  The result is stored in E_DF
- *  
  */
-static void E_deg_freed()
+void Estimation::E_deg_freed()
 {
     int     j, eq, cf, nbr, nbce;
 
@@ -128,7 +111,7 @@ static void E_deg_freed()
 /**
  *  Sub function of E_c_loglik().
  */
-static double  E_c_umu()
+double Estimation::E_c_umu()
 {
     int         i, j;
     double      umu = 0.0;
@@ -158,7 +141,7 @@ static double  E_c_umu()
  *  
  *  @return int 0 always
  */
-static int E_c_loglik()
+int Estimation::E_c_loglik()
 {
     int     i;
     double  loglik;
@@ -187,7 +170,7 @@ static int E_c_loglik()
  *  
  *  @return int 0 always
  */
-static E_c_mcorr()
+int Estimation::E_c_mcorr()
 {
     int         i, j;
     double      vii, vij, vjj;
@@ -213,7 +196,7 @@ static E_c_mcorr()
  *  
  *  @return int 0 always
  */
-static int E_c_mcorru()
+int Estimation::E_c_mcorru()
 {
     int         i, j;
     double      vii, vij, vjj;
@@ -237,7 +220,7 @@ static int E_c_mcorru()
  *  
  *  @return int 0 always
  */
-static int E_c_ttests()
+int Estimation::E_c_ttests()
 {
     int     i, j;
     SCL     *scl;
@@ -277,13 +260,10 @@ static int E_c_ttests()
  *  
  *  @return  int    -1 if one of the tests has generated an error. 0 otherwise
  */
-int E_output()
+int Estimation::E_output()
 {
     int     i, j;
     double  sum, tmp /*, sum1 */;
-#ifndef WATCOM
-    double  sqrt();
-#endif
 
     /* 1. OUTPUT BY COEFFICIENT */
     E_deg_freed();

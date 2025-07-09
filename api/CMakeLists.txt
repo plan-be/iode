@@ -6,7 +6,6 @@ message(STATUS "\n---- C API ----\n")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
-
 add_library(iode_c_api STATIC "")
 
 # Add source to this project's library.
@@ -38,8 +37,15 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
   	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-int")
   	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-function-declaration")
 endif()
+if(NOT SKBUILD)
+	target_link_libraries(iode_c_api PUBLIC gtest_main)
+endif()
 target_link_libraries(iode_c_api PUBLIC "iode_scr4")
 target_include_directories(iode_c_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT SKBUILD)
+	include(GoogleTest)
+endif()
 
 if(TARGET iode_c_api)
 	message(STATUS "New target iode_c_api enabled\n")

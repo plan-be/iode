@@ -1,2 +1,3 @@
 
-target_sources(iode_c_api PRIVATE k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c e_dftest.c)
+target_sources(iode_c_api PRIVATE k_est.cpp e_error.cpp e_est.cpp e_prep.cpp e_print.cpp 
+                                  e_step.cpp e_tests.cpp e_dftest.cpp)

@@ -292,14 +292,16 @@ class Equation:
         """
         return self._cython_instance.split_equation()
 
-    def _estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None) -> bool:
+    def _estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
+                  maxit: int=100, epsilon: float=1.0e-6) -> bool:
         if isinstance(from_period, Period):
             from_period = str(from_period)
         if isinstance(to_period, Period):
             to_period = str(to_period)
-        return self._cython_instance.estimate(from_period, to_period)
+        return self._cython_instance.estimate(from_period, to_period, maxit, epsilon)
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, quiet: bool=False) -> bool:
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
+                 maxit: int=100, epsilon: float=1.0e-6, quiet: bool=False) -> bool:
         r"""
         Estimate the present equation.
 
@@ -341,6 +343,12 @@ class Equation:
         to_period : str or Period, optional
             The ending period of the execution range.
             Defaults to the ending period of the current Variables sample.
+        maxit : int, optional
+            The maximum number of iterations for the estimation process.
+            Defaults to 100.
+        epsilon : float, optional
+            The convergence threshold for the estimation process.
+            Defaults to 1.0e-6.
         quiet : bool, optional
             If True, suppresses the log messages during the estimation process. 
             Default to False.
@@ -451,7 +459,7 @@ class Equation:
         if quiet:
             suppress_msgs()
         try:
-            success = self._estimate(from_period, to_period)
+            success = self._estimate(from_period, to_period, maxit, epsilon)
             if quiet:
                 enable_msgs()
             return success

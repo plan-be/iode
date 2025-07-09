@@ -98,7 +98,7 @@ cdef class Equation:
         lhs, rhs = self.c_equation.split_equation()
         return lhs.decode(), rhs.decode() 
 
-    def estimate(self, from_period: str=None, to_period: str=None) -> bool:
+    def estimate(self, from_period: str, to_period: str, maxit: int, epsilon: float) -> bool:
         cdef CEquation* c_global_equation = NULL
         cdef string eq_name = self.c_equation.get_endo()
 
@@ -111,7 +111,7 @@ cdef class Equation:
         
         try:
             # NOTE: In the C API, the estimation is made on equations stored in the global equations workspace. 
-            cpp_eqs_estimate(eq_name, from_period.encode(), to_period.encode())
+            cpp_eqs_estimate(eq_name, from_period.encode(), to_period.encode(), maxit, epsilon)
             
             # copy tests values and estimation date from the global equations workspace
             c_global_equation = cpp_global_equations.get(eq_name)

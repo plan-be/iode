@@ -14,20 +14,19 @@
 #include "api/k_super.h"
 #include "api/estimation/estimation.h"
 
+extern "C" char* B_ERROR_DFT_MSG;
+
 
 /**
  *  Displays a message using kmsg().
  *  
  *  @param [in] char*   fmt     Message format (1st arg of vsnprintf_s())
- *  @param [in]         ...     fmt parameters 
- *  
+ *  @param [in]         ...     fmt parameters  
  */
- 
-void E_msg(char* fmt,...)
+void Estimation::E_msg(char* fmt, ...)
 {
     va_list     myargs;
     char        buf[512];
-    extern char* B_ERROR_DFT_MSG;
     
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);  
@@ -46,10 +45,9 @@ void E_msg(char* fmt,...)
 
 
 // see B_seterrn() for code example
-void E_msg_n(int n, ...)
+void Estimation::E_msg_n(int n, ...)
 {
     char    buf[256];
-    char    *B_msg();
     va_list myargs;
     
     va_start(myargs, n);    
@@ -69,14 +67,11 @@ void E_msg_n(int n, ...)
  *  
  *  @param [in] char*   fmt     Message format (1st arg of vsnprintf_s())
  *  @param [in]         ...     fmt parameters 
- *  
  */
-
-void E_error(char* fmt,...)
+void Estimation::E_error(char* fmt,...)
 {
     va_list     myargs;
     char        buf[512];
-    extern char* B_ERROR_DFT_MSG;
     
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
@@ -98,13 +93,12 @@ void E_error(char* fmt,...)
  *  Displays the estimation error message number n using B_seterror().
  *  
  *  @param [in] int n   Estimation error number (identified par 1200+n in iode_msg_map) 
- *  
  */
-// see B_seterrn() for code example
-void E_error_n(int n, ...)
+void Estimation::E_error_n(int n, ...)
 {
+    // see B_seterrn() for code example
+
     char    buf[256];
-    char    *B_msg();
     va_list myargs;
     
     va_start(myargs, n);
