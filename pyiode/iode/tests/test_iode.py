@@ -873,22 +873,20 @@ def test_estimation(capsys):
 
     estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
     estimation.block = "ACAF;DPUH", "ACAF"
-    with pytest.warns(RuntimeWarning, match=r"Could not estimate equation\(s\) ACAF;DPUH\n"
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
                                             r"Estimation : NaN Generated"):
         estimation.estimate()
 
-    with pytest.warns(RuntimeWarning, match=r"Could not estimate equation\(s\) ACAF from "
-                                            r"'1980Y1' to '1996Y1'\n"
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
                                             r"Estimation : NaN Generated"):
         eq_ACAF.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not estimate equation\(s\) ACAG from "
-                                            r"'1980Y1' to '1996Y1'\nNo scalars in your system\n"
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
+                                            r"No scalars in your system\n"
                                             r"Estimation : No current estimation"):
         eq_ACAG.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not estimate equation\(s\) ACAF from "
-                                            r"'1980Y1' to '1996Y1'\n"
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
                                             r"Estimation : NaN Generated"):
         equations.estimate("1980Y1", "1996Y1", "ACAF")
 

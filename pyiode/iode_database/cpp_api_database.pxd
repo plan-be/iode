@@ -124,7 +124,8 @@ cdef extern from "cpp_api/KDB/kdb_reference.h":
     void clear_all_reference_kdbs() except +
 
 cdef extern from "cpp_api/compute/simulation.h":
-    void eqs_estimate(const string& eqs, const string& from_period, const string& to_period) except +
+    void eqs_estimate(const string& eqs, const string& from_period, const string& to_period, 
+                      const int maxit, const double eps) except +
 
 cdef extern from "pyiode/iode_database/variables_database.cpp":
     void _c_add_var_from_other(const string& name, KDBVariables* dest, KDBVariables* source, 

@@ -203,7 +203,7 @@ The selection is done by blocking all possible combinaisons of coefficients.
 |Syntax|Description|
 |:---|:---|
 |`double C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
-|`double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
+|`double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
 
 # IODE: Equation Edition and Estimation GUI {#T12}
 

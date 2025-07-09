@@ -14,7 +14,7 @@
  *  List of functions 
  *  -----------------
  *      double C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
- *      double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
+ *      double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
  *                                                                                  coefficient configuration that gives 
  *                                                                                  the best statistical result (for a chosen test).
  */
@@ -31,9 +31,7 @@
 // Function declarations
 static int E_GetScls(CLEC* clec, char*** scl);
 static void E_SetScl(int relax, char* name);
-double C_evallec(char* lec, int t);
-static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
-double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
+static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
 
 
 /**
@@ -48,11 +46,12 @@ static int E_GetScls(CLEC* clec, char*** scl)
     int     j, nbscl = 0;
     if(clec != 0) {
         for(j = 0 ; j < clec->nb_names ; j++) {
-            if(L_ISCOEF(clec->lnames[j].name) && KSVAL(K_WS[SCALARS],K_find(K_WS[SCALARS],clec->lnames[j].name))->relax  !=0)
-                SCR_add_ptr(scl, &nbscl,clec->lnames[j].name);
+            if(L_ISCOEF(clec->lnames[j].name) && KSVAL(K_WS[SCALARS], 
+               K_find(K_WS[SCALARS],clec->lnames[j].name))->relax !=0)
+                    SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) clec->lnames[j].name);
         }
     }
-    SCR_add_ptr(scl, &nbscl, NULL);
+    SCR_add_ptr((unsigned char***) scl, &nbscl, NULL);
     return(nbscl - 1);
 }
 
@@ -63,8 +62,6 @@ static int E_GetScls(CLEC* clec, char*** scl)
  *  @param [in] int     relax   if 1, sets the scalar VALUE to 0.9 and its relax to 1.0
  *                              else, sets the scalar VALUE to 0.0 and its relax to 0.0
  *  @param [in] char*   name    name of the SCL
- *  @return 
- *  
  */
 static void E_SetScl(int relax, char* name)                                             
 {
@@ -86,15 +83,16 @@ static void E_SetScl(int relax, char* name)
  *  @param [in] int         t       period of calculation (starts at 0 = first period of the sample)
  *  @return     double           IODE_NAN on error, lec[t] on success
  */
- 
 double C_evallec(char* lec, int t)
 {
     CLEC        *clec;
     double   x = IODE_NAN;
     char        tmplec[4096];
 
-    SCR_strlcpy(tmplec, lec, 4094); // For C++ when lec is a const string (in the DATA memory segment)
-    SCR_strip(tmplec);
+    // For C++ when lec is a const string (in the DATA memory segment)
+    SCR_strlcpy((unsigned char*) tmplec, (unsigned char*) lec, 4094);
+
+    SCR_strip((unsigned char*) tmplec);
     if(tmplec[0]) {
         clec = L_cc(tmplec);
         if(clec == NULL) {
@@ -113,7 +111,7 @@ double C_evallec(char* lec, int t)
 /**
  *  Sub function of E_StepWize(). 
  *  Estimates an equation after having blocked or released some coefficients according to 
- *  the current run number (see E_StepWise() for a description of the "runs").
+ *  the current run number (see estimate_step_wise() for a description of the "runs").
  *  
  *  If a solution is reached for the combination of coefficients, returns the value of the statistical test ("r2" or "fstat") retrieved from
  *  the generated scalar e0_<test>.
@@ -124,15 +122,15 @@ double C_evallec(char* lec, int t)
  *  @param [in] SAMPLE*     smpl    estimation sample
  *  @param [in] char**      eqs     table of equation names (only eqs[0] is used)
  *  @param [in] char*       test    name of the statistical test to optimize: "fstat" or "r2"
- *  @return     double           value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
+ *  @return     double              value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
- 
-static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
+static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
 {
-    int         j, cscl, nscl, rc;
+    int         j, cscl, nscl;
     char        buf[512];
-    double   res;
+    double      res;
     char        etest[20];
+    Estimation* est = NULL;
 
     cscl = 1;
     nscl = 0;
@@ -152,12 +150,13 @@ static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eq
         cscl = cscl * 2;               // 0001 -> 0010 -> 0100 -> 1000
     }
 
-    if(nscl > 1) {                   /*Effectue l'estimation si plus d'un relax est != 0 */
-        //B_EqsEstimateEqs(smpl,eqs);
-        rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs, 1);
+    if(nscl > 1) {                   /* Effectue l'estimation si plus d'un relax est != 0 */
+        est = new Estimation(eqs, KE_WS, KV_WS, KS_WS, smpl);
+        est->estimate();
+        delete est;                 // Free the Estimation object
         etest[0]=0;
-        strcat(etest,"e0_");
-        strcat(etest,test);
+        strcat(etest, "e0_");
+        strcat(etest, test);
         //E_SclToReal(etest, res);
         res = K_s_get_value(KS_WS, etest); // JMP 09/07/2022
         kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);        // JMP 08/07/2022
@@ -220,8 +219,7 @@ static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eq
  *                                              "fstat" , "r2"    , "r2adj" , "dw" or "loglik"
  *  @return     double          best test "test" value
  */
-
-double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
+double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;
@@ -247,7 +245,7 @@ double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
     lnumtest = -999999999999.0;
     lasti = 0;
     for(i = 1; i < nbcom; i++) {                                                
-        numtest = E_StepWise_1(i, nbscl, scl, smpl, eqs, test);
+        numtest = estimate_step_wise_1(i, nbscl, scl, smpl, eqs, test);
         /*print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);*/   /*Aide pour la programmation*/
         if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) {          /*Sauve la combi qui a le meilleur fstat*/
             lasti = i;
@@ -256,8 +254,8 @@ double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
     }
 
     // Refait l'estimation pour la meilleure combi
-    numtest = E_StepWise_1(lasti, nbscl, scl, smpl, eqs,test);    
-    SCR_free_tbl(eqs);
-    SCR_free_tbl(scl);
+    numtest = estimate_step_wise_1(lasti, nbscl, scl, smpl, eqs,test);    
+    SCR_free_tbl((unsigned char**) eqs);
+    SCR_free_tbl((unsigned char**) scl);
     return(numtest);
 }

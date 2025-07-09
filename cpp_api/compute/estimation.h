@@ -98,10 +98,16 @@ class EditAndEstimateEquations
     KDBEquations* kdb_eqs;
     KDBScalars* kdb_scl;
     CorrelationMatrix* m_corr;
+    Estimation* estimation;
 
 public:
     EditAndEstimateEquations(const std::string& from = "", const std::string& to = "");
     ~EditAndEstimateEquations();
+
+    Estimation* get_estimation() const
+    {
+        return estimation;
+    }
 
     Sample* get_sample() const
     {
@@ -280,13 +286,6 @@ public:
      */
     void update_scalars();
 
-    /**
-     * @brief extract and save the resulting values for the tests for each equations in the local Equations database.
-     * 
-     * @note equivalent to the ODE_blk_cur_atests() function from o_est.c from the old GUI
-     */
-    void copy_eq_tests_values();
-
     KDBEquations* get_equations() { return kdb_eqs; }
 
     /**
@@ -318,44 +317,47 @@ public:
 
     std::vector<double> get_observed_values(const std::string& name) const
     {
-        std::vector<double> values;
+        if(!estimation)
+            throw std::runtime_error("No estimation has been done yet. Cannot get observed values.");
+
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
-            return values;
+            return std::vector<double>();
         
         int i = (int) std::distance(v_equations.begin(), it);
-        for(int t = 0; t < M_NC(E_LHS); t++) values.push_back(MATE(E_LHS, i, t));
-        return values;
+        return estimation->get_observed_values(i);
     }
 
     std::vector<double> get_fitted_values(const std::string& name) const
     {
-        std::vector<double> values;
+        if(!estimation)
+            throw std::runtime_error("No estimation has been done yet. Cannot get observed values.");
+        
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
-            return values;
+            return std::vector<double>();
         
         int i = (int) std::distance(v_equations.begin(), it);
-        for(int t = 0; t < M_NC(E_RHS); t++) values.push_back(MATE(E_RHS, i, t));
-        return values;
+        return estimation->get_fitted_values(i);
     }
 
     std::vector<double> get_residual_values(const std::string& name) const
     {
-        std::vector<double> values;
+        if(!estimation)
+            throw std::runtime_error("No estimation has been done yet. Cannot get observed values.");
+
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
-            return values;
+            return std::vector<double>();
         
         int i = (int) std::distance(v_equations.begin(), it);
-        for(int t = 0; t < M_NC(E_LHS); t++) values.push_back(MATE(E_LHS, i, t) - MATE(E_RHS, i, t));
-        return values;
+        return estimation->get_residual_values(i);
     }
 
     /**
      * @note equivalent to ODE_blk_est() from o_est.c from the old GUI 
      */
-    void estimate();
+    void estimate(int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS);
 
     bool is_estimation_done() const { return estimation_done; }
 
@@ -383,13 +385,16 @@ public:
  *        in the equation before the estimation.
  *        Only defined to standardize the Python API functions.
  * 
- * @param eqs   comma separated list of equation names (=endo  names)
- * @param from  first period of the estimation sample
- * @param to    last period of the estimation sample
+ * @param eqs    comma separated list of equation names (endo = equation name)
+ * @param from   first period of the estimation sample
+ * @param to     last period of the estimation sample
+ * @param maxit  maximum number of iterations for the estimation
+ * @param eps    convergence criterion for the estimation
  * 
  * @note equivalent to function IodeEstimate() from b_api.c (iode_dos repository)
  */
-void eqs_estimate(const std::string& eqs, const std::string& from = "", const std::string& to = "");
+void eqs_estimate(const std::string& eqs, const std::string& from = "", const std::string& to = "", 
+                  int maxit = ESTIMATION_MAXIT, double eps = ESTIMATION_EPS);
 
 /**
  * @brief Estimate an equation of a given sample. 
@@ -400,5 +405,8 @@ void eqs_estimate(const std::string& eqs, const std::string& from = "", const st
  * @param eqs   list of equation names (=endo  names)
  * @param from  first period of the estimation sample
  * @param to    last period of the estimation sample
+ * @param maxit  maximum number of iterations for the estimation
+ * @param eps    convergence criterion for the estimation
  */
-void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from = "", const std::string& to = "");
+void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from = "", const std::string& to = "", 
+                  int maxit = ESTIMATION_MAXIT, double eps = ESTIMATION_EPS);

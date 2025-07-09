@@ -115,6 +115,10 @@ if(CMAKE_C_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
   add_compile_definitions(INTEL)
 endif()
 
+if(SKBUILD)
+  add_compile_definitions(SKBUILD)
+endif()
+
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
 # ---- include ----

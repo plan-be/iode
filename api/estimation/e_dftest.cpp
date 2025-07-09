@@ -33,7 +33,6 @@
  *  @param [in]       char*    name     variable to be analysed (from KV_WS)
  *  @return           int               0 if name is found in KV_WS, -1 otherwise
  */
- 
 static int E_GetSmpl(SAMPLE *smpl, char *name)
 {
     int     pos, t;
@@ -97,23 +96,25 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
     int     rc = -1, neqs = 0;
     char    **eqs = NULL;
 
-    SCR_add_ptr(&eqs, &neqs, "_DF");
-    SCR_add_ptr(&eqs, &neqs, NULL);
+    SCR_add_ptr((unsigned char***) &eqs, &neqs, (unsigned char*) "_DF");
+    SCR_add_ptr((unsigned char***) &eqs, &neqs, NULL);
 
     rc = K_upd_eqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
-    if(rc) return(rc);
-    //rc = B_EqsEstimateEqs(smpl, eqs);
-    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs, 1);
+    if(rc) 
+        return(rc);
+    
+    Estimation est(eqs, KE_WS, KV_WS, KS_WS, smpl);
+    rc = est.estimate();
 
     K_del_by_name(KE_WS, "_DF");
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     return(rc);
 }
 
 
 /**
  *  Implementation of the Dickey-Fuller test. DF-test tests 
- *  the null hypothesis that a unit root is present in an autoregressive 
+ *  the null hypothesis that a unit root is present in an auto-regressive 
  *  time series model. 
  *  
  *  See https://en.wikipedia.org/wiki/Dickey%E2%80%93Fuller_test for more details on the DF-tests.
@@ -296,4 +297,3 @@ void E_PrintDF(char* lec, double* res, int drift, int trend, int order)
     }
     W_printf(".te\n");
 }
-

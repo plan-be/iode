@@ -135,9 +135,6 @@ cdef class CythonEditAndEstimateEquations:
     def set_instruments(self, value: str):
         self.c_estimation_ptr.set_instruments(value.encode())
 
-    def copy_eq_tests_values(self):
-        self.c_estimation_ptr.copy_eq_tests_values()
-
     def update_scalars(self):
         self.c_estimation_ptr.update_scalars()
 
@@ -205,8 +202,8 @@ cdef class CythonEditAndEstimateEquations:
         cdef string s_name = name.encode('utf-8')
         return [value for value in self.c_estimation_ptr.get_residual_values(s_name)]
 
-    def estimate(self):
-        self.c_estimation_ptr.estimate()
+    def estimate(self, maxit: int, epsilon: float):
+        self.c_estimation_ptr.estimate(maxit, epsilon)
 
     def get_is_done(self) -> bool:
         return self.c_estimation_ptr.is_estimation_done()

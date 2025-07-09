@@ -53,6 +53,12 @@
 #endif
 
 #ifdef __cplusplus
+#include <set>
+#include <map>
+#include <string>
+#include <vector>
+#include <stdexcept>
+
 extern "C" {
 #endif
 

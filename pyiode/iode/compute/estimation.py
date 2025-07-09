@@ -641,19 +641,6 @@ class EditAndEstimateEquations:
             value = ';'.join(value)
         self._cython_instance.set_instruments(value)
 
-    def copy_eq_tests_values(self):
-        r"""
-        Extract and save the resulting values for the tests for each equations in the 
-        local estimation Equations database.
-
-        See :meth:`EditAndEstimateEquations.estimate` for the examples.
-
-        Notes
-        -----
-        Equivalent to the ODE_blk_cur_atests() function from o_est.c from the old GUI (developed by Jean-Marc Paul)
-        """
-        self._cython_instance.copy_eq_tests_values()
-
     def update_scalars(self):
         r"""
         Update the local estimation Scalars database 'kdb_scl'.
@@ -959,16 +946,16 @@ class EditAndEstimateEquations:
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
+        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
+        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
         """
         observed_values = self._cython_instance.get_observed_values(name)
         if not observed_values:
@@ -1006,16 +993,16 @@ class EditAndEstimateEquations:
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
+        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
+        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
         """
         fitted_values = self._cython_instance.get_fitted_values(name)
         if not fitted_values:
@@ -1053,16 +1040,16 @@ class EditAndEstimateEquations:
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
+        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
+        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
         """
         residual_values = self._cython_instance.get_residual_values(name)
         if not residual_values:
@@ -1070,13 +1057,19 @@ class EditAndEstimateEquations:
             return []
         return residual_values
 
-    def estimate(self, quiet: bool=False) -> bool:
+    def estimate(self, maxit: int=100, epsilon: float=1.0e-6, quiet: bool=False) -> bool:
         r"""
         Estimate the current block of equations (which is not necessarily all the equations 
         in the local Equations database 'kdb_eqs').
 
         Parameters
         ----------
+        maxit: int, optional
+            Maximum number of iterations for the estimation. 
+            Default is 100.
+        epsilon: float, optional
+            Convergence criterion for the estimation. 
+            Default is 1.0e-6.
         quiet: bool, optional
             If True, the estimation will be silent (no printout). 
             Default is False.
@@ -1164,13 +1157,13 @@ class EditAndEstimateEquations:
             dpuh_2 | -0.0372903   0.0395814  -0.00892588  -0.0419869           1
         <BLANKLINE>
 
-        >>> estimation.copy_eq_tests_values()
-        >>> equations_est["ACAF"]             # doctest: +NORMALIZE_WHITESPACE
+        >>> equations_est["ACAF"]             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         Equation(endogenous = 'ACAF',
                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
                 method = 'LSQ',
-                from_period = '1960Y1',
-                to_period = '2015Y1',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF;DPUH',
                 tests = {corr = 1,
                          dw = 2.33007,
                          fstat = 32.2851,
@@ -1181,13 +1174,15 @@ class EditAndEstimateEquations:
                          ssres = 5.19787e-05,
                          stderr = 0.00192685,
                          stderrp = 23.5422,
-                         stdev = 0.0042699})
-        >>> equations_est["DPUH"]             # doctest: +NORMALIZE_WHITESPACE
+                         stdev = 0.0042699},
+                date = ...)
+        >>> equations_est["DPUH"]             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
         Equation(endogenous = 'DPUH',
                 lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
                 method = 'LSQ',
-                from_period = '1960Y1',
-                to_period = '2015Y1',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF;DPUH',
                 tests = {corr = 0.126096,
                          dw = 3.15593,
                          fstat = 3.51611,
@@ -1198,7 +1193,8 @@ class EditAndEstimateEquations:
                          ssres = 0.00591031,
                          stderr = 0.01985,
                          stderrp = 39.2966,
-                         stdev = 0.0213538})
+                         stdev = 0.0213538},
+                date = ...)
 
         >>> # global Equations and Scalars databases are left intact by the method estimate()
         >>> equations["ACAF"]                   # doctest: +NORMALIZE_WHITESPACE
@@ -1269,7 +1265,7 @@ class EditAndEstimateEquations:
             suppress_msgs()
 
         try:
-            self._cython_instance.estimate()
+            self._cython_instance.estimate(maxit, epsilon)
             success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)

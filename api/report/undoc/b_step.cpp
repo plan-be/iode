@@ -8,12 +8,12 @@
  *  -----------------
  *      int B_EqsStepWise(char* arg) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
 #include "api/estimation/estimation.h"
-
 #include "api/report/commands/commands.h"
 #include "api/report/undoc/undoc.h"
 
@@ -86,64 +86,43 @@ int B_EqsStepWise(char* arg)
     smpl = PER_atosmpl(from, to);                                /*Calcule le sample*/
     if(smpl == NULL) {                                           /*Gère les erreurs de sample*/
         kerror(0,"Incorrect sample");
-        SCR_free_tbl(args);
+        SCR_free_tbl((unsigned char**) args);
         return(1);
     }
-
 
     eqs = args[2];                                               
     if(K_find(K_WS[EQUATIONS], eqs)== -1) {                            /*Gère les erreurs d'équation*/
         kerror(0,"Eqs %s not found",eqs);
-        SCR_free_tbl(args);
+        SCR_free_tbl((unsigned char**) args);
         return(1);
     }
 
     cond = args[3];                                              
     if(C_evallec(cond, 0)==-1)                                       /*Gère les erreurs de condition*/
     {
-        SCR_free_tbl(args);
+        SCR_free_tbl((unsigned char**) args);
         return(1);                          
     }
 
     // Sanitizer -> need to make a copy of str to avoid the 
     // strcpy-param-overlap error (from SCR_add_ptr())
     tmp = args[4];
-    test = SCR_stracpy(SCR_lower(tmp));
+    test = (char*) SCR_stracpy(SCR_lower((unsigned char*) tmp));
     if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*Gère les erreurs de test*/
     {
         kerror(0,"Incorrect test name");
-        SCR_free_tbl(args);
+        SCR_free_tbl((unsigned char**) args);
         return(1);
     }
 
     if(check_scl_var(eqs) == -1)                                /*Gère les erreurs de présence des scalaires et variables de l'équation*/
     {
-        SCR_free_tbl(args);
+        SCR_free_tbl((unsigned char**) args);
         return(1);                      
     }
 
-    E_StepWise(smpl, eqs, cond, test);                          /*Effectue les estimations*/
+    estimate_step_wise(smpl, eqs, cond, test);                          /*Effectue les estimations*/
     
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(0);
 }
-
-//print_result(double F,double R,double cond,char **tab_scl,int nb_scls,int combi,char *cond_string)  /*Imprime le résultat d'un estimation*/
-//{
-//    double res[3];
-//    char *tmp;
-//    FILE *output;
-//    int j;
-//
-//    tmp=(char *)malloc(30);
-//    output=fopen("stepwise.txt","a");
-//    fprintf(output,"\nStep %d : (F_Stat = %f;R2 = %f;Condition(%s) = %f) ",combi,F,R,cond_string,cond);
-//    for(j=0; j<nb_scls; j++) {
-//        sprintf(tmp,"%s",tab_scl[j]);
-//        E_SclToReal(tmp,res);
-//        fprintf(output,"%s = %f ",tab_scl[j],res[0]);
-//    }
-//    SCR_free(tmp);
-//    fclose(output);
-//}
-

@@ -11,92 +11,20 @@
  *  
  *  List of functions 
  *  -----------------
- *      int E_est(char** endos, char** lecs, KDB* dbv, KDB* dbs, SAMPLE* smpl, int met, char** instrs, int maxit, double eps)
- *          Estimates a block of equations
- *      int E_scl_in_eq(int coef_nb, int eq_nb)     
- *          Checks if the coefficient coef_nb is in the equation eq_nb.
- *  
- *  List of global variables
- *  ------------------------
- * int       E_errno;        Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS
- * int       E_NEQ;          Number of equations in the current block of equations
- * int       E_NCE;          Number of estimated coefficients in the current block of equations
- * int       E_NC;           Number of coefficients (est and non est) in the current block of equations
- * int       E_NINSTR;       Number of instruments in the estimation
- * int       E_T;            Number of periods in the estimation sample
- * int       E_FROM;         Position in E_DBV of the first period in the estimation sample
- * int       *E_C_NBS;       Positions in E_DBS of the estimated coefs
- * KDB       *E_DBV;         KDB of variables used for the estimation 
- * KDB       *E_DBS;         KDB of scalars used for the estimation
- * SAMPLE    *E_SMPL;        Current estimation sample
- * char      E_MET;          Current estimation method
- * double E_CONV_TEST;  Sum of the squares of the relative differences between 2 iterations
- * double E_EPS;        Convergence criterion (threshold) for the estimation
- * CLEC      **E_CRHS;       List of CLEC corresponding to the right members of the equations
- * char      **E_LECS;       List (block) of simultaneous equations of the current estimation
- * char      **E_INSTRS;     List of instruments (LEC formulas) of the current estimation    
- * char      **E_ENDOS;      List of endogenous vars of the current estimation
- *         
- * MAT* E_U              Residuals (neq x t)
- * MAT* E_VCU            Variance / covariance of the residuals (neq x neq)    
- * MAT* E_IVCU           Inverse of E_VCU
- * MAT* E_RHS            Right side of equations (neq x t)
- * MAT* E_G              Jacobian matrix of the system
- * MAT* E_VCC            Var/covar of the coefficients
- * MAT* E_dC             Vector of coefficient increments
- * MAT* E_DF             Degrees of freedom of each coefficient
- * MAT* E_STDERR         Std error of each equation 
- * MAT* E_SSRES          Sum of squares of residuals of each eq
- * MAT* E_MEAN_Y         Mean of the LHS on each equation 
- * MAT* E_STDEV          Std deviation of each equation 
- * MAT* E_RSQUARE        R-square of each equation
- * MAT* E_RSQUARE_ADJ    Adjusted R-square of each equation
- * MAT* E_DW             Durbin-Watson test of each equation
- * MAT* E_FSTAT          F-Stat of each equation
- * MAT* E_LOGLIK         Log-likelihood of each equation
- * MAT* E_STD_PCT        Standard errors in % for each equation
- * MAT* E_MCORR          Correlation matrix bw coefficients
- * MAT* E_MCORRU         Correlation matrix bw error terms of equations
- * MAT* E_DEV            Deviation between observed and calculated values
+ *      int E_est(char** endos, char** lecs, char** instrs)     Estimates a block of equations
+ *      int E_scl_in_eq(int coef_nb, int eq_nb)                 Checks if the coefficient coef_nb is in the equation eq_nb.
  */
+
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 #include "api/estimation/estimation.h"
-
-
-// Functions prototypes
-static int E_c_gmg();
-static int E_residuals();
-static int E_deltac();
-static double E_rhs_ij(int i, int j);
-static int E_c_rhs();
-static int E_jacobian();
-int E_scl_in_eq(int coef_nb, int eq_nb);
-static int E_mod_residuals(int coef_nb, int est_coef_nb, double h);
-static int E_c_gmu();
-static int E_testcv();
-static int E_adaptcoef();
-static int E_c_vcu();
-static int E_c_ivcu();
-static int E_c_mcu();
-static int E_c_ivcc();
-static int E_c_vcc();
-static E_gls();
-int E_est(char** endos, char** lecs, KDB* dbv, KDB* dbs, SAMPLE* smpl, int met, char** instrs, int maxit, double eps);
-
-
-// Global variables
-int     E_IT,           // Number of iterations of the last estimation
-        E_MAXIT,        // Max number of iterations 
-        E_CONV;         // Boolean. Indicates if the estimation iteration has converged
 
 /**
  *  Computes VCC, the matrix of var/covar bw the coefficients (?).
  *  
  *  @return     int 0   always
- *  
  */
-static int E_c_gmg()
+int Estimation::E_c_gmg()
 {
     int i, j;
 
@@ -126,25 +54,23 @@ static int E_c_gmg()
  *  
  *  @param [in] int i   equation number in the block 
  *  @param [in] int t   period of time (beginning on E_FROM
- *  @return     double  value of equation i in t
- *  
+ *  @return     double  value of equation i in t 
  */
- 
-static double E_rhs_ij(int i, int t)
+double Estimation::E_rhs_ij(int i, int t)
 {
     return(L_exec(E_DBV, E_DBS, E_CRHS[i], t + E_FROM));
 }
 
 
 /**
- *  Calculates the right members of the equations (RHS) with the current values of the coefficients
- *  in E_DBS.
+ *  Calculates the right members of the equations (RHS) with the current values of 
+ *  the coefficients in E_DBS.
  *  
  *  The result is stored in the E_RHS(NEQ x T). 
  *  
  *  @return     int     0 on success, -1 on error in the calculation of RHS
  */
-static int E_c_rhs()
+int Estimation::E_c_rhs()
 {
     int      i, t;
     double   x;
@@ -168,9 +94,8 @@ static int E_c_rhs()
  *  Calculates the matrix E_U of residuals: E_U = E_LHS - E_RHS. 
  *  
  *  @return     int     0 on success, -1 on error in the calculation of RHS
- *  
  */
-static int E_residuals()
+int Estimation::E_residuals()
 {
     /* COMPUTE RHS */
     if(E_c_rhs() != 0) return(-1);
@@ -185,7 +110,7 @@ static int E_residuals()
  *  
  *  @return  int    0 or error code E_errno
  */
-static int E_deltac()
+int Estimation::E_deltac()
 {
     M_solve(E_dC, E_VCC, E_GMU);
     if(M_errno) return(E_errno = EST_VCC_SING_ERR);
@@ -211,7 +136,7 @@ static int E_deltac()
  *  @param [in] double  h           step used to compute the numerical derivative
  *  @return     int                 0 on success, -1 on error (E_errno set to EST_NAN_ERR)
  */
-static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
+int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
 {
     int     i, j;
     double  x;
@@ -254,7 +179,7 @@ static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
  *  
  *  @return  int    0 on success or -1 on error
  */
-static int E_jacobian()
+int Estimation::E_jacobian()
 {
     double  h = 1e-4, oldc;
     int     i, j;
@@ -284,9 +209,8 @@ static int E_jacobian()
  *  @param [in] int coef_nb     position of the coefficient to search in E_C_NBS.
  *  @param [in] int eq_nb       equation position in the estimated block
  *  @return     int             1 if coef_nb is in eq_nb, 0 otherwise
- *  
  */
-int E_scl_in_eq(int coef_nb, int eq_nb)
+int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
     CLEC    *clec = E_CRHS[eq_nb];
     int    j;
@@ -307,7 +231,7 @@ int E_scl_in_eq(int coef_nb, int eq_nb)
  *  @return int     0   always
  *  
  */
-static int E_c_gmu()
+int Estimation::E_c_gmu()
 {
     int     i, j;
 
@@ -341,7 +265,7 @@ static int E_c_gmu()
  *  @return  int    1 if a solution has been reached, 
  *                  0 otherwise.
  */
-static int E_testcv()
+int Estimation::E_testcv()
 {
     int         i, j;
     double      sum = 0, tmp, ci, dci;
@@ -372,7 +296,7 @@ static int E_testcv()
  *  
  *  @return int     0   always
  */
-static int  E_adaptcoef()
+int Estimation::E_adaptcoef()
 {
     int i, j;
 
@@ -395,7 +319,7 @@ static int  E_adaptcoef()
  *  
  *  @return     int     0 always
  */
-static int E_c_vcu()
+int Estimation::E_c_vcu()
 {
     M_xxprim(E_VCU, E_U);
     M_scale(E_VCU, E_VCU, 1.0 / E_T);
@@ -410,7 +334,7 @@ static int E_c_vcu()
  *  
  *  @return     int     0 on success, E_errno = EST_VCU_SING_ERR on error
  */
-static int E_c_ivcu()
+int Estimation::E_c_ivcu()
 {
     M_inv_1(E_IVCU, E_VCU);
     if(M_errno) return(E_errno = EST_VCU_SING_ERR);
@@ -426,7 +350,7 @@ static int E_c_ivcu()
  *  
  *  @return     int     0 always
  */
-static int E_c_mcu()
+int Estimation::E_c_mcu()
 {
     int     i, j;
     double  x;
@@ -449,7 +373,7 @@ static int E_c_mcu()
  *  
  *  @return     int     0 on success, E_errno = EST_VCC_SING_ERR on error
  */
-static int E_c_ivcc()
+int Estimation::E_c_ivcc()
 {
     M_inv_1(E_VCCTMP, E_VCC);
     if(M_errno != 0) return(E_errno = EST_VCC_SING_ERR);
@@ -462,7 +386,7 @@ static int E_c_ivcc()
  *    
  *  @return     int     0 on success, E_errno on error
  */
-static int E_c_vcc()
+int Estimation::E_c_vcc()
 {
     M_clear(E_IVCU);
     E_c_ivcu();
@@ -471,23 +395,6 @@ static int E_c_vcc()
     E_c_vcu();
     return(0);
 }
-
-/*
-E_print_mat(tit, m)
-char    *tit;
-MAT     *m;
-{
-    int     i, j;
-
-    printf("\n%s - [%d,%d]\n", tit, M_NL(m), M_NC(m));
-    for(i = 0 ; i < M_NL(m) ; i++) {
-	printf("\n%3d : ", i);
-	for(j = 0 ; j < M_NC(m) ; j++) printf("%f ", MATE(m, i, j));
-	}
-}
-
-*/
-
 
 /**
  *  Estimates a block of equations. The parameters (method, convergence threshold...) 
@@ -503,7 +410,7 @@ MAT     *m;
  *  @return int 0 on success, -1 if a solution can not be reached.
  *  
  */
-static int E_gls()
+int Estimation::E_gls()
 {
     int         step = 0;
     int         conv = 0;
@@ -558,8 +465,7 @@ err :
 
 
 /**
- *  Estimates a block of equations. The LEC form of the equations, the method, the simulataneous 
- *  block, the instruments and the sample are passed as arguments. 
+ *  Estimates a block of equations.
  *
  *  At the end of the estimation, only the estimated coefficients and their 
  *  associated tests are directly saved in dbs. 
@@ -578,39 +484,42 @@ err :
  *       2: Instrumental Variables (IV)
  *       3: GLS (3SLS)
  *       4: Max.Likelihood (not implemented in IODE)
- *  
+ * 
  *  @param [in] char**  endos   list of equations names (endogenous var) to estimate simultaneously
  *  @param [in] char**  lecs    list of corresponding LEC equations
- *  @param [in] KDB*    dbv     VAR KDB (to link equations)
- *  @param [in] KDB*    dbs     SCL KDB (to link equations and to save estimated coefficients)
- *  @param [in] SAMPLE* smpl    estimation sample
- *  @param [in] char    met     estimation method (0-4)
  *  @param [in] char**  instrs  list of LEC formulas (instruments)
- *  @param [in] int     maxit   max number of iterations
- *  @param [in] double  eps     convergence threshold
  *  @return     int             0 if a solution is found, -1 otherwise
  */
-
-int E_est(char** endos, char** lecs, KDB* dbv, KDB* dbs, SAMPLE* smpl, int met, char** instrs, int maxit, double eps)
+int Estimation::E_est(char** endos, char** lecs, char** instrs)
 {
-    int     rc = 0;
+    int  rc_prep = -1, rc_est = -1;
 
     E_errno = 0;
     M_errno = 0;
-    E_DBV  = dbv;
-    E_DBS  = dbs;
-    E_SMPL = smpl;
-    E_MET  = met;
-    E_EPS  = eps;
-    E_MAXIT= maxit;
+    E_ENDOS = endos;
     E_LECS = lecs;
     E_INSTRS = instrs;
-    E_ENDOS = endos;
-    E_FROM = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
-    E_T    = smpl->s_nb;
 
-    if(E_prep(lecs, instrs) == 0 && E_gls() == 0) E_output();
-    if(E_errno != 0) E_error_n(E_errno);
+    if(E_SMPL == NULL)
+        throw std::runtime_error("Estimation sample has not been set for estimation");
+    E_FROM = PER_diff_per(&(E_SMPL->s_p1), &(KSMPL(E_DBV)->s_p1));
+    E_T    = E_SMPL->s_nb;
+
+    rc_prep = E_prep(lecs, instrs);
+    if(rc_prep != 0){
+        if(E_errno != 0)
+            E_error_n(E_errno);
+        std::string error_msg(B_get_last_error());
+        throw std::runtime_error("Could not prepare estimation:\n" + error_msg);
+    }
+    
+    rc_est = E_gls();
+    if(rc_prep == 0 && rc_est == 0) 
+        E_output();
+    
+    if(E_errno != 0) 
+        E_error_n(E_errno);
+    
     return(E_errno);
 }
 

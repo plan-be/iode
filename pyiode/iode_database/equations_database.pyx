@@ -75,7 +75,8 @@ cdef class Equations(CythonIodeDatabase):
         else:
             self.database_ptr.add(name.encode(), dereference(c_equation))
 
-    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None) -> bool:
+    def estimate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
+                 list_eqs: Union[str, List[str]], maxit: int, epsilon: float) -> bool:
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
@@ -97,7 +98,7 @@ cdef class Equations(CythonIodeDatabase):
             list_eqs = ';'.join(list_eqs)
         
         try:
-            cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
+            cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode(), maxit, epsilon)
             return True
         except RuntimeError as e:
             warnings.warn(str(e), RuntimeWarning)
