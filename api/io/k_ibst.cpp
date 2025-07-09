@@ -22,8 +22,8 @@
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
-#include "api/conversion/dif.h"
-#include "api/conversion/import.h"
+#include "api/io/dif.h"
+#include "api/io/import.h"
 
 
 int ImportObjsBST::read_header(YYFILE* yy, SAMPLE* smpl)

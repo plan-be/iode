@@ -19,7 +19,7 @@ add_subdirectory(print)
 add_subdirectory(write)
 add_subdirectory(simulation)
 add_subdirectory(estimation)
-add_subdirectory(conversion)
+add_subdirectory(io)
 add_subdirectory(report)
 
 target_sources(iode_c_api PRIVATE b_args.c b_errors.c) # MISC

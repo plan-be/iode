@@ -4,7 +4,7 @@
 
 
 
-- [IODE: Object conversions (Import / Export)](#T1)
+- [IODE: Object io (Import / Export)](#T1)
     - [Export](#T2)
     - [Import](#T3)
     - [Rule files](#T4)
@@ -63,7 +63,7 @@
       - [Format](#T57)
       - [List of functions](#T58)
 
-# IODE: Object conversions (Import / Export) {#T1}
+# IODE: Object io (Import / Export) {#T1}
 
 IODE offers several functions to import and export objects from and to various formats. Some formats date back to the 80s and 90s and are now obsolete, but are still available in the software and therefore kept (in a simplified version) for sake of completeness.
 

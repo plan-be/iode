@@ -100,8 +100,8 @@
 #include "api/objs/objs.h"
 #include "api/objs/variables.h"
 #include "api/write/write.h"
-#include "api/conversion/import.h"
-#include "api/conversion/export.h"
+#include "api/io/import.h"
+#include "api/io/export.h"
 
 extern  char    **IMP_rule; // See k_rule.c
 extern  char    **IMP_pat;  // See k_rule.c
