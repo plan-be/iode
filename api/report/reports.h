@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scr4/s_strs.h"        // U_ch
-
 #include "api/constants.h"
 #include "api/utils/time.h"         // PERIOD
 
