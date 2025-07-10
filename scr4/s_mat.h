@@ -30,6 +30,10 @@
 #define NL2             M_NL(m2)
 #define NL3             M_NL(m3)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*****************************************************************/
 /*  to swap or not to swap in EMS ? */
 /*  Les matrices sont stockées en EMS par défaut, la définition de la
@@ -106,9 +110,18 @@ typedef struct _mat_
 
 extern  int M_errno;
 
+#ifdef __cplusplus
+}
+#endif
+
 /********** FNS PROTOTYPES ***********/
 
 #ifndef SCRPROTO
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern  char    *M_error();
 extern  MAT*    M_alloc();
 extern  MAT*    M_prod();
@@ -134,6 +147,10 @@ extern  MAT     *M_xxprim();
 extern  MAT     *M_xaxprim();
 extern  MAT     *M_xprimax();
 
+#ifdef __cplusplus
+}
+#endif
+
 #else
 
 #include <s_proma.h>
@@ -141,5 +158,3 @@ extern  MAT     *M_xprimax();
 #endif
 
 #endif /* _S_SWAP_H_ */
-
-
