@@ -1,9 +1,7 @@
 #pragma once
 
-#include "scr4/s_a2m.h"
-#include "scr4/s_strs.h"
-
 #include "api/constants.h"
+#include "scr4/s_a2m.h"
 
 #ifdef __cplusplus
 extern "C" {

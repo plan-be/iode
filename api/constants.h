@@ -17,6 +17,8 @@
     #define NOEMF
 #endif
 
+#include "scr4/s_strs.h"
+
 /*---------------- DEFINE ------------------------*/
 
 // ALD 23/11/2023
