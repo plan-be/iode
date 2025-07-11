@@ -2514,7 +2514,7 @@ class Variables(IodeDatabase):
         >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         >>> updated_ACAF = data + vars_subset["ACAF"]
         >>> updated_ACAF                                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        array([ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ])
+        array([27.240999 , 32.159    , 37.661999 , 12.1610022, -8.130997 ])
         >>> # add a numpy 1D ndarray to the subset corresponding to a single period
         >>> vars_subset_1995Y1 = data + vars_subset[:, "1995Y1"]
         >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -3797,7 +3797,7 @@ class Variables(IodeDatabase):
         >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         >>> result = data + vars_subset["ACAF"]
         >>> result                                      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        array([ 27.240999 ,  32.159    ,  37.661999 ,  12.1610022,  -8.130997 ])
+        array([27.240999 , 32.159    , 37.661999 , 12.1610022, -8.130997 ])
         >>> # multiply the subset corresponding to a single period by a numpy 1D ndarray
         >>> vars_subset_1995Y1 = data * vars_subset[:, "1995Y1"]
         >>> vars_subset_1995Y1                              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -5017,12 +5017,12 @@ class Variables(IodeDatabase):
         >>> for i in range(len(vars_names)):
         ...     for j in range(nb_periods):
         ...         data[i, j] = i * nb_periods + j
-        >>> data
-        array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.],
-               [ 11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.,  20.,  21.],
-               [ 22.,  23.,  24.,  25.,  26.,  27.,  28.,  29.,  30.,  31.,  32.],
-               [ 33.,  34.,  35.,  36.,  37.,  38.,  39.,  40.,  41.,  42.,  43.],
-               [ 44.,  45.,  46.,  47.,  48.,  49.,  50.,  51.,  52.,  53.,  54.]])
+        >>> data                                            # doctest: +NORMALIZE_WHITESPACE
+        array([[ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.],
+               [11., 12., 13., 14., 15., 16., 17., 18., 19., 20., 21.],
+               [22., 23., 24., 25., 26., 27., 28., 29., 30., 31., 32.],
+               [33., 34., 35., 36., 37., 38., 39., 40., 41., 42., 43.],
+               [44., 45., 46., 47., 48., 49., 50., 51., 52., 53., 54.]])
         
         >>> variables["A*", "2000Y1:2010Y1"]                # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
