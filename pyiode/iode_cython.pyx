@@ -46,6 +46,15 @@ cpp_iode_init()
 include "super.pyx"
 python_assign_super() 
 
+# starting from numpy 2.2, the representation of NumPy scalars (via __repr__) has changed.
+# Scalars are now printed as np.float64(3.0) rather than just 3.0.
+# However, one can use np.set_printoptions(legacy="1.25") to get the old behavior
+# see link https://numpy.org/doc/stable/release/2.0.0-notes.html#representation-of-numpy-scalars-changed 
+try:
+    np.set_printoptions(legacy="1.25")
+except TypeError:
+    pass
+
 # PYIODE API
 # ----------
 
