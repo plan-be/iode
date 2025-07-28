@@ -16,25 +16,13 @@
  *      int KE_poseq(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
  *      void KE_tri(KDB* dbe, int** predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
-#include "scr4/scr4.h"
-
+#include "api/constants.h"
 #include "api/k_super.h"
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/simulation/simulation.h"
 
-
-/* EQUATION ORDERING */
-int     KSIM_PRE;       // number of equations in the "prolog" block 
-int     KSIM_INTER;     // number of equations in the "interdep" block
-int     KSIM_POST;      // number of equations in the "epilog"
-int     *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order
-int     KSIM_CPU_SCC;   // Elapsed time to compute SCC
-int     KSIM_CPU_SORT;  // Elapsed time to sort interdep block
-
-static int     *KSIM_PERM;      // vector of permutation 
-static char    *KSIM_ORDERED;   // indicates if equation i is already in a block
 
 /**
  *  Adds the successor i to the list successors[pos] of successors of equation pos. 
@@ -50,8 +38,7 @@ static char    *KSIM_ORDERED;   // indicates if equation i is already in a block
  *  @param [in]         int     pos         position of the predecessor of i
  *  
  */
- 
-static void KE_add_post(int** successors, int i, int pos)
+int CSimulation::KE_add_post(int** successors, int i, int pos)
 {
     int     nb = 1;
 
@@ -63,6 +50,8 @@ static void KE_add_post(int** successors, int i, int pos)
     }
     successors[pos][0]  = nb;
     successors[pos][nb] = i;
+
+    return(0);
 }
 
 
@@ -95,8 +84,7 @@ static void KE_add_post(int** successors, int i, int pos)
  *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
  *  
  */
- 
-static int KE_pre(KDB* dbe, int** predecessors, int from)
+int CSimulation::KE_pre(KDB* dbe, int** predecessors, int from)
 {
     int     i, j,
             c = 1, nb = 0;
@@ -141,8 +129,7 @@ static int KE_pre(KDB* dbe, int** predecessors, int from)
  *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
  *  
  */
- 
-static int KE_interdep(KDB* dbe, int** predecessors)
+int CSimulation::KE_interdep(KDB* dbe, int** predecessors)
 {
     int     i, nb = 0;
 
@@ -162,8 +149,7 @@ static int KE_interdep(KDB* dbe, int** predecessors)
  *  @param [in, out]    int**   successors      see KE_preorder()
  *  
  */
- 
-static void KE_postorder(KDB* dbe, int** predecessors, int** successors)
+int CSimulation::KE_postorder(KDB* dbe, int** predecessors, int** successors)
 {
     int     i;
 
@@ -174,6 +160,8 @@ static void KE_postorder(KDB* dbe, int** predecessors, int** successors)
     SW_nfree(predecessors);
     SW_nfree(successors);
     SW_nfree(KSIM_ORDERED);
+
+    return(0);
 }
 
 
@@ -201,8 +189,7 @@ static void KE_postorder(KDB* dbe, int** predecessors, int** successors)
  *                                              -> Note that KSIM_ORDER is not calculated here, only allocated 
  *  
  */
- 
-static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
+int CSimulation::KE_preorder(KDB* dbe, int** predecessors, int** successors)
 {
     int     i, j, pos, posj, nb;
     CLEC    *clec;
@@ -232,6 +219,8 @@ static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
             if(pos >= 0) KE_add_post(successors, i, pos);
         }
     }
+
+    return(0);
 }
 
 
@@ -265,8 +254,7 @@ static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
  *  @global [out]   int  KSIM_POST   number of equations in the "epilog"
  *  
  */
- 
-void KE_order(KDB* dbe, char** eqs)
+void CSimulation::KE_order(KDB* dbe, char** eqs)
 {
     int     **predecessors, **successors, *tmp2, i, k, nb;
     long    cpu_order = 0; 
@@ -346,8 +334,7 @@ void KE_order(KDB* dbe, char** eqs)
  *  @global [in]    int*    KSIM_POSXK      KSIM_POSXK[i] = position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
  *  
  */
- 
-int KE_poseq(int posendo)
+int CSimulation::KE_poseq(int posendo)
 {
     if(posendo < 0) return(-1);
     if(posendo < KSIM_MAXDEPTH && KSIM_POSXK[posendo] == posendo) return(posendo);
@@ -365,8 +352,7 @@ int KE_poseq(int posendo)
  *  @global [out]   int*    KSIM_PERM   vector of equations permutations. Filled with -1 at start.
  *  
  */
-
-static void KE_tri_begin(KDB* dbe)
+int CSimulation::KE_tri_begin(KDB* dbe)
 {
     int     i, nb;
 
@@ -375,6 +361,8 @@ static void KE_tri_begin(KDB* dbe)
     for(i = 0 ; i < nb ; i++) KSIM_PERM[i] = -1;
     for(i = 0 ; i < KSIM_INTER ; i++)
         KSIM_PERM[KSIM_ORDER[KSIM_PRE + i]] = i;
+
+    return(0);
 }
 
 
@@ -386,7 +374,7 @@ static void KE_tri_begin(KDB* dbe)
  *  
  */
  
-static void KE_tri_end(KDB* dbe)
+int CSimulation::KE_tri_end(KDB* dbe)
 {
     int     i;
 
@@ -395,6 +383,7 @@ static void KE_tri_end(KDB* dbe)
             KSIM_ORDER[KSIM_PRE + KSIM_PERM[i]] = i;
 
     SW_nfree(KSIM_PERM);
+    return(0);
 }
 
 
@@ -413,8 +402,7 @@ static void KE_tri_end(KDB* dbe)
  *  @global [in, out]   int*    KSIM_PERM   vector of equations permutations. 
  *  
  */
-
-static void KE_tri_perm1(KDB* dbe, int i, int* vars)
+void CSimulation::KE_tri_perm1(KDB* dbe, int i, int* vars)
 {
     int     j, m = -1, posj, nbe = KNB(dbe), ksim_permi = KSIM_PERM[i];
 
@@ -451,7 +439,7 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
  *  @global [in, out]   int*    KSIM_PERM vector of equation positions after pseudo-triangulation
  *  
  */
-void KE_tri(KDB* dbe, int** predecessors, int passes)
+void CSimulation::KE_tri(KDB* dbe, int** predecessors, int passes)
 {
     int     i, var, j;
     int     cpu_sort;

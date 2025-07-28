@@ -16,6 +16,7 @@
  *   int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *
  */
+#include "api/constants.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
 #include "api/lec/lec.h"
@@ -23,15 +24,6 @@
 #include "api/objs/equations.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
-
-
-extern KDB          *KSIM_DBV,      // See k_sim_main.c
-                    *KSIM_DBS,      // 
-                    *KSIM_DBE;      // 
-extern double       *KSIM_XK,       // 
-                    *KSIM_XK1;      // 
-
-extern int          *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order
 
 
 /**
@@ -45,8 +37,7 @@ extern int          *KSIM_ORDER;    // position in dbe of the equations (to simu
  *  @return     int             0 if ok, -1 if dbe is empty    
  *  
  */
- 
-int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
+int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
 {
     int i,
         opasses = KSIM_PASSES,
@@ -108,8 +99,7 @@ int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
  *                                                              the simulation does not succeed
  *  
  */
-
-static int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
+int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
 {
     int     i, t, rc = 0;
 
@@ -184,14 +174,13 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
- 
-int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)
+int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 
-    KSIM_PRE = SCR_tbl_size(pre);
-    KSIM_INTER = SCR_tbl_size(inter);
-    KSIM_POST = SCR_tbl_size(post);
+    KSIM_PRE = SCR_tbl_size((unsigned char**) pre);
+    KSIM_INTER = SCR_tbl_size((unsigned char**) inter);
+    KSIM_POST = SCR_tbl_size((unsigned char**) post);
 
     if(K_simul_SCC_init(dbe, dbv, dbs, smpl)) return(-1);
 

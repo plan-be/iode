@@ -117,10 +117,11 @@
 #include "scr4/s_prost.h"
 #include "scr4/s_prodt.h"
 
-#include "api/k_super.h"
 #include "api/constants.h"
+#include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/grep.h"
 #include "api/objs/comments.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
@@ -128,6 +129,7 @@
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
+#include "api/print/print.h"
 
 #include "api/report/engine/engine.h"
 #include "api/report/undoc/undoc.h"
@@ -166,12 +168,12 @@ U_ch *RPF_take(U_ch** args)
     int     n, lg;
 
     if(SCR_tbl_size(args) != 2) return(res);
-    n = atol(args[0]);
-    lg = (int)strlen(args[1]);
+    n = atol((char*) args[0]);
+    lg = (int)strlen((char*) args[1]);
     if(n > 0) {
-        res = SCR_malloc(n + 1);
+        res = (unsigned char*) SCR_malloc(n + 1);
         if(n >= lg) {
-            strcpy(res, args[1]);
+            strcpy((char*) res, (char*) args[1]);
             memset(res + lg, ' ', n - lg);
             res[n] = 0;
             return(res);
@@ -184,10 +186,10 @@ U_ch *RPF_take(U_ch** args)
     }
     else {
         n = -n;
-        res = SCR_malloc(n + 1);
+        res = (unsigned char*) SCR_malloc(n + 1);
         if(n >= lg) {
             memset(res, ' ', n - lg);
-            strcpy(res + n - lg, args[1]);
+            strcpy(((char*) res) + n - lg, (char*) args[1]);
             return(res);
         }
         else {
@@ -226,20 +228,20 @@ U_ch *RPF_drop(U_ch** args)
     int     n, lg;
 
     if(SCR_tbl_size(args) != 2) return(res);
-    n = atol(args[0]);
-    lg = (int)strlen(args[1]);
+    n = atol((char*) args[0]);
+    lg = (int)strlen((char*) args[1]);
     if(lg == 0) return(res);
 
     if(n > 0) {
-        if(n >= lg) return(SCR_malloc(1));
-        res = SCR_malloc(lg - n + 1);
-        strcpy(res, args[1] + n);
+        if(n >= lg) return((unsigned char*) SCR_malloc(1));
+        res = (unsigned char*) SCR_malloc(lg - n + 1);
+        strcpy((char*) res, (char*) args[1] + n);
         return(res);
     }
     else {
         n = -n;
-        if(n >= lg) return(SCR_malloc(1));
-        res = SCR_malloc(lg - n + 1);
+        if(n >= lg) return((unsigned char*) SCR_malloc(1));
+        res = (unsigned char*) SCR_malloc(lg - n + 1);
         SCR_strlcpy(res, args[1], lg - n);
         return(res);
     }
@@ -288,12 +290,12 @@ U_ch *RPF_equal(U_ch** args)
     U_ch    *res = 0;
 
     if(SCR_tbl_size(args) != 2)
-        res = SCR_stracpy("0");
+        res = SCR_stracpy((unsigned char*) "0");
     else {
-        if(strcmp(args[0], args[1]))
-            res = SCR_stracpy("0");
+        if(strcmp((char*) args[0], (char*) args[1]))
+            res = SCR_stracpy((unsigned char*) "0");
         else
-            res = SCR_stracpy("1");
+            res = SCR_stracpy((unsigned char*) "1");
     }
     return(res);
 }
@@ -406,9 +408,9 @@ U_ch *RPF_fmtint(U_ch** args)
         case 0 :
             return(SCR_mtov(args, ' '));
         case 2 :
-            return(SCR_stracpy(SCR_fmt_long(buf, args[1], atol(args[0]))));
+            return(SCR_stracpy(SCR_fmt_long(buf, args[1], atol((char*) args[0]))));
         default :
-            return(SCR_stracpy(SCR_fmt_long(buf, "999999", atol(args[0]))));
+            return(SCR_stracpy(SCR_fmt_long(buf, (unsigned char*) "999999", atol((char*) args[0]))));
     }
 }
 
@@ -443,9 +445,9 @@ U_ch *RPF_count(U_ch** args)
     U_ch    *res;
     int     n;
 
-    res = SCR_malloc(20);
+    res = (unsigned char*) SCR_malloc(20);
     n = SCR_tbl_size(args);
-    sprintf(res, "%d", n);
+    sprintf((char*) res, "%d", n);
     return(res);
 }
 
@@ -469,9 +471,9 @@ U_ch *RPF_index(U_ch** args)
     int     n, pos;
 
     n = SCR_tbl_size(args) - 1;
-    if(n < 1) return(SCR_malloc(1));
-    pos = atol(args[0]);
-    if(pos > n || pos < 1) return(SCR_malloc(1));
+    if(n < 1) return((unsigned char*) SCR_malloc(1));
+    pos = atol((char*) args[0]);
+    if(pos > n || pos < 1) return((unsigned char*) SCR_malloc(1));
     return(SCR_stracpy(args[pos]));
 }
 
@@ -486,7 +488,7 @@ U_ch *RPF_index(U_ch** args)
  */
 U_ch *RPF_void(U_ch **args)
 {
-    return(SCR_stracpy(""));
+    return(SCR_stracpy((unsigned char*) ""));
 }
 
 
@@ -511,10 +513,10 @@ U_ch *RPF_date(U_ch** args)
 {
     U_ch    *res, *fmt;
 
-    res = SCR_malloc(60);
+    res = (unsigned char*) SCR_malloc(60);
     if(args[0]) fmt = args[0];
-    else        fmt = "dd-mm-yyyy";
-    SCR_long_to_fdate(SCR_current_date(), res, fmt);
+    else        fmt = (unsigned char*) "dd-mm-yyyy";
+    SCR_long_to_fdate(SCR_current_date(), (char*) res, (char*) fmt);
     return(res);
 }
 
@@ -535,57 +537,60 @@ U_ch *RPF_time(U_ch** args)
 {
     U_ch    *res, *fmt;
 
-    res = SCR_malloc(60);
+    res = (unsigned char*) SCR_malloc(60);
     if(args[0]) fmt = args[0];
-    else        fmt = "hh:mm:ss";
-    SCR_long_to_ftime(SCR_current_time(), res, fmt);
+    else        fmt = (unsigned char*) "hh:mm:ss";
+    SCR_long_to_ftime(SCR_current_time(), (char*) res, (char*) fmt);
     return(res);
 }
 
 
-U_ch    *RPF_MONTHSE[] = {
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+U_ch* RPF_MONTHSE[] = 
+{
+    (unsigned char*) "January",
+    (unsigned char*) "February",
+    (unsigned char*) "March",
+    (unsigned char*) "April",
+    (unsigned char*) "May",
+    (unsigned char*) "June",
+    (unsigned char*) "July",
+    (unsigned char*) "August",
+    (unsigned char*) "September",
+    (unsigned char*) "October",
+    (unsigned char*) "November",
+    (unsigned char*) "December"
 };
 
-U_ch    *RPF_MONTHSF[] = {
-    "Janvier",
-    "Février",
-    "Mars",
-    "Avril",
-    "Mai",
-    "Juin",
-    "Juillet",
-    "Août",
-    "Septembre",
-    "Octobre",
-    "Novembre",
-    "Decembre"
+U_ch* RPF_MONTHSF[] = 
+{
+    (unsigned char*) "Janvier",
+    (unsigned char*) "Février",
+    (unsigned char*) "Mars",
+    (unsigned char*) "Avril",
+    (unsigned char*) "Mai",
+    (unsigned char*) "Juin",
+    (unsigned char*) "Juillet",
+    (unsigned char*) "Août",
+    (unsigned char*) "Septembre",
+    (unsigned char*) "Octobre",
+    (unsigned char*) "Novembre",
+    (unsigned char*) "Decembre"
 };
 
-U_ch    *RPF_MONTHSN[] = {
-    "Januari",
-    "Februari",
-    "Maart",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Augustus",
-    "September",
-    "Oktober",
-    "November",
-    "December"
+U_ch* RPF_MONTHSN[] = 
+{
+    (unsigned char*) "Januari",
+    (unsigned char*) "Februari",
+    (unsigned char*) "Maart",
+    (unsigned char*) "April",
+    (unsigned char*) "Mei",
+    (unsigned char*) "Juni",
+    (unsigned char*) "Juli",
+    (unsigned char*) "Augustus",
+    (unsigned char*) "September",
+    (unsigned char*) "Oktober",
+    (unsigned char*) "November",
+    (unsigned char*) "December"
 };
 
 
@@ -604,7 +609,7 @@ U_ch *RPF_month(U_ch** args)
     int     m, lang = 'F';
 
     if(SCR_tbl_size(args) < 1) return((U_ch *)0);
-    m = atoi(args[0]);
+    m = atoi((char*) args[0]);
     if(m < 1 || m > 12) return((U_ch *)0);
     if(SCR_tbl_size(args) >= 2) lang = SCR_upper_char(args[1][0]);
     switch(lang) {
@@ -636,17 +641,16 @@ U_ch *RPF_sstderr(U_ch** args)
     U_ch    *res = 0, buf[80];
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, " ");
-        pos = K_find(K_WS[SCALARS], args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) " ");
+        pos = K_find(K_WS[SCALARS], (char*) args[i]);
         if(pos < 0 || (scl = KSVAL(K_WS[SCALARS], pos)) == 0) {
-            strcpy(buf, "--");
+            strcpy((char*) buf, "--");
         }
         else {
             if(IODE_IS_A_NUMBER(scl->std))
-                sprintf(buf, "%lf", (double) scl->std);
+                sprintf((char*) buf, "%lf", (double) scl->std);
             else
-                strcpy(buf, "--");
-
+                strcpy((char*) buf, "--");
         }
         res = SCR_strafcat(res, buf);
     }
@@ -669,17 +673,16 @@ U_ch *RPF_srelax(U_ch** args)
     U_ch    *res = 0, buf[80];
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, " ");
-        pos = K_find(K_WS[SCALARS], args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) " ");
+        pos = K_find(K_WS[SCALARS], (char*) args[i]);
         if(pos < 0 || (scl = KSVAL(K_WS[SCALARS], pos)) == 0) {
-            strcpy(buf, "--");
+            strcpy((char*) buf, "--");
         }
         else {
             if(IODE_IS_A_NUMBER(scl->relax))
-                sprintf(buf, "%lf", (double) scl->relax);
+                sprintf((char*) buf, "%lf", (double) scl->relax);
             else
-                strcpy(buf, "--");
-
+                strcpy((char*) buf, "--");
         }
         res = SCR_strafcat(res, buf);
     }
@@ -699,16 +702,15 @@ U_ch *RPF_srelax(U_ch** args)
  */
 U_ch *RPF_ttitle(U_ch** args)
 {
-    U_ch    *T_get_title();
     U_ch    *res = 0, buf[128];
     TBL     *tbl;
     int     pos, i;
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, "\n");
-        pos = K_find(K_WS[TABLES], args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) "\n");
+        pos = K_find(K_WS[TABLES], (char*) args[i]);
         if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0) {
-            sprintf(buf, "Table %s not found", args[i]);
+            sprintf((char*) buf, "Table %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
@@ -739,15 +741,15 @@ U_ch *RPF_cvalue(U_ch** args)
     if(kdb == NULL) return(res);
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, ";");
-        pos = K_find(kdb, args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
+        pos = K_find(kdb, (char*) args[i]);
         if(pos < 0) {
-            sprintf(buf, "Cmt %s not found", args[i]);
+            sprintf((char*) buf, "Cmt %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
-            res = SCR_strafcat(res, KCVAL(kdb, pos));
-            res = SCR_replace(res, "\n", " ");
+            res = SCR_strafcat(res, (unsigned char*) KCVAL(kdb, pos));
+            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
     return(res);
@@ -775,19 +777,19 @@ U_ch *RPF_vvalue(U_ch** args)
     if(kdb == NULL) return(res);
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, ";");
-        pos = K_find(kdb, args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
+        pos = K_find(kdb, (char*) args[i]);
         if(pos < 0) {
-            sprintf(buf, "VAR %s not found", args[i]);
+            sprintf((char*) buf, "VAR %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
             smpl = (SAMPLE *) KDATA(kdb);
             val = KVVAL(kdb, pos, 0);
             for(j = 0 ; j < smpl->s_nb; j++, val++) {
-                IodeFmtVal(buf, *val);
+                IodeFmtVal((char*) buf, *val);
                 res = SCR_strafcat(res, buf);
-                res = SCR_strafcat(res, " ");
+                res = SCR_strafcat(res, (unsigned char*) " ");
             }
         }
     }
@@ -816,15 +818,15 @@ U_ch *RPF_lvalue(U_ch** args)
     if(kdb == NULL) return(res);
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, ",");
-        pos = K_find(kdb, args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ",");
+        pos = K_find(kdb, (char*) args[i]);
         if(pos < 0) {
-            sprintf(buf, "List %s not found", args[i]);
+            sprintf((char*) buf, "List %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
-            res = SCR_strafcat(res, KLVAL(kdb, pos));
-            res = SCR_replace(res, ";", ",");
+            res = SCR_strafcat(res, (unsigned char*) KLVAL(kdb, pos));
+            res = SCR_replace(res, (unsigned char*) ";", (unsigned char*) ",");
         }
     }
     return(res);
@@ -853,15 +855,15 @@ U_ch *RPF_ivalue(U_ch** args)
     if(kdb == NULL) return(res);
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, ";");
-        pos = K_find(kdb, args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
+        pos = K_find(kdb, (char*) args[i]);
         if(pos < 0) {
-            sprintf(buf, "Idt %s not found", args[i]);
+            sprintf((char*) buf, "Idt %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
-            res = SCR_strafcat(res, KILEC(kdb, pos));
-            res = SCR_replace(res, "\n", " ");
+            res = SCR_strafcat(res, (unsigned char*) KILEC(kdb, pos));
+            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
     return(res);
@@ -892,15 +894,15 @@ U_ch *RPF_evalue(U_ch** args)
     if(kdb == NULL) return(res);
 
     for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, ";");
-        pos = K_find(kdb, args[i]);
+        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
+        pos = K_find(kdb, (char*) args[i]);
         if(pos < 0) {
-            sprintf(buf, "Eqs %s not found", args[i]);
+            sprintf((char*) buf, "Eqs %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else {
-            res = SCR_strafcat(res, KELEC(kdb, pos));
-            res = SCR_replace(res, "\n", " ");
+            res = SCR_strafcat(res, (unsigned char*) KELEC(kdb, pos));
+            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
     return(res);
@@ -926,11 +928,11 @@ U_ch *RPF_eqsample(U_ch** args)
     if(kdb == NULL) return(res);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(res); // 1! eq
 
-    res = SCR_malloc(80);
-    pos = K_find(kdb, args[0]);
+    res = (unsigned char*) SCR_malloc(80);
+    pos = K_find(kdb, (char*) args[0]);
 
-    if(pos < 0) sprintf(res, "[Eqs %s not found]", args[0]);
-    else        PER_smpltoa(&(KESMPL(kdb, pos)), res);
+    if(pos < 0) sprintf((char*) res, "[Eqs %s not found]", args[0]);
+    else        PER_smpltoa(&(KESMPL(kdb, pos)), (char*) res);
 
     return(res);
 }
@@ -955,16 +957,16 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
     if(kdb == NULL) return(res);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(res); // 1! eq
 
-    res = SCR_malloc(30 + (int)strlen(args[0]));
-    pos = K_find(kdb, args[0]);
+    res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
+    pos = K_find(kdb, (char*) args[0]);
 
-    if(pos < 0) sprintf(res, "[Eqs %s not found]", args[0]);
+    if(pos < 0) sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else {
         smpl = &KESMPL(kdb, pos);
-        if(fromto == 0) PER_pertoa(&smpl->s_p1, res);
-        else            PER_pertoa(&smpl->s_p2, res);
+        if(fromto == 0) PER_pertoa(&smpl->s_p1, (char*) res);
+        else            PER_pertoa(&smpl->s_p2, (char*) res);
     }
-    if(res[0] == 0) strcpy(res, " "); // pour éviter de quitter le rapport si sample vide
+    if(res[0] == 0) strcpy((char*) res, " "); // pour éviter de quitter le rapport si sample vide
 
     return(res);
 }
@@ -1016,20 +1018,20 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
     if(kdb == NULL) return(eq);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(eq); // 1! eq
 
-    pos = K_find(kdb, args[0]);
+    pos = K_find(kdb, (char*) args[0]);
 
     if(pos < 0) {
-        eq = SCR_malloc(80);
-        sprintf(eq, "[Eqs %s not found]", args[0]);
+        eq = (unsigned char*) SCR_malloc(80);
+        sprintf((char*) eq, "[Eqs %s not found]", args[0]);
     }
     else {
-        eq = SCR_stracpy(KELEC(kdb, pos));
-        poscolon = L_split_eq(eq);
+        eq = SCR_stracpy((unsigned char*) KELEC(kdb, pos));
+        poscolon = L_split_eq((char*) eq);
         if(poscolon > 0) {
             if(lhsrhs == 0) eq[poscolon] = 0;
             else {
                 rhs = SCR_stracpy(eq);
-                strcpy(rhs, eq + poscolon + 2);
+                strcpy((char*) rhs, ((char*) eq) + poscolon + 2);
                 SCR_free(eq);
                 eq = rhs;
             }    
@@ -1101,13 +1103,13 @@ U_ch *RPF_sample(U_ch** args)
     
     switch(what) {
         case 'B':
-            sprintf(buf, "%s", per1);
+            sprintf((char*) buf, "%s", per1);
             break;
         case 'E':
-            sprintf(buf, "%s", per2);
+            sprintf((char*) buf, "%s", per2);
             break;
         default :
-            sprintf(buf, "%s %s", per1, per2);
+            sprintf((char*) buf, "%s %s", per1, per2);
             break;
     }
 
@@ -1133,8 +1135,8 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
         if(L_ISCOEF(cl->lnames[j].name) && type != 'S') continue;
         if(!L_ISCOEF(cl->lnames[j].name) && type != 'V') continue;
         for(k = 0 ; k < *nb ; k++)
-            if(strcmp(cl->lnames[j].name, (*tbl)[k]) == 0) break;
-        if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, cl->lnames[j].name);
+            if(strcmp(cl->lnames[j].name, (char*) (*tbl)[k]) == 0) break;
+        if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, (unsigned char*) cl->lnames[j].name);
     }
 
     return(0);
@@ -1157,7 +1159,7 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     if(SCR_tbl_size(args) < 1) return(NULL);
 
     for(i = 0 ; args[i] ; i++) {
-        pos = K_find(K_WS[EQUATIONS], args[i]);
+        pos = K_find(K_WS[EQUATIONS], (char*) args[i]);
         if(pos < 0) continue;
         eq = KEVAL(K_WS[EQUATIONS], pos);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
@@ -1187,7 +1189,7 @@ U_ch **RPF_unique(U_ch** tbl)
     SCR_add_ptr(&tbl2, &nl, tbl[0]);
     for(i = 1 ; tbl[i] ; i++) {
         for(j = 0 ; j < nl ; j++) {
-            if(strcmp(tbl[i], tbl2[j]) == 0) break;
+            if(strcmp((char*) tbl[i], (char*) tbl2[j]) == 0) break;
         }
         if(j == nl)
             SCR_add_ptr(&tbl2, &nl, tbl[i]);
@@ -1234,13 +1236,12 @@ U_ch *RPF_sliste(U_ch** args)
  */
 U_ch *RPF_expand(U_ch** args, int type)
 {
-    extern char *K_expand();
     U_ch        *res, *tmp, **tbl = 0, **tbl2;
     int         nb = 0, i;
 
 
     for(i = 0 ; args[i] ; i++) {
-        tmp = K_expand(type, 0L, args[i], '*');
+        tmp = (unsigned char*) K_expand(type, 0L, (char*) args[i], (int) '*');
         if(tmp) SCR_add_ptr(&tbl, &nb, tmp);
         SCR_free(tmp);
     }
@@ -1253,7 +1254,7 @@ U_ch *RPF_expand(U_ch** args, int type)
     SCR_free_tbl(tbl);
     res = SCR_mtov(tbl2, ';');
     SCR_free_tbl(tbl2);
-    if(res == 0) res = SCR_stracpy(""); // JMP 04/11/2022 
+    if(res == 0) res = SCR_stracpy((unsigned char*) ""); // JMP 04/11/2022 
     return(res);
 }
 
@@ -1387,7 +1388,7 @@ int RPF_CalcPeriod(U_ch** args)
 
     // Check args
     if(SCR_tbl_size(args) == 0) return(-1); // Erreur, arg required
-    per = PER_atoper(args[0]);
+    per = PER_atoper((char*) args[0]);
     if(per == 0) return(-1); // Error
 
     // Calc diff bw per and WS sample
@@ -1413,7 +1414,7 @@ U_ch *RPF_SimMaxit()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d", KSIM_MAXIT);
+    sprintf((char*) buf, "%d", CSimulation::KSIM_MAXIT);
     return(SCR_stracpy(buf));
 }
 
@@ -1429,7 +1430,7 @@ U_ch *RPF_SimEps()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%lg", KSIM_EPS);
+    sprintf((char*) buf, "%lg", CSimulation::KSIM_EPS);
     return(SCR_stracpy(buf));
 }
 
@@ -1445,7 +1446,7 @@ U_ch *RPF_SimRelax()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%lf", KSIM_RELAX);
+    sprintf((char*) buf, "%lf", CSimulation::KSIM_RELAX);
     return(SCR_stracpy(buf));
 }
 
@@ -1461,7 +1462,7 @@ U_ch *RPF_SimSortNbPasses()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d", KSIM_PASSES);
+    sprintf((char*) buf, "%d", CSimulation::KSIM_PASSES);
     return(SCR_stracpy(buf));
 }
 
@@ -1478,11 +1479,11 @@ U_ch *RPF_SimSortAlgo()
     
     int     isort;
 
-    isort = KSIM_SORT;
+    isort = CSimulation::KSIM_SORT;
     if(isort < 0 || isort > 2)
         isort = 1; // Default value
         
-    return(SCR_stracpy(algos[isort]));
+    return(SCR_stracpy((unsigned char*) algos[isort]));
 }
 
 
@@ -1497,7 +1498,7 @@ U_ch *RPF_SimInitValues()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d", KSIM_START);
+    sprintf((char*) buf, "%d", CSimulation::KSIM_START);
     return(SCR_stracpy(buf));
 }
 
@@ -1516,10 +1517,10 @@ double RPF_SimNormReal(U_ch** args)
     if(t < 0) return(-1.0);
 
     // Check si déjà simulation
-    if(KSIM_NORMS == 0) return(-1.0); // Pas encore de simulation
+    if(CSimulation::KSIM_NORMS == 0) return(-1.0); // Pas encore de simulation
 
     // Return norme t
-    return(KSIM_NORMS[t]);
+    return(CSimulation::KSIM_NORMS[t]);
 }
 
 /**
@@ -1538,9 +1539,9 @@ U_ch *RPF_SimNorm(U_ch** args)
     double  value;
 
     value = RPF_SimNormReal(args);
-    if(value < 0) return(SCR_malloc(1));
-    sprintf(buf, "%lg", value);
-    return(SCR_stracpy(buf));
+    if(value < 0) return((unsigned char*) SCR_malloc(1));
+    sprintf((char*) buf, "%lg", value);
+    return(SCR_stracpy((unsigned char*) buf));
 }
 
 /**
@@ -1557,10 +1558,10 @@ int RPF_SimNIterInt(U_ch** args)
     if(t < 0) return(-1);
 
     // Check si déjà simulation
-    if(KSIM_NITERS == 0) return(-1); // Pas encore de simulation
+    if(CSimulation::KSIM_NITERS == 0) return(-1); // Pas encore de simulation
 
     // Return norme t
-    return(KSIM_NITERS[t]);
+    return(CSimulation::KSIM_NITERS[t]);
 }
 
 /**
@@ -1579,11 +1580,11 @@ U_ch *RPF_SimNIter(U_ch** args)
     char	buf[128];
 
     niter = RPF_SimNIterInt(args);
-    if(niter < 0) return(SCR_malloc(1));
+    if(niter < 0) return((unsigned char*) SCR_malloc(1));
 
     // Return niter in t
-    sprintf(buf, "%d", niter);
-    return(SCR_stracpy(buf));
+    sprintf((char*) buf, "%d", niter);
+    return(SCR_stracpy((unsigned char*) buf));
 }
 
 
@@ -1601,10 +1602,10 @@ int RPF_SimCpuInt(U_ch** args)
     if(t < 0) return(-1);
 
     // Check si déjà simulation
-    if(KSIM_CPUS == 0) return(-1); // Pas encore de simulation
+    if(CSimulation::KSIM_CPUS == 0) return(-1); // Pas encore de simulation
 
     // Return norme t
-    return(KSIM_CPUS[t]);
+    return(CSimulation::KSIM_CPUS[t]);
 }
 
 
@@ -1626,10 +1627,10 @@ U_ch *RPF_SimCpu(U_ch** args)
     char	buf[128];
 
     cpu = RPF_SimCpuInt(args);
-    if(cpu < 0) return(SCR_malloc(1));
+    if(cpu < 0) return((unsigned char*) SCR_malloc(1));
 
-    sprintf(buf, "%d", cpu);
-    return(SCR_stracpy(buf));
+    sprintf((char*) buf, "%d", cpu);
+    return(SCR_stracpy((unsigned char*) buf));
 }
 
 
@@ -1645,7 +1646,7 @@ U_ch *RPF_SimCpuSCC()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d", KSIM_CPU_SCC);
+    sprintf((char*) buf, "%d", CSimulation::KSIM_CPU_SCC);
     return(SCR_stracpy(buf));
 }
 
@@ -1660,7 +1661,7 @@ U_ch *RPF_SimCpuSort()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d", KSIM_CPU_SORT);
+    sprintf((char*) buf, "%d", CSimulation::KSIM_CPU_SORT);
     return(SCR_stracpy(buf));
 }
 
@@ -1693,25 +1694,25 @@ U_ch *RPF_vtake(U_ch** args)
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
-    if(SCR_tbl_size(args) < 1) return(SCR_malloc(1));
+    if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
     arg = SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms(arg, RP_VSEPS);
+    args = SCR_vtoms(arg, (unsigned char*) RP_VSEPS);
     SCR_free(arg);
     lg = SCR_tbl_size(args) - 1;
     if(lg == 0) {
         SCR_free_tbl(args);
-        return(SCR_malloc(1));
+        return((unsigned char*) SCR_malloc(1));
     }
-    n = atol(args[0]);
+    n = atol((char*) args[0]);
     if(n > 0) {
-        n = min(lg, n);
+        n = std::min(lg, n);
         tmp = args[n + 1];
         args[n + 1] = 0;
         res = SCR_mtov(args + 1, RP_VSEPS[0]);
         args[n + 1] = tmp;
     }
     else {
-        n = lg - min(lg, -n);
+        n = lg - std::min(lg, -n);
         res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
     }
     SCR_free_tbl(args);
@@ -1741,25 +1742,25 @@ U_ch *RPF_vdrop(U_ch** args)
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
-    if(SCR_tbl_size(args) < 1) return(SCR_malloc(1));
+    if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
     arg = SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms(arg, RP_VSEPS);
+    args = SCR_vtoms(arg, (unsigned char*) RP_VSEPS);
     SCR_free(arg);
     lg = SCR_tbl_size(args) - 1;
     if(lg == 0) {
         SCR_free_tbl(args);
-        return(SCR_malloc(1));
+        return((unsigned char*) SCR_malloc(1));
     }
-    n = atol(args[0]);
+    n = atol((char*) args[0]);
     if(n < 0) {
-        n = max(lg + n, 0);
+        n = std::max(lg + n, 0);
         tmp = args[n + 1];
         args[n + 1] = 0;
         res = SCR_mtov(args + 1, RP_VSEPS[0]);
         args[n + 1] = tmp;
     }
     else {
-        n = min(lg, n);
+        n = std::min(lg, n);
         res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
     }
     SCR_free_tbl(args);
@@ -1785,13 +1786,13 @@ U_ch *RPF_vcount(U_ch** args)
     char    buf[128], *arg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
-    arg = SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms(arg, RP_VSEPS);
+    arg = (char*) SCR_mtov(args, RP_VSEPS[0]);
+    args = SCR_vtoms((unsigned char*) arg, (unsigned char*) RP_VSEPS);
     SCR_free(arg);
 
-    sprintf(buf,  "%d", SCR_tbl_size(args));
+    sprintf((char*) buf,  "%d", SCR_tbl_size(args));
     SCR_free_tbl(args);
-    return(SCR_stracpy(buf));
+    return(SCR_stracpy((unsigned char*) buf));
 }
 
 
@@ -1808,7 +1809,7 @@ U_ch *RPF_IodeVersion()
 {
     U_ch    buf[128];
 
-    sprintf(buf, "%d.%d", IODE_VERSION_MAJOR, IODE_VERSION_MINOR);
+    sprintf((char*) buf, "%d.%d", IODE_VERSION_MAJOR, IODE_VERSION_MINOR);
     return(SCR_stracpy(buf));
 }
 
@@ -1835,7 +1836,7 @@ U_ch *RPF_memory(U_ch** args)
     convfree = ((double)st.st_convafree + (double)st.st_convfree)/(1024.0*1024.0);
     convused = ((double)st.st_convalloc - (double)st.st_convafree)/(1024.0*1024.0);
     
-    sprintf(buf, "NBA=%ld, NBB=%ld, ALLOC=%.1lf MB, FREE=%.1lf MB, USED=%.1lf MB",
+    sprintf((char*) buf, "NBA=%ld, NBB=%ld, ALLOC=%.1lf MB, FREE=%.1lf MB, USED=%.1lf MB",
             st.st_nballoc - st.st_nbfree,
             st.st_nbblks,
             //(st.st_convalloc)/(1024 * 1024),
@@ -1863,11 +1864,9 @@ static long RPF_CHRONO = 0;     // Current chrono initial time
  *      @chronoreset()            =>  ""
  */
 U_ch *RPF_ChronoReset()
-{
-    extern long WscrGetMS(); 
-    
+{    
     RPF_CHRONO = WscrGetMS();
-    return(SCR_malloc(1));
+    return((unsigned char*) SCR_malloc(1));
 }
 
 
@@ -1884,10 +1883,9 @@ U_ch *RPF_ChronoGet()
 {
     U_ch        buf[128];
     long	    ms;
-    extern long WscrGetMS(); 
 
     ms = WscrGetMS() - RPF_CHRONO;
-    sprintf(buf, "%ld", ms);
+    sprintf((char*) buf, "%ld", ms);
     return(SCR_stracpy(buf));
 }
 
@@ -1907,14 +1905,14 @@ U_ch *RPF_fappend(U_ch** args)
     int     i;
 
     if(SCR_tbl_size(args) < 1) return(NULL);
-    fd = fopen(args[0], "a+");
+    fd = fopen((char*) args[0], "a+");
     if(fd == 0) return(NULL);
     for(i = 1 ; args[i] ; i++) {
-        if(strcmp(args[i], "NL") == 0) fprintf(fd, "\n");
-        else                           fprintf(fd, "%s", args[i]);
+        if(strcmp((char*) args[i], "NL") == 0) fprintf(fd, "\n");
+        else                                   fprintf(fd, "%s", args[i]);
     }
     fclose(fd);
-    return(SCR_malloc(1));
+    return((unsigned char*) SCR_malloc(1));
 }
 
 
@@ -1928,8 +1926,8 @@ U_ch *RPF_fappend(U_ch** args)
 U_ch *RPF_fdelete(U_ch** args)
 {
     if(SCR_tbl_size(args) < 1) return(NULL);
-    _unlink(args[0]);
-    return(SCR_malloc(1));
+    _unlink((char*) args[0]);
+    return((unsigned char*) SCR_malloc(1));
 }
 
 
@@ -1944,8 +1942,8 @@ U_ch *RPF_getdir()
 {
     U_ch    dir[512];
 
-    if(SCR_getcwd(0, dir) == 0)
-        return(SCR_stracpy(""));
+    if(SCR_getcwd(0, (char*) dir) == 0)
+        return(SCR_stracpy((unsigned char*) ""));
     else
         return(SCR_stracpy(dir));
 }
@@ -1966,9 +1964,9 @@ U_ch *RPF_chdir(U_ch **args)
 
     if(SCR_tbl_size(args) > 0) {
         #ifdef _MSC_VER
-            rc = _chdir(args[0]); 
+            rc = _chdir((char*) args[0]); 
         #else
-            rc = chdir(args[0]); 
+            rc = chdir((char*) args[0]); 
         #endif
     }    
 
@@ -1993,9 +1991,13 @@ U_ch *RPF_mkdir(U_ch **args)
     int     rc = 0;
 
     if(SCR_tbl_size(args) > 0)
-        _mkdir(args[0]);
+    #ifdef _MSC_VER
+        _mkdir((char*) args[0]);
+    #else
+        mkdir((char*) args[0], 0777);
+    #endif
 
-    return(SCR_stracpy(""));
+    return(SCR_stracpy((unsigned char*) ""));
 }
 
 /**
@@ -2014,9 +2016,7 @@ U_ch *RPF_rmdir(U_ch **args)
     int     rc = 0;
 
     if(SCR_tbl_size(args) > 0)
-        _rmdir(args[0]);
+        _rmdir((char*) args[0]);
 
-    return(SCR_stracpy(""));
+    return(SCR_stracpy((unsigned char*) ""));
 }
-
-

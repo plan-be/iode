@@ -114,13 +114,10 @@
  */
 #include <math.h>
 #include "api/lec/lec.h"
+#include "api/simulation/simulation.h"
 
 
 static double  L_newton_1();
-int     KSIM_NEWTON_DEBUG = 0;          //
-int     KSIM_NEWTON_MAXIT = 50;         // Max number of iterations of the Newton-Raphson sub algorithm.
-double  KSIM_NEWTON_EPS   = 1e-6;       // Newton-Raphson convergence criterion
-double  KSIM_NEWTON_STEP  = 1e-6;       // Step to calculate the local derivative (f(x+h) - f(x)) / h
 
 /**
  *  Solves numerically a LEC equation for one period of time with respect to a given variable (varnb).  
@@ -168,15 +165,16 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
  */
 static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
-    double  oldx, x, fx, fxh, h = KSIM_NEWTON_STEP, eps = KSIM_NEWTON_EPS, ax, afx, dx = 0.0, ox;
+    double  oldx, x, fx, fxh, ax, afx, dx = 0.0, ox;
+    double  h = CSimulation::KSIM_NEWTON_STEP;
+    double  eps = CSimulation::KSIM_NEWTON_EPS;
     int     it = 0;
     double    *d_ptr, shift;
-    extern  int KSIM_DEBUG;
 
     d_ptr = L_getvar(dbv, varnb) + t;
     oldx = x = d_ptr[0];
     if(!IODE_IS_A_NUMBER(x)) {
-        if(KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb));
+        if(CSimulation::KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb));
         return((double)IODE_NAN);
     }
 
@@ -193,21 +191,21 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         ax = fabs(shift);
     }
 
-    if(KSIM_NEWTON_DEBUG)
+    if(CSimulation::KSIM_NEWTON_DEBUG)
         L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
 
 
     if(algo && ax > 1.0) eps *= ax; /* GB 20-06-96 */
-    while(it < KSIM_NEWTON_MAXIT) {
+    while(it < CSimulation::KSIM_NEWTON_MAXIT) {
         d_ptr = L_getvar(dbv, varnb) + t;
         d_ptr[0] = x;
         ax = fabs(x);
 
         fx = L_exec(dbv, dbs, clec, t);
-        if(KSIM_NEWTON_DEBUG) L_debug("   - f(%lg) = %lg\n", x, fx);
+        if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("   - f(%lg) = %lg\n", x, fx);
 
         if(!IODE_IS_A_NUMBER(fx)) {
-            if(KSIM_NEWTON_DEBUG) { // Message iniquement en cas de pb
+            if(CSimulation::KSIM_NEWTON_DEBUG) { // Message iniquement en cas de pb
                 L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
                 L_debug("   - f(%lg) = %lg\n", x, fx);
                 L_debug("   -> cannot compute f(%lg)\n", x);
@@ -219,7 +217,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         afx = fabs(fx);
 
         if(afx < eps) {
-            if(KSIM_NEWTON_DEBUG) L_debug("   -> %lf\n", x);
+            if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("   -> %lf\n", x);
             return(x);
         }
         if(ax > 1.0) h = 1e-4 * ax;
@@ -229,16 +227,16 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         d_ptr[0] = x + h;
         fxh = L_exec(dbv, dbs, clec, t);
         if(!IODE_IS_A_NUMBER(fxh)) {
-            if(KSIM_NEWTON_DEBUG) L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
+            if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
             goto err;
         }
 
         fxh -= shift;
         if(fabs(fxh - fx) < 1e-8) {
-            if(KSIM_NEWTON_DEBUG) L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
+            if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
             goto err;
         }
-        if(KSIM_NEWTON_DEBUG) L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
+        if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
         dx = h * fx / (fxh - fx);
         ox = x;
         x -= dx;
@@ -248,7 +246,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         it++;
     }
 
-    if(KSIM_NEWTON_DEBUG) L_debug("    #it > %d\n", it);
+    if(CSimulation::KSIM_NEWTON_DEBUG) L_debug("    #it > %d\n", it);
 
 err:
     d_ptr[0] = oldx;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdlib.h>
 
 // set SCR4 flags to help IntelliSense (VS Code) 
 // to find the right functions and variables definitions
@@ -27,6 +28,9 @@
 #define __DBG__ DebugForce("%s[%d]\n", __FILE__, __LINE__);     // tests
 
 #ifdef __GNUC__
+    #include <sys/stat.h>   // for mkdir
+    #include <unistd.h>
+
     #define _unlink unlink
     #define _access access
     #define _creat creat
@@ -34,7 +38,6 @@
     #define _read read
     #define _lseek lseek
     #define _close close
-    #define _mkdir mkdir
     #define _rmdir rmdir
     #define vsnprintf_s vsnprintf
 #endif

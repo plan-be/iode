@@ -21,13 +21,13 @@ protected:
         endo_exo = "UY-XNATY";
 
         // Simulation std parameters
-        KSIM_START = VAR_INIT_TM1;
-        KSIM_EPS = 0.0001;
-        KSIM_MAXIT = 100;
-        KSIM_RELAX = 0.7;
-        KSIM_SORT = SORT_BOTH;
-        KSIM_PASSES = 5;
-        KSIM_DEBUG = 1;
+        CSimulation::KSIM_START = VAR_INIT_TM1;
+        CSimulation::KSIM_EPS = 0.0001;
+        CSimulation::KSIM_MAXIT = 100;
+        CSimulation::KSIM_RELAX = 0.7;
+        CSimulation::KSIM_SORT = SORT_BOTH;
+        CSimulation::KSIM_PASSES = 5;
+        CSimulation::KSIM_DEBUG = 1;
     }
 
     // void TearDown() override {}
@@ -36,12 +36,12 @@ protected:
 TEST_F(SimulationTest, ModelExchange)
 {
     sim.model_exchange(endo_exo);
-    EXPECT_EQ(SCR_tbl_size((unsigned char**) KSIM_EXO), 1);
-    EXPECT_EQ(std::string(KSIM_EXO[0]), "UY-XNATY");
+    EXPECT_EQ(SCR_tbl_size((unsigned char**) CSimulation::KSIM_EXO), 1);
+    EXPECT_EQ(std::string(CSimulation::KSIM_EXO[0]), "UY-XNATY");
 
     // reset KSIM_EXO
     sim.model_exchange();
-    EXPECT_TRUE(KSIM_EXO == NULL);
+    EXPECT_TRUE(CSimulation::KSIM_EXO == NULL);
 }
 
 TEST_F(SimulationTest, Simulation)
@@ -65,7 +65,7 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_THROW(sim.model_simulate(from, to, "$UNKNOWN_LIST"), std::invalid_argument);
 
     // Test simulation: divergence
-    KSIM_MAXIT = 2;
+    CSimulation::KSIM_MAXIT = 2;
     EXPECT_THROW(sim.model_simulate(from, to), std::runtime_error);
 
     // Check _PRE list after simulation (prolog)
@@ -79,7 +79,7 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_EQ(lst_diver, expected_lst_diver);
 
     // Test with with convergence (increase MAXIT)
-    KSIM_MAXIT = 100;
+    CSimulation::KSIM_MAXIT = 100;
     sim.model_simulate(from, to);
 
     // Check result
@@ -154,7 +154,7 @@ TEST_F(SimulationTest, SimulateSCC)
     sim.model_calculate_SCC(10);
 
     // SCC simulation
-    KSIM_MAXIT = 100;
+    CSimulation::KSIM_MAXIT = 100;
     sim.model_simulate_SCC(from, to);
 
     // Check result

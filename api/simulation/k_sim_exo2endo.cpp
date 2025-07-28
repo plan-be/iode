@@ -59,6 +59,7 @@
  *
  *  
  */
+#include "api/constants.h"
 #include "api/b_errors.h"
 #include "api/lec/lec.h"
 #include "api/objs/equations.h"
@@ -78,12 +79,10 @@
  *  TODO: check that eclec is freed
  *  
  */
-static int KE_findpath(int posendo, int posexo, int* depth)
+int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
 {
     int         j, poseq, posseq, posvar, rc = -1;
     CLEC        *clec = NULL, *eclec;
-    extern char *KSIM_PATH;
-    extern KDB  *KSIM_DBE;
 
     if(posexo < 0 || *depth > KSIM_MAXDEPTH) return(-1);
 
@@ -163,13 +162,10 @@ static int KE_findpath(int posendo, int posexo, int* depth)
  *                                      path between endo and exo inexistent 
  *  
  */
- 
-int KE_exo2endo(int posendo, int posexo)
+int CSimulation::KE_exo2endo(int posendo, int posexo)
 {
     int         endo, exo;
     int         depth = 0;
-    extern char *KSIM_PATH;
-    extern KDB  *KSIM_DBV;
 
     endo = KE_poseq(posendo);
     if(endo < 0) {
@@ -191,6 +187,3 @@ int KE_exo2endo(int posendo, int posexo)
     }
     return(0);
 }
-
-
-
