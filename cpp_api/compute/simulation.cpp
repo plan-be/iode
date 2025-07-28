@@ -1,12 +1,6 @@
 #include "simulation.h"
 
 
-Simulation::Simulation()
-{
-    // reset global variable KSIM_EXO
-    model_exchange();
-}
-
 /**
  * Same as B_ModelExchange()
  * 

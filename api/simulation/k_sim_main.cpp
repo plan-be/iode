@@ -86,9 +86,7 @@
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
  *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
-#include <math.h>
-#include "scr4/scr4.h"
-
+#include "api/constants.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
 #include "api/lec/lec.h"
@@ -98,40 +96,31 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
+            
 
+double  CSimulation::KSIM_EPS = 0.001;
+double  CSimulation::KSIM_RELAX = 1.0;
+int     CSimulation::KSIM_MAXIT = 100;
+int     CSimulation::KSIM_DEBUG = 0;
+int     CSimulation::KSIM_PASSES = 5;
+int     CSimulation::KSIM_SORT = SORT_BOTH;
+int     CSimulation::KSIM_START = VAR_INIT_TM1;
 
-#define KSIM_VAL(i, t)      *(KVVAL(KSIM_DBV, KSIM_POSXK[i], t))  // Value of endo[i] in period nb t
-#define KSIM_NAME(i)        (KONAME(KSIM_DBV, KSIM_POSXK[i]))     // Name  of the endogenous of equation i (possibly after endo-exo)  
+int     CSimulation::KSIM_NEWTON_MAXIT = 50;        
+int     CSimulation::KSIM_NEWTON_DEBUG = 0;
+double  CSimulation::KSIM_NEWTON_EPS   = 1e-6;      
+double  CSimulation::KSIM_NEWTON_STEP  = 1e-6;      
 
-// Global variables
-double   *KSIM_NORMS = 0;	      // Convergence threshold reached at the end of each simulation period 
-double   KSIM_NORM;                // Error measure: maximum difference between 2 iterations 
-int         *KSIM_NITERS = 0; 	      // Numbers of iterations needed for each simulation period
-long        *KSIM_CPUS = 0; 	      // Elapsed time for each simulation period
-double   KSIM_EPS = 0.001;         // Required max convergence threshold
-double   KSIM_RELAX = 1.0;         // Relaxation parameter
-double   *KSIM_XK;                 // Values of the endogenous variables (in the interdep block) at the end of the previous iteration 
-double   *KSIM_XK1;                // Values of the endogenous variables (in the interdep block) during the current iteration
-int         KSIM_MAXIT= 100;          // Maximum number of iteration to reach a solution
-int         KSIM_DEBUG = 0;           // Debug level: 0 = no debugging output
-int         KSIM_MAXDEPTH;            // Number of equations in the model
-int         *KSIM_POSXK;              // Position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
-int         *KSIM_POSXK_REV;          // Position in KSIM_DBE of the equation whose endo is "KSIM_DBV[i]" reverse of KSIM_POSXK
-int         KSIM_PASSES = 5;          // Number of passes for the heuristic triangulation algorithm
-int         KSIM_SORT = SORT_BOTH;    // Reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
-int         KSIM_START = VAR_INIT_TM1; // Endogenous initial values: @see KV_init_values_1() for available options
-char        **KSIM_EXO = NULL;        // 
-char        *KSIM_PATH = NULL;        //
-KDB         *KSIM_DBV;                // KDB of variables used for the simulation. Normally K_WS[VARIABLES]
-KDB         *KSIM_DBS;                // KDB of scalars used for the simulation. Normally K_WS[SCALARS]
-KDB         *KSIM_DBE;                // KDB of equations defining the model to simulation. Can K_WS[EQUATIONS] or a subset.
-
-extern int  KSIM_PRE,                 // number of equations in the "prolog" block 
-            KSIM_INTER,               // number of equations in the "interdep" block
-            KSIM_POST,                // number of equations in the "epilog"
-            *KSIM_ORDER;              // position in dbe of the equations (to simulate) in the execution order. See k_sim_order.c.
+char**  CSimulation::KSIM_EXO = NULL;
+char*   CSimulation::KSIM_PATH = NULL;
+double* CSimulation::KSIM_NORMS = 0;
+int*    CSimulation::KSIM_NITERS = 0;
+long*   CSimulation::KSIM_CPUS = 0;
+int     CSimulation::KSIM_CPU_SCC = 0; 
+int     CSimulation::KSIM_CPU_SORT = 0; 
 
 /**
+ * 
  *  Initialises the values of the interdependent endogenous variables for one period before starting 
  *  the solver on that period.
  *  
@@ -141,10 +130,10 @@ extern int  KSIM_PRE,                 // number of equations in the "prolog" blo
  *  @global     int     KSIM_START  initialisation method 
  *  
  */
-static void K_init_values(int t)
+void CSimulation::K_init_values(int t)
 {
     int         i;
-    double        *val;
+    double      *val;
 
     if(KSIM_START == VAR_INIT_ASIS) return;
 
@@ -164,29 +153,12 @@ static void K_init_values(int t)
  *  @global [in]  double*    KSIM_XK   result of the last Gauss-Seidel iteration 
  *  
  */
-static void K_restore_XK(int t)
+void CSimulation::K_restore_XK(int t)
 {
     int         i, j;
 
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)
         KSIM_VAL(KSIM_ORDER[i], t) = KSIM_XK[j];
-}
-
-
-/**
- *  Frees all temporary allocated memory for the simulation.
- */
-void K_simul_free()
-{
-    SW_nfree(KSIM_XK);
-    SW_nfree(KSIM_XK1);
-    SW_nfree(KSIM_POSXK);
-    SW_nfree(KSIM_POSXK_REV);
-    SW_nfree(KSIM_ORDER);
-    SW_nfree(KSIM_PATH);
-    KSIM_PATH = NULL;
-    KSIM_XK = KSIM_XK1 = NULL;
-    KSIM_POSXK = KSIM_POSXK_REV = KSIM_ORDER = NULL;
 }
 
 /**
@@ -197,7 +169,7 @@ void K_simul_free()
  *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
-static int K_prolog(int t)
+int CSimulation::K_prolog(int t)
 {
     int     i;
     double    x;
@@ -227,11 +199,10 @@ static int K_prolog(int t)
  *  @global [out]   double   KSIM_NORM    maximum difference bw endos before and after iteration
  *  
  */
- 
-static int K_interdep_1(int t)
+int CSimulation::K_interdep_1(int t)
 {
     int     i, j;
-    double    x;
+    double  x;
     double  d, pd;
 
 
@@ -248,9 +219,9 @@ static int K_interdep_1(int t)
         if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
             d = (KSIM_XK[j] - x);   // d = diff between 2 iterations
             if(!IODE_IS_0(KSIM_XK[j]))  
-                pd = min(fabs(1 - x / KSIM_XK[j]), fabs(d)); // if ||endo|| != 0, norm = relative difference
+                pd = std::min(fabs(1 - x / KSIM_XK[j]), fabs(d));   // if ||endo|| != 0, norm = relative difference
             else 
-                pd = fabs(d);                                // else norm = |d| 
+                pd = fabs(d);                                       // else norm = |d| 
 
             pd *= KSIM_RELAX; 
             if(pd > KSIM_NORM) KSIM_NORM = pd;
@@ -283,8 +254,7 @@ static int K_interdep_1(int t)
  *                              0 otherwise
  *  @global [out]   double   KSIM_NORM    maximum difference between 2 iterations
  */
- 
-static int K_interdep_2(int t)
+int CSimulation::K_interdep_2(int t)
 {
     int     i, j;
     double  d, pd;
@@ -308,7 +278,7 @@ static int K_interdep_2(int t)
             // Calcule la 'norme' = fabs de la différence relative entre 2 it.
             //   ou de la diff entre 2 it.
             if(!IODE_IS_0(KSIM_XK[j]))
-                pd = min(fabs(1 - KSIM_XK1[j] / KSIM_XK[j]), fabs(d));
+                pd = std::min(fabs(1 - KSIM_XK1[j] / KSIM_XK[j]), fabs(d));
             else
                 pd = fabs(d);
 
@@ -341,7 +311,7 @@ static int K_interdep_2(int t)
  *  @return     int         0 on success, -1 on error
  *  
  */
-static int K_interdep(int t)
+int CSimulation::K_interdep(int t)
 {
     int         rc;
     double      relax = KSIM_RELAX;
@@ -362,11 +332,10 @@ static int K_interdep(int t)
  *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
-static int K_epilog(int t)
+int CSimulation::K_epilog(int t)
 {
     int     i, j;
     double    x;
-
 
     for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
@@ -391,12 +360,12 @@ static int K_epilog(int t)
  *      replace B_ fns by K_ fns (see comments)
  *  
  */
-static int K_diverge(int t, char* lst, double eps)
+int CSimulation::K_diverge(int t, char* lst, double eps)
 {
     //char        buf[81];
     char        *diverg = NULL;
     int         i, j, pos;
-    double   x;
+    double      x;
     double      d, pd;
 
     // Delete lst 
@@ -420,13 +389,13 @@ static int K_diverge(int t, char* lst, double eps)
 
             d = (KSIM_XK[j] - x);
             if(!IODE_IS_0(KSIM_XK[j]))
-                pd = min(fabs(1 - x / KSIM_XK[j]), fabs(d));
+                pd = std::min(fabs(1 - x / KSIM_XK[j]), fabs(d));
             else pd = fabs(d);
 
             pd *= KSIM_RELAX;
             if(pd > eps)  {
-                if(diverg) diverg = SCR_strafcat(diverg, ",");
-                diverg = SCR_strafcat(diverg, KSIM_NAME(KSIM_ORDER[i]));
+                if(diverg) diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
+                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) KSIM_NAME(KSIM_ORDER[i]));
                 //sprintf(buf, "%s %s", lst, KSIM_NAME(KSIM_ORDER[i]));
                 //B_DataAppend(buf, LISTS);
             }
@@ -455,7 +424,7 @@ static int K_diverge(int t, char* lst, double eps)
  *  
  *  @see K_simul() for the global input and output globlals.
  */
-int K_simul_1(int t)
+int CSimulation::K_simul_1(int t)
 {
     extern  int SCR_vtime;
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime; /* JMP 27-09-96 */
@@ -544,7 +513,7 @@ int K_simul_1(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)
+int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)
 {
     int     i, t, j, k, endo_exonb,
             posendo, posexo, posvar,
@@ -612,11 +581,11 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
     // Optional goal seeking = exchange exo and endo roles in equations
     // Each couple endo-exo
     if(endo_exo != NULL) {
-        endo_exonb = SCR_tbl_size(endo_exo);
+        endo_exonb = SCR_tbl_size((unsigned char**) endo_exo);
         KSIM_PATH = SW_nalloc(KSIM_MAXDEPTH);
         for(i = 0; i < endo_exonb; i ++) {
-            var = SCR_vtom(endo_exo[i], '-');
-            if(var == NULL || SCR_tbl_size(var) != 2) {
+            var = (char**) SCR_vtom((unsigned char*) endo_exo[i], (int) '-');
+            if(var == NULL || SCR_tbl_size((unsigned char**) var) != 2) {
                 B_seterrn(115, endo_exo[i]);
                 rc = -1;
                 goto fin;
@@ -642,7 +611,7 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
             }
 
             //          fprintf(stdout, "\nDone");
-            SCR_free_tbl(var);
+            SCR_free_tbl((unsigned char**) var);
             var = NULL;
         }
 
@@ -663,20 +632,20 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
         if(endo_exo != NULL) {
             for(k = 0; k < endo_exonb; k ++) {
-                var = SCR_vtom(endo_exo[k], '-');
+                var = (char**) SCR_vtom((unsigned char*) endo_exo[k], '-');
                 posexo = K_find(KSIM_DBV, var[1]);
 
                 x = KVVAL(KSIM_DBV, posexo, 0);
                 for(j = t + 1; j < KSMPL(dbv)->s_nb; j++)  x[j] = x[t];
 
-                SCR_free_tbl(var);
+                SCR_free_tbl((unsigned char**) var);
                 var = NULL;
             }
         }
     }
 
 fin:
-    SCR_free_tbl(var);
+    SCR_free_tbl((unsigned char**) var);
     K_simul_free();
     return(rc);
 }
@@ -701,12 +670,11 @@ fin:
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
-
-double K_calc_clec(int eqnb, int t, int varnb, int msg)
+double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
 {
     int     lg, eqvarnb = -1;
     CLEC    *clec;
-    double    x;
+    double  x;
     char    buf[10];
 
 //Debug("Eq %s\n", KONAME(KSIM_DBE, eqnb));
@@ -739,8 +707,7 @@ double K_calc_clec(int eqnb, int t, int varnb, int msg)
  *  @param [in] int     eqn         last equation pos in KSIM_ORDER (name = KSIM_NAME[KSIM_ORDER[eqn]])
  *  
  */
-
-static void K_lstorder_1(char* lstname, int eq1, int eqn)
+void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
 {
     U_ch 	        **lst = 0,                     
                     **tbl_todel;
@@ -750,28 +717,27 @@ static void K_lstorder_1(char* lstname, int eq1, int eqn)
                     nlst = 0, 
                     nb = eqn - eq1 + 1,  
                     maxl = 1000;
-    extern  KDB*    KSIM_DBV;
 
     // Détruit la liste cible et les sous-listes
-    sprintf(buf, "%s*", lstname);
+    sprintf((char*) buf, "%s*", lstname);
     //B_DataDelete(buf, LISTS); // Old version usign B_*() fns
-    lst_todel = K_expand(LISTS, NULL, buf, '*');
+    lst_todel = (unsigned char*) K_expand(LISTS, NULL, (char*) buf, '*');
     if(lst_todel) {
         tbl_todel = SCR_vtom(lst_todel, ';');
         for(i = 0; tbl_todel[i] ; i++)
-            K_del_by_name(KL_WS, tbl_todel[i]);
+            K_del_by_name(KL_WS, (char*) tbl_todel[i]);
     }
     SCR_free(lst_todel);
     SCR_free_tbl(tbl_todel);
     
     // Creates a table of strings containing all the name to set in the list
     for(i = 0; i < nb; i++)
-        SCR_add_ptr(&lst, &nlst, KSIM_NAME(KSIM_ORDER[i + eq1]));
+        SCR_add_ptr(&lst, &nlst, (unsigned char*) KSIM_NAME(KSIM_ORDER[i + eq1]));
 
     SCR_add_ptr(&lst, &nlst, 0); 
 
     // Creates the list lstname (and possibly sub-lists lstname1,...) 
-    KL_lst(lstname, lst, maxl);
+    KL_lst(lstname, (char**) lst, maxl);
     SCR_free_tbl(lst);
 }
 
@@ -786,7 +752,7 @@ static void K_lstorder_1(char* lstname, int eq1, int eqn)
  *  @param [in] char*   post    name of the list containing the epilog
  *  
  */
-void K_lstorder(char* pre, char* inter, char *post)
+void CSimulation::K_lstorder(char* pre, char* inter, char *post)
 {
     K_lstorder_1(pre,   0, 					   KSIM_PRE - 1);
     K_lstorder_1(inter, KSIM_PRE, 			   KSIM_PRE + KSIM_INTER - 1);

@@ -17,6 +17,7 @@
  *      int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
  *      int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
  */
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -45,12 +46,13 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
 {
     KDB     *tdbe;
     int     rc;
+    CSimulation simu;
 
-    if(eqs == NULL || SCR_tbl_size(eqs) == 0)
-        rc = K_simul(K_WS[EQUATIONS], K_WS[VARIABLES], K_WS[SCALARS], smpl, KSIM_EXO, NULL);
+    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
+        rc = simu.K_simul(K_WS[EQUATIONS], K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, NULL);
     else {
-        tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
-        rc = K_simul(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, KSIM_EXO, eqs);
+        tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
+        rc = simu.K_simul(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, eqs);
         K_free_kdb(tdbe);
     }
 
@@ -72,7 +74,7 @@ int B_ModelSimulate(char *const_arg)
     char    *arg;
 
     // Copy for C++ strings = read only (const)
-    arg = SCR_stracpy(const_arg);
+    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
@@ -89,7 +91,7 @@ int B_ModelSimulate(char *const_arg)
     rc = B_ModelSimulateEqs(smpl, eqs);
 
 err:
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(smpl);
     SCR_free(arg);
     return(rc);
@@ -110,35 +112,32 @@ int B_ModelSimulateParms(char* arg)
 {
     char    **args;
     int     rc = 0, nargs;
-#ifndef WATCOM
-    double  atof();
-#endif
 
-    args = (char **)SCR_vtoms(arg, B_SEPS);
-    nargs = SCR_tbl_size(args);
+    args = (char **) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nargs = SCR_tbl_size((unsigned char**) args);
     if(nargs < 6) {
         B_seterror("ModelSimulateParms : incorrect nb of parameters");
         rc = -1;
         goto fin;
     }
 
-    KSIM_EPS   = atof(args[0]);
-    KSIM_RELAX = atof(args[1]);
-    KSIM_MAXIT = atoi(args[2]);
+    CSimulation::KSIM_EPS   = atof(args[0]);
+    CSimulation::KSIM_RELAX = atof(args[1]);
+    CSimulation::KSIM_MAXIT = atoi(args[2]);
     if(U_is_in(args[3][0], "bB")) 
         args[3][0] = 'T'; // JMP 20/02/2023 
-    KSIM_SORT  = B_argpos("CTN", args[3][0]);
-    KSIM_START = args[4][0] - '0';
-    KSIM_DEBUG = B_argpos("NY", args[5][0]);
-    if(nargs > 6) KSIM_PASSES = atoi(args[6]); //JMP 14/3/2012
+    CSimulation::KSIM_SORT  = B_argpos("CTN", args[3][0]);
+    CSimulation::KSIM_START = args[4][0] - '0';
+    CSimulation::KSIM_DEBUG = B_argpos("NY", args[5][0]);
+    if(nargs > 6) CSimulation::KSIM_PASSES = atoi(args[6]); //JMP 14/3/2012
 
     if(nargs > 7)
-        KSIM_NEWTON_DEBUG = B_argpos("NY", args[7][0]); // JMP 6/3/2012
+        CSimulation::KSIM_NEWTON_DEBUG = B_argpos("NY", args[7][0]); // JMP 6/3/2012
     else
-        KSIM_NEWTON_DEBUG = 0;
+        CSimulation::KSIM_NEWTON_DEBUG = 0;
 
 fin :
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
@@ -157,15 +156,15 @@ int B_ModelExchange(char* const_arg)
     char    *arg;
 
     // Copy for C++ strings = read only (const)
-    arg = SCR_stracpy(const_arg);
+    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
-    if(KSIM_EXO) {
-        SCR_free_tbl(KSIM_EXO);
-        KSIM_EXO = NULL;
+    if(CSimulation::KSIM_EXO) {
+        SCR_free_tbl((unsigned char**) CSimulation::KSIM_EXO);
+        CSimulation::KSIM_EXO = NULL;
     }
 
-    if(arg && SCR_strip(arg)[0]) 
-        KSIM_EXO = B_ainit_chk(arg, NULL, 0);
+    if(arg && SCR_strip((unsigned char*) arg)[0]) 
+        CSimulation::KSIM_EXO = B_ainit_chk(arg, NULL, 0);
     
     SCR_free(arg);
     return(0);
@@ -218,13 +217,13 @@ int B_ModelCompile(char* arg)
     }
     else {
         eqs = B_ainit_chk(arg, NULL, 0);
-        if(eqs == NULL || SCR_tbl_size(eqs) == 0)
+        if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
             return(KE_compile(K_WS[EQUATIONS]));
         else {
-            tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
+            tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
             rc = KE_compile(tdbe);
             K_free_kdb(tdbe);
-            SCR_free_tbl(eqs);
+            SCR_free_tbl((unsigned char**) eqs);
         }
     }
     return(rc);
@@ -242,12 +241,13 @@ int B_ModelCalcSCC(char *const_arg)
     int     rc = -1, lg1, tris;
     KDB		*tdbe = NULL;
     char    *arg;
+    CSimulation simu;
 
     // Copy for C++ strings = read only (const)
-    arg = SCR_stracpy(const_arg);
+    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
     // Tri
-    lg1 = B_get_arg0(buf,    arg, 15);
+    lg1 = B_get_arg0(buf, arg, 15);
     tris = atoi(buf); 
     if(tris < 0) tris = 0;
 
@@ -259,16 +259,16 @@ int B_ModelCalcSCC(char *const_arg)
 
     // eqs if given
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
-    if(SCR_tbl_size(eqs) == 0)
+    if(SCR_tbl_size((unsigned char**) eqs) == 0)
         tdbe = K_WS[EQUATIONS];
     else
         tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
 
-    rc = KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
+    rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
-    if(SCR_tbl_size(eqs) != 0) K_free_kdb(tdbe);
+    if(SCR_tbl_size((unsigned char**) eqs) != 0) K_free_kdb(tdbe);
 err:
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(arg);
     return(rc);
 }
@@ -288,9 +288,10 @@ int B_ModelSimulateSCC(char *const_arg)
     SAMPLE  *smpl;
     KDB     *tdbe;
     char    *arg;
+    CSimulation simu;
 
     // Copy for C++ strings = read only (const)
-    arg = SCR_stracpy(const_arg);
+    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
@@ -304,9 +305,9 @@ int B_ModelSimulateSCC(char *const_arg)
 
     // Extrait les listes restantes
     lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(lsts == 0 || SCR_tbl_size(lsts) != 3) {
+    if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) {
         B_seterror("ModelSimulateSCC: syntax error in lists");
-        SCR_free_tbl(lsts);
+        SCR_free_tbl((unsigned char**) lsts);
         rc = -1;
         goto err;
     }
@@ -314,7 +315,7 @@ int B_ModelSimulateSCC(char *const_arg)
     prepos   = K_find(K_WS[LISTS], lsts[0]); 
     interpos = K_find(K_WS[LISTS], lsts[1]);
     postpos  = K_find(K_WS[LISTS], lsts[2]);
-    SCR_free_tbl(lsts);
+    SCR_free_tbl((unsigned char**) lsts);
 
     if(prepos < 0 || interpos < 0 || postpos < 0) {
         rc = -1;
@@ -322,25 +323,25 @@ int B_ModelSimulateSCC(char *const_arg)
         goto err;
     }
 
-    pre   = KL_expand(KLVAL(K_WS[LISTS], prepos));
-    inter = KL_expand(KLVAL(K_WS[LISTS], interpos));
-    post  = KL_expand(KLVAL(K_WS[LISTS], postpos));
+    pre   = (char**) KL_expand(KLVAL(K_WS[LISTS], prepos));
+    inter = (char**) KL_expand(KLVAL(K_WS[LISTS], interpos));
+    post  = (char**) KL_expand(KLVAL(K_WS[LISTS], postpos));
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
-    eqs1 = SCR_union_quick(pre, inter); // JMP 29/8/2012
-    eqs = SCR_union_quick(eqs1, post);  // JMP 29/8/2012
-    SCR_free_tbl(eqs1);                 // JMP 29/8/2012
+    eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
+    eqs = (char**) SCR_union_quick((unsigned char**) eqs1, (unsigned char**) post);  // JMP 29/8/2012
+    SCR_free_tbl((unsigned char**) eqs1);                 // JMP 29/8/2012
     tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
-    SCR_free_tbl(eqs);
+    SCR_free_tbl((unsigned char**) eqs);
 
     // Lance la simulation
-    rc = K_simul_SCC(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, pre, inter, post);
+    rc = simu.K_simul_SCC(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, pre, inter, post);
 
     // Cleanup
     K_free_kdb(tdbe);
-    SCR_free_tbl(pre);
-    SCR_free_tbl(inter);
-    SCR_free_tbl(post);
+    SCR_free_tbl((unsigned char**) pre);
+    SCR_free_tbl((unsigned char**) inter);
+    SCR_free_tbl((unsigned char**) post);
 
 err:
     SCR_free(smpl);
@@ -361,7 +362,7 @@ static int B_CreateEmptyVar(char *name)
 
     // Create var
     strcpy(uname, name);
-    SCR_sqz(SCR_upper(uname));
+    SCR_sqz(SCR_upper((unsigned char*) uname));
     sprintf(buf, "%s 1/0", uname);
     B_DataCalcVar(buf);
     return(0);
@@ -382,7 +383,7 @@ static double *B_GetVarPtr(char *name)
 
     // get var position in KDB
     strcpy(uname, name);
-    SCR_sqz(SCR_upper(uname));
+    SCR_sqz(SCR_upper((unsigned char*) uname));
     pos = K_find(dbv, uname);
     if(pos < 0)
         return(NULL);
@@ -401,7 +402,7 @@ static double *B_GetVarPtr(char *name)
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
     KDB         *dbv = K_WS[VARIABLES];
-    double   *x;
+    double      *x;
     int         t;
 
     // Create var and get Ptr
@@ -427,7 +428,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
     KDB         *dbv = K_WS[VARIABLES];
-    double   *x;
+    double      *x;
     int         t;
 
     // Create var and get Ptr
@@ -456,9 +457,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  */
 int B_ModelSimulateSaveNIters(char *arg)
 {
-    extern int  *KSIM_NITERS;
-
-    return(B_CreateVarFromVecOfInts(arg, KSIM_NITERS));
+    return(B_CreateVarFromVecOfInts(arg, CSimulation::KSIM_NITERS));
 }
 
 
@@ -471,7 +470,5 @@ int B_ModelSimulateSaveNIters(char *arg)
  */
 int B_ModelSimulateSaveNorms(char *arg)
 {
-    extern double   *KSIM_NORMS;	// Norme de convergence par année JMP 21/3/2012
-
-    return(B_CreateVarFromVecOfDoubles(arg, KSIM_NORMS));
+    return(B_CreateVarFromVecOfDoubles(arg, CSimulation::KSIM_NORMS));
 }

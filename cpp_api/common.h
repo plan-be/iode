@@ -102,18 +102,6 @@ const static std::vector<FileType> v_file_types =
     FileType("Directory", {})
 };
 
-
-const static std::vector<std::string> v_simulation_initialization
-{
-    "Y := Y[-1], if Y null or NA",                  // TM1
-    "Y := Y[-1], always",                           // TM1_A
-    "Y := extrapolation, if Y null or NA",          // EXTRA    -> Y := fn(Y[-1], Y[-2]), 
-    "Y := extrapolation, always",                   // EXTRA_A  -> Y := fn(Y[-1], Y[-3])
-    "Y unchanged",                                  // ASIS
-    "Y := Y[-1], if Y = NA",                        // TM1_NA
-    "Y := extrapolation, if Y = NA"                 // EXTRA_NA -> Y := fn(Y[-1], Y[-3])
-};
-
 const static std::vector<std::string> vExportFormats = 
 	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
 

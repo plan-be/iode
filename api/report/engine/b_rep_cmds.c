@@ -519,7 +519,11 @@ int RP_rmdir(char* arg)
 // $mkdir <dirname>
 int RP_mkdir(char* arg)
 {
+#ifdef _MSC_VER
     return(_mkdir(arg));
+#else
+    return(mkdir(arg, 0777)); // 0777 is the permissions mask
+#endif
 }
 
 

@@ -1296,22 +1296,25 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     lst = KLPTR("_DIVER");
     EXPECT_TRUE(lst == NULL);
 
-    // Simulation std parameters
+    // Simulation instance
+    CSimulation simu;
+
+    // Simulation parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
-    KSIM_START = VAR_INIT_TM1;
-    KSIM_EPS = 0.0001;
-    KSIM_MAXIT = 100;
-    KSIM_RELAX = 0.7;
-    KSIM_SORT = SORT_BOTH;
-    KSIM_PASSES = 5;
-    KSIM_DEBUG = 1;
+    CSimulation::KSIM_START = VAR_INIT_TM1;
+    CSimulation::KSIM_EPS = 0.0001;
+    CSimulation::KSIM_MAXIT = 100;
+    CSimulation::KSIM_RELAX = 0.7;
+    CSimulation::KSIM_SORT = SORT_BOTH;
+    CSimulation::KSIM_PASSES = 5;
+    CSimulation::KSIM_DEBUG = 1;
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
 
     // Test simulation : divergence
-    KSIM_MAXIT = 2;
-    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    CSimulation::KSIM_MAXIT = 2;
+    rc = simu.K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
@@ -1327,8 +1330,8 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Test with with convergence (increase MAXIT)
-    KSIM_MAXIT = 100;
-    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    CSimulation::KSIM_MAXIT = 100;
+    rc = simu.K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_EQ(rc, 0);
     //S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
 
@@ -1349,7 +1352,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Simulate with exchange UY - XNATY
     endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
-    rc = K_simul(kdbe, kdbv, kdbs, smpl, (char**)endo_exo, NULL);
+    rc = simu.K_simul(kdbe, kdbv, kdbs, smpl, (char**)endo_exo, NULL);
 
     // Check result
     EXPECT_EQ(rc, 0);
@@ -2254,20 +2257,20 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbe, nullptr);
 
     // B_ModelSimulateParms()
-    KSIM_START = VAR_INIT_TM1;
-    KSIM_EPS = 0.00001;
-    KSIM_MAXIT = 1000;
-    KSIM_RELAX = 1.0;
-    KSIM_SORT = 0;
-    KSIM_PASSES = 3;
-    KSIM_DEBUG = 1;
+    CSimulation::KSIM_START = VAR_INIT_TM1;
+    CSimulation::KSIM_EPS = 0.00001;
+    CSimulation::KSIM_MAXIT = 1000;
+    CSimulation::KSIM_RELAX = 1.0;
+    CSimulation::KSIM_SORT = 0;
+    CSimulation::KSIM_PASSES = 3;
+    CSimulation::KSIM_DEBUG = 1;
     rc = B_ModelSimulateParms("0.0001 0.7 100 Triang 0 no 5 no");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KSIM_EPS, 0.0001);
-    EXPECT_EQ(KSIM_MAXIT, 100);
-    EXPECT_EQ(KSIM_RELAX, 0.7);
-    EXPECT_EQ(KSIM_DEBUG, 0);
-    EXPECT_EQ(KSIM_PASSES, 5);
+    EXPECT_EQ(CSimulation::KSIM_EPS, 0.0001);
+    EXPECT_EQ(CSimulation::KSIM_MAXIT, 100);
+    EXPECT_EQ(CSimulation::KSIM_RELAX, 0.7);
+    EXPECT_EQ(CSimulation::KSIM_DEBUG, 0);
+    EXPECT_EQ(CSimulation::KSIM_PASSES, 5);
 
 
     // B_ModelSimulate()
