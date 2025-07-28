@@ -187,7 +187,7 @@ int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float
 int Estimation::KE_est_s(SAMPLE* smpl)
 {
     static  char met[6] = {"LZIGM"};
-    int     i, j, pos, nb, method, error = 0, nbl = 0, nbe = 0, nblk;
+    int     i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
     SAMPLE  eq_smpl;
     U_ch    **endos = 0;
     U_ch    **blk = 0;
@@ -277,7 +277,7 @@ int Estimation::KE_est_s(SAMPLE* smpl)
                 tests[9] = (float)MATE(E_DW,          0, j);
                 tests[10]= (float)MATE(E_LOGLIK,      0, j);
 
-                KE_update((char*) endos[j], (char*) lecs[j], method, E_SMPL, tests);
+                KE_update((char*) endos[j], (char*) lecs[j], E_MET, E_SMPL, tests);
                 pos = K_find(E_DBE, (char*) endos[j]);   /* JMP 24-06-98 */
                 eq = KEVAL(E_DBE, pos);          /* JMP 24-06-98 */
                 // create the Scalars containing the results of an estimated equation
