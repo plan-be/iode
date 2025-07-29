@@ -5,9 +5,9 @@ from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QChec
 from PySide6.QtGui import QDesktopServices, QCloseEvent
 
 from iode_gui.utils import URL_MANUAL, Context
+from iode_gui.color_theme import ColorTheme
 from iode_gui.util.widgets.file_chooser import IodeFileChooser
 from iode_gui.util.widgets.sample_edit import IodeSampleEdit
-
 
 import re
 from typing import Any
@@ -18,14 +18,28 @@ PRINT_TO_FILE = "print_to_file"
 
 class ProjectSettings:
     project_settings: QSettings = None
+    _color_theme: ColorTheme = None
 
     def __init__(self) -> None:
         raise NotImplementedError()
 
     @classmethod
+    def color_theme(cls) -> ColorTheme:
+        if cls._color_theme is None:
+            cls._color_theme = ColorTheme.from_settings(cls.project_settings)
+        return cls._color_theme
+
+    @classmethod
+    def set_color_theme(cls, value: ColorTheme) -> None:
+        if not isinstance(value, ColorTheme):
+            return
+        cls._color_theme = value
+
+    @classmethod
     def change_project(cls, project_dir: QDir, parent: QWidget=None) -> QSettings:
         filepath = project_dir.absoluteFilePath("iode_gui_settings.ini")
         cls.project_settings = QSettings(filepath, QSettings.Format.IniFormat, parent)
+        cls.set_color_theme(ColorTheme.from_settings(cls.project_settings))
         return cls.project_settings
 
 
@@ -35,6 +49,17 @@ def get_settings() -> QSettings:
     else:
         return ProjectSettings.project_settings
 
+def get_color_theme() -> ColorTheme:
+    if Context.called_from_python_script:
+        return ColorTheme.from_settings(QSettings(QSettings.Scope.UserScope))
+    else:
+        return ProjectSettings.color_theme()
+
+def set_color_theme(value: ColorTheme) -> None:
+    if Context.called_from_python_script:
+        value.update_settings(QSettings(QSettings.Scope.UserScope))
+    else:
+        ProjectSettings.set_color_theme(value)
 
 def class_name_to_settings_group_name(object: Any) -> str:
         menu_class_name: str = object.__class__.__name__

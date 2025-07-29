@@ -1,6 +1,9 @@
-from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtCore import QRegularExpression, QSettings
 from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
-from PySide6.QtWidgets import QTextEdit
+from PySide6.QtWidgets import QTextEdit, QMessageBox
+
+from iode_gui.color_theme import ColorTheme
+from iode_gui.settings import get_color_theme
 
 from typing import List
 from iode.reports import build_command_functions_list
@@ -22,28 +25,37 @@ class IodeHighlighter(QSyntaxHighlighter):
 
     def __init__(self, parent=None):
         super(IodeHighlighter, self).__init__(parent)
-
         self.highlighting_rules: List[HighlightingRule] = []
+        self.update_colors()
 
-        # report command -> $ or # (group 0 -> Report internal fns)
-        self._add_rule_commands(0, Qt.GlobalColor.red)
+    def update_colors(self):
+        color_theme: ColorTheme = get_color_theme()
+        self.set_color_theme(color_theme)
 
-        # report command -> $ or # (group 1)
-        self._add_rule_commands(1, Qt.GlobalColor.darkBlue)
-
-        # report function -> @
-        self._add_rule(r"(@\w+\([^\)]*\))", Qt.GlobalColor.darkGreen)
-
-        # report comment
-        # color = olive
-        self._add_rule(r"([$#]\s[^\n]*)", QColor.fromString("#808000"))
-
-        # %<expression>%
-        self._add_rule(r"(%[^%]+%)", Qt.GlobalColor.darkMagenta)
-
-        # {expression}
-        self._add_rule(r"(\{(.*?)\})", Qt.GlobalColor.darkGreen)
-
+    def set_color_theme(self, color_theme: ColorTheme):
+        """
+        Update the highlighter with a new color theme.
+        Args:
+            color_theme (ColorTheme): The new color theme to apply.
+        """
+        try:
+            self.highlighting_rules.clear()
+            # report command -> $ or # (group 0 -> Report internal fns)
+            self._add_rule_commands(0, color_theme.report_internal_functions)
+            # report command -> $ or # (group 1)
+            self._add_rule_commands(1, color_theme.report_commands)
+            # report function -> @
+            self._add_rule(r"(@\w+\([^\)]*\))", color_theme.report_functions)
+            # report comment
+            self._add_rule(r"([$#]\s[^\n]*)", color_theme.report_comments)
+            # %<expression>%
+            self._add_rule(r"(%[^%]+%)", color_theme.report_macros)
+            # {expression}
+            self._add_rule(r"(\{(.*?)\})", color_theme.report_expressions)
+            # update the widget with the new color theme
+            self.rehighlight()
+        except Exception as e:
+            QMessageBox.warning(None, "Error", f"Highlighter: failed to set color theme: {e}")
 
     def _add_rule(self, pattern: str, foreground_color: QColor):
         """

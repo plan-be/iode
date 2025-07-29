@@ -36,7 +36,7 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy", "pandas", "matplotlib", "iode", "pyside6", "qtconsole", "ipython" ]
+dependencies = [ "numpy", "pandas", "matplotlib", "iode", "pyside6>=6.5", "qtconsole", "ipython" ]
 
 [project.gui-scripts]
 iode-gui = "iode_gui.main:start"

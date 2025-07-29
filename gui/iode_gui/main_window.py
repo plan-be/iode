@@ -382,6 +382,9 @@ class MainWindow(AbstractMainWindow):
         # (re)open tabs
         self.ui.tabWidget_IODE_objs.setup(self)
 
+        # update colors (after the update of ProjectSettings)
+        self.ui.tabWidget_IODE_objs.update_colors()
+
         # (re)load last executed commands
         self.ui.lineEdit_iode_command.load_settings()
 
@@ -631,7 +634,8 @@ class MainWindow(AbstractMainWindow):
     @Slot()
     def open_settings(self):
         dialog = MenuFileSettings(self)
-        dialog.exec()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.ui.tabWidget_IODE_objs.update_colors()
 
     # Workspace Menu
 
