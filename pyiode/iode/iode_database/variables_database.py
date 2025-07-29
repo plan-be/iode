@@ -5416,6 +5416,8 @@ class Variables(IodeDatabase):
         >>> len(variables)
         0
 
+        1) Filling an empty Variables database from a pandas DataFrame
+
         >>> # create the pandas DataFrame
         >>> vars_names = [f"{region}_{code}" for region in ["VLA", "WAL", "BXL"] for code in ["00", "01", "02"]]
         >>> periods_list = [f"{i}Y1" for i in range(1960, 1971)]
@@ -5468,6 +5470,48 @@ class Variables(IodeDatabase):
          name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
         BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
         <BLANKLINE>
+
+        2) Updating an existing Variables database from a pandas DataFrame
+
+        >>> # take a subset of the pandas DataFrame
+        >>> df = df.iloc[6:, 2:-2]
+        >>> # change values
+        >>> df += 3.0
+        >>> # add a new entry
+        >>> df.loc['BXL_03'] = [104.0, 105.0, 106.0, 107.0, 108.0, 109.0, 110.0]
+        >>> df          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+                1962Y1  1963Y1  ...  1967Y1  1968Y1
+        BXL_00    71.0    72.0  ...    76.0    77.0
+        BXL_01    82.0    83.0  ...    87.0    88.0
+        BXL_02    93.0    94.0  ...    98.0    99.0
+        BXL_03   104.0   105.0  ...   109.0   110.0
+        >>> # update the IODE Variables database
+        >>> variables.from_frame(df)
+        >>> len(variables)
+        10
+        >>> variables.names     # doctest: +ELLIPSIS
+        ['BXL_00', 'BXL_01', 'BXL_02', 'BXL_03', ..., 'WAL_00', 'WAL_01', 'WAL_02']
+        >>> # note that the new variable BXL_03 has been added with NA values 
+        >>> # for the periods present in the Variables sample but not in the DataFrame
+        >>> variables           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 10
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name      1960Y1  1961Y1  1962Y1  1963Y1  1964Y1  1965Y1  1966Y1  1967Y1  1968Y1  1969Y1  1970Y1        
+        BXL_00      66.00   67.00   71.00   72.00   73.00   74.00   75.00   76.00   77.00   75.00   76.00        
+        BXL_01      77.00   78.00   82.00   83.00   84.00   85.00   86.00   87.00   88.00   86.00   87.00        
+        BXL_02      88.00   89.00   93.00   94.00   95.00   96.00   97.00   98.00   99.00   97.00   98.00        
+        BXL_03         na      na  104.00  105.00  106.00  107.00  108.00  109.00  110.00      na      na        
+        VLA_00       0.00    1.00    2.00    3.00    4.00    5.00    6.00    7.00    8.00    9.00   10.00        
+        VLA_01      11.00   12.00   13.00   14.00   15.00   16.00   17.00   18.00   19.00   20.00   21.00        
+        VLA_02      22.00   23.00   24.00   25.00   26.00   27.00   28.00   29.00   30.00   31.00   32.00        
+        WAL_00      33.00   34.00   35.00   36.00   37.00   38.00   39.00   40.00   41.00   42.00   43.00        
+        WAL_01      44.00   45.00   46.00   47.00   48.00   49.00   50.00   51.00   52.00   53.00   54.00        
+        WAL_02      55.00   56.00   57.00   58.00   59.00   60.00   61.00   62.00   63.00   64.00   65.00  
+        <BLANKLINE>
         """
         # list of variable names
         vars_names = df.index.to_list()
@@ -5483,8 +5527,9 @@ class Variables(IodeDatabase):
         if self._is_subset_over_periods:
             raise RuntimeError("Cannot call 'from_frame' method on a subset of the sample of the variables workspace")
 
-        # override the current sample
-        self.sample = f"{first_period}:{last_period}"
+        # override the current sample if not set (empty Variables workspace)
+        if not self.sample:
+            self.sample = f"{first_period}:{last_period}"
 
         # numpy data
         data = df.to_numpy(copy=False)
@@ -5698,11 +5743,13 @@ class Variables(IodeDatabase):
         >>> len(variables)
         0
 
+        1) Filling an empty Variables database from a LArray Array
+
         >>> regions_axis = la.Axis("region=VLA,WAL,BXL")
         >>> code_axis = la.Axis("code=00..02")
         >>> periods_axis = la.Axis("time=1960Y1..1970Y1")
         >>> array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
-        >>> array
+        >>> array           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         region  code\time  1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
            VLA         00     0.0     1.0     2.0  ...     8.0     9.0    10.0
            VLA         01    11.0    12.0    13.0  ...    19.0    20.0    21.0
@@ -5742,6 +5789,57 @@ class Variables(IodeDatabase):
          name       1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
         BXL_02       88.00   89.00   90.00  ...   96.00   97.00   98.00
         <BLANKLINE>
+
+        2) Updating an existing Variables database from a LArray Array
+
+        >>> # take a subset of the LArray Array
+        >>> array = array['1962Y1':'1968Y1']
+        >>> # change values
+        >>> array += 3.0
+        >>> # add a new code
+        >>> array = array.append(axis='code', value=array['02'] + 5.0, label='03')
+        >>> array          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        region  code\time  1962Y1  1963Y1  1964Y1  1965Y1  1966Y1  1967Y1  1968Y1
+           VLA         00     5.0     6.0     7.0     8.0     9.0    10.0    11.0
+           VLA         01    16.0    17.0    18.0    19.0    20.0    21.0    22.0
+           VLA         02    27.0    28.0    29.0    30.0    31.0    32.0    33.0
+           VLA         03    32.0    33.0    34.0    35.0    36.0    37.0    38.0
+           WAL         00    38.0    39.0    40.0    41.0    42.0    43.0    44.0
+           WAL         01    49.0    50.0    51.0    52.0    53.0    54.0    55.0
+           WAL         02    60.0    61.0    62.0    63.0    64.0    65.0    66.0
+           WAL         03    65.0    66.0    67.0    68.0    69.0    70.0    71.0
+           BXL         00    71.0    72.0    73.0    74.0    75.0    76.0    77.0
+           BXL         01    82.0    83.0    84.0    85.0    86.0    87.0    88.0
+           BXL         02    93.0    94.0    95.0    96.0    97.0    98.0    99.0
+           BXL         03    98.0    99.0   100.0   101.0   102.0   103.0   104.0
+        >>> # update the IODE Variables database
+        >>> variables.from_array(array)
+        >>> len(variables)
+        12
+        >>> variables.names     # doctest: +ELLIPSIS
+        ['BXL_00', 'BXL_01', 'BXL_02', 'BXL_03', ..., 'WAL_00', 'WAL_01', 'WAL_02', 'WAL_03']
+        >>> # note that the new variables '<region>_03' have been added with NA values 
+        >>> # for the periods present in the Variables sample but not in the Array
+        >>> variables           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 12
+        filename: ws
+        sample: 1960Y1:1970Y1
+        mode: LEVEL
+        <BLANKLINE>
+         name      1960Y1  1961Y1  1962Y1  1963Y1  1964Y1  1965Y1  1966Y1  1967Y1  1968Y1  1969Y1  1970Y1        
+        BXL_00      66.00   67.00   71.00   72.00   73.00   74.00   75.00   76.00   77.00   75.00   76.00        
+        BXL_01      77.00   78.00   82.00   83.00   84.00   85.00   86.00   87.00   88.00   86.00   87.00        
+        BXL_02      88.00   89.00   93.00   94.00   95.00   96.00   97.00   98.00   99.00   97.00   98.00        
+        BXL_03         na      na   98.00   99.00  100.00  101.00  102.00  103.00  104.00      na      na        
+        VLA_00       0.00    1.00    5.00    6.00    7.00    8.00    9.00   10.00   11.00    9.00   10.00        
+        ...           ...     ...     ...     ...     ...     ...     ...     ...     ...     ...     ...        
+        VLA_03         na      na   32.00   33.00   34.00   35.00   36.00   37.00   38.00      na      na        
+        WAL_00      33.00   34.00   38.00   39.00   40.00   41.00   42.00   43.00   44.00   42.00   43.00        
+        WAL_01      44.00   45.00   49.00   50.00   51.00   52.00   53.00   54.00   55.00   53.00   54.00        
+        WAL_02      55.00   56.00   60.00   61.00   62.00   63.00   64.00   65.00   66.00   64.00   65.00        
+        WAL_03         na      na   65.00   66.00   67.00   68.00   69.00   70.00   71.00      na      na  
+        <BLANKLINE>
         """
         if la is None:
             raise RuntimeError("larray library not found")  
@@ -5756,8 +5854,9 @@ class Variables(IodeDatabase):
         time = array.axes[time_axis_name]
         first_period, last_period = time.labels[0], time.labels[-1]
 
-        # override the current sample
-        self.sample = f"{first_period}:{last_period}"
+        # override the current sample if not set (empty Variables workspace)
+        if not self.sample:
+            self.sample = f"{first_period}:{last_period}"
         
         # push the time axis as last axis and combine all other axes 
         array = array.transpose(..., time_axis_name)
