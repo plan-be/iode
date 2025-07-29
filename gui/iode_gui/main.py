@@ -52,6 +52,7 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         app = QApplication(sys.argv)
         app.setOrganizationName(ORGANIZATION_NAME)
         app.setApplicationName("IODE")
+        app.setStyle('Fusion')
 
     pixmap = QPixmap(":/images/iode_splash_screen.png")
     splash = QSplashScreen(pixmap)

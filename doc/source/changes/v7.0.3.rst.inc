@@ -6,6 +6,8 @@ In development
 New Features 
 ------------
 
+- allowed the users to choose the displayed colors in the IODE report tabs 
+  in the Graphical User Interface (GUI) (closes :issue:`1000`)
 
 Improvements 
 ------------

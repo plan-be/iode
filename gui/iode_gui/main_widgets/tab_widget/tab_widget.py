@@ -381,6 +381,14 @@ class IodeTabWidget(QTabWidget):
         
         self.show()
 
+    def update_colors(self):
+        """
+        Update the colors of all tabs according to the current color theme.
+        """
+        for index in range(self.count()):
+            tab_widget: IodeAbstractWidget = self.widget(index)
+            tab_widget.update_colors()
+
     def _reset_file_system_watcher(self):
         """
         Reset all the paths (to directories and files) registered in the file system watcher.

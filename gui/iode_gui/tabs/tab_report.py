@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, QSettings
 from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
 from PySide6.QtPrintSupport import QPrintPreviewDialog
 
@@ -46,6 +46,10 @@ class ReportWidget(AbstractTextWidget):
         # Setup the editors
         self._editor.setup(main_window)
         self._editor_2.setup(main_window)
+
+        # Set the same highlighter for both editors
+        self.highlighter = self._editor.highlighter
+        self._editor_2.highlighter = self.highlighter
 
         self._editor_2.hide()
 
@@ -103,6 +107,13 @@ class ReportWidget(AbstractTextWidget):
         settings.setValue("report_parameters", parameters)
         settings.setValue("report_language", language_index)
         settings.setValue("report_nb_decimals", nb_decimals)
+
+    # overrides from IodeAbstractWidget
+    def update_colors(self):
+        """
+        Set the highlighting colors according to the current color theme.
+        """
+        self.highlighter.update_colors()
 
     @Slot()
     def run(self):

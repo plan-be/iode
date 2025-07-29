@@ -1,5 +1,4 @@
-from PySide6.QtCore import QUrl, QDir
-from PySide6.QtCore import QLocale
+from PySide6.QtCore import Qt, QUrl, QDir, QLocale
 
 import iode_gui.${PY_RESOURCE_FILENAME}
 from iode_gui import DOC_DIR as GUI_DOC_DIR

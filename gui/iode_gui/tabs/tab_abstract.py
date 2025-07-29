@@ -140,6 +140,13 @@ class IodeAbstractWidget(QWidget):
         """
         pass
 
+    def update_colors(self):
+        """
+        Update the colors of the current tab.
+        This method should be overridden in subclasses to apply specific color themes.
+        """
+        pass
+
     def _check_new_filepath(self, filepath: str) -> bool:
         try:
             check_filepath(filepath, self.file_type, file_must_exist=True)

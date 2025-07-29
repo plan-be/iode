@@ -6,7 +6,8 @@ from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSiz
 from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
-from iode_gui.settings import get_settings, PRINT_TO_FILE
+from iode_gui.color_theme import ColorTheme
+from iode_gui.settings import get_settings, get_color_theme, PRINT_TO_FILE
 from iode_gui.iode_objs.models.abstract_table_model import IodeAbstractTableModel
 from iode_gui.iode_objs.delegates.base_delegate import BaseDelegate
 from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
@@ -40,8 +41,6 @@ class IodeAbstractTableView(QTableView):
         self.document: QTextDocument = QTextDocument(self)
         self.section_edited: int = None
 
-        stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }"
-
         # size policy
         size_policy_table = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         size_policy_table.setHorizontalStretch(0)
@@ -53,8 +52,8 @@ class IodeAbstractTableView(QTableView):
         # sorting
         self.setSortingEnabled(False)
 
-        # stylesheet
-        self.setStyleSheet(stylesheet)
+        # colors
+        self.update_colors()
 
         # delegate
         self.setItemDelegate(delegate)
@@ -314,6 +313,18 @@ class IodeAbstractTableView(QTableView):
                 return
 
         super().keyPressEvent(event)
+
+    # overrides from IodeAbstractWidget
+    def update_colors(self):
+        """
+        Set the highlighting colors according to the current color theme.
+        """
+        color_theme: ColorTheme = get_color_theme()
+        background_color = color_theme.header_background.name()
+        text_color = color_theme.header_text_color.name()
+        stylesheet = f"QHeaderView::section {{ background-color: {background_color}; color: {text_color}, "\
+                     "font: bold; border: 0.5px solid }"
+        self.setStyleSheet(stylesheet)
 
     def dump_table_in_document(self):
         """
