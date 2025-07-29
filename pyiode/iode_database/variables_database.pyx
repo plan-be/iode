@@ -192,6 +192,7 @@ cdef class Variables(CythonIodeDatabase):
         _c_add_var_from_other(c_name, self.database_ptr, value.database_ptr, t_first, t_last)
 
     def _add(self, name: str, values: Union[str, float, np.ndarray, Iterable[float], Variables]):
+        cdef int var_pos
         cdef vector[double] cpp_values
         cdef int c_nb_periods
         cdef char* c_name
@@ -212,7 +213,9 @@ cdef class Variables(CythonIodeDatabase):
             c_name = b_name
             c_nb_periods = self.get_sample().get_nb_periods()
             c_db_ptr = self.database_ptr.get_database()
-            K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
+            var_pos = K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
+            if var_pos < 0:
+                raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
         # NOTE: 'values' can contains more than one variable as long as the variable named 'name' is present
         elif isinstance(values, Variables):
@@ -240,6 +243,9 @@ cdef class Variables(CythonIodeDatabase):
         cdef double[::1] numpy_data_memview 
 
         c_db_ptr = self.database_ptr.get_database()
+
+        if pos < 0 or pos >= self.count():
+            raise IndexError(f"Cannot update variable '{name}': variable not found in the Variables database")
 
         # update the value for only one period 
         if isinstance(key_periods, Period):
@@ -345,7 +351,7 @@ cdef class Variables(CythonIodeDatabase):
         return self
 
     def from_numpy(self, data: np.ndarray, vars_names: List[str], new_vars: Set[str], t_first_period: int, t_last_period: int):
-        cdef var_pos
+        cdef int var_pos
         cdef bytes b_name
         cdef char* c_name
         cdef double value
@@ -358,6 +364,11 @@ cdef class Variables(CythonIodeDatabase):
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace has not been initialized")
 
+        vars_t_first, vars_t_last = self._get_periods_bounds()
+        if t_first_period < vars_t_first or t_last_period > vars_t_last:
+            raise ValueError(f"Periods {t_first_period} to {t_last_period} are outside the sample bounds "
+                             f"{vars_t_first} to {vars_t_last} of the Variables database")
+
         # add new variables if they do not exist
         for name in new_vars:
             # NOTE: Cython cannot directly convert a Python string to a C string, 
@@ -366,7 +377,9 @@ cdef class Variables(CythonIodeDatabase):
             b_name = name.encode()
             c_name = b_name
             # add a new variable with all values set to IODE_NAN
-            KV_add(db_ptr, c_name)
+            var_pos = KV_add(db_ptr, c_name)
+            if var_pos < 0:
+                raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
 
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
@@ -382,6 +395,8 @@ cdef class Variables(CythonIodeDatabase):
                 b_name = name.encode()
                 c_name = b_name
                 var_pos = K_find(db_ptr, c_name)
+                if var_pos < 0:
+                    raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 var_ptr = KVVAL(db_ptr, var_pos, t_first_period)
                 memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
         else:
@@ -389,6 +404,8 @@ cdef class Variables(CythonIodeDatabase):
                 b_name = name.encode()
                 c_name = b_name
                 var_pos = K_find(db_ptr, c_name)
+                if var_pos < 0:
+                    raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 for j, t in enumerate(range(t_first_period, t_last_period + 1)):
                     value = data_view[i, j]
                     KV_set(db_ptr, var_pos, t, mode, value)
