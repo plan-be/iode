@@ -72,25 +72,25 @@
  *  List of functions 
  *  -----------------
  *      int B_DataPattern(char* arg,int type)       Creates an IODE list with all existing objects of a given type having the name constructed by the combinations of 2 lists.
- *      int B_DataRasVar(char* arg)                 RAS method implementation. 
- *      int B_DataCalcVar(char* arg)                Computes a new variable based on a LEC expression.
+ *      int B_DataRasVar(char* arg, int unused)                 RAS method implementation. 
+ *      int B_DataCalcVar(char* arg, int unused)                Computes a new variable based on a LEC expression.
  *      int B_DataCreate(char* arg, int type)       Creates one or more new objects.
  *      int B_DataDelete(char* arg, int type)       Deletes one or more objects.
  *      int B_DataRename(char* arg, int type)       Renames an object. Equations cannot be renamed.
  *      int B_DataDuplicate(char* arg, int type)    Duplicates an object. Equations cannot be duplicated.
  *      int B_DataUpdate(char* arg, int type)       Updates an object. The syntax can differ according to the object type.
  *      int B_DataSearch(char* arg, int type)       Searches all objects containing a given string in their names and/or definitions.
- *      int B_DataListSort(char* arg)               Sorts a list alphanumerically. 
+ *      int B_DataListSort(char* arg, int unused)               Sorts a list alphanumerically. 
  *      int B_DataScan(char* arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all SCL found in the kdb objects.
  *      int B_DataExist(char* arg, int type)        Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
  *      int B_DataAppend(char* arg, int type)       Appends data (a string) to a CMT or a LST.
  *      int B_DataList(char* arg, int type)         Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.
- *      int B_DataCalcLst(char* arg)                List calculus: 4 operations between 2 lists.
- *      int B_DataListCount(char* arg)              Returns the number of elements in a list.
- *      int B_DataCompareEps(char* arg)             Defines the threshold under which the difference between 2 variables are considered equal.
+ *      int B_DataCalcLst(char* arg, int unused)                List calculus: 4 operations between 2 lists.
+ *      int B_DataListCount(char* arg, int unused)              Returns the number of elements in a list.
+ *      int B_DataCompareEps(char* arg, int unused)             Defines the threshold under which the difference between 2 variables are considered equal.
  *      int B_DataCompare(char* arg, int type)      Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
- *      int B_DataDisplayGraph(char* arg)           This function allows you to view VARs or combinations of VARS in graphical form.
- *      int B_DataPrintGraph(char* arg)             This function allows you to print VARs or combinations of VARS in graphical form.
+ *      int B_DataDisplayGraph(char* arg, int unused)           This function allows you to view VARs or combinations of VARS in graphical form.
+ *      int B_DataPrintGraph(char* arg, int unused)             This function allows you to print VARs or combinations of VARS in graphical form.
  */
 #include "scr4/s_args.h"
 
@@ -139,24 +139,24 @@ int B_DataPattern(char* arg,int type)
     int     rc = -1, nrows = 0, ncols = 0, crow, ccol;
     int     nbargs;
 
-    args = SCR_vtom(arg, ' ');
-    nbargs = SCR_tbl_size(args);
+    args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
+    nbargs = SCR_tbl_size((unsigned char**) args);
     if(nbargs < 3) goto cleanup;
     else {
         lstname = args[0];
         pattern = args[1];
         xvars = B_ainit_chk(args[2], NULL, 0);
-        nrows = SCR_tbl_size(xvars);
+        nrows = SCR_tbl_size((unsigned char**) xvars);
 
         if(nbargs > 3) {
             yvars = B_ainit_chk(args[3], NULL, 0);
-            ncols = SCR_tbl_size(yvars);
+            ncols = SCR_tbl_size((unsigned char**) yvars);
         }
 
         if(nrows == 0) goto cleanup;
         for(crow = 0; crow < nrows; crow++) {
             strcpy(rvar, pattern);
-            SCR_replace(rvar, "x", xvars[crow]);
+            SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
             if(ncols == 0) {
                 sprintf(toappend, "%s %s", lstname, rvar);
                 if(crow == 0) B_DataUpdate(toappend, LISTS);
@@ -164,7 +164,7 @@ int B_DataPattern(char* arg,int type)
             }
             for(ccol = 0; ccol < ncols; ccol++) {
                 strcpy(cvar, rvar);
-                SCR_replace(cvar, "y", yvars[ccol]);
+                SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
                 if(B_DataExist(cvar, type) >= 0) {
                     sprintf(toappend, "%s %s", lstname, cvar);
                     if(crow == 0 && ccol == 0) B_DataUpdate(toappend, LISTS); // Creates the list
@@ -176,9 +176,9 @@ int B_DataPattern(char* arg,int type)
     }
 
 cleanup:
-    SCR_free_tbl(args);
-    SCR_free_tbl(xvars);
-    SCR_free_tbl(yvars);
+    SCR_free_tbl((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) xvars);
+    SCR_free_tbl((unsigned char**) yvars);
     return(rc);
 }
 
@@ -191,14 +191,14 @@ cleanup:
  *  
  *  @params See file header 
  */
-int B_DataRasVar(char* arg)
+int B_DataRasVar(char* arg, int unused)
 {
     char    **args;
     int     rc = 0, nbargs, maxit = 100;
     double  eps = 0.001;
 
-    args = SCR_vtom(arg, ' ');
-    nbargs = SCR_tbl_size(args);
+    args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
+    nbargs = SCR_tbl_size((unsigned char**) args);
     if(nbargs < 5) rc = -1;
     else {
         if(nbargs > 5) maxit = atoi(args[5]);
@@ -206,7 +206,7 @@ int B_DataRasVar(char* arg)
         rc = RasExecute(args[0], args[1], args[2], PER_atoper(args[3]), PER_atoper(args[4]), maxit, eps);
     }
 
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
@@ -222,7 +222,7 @@ int B_DataRasVar(char* arg)
  *  @return int     0 on success, 
  *                  -1 on error: variable cannot be created, error in LEC formula, link impossible...
  */
-int B_DataCalcVar(char* arg)
+int B_DataCalcVar(char* arg, int unused)
 {
     char        name[K_MAX_NAME + 1], *lec;
     int         lg, t, nb;
@@ -234,7 +234,7 @@ int B_DataCalcVar(char* arg)
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
 
     lec = arg + lg + 1;
-    SCR_strip(lec);
+    SCR_strip((unsigned char*) lec);
 
     nb = KSMPL(kdb)->s_nb;
     if((pos = K_find(kdb, name)) < 0) pos = K_add(kdb, name, NULL, &nb);
@@ -302,6 +302,10 @@ int B_DataCreate_1(char* arg, int* ptype)
     return(-1);
 }
 
+int wrapper_B_DataCreate_1(char* arg, void* ptype)
+{
+    return B_DataCreate_1(arg, (int*) ptype);
+}
 
 /**
  *  Creates one or more new objects.
@@ -317,7 +321,7 @@ int B_DataCreate_1(char* arg, int* ptype)
 
 int B_DataCreate(char* arg, int type)
 {
-    return(B_ainit_loop(arg, B_DataCreate_1, (char *)&type));
+    return(B_ainit_loop(arg, wrapper_B_DataCreate_1, (char *) &type));
 }
 
 
@@ -343,6 +347,11 @@ int B_DataDelete_1(char* arg, int* ptype)
     return(0);
 }
 
+int wrapper_B_DataDelete_1(char* arg, void* ptype)
+{
+    return B_DataDelete_1(arg, (int*) ptype);
+}
+
 /**
  *  Deletes one or more objects. Name may contain * to delete all objects with the same pattern.
  *  
@@ -360,7 +369,7 @@ int B_DataDelete(char* arg, int type)
     int     rc;
 
     lst = K_expand(type, NULL, arg, '*');  /* JMP 23-12-98 */
-    rc = B_ainit_loop(lst, B_DataDelete_1, (char *)&type);
+    rc = B_ainit_loop(lst, wrapper_B_DataDelete_1, (char *)&type);
     SCR_free(lst);
     return(rc);
 }
@@ -393,7 +402,7 @@ int B_DataRename(char* arg, int type)
         rc = -1;
     }
 
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -429,7 +438,7 @@ int B_DataRename(char* arg, int type)
         rc = -1;
     }
 
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -464,9 +473,6 @@ int B_DataUpdate(char* arg, int type)
                             nb_args, nb_upd, nb_p,
                             i, mode;
     double  var;
-#ifndef WATCOM
-    double  atof();
-#endif
     KDB     *kdb = K_WS[type];
     SCL     scl;
     PERIOD  *per = NULL;
@@ -495,8 +501,8 @@ int B_DataUpdate(char* arg, int type)
         break;
 
     case SCALARS : /* Name Val [Relax] */
-        args = SCR_vtoms(arg, B_SEPS);
-        nb_args = SCR_tbl_size(args);
+        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+        nb_args = SCR_tbl_size((unsigned char**) args);
         scl.val = 0.9;
         scl.relax = 1.0;
         scl.std = IODE_NAN;
@@ -519,8 +525,8 @@ int B_DataUpdate(char* arg, int type)
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
-        args = SCR_vtoms(arg, B_SEPS);
-        nb_args = SCR_tbl_size(args);
+        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+        nb_args = SCR_tbl_size((unsigned char**) args);
         if(nb_args > 1) {
             nb_p = 1;
             switch(args[1][0]) {
@@ -552,7 +558,7 @@ int B_DataUpdate(char* arg, int type)
                 rc = -1;
                 break;
             }
-            nb_upd = min(nb_upd, PER_diff_per(&(KSMPL(kdb)->s_p2), per) + 1);
+            nb_upd = std::min(nb_upd, PER_diff_per(&(KSMPL(kdb)->s_p2), per) + 1);
             if(per == NULL
                     || (shift = PER_diff_per(per, &(KSMPL(kdb)->s_p1))) < 0)
                 /*                    || (PER_diff_per(&(KSMPL(kdb)->s_p2), per) + 1 - nb_upd) < 0) */
@@ -572,7 +578,7 @@ int B_DataUpdate(char* arg, int type)
         break;
     }
 
-    A_free(args);
+    A_free((unsigned char**) args);
     SCR_free(per);
     if(rc >= 0) rc = 0;
     if(rc < 0) rc = -1; // Pour éviter return dans les rapports si rc = -2
@@ -601,18 +607,17 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
 {
     int     rc = 0;
     char    **args = NULL, buf[81];
-    char    **K_grep();
     KDB     *kdb = K_WS[type];
 
     
     if(word == 1) {
         strcpy(buf, "*!");
-        SCR_strlcpy(buf + 2, name, 76);
+        SCR_strlcpy(((unsigned char*) buf) + 2, (unsigned char*) name, 76);
         strcat(buf, "!*");
     }
     else {
         buf[0] = '*';
-        SCR_strlcpy(buf + 1, name, 76);
+        SCR_strlcpy(((unsigned char*) buf) + 1, (unsigned char*) name, 76);
         strcat(buf, "*");
     }
 
@@ -671,9 +676,9 @@ int B_DataSearch(char* arg, int type)
     lst = B_DataSearchParms(args[0], word, ecase, names, forms, texts, type);
   
     rc = KL_lst(args[6], lst, 200);
-    SCR_free_tbl(lst);
+    SCR_free_tbl((unsigned char**) lst);
 
-    A_free(args);
+    A_free((unsigned char**) args);
 
     return(rc);
 }
@@ -681,7 +686,7 @@ int B_DataSearch(char* arg, int type)
 /**
  *  Obsolete. Was used only with a GUI to specify the way variables must be displayed.
  */
-int B_DataEditCnf(char* arg)
+int B_DataEditCnf(char* arg, int unused)
 {
     int     rc = 0, VM, VN;
     char    **args = NULL;
@@ -705,10 +710,10 @@ int B_DataEditCnf(char* arg)
     }
 
     VN = atoi(args[1]);          /* JMP38 01-10-92 */
-    VN = max(-1, VN);
-    VN = min(6, VN);
+    VN = std::max(-1, VN);
+    VN = std::min(6, VN);
     //BGUI_DataEditGlobal(VM, VN);  // JMP 2/8/2022 => no used 
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -745,7 +750,7 @@ static int my_strcmp(const void *pa, const void *pb)
  *                  -1 on error: variable cannot be created
  */
 
-int B_DataListSort(char* arg)
+int B_DataListSort(char* arg, int unused)
 {
     int     rc = 0, p;
     char    *in, *out, *lst,
@@ -784,19 +789,19 @@ int B_DataListSort(char* arg)
         goto done;
     }
 
-    qsort(lsti, SCR_tbl_size(lsti), sizeof(char **), my_strcmp);
-    lst = SCR_mtov(lsti, ';');  /* JMP 09-03-95 */
+    qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
+    lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
     if(K_add(K_WS[LISTS], out, lst) < 0) {
         B_seterrn(66, out);
         rc = -1;
     }
 
-    SCR_free_tbl(lsti);
+    SCR_free_tbl((unsigned char**) lsti);
     SCR_free(lst);
 
 done:
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -833,17 +838,17 @@ int B_DataScan(char* arg, int type)
     }
     else {
         objs = B_ainit_chk(arg, NULL, 0);
-        if(objs == NULL || SCR_tbl_size(objs) == 0)
+        if(objs == NULL || SCR_tbl_size((unsigned char**) objs) == 0)
             return(K_scan(K_WS[type], "_EXO", "_SCAL"));
         else {
-            tkdb = K_refer(K_WS[type], SCR_tbl_size(objs), objs);
+            tkdb = K_refer(K_WS[type], SCR_tbl_size((unsigned char**) objs), objs);
             if(tkdb == 0 || KNB(tkdb) == 0)            /* JMP 12-05-11 */
                 rc = -1;                                /* JMP 12-05-11 */
             else                                        /* JMP 12-05-11 */
                 rc = K_scan(tkdb, "_EXO", "_SCAL");     /* JMP 12-05-11 */
 
             K_free_kdb(tkdb);
-            SCR_free_tbl(objs);
+            SCR_free_tbl((unsigned char**) objs);
         }
     }
     return(rc);
@@ -950,7 +955,6 @@ int B_DataList(char* arg, int type)
     int     rc = 0;
     char    **args = NULL, **lst,
             *name, *pattern, *file;
-    char    **K_grep();
     KDB     *kdb = K_WS[type];
 
     if((args = B_vtom_chk(arg, 3)) == NULL) {
@@ -977,8 +981,8 @@ int B_DataList(char* arg, int type)
     }
 
     rc = KL_lst(name, lst, 200);
-    SCR_free_tbl(lst);
-    A_free(args);
+    SCR_free_tbl((unsigned char**) lst);
+    A_free((unsigned char**) args);
 
     return(rc);
 }
@@ -1003,17 +1007,17 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
     nl = 0;
     ll3 = 0;
     for(i = 0; i < inb; i++) {
-        ll1 = (int) strlen(l1[i]);
+        ll1 = (int) strlen((char*) l1[i]);
         for(j = 0; j < jnb; j++) {
-            ll2 = (int)strlen(l2[j]);
+            ll2 = (int) strlen((char*) l2[j]);
 
             if(ll3 < ll1 + ll2 + 1) {
                 ll3 = ll1 + ll2 + 1;
                 SCR_free(l3);
-                l3 = SCR_malloc(ll3);
+                l3 = (unsigned char*) SCR_malloc(ll3);
             }
 
-            if(l3 != NULL) sprintf(l3, "%s%s", l1[i], l2[j]);
+            if(l3 != NULL) sprintf((char*) l3, "%s%s", l1[i], l2[j]);
             SCR_add_ptr(&res, &nl, l3);
         }
     }
@@ -1041,31 +1045,29 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
  *  @return int     0 on success
  *                  -1 on error (list non found...)
  */
-int B_DataCalcLst(char* arg)
+int B_DataCalcLst(char* arg, int unused)
 {
     int             rc = 0, p1, p2;
     unsigned char   **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
                       *res, *list1, *list2, *op;
 
-    unsigned char   **SCR_union(), **SCR_inter(), **SCR_dif();
-
     /* arg: res list1 op list2 */
-    if((args = B_vtom_chk(arg, 4)) == NULL) return(-1);
+    if((args = (unsigned char**) B_vtom_chk(arg, 4)) == NULL) return(-1);
     res  = args[0];
     list1 = args[1];
     op   = args[2];
     list2 = args[3];
 
-    p1 = K_find(K_WS[LISTS], list1);
-    p2 = K_find(K_WS[LISTS], list2);
+    p1 = K_find(K_WS[LISTS], (char*) list1);
+    p2 = K_find(K_WS[LISTS], (char*) list2);
     if(p1 < 0 || p2 < 0) {
         B_seterror("List %s not in WS", (p1 < 0) ? list1:list2); // JMP 4/02/09
         rc = -1;
         goto done;
     }
 
-    l1 = B_ainit_chk(KLVAL(K_WS[LISTS], p1), NULL, 0);
-    l2 = B_ainit_chk(KLVAL(K_WS[LISTS], p2), NULL, 0);
+    l1 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p2), NULL, 0);
     switch(op[0]) {
     case '+' :
         lst = SCR_union(l1, l2);
@@ -1083,13 +1085,13 @@ int B_DataCalcLst(char* arg)
         rc = -1;
         goto done;
     }
-    rc = KL_lst(res, lst, -1); 
+    rc = KL_lst((char*) res, (char**) lst, -1); 
 
 
 done :
-    A_free(args);
-    A_free(l1);
-    A_free(l2);
+    A_free((unsigned char**) args);
+    A_free((unsigned char**) l1);
+    A_free((unsigned char**) l2);
     SCR_free_tbl(lst);
     return(rc);
 }
@@ -1100,18 +1102,18 @@ done :
  *  @param [in] char*   arg     list_name
  *  @return     int             nb of elements in the list or -1 if the list does not exist
  */
-int B_DataListCount(char* arg)
+int B_DataListCount(char* arg, int unused)
 {
     int     nb = 0;
     char    *lst,
             **lsti = NULL;
 
-    lst = SCR_stracpy((char *)KLVAL(KL_WS, K_find(KL_WS, arg)));
+    lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, K_find(KL_WS, arg)));
     if(lst == NULL) return(-1);
 
     lsti = B_ainit_chk(lst, NULL, 0);
-    nb = SCR_tbl_size(lsti);
-    SCR_free_tbl(lsti);
+    nb = SCR_tbl_size((unsigned char**) lsti);
+    SCR_free_tbl((unsigned char**) lsti);
     SCR_free(lst);
 
     return(nb);
@@ -1131,7 +1133,7 @@ int B_DataListCount(char* arg)
  *  @return int     0 always
  */
  
-int B_DataCompareEps(char* arg)
+int B_DataCompareEps(char* arg, int unused)
 {
     extern double K_CMP_EPS;
 
@@ -1186,27 +1188,28 @@ int B_DataCompare(char* arg, int type)
         rc = K_cmp(name, kdb1, kdb2);
         switch(rc) {
         case 1 :
-            SCR_add_ptr(&l1, &n1, name);
+            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) name);
             break;
         case 2 :
-            SCR_add_ptr(&l2, &n2, name);
+            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) name);
             break; /* never reached */
         case 3 :
-            SCR_add_ptr(&l3, &n3, name);
+            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) name);
             break;
         case 4 :
-            SCR_add_ptr(&l4, &n4, name);
+            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) name);
             break;
         }
         if(rc > 2) K_del(kdb2, K_find(kdb2, name)) ;
     }
 
-    for(i = 0; i < KNB(kdb2); i++) SCR_add_ptr(&l2, &n2, KONAME(kdb2, i));
+    for(i = 0; i < KNB(kdb2); i++) 
+        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) KONAME(kdb2, i));
 
-    SCR_add_ptr(&l1, &n1, NULL);
-    SCR_add_ptr(&l2, &n2, NULL);
-    SCR_add_ptr(&l3, &n3, NULL);
-    SCR_add_ptr(&l4, &n4, NULL);
+    SCR_add_ptr((unsigned char***) &l1, &n1, NULL);
+    SCR_add_ptr((unsigned char***) &l2, &n2, NULL);
+    SCR_add_ptr((unsigned char***) &l3, &n3, NULL);
+    SCR_add_ptr((unsigned char***) &l4, &n4, NULL);
 
     /*
         rc = KL_lst(one,    l1, 200);
@@ -1219,12 +1222,12 @@ int B_DataCompare(char* arg, int type)
     rc = KL_lst(three,  l3, 10000);
     rc = KL_lst(fr,     l4, 10000);
 
-    SCR_free_tbl(l1);
-    SCR_free_tbl(l2);
-    SCR_free_tbl(l3);
-    SCR_free_tbl(l4);
+    SCR_free_tbl((unsigned char**) l1);
+    SCR_free_tbl((unsigned char**) l2);
+    SCR_free_tbl((unsigned char**) l3);
+    SCR_free_tbl((unsigned char**) l4);
 
-    A_free(args);
+    A_free((unsigned char**) args);
     K_free(kdb2);
 
     return(rc);
@@ -1238,14 +1241,11 @@ static int B_DataEditGraph(int view, char* arg)
 {
     int     rc = 0, nb_args, mode, type, xgrid, ygrid, axis;
     double  ymin, ymax;
-#ifndef WATCOM
-    double  atof();
-#endif
     char    **args = NULL;
     SAMPLE  *smpl = 0;
 
     args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size(args);    /* JMP 16-12-93 */
+    nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
     if(nb_args < 10) {
 	B_seterrn(67);
 	rc = -1;
@@ -1253,7 +1253,7 @@ static int B_DataEditGraph(int view, char* arg)
     }
 
     mode = L_pos("LDGdg", args[0][0]); /* GB 10/08/98 */
-    mode = max(0, mode);
+    mode = std::max(0, mode);
 
     type  = B_argpos("LSBM", args[1][0]);
     //xgrid = B_argpos("MNJ",  args[2][0]);
@@ -1278,7 +1278,7 @@ static int B_DataEditGraph(int view, char* arg)
 		    smpl, args + 9);
 
 fin:
-    A_free(args);
+    A_free((unsigned char**) args);
     SCR_free(smpl);
     return(rc);
 }
@@ -1302,7 +1302,7 @@ fin:
  *  @params See file header 
  */
  
-int B_DataDisplayGraph(char* arg)
+int B_DataDisplayGraph(char* arg, int unused)
 {
     return(B_DataEditGraph(1, arg));
 }
@@ -1330,7 +1330,7 @@ int B_DataDisplayGraph(char* arg)
  *  @params See file header 
  */
 
-int B_DataPrintGraph(char* arg) 
+int B_DataPrintGraph(char* arg, int unused) 
 {
     return(B_DataEditGraph(0, arg));
 }

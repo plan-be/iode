@@ -8,6 +8,8 @@ extern "C" {
 #endif
 
 /* k_super.c */
+extern int     kmsgbox_continue;
+extern int     kpause_continue;
 extern int     (*kerror_super)(const int level, const char* fmt);
 extern void    (*kwarning_super)(const char* msg);
 extern void    (*kpause_super)();
@@ -16,8 +18,6 @@ extern int     (*kwprintf_super)(const char* msg);
 extern void    (*kpanic_super)();
 extern int     (*kconfirm_super)(const char* msg);
 extern int     (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
-extern int     kmsgbox_continue;
-extern int     kpause_continue;
 extern void    (*krecordkey_super)(const int ch);
 extern void    (*krecordtext_super)(const unsigned char* text);
 extern void    (*ksettitle_super)(void);
@@ -49,7 +49,7 @@ extern void    kbeep();
 extern SAMPLE* kasksmpl();
 extern int     kexecsystem(const char*);
 extern int     kshellexec(const char*);
-extern char    *A_expand_super_API(const char* name);
+extern char    *A_expand_super_API(char* name);
 extern int     ODE_end(const int st);
 extern void    IODE_assign_super_API(void);
 

@@ -13,9 +13,9 @@
  *    int B_dump_str(unsigned char*head, unsigned char*txt)            | Print a header and a modified text: spaces are added before and after specific characters in the text
  *    int B_get1int(char* arg)                                         | Return the integer value of the beginning of a string.
  *    int B_ScrollSet(char* arg, long *plong, int inf, int sup)        | Interprets the first part of a string as a integer and check that the value is between 2 boundaries.
- *    int B_PrintObjTblTitle(char* arg)                                | $PrintObjTitle 0 or 1
- *    int B_PrintObjLec(char* arg)                                     | $PrintObjLec {0|1|2}
- *    int B_PrintObjEqsInfos(char* arg)                                | $PrintObjInfos {0|1|2}
+ *    int B_PrintObjTblTitle(char* arg, int unused)                                | $PrintObjTitle 0 or 1
+ *    int B_PrintObjLec(char* arg, int unused)                                     | $PrintObjLec {0|1|2}
+ *    int B_PrintObjEqsInfos(char* arg, int unused)                                | $PrintObjInfos {0|1|2}
  *    int B_PrintObjDef_1(char* arg, int* type)                        | Print the definition of the object named arg of the given type
  *    int B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
  *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
@@ -36,6 +36,7 @@
  */
 #include "scr4/s_prost.h"
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_a2mini.h"
 #include "api/b_errors.h"
@@ -54,17 +55,6 @@
 
 
 int     B_MULTIBAR = 0; // Graph parameter (see GB)
-int     B_TBL_TITLE;    // Specify how to print a TABLE 
-                        //      0 : print table full definitions
-                        //      1 : print only table titles
-int     B_EQS_INFOS;    // Information detail to print (for equations)
-                        //    0: equation only 
-                        //    1: equation + comment
-                        //    2: equation + comment + estimation results
-int     B_EQS_LEC;      // Specify how to print a LEC expression 
-                        //    0 : print the LEC form as is
-                        //    1 : replace all scalars by their values
-                        //    2 : replaced all scalars by their values + t-tests
 
 /*================================= UTILITIES ===============================*/
 
@@ -135,7 +125,7 @@ int B_PrintDefGnl(char* name, char* text)
 
     //sprintf(buf, ".par1 enum_1\n\\b%s\\B : ", name);
     sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name, A2M_ESCCH);  // JMP 10/04/2023
-    B_dump_str(buf, text);
+    B_dump_str((unsigned char*) buf, (unsigned char*) text);
     return(0);
 }
 
@@ -202,7 +192,7 @@ int B_get1int(char* arg)
     args = B_ainit_chk(arg, 0L, 1);
     if(args == 0) return(-100);
     n = atoi(args[0]);
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(n);
 }
 
@@ -226,8 +216,8 @@ int B_ScrollSet(char* arg, long *plong, int inf, int sup)
 
     n = B_get1int(arg);
     if(n <= -100) return(-1);
-    n = max(inf, n);
-    n = min(sup, n);
+    n = std::max(inf, n);
+    n = std::min(sup, n);
     *plong = n;
     return(0);
 }
@@ -236,7 +226,7 @@ int B_ScrollSet(char* arg, long *plong, int inf, int sup)
 // $PrintObjTitle 0 or 1
 //      0 : print table full definitions
 //      1 : print only table titles
-int B_PrintObjTblTitle(char* arg)
+int B_PrintObjTblTitle(char* arg, int unused)
 {
     long    l;
     int     rc;
@@ -252,7 +242,7 @@ int B_PrintObjTblTitle(char* arg)
 //     0 : print the LEC equation
 //     1 : replace all scalars by their values
 //     2 : replaced all scalars by their values + t-tests
-int B_PrintObjLec(char* arg)
+int B_PrintObjLec(char* arg, int unused)
 {
     long    l;
     int     rc;
@@ -268,7 +258,7 @@ int B_PrintObjLec(char* arg)
 //    0: equation only 
 //    1: equation + comment
 //    2: equation + comment + estimation results
-int B_PrintObjEqsInfos(char* arg)
+int B_PrintObjEqsInfos(char* arg, int unused)
 {
     long    l;
     int     rc;
@@ -285,7 +275,7 @@ static int     BEG = 0;     // Nb of the current printed variable (to limit each
 /**
  *  Print the definition of the object named arg of the given type.
  *  
- *  If the object does not exist or type is llegal, a message is stored in the error table via B_seterror()
+ *  If the object does not exist or type is illegal, a message is stored in the error table via B_seterror()
  *  
  *  @param [in] arg     char*   object name
  *  @param [in] type    int     object type
@@ -377,6 +367,11 @@ int B_PrintObjDef(char* arg, int type)
 }
 
 
+int wrapper_B_PrintObjDef_1(char* arg, void* type)
+{
+    return B_PrintObjDef_1(arg, (int*) type);
+}
+
 /**
  *  Print a list of objects of a given type.
  *  
@@ -395,7 +390,7 @@ int B_PrintObjDefArgs(char* arg, int type)
             if(rc) break;
         }
     else
-        rc = B_ainit_loop(arg, B_PrintObjDef_1, (char *)&type);
+        rc = B_ainit_loop(arg, wrapper_B_PrintObjDef_1, (char *)&type);
 
     if(BEG) { /* JMP 17-12-93 */
         BEG = 0;
@@ -423,9 +418,7 @@ int B_PrintObjDefArgs(char* arg, int type)
  */
 int B_PrintDefTbl(KDB* kdb, int pos)
 {
-    TBL                     *tbl = NULL;
-    extern int              B_TBL_TITLE;
-    extern unsigned char    *T_get_title();
+    TBL *tbl = NULL;
 
     if((tbl = KTVAL(kdb, pos)) == NULL) return(-1);
     if(B_TBL_TITLE) {
@@ -434,7 +427,7 @@ int B_PrintDefTbl(KDB* kdb, int pos)
         T_free(tbl);
         return(0);
     }
-    B_PrintRtfTopic(T_get_title(tbl));
+    B_PrintRtfTopic((char*) T_get_title(tbl));
     W_printf(".tb %d\n", T_NC(tbl));
     W_printfRepl(".sep &\n");
     W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
@@ -514,7 +507,7 @@ int B_CellDef(TCELL* cell)
 {
     if((cell->tc_val) == NULL) return(0);
     if(cell->tc_type == TABLE_CELL_LEC &&
-            strcmp("1", P_get_ptr(cell->tc_val, 0)) == 0) return(0);
+            strcmp("1", (char*) P_get_ptr(cell->tc_val, 0)) == 0) return(0);
     return(1);
 }
 
@@ -616,14 +609,14 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
     int     j, pos, lg;
 
     lg = (int)strlen(eqlec);
-    lg = max(512, 4 * lg);
+    lg = std::max(512, 4 * lg);
     lec = SCR_malloc(lg);
     strcpy(lec, eqlec);
     clec = (CLEC *) SCR_malloc(eqclec->tot_lg + 1);
     memcpy(clec, eqclec, eqclec->tot_lg);
 
     sprintf(buf, "%cb%s%cB", A2M_ESCCH, name, A2M_ESCCH);
-    SCR_replace_gnl(lec, name, buf, "_\\");
+    SCR_replace_gnl((unsigned char*) lec, (unsigned char*) name, (unsigned char*) buf, (unsigned char*) "_\\");
     for(j = 0 ; j < clec->nb_names ; j++) {
         sname = clec->lnames[j].name;
         buf[0] = 0;
@@ -640,9 +633,9 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
             }
         }
         if(buf[0] == 0) sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname, A2M_ESCCH);
-        SCR_replace_gnl(lec, sname, buf, "_\\");
+        SCR_replace_gnl((unsigned char*) lec, (unsigned char*) sname, (unsigned char*) buf, (unsigned char*) "_\\");
     }
-    B_dump_str(" ", lec);
+    B_dump_str((unsigned char*) " ", (unsigned char*) lec);
 
     SCR_free(lec);
     SCR_free(clec);
@@ -674,7 +667,7 @@ int B_PrintEqs(char* name, EQ* eq)
     if(B_EQS_INFOS < 1) return(0);
     if(B_isdef(eq->cmt)) {
         sprintf(buf, ".par1 par_1\n%ci ", A2M_ESCCH);
-        B_dump_str(buf, eq->cmt);
+        B_dump_str((unsigned char*) buf, (unsigned char*) eq->cmt);
     }    
 
     if(B_EQS_INFOS < 2) return(0);
@@ -684,8 +677,8 @@ int B_PrintEqs(char* name, EQ* eq)
         W_printf(".par enum_2\nEstimation : %ci%c%cI on %s-%s\n\n", A2M_ESCCH, "LZIG"[eq->method], A2M_ESCCH, 
                  PER_pertoa(&(eq->smpl.s_p1), from),
                  PER_pertoa(&(eq->smpl.s_p2), to));
-        if(B_isdef(eq->blk))   B_dump_str("Block : ", eq->blk);
-        if(B_isdef(eq->instr)) B_dump_str("Instruments : ", eq->instr);
+        if(B_isdef(eq->blk))   B_dump_str((unsigned char*) "Block : ", (unsigned char*) eq->blk);
+        if(B_isdef(eq->instr)) B_dump_str((unsigned char*) "Instruments : ", (unsigned char*) eq->instr);
 
         W_printf("\nTests :\n");
         W_printf(".par enum_3\n");

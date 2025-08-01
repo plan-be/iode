@@ -19,6 +19,7 @@
  */
 #include <string.h>
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -27,9 +28,7 @@
 #include "api/report/undoc/undoc.h"
 
 
-static int HP_smpl(f_smpl, ws_smpl, t_smpl, shift)
-SAMPLE  *f_smpl, *ws_smpl, **t_smpl;
-int     *shift;
+static int HP_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
 {
     int     nbper;
 
@@ -64,7 +63,7 @@ static int B_WsTrendAll(char* arg, int std)
     data = B_ainit_chk(arg + lg, NULL, 0);
     // lambda = atoi(data[0]); // JMP  22/1/2019
     lambda = atof(data[0]); // JMP  22/1/2019
-    nb = SCR_tbl_size(data + 1);
+    nb = SCR_tbl_size((unsigned char**) data + 1);
     if(nb == 0) goto done;
 
     from = K_load(VARIABLES, file, nb, data + 1);
@@ -95,7 +94,7 @@ static int B_WsTrendAll(char* arg, int std)
 done:
     K_free(to);
     K_free(from);
-    SCR_free_tbl(data);
+    SCR_free_tbl((unsigned char**) data);
 
     SW_nfree(t_smpl);
     SW_nfree(t_vec);
@@ -108,7 +107,7 @@ done:
 
 
 // $WsTrend VarFilename Lambda series1 series2 ...
-int B_WsTrend(char* arg)
+int B_WsTrend(char* arg, int unused)
 {
     return(B_WsTrendAll(arg, 0));
 }
@@ -117,7 +116,7 @@ int B_WsTrend(char* arg)
 // $WsTrendStd VarFilename Lambda series1 series2 ...
 // Unlike the $WsTrend function, the series are not transformed before the calculation. 
 // The positivity constraint does not apply.
-int B_WsTrendStd(char* arg)
+int B_WsTrendStd(char* arg, int unused)
 {
     return(B_WsTrendAll(arg, 1));
 }

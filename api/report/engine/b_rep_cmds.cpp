@@ -29,40 +29,41 @@
  *  List of functions
  *  -----------------
  *      int RP_vseps(char* seps)                         $vseps <seps>
- *      int RP_repeatstring(char* buf)                   $repeatstring <string>
- *      int RP_repeat(char* buf)                         $repeat <command>
+ *      int RP_repeatstring(char* buf, int unused)                   $repeatstring <string>
+ *      int RP_repeat(char* buf, int unused)                         $repeat <command>
  *      int RP_onerror_1(char* arg)                      Sub function of RP_onerror() which assigns the 2 global variables RP_RT and RP_PRINT.
- *      int RP_onerror(char* arg)                        $onerror [{return|abort|quitode}] [{display|print|noprint}]
- *      int RP_abort(char* arg)                          $abort 
- *      int RP_quitode(char* arg)                        $quitode or $quit
- *      int RP_return(char* arg)                         $return
- *      int RP_label(char* arg)                          $label <label>
+ *      int RP_onerror(char* arg, int unused)                        $onerror [{return|abort|quitode}] [{display|print|noprint}]
+ *      int RP_abort(char* arg, int unused)                          $abort 
+ *      int RP_quitode(char* arg, int unused)                        $quitode or $quit
+ *      int RP_return(char* arg, int unused)                         $return
+ *      int RP_label(char* arg, int unused)                          $label <label>
  *      int RP_goto_label(char *command, char *parm)     Search in the current REPFILE (CUR_REPFILE) the line beginning with "$command parm" or "#command parm", where command can be "label" or "next".
- *      int RP_goto(char* arg)                           $goto label [value]
- *      int RP_message(char* arg)                        $show message
- *      int RP_warning(char* arg)                        $msg text
- *      int RP_silent(char* arg)                         $silent {0|1|N|n|Y|y]
+ *      int RP_goto(char* arg, int unused)                           $goto label [value]
+ *      int RP_message(char* arg, int unused)                        $show message
+ *      int RP_warning(char* arg, int unused)                        $msg text
+ *      int RP_silent(char* arg, int unused)                         $silent {0|1|N|n|Y|y]
  *      int RP_beep()                                    $beep
- *      int RP_ask(char* arg)                            $ask <label> <question>
+ *      int RP_ask(char* arg, int unused)                            $ask <label> <question>
  *      int B_ReportPrompt(char* arg)                    #prompt <macro_name> <question>
- *      int RP_setdebug(char* arg)                       $debug {0|n|N|1|2|f|F}
- *      int RP_setindent(char* arg)                      $indent {0|n|N|1}
- *      int RP_setmultiline(char* arg)                   $multiline {0|n|N|1} 
+ *      int RP_setdebug(char* arg, int unused)                       $debug {0|n|N|1|2|f|F}
+ *      int RP_setindent(char* arg, int unused)                      $indent {0|n|N|1}
+ *      int RP_setmultiline(char* arg, int unused)                   $multiline {0|n|N|1} 
  *      int RP_noparsingchar(char* arg)                  $noparsing [0|n|N|1]
  *      int RP_shift(char* arg)                          $shift [n] or $shift_args [n]
- *      int RP_chdir(char* arg)                          $chdir <dirname>
- *      int RP_rmdir(char* arg)                          $rmdir <dirname>
- *      int RP_mkdir(char* arg)                          $mkdir <dirname>
- *      int RP_settime(char* arg)                        $settime <period>
- *      int RP_incrtime(char* arg)                       $incrtime [n]
- *      int RP_system(char* arg)                         $system <command>
- *      int B_shellexec(char *arg)                       $shellexec <command>
- *      int B_Sleep(char* arg)                           $sleep <msecs>
- *      int B_GraphDefault(char* type)                   $graphdefault {l|L|s|S|b|B} 
+ *      int RP_chdir(char* arg, int unused)                          $chdir <dirname>
+ *      int RP_rmdir(char* arg, int unused)                          $rmdir <dirname>
+ *      int RP_mkdir(char* arg, int unused)                          $mkdir <dirname>
+ *      int RP_settime(char* arg, int unused)                        $settime <period>
+ *      int RP_incrtime(char* arg, int unused)                       $incrtime [n]
+ *      int RP_system(char* arg, int unused)                         $system <command>
+ *      int B_shellexec(char *arg, int unused)                       $shellexec <command>
+ *      int B_Sleep(char* arg, int unused)                           $sleep <msecs>
+ *      int B_GraphDefault(char* type, int unused)                   $graphdefault {l|L|s|S|b|B} 
  *  
  */
 #include "scr4/scr4.h"
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -73,40 +74,40 @@
     #include <direct.h>
 #endif 
 
-char *RP_RPTSTR = 0;    // Repeat string used by the command $repeat. Default = '_'.
-char *RP_VSEPS = 0;     //Vector of separators used by RPF_vtake(), RPF_vdrop() and RPF_vcount()
+extern "C" int  SCR_sleep(int);
+
 
 // $vseps <seps> 
 // @see https://iode.plan.be/doku.php?id=vseps
 
-int RP_vseps(char* seps)  
+int RP_vseps(char* seps, int unused)  
 {
     if(seps == 0 || strlen(seps) == 0) seps = ";, ";
     SCR_free(RP_VSEPS);
-    RP_VSEPS = SCR_stracpy(seps);
+    RP_VSEPS = (char*) SCR_stracpy((unsigned char*) seps);
     return(0);
 }
 
 
 // $repeatstring <string>
-int RP_repeatstring(char* buf)   /* JMP 06-06-99 */
+int RP_repeatstring(char* buf, int unused)   /* JMP 06-06-99 */
 {
-    SCR_sqz(buf);
+    SCR_sqz((unsigned char*) buf);
     if(strlen(buf) == 0) buf = "_";
     SCR_free(RP_RPTSTR);
-    RP_RPTSTR = SCR_stracpy(buf);
+    RP_RPTSTR = (char*) SCR_stracpy((unsigned char*) buf);
     return(0);
 }
 
 // $repeat <command>
 // Nouvelle version améliorée pour les allocs JAN 2009
-int RP_repeat(char* buf)
+int RP_repeat(char* buf, int unused)
 {
     U_ch    *line = 0, *cmd;
     U_ch    **args;
     int     rc, i, pos1, pos2, maxlg = 0, lg;
 
-    rc = RP_expand(&line, buf);
+    rc = RP_expand((char**) &line, buf);
     if(rc) return(rc);
 
     pos1 = U_pos('"', line); // Position du premier " dans line
@@ -116,7 +117,7 @@ int RP_repeat(char* buf)
     }
     pos2 = pos1 + 1 + U_pos('"', line + pos1 + 1); // Position du second " dans line
     line[pos2] = 0; // line + pos1  devient la commande ($repeat "$DatadeleteVar _ _" donne dans line + pos 1 = [$DataDeleteVar _ _] par exemple)
-    args = B_ainit_chk(line + pos2 + 1, NULL, 0); // Arguments sur lesquels il faut boucler
+    args = (unsigned char**) B_ainit_chk(((char*) line) + pos2 + 1, NULL, 0); // Arguments sur lesquels il faut boucler
 
     if(args == NULL) {
         SCR_free(line);
@@ -127,21 +128,22 @@ int RP_repeat(char* buf)
 
     // Calcule la longueur max d'un arg et alloue une commande assez longue
     for(maxlg = i = 0 ; args[i] ; i++) {
-        lg = (int)strlen(args[i]);
+        lg = (int) strlen((char*) args[i]);
         if(lg > maxlg) maxlg = lg;
     }
     //cmd = SCR_malloc(strlen(line + pos1 + 1) + 10 * maxlg + 64);
-    cmd = RP_alloc((int)strlen(line + pos1 + 1) + 10 * maxlg + 64);
+    cmd = (unsigned char*) RP_alloc((int) strlen(((char*) line) + pos1 + 1) + 10 * maxlg + 64);
 
     // Démarre la boucle
     for(i = 0 ; args[i] ; i++) {
-        strcpy(cmd, line + pos1 + 1); // Commande
-        SCR_replace(cmd, RP_RPTSTR, args[i]);
-        rc = B_ReportLine(cmd, 1);
+        strcpy((char*) cmd, ((char*) line) + pos1 + 1); // Commande
+        SCR_replace(cmd, (unsigned char*) RP_RPTSTR, args[i]);
+        rc = B_ReportLine((char*) cmd, 1);
         if(rc) break;
     }
+
     //SCR_free(cmd);
-    RP_free(cmd);
+    RP_free((char*) cmd);
     SCR_free(line); //GB 20/08/2012 solved memory leak
     SCR_free_tbl(args);
     return(0);
@@ -154,7 +156,7 @@ int RP_repeat(char* buf)
  */
 int RP_onerror_1(char* arg)
 {
-    SCR_upper(arg);
+    SCR_upper((unsigned char*) arg);
 
     if(strcmp(arg, "IGNORE")  == 0) RP_RT = 0;
     else    if(strcmp(arg, "RETURN")  == 0) RP_RT = -2;
@@ -166,15 +168,20 @@ int RP_onerror_1(char* arg)
     return(0);
 }
 
-// $onerror [{return|abort|quitode}] [{display|print|noprint}]
-int RP_onerror(char* arg)
+int wrapper_RP_onerror_1(char* arg, void* unused)
 {
-    return(B_ainit_loop(arg, RP_onerror_1, NULL));
+    return RP_onerror_1(arg);
+}
+
+// $onerror [{return|abort|quitode}] [{display|print|noprint}]
+int RP_onerror(char* arg, int unused)
+{
+    return(B_ainit_loop(arg, wrapper_RP_onerror_1, NULL));
 }
 
 // $abort 
 // Quits the current report execution stack.
-int RP_abort(char* arg)
+int RP_abort(char* arg, int unused)
 {
     return(-3);
 }
@@ -186,7 +193,7 @@ int RP_abort(char* arg)
 // ODE stands for "Outils de Développements Econométriques"
 // IODE for "Intégrateur d'Outils de Développements Econométriques".
 
-int RP_quitode(char* arg)
+int RP_quitode(char* arg, int unused)
 {
     SCR_APP_ABORT = ACT_APPL_QUIT;
     //K_end_ws(0);
@@ -197,7 +204,7 @@ int RP_quitode(char* arg)
 
 // $return
 // Quits the current report and goes up one level in the report stack (depth decreased by 1).
-int RP_return(char* arg)
+int RP_return(char* arg, int unused)
 {
     return(-2);
 }
@@ -205,7 +212,7 @@ int RP_return(char* arg)
 
 // $label <label>
 // Note that there is no action associated with $label: it is only a marker used by $goto.
-int RP_label(char* arg)
+int RP_label(char* arg, int unused)
 {
     return(0);
 }
@@ -231,8 +238,8 @@ int RP_goto_label(char *command, char *parm)
     
     if(strcmp(command, "label") == 0)  // JMP 14/2/2013
         CUR_REPFILE->curline = 0;
-    SCR_sqz(parm);
-    SCR_lower(parm);
+    SCR_sqz((unsigned char*) parm);
+    SCR_lower((unsigned char*) parm);
 
     while(1) {
         SW_nfree(line);
@@ -252,8 +259,8 @@ int RP_goto_label(char *command, char *parm)
             goto done;
         }
 
-        SCR_lower(name);
-        SCR_lower(arg);
+        SCR_lower((unsigned char*) name);
+        SCR_lower((unsigned char*) arg);
         if(strcmp(name, command) == 0 && strcmp(parm, arg) == 0) {
             rc = 0;
             goto done;
@@ -269,9 +276,9 @@ done:
 
 // $goto label [value]
 // See RP_goto_label().
-int RP_goto(char* arg)
+int RP_goto(char* arg, int unused)
 {
-    unsigned    char    **args, **SCR_vtomsq();
+    unsigned    char    **args;
     int                 rc = 0, nb;
 
     args = SCR_vtomsq(arg, B_SEPS, '"');
@@ -282,18 +289,18 @@ int RP_goto(char* arg)
             break;
 
         case 1 :
-            rc = RP_goto_label("label", args[0]);
+            rc = RP_goto_label("label", (char*) args[0]);
             break;
 
         default: // JMP 13-12-12: Ok si plus de 2 args
-            rc = atoi(args[1]);
+            rc = atoi((char*) args[1]);
             switch(rc) {
                 case  0 :
                 case -1 :
                     break;
                 //case  1 : // JMP 12-12-12 !!
                 default :   // JMP 12-12-12 !!
-                    rc = RP_goto_label("label", args[0]);
+                    rc = RP_goto_label("label", (char*) args[0]);
                     break;
             }
             break;
@@ -309,7 +316,7 @@ int RP_goto(char* arg)
 // ====================
 
 // $show message
-int RP_message(char* arg)
+int RP_message(char* arg, int unused)
 {
     char    fmt[2048];
 
@@ -325,7 +332,7 @@ int RP_message(char* arg)
 
 
 // $msg text
-int RP_warning(char* arg)            
+int RP_warning(char* arg, int unused)            
 {
     if(arg == NULL || arg[0] == 0) return(0); /* JMP 11-07-96 */
 
@@ -335,7 +342,7 @@ int RP_warning(char* arg)
 }
 
 // $silent {0|1|n|N|Y|y}
-int RP_silent(char* arg)   
+int RP_silent(char* arg, int unused)   
 {  
      int     ch;
     
@@ -355,23 +362,23 @@ int RP_silent(char* arg)
 }
 
 // $beep
-int RP_beep(char* arg)
+int RP_beep(char* arg, int unused)
 {
     kbeep();
     return(0);
 }
 
 // $ask <label> <question>
-int RP_ask(char* arg)
+int RP_ask(char* arg, int unused)
 {
     int     lg;
     U_ch    name[31];
 
-    lg = B_get_arg0(name, arg, 30);
+    lg = B_get_arg0((char*) name, arg, 30);
     //if(SCR_confirme(arg + lg + 1) != 0) return(0); /* rep. NON -> ligne suivante */
     if(kconfirm(arg + lg + 1) != 0) return(0);       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
-    if(RP_goto_label("label", name) != 0) return(-3);
+    if(RP_goto_label("label", (char*) name) != 0) return(-3);
     return(0);
 }
 
@@ -381,14 +388,14 @@ int RP_ask(char* arg)
 // TODO: implement $prompt 
 int B_ReportPrompt(char* arg)
 {
-    return(RP_define(arg));
+    return(RP_define(arg, -1));
 }
 
 // Report language parameters
 // ==========================
 
 // $debug {0|n|N|1|2|f|F}
-int RP_setdebug(char* arg)   
+int RP_setdebug(char* arg, int unused)   
 {  
     int     ch;
     
@@ -413,7 +420,7 @@ int RP_setdebug(char* arg)
 }
 
 // $indent {0|n|N|1}
-int RP_setindent(char* arg) 
+int RP_setindent(char* arg, int unused) 
 {
     int     ch;
     
@@ -433,7 +440,7 @@ int RP_setindent(char* arg)
 }
 
 // $multiline {0|n|N|1} 
-int RP_setmultiline(char* arg) 
+int RP_setmultiline(char* arg, int unused) 
 {
     int     ch;
     
@@ -453,7 +460,7 @@ int RP_setmultiline(char* arg)
 }
 
 // $noparsing [0|n|N|1]
-int RP_noparsing(char* arg) 
+int RP_noparsing(char* arg, int unused) 
 {
     int     ch;
     
@@ -479,11 +486,11 @@ int RP_noparsing(char* arg)
 // $shift [n]
 // $shift_args [n]
 // Pops or Pushes current report arguments
-int RP_shift_args(char* arg)
+int RP_shift_args(char* arg, int unused)
 {
     int     incr = 1;
 
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     if(arg[0]) incr = atoi(arg);
 
     RP_ARG0 += incr;
@@ -495,7 +502,7 @@ int RP_shift_args(char* arg)
 // ====================
 
 // $chdir <dirname>
-int RP_chdir(char* arg)
+int RP_chdir(char* arg, int unused)
 {
     int rc;
 
@@ -511,13 +518,13 @@ int RP_chdir(char* arg)
 }
 
 // $rmdir <dirname>
-int RP_rmdir(char* arg)
+int RP_rmdir(char* arg, int unused)
 {
     return(_rmdir(arg));
 }
 
 // $mkdir <dirname>
-int RP_mkdir(char* arg)
+int RP_mkdir(char* arg, int unused)
 {
 #ifdef _MSC_VER
     return(_mkdir(arg));
@@ -530,7 +537,7 @@ int RP_mkdir(char* arg)
 // Current value of t in {report expressions}
 // ==========================================
 // $settime <period>
-int RP_settime(char* arg)
+int RP_settime(char* arg, int unused)
 {
     PERIOD *rp_per;
 
@@ -546,12 +553,12 @@ int RP_settime(char* arg)
 }
 
 // $incrtime [n]
-int RP_incrtime(char* arg)
+int RP_incrtime(char* arg, int unused)
 {
     int     incr = 1;
     PERIOD  *per;
 
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     if(arg[0]) incr = atoi(arg);
 
     per = PER_addper(&RP_PER, incr);
@@ -564,23 +571,21 @@ int RP_incrtime(char* arg)
 // ===============
 
 // $system <command>
-int RP_system(char* arg)
+int RP_system(char* arg, int unused)
 {
     return(kexecsystem(arg)); // JMP 13/12/2021
 }
 
 // $shellexec <command>
-int B_shellexec(char *arg)
+int B_shellexec(char *arg, int unused)
 {
     return(kshellexec(arg));
 }
 
 // $sleep <msecs>
-int B_Sleep(char* arg)
+int B_Sleep(char* arg, int unused)
 {
-    int         ms = atoi(arg);
-    extern int  SCR_sleep(int);
-
+    int ms = atoi(arg);
     SCR_sleep(ms);
     return(0);
 }
@@ -590,7 +595,7 @@ int B_Sleep(char* arg)
 //
 // Defines the default table graph default (Line, Bar...). 
 // Used when creating a new line in a table.
-int B_GraphDefault(char* type) 
+int B_GraphDefault(char* type, int unused) 
 {
     extern int T_GRAPHDEFAULT;
     

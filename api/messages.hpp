@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+char* get_iode_message(int val);
 
 const static std::map<int, std::string> iode_msg_map = {
     {0, "can't access file"},

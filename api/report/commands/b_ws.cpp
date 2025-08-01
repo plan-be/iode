@@ -15,26 +15,26 @@
  * int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
  * int B_WsExport(char* arg, int type)               $WsExport<type> filename
  * int B_WsImport(char* arg, int type)               $WsImport<type> filename
- * int B_WsSample(char* arg)                         $WsSample period_from period_to
+ * int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
  * int B_WsClear(char* arg, int type)                $WsClear<type> 
- * int B_WsClearAll(char* arg)                       $WsClearAll
+ * int B_WsClearAll(char* arg, int unused)                       $WsClearAll
  * int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
  * int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
  * int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
  * int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
- * int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
- * int B_WsAggrChar(char* arg)                       $WsAggrChar char
- * int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
- * int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
- * int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
+ * int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
+ * int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
+ * int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
+ * int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
+ * int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
  * double *B_StatUnitRoot_1(char* arg, int print) Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
- * int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+ * int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
  * int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
- * int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
- * int B_CsvSep(char *sep)                           $CsvSep char
- * int B_CsvNaN(char *nan)                           $CsvNaN text
- * int B_CsvAxes(char *var)                          $CsvAxes AxisName
- * int B_CsvDec(char *dec)                           $CsvDec char
+ * int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
+ * int B_CsvSep(char *sep, int unused)                           $CsvSep char
+ * int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
+ * int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
+ * int B_CsvDec(char *dec, int unused)                           $CsvDec char
  */
 #include "scr4/s_args.h"
 #include "api/k_super.h"
@@ -246,7 +246,7 @@ int B_WsImport(char* arg, int type)
  *  @see https://iode.plan.be/doku.php?id=wssample
  */
 
-int B_WsSample(char* arg)
+int B_WsSample(char* arg, int unused)
 {
     char    **args;
     SAMPLE  *new_smpl = NULL;
@@ -293,7 +293,7 @@ int B_WsClear(char* arg, int type)
  *    
  *  @see https://iode.plan.be/doku.php?id=wsclearall
  */
-int B_WsClearAll(char* arg)
+int B_WsClearAll(char* arg, int unused)
 {
     int i;
 
@@ -440,7 +440,7 @@ int B_WsMerge(char* arg, int type)
  *  @see https://iode.plan.be/doku.php?id=wsextrapolate
  */
  
-int B_WsExtrapolate(char* arg)
+int B_WsExtrapolate(char* arg, int unused)
 {
     int     nb_args, p = 0, method = 0, rc = -1;
     char    **args, **vars;
@@ -518,7 +518,7 @@ done:
  *  
  */
  
-int B_WsAggrChar(char* arg)
+int B_WsAggrChar(char* arg, int unused)
 {
     if(arg == NULL || arg[0] == 0) K_AggrChar = ' ';
     else K_AggrChar = arg[0];
@@ -532,7 +532,7 @@ int B_WsAggrChar(char* arg)
  *  @see https://iode.plan.be/doku.php?id=wsaggrsum
  */
  
-int B_WsAggrSum(char* arg)
+int B_WsAggrSum(char* arg, int unused)
 {
     return(B_WsAggr(0, arg));
 }
@@ -545,7 +545,7 @@ int B_WsAggrSum(char* arg)
  *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
  */
 
-int B_WsAggrProd(char* arg)
+int B_WsAggrProd(char* arg, int unused)
 {
     return(B_WsAggr(1, arg));
 }
@@ -558,7 +558,7 @@ int B_WsAggrProd(char* arg)
  *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
  */
 
-int B_WsAggrMean(char* arg)
+int B_WsAggrMean(char* arg, int unused)
 {
     return(B_WsAggr(2, arg));
 }
@@ -623,7 +623,7 @@ double *B_StatUnitRoot_1(char* arg, int print)
  *  @see https://iode.plan.be/doku.php?id=statunitroot
  */
 
-int B_StatUnitRoot(char* arg)
+int B_StatUnitRoot(char* arg, int unused)
 {
     int     rc = -1;
     double    *df;
@@ -701,7 +701,7 @@ int B_CsvSave(char* arg, int type)
  *  @see https://iode.plan.be/doku.php?id=csvdigits
  */
 
-int B_CsvNbDec(char *nbdec)
+int B_CsvNbDec(char *nbdec, int unused)
 {
     AsciiVariables::CSV_NBDEC = atoi(nbdec);
     if(AsciiVariables::CSV_NBDEC > 99 || (AsciiVariables::CSV_NBDEC < 0 && AsciiVariables::CSV_NBDEC != -1)) {
@@ -719,7 +719,7 @@ int B_CsvNbDec(char *nbdec)
  *  @see https://iode.plan.be/doku.php?id=csvsep
  */
 
-int B_CsvSep(char *sep)
+int B_CsvSep(char *sep, int unused)
 {
     SCR_free(AsciiVariables::CSV_SEP);
     AsciiVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
@@ -733,7 +733,7 @@ int B_CsvSep(char *sep)
  *  @see https://iode.plan.be/doku.php?id=csvnan
  */
 
-int B_CsvNaN(char *nan)
+int B_CsvNaN(char *nan, int unused)
 {
     SCR_free(AsciiVariables::CSV_NAN);
     AsciiVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
@@ -748,7 +748,7 @@ int B_CsvNaN(char *nan)
  *  @see https://iode.plan.be/doku.php?id=csvsaxes
  */
 
-int B_CsvAxes(char *var)
+int B_CsvAxes(char *var, int unused)
 {
     SCR_free(AsciiVariables::CSV_AXES);
     AsciiVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
@@ -763,7 +763,7 @@ int B_CsvAxes(char *var)
  *  @see https://iode.plan.be/doku.php?id=csvdec
  */
 
-int B_CsvDec(char *dec)
+int B_CsvDec(char *dec, int unused)
 {
     SCR_free(AsciiVariables::CSV_DEC);
     AsciiVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);

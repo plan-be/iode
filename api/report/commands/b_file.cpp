@@ -74,7 +74,7 @@ fin:
         fclose(to);
         if(type <= VARIABLES) K_setname(buf_to, buf_to);  // JMP 27/10/2021
     }
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -114,7 +114,7 @@ int B_FileRename(char* arg, int type)
 
 fin:
     if(rc < 0) B_seterror("Unable to rename %s", buf_from);
-    A_free(args);
+    A_free((unsigned char**) args);
     return(rc);
 }
 
@@ -141,6 +141,11 @@ static int B_unlink_1(char* arg, int *type)
     return(0);
 }
 
+static int wrapper_B_unlink_1(char* arg, void *type)
+{
+    return B_unlink_1(arg, (int*) type);
+}
+
 /**
  *  Report function to delete a file(s) of a specified type. 
  *  
@@ -156,5 +161,5 @@ static int B_unlink_1(char* arg, int *type)
 
 int B_FileDelete(char* arg, int type)
 {
-    return(B_ainit_loop(arg, B_unlink_1, (char *)&type));
+    return(B_ainit_loop(arg, wrapper_B_unlink_1, (char *)&type));
 }

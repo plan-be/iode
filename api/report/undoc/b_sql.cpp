@@ -24,7 +24,8 @@
  *  
  *  TODO: rename b_sql.c in b_rep_sql.c
  */
- 
+
+#include "api/constants.h"
 #include "api/report/undoc/undoc.h"
 
 // These functions are NOT implemented (yet) under Linux or in VC64
@@ -33,44 +34,44 @@
 
 U_ch    *RPS_Open(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 
 U_ch  *RPS_Field(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 U_ch  *RPS_NbFlds(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 U_ch  *RPS_Record(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 
 U_ch    *RPS_Query(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 U_ch    *RPS_Sql(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 U_ch    *RPS_Next(U_ch** args)
 {
-    return(SCR_stracpy("0"));
+    return(SCR_stracpy((unsigned char*) "0"));
 }
 
 U_ch    *RPS_Close(U_ch** args)
 {
-    return(SCR_stracpy("1"));
+    return(SCR_stracpy((unsigned char*) "1"));
 }
 
 //KDB  *K_load_odbc(int ftype, char *odbc, int no, char **objs)

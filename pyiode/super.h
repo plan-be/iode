@@ -12,36 +12,36 @@ int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, const 
 // See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c //
 // ========================================================================= //
 
-int c_PrintObjDef_super();
-int c_ViewPrintGr_super();
-int c_ViewPrintTbl_super();
-int c_ViewByTbl_super();
-int c_DataSearch_super();
-int c_DataDuplicate_super();
-int c_DataList_super();
-int c_DataCompare_super();
-int c_DataCalcLst_super();
-int c_DataListSort_super();
-int c_DataEditGraph_super();
-int c_DataScan_super();
-int c_StatUnitRoot_super();
-int c_WsLoad_super();
-int c_WsSave_super();
-int c_WsMerge_super();
-int c_WsDescr_super();
-int c_WsCopy_super();
-int c_WsClear_super();
-int c_WsSample_super();
-int c_WsExtrapolate_super();
-int c_WsHtoL_super();
-int c_WsLtoH_super();
-int c_WsSeasonAdj_super();
-int c_WsTrend_super();
-int c_ModelSimulate_super();
-int c_ModelCompile_super();
-int c_IdtExecute_super();
-int c_EqsEstimate_super();
-int c_XodeRuleImport_super();
+int c_PrintObjDef_super(char* arg, int unused);
+int c_ViewPrintGr_super(char* arg, int unused);
+int c_ViewPrintTbl_super(char* arg, int unused);
+int c_ViewByTbl_super(char* arg, int unused);
+int c_DataSearch_super(char* arg, int unused);
+int c_DataDuplicate_super(char* arg, int unused);
+int c_DataList_super(char* arg, int unused);
+int c_DataCompare_super(char* arg, int unused);
+int c_DataCalcLst_super(char* arg, int unused);
+int c_DataListSort_super(char* arg, int unused);
+int c_DataEditGraph_super(char* arg, int unused);
+int c_DataScan_super(char* arg, int unused);
+int c_StatUnitRoot_super(char* arg, int unused);
+int c_WsLoad_super(char* arg, int unused);
+int c_WsSave_super(char* arg, int unused);
+int c_WsMerge_super(char* arg, int unused);
+int c_WsDescr_super(char* arg, int unused);
+int c_WsCopy_super(char* arg, int unused);
+int c_WsClear_super(char* arg, int unused);
+int c_WsSample_super(char* arg, int unused);
+int c_WsExtrapolate_super(char* arg, int unused);
+int c_WsHtoL_super(char* arg, int unused);
+int c_WsLtoH_super(char* arg, int unused);
+int c_WsSeasonAdj_super(char* arg, int unused);
+int c_WsTrend_super(char* arg, int unused);
+int c_ModelSimulate_super(char* arg, int unused);
+int c_ModelCompile_super(char* arg, int unused);
+int c_IdtExecute_super(char* arg, int unused);
+int c_EqsEstimate_super(char* arg, int unused);
+int c_XodeRuleImport_super(char* arg, int unused);
 
 int c_ViewTable_super(TBL* tbl, char* smpl, char* name);
 

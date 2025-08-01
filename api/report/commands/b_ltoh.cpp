@@ -11,8 +11,8 @@
  *  
  *  List of public functions 
  *  ------------------------
- *      int B_WsLtoHStock(char* arg)    $WsLtoHStock {L|C|S} Filename VarList
- *      int B_WsLtoHFlow(char* arg)     $WsLtoHFlow  {L|C|S} Filename VarList
+ *      int B_WsLtoHStock(char* arg, int unused)    $WsLtoHStock {L|C|S} Filename VarList
+ *      int B_WsLtoHFlow(char* arg, int unused)     $WsLtoHFlow  {L|C|S} Filename VarList
  */
 #include <math.h>
 
@@ -323,12 +323,12 @@ static int B_ltoh(int type, char* arg)
 
 
     lg = B_get_arg0(method, arg, 80);
-    U_sqz_text(method);
+    U_sqz_text((unsigned char*) method);
 
     lg += B_get_arg0(file, arg + lg, K_MAX_FILE);
 
     data = B_ainit_chk(arg + lg, NULL, 0);
-    nb = SCR_tbl_size(data);
+    nb = SCR_tbl_size((unsigned char**) data);
     if(nb == 0) goto done;
 
     from = K_load(VARIABLES, file, nb, data);
@@ -380,7 +380,7 @@ static int B_ltoh(int type, char* arg)
 done:
     K_free(to);
     K_free(from);
-    SCR_free_tbl(data);
+    SCR_free_tbl((unsigned char**) data);
 
     SW_nfree(t_smpl);
     SW_nfree(t_vec);
@@ -401,7 +401,7 @@ done:
  *  
  *  @see https://iode.plan.be/doku.php?id=WsLtoHStock
  */
-int B_WsLtoHStock(char* arg)
+int B_WsLtoHStock(char* arg, int unused)
 {
     return(B_ltoh(LTOH_STOCK, arg));
 }
@@ -416,7 +416,7 @@ int B_WsLtoHStock(char* arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=WsLtoHFlow
  */
-int B_WsLtoHFlow(char* arg)
+int B_WsLtoHFlow(char* arg, int unused)
 {
     return(B_ltoh(LTOH_FLOW, arg));
 }

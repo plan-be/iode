@@ -37,7 +37,7 @@
  *
  * SCR4 superseeded functions + assign
  * -----------------------------------
- *     char *A_expand_super_API(const char* name)               Default implementation of A_expand() in IODE API
+ *     char *A_expand_super_API(char* name)                     Default implementation of A_expand() in IODE API
  *     void IODE_assign_super_API()                             Assigns default values to "super" (virtual) functions. 
  * 
  * List of function pointers that can replace the standard implementation  
@@ -74,6 +74,7 @@
 
 #include "api/constants.h"
 #include "api/k_super.h"
+#include "api/messages.hpp"
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
@@ -81,28 +82,30 @@
 
 
 // Global variables
-int MSG_DISABLED = 0;    // if 1, kmsg() is disabled
+int     MSG_DISABLED = 0;    // if 1, kmsg() is disabled
 
-int (*kerror_super)(const int level, const char*msg);
-void (*kwarning_super)(const char* msg);
-void (*kpause_super)();
-void (*kmsg_super)(const char* msg);
-int  (*kwprintf_super)(const char* msg);
-void (*kpanic_super)(void);
-int  (*kconfirm_super)(const char* msg);
-int  (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
-int   kmsgbox_continue = 0; 
-int   kpause_continue = 0; 
-void (*krecordkey_super)(const int ch);
-void (*ksettitle_super)(void);
-int  (*ktermvkey_super)(const int vkey);
-int  (*khitkey_super)();
-int  (*kgetkey_super)();
-void (*kbeep_super)(void);
-SAMPLE *(*kasksmpl_super)(void);
-int  (*kexecsystem_super)();
-int  (*kshellexec_super)();
-int  (*ODE_end_super)(const int);
+int     kmsgbox_continue = 0;
+int     kpause_continue = 0;
+
+int     (*kerror_super)(const int level, const char* fmt) = nullptr;
+void    (*kwarning_super)(const char* msg) = nullptr;
+void    (*kpause_super)() = nullptr;
+void    (*kmsg_super)(const char* fmt) = nullptr;
+int     (*kwprintf_super)(const char* msg) = nullptr;
+void    (*kpanic_super)() = nullptr;
+int     (*kconfirm_super)(const char* msg) = nullptr;
+int     (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts) = nullptr;
+void    (*krecordkey_super)(const int ch) = nullptr;
+void    (*krecordtext_super)(const unsigned char* text) = nullptr;
+void    (*ksettitle_super)(void) = nullptr;
+int     (*ktermvkey_super)(const int vkey) = nullptr;
+int     (*khitkey_super)() = nullptr;
+int     (*kgetkey_super)() = nullptr;
+void    (*kbeep_super)(void) = nullptr;
+SAMPLE* (*kasksmpl_super)(void) = nullptr;
+int     (*kexecsystem_super)(const char*) = nullptr;
+int     (*kshellexec_super )(const char*) = nullptr;
+int     (*ODE_end_super)(const int) = nullptr;
 
 /**
  *  Displays an error message and optionally exits the program.
@@ -288,7 +291,7 @@ int kconfirm(const char *fmt,...)
 #else
         gets_s(buf, sizeof(buf) - 1);
 #endif
-        SCR_sqz(buf);
+        SCR_sqz((unsigned char*) buf);
         return(!U_is_in(buf[0], "OoYyJj1"));
     }    
 }
@@ -350,7 +353,7 @@ void krecordtext(const unsigned char* text)
 {
     int     i;
 
-    for(i = (int)strlen(text) - 1 ; i >= 0 ; i--)
+    for(i = (int)strlen((char*) text) - 1 ; i >= 0 ; i--)
         krecordkey(text[i]);
 }
 
@@ -550,7 +553,8 @@ int kshellexec(const char *arg)
     int res = 0;
 
 #ifdef _MSC_VER
-    SHELLEXECUTEINFO    sei;
+    SHELLEXECUTEINFOW    sei;
+    wchar_t warg[1024];
 
     if(kshellexec_super) 
         return((*kshellexec_super)(arg));
@@ -562,10 +566,11 @@ int kshellexec(const char *arg)
     //sei.hwnd = hWndDOS;
 	sei.hwnd = 0;
     sei.nShow = SW_SHOW;
-    sei.lpFile = arg;
+    mbstowcs(warg, arg, 1024);
+    sei.lpFile = warg;
 //    sei.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
 
-    ShellExecuteEx(&sei);
+    ShellExecuteExW(&sei);
     return(res);
 #else
     if(kshellexec_super) 
@@ -585,11 +590,11 @@ int kshellexec(const char *arg)
  *  @return             char*   expanded string  
  *  
  */
-char* A_expand_super_API(const char* name)
+char* A_expand_super_API(char* name)
 {
     int     pos;
 
-    pos = K_find(KL_WS, name);
+    pos = K_find(KL_WS, const_cast<char*>(name));
     if (pos < 0) return(NULL);
     return((char *)KLVAL(KL_WS, pos));
 }

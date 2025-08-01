@@ -14,6 +14,10 @@ extern  int     G_CUR_DATA;
 extern  int     G_CUR_WINDOW;
 extern  int     G_CUR_TITLE;
 
+extern  char    **KT_names;
+extern  int     KT_nbnames;   
+extern  int     KT_mode[MAX_MODE];
+
 /*----------------------------- DEFINE -----------------------------*/
 
 #define G_FSCALEMAX       2.0

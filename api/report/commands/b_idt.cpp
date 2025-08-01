@@ -5,10 +5,10 @@
  *  
  *  List of Functions
  *  ------------------
- *      int B_IdtExecute(char* arg)             $IdtExecute period_from period_to [idt1 idt2...]
- *      int B_IdtExecuteVarFiles(char* arg)     $IdtExecuteVarFiles file1 [file2 ...]
- *      int B_IdtExecuteSclFiles(char* arg)     $IdtExecuteSclFiles file1 [file2 ...]
- *      int B_IdtExecuteTrace(char* arg)        $IdtExecuteTrace {Yes | No}
+ *      int B_IdtExecute(char* arg, int unused)             $IdtExecute period_from period_to [idt1 idt2...]
+ *      int B_IdtExecuteVarFiles(char* arg, int unused)     $IdtExecuteVarFiles file1 [file2 ...]
+ *      int B_IdtExecuteSclFiles(char* arg, int unused)     $IdtExecuteSclFiles file1 [file2 ...]
+ *      int B_IdtExecuteTrace(char* arg, int unused)        $IdtExecuteTrace {Yes | No}
  */
 #include "api/b_args.h"
 #include "api/b_errors.h"
@@ -20,18 +20,18 @@
 
 
 // List of functions
-int B_IdtExecute(char* arg);
+int B_IdtExecute(char* arg, int unused);
 int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
-int B_IdtExecuteVarFiles(char* arg);
-int B_IdtExecuteSclFiles(char* arg);
-int B_IdtExecuteTrace(char* arg);
+int B_IdtExecuteVarFiles(char* arg, int unused);
+int B_IdtExecuteSclFiles(char* arg, int unused);
+int B_IdtExecuteTrace(char* arg, int unused);
 
 
 /**
  *  Report function to execute identities. Used in conjunction with report functions
- *      B_IdtExecuteVarFiles(char* arg)
- *      B_IdtExecuteSclFiles(char* arg)
- *      B_IdtExecuteTrace(char* arg)
+ *      B_IdtExecuteVarFiles(char* arg, int unused)
+ *      B_IdtExecuteSclFiles(char* arg, int unused)
+ *      B_IdtExecuteTrace(char* arg, int unused)
  *  
  *  Syntax: $IdtExecute period_from period_to [idt1 idt2...]
  *  
@@ -45,7 +45,7 @@ int B_IdtExecuteTrace(char* arg);
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
 
-int B_IdtExecute(char* arg)
+int B_IdtExecute(char* arg, int unused)
 {
     int     lg1, lg2;
     int     rc = 0;
@@ -65,7 +65,7 @@ int B_IdtExecute(char* arg)
 
     rc = B_IdtExecuteIdts(smpl, idts);
 
-    SCR_free_tbl(idts);
+    SCR_free_tbl((unsigned char**) idts);
     SCR_free(smpl);
     return(rc);
 }
@@ -90,23 +90,23 @@ int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
 {
     KDB     *tdbi, *tkdb;
 
-    if(idts == NULL || SCR_tbl_size(idts) == 0)
+    if(idts == NULL || SCR_tbl_size((unsigned char**) idts) == 0)
         tkdb = KI_exec(KI_WS,
-                       KV_WS, SCR_tbl_size(KEXEC_VFILES), KEXEC_VFILES,
-                       KS_WS, SCR_tbl_size(KEXEC_SFILES), KEXEC_SFILES,
+                       KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                       KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                        smpl);
     else {
-        tdbi = K_refer(KI_WS, SCR_tbl_size(idts), idts);
+        tdbi = K_refer(KI_WS, SCR_tbl_size((unsigned char**) idts), idts);
         tkdb = KI_exec(tdbi,
-                       KV_WS, SCR_tbl_size(KEXEC_VFILES), KEXEC_VFILES,
-                       KS_WS, SCR_tbl_size(KEXEC_SFILES), KEXEC_SFILES,
+                       KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                       KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                        smpl);
         K_free_kdb(tdbi);
     }
 
-    SCR_free_tbl(KEXEC_VFILES);
+    SCR_free_tbl((unsigned char**) KEXEC_VFILES);
     KEXEC_VFILES = NULL;
-    SCR_free_tbl(KEXEC_SFILES);
+    SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = NULL;
 
     if(tkdb == NULL) return(-1);
@@ -132,9 +132,9 @@ int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteVarFiles(char* arg)
+int B_IdtExecuteVarFiles(char* arg, int unused)
 {
-    SCR_free_tbl(KEXEC_VFILES);
+    SCR_free_tbl((unsigned char**) KEXEC_VFILES);
     KEXEC_VFILES = B_ainit_chk(arg, NULL, 0);
     return(0);
 }
@@ -153,9 +153,9 @@ int B_IdtExecuteVarFiles(char* arg)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteSclFiles(char* arg)
+int B_IdtExecuteSclFiles(char* arg, int unused)
 {
-    SCR_free_tbl(KEXEC_SFILES);
+    SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = B_ainit_chk(arg, NULL, 0);
     return(0);
 }
@@ -175,7 +175,7 @@ int B_IdtExecuteSclFiles(char* arg)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteTrace(char* arg)
+int B_IdtExecuteTrace(char* arg, int unused)
 {
     KEXEC_TRACE = (SCR_upper_char(arg[0]) == 'Y') ? 1 : 0;  /* JMP 19-12-97 */
     return(0);

@@ -41,11 +41,11 @@
 
 // Structure to store one allocated memory block. 
 // Used (only when RP_STDALLOC is null) by RP_alloc(), RP_stracpy(), RP_vtoms()... 
-typedef struct _memblk_ {
+struct MEMBLK {
     int  used;      // 1 if in use, 0 otherwise
     int  size;      // allocated size
     char *ptr;      // pointer to an allocated memory block
-} MEMBLK;
+};
 
 // Table of allocated memory blocs
 static MEMBLK *RP_MEMBLKS = 0;     // Table of allocated MEMBLKs
@@ -199,7 +199,8 @@ char *RP_stracpy(char *ptr)
 {
     char        *ptr1;
 
-    if(RP_STDALLOC) return(SCR_stracpy(ptr));
+    if(RP_STDALLOC) 
+        return((char*) SCR_stracpy((unsigned char*) ptr));
     ptr1 = RP_alloc((int)strlen(ptr) + 1);
     strcpy(ptr1, ptr);
     return(ptr1);
@@ -229,11 +230,11 @@ unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)
     // 1. Compter les strings entre séparateurs
     while(1) {
         for(i = 0 ; str[i] ; i++)
-            if(!U_is_in(str[i], seps)) break; /* SKIP SEPS */
+            if(!U_is_in(str[i], (char*) seps)) break; /* SKIP SEPS */
         if(str[i] == 0) break;
         str += i;
         for(i = 0 ; str[i] ; i++)
-            if(U_is_in(str[i], seps)) break;
+            if(U_is_in(str[i], (char*) seps)) break;
         ntbl++;
         if(str[i] == 0) break; /* JMP 07-06-96 */
         str += i + 1;
@@ -244,14 +245,14 @@ unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)
     ntbl = 0;
     while(1) {
         for(i = 0 ; str[i] ; i++)
-            if(!U_is_in(str[i], seps)) break; /* SKIP SEPS */
+            if(!U_is_in(str[i], (char*) seps)) break; /* SKIP SEPS */
         if(str[i] == 0) break;
         str += i;
         for(i = 0 ; str[i] ; i++)
-            if(U_is_in(str[i], seps)) break;
+            if(U_is_in(str[i], (char*) seps)) break;
 
         if(str2 == 0) {
-            str2 = RP_stracpy(str);
+            str2 = (unsigned char*) RP_stracpy((char*) str);
             str = str2;
         }
         tbl[ntbl] = str;
@@ -294,8 +295,8 @@ int RP_free_tbl(unsigned char **tbl)
         return(0);
     }
 
-    RP_free(tbl[0]);
-    RP_free((unsigned char *)tbl);
+    RP_free((char*) tbl[0]);
+    RP_free((char*) tbl);
     return(0);
 }
 
@@ -388,7 +389,7 @@ U_ch **SCR_vtomsq(char* str, char* seps, int quote)
         tmp = str[i];
         str[i] = 0;
 
-        SCR_add_ptr(&tbl, &ntbl, str);
+        SCR_add_ptr(&tbl, &ntbl, (unsigned char*) str);
         str[i] = tmp;
         if(tmp == 0) break;
         str += i + 1;

@@ -7,8 +7,8 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_FileImportCmt(char* arg)  $FileImportCmt format rule infile outfile language [trace]
- *      int B_FileImportVar(char* arg)  $FileImportVar format rule infile outfile from to  [trace]
+ *      int B_FileImportCmt(char* arg, int unused)  $FileImportCmt format rule infile outfile language [trace]
+ *      int B_FileImportVar(char* arg, int unused)  $FileImportVar format rule infile outfile from to  [trace]
  */
 
  
@@ -31,7 +31,7 @@
  *  
  *  @see https://iode.plan.be/doku.php?id=fileimportcmt
  */
-int B_FileImportCmt(char* arg)
+int B_FileImportCmt(char* arg, int unused)
 {
     int     rc = 0, nb_args, format, lang;
     char    **args = NULL, *trace, *rule, *infile, *oufile, empty_buf[1];
@@ -77,7 +77,7 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=fileimportvar
  */
-int B_FileImportVar(char* arg)
+int B_FileImportVar(char* arg, int unused)
 {
     int     rc = 0, nb_args, format;
     char    **args = NULL, *trace, *rule, *from, *to,*infile, *oufile, empty_buf[1];

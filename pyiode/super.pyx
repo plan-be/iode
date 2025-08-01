@@ -22,36 +22,36 @@ cdef extern from "super.h":
     cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
                              const unsigned char** buts) noexcept
 
-    cdef int c_PrintObjDef_super() except? -1
-    cdef int c_ViewPrintGr_super() except? -1
-    cdef int c_ViewPrintTbl_super() except? -1
-    cdef int c_ViewByTbl_super() except? -1
-    cdef int c_DataSearch_super() except? -1
-    cdef int c_DataDuplicate_super() except? -1
-    cdef int c_DataList_super() except? -1
-    cdef int c_DataCompare_super() except? -1
-    cdef int c_DataCalcLst_super() except? -1
-    cdef int c_DataListSort_super() except? -1
-    cdef int c_DataEditGraph_super() except? -1
-    cdef int c_DataScan_super() except? -1
-    cdef int c_StatUnitRoot_super() except? -1
-    cdef int c_WsLoad_super() except? -1
-    cdef int c_WsSave_super() except? -1
-    cdef int c_WsMerge_super() except? -1
-    cdef int c_WsDescr_super() except? -1
-    cdef int c_WsCopy_super() except? -1
-    cdef int c_WsClear_super() except? -1
-    cdef int c_WsSample_super() except? -1
-    cdef int c_WsExtrapolate_super() except? -1
-    cdef int c_WsHtoL_super() except? -1
-    cdef int c_WsLtoH_super() except? -1
-    cdef int c_WsSeasonAdj_super() except? -1
-    cdef int c_WsTrend_super() except? -1
-    cdef int c_ModelSimulate_super() except? -1
-    cdef int c_ModelCompile_super() except? -1
-    cdef int c_IdtExecute_super() except? -1
-    cdef int c_EqsEstimate_super() except? -1
-    cdef int c_XodeRuleImport_super() except? -1
+    cdef int c_PrintObjDef_super(char* arg, int unused) except? -1
+    cdef int c_ViewPrintGr_super(char* arg, int unused) except? -1
+    cdef int c_ViewPrintTbl_super(char* arg, int unused) except? -1
+    cdef int c_ViewByTbl_super(char* arg, int unused) except? -1
+    cdef int c_DataSearch_super(char* arg, int unused) except? -1
+    cdef int c_DataDuplicate_super(char* arg, int unused) except? -1
+    cdef int c_DataList_super(char* arg, int unused) except? -1
+    cdef int c_DataCompare_super(char* arg, int unused) except? -1
+    cdef int c_DataCalcLst_super(char* arg, int unused) except? -1
+    cdef int c_DataListSort_super(char* arg, int unused) except? -1
+    cdef int c_DataEditGraph_super(char* arg, int unused) except? -1
+    cdef int c_DataScan_super(char* arg, int unused) except? -1
+    cdef int c_StatUnitRoot_super(char* arg, int unused) except? -1
+    cdef int c_WsLoad_super(char* arg, int unused) except? -1
+    cdef int c_WsSave_super(char* arg, int unused) except? -1
+    cdef int c_WsMerge_super(char* arg, int unused) except? -1
+    cdef int c_WsDescr_super(char* arg, int unused) except? -1
+    cdef int c_WsCopy_super(char* arg, int unused) except? -1
+    cdef int c_WsClear_super(char* arg, int unused) except? -1
+    cdef int c_WsSample_super(char* arg, int unused) except? -1
+    cdef int c_WsExtrapolate_super(char* arg, int unused) except? -1
+    cdef int c_WsHtoL_super(char* arg, int unused) except? -1
+    cdef int c_WsLtoH_super(char* arg, int unused) except? -1
+    cdef int c_WsSeasonAdj_super(char* arg, int unused) except? -1
+    cdef int c_WsTrend_super(char* arg, int unused) except? -1
+    cdef int c_ModelSimulate_super(char* arg, int unused) except? -1
+    cdef int c_ModelCompile_super(char* arg, int unused) except? -1
+    cdef int c_IdtExecute_super(char* arg, int unused) except? -1
+    cdef int c_EqsEstimate_super(char* arg, int unused) except? -1
+    cdef int c_XodeRuleImport_super(char* arg, int unused) except? -1
 
     cdef int c_ViewTable_super(TBL* tbl, char* smpl, char* name) except? -1
 
@@ -124,94 +124,94 @@ def skip_pause(value: bool):
 def skip_msg_box(value: bool):
     kmsgbox_continue = <bint>value
 
-cdef int c_PrintObjDef_super():
+cdef int c_PrintObjDef_super(char* arg, int unused):
     return __registry_super_functions['PrintObjDef']()
 
-cdef int c_ViewPrintGr_super():
+cdef int c_ViewPrintGr_super(char* arg, int unused):
     return __registry_super_functions['ViePrintGr']()
 
-cdef int c_ViewPrintTbl_super():
+cdef int c_ViewPrintTbl_super(char* arg, int unused):
     return __registry_super_functions['ViewPrintTbl']()
 
-cdef int c_ViewByTbl_super():
+cdef int c_ViewByTbl_super(char* arg, int unused):
     return __registry_super_functions['ViewByTbl']()
 
-cdef int c_DataSearch_super():
+cdef int c_DataSearch_super(char* arg, int unused):
     return __registry_super_functions['DaSearch']()
 
-cdef int c_DataDuplicate_super():
+cdef int c_DataDuplicate_super(char* arg, int unused):
     return __registry_super_functions['DataDuplicate']()
 
-cdef int c_DataList_super():
+cdef int c_DataList_super(char* arg, int unused):
     return __registry_super_functions['DataList']()
 
-cdef int c_DataCompare_super():
+cdef int c_DataCompare_super(char* arg, int unused):
     return __registry_super_functions['DataCompare']()
 
-cdef int c_DataCalcLst_super():
+cdef int c_DataCalcLst_super(char* arg, int unused):
     return __registry_super_functions['DataCalcLst']()
 
-cdef int c_DataListSort_super():
+cdef int c_DataListSort_super(char* arg, int unused):
     return __registry_super_functions['DataListSort']()
 
-cdef int c_DataEditGraph_super():
+cdef int c_DataEditGraph_super(char* arg, int unused):
     return __registry_super_functions['DataEditGraph']()
 
-cdef int c_DataScan_super():
+cdef int c_DataScan_super(char* arg, int unused):
     return __registry_super_functions['DataScan']()
 
-cdef int c_StatUnitRoot_super():
+cdef int c_StatUnitRoot_super(char* arg, int unused):
     return __registry_super_functions['StatUnitRoot']()
 
-cdef int c_WsLoad_super():
+cdef int c_WsLoad_super(char* arg, int unused):
     return __registry_super_functions['WsLoad']()
 
-cdef int c_WsSave_super():
+cdef int c_WsSave_super(char* arg, int unused):
     return __registry_super_functions['WsSave']()
 
-cdef int c_WsMerge_super():
+cdef int c_WsMerge_super(char* arg, int unused):
     return __registry_super_functions['WsMerge']()
 
-cdef int c_WsDescr_super():
+cdef int c_WsDescr_super(char* arg, int unused):
     return __registry_super_functions['WsDescr']()
 
-cdef int c_WsCopy_super():
+cdef int c_WsCopy_super(char* arg, int unused):
     return __registry_super_functions['WsCopy']()
 
-cdef int c_WsClear_super():
+cdef int c_WsClear_super(char* arg, int unused):
     return __registry_super_functions['WsClear']()
 
-cdef int c_WsSample_super():
+cdef int c_WsSample_super(char* arg, int unused):
     return __registry_super_functions['WsSample']()
 
-cdef int c_WsExtrapolate_super():
+cdef int c_WsExtrapolate_super(char* arg, int unused):
     return __registry_super_functions['WsExtrapolate']()
 
-cdef int c_WsHtoL_super():
+cdef int c_WsHtoL_super(char* arg, int unused):
     return __registry_super_functions['WsHtoL']()
 
-cdef int c_WsLtoH_super():
+cdef int c_WsLtoH_super(char* arg, int unused):
     return __registry_super_functions['WsLtoH']()
 
-cdef int c_WsSeasonAdj_super():
+cdef int c_WsSeasonAdj_super(char* arg, int unused):
     return __registry_super_functions['WsSeasonAdj']()
 
-cdef int c_WsTrend_super():
+cdef int c_WsTrend_super(char* arg, int unused):
     return __registry_super_functions['WsTrend']()
 
-cdef int c_ModelSimulate_super():
+cdef int c_ModelSimulate_super(char* arg, int unused):
     return __registry_super_functions['ModelSimulate']()
 
-cdef int c_ModelCompile_super():
+cdef int c_ModelCompile_super(char* arg, int unused):
     return __registry_super_functions['ModelCompile']()
 
-cdef int c_IdtExecute_super():
+cdef int c_IdtExecute_super(char* arg, int unused):
     return __registry_super_functions['IdtExecute']()
 
-cdef int c_EqsEstimate_super():
+cdef int c_EqsEstimate_super(char* arg, int unused):
     return __registry_super_functions['EqsEstimate']()
 
-cdef int c_XodeRuleImport_super():
+cdef int c_XodeRuleImport_super(char* arg, int unused):
     return __registry_super_functions['XodeRuleImport']()
 
 cdef int c_ViewTable_super(TBL* tbl, char* smpl, char* name):

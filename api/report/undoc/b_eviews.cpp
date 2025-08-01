@@ -58,7 +58,7 @@
  *      EV_cc_idt(char *idt, char *endo, char *lec)               | Transform E-views identity idt into LEC format and returns the first encountered var name as endogenous.
  *      int EV_read_line(char *buf)                               | Read a line in EV_FD and delete the optional comment as from the first ' char.
  *      int EV_cc_file(char *filename)                            | Interpret an E-Views file and store all read objects into the current equation and scalar WS. 
- *      int B_WsImportEviews(char *arg)                           | $WsImportEviews filename
+ *      int B_WsImportEviews(char* arg, int unused)                           | $WsImportEviews filename
  */
  
 // 2012-05-04 : version 1
@@ -76,6 +76,7 @@
 
 //================================================================================================================= */
 
+#include "api/constants.h"
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 
@@ -132,8 +133,8 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
             case YY_EOF:
                 goto fin;
             case YY_WORD:
-                strcpy(word, yy->yy_text);
-                SCR_upper(word);
+                strcpy(word, (char*) yy->yy_text);
+                SCR_upper((unsigned char*) word);
 
                 // D(...) -> d(...)
                 if(strcmp(word, "D") == 0) {
@@ -156,7 +157,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                 }
 
                 // C(123) -> c_123
-                else if(strcmp(yy->yy_text, "C") == 0) {
+                else if(strcmp((char*) yy->yy_text, "C") == 0) {
                     YY_skip_spaces(yy);
                     if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != '(') return(-1); // Erreur de syntaxe
                     YY_skip_spaces(yy);
@@ -179,9 +180,9 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                             // NAME(n => param
                             isscl = 1;
                             if(EV_ISKEEPCOEFS)                                                        // JMP 2017-02-05
-                                sprintf(lec + strlen(lec), "%s_%d", SCR_lower(word), yy->yy_long);  // JMP 2017-02-05
+                                sprintf(lec + strlen(lec), "%s_%d", SCR_lower((unsigned char*) word), yy->yy_long);  // JMP 2017-02-05
                             else                                                                    // JMP 2017-02-05
-                                sprintf(lec + strlen(lec), "%s", SCR_lower(word));                  // JMP 2017-02-05
+                                sprintf(lec + strlen(lec), "%s", SCR_lower((unsigned char*) word));                  // JMP 2017-02-05
 
                             YY_skip_spaces(yy);
                             if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return(-1); // Syntax
@@ -206,7 +207,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                     if(endo[0] == 0 && !isscl) {
                         strcpy(endo, word);
                         strcpy(scl, endo);
-                        SCR_lower(scl);
+                        SCR_lower((unsigned char*) scl);
                     }
                     var = 1; // Last token = varname
                 }
@@ -246,11 +247,11 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                 // @PCH -> grt @TREND -> t
                 else if(ch == '@') {
                     if(YY_read(yy) != YY_WORD) return(-1);
-                    if(strcmp(yy->yy_text, "PCH") == 0) {
+                    if(strcmp((char*) yy->yy_text, "PCH") == 0) {
                         sprintf(lec + strlen(lec), " 0.01 * grt"); // JMP 19/2/2013
                         var = 0;
                     }
-                    else if(strcmp(yy->yy_text, "TREND") == 0) {
+                    else if(strcmp((char*) yy->yy_text, "TREND") == 0) {
                         sprintf(lec + strlen(lec), " t");
                         var = 1;
                     }
@@ -289,7 +290,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
             case YY_LONG:
             case YY_DOUBLE:
             default :
-                strcat(lec, yy->yy_text);
+                strcat(lec, (char*) yy->yy_text);
                 var = 0;
                 break;
         }
@@ -309,13 +310,13 @@ fin:
  *  @param [out] coefs     double*  values of the coefs
  *  @return                int      -1 on error, nb of coefs if ok
  */
-EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
+int EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
 {
     int		idx = 0, pos1 = 0, i, csign;
 
     while(1) {
         // find next coef (ie "C(") and move pointer in lasteq and lastsubeq
-        pos1 = U_index(lasteq, "C(");
+        pos1 = U_index((unsigned char*) lasteq, (unsigned char*) "C(");
         if(pos1 < 0) break;
 
         // if ABC(... -> not a coef, thus skip
@@ -365,7 +366,7 @@ EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
 
         // lasteq -> after C(...)
         lasteq += pos1 + 2;
-        pos1 = U_pos(')', lasteq);
+        pos1 = U_pos(')', (unsigned char*) lasteq);
         if(pos1 < 0) return(-1);
         lasteq += pos1 + 1; // après C(...)
     }
@@ -382,10 +383,10 @@ EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
  *  @param [out] lec    char *      lec form
  *  @return             int         0 if OK, -1 if syntax error in lasteq
  */
-EV_cc_idt(char *idt, char *endo, char *lec)
+int EV_cc_idt(char *idt, char *endo, char *lec)
 {
-    SCR_upper(idt);
-    SCR_replace(idt, "@IDENTITY", "");
+    SCR_upper((unsigned char*) idt);
+    SCR_replace((unsigned char*) idt, (unsigned char*) "@IDENTITY", (unsigned char*) "");
     return(EV_cc_eq(idt, endo, lec));
 }
 
@@ -402,7 +403,7 @@ int EV_read_line(char *buf)
 
     if(EV_FD == 0) return(-1);
     EV_LINENB++;
-    n = SCR_read_line(EV_FD, buf, EV_MAXBUF - 1);
+    n = SCR_read_line(EV_FD, (unsigned char*) buf, EV_MAXBUF - 1);
     if(n < 0) {
         fclose(EV_FD);
         EV_FD = 0;
@@ -412,8 +413,8 @@ int EV_read_line(char *buf)
     for(n = 0; buf[n] && buf[n] != '\''; n++);
     buf[n] = 0;
 
-    SCR_strip(buf);
-    SCR_upper(buf);
+    SCR_strip((unsigned char*) buf);
+    SCR_upper((unsigned char*) buf);
     return(n);
 }
 
@@ -473,7 +474,7 @@ int EV_cc_file(char *filename)
             // Save in WS
             if(K_upd_eqs(endo, lec, lasteq, 0, 0L, 0L, 0L, 0L, 0)) break;
             for(i = 0 ; i < nbcoefs ; i++) {
-                sprintf(buf, "%s_%d %lf 1", SCR_lower(endo), i + 1, coefs[i + 1]);
+                sprintf(buf, "%s_%d %lf 1", SCR_lower((unsigned char*) endo), i + 1, coefs[i + 1]);
                 if(B_DataUpdate(buf, SCALARS)) goto err;
             }
             continue;
@@ -531,7 +532,7 @@ err:
 
 
 // $WsImportEviews filename
-int B_WsImportEviews(char *arg)
+int B_WsImportEviews(char* arg, int unused)
 {
     return(EV_cc_file(arg));
 }

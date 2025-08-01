@@ -23,7 +23,10 @@
 #include "api/objs/lists.h"
 #include "api/objs/tables.h"
 #include "api/objs/grep.h"
+#include "api/report/commands/commands.h"       // K_AggrChar
 
+
+extern "C" int SCR_ADD_PTR_CHUNCK;
 
 /**
  *  Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...
@@ -58,13 +61,12 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     TLINE   *tline;
     TCELL   *tcell;
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
-    extern int SCR_ADD_PTR_CHUNCK;
     
     if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) {     // JMP 19/01/2023 => speed
         n = KNB(kdb);
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
         for(i = 0; i < n ; i++) 
-            lst[i] = SCR_stracpy(KONAME(kdb, i));
+            lst[i] = (char*) SCR_stracpy((unsigned char*) KONAME(kdb, i));
         return(lst);
     }
 
@@ -118,10 +120,10 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
             }
         }
 
-        if(found) SCR_add_ptr(&lst, &n, KONAME(kdb, i));
+        if(found) SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) KONAME(kdb, i));
     }
 
-    if(lst != NULL) SCR_add_ptr(&lst, &n, NULL);
+    if(lst != NULL) SCR_add_ptr((unsigned char***) &lst, &n, NULL);
     
     SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;    // JMP 19/01/2023
     return(lst);
@@ -155,23 +157,23 @@ char *K_expand(int type, char* file, char* pattern, int all)
         if(kdb == NULL) return(lst);  /* JMP 05-01-99 */
     }
 
-    ptbl = SCR_vtoms(pattern, A_SEPS); /* JMP 14-08-98 */
-    np = SCR_tbl_size(ptbl);
+    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */
+    np = SCR_tbl_size((unsigned char**) ptbl);
     for(i = 0; i < np; i++) {
         if(ptbl[i][0] != '"' &&
                 (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) {
             tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
             SCR_free(ptbl[i]);
             if(tbl != NULL) {
-                ptbl[i] = SCR_mtov(tbl, ';');
-                SCR_free_tbl(tbl);
+                ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
+                SCR_free_tbl((unsigned char**) tbl);
             }
-            else ptbl[i] = SCR_stracpy("");
+            else ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
         }
     }
 
-    lst = SCR_mtov(ptbl, ';');
-    SCR_free_tbl(ptbl);
+    lst = (char*) SCR_mtov((unsigned char**) ptbl, ';');
+    SCR_free_tbl((unsigned char**) ptbl);
 
     if(file != NULL) K_free(kdb);
     return(lst);
@@ -199,29 +201,26 @@ char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
 
     if(kdb == NULL) kdb = K_WS[type];
 
-    ptbl = SCR_vtoms(pattern, A_SEPS); /* JMP 14-08-98 */
-    np = SCR_tbl_size(ptbl);
+    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */
+    np = SCR_tbl_size((unsigned char**) ptbl);
     for(i = 0; i < np; i++) {
         if(ptbl[i][0] != '"' &&
                 (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) {
             tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
             SCR_free(ptbl[i]);
             if(tbl != NULL) {
-                ptbl[i] = SCR_mtov(tbl, ';');
-                SCR_free_tbl(tbl);
+                ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
+                SCR_free_tbl((unsigned char**) tbl);
             }
-            else ptbl[i] = SCR_stracpy("");
+            else ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
         }
     }
 
-    lst = SCR_mtov(ptbl, ';');
-    SCR_free_tbl(ptbl);
+    lst = (char*) SCR_mtov((unsigned char**) ptbl, ';');
+    SCR_free_tbl((unsigned char**) ptbl);
 
     return(lst);
 }
-
-
-char    K_AggrChar;     // Replacement character in the aggregated names
 
 /**
  *  Transforms a variable name based on an "aggregation" pattern. 
@@ -276,12 +275,8 @@ int K_aggr(char* pattern, char* ename, char* nname)
     if(ename[e]) goto done; /* premature end of pattern */
 
     nname[n] = 0;
-    SCR_sqz(nname);
+    SCR_sqz((unsigned char*) nname);
     rc = 0;
 done:
     return(rc);
 }
-
-
-
-

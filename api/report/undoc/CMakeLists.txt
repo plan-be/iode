@@ -1,3 +1,4 @@
 
-target_sources(iode_c_api PRIVATE b_dde.c b_pdest.c b_print.c b_view.c b_step.cpp b_season.c 
-                               b_trend.c b_eviews.c b_ds.c b_sql.c b_api.c)
+target_sources(iode_c_api PRIVATE b_dde.cpp b_pdest.cpp b_print.cpp b_view.cpp b_step.cpp 
+                                  b_season.cpp b_trend.cpp b_eviews.cpp b_ds.cpp b_sql.cpp 
+                                  b_api.cpp)

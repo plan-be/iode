@@ -7,9 +7,9 @@
  *  
  *  List of functions 
  *  -----------------
- *  int B_WsHtoLLast(char* arg)     $WsHtoLLast Filename VarList
- *  int B_WsHtoLMean(char* arg)     $WsHtoLMean Filename VarList
- *  int B_WsHtoLSum(char* arg)      $WsHtoLSum Filename VarList
+ *  int B_WsHtoLLast(char* arg, int unused)     $WsHtoLLast Filename VarList
+ *  int B_WsHtoLMean(char* arg, int unused)     $WsHtoLMean Filename VarList
+ *  int B_WsHtoLSum(char* arg, int unused)      $WsHtoLSum Filename VarList
  */
 #include "api/b_args.h"
 #include "api/b_errors.h"
@@ -103,7 +103,7 @@ static int B_htol(int method, char* arg)
     lg = B_get_arg0(file, arg, K_MAX_FILE);
 
     data = B_ainit_chk(arg + lg, NULL, 0);
-    nb = SCR_tbl_size(data);
+    nb = SCR_tbl_size((unsigned char**) data);
     if(nb == 0) goto done;
 
     from = K_load(VARIABLES, file, nb, data);
@@ -159,7 +159,7 @@ static int B_htol(int method, char* arg)
 done:
     K_free(to);
     K_free(from);
-    SCR_free_tbl(data);
+    SCR_free_tbl((unsigned char**) data);
 
     SW_nfree(t_smpl);
     SW_nfree(t_vec);
@@ -239,7 +239,7 @@ done:
  *  
  *  @see https://iode.plan.be/doku.php?id=WsHtoLLast
  */
-int B_WsHtoLLast(char* arg)
+int B_WsHtoLLast(char* arg, int unused)
 {
     return(B_htol(HTOL_LAST, arg));
 }
@@ -250,7 +250,7 @@ int B_WsHtoLLast(char* arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=WsHtoLMean
  */
-int B_WsHtoLMean(char* arg)
+int B_WsHtoLMean(char* arg, int unused)
 {
     return(B_htol(HTOL_MEAN, arg));
 }
@@ -261,7 +261,7 @@ int B_WsHtoLMean(char* arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=WsHtoLSum
  */
-int B_WsHtoLSum(char* arg)
+int B_WsHtoLSum(char* arg, int unused)
 {
     return(B_htol(HTOL_SUM, arg));
 }
