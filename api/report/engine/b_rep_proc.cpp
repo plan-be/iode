@@ -65,8 +65,8 @@
  *      static void RP_proc_delete(int proc_nb)     Deletes a REP_PROC object and frees its reference in the table REP_PROCS.
  *      static int RP_proc_create(char *name)       Adds a new empty PROC in REP_PROCS.
  *      void RP_proc_free_all()                     Frees all the defined procedures and the table REP_PROCS.
- *      int RP_procdef(char* arg)                   Reads and creates a new PROC.
- *      int RP_procexec(char* arg)                  Executes a procedure (called by $procexec parms).
+ *      int RP_procdef(char* arg, int unused)                   Reads and creates a new PROC.
+ *      int RP_procexec(char* arg, int unused)                  Executes a procedure (called by $procexec parms).
  *      
  *  List of global variables
  *  ------------------------
@@ -79,12 +79,13 @@
 
 
 // REP_PROC: procedure parameters and code
-typedef struct _rp_proc_ {
+struct REP_PROC 
+{
     char    proc_name[80];      // PROC name (case sensitive)
     char    **proc_parms;       // List of parameter names
     int     proc_nb_parms;      // Number of parameters
     REPFILE *proc_rf;           // Procedure lines (= sub-report) including $procdef and $procend
-} REP_PROC;
+};
 
 // Global variables
 static REP_PROC    **REP_PROCS;            // Table of pointers to existing PROCs (including deleted ones as NULL pointers)
@@ -100,7 +101,7 @@ static int RP_proc_find(char *name)
 {
     int     i;
 
-    SCR_sqz(name);
+    SCR_sqz((unsigned char*) name);
     for(i = 0 ; i < REP_NB_PROCS ; i++)
         if(REP_PROCS[i] && strcmp(REP_PROCS[i]->proc_name, name) == 0) return(i);
 
@@ -122,8 +123,8 @@ static int RP_proc_is_procend(char *line)
     strcpy(buf, line);  // JMP 23/5/2019
     //U_rjust_text(buf);  // JMP 23/5/2019  05/11/2022
     //U_ljust_text(buf);  // JMP 23/5/2019  05/11/2022
-    SCR_sqz(buf);       // JMP 05/11/2022
-    SCR_lower(buf);     // JMP 23/5/2019
+    SCR_sqz((unsigned char*) buf);       // JMP 05/11/2022
+    SCR_lower((unsigned char*) buf);     // JMP 23/5/2019
     if(strcmp(buf, "$procend") == 0) return(1);
     return(0);
 }
@@ -141,7 +142,7 @@ static void RP_proc_delete(int proc_nb)
     if(proc_nb < 0) return;
     proc = REP_PROCS[proc_nb];
     if(proc == 0) return;
-    SCR_free_tbl(proc->proc_parms);
+    SCR_free_tbl((unsigned char**) proc->proc_parms);
     RP_free_repfile(proc->proc_rf);
     //SCR_free(proc->proc_filename);
     SCR_free(proc);
@@ -174,7 +175,7 @@ static int RP_proc_create(char *name)
     }
 
     proc = REP_PROCS[proc_nb] = (REP_PROC *) SCR_malloc(sizeof(REP_PROC));
-    SCR_strlcpy(proc->proc_name, name, sizeof(proc->proc_name) - 1);
+    SCR_strlcpy((unsigned char*) proc->proc_name, (unsigned char*) name, sizeof(proc->proc_name) - 1);
     return(proc_nb);
 }
 
@@ -200,7 +201,7 @@ void RP_proc_free_all()
  *  @param [in] char*   arg     line starting with "$procdef" 
  *  @return     int             0 if a PROC is created, -1 on error
  */
-int RP_procdef(char* arg)
+int RP_procdef(char* arg, int unused)
 {
     //REPFILE			*RP_create_repfile(char *, unsigned char **);
     REP_PROC        *proc;
@@ -208,23 +209,23 @@ int RP_procdef(char* arg)
     unsigned char   name[128], buf[1024], *list, **lines; // JMP 23/5/2019
     int             proc_nb, nblines = 0, line1, i;
 
-    if(RP_splitline(arg, name, &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
 
     // Creates the REP_PROC object
     // if a proc with the same name already exists, first deletes the existing one
-    proc_nb = RP_proc_create(name);
+    proc_nb = RP_proc_create((char*) name);
     proc = REP_PROCS[proc_nb];
 
     // Compute the formal parameters (sep = space)
-    proc->proc_parms = SCR_vtoms(list, " ");
-    proc->proc_nb_parms = SCR_tbl_size(proc->proc_parms);
+    proc->proc_parms = (char**) SCR_vtoms(list, (unsigned char*) " ");
+    proc->proc_nb_parms = SCR_tbl_size((unsigned char**) proc->proc_parms);
 
     // Save the current position in CUR_REPFILE
     line1 =  rf->curline;
 
     // Reads CUR_REPFILE to the next $procend line (or EOF)
     for(nblines = 0; rf->curline < rf->nblines ; rf->curline++, nblines++) {
-        if(RP_proc_is_procend(rf->tbl[rf->curline])) {                      // JMP 23/5/2019
+        if(RP_proc_is_procend((char*) rf->tbl[rf->curline])) {                      // JMP 23/5/2019
             rf->curline++; // To go to the next line in the report execution (if any)
             
             // Creates a REPFILE in memory containing the PROC code 
@@ -232,8 +233,8 @@ int RP_procdef(char* arg)
             lines = (unsigned char **) SCR_malloc((nblines + 1) * sizeof(char *));
             for(i = 0 ; i < nblines ; i++)
                 lines[i] = SCR_stracpy(rf->tbl[line1 + i]);
-            sprintf(buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename, line1);
-            proc->proc_rf = RP_create_repfile(buf, lines); 
+            sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename, line1);
+            proc->proc_rf = RP_create_repfile((char*) buf, lines); 
             break;
         }
     }
@@ -261,16 +262,16 @@ int RP_procdef(char* arg)
  *  @param [in] char*   arg     line beginning with "$procexec"
  *  @return     int             -1 if the PROC does not exist
  */
-int RP_procexec(char* arg)
+int RP_procexec(char* arg, int unused)
 {
     unsigned char   name[128], *list, **aparms, *lastparms;
     int             rc = 0, i, nformal, nactual, proc_nb;
     REP_PROC        *proc;
 
-    if(RP_splitline(arg, name, &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
 
     // Searches the proc definition
-    proc_nb = RP_proc_find(name);
+    proc_nb = RP_proc_find((char*) name);
     if(proc_nb < 0) {
         B_seterror("Procedure %s: not defined", name);
         return(-1);
@@ -282,7 +283,7 @@ int RP_procexec(char* arg)
     if(rc < 0) return(rc);
 
     // Creates macros with the actual parameters
-    aparms = SCR_vtomsq(list, B_SEPS, '"');
+    aparms = SCR_vtomsq((char*) list, B_SEPS, '"');
     //aparms = SCR_vtoms(list, " ");
     nactual = SCR_tbl_size(aparms);
     nformal = proc->proc_nb_parms;
@@ -291,7 +292,7 @@ int RP_procexec(char* arg)
     // If there are less actual parms than formal parms, creates only $defines for the actual ones
     if(nformal >= nactual) {
         for(i = 0 ; i < nactual; i++) {
-            rc = RP_define_1(proc->proc_parms[i], aparms[i]);
+            rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
             if(rc < 0) return(rc);
         }
     }
@@ -299,11 +300,11 @@ int RP_procexec(char* arg)
     //  is created with the list of all remaining actual parms separated by a space
     else {
         for(i = 0 ; i < nformal - 1; i++) {
-            rc = RP_define_1(proc->proc_parms[i], aparms[i]);
+            rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
             if(rc < 0) return(rc);
         }
         lastparms = SCR_mtov(aparms + nformal - 1, ' ');
-        rc = RP_define_1(proc->proc_parms[nformal - 1], lastparms);
+        rc = RP_define_1(proc->proc_parms[nformal - 1], (char*) lastparms);
         SCR_free(lastparms);
         if(rc < 0) return(rc);
     }

@@ -817,28 +817,28 @@ Some of IODE report commands line $ExcelGet are implemented here.
 |`int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)`||
 |`char *B_ExcelGetItem(char *arg)`||
 |`int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)`||
-|`int B_ExcelDecimal(char *arg)`||
-|`int B_ExcelThousand(char *arg)`||
-|`int B_ExcelCurrency(char *arg)`||
-|`int B_ExcelLang(char *arg)`||
+|`int B_ExcelDecimal(char *arg, int unused)`||
+|`int B_ExcelThousand(char *arg, int unused)`||
+|`int B_ExcelCurrency(char *arg, int unused)`||
+|`int B_ExcelLang(char *arg, int unused)`||
 |`int B_ExcelGet(char *arg, int type)`||
 |`int B_ExcelSet(char *arg, int type)`||
-|`int B_ExcelExecute(char *arg)`||
+|`int B_ExcelExecute(char *arg, int unused)`||
 |`int B_ExcelCmd(char *cmd, char *arg)`||
-|`int B_DDEGet(char *arg)`||
-|`int B_ExcelWrite(char *ptr)`||
-|`int B_DDEGet(char *arg)`||
+|`int B_DDEGet(char *arg, int unused)`||
+|`int B_ExcelWrite(char *ptr, int unused)`||
+|`int B_DDEGet(char *arg, int unused)`||
 |`char *B_ExcelGetItem(char *arg)`||
 |`int B_ExcelGet(char *arg, int type)`||
 |`int B_ExcelSet(char *arg, int type)`||
-|`int B_ExcelExecute(char *arg)`||
+|`int B_ExcelExecute(char *arg, int unused)`||
 |`int B_ExcelCmd(char *cmd, char *arg)`||
-|`int B_ExcelWrite(char *ptr)`||
-|`int B_ExcelOpen(char *arg)`||
-|`int B_ExcelClose(char *arg)`||
-|`int B_ExcelPrint(char *arg)`||
-|`int B_ExcelSave(char *arg)`||
-|`int B_ExcelSaveAs(char *arg)`||
-|`int B_ExcelNew(char *arg)`||
+|`int B_ExcelWrite(char *ptr, int unused)`||
+|`int B_ExcelOpen(char *arg, int unused)`||
+|`int B_ExcelClose(char *arg, int unused)`||
+|`int B_ExcelPrint(char *arg, int unused)`||
+|`int B_ExcelSave(char *arg, int unused)`||
+|`int B_ExcelSaveAs(char *arg, int unused)`||
+|`int B_ExcelNew(char *arg, int unused)`||
 |`int IodeFmtVal(char *buf, double val)`||
 

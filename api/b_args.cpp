@@ -5,12 +5,12 @@
  *
  *  Main functions
  *  --------------
- *      char **B_ainit_chk(char* arg, ADEF* adef, int nb)       : expands an argument by replacing @filename and $listname by their contents
- *      char **B_vtom_chk(char* arg, int nb)                    : splits a string (generally a function argument) into a table of strings. 
- *      int B_loop(char *argv[], int (*fn)(), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
- *      int B_ainit_loop(char* arg, int (*fn)(), char* client)  : calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
- *      int B_get_arg0(char* arg0, char*arg, int lg)            : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
- *      int B_argpos(char* str, int ch)                         : returns the position of a char in a string. 
+ *      char **B_ainit_chk(char* arg, ADEF* adef, int nb)                   : expands an argument by replacing @filename and $listname by their contents
+ *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
+ *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
+ *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
+ *      int B_get_arg0(char* arg0, char*arg, int lg)                        : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
+ *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
  *   
  */
 #include "scr4/s_prost.h"
@@ -19,7 +19,7 @@
 #include "b_args.h"
 #include "b_errors.h"
 #include "api/utils/time.h"
-#include "api/report/engine/engine.h"
+#include "api/report/engine/engine.h"       // SCR_vtomsq
 
 
 char    B_SEPS[] = " ,\n\t";        // Accepted separators for fn arguments (in report, DOS GUI..)
@@ -64,9 +64,9 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
     args = A_init(arg);
     if(args == 0) return(args);
     if((adef && A_check(args, adef)) ||
-            (nb > 0 && SCR_tbl_size(args) != nb)) {
+            (nb > 0 && SCR_tbl_size((unsigned char**) args) != nb)) {
         B_seterrn(OM_ILL_ARGS);
-        A_free(args);
+        A_free((unsigned char**) args);
         args = 0;
     }
 
@@ -90,19 +90,19 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
  */
 char **B_vtom_chk(char* arg, int nb)
 {
-    char **args;
-    char *tmp = SCR_stracpy(arg);       // need to create a copy of arg to avoid segmentation fault 
+    unsigned char **args;
+    char *tmp = (char*) SCR_stracpy((unsigned char*) arg);       // need to create a copy of arg to avoid segmentation fault 
                                         // when called from C++/cython: 
 
     args = SCR_vtomsq(tmp, B_SEPS, '"');
-    if(args == 0) return(args);
+    if(args == 0) return((char**) args);
     if((nb > 0 && SCR_tbl_size(args) != nb)) {
         B_seterrn(OM_ILL_ARGS);
         SCR_free_tbl(args);
         args = 0;
     }
 
-    return(args);
+    return((char**) args);
 }
 
 
@@ -122,12 +122,12 @@ char **B_vtom_chk(char* arg, int nb)
  *  @return             int                     result of the last call to fn()
  *  
  */
-int B_loop(char *argv[], int (*fn)(), char* client)
+int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 {
     int     i, rc;
 
     for(i = 0 ; argv[i] ; i++) {
-        if(client == NULL) rc = (*fn)(argv[i]);
+        if(client == NULL) rc = (*fn)(argv[i], NULL);
         else rc = (*fn)(argv[i], client);
         if(rc) return(rc);
     }
@@ -147,14 +147,14 @@ int B_loop(char *argv[], int (*fn)(), char* client)
  *  @return             int                     result of the last call to fn()
  *  
  */
-int B_ainit_loop(char* arg, int (*fn)(), char* client)
+int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 {
     char    **argv;
     int     rc;
 
     if((argv = B_ainit_chk(arg, 0L, 0)) == 0) return(-1);
     rc = B_loop(argv, fn, client);
-    A_free(argv);
+    A_free((unsigned char**) argv);
     return(rc);
 }
 
@@ -179,8 +179,8 @@ int B_get_arg0(char* arg0, char*arg, int lg)
 {
     int     i;
 
-    SCR_replace(arg, "\t", " ");
-    U_ljust_text(arg);
+    SCR_replace((unsigned char*) arg, (unsigned char*) "\t", (unsigned char*) " ");
+    U_ljust_text((unsigned char*) arg);
     for(i = 0; i < lg - 1 && arg[i] ; i++) {
         if(U_is_in(arg[i], B_SEPS)) break;
         arg0[i] = arg[i];
@@ -207,7 +207,6 @@ int B_argpos(char* str, int ch)
 
     ch = SCR_upper_char(ch);
     pos = L_pos(str, ch);
-    pos = max(0, pos);
+    pos = std::max(0, pos);
     return(pos);
 }
-

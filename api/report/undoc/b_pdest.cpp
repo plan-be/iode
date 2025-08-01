@@ -14,61 +14,63 @@
  *      int B_PrintDestExt(char* file, int newf, int type) | Define the printing destination.
  *      int B_PrintDestFile(char *arg, int newf)           | Define the output file for the following printouts.
  *      int B_PrintDest(char *file)                        | $PrintDest [nom_fichier] [format]
- *      int B_PrintDestNew(char* file)                     | $PrintDestNew [nom_fichier] [format]
- *      int B_PrintNbDec(char* nbdec)                      | $PrintNbDec nb
- *      int B_PrintLang(char* lang)                        | $PrintLang {English | French | Dutch}
- *      int B_PrintMulti(char* multi)                      | $PrintMulti STACKMODE
- *      int B_PrintA2mAppend(char* arg)                    | $PrintA2mAppend [NO|Yes]
- *      int B_PrintTBreak(char* arg)                       | $PrintTableBreak [NO|Yes]
- *      int B_PrintTPage(char* arg)                        | $PrintTablePage  [NO|Yes]
- *      int B_PrintGPage(char* arg)                        | $PrintGraphPage [NO|Yes]
- *      int B_PrintParaNum(char* arg)                      | $PrintParanum [NO|Yes]
- *      int B_PrintPageHeader(char* arg)                   | $PrintPageHeader following_pages_title
- *      int B_PrintPageFooter(char* arg)                   | $PrintPageFooter following_pages_footer
- *      int B_PrintFont(char* arg)                         | $PrintFont Times|Helvetica|Courier|Bookman|Palatino [size [incr]]
- *      int B_PrintTFont(char* arg)                        | $PrintTableFont Times|Helvetica|Courier|Bookman|Palatino [size]
- *      int B_PrintTBox(char* arg)                         | $PrintTableBox n
- *      int B_PrintTColor(char* arg)                       | $PrintTableColor [NO|Yes]
- *      int B_PrintTWidth(char* arg)                       | $PrintTableWidth width [col1 [coln]]
- *      int B_PrintGSize(char* arg)                        | $PrintGraphSize  width [height] [fontsize]
- *      int B_PrintGTheme(char* arg)                       | $PrintGraphTheme theme
- *      int B_PrintGBand(char* arg)                        | $PrintGraphBand [per_from per_to]
- *      int B_PrintGBox(char* arg)                         | $PrintGraphBox n
- *      int B_PrintGBrush(char* arg)                       | $PrintGraphBrush pct|Yes
- *      int B_GetColor(char* arg)                          | Sub function of B_PrintColor() to interpret color names.
- *      int B_PrintGColor(char* arg)                       | $PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White
- *      int B_PrintRtfHelp(char* arg)                      | $PrintRtfHelp [YES|No]
- *      int B_PrintHtmlHelp(char* arg)                     | $PrintHtmlHelp [YES|No]
- *      int B_PrintRtfTitle(char* arg)                     | $PrintRtfTitle Help title
- *      int B_PrintRtfCopy(char* arg)                      | $PrintRtfCopyright copyright text
- *      int B_PrintRtfLevel(char* arg)                     | $PrintRtfLevel [+|-|n]
- *      int B_PrintRtfTopic(char* arg)                     | $PrintRtfTopic topic title
- *      int B_PrintGdiOrient(char* arg)                    | $PrintOrientation {Portrait|Landscape}
- *      int B_PrintGdiDuplex(char* arg)                    | $PrintDuplex {Simplex|Duplex|VerticalDuplex}
- *      int B_PrintGdiPrinter(char* arg)                   | $SetPrinter printer_name
- *      int B_PrintGIFBackColor(char* arg)                 | $PrintGIFBackColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
- *      int B_PrintGIFTransColor(char* arg)                | $PrintGIFTransColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
- *      int B_PrintGIFInterlaced(char* arg)                | $PrintGIFInterlaced {Yes|No} 
- *      int B_PrintGIFTransparent(char* arg)               | $PrintGIFTransparent {Yes|No}
- *      int B_PrintGIFFilled(char* arg)                    | $PrintGIFilled {Yes|No}
- *      int B_PrintGIFFont(char* arg)                      | $PrintGIFFont FontNb (between 0 and 5)
- *      int B_PrintHtmlStrip(char* arg)                    | $PrintHtmlStrip [YES|No]
- *      int B_PrintHtmlStyle(char* arg)                    | $PrintHtmlStyle filename
+ *      int B_PrintDestNew(char* file, int unused)                     | $PrintDestNew [nom_fichier] [format]
+ *      int B_PrintNbDec(char* nbdec, int unused)                      | $PrintNbDec nb
+ *      int B_PrintLang(char* lang, int unused)                        | $PrintLang {English | French | Dutch}
+ *      int B_PrintMulti(char* multi, int unused)                      | $PrintMulti STACKMODE
+ *      int B_PrintA2mAppend(char* arg, int unused)                    | $PrintA2mAppend [NO|Yes]
+ *      int B_PrintTBreak(char* arg, int unused)                       | $PrintTableBreak [NO|Yes]
+ *      int B_PrintTPage(char* arg, int unused)                        | $PrintTablePage  [NO|Yes]
+ *      int B_PrintGPage(char* arg, int unused)                        | $PrintGraphPage [NO|Yes]
+ *      int B_PrintParaNum(char* arg, int unused)                      | $PrintParanum [NO|Yes]
+ *      int B_PrintPageHeader(char* arg, int unused)                   | $PrintPageHeader following_pages_title
+ *      int B_PrintPageFooter(char* arg, int unused)                   | $PrintPageFooter following_pages_footer
+ *      int B_PrintFont(char* arg, int unused)                         | $PrintFont Times|Helvetica|Courier|Bookman|Palatino [size [incr]]
+ *      int B_PrintTFont(char* arg, int unused)                        | $PrintTableFont Times|Helvetica|Courier|Bookman|Palatino [size]
+ *      int B_PrintTBox(char* arg, int unused)                         | $PrintTableBox n
+ *      int B_PrintTColor(char* arg, int unused)                       | $PrintTableColor [NO|Yes]
+ *      int B_PrintTWidth(char* arg, int unused)                       | $PrintTableWidth width [col1 [coln]]
+ *      int B_PrintGSize(char* arg, int unused)                        | $PrintGraphSize  width [height] [fontsize]
+ *      int B_PrintGTheme(char* arg, int unused)                       | $PrintGraphTheme theme
+ *      int B_PrintGBand(char* arg, int unused)                        | $PrintGraphBand [per_from per_to]
+ *      int B_PrintGBox(char* arg, int unused)                         | $PrintGraphBox n
+ *      int B_PrintGBrush(char* arg, int unused)                       | $PrintGraphBrush pct|Yes
+ *      int B_GetColor(char* arg, int unused)                          | Sub function of B_PrintColor() to interpret color names.
+ *      int B_PrintGColor(char* arg, int unused)                       | $PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White
+ *      int B_PrintRtfHelp(char* arg, int unused)                      | $PrintRtfHelp [YES|No]
+ *      int B_PrintHtmlHelp(char* arg, int unused)                     | $PrintHtmlHelp [YES|No]
+ *      int B_PrintRtfTitle(char* arg, int unused)                     | $PrintRtfTitle Help title
+ *      int B_PrintRtfCopy(char* arg, int unused)                      | $PrintRtfCopyright copyright text
+ *      int B_PrintRtfLevel(char* arg, int unused)                     | $PrintRtfLevel [+|-|n]
+ *      int B_PrintRtfTopic(char* arg, int unused)                     | $PrintRtfTopic topic title
+ *      int B_PrintGdiOrient(char* arg, int unused)                    | $PrintOrientation {Portrait|Landscape}
+ *      int B_PrintGdiDuplex(char* arg, int unused)                    | $PrintDuplex {Simplex|Duplex|VerticalDuplex}
+ *      int B_PrintGdiPrinter(char* arg, int unused)                   | $SetPrinter printer_name
+ *      int B_PrintGIFBackColor(char* arg, int unused)                 | $PrintGIFBackColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
+ *      int B_PrintGIFTransColor(char* arg, int unused)                | $PrintGIFTransColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
+ *      int B_PrintGIFInterlaced(char* arg, int unused)                | $PrintGIFInterlaced {Yes|No} 
+ *      int B_PrintGIFTransparent(char* arg, int unused)               | $PrintGIFTransparent {Yes|No}
+ *      int B_PrintGIFFilled(char* arg, int unused)                    | $PrintGIFilled {Yes|No}
+ *      int B_PrintGIFFont(char* arg, int unused)                      | $PrintGIFFont FontNb (between 0 and 5)
+ *      int B_PrintHtmlStrip(char* arg, int unused)                    | $PrintHtmlStrip [YES|No]
+ *      int B_PrintHtmlStyle(char* arg, int unused)                    | $PrintHtmlStyle filename
  *      int B_A2mToAll(char* arg, int type)                | Convert an A2M file to another format.
- *      int B_A2mToPrinter(char* arg)                      | $A2mToPrinter file.a2m
- *      int B_A2mToHtml(char* arg)                         | $A2mToHtml filein fileout
- *      int B_A2mToRtf(char* arg)                          | $A2mToRtf filein fileout
- *      int B_A2mToMif(char* arg)                          | $A2mToMif filein fileout
- *      int B_A2mToCsv(char* arg)                          | $A2mToCsv filein fileout
+ *      int B_A2mToPrinter(char* arg, int unused)                      | $A2mToPrinter file.a2m
+ *      int B_A2mToHtml(char* arg, int unused)                         | $A2mToHtml filein fileout
+ *      int B_A2mToRtf(char* arg, int unused)                          | $A2mToRtf filein fileout
+ *      int B_A2mToMif(char* arg, int unused)                          | $A2mToMif filein fileout
+ *      int B_A2mToCsv(char* arg, int unused)                          | $A2mToCsv filein fileout
  *      int B_A2mSetCol(int *dest, int col)                | Extracts a color definition from B_GIFCOLS and saves it in dest[3].
- *      int B_PrintHtmlTableClass(char *table_class)       | $PrintHtmlTableClass class_name
- *      int B_PrintHtmlTRClass(char *tr_class)             | $PrintHtmlTRClass class_name
- *      int B_PrintHtmlTHClass(char *th_class)             | $PrintHtmlTHClass class_name
- *      int B_PrintHtmlTDClass(char *td_class)             | $PrintHtmlTDClass class_name
+ *      int B_PrintHtmlTableClass(char *table_class, int unused)       | $PrintHtmlTableClass class_name
+ *      int B_PrintHtmlTRClass(char *tr_class, int unused)             | $PrintHtmlTRClass class_name
+ *      int B_PrintHtmlTHClass(char *th_class, int unused)             | $PrintHtmlTHClass class_name
+ *      int B_PrintHtmlTDClass(char *td_class, int unused)             | $PrintHtmlTDClass class_name
  */
 #include "scr4/s_a2m.h"
 #include "scr4/s_args.h"
+#include "scr4/s_proa2m.h"
 
+#include "api/constants.h"
 #include "api/b_a2mini.h"
 #include "api/b_errors.h"
 #include "api/k_lang.h"
@@ -116,10 +118,10 @@ int B_PrintDestFile(char *arg, int newf)
     int     nb_args, type, rc;
 
     KT_CUR_TOPIC = 0; /* JMP 06-01-02 */
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != 0) {
-        args = SCR_vtoms(arg, B_SEPS);
-        nb_args = SCR_tbl_size(args);
+        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+        nb_args = SCR_tbl_size((unsigned char**) args);
         if(nb_args > 1) {
             switch(args[1][0]) {
                 case 'h':
@@ -150,7 +152,7 @@ int B_PrintDestFile(char *arg, int newf)
         }
         else type = W_A2M;
         rc = B_PrintDestExt(args[0], newf, type);
-        A_free(args);
+        A_free((unsigned char**) args);
     }
     else rc = B_PrintDestExt("", newf, W_GDI);
 
@@ -159,7 +161,7 @@ int B_PrintDestFile(char *arg, int newf)
 
 //  $PrintDest [nom_fichier] [format]
 //  where format = A2M, MIF, HTML, RTF or CSV
-int B_PrintDest(char *file)
+int B_PrintDest(char *file, int unused)
 {
     return(B_PrintDestFile(file, 0));
 }
@@ -167,14 +169,14 @@ int B_PrintDest(char *file)
 
 // $PrintDestNew [nom_fichier] [format]
 //  where format = A2M, MIF, HTML, RTF or CSV 
-int B_PrintDestNew(char* file)
+int B_PrintDestNew(char* file, int unused)
 {
     return(B_PrintDestFile(file, 1));
 }
 
 
 // $PrintNbDec nb
-int B_PrintNbDec(char* nbdec)
+int B_PrintNbDec(char* nbdec, int unused)
 {
     K_NBDEC = atoi(nbdec); 
     if(K_NBDEC > 99 || (K_NBDEC < 0 && K_NBDEC != -1)) {
@@ -186,7 +188,7 @@ int B_PrintNbDec(char* nbdec)
 }
 
 // $PrintLang {English | French | Dutch}
-int B_PrintLang(char* lang)       
+int B_PrintLang(char* lang, int unused)       
 {
     switch(lang[0]) {
         case 'e' :
@@ -216,7 +218,7 @@ int B_PrintLang(char* lang)
 // $PrintMulti STACKMODE
 // where STACKMODE = None(=default), Stacked, Percent
 // GB 30/10/2007 
-int B_PrintMulti(char* multi) 
+int B_PrintMulti(char* multi, int unused) 
 {
     switch(multi[0]) {
         case 'n' :
@@ -240,7 +242,7 @@ int B_PrintMulti(char* multi)
 
 
 // $PrintA2mAppend [NO|Yes]
-int B_PrintA2mAppend(char* arg)
+int B_PrintA2mAppend(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -258,7 +260,7 @@ int B_PrintA2mAppend(char* arg)
 
 
 // $PrintTableBreak [NO|Yes]
-int B_PrintTBreak(char* arg)
+int B_PrintTBreak(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -276,7 +278,7 @@ int B_PrintTBreak(char* arg)
 
 
 // $PrintTablePage  [NO|Yes]
-int B_PrintTPage(char* arg)
+int B_PrintTPage(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -294,7 +296,7 @@ int B_PrintTPage(char* arg)
 
 
 // $PrintGraphPage [NO|Yes]
-int B_PrintGPage(char* arg)
+int B_PrintGPage(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -312,7 +314,7 @@ int B_PrintGPage(char* arg)
 
 
 // $PrintParanum [NO|Yes]
-int B_PrintParaNum(char* arg)
+int B_PrintParaNum(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -330,7 +332,7 @@ int B_PrintParaNum(char* arg)
 
 
 // $PrintPageHeader following_pages_title
-int B_PrintPageHeader(char* arg)
+int B_PrintPageHeader(char* arg, int unused)
 {
     W_print_pg_header(arg);      // JMP 27/6/2022
     return(0);
@@ -338,7 +340,7 @@ int B_PrintPageHeader(char* arg)
 
 
 // $PrintPageFooter following_pages_footer
-int B_PrintPageFooter(char* arg)
+int B_PrintPageFooter(char* arg, int unused)
 {
     W_print_pg_footer(arg);      // JMP 27/6/2022
     return(0);
@@ -346,26 +348,26 @@ int B_PrintPageFooter(char* arg)
 
 
 // $PrintFont Times|Helvetica|Courier|Bookman|Palatino [size [incr]]
-int B_PrintFont(char* arg)
+int B_PrintFont(char* arg, int unused)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
         A2M_FONTFAMILY = SCR_upper_char(tbl[0][0]);
         // BGUI_PrintFont1();
     }
     if(ntbl > 1) {
-        A2M_FONTSIZE = atoi(tbl[1]);
-        A2M_FONTSIZE = max(A2M_FONTSIZE, 4);
+        A2M_FONTSIZE = atoi((char*) tbl[1]);
+        A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
 
     if(ntbl > 2) {
-        A2M_FONTINCR = atoi(tbl[2]);
-        A2M_FONTINCR = max(A2M_FONTINCR, 1);
+        A2M_FONTINCR = atoi((char*) tbl[2]);
+        A2M_FONTINCR = std::max(A2M_FONTINCR, 1);
         // BGUI_PrintFont3();
     }
     SCR_free_tbl(tbl);
@@ -375,20 +377,20 @@ int B_PrintFont(char* arg)
 
 
 // $PrintTableFont Times|Helvetica|Courier|Bookman|Palatino [size]
-int B_PrintTFont(char* arg)
+int B_PrintTFont(char* arg, int unused)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
         A2M_TFONTFAMILY = SCR_upper_char(tbl[0][0]);
         // BGUI_PrintTFont1();
     }
     if(ntbl > 1) {
-        A2M_TFONTSIZE = atoi(tbl[1]);
-        A2M_TFONTSIZE = max(A2M_TFONTSIZE, 4);
+        A2M_TFONTSIZE = atoi((char*) tbl[1]);
+        A2M_TFONTSIZE = std::max(A2M_TFONTSIZE, 4);
         // BGUI_PrintTFont2();
     }
     SCR_free_tbl(tbl);
@@ -397,7 +399,7 @@ int B_PrintTFont(char* arg)
 
 
 // $PrintTableBox  n
-int B_PrintTBox(char* arg)
+int B_PrintTBox(char* arg, int unused)
 {
     int     box = atoi(arg);
 
@@ -414,7 +416,7 @@ int B_PrintTBox(char* arg)
 
 
 // $PrintTableColor [NO|Yes]
-int B_PrintTColor(char* arg)
+int B_PrintTColor(char* arg, int unused)
 {
     int     box = atoi(arg);
 
@@ -429,32 +431,32 @@ int B_PrintTColor(char* arg)
 
 
 // $PrintTableWidth width [col1 [coln]]
-int B_PrintTWidth(char* arg)
+int B_PrintTWidth(char* arg, int unused)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, w, col1, coln;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
-        w = atoi(tbl[0]);
-        w = max(w, 65);
+        w = atoi((char*) tbl[0]);
+        w = std::max(w, 65);
         A2M_RTF_TWIDTH = w;
         A2M_FRM_TWIDTH = w;
         // BGUI_PrintTWidth1();
     }
 
     if(ntbl > 1) {
-        col1 = atoi(tbl[1]);
-        col1 = max(col1, 50);
+        col1 = atoi((char*) tbl[1]);
+        col1 = std::max(col1, 50);
         A2M_RTF_TCOL1 = col1;
         A2M_FRM_TCOL1 = col1;
         // BGUI_PrintTWidth2();
     }
 
     if(ntbl > 2) {
-        coln = atoi(tbl[2]);
-        coln = max(coln, 15);
+        coln = atoi((char*) tbl[2]);
+        coln = std::max(coln, 15);
         A2M_RTF_TCOLN = coln;
         A2M_FRM_TCOLN = coln;
         // BGUI_PrintTWidth3();
@@ -466,32 +468,31 @@ int B_PrintTWidth(char* arg)
 
 
 // $PrintGraphSize  width [height] [fontsize]
-int B_PrintGSize(char* arg)
+int B_PrintGSize(char* arg, int unused)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, w;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
-        w = atoi(tbl[0]);
-        w = max(w, 35);
+        w = atoi((char*) tbl[0]);
+        w = std::max(w, 35);
         A2M_GWIDTH = 0.1 * w;
         // BGUI_PrintGSize1();
     }
 
     if(ntbl > 1) {
-        w = atoi(tbl[1]);
-        w = max(w, 20);
+        w = atoi((char*) tbl[1]);
+        w = std::max(w, 20);
         A2M_GHEIGHT = 0.1 * w;
         // BGUI_PrintGSize2();
     }
     if(ntbl > 2) { // GB 16/03/2009
-        A2M_FONTSIZE = atoi(tbl[2]);
-        A2M_FONTSIZE = max(A2M_FONTSIZE, 4);
+        A2M_FONTSIZE = atoi((char*) tbl[2]);
+        A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
-
 
     SCR_free_tbl(tbl);
     return(0);
@@ -500,7 +501,7 @@ int B_PrintGSize(char* arg)
 
 // $PrintGraphTheme theme
 // TODO: add to manual
-int B_PrintGTheme(char* arg)
+int B_PrintGTheme(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
     ChrtThemeInit(arg);
@@ -511,7 +512,7 @@ int B_PrintGTheme(char* arg)
 
 // $PrintGraphBand [per_from per_to]
 // TODO: add to manual (see GB)
-int B_PrintGBand(char* arg)
+int B_PrintGBand(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
     char    **args;
@@ -540,7 +541,7 @@ int B_PrintGBand(char* arg)
 
 
 // $PrintGraphBox n
-int B_PrintGBox(char* arg)
+int B_PrintGBox(char* arg, int unused)
 {
     int     box = atoi(arg);
 
@@ -552,7 +553,7 @@ int B_PrintGBox(char* arg)
 
 
 // $PrintGraphBrush pct|Yes
-int B_PrintGBrush(char* arg)
+int B_PrintGBrush(char* arg, int unused)
 {
     int     box = atoi(arg);
 
@@ -564,11 +565,11 @@ int B_PrintGBrush(char* arg)
 
 
 // Sub function of B_PrintColor() to interpret color names.
-int B_GetColor(char* arg)
+int B_GetColor(char* arg, int unused)
 {
     int     col;
 
-    SCR_lower(arg);
+    SCR_lower((unsigned char*) arg);
     if(strcmp(arg, "blue") == 0)           col  = 'b';
     else if(strcmp(arg, "black") == 0)     col  = 'B';
     else if(strcmp(arg, "magenta") == 0)   col  = 'm';
@@ -577,12 +578,12 @@ int B_GetColor(char* arg)
     else if(strcmp(arg, "green") == 0)     col  = 'g';
     else if(strcmp(arg, "yellow") == 0)    col  = 'y';
     else if(strcmp(arg, "white") == 0)     col  = 'w';
-    return(U_pos(col, "byBwrgcm"));
+    return(U_pos(col, (unsigned char*) "byBwrgcm"));
 }
 
 
 // $PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White
-int B_PrintGColor(char* arg)
+int B_PrintGColor(char* arg, int unused)
 {
     int     col;
 
@@ -594,7 +595,7 @@ int B_PrintGColor(char* arg)
 
 
 // $PrintRtfHelp [YES|No]
-int B_PrintRtfHelp(char* arg)
+int B_PrintRtfHelp(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -615,7 +616,7 @@ int B_PrintRtfHelp(char* arg)
 
 
 // $PrintHtmlHelp [YES|No]
-int B_PrintHtmlHelp(char* arg)
+int B_PrintHtmlHelp(char* arg, int unused)
 {
     switch(arg[0]) {
         case '0':
@@ -634,41 +635,40 @@ int B_PrintHtmlHelp(char* arg)
 
 
 // $PrintRtfTitle Help title
-int B_PrintRtfTitle(char* arg)
+int B_PrintRtfTitle(char* arg, int unused)
 {
-    B_A2mSetRtfTitle(arg);
+    B_A2mSetRtfTitle((unsigned char*) arg);
     // BGUI_PrintRtfTitle(arg);
     return(0);
 }
 
 
 // $PrintRtfCopyright copyright text
-int B_PrintRtfCopy(char* arg)
+int B_PrintRtfCopy(char* arg, int unused)
 {
-    B_A2mSetRtfCopy(arg);
+    B_A2mSetRtfCopy((unsigned char*) arg);
     // BGUI_PrintRtfCopy(arg);
     return(0);
 }
 
 
 // $PrintRtfLevel [+|-|n]
-int B_PrintRtfLevel(char* arg)
+int B_PrintRtfLevel(char* arg, int unused)
 {
     int     level = atoi(arg);
-    extern int KT_CUR_LEVEL;
 
     if(level == 0) {
         if(arg[0] == '+') KT_CUR_LEVEL++;
         else              KT_CUR_LEVEL--;
     }
     else KT_CUR_LEVEL = level;
-    KT_CUR_LEVEL = max(0, KT_CUR_LEVEL);
+    KT_CUR_LEVEL = std::max(0, KT_CUR_LEVEL);
     return(0);
 }
 
 
 // $PrintRtfTopic topic title
-int B_PrintRtfTopic(char* arg)
+int B_PrintRtfTopic(char* arg, int unused)
 {   
     W_print_rtf_topic(arg);
     return(0);
@@ -676,7 +676,7 @@ int B_PrintRtfTopic(char* arg)
 
 
 // $PrintOrientation {Portrait|Landscape}
-int B_PrintGdiOrient(char* arg)
+int B_PrintGdiOrient(char* arg, int unused)
 {
     extern int W_gdiorient;
 
@@ -695,7 +695,7 @@ int B_PrintGdiOrient(char* arg)
 
 
 // $PrintDuplex {Simplex|Duplex|VerticalDuplex}
-int B_PrintGdiDuplex(char* arg)
+int B_PrintGdiDuplex(char* arg, int unused)
 {
     extern int W_gdiduplex;
 
@@ -720,17 +720,17 @@ int B_PrintGdiDuplex(char* arg)
 
 
 // $SetPrinter printer_name
-int B_PrintGdiPrinter(char* arg)
+int B_PrintGdiPrinter(char* arg, int unused)
 {
     extern char W_gdiprinter[];
 
-    SCR_strlcpy(W_gdiprinter, arg, 70);
+    SCR_strlcpy((unsigned char*) W_gdiprinter, (unsigned char*) arg, 70);
     return(0);
 }
 
 
 // $PrintGIFBackColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
-int B_PrintGIFBackColor(char* arg)
+int B_PrintGIFBackColor(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)
     int     col;
@@ -746,7 +746,7 @@ int B_PrintGIFBackColor(char* arg)
 
 
 // $PrintGIFTransColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
-int B_PrintGIFTransColor(char* arg)
+int B_PrintGIFTransColor(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)
     int     col;
@@ -762,7 +762,7 @@ int B_PrintGIFTransColor(char* arg)
 
 
 // $PrintGIFInterlaced {Yes|No} 
-int B_PrintGIFInterlaced(char* arg)
+int B_PrintGIFInterlaced(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
     switch(arg[0]) {
@@ -782,7 +782,7 @@ int B_PrintGIFInterlaced(char* arg)
 
 
 // $PrintGIFTransparent {Yes|No}
-int B_PrintGIFTransparent(char* arg)
+int B_PrintGIFTransparent(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)
     switch(arg[0]) {
@@ -803,7 +803,7 @@ int B_PrintGIFTransparent(char* arg)
 
 
 // $PrintGIFilled {Yes|No}
-int B_PrintGIFFilled(char* arg)
+int B_PrintGIFFilled(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)
     switch(arg[0]) {
@@ -824,7 +824,7 @@ int B_PrintGIFFilled(char* arg)
 
 
 // $PrintGIFFont FontNb (between 0 and 5)
-int B_PrintGIFFont(char* arg)
+int B_PrintGIFFont(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)
     int     font;
@@ -840,7 +840,7 @@ int B_PrintGIFFont(char* arg)
 
 
 // $PrintHtmlStrip [YES|No]
-int B_PrintHtmlStrip(char* arg)
+int B_PrintHtmlStrip(char* arg, int unused)
 {
     extern int  A2M_HTML_STRIP;
 
@@ -862,11 +862,11 @@ int B_PrintHtmlStrip(char* arg)
 // $PrintHtmlStyle filename
 // TODO: add to manual
 
-int B_PrintHtmlStyle(char* arg) 
+int B_PrintHtmlStyle(char* arg, int unused) 
 {
     extern char *A2M_HTML_STYLE;
 
-    A2M_HTML_RELSTYLE = SCR_stracpy(arg);
+    A2M_HTML_RELSTYLE = (char*) SCR_stracpy((unsigned char*) arg);
     return(0);
 }
 
@@ -886,42 +886,46 @@ int B_A2mToAll(char* arg, int type)
     U_ch    **tbl = 0, ibuf[256], obuf[256], *ext;
     int     ntbl;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl == 0) return(-1);
-    SCR_cat_ext(ibuf, tbl[0], "a2m");
+    SCR_cat_ext((char*) ibuf, (char*) tbl[0], (char*) "a2m");
     switch(type) {
         case A2M_DESTFRM :
-            ext = "mif";
+            ext = (unsigned char*) "mif";
             break;
         case A2M_DESTHTML:
-            ext = "htm";
+            ext = (unsigned char*) "htm";
             break;
         case A2M_DESTRTF :
-            ext = "rtf";
+            ext = (unsigned char*) "rtf";
             break;
         case A2M_DESTCSV :
-            ext = "csv";
+            ext = (unsigned char*) "csv";
             break;
         default : 
-            ext = "";           
+            ext = (unsigned char*) "";           
             break;                  
     }
 
-    if(ntbl > 1) SCR_cat_ext(obuf, tbl[1], ext);
-    else         SCR_change_ext(obuf, tbl[0], ext);
+    if(ntbl > 1) SCR_cat_ext((char*) obuf, (char*) tbl[1], (char*) ext);
+    else         SCR_change_ext((char*) obuf, (char*) tbl[0], (char*) ext);
     SCR_free_tbl(tbl);
     switch(type) {
         case A2M_DESTFRM :
-            return(A2mToMif(ibuf, obuf));
+            return(A2mToMif((char*) ibuf, (char*) obuf));
         case A2M_DESTHTML:
-            return(A2mToHtml(ibuf, obuf, W_htmlhelp));
+            return(A2mToHtml((char*) ibuf, (char*) obuf, W_htmlhelp));
         case A2M_DESTRTF :
-            return(A2mToRtf(ibuf, obuf, W_rtfhelp));
+            return(A2mToRtf((char*) ibuf, (char*) obuf, W_rtfhelp));
         case A2M_DESTCSV :
-            return(A2mToCsv(ibuf, obuf));
-        case A2M_DESTGDIPRT :
-            return(A2mToGdiPrinter(0L, 1, "Iode", ibuf));
+            return(A2mToCsv((char*) ibuf, (char*) obuf));
+            case A2M_DESTGDIPRT :
+#ifdef WIN32
+            return(A2mToGdiPrinter(0L, 1, (unsigned char*) "Iode", ibuf));
+#else
+            return(-1); // Not supported on non-Windows platforms
+#endif
         default : 
             return(-1);
     }
@@ -930,35 +934,35 @@ int B_A2mToAll(char* arg, int type)
 
 
 // $A2mToPrinter file.a2m
-int B_A2mToPrinter(char* arg)
+int B_A2mToPrinter(char* arg, int unused)
 {
     return(B_A2mToAll(arg, A2M_DESTGDIPRT));
 }
 
 
 // $A2mToHtml filein fileout
-int B_A2mToHtml(char* arg)
+int B_A2mToHtml(char* arg, int unused)
 {
     return(B_A2mToAll(arg, A2M_DESTHTML));
 }
 
 
 // $A2mToRtf filein fileout
-int B_A2mToRtf(char* arg)
+int B_A2mToRtf(char* arg, int unused)
 {
     return(B_A2mToAll(arg, A2M_DESTRTF));
 }
 
 
 // $A2mToMif filein fileout
-int B_A2mToMif(char* arg)
+int B_A2mToMif(char* arg, int unused)
 {
     return(B_A2mToAll(arg, A2M_DESTFRM));
 }
 
 
 // $A2mToCsv filein fileout
-int B_A2mToCsv(char* arg)
+int B_A2mToCsv(char* arg, int unused)
 {
     return(B_A2mToAll(arg, A2M_DESTCSV));
 }
@@ -994,38 +998,38 @@ int B_A2mSetCol(int *dest, int col)
 
 // $PrintHtmlTableClass class_name
 // TODO: add to manual
-int B_PrintHtmlTableClass(char *table_class)
+int B_PrintHtmlTableClass(char *table_class, int unused)
 {
     SCR_free(A2M_HTML_TABLECLASS);
-    A2M_HTML_TABLECLASS = SCR_stracpy(table_class);
+    A2M_HTML_TABLECLASS = (char*) SCR_stracpy((unsigned char*) table_class);
     return(0);
 }
 
 // $PrintHtmlTRClass class_name
 // TODO: add to manual
-int B_PrintHtmlTRClass(char *tr_class)
+int B_PrintHtmlTRClass(char *tr_class, int unused)
 {
     SCR_free(A2M_HTML_TRCLASS);
-    A2M_HTML_TRCLASS = SCR_stracpy(tr_class);
+    A2M_HTML_TRCLASS = (char*) SCR_stracpy((unsigned char*) tr_class);
     return(0);
 }
 
 
 // $PrintHtmlTHClass class_name
 // TODO: add to manual
-int B_PrintHtmlTHClass(char *th_class)
+int B_PrintHtmlTHClass(char *th_class, int unused)
 {
     SCR_free(A2M_HTML_THCLASS);
-    A2M_HTML_THCLASS = SCR_stracpy(th_class);
+    A2M_HTML_THCLASS = (char*) SCR_stracpy((unsigned char*) th_class);
     return(0);
 }
 
 
 // $PrintHtmlTDClass class_name
 // TODO: add to manual
-int B_PrintHtmlTDClass(char *td_class)
+int B_PrintHtmlTDClass(char *td_class, int unused)
 {
     SCR_free(A2M_HTML_TDCLASS);
-    A2M_HTML_TDCLASS = SCR_stracpy(td_class);
+    A2M_HTML_TDCLASS = (char*) SCR_stracpy((unsigned char*) td_class);
     return(0);
 }

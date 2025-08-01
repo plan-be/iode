@@ -15,12 +15,12 @@
  *  List of functions 
  *  -----------------
  * int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)   Estimates a bloc of equations on a defined SAMPLE.
- * int B_EqsEstimate(char* arg)                     Implementation of the report function $EqsEstimate.
- * int B_EqsSetSample(char* arg)                    Implementation of the report function $EqsSetSample.
- * int B_EqsSetMethod(char* arg)                    Implementation of the report function $EqsSetMethod.   
- * int B_EqsSetBloc(char* arg)                      Implementation of the report function $EqsSetBlock
- * int B_EqsSetCmt(char* arg)                       Implementation of the report function $EqsSetCmt.
- * int B_EqsSetInstrs(char* arg)                    Implementation of the report function $EqsSetInstrs.
+ * int B_EqsEstimate(char* arg, int unused)                     Implementation of the report function $EqsEstimate.
+ * int B_EqsSetSample(char* arg, int unused)                    Implementation of the report function $EqsSetSample.
+ * int B_EqsSetMethod(char* arg, int unused)                    Implementation of the report function $EqsSetMethod.   
+ * int B_EqsSetBloc(char* arg, int unused)                      Implementation of the report function $EqsSetBlock
+ * int B_EqsSetCmt(char* arg, int unused)                       Implementation of the report function $EqsSetCmt.
+ * int B_EqsSetInstrs(char* arg, int unused)                    Implementation of the report function $EqsSetInstrs.
  */
 
 #include "api/constants.h"
@@ -98,7 +98,7 @@ int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)
  *  @See https://iode.plan.be/doku.php?id=eqsestimate for details. 
  *  
  */
-int B_EqsEstimate(char* arg)
+int B_EqsEstimate(char* arg, int unused)
 {
     int     rc = -1;
     char    **eqs;
@@ -126,7 +126,7 @@ int B_EqsEstimate(char* arg)
  *  @See https://iode.plan.be/doku.php?id=eqssetsample for details. 
  *  
  */
-int B_EqsSetSample(char* arg)
+int B_EqsSetSample(char* arg, int unused)
 {
     int     rc = 0, i;
     char    **eqs;
@@ -163,7 +163,7 @@ int B_EqsSetSample(char* arg)
  *  @See https://iode.plan.be/doku.php?id=eqssetmethod for details. 
  *  
  */
-int B_EqsSetMethod(char* arg)
+int B_EqsSetMethod(char* arg, int unused)
 {
     int     lg1, meth, rc = 0, i;
     char    tmeth[16], **eqs = 0;
@@ -192,7 +192,7 @@ int B_EqsSetMethod(char* arg)
  *  @See https://iode.plan.be/doku.php?id=eqssetbloc for details. 
  *  
  */
-int B_EqsSetBloc(char* arg)
+int B_EqsSetBloc(char* arg, int unused)
 {
     int     rc = 0, i;
     char    **eqs = 0, *bloc;
@@ -222,7 +222,7 @@ int B_EqsSetBloc(char* arg)
  *  @See https://iode.plan.be/doku.php?id=eqssetcmt for details. 
  *  
  */
-int B_EqsSetCmt(char* arg)
+int B_EqsSetCmt(char* arg, int unused)
 {
     int     lg1, rc = 0;
     char    name[16];
@@ -245,7 +245,7 @@ int B_EqsSetCmt(char* arg)
  *  @See https://iode.plan.be/doku.php?id=eqssetinstrs for details. 
  *  
  */
-int B_EqsSetInstrs(char* arg)
+int B_EqsSetInstrs(char* arg, int unused)
 {
     int     lg1, rc = 0;
     char    name[16];

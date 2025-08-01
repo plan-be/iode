@@ -5,10 +5,10 @@
  *  
  *  List of Functions
  *  -----------------
- *      int B_SysRename(char* arg)      $SysMoveFile filein fileout
- *      int B_SysCopy(char* arg)        $SysCopyFile filein fileout
- *      int B_SysAppend(char* arg)      $SysAppendFile filein fileout
- *      int B_SysDelete(char* arg)      $SysDeleteFile file1 file2 ...
+ *      int B_SysRename(char* arg, int unused)      $SysMoveFile filein fileout
+ *      int B_SysCopy(char* arg, int unused)        $SysCopyFile filein fileout
+ *      int B_SysAppend(char* arg, int unused)      $SysAppendFile filein fileout
+ *      int B_SysDelete(char* arg, int unused)      $SysDeleteFile file1 file2 ...
  *      int B_SysOemToUTF8(char *arg)   $SysOemToUTF8 inputfile outputfile
  *      int B_SysAnsiToUTF8(char *arg)  $SysAnsiToUTF8 inputfile outputfile
  *      int B_SysAnsiToOem(char *arg)   $SysAnsiToOem inputfile outputfile    
@@ -30,12 +30,12 @@
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
 
-int B_SysRename(char* arg) 
+int B_SysRename(char* arg, int unused) 
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
         B_seterror("Syntax error %s", arg);
@@ -43,7 +43,7 @@ int B_SysRename(char* arg)
         goto fin;
     }
 
-    rc = SCR_rename(tbl[0], tbl[1]);
+    rc = SCR_rename((char*) tbl[0], (char*) tbl[1]);
     if(rc) B_seterror("Rename failed (%s)", arg);
 
 fin:
@@ -57,12 +57,12 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=syscopyfile
  */
-int B_SysCopy(char* arg) 
+int B_SysCopy(char* arg, int unused) 
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
         B_seterror("Syntax error %s", arg);
@@ -70,7 +70,7 @@ int B_SysCopy(char* arg)
         goto fin;
     }
 
-    rc = SCR_copy_file(tbl[0], tbl[1]);
+    rc = SCR_copy_file((char*) tbl[0], (char*) tbl[1]);
     if(rc) B_seterror("Copy failed (%s)", arg);
 
 fin:
@@ -84,12 +84,12 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=sysappendfile
  */
-int B_SysAppend(char* arg) 
+int B_SysAppend(char* arg, int unused) 
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
         B_seterror("Syntax error %s", arg);
@@ -97,7 +97,7 @@ int B_SysAppend(char* arg)
         goto fin;
     }
 
-    rc = SCR_append_file(tbl[0], tbl[1]);
+    rc = SCR_append_file((char*) tbl[0], (char*) tbl[1]);
     if(rc) B_seterror("Copy failed (%s)", arg);
 
 fin:
@@ -111,12 +111,12 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=sysdeletefile
  */
-int B_SysDelete(char* arg) 
+int B_SysDelete(char* arg, int unused) 
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0, i;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl < 1) {
         B_seterror("Syntax error %s", arg);
@@ -124,7 +124,8 @@ int B_SysDelete(char* arg)
         goto fin;
     }
 
-    for(i = 0 ; i < ntbl ; i++) _unlink(tbl[i]);
+    for(i = 0 ; i < ntbl ; i++) 
+        _unlink((char*) tbl[i]);
 
 fin:
     SCR_free_tbl(tbl);
@@ -147,7 +148,7 @@ static int B_SysOemAnsiToUTF8(char *arg, int isansi)
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
         B_seterror("Input and output file required %s", arg);
@@ -155,8 +156,8 @@ static int B_SysOemAnsiToUTF8(char *arg, int isansi)
         goto fin;
     }
 
-    if(isansi) rc = SCR_ConvertToUTF8(tbl[0], tbl[1], 1, 1);
-    else       rc = SCR_ConvertToUTF8(tbl[0], tbl[1], 1, 0);
+    if(isansi) rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 1);
+    else       rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 0);
 
     if(rc) B_seterror("Conversion to UTF8 failed (%s)", arg);
 
@@ -170,7 +171,7 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=sysoemtoutf8
  */
-int B_SysOemToUTF8(char *arg)
+int B_SysOemToUTF8(char *arg, int unused)
 {
     return(B_SysOemAnsiToUTF8(arg, 0));
 }
@@ -181,7 +182,7 @@ int B_SysOemToUTF8(char *arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=sysansitoutf8
  */
-int B_SysAnsiToUTF8(char *arg)
+int B_SysAnsiToUTF8(char *arg, int unused)
 {
     return(B_SysOemAnsiToUTF8(arg, 1));
 }
@@ -204,7 +205,7 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
     U_ch    **tbl = 0;
     int     ntbl = 0, rc = 0;
     
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
         B_seterror("Input and output file required %s", arg);
@@ -213,11 +214,11 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
     }
     
 #ifdef DOS
-	fd1 = fopen(tbl[0], "rb");
-	fd2 = fopen(tbl[1], "wb+");
+	fd1 = fopen((char*) tbl[0], "rb");
+	fd2 = fopen((char*) tbl[1], "wb+");
 #else
-	fd1 = fopen(tbl[0], "r");
-	fd2 = fopen(tbl[1], "w+");
+	fd1 = fopen((char*) tbl[0], "r");
+	fd2 = fopen((char*) tbl[1], "w+");
 #endif
 	if(fd1 == 0 || fd2 == 0) {
 	    B_seterror("%s or %s: access denied\n", tbl[0], tbl[1]);
@@ -247,7 +248,7 @@ fin:
  *  
  *  @see https://iode.plan.be/doku.php?id=sysansitooem
  */
-int B_SysAnsiToOem(char *arg)
+int B_SysAnsiToOem(char *arg, int unused)
 {
      return(B_SysOemOrAnsiToAnsiOrOem(arg, 1));
 }
@@ -257,7 +258,7 @@ int B_SysAnsiToOem(char *arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=sysoemtoansi
  */
-int B_SysOemToAnsi(char *arg)
+int B_SysOemToAnsi(char *arg, int unused)
 {
      return(B_SysOemOrAnsiToAnsiOrOem(arg, 0));
 }

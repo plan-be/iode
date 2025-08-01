@@ -90,23 +90,23 @@
  *      U_ch *RPF_SimNorm(U_ch** args)
  *      U_ch *RPF_SimNIter(U_ch** args)
  *      U_ch *RPF_SimCpu(U_ch** args)
- *      U_ch *RPF_SimMaxit()
- *      U_ch *RPF_SimEps()
- *      U_ch *RPF_SimRelax()
- *      U_ch *RPF_SimSortNbPasses()
- *      U_ch *RPF_SimSortAlgo()
- *      U_ch *RPF_SimInitValues()
- *      U_ch *RPF_SimCpuSCC()
- *      U_ch *RPF_SimCpuSort()
+ *      U_ch *RPF_SimMaxit(U_ch** unused)
+ *      U_ch *RPF_SimEps(U_ch** unused)
+ *      U_ch *RPF_SimRelax(U_ch** unused)
+ *      U_ch *RPF_SimSortNbPasses(U_ch** unused)
+ *      U_ch *RPF_SimSortAlgo(U_ch** unused)
+ *      U_ch *RPF_SimInitValues(U_ch** unused)
+ *      U_ch *RPF_SimCpuSCC(U_ch** unused)
+ *      U_ch *RPF_SimCpuSort(U_ch** unused)
  *      U_ch *RPF_vtake(U_ch** args)
  *      U_ch *RPF_vdrop(U_ch** args)
  *      U_ch *RPF_vcount(U_ch** args)
  *      U_ch *RPF_memory(U_ch** args)
- *      U_ch *RPF_ChronoReset()
- *      U_ch *RPF_ChronoGet()
+ *      U_ch *RPF_ChronoReset(U_ch** unused)
+ *      U_ch *RPF_ChronoGet(U_ch** unused)
  *      U_ch *RPF_fappend(U_ch** args)
  *      U_ch *RPF_fdelete(U_ch** args)
- *      U_ch *RPF_getdir()
+ *      U_ch *RPF_getdir(U_ch** unused)
  *      U_ch *RPF_chdir(U_ch **args)
  *      U_ch *RPF_mkdir(U_ch **args)
  *      U_ch *RPF_rmdir(U_ch **args)
@@ -1410,7 +1410,7 @@ int RPF_CalcPeriod(U_ch** args)
  *  --------
  *      @SimMaxit()             =>  "100"
  */
-U_ch *RPF_SimMaxit()
+U_ch *RPF_SimMaxit(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1426,7 +1426,7 @@ U_ch *RPF_SimMaxit()
  *  --------
  *      @SimEps()               =>  "0.001"
  */
-U_ch *RPF_SimEps()
+U_ch *RPF_SimEps(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1442,7 +1442,7 @@ U_ch *RPF_SimEps()
  *  --------
  *        @SimRelax()             =>  "1.000000"
  */
-U_ch *RPF_SimRelax()
+U_ch *RPF_SimRelax(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1458,7 +1458,7 @@ U_ch *RPF_SimRelax()
  *  --------
  *        @SimSortNbPasses()        =>  "5"
  */
-U_ch *RPF_SimSortNbPasses()
+U_ch *RPF_SimSortNbPasses(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1473,7 +1473,7 @@ U_ch *RPF_SimSortNbPasses()
  *  --------
  *        @SimSortAlgo()        =>  "Triangulation"
  */
-U_ch *RPF_SimSortAlgo()
+U_ch *RPF_SimSortAlgo(U_ch** unused)
 {
     char *algos[] = {"Connex", "Triangulation", "None"};
     
@@ -1494,7 +1494,7 @@ U_ch *RPF_SimSortAlgo()
  *  --------
  *        @SimInitValues()        =>  "1"
  */
-U_ch *RPF_SimInitValues()
+U_ch *RPF_SimInitValues(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1642,7 +1642,7 @@ U_ch *RPF_SimCpu(U_ch** args)
  *  --------
  *        @SimCpuSCC()        =>  "31343"
  */
-U_ch *RPF_SimCpuSCC()
+U_ch *RPF_SimCpuSCC(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1657,7 +1657,7 @@ U_ch *RPF_SimCpuSCC()
  *  --------
  *        @SimCpuReorder()        =>  "1234"
  */
-U_ch *RPF_SimCpuSort()
+U_ch *RPF_SimCpuSort(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1805,7 +1805,7 @@ U_ch *RPF_vcount(U_ch** args)
  *  --------
  *        @IodeVersion()             =>  "6.69"
  */
-U_ch *RPF_IodeVersion()
+U_ch *RPF_IodeVersion(U_ch** unused)
 {
     U_ch    buf[128];
 
@@ -1863,7 +1863,7 @@ static long RPF_CHRONO = 0;     // Current chrono initial time
  *  -------
  *      @chronoreset()            =>  ""
  */
-U_ch *RPF_ChronoReset()
+U_ch *RPF_ChronoReset(U_ch** unused)
 {    
     RPF_CHRONO = WscrGetMS();
     return((unsigned char*) SCR_malloc(1));
@@ -1871,7 +1871,7 @@ U_ch *RPF_ChronoReset()
 
 
 /**
- *  Returns the number of millisecond elapsed since the last call to RPF_ChronoReset().
+ *  Returns the number of millisecond elapsed since the last call to RPF_ChronoReset(U_ch** unused).
  *  
  *  Syntax: @chronoget()
  *  
@@ -1879,7 +1879,7 @@ U_ch *RPF_ChronoReset()
  *  -------
  *      @chronoget()              =>  "47"
  */
-U_ch *RPF_ChronoGet()
+U_ch *RPF_ChronoGet(U_ch** unused)
 {
     U_ch        buf[128];
     long	    ms;
@@ -1938,7 +1938,7 @@ U_ch *RPF_fdelete(U_ch** args)
  *  --------
  *      `@getdir()`                 =>  "C:\Usr\iode"
  */
-U_ch *RPF_getdir()
+U_ch *RPF_getdir(U_ch** unused)
 {
     U_ch    dir[512];
 
@@ -1972,7 +1972,7 @@ U_ch *RPF_chdir(U_ch **args)
 
     //ODE_settitle();
     ksettitle();     // JMP 10/12/2021
-    return(RPF_getdir());
+    return(RPF_getdir(NULL));
 }
 
 

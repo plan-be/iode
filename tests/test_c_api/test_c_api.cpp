@@ -846,7 +846,7 @@ public:
 	    //U_test_B_WsLoad("fun", VARIABLES, 394);
 	
 	    // Dickey-Fuller test (E_UnitRoot)
-	    // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+	    // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
 	    sprintf(arg, "%d %d %d %s", drift, trend, order, varname);
 	    rc = B_StatUnitRoot(arg);
 	    sprintf(scalar, "df_%s", varname);
@@ -861,11 +861,11 @@ public:
 	    int     rc;
 	    char    arg[512];
 	
-	    // int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
-	    // int B_CsvSep(char *sep)                           $CsvSep char
-	    // int B_CsvNaN(char *nan)                           $CsvNaN text
-	    // int B_CsvAxes(char *var)                          $CsvAxes AxisName
-	    // int B_CsvDec(char *dec)                           $CsvDec char
+	    // int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
+	    // int B_CsvSep(char *sep, int unused)                           $CsvSep char
+	    // int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
+	    // int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
+	    // int B_CsvDec(char *dec, int unused)                           $CsvDec char
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
@@ -1725,7 +1725,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(std::string(KLPTR("LC")), "acaf1;acaf2;acaf3;acaf4");
     printf("LC = \"%s\"\n", KLPTR("LC"));
 
-    // B_DataCalcLst(char* arg)
+    // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
     B_DataUpdate("LST2 C,D,E", LISTS);
 
@@ -1796,10 +1796,10 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     EXPECT_EQ(smpl->s_p1.p_y, 1981);
 
     // TODO: implement next utests with the same canevas
-        //B_EqsSetMethod(char* arg)
-        //B_EqsSetBloc(char* arg)
-        //B_EqsSetCmt(char* arg)
-        //B_EqsSetInstrs(char* arg)
+        //B_EqsSetMethod(char* arg, int unused)
+        //B_EqsSetBloc(char* arg, int unused)
+        //B_EqsSetCmt(char* arg, int unused)
+        //B_EqsSetInstrs(char* arg, int unused)
 
     U_test_reset_kmsg_msgs();
 }
@@ -1893,25 +1893,25 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
     EXPECT_EQ(rc, 0);
     U_test_compare_localfile_to_reffile("test.a2m.utf8", "test.a2m.utf8.ref");
 
-    // B_SysRename(char* arg) : rename test.a2m.ansi -> brol.a2m.ansi
+    // B_SysRename(char* arg, int unused) : rename test.a2m.ansi -> brol.a2m.ansi
     sprintf(arg, "test.a2m.ansi brol.a2m.ansi");
     EXPECT_EQ(rc, 0);
     rc = B_SysRename(arg);
     U_test_compare_localfile_to_reffile("brol.a2m.ansi", "test.a2m.ansi.ref");
 
-    // B_SysCopy(char* arg) : copy brol.a2m.ansi dans testdbl.a2m.ansi
+    // B_SysCopy(char* arg, int unused) : copy brol.a2m.ansi dans testdbl.a2m.ansi
     sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
     rc = B_SysCopy(arg);
     EXPECT_EQ(rc, 0);
     U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "test.a2m.ansi.ref");
 
-    // B_SysAppend(char* arg) : append testdbl.a2m.ansi to brol.a2m.ansi
+    // B_SysAppend(char* arg, int unused) : append testdbl.a2m.ansi to brol.a2m.ansi
     sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
     rc = B_SysAppend(arg);
     EXPECT_EQ(rc, 0);
     U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "testdbl.a2m.ansi.ref");
 
-    // B_SysDelete(char* arg) : delete totdbl.a2m.ansi and brol.a2m.ansi
+    // B_SysDelete(char* arg, int unused) : delete totdbl.a2m.ansi and brol.a2m.ansi
     rc = B_SysDelete("brol.a2m.ansi testdbl.a2m.ansi tutu.a2m test.a2m test.a2m.oem test.a2m.utf8");
     rc = U_test_file_not_exists("brol.a2m.ansi",  "B_SysDelete(\"brol.a2m.ansi\")");
     rc = U_test_file_not_exists("brol2.a2m.ansi", "B_SysDelete(\"testdbl.a2m.ansi\")");
@@ -2233,9 +2233,9 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     // B_Model*() tests
     // ----------------
     // X int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
-    // X int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
-    // X int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
-    // X int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
+    // X int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
+    // X int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+    // X int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
     // X int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
     // X int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
     // int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
@@ -2303,7 +2303,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
     EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800673);
 
-    // B_ModelCompile(char* arg)
+    // B_ModelCompile(char* arg, int unused)
     rc = B_ModelCompile("");
     EXPECT_EQ(rc, 0);
 
@@ -2345,25 +2345,25 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     //   - int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
     //   - int B_WsExport(char* arg, int type)               $WsExport<type> filename
     //   - int B_WsImport(char* arg, int type)               $WsImport<type> filename
-    //   - int B_WsSample(char* arg)                         $WsSample period_from period_to
+    //   - int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
     //   - int B_WsClear(char* arg, int type)                $WsClear<type>
-    //   - int B_WsClearAll(char* arg)                       $WsClearAll
+    //   - int B_WsClearAll(char* arg, int unused)                       $WsClearAll
     //   - int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
     //   - int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
     //   - int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
     //   - int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-    //   - int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
-    //   - int B_WsAggrChar(char* arg)                       $WsAggrChar char
-    //   - int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
-    //   - int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
-    //   - int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
-    //   - int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+    //   - int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
+    //   - int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
+    //   - int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
+    //   - int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
+    //   - int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
+    //   - int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
     //   - int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
-    //   - int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
-    //   - int B_CsvSep(char *sep)                           $CsvSep char
-    //   - int B_CsvNaN(char *nan)                           $CsvNaN text
-    //   - int B_CsvAxes(char *var)                          $CsvAxes AxisName
-    //   - int B_CsvDec(char *dec)                           $CsvDec char
+    //   - int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
+    //   - int B_CsvSep(char *sep, int unused)                           $CsvSep char
+    //   - int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
+    //   - int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
+    //   - int B_CsvDec(char *dec, int unused)                           $CsvDec char
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
@@ -2437,7 +2437,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     for(int i = 0; i < KNB(KE_WS); i++)
         ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
 
-    // int B_WsSample(char* arg)                         $WsSample period_from period_to
+    // int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
     U_test_print_title("B_WsSample()");
     rc = B_WsSample("1965Y1 2020Y1");
     smpl = PER_atosmpl("1965Y1", "2020Y1");
@@ -2445,7 +2445,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     EXPECT_EQ(memcmp((char*) KSMPL(KV_WS), (char*) smpl, sizeof(SAMPLE)), 0);
     SCR_free(smpl);
 
-    // int B_WsClearAll(char* arg)                       $WsClearAll
+    // int B_WsClearAll(char* arg, int unused)                       $WsClearAll
     U_test_print_title("B_WsClearAll()");
     rc = B_WsClearAll("");
     EXPECT_EQ(rc, 0);
@@ -2503,7 +2503,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsMerge("fun", SCALARS, 161);
     U_test_B_WsMerge("fun", TABLES, 46);
 
-    // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
+    // int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
     U_test_print_title("B_WsExtrapolate");
     U_test_B_WsExtrapolate(0, 6.0);
     U_test_B_WsExtrapolate(1, 4.0);
@@ -2513,14 +2513,14 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsExtrapolate(5, 6.0);
     U_test_B_WsExtrapolate(6, 7.0);
 
-    // int B_WsAggrChar(char* arg)                       $WsAggrChar char
-    // int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
-    // int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
-    // int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
+    // int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
+    // int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
+    // int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
+    // int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
     U_test_print_title("B_WsAggregate");
     U_test_B_WsAggregate();
 
-    // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+    // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
     U_test_print_title("B_StatUnitRoot");
     U_test_B_WsLoad("fun", SCALARS, 161);
     U_test_B_WsLoad("fun", VARIABLES, 394);
@@ -2530,11 +2530,11 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_StatUnitRoot(1, 1, 0, "ACAF", -0.798686);
     U_test_B_StatUnitRoot(0, 0, 2, "ACAF", 1.419631);
 
-    // int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
-    // int B_CsvSep(char *sep)                           $CsvSep char
-    // int B_CsvNaN(char *nan)                           $CsvNaN text
-    // int B_CsvAxes(char *var)                          $CsvAxes AxisName
-    // int B_CsvDec(char *dec)                           $CsvDec char
+    // int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
+    // int B_CsvSep(char *sep, int unused)                           $CsvSep char
+    // int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
+    // int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
+    // int B_CsvDec(char *dec, int unused)                           $CsvDec char
     // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
     U_test_print_title("B_Csv*");
     U_test_B_Csv();

@@ -13,10 +13,10 @@
  *      int RP_macro_createdb()                     Creates the KDB RP_MACRO if it does not exist.
  *      int RP_macro_deletedb()                     Deletes the KDB RP_MACRO and its content.
  *      int RP_define_1(char *name, char *macro)    Adds or replaces a macro to RP_MACRO.
- *      int RP_define(char* arg)                    Report function to define a new macro.
+ *      int RP_define(char* arg, int unused)                    Report function to define a new macro.
  *      char* RP_get_macro_ptr(char* macro_name)    Returns the pointer to a macro (aka define) value.    
  *      int RP_undef_1(char *name)                  Deletes one macro.
- *      int RP_undef(char *arg)                     Report function to delete macros.
+ *      int RP_undef(char *arg, int unused)                     Report function to delete macros.
  *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
  *      int RP_define_save(char *name)              Saves (pushes) a macro under the name "name#<depth+1>".
  *      int RP_define_restore(char *name)           Deletes the macro "name" and restores (pops) the macro "name#<depth>" under the name "name".
@@ -98,7 +98,7 @@ int RP_define_1(char *name, char *macro)
  *  @param [in] char* arg   $define parameters
  *  @return                 see RP_define_1()
  */
-int RP_define(char* arg)
+int RP_define(char* arg, int unused)
 {
     int     lg;
     ONAME   name;
@@ -106,8 +106,8 @@ int RP_define(char* arg)
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     macro = arg + lg + 1;
-    U_ljust_text(macro);
-    SCR_strip(macro);
+    U_ljust_text((unsigned char*) macro);
+    SCR_strip((unsigned char*) macro);
 
     return(RP_define_1(name, macro));
 }
@@ -142,6 +142,10 @@ int RP_undef_1(char *name)
     return(0);
 }
 
+int wrapper_RP_undef_1(char *name, void* unused)
+{
+    return RP_undef_1(name);
+}
 
 /**
  *  Report function to delete macros.
@@ -151,11 +155,11 @@ int RP_undef_1(char *name)
  *  @param [in] char* arg   list of macro names
  *  @return                 always 0
  */
-int RP_undef(char *arg)
+int RP_undef(char *arg, int unused)
 {
     //ONAME   name;
 
-    return(B_ainit_loop(arg, RP_undef_1, (char *)0));
+    return(B_ainit_loop(arg, wrapper_RP_undef_1, (char *)0));
     //B_get_arg0(name, arg, K_MAX_NAME + 1);
     //RP_undef_1(name);
 

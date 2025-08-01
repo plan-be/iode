@@ -127,7 +127,7 @@
  *  
  *  Main functions
  *  ---------------
- *      int B_ReportExec(char* arg)                                         Executes a report file (recursive function).
+ *      int B_ReportExec(char* arg, int unused)                                         Executes a report file (recursive function).
  *      int B_ReportLine(char* line)                                        Executes a set of report lines separated by '\n'. 
  *
  *  List of global variables
@@ -145,27 +145,11 @@
 #include "api/report/undoc/undoc.h"
 
 
-// Global parameters
-// -----------------
-int     RP_ALLOW_MULTILINE = 1;     // If set, accepts instruction on multiple lines (non breaking char = '\')
-int     RP_ALLOW_NOPARSING = 1;     // If set, text between '`' is left asis
-int     RP_NOPARSING_CHAR = '`';    // No parsing character
-int     RP_ALLOW_INDENT = 0;        // Indentation of commands allowed in reports (eg: "  $cmd") // JMP 18-02-13 
-int     RP_RT = 0;                  // Indicates what to do on error: 0: continue (ignore), -2: return, -3: abort, -4: quit IODE 
-int     RP_PRINT = 2;               // Indicates how to use error messages: 2 = print and display messages, 1 = print only, 0 = ignore
-PERIOD  RP_PER;                     // current PERIOD for LEC evaluations {lec}
-int     RP_DEBUG = 0;               // Debug level for reports (0=no debug, 1=std debug, 2=full debug)// JMP 06-08-98 
-int     RP_STDOUT = 0;              // If set, the report is written to stdout (default to 0 -> write to file specified by the user)
-
 // Global working variables
 // ------------------------
-int      RP_T = 0;                  // current index (t) for LEC evaluations {lec} 
-REPFILE  *CUR_REPFILE = 0;          // Current report lines (not expanded)
-char     **RP_ARGV = NULL;          // Current report arguments
-int      RP_DEPTH = 0;              // Level of the current report in the report "stack"
-int      RP_ARG0 = 0;               // Position of the first argument in RP_ARGV (can be changed by a call to $shift)
-
-extern KDB  *RP_MACRO;              // Special KDB with all $defines (see also b_proc_defs.c)
+char            **RP_ARGV = NULL;          // Current report arguments
+int             RP_DEPTH = 0;              // Level of the current report in the report "stack"
+extern KDB      *RP_MACRO;              // Special KDB with all $defines (see also b_proc_defs.c)
 
 // Function declarations
 // ---------------------
@@ -189,7 +173,7 @@ int RP_add(char** line, int* lg, int* j, char* res);
 int RP_expand(char** line, char* buf);
 int RP_ReportExec_tbl(REPFILE *rf);
 int RP_ReportExec_1(char* file);
-int B_ReportExec(char* arg);
+int B_ReportExec(char* arg, int unused);
 int B_ReportLine(char* line, int cleanup);
 
 
@@ -210,7 +194,7 @@ REPFILE *RP_create_repfile(char *filename, unsigned char **tbl)
     REPFILE *rf;
 
     rf = (REPFILE *) SCR_malloc(sizeof(REPFILE));
-    rf->filename = SCR_stracpy(filename);
+    rf->filename = (char*) SCR_stracpy((unsigned char*) filename);
     rf->tbl = tbl;
     rf->curline = 0;
     rf->nblines = SCR_tbl_size(tbl);
@@ -316,7 +300,7 @@ char* RP_read_multiline(REPFILE* rf)
     
     while(1) {
         if(rf->curline >= rf->nblines) return(multi_line);
-        multi_line = SCR_strafcat(multi_line, rf->tbl[rf->curline]);
+        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->tbl[rf->curline]);
         rf->curline++;
         
         lg = (int) strlen(multi_line);
@@ -355,7 +339,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
     if(mode)  // expand macros, {}, ...
         rc = RP_expand(line, multi_line);
     else
-        *line = SCR_stracpy(multi_line);
+        *line = (char*) SCR_stracpy((unsigned char*) multi_line);
 
     SCR_free(multi_line);
     if(rc) return(rc);
@@ -363,7 +347,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
     // Shift text to the margin if $ or # and indent allowed
     if(*line && RP_ALLOW_INDENT) {
         for(i = 0 ; (*line)[i] && SCR_is_space((*line)[i]); i++) ; // Goto 1st non space
-        if(U_is_in((*line)[i], "$#")) U_ljust_text(*line);
+        if(U_is_in((*line)[i], "$#")) U_ljust_text((unsigned char*) *line);
     }
     //rf->curline++;
     return(rc);
@@ -441,8 +425,8 @@ int RP_splitline(char* text, char* cmd, char** arg, int lg)
 done :
     cmd[i] = 0;
     *arg = text + j;
-    U_ljust_text(*arg);
-    SCR_strip(*arg);
+    U_ljust_text((unsigned char*) *arg);
+    SCR_strip((unsigned char*) *arg);
     return(rt);
 }
 
@@ -463,7 +447,7 @@ int RP_find_fn(char* name, int* type, int fs)
 {
     int     i, lg, j;
 
-    SCR_lower(name);
+    SCR_lower((unsigned char*) name);
     for(i = 0 ; B_fns[i].keyw ; i++) {
         if(B_fns[i].type == 0) { // command withour extension 
             if(strcmp(name, B_fns[i].keyw) == 0) return(i);
@@ -558,7 +542,7 @@ char *RP_extract(char* buf, int* i, int ch)
     int     pos, j;
     char    *res;
 
-    pos = U_pos(ch, buf + (*i));
+    pos = U_pos(ch, ((unsigned char*) buf) + (*i));
     if(pos < 0) return(NULL);
 
     res = RP_alloc(pos + 1); // JMP 6/02/09
@@ -592,11 +576,13 @@ char *RP_gmacro(char* str)
     if(str == NULL) return(NULL);
 
     //if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0) {                      //JMP 13/10/2022
-    if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0) {//JMP 13/10/2022
+    if(U_pos('%', (unsigned char*) str) >= 0 || 
+       U_pos('{', (unsigned char*) str) >= 0 || 
+       U_pos('@', (unsigned char*) str) >= 0) {//JMP 13/10/2022
         RP_expand(&tmp, str);
     }
     else {
-        tmp = SCR_stracpy(str);
+        tmp = (char*) SCR_stracpy((unsigned char*) str);
     }
 
 //        if(isdigit(tmp[0])) {
@@ -604,21 +590,22 @@ char *RP_gmacro(char* str)
         pos = atoi(tmp);
 
         if(pos == 0) {
-            sprintf(buf, "%d", SCR_tbl_size(RP_ARGV) - RP_ARG0);
-            res = SCR_stracpy(buf);
+            sprintf(buf, "%d", SCR_tbl_size((unsigned char**) RP_ARGV) - RP_ARG0);
+            res = (char*) SCR_stracpy((unsigned char*) buf);
         }
         else {
             pos += RP_ARG0;
-            if(pos < 0 || pos > SCR_tbl_size(RP_ARGV)) {
+            if(pos < 0 || pos > SCR_tbl_size((unsigned char**) RP_ARGV)) {
                 B_seterrn(252, pos);
                 SCR_free(tmp); // JMP 24/8/2012
                 return(NULL);
             }
-            res = SCR_stracpy(RP_ARGV[pos - 1]);
+            res = (char*) SCR_stracpy((unsigned char*) RP_ARGV[pos - 1]);
         }
     }
     else {
-        if(tmp[0] == '*') res = SCR_mtov(RP_ARGV + RP_ARG0, ';');
+        if(tmp[0] == '*') 
+            res = (char*) SCR_mtov(((unsigned char**) RP_ARGV) + RP_ARG0, ';');
 
         else {
             pos = K_find(RP_MACRO, tmp);
@@ -627,7 +614,7 @@ char *RP_gmacro(char* str)
                 SCR_free(tmp); // JMP&GB 26/1/09
                 return(NULL);
             }
-            res = SCR_stracpy(KOVAL(RP_MACRO, pos));
+            res = (char*) SCR_stracpy((unsigned char*) KOVAL(RP_MACRO, pos));
         }
     }
 
@@ -651,11 +638,13 @@ char *RP_gcmd(char* str)
 
     if(str == NULL) return(NULL);
 
-    if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0) {
+    if(U_pos('%', (unsigned char*) str) >= 0 || 
+       U_pos('{', (unsigned char*) str) >= 0 || 
+       U_pos('@', (unsigned char*) str) >= 0) {
         RP_expand(&tmp, str);
     }
     else
-        tmp = SCR_stracpy(str); // JMP&GB 26/1/09
+        tmp = (char*) SCR_stracpy((unsigned char*) str); // JMP&GB 26/1/09
 
     RP_eval(&res, tmp);
     SCR_free(tmp);              // JMP&GB 26/1/09
@@ -698,7 +687,7 @@ double RP_evallec(char* lec)
 
     if(RP_evaltime() < 0) return(IODE_NAN);
 
-    SCR_strip(lec);
+    SCR_strip((unsigned char*) lec);
     if(lec[0]) {
         clec = L_cc(lec);
         if(clec == NULL) {
@@ -739,9 +728,9 @@ int RP_fmt(char* buf, char* format, double value)
 
     if(format == NULL) goto normal;
 
-    U_ljust_text(format);
-    SCR_strip(format);
-    SCR_upper(format);
+    U_ljust_text((unsigned char*) format);
+    SCR_strip((unsigned char*) format);
+    SCR_upper((unsigned char*) format);
     if(format[0] == '\0') goto normal;
 
     if(format[0] == 'T') {
@@ -751,7 +740,7 @@ int RP_fmt(char* buf, char* format, double value)
         return(0);
     }
 
-    fmt = SCR_vtom(format, '.');
+    fmt = (char**) SCR_vtom((unsigned char*) format, (int) '.');
     if(fmt == NULL || fmt[0] == NULL) goto normal;
 
     lg = (int)strlen(fmt[0]);
@@ -765,12 +754,12 @@ int RP_fmt(char* buf, char* format, double value)
     }
     else nbdec = 0; /* JMP 20-03-00 */
 
-    SCR_free_tbl(fmt);
+    SCR_free_tbl((unsigned char**) fmt);
 
 normal:
-    if(value > 0) SCR_fmt_dbl((double) value, buf, lg, nbdec);
-    else          SCR_fmt_dbl((double) value, buf, lg + 1, nbdec);
-    SCR_sqz(buf); /* JMP 01-10-96 */
+    if(value > 0) SCR_fmt_dbl((double) value, (unsigned char*) buf, lg, nbdec);
+    else          SCR_fmt_dbl((double) value, (unsigned char*) buf, lg + 1, nbdec);
+    SCR_sqz((unsigned char*) buf); /* JMP 01-10-96 */
     return(0);
 }
 
@@ -799,7 +788,7 @@ int RP_eval(char** res, char* farg)
     char        ch, name[31],
                 *lec, *fmt;
     int         rc, rp_rt, pos, inv;
-    double   x, RP_evallec();
+    double      x;
 
     *res = SW_nalloc(41);
     ch = farg[0];
@@ -834,15 +823,15 @@ int RP_eval(char** res, char* farg)
         SCR_free(*res);
         *res = B_ExcelGetItem(farg + 1);
         if(*res == NULL) return(-1);
-        SCR_replace(*res, "\t", " ");
-        SCR_replace(*res, "\r\n", " ");
+        SCR_replace((unsigned char*) *res, (unsigned char*) "\t", (unsigned char*) " ");
+        SCR_replace((unsigned char*) *res, (unsigned char*) "\r\n", (unsigned char*) " ");
         return(0);
     }
 
     // farg = "lec_expression" or "lec_expression@format"
     lec = farg;    
     fmt = NULL;
-    pos = U_pos('@', farg);
+    pos = U_pos('@', (unsigned char*) farg);
     if(pos >= 0) {
         farg[pos] = '\0';       // LEC formula ends with a 0 
         fmt = farg + pos + 1;   // format 
@@ -874,7 +863,7 @@ int RP_add(char** line, int* lg, int* j, char* res)
 
     if(res == NULL) return(0);
     add = (int)strlen(res);
-    *line = SW_nrealloc(*line, *lg, *lg + add);
+    *line = (char*) SW_nrealloc(*line, *lg, *lg + add);
     if(*line == NULL) {
         *lg = 0;
         return(-2);
@@ -977,7 +966,7 @@ int RP_fneval(char** res, char* str)
     SCR_strip(tbl[0]);
     SCR_lower(tbl[0]);
     for(i = 0 ; RP_FNS[i].name ; i++)
-        if(strcmp(RP_FNS[i].name, tbl[0]) == 0) break;
+        if(strcmp((char*) RP_FNS[i].name, (char*) tbl[0]) == 0) break;
 
     if(RP_FNS[i].name == 0) { // @function name not found
         rc = -1;
@@ -985,7 +974,7 @@ int RP_fneval(char** res, char* str)
     }
     
     // Execute the @function 
-    *res = (*RP_FNS[i].fn)(tbl + 1);
+    *res = (char*) (*RP_FNS[i].fn)((U_ch**) tbl + 1);
     if(*res == 0) rc = -1;
 fin:
     SCR_free_tbl(tbl);
@@ -1009,13 +998,13 @@ U_ch *RP_gfn(U_ch* str)
     if(str == NULL) return(NULL);
 
     if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0) {
-        RP_expand(&res, str);
+        RP_expand((char**) &res, (char*) str);
         str = SCR_stracpy(res);
         allc = 1;  // JMP 28/8/2012
         SW_nfree(res);
     }
 
-    RP_fneval(&res, str);
+    RP_fneval((char**) &res, (char*) str);
     if(allc) SCR_free(str); // JMP 28/8/2012
     return(res);
 }
@@ -1115,7 +1104,6 @@ int RP_expand(char** line, char* buf)
 {
     int     rc = 0, i, previ, j, lg, upper, sqz;  /* JMP 07-09-98 */
     char    *w = NULL, *res = NULL;
-    char    *RP_extract(), *RP_gmacro(), *RP_gcmd(), *RP_extractpar();
 
     lg = (int)strlen(buf);
     *line = SW_nalloc(lg + 1);
@@ -1138,9 +1126,9 @@ int RP_expand(char** line, char* buf)
                         res = SW_nalloc(10 + (int)strlen(w)); // JMP 3/1/2017
                         sprintf(res, "%%%s%%", w);
                     }
-                    if(sqz) SCR_asqz(res, "_");
-                    if(upper < 0) SCR_lower(res);
-                    if(upper > 0) SCR_upper(res);
+                    if(sqz) SCR_asqz((unsigned char*) res, (unsigned char*) "_");
+                    if(upper < 0) SCR_lower((unsigned char*) res);
+                    if(upper > 0) SCR_upper((unsigned char*) res);
 
                     rc = RP_add(line, &lg, &j, res);
                     SW_nfree(res);
@@ -1173,7 +1161,7 @@ int RP_expand(char** line, char* buf)
                 if(buf[i] == '@') goto dft;  /* JMP 06-08-98 */
                 previ = i;  // Keeps the previous value of i in case of error in RP_gfn()
                 w = RP_extractpar(buf, &i, "()");
-                res = RP_gfn(w);
+                res = (char*) RP_gfn((unsigned char*) w);
                 if(res == 0) {
                     i = previ - 1;  // JMP 18/10/2022
                     //i--;          // JMP 18/10/2022
@@ -1255,9 +1243,9 @@ int RP_ReportExec_tbl(REPFILE *rf)
         
         // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
         if(RP_DEBUG || RP_STDOUT) {
-            SCR_strlcpy(filename, rf->filename, 255);
-            SCR_strlcpy(debug_line, line, 1023);
-            SCR_strip(debug_line);
+            SCR_strlcpy((unsigned char*) filename, (unsigned char*) rf->filename, 255);
+            SCR_strlcpy((unsigned char*) debug_line, (unsigned char*) line, 1023);
+            SCR_strip((unsigned char*) debug_line);
             if(debug_line[0]) {
                 if(RP_DEBUG)
                     kmsg("%s[%d] - %s", filename, rf->curline, debug_line); // JMP 14/2/2013
@@ -1388,7 +1376,7 @@ int RP_ReportExec_1(char* file)
  *  @return     int             0 on success, report error code on error
  */
 
-int B_ReportExec(char* arg)
+int B_ReportExec(char* arg, int unused)
 {
     unsigned char   **argv = NULL, 
                     **o_argv,
@@ -1397,11 +1385,11 @@ int B_ReportExec(char* arg)
                     o_arg0;
 
     // Save current report execution context: command = o_arg0 and parameters = o_argv
-    o_argv = RP_ARGV;
+    o_argv = (unsigned char**) RP_ARGV;
     o_arg0 = RP_ARG0;
 
     /* argv = SCR_vtomsq(arg, B_SEPS, '"'); */
-    argv = B_ainit_chk(arg, NULL, 0);
+    argv = (unsigned char**) B_ainit_chk(arg, NULL, 0);
     if(argv == NULL || SCR_tbl_size(argv) == 0) {
         rc = -1;
         goto done;
@@ -1413,19 +1401,19 @@ int B_ReportExec(char* arg)
     }
     
     // Changes the report context
-    RP_ARGV = argv + 1;
+    RP_ARGV = (char**) argv + 1;
     RP_ARG0 = 0;
     
     // Executes the report argv[0]
     RP_DEPTH ++; // Recursive level of the current report
-    rc = RP_ReportExec_1(argv[0]);
+    rc = RP_ReportExec_1((char*) argv[0]);
     RP_DEPTH --;
 
 done:
     SCR_free_tbl(argv);
     
     // Restores the report context at the time of entering the function
-    RP_ARGV = o_argv;
+    RP_ARGV = (char**) o_argv;
     RP_ARG0 = o_arg0;
     
     // When exiting the top level report, all $defines are deleted
@@ -1457,11 +1445,11 @@ int B_ReportLine(char* line, int cleanup)
     REPFILE             *rf;
 
     // Save current report execution context: command o_arg0 and parameters o_argv
-    o_argv = RP_ARGV;
+    o_argv = (unsigned char**) RP_ARGV;
     o_arg0 = RP_ARG0;
 
     // To mimic B_Report(), argv is artificially created as if a report called "temp.rep" were executed 
-    argv = B_ainit_chk("temp.rep", NULL, 0);
+    argv = (unsigned char**) B_ainit_chk("temp.rep", NULL, 0);
     if(argv == NULL || SCR_tbl_size(argv) == 0) { // Impossible ?
         rc = -1;
         goto done;
@@ -1474,14 +1462,14 @@ int B_ReportLine(char* line, int cleanup)
     }
 
     // Sauve les arguments pour usage dans les ss fonctions
-    RP_ARGV = argv + 1;
+    RP_ARGV = (char**) argv + 1;
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
     // Crée une struct REPFILE
     rf = (REPFILE *) RP_alloc(sizeof(REPFILE));
     rf->filename = RP_stracpy("temp.rep"); // JMP 4/02/09
-    rf->tbl = RP_vtom(line, '\n');
+    rf->tbl = RP_vtom((unsigned char*) line, '\n');
     rf->curline = 0;
     rf->nblines = RP_tbl_size(rf->tbl); // JMP 4/02/09
 
@@ -1497,7 +1485,7 @@ int B_ReportLine(char* line, int cleanup)
 done:
     // Resets previous report context 
     SCR_free_tbl(argv);
-    RP_ARGV = o_argv;
+    RP_ARGV = (char**) o_argv;
     RP_ARG0 = o_arg0;
 
     // Si fin des rapports vide les macros
@@ -1507,7 +1495,3 @@ done:
     }
     return(rc);
 }
-
-
-
-

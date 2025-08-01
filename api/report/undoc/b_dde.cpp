@@ -29,37 +29,42 @@
  *  
  *      char *B_ExcelGetItem(char *arg)
  *      int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
- *      int B_ExcelDecimal(char *arg)
- *      int B_ExcelThousand(char *arg)
- *      int B_ExcelCurrency(char *arg)
- *      int B_ExcelLang(char *arg)
+ *      int B_ExcelDecimal(char *arg, int unused)
+ *      int B_ExcelThousand(char *arg, int unused)
+ *      int B_ExcelCurrency(char *arg, int unused)
+ *      int B_ExcelLang(char *arg, int unused)
  *      int B_ExcelGet(char *arg, int type)
  *      int B_ExcelSet(char *arg, int type)
- *      int B_ExcelExecute(char *arg)
+ *      int B_ExcelExecute(char *arg, int unused)
  *      int B_ExcelCmd(char *cmd, char *arg)
- *      int B_DDEGet(char *arg)
- *      int B_ExcelWrite(char *ptr)
- *      int B_DDEGet(char *arg)
+ *      int B_DDEGet(char *arg, int unused)
+ *      int B_ExcelWrite(char *ptr, int unused)
+ *      int B_DDEGet(char *arg, int unused)
  *      char *B_ExcelGetItem(char *arg)
  *      int B_ExcelGet(char *arg, int type)
  *      int B_ExcelSet(char *arg, int type)
- *      int B_ExcelExecute(char *arg)
+ *      int B_ExcelExecute(char *arg, int unused)
  *      int B_ExcelCmd(char *cmd, char *arg)
- *      int B_ExcelWrite(char *ptr)
- *      int B_ExcelOpen(char *arg)
- *      int B_ExcelClose(char *arg)
- *      int B_ExcelPrint(char *arg)
- *      int B_ExcelSave(char *arg)
- *      int B_ExcelSaveAs(char *arg)
- *      int B_ExcelNew(char *arg)
+ *      int B_ExcelWrite(char *ptr, int unused)
+ *      int B_ExcelOpen(char *arg, int unused)
+ *      int B_ExcelClose(char *arg, int unused)
+ *      int B_ExcelPrint(char *arg, int unused)
+ *      int B_ExcelSave(char *arg, int unused)
+ *      int B_ExcelSaveAs(char *arg, int unused)
+ *      int B_ExcelNew(char *arg, int unused)
  *      int IodeFmtVal(char *buf, double val)
  */
+#include "scr4/scr4w.h"
+
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/k_lang.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
+#include "api/print/print.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/grep.h"
 #include "api/objs/comments.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
@@ -73,8 +78,6 @@
 
 
 /**************** WINDOWS : DDE **********************/
-
-#include "scr4w.h"
 
 char    ExcelCellEn[3] = "RC", ExcelCellFr[3] = "LC", ExcelCellNl[3] = "RK";
 char    ExcelSheetEn[15] = "Sheet1", ExcelSheetFr[15] = "Feuil1", ExcelSheetNl[15] = "Blad1";
@@ -126,7 +129,7 @@ int IodeDdeUnLocale(char *buf)
 
 int IodeDdeType(char *szTopic)
 {
-    return(U_pos(SCR_upper_char(szTopic[0]), "CEILSTV"));
+    return(U_pos(SCR_upper_char(szTopic[0]), (unsigned char*) "CEILSTV"));
 }
 
 char *IodeDdeGetWS(char *szItem)
@@ -135,9 +138,9 @@ char *IodeDdeGetWS(char *szItem)
     char    *res;
     int     i, type;
 
-    SCR_upper(szItem);
+    SCR_upper((unsigned char*) szItem);
     type = IodeDdeType(szItem);
-    if(type < 0 || type > 6) return(SCR_stracpy("Error"));
+    if(type < 0 || type > 6) return((char*) SCR_stracpy((unsigned char*) "Error"));
 
     kdb = K_WS[type];
     if(strcmp(szItem, "SAMPLE") == 0) {
@@ -156,12 +159,12 @@ char *IodeDdeGetWS(char *szItem)
     }
     else if(strcmp(szItem + 1, "NAME") == 0) {
         if(kdb == 0) return((char *)0);
-        res = SCR_stracpy(KNAMEPTR(kdb)); /* JMP 03-06-2015 */
+        res = (char*) SCR_stracpy((unsigned char*) KNAMEPTR(kdb)); /* JMP 03-06-2015 */
         return(res);
     }
     else if(strcmp(szItem + 1, "DESCR") == 0) {
         if(kdb == 0) return((char *)0);
-        res = SCR_stracpy(KDESC(kdb));
+        res = (char*) SCR_stracpy((unsigned char*) KDESC(kdb));
         return(res);
     }
     else if(strcmp(szItem + 1, "NB") == 0) {
@@ -192,7 +195,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
         strcat(res, "\t");
     }
 
-    SCR_sqz(res);
+    SCR_sqz((unsigned char*) res);
     return(res);
 }
 
@@ -210,7 +213,7 @@ char *IodeDdeCreatePer(int bt)
         strcat(res, "\t");
     }
 
-    SCR_sqz(res);
+    SCR_sqz((unsigned char*) res);
     return(res);
 }
 
@@ -242,7 +245,7 @@ char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
     }
     else {
         line = atoi(offset + 1);
-        pos = U_pos('C', offset);
+        pos = U_pos('C', (unsigned char*) offset);
         if(pos > 0) col = atoi(offset + pos + 1);
         else        col = 1;
     }
@@ -257,20 +260,18 @@ char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
     return(buf);
 }
 
-extern  char **KT_names;
-extern  int  KT_nbnames, KT_mode[MAX_MODE];
 #define DDECELLSIZE 512
+
 char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
 {
     static char    buf[DDECELLSIZE + 1]; /* JMP 4/4/2016 (PS) !!! */
     char    *ptr = NULL;
-    char    *COL_text();
 
     buf[0] = 0;
     if(cell->tc_type != 0) {
         if(cl == NULL || cell->tc_type == TABLE_CELL_STRING) {
             ptr = (char *) COL_text(cl, cell->tc_val, KT_nbnames);
-            SCR_strlcpy(buf, ptr, DDECELLSIZE);
+            SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
             buf[DDECELLSIZE] = 0;
             SW_nfree(ptr);
         }
@@ -278,8 +279,8 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
             if(!IODE_IS_A_NUMBER(cl->cl_res)) strcpy(buf, "#N/A");
             else {
                 sprintf(buf, "%80.20lf", cl->cl_res); /* JMP 18-10-07 */
-                SCR_sqz(buf);                         /* JMP 18-10-07 */
-                SCR_pstrip(buf, "0");                 /* JMP 18-10-07 */
+                SCR_sqz((unsigned char*) buf);                         /* JMP 18-10-07 */
+                SCR_pstrip((unsigned char*) buf, (unsigned char*) "0");                 /* JMP 18-10-07 */
             }
             // T_fmt_val(buf, cl->cl_res, 20, nbdec); /* JMP 18-10-07 */
         }
@@ -308,8 +309,6 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     long    SCR_current_date();
     char    date[11];
     /* mode */
-    extern char *KLG_OPERS_TEXTS[][3];
-
     if(ismpl == NULL) {
         sprintf(gsmpl, "%s:%d",
                 PER_pertoa(&(smpl->s_p1), NULL), smpl->s_nb);
@@ -318,11 +317,11 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
         sprintf(gsmpl, "%s", ismpl);
 
     dim = T_prep_cls(tbl, gsmpl, &cls);
-    if(dim < 0) return(SCR_stracpy("Error in Tbl or Smpl"));
+    if(dim < 0) return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
     KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size(KT_names);
-    if(KT_nbnames == 0) return(SCR_stracpy("Error in Tbl or Smpl"));
+    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
+    if(KT_nbnames == 0) return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
     COL_find_mode(cls, KT_mode, 2);
 
     *nc = dim + 1;
@@ -376,19 +375,19 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
         }
 
         if(buf[0]) {
-            SCR_add_ptr(&l, &nli, buf);
+            SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
             (*nl)++;
         }
     }
-    SCR_add_ptr(&l, &nli, NULL);
+    SCR_add_ptr((unsigned char***) &l, &nli, NULL);
     *nl += nf + nm;
-    res = SCR_mtov(l, '\n');
+    res = (char*) SCR_mtov((unsigned char**) l, '\n');
 
     COL_free_cols(cls);
-    SCR_free_tbl(l);
+    SCR_free_tbl((unsigned char**) l);
     SCR_free(buf);
 
-    SCR_free_tbl(KT_names);
+    SCR_free_tbl((unsigned char**) KT_names);
     KT_names = NULL;
     KT_nbnames = 0;
 
@@ -405,19 +404,19 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
         *nl = 1;
         switch(type) {
             case COMMENTS :
-                obj = (char *)KCVAL(kdb, objnb);
+                obj = (char*) KCVAL(kdb, objnb);
                 break;
             case EQUATIONS :
-                obj = (char *)KELEC(kdb, objnb);
+                obj = (char*) KELEC(kdb, objnb);
                 break;
             case IDENTITIES :
-                obj = (char *)KILEC(kdb, objnb);
+                obj = (char*) KILEC(kdb, objnb);
                 break;
             case LISTS :
-                obj = (char *)KLVAL(kdb, objnb);
+                obj = (char*) KLVAL(kdb, objnb);
                 break;
             default    :
-                obj = SCR_stracpy("Not yet implemented") ;
+                obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
                 break;
         }
 
@@ -431,7 +430,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
     else
         res = IodeDdeCreateTbl(objnb, NULL, nc, nl, -1);
 
-    SCR_OemToAnsi(res, res);
+    SCR_OemToAnsi((unsigned char*) res, (unsigned char*) res);
     return(res);
 }
 
@@ -453,60 +452,60 @@ char *IodeDdeGetXObj(char *szItem, int type)
 {
     U_ch    **tbl, **lst;
     char    *res = 0, *sheet, *item,
-             *plst =  NULL, *K_expand();
+             *plst =  NULL;
     KDB     *kdb;
     int     objnb, i, l, h;
     HCONV   hConv;
 
     kdb = K_WS[type];
-    tbl = SCR_vtom(szItem, '!');
-    if(SCR_tbl_size(tbl) < 1) lst = SCR_vtom("", ',');
+    tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
+    if(SCR_tbl_size(tbl) < 1) lst = SCR_vtom((unsigned char*) "", (int) ',');
     else {
-        plst = K_expand(type, NULL, tbl[0], '*');
-        lst = B_ainit_chk(plst, NULL, 0);
+        plst = K_expand(type, NULL, (char*) tbl[0], '*');
+        lst = (unsigned char**) B_ainit_chk(plst, NULL, 0);
     }
 
     if(SCR_tbl_size(tbl) < 2) sheet = "Sheet1";
-    else                      sheet = tbl[1];
+    else                      sheet = (char*) tbl[1];
     if(SCR_tbl_size(tbl) < 3) item = "R1C1";
-    else                      item = tbl[2];
+    else                      item = (char*) tbl[2];
 
     hConv = WscrDdeConnect("EXCEL", sheet);
-    if(hConv == 0) return(SCR_stracpy("Error"));
+    if(hConv == 0) return((char*) SCR_stracpy((unsigned char*) "Error"));
 
     switch(type) {
         case VARIABLES:
             if(SCR_tbl_size(lst) == 0) {
                 res = IodeDdeCreatePer(0);
-                WscrDdeSetItem(hConv,
-                               IodeDdeXlsCell(item, 0, 1,  KSMPL(kdb)->s_nb, 1), res);
+                WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1,  KSMPL(kdb)->s_nb, 1), 
+                               (unsigned char*) res);
                 SCR_free(res);
             }
 
             if(SCR_tbl_size(lst) == 0) {
                 for(i = 0 ; i < KNB(kdb) ; i++) {
                     res = IodeDdeCreateSeries(i, 0);
-                    WscrDdeSetItem(hConv,
-                                   IodeDdeXlsCell(item, i + 1, 0, 1 + KSMPL(kdb)->s_nb, 1), res);
+                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + KSMPL(kdb)->s_nb, 1), 
+                                   (unsigned char*) res);
                     SCR_free(res);
                 }
             }
 
             else {
                 for(i = 0 ; lst[i] ; i++) {
-                    if(strcmp(lst[i], "t") == 0) {
+                    if(strcmp((char*) lst[i], "t") == 0) {
                         res = IodeDdeCreatePer(0);
-                        WscrDdeSetItem(hConv,
-                                       IodeDdeXlsCell(item, i, 1, 1 + KSMPL(kdb)->s_nb, 1), res);
+                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + KSMPL(kdb)->s_nb, 1), 
+                                       (unsigned char*) res);
                         SCR_free(res);
                     }
                     else {
-                        objnb = K_find(kdb, lst[i]);
+                        objnb = K_find(kdb, (char*) lst[i]);
                         if(objnb < 0) continue;
 
                         res = IodeDdeCreateSeries(objnb, 0);
-                        WscrDdeSetItem(hConv,
-                                       IodeDdeXlsCell(item, i, 0, 1 + KSMPL(kdb)->s_nb, 1), res);
+                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + KSMPL(kdb)->s_nb, 1), 
+                                       (unsigned char*) res);
                         SCR_free(res);
                     }
                 }
@@ -517,19 +516,19 @@ char *IodeDdeGetXObj(char *szItem, int type)
             if(SCR_tbl_size(lst) == 0) {
                 for(i = 0 ; i < KNB(kdb) ; i++) {
                     res = IodeDdeCreateObj(i, type, &l, &h);
-                    WscrDdeSetItem(hConv,
-                                   IodeDdeXlsCell(item, i, 0, l, h), res);
+                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
+                                   (unsigned char*) res);
                     SCR_free(res);
                 }
             }
 
             else {
                 for(i = 0 ; lst[i] ; i++) {
-                    objnb = K_find(kdb, lst[i]);
+                    objnb = K_find(kdb, (char*) lst[i]);
                     if(objnb < 0) continue;
                     res = IodeDdeCreateObj(objnb, type, &l, &h);
-                    WscrDdeSetItem(hConv,
-                                   IodeDdeXlsCell(item, i, 0, l, h), res);
+                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
+                                   (unsigned char*) res);
                     SCR_free(res);
                 }
             }
@@ -539,7 +538,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
     SCR_free(plst);
     WscrDdeEnd(hConv) ;
     SCR_free_tbl(tbl);
-    return(SCR_stracpy("Ok"));
+    return((char*) SCR_stracpy((unsigned char*) "Ok"));
 }
 
 char *IodeDdeGetItem(char *szTopic, char *szItem)
@@ -551,7 +550,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     SCL     *scl;
 
     SCR_vtime = 1;
-    SCR_upper(szTopic);
+    SCR_upper((unsigned char*) szTopic);
     kmsg("Dispatching DDE-call: %s!%s", szTopic, szItem);
 
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeGetWS(szItem));
@@ -563,9 +562,9 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(strcmp(szTopic, "XREP") == 0) return(IodeDdeGetReportRC(szItem));
 
     type = IodeDdeType(szTopic);
-    if(type < 0 || type > 6) return(SCR_stracpy("Error"));
+    if(type < 0 || type > 6) return((char*) SCR_stracpy((unsigned char*) "Error"));
     kdb = K_WS[type];
-    if(type == SCALARS) SCR_lower(szItem);
+    if(type == SCALARS) SCR_lower((unsigned char*) szItem);
     objnb = K_find(kdb, szItem);
     if(objnb < 0) return((char *)0);
 
@@ -577,9 +576,9 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case COMMENTS :
         case LISTS :
-            res = SCR_stracpy((char *)KCVAL(kdb, objnb));
-            SCR_replace(res, "\t", " ");
-            SCR_replace(res, "\n", " ");
+            res = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, objnb));
+            SCR_replace((unsigned char*) res, (unsigned char*) "\t", (unsigned char*) " ");
+            SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
             return(res);
 
         case VARIABLES :
@@ -612,7 +611,7 @@ int IodeDdeSetWS(char *szItem, char *szBuffer)
     int     type, rc = 0;
 
     kmsg("Dispatching DDE-Poke: %s!%s", szItem, szBuffer);
-    SCR_upper(szItem);
+    SCR_upper((unsigned char*) szItem);
     type = IodeDdeType(szItem);
     if(type < 0 || type > 6) return(-1);
 
@@ -632,16 +631,16 @@ int IodeDdePlay(char *szItem, char *szBuffer)
     U_ch    **keys;
     int     key, i, n;
 
-    SCR_upper(szItem);
+    SCR_upper((unsigned char*) szItem);
     if(strcmp(szItem, "TEXT") == 0) {
-        krecordtext(szBuffer);
+        krecordtext((unsigned char*) szBuffer);
         return(0);
     }
     else {
-        keys = SCR_vtoms(szBuffer, ", ;");
+        keys = SCR_vtoms((unsigned char*) szBuffer, (unsigned char*) ", ;");
         n = SCR_tbl_size(keys);
         for(i = n - 1 ; i >= 0 ; i--) {
-            key = DdeTsfKey(keys[i]);
+            key = DdeTsfKey((char*) keys[i]);
             if(key) krecordkey(key);
         }
         SCR_free_tbl(keys);
@@ -652,7 +651,7 @@ int IodeDdePlay(char *szItem, char *szBuffer)
 int DdeTsfKey(char *key)
 {
     if(strlen(key) == 1) return(key[0]);
-    SCR_upper(key);
+    SCR_upper((unsigned char*) key);
     if(strcmp(key, "HOME") == 0)     return(SCR_CSR_HOME);
     if(strcmp(key, "END") == 0)      return(SCR_CSR_END);
     if(strcmp(key, "UP") == 0)       return(SCR_CSR_UP);
@@ -689,7 +688,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
 
     kmsg("Dispatching DDE-Poke: %s!%s", szTopic, szItem);
     SCR_vtime = 1;
-    SCR_upper(szTopic);
+    SCR_upper((unsigned char*) szTopic);
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeSetWS(szItem, szBuffer));
     if(strcmp(szTopic, "PLAY") == 0) return(IodeDdePlay(szItem, szBuffer));
     if(strcmp(szTopic, "REP") == 0)  return(B_ReportLine(szBuffer, 1));
@@ -708,7 +707,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
         sprintf(tmp, "%s %s", szItem, szBuffer);
     }
 
-    SCR_replace(tmp, "\t", " ");
+    SCR_replace((unsigned char*) tmp, (unsigned char*) "\t", (unsigned char*) " ");
     B_DataUpdate(tmp, type);
     SCR_free(tmp);
     return(0);
@@ -729,13 +728,13 @@ char    *B_ExcelGetItem(char *arg)
              **args = NULL;
     int     nb_args;
 
-    args = SCR_vtom(arg, '!');
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtom((unsigned char*) arg, (int) '!');
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
-    if(nb_args == 2) ddeptr = WscrDdeGet("Excel", args[0], args[1]);
+    if(nb_args == 2) ddeptr = (char*) WscrDdeGet("Excel", args[0], args[1]);
     IodeDdeUnLocale(ddeptr);
 
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     return(ddeptr);
 }
 
@@ -744,8 +743,8 @@ int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
     char    **args = NULL, *topic, *item;
     int     nb_args, rc = -1;
 
-    args = SCR_vtom(ddeitem, '!');
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtom((unsigned char*) ddeitem, (int) '!');
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 2) {
         topic = args[0];
@@ -758,18 +757,18 @@ int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
     }
 
     rc = WscrDdeSet("Excel", topic,
-                    IodeDdeXlsCell(item, 0, 0, nc, nl), ptr);
-    SCR_free_tbl(args);
+                    IodeDdeXlsCell(item, 0, 0, nc, nl), (unsigned char*) ptr);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
-int B_ExcelDecimal(char *arg)
+int B_ExcelDecimal(char *arg, int unused)
 {
     char    **args;
     int     nb_args, rc= 0;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -798,13 +797,13 @@ $ExcelSetThousand Period => skip periods when reading from excel sheet (! decima
   - no arg => no sep
 */
 
-int B_ExcelThousand(char *arg)
+int B_ExcelThousand(char *arg, int unused)
 {
     char    **args;
     int     nb_args, rc = 0;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -850,13 +849,13 @@ $ExcelSetCurrency c => skip c (any c)
 $ExcelSetCurrency [no arg] => no sep
 */
 
-int B_ExcelCurrency(char *arg)
+int B_ExcelCurrency(char *arg, int unused)
 {
     char    **args;
     int     nb_args, rc = 0;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -886,13 +885,13 @@ int B_ExcelCurrency(char *arg)
 }
 
 
-int B_ExcelLang(char *arg)
+int B_ExcelLang(char *arg, int unused)
 {
     char    **args;
     int     nb_args, rc = 0;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -925,22 +924,23 @@ int B_ExcelGet(char *arg, int type)
     int     nb_args, ntbl = 0,
                      i, rc = -1;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     ddeptr = B_ExcelGetItem(args[nb_args - 1]);
     if(ddeptr == NULL) goto the_end;
 
-    for(i = 0; i < nb_args - 1; i++) SCR_add_ptr(&tbl, &ntbl, args[i]);
-    SCR_add_ptr(&tbl, &ntbl, ddeptr);
-    SCR_add_ptr(&tbl, &ntbl, NULL);
+    for(i = 0; i < nb_args - 1; i++) 
+        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) args[i]);
+    SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) ddeptr);
+    SCR_add_ptr((unsigned char***) &tbl, &ntbl, NULL);
 
-    argptr = SCR_mtov(tbl, ' ');
+    argptr = (char*) SCR_mtov((unsigned char**) tbl, (int) ' ');
     rc = B_DataUpdate(argptr, type);
 
 the_end:
-    SCR_free_tbl(args);
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) tbl);
     SCR_free(argptr);
     SCR_free(ddeptr);
     return(rc);
@@ -958,8 +958,8 @@ int B_ExcelSet(char *arg, int type)
                 *ptr = NULL,
                 *item, *smpl;
 
-    args = SCR_vtoms(arg, B_SEPS);
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     pos = K_find(kdb, args[0]);
     if(pos < 0) goto the_end;
@@ -967,16 +967,16 @@ int B_ExcelSet(char *arg, int type)
     item = args[nb_args - 1];
     switch(type) {
         case COMMENTS :
-            ptr = SCR_stracpy(KCVAL(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, pos));
             break;
         case IDENTITIES :
-            ptr = SCR_stracpy(KILEC(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(kdb, pos));
             break;
         case LISTS :
-            ptr = SCR_stracpy(KLVAL(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, pos));
             break;
         case EQUATIONS :
-            ptr = SCR_stracpy(KELEC(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KELEC(kdb, pos));
             break;
         case SCALARS :
             scl = KSVAL(kdb, pos); /* JMP 10-08-00 */
@@ -1003,14 +1003,14 @@ int B_ExcelSet(char *arg, int type)
             break;
     }
 
-    SCR_OemToAnsi(ptr, ptr);
+    SCR_OemToAnsi((unsigned char*) ptr, (unsigned char*) ptr);
     IodeDdeLocale(ptr);
     rc = B_ExcelSetItem(item, ptr, nc, nl);
 
 the_end:
     if(pos < 0) B_seterror(B_msg(98), args[0]);  /* JMP 10-08-00 */
 
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     SCR_free(per);
     SCR_free(ptr);
 
@@ -1019,15 +1019,15 @@ the_end:
     return(rc);
 }
 
-int B_ExcelExecute(char *arg)
+int B_ExcelExecute(char *arg, int unused)
 {
     int     rc;
     char    *cmd;
 
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     cmd = SCR_malloc((int)strlen(arg)+2);
     sprintf(cmd, "[%s]", arg);
-    rc = WscrDdeExecute("Excel", "System", cmd);
+    rc = WscrDdeExecute("Excel", "System", (unsigned char*) cmd);
 
     SCR_free(cmd);
     return(rc);
@@ -1038,8 +1038,8 @@ int B_ExcelCmd(char *cmd, char *arg)
     int     rc;
     char    *xlscmd;
 
-    SCR_strip(cmd);
-    if(arg) SCR_strip(arg);
+    SCR_strip((unsigned char*) cmd);
+    if(arg) SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != '\0') {
         xlscmd = SCR_malloc((int)strlen(cmd) + (int)strlen(arg) + 10);
 
@@ -1051,20 +1051,20 @@ int B_ExcelCmd(char *cmd, char *arg)
         sprintf(xlscmd, "[%s]", cmd);
     }
 
-    rc = WscrDdeExecute("Excel", "System", xlscmd);
+    rc = WscrDdeExecute("Excel", "System", (unsigned char*) xlscmd);
 
     SCR_free(xlscmd);
     return(rc);
 }
 
-int B_DDEGet(char *arg)
+int B_DDEGet(char *arg, int unused)
 {
     U_ch    **tbl, *ddeptr;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     if(SCR_tbl_size(tbl) < 3) return(-1);
 //    rc = WscrDdeExecute(tbl[0], tbl[1], tbl[2]);
-    ddeptr = WscrDdeGet(tbl[0], tbl[1], tbl[2]);
+    ddeptr = WscrDdeGet((char*) tbl[0], (char*) tbl[1], (char*) tbl[2]);
 
     SCR_free_tbl(tbl);
     SCR_free(ddeptr);
@@ -1072,35 +1072,35 @@ int B_DDEGet(char *arg)
 }
 
 /* JMP 03-08-2004 */
-int B_ExcelWrite(char *ptr)
+int B_ExcelWrite(char *ptr, int unused)
 {
     char    **args = NULL, *topic, *item, *val, **tbl, **tbl2;
     int     i, nb_args, rc = -1, pos, nl = 1, nc = 1, nc1;
 
 
-    U_ljust_text(ptr);
-    pos = U_pos(' ', ptr);
+    U_ljust_text((unsigned char*) ptr);
+    pos = U_pos(' ', (unsigned char*) ptr);
     if(pos < 0)
         val = "";
     else {
         ptr[pos] = 0;
         val = ptr + pos + 1;
-        U_ljust_text(val);
-        SCR_replace(val, "\\t", "\t");
-        SCR_replace(val, "\\n", "\n");
-        tbl = SCR_vtom(val, '\n');
-        nl = SCR_tbl_size(tbl);
+        U_ljust_text((unsigned char*) val);
+        SCR_replace((unsigned char*) val, (unsigned char*) "\\t", (unsigned char*) "\t");
+        SCR_replace((unsigned char*) val, (unsigned char*) "\\n", (unsigned char*) "\n");
+        tbl = (char**) SCR_vtom((unsigned char*) val, (int) '\n');
+        nl = SCR_tbl_size((unsigned char**) tbl);
         for(i = 0 ; i < nl ; i++) {
-            tbl2 = SCR_vtom(tbl[i], '\t');
-            nc1 = SCR_tbl_size(tbl2);
+            tbl2 = (char**) SCR_vtom((unsigned char*) tbl[i], (int) '\t');
+            nc1 = SCR_tbl_size((unsigned char**) tbl2);
             if(nc1 > nc) nc = nc1;
-            SCR_free_tbl(tbl2);
+            SCR_free_tbl((unsigned char**) tbl2);
         }
-        SCR_free_tbl(tbl);
+        SCR_free_tbl((unsigned char**) tbl);
     }
 
-    args = SCR_vtom(ptr, '!');
-    nb_args = SCR_tbl_size(args);
+    args = (char**) SCR_vtom((unsigned char*) ptr, (int) '!');
+    nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 2) {
         topic = args[0];
@@ -1113,13 +1113,13 @@ int B_ExcelWrite(char *ptr)
     }
 
     rc = WscrDdeSet("Excel", topic,
-                    IodeDdeXlsCell(item, 0, 0, nc, nl), val);
-    SCR_free_tbl(args);
+                    IodeDdeXlsCell(item, 0, 0, nc, nl), (unsigned char*) val);
+    SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
 
 #else
-int B_DDEGet(char *arg)
+int B_DDEGet(char *arg, int unused)
 {
     return(-1);
 }
@@ -1138,7 +1138,7 @@ int B_ExcelSet(char *arg, int type)
     return(-1);
 }
 
-int B_ExcelExecute(char *arg)
+int B_ExcelExecute(char *arg, int unused)
 {
     return(-1);
 }
@@ -1148,39 +1148,39 @@ int B_ExcelCmd(char *cmd, char *arg)
     return(-1);
 }
 
-int B_ExcelWrite(char *ptr)
+int B_ExcelWrite(char *ptr, int unused)
 {
     return(-1);
 }
 
 #endif
 
-int B_ExcelOpen(char *arg)
+int B_ExcelOpen(char *arg, int unused)
 {
     return(B_ExcelCmd("OPEN", arg));
 }
 
-int B_ExcelClose(char *arg)
+int B_ExcelClose(char *arg, int unused)
 {
     return(B_ExcelCmd("CLOSE", NULL));
 }
 
-int B_ExcelPrint(char *arg)
+int B_ExcelPrint(char *arg, int unused)
 {
     return(B_ExcelCmd("PRINT", NULL));
 }
 
-int B_ExcelSave(char *arg)
+int B_ExcelSave(char *arg, int unused)
 {
     return(B_ExcelCmd("SAVE", NULL));
 }
 
-int B_ExcelSaveAs(char *arg)
+int B_ExcelSaveAs(char *arg, int unused)
 {
     return(B_ExcelCmd("SAVE.AS", arg));
 }
 
-int B_ExcelNew(char *arg)
+int B_ExcelNew(char *arg, int unused)
 {
     return(B_ExcelCmd("NEW(5)", NULL));
 }

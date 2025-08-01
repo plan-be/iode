@@ -87,6 +87,8 @@ enum TableCellType
 
 #define  KT_CHUNCK   5
 
+extern int T_GRAPHDEFAULT;
+
 /*----------------------- STRUCTS ----------------------------*/
 
 // TCELL = Table Cell

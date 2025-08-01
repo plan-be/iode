@@ -21,6 +21,7 @@
  */
 #include "scr4/s_args.h"
 
+#include "api/constants.h"
 #include "api/b_iodeini.h"
 #include "api/k_lang.h"
 #include "api/k_super.h"
@@ -44,7 +45,7 @@ int IodeInit()
     extern int      SW_ACTIVE;      // JMP 07/06/2023           
     
     // Initialize chrono for report functions
-    RPF_ChronoReset();      
+    RPF_ChronoReset(NULL);      
     
     // Initialize scr4 SWAP memory management if not yet done // JMP 07/06/2023
     if(SW_ACTIVE == 0) {            // JMP 08/06/2023

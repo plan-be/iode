@@ -17,10 +17,15 @@
  *      int B_DSUpdateVar(char *name, PERIOD *per, char *val)
  *      int B_DSInterpret(char *code, char freq, char *contents)
  *      int B_DSImportDb_1(char *arg, SAMPLE *smpl)
- *      int B_DSImportDb(char *arg)
+ *      int B_DSImportDb(char *arg, int unused)
  */ 
-#include "scr4/scr4w.h"
+#include "scr4/s_a2m.h"
+#include "scr4/s_args.h"
+#ifdef _MSC_VER
+    #include "scr4/s_prowin.h"
+#endif
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/k_super.h"
 #include "api/objs/variables.h"
@@ -73,8 +78,7 @@ int B_DSTimedOut(char *name)
     return(0);
 }
 
-long B_DSa2y(year)
-char    *year;
+long B_DSa2y(char* year)
 {
     long    y;
 
@@ -88,31 +92,30 @@ char    *year;
 int B_DSDate2Period(PERIOD *per, char *date, char freq)
 {
     char    **tbl;
-    extern  long    atol();
 
     per->p_p = freq;
     per->p_s = 1L;
     per->p_y = 1970L;
 
     if(U_is_in('/', date)) { /* DD/MM/YY */
-        tbl = SCR_vtom(date, '/');
+        tbl = (char**) SCR_vtom((unsigned char*) date, (int) '/');
         per->p_y = B_DSa2y(tbl[2]);
         switch(freq) {
             case 'Y' :
                 break;
             case 'Q' :
-                per->p_s = atol(tbl[1])/4;
+                per->p_s = atol(tbl[1]) / 4;
                 break;
             case 'M' :
                 per->p_s = atol(tbl[1]);
                 break;
         }
-        SCR_free_tbl(tbl);
+        SCR_free_tbl((unsigned char**) tbl);
         return(0);
     }
 
     if(U_is_in('Q', date)) {    /* "Q1 70" */
-        tbl = SCR_vtom(date, ' ');
+        tbl = (char**) SCR_vtom((unsigned char*) date, (int) ' ');
         per->p_y = B_DSa2y(tbl[1]);
         switch(freq) {
             case 'Y' :
@@ -121,10 +124,10 @@ int B_DSDate2Period(PERIOD *per, char *date, char freq)
                 per->p_s = atol(tbl[0] + 1);
                 break;
             case 'M' :
-                per->p_s = atol(tbl[0] + 1)* 3;
+                per->p_s = atol(tbl[0] + 1) * 3;
                 break;
         }
-        SCR_free_tbl(tbl);
+        SCR_free_tbl((unsigned char**) tbl);
         return(0);
     }
 
@@ -136,7 +139,7 @@ int B_DSCode(char *name)
 {
     int i, pfct;
 
-    pfct = U_pos('(', name);
+    pfct = U_pos('(', (unsigned char*) name);
     if(pfct > 0) {
         for(i = 0, pfct++; name[pfct] && name[pfct] != ')'; i++, pfct++)
             name[i] = name[pfct];
@@ -169,8 +172,8 @@ int B_DSUpdateVar(char *name, PERIOD *per, char *val)
 
     update = SCR_malloc(K_MAX_NAME + 23 + (int)strlen(val)); /* IODE64K */
     if(update) {
-        SCR_replace(val, ",", ".");
-        SCR_replace(val, "#n/a", "na"); // Modif na au lieu de -- 27/08/2009
+        SCR_replace((unsigned char*) val, (unsigned char*) ",", (unsigned char*) ".");
+        SCR_replace((unsigned char*) val, (unsigned char*) "#n/a", (unsigned char*) "na"); // Modif na au lieu de -- 27/08/2009
 
         sprintf(update, "%s %s %s", name, PER_pertoa(per, period), val);
         rc = B_DataUpdate(update, VARIABLES);
@@ -185,12 +188,12 @@ int B_DSInterpret(char *code, char freq, char *contents)
     PERIOD  stp;
     int     i, nl, rc = 0;
 
-    line = SCR_vtom(contents, '\n');
-    nl = SCR_tbl_size(line);
+    line = (char**) SCR_vtom((unsigned char*) contents, (int) '\n');
+    nl = SCR_tbl_size((unsigned char**) line);
     if(nl < 4) rc = -1;
 
     for(i = 0; i < nl - 1 && !rc; i++) {
-        tbl = SCR_vtom(line[i], '"');
+        tbl = (char**) SCR_vtom((unsigned char*) line[i], (int) '"');
         switch(i) {
             case 0: /* Start */
                 if(strcmp(tbl[0], "Start")) rc = -1;
@@ -211,12 +214,12 @@ int B_DSInterpret(char *code, char freq, char *contents)
 
         }
 
-        SCR_free_tbl(tbl);
+        SCR_free_tbl((unsigned char**) tbl);
         tbl = NULL;
     }
 
-    SCR_free_tbl(line);
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char**) line);
+    SCR_free_tbl((unsigned char**) tbl);
 
     if(rc < 0) B_DSLog(contents);
     return(rc);
@@ -225,37 +228,50 @@ int B_DSInterpret(char *code, char freq, char *contents)
 /* DATA stream interface */
 int B_DSImportDb_1(char *arg, SAMPLE *smpl)
 {
+#ifdef WIN32
     char            freq;
     unsigned char   *ptr,
              request[81],
              st_date[20], nd_date[20];
 
-    B_DSPeriod2Date(&(smpl->s_p1), st_date, &freq);
-    B_DSPeriod2Date(&(smpl->s_p2), nd_date, &freq);
+    B_DSPeriod2Date(&(smpl->s_p1), (char*) st_date, &freq);
+    B_DSPeriod2Date(&(smpl->s_p2), (char*) nd_date, &freq);
 
-    sprintf(request, "TRH>%s;;%s;%s;%c", arg, st_date, nd_date, freq);
+    sprintf((char*) request, "TRH>%s;;%s;%s;%c", arg, st_date, nd_date, freq);
 
     kmsg("DSDDE :%s ...", request);
     //if(SCR_hit_key() != 0) SCR_get_key();
     if(khitkey() != 0) kgetkey();               // JMP 11/12/2021
     
-    ptr = WscrDdeGet("DSDDE", "TS", request);
+    ptr = WscrDdeGet("DSDDE", "TS", (char*) request);
     if(ptr != NULL) {
-        B_DSInterpret(arg, freq, ptr);
+        B_DSInterpret(arg, freq, (char*) ptr);
         SCR_free(ptr);
     }
     else B_DSTimedOut(arg);
 
     return(0);
+#else
+    return(-1);
+#endif
 }
 
-int B_DSImportDb(char *arg)
+int wrapper_B_DSImportDb_1(char *arg, void *smpl)
 {
+    return B_DSImportDb_1(arg, (SAMPLE *) smpl);
+}
+
+int B_DSImportDb(char *arg, int unused)
+{
+#ifdef WIN32
     SAMPLE  *smpl;
 
     if(KSMPL(K_WS[VARIABLES])->s_nb == 0) return(-1);
 
     WscrDdeSetTimeOut(10000, 3);
     smpl = KSMPL(K_WS[VARIABLES]);
-    return(B_ainit_loop(arg, B_DSImportDb_1, (char *)smpl));
+    return(B_ainit_loop(arg, wrapper_B_DSImportDb_1, (char *) smpl));
+#else
+    return(-1);
+#endif
 }

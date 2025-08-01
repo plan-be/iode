@@ -11,6 +11,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -18,10 +19,12 @@
 
 #include "api/report/undoc/undoc.h"
 
+
 double  SEASON_EPS = 5.0;
 
+
 // $WsSeasonAdj Filename VarList
-int B_WsSeasonAdj(char *arg)
+int B_WsSeasonAdj(char *arg, int unused)
 {
     return(B_season(arg));
 }
@@ -38,7 +41,7 @@ int B_season(char* arg)
 
     lg = B_get_arg0(name, arg, 80);
     data = B_ainit_chk(arg + lg, NULL, 0);
-    nb = SCR_tbl_size(data);
+    nb = SCR_tbl_size((unsigned char**) data);
     if(nb == 0) goto done;
 
     eps = atof(data[nb - 1]);
@@ -99,7 +102,7 @@ int B_season(char* arg)
 done:
     K_free(to);
     K_free(from);
-    SCR_free_tbl(data);
+    SCR_free_tbl((unsigned char**) data);
 
     SW_nfree(t_smpl);
     SW_nfree(t_vec);
@@ -121,7 +124,7 @@ int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
 
     *shift = 0.0;
     for(*dim = *beg; *dim < nb && IODE_IS_A_NUMBER(vec[*dim]); (*dim)++)
-        *shift = min(*shift, vec[*dim]);
+        *shift = std::min(*shift, vec[*dim]);
 
 
     if(*shift < 0.0) {
@@ -148,8 +151,8 @@ int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
         if(f == 0 || f == 11) ti[f] /= nj -1;
         else ti[f] /= nj;
 
-        maxti = max(maxti, ti[f]);
-        minti = min(minti, ti[f]);
+        maxti = std::max(maxti, ti[f]);
+        minti = std::min(minti, ti[f]);
     }
 
     if(fabs(maxti - minti) > SEASON_EPS) rc = 1; /* seasonal */

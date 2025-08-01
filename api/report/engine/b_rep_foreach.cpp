@@ -52,9 +52,9 @@
  *  List of functions
  *  -----------------
  *      static int RP_foreach_next_index(char *name)    Goes to the next element and decreases the number of elements in a foreach loop.
- *      int RP_foreach(char* arg)                       Implemention of $foreach <index_name> <list_of_values>
+ *      int RP_foreach(char* arg, int unused)                       Implemention of $foreach <index_name> <list_of_values>
  *      int RP_foreach_break(char *name)                Exits the foreach block. Not implemented
- *      int RP_foreach_next(char* arg)                  Implementation of $next <index_name>
+ *      int RP_foreach_next(char* arg, int unused)                  Implementation of $next <index_name>
  *      static int RP_foreach_goto_next(char* label)    Reads a report backwards until the previous $foreach line then goes to the next index in the loop.
  *  
  */
@@ -77,27 +77,27 @@ static int RP_foreach_next_index(char *name)
     int             n = 0;
 
     // compte le nb d'éléments restant dans la liste FOREACH__name
-    sprintf(buf, "@vcount(%%FOREACH__%s%%)", name);
-    RP_expand(&line, buf);
+    sprintf((char*) buf, "@vcount(%%FOREACH__%s%%)", name);
+    RP_expand((char**) &line, (char*) buf);
     if(line) {
-        n = atol(line);
+        n = atol((char*) line);
         SW_nfree(line);
     }
     if(n == 0) { // On a atteint la fin de la liste
-        sprintf(buf, "FOREACH__%s", name);
+        sprintf((char*) buf, "FOREACH__%s", name);
         RP_undef_1(name); // Needed ?
-        RP_undef_1(buf);  // Needed ?
+        RP_undef_1((char*) buf);  // Needed ?
         RP_define_restore(name);
-        RP_define_restore(buf);
+        RP_define_restore((char*) buf);
         return(-1);
     }
     // Place le premier élément dans l'index de la boucle
-    sprintf(buf, "$define %s @vtake(1,%%FOREACH__%s%%)", name, name);
-    B_ReportLine(buf, 1);
+    sprintf((char*) buf, "$define %s @vtake(1,%%FOREACH__%s%%)", name, name);
+    B_ReportLine((char*) buf, 1);
 
     // Drop le premier indice
-    sprintf(buf, "$define FOREACH__%s @vdrop(1,%%FOREACH__%s%%)", name, name);
-    B_ReportLine(buf, 1);
+    sprintf((char*) buf, "$define FOREACH__%s @vdrop(1,%%FOREACH__%s%%)", name, name);
+    B_ReportLine((char*) buf, 1);
 
     return(n - 1);
 }
@@ -109,35 +109,35 @@ static int RP_foreach_next_index(char *name)
  *  See above for details.
  *  
  */
-int RP_foreach(char* arg)
+int RP_foreach(char* arg, int unused)
 {
     unsigned char   name[128], buf[512], *list;
     int             rc = 0;
 
     // Crée l'index (name) et la liste de valeurs à traiter (list)
-    if(RP_splitline(arg, name, &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
     
     // Sauve la valeur avant la boucle de l'index de la boucle (name)
-    RP_define_save(name);
+    RP_define_save((char*) name);
     
     // Sauve de la même façon l'éventuel define FOREACH__<name>
-    sprintf(buf, "FOREACH__%s", name);
-    RP_define_save(buf);
+    sprintf((char*) buf, "FOREACH__%s", name);
+    RP_define_save((char*) buf);
     
     // Crée le define name avec la liste des indices de la boucle
-    RP_define_1(name, list); 
+    RP_define_1((char*) name, (char*) list); 
 
     // Crée un define identique avec comme nom FOREACH__<nom>
-    sprintf(buf, "$define FOREACH__%s %%%s%%", name, name);
-    B_ReportLine(buf, 1);
+    sprintf((char*) buf, "$define FOREACH__%s %%%s%%", name, name);
+    B_ReportLine((char*) buf, 1);
 
     // Place la première valeur dans name et supprime cette valeur de la liste
     // Si la liste est vide, saute à la fin ($next name)
-    if(RP_foreach_next_index(name) < 0) {
+    if(RP_foreach_next_index((char*) name) < 0) {
         //RP_define_restore(name);        // Restores the $define <name>
         //sprintf(buf, "FOREACH__%s", name);
         //RP_define_restore(buf);         // Restores the $define FOREACH__<name>
-        RP_goto_label("next", name);    // move to the line "$next <name>"
+        RP_goto_label("next", (char*) name);    // move to the line "$next <name>"
     }    
 
     return(rc);
@@ -173,7 +173,7 @@ static int RP_foreach_goto_next(char* label)
     int     rc, beg = 1;
     char    *line = NULL, name[128], *arg, **parms;
 
-    SCR_sqz(label);
+    SCR_sqz((unsigned char*) label);
 
     while(1) {
         // Stoppe si début du fichier atteint
@@ -190,17 +190,17 @@ static int RP_foreach_goto_next(char* label)
                 goto done;
             }
 
-            SCR_lower(name);
+            SCR_lower((unsigned char*) name);
             if(strcmp(name, "foreach") == 0) {
-                parms = SCR_vtoms(arg, " ");
+                parms = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ");
                 if(parms && parms[0] && strcmp(label, parms[0]) == 0) {
-                    SCR_free_tbl(parms);
+                    SCR_free_tbl((unsigned char**) parms);
                     // Place la première valeur dans name et supprime cette valeur de la liste
                     rc = RP_foreach_next_index(label);
                     if(rc > 0) rc = 0;
                     goto done;
                 }
-                SCR_free_tbl(parms);
+                SCR_free_tbl((unsigned char**) parms);
             }
         }
     }
@@ -219,9 +219,9 @@ done:
  *  See above for details. 
  *  
  */
-int RP_foreach_next(char* arg)
+int RP_foreach_next(char* arg, int unused)
 {
-    unsigned    char    **args, **SCR_vtomsq();
+    unsigned    char    **args;
     int                 rc = 0, nb,
                         curline = CUR_REPFILE->curline;
 
@@ -229,7 +229,7 @@ int RP_foreach_next(char* arg)
     nb = SCR_tbl_size(args);
     switch(nb) {
         case 1 :
-            rc = RP_foreach_goto_next(args[0]);
+            rc = RP_foreach_goto_next((char*) args[0]);
             break;
 
         default: // $next must have exactly 1 arg

@@ -8,10 +8,10 @@
  *  List of functions 
  *  -----------------
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
- *      int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
- *      int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+ *      int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
+ *      int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
  *      int KE_compile(KDB* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
- *      int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
+ *      int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
  *      int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
@@ -65,7 +65,7 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
  *  
  *  @see https://iode.plan.be/doku.php?id=modelsimulate
  */
-int B_ModelSimulate(char *const_arg)
+int B_ModelSimulate(char *const_arg, int unused)
 {
     int     lg1, lg2;
     int     rc = -1;
@@ -108,7 +108,7 @@ err:
  *          
  *  @see https://iode.plan.be/doku.php?id=modelsimulateparms
  */
-int B_ModelSimulateParms(char* arg)
+int B_ModelSimulateParms(char* arg, int unused)
 {
     char    **args;
     int     rc = 0, nargs;
@@ -151,7 +151,7 @@ fin :
  *  
  *  @see https://iode.plan.be/doku.php?id=modelexchange
  */
-int B_ModelExchange(char* const_arg)
+int B_ModelExchange(char* const_arg, int unused)
 {
     char    *arg;
 
@@ -205,7 +205,7 @@ int KE_compile(KDB* dbe)
  *  
  *  @see https://iode.plan.be/doku.php?id=modelsimulate
  */
-int B_ModelCompile(char* arg)
+int B_ModelCompile(char* arg, int unused)
 {
     char    **eqs = NULL;
     KDB     *tdbe = NULL;
@@ -235,7 +235,7 @@ int B_ModelCompile(char* arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelCalcSCC
  */
-int B_ModelCalcSCC(char *const_arg)
+int B_ModelCalcSCC(char *const_arg, int unused)
 {
     char    **eqs, buf[256], pre[64], inter[64], post[64];
     int     rc = -1, lg1, tris;
@@ -281,7 +281,7 @@ err:
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelSimulateSCC
  */
-int B_ModelSimulateSCC(char *const_arg)
+int B_ModelSimulateSCC(char *const_arg, int unused)
 {
     int     lg1, lg2, rc, prepos, interpos, postpos;
     char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
@@ -455,7 +455,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelSimulateSaveNIters
  */
-int B_ModelSimulateSaveNIters(char *arg)
+int B_ModelSimulateSaveNIters(char *arg, int unused)
 {
     return(B_CreateVarFromVecOfInts(arg, CSimulation::KSIM_NITERS));
 }
@@ -468,7 +468,7 @@ int B_ModelSimulateSaveNIters(char *arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelSimulateSaveNorms
  */
-int B_ModelSimulateSaveNorms(char *arg)
+int B_ModelSimulateSaveNorms(char *arg, int unused)
 {
     return(B_CreateVarFromVecOfDoubles(arg, CSimulation::KSIM_NORMS));
 }

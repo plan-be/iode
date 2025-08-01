@@ -9,9 +9,9 @@
  *  
  *  
  */
-#include "scr4/s_args.h"
 #include "scr4/s_mat.h"
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -163,10 +163,10 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         if(rt < 0 || ct < 0) goto cleanup;
 
         xvars = B_ainit_chk(xdim, NULL, 0);
-        nrows = SCR_tbl_size(xvars) - 1;
+        nrows = SCR_tbl_size((unsigned char**) xvars) - 1;
 
         yvars = B_ainit_chk(ydim, NULL, 0);
-        ncols = SCR_tbl_size(yvars) - 1;
+        ncols = SCR_tbl_size((unsigned char**) yvars) - 1;
 
         if(nrows == 0 || ncols == 0) goto cleanup;
 
@@ -178,11 +178,11 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         // get matrix from variables
         for(crow = 0; crow < nrows; crow++) {
             strcpy(rvar, pattern);
-            SCR_replace(rvar, "x", xvars[crow]);
+            SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
 
             for(ccol = 0; ccol < ncols; ccol++) {
                 strcpy(cvar, rvar);
-                SCR_replace(cvar, "y", yvars[ccol]);
+                SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
 
                 var = RasGetVar(cvar, rt);
                 if(!IODE_IS_A_NUMBER(var)) goto cleanup;
@@ -198,20 +198,20 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         }
 
         strcpy(rvar, pattern);
-        SCR_replace(rvar, "y", yvars[ncols]);
+        SCR_replace((unsigned char*) rvar, (unsigned char*) "y", (unsigned char*) yvars[ncols]);
         for(crow = 0; crow < nrows; crow++) {
             strcpy(cvar, rvar);
-            SCR_replace(cvar, "x", xvars[crow]);
+            SCR_replace((unsigned char*) cvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
             var = RasGetVar(cvar, ct);
             if(!IODE_IS_A_NUMBER(var)) goto cleanup;
             row[crow] += var;
         }
 
         strcpy(rvar, pattern);
-        SCR_replace(rvar, "x", xvars[nrows]);
+        SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[nrows]);
         for(ccol = 0; ccol < ncols; ccol++) {
             strcpy(cvar, rvar);
-            SCR_replace(cvar, "y", yvars[ccol]);
+            SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
             var = RasGetVar(cvar, ct);
             if(!IODE_IS_A_NUMBER(var)) goto cleanup;
             col[ccol] += var;
@@ -222,11 +222,11 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         // write results back
         for(crow = 0; crow < nrows; crow++) {
             strcpy(rvar, pattern);
-            SCR_replace(rvar, "x", xvars[crow]);
+            SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
 
             for(ccol = 0; ccol < ncols; ccol++) {
                 strcpy(cvar, rvar);
-                SCR_replace(cvar, "y", yvars[ccol]);
+                SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
                 // keep var if fixed
                 if(!IODE_IS_A_NUMBER(RasGetVar(cvar, ct)))
                     if(RasSetVar(cvar, ct, MATE(A, crow, ccol)) < 0) goto cleanup;
@@ -237,13 +237,13 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     }
 
 cleanup:
-    if(xvars != NULL) SCR_free_tbl(xvars);
-    if(yvars != NULL) SCR_free_tbl(yvars);
+    if(xvars != NULL) SCR_free_tbl((unsigned char**) xvars);
+    if(yvars != NULL) SCR_free_tbl((unsigned char**) yvars);
     if(A != NULL) M_free(A);
-    if(rper != NULL) SCR_free(rper);
-    if(cper != NULL) SCR_free(cper);
-    if(row != NULL) SCR_free(row);
-    if(col != NULL) SCR_free(col);
+    if(rper != NULL) SCR_free((unsigned char**) rper);
+    if(cper != NULL) SCR_free((unsigned char**) cper);
+    if(row != NULL) SCR_free((unsigned char**) row);
+    if(col != NULL) SCR_free((unsigned char**) col);
     return(rc);
 }
 

@@ -6,7 +6,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_EqsStepWise(char* arg) | $EqsStepWise from to eqname leccond {r2|fstat}
+ *      int B_EqsStepWise(char* arg, int unused) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
 #include "api/constants.h"
 #include "api/b_args.h"
@@ -71,7 +71,7 @@ static int check_scl_var(char *eqs)
  *       eqname  : equation to estimate
  *       leccond : condition of eligibility
  */
-int B_EqsStepWise(char* arg)                                                 
+int B_EqsStepWise(char* arg, int unused)                                                 
 {
     char    *from, *to, *eqs, *cond, *test, *tmp;
     char**  args;

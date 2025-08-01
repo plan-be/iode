@@ -301,97 +301,96 @@ BFNS B_fns[] = {
 // ========= Definition of report @-functions =========
 
 RPFN RP_FNS[] = {
-    "upper",        RPF_upper,
-    "date",         RPF_date,
-    "time",         RPF_time,
-    "lower",        RPF_lower,
+    (unsigned char*) "upper",        RPF_upper,
+    (unsigned char*) "date",         RPF_date,
+    (unsigned char*) "time",         RPF_time,
+    (unsigned char*) "lower",        RPF_lower,
     
-    "take",         RPF_take,                /* JMP 18-12-01 */
-    "drop",         RPF_drop,                /* JMP 18-12-01 */
-    "count",        RPF_count,               /* JMP 18-12-01 */
-    "index",        RPF_index,               /* JMP 18-12-01 */
-    "fmt",          RPF_fmtint,              /* JMP 06-11-2003 */
-    "sqz",          RPF_sqz,                 /* JMP 10-11-2004 */
-    "strip",        RPF_strip,               /* JMP 10-11-2004 */
+    (unsigned char*) "take",         RPF_take,                /* JMP 18-12-01 */
+    (unsigned char*) "drop",         RPF_drop,                /* JMP 18-12-01 */
+    (unsigned char*) "count",        RPF_count,               /* JMP 18-12-01 */
+    (unsigned char*) "index",        RPF_index,               /* JMP 18-12-01 */
+    (unsigned char*) "fmt",          RPF_fmtint,              /* JMP 06-11-2003 */
+    (unsigned char*) "sqz",          RPF_sqz,                 /* JMP 10-11-2004 */
+    (unsigned char*) "strip",        RPF_strip,               /* JMP 10-11-2004 */
     
-    "ttitle",       RPF_ttitle,
-    "cvalue",       RPF_cvalue,
-    "lvalue",       RPF_lvalue,
-    "vvalue",       RPF_vvalue,
-    "sample",       RPF_sample,
-    "replace",      RPF_replace,
-    "month",        RPF_month,
-    "ansi",         RPF_ansi,
-    "equal",        RPF_equal,
+    (unsigned char*) "ttitle",       RPF_ttitle,
+    (unsigned char*) "cvalue",       RPF_cvalue,
+    (unsigned char*) "lvalue",       RPF_lvalue,
+    (unsigned char*) "vvalue",       RPF_vvalue,
+    (unsigned char*) "sample",       RPF_sample,
+    (unsigned char*) "replace",      RPF_replace,
+    (unsigned char*) "month",        RPF_month,
+    (unsigned char*) "ansi",         RPF_ansi,
+    (unsigned char*) "equal",        RPF_equal,
     
-    "ivalue",       RPF_ivalue,              /* JMP 18-12-01 */
+    (unsigned char*) "ivalue",       RPF_ivalue,              /* JMP 18-12-01 */
     
-    "evalue",       RPF_evalue,              /* GB  14-02-05 */
+    (unsigned char*) "evalue",       RPF_evalue,              /* GB  14-02-05 */
 
-    "eqsample",     RPF_eqsample,      /* JMP 27-07-11 */
-    "eqsamplefrom", RPF_eqsamplefrom,  /* JMP 27-07-11 */
-    "eqsampleto",   RPF_eqsampleto,    /* JMP 27-07-11 */
-    "eqlhs",        RPF_eqlhs,         /* JMP 27-07-11 */
-    "eqrhs",        RPF_eqrhs,         /* JMP 27-07-11 */
+    (unsigned char*) "eqsample",     RPF_eqsample,      /* JMP 27-07-11 */
+    (unsigned char*) "eqsamplefrom", RPF_eqsamplefrom,  /* JMP 27-07-11 */
+    (unsigned char*) "eqsampleto",   RPF_eqsampleto,    /* JMP 27-07-11 */
+    (unsigned char*) "eqlhs",        RPF_eqlhs,         /* JMP 27-07-11 */
+    (unsigned char*) "eqrhs",        RPF_eqrhs,         /* JMP 27-07-11 */
 
-    "vliste",       RPF_vliste,
-    "sliste",       RPF_sliste,
+    (unsigned char*) "vliste",       RPF_vliste,
+    (unsigned char*) "sliste",       RPF_sliste,
     
-    "cexpand",      RPF_cexpand,
-    "eexpand",      RPF_eexpand,
-    "iexpand",      RPF_iexpand,
-    "lexpand",      RPF_lexpand,
-    "sexpand",      RPF_sexpand,
-    "texpand",      RPF_texpand,
-    "vexpand",      RPF_vexpand,
+    (unsigned char*) "cexpand",      RPF_cexpand,
+    (unsigned char*) "eexpand",      RPF_eexpand,
+    (unsigned char*) "iexpand",      RPF_iexpand,
+    (unsigned char*) "lexpand",      RPF_lexpand,
+    (unsigned char*) "sexpand",      RPF_sexpand,
+    (unsigned char*) "texpand",      RPF_texpand,
+    (unsigned char*) "vexpand",      RPF_vexpand,
     
-    "fappend",      RPF_fappend,
-    "fdelete",      RPF_fdelete,
+    (unsigned char*) "fappend",      RPF_fappend,
+    (unsigned char*) "fdelete",      RPF_fdelete,
     
-    "sstderr",      RPF_sstderr,
+    (unsigned char*) "sstderr",      RPF_sstderr,
     
-    "sqlopen",      RPS_Open,
-    "sqlquery",     RPS_Query,
-    "sqlnext",      RPS_Next,
-    "sqlrecord",    RPS_Record,
-    "sqlfield",     RPS_Field,
-    "sqlnbflds",    RPS_NbFlds,
-    "sqlclose",     RPS_Close,
+    (unsigned char*) "sqlopen",      RPS_Open,
+    (unsigned char*) "sqlquery",     RPS_Query,
+    (unsigned char*) "sqlnext",      RPS_Next,
+    (unsigned char*) "sqlrecord",    RPS_Record,
+    (unsigned char*) "sqlfield",     RPS_Field,
+    (unsigned char*) "sqlnbflds",    RPS_NbFlds,
+    (unsigned char*) "sqlclose",     RPS_Close,
     
-    "srelax",       RPF_srelax,
+    (unsigned char*) "srelax",       RPF_srelax,
     
-    "memory",       RPF_memory,
+    (unsigned char*) "memory",       RPF_memory,
 
-    "chronoreset",  RPF_ChronoReset,
-    "chronoget",    RPF_ChronoGet,
+    (unsigned char*) "chronoreset",  RPF_ChronoReset,
+    (unsigned char*) "chronoget",    RPF_ChronoGet,
 
-    "simeps",		RPF_SimEps,
-    "simmaxit",		RPF_SimMaxit,
-    "simrelax",		RPF_SimRelax,
-    "simsortnbpasses", RPF_SimSortNbPasses,
-    "simsortalgo",    RPF_SimSortAlgo,
-    "siminitvalues", RPF_SimInitValues,
+    (unsigned char*) "simeps",		    RPF_SimEps,
+    (unsigned char*) "simmaxit",		RPF_SimMaxit,
+    (unsigned char*) "simrelax",		RPF_SimRelax,
+    (unsigned char*) "simsortnbpasses", RPF_SimSortNbPasses,
+    (unsigned char*) "simsortalgo",     RPF_SimSortAlgo,
+    (unsigned char*) "siminitvalues",   RPF_SimInitValues,
 
-    "simnorm",		RPF_SimNorm,
-    "simniter",		RPF_SimNIter,
-    "simcpu",		RPF_SimCpu,
-    "simcpuscc",    RPF_SimCpuSCC,
-    "simcpusort",   RPF_SimCpuSort,
+    (unsigned char*) "simnorm",		RPF_SimNorm,
+    (unsigned char*) "simniter",		RPF_SimNIter,
+    (unsigned char*) "simcpu",		RPF_SimCpu,
+    (unsigned char*) "simcpuscc",    RPF_SimCpuSCC,
+    (unsigned char*) "simcpusort",   RPF_SimCpuSort,
     
 
     //"vseps",		RPF_vseps,
-    "vtake",		RPF_vtake,
-    "vdrop",		RPF_vdrop,
-    "vcount",		RPF_vcount,
+    (unsigned char*) "vtake",		RPF_vtake,
+    (unsigned char*) "vdrop",		RPF_vdrop,
+    (unsigned char*) "vcount",		RPF_vcount,
 
-    "getdir",       RPF_getdir, // 9/4/2019
-    "chdir",        RPF_chdir,  // 9/4/2019
-    "mkdir",        RPF_mkdir,  // 9/4/2019
-    "rmdir",        RPF_rmdir,  // 9/4/2019
+    (unsigned char*) "getdir",       RPF_getdir, // 9/4/2019
+    (unsigned char*) "chdir",        RPF_chdir,  // 9/4/2019
+    (unsigned char*) "mkdir",        RPF_mkdir,  // 9/4/2019
+    (unsigned char*) "rmdir",        RPF_rmdir,  // 9/4/2019
 
-    "void",         RPF_void,   // 9/4/2019
-    "version",      RPF_IodeVersion, 
+    (unsigned char*) "void",         RPF_void,   // 9/4/2019
+    (unsigned char*) "version",      RPF_IodeVersion, 
     
     0, 0
 };
-
