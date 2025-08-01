@@ -68,7 +68,9 @@
  */
 #include "scr4/s_a2m.h"
 #include "scr4/s_args.h"
+#include "scr4/s_proa2m.h"
 
+#include "api/constants.h"
 #include "api/b_a2mini.h"
 #include "api/b_errors.h"
 #include "api/k_lang.h"
@@ -116,10 +118,10 @@ int B_PrintDestFile(char *arg, int newf)
     int     nb_args, type, rc;
 
     KT_CUR_TOPIC = 0; /* JMP 06-01-02 */
-    SCR_strip(arg);
+    SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != 0) {
-        args = SCR_vtoms(arg, B_SEPS);
-        nb_args = SCR_tbl_size(args);
+        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+        nb_args = SCR_tbl_size((unsigned char**) args);
         if(nb_args > 1) {
             switch(args[1][0]) {
                 case 'h':
@@ -150,7 +152,7 @@ int B_PrintDestFile(char *arg, int newf)
         }
         else type = W_A2M;
         rc = B_PrintDestExt(args[0], newf, type);
-        A_free(args);
+        A_free((unsigned char**) args);
     }
     else rc = B_PrintDestExt("", newf, W_GDI);
 
@@ -351,21 +353,21 @@ int B_PrintFont(char* arg)
     U_ch    **tbl = 0;
     int     ntbl = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
         A2M_FONTFAMILY = SCR_upper_char(tbl[0][0]);
         // BGUI_PrintFont1();
     }
     if(ntbl > 1) {
-        A2M_FONTSIZE = atoi(tbl[1]);
-        A2M_FONTSIZE = max(A2M_FONTSIZE, 4);
+        A2M_FONTSIZE = atoi((char*) tbl[1]);
+        A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
 
     if(ntbl > 2) {
-        A2M_FONTINCR = atoi(tbl[2]);
-        A2M_FONTINCR = max(A2M_FONTINCR, 1);
+        A2M_FONTINCR = atoi((char*) tbl[2]);
+        A2M_FONTINCR = std::max(A2M_FONTINCR, 1);
         // BGUI_PrintFont3();
     }
     SCR_free_tbl(tbl);
@@ -380,15 +382,15 @@ int B_PrintTFont(char* arg)
     U_ch    **tbl = 0;
     int     ntbl = 0;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
         A2M_TFONTFAMILY = SCR_upper_char(tbl[0][0]);
         // BGUI_PrintTFont1();
     }
     if(ntbl > 1) {
-        A2M_TFONTSIZE = atoi(tbl[1]);
-        A2M_TFONTSIZE = max(A2M_TFONTSIZE, 4);
+        A2M_TFONTSIZE = atoi((char*) tbl[1]);
+        A2M_TFONTSIZE = std::max(A2M_TFONTSIZE, 4);
         // BGUI_PrintTFont2();
     }
     SCR_free_tbl(tbl);
@@ -434,27 +436,27 @@ int B_PrintTWidth(char* arg)
     U_ch    **tbl = 0;
     int     ntbl = 0, w, col1, coln;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
-        w = atoi(tbl[0]);
-        w = max(w, 65);
+        w = atoi((char*) tbl[0]);
+        w = std::max(w, 65);
         A2M_RTF_TWIDTH = w;
         A2M_FRM_TWIDTH = w;
         // BGUI_PrintTWidth1();
     }
 
     if(ntbl > 1) {
-        col1 = atoi(tbl[1]);
-        col1 = max(col1, 50);
+        col1 = atoi((char*) tbl[1]);
+        col1 = std::max(col1, 50);
         A2M_RTF_TCOL1 = col1;
         A2M_FRM_TCOL1 = col1;
         // BGUI_PrintTWidth2();
     }
 
     if(ntbl > 2) {
-        coln = atoi(tbl[2]);
-        coln = max(coln, 15);
+        coln = atoi((char*) tbl[2]);
+        coln = std::max(coln, 15);
         A2M_RTF_TCOLN = coln;
         A2M_FRM_TCOLN = coln;
         // BGUI_PrintTWidth3();
@@ -471,27 +473,26 @@ int B_PrintGSize(char* arg)
     U_ch    **tbl = 0;
     int     ntbl = 0, w;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl > 0) {
-        w = atoi(tbl[0]);
-        w = max(w, 35);
+        w = atoi((char*) tbl[0]);
+        w = std::max(w, 35);
         A2M_GWIDTH = 0.1 * w;
         // BGUI_PrintGSize1();
     }
 
     if(ntbl > 1) {
-        w = atoi(tbl[1]);
-        w = max(w, 20);
+        w = atoi((char*) tbl[1]);
+        w = std::max(w, 20);
         A2M_GHEIGHT = 0.1 * w;
         // BGUI_PrintGSize2();
     }
     if(ntbl > 2) { // GB 16/03/2009
-        A2M_FONTSIZE = atoi(tbl[2]);
-        A2M_FONTSIZE = max(A2M_FONTSIZE, 4);
+        A2M_FONTSIZE = atoi((char*) tbl[2]);
+        A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
-
 
     SCR_free_tbl(tbl);
     return(0);
@@ -568,7 +569,7 @@ int B_GetColor(char* arg)
 {
     int     col;
 
-    SCR_lower(arg);
+    SCR_lower((unsigned char*) arg);
     if(strcmp(arg, "blue") == 0)           col  = 'b';
     else if(strcmp(arg, "black") == 0)     col  = 'B';
     else if(strcmp(arg, "magenta") == 0)   col  = 'm';
@@ -577,7 +578,7 @@ int B_GetColor(char* arg)
     else if(strcmp(arg, "green") == 0)     col  = 'g';
     else if(strcmp(arg, "yellow") == 0)    col  = 'y';
     else if(strcmp(arg, "white") == 0)     col  = 'w';
-    return(U_pos(col, "byBwrgcm"));
+    return(U_pos(col, (unsigned char*) "byBwrgcm"));
 }
 
 
@@ -636,7 +637,7 @@ int B_PrintHtmlHelp(char* arg)
 // $PrintRtfTitle Help title
 int B_PrintRtfTitle(char* arg)
 {
-    B_A2mSetRtfTitle(arg);
+    B_A2mSetRtfTitle((unsigned char*) arg);
     // BGUI_PrintRtfTitle(arg);
     return(0);
 }
@@ -645,7 +646,7 @@ int B_PrintRtfTitle(char* arg)
 // $PrintRtfCopyright copyright text
 int B_PrintRtfCopy(char* arg)
 {
-    B_A2mSetRtfCopy(arg);
+    B_A2mSetRtfCopy((unsigned char*) arg);
     // BGUI_PrintRtfCopy(arg);
     return(0);
 }
@@ -655,14 +656,13 @@ int B_PrintRtfCopy(char* arg)
 int B_PrintRtfLevel(char* arg)
 {
     int     level = atoi(arg);
-    extern int KT_CUR_LEVEL;
 
     if(level == 0) {
         if(arg[0] == '+') KT_CUR_LEVEL++;
         else              KT_CUR_LEVEL--;
     }
     else KT_CUR_LEVEL = level;
-    KT_CUR_LEVEL = max(0, KT_CUR_LEVEL);
+    KT_CUR_LEVEL = std::max(0, KT_CUR_LEVEL);
     return(0);
 }
 
@@ -724,7 +724,7 @@ int B_PrintGdiPrinter(char* arg)
 {
     extern char W_gdiprinter[];
 
-    SCR_strlcpy(W_gdiprinter, arg, 70);
+    SCR_strlcpy((unsigned char*) W_gdiprinter, (unsigned char*) arg, 70);
     return(0);
 }
 
@@ -866,7 +866,7 @@ int B_PrintHtmlStyle(char* arg)
 {
     extern char *A2M_HTML_STYLE;
 
-    A2M_HTML_RELSTYLE = SCR_stracpy(arg);
+    A2M_HTML_RELSTYLE = (char*) SCR_stracpy((unsigned char*) arg);
     return(0);
 }
 
@@ -886,42 +886,42 @@ int B_A2mToAll(char* arg, int type)
     U_ch    **tbl = 0, ibuf[256], obuf[256], *ext;
     int     ntbl;
 
-    tbl = SCR_vtom(arg, ' ');
+    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl == 0) return(-1);
-    SCR_cat_ext(ibuf, tbl[0], "a2m");
+    SCR_cat_ext((char*) ibuf, (char*) tbl[0], (char*) "a2m");
     switch(type) {
         case A2M_DESTFRM :
-            ext = "mif";
+            ext = (unsigned char*) "mif";
             break;
         case A2M_DESTHTML:
-            ext = "htm";
+            ext = (unsigned char*) "htm";
             break;
         case A2M_DESTRTF :
-            ext = "rtf";
+            ext = (unsigned char*) "rtf";
             break;
         case A2M_DESTCSV :
-            ext = "csv";
+            ext = (unsigned char*) "csv";
             break;
         default : 
-            ext = "";           
+            ext = (unsigned char*) "";           
             break;                  
     }
 
-    if(ntbl > 1) SCR_cat_ext(obuf, tbl[1], ext);
-    else         SCR_change_ext(obuf, tbl[0], ext);
+    if(ntbl > 1) SCR_cat_ext((char*) obuf, (char*) tbl[1], (char*) ext);
+    else         SCR_change_ext((char*) obuf, (char*) tbl[0], (char*) ext);
     SCR_free_tbl(tbl);
     switch(type) {
         case A2M_DESTFRM :
-            return(A2mToMif(ibuf, obuf));
+            return(A2mToMif((char*) ibuf, (char*) obuf));
         case A2M_DESTHTML:
-            return(A2mToHtml(ibuf, obuf, W_htmlhelp));
+            return(A2mToHtml((char*) ibuf, (char*) obuf, W_htmlhelp));
         case A2M_DESTRTF :
-            return(A2mToRtf(ibuf, obuf, W_rtfhelp));
+            return(A2mToRtf((char*) ibuf, (char*) obuf, W_rtfhelp));
         case A2M_DESTCSV :
-            return(A2mToCsv(ibuf, obuf));
+            return(A2mToCsv((char*) ibuf, (char*) obuf));
         case A2M_DESTGDIPRT :
-            return(A2mToGdiPrinter(0L, 1, "Iode", ibuf));
+            return(A2mToGdiPrinter(0L, 1, (unsigned char*) "Iode", ibuf));
         default : 
             return(-1);
     }
@@ -997,7 +997,7 @@ int B_A2mSetCol(int *dest, int col)
 int B_PrintHtmlTableClass(char *table_class)
 {
     SCR_free(A2M_HTML_TABLECLASS);
-    A2M_HTML_TABLECLASS = SCR_stracpy(table_class);
+    A2M_HTML_TABLECLASS = (char*) SCR_stracpy((unsigned char*) table_class);
     return(0);
 }
 
@@ -1006,7 +1006,7 @@ int B_PrintHtmlTableClass(char *table_class)
 int B_PrintHtmlTRClass(char *tr_class)
 {
     SCR_free(A2M_HTML_TRCLASS);
-    A2M_HTML_TRCLASS = SCR_stracpy(tr_class);
+    A2M_HTML_TRCLASS = (char*) SCR_stracpy((unsigned char*) tr_class);
     return(0);
 }
 
@@ -1016,7 +1016,7 @@ int B_PrintHtmlTRClass(char *tr_class)
 int B_PrintHtmlTHClass(char *th_class)
 {
     SCR_free(A2M_HTML_THCLASS);
-    A2M_HTML_THCLASS = SCR_stracpy(th_class);
+    A2M_HTML_THCLASS = (char*) SCR_stracpy((unsigned char*) th_class);
     return(0);
 }
 
@@ -1026,6 +1026,6 @@ int B_PrintHtmlTHClass(char *th_class)
 int B_PrintHtmlTDClass(char *td_class)
 {
     SCR_free(A2M_HTML_TDCLASS);
-    A2M_HTML_TDCLASS = SCR_stracpy(td_class);
+    A2M_HTML_TDCLASS = (char*) SCR_stracpy((unsigned char*) td_class);
     return(0);
 }

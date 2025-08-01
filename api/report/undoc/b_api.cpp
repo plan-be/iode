@@ -21,6 +21,7 @@
  */
 #include "scr4/s_args.h"
 
+#include "api/constants.h"
 #include "api/b_iodeini.h"
 #include "api/k_lang.h"
 #include "api/k_super.h"

@@ -5,12 +5,12 @@
  *
  *  Main functions
  *  --------------
- *      char **B_ainit_chk(char* arg, ADEF* adef, int nb)       : expands an argument by replacing @filename and $listname by their contents
- *      char **B_vtom_chk(char* arg, int nb)                    : splits a string (generally a function argument) into a table of strings. 
- *      int B_loop(char *argv[], int (*fn)(), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
- *      int B_ainit_loop(char* arg, int (*fn)(), char* client)  : calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
- *      int B_get_arg0(char* arg0, char*arg, int lg)            : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
- *      int B_argpos(char* str, int ch)                         : returns the position of a char in a string. 
+ *      char **B_ainit_chk(char* arg, ADEF* adef, int nb)                   : expands an argument by replacing @filename and $listname by their contents
+ *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
+ *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
+ *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
+ *      int B_get_arg0(char* arg0, char*arg, int lg)                        : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
+ *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
  *   
  */
 #include "scr4/s_prost.h"
@@ -122,12 +122,12 @@ char **B_vtom_chk(char* arg, int nb)
  *  @return             int                     result of the last call to fn()
  *  
  */
-int B_loop(char *argv[], int (*fn)(), char* client)
+int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 {
     int     i, rc;
 
     for(i = 0 ; argv[i] ; i++) {
-        if(client == NULL) rc = (*fn)(argv[i]);
+        if(client == NULL) rc = (*fn)(argv[i], NULL);
         else rc = (*fn)(argv[i], client);
         if(rc) return(rc);
     }
@@ -147,7 +147,7 @@ int B_loop(char *argv[], int (*fn)(), char* client)
  *  @return             int                     result of the last call to fn()
  *  
  */
-int B_ainit_loop(char* arg, int (*fn)(), char* client)
+int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 {
     char    **argv;
     int     rc;

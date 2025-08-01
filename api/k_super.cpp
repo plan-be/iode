@@ -37,7 +37,7 @@
  *
  * SCR4 superseeded functions + assign
  * -----------------------------------
- *     char *A_expand_super_API(const char* name)               Default implementation of A_expand() in IODE API
+ *     char *A_expand_super_API(char* name)                     Default implementation of A_expand() in IODE API
  *     void IODE_assign_super_API()                             Assigns default values to "super" (virtual) functions. 
  * 
  * List of function pointers that can replace the standard implementation  
@@ -100,8 +100,8 @@ int  (*khitkey_super)();
 int  (*kgetkey_super)();
 void (*kbeep_super)(void);
 SAMPLE *(*kasksmpl_super)(void);
-int  (*kexecsystem_super)();
-int  (*kshellexec_super)();
+int  (*kexecsystem_super)(const char* arg);
+int  (*kshellexec_super)(const char* arg);
 int  (*ODE_end_super)(const int);
 
 /**
@@ -288,7 +288,7 @@ int kconfirm(const char *fmt,...)
 #else
         gets_s(buf, sizeof(buf) - 1);
 #endif
-        SCR_sqz(buf);
+        SCR_sqz((unsigned char*) buf);
         return(!U_is_in(buf[0], "OoYyJj1"));
     }    
 }
@@ -350,7 +350,7 @@ void krecordtext(const unsigned char* text)
 {
     int     i;
 
-    for(i = (int)strlen(text) - 1 ; i >= 0 ; i--)
+    for(i = (int)strlen((char*) text) - 1 ; i >= 0 ; i--)
         krecordkey(text[i]);
 }
 
@@ -562,7 +562,7 @@ int kshellexec(const char *arg)
     //sei.hwnd = hWndDOS;
 	sei.hwnd = 0;
     sei.nShow = SW_SHOW;
-    sei.lpFile = arg;
+    sei.lpFile = (LPCWSTR) arg;
 //    sei.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
 
     ShellExecuteEx(&sei);
@@ -585,11 +585,11 @@ int kshellexec(const char *arg)
  *  @return             char*   expanded string  
  *  
  */
-char* A_expand_super_API(const char* name)
+char* A_expand_super_API(char* name)
 {
     int     pos;
 
-    pos = K_find(KL_WS, name);
+    pos = K_find(KL_WS, const_cast<char*>(name));
     if (pos < 0) return(NULL);
     return((char *)KLVAL(KL_WS, pos));
 }
