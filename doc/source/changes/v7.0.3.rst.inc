@@ -20,6 +20,8 @@ Fixed Bugs
   Graphical User Interface (GUI) for double values (closes :issue:`984`)
 - fixed methods :meth:`Variables.from_frame` and :meth:`Variables.from_array` systematically 
   overriding the sample of the *variables* workspace (closes :issue:`998`)
+- fixed *mode* not reset to LEVEL when a Variables database is loaded or cleared in the
+  Graphical User Interface (GUI) (closes :issue:`1007`)
 
 Miscellaneous 
 -------------

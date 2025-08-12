@@ -198,6 +198,8 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
         self.database_model.database_modified.connect(self.database_modified)
+        self.database_model.database_loaded.connect(self.reset_mode)
+        self.database_model.database_cleared.connect(self.reset_mode)
         self.database_view.database_modified.connect(self.database_modified)
 
     def reset_filter(self):
@@ -232,6 +234,13 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         
         self.save_numeric_settings(settings)
         settings.setValue("mode", self.combo_mode.currentIndex())
+
+    @Slot()
+    def reset_mode(self):
+        """
+        Resets the mode of the VariablesModel object to LEVEL.
+        """
+        self.combo_mode.setCurrentIndex(0)
 
     @Slot(int)
     def update_mode(self, index):
