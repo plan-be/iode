@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 if sys.version_info.minor >= 11:
     from typing import Self
@@ -560,7 +561,79 @@ class Identities(IodeDatabase):
         >>> variables.names
         ['GAP2', 'GAP_']
         """
-        self._cython_instance.execute(identities, from_period, to_period, var_files, scalar_files, trace)
+        from iode import variables
+
+        if identities is None:
+            identities = ""
+        if isinstance(identities, str):
+            pass
+        elif isinstance(identities, Iterable) and all(isinstance(item, str) for item in identities):
+            identities = ';'.join(identities)
+        else:
+            raise TypeError("'identities': Expected value of type str or a list of str. "
+                            f"Got value of type {type(identities).__name__}")
+        
+        sample = variables.sample
+        if sample is None:
+            raise RuntimeError("Variables sample is not defined. "
+                               "Please set the sample before executing identities.")
+        if sample.start is None and sample.end is None:
+            raise RuntimeError("Variables sample is not defined. "
+                               "Please set the sample before executing identities.")  
+        if sample.start is None:
+            raise RuntimeError("Variables sample start is not defined. "
+                               "Please set the sample start before executing identities.")
+        if sample.end is None:
+            raise RuntimeError("Variables sample end is not defined. "
+                               "Please set the sample end before executing identities.")
+
+        if from_period is None:
+            from_period = sample.start
+        if to_period is None:
+            to_period = sample.end
+        
+        if isinstance(from_period, str):
+            from_period = Period(from_period)
+        if not isinstance(from_period, Period):
+            raise TypeError("'from_period': Expected value of type str or Period. "
+                            f"Got value of type {type(from_period).__name__}")
+
+        if isinstance(to_period, str):
+            to_period = Period(to_period)
+        if not isinstance(to_period, Period):
+            raise TypeError("'to_period': Expected value of type str or Period. "
+                            f"Got value of type {type(to_period).__name__}")
+        
+        if from_period > to_period:
+            raise ValueError("'from_period' cannot be greater than 'to_period'. "
+                             f"Got 'from_period': {from_period} and 'to_period': {to_period}")
+        if from_period < sample.start:
+            raise ValueError("'from_period' cannot be less than the variables sample start. "
+                             f"Got 'from_period': {from_period} and variables sample start: {sample.start}")
+        if to_period > sample.end:
+            raise ValueError("'to_period' cannot be greater than the variables sample end. "
+                             f"Got 'to_period': {to_period} and variables sample end: {sample.end}")
+
+        if var_files is None:
+            var_files = ""
+        if isinstance(var_files, str):
+            pass
+        elif isinstance(var_files, Iterable) and all(isinstance(item, str) for item in var_files):
+            var_files = ';'.join(var_files)
+        else:
+            raise TypeError("'var_files': Expected value of type str or a list of str. "
+                            f"Got value of type {type(var_files).__name__}")
+
+        if scalar_files is None:
+            scalar_files = ""
+        if isinstance(scalar_files, str):
+            pass
+        elif isinstance(scalar_files, Iterable) and all(isinstance(item, str) for item in scalar_files):
+            scalar_files = ';'.join(scalar_files)
+        else:
+            raise TypeError("'scalar_files': Expected value of type str or a list of str. "
+                            f"Got value of type {type(scalar_files).__name__}")
+        self._cython_instance.execute(identities, str(from_period), str(to_period), var_files, scalar_files, trace)
 
     def from_series(self, s: pd.Series):
         r"""
