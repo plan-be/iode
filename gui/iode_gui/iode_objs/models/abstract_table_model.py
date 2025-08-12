@@ -25,6 +25,8 @@ class IodeAbstractTableModel(QAbstractTableModel):
     """
 
     database_modified = Signal()
+    database_loaded = Signal()
+    database_cleared = Signal()
     object_removed = Signal(str)
 
     def __init__(self, column_names: List[str], iode_type: IodeType, database=None, parent=None):
@@ -255,6 +257,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if self._database is not None:
             self._database.clear()
         self._displayed_database = self._database
+        self.database_cleared.emit()
 
     def load(self, filepath: str, force_overwrite: bool):
         """
@@ -287,6 +290,8 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
             # update the view
             self.reset_model()
+
+            self.database_loaded.emit()
 
             return True
         except Exception as e:
