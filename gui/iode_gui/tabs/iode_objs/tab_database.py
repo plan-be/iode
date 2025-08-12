@@ -52,12 +52,52 @@ class IdentitiesWidget(AbstractIodeObjectWidget):
     def __init__(self, parent):
         super().__init__(IodeType.IDENTITIES, parent)
 
+        # execution sample for identities
+        self.label_idt_sample = QLabel("Execution sample:")
+        self.label_idt_sample.setObjectName("label_idt_sample")
+        self.top_horizontal_layout.insertWidget(3, self.label_idt_sample, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.lineEdit_idt_sample = QLineEdit()
+        self.lineEdit_idt_sample.setObjectName("lineEdit_idt_sample")
+        self.lineEdit_idt_sample.setPlaceholderText("from_period:to_period")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.lineEdit_idt_sample.setSizePolicy(sizePolicy)
+        self.lineEdit_idt_sample.setMinimumSize(150, 0)
+        self.top_horizontal_layout.insertWidget(4, self.lineEdit_idt_sample, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.lineEdit_idt_sample.textChanged.connect(self.database_view.set_execution_sample)
+
         self.database_model.dataChanged.connect(self.database_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
         self.database_model.database_modified.connect(self.database_modified)
         self.database_view.database_modified.connect(self.database_modified)
+
+    # NOTE: automatically called from IodeTabWidget.load_settings()
+    def load_settings(self):
+        """
+        Loads settings from a QSettings object.
+        """
+        settings: QSettings = get_settings()
+        if settings is None:
+            return
+
+        sample = settings.value("idt_sample", "", type=str)
+        self.lineEdit_idt_sample.setText(sample)
+
+    # NOTE: automatically called from IodeTabWidget.save_settings()
+    def save_settings(self):
+        """
+        Saves settings to a QSettings object.
+        """
+        settings: QSettings = get_settings()
+        if settings is None:
+            return
+        
+        settings.setValue("idt_sample", self.lineEdit_idt_sample.text())
 
 
 class ListsWidget(AbstractIodeObjectWidget):
@@ -142,7 +182,7 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         # periods filter
         self.label_filter_periods = QLabel("Periods:")
         self.label_filter_periods.setObjectName("label_periods_filter")
-        self.top_horizontal_layout.insertWidget(2, self.label_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.top_horizontal_layout.insertWidget(3, self.label_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.lineEdit_filter_periods = QLineEdit()
         self.lineEdit_filter_periods.setObjectName("lineEdit_filter_periods")
@@ -151,8 +191,8 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         sizePolicyFilter.setHorizontalStretch(0)
         sizePolicyFilter.setVerticalStretch(0)
         self.lineEdit_filter_periods.setSizePolicy(sizePolicyFilter)
-        self.lineEdit_filter_periods.setMinimumSize(200, 0)
-        self.top_horizontal_layout.insertWidget(3, self.lineEdit_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.lineEdit_filter_periods.setMinimumSize(150, 0)
+        self.top_horizontal_layout.insertWidget(4, self.lineEdit_filter_periods, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.database_view.set_filter_periods(self.lineEdit_filter_periods)
         self.database_view_2.set_filter_periods(self.lineEdit_filter_periods)

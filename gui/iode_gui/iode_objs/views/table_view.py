@@ -105,6 +105,9 @@ class IdentitiesView(IodeAbstractTableView):
 
         self.context_menu: QMenu = None
 
+        # to store the execution sample for identities
+        self.execution_sample: str = ""
+
         # headers
         self.horizontalHeader().setStretchLastSection(True)
         self.verticalHeader().setStretchLastSection(False)
@@ -172,6 +175,10 @@ class IdentitiesView(IodeAbstractTableView):
         self.popup_context_menu(event)
         event.accept()
 
+    @Slot(str)
+    def set_execution_sample(self, execution_sample: str):
+        self.execution_sample = execution_sample.strip()
+
     @Slot()
     def execute_current_identity(self):
         # Get the selected object
@@ -182,12 +189,50 @@ class IdentitiesView(IodeAbstractTableView):
 
         # Check if global sample is defined
         if not self.check_global_sample():
+            QMessageBox.warning(self, "WARNING", "The Variables sample is not defined. "
+                                "Please set the Variables sample from the menu "
+                                "'Workspace > Set Variables Sample' before executing identities.")
+            return
+        
+        # extract the execution sample
+        try:
+            variables_sample = variables.sample
+            if not self.execution_sample:
+                from_period = variables_sample.start
+                to_period = variables_sample.end
+            else:
+                if ':' not in self.execution_sample:
+                    QMessageBox.warning(self, "WARNING", "The execution sample is not valid. "
+                                        "The semicolon ':' is missing.")
+                    return
+                from_period, to_period = self.execution_sample.split(':')
+                from_period = from_period.strip()
+                from_period = Period(from_period) if from_period else variables_sample.start
+                to_period = to_period.strip()
+                to_period = Period(to_period) if to_period else variables_sample.end
+        except Exception as e:
+            QMessageBox.warning(self, "WARNING", f"Could not parse the execution sample:\n{str(e)}")
+            return
+
+        if from_period > to_period:
+            QMessageBox.warning(self, "WARNING", "The execution sample is invalid. "
+                                "The start period must be less than or equal to the end period.")
+            return
+        if from_period < variables_sample.start:
+            QMessageBox.warning(self, "WARNING", "The execution sample is invalid. "
+                                "The start period must be greater than or equal to the variables sample "
+                                f"start period {variables_sample.start}.")
+            return
+        if to_period > variables_sample.end:
+            QMessageBox.warning(self, "WARNING", "The execution sample is invalid. "
+                                "The end period must be less than or equal to the variables sample "
+                                f"end period {variables_sample.end}.")
             return
 
         # Computes the selected identity + updates other IODE objects tabs if necessary
         self.main_window.compute_hash(True)
         model: IdentitiesModel = self.model()
-        model.execute_identity(index.row())
+        model.execute_identity(index.row(), from_period, to_period)
         self.main_window.update_tab_and_completer()
 
 
