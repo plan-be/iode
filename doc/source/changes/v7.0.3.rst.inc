@@ -20,6 +20,8 @@ Fixed Bugs
   Graphical User Interface (GUI) for double values (closes :issue:`984`)
 - fixed methods :meth:`Variables.from_frame` and :meth:`Variables.from_array` systematically 
   overriding the sample of the *variables* workspace (closes :issue:`998`)
+- fixed the identity execution in the Graphical User Interface (GUI) to allow
+  the user to specify a period range for the execution (closes :issue:`1005`)
 
 Miscellaneous 
 -------------
