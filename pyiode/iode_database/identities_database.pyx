@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 
 cimport cython
@@ -69,56 +68,7 @@ cdef class Identities(CythonIodeDatabase):
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
-    def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, scalar_files: Union[str, List[str]]=None, trace: bool=False):
-        if identities is None:
-            identities = ""
-        if isinstance(identities, str):
-            pass
-        elif isinstance(identities, Iterable) and all(isinstance(item, str) for item in identities):
-            identities = ';'.join(identities)
-        else:
-            raise TypeError("'identities': Expected value of type str or a list of str. "
-                            f"Got value of type {type(identities).__name__}")
-        
-        if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get_sample()
-            if from_period is None:
-                from_period = c_sample.start_period.to_string().decode()
-            if to_period is None:
-                to_period = c_sample.end_period.to_string().decode()
-        
-        if isinstance(from_period, Period):
-            from_period = str(from_period)
-        if not isinstance(from_period, str):
-            raise TypeError("'from_period': Expected value of type str or Period. "
-                            f"Got value of type {type(from_period).__name__}")
-
-        if isinstance(to_period, Period):
-            to_period = str(to_period)
-        if not isinstance(to_period, str):
-            raise TypeError("'to_period': Expected value of type str or Period. "
-                            f"Got value of type {type(to_period).__name__}")
-
-        if var_files is None:
-            var_files = ""
-        if isinstance(var_files, str):
-            pass
-        elif isinstance(var_files, Iterable) and all(isinstance(item, str) for item in var_files):
-            var_files = ';'.join(var_files)
-        else:
-            raise TypeError("'var_files': Expected value of type str or a list of str. "
-                            f"Got value of type {type(var_files).__name__}")
-
-        if scalar_files is None:
-            scalar_files = ""
-        if isinstance(scalar_files, str):
-            pass
-        elif isinstance(scalar_files, Iterable) and all(isinstance(item, str) for item in scalar_files):
-            scalar_files = ';'.join(scalar_files)
-        else:
-            raise TypeError("'scalar_files': Expected value of type str or a list of str. "
-                            f"Got value of type {type(scalar_files).__name__}")
-
+    def execute(self, identities: str, from_period: str, to_period: str, var_files: str, scalar_files: str, trace: bool=False):
         self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
 
