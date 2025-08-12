@@ -233,7 +233,7 @@ class IodeAbstractTableView(QTableView):
             return True
         # if not -> ask to set it
         else:
-            reply = QMessageBox.question(None, "Sample", "Sample undefined. Set it?",
+            reply = QMessageBox.question(None, "Variables sample", "Variables sample undefined. Set it?",
                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if reply == QMessageBox.StandardButton.Yes:
                 try:
@@ -242,7 +242,9 @@ class IodeAbstractTableView(QTableView):
                         from_str = dialog.from_period
                         to_str = dialog.to_period
                         variables.sample = from_str, to_str
-                    return True
+                        return True
+                    else:
+                        return False
                 except Exception as e:
                     QMessageBox.warning(None, "WARNING", str(e))
                     return False

@@ -217,6 +217,37 @@ def test_print_equation():
                       "         date = 12-06-1998)")
     assert str(eq_ACAF) == string_eq_ACAF
 
+# Identities
+# ----------
+
+def test_execute_identity():
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    variables.clear()
+
+    with pytest.raises(RuntimeError, match=r"Variables sample is not defined. "
+                                           r"Please set the sample before executing identities."):
+        identities.execute("AOUC")
+
+    with pytest.raises(RuntimeError, match=r"Variables sample is not defined. "
+                                           r"Please set the sample before executing identities."):
+        identities.execute("AOUC", Period("1990Y1"), Period("2000Y1"))
+
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    identities.execute("AOUC")
+    identities.execute("AOUC", Period("1990Y1"), Period("2000Y1"))
+
+    with pytest.raises(ValueError, match=r"'from_period' cannot be greater than 'to_period'. "
+                                         r"Got 'from_period': 2000Y1 and 'to_period': 1990Y1"):
+        identities.execute("AOUC", Period("2000Y1"), Period("1990Y1"))
+
+    with pytest.raises(ValueError, match=r"'from_period' cannot be less than the variables sample start. "
+                                         r"Got 'from_period': 1950Y1 and variables sample start: 1960Y1"):
+        identities.execute("AOUC", Period("1950Y1"), Period("2000Y1"))
+
+    with pytest.raises(ValueError, match=r"'to_period' cannot be greater than the variables sample end. "
+                                         r"Got 'to_period': 2050Y1 and variables sample end: 2015Y1"):
+        identities.execute("AOUC", Period("1980Y1"), Period("2050Y1"))
+
 # Tables
 # ------
 
