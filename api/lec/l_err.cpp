@@ -6,15 +6,8 @@
  *      int L_errnon:       Last error number during LEC compilation
  *      char* L_error():    Returns a static buffer containing the last LEC compilation error message.
  */
-
-
 #include "api/lec/lec.h"
 
-//#define L_MAX_WARNS   100
-//#define L_MAX_ERRS    20
-
-// LEC error number (during compilation)
-int     L_errno = 0;  
 
 // LEC error messages corresponding to L_errno
 char  *L_ERR_TEXT[] = {

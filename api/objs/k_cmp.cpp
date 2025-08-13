@@ -19,6 +19,7 @@
 #include "api/objs/variables.h"
 #include "api/objs/compare.h"
 
+
 /**
  *  Compare the size (length) of 2 packed objects. 
  *  
@@ -145,9 +146,9 @@ static int K_cmpidt(char* p1, char* p2, char* name)
     int     rc = 1;
     char    *i1 = NULL, *i2 = NULL;
     CLEC    *cl1 = NULL, *cl2 = NULL;
-    i1 = P_get_ptr(p1, 0);
+    i1 = (char*) P_get_ptr(p1, 0);
     cl1 = L_cc(i1);
-    i2 = P_get_ptr(p2, 0);
+    i2 = (char*) P_get_ptr(p2, 0);
     cl2 = L_cc(i2);
 
     if(cl1 == NULL || cl2 == NULL ||
@@ -205,10 +206,6 @@ int K_cmp_tbl(TBL* tbl1, TBL* tbl2)
     return rc;
 }
 
-
-// Threshold for VAR comparisons 
-double K_CMP_EPS = 1e-7;
-
 /**
  *  Compares 2 double values. 
  *  
@@ -262,29 +259,14 @@ static int K_cmpvar(char* p1, char* p2, char* name)
     double *r1, *r2;
     int     i, nb = KSMPL(KV_WS)->s_nb;
 
-
-    r1 = P_get_ptr(p1, 0);
-    r2 = P_get_ptr(p2, 0);
+    r1 = (double*) P_get_ptr(p1, 0);
+    r2 = (double*) P_get_ptr(p2, 0);
     for(i = 0 ; i < nb ; i++) {
         if(K_cmpvar_1(r1[i], r2[i])) return(1);
     }
 
     return(0);
 }
-
-/**
- *  Table of function pointers for IODE objects comparison: CMT, EQ, IDT, LST, SCL, TBL, VAR.
- */
-static int (*K_cmpobj[])() = {
-    K_cmplg,
-    K_cmpeqs,
-    K_cmpidt,
-    K_cmplg,
-    K_cmplg,
-    K_cmplg,
-    K_cmpvar
-};
-
 
 /*
     compares object name from 2 different kdb's
@@ -310,7 +292,7 @@ static int (*K_cmpobj[])() = {
 
 int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 {
-    int     p1, p2;
+    int     p1, p2, res=0;
 
     if(KTYPE(kdb1) != KTYPE(kdb2)) return(-1);
 
@@ -324,7 +306,33 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 
     if(p2 < 0) return(1);      /* 1, not 2 */
 
+    switch(KTYPE(kdb1))
+    {
+    case COMMENTS:
+        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case EQUATIONS:
+        res = K_cmpeqs(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case IDENTITIES:
+        res = K_cmpidt(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case LISTS:
+        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case SCALARS:
+        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case TABLES:
+        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    case VARIABLES:
+        res = K_cmpvar(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        break;
+    default:
+        break;
+    }
+
     /* 1, 2 */
-    return(3 +
-           K_cmpobj[KTYPE(kdb1)](KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name));
+    return(3 + res);
 }

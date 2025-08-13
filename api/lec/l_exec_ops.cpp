@@ -79,24 +79,3 @@ L_REAL L_exp(L_REAL a, L_REAL b)
     if(_isnan(x)) x = IODE_NAN; /* JMP 18-01-02 */
     return((L_REAL)x);
 }
-
-
-/**
- *  Table of function pointers L_OPS_FN
- */
-
-L_REAL(*L_OPS_FN[])() = {
-    L_or,           // L_OR        L_OP + 0
-    L_and,          // L_AND       L_OP + 1 
-    L_ge,           // L_GE        L_OP + 2
-    L_gt,           // L_GT        L_OP + 3
-    L_le,           // L_LE        L_OP + 4
-    L_lt,           // L_LT        L_OP + 5
-    L_eq,           // L_EQ        L_OP + 6
-    L_ne,           // L_NE        L_OP + 7
-    L_plus,         // L_PLUS      L_OP + 8
-    L_minus,        // L_MINUS     L_OP + 9   
-    L_divide,       // L_DIVIDE    L_OP + 10    
-    L_times,        // L_TIMES     L_OP + 11
-    L_exp           // L_EXP       L_OP + 12
-};

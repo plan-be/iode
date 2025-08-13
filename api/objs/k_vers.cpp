@@ -61,6 +61,6 @@ char *K_CurrentVersion()
     char buf[30];
 
     sprintf(buf, "IODE %d.%d", IODE_VERSION_MAJOR, IODE_VERSION_MINOR);
-    return(SCR_stracpy(buf));
+    return((char*) SCR_stracpy((unsigned char*) buf));
 }
 

@@ -17,6 +17,7 @@
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/grep.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
@@ -35,7 +36,7 @@
 int K_scan(KDB* kdb, char* l_var, char* l_scal)
 {
     int     rc = 0, i;
-    char    **lst, **K_grep();
+    char    **lst;
     KDB     *exo = NULL, *scal = NULL;
 
     if(kdb == NULL || KNB(kdb) == 0) {
@@ -68,11 +69,11 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
 
     lst = K_grep(scal, "*", 1, 1, 0, 0, '*');
     rc =  KL_lst(l_scal, lst, 200);
-    SCR_free_tbl(lst);
+    SCR_free_tbl((unsigned char**) lst);
 
     lst = K_grep(exo, "*", 1, 1, 0, 0, '*');
     rc = KL_lst(l_var, lst, 200);
-    SCR_free_tbl(lst);
+    SCR_free_tbl((unsigned char**) lst);
 
 done:
     K_free(scal);
@@ -189,7 +190,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
         for(l = 0; l < T_NC(tbl); l++) {
             if(cell[l].tc_type != TABLE_CELL_LEC) continue;
 
-            cl = P_get_ptr(cell[l].tc_val, 1);
+            cl = (CLEC*) P_get_ptr(cell[l].tc_val, 1);
             K_clecscan(NULL, cl, exo, scal);
         }
     }
@@ -222,14 +223,14 @@ int KL_lst(char* name, char** lst, int chunck)
     int     rc = 0, i, j, nb;
     char    *str, *ptr, buf[30];
 
-    nb = SCR_tbl_size(lst);
+    nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) {
         if(K_add(K_WS[LISTS], name, "") < 0)  rc = -1;
         goto done;
     }
 
     if(nb < chunck || chunck < 0) { /* GB 16/10/2007 */
-        str = SCR_mtov(lst, ';'); /* JMP 09-03-95 */
+        str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
         if(K_add(K_WS[LISTS], name, str) < 0)  rc = -1;
         SCR_free(str);
         return(rc);
@@ -241,7 +242,7 @@ int KL_lst(char* name, char** lst, int chunck)
             lst[i + chunck] = NULL;
         }
 
-        str = SCR_mtov(lst + i, ';');
+        str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
         if(K_add(K_WS[LISTS], buf, str) < 0)  rc = -1;
@@ -285,15 +286,16 @@ done:
  */
 unsigned char **KL_expand(char *str)
 {
-    unsigned char 	**tbl, **tbl2, *seps = " ,;\t\n\r\f";
+    unsigned char 	**tbl, **tbl2;
+    unsigned char*  seps = (unsigned char*) " ,;\t\n\r\f";
     int				i, nb, nb2, pos;
 
-    tbl = SCR_vtoms(str, seps);
+    tbl = SCR_vtoms((unsigned char*) str, seps);
     nb = SCR_tbl_size(tbl);
     if(SCR_tbl_size(tbl) == 0) return(tbl);
     for(i = 0 ; tbl[i] ; i++) {
         if(tbl[i][0] == '$') {
-            pos = K_find(K_WS[LISTS], tbl[i] + 1);
+            pos = K_find(K_WS[LISTS], (char*) tbl[i] + 1);
             if(pos >= 0) {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
                 tbl2 = KL_expand(KLVAL(K_WS[LISTS], pos));

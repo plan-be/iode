@@ -61,7 +61,7 @@
  */
 char *K_oval(KDB* kdb, int pos, int n)
 {
-    return(P_get_ptr(SW_getptr(kdb->k_objs[pos].o_val), n));
+    return((char*) P_get_ptr(SW_getptr(kdb->k_objs[pos].o_val), n));
 }
 
 

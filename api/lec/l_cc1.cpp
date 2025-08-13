@@ -31,12 +31,6 @@
 LSTACK  L_OPS[L_MAX_STACK]; // Stack of operators encountered during compilation process. Limited to a max depth of L_MAX_STACK.
 int     L_NB_OPS = 0,       // Current operator stack depth
         L_PAR = 0;          // Current parenthesis depth
-ALEC    *L_EXPR = 0;        // Table of all ALEC atomic elements (see iode.h)
-char    **L_NAMES = 0;      // Table of names encountered in the current LEC expression (vars and scalars)
-int     L_NB_EXPR = 0,      // Current number of elements (ALEC) in L_EXPR
-        L_NB_AEXPR = 0,     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
-        L_NB_NAMES = 0,     // Current number of names in L_NAMES
-        L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
 // TODO: move LSTACK here + L_OPS... static
 

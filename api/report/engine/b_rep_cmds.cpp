@@ -596,9 +596,7 @@ int B_Sleep(char* arg, int unused)
 // Defines the default table graph default (Line, Bar...). 
 // Used when creating a new line in a table.
 int B_GraphDefault(char* type, int unused) 
-{
-    extern int T_GRAPHDEFAULT;
-    
+{   
     switch(type[0]) {
         case 'l' :
         case 'L' :

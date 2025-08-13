@@ -58,8 +58,8 @@ int E_split_eq(char* lec, char** lhs, char** rhs)
     if(pos < 0) goto done;
 
     lec[pos] = 0;
-    *lhs = SCR_stracpy(lec);
-    *rhs = SCR_stracpy(lec + pos + 2);
+    *lhs = (char*) SCR_stracpy((unsigned char*) lec);
+    *rhs = (char*) SCR_stracpy(((unsigned char*) lec) + pos + 2);
 
 done :
     return(pos);
@@ -90,8 +90,8 @@ int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)
 
     *adjlec = NULL;
     if(E_split_eq(lec, &lhs, &rhs) < 0) goto done;
-    SCR_strip(lhs);
-    SCR_strip(rhs);
+    SCR_strip((unsigned char*) lhs);
+    SCR_strip((unsigned char*) rhs);
 
     if(method == 0) {
         if(c1 == NULL || c1[0] == 0) goto done;
@@ -134,20 +134,18 @@ done :
  *  
  */
 
-E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)
+int E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)
 {
     char    *ae;
 
-    SCR_strip(*eqs);
-    SCR_strip(c1);
-    SCR_strip(c2);
+    SCR_strip((unsigned char*) *eqs);
+    SCR_strip((unsigned char*) c1);
+    SCR_strip((unsigned char*) c2);
 
     E_dynadj(method, *eqs, c1, c2, &ae);
 
-    SCR_strfacpy(eqs, ae);
+    SCR_strfacpy((unsigned char**) eqs, (unsigned char*) ae);
     SCR_free(ae);
 
     return(0);
 }
-
-

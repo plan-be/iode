@@ -128,7 +128,6 @@ L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1, v2;
     int     lag = 1;
-    extern L_REAL L_divide();
 
     if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
     v1 = L_exec_sub(expr, len, t, stack);
@@ -147,7 +146,6 @@ L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  */
 L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
-    extern L_REAL L_divide();
     L_REAL  v1, v2;
     int     lag = 1;
 
@@ -156,7 +154,7 @@ L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
     if(!IODE_IS_A_NUMBER(v1)) return(IODE_NAN);
     v2 = L_exec_sub(expr, len, t - lag, stack);
     if(!IODE_IS_A_NUMBER(v2)) return(IODE_NAN);
-    return(L_logn(L_divide(v1,v2)));
+    return(L_logn(L_divide(v1, v2)));
 }
 
 
@@ -356,25 +354,3 @@ L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs
     }
     return(IODE_NAN);
 }
-
-
-/**
- *  Table of function pointers L_TFN_FN
- */
-L_REAL(*L_TFN_FN[])() = { 
-    L_lag,          // L_LAG       L_TFN + 0 
-    L_diff,         // L_DIFF      L_TFN + 1 
-    L_rapp,         // L_RAPP      L_TFN + 2 
-    L_dln,          // L_DLN       L_TFN + 3 
-    L_grt,          // L_GRT       L_TFN + 4 
-    L_mavg,         // L_MAVG      L_TFN + 5 
-    L_vmax,         // L_VMAX      L_TFN + 6 
-    L_vmin,         // L_VMIN      L_TFN + 7 
-    L_sum,          // L_SUM       L_TFN + 8 
-    L_prod,         // L_PROD      L_TFN + 9 
-    L_mean,         // L_MEAN      L_TFN + 10
-    L_stderr,       // L_STDERR    L_TFN + 11
-    0,              // L_DLAG      L_TFN + 12
-    L_lastobs       // L_LASTOBS   L_TFN + 13
-};
-

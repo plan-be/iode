@@ -3,21 +3,19 @@
 #include "api/constants.h"
 #include "api/objs/kdb.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+typedef char OONAME[OK_MAX_NAME + 1];
 
 
-typedef char    OONAME[OK_MAX_NAME + 1];
-
-
-typedef struct  _okobj_ {
+struct OKOBJ 
+{
     short       o_val;
 	OONAME      o_name;
     char        o_pad[3];
-} OKOBJ;
+};
 
-typedef struct _okdb_ {
+struct OKDB 
+{
     KOBJ        *k_objs;
     long        k_nb;
     short       k_type;
@@ -27,9 +25,10 @@ typedef struct _okdb_ {
     OFNAME       k_name;
     char        k_desc[K_MAX_DESC];
     char        k_data[K_MAX_DESC];     /* Client Data */
-} OKDB;
+};
 
-typedef struct _okdb643_ {
+struct OKDB643 
+{
     KOBJ        *k_objs;
     long        k_nb;
     short       k_type;
@@ -41,23 +40,21 @@ typedef struct _okdb643_ {
     char        k_data[K_MAX_DESC];     /* Client Data */
     char        k_compressed;           /* IODE64K */
     char        k_reserved[63];         /* IODE64K */
-} OKDB643;
+};
 
-typedef struct _olname_ {
+struct OLNAME 
+{
     OONAME   name;
     char    pad[3];
     short   pos;
-} OLNAME;
+};
 
-typedef struct _oclec_ {
+struct OCLEC 
+{
     short   tot_lg,         /* SWHDL */
 	    exec_lg,
 	    nb_names;
     char    dupendo;
     char    pad;
     OLNAME  lnames[1];
-} OCLEC;
-
-#ifdef __cplusplus
-}
-#endif
+};

@@ -6,10 +6,6 @@
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* ---------------------- DEFINE ---------------------- */
 
 #ifndef M_E
@@ -188,58 +184,62 @@ enum LecMultiTimeFunction
 
 /*---------------- STRUCTS ------------------------*/
 
-typedef struct _alec {      /* LEC atomic element */
-	int     al_type;        /* type : L_VAR, L_COEF, L_CONST ... */
+// LEC atomic element
+struct ALEC 
+{
+    int     al_type;        // type : L_VAR, L_COEF, L_CONST ...
     union {
-	LECREAL v_real;         /* constant values double */
-	long    v_long;         /* constant values long int */
-	int     v_nb_args;      /* nb of args for fn */
-	struct {
-	    short   pos;        /* coef or series pos in table ?? */
-	    PERIOD  per;        /* PERIOD if any */
-	    short   lag;        /* lag if any */
-	} v_var;                /* variable  */
-	short   v_coef;         /* coef number */
-	PERIOD  v_per;          /* period */
+        LECREAL v_real;         // constant values double
+        long    v_long;         // constant values long int
+        int     v_nb_args;      // nb of args for fn
+        struct {
+            short   pos;        // coef or series pos in table ??
+            PERIOD  per;        // PERIOD if any
+            short   lag;        // lag if any
+        } v_var;                // variable
+        short   v_coef;         // coef number
+        PERIOD  v_per;          // period
     } al_val;
-} ALEC;
+};
 
-typedef struct _cvar_ {
-    short   pos,  /* SWHDL ?? NON */
-	    lag,
-	    ref,
-	    pad;
+struct CVAR {
+    short   pos,  // SWHDL ?? NON
+            lag,
+            ref,
+            pad;
     PERIOD  per;
-} CVAR;
+};
 
-typedef struct _token {
+struct TOKEN {
     LECREAL tk_real;
     long    tk_long;
     PERIOD  tk_period;
-	int     tk_def;
-	char    tk_name[L_MAX_NAME + 1];
-} TOKEN;
+    int     tk_def;
+    char    tk_name[L_MAX_NAME + 1];
+};
 
-typedef struct _lstack {        // stack of operators used by L_analyse 
+// stack of operators used by L_analyse 
+struct LSTACK 
+{        
     unsigned ls_op      : 8;    // operator 
     //unsigned ls_nb_args : 8;  // nb of arguments 
     unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
-} LSTACK;
+};
 
-typedef struct _lname_ {
+struct LNAME {
     ONAME   name;   // scalar or variable name
-	char    pad[3];
+    char    pad[3];
     long    pos;    // SWHDL 
-} LNAME;
+};
 
-typedef struct _clec_ {
+struct CLEC {
     long    tot_lg,      
-		exec_lg;       
+            exec_lg;       
     short   nb_names;   // number of scalar and variables names
     char    dupendo;
     char    pad;
     LNAME   lnames[1];  // list of of scalar and variable names
-} CLEC;
+};
 
 /*---------------- MACROS ------------------------*/
 
@@ -267,96 +267,200 @@ typedef struct _clec_ {
 
 /*----------------- GLOBALS ----------------------*/
 
-extern  int     L_errno;
-extern  int     L_LEVEL;
-extern  SAMPLE  L_SAMPLE;
-extern  ALEC    *L_EXPR;
-extern  char    **L_NAMES;
-extern  int     L_NB_EXPR, L_NB_AEXPR, L_NB_ANAMES;
-extern  int     L_NB_NAMES;
-extern  int     L_PRIOR[],
-	            L_MAX_FARGS[],
-	            L_MIN_FARGS[],
-	            L_MAX_TARGS[],
-	            L_MIN_TARGS[],
-	            L_MAX_MTARGS[],
-	            L_MIN_MTARGS[];
-extern YYKEYS   L_TABLE[];
+inline int      L_curt = 0;         // current value of t
+inline int      L_errno = 0;        // LEC error number (during compilation)
+inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements (see iode.h)
+inline char     **L_NAMES = 0;      // Table of names encountered in the current LEC expression (vars and scalars)
+inline int      L_NB_EXPR = 0;      // Current number of elements (ALEC) in L_EXPR
+inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
+inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
+inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
-extern  TOKEN   L_TOKEN;
-extern  YYFILE  *L_YY;
-extern  char    L_PERIOD_CH[];
-extern  int     L_PERIOD_NB[];
+// --- PRIORITY OF OPERATORS  and number of functions args ---
+// See iode.h FOR POSITIONS in the vectors
+inline int L_PRIOR[13]    = {2, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7};
+inline int L_MIN_FARGS[]  = {1, 1, 1, 1, 1, 1,  1,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2};
+inline int L_MAX_FARGS[]  = {1, 1, 2, 1, 1, 2, 255, 255, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 255, 255, 1, 255, 255, 1, 255, 1, 1, 1, 2, 1, 2, 1, 2};
+inline int L_MAX_TARGS[]  = {2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 3}; /* JMP 17-04-98 */
+inline int L_MIN_TARGS[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1}; /* JMP 17-04-98 */
+inline int L_MAX_MTARGS[] = {4, 4, 4, 3, 3, 4, 4, 1, 2, 4, 2, 4}; /* GB 14-11-00 */ // JMP 12/4/2019
+inline int L_MIN_MTARGS[] = {2, 2, 2, 1, 1, 2, 2, 1, 2, 2, 2, 2}; /* GB 14-11-00 */ // JMP 12/4/2019
 
-extern int      G_errno;
+// --- LEC tokens ---
+inline YYKEYS L_TABLE[] = 
+{
+    (unsigned char*) "!",            L_NOT,
+    (unsigned char*) "!=",           L_NE,
+    (unsigned char*) "(",            L_OPENP,
+    (unsigned char*) "()",           L_OCPAR,
+    (unsigned char*) ")",            L_CLOSEP,
+    (unsigned char*) "*",            L_TIMES,
+    (unsigned char*) "**",           L_EXP,
+    (unsigned char*) "+",            L_PLUS,
+    (unsigned char*) "+ ",           L_UPLUS,
+    (unsigned char*) ",",            L_COMMA,
+    (unsigned char*) "/",            L_DIVIDE,
+    (unsigned char*) ":",            L_COLON,
+    (unsigned char*) ";",            L_EOE,
+    (unsigned char*) /*    ";",            L_COMMA,*/
+    (unsigned char*) "<",            L_LT,
+    (unsigned char*) ">=",           L_GE,
+    (unsigned char*) "<=",           L_LE,
+    (unsigned char*) "<>",           L_NE,
+    (unsigned char*) "=",            L_EQ,
+    (unsigned char*) ">",            L_GT,
+    (unsigned char*) "-",            L_MINUS,
+    (unsigned char*) "- ",           L_UMINUS,
+    (unsigned char*) "abs",          L_ABS,
+    (unsigned char*) "acf",          L_ACF,
+    (unsigned char*) "acos",         L_ACOS,
+    (unsigned char*) "and",          L_AND,
+    (unsigned char*) "app",          L_APP,
+    (unsigned char*) "appdif",       L_DAPP,
+    (unsigned char*) "asin",         L_ASIN,
+    (unsigned char*) "atan",         L_ATAN,
+    (unsigned char*) "ceil",         L_CEIL,  /* JMP 18-10-2004 */
+    (unsigned char*) "cos",          L_COS,
+    (unsigned char*) "cosh",         L_COSH,
+    (unsigned char*) "corr",         L_CORR, /* JMP 17-04-98 */
+    (unsigned char*) "covar",        L_COVAR, /* JMP 17-04-98 */
+    (unsigned char*) "covar0",       L_COVAR0, /* JMP 17-04-98 */
+    (unsigned char*) "d",            L_DIFF,
+    (unsigned char*) "dapp",         L_DAPP,
+    (unsigned char*) "dlag",         L_DLAG,
+    (unsigned char*) "dln",          L_DLN,
+    (unsigned char*) "e",            L_E,
+    (unsigned char*) "euro",         L_EURO,
+    (unsigned char*) "exp",          L_EXPN,
+    (unsigned char*) "gamma",        L_GAMMA,
+    (unsigned char*) "div0",         L_DIV0,
+    (unsigned char*) "grandom",      L_GRANDOM,
+    (unsigned char*) "grt",          L_GRT,
+    (unsigned char*) "hp",           L_HP,
+    (unsigned char*) "hpstd",        L_HPSTD, // JMP 12/4/2019
+    (unsigned char*) "if",           L_IF,
+    (unsigned char*) "index",        L_INDEX,
+    (unsigned char*) "int",          L_INT,
+    (unsigned char*) "interpol",     L_INTERPOL,
+    (unsigned char*) "isan",         L_FNISAN,
+    (unsigned char*) "floor",        L_FLOOR, /* JMP 18-10-2004 */
+    (unsigned char*) "l",            L_LAG,
+    (unsigned char*) "lastobs",      L_LASTOBS,
+    (unsigned char*) "ln",           L_LN,
+    (unsigned char*) "lcount",       L_LCOUNT,
+    (unsigned char*) "lmean",        L_LMEAN,
+    (unsigned char*) "log",          L_LOG,
+    (unsigned char*) "lprod",        L_LPROD,
+    (unsigned char*) "lstderr",      L_LSTDERR,
+    (unsigned char*) "lsum",         L_LSUM,
+    (unsigned char*) "ma",           L_MAVG,
+    (unsigned char*) "mavg",         L_MAVG,
+    (unsigned char*) "max",          L_MAX,
+    (unsigned char*) "mean",         L_MEAN,
+    (unsigned char*) "min",          L_MIN,
+    (unsigned char*) "not",          L_NOT,
+    (unsigned char*) "or",           L_OR,
+    (unsigned char*) "pi",           L_PI,
+    (unsigned char*) "prod",         L_PROD,
+    (unsigned char*) "r",            L_RAPP,
+    (unsigned char*) "rad",          L_RAD,
+    (unsigned char*) "random",       L_RANDOM,
+    (unsigned char*) "round",        L_ROUND, /* JMP 18-10-2004 */
+    (unsigned char*) "sign",         L_SIGN,
+    (unsigned char*) "sin",          L_SIN,
+    (unsigned char*) "sinh",         L_SINH,
+    (unsigned char*) "sqrt",         L_SQRT,
+    (unsigned char*) "stddev",       L_STDDEV,
+    (unsigned char*) "stderr",       L_STDERR,
+    (unsigned char*) "sum",          L_SUM,
+    (unsigned char*) "t",            L_TIME,
+    (unsigned char*) "tan",          L_TAN,
+    (unsigned char*) "tanh",         L_TANH,
+    (unsigned char*) "urandom",      L_URANDOM,
+    (unsigned char*) "var",          L_VARIANCE,
+    (unsigned char*) "vmax",         L_VMAX,
+    (unsigned char*) "vmin",         L_VMIN,
+    (unsigned char*) "[",            L_OPENB,
+    (unsigned char*) "]",            L_CLOSEB,
+    (unsigned char*) "^",            L_EXP,
+    (unsigned char*) "i",            L_I
+};
 
-extern  char    **KEXEC_VFILES, 
-                **KEXEC_SFILES;
-extern  int     KEXEC_TRACE;
+inline  TOKEN   L_TOKEN;            // Global containing the last read token
+inline  YYFILE* L_YY = nullptr;     // LEC stream the compiler is reading from
+
+inline char    **KEXEC_VFILES = NULL;
+inline char    **KEXEC_SFILES = NULL;
+inline int     KEXEC_TRACE = 0;
 
 /* ---------------------- FUNCS ---------------------- */
 
+inline int YY_compare(const void *a, const void *b)
+{
+    return YY_strcmp((const char*) a, (const char*) b);
+}
+
 /* l_token.c */
-extern int L_nb_tokens(void);
-extern int L_open_all(char *,int );
-extern void L_close(void);
-//extern int L_lex(void);
-//extern int L_read(void);
-//extern int L_unread(void);
-//extern int L_macro(void);
-//extern int L_string(void);
-//extern int L_read_string(void);
-//extern int L_getc(void);
-//extern void L_ungetc(int );
-//extern void L_skip(void);
-extern int L_get_token(void);
-//extern int L_include(char *,char *);
-//extern int L_get_int(void);
-//extern int L_get_period(YYFILE *,PERIOD *);
+int L_nb_tokens(void);
+int L_open_all(char *,int );
+void L_close(void);
+//int L_lex(void);
+//int L_read(void);
+//int L_unread(void);
+//int L_macro(void);
+//int L_string(void);
+//int L_read_string(void);
+//int L_getc(void);
+//void L_ungetc(int );
+//void L_skip(void);
+int L_get_token(void);
+//int L_include(char *,char *);
+//int L_get_int(void);
+//int L_get_period(YYFILE *,PERIOD *);
 
 /* l_cc1.c */
-extern void L_alloc_expr(int );
-extern int L_cc1(int );
-// extern int L_add_new_series(char *);
-extern void L_free_anames(void);
-//extern int L_save_var(void);
-//extern int L_save_op(void);
-//extern int L_priority_sup(int );
-//extern int L_add_stack(int );
-//extern int L_clear_stack(void);
-//extern int L_anal_lag(void);
-extern int L_sub_expr(ALEC *,int );
-//extern int L_time_expr(void);
-//extern int L_lag_expr(int );
+void L_alloc_expr(int );
+int L_cc1(int );
+// int L_add_new_series(char *);
+void L_free_anames(void);
+//int L_save_var(void);
+//int L_save_op(void);
+//int L_priority_sup(int );
+//int L_add_stack(int );
+//int L_clear_stack(void);
+//int L_anal_lag(void);
+int L_sub_expr(ALEC *,int );
+//int L_time_expr(void);
+//int L_lag_expr(int );
 
 /* ode.c */
-//extern  char    *L_expand(char *);
+// char    *L_expand(char *);
 
 /* l_alloc.c */
-extern char *L_malloc(int );
-//extern int L_free(char *);
-extern void L_free(void *);
+char *L_malloc(int );
+//int L_free(char *);
+void L_free(void *);
 
 /* l_err.c */
-extern char *L_error(void);
+char *L_error(void);
 
 /* l_cc2.c */
-extern CLEC *L_cc2(ALEC *);
-extern void L_move_arg(char *,char *,int );
-//extern int L_calc_len(ALEC *,int ,int );
-extern CLEC *L_cc_stream(void);
-extern CLEC *L_cc(char *);
+CLEC *L_cc2(ALEC *);
+void L_move_arg(char *,char *,int );
+//int L_calc_len(ALEC *,int ,int );
+CLEC *L_cc_stream(void);
+CLEC *L_cc(char *);
 
 /* l_link.c */
-extern int L_link(KDB *,KDB *,CLEC *);
-// extern int L_link1(KDB *,KDB *,CLEC *);
-//extern int L_link2(KDB *,CLEC *);
-//extern int L_link_sub(KDB *,char *,int );
-extern void L_link_endos(KDB* kde, CLEC* cl);
+int L_link(KDB *,KDB *,CLEC *);
+// int L_link1(KDB *,KDB *,CLEC *);
+//int L_link2(KDB *,CLEC *);
+//int L_link_sub(KDB *,char *,int );
+void L_link_endos(KDB* kde, CLEC* cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER
-        extern int matherr(struct _exception *e);
+        int matherr(struct _exception *e);
 #else
         // Define the exception structure
         struct exception {
@@ -367,121 +471,235 @@ extern void L_link_endos(KDB* kde, CLEC* cl);
         double retval;  // Return value
         };
         
-        extern int matherr(struct exception *e);
+        int matherr(struct exception *e);
 #endif
-extern void L_fperror(void);
-extern double L_exec(KDB *,KDB *,CLEC *,int );
-extern double L_exec_sub(unsigned char *,int ,int ,double *);
-extern L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs);
-extern int L_intlag(double );
-extern double L_uminus(double *);
-extern double L_uplus(double *);
-extern double L_logn(double );
-extern double L_log(double *,int );
-extern double L_ln(double *);
-extern double L_not(double *);
-extern double L_expn(double *, int);
-extern double L_max(double *,int );
-extern double L_min(double *,int );
-extern double L_sin(double *);
-extern double L_asin(double *);
-extern double L_cos(double *);
-extern double L_acos(double *);
-extern double L_tan(double *);
-extern double L_atan(double *);
-extern double L_sinh(double *);
-extern double L_cosh(double *);
-extern double L_tanh(double *);
-extern double L_sqrt(double *);
-extern double L_int(double *);
-extern double L_abs(double *);
-extern double L_sign(double *);
-extern double L_rad(double *);
-extern double L_if(double *,int );
-extern double L_fnisan(double *,int );
-extern double L_lcount(double *,int );
-extern double L_lprod(double *,int );
-extern double L_lsum(double *,int );
-extern double L_lstderr(double *,int );
-extern double L_lmean(double *,int );
-extern double L_random(double *);
-extern double L_or(double ,double );
-extern double L_and(double ,double );
-extern double L_ge(double ,double );
-extern double L_gt(double ,double );
-extern double L_eq(double ,double );
-extern double L_ne(double ,double );
-extern double L_le(double ,double );
-extern double L_lt(double ,double );
-extern double L_plus(double ,double );
-extern double L_minus(double ,double );
-extern double L_divide(double ,double );
-extern double L_times(double ,double );
-extern double L_exp(double ,double );
-extern double L_pi(void);
-extern double L_euro(void);
-extern double L_e(void);
-extern double L_time(int );
-extern double L_i(int );
-extern double L_lag(unsigned char *,short ,int ,double *,int );
-extern double L_diff(unsigned char *,short,int ,double *,int );
-extern double L_rapp(unsigned char *,short,int ,double *,int );
-extern double L_dln(unsigned char *,short,int ,double *,int );
-extern double L_grt(unsigned char *,short,int ,double *,int );
-extern double L_mavg(unsigned char *,short,int ,double *,int );
-extern void L_tfn_args(int ,double *,int ,int *,int *);
-extern double L_vmax(unsigned char *,short,int ,double *,int );
-extern double L_vmin(unsigned char *,short,int ,double *,int );
-extern double L_sum(unsigned char *,short,int ,double *,int );
-extern double L_prod(unsigned char *,short,int ,double *,int );
-extern double L_mean(unsigned char *,short ,int ,double *,int );
-extern double L_stderr(unsigned char *,short,int ,double *,int );
-extern double L_lastobs(unsigned char *,short,int ,double *,int );
-extern double L_calccorr(unsigned char *,short ,unsigned char *,short ,int ,double *,int );
-extern double L_corr(unsigned char *,short ,int ,double *,int );
-extern double L_calccovar(unsigned char *,short ,unsigned char *,short ,int ,double *,int ,int );
-extern double L_covar(unsigned char *,short ,int ,double *,int );
-extern double L_covar0(unsigned char *,short ,int ,double *,int );
-extern double L_var(unsigned char *,short ,int ,double *,int );
-extern double L_stddev(unsigned char *,short ,int ,double *,int );
-extern double L_index(unsigned char *,short ,int ,double *,int );
-extern double L_acf(unsigned char *,short ,int ,double *,int );
-extern int L_stackna(double **,int );
-extern int L_calcvals(unsigned char *,short ,int ,double *,int *,double *, int);
-extern double L_interpol(unsigned char *,short ,int ,double *,int );
-extern double L_app(unsigned char *,short ,int ,double *,int );
+void L_fperror(void);
+double L_exec(KDB *,KDB *,CLEC *,int );
+double L_exec_sub(unsigned char *,int ,int ,double *);
+L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs);
+int L_intlag(double );
+double L_uminus(double* stack, int nbargs=-1);
+double L_uplus(double* stack, int nbargs=-1);
+double L_logn(double );
+double L_log(double* stack, int nbargs);
+double L_ln(double* stack, int nbargs=-1);
+double L_not(double* stack, int nbargs=-1);
+double L_expn(double *, int);
+double L_max(double* stack, int nbargs);
+double L_min(double* stack, int nbargs);
+double L_sin(double* stack, int nbargs=-1);
+double L_asin(double* stack, int nbargs=-1);
+double L_cos(double* stack, int nbargs=-1);
+double L_acos(double* stack, int nbargs=-1);
+double L_tan(double* stack, int nbargs=-1);
+double L_atan(double* stack, int nbargs=-1);
+double L_sinh(double* stack, int nbargs=-1);
+double L_cosh(double* stack, int nbargs=-1);
+double L_tanh(double* stack, int nbargs=-1);
+double L_sqrt(double* stack, int nbargs=-1);
+double L_int(double* stack, int nbargs=-1);
+double L_abs(double* stack, int nbargs=-1);
+double L_sign(double* stack, int nbargs=-1);
+double L_rad(double* stack, int nbargs=-1);
+double L_if(double* stack, int nbargs);
+double L_fnisan(double* stack, int nbargs);
+double L_lcount(double* stack, int nbargs);
+double L_lprod(double* stack, int nbargs);
+double L_lsum(double* stack, int nbargs);
+double L_lstderr(double* stack, int nbargs);
+double L_lmean(double* stack, int nbargs);
+double L_random(double* stack, int nbargs=-1);
+double L_or(double ,double );
+double L_and(double ,double );
+double L_ge(double ,double );
+double L_gt(double ,double );
+double L_eq(double ,double );
+double L_ne(double ,double );
+double L_le(double ,double );
+double L_lt(double ,double );
+double L_plus(double ,double );
+double L_minus(double ,double );
+double L_divide(double ,double );
+double L_times(double ,double );
+double L_exp(double ,double );
+double L_pi(int t=-1);
+double L_euro(int t=-1);
+double L_e(int t=-1);
+double L_time(int t);
+double L_i(int t);
+double L_lag(unsigned char *,short ,int ,double *,int );
+double L_diff(unsigned char *,short,int ,double *,int );
+double L_rapp(unsigned char *,short,int ,double *,int );
+double L_dln(unsigned char *,short,int ,double *,int );
+double L_grt(unsigned char *,short,int ,double *,int );
+double L_mavg(unsigned char *,short,int ,double *,int );
+void L_tfn_args(int ,double *,int ,int *,int *);
+double L_vmax(unsigned char *,short,int ,double *,int );
+double L_vmin(unsigned char *,short,int ,double *,int );
+double L_sum(unsigned char *,short,int ,double *,int );
+double L_prod(unsigned char *,short,int ,double *,int );
+double L_mean(unsigned char *,short ,int ,double *,int );
+double L_stderr(unsigned char *,short,int ,double *,int );
+double L_lastobs(unsigned char *,short,int ,double *,int );
+double L_calccorr(unsigned char *,short ,unsigned char *,short ,int ,double *,int );
+double L_corr(unsigned char *,short ,int ,double *,int );
+double L_calccovar(unsigned char *,short ,unsigned char *,short ,int ,double *,int ,int );
+double L_covar(unsigned char *,short ,int ,double *,int );
+double L_covar0(unsigned char *,short ,int ,double *,int );
+double L_var(unsigned char *,short ,int ,double *,int );
+double L_stddev(unsigned char *,short ,int ,double *,int );
+double L_index(unsigned char *,short ,int ,double *,int );
+double L_acf(unsigned char *,short ,int ,double *,int );
+int L_stackna(double **,int );
+int L_calcvals(unsigned char *,short ,int ,double *,int *,double *, int);
+double L_interpol(unsigned char *,short ,int ,double *,int );
+double L_app(unsigned char *,short ,int ,double *,int );
 
 /* l_hodrick.c */
-extern int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
-extern void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
+int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
+void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
-extern CLEC *L_solve(char *,char *);
-extern int L_split_eq(char *);
+CLEC *L_solve(char *,char *);
+int L_split_eq(char *);
 
 /* l_newton.c */
-extern double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
-extern double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
-//extern double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
+double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
+double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
+//double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* l_secant.c */
-//extern double L_fx(double ,int );
-//extern int L_bracket(double *,double *,int );
-extern double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
+//double L_fx(double ,int );
+//int L_bracket(double *,double *,int );
+double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* l_debug.c */
-extern void L_debug(char *,...);
+void L_debug(char *,...);
 
 /* k_lec.c */
-extern char *(*L_expand_super)(char* list_name);
+inline char *(*L_expand_super)(char* list_name) = nullptr;
 
-extern double *L_getvar(KDB *,int );
-extern double L_getscl(KDB *,int );
-extern SAMPLE *L_getsmpl(KDB *);
-extern int L_findscl(KDB *,char *);
-extern int L_findvar(KDB *,char *);
-extern char* L_expand(char* list_name);
+double *L_getvar(KDB *,int );
+double L_getscl(KDB *,int );
+SAMPLE *L_getsmpl(KDB *);
+int L_findscl(KDB *,char *);
+int L_findvar(KDB *,char *);
+char* L_expand(char* list_name);
 
-#ifdef __cplusplus
-}
-#endif
+// l_exec_val.c
+inline L_REAL(*L_VAL_FN[])(int t) = 
+{ 
+    L_pi,           // L_PI        L_VAL + 0
+    L_e,            // L_E         L_VAL + 1
+    L_time,         // L_TIME      L_VAL + 2
+    L_i,            // L_I         L_VAL + 3
+    L_euro          // L_EURO      L_VAL + 4
+};
+
+// l_exec_ops.c
+inline L_REAL(*L_OPS_FN[])(L_REAL val1, L_REAL val2) = 
+{ 
+    L_or,           // L_OR        L_OP + 0
+    L_and,          // L_AND       L_OP + 1 
+    L_ge,           // L_GE        L_OP + 2
+    L_gt,           // L_GT        L_OP + 3
+    L_le,           // L_LE        L_OP + 4
+    L_lt,           // L_LT        L_OP + 5
+    L_eq,           // L_EQ        L_OP + 6
+    L_ne,           // L_NE        L_OP + 7
+    L_plus,         // L_PLUS      L_OP + 8
+    L_minus,        // L_MINUS     L_OP + 9   
+    L_divide,       // L_DIVIDE    L_OP + 10    
+    L_times,        // L_TIMES     L_OP + 11
+    L_exp           // L_EXP       L_OP + 12
+};
+
+// l_exec_fns.cpp
+L_REAL L_floor(L_REAL* stack, int nbargs=-1);
+L_REAL L_ceil (L_REAL* stack, int nbargs=-1);
+L_REAL L_round(L_REAL* stack, int nbargs);
+L_REAL L_urandom(L_REAL* stack, int nbargs=-1);
+L_REAL L_grandom(L_REAL* stack, int nbargs=-1);
+L_REAL L_gamma(L_REAL* stack, int nbargs=-1);
+L_REAL L_div0(L_REAL* stack, int nbargs);
+
+inline L_REAL(*L_FNS_FN[])(L_REAL* stack, int nbargs) = 
+{ 
+    L_uminus,       // L_UMINUS    L_FN + 0
+    L_uplus,        // L_UPLUS     L_FN + 1
+    L_log,          // L_LOG       L_FN + 2  
+    L_ln,           // L_LN        L_FN + 3
+    L_not,          // L_NOT       L_FN + 4  
+    L_expn,         // L_EXPN      L_FN + 5   
+    L_max,          // L_MAX       L_FN + 6
+    L_min,          // L_MIN       L_FN + 7  
+    L_sin,          // L_SIN       L_FN + 8  
+    L_cos,          // L_COS       L_FN + 9
+    L_acos,         // L_ACOS      L_FN + 10   
+    L_asin,         // L_ASIN      L_FN + 11   
+    L_tan,          // L_TAN       L_FN + 12
+    L_atan,         // L_ATAN      L_FN + 13   
+    L_tanh,         // L_TANH      L_FN + 14   
+    L_sinh,         // L_SINH      L_FN + 15
+    L_cosh,         // L_COSH      L_FN + 16   
+    L_abs,          // L_ABS       L_FN + 17  
+    L_sqrt,         // L_SQRT      L_FN + 18
+    L_int,          // L_INT       L_FN + 19  
+    L_rad,          // L_RAD       L_FN + 20  
+    L_if,           // L_IF        L_FN + 21
+    L_lsum,         // L_LSUM      L_FN + 22   
+    L_lmean,        // L_LMEAN     L_FN + 23    
+    L_fnisan,       // L_FNISAN    L_FN + 24
+    L_lcount,       // L_LCOUNT    L_FN + 25     
+    L_lprod,        // L_LPROD     L_FN + 26    
+    L_sign,         // L_SIGN      L_FN + 27
+    L_lstderr,      // L_LSTDERR   L_FN + 28     
+    L_random,       // L_RANDOM    L_FN + 29     
+    L_floor,        // L_FLOOR     L_FN + 30
+    L_ceil,         // L_CEIL      L_FN + 31     
+    L_round,        // L_ROUND     L_FN + 32     
+    L_urandom,      // L_URANDOM   L_FN + 33
+    L_grandom,      // L_GRANDOM   L_FN + 34     
+    L_gamma,        // L_GAMMA     L_FN + 35     
+    L_div0          // L_DIV0      L_FN + 36
+};
+
+// l_exec_tfn.c
+inline L_REAL(*L_TFN_FN[])(unsigned char* expr, short length, int t, L_REAL *stack, int nargs) = 
+{ 
+    L_lag,          // L_LAG       L_TFN + 0 
+    L_diff,         // L_DIFF      L_TFN + 1 
+    L_rapp,         // L_RAPP      L_TFN + 2 
+    L_dln,          // L_DLN       L_TFN + 3 
+    L_grt,          // L_GRT       L_TFN + 4 
+    L_mavg,         // L_MAVG      L_TFN + 5 
+    L_vmax,         // L_VMAX      L_TFN + 6 
+    L_vmin,         // L_VMIN      L_TFN + 7 
+    L_sum,          // L_SUM       L_TFN + 8 
+    L_prod,         // L_PROD      L_TFN + 9 
+    L_mean,         // L_MEAN      L_TFN + 10
+    L_stderr,       // L_STDERR    L_TFN + 11
+    0,              // L_DLAG      L_TFN + 12
+    L_lastobs       // L_LASTOBS   L_TFN + 13 
+};
+
+// l_exec_mtfn.c
+L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs);
+L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs);
+L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs);
+
+inline L_REAL(*L_MTFN_FN[])(unsigned char* expr, short nvargs, int t, L_REAL *stack, int nargs) = 
+{ 
+    L_corr,         // L_CORR      L_M
+    L_covar,        // L_COVAR     L_M
+    L_covar0,       // L_COVAR0    L_M
+    L_var,          // L_VARIANCE  L_M
+    L_stddev,       // L_STDDEV    L_M
+    L_index,        // L_INDEX     L_M
+    L_acf,          // L_ACF       L_M
+    L_interpol,     // L_INTERPOL  L_M
+    L_app,          // L_APP       L_M
+    L_hp,           // L_HP        L_M
+    L_dapp,         // L_DAPP      L_M
+    L_hpstd         // L_HPSTD     L_M
+};  

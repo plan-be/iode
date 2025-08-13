@@ -125,7 +125,8 @@ void *P_add(void *vptr1, void *vptr2, int lg)
 {
     int     i, lg2, dif, n_p = 0;
     OSIZE   *pos;
-    char    *ptr1 = vptr1, *ptr2 = vptr2;
+    char    *ptr1 = (char*) vptr1;
+    char    *ptr2 = (char*) vptr2;
 
     // lg2 = real length that will be allocated to insure alignment on P_ALIGN (4) bytes 
     lg2 = lg + P_ALIGN - lg % P_ALIGN;
@@ -137,8 +138,7 @@ void *P_add(void *vptr1, void *vptr2, int lg)
     if(pos[1] % 2 == 0)  n_p = 2 * sizeof(OSIZE);
 
     // add lg2 + n_p to the buffer
-    ptr1 = SW_nrealloc(ptr1,
-                       (int) pos[0], (int) pos[0] + lg2 + n_p);
+    ptr1 = (char*) SW_nrealloc(ptr1, (int) pos[0], (int) pos[0] + lg2 + n_p);
     pos = (OSIZE *) ptr1; // new pointer to the first long 
 
     if(pos[1] == 0) { // No element in the pack
@@ -180,7 +180,7 @@ void *P_add(void *vptr1, void *vptr2, int lg)
 
 void *P_get_ptr(void *vptr, int i)
 {
-    char    *ptr = vptr;
+    char    *ptr = (char*) vptr;
     OSIZE   *pos = (OSIZE *) ptr;
 
 
@@ -203,7 +203,7 @@ void *P_get_ptr(void *vptr, int i)
 OSIZE P_get_len(void *vptr, int i)
 {
     OSIZE   len, *pos;
-    char    *ptr = vptr;
+    char    *ptr = (char*) vptr;
 
     if(ptr == 0) return(0);
     pos = (OSIZE *) ptr;

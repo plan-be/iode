@@ -4,14 +4,10 @@
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*----------------------- TYPEDEF ----------------------------*/
 
 // VAR = Variable (pointer to a vector of double)
-typedef double     *VAR;
+using VAR = double*;
 
 /*----------------------- DEFINE ----------------------------*/
 
@@ -58,39 +54,29 @@ enum IodeLowToHigh
 
 /*----------------------- FUNCS ----------------------------*/
 
-extern double *K_vval(KDB *, int, int);
-extern double *K_vptr(KDB *, char*, int);
+double *K_vval(KDB *, int, int);
+double *K_vptr(KDB *, char*, int);
 
 /* k_wsvar.c */
-extern int KV_sample(KDB *,SAMPLE *);
-extern int KV_merge(KDB *,KDB *,int );
-extern void KV_merge_del(KDB *,KDB *,int );
-extern int KV_add(KDB* kdb, char* varname);
-extern double KV_get(KDB *,int ,int ,int );
-extern void KV_set(KDB *,int ,int ,int ,double );
-extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
-extern KDB *KV_aggregate(KDB *,int ,char *,char *);
+int KV_sample(KDB *,SAMPLE *);
+int KV_merge(KDB *,KDB *,int );
+void KV_merge_del(KDB *,KDB *,int );
+int KV_add(KDB* kdb, char* varname);
+double KV_get(KDB *,int ,int ,int );
+void KV_set(KDB *,int ,int ,int ,double );
+int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
+KDB *KV_aggregate(KDB *,int ,char *,char *);
 void KV_init_values_1(double* val, int t, int method);
-//extern int KV_GetSmpl(SAMPLE *,char *);
-extern double KV_get_at_t(char*varname, int t);
-extern double KV_get_at_per(char*varname, PERIOD* per);
-extern double KV_get_at_aper(char*varname, char* aper);
-extern int KV_set_at_t(char*varname, int t, double val);
-extern int KV_set_at_per(char*varname, PERIOD* per, double val);
-extern int KV_set_at_aper(char*varname, char* aper, double val);
+//int KV_GetSmpl(SAMPLE *,char *);
+double KV_get_at_t(char*varname, int t);
+double KV_get_at_per(char*varname, PERIOD* per);
+double KV_get_at_aper(char*varname, char* aper);
+int KV_set_at_t(char*varname, int t, double val);
+int KV_set_at_per(char*varname, PERIOD* per, double val);
+int KV_set_at_aper(char*varname, char* aper, double val);
 
 /*----------------------- MACROS ----------------------------*/
 
 #define KSMPL(kdb)          ((SAMPLE *) (kdb)->k_data)
 #define KVVAL(kdb, pos, t)  K_vval(kdb, pos, t)
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)
-
-/*----------------------- GLOBALS ----------------------------*/
-
-extern int KVAR_MODE;
-extern int KVAR_NDEC;
-extern int KVAR_START;
-
-#ifdef __cplusplus
-}
-#endif

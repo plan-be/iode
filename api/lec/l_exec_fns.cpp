@@ -94,19 +94,18 @@ L_REAL L_logn(L_REAL v)
 
 /*------------- GROUP L_FNS_FN ---------------------*/
 
-L_REAL L_uminus(L_REAL* stack) {return(- *stack);}
-L_REAL L_uplus (L_REAL* stack) {return(*stack);}
+L_REAL L_uminus(L_REAL* stack, int unused) {return(- *stack);}
+L_REAL L_uplus (L_REAL* stack, int unused) {return(*stack);}
 
 L_REAL L_log(L_REAL* stack, int nargs)
-{
-    extern L_REAL L_divide();
-    
-    if(nargs == 2) return(L_divide(L_logn(*stack), L_logn(*(stack - 1))));
+{   
+    if(nargs == 2) 
+        return(L_divide(L_logn(*stack), L_logn(*(stack - 1))));
     return(L_logn(*stack));
 }
 
-L_REAL L_ln(L_REAL* stack)  {return(L_logn(*stack));}
-L_REAL L_not(L_REAL* stack) {return((fabs((double)(*stack)) < 1e-15) ? 1.0: 0.0);}
+L_REAL L_ln(L_REAL* stack, int unused)  {return(L_logn(*stack));}
+L_REAL L_not(L_REAL* stack, int unused) {return((fabs((double)(*stack)) < 1e-15) ? 1.0: 0.0);}
 
 /**
  *  Computes the exponential of the value on the stack.
@@ -164,19 +163,19 @@ L_REAL L_min(L_REAL* stack, int nargs)
     return(m);
 }
 
-L_REAL L_sin  (L_REAL* stack) {return((L_REAL)sin ((double)*stack));}
-L_REAL L_cos  (L_REAL* stack) {return((L_REAL)cos ((double)*stack));}
-L_REAL L_acos (L_REAL* stack) {return((L_REAL)acos((double)*stack));}
-L_REAL L_asin (L_REAL* stack) {return((L_REAL)asin((double)*stack));}
-L_REAL L_tan  (L_REAL* stack) {return((L_REAL)tan ((double)*stack));}
-L_REAL L_atan (L_REAL* stack) {return((L_REAL)atan((double)*stack));}
-L_REAL L_tanh (L_REAL* stack) {return((L_REAL)tanh((double)*stack));}
-L_REAL L_sinh (L_REAL* stack) {return((L_REAL)sinh((double)*stack));}
-L_REAL L_cosh (L_REAL* stack) {return((L_REAL)cosh((double)*stack));}
-L_REAL L_abs  (L_REAL* stack) {return((L_REAL)fabs((double)*stack));}
-L_REAL L_sqrt (L_REAL* stack) {return((*stack < 0) ? IODE_NAN: (L_REAL)sqrt((double)*stack));}
-L_REAL L_int  (L_REAL* stack) {return((L_REAL)floor((double)(0.5 + *stack)));}
-L_REAL L_rad  (L_REAL* stack) {return((L_REAL)(((double)(*stack)) * M_PI / 180.0));}
+L_REAL L_sin  (L_REAL* stack, int unused) {return((L_REAL)sin ((double)*stack));}
+L_REAL L_cos  (L_REAL* stack, int unused) {return((L_REAL)cos ((double)*stack));}
+L_REAL L_acos (L_REAL* stack, int unused) {return((L_REAL)acos((double)*stack));}
+L_REAL L_asin (L_REAL* stack, int unused) {return((L_REAL)asin((double)*stack));}
+L_REAL L_tan  (L_REAL* stack, int unused) {return((L_REAL)tan ((double)*stack));}
+L_REAL L_atan (L_REAL* stack, int unused) {return((L_REAL)atan((double)*stack));}
+L_REAL L_tanh (L_REAL* stack, int unused) {return((L_REAL)tanh((double)*stack));}
+L_REAL L_sinh (L_REAL* stack, int unused) {return((L_REAL)sinh((double)*stack));}
+L_REAL L_cosh (L_REAL* stack, int unused) {return((L_REAL)cosh((double)*stack));}
+L_REAL L_abs  (L_REAL* stack, int unused) {return((L_REAL)fabs((double)*stack));}
+L_REAL L_sqrt (L_REAL* stack, int unused) {return((*stack < 0) ? IODE_NAN: (L_REAL)sqrt((double)*stack));}
+L_REAL L_int  (L_REAL* stack, int unused) {return((L_REAL)floor((double)(0.5 + *stack)));}
+L_REAL L_rad  (L_REAL* stack, int unused) {return((L_REAL)(((double)(*stack)) * M_PI / 180.0));}
 
 L_REAL L_if(L_REAL* stack, int nargs)
 {
@@ -226,7 +225,7 @@ L_REAL L_lprod(L_REAL* stack, int nargs)
     return(m);
 }
 
-L_REAL L_sign(L_REAL* stack)
+L_REAL L_sign(L_REAL* stack, int unused)
 {
     if(*stack < 0) return((L_REAL)-1.0);
     else           return((L_REAL)1.0);
@@ -249,7 +248,7 @@ L_REAL L_lstderr(L_REAL* stack, int nargs)
     else return(IODE_NAN);
 }
 
-L_REAL L_random(L_REAL* stack)
+L_REAL L_random(L_REAL* stack, int unused)
 {
     static int init = 0;
     double  x, s = *stack;
@@ -265,8 +264,8 @@ L_REAL L_random(L_REAL* stack)
 }
 
 
-L_REAL L_floor(L_REAL* stack) {return((L_REAL)floor((double)(*stack))); }
-L_REAL L_ceil (L_REAL* stack) {return((L_REAL)(1.0 + floor((double)(*stack))));}
+L_REAL L_floor(L_REAL* stack, int unused) {return((L_REAL)floor((double)(*stack))); }
+L_REAL L_ceil (L_REAL* stack, int unused) {return((L_REAL)(1.0 + floor((double)(*stack))));}
 
 L_REAL L_round(L_REAL* stack, int nargs)
 {
@@ -281,7 +280,7 @@ L_REAL L_round(L_REAL* stack, int nargs)
     return((L_REAL)(val / cf));
 }
 
-L_REAL L_urandom(L_REAL* stack)
+L_REAL L_urandom(L_REAL* stack, int unused)
 {
     static int init = 0;
     double  x, s = *stack;
@@ -328,7 +327,7 @@ static double randBoxMuller(double rv_mean, double rv_sd)
     return(rv_mean + rv_sd * z1);
 }
 
-L_REAL L_grandom(L_REAL* stack)
+L_REAL L_grandom(L_REAL* stack, int unused)
 {
     extern double randBoxMuller(double m, double s);
     double  s = *stack, m = *(stack - 1);
@@ -365,7 +364,7 @@ static double dgamma(double x)
     return w / y;
 }
 
-L_REAL L_gamma(L_REAL* stack)
+L_REAL L_gamma(L_REAL* stack, int unused)
 {
     extern double dgamma(double x);
     double  s = *stack;
@@ -373,7 +372,7 @@ L_REAL L_gamma(L_REAL* stack)
     return(dgamma(s));
 }
 
-L_REAL L_div0(L_REAL *stack, int nargs)
+L_REAL L_div0(L_REAL *stack, int unused)
 {
     double a = *(stack - 1);
     double b = *stack;
@@ -382,47 +381,3 @@ L_REAL L_div0(L_REAL *stack, int nargs)
     else if(b == 0) return(0);
     return(a / b);
 }
-
-
-/**
- *  Table of function pointers L_FNS_FN
- */
-L_REAL(*L_FNS_FN[])() = { 
-    L_uminus,       // L_UMINUS    L_FN + 0
-    L_uplus,        // L_UPLUS     L_FN + 1
-    L_log,          // L_LOG       L_FN + 2  
-    L_ln,           // L_LN        L_FN + 3
-    L_not,          // L_NOT       L_FN + 4  
-    L_expn,         // L_EXPN      L_FN + 5   
-    L_max,          // L_MAX       L_FN + 6
-    L_min,          // L_MIN       L_FN + 7  
-    L_sin,          // L_SIN       L_FN + 8  
-    L_cos,          // L_COS       L_FN + 9
-    L_acos,         // L_ACOS      L_FN + 10   
-    L_asin,         // L_ASIN      L_FN + 11   
-    L_tan,          // L_TAN       L_FN + 12
-    L_atan,         // L_ATAN      L_FN + 13   
-    L_tanh,         // L_TANH      L_FN + 14   
-    L_sinh,         // L_SINH      L_FN + 15
-    L_cosh,         // L_COSH      L_FN + 16   
-    L_abs,          // L_ABS       L_FN + 17  
-    L_sqrt,         // L_SQRT      L_FN + 18
-    L_int,          // L_INT       L_FN + 19  
-    L_rad,          // L_RAD       L_FN + 20  
-    L_if,           // L_IF        L_FN + 21
-    L_lsum,         // L_LSUM      L_FN + 22   
-    L_lmean,        // L_LMEAN     L_FN + 23    
-    L_fnisan,       // L_FNISAN    L_FN + 24
-    L_lcount,       // L_LCOUNT    L_FN + 25     
-    L_lprod,        // L_LPROD     L_FN + 26    
-    L_sign,         // L_SIGN      L_FN + 27
-    L_lstderr,      // L_LSTDERR   L_FN + 28     
-    L_random,       // L_RANDOM    L_FN + 29     
-    L_floor,        // L_FLOOR     L_FN + 30
-    L_ceil,         // L_CEIL      L_FN + 31     
-    L_round,        // L_ROUND     L_FN + 32     
-    L_urandom,      // L_URANDOM   L_FN + 33
-    L_grandom,      // L_GRANDOM   L_FN + 34     
-    L_gamma,        // L_GAMMA     L_FN + 35     
-    L_div0          // L_DIV0      L_FN + 36
-};

@@ -1132,11 +1132,8 @@ int B_DataListCount(char* arg, int unused)
  *  @params See file header 
  *  @return int     0 always
  */
- 
 int B_DataCompareEps(char* arg, int unused)
 {
-    extern double K_CMP_EPS;
-
     // Set Vars threshold
     K_CMP_EPS = atof(arg);
     if(K_CMP_EPS < 1e-15) K_CMP_EPS = 1e-15;

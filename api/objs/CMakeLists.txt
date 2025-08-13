@@ -1,4 +1,4 @@
 
-target_sources(iode_c_api PRIVATE k_vers.c k_objs.c k_objsv.c pack.c k_pack.c k_objfile.cpp 
-                               k_objvers.c k_xdr.c k_kdb.c k_ws.c k_val.c k_tbl.c k_lst.c 
-                               k_wsvar.c k_cmp.c k_eqs.c k_grep.cpp)
+target_sources(iode_c_api PRIVATE k_vers.cpp k_objs.cpp k_objsv.cpp pack.cpp k_pack.cpp k_objfile.cpp 
+                               k_objvers.cpp k_xdr.cpp k_kdb.cpp k_ws.cpp k_val.cpp k_tbl.cpp k_lst.cpp 
+                               k_wsvar.cpp k_cmp.cpp k_eqs.cpp k_grep.cpp)

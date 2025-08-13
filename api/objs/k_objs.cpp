@@ -30,9 +30,6 @@
 #include "api/objs/tables.h"
 
 
-int     K_WARN_DUP = 0;     // If null, adding an existing object name in a KDB does not trigger an error (used in K_add_entry())
-
-
 // Utilities 
 // ---------
 
@@ -58,9 +55,6 @@ static int K_find_strcmp(const void *name, const void *kobjs)
 // API
 // ---
 
-// The K_SECRETSEP ('#') is used for internally created vars in reports.
-int K_SECRETSEP = '#'; // JMP 14/2/2013 pour les macros pushed A#n in reports
-
 
 /**
  *  Checks the validity of an object name and modify its "case" according to the value of mode.
@@ -80,7 +74,7 @@ int K_key(char* name, int mode)
 {
     int     i;
 
-    SCR_sqz(name);
+    SCR_sqz((unsigned char*) name);
     if(!SCR_is_alpha(name[0]) && name[0] != '_') return(-1);
     if(strlen(name) > K_MAX_NAME) name[K_MAX_NAME] = 0;
     for(i = 1 ; name[i] ; i++)
@@ -88,10 +82,10 @@ int K_key(char* name, int mode)
 
     switch(mode) {
         case UPPER_CASE :
-            SCR_upper(name);
+            SCR_upper((unsigned char*) name);
             break;
         case LOWER_CASE :
-            SCR_lower(name);
+            SCR_lower((unsigned char*) name);
             break;
         case ASIS_CASE  :
             break;
@@ -214,7 +208,7 @@ int K_add_entry(KDB* kdb, char* newname)
     ONAME   name;
 
     if(kdb == NULL) return(-1);
-    SCR_strlcpy(name, newname, K_MAX_NAME);  /* JMP 13-02-2013 */
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) newname, K_MAX_NAME);  /* JMP 13-02-2013 */
     if(K_key(name, KMODE(kdb)) < 0) return(-1);
     pos = K_find(kdb, name);
     if(pos >= 0) {
@@ -225,9 +219,9 @@ int K_add_entry(KDB* kdb, char* newname)
 
     if((KNB(kdb)) % K_CHUNCK == 0)
         //KOBJS(kdb) = (char *) SW_nrealloc(KOBJS(kdb),
-        KOBJS(kdb) = SW_nrealloc(KOBJS(kdb),
-                                 (unsigned int)(sizeof(KOBJ) * KNB(kdb)),
-                                 (unsigned int)(sizeof(KOBJ) * (KNB(kdb) + K_CHUNCK)));
+        KOBJS(kdb) = (KOBJ*) SW_nrealloc(KOBJS(kdb),
+                                         (unsigned int)(sizeof(KOBJ) * KNB(kdb)),
+                                         (unsigned int)(sizeof(KOBJ) * (KNB(kdb) + K_CHUNCK)));
     if(KOBJS(kdb) == 0) return(-1);
 
 
@@ -265,7 +259,7 @@ done :
         //SCR_free(ktmp);
     }
 
-    lg = min((int)strlen(name), K_MAX_NAME);
+    lg = std::min((int) strlen(name), K_MAX_NAME);
     memcpy(KONAME(kdb, maxpos), name, lg + 1);
     KSOVAL(kdb, maxpos) = 0;
 
@@ -291,7 +285,7 @@ int K_find(KDB* kdb, char* name)
 
     if(kdb == NULL || KNB(kdb) == 0) return(-1);
 
-    SCR_strlcpy(oname, name, K_MAX_NAME);  
+    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
     if(K_key(oname, KMODE(kdb)) < 0) return(-1);
 
     res = (char *) bsearch(oname, KOBJS(kdb), (int) KNB(kdb),
@@ -396,22 +390,22 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
         eq = KEVAL(K_WS[EQUATIONS], pos);
 
     SW_nfree(eq->endo);
-    eq->endo = SCR_stracpy(name);
+    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
     if(lec != NULL) {
         SW_nfree(eq->lec);
-        eq->lec = SCR_stracpy(lec);
+        eq->lec = (char*) SCR_stracpy((unsigned char*) lec);
     }
     if(cmt != NULL) {
         SW_nfree(eq->cmt);
-        eq->cmt = SCR_stracpy(cmt);
+        eq->cmt = (char*) SCR_stracpy((unsigned char*) cmt);
     }
     if(instr != NULL) {
         SW_nfree(eq->instr);
-        eq->instr = SCR_stracpy(instr);
+        eq->instr = (char*) SCR_stracpy((unsigned char*) instr);
     }
     if(blk != NULL) {
         SW_nfree(eq->blk);
-        eq->blk = SCR_stracpy(blk);
+        eq->blk = (char*) SCR_stracpy((unsigned char*) blk);
     }
 
     if(method >= 0) eq->method = method;
@@ -474,7 +468,7 @@ int K_upd_tbl(char* name, char* arg)
     if(lecs == 0) goto add;
     A_SEPS = oldseps;
     T_auto(tbl, lecs[0], lecs + 1, 1, 1, 0);
-    SCR_free_tbl(lecs);
+    SCR_free_tbl((unsigned char**) lecs);
 
 add:
     rc = K_add(K_WS[TABLES], name, tbl);
