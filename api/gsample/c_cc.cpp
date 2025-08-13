@@ -44,16 +44,19 @@
  */
 #include "scr4/s_prodt.h"
 
+#include "api/constants.h"
+#include "api/k_lang.h"
 #include "api/objs/kdb.h"
 #include "api/objs/variables.h"
 #include "api/gsample/gsample.h"
 
 
+// extern "C" int  B_LANG;
+extern "C" int  K_LANG;
+extern "C" char *KLG_MONTHS[][3], *KLG_ROM[], *KLG_OPERS_TEXTS[][3];
+
 // Function declarations
 static void COL_free_fils(FILS* fils);
-char *COL_ctoa(COL* cl, int ch, int n, int nbf);
-char *COL_text(COL* cl, char* str, int nbnames);
-COLS *COL_add_col(COLS* cls);
 static FILS* COL_add_fil(FILS* fils);
 static void COL_apply_fil(COL* cl, FIL* fl);
 static void COL_calc_now(PERIOD *per);
@@ -67,84 +70,66 @@ static FILS *COL_read_f(YYFILE* yy);
 static void COL_shift(COLS *cls, int key, int nb);
 static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval);
 static COLS *COL_read_cols(YYFILE* yy);
-COLS *COL_cc(char* gsample);
-int COL_free_cols(COLS* cls);
-int COL_find_mode(COLS* cls, int* mode, int type);
+
 
 // GSAMPLE tokens -- may be expanded
 YYKEYS COL_KEYWS[] = {
-    "[",    COL_OBRACK,
-    "]",    COL_CBRACK,
-    "(",    COL_OPAR,
-    ")",    COL_CPAR,
-    ":",    COL_COLON,
-    ";",    COL_COMMA,
-    "*",    COL_DOT,
-    "<",    COL_SHIFTL,
-    ">",    COL_SHIFTR,
+    (unsigned char*) "[",    COL_OBRACK,
+    (unsigned char*) "]",    COL_CBRACK,
+    (unsigned char*) "(",    COL_OPAR,
+    (unsigned char*) ")",    COL_CPAR,
+    (unsigned char*) ":",    COL_COLON,
+    (unsigned char*) ";",    COL_COMMA,
+    (unsigned char*) "*",    COL_DOT,
+    (unsigned char*) "<",    COL_SHIFTL,
+    (unsigned char*) ">",    COL_SHIFTR,
 
-    "-",    COL_DIFF,
-    "--",   COL_MDIFF,
-    "~",    COL_MEAN,  /* ^ */
-    "^",    COL_MEAN,  /* ^ */
-    "+",    COL_ADD,
-    "=",    COL_BASE,
-    "/",    COL_GRT,
-    "//",   COL_MGRT,
+    (unsigned char*) "-",    COL_DIFF,
+    (unsigned char*) "--",   COL_MDIFF,
+    (unsigned char*) "~",    COL_MEAN,  /* ^ */
+    (unsigned char*) "^",    COL_MEAN,  /* ^ */
+    (unsigned char*) "+",    COL_ADD,
+    (unsigned char*) "=",    COL_BASE,
+    (unsigned char*) "/",    COL_GRT,
+    (unsigned char*) "//",   COL_MGRT,
 
-    "EOS",   COL_EOS,
-    "EOSM",  COL_EOS,
-    "EOSQ",  COL_EOS,
-    "EOSW",  COL_EOS,
+    (unsigned char*) "EOS",   COL_EOS,
+    (unsigned char*) "EOSM",  COL_EOS,
+    (unsigned char*) "EOSQ",  COL_EOS,
+    (unsigned char*) "EOSW",  COL_EOS,
 
-    "EOS1",   COL_EOS1,
-    "EOSM1",  COL_EOS1,
-    "EOSQ1",  COL_EOS1,
-    "EOSW1",  COL_EOS1,
+    (unsigned char*) "EOS1",   COL_EOS1,
+    (unsigned char*) "EOSM1",  COL_EOS1,
+    (unsigned char*) "EOSQ1",  COL_EOS1,
+    (unsigned char*) "EOSW1",  COL_EOS1,
 
-    "BOS",   COL_BOS,
-    "BOSM",  COL_BOS,
-    "BOSQ",  COL_BOS,
-    "BOSW",  COL_BOS,
+    (unsigned char*) "BOS",   COL_BOS,
+    (unsigned char*) "BOSM",  COL_BOS,
+    (unsigned char*) "BOSQ",  COL_BOS,
+    (unsigned char*) "BOSW",  COL_BOS,
 
-    "BOS1",   COL_BOS1,
-    "BOSM1",  COL_BOS1,
-    "BOSQ1",  COL_BOS1,
-    "BOSW1",  COL_BOS1,
+    (unsigned char*) "BOS1",   COL_BOS1,
+    (unsigned char*) "BOSM1",  COL_BOS1,
+    (unsigned char*) "BOSQ1",  COL_BOS1,
+    (unsigned char*) "BOSW1",  COL_BOS1,
 
-    "NOW",   COL_NOW,
-    "NOWM",  COL_NOW,
-    "NOWQ",  COL_NOW,
-    "NOWW",  COL_NOW,
+    (unsigned char*) "NOW",   COL_NOW,
+    (unsigned char*) "NOWM",  COL_NOW,
+    (unsigned char*) "NOWQ",  COL_NOW,
+    (unsigned char*) "NOWW",  COL_NOW,
 
-    "NOW1",   COL_NOW1,
-    "NOWM1",  COL_NOW1,
-    "NOWQ1",  COL_NOW1,
-    "NOWW1",  COL_NOW1,
+    (unsigned char*) "NOW1",   COL_NOW1,
+    (unsigned char*) "NOWM1",  COL_NOW1,
+    (unsigned char*) "NOWQ1",  COL_NOW1,
+    (unsigned char*) "NOWW1",  COL_NOW1,
 
-    "PER",  COL_PER,
-    "P",    COL_PER,
+    (unsigned char*) "PER",  COL_PER,
+    (unsigned char*) "P",    COL_PER,
 
-    "S",    COL_SUBPER,
-    "SUB",  COL_SUBPER
+    (unsigned char*) "S",    COL_SUBPER,
+    (unsigned char*) "SUB",  COL_SUBPER
 
 };
-
-// Operator representations used when printing (only valid for period operations)
-// TODO: distinguish bw operations between periods and between files ?
-char    *COL_OPERS[] = {
-    "",     // COL_NOP
-    "-",    // COL_DIFF,
-    "--",   // COL_MDIFF, 
-    "^",    // COL_MEAN, 
-    "/",    // COL_GRT,
-    "//",   // COL_MGRT,
-    "+",    // COL_ADD,
-    "="     // COL_BASE,
-//    "<",    // Faux !! Ne peut pas se produire
-//    ">"     // Faux !! Idem
-};
-
 
 /*
     Compile un GSAMPLE (définitions des colonnes à imprimer). 
@@ -257,9 +242,6 @@ char *COL_ctoa(COL* cl, int ch, int n, int nbf)
 {
     static char res[30];
     PERIOD      *per;
-    // extern int  B_LANG;
-    extern int  K_LANG;
-    extern char *KLG_MONTHS[][3], *KLG_ROM[], *KLG_OPERS_TEXTS[][3];
 
     res[0] = res[1] = 0;
 
@@ -292,7 +274,7 @@ Rom:
             case 'R' :
                 if(!U_is_in(per->p_p, "QM")) goto Num;
                 strcpy(res, KLG_ROM[per->p_s - 1]);
-                if(SCR_is_lower(ch)) SCR_lower(res);
+                if(SCR_is_lower(ch)) SCR_lower((unsigned char*) res);
                 break;
 Num:
             case 'n' :
@@ -1096,7 +1078,7 @@ err:
  
 COLS *COL_cc(char* gsample)
 {
-    COLS    *cls, *COL_read_cols();
+    COLS    *cls;
     COL     *cl;
     YYFILE  *yy;
     static  int sorted = 0;
@@ -1104,7 +1086,7 @@ COLS *COL_cc(char* gsample)
 
     YY_CASE_SENSITIVE = 1;
     if(sorted == 0) {
-        qsort(COL_KEYWS, sizeof(COL_KEYWS) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
+        qsort(COL_KEYWS, sizeof(COL_KEYWS) / sizeof(YYKEYS), sizeof(YYKEYS), col_compare);
         sorted = 1;
     }
     yy = YY_open(gsample, COL_KEYWS,

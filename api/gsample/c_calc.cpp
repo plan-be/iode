@@ -31,6 +31,7 @@
  */
 #include <math.h>
 
+#include "api/constants.h"
 #include "api/k_super.h"
 #include "api/utils/time.h"
 #include "api/gsample/gsample.h"
