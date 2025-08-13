@@ -205,10 +205,6 @@ int K_cmp_tbl(TBL* tbl1, TBL* tbl2)
     return rc;
 }
 
-
-// Threshold for VAR comparisons 
-double K_CMP_EPS = 1e-7;
-
 /**
  *  Compares 2 double values. 
  *  

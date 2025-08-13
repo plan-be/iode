@@ -89,8 +89,6 @@ int L_findvar(KDB* kdb, char* name)
     return(K_find(kdb, name));
 }
 
-char *(*L_expand_super)(char* list_name);
-
 /**
  *  Implentation of L_expand()
  *  

@@ -4,19 +4,17 @@
 
 #include "api/constants.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*----------------------- STRUCTS ----------------------------*/
 
-typedef struct  _kobj_ {
+struct  KOBJ 
+{
     SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
     ONAME       o_name;         // name of the object
     char        o_pad[3];
-} KOBJ;
+};
 
-typedef struct _kdb_ {
+struct KDB 
+{
     KOBJ        *k_objs;                // map <position in the memory, object name>
 	long        k_nb;                   // number of objects in the database
     short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
@@ -29,15 +27,58 @@ typedef struct _kdb_ {
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
     char        k_reserved[59];         // not used (NOTE: decreased by 4 bytes in version 6.44 for k_nameptr)
     char        *k_nameptr;             // filepath to the database file
-} KDB;
+};
 
 /*----------------------- GLOBALS ----------------------------*/
 
-extern KDB      *K_WS[7];
-extern KDB      *K_RWS[7][5];
-extern int      K_PWS[7];
-extern int      K_WARN_DUP;
-extern int      K_SECRETSEP;
+inline KDB*     K_WS[7] = { NULL };             // Current workspaces
+inline KDB*     K_RWS[7][5] = {{ NULL }};       // Currently loaded workspaces (for printing and identity execution)
+inline int      K_PWS[7] = { 0 };               // ??? TODO: check if still in use
+inline int      K_WARN_DUP = 0;                 // If null, adding an existing object name in a KDB does not trigger 
+                                                // an error (used in K_add_entry())
+inline int      K_SECRETSEP = '#';              // pour les macros pushed A#n in reports
+
+/**
+ * k_ext[][4] : extensions of IODE filenames.
+ * 
+ *   - cmt..var = IODE objects internal format
+ *   - ac..av = IODE objects ascii format
+ *   - next extensions : other IODE files
+ */
+inline char k_ext[][4] = 
+{
+    "cmt", // 0 = FILE_COMMENTS
+    "eqs", // 1 = FILE_EQUATIONS
+    "idt", // ... 
+    "lst",
+    "scl",
+    "tbl",
+    "var",
+    "ooo", // 7 = IODE_NB_TYPES
+
+    "ac",  // 8
+    "ae",
+    "ai",
+    "al",
+    "as",
+    "at",
+    "av",
+    "",    // 15
+
+    "rep", // 16
+    "a2m",
+    "agl",
+    "prf",
+    "dif",
+    "mif",
+    "rtf",
+    "ps",
+    "asc",
+    "txt",
+    "csv",  // 26 = FILE_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
+
+    "xxx"
+};
 
 /*----------------------- DEFINE ----------------------------*/
 
@@ -76,59 +117,50 @@ extern int      K_SECRETSEP;
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
-/*----------------------- GLOBALS ----------------------------*/
-
-extern char    k_magic[][LMAGIC];
-extern char    k_ext[][4];
-
 /*----------------------- FUNCS ----------------------------*/
 
 /* k_kdb.c */
-extern void K_sort(KDB* kdb);
-extern KDB *K_init_kdb(int ,char *);
-extern char *K_get_kdb_nameptr(KDB *kdb);
-extern void K_set_kdb_name(KDB *kdb, U_ch *filename);
-extern void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
-extern KDB *K_create(int ,int );
-extern int K_free(KDB *);
-extern int K_clear(KDB *);
-extern int K_free_kdb(KDB *);
-extern int K_merge(KDB* kdb1, KDB* kdb2, int replace);
-extern KDB* K_refer(KDB* kdb, int nb, char** names);
-extern KDB *K_quick_refer(KDB *, char **names);
+void K_sort(KDB* kdb);
+KDB *K_init_kdb(int ,char *);
+char *K_get_kdb_nameptr(KDB *kdb);
+void K_set_kdb_name(KDB *kdb, U_ch *filename);
+void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
+KDB *K_create(int ,int );
+int K_free(KDB *);
+int K_clear(KDB *);
+int K_free_kdb(KDB *);
+int K_merge(KDB* kdb1, KDB* kdb2, int replace);
+KDB* K_refer(KDB* kdb, int nb, char** names);
+KDB *K_quick_refer(KDB *, char **names);
 
 /* k_val.c */
-extern char *K_oval(KDB *,int ,int );
-extern char *K_oval0(KDB *,int );
-extern char *K_oval1(KDB *,int );
+char *K_oval(KDB *,int ,int );
+char *K_oval0(KDB *,int );
+char *K_oval1(KDB *,int );
 
-extern char *K_optr(KDB *,char* ,int );
-extern char *K_optr0(KDB *,char* );
-extern char *K_optr1(KDB *,char* );
+char *K_optr(KDB *,char* ,int );
+char *K_optr0(KDB *,char* );
+char *K_optr1(KDB *,char* );
 
 // Estimation tests by equation name
-extern double K_etest(KDB* kdb, char*name, int test_nb);
-extern double K_e_stdev (KDB* kdb, char*name);
-extern double K_e_meany (KDB* kdb, char*name);
-extern double K_e_ssres (KDB* kdb, char*name);
-extern double K_e_stderr(KDB* kdb, char*name);
-extern double K_e_fstat (KDB* kdb, char*name);
-extern double K_e_r2    (KDB* kdb, char*name);
-extern double K_e_r2adj (KDB* kdb, char*name);
-extern double K_e_dw    (KDB* kdb, char*name);
-extern double K_e_loglik(KDB* kdb, char*name);
+double K_etest(KDB* kdb, char*name, int test_nb);
+double K_e_stdev (KDB* kdb, char*name);
+double K_e_meany (KDB* kdb, char*name);
+double K_e_ssres (KDB* kdb, char*name);
+double K_e_stderr(KDB* kdb, char*name);
+double K_e_fstat (KDB* kdb, char*name);
+double K_e_r2    (KDB* kdb, char*name);
+double K_e_r2adj (KDB* kdb, char*name);
+double K_e_dw    (KDB* kdb, char*name);
+double K_e_loglik(KDB* kdb, char*name);
 
 // Values of scalars by name
-extern double K_s_get_info(KDB* kdb, char*name, int info_nb);
-extern double K_s_get_value (KDB* kdb, char*name);
-extern double K_s_get_relax (KDB* kdb, char*name);
-extern double K_s_get_stderr(KDB* kdb, char*name);
-extern double K_s_get_ttest (KDB* kdb, char*name);
-extern int K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
-extern int K_s_set_value (KDB* kdb, char*name, double val);
-extern int K_s_set_relax (KDB* kdb, char*name, double val);
-extern int K_s_set_stderr(KDB* kdb, char*name, double val);
-
-#ifdef __cplusplus
-}
-#endif
+double K_s_get_info(KDB* kdb, char*name, int info_nb);
+double K_s_get_value (KDB* kdb, char*name);
+double K_s_get_relax (KDB* kdb, char*name);
+double K_s_get_stderr(KDB* kdb, char*name);
+double K_s_get_ttest (KDB* kdb, char*name);
+int K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
+int K_s_set_value (KDB* kdb, char*name, double val);
+int K_s_set_relax (KDB* kdb, char*name, double val);
+int K_s_set_stderr(KDB* kdb, char*name, double val);

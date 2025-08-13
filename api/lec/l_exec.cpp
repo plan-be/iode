@@ -31,16 +31,11 @@
  *  is created. 
  *  
  *      - L_OPS_FN[]:  operators                   Syntax: L_REAL fn(L_REAL val1, L_REAL val2)
- *      - L_FNS_FN[]:  simple functions            Syntax: L_REAL fn(L_REAL *stack, int nargs])
+ *      - L_FNS_FN[]:  simple functions            Syntax: L_REAL fn(L_REAL *stack, [int nargs])
  *      - L_TFN_FN[]:  time functions              Syntax: L_REAL fn(char* expr, short length, int t, L_REAL *stack, int nargs)
  *      - L_MTFN_FN[]: multi-args time functions   Syntax: L_REAL fn(char* expr, int nvargs, int t, L_REAL *stack, int nargs)
  *      - L_VAL_FN[]:  values                      Syntax: L_REAL fn(int t)
- */
-extern L_REAL(*L_VAL_FN[])();       // l_exec_val.c
-extern L_REAL(*L_OPS_FN[])();       // l_exec_ops.c
-extern L_REAL(*L_FNS_FN[])();       // l_exec_fns.c
-extern L_REAL(*L_TFN_FN[])();       // l_exec_tfn.c
-extern L_REAL(*L_MTFN_FN[])();      // l_exec_mtfn.c    
+ */  
 
 // Globals
 static LNAME    *L_EXEC_NAMES;
@@ -50,7 +45,6 @@ static jmp_buf  L_JMP;
 // Globals used in L_* fns
 KDB     *L_EXEC_DBV,    
         *L_EXEC_DBS; 
-int     L_curt;         // current value of t
 
 // Math exceptions trap
 #ifdef _MSC_VER
@@ -70,7 +64,7 @@ int matherr(struct exception *e)
 #endif
 
 // Function called on floating point exception (SIGFPE)
-void L_fperror()
+void L_fperror(int)
 {
     L_SIG = 0;
 #ifdef DOS
@@ -300,7 +294,7 @@ L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
     pos = sizeof(CLEC) + (expr->nb_names - 1) * sizeof(LNAME);
     
     
-    return(L_exec_sub((char *)expr + pos, expr->tot_lg - pos, t, stack));
+    return(L_exec_sub((unsigned char*) expr + pos, expr->tot_lg - pos, t, stack));
 }
 
 

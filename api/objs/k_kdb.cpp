@@ -110,7 +110,7 @@ KDB *K_init_kdb(int type, char* filename)
     kdb = K_create(type, mode);
     if(kdb == NULL) return(kdb);
     //strcpy(KNAME(kdb), filename);
-    K_set_kdb_name(kdb, filename); // JMP 3/6/2015
+    K_set_kdb_name(kdb, (unsigned char*) filename); // JMP 3/6/2015
     return(kdb);
 }
 
@@ -146,7 +146,7 @@ void K_set_kdb_name(KDB *kdb, U_ch *filename)
 {
     if(kdb) {
         SCR_free(KNAMEPTR(kdb));
-        KNAMEPTR(kdb) = SCR_stracpy(filename);
+        KNAMEPTR(kdb) = (char*) SCR_stracpy(filename);
     }
 }
 
@@ -164,9 +164,9 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
 {
     char    *ptr, fullpath[1024];
     
-    ptr = SCR_fullpath(filename, fullpath);
-    if(ptr == 0) ptr = filename;
-    K_set_kdb_name(kdb, ptr);  
+    ptr = SCR_fullpath((char*) filename, fullpath);
+    if(ptr == 0) ptr = (char*) filename;
+    K_set_kdb_name(kdb, (unsigned char*) ptr);  
 }
 
 
@@ -190,7 +190,7 @@ KDB *K_create(int type, int mode)
     strcpy(KARCH(kdb), ARCH);
     KMODE(kdb) = mode;
     KTYPE(kdb) = type;
-    KNAMEPTR(kdb) = SCR_stracpy(I_DEFAULT_FILENAME); // JMP 29/9/2015
+    KNAMEPTR(kdb) = (char*) SCR_stracpy((unsigned char*) I_DEFAULT_FILENAME); // JMP 29/9/2015
     return(kdb);
 }
 
@@ -257,7 +257,7 @@ int K_clear(KDB* kdb)
     SCR_free(KNAMEPTR(kdb)); // JMP 3/6/2015
     KNAMEPTR(kdb) = 0;              // JMP 3/6/2015
     memset(KSMPL(kdb), 0, sizeof(SAMPLE)); /* JMP 28-03-92 */
-    KNAMEPTR(kdb) = SCR_stracpy(I_DEFAULT_FILENAME); // JMP 29/9/2015
+    KNAMEPTR(kdb) = (char*) SCR_stracpy((unsigned char*) I_DEFAULT_FILENAME); // JMP 29/9/2015
     return(0);
 }
 
@@ -331,7 +331,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
 KDB *K_quick_refer(KDB *kdb, char *names[])
 {
-    int     i, pos, nb = SCR_tbl_size(names);
+    int     i, pos, nb = SCR_tbl_size((unsigned char**) names);
     KDB     *tkdb;
 
     if(kdb == NULL) return(NULL);

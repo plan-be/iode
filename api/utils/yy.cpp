@@ -61,7 +61,7 @@ ag:
             return(IODE_NAN);
 
         case YY_WORD   :
-            if(strcmp("na", yy->yy_text) != 0)
+            if(strcmp("na", (char*) yy->yy_text) != 0)
                 YY_unread(yy);
             return(IODE_NAN);
         default :
@@ -121,7 +121,7 @@ char* K_read_str(YYFILE* yy)
     char    *ptr = NULL;
 
     if(YY_lex(yy) != YY_STRING) return(NULL);
-    ptr = SCR_stracpy(yy->yy_text);
+    ptr = (char*) SCR_stracpy(yy->yy_text);
     return(ptr);
 }
 
@@ -141,12 +141,12 @@ PERIOD  *K_read_per(YYFILE* yy)
 
     buf[0] = 0;
     if(YY_lex(yy) != YY_LONG) goto err;
-    strcpy(buf, yy->yy_text);
+    strcpy(buf, (char*) yy->yy_text);
     buf1[0] = YY_getc(yy);
     buf1[1] = 0;
     strcat(buf, buf1);
     if(YY_lex(yy) != YY_LONG) goto err;
-    strcat(buf, yy->yy_text);
+    strcat(buf, (char*) yy->yy_text);
 
     tmp = PER_atoper(buf);
     return(tmp);
@@ -267,7 +267,7 @@ int K_wrdef(FILE* fd, YYKEYS* table, int def)
  */
 int K_compare(YYKEYS* yy1, YYKEYS* yy2)
 {
-    return(strcmp(yy1->yk_word, yy2->yk_word));
+    return(strcmp((char*) yy1->yk_word, (char*) yy2->yk_word));
 }
 
 /**
@@ -284,12 +284,17 @@ char *K_wrap(char *in, int lg)
     unsigned char  *txt = NULL,
                     **tbl = NULL;
 
-    if(in == 0) return(txt);
-    if(U_is_in('\n', in))  return(SCR_stracpy(in));
+    if(in == 0) 
+        return((char*) txt);
 
-    tbl = SCR_text(in, ";,*+-/) ", lg); /* JMP 09-03-95 */
-    if(tbl == 0) return(txt);
+    if(U_is_in('\n', in))  
+        return((char*) SCR_stracpy((unsigned char*) in));
+
+    tbl = SCR_text((unsigned char*) in, (unsigned char*) ";,*+-/) ", lg); /* JMP 09-03-95 */
+    if(tbl == 0) 
+        return((char*) txt);
+
     txt = SCR_mtov(tbl, '\n');
     SCR_free_tbl(tbl);
-    return(txt);
+    return((char*) txt);
 }

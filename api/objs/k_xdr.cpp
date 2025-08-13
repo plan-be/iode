@@ -60,7 +60,7 @@ static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
     if(xdr_ptr == NULL) return(-1);
 
     len = P_len(ptr);
-    *xdr_ptr = SW_nalloc(len);
+    *xdr_ptr = (unsigned char*) SW_nalloc(len);
     memcpy(*xdr_ptr, ptr, len);
     return(0);
 }
@@ -116,7 +116,8 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
  *    
  */
  
-int (*K_xdrobj[])() = {
+int (*K_xdrobj[])(unsigned char* ptr, unsigned char** xdr_ptr) = 
+{
     K_oxdr,
     K_oxdr,
     K_oxdr,
@@ -729,7 +730,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
     }
     else {
         /* intel write */
-        xdr_kdb = SW_nalloc(sizeof(KDB));
+        xdr_kdb = (KDB*) SW_nalloc(sizeof(KDB));
         memcpy(xdr_kdb, ikdb, sizeof(KDB));
 
         *okdb = xdr_kdb;

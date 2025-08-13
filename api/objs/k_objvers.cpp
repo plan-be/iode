@@ -29,12 +29,6 @@
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 
-
-char    K_LABELS[] = "KOBJS 4.02\032";  // Version 1
-char    K_LABELD[] = "KOBJS 504d\032";  // Version 2
-char    K_LABELX[] = "KOBJS 564A\032";  // Version 3 
-char    K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
-
 /**
  *  Returns the current object version (0-2) of an IODE file header. 
  *  
@@ -148,12 +142,12 @@ static char *T_cell_repack(char* pack, TCELL* cell)
     if(cell->tc_type == TABLE_CELL_LEC) {
         npack = Pack16To32(cell->tc_val);
         ipack = 0;
-        K_ipack(&ipack, P_get_ptr(npack, 0));
-        pack  = P_add(pack, ipack, P_len(ipack));
+        K_ipack(&ipack, (char*) P_get_ptr(npack, 0));
+        pack = (char*) P_add(pack, ipack, P_len(ipack));
         SW_nfree(npack);
     }
     else
-        pack = P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
+        pack = (char*) P_add(pack, cell->tc_val, (int) strlen(cell->tc_val) + 1);
 
     return(pack);
 }
@@ -175,32 +169,32 @@ static char *K_repack_tbl(TBL *tbl)
     int     i, j;
     char    *pack;
 
-    pack = P_create();
+    pack = (char*) P_create();
     if(tbl == NULL) return(NULL);
 
     /* tbl */
-    pack = P_add(pack, (char *) tbl, sizeof(TBL));
+    pack = (char*) P_add(pack, (char *) tbl, sizeof(TBL));
 
     /* div */
     cell = (TCELL *) tbl->t_div.tl_val;
-    pack= P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
+    pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
     for(j = 0; j < T_NC(tbl); j++)
         pack = T_cell_repack(pack, cell + j);
 
     /* lines */
-    pack= P_add(pack, (char *) tbl->t_line, sizeof(TLINE) * (int) T_NL(tbl));
+    pack = (char*) P_add(pack, (char *) tbl->t_line, sizeof(TLINE) * (int) T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
         switch(tbl->t_line[i].tl_type) {
             case TABLE_LINE_CELL :
                 cell = (TCELL *) tbl->t_line[i].tl_val;
-                pack= P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
+                pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
                 for(j = 0; j < T_NC(tbl); j++)
                     pack = T_cell_repack(pack, cell + j);
                 break;
             case TABLE_LINE_TITLE :
                 cell = (TCELL *) tbl->t_line[i].tl_val;
-                pack= P_add(pack, (char *) cell, sizeof(TCELL));
-                pack= T_cell_repack(pack, cell);
+                pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL));
+                pack = T_cell_repack(pack, cell);
                 break;
         }
     }
@@ -281,7 +275,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case IDENTITIES :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
-            K_ipack(&pack, P_get_ptr(optr, 0));
+            K_ipack(&pack, (char*) P_get_ptr(optr, 0));
             SW_free(opos);
             lg = P_get_len(pack, -1);
             pos = SW_alloc(lg);

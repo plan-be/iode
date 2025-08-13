@@ -71,13 +71,13 @@ int K_vpack(char **pack, double *a1, int *a2)
     double* ptr;
 
     if(*a2 == 0) return(-1);
-    *pack = P_create();
+    *pack = (char*) P_create();
     if(a1 == NULL) {
-        *pack = P_add(*pack, NULL, sizeof(double) * *a2);
+        *pack = (char*) P_add(*pack, NULL, sizeof(double) * *a2);
         ptr = (double*)P_get_ptr(*pack, 0);
         for(i = 0; i < *a2; i++) ptr[i] = IODE_NAN;
     }
-    else *pack = P_add(*pack, (char*)a1, sizeof(double) * *a2);
+    else *pack = (char*) P_add(*pack, (char*)a1, sizeof(double) * *a2);
     return(0);
 }
 
@@ -97,9 +97,9 @@ static char* K_tcell_pack(char *pack, TCELL *cell)
 {
     if(cell->tc_val == NULL) return(pack);
     if(cell->tc_type == TABLE_CELL_LEC)
-        pack = P_add(pack, cell->tc_val, P_len(cell->tc_val));
+        pack = (char*) P_add(pack, cell->tc_val, P_len(cell->tc_val));
     else
-        pack = P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
+        pack = (char*) P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
 
     return(pack);
 }
@@ -202,16 +202,16 @@ static int K_tpack32(char **pack, char *a1)
     TCELL* cell;
     int     i, j;
 
-    *pack = P_create();
+    *pack = (char*) P_create();
     if(a1 == NULL) return(-1);
 
     /* tbl */
-    *pack = P_add(*pack, (char*)tbl, sizeof(TBL));
+    *pack = (char*) P_add(*pack, (char*)tbl, sizeof(TBL));
 
     /* div */
     /* 1. : [nc x TCELL] */
     cell = (TCELL*)tbl->t_div.tl_val;
-    *pack = P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
+    *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
 
     /* 2. : nc x [TCELL->tc_val] */
     for(j = 0; j < T_NC(tbl); j++)
@@ -219,13 +219,13 @@ static int K_tpack32(char **pack, char *a1)
 
     /* lines */
     /* 1. : [nl x TLINE] */
-    *pack = P_add(*pack, (char*)tbl->t_line, sizeof(TLINE) * (int)T_NL(tbl));
+    *pack = (char*) P_add(*pack, (char*)tbl->t_line, sizeof(TLINE) * (int)T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
         switch(tbl->t_line[i].tl_type) {
             case TABLE_LINE_CELL:
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [nc x TCELL] */
-                *pack = P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
+                *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
                 /* 2. : nc x [TCELL->tc_val] */
                 for(j = 0; j < T_NC(tbl); j++)
                     *pack = K_tcell_pack(*pack, cell + j);
@@ -233,7 +233,7 @@ static int K_tpack32(char **pack, char *a1)
             case TABLE_LINE_TITLE:
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [1 x TCELL] */
-                *pack = P_add(*pack, (char*)cell, sizeof(TCELL));
+                *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL));
                 /* 1 x [TCELL->tc_val] */
                 *pack = K_tcell_pack(*pack, cell);
                 break;
@@ -263,12 +263,12 @@ static int K_tpack64(char **pack, char *a1)
     TCELL32* cell32;
     int     i, j;
 
-    *pack = P_create();
+    *pack = (char*) P_create();
     if(a1 == NULL) return(-1);
 
     /* tbl */
     K_tbl64_32(tbl, &tbl32);
-    *pack = P_add(*pack, (char*)&tbl32, sizeof(TBL32));
+    *pack = (char*) P_add(*pack, (char*)&tbl32, sizeof(TBL32));
 
     /* div */
     /* 1. : [nc x TCELL32] */
@@ -277,7 +277,7 @@ static int K_tpack64(char **pack, char *a1)
     for(j = 0; j < T_NC(tbl); j++)
         K_tcell64_32(cell + j, cell32 + j);
 
-    *pack = P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
+    *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
 
     /* 2. : [cell] [cell] (nc x [TCELL->tc_val]) */
     for(j = 0; j < T_NC(tbl); j++)
@@ -290,7 +290,7 @@ static int K_tpack64(char **pack, char *a1)
     for(j = 0; j < T_NL(tbl); j++)
         K_tline64_32(line + j, line32 + j);
 
-    *pack = P_add(*pack, (char*)line32, sizeof(TLINE32) * (int)T_NL(tbl));
+    *pack = (char*) P_add(*pack, (char*)line32, sizeof(TLINE32) * (int)T_NL(tbl));
 
     /* 2. For each line and each col, pack cell
       [cell] [cell] ... */
@@ -301,7 +301,7 @@ static int K_tpack64(char **pack, char *a1)
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 for(j = 0; j < T_NC(tbl); j++) 
                     K_tcell64_32(cell + j, cell32 + j);
-                *pack = P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
+                *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
 
                 /* [TCELL32] [TCELL32] ... */
                 for(j = 0; j < T_NC(tbl); j++)
@@ -312,7 +312,7 @@ static int K_tpack64(char **pack, char *a1)
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [1 x TCELL] */
                 K_tcell64_32(cell + 0, cell32 + 0);
-                *pack = P_add(*pack, (char*)cell32, sizeof(TCELL32) * 1);
+                *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * 1);
 
                 /* 1 x [TCELL->tc_val] */
                 *pack = K_tcell_pack(*pack, cell);
@@ -361,9 +361,9 @@ int K_ipack(char **pack, char *a1)
     if(a1 == NULL) return(-1);
     clec = L_cc(a1);
     if(clec == 0)  return(-1);
-    *pack = P_create();
-    *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
-    *pack = P_add(*pack, (char*)clec, clec->tot_lg);
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, a1, (int)strlen(a1) + 1);
+    *pack = (char*) P_add(*pack, (char*)clec, clec->tot_lg);
     SW_nfree(clec);
     return(0);
 }
@@ -394,28 +394,34 @@ int   K_epack(char **pack, char *a1, char *endo)
 
     eq = (EQ*)a1;
 
-    *pack = P_create();
+    *pack = (char*) P_create();
     if(eq->lec == NULL) return(-1);
     clec = L_solve(eq->lec, endo);
     if(clec == 0)  return(-1);
 
-    *pack = P_add(*pack, eq->lec, (int)strlen(eq->lec) + 1);             /* lec */
-    *pack = P_add(*pack, (char*)clec, clec->tot_lg);                /* clec */
-    *pack = P_add(*pack, &(eq->solved), 1);                         /* solved */
-    *pack = P_add(*pack, &(eq->method), 1);                         /* method */
-    *pack = P_add(*pack, (char*)&(eq->smpl), sizeof(SAMPLE));       /* sample */
+    *pack = (char*) P_add(*pack, eq->lec, (int) strlen(eq->lec) + 1);             /* lec */
+    *pack = (char*) P_add(*pack, (char*)clec, clec->tot_lg);                /* clec */
+    *pack = (char*) P_add(*pack, &(eq->solved), 1);                         /* solved */
+    *pack = (char*) P_add(*pack, &(eq->method), 1);                         /* method */
+    *pack = (char*) P_add(*pack, (char*)&(eq->smpl), sizeof(SAMPLE));       /* sample */
 
-    if(eq->cmt == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->cmt, (int)strlen(eq->cmt) + 1);    /* cmt */
+    if(eq->cmt == NULL) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*)eq->cmt, (int)strlen(eq->cmt) + 1);    /* cmt */
 
-    if(eq->blk == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->blk, (int)strlen(eq->blk) + 1);    /* blk */
+    if(eq->blk == NULL) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*)eq->blk, (int)strlen(eq->blk) + 1);    /* blk */
 
-    if(eq->instr == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->instr, (int)strlen(eq->instr) + 1);/* instr */
+    if(eq->instr == NULL) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*)eq->instr, (int)strlen(eq->instr) + 1);/* instr */
 
-    *pack = P_add(*pack, (char*)&(eq->date), sizeof(long));                 /* date */
-    *pack = P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float)); /* tests*/ /* FLOAT 12-04-98 */
+    *pack = (char*) P_add(*pack, (char*)&(eq->date), sizeof(long));                 /* date */
+    *pack = (char*) P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float)); /* tests*/ /* FLOAT 12-04-98 */
 
     SW_nfree(clec);
     return(0);
@@ -437,11 +443,11 @@ int K_spack(char **pack, char *a1)
 {
     static    SCL scl = { 0.9, 1.0, IODE_NAN };
 
-    *pack = P_create();
+    *pack = (char*) P_create();
     if(a1 == NULL)
-        *pack = P_add(*pack, &scl, sizeof(SCL));
+        *pack = (char*) P_add(*pack, &scl, sizeof(SCL));
     else
-        *pack = P_add(*pack, a1, sizeof(SCL));
+        *pack = (char*) P_add(*pack, a1, sizeof(SCL));
     return(0);
 }
 
@@ -459,9 +465,11 @@ int K_spack(char **pack, char *a1)
 
 int K_cpack(char **pack, char *a1)
 {
-    *pack = P_create();
-    if(a1 == NULL) *pack = P_add(*pack, "", 1);
-    else *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
+    *pack = (char*) P_create();
+    if(a1 == NULL) 
+        *pack = (char*) P_add(*pack, (char*) "", 1);
+    else 
+        *pack = (char*) P_add(*pack, a1, (int)strlen(a1) + 1);
     return(0);
 }
 
@@ -479,9 +487,11 @@ int K_cpack(char **pack, char *a1)
 
 int K_lpack(char** pack, char* a1)
 {
-    *pack = P_create();
-    if(a1 == NULL) *pack = P_add(*pack, "", 1);
-    else *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
+    *pack = (char*) P_create();
+    if(a1 == NULL) 
+        *pack = (char*) P_add(*pack, (char*) "", 1);
+    else 
+        *pack = (char*) P_add(*pack, a1, (int)strlen(a1) + 1);
     return(0);
 }
 
@@ -496,25 +506,14 @@ int K_lpack(char** pack, char* a1)
  
 int K_opack(char** pack, char* a1, int* a2)
 {
-    *pack = P_create();
-    if(a1 == NULL || *a2 == 0) *pack = P_add(*pack, "", 1);
-    else *pack = P_add(*pack, a1, *a2);
+    *pack = (char*) P_create();
+    if(a1 == NULL || *a2 == 0) 
+        *pack = (char*) P_add(*pack, (char*) "", 1);
+    else 
+        *pack = (char*) P_add(*pack, a1, *a2);
     return(0);
 }
 
-/**
- * Table of pointers to the 7 K_*pack() functions.
-*/
-int (*K_pack[])() = {
-    K_cpack,
-    K_epack,
-    K_ipack,
-    K_lpack,
-    K_spack,
-    K_tpack,
-    K_vpack,
-    K_opack
-};
 
 /* 
  * UNPACK functions
@@ -542,7 +541,7 @@ static void K_tcell_sanitize(TCELL* cell, int j)
         cell->tc_type = TABLE_CELL_LEC;
     // if it is a string cell and its content is NULL, initialize it to an empty string
     if(cell->tc_type == TABLE_CELL_STRING && cell->tc_val == NULL)
-        T_set_string_cell(cell, "");
+        T_set_string_cell(cell, (unsigned char*) "");
 }
 
 /**
@@ -568,7 +567,7 @@ static TBL* K_tunpack32(char *pack)
 
     /* div */
     len = P_get_len(pack, 1);
-    ptbl->t_div.tl_val = P_get_ptr(pack, 1);
+    ptbl->t_div.tl_val = (char*) P_get_ptr(pack, 1);
     pcell = (TCELL*)ptbl->t_div.tl_val;
 
     tbl->t_div.tl_val = SW_nalloc(len);
@@ -578,7 +577,7 @@ static TBL* K_tunpack32(char *pack)
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
         if(pcell[j].tc_val != NULL) {
             len = P_get_len(pack, p);
-            pcell[j].tc_val = P_get_ptr(pack, p);
+            pcell[j].tc_val = (char*) P_get_ptr(pack, p);
             cell[j].tc_val = SW_nalloc(len);
             memcpy(cell[j].tc_val, pcell[j].tc_val, len);
             p++;
@@ -588,11 +587,11 @@ static TBL* K_tunpack32(char *pack)
 
     /* lines */
     len = P_get_len(pack, p);
-    T_L(ptbl) = P_get_ptr(pack, p);
+    T_L(ptbl) = (TLINE*) P_get_ptr(pack, p);
     p++;
 
     /* alloc must be a multiple of KT_CHUNCK */
-    T_L(tbl) = (void*)SW_nalloc(sizeof(TLINE) * ((int)T_NL(tbl) / KT_CHUNCK + 1) * KT_CHUNCK);
+    T_L(tbl) = (TLINE*) SW_nalloc(sizeof(TLINE) * ((int)T_NL(tbl) / KT_CHUNCK + 1) * KT_CHUNCK);
     memcpy(T_L(tbl), T_L(ptbl), len);
 
     for(i = 0; i < T_NL(tbl); i++) {
@@ -609,7 +608,7 @@ static TBL* K_tunpack32(char *pack)
                 for(j = 0; j < T_NC(tbl); j++){
                     if(cell[j].tc_val != NULL) {
                         len = P_get_len(pack, p);
-                        pcell[j].tc_val = P_get_ptr(pack, p);
+                        pcell[j].tc_val = (char*) P_get_ptr(pack, p);
                         cell[j].tc_val = SW_nalloc(len);
                         memcpy(cell[j].tc_val, pcell[j].tc_val, len);
                         p++;
@@ -633,7 +632,7 @@ static TBL* K_tunpack32(char *pack)
 
                 if(cell->tc_val != NULL) {
                     len = P_get_len(pack, p);
-                    pcell->tc_val = P_get_ptr(pack, p);
+                    pcell->tc_val = (char*) P_get_ptr(pack, p);
                     cell->tc_val = SW_nalloc(len);
                     memcpy(cell->tc_val, pcell->tc_val, len);
                     p++;
@@ -740,7 +739,7 @@ static TBL* K_tunpack64(char *pack)
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
         K_tcell32_64(cell32 + j, cell + j);
         if(cell32[j].tc_val != 0) {
-            cell[j].tc_val = P_alloc_get_ptr(pack, p);
+            cell[j].tc_val = (char*) P_alloc_get_ptr(pack, p);
             p++;
         }
         K_tcell_div_sanitize(cell + j, j);
@@ -763,7 +762,7 @@ static TBL* K_tunpack64(char *pack)
                 for(j = 0; j < T_NC(tbl); j++) {
                     K_tcell32_64(cell32 + j, cell + j);
                     if(cell32[j].tc_val != 0) {
-                        cell[j].tc_val = P_alloc_get_ptr(pack, p);
+                        cell[j].tc_val = (char*) P_alloc_get_ptr(pack, p);
                         p++;
                     }
                     K_tcell_sanitize(cell + j, j);
@@ -821,7 +820,7 @@ EQ* K_eunpack(char *pack, char *name)
 
     eq = (EQ*)SW_nalloc(sizeof(EQ));
 
-    eq->endo = SCR_stracpy(name);
+    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
 
     len = P_get_len(pack, 0);
     eq->lec = SW_nalloc(len);
@@ -872,7 +871,7 @@ IDT* K_iunpack(char* pack)
     IDT* idt = (IDT*) SW_nalloc(sizeof(IDT));
 
     len = P_get_len(pack, 0);
-    idt->lec = SCR_stracpy(P_get_ptr(pack, 0));
+    idt->lec = (char*) SCR_stracpy((unsigned char*) P_get_ptr(pack, 0));
     len = P_get_len(pack, 1);
     idt->clec = (CLEC*) SW_nalloc(len);
     memcpy(idt->clec, P_get_ptr(pack, 1), len);

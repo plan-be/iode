@@ -1,5 +1,5 @@
 
-target_sources(iode_c_api PRIVATE l_alloc.c l_err.c l_token.c l_cc1.c l_cc2.c l_eqs.c 
-                               l_link.c l_exec.c l_exec_fns.c l_exec_ops.c l_exec_tfn.c 
-                               l_exec_mtfn.c l_exec_val.c l_hodrick.c l_debug.c 
-                               l_newton.cpp l_secant.c k_lec.c)
+target_sources(iode_c_api PRIVATE l_alloc.cpp l_err.cpp l_token.cpp l_cc1.cpp l_cc2.cpp l_eqs.cpp 
+                               l_link.cpp l_exec.cpp l_exec_fns.cpp l_exec_ops.cpp l_exec_tfn.cpp 
+                               l_exec_mtfn.cpp l_exec_val.cpp l_hodrick.cpp l_debug.cpp 
+                               l_newton.cpp l_secant.cpp k_lec.cpp)

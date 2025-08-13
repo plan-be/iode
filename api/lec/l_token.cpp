@@ -48,7 +48,7 @@
  *      static int L_get_int()                      Reads an integer or a PERIOD on the stream L_YY.
  *  
  */
-
+#include "api/objs/grep.h"
 #include "api/lec/lec.h"
 
 /* WARNING !!! : IF YOU MODIFY L_TABLE (below), DON'T FORGET TO CHANGE
@@ -58,119 +58,6 @@
             L_MAX_MTARGS, L_MIN_MTARGS 
 */
 
-// --- PRIORITY OF OPERATORS  and number of functions args. See iode.h FOR POSITIONS in the vectors ---
-int L_PRIOR[13] = {2, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7};
-int L_MIN_FARGS[] = {1, 1, 1, 1, 1, 1,  1,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2};
-int L_MAX_FARGS[] = {1, 1, 2, 1, 1, 2, 255, 255, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 255, 255, 1, 255, 255, 1, 255, 1, 1, 1, 2, 1, 2, 1, 2};
-int L_MAX_TARGS[]  = {2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 3}; /* JMP 17-04-98 */
-int L_MIN_TARGS[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1}; /* JMP 17-04-98 */
-int L_MAX_MTARGS[]  = {4, 4, 4, 3, 3, 4, 4, 1, 2, 4, 2, 4}; /* GB 14-11-00 */ // JMP 12/4/2019
-int L_MIN_MTARGS[]  = {2, 2, 2, 1, 1, 2, 2, 1, 2, 2, 2, 2}; /* GB 14-11-00 */ // JMP 12/4/2019
-
-// --- LEC tokens ---
-YYKEYS L_TABLE[] = {
-    "!",            L_NOT,
-    "!=",           L_NE,
-    "(",            L_OPENP,
-    "()",           L_OCPAR,
-    ")",            L_CLOSEP,
-    "*",            L_TIMES,
-    "**",           L_EXP,
-    "+",            L_PLUS,
-    "+ ",           L_UPLUS,
-    ",",            L_COMMA,
-    "/",            L_DIVIDE,
-    ":",            L_COLON,
-    ";",            L_EOE,
-    /*    ";",            L_COMMA,*/
-    "<",            L_LT,
-    ">=",           L_GE,
-    "<=",           L_LE,
-    "<>",           L_NE,
-    "=",            L_EQ,
-    ">",            L_GT,
-    "-",            L_MINUS,
-    "- ",           L_UMINUS,
-    "abs",          L_ABS,
-    "acf",          L_ACF,
-    "acos",         L_ACOS,
-    "and",          L_AND,
-    "app",          L_APP,
-    "appdif",       L_DAPP,
-    "asin",         L_ASIN,
-    "atan",         L_ATAN,
-    "ceil",         L_CEIL,  /* JMP 18-10-2004 */
-    "cos",          L_COS,
-    "cosh",         L_COSH,
-    "corr",         L_CORR, /* JMP 17-04-98 */
-    "covar",        L_COVAR, /* JMP 17-04-98 */
-    "covar0",       L_COVAR0, /* JMP 17-04-98 */
-    "d",            L_DIFF,
-    "dapp",         L_DAPP,
-    "dlag",         L_DLAG,
-    "dln",          L_DLN,
-    "e",            L_E,
-    "euro",         L_EURO,
-    "exp",          L_EXPN,
-    "gamma",        L_GAMMA,
-    "div0",         L_DIV0,
-    "grandom",      L_GRANDOM,
-    "grt",          L_GRT,
-    "hp",           L_HP,
-    "hpstd",        L_HPSTD, // JMP 12/4/2019
-    "if",           L_IF,
-    "index",        L_INDEX,
-    "int",          L_INT,
-    "interpol",     L_INTERPOL,
-    "isan",         L_FNISAN,
-    "floor",        L_FLOOR, /* JMP 18-10-2004 */
-    "l",            L_LAG,
-    "lastobs",      L_LASTOBS,
-    "ln",           L_LN,
-    "lcount",       L_LCOUNT,
-    "lmean",        L_LMEAN,
-    "log",          L_LOG,
-    "lprod",        L_LPROD,
-    "lstderr",      L_LSTDERR,
-    "lsum",         L_LSUM,
-    "ma",           L_MAVG,
-    "mavg",         L_MAVG,
-    "max",          L_MAX,
-    "mean",         L_MEAN,
-    "min",          L_MIN,
-    "not",          L_NOT,
-    "or",           L_OR,
-    "pi",           L_PI,
-    "prod",         L_PROD,
-    "r",            L_RAPP,
-    "rad",          L_RAD,
-    "random",       L_RANDOM,
-    "round",        L_ROUND, /* JMP 18-10-2004 */
-    "sign",         L_SIGN,
-    "sin",          L_SIN,
-    "sinh",         L_SINH,
-    "sqrt",         L_SQRT,
-    "stddev",       L_STDDEV,
-    "stderr",       L_STDERR,
-    "sum",          L_SUM,
-    "t",            L_TIME,
-    "tan",          L_TAN,
-    "tanh",         L_TANH,
-    "urandom",      L_URANDOM,
-    "var",          L_VARIANCE,
-    "vmax",         L_VMAX,
-    "vmin",         L_VMIN,
-    "[",            L_OPENB,
-    "]",            L_CLOSEB,
-    "^",            L_EXP,
-    "i",            L_I
-};
-
-
-// --- GLOBAL VARIABLES USED BY THE COMPILER ---
-
-TOKEN   L_TOKEN;    // Global containing the last read token
-YYFILE*  L_YY;      // LEC stream the compiler is reading from
 
 // --- FUNCTIONS ---
 
@@ -202,7 +89,7 @@ int L_open_all(char* filename, int type)
 
     YY_CASE_SENSITIVE = 1;
     if(sorted == 0) {
-        qsort(L_TABLE, sizeof(L_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
+        qsort(L_TABLE, sizeof(L_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), YY_compare);
         sorted = 1;
     }
 
@@ -291,11 +178,11 @@ static int L_macro()
     char    *ptr;
 
     if(L_read() != YY_WORD) return(L_errno = L_MACRO_ERR);
-    ptr = L_expand(LYYTEXT);
+    ptr = L_expand((char*) LYYTEXT);
     if(ptr == 0) return(L_errno = L_MACRO_ERR);
     /*    YY_record(L_YY, ")"); */  /* JMP 25-09-98 */
-    SCR_replace(ptr, ";", ","); /* JMP 25-09-98 */
-    YY_record(L_YY, ptr);
+    SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ","); /* JMP 25-09-98 */
+    YY_record(L_YY, (unsigned char*) ptr);
     /*    YY_record(L_YY, "("); */  /* JMP 25-09-98 */
 
     return(0);
@@ -412,13 +299,13 @@ static int L_get_int()
  */
 static int L_string()
 {
-    char    *ptr, *K_expand();
+    char    *ptr;
 
     L_read_string();
-    ptr = K_expand(VARIABLES, NULL, LYYTEXT, '*');
+    ptr = K_expand(VARIABLES, NULL, (char*) LYYTEXT, '*');
     if(ptr == 0) return(L_errno = L_MACRO_ERR);
-    SCR_replace(ptr, ";", ",");
-    YY_record(L_YY, ptr);
+    SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ",");
+    YY_record(L_YY, (unsigned char*) ptr);
     SCR_free(ptr);
     return(0);
 }
@@ -485,7 +372,7 @@ int L_get_token()
     if(is_val(keyw))  return(L_VAL);
     if(is_mtfn(keyw))  return(L_MTFN)/* JMP 20-04-98 */;
     if(keyw >= 0)     return(keyw);
-    if(LYYTEXT) SCR_strlcpy(L_TOKEN.tk_name, LYYTEXT, L_MAX_NAME);
+    if(LYYTEXT) SCR_strlcpy((unsigned char*) L_TOKEN.tk_name, LYYTEXT, L_MAX_NAME);
     switch(keyw) {
         case YY_EOF     :
             keyw = YY_EOF;

@@ -86,7 +86,6 @@ static int L_calc_len(ALEC* expr, int from, int to)
 */
 CLEC *L_cc2(ALEC* expr) 
 {
-
     unsigned char    *ll = 0, *tmp;
     CLEC    *ptr = 0;
     int     lg = 0, i, pos, pos1, alg = 0, j, nvargs;
@@ -100,7 +99,7 @@ CLEC *L_cc2(ALEC* expr)
     if(expr == 0) return(ptr);
     for(al = expr, i = 0 ; al->al_type != L_EOE ; al++, i++) {
         if(lg + 30 >= alg) {
-            ll = SW_nrealloc(ll, alg, alg + 512);
+            ll = (unsigned char*) SW_nrealloc(ll, alg, alg + 512);
             alg += 512;
         }
         ll[lg++] = al->al_type;
@@ -140,7 +139,7 @@ CLEC *L_cc2(ALEC* expr)
                     len = L_calc_len(expr, pos, i);
                     /* Move last arg */
                     tmp = ll + lg - len - 1;
-                    L_move_arg(tmp + 2 + sizeof(short), tmp, len);
+                    L_move_arg((char*) tmp + 2 + sizeof(short), (char*) tmp, len);
                     memcpy(tmp + 2, &len, sizeof(short));
                     tmp[0] = al->al_type;
                     tmp[1] = al->al_val.v_nb_args;
@@ -158,7 +157,7 @@ CLEC *L_cc2(ALEC* expr)
                         pos = pos1 - 1;
                         /* Move arg */
                         tmp = ll + lg - 1 - len;
-                        L_move_arg(tmp + 3 + (nvargs - j + 1) * sizeof(short), tmp, len1);
+                        L_move_arg((char*) tmp + 3 + (nvargs - j + 1) * sizeof(short), (char*) tmp, len1);
                         memcpy(tmp + 3 + (nvargs - j) * sizeof(short), &len1, sizeof(short));
                     }
 
@@ -189,7 +188,7 @@ CLEC *L_cc2(ALEC* expr)
     ptr->nb_names = L_NB_NAMES;
     for(i = 0 ; i < L_NB_NAMES ; i++)
         strcpy(ptr->lnames[i].name, L_NAMES[i]);
-    tmp = (char *) ptr;
+    tmp = (unsigned char *) ptr;
     memcpy(tmp + len - lg, ll, lg);
 fin:
     SW_nfree(ll);

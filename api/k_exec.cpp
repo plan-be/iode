@@ -97,12 +97,6 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl);
 static int KI_quick_extract(KDB* dbv, KDB* dbi);
 KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl);
 
-// Global variables
-char    **KEXEC_VFILES = NULL;
-char    **KEXEC_SFILES = NULL;
-int     KEXEC_TRACE = 0;
-
-
 /**
  *  Helper function used to compare 2 strings in KI_series_list().
  *  
@@ -121,6 +115,10 @@ static int KI_strcmp(const char *pa, const char *pb)
     else return(strcmp(a, b));
 }
 
+static int wrapper_KI_strcmp(const void *pa, const void *pb)
+{
+    return KI_strcmp((char*) pa, (char*) pb);
+}
 
 /**
  *  Creates a KDB containing all variables found in the IDT KDB dbi.
@@ -143,20 +141,20 @@ static KDB *KI_series_list(KDB* dbi)
 
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
     for(i = 0; i < KNB(dbi); i++) {
-        SCR_add_ptr(&tbl, &ntbl, KONAME(dbi, i));
+        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) KONAME(dbi, i));
         clec = KICLEC(dbi, i);
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
 
         for(j = 0; j < nb_names; j++) {
             if(L_ISCOEF(lname[j].name)) continue;
-            SCR_add_ptr(&tbl, &ntbl, lname[j].name);
+            SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) lname[j].name);
         }
     }
-    SCR_add_ptr(&tbl, &ntbl, 0);
+    SCR_add_ptr((unsigned char***) &tbl, &ntbl, 0);
 
     // Sort the names (is it really required?)
-    qsort(tbl, ntbl - 1, sizeof(char *), KI_strcmp);
+    qsort(tbl, ntbl - 1, sizeof(char *), wrapper_KI_strcmp);
 
     // Create a new KDB of vars with all the names in tbl
     dbv = K_create(VARIABLES, UPPER_CASE);
@@ -165,7 +163,7 @@ static KDB *KI_series_list(KDB* dbi)
             K_add_entry(dbv, tbl[i - 1]);
     }
 
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char **) tbl);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
     return(dbv);
@@ -241,7 +239,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
 
     // Computes in objsnb the nb of VARs that have the same name as an IDT in dbi and that already exist in dbv.
     nbres = 0;
-    objsnb = (long *) SW_nalloc(sizeof(long) * KNB(dbv));
+    objsnb = (int *) SW_nalloc(sizeof(long) * KNB(dbv));
     for(i = 0 ; i < KNB(dbv); i++) {
         pos = K_find(dbi, KONAME(dbv, i));
         if(pos >= 0) {
@@ -414,9 +412,9 @@ static int KI_read_vars_file(KDB* dbv, char* file)
     SCR_ADD_PTR_CHUNCK = 1000;
     for(j = 0 ; j < KNB(dbv); j++) {
         if(KSOVAL(dbv, j) != 0) continue;
-        SCR_add_ptr(&vars, &nbv, KONAME(dbv, j));
+        SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) KONAME(dbv, j));
     }
-    SCR_add_ptr(&vars, &nbv, NULL);
+    SCR_add_ptr((unsigned char***) &vars, &nbv, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
     kdb = K_load(VARIABLES, file, nbv, vars);
@@ -426,7 +424,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
     }
 
     nbf = KI_read_vars_db(dbv, kdb, file);
-    SCR_free_tbl(vars);
+    SCR_free_tbl((unsigned char **) vars);
     K_free(kdb);
 
     return(nbf);
@@ -548,9 +546,9 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     SCR_ADD_PTR_CHUNCK = 1000;
     for(j = 0 ; j < KNB(dbs); j++) {
         if(KSOVAL(dbs, j) != 0) continue;
-        SCR_add_ptr(&scls, &nbs, KONAME(dbs, j));
+        SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) KONAME(dbs, j));
     }
-    SCR_add_ptr(&scls, &nbs, NULL);
+    SCR_add_ptr((unsigned char***) &scls, &nbs, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
     kdb = K_load(SCALARS, file, nbs, scls);
@@ -560,7 +558,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     }
 
     nbf = KI_read_scls_db(dbs, kdb, file);
-    SCR_free_tbl(scls);
+    SCR_free_tbl((unsigned char**) scls);
     K_free(kdb);
 
     return(nbf);
@@ -697,9 +695,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     KDB     *dbv_i, *dbs_i;
     SAMPLE  *smpl;
     int     *order;
-    int     *KI_reorder();
     char    buf[80];
-
 
     smpl = KSMPL(KV_WS);
     if(in_smpl != 0) smpl = in_smpl;
@@ -727,8 +723,10 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     }
 
     dbv_i = KI_series_list(dbi);
-    if(KSMPL(KV_WS)->s_nb == 0) memcpy(KDATA(dbv_i), smpl, sizeof(SAMPLE));
-    else  memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(SAMPLE));
+    if(KSMPL(KV_WS)->s_nb == 0) 
+        memcpy(KDATA(dbv_i), smpl, sizeof(SAMPLE));
+    else  
+        memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(SAMPLE));
 
     if(KEXEC_TRACE) {
         W_printf("\n.par1 tit_0\nExecution of identities\n");

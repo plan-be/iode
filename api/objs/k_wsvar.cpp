@@ -264,7 +264,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  * @param [in]       pos       int         position of the variable in the kdb
  * @param [in]       t         int         index in the variable (0 = first position in the series...)
  * @param [in]       mode      int         transformation of the value, see below. 
- * @param [in]       new       double   new value of VAR[t] before transformation according to mode, see below. 
+ * @param [in]       value     double      new value of VAR[t] before transformation according to mode, see below. 
  *                                              VAR_MODE_LEVEL : no modification    x[t] = new
  *                                              VAR_MODE_DIFF  : diff on one period x[t] = x[t-1] + new
  *                                              VAR_MODE_Y0Y_DIFF : diff on one year   x[t] = x[t-{nb sub periods}] + new
@@ -273,7 +273,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  *                              
  */
  
-void KV_set(KDB *kdb, int pos, int t, int mode, double new)
+void KV_set(KDB *kdb, int pos, int t, int mode, double value)
 {
     int     pernb;
     double    *var;
@@ -285,7 +285,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
     var = KVVAL(kdb, pos, 0);
     switch(mode) {
         case VAR_MODE_LEVEL :
-            var[t] = new;
+            var[t] = value;
             break;
 
         case VAR_MODE_DIFF :
@@ -294,7 +294,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
         case VAR_MODE_Y0Y_DIFF :
             if(t < pernb)  break;
 
-            if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb])) var[t] = var[t - pernb] + new;
+            if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(var[t - pernb])) var[t] = var[t - pernb] + value;
             else var[t] = IODE_NAN;
             break;
 
@@ -304,8 +304,8 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
         case VAR_MODE_Y0Y_GROWTH_RATE :
             if(t < pernb) break;
 
-            if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb]))
-                var[t] = (new/100.0 + 1.0) * var[t - pernb];
+            if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(var[t - pernb]))
+                var[t] = (value/100.0 + 1.0) * var[t - pernb];
             else var[t] = IODE_NAN;
             break;
     }
@@ -396,8 +396,10 @@ int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
         goto done;
     }
 
-    if(vars == NULL || SCR_tbl_size(vars) == 0) edbv = dbv;
-    else edbv = K_refer(dbv, SCR_tbl_size(vars), vars);
+    if(vars == NULL || SCR_tbl_size((unsigned char**) vars) == 0) 
+        edbv = dbv;
+    else 
+        edbv = K_refer(dbv, SCR_tbl_size((unsigned char**) vars), vars);
     // if(edbv == NULL) goto done; /* JMP 12-05-11 */
     if(edbv == NULL || KNB(edbv) == 0) goto done; /* JMP 12-05-11 */
 

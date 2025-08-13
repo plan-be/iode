@@ -38,9 +38,6 @@
 #include "api/utils/buf.h"
 
 
-int T_GRAPHDEFAULT = 0; // Replace B_GRAPHDEFAULT (JMP 12/01/2022)
-
-
 /**
  *  Creates a new TBL object.
  *  
@@ -227,7 +224,7 @@ char* T_cell_cont(TCELL* cell, int mode)
 
     if(cell->tc_val == NULL) return(""); /* JMP 20-11-93 */
     if(cell->tc_type == TABLE_CELL_LEC)
-        return(BUF_strcpy(P_get_ptr(cell->tc_val, 0)));
+        return(BUF_strcpy((char*) P_get_ptr(cell->tc_val, 0)));
     buf = BUF_alloc((int)strlen(cell->tc_val) + 3);
     if(mode) sprintf(buf, "\"%s\"", cell->tc_val);
     else BUF_strcpy(cell->tc_val);
@@ -344,13 +341,13 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 
     cell->tc_type = TABLE_CELL_LEC;
     cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_DECIMAL);
-    if(K_ipack(&ptr, lec) < 0 && L_errno) {
+    if(K_ipack((char**) &ptr, (char*) lec) < 0 && L_errno) {
         kerror(0, "Illegal lec-formula");
         return(-1);
     }
     else {
         T_free_cell(cell);
-        cell->tc_val = ptr;
+        cell->tc_val = (char*) ptr;
     }
     return(0);
 }
@@ -394,9 +391,9 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     /*    cell->tc_attr |= TABLE_CELL_LEFT; /* JMP 11-11-93 */
     attr = cell->tc_attr;
     if(attr & TABLE_CELL_DECIMAL) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);  /* JMP 19-11-93 */
-    if(U_is_in('#', txt)) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);  /* JMP 19-11-93 */
+    if(U_is_in('#', (char*) txt)) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);  /* JMP 19-11-93 */
     cell->tc_attr = attr;
-    len = (int)strlen(txt);
+    len = (int) strlen((char*) txt);
     if (len > 0) {
         if (txt[0] == '\"') {
             txt++;
@@ -405,7 +402,7 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
         if (len > 0 && txt[len - 1] == '\"') txt[len - 1] = 0;
     }
     T_free_cell(cell);
-    cell->tc_val = SCR_stracpy(txt);
+    cell->tc_val = (char*) SCR_stracpy(txt);
 }
 
 /**
@@ -495,14 +492,14 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
 
     if(titg) {
         T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_TITLE, 0);
-        SCR_strip(titg);
+        SCR_strip((unsigned char*) titg);
         if(titg[0])
-            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), titg);
+            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), (unsigned char*) titg);
         T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
     }
     T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
     for(j = 1 ; j < T_NC(tbl) ; j++) {
-        T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, "\"#S");  /* JMP 24-03-2004 */
+        T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, (unsigned char*) "\"#S");  /* JMP 24-03-2004 */
         T_set_cell_attr(tbl, T_NL(tbl) - 1, j, TABLE_CELL_CENTER); /* JMP 11-11-93 */
     }
     T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
@@ -510,9 +507,9 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
     if(lecs && titls) {
         for(i = 0 ; lecs[i] && titls[i]; i++) {
             T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
-            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), titls[i]);
+            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), (unsigned char*) titls[i]);
             for(j = 1 ; j < T_NC(tbl) ; j++)
-                T_set_lec_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, lecs[i]);
+                T_set_lec_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, (unsigned char*) lecs[i]);
         }
     }
     else T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_CELL, 0);
@@ -545,30 +542,30 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
 void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)
 {
     int     i, pos,
-            nb = SCR_tbl_size(vars),
+            nb = SCR_tbl_size((unsigned char**) vars),
             nbt = 0, nbl = 0;
     KDB     *kdb = K_WS[COMMENTS];
     char    *titg, **titls = NULL, **lecs = NULL;
 
     pos = K_find(kdb, def);
-    if(pos < 0) titg = SCR_stracpy(def);
-    else titg = SCR_stracpy(KCVAL(kdb, pos));
+    if(pos < 0) titg = (char*) SCR_stracpy((unsigned char*) def);
+    else titg = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, pos));
     for(i = 0; i < nb; i++) {
         pos = K_find(kdb, vars[i]);
         if(pos < 0)
-            SCR_add_ptr(&titls, &nbt, vars[i]);
+            SCR_add_ptr((unsigned char***) &titls, &nbt, (unsigned char*) vars[i]);
         else
-            SCR_add_ptr(&titls, &nbt, KCVAL(kdb, pos));
+            SCR_add_ptr((unsigned char***) &titls, &nbt, (unsigned char*) KCVAL(kdb, pos));
 
-        SCR_add_ptr(&lecs, &nbl, vars[i]);
+        SCR_add_ptr((unsigned char***) &lecs, &nbl, (unsigned char*) vars[i]);
     }
 
-    SCR_add_ptr(&titls, &nbt, NULL);
-    SCR_add_ptr(&lecs, &nbl, NULL);
+    SCR_add_ptr((unsigned char***) &titls, &nbt, NULL);
+    SCR_add_ptr((unsigned char***) &lecs, &nbl, NULL);
 
     T_default(tbl, titg, titls, lecs, mode, files, date);
 
     SCR_free(titg);
-    SCR_free_tbl(titls);
-    SCR_free_tbl(lecs);
+    SCR_free_tbl((unsigned char**) titls);
+    SCR_free_tbl((unsigned char**) lecs);
 }

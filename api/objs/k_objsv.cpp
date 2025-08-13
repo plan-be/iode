@@ -62,31 +62,6 @@
  *                                      on success, position of the new object in kdb 
  *  
  */
- 
-// OLD VERSION 
-//
-//int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)
-//{
-//    char    *pack;
-//    int     pos, lg;
-//
-//    if(kdb == NULL) return(-1);
-//    if(K_pack[KTYPE(kdb)](&pack, a1, a2, a3, a4, a5, a6, a7, a8, a9) < 0)
-//        return(-2);
-//    pos = K_add_entry(kdb, name);
-//    if(pos < 0) {
-//        B_seterror("%.80s cannot be created (syntax ?)", name);
-//        goto einde;
-//    }
-//
-//    lg = * (OSIZE *) pack;
-//    if(KSOVAL(kdb, pos) != 0) SW_free(KSOVAL(kdb, pos));
-//    KSOVAL(kdb, pos) = SW_alloc(lg);
-//    memcpy(KGOVAL(kdb, pos), pack, lg);
-//einde:
-//    SW_nfree(pack);
-//    return(pos);
-//}
 
 
 // NEW VERSION: K_add() prototype is correct and corresponds to the implementation

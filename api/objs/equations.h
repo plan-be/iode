@@ -4,10 +4,6 @@
 #include "api/utils/time.h"
 #include "api/lec/lec.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*----------------------- DEFINE ----------------------------*/
 
 #define EQS_NBTESTS     20
@@ -75,7 +71,8 @@ enum IodeEquationAscii
 // WARNING about the method property. 
 // Before using it, check that the method property value is in the appropriate range: in the very first versions of iode,
 // the allowed values for method were 'l', 'z', instead of 0, 1...
-typedef struct _eq_ {
+struct EQ 
+{
     char    *endo;      // endogeneous variable (= equation name)   
     char    *lec;       // LEC form of the equation (LHS := RHS)
     CLEC    *clec;      // Compiled equation for the simulation
@@ -87,17 +84,17 @@ typedef struct _eq_ {
     char    *instr;     // List of instruments used to modify metric in the estimation process (INSTR method)
     long    date;       // Estimation date
     float   tests[EQS_NBTESTS]; // Estimation tests
-} EQ;
+};
 
 /*----------------------- FUNCS ----------------------------*/
 
-extern EQ*  K_eptr(KDB* kdb, char* name);
+EQ*  K_eptr(KDB* kdb, char* name);
 
 /* k_eqs.c */
-extern void E_free(EQ *);
-extern int E_split_eq(char *,char **,char **);
-extern int E_dynadj(int ,char *,char *,char *,char **);
-extern int E_DynamicAdjustment(int ,char **,char *,char *);
+void E_free(EQ *);
+int E_split_eq(char *,char **,char **);
+int E_dynadj(int ,char *,char *,char *,char **);
+int E_DynamicAdjustment(int ,char **,char *,char *);
 
 /*----------------------- MACROS ----------------------------*/
 
@@ -124,7 +121,3 @@ extern int E_DynamicAdjustment(int ,char **,char *,char *);
 
 #define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name) )
 #define KEPTR(name)         K_eptr(KE_WS, name)      // returns an allocated EQ
-
-#ifdef __cplusplus
-}
-#endif

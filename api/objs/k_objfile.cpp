@@ -39,53 +39,9 @@
 #include "api/objs/old_structs.h"
 #include "api/objs/structs_32.h"
 
-extern "C" char K_LABEL[];
-
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------
-
-/**
- * k_ext[][4] : extensions of IODE filenames.
- * 
- *   - cmt..var = IODE objects internal format
- *   - ac..av = IODE objects ascii format
- *   - next extensions : other IODE files
- */
-char k_ext[][4] = {
-    "cmt", // 0 = FILE_COMMENTS
-    "eqs", // 1 = FILE_EQUATIONS
-    "idt", // ... 
-    "lst",
-    "scl",
-    "tbl",
-    "var",
-    "ooo", // 7 = IODE_NB_TYPES
-
-    "ac",  // 8
-    "ae",
-    "ai",
-    "al",
-    "as",
-    "at",
-    "av",
-    "",    // 15
-
-    "rep", // 16
-    "a2m",
-    "agl",
-    "prf",
-    "dif",
-    "mif",
-    "rtf",
-    "ps",
-    "asc",
-    "txt",
-    "csv",  // 26 = FILE_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
-
-    "xxx"
-};
-
 
 /**
  *  Forces the extension of a filename. Filename must be large enough to include the extension.
@@ -627,7 +583,6 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
     KDB     kdb;
     FNAME   file;
     char    label[80];
-    extern char K_LABEL[];
 
     if (descr) descr[0] = 0;
     if (nobjs) *nobjs = 0;
@@ -1175,7 +1130,6 @@ int K_setname(char* from, char* to)
     char    label[512];
     KDB     kdb;
     FILE    *fd;
-    extern char    K_LABEL[];
 
     fd = fopen(from, "rb+");
     if(fd == NULL)  return(-1);
