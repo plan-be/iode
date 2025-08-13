@@ -25,6 +25,7 @@
  *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
 #include "api/b_errors.h"
+#include "api/k_lang.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/variables.h"
@@ -32,20 +33,7 @@
 #include "api/write/write.h"
 
 
-// Function declarations
-int T_GraphTest(TBL *tbl);
-int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
-int T_GraphEnd();
-int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
-int T_GraphTitle(char *txt);
-int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
-int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphTimeData(SAMPLE *smpl, double *y);
-int T_GraphXYData(int nb, double *x, double *y);
-int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
-int T_find_opf(COLS *fcls, COL *cl);
-int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl);
+extern "C" char *KLG_MODES[][3];        /* JMP38 01-10-92 */
 
 //int         KT_nb;          // // JMP 11/05/2022 unused ? current nb of displayed graphs
 //int         KT_attr;        //    // JMP 11/05/2022
@@ -70,7 +58,7 @@ int T_GraphTest(TBL *tbl)
         return(-1);
     }
 
-    W_EndDisplay(T_get_title(tbl), -1, -1, -1, -1);
+    W_EndDisplay((char*) T_get_title(tbl), -1, -1, -1, -1);
     return(0);
 }
 
@@ -170,7 +158,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
 
     //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
     //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
-    if(mode != 0) W_print_rtf_topic(T_get_title(tbl)); // JMP 01-07-2022
+    if(mode != 0) W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
     
     w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,  /* JMP 19-02-98 */
                     tbl->t_gridx, tbl->t_gridy,
@@ -203,7 +191,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     }
     T_GraphEnd();
 
-    SCR_free_tbl(files);
+    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
     COL_free_cols(cls);
@@ -473,10 +461,9 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     char    *buf, **vars;
     int     i, t, ng, var_nb, rc = 0;
     double    *y;
-    extern char *KLG_MODES[][3];        /* JMP38 01-10-92 */
 
-    vars = (char **)SCR_vtoms(names, "+-");
-    ng = SCR_tbl_size(vars);
+    vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
+    ng = SCR_tbl_size((unsigned char**) vars);
     if(ng == 0) {
         B_seterrn(68);
         return(-1);
@@ -513,7 +500,7 @@ fin:
     T_GraphEnd();
 
     SW_nfree(y);
-    SCR_free_tbl(vars);
+    SCR_free_tbl((unsigned char**) vars);
     return(rc);
 }
 
@@ -531,7 +518,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
 {
     int     i, dt, nt, ng;
 
-    ng = SCR_tbl_size(names);
+    ng = SCR_tbl_size((unsigned char**) names);
     if(ng == 0) {
         B_seterrn(69);
         return(-1);
@@ -595,18 +582,18 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
 // -----------------------------------------------------------------------------------------------------------------------------
 
 // Struct declarations
-typedef struct _apichrt {
+struct APICHRT {
     char    **ChrtTitle;
     char    *ChrtType;
     int     *ChrtAxis;
     double    **ChrtData;
     int     ChrtI;
     int     ChrtNb;
-} APICHRT;
+};
 
 // Global variables
-APICHRT **API_CHARTS = 0;
-int     API_NBCHARTS = 0;
+APICHRT** API_CHARTS = NULL;
+int       API_NBCHARTS = 0;
 
 // Functions declarations 
 int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
@@ -683,9 +670,9 @@ int APIGraphTitle(int hdl, char *txt, double *x, int nb)
 
     APICHRT    *Chrt = API_CHARTS[hdl];
     Chrt->ChrtType[Chrt->ChrtI] = 'T';
-    Chrt->ChrtTitle[Chrt->ChrtI] = SCR_stracpy(txt);
-    SCR_OemToAnsi(Chrt->ChrtTitle[Chrt->ChrtI],
-                  Chrt->ChrtTitle[Chrt->ChrtI]);
+    Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_stracpy((unsigned char*) txt);
+    SCR_OemToAnsi((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI],
+                  (unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI]);
     Chrt->ChrtData[Chrt->ChrtI] = (double *) SW_nalloc(sizeof(double) * nb);
     memcpy(Chrt->ChrtData[Chrt->ChrtI], x, sizeof(double) * nb);
     Chrt->ChrtI++;
@@ -708,11 +695,11 @@ int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
     APICHRT    *Chrt = API_CHARTS[hdl];
     Chrt->ChrtType[Chrt->ChrtI] = type;
     Chrt->ChrtAxis[Chrt->ChrtI] = axis;
-    Chrt->ChrtTitle[Chrt->ChrtI] = SCR_stracpy(txt);
+    Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_stracpy((unsigned char*) txt);
     if(fileop != NULL && fileop[0] != 0)
-        Chrt->ChrtTitle[Chrt->ChrtI] = SCR_strafcat(Chrt->ChrtTitle[Chrt->ChrtI], fileop);
-    SCR_OemToAnsi(Chrt->ChrtTitle[Chrt->ChrtI],
-                  Chrt->ChrtTitle[Chrt->ChrtI]);
+        Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_strafcat((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI], (unsigned char*) fileop);
+    SCR_OemToAnsi((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI],
+                  (unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI]);
     return(0);
 }
 
@@ -905,7 +892,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
         }
     }
     API_CHARTS[hdl]->ChrtNb = smpl.s_nb;
-    SCR_free_tbl(files);
+    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
     COL_free_cols(cls);

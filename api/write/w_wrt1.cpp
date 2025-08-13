@@ -15,8 +15,12 @@
  *      void W_print_tb(char* title, int nc) Starts a new table in A2M format
  */
 
-#include "write.h"
+#include "api/print/print.h" 
+#include "api/write/write.h"
 
+
+extern "C" int W_rtfhelp;
+extern int W_type;
 
 /**
  *  Starts an A2M enum paragraph (enum_*) of level n (only the next paragraph is changed). 
@@ -86,7 +90,7 @@ void W_print_tit(int n)
 void W_print_pg_header(char* arg)
 {
     SCR_free(A2M_PGHEAD);
-    A2M_PGHEAD = SCR_stracpy(arg);
+    A2M_PGHEAD = SCR_stracpy((unsigned char*) arg);
     SCR_strip(A2M_PGHEAD);
     W_printf(".pghead %s\n", A2M_PGHEAD);
 }
@@ -102,7 +106,7 @@ void W_print_pg_header(char* arg)
 void W_print_pg_footer(char* arg)
 {
     SCR_free(A2M_PGFOOT);
-    A2M_PGFOOT = SCR_stracpy(arg);
+    A2M_PGFOOT = SCR_stracpy((unsigned char*) arg);
     SCR_strip(A2M_PGFOOT);
     //BGUI_PrintPageFooter();
     W_printf(".pgfoot %s\n", A2M_PGFOOT); 
@@ -118,9 +122,6 @@ void W_print_pg_footer(char* arg)
 
 void W_print_rtf_topic(char* arg)
 {
-    extern int KT_CUR_LEVEL, KT_CUR_TOPIC;
-    extern int W_rtfhelp, W_type;
-
     if(arg) {
         W_printf(".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, arg);
         if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);

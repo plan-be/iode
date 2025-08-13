@@ -103,19 +103,9 @@
 // Function prototypes
 // ----------------------------------------------------------------------------------------------------
 
-int W_dest(char *filename, int type);
 static int W_InitParms();
 static int W_open();
-int W_close();
-int W_flush();
-int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args);
-int W_printf(char* fmt, ...);
-int W_printfDbl(char* fmt, ...) ;
-int W_putc(int ch);
-static W_isempty(char *buf);
-int W_record(char *str);
-int W_InitDisplay();
-int W_EndDisplay(char *title, int x, int y, int w, int h);
+static int W_isempty(char *buf);
 static int W_SavePrinterSettings();
 static int W_ResetPrinterSettings();
 static int W_SetPrinterSettings();
@@ -205,9 +195,9 @@ int W_dest(char *filename, int type)
 #endif
         }
 
-        SCR_strlcpy(W_filename, filename, K_MAX_FILE);  /* JMP 6-10-2015 */
-        SCR_strip(W_filename);
-        SCR_lower(W_filename);                  /* JMP 11-07-96 */
+        SCR_strlcpy((unsigned char*) W_filename, (unsigned char*) filename, K_MAX_FILE);  /* JMP 6-10-2015 */
+        SCR_strip((unsigned char*)W_filename);
+        SCR_lower((unsigned char*)W_filename);                  /* JMP 11-07-96 */
 
         if(!U_is_in('.', W_filename)) SCR_change_ext(W_filename, W_filename, ext); /* JMP 14-12-98 */
     }
@@ -322,7 +312,7 @@ static int W_open()
         W_SetPrinterSettings();
     }
 
-    W_af = A2mMemBegin(W_type, W_filename, ask);  /* JMP 06-02-98 */
+    W_af = A2mMemBegin(W_type, (unsigned char*) W_filename, ask);  /* JMP 06-02-98 */
     if(W_af == NULL) {
         if(W_type == W_GDI) W_ResetPrinterSettings();
         W_cancel = 1;
@@ -401,15 +391,15 @@ int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)
     }
 
     W_cont = 1;
-    if(dup) SCR_replace(buf, "\\", "\\\\"); // TODO: check buf size !!!
+    if(dup) SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "\\\\"); // TODO: check buf size !!!
     if(ch1 && ch2) {
        str1[0] = ch1;
        str2[0] = ch2;
        str1[1] = str2[1] = 0;
-       SCR_replace(buf, str1, str2);
+       SCR_replace((unsigned char*) buf, (unsigned char*) str1, (unsigned char*) str2);
     }   
     
-    A2mMemRecord(W_af, buf);
+    A2mMemRecord(W_af, (unsigned char*) buf);
 
 fin:
     return(rc);
@@ -521,7 +511,7 @@ int W_putc(int ch)
  *  @param [in] char*   buf     buffer to analyse
  *  @return     int             0 if the buffer is not empty, 1 if it is empty.
  */
-static W_isempty(char *buf)
+static int W_isempty(char* buf)
 {
     int i;
 
@@ -545,7 +535,7 @@ int W_record(char *str)
     if(W_open()) return(-1);
 
     W_cont = 1;
-    A2mMemRecord(W_af, str);
+    A2mMemRecord(W_af, (unsigned char*) str);
     return(0);
 }
 

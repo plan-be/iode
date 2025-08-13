@@ -35,17 +35,6 @@
 #include "api/write/write.h"
 
 
-//char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
-int      K_NBDEC = -1;          // Default nb of decimals
-
-char     **KT_names = NULL;     // Names of the files used in a GSAMPLE
-int      KT_nbnames = 0;        // Number of names in KT_names
-int      KT_mode[MAX_MODE];     // Modes used in a GSAMPLE
-int      KT_CUR_TOPIC = 0;      // Used in A2M file generation
-int      KT_CUR_LEVEL = 0;      // Used in A2M file generation
-
-
-
 /**
  *  Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL.
  *  
@@ -81,9 +70,10 @@ int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)
  
 void T_fmt_val(char* buf, double val, int lg, int nd) 
 {
-    if(IODE_IS_A_NUMBER(val)) SCR_fmt_dbl(val, buf, lg, nd);
+    if(IODE_IS_A_NUMBER(val)) 
+        SCR_fmt_dbl(val, (unsigned char*) buf, lg, nd);
     else strcpy(buf, "-.-");
-    SCR_sqz(buf);
+    SCR_sqz((unsigned char*) buf);
 }
 
 
@@ -116,7 +106,6 @@ void T_print_val(double val)
 void T_print_string(COL* cl, char* string)
 {
     char   *ptr = NULL;
-    char    *COL_text();
 
     ptr = (char *) COL_text(cl, string, KT_nbnames);
     if(ptr != NULL) W_printf("%s", ptr);
@@ -270,16 +259,16 @@ char **T_find_files(COLS* cls)
         kdb = K_RWS[VARIABLES][i - 1];
         if(kdb == NULL) {
             B_seterror("File %d not present", i);
-            SCR_add_ptr(&names, &nf, 0L);
-            SCR_free_tbl(names);
+            SCR_add_ptr((unsigned char***) &names, &nf, 0L);
+            SCR_free_tbl((unsigned char**) names);
             return(NULL);
         }
         sprintf(buf, "[%d] %s", i, KNAMEPTR(kdb));
-        SCR_replace(buf, "\\", "/");
+        SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "/");
         //B_path_change(buf);
-        SCR_add_ptr(&names, &nf, buf);
+        SCR_add_ptr((unsigned char***) &names, &nf, (unsigned char*) buf);
     }
-    SCR_add_ptr(&names, &nf, 0L);
+    SCR_add_ptr((unsigned char***) &names, &nf, 0L);
     return(names);
 }
 
@@ -360,7 +349,7 @@ void T_print_date(int dim)
 int T_begin_tbl(int dim, COLS* cls)
 {
     KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size(KT_names);
+    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
     if(KT_nbnames == 0) return(-1); /* JMP 11-06-99 */
     COL_find_mode(cls, KT_mode, 2);
 
@@ -381,7 +370,7 @@ int T_begin_tbl(int dim, COLS* cls)
 void T_end_tbl()
 {
     W_printf(".te \n");
-    SCR_free_tbl(KT_names);
+    SCR_free_tbl((unsigned char**) KT_names);
     KT_names = NULL;
     KT_nbnames = 0;
 }
@@ -414,11 +403,10 @@ unsigned char *T_get_title(TBL* tbl)
 
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) ||
-            ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)
-        strcpy(buf, "No title");
+    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)
+        strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (char *)((TCELL *) tbl->t_line[k].tl_val)->tc_val, sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].tl_val)->tc_val, sizeof(buf) - 1);
 
     return(buf);
 }
@@ -438,7 +426,6 @@ int T_print_tbl(TBL* tbl, char* smpl)
     int     i, dim, rc = 0, first = 1;
     COLS    *cls;
     TLINE   *line;
-    unsigned char *T_get_title();
 
     dim = T_prep_cls(tbl, smpl, &cls);
     if(dim < 0) return(-1);
