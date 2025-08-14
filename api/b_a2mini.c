@@ -40,16 +40,13 @@
  */
 
 #include "api/b_a2mini.h"
+#include "api/write/write.h"
 #include "b_iodeini.h"
 #include <s_a2m.h>
 
+
 // Variables
 // ---------
-double   A2M_GWIDTH = 9.5;     // Default graph width in cm
-double   A2M_GHEIGHT = 6.5;    // Default graph height in cm
-int      A2M_BOXWIDTH = 1;     // Width of the box around the graphs (0 for no box)
-int      A2M_BACKBRUSH = 50;   // Intensity of the graph background brushes
-int      A2M_BACKCOLOR = 'b';  // Color of the graph background: one of "Bwrgbcmy"
 int      A2M_GIF_BGCOLOR_NB;   // Number of the BG color of the gif graphs // JMP 1/5/2022
 int      A2M_GIF_TRCOLOR_NB;   // Number of the TR color of the gif graphs // JMP 1/5/2022 
 
