@@ -329,7 +329,6 @@ static double randBoxMuller(double rv_mean, double rv_sd)
 
 L_REAL L_grandom(L_REAL* stack, int unused)
 {
-    extern double randBoxMuller(double m, double s);
     double  s = *stack, m = *(stack - 1);
 
     return(randBoxMuller(m, s));
@@ -366,7 +365,6 @@ static double dgamma(double x)
 
 L_REAL L_gamma(L_REAL* stack, int unused)
 {
-    extern double dgamma(double x);
     double  s = *stack;
 
     return(dgamma(s));

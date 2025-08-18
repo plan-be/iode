@@ -16,14 +16,12 @@
 #include "scr4/s_prost.h"
 #include "scr4/s_strs.h"
 
+#include "api/constants.h"
 #include "b_args.h"
 #include "b_errors.h"
 #include "api/utils/time.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
 
-
-char    B_SEPS[] = " ,\n\t";        // Accepted separators for fn arguments (in report, DOS GUI..)
-                                    // !! Semi-colon not accepted !!
 
 /**
  *  Expands an argument by replacing @filename and $listname by their contents : 

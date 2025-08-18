@@ -42,10 +42,6 @@ static LNAME    *L_EXEC_NAMES;
 static int      L_SIG = 0;
 static jmp_buf  L_JMP;
 
-// Globals used in L_* fns
-KDB     *L_EXEC_DBV,    
-        *L_EXEC_DBS; 
-
 // Math exceptions trap
 #ifdef _MSC_VER
 #include <math.h>

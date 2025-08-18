@@ -50,11 +50,8 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/write/write.h"
-
 #include "api/report/undoc/undoc.h"
 
-
-int     B_MULTIBAR = 0; // Graph parameter (see GB)
 
 /*================================= UTILITIES ===============================*/
 

@@ -187,13 +187,7 @@ void K_strip(char* filename)
 
 
 // UTILITIES FOR READING / WRITING IODE FILES
-// ------------------------------------------
-
-/**
- *  K_LZH : indicates if a saved WS must be compressed or not. 
- *  See also https://en.wikipedia.org/wiki/LHA_(file_format).
- */
-int     K_LZH = 0;          
+// ------------------------------------------         
 
 // TODO: review the next 3 lines
 #define kread(buf, so, nbo, fd)   if(fread(buf, so, nbo, fd) != (nbo))  goto error;
@@ -1011,7 +1005,6 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     KDB32   kdb32;
     FNAME   file;
     FILE    *fd;
-    extern  char K_LABEL[];
 
     if(kdb == NULL) return(-1);
 

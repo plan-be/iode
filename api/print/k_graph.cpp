@@ -24,6 +24,7 @@
  *      int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)                   Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.
  *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
+#include "api/constants.h"
 #include "api/b_errors.h"
 #include "api/k_lang.h"
 #include "api/objs/kdb.h"
@@ -32,11 +33,6 @@
 #include "api/print/print.h"
 #include "api/write/write.h"
 
-
-extern "C" char *KLG_MODES[][3];        /* JMP38 01-10-92 */
-
-//int         KT_nb;          // // JMP 11/05/2022 unused ? current nb of displayed graphs
-//int         KT_attr;        //    // JMP 11/05/2022
 
 /**
  *  Displays the table tbl as a graph (in level) on the full sample of the current WS.
@@ -129,11 +125,8 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     COLS    *cls, *fcls;
     TLINE   *line;
     SAMPLE  smpl;
-    double    step,
-                 *x, *y;
-    TCELL   *cell;
-    extern char *KLG_OPERS_TEXTS[][3];
-    //extern int  B_viewmode;     
+    double    step, *x, *y;
+    TCELL   *cell;   
 
 //    KT_attr = 4;
     if(tbl->t_nc != 2) {
@@ -855,10 +848,9 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     COLS    *cls, *fcls;
     TLINE   *line;
     SAMPLE  smpl;
-    double    step,
-                 *x, *y;
+    double    step, *x, *y;
     TCELL   *cell;
-    extern char *KLG_OPERS_TEXTS[][3];
+
     if(tbl->t_nc != 2) {
         B_seterrn(71);
         return(-1);

@@ -41,22 +41,6 @@
 #include "api/b_errors.h"
 #include "api/utils/time.h"
 
-
-/**
- *  Variables for period definitions: 
- *      L_PERIOD_CH : list of valid periodicities :
- *          Y = Yearly
- *          S = Half-Yearly
- *          Q = Quaterly
- *          M = Monthly
- *          W = Weekly
- *          D = Daily
- *         
- *      L_PERIOD_NB : number of periods in 1 year for each periodicity (in the same defn order).
- */
-
-char    L_PERIOD_CH[] = "YSQMWD";
-int     L_PERIOD_NB[] = {1, 2, 4, 12, 52, 365};
   
 /**
  *  Compute position of character ch in string str.
@@ -229,7 +213,7 @@ PERIOD *PER_atoper(char *aper)
     if(aper == 0 || aper[0] == 0 || aper[0] == ' ') return(per); // JMP 21/04/023 to avoid unwanted messages
     
     // work on a local copy of aper 
-    SCR_strlcpy(text, aper, sizeof(text) -1);
+    SCR_strlcpy((unsigned char*) text, (unsigned char*) aper, sizeof(text) -1);
 
     // Search the periodicity sign and keeps the digits
     for(i = 0 ; i < 4 ; i++)

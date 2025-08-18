@@ -76,13 +76,11 @@
 #include "api/k_lang.h"
 #include "api/print/print.h"
 #include "api/write/write.h"
-
 #include "api/report/undoc/undoc.h"
 
 
-extern int     KT_CUR_TOPIC;        // A2M: Current topic id
-extern int     A2M_GIF_BGCOLOR_NB;  // GIF background color nb
-extern int     A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
+int A2M_GIF_BGCOLOR_NB;  // GIF background color nb
+int A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
 
 /**
  *  Define the printing destination. Sub function of B_PrintDest() and B_PrintDestNew().
@@ -678,8 +676,6 @@ int B_PrintRtfTopic(char* arg, int unused)
 // $PrintOrientation {Portrait|Landscape}
 int B_PrintGdiOrient(char* arg, int unused)
 {
-    extern int W_gdiorient;
-
     switch(SCR_upper_char(arg[0])) {
         case 'L' :
             W_gdiorient = 1;
@@ -697,8 +693,6 @@ int B_PrintGdiOrient(char* arg, int unused)
 // $PrintDuplex {Simplex|Duplex|VerticalDuplex}
 int B_PrintGdiDuplex(char* arg, int unused)
 {
-    extern int W_gdiduplex;
-
     switch(SCR_upper_char(arg[0])) {
         /*case 'D' : W_gdiduplex = 1; break;
         case 'V' : W_gdiduplex = 2; break;
@@ -722,8 +716,6 @@ int B_PrintGdiDuplex(char* arg, int unused)
 // $SetPrinter printer_name
 int B_PrintGdiPrinter(char* arg, int unused)
 {
-    extern char W_gdiprinter[];
-
     SCR_strlcpy((unsigned char*) W_gdiprinter, (unsigned char*) arg, 70);
     return(0);
 }
@@ -842,8 +834,6 @@ int B_PrintGIFFont(char* arg, int unused)
 // $PrintHtmlStrip [YES|No]
 int B_PrintHtmlStrip(char* arg, int unused)
 {
-    extern int  A2M_HTML_STRIP;
-
     switch(arg[0]) {
         case '0':
         case 'n':
@@ -864,14 +854,9 @@ int B_PrintHtmlStrip(char* arg, int unused)
 
 int B_PrintHtmlStyle(char* arg, int unused) 
 {
-    extern char *A2M_HTML_STYLE;
-
     A2M_HTML_RELSTYLE = (char*) SCR_stracpy((unsigned char*) arg);
     return(0);
 }
-
-
-
 
 /**
  *  Convert an A2M file to another format.

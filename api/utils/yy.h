@@ -5,22 +5,14 @@
 #include "api/constants.h"
 #include "api/utils/time.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* yy.c */
-extern double K_read_real(YYFILE *);
-extern long K_read_long(YYFILE *);
-extern char *K_read_str(YYFILE *);
-extern PERIOD *K_read_per(YYFILE *);
-extern SAMPLE *K_read_smpl(YYFILE *);
-extern int K_read_align(YYFILE* yy);
-extern void K_stracpy(char **,char *);
-extern int K_wrdef(FILE *,YYKEYS *,int );
-extern int K_compare(YYKEYS *,YYKEYS *);
-extern char *K_wrap(char *,int );
-
-#ifdef __cplusplus
-}
-#endif
+double K_read_real(YYFILE *);
+long K_read_long(YYFILE *);
+char *K_read_str(YYFILE *);
+PERIOD *K_read_per(YYFILE *);
+SAMPLE *K_read_smpl(YYFILE *);
+int K_read_align(YYFILE* yy);
+void K_stracpy(char **,char *);
+int K_wrdef(FILE *,YYKEYS *,int );
+int K_compare(YYKEYS *,YYKEYS *);
+char *K_wrap(char *,int );

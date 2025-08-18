@@ -51,10 +51,6 @@
 #include "api/gsample/gsample.h"
 
 
-// extern "C" int  B_LANG;
-extern "C" int  K_LANG;
-extern "C" char *KLG_MONTHS[][3], *KLG_ROM[], *KLG_OPERS_TEXTS[][3];
-
 // Function declarations
 static void COL_free_fils(FILS* fils);
 static FILS* COL_add_fil(FILS* fils);

@@ -30,8 +30,6 @@
 #include "api/b_iodeini.h"
 
 
-char* ODE_INIFILE = 0;          // Name of the iode.ini file
-
 /**
  *  Retrieves the path to the iode.ini file and stores the result in the global ODE_INIFILE. 
  *  The path is constructed by appending "iode.ini" to the path of the current executable.
@@ -43,15 +41,17 @@ void B_IodeIniFile()
 	char 	module[1024], file[1024];
 
     // Get module directory (c:/iode p.ex)
-    if(ODE_INIFILE) return;
+    if(ODE_INIFILE) 
+        return;
+    
 #ifdef __GNUC__
     readlink("/proc/self/exe", module, sizeof(module) - 1);
 #else
-    GetModuleFileName(0, module, 1000);
+    GetModuleFileName(0, (char*) module, 1000);
 #endif
     SCR_split_dir(module, file);
 	sprintf(file, "%s\\iode.ini", module);
-	ODE_INIFILE = SCR_stracpy(file);
+	ODE_INIFILE = (char*) SCR_stracpy((unsigned char*) file);
     //printf("iode.ini file: %s\n", ODE_INIFILE);
 }
 
@@ -84,7 +84,8 @@ int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft)
     int     rc;
     
     B_IodeIniFile();
-	rc =  IniReadTxtParm(ODE_INIFILE, section, parm, res, maxlen);
+	rc = IniReadTxtParm((unsigned char*) ODE_INIFILE, (unsigned char*) section, 
+                        (unsigned char*) parm, (unsigned char*) res, maxlen);
     if(rc < 0) 
         strcpy(res, dft);
     return(rc);
@@ -124,7 +125,8 @@ int B_IniReadChar(char* section, char* parm, char dft)
     int     rc;
     
     B_IodeIniFile();
-	rc =  IniReadTxtParm(ODE_INIFILE, section, parm, buf, 80);
+	rc = IniReadTxtParm((unsigned char*) ODE_INIFILE, (unsigned char*) section, 
+                        (unsigned char*) parm, (unsigned char*) buf, 80);
     return(rc < 0 ? dft : buf[0]);
 }
 
@@ -165,7 +167,8 @@ int B_IniReadNum(char* section, char* parm, int dft)
     int val, res;
     
     B_IodeIniFile();
-	res = IniReadNumParm(ODE_INIFILE, section, parm, &val);
+	res = IniReadNumParm((unsigned char*) ODE_INIFILE, (unsigned char*) section, 
+                         (unsigned char*) parm, &val);
     return(res < 0 ? dft : val);
 }
 

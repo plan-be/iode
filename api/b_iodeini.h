@@ -2,21 +2,14 @@
 
 #include "api/constants.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+inline char* ODE_INIFILE = 0;          // Name of the iode.ini file
 
-extern char* ODE_INIFILE;
-extern void B_IodeIniFile();
-extern int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft);
-extern int B_IniWriteText(char* section, char* parm, char* val);
-extern int B_IniReadChar(char* section, char* parm, char dft);
-extern int B_IniWriteChar(char* section, char* parm, char val);
-extern int B_IniReadNum(char* section, char* parm, int dft);
-extern int B_IniWriteNum(char* section, char* parm, int val);
-extern int B_IniReadYN(char* section, char* parm, int dft);
-extern int B_IniWriteYN(char* section, char* parm, int val);
-
-#ifdef __cplusplus
-}
-#endif
+void B_IodeIniFile();
+int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft);
+int B_IniWriteText(char* section, char* parm, char* val);
+int B_IniReadChar(char* section, char* parm, char dft);
+int B_IniWriteChar(char* section, char* parm, char val);
+int B_IniReadNum(char* section, char* parm, int dft);
+int B_IniWriteNum(char* section, char* parm, int val);
+int B_IniReadYN(char* section, char* parm, int dft);
+int B_IniWriteYN(char* section, char* parm, int val);

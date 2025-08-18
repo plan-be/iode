@@ -81,32 +81,6 @@
 #include "api/report/undoc/undoc.h"
 
 
-// Global variables
-int     MSG_DISABLED = 0;    // if 1, kmsg() is disabled
-
-int     kmsgbox_continue = 0;
-int     kpause_continue = 0;
-
-int     (*kerror_super)(const int level, const char* fmt) = nullptr;
-void    (*kwarning_super)(const char* msg) = nullptr;
-void    (*kpause_super)() = nullptr;
-void    (*kmsg_super)(const char* fmt) = nullptr;
-int     (*kwprintf_super)(const char* msg) = nullptr;
-void    (*kpanic_super)() = nullptr;
-int     (*kconfirm_super)(const char* msg) = nullptr;
-int     (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts) = nullptr;
-void    (*krecordkey_super)(const int ch) = nullptr;
-void    (*krecordtext_super)(const unsigned char* text) = nullptr;
-void    (*ksettitle_super)(void) = nullptr;
-int     (*ktermvkey_super)(const int vkey) = nullptr;
-int     (*khitkey_super)() = nullptr;
-int     (*kgetkey_super)() = nullptr;
-void    (*kbeep_super)(void) = nullptr;
-SAMPLE* (*kasksmpl_super)(void) = nullptr;
-int     (*kexecsystem_super)(const char*) = nullptr;
-int     (*kshellexec_super )(const char*) = nullptr;
-int     (*ODE_end_super)(const int) = nullptr;
-
 /**
  *  Displays an error message and optionally exits the program.
  *  By default, the message is sent to the stderr.
@@ -626,7 +600,6 @@ int ODE_end(const int st)
  */
 char* SCR_err_txt_super_impl(int val)
 {
-    extern char* get_iode_message(int val);
     char* msg;
     static char buf[256];
 

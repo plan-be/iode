@@ -32,9 +32,9 @@ const static int IODE_NB_IMPORT_FORMATS = 8;
 
 /*---------------- GLOBALS -------------------------*/
 
-inline char** IMP_rule;         // Rules read in a rule file
-inline char** IMP_pat;          // Patterns read in a rule file (// to IMP_rule)
-inline int    IMP_trace;        // If not null, saves a trace of the object name modifications
+inline char** IMP_rule = NULL;  // Rules read in a rule file
+inline char** IMP_pat = NULL;   // Patterns read in a rule file (// to IMP_rule)
+inline int    IMP_trace = 0;    // If not null, saves a trace of the object name modifications
 
 static YYKEYS ImportObjsASCII_KEYS[] = {
     (unsigned char*) "sample",   ASC_SMPL

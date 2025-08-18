@@ -18,9 +18,8 @@
 #include "api/utils/buf.h"
 
 
-char    *BUF_DATA = NULL;
-static int     BUF_LEN = 0;
-static int     BUF_LCK = 0;
+static int BUF_LEN = 0;
+static int BUF_LCK = 0;
 
 /**
  * @brief Allocates or extends a global buffer of at least len bytes. 

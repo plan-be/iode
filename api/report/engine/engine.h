@@ -5,6 +5,9 @@
 #include "api/objs/tables.h"
 #include "api/report/reports.h"
 
+inline KDB* RP_MACRO = nullptr;     // KDB containing the macros during a report execution
+
+
 /* b_rep_utils.c */
 int RP_alloc_ptrs();
 char *RP_alloc(int size);

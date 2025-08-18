@@ -66,13 +66,6 @@
 
 /* ============ TFN ============ */
 
-// L_tfn_args() computes the value of from and to based on nargs, the number of arguments of the calling function.
-// see L_tfn_args() definition in l_exec.c.
-extern void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to);
-
-// L_intlag() transforms a lag on the stask (real value) to an integer.
-extern int  L_intlag(L_REAL);
-
 /**
  *  Computes a lagged CLEC sub expression.
  *  

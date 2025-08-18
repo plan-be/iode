@@ -8,6 +8,8 @@
  *      int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res)   Displays or prints the graphs of residuals or observed / fitted values 
  *      int E_print_results(int corr, int corru, int obs, int grobs, int grres)             Prints the estimation input and output of a block of equations. 
  */
+#include "api/constants.h"
+#include "api/k_lang.h"
 #include "api/objs/objs.h"
 #include "api/objs/scalars.h"
 #include "api/print/print.h"
@@ -287,7 +289,6 @@ int Estimation::E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int v
     char    buf[256], lhs[80], rhs[80];
     int     i, t, nt, ng;
     double    *y;
-    extern char *KLG_OBS[], *KLG_CALC[], *KLG_RES[];
 
     ng = M_NL(mlhs);
     nt = M_NC(mlhs);

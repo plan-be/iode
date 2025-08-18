@@ -53,14 +53,6 @@
 
 /* =============================== MTFN ============================== */
 
-// L_tfn_args() computes the value of from and to based on nargs, the number of arguments of the calling function.
-// see L_tfn_args() definition in l_exec.c.
-extern void     L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to);
-extern L_REAL   L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs); 
-
-extern KDB      *L_EXEC_DBV, *L_EXEC_DBS; 
-
-
 /**
  *  Sub function of L_corr() that calculates the correlation between 2 series defined the CLEC sub-expressions 
  *  expr1 and expr2.

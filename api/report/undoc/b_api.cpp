@@ -35,15 +35,15 @@
 #include "api/report/undoc/undoc.h"
 
 
+extern "C" int SW_ACTIVE;
+
 /**
  *  Initialise an IODE session.
  *
  *  @return int     always 0
  */
 int IodeInit()
-{
-    extern int      SW_ACTIVE;      // JMP 07/06/2023           
-    
+{             
     // Initialize chrono for report functions
     RPF_ChronoReset(NULL);      
     

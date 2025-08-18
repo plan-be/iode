@@ -25,11 +25,6 @@
 #include "b_errors.h"
 
 
-char**   B_ERROR_MSG; // Table of last recorded error messages 
-int      B_ERROR_NB;  // Nb of last recorded error messages 
-char     *B_ERROR_DFT_MSG = "Unknown error"; // Default message if not found in iode_msg_map
-
-
 /**
  *  Returns a static buffer containing the message n from the table iode_msg_map. 
  *  
@@ -73,7 +68,7 @@ void B_add_error(char* msg)
         }
     }
     
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, msg);
+    SCR_add_ptr((unsigned char***) &B_ERROR_MSG, &B_ERROR_NB, (unsigned char*) msg);
 }
 
 
@@ -132,7 +127,6 @@ void B_seterror(char* fmt, ...)
 void B_seterrn(int n, ...)
 {
     char    buf[256];
-    char    *B_msg();
     va_list myargs;
     
     va_start(myargs, n);    
@@ -162,12 +156,13 @@ char* B_get_last_error()
 {
     char* errors = NULL;
 
-    if(B_ERROR_NB == 0) return errors;
+    if(B_ERROR_NB == 0) 
+        return errors;
     
     // Adds a null pointer to close B_ERROR_MSG
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
+    SCR_add_ptr((unsigned char***) &B_ERROR_MSG, &B_ERROR_NB, NULL);
 
-    errors = SCR_mtov(B_ERROR_MSG, '\n');
+    errors = (char*) SCR_mtov((unsigned char**) B_ERROR_MSG, (int) '\n');
 
     B_clear_last_error();
 
@@ -185,12 +180,13 @@ void B_display_last_error()
 {
     char    *v = NULL;
 
-    if(B_ERROR_NB == 0) return;
+    if(B_ERROR_NB == 0) 
+        return;
     
     // Adds a null pointer to close B_ERROR_MSG
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
+    SCR_add_ptr((unsigned char***) &B_ERROR_MSG, &B_ERROR_NB, NULL);
 
-    v = SCR_mtov(B_ERROR_MSG, '\n');
+    v = (char*) SCR_mtov((unsigned char**) B_ERROR_MSG, (int) '\n');
     //buts[0] = "Ok";
     //buts[1] = 0;
     //kmsgbox("E R R O R", v, buts);             // JMP 10/12/2021
@@ -212,10 +208,13 @@ void B_print_last_error()
 {
     int     i;
 
-    if(B_ERROR_NB == 0) return;
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
+    if(B_ERROR_NB == 0) 
+        return;
+    
+    SCR_add_ptr((unsigned char***) &B_ERROR_MSG, &B_ERROR_NB, NULL);
 
-    for(i = 0; i < B_ERROR_NB - 1; i++) W_printf("%s\n", B_ERROR_MSG[i]);
+    for(i = 0; i < B_ERROR_NB - 1; i++) 
+        W_printf("%s\n", B_ERROR_MSG[i]);
 
     B_clear_last_error();
 }
@@ -230,8 +229,8 @@ void B_print_last_error()
 void B_clear_last_error()
 {
     if(B_ERROR_NB == 0) return;
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
-    SCR_free_tbl(B_ERROR_MSG);
+    SCR_add_ptr((unsigned char***) &B_ERROR_MSG, &B_ERROR_NB, NULL);
+    SCR_free_tbl((unsigned char**) B_ERROR_MSG);
     B_ERROR_MSG = 0;
     B_ERROR_NB = 0;
 }
