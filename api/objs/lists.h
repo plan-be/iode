@@ -3,11 +3,6 @@
 #include "api/constants.h"
 #include "api/objs/kdb.h"       // KDB
 
-/*----------------------- TYPEDEF ----------------------------*/
-
-// LIS = List (string)
-using LIS = char*; 
-
 /*----------------------- MACROS ----------------------------*/
 
 #define KLPTR(name)         K_optr0(KL_WS, name)

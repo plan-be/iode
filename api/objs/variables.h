@@ -4,11 +4,6 @@
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
 
-/*----------------------- TYPEDEF ----------------------------*/
-
-// VAR = Variable (pointer to a vector of double)
-using VAR = double*;
-
 /*----------------------- DEFINE ----------------------------*/
 
 #define LTOH_LIN    'L'

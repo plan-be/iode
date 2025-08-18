@@ -1,27 +1,29 @@
 #pragma once
 
-#include "scr4/s_swap.h"        // SWHDL
-
 #include "api/constants.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+
+#include <string>
+#include <variant>
+#include <array>
+#include <map>
+#include <iostream>
+
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct  KOBJ 
+template<class T> class IodeDatabase: public std::map<std::string, T> 
 {
-    SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
-    char        o_pad[3];
-};
-
-struct KDB 
-{
-    KOBJ        *k_objs;                // map <position in the memory, object name>
-	long        k_nb;                   // number of objects in the database
     short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
     short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     char        k_arch[LMAGIC];         // not used
-    char        k_magic[LMAGIC];        // not used
-    OFNAME       k_oname;               // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)
+    OFNAME      k_oname;                // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)
     char        k_desc[K_MAX_DESC];     // short file content description
     char        k_data[K_MAX_DESC];     // Sample if Variables database
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
@@ -29,11 +31,25 @@ struct KDB
     char        *k_nameptr;             // filepath to the database file
 };
 
+class CommentsDatabase : public IodeDatabase<CMT> {};
+class EquationsDatabase : public IodeDatabase<EQ> {};
+class IdentitiesDatabase : public IodeDatabase<IDT> {};
+class ListsDatabase : public IodeDatabase<LIS> {};
+class ScalarsDatabase : public IodeDatabase<SCL> {};
+class TablesDatabase : public IodeDatabase<TBL> {};
+class VariablesDatabase : public IodeDatabase<VAR> {};
+
 /*----------------------- GLOBALS ----------------------------*/
 
-inline KDB*     K_WS[7] = { NULL };             // Current workspaces
-inline KDB*     K_RWS[7][5] = {{ NULL }};       // Currently loaded workspaces (for printing and identity execution)
-inline int      K_PWS[7] = { 0 };               // ??? TODO: check if still in use
+using IodeDatabaseVariant = std::variant<CommentsDatabase, EquationsDatabase, IdentitiesDatabase,
+                                         ListsDatabase, ScalarsDatabase, TablesDatabase, VariablesDatabase>;
+
+// Current workspaces
+inline std::array<IodeDatabaseVariant, IODE_NB_TYPES> K_WS;
+// Currently loaded workspaces (for printing and identity execution)
+inline std::array<std::array<IodeDatabaseVariant, IODE_NB_TYPES>, 5> K_RWS;
+// table of "current" K_RWS number. Set to 0 and never used (yet)
+inline std::array<int, IODE_NB_TYPES> K_PWS = { 0 };
 inline int      K_WARN_DUP = 0;                 // If null, adding an existing object name in a KDB does not trigger 
                                                 // an error (used in K_add_entry())
 inline int      K_SECRETSEP = '#';              // pour les macros pushed A#n in reports
@@ -45,7 +61,7 @@ inline int      K_SECRETSEP = '#';              // pour les macros pushed A#n in
  *   - ac..av = IODE objects ascii format
  *   - next extensions : other IODE files
  */
-inline char k_ext[][4] = 
+inline std::vector<std::string> k_ext = 
 {
     "cmt", // 0 = FILE_COMMENTS
     "eqs", // 1 = FILE_EQUATIONS
@@ -76,32 +92,29 @@ inline char k_ext[][4] =
     "asc",
     "txt",
     "csv",  // 26 = FILE_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
-
-    "xxx"
 };
 
 /*----------------------- DEFINE ----------------------------*/
 
-#define KC_WS   K_WS[COMMENTS]
-#define KE_WS   K_WS[EQUATIONS]
-#define KI_WS   K_WS[IDENTITIES]
-#define KL_WS   K_WS[LISTS]
-#define KS_WS   K_WS[SCALARS]
-#define KT_WS   K_WS[TABLES]
-#define KV_WS   K_WS[VARIABLES]
+#define KC_WS   static_cast<CommentsDatabase>(K_WS[COMMENTS])
+#define KE_WS   static_cast<EquationsDatabase>(K_WS[EQUATIONS])
+#define KI_WS   static_cast<IdentitiesDatabase>(K_WS[IDENTITIES])
+#define KL_WS   static_cast<ListsDatabase>(K_WS[LISTS])
+#define KS_WS   static_cast<ScalarsDatabase>(K_WS[SCALARS])
+#define KT_WS   static_cast<TablesDatabase>(K_WS[TABLES])
+#define KV_WS   static_cast<VariablesDatabase>(K_WS[VARIABLES])
 
-#define KC_RWS   K_RWS[COMMENTS][K_PWS[COMMENTS]]
-#define KE_RWS   K_RWS[EQUATIONS][K_PWS[EQUATIONS]]
-#define KI_RWS   K_RWS[IDENTITIES][K_PWS[IDENTITIES]]
-#define KL_RWS   K_RWS[LISTS][K_PWS[LISTS]]
-#define KS_RWS   K_RWS[SCALARS][K_PWS[SCALARS]]
-#define KT_RWS   K_RWS[TABLES][K_PWS[TABLES]]
-#define KV_RWS   K_RWS[VARIABLES][K_PWS[VARIABLES]]
+#define KC_RWS   static_cast<CommentsDatabase>(K_RWS[K_PWS[COMMENTS]][COMMENTS])
+#define KE_RWS   static_cast<EquationsDatabase>(K_RWS[K_PWS[EQUATIONS]][EQUATIONS])
+#define KI_RWS   static_cast<IdentitiesDatabase>(K_RWS[K_PWS[IDENTITIES]][IDENTITIES])
+#define KL_RWS   static_cast<ListsDatabase>(K_RWS[K_PWS[LISTS]][LISTS])
+#define KS_RWS   static_cast<ScalarsDatabase>(K_RWS[K_PWS[SCALARS]][SCALARS])
+#define KT_RWS   static_cast<TablesDatabase>(K_RWS[K_PWS[TABLES]][TABLES])
+#define KV_RWS   static_cast<VariablesDatabase>(K_RWS[K_PWS[VARIABLES]][VARIABLES])
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KARCH(kdb)   ((kdb)->k_arch)
-#define KMAGIC(kdb)  ((kdb)->k_magic)
+/*
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
@@ -116,6 +129,7 @@ inline char k_ext[][4] =
 #define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
+*/
 
 /*----------------------- FUNCS ----------------------------*/
 

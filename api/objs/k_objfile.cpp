@@ -293,7 +293,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
         kdb->k_type    = okdb643->k_type  ;
         kdb->k_mode    = okdb643->k_mode  ;
         memcpy(kdb->k_arch,  okdb643->k_arch, LMAGIC);
-        memcpy(kdb->k_magic, okdb643->k_magic, LMAGIC);
         memcpy(kdb->k_oname,  okdb643->k_name, OK_MAX_FILE); // JMP 03-06-2015 
         memcpy(kdb->k_desc,  okdb643->k_desc, K_MAX_DESC);
         memcpy(kdb->k_data,  okdb643->k_data, K_MAX_DESC);

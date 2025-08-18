@@ -60,18 +60,12 @@ cdef extern from "api/all.h":
                    int maxit, double eps)
     int B_DataPattern(char* arg, int iode_type)
 
-    ctypedef struct KOBJ:
-        SWHDL o_val
-        ONAME o_name
-        char o_pad[3]
-
     ctypedef struct KDB:
         KOBJ *k_objs
         long k_nb
         short k_type
         short k_mode
         char k_arch[32]
-        char k_magic[32]
         OFNAME k_oname
         char k_desc[64]
         char k_data[64]

@@ -119,6 +119,10 @@ const static char NAN_REP[3] = "--";
 
 /*----------------------- TYPEDEF ----------------------------*/
 
+using CMT = char*;      // CMT = Comment (string)
+using LIS = char*;      // LIS = List (string)
+using VAR = double*;    // VAR = Variable (pointer to a vector of double)
+
 typedef char    OFNAME[OK_MAX_FILE];
 typedef char    FNAME[K_MAX_FILE];
 typedef char    ONAME[K_MAX_NAME + 1];
