@@ -12,10 +12,10 @@ from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport K_NBDEC
+from pyiode.iode_database.cpp_api_database cimport error_manager
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
 from pyiode.iode_database.cpp_api_database cimport B_DataPattern
-from pyiode.iode_database.cpp_api_database cimport B_display_last_error
 from pyiode.iode_database.cpp_api_database cimport B_PrintNbDec
 from pyiode.iode_database.cpp_api_database cimport B_PrintDest
 from pyiode.iode_database.cpp_api_database cimport B_PrintObjDef
@@ -110,7 +110,7 @@ cdef class CythonIodeDatabase:
     def compare(self, args: str, i_iode_type: int):
         res = B_DataCompare(args.encode(), i_iode_type)
         if res != 0:
-            B_display_last_error()
+            error_manager.display_last_error()
 
     def merge(self, cython_other: CythonIodeDatabase, overwrite: bool=True):        
         cdef CKDBAbstract* other_db_ptr = cython_other.abstract_db_ptr

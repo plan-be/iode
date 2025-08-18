@@ -135,7 +135,8 @@ int K_add(KDB* kdb, char* name, ...)
     // Add entry (name) into kdb
     pos = K_add_entry(kdb, name);
     if(pos < 0) {
-        B_seterror("%.80s cannot be created (syntax ?)", name);
+        error_manager.append_error(v_iode_types[KTYPE(kdb)] + " " + std::string(name) + 
+                                   " cannot be created (syntax ?)");
         goto einde;
     }
 

@@ -21,7 +21,8 @@
  * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
  * and their positions are saved in CLEC->lnames.
  *
- * If a name is not found, a message is saved via B_seterror() and L_errno is set to L_NOT_FOUND_ERR.
+ * If a name is not found, an error message is added to the stack via IodeErrorManager::append_error 
+ * and L_errno is set to L_NOT_FOUND_ERR.
  *
  * @param [in]      dbv     KDB*    KDB of variables
  * @param [in]      dbs     KDB*    KDB of scalars
@@ -38,7 +39,7 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
         else
             cl->lnames[i].pos = L_findvar(dbv, cl->lnames[i].name);
         if (cl->lnames[i].pos < 0) {
-            B_seterror("%s : not in WS", cl->lnames[i].name);
+            error_manager.append_error(std::string(cl->lnames[i].name) + " : not found");
             return(L_errno = L_NOT_FOUND_ERR);
         }
     }

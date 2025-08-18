@@ -419,7 +419,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
 
     kdb = K_load(VARIABLES, file, nbv, vars);
     if(kdb == 0) {
-        B_seterrn(96, file);
+        error_manager.append_error("VarFile '" + std::string(file) + "' not found");
         return(-1);
     }
 
@@ -480,12 +480,19 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
                 continue;
             }
             j++;
-            //B_seterrn(90, KONAME(dbv, i));                     // Exogenous series not found => error
-            B_seterror("Variable %s not found", KONAME(dbv, i));   // Exogenous series not found => error
+
+            // Exogenous series not found => error
+            error_manager.append_error("Variable '" + std::string(KONAME(dbv, i)) + "' not found");
         }
-        if(j == 0) return(0);                   // all VARs found
-        // if(j == 10) B_seterrn(91);                 // more than 10 exogenous vars not found => special msg 
-        if(j == 10) B_seterror("... others skipped"); // more than 10 exogenous vars not found => special msg 
+
+        // all VARs found
+        if(j == 0) 
+            return(0);
+        
+        // more than 10 exogenous vars not found => special msg
+        if(j == 10) 
+            error_manager.append_error("... others skipped"); 
+        
         return(-2);
     }
     return(0);
@@ -553,7 +560,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
 
     kdb = K_load(SCALARS, file, nbs, scls);
     if(kdb == 0) {
-        B_seterrn(96, file);
+        error_manager.append_error("VarFile '" + std::string(file) + "' not found");
         return(-1);
     }
 
@@ -604,11 +611,13 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         for(i = 0, j = 0 ; i < KNB(dbs) && j < 10; i++) {
             if(KSOVAL(dbs, i) != 0) continue;  /* series already present */
             j++;
-            //B_seterrn(92, KONAME(dbs, i));
-            B_seterror("Scalar %s not found", KONAME(dbs, i));   // scalar not found
+
+            error_manager.append_error("Scalar '" + std::string(KONAME(dbs, i)) + "' not found");
         }
-        //if(j == 10) B_seterrn(91);
-        if(j == 10) B_seterror("... others skipped");
+
+        if(j == 10) 
+            error_manager.append_error("... others skipped");
+        
         return(-2);
     }
     return(0);
@@ -688,7 +697,7 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl)
  *  @param [in] char*   sfiles[]    Input SCL files
  *  @param [in] SAMPLE* smpl        execution SAMPLE or NULL to select the current VAR KDB sample
  *  @return     KDB*                NULL on error (illegal SAMPLE, empty dbi, vars or scls not found...).
- *                                  The specific message is added via B_seterrn().
+ *                                  The specific message is added via IodeErrorManager::append_error().
  */
 KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* in_smpl)
 {
@@ -701,24 +710,24 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     if(in_smpl != 0) smpl = in_smpl;
     
     if(smpl->s_nb == 0) {
-        B_seterrn(93);
+        error_manager.append_error("Empty execution sample");
         return((KDB *)0);
     }
     
     if(KSMPL(KV_WS)->s_nb != 0 &&
             (PER_diff_per(&(KSMPL(KV_WS)->s_p2), &(smpl->s_p2)) < 0
              || PER_diff_per(&(smpl->s_p1), &(KSMPL(KV_WS)->s_p1)) < 0)) {
-        B_seterrn(93);
+        error_manager.append_error("Empty execution sample");
         return((KDB *)0);
     }
     if(KNB(dbi) == 0) {
-        B_seterrn(94);
+        error_manager.append_error("Empty set of identities");
         return((KDB *)0);
     }
 
     order = KI_reorder(dbi);
     if(order == 0) {
-        B_seterrn(95);
+        error_manager.append_error("Circular identity definition");
         return((KDB *)0);
     }
 

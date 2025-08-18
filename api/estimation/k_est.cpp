@@ -160,8 +160,8 @@ int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float
     memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
     rc = K_add(E_DBE, name, eq, name);
     if(rc < 0) {
+        error_manager.append_error(std::string(L_error()));
         rc = -1;
-        B_seterror(L_error());
     }
     else rc = 0;
 
@@ -209,7 +209,8 @@ int Estimation::KE_est_s(SAMPLE* smpl)
 
         pos = K_find(E_DBE, est_endos[i]);
         if(pos < 0) {
-            B_seterrn(120, est_endos[i]);
+            std::string error_msg  = "Equation '" + std::string(est_endos[i]) + "' not found";
+            error_manager.append_error(error_msg);
             goto err;
         }
 
@@ -225,7 +226,8 @@ int Estimation::KE_est_s(SAMPLE* smpl)
         else
             E_SMPL = smpl;
         if(E_SMPL->s_nb < 1) {
-            B_seterrn(121, est_endos[i]);
+            std::string error_msg = "Equation '" + std::string(est_endos[i]) + "': estimation sample undefined";
+            error_manager.append_error(error_msg);
             goto err;
         }
         E_T = E_SMPL->s_nb;
@@ -248,7 +250,10 @@ int Estimation::KE_est_s(SAMPLE* smpl)
                 SCR_sqz(blk[j]);
                 pos = K_find(KE_WS, (char*) blk[j]);
                 if(pos < 0) {
-                    B_seterrn(120, blk[j]);
+                    std::string error_msg = "Equation '";
+                    error_msg += std::string((char*) blk[j]); 
+                    error_msg += "' not found";
+                    error_manager.append_error(error_msg);
                     goto err;
                 }
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(KE_WS, pos));

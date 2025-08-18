@@ -255,8 +255,9 @@ public:
             if(clec == NULL) 
             {
                 this->instruments = "";
-                B_seterrn(213, to_char_array(instr), L_error());
-                throw std::runtime_error(get_last_error());
+                std::string error_msg = "Estimation : Instrument '" + instr + "' : error " + std::string(L_error());
+                error_manager.append_error(error_msg);
+                throw std::runtime_error(error_manager.get_last_error());
             }
         }
 

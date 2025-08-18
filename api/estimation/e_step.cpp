@@ -96,7 +96,8 @@ double C_evallec(char* lec, int t)
     if(tmplec[0]) {
         clec = L_cc(tmplec);
         if(clec == NULL) {
-            B_seterror("Syntax error %.80s", L_error());
+            std::string error_msg = "Syntax error " + std::string(L_error());
+            error_manager.append_error(error_msg);
             return(x);
         }
         if(clec != 0 && !L_link(K_WS[VARIABLES], K_WS[SCALARS], clec))

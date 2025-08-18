@@ -271,12 +271,12 @@ static int LTOH_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* skip
     ws_nbper = PER_nbper(&(ws_smpl->s_p1));
 
     if(ws_nbper <= 0) {
-        B_seterror("Set Ws periodicity first");
+        error_manager.append_error("Set the periodicity first");
         return(-1);
     }
 
     if(ws_nbper <= f_nbper) {
-        B_seterror("File has more observartions than the current ws");
+        error_manager.append_error("File has more observations than the current workspace");
         return(-1);
     }
 

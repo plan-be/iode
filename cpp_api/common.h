@@ -49,8 +49,6 @@ struct FileType
         : name(name), v_ext(v_ext) {} 
 };
 
-const static std::vector<std::string> v_iode_types = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
-
 const static std::vector<std::string> v_table_langs = { "English", "Dutch", "French" };
 
 const static std::string report_ext = ".rep";

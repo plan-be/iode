@@ -873,21 +873,21 @@ def test_estimation(capsys):
 
     estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
     estimation.block = "ACAF;DPUH", "ACAF"
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
-                                            r"Estimation : NaN Generated"):
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+                                            r"Estimation: NaN Generated"):
         estimation.estimate()
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
-                                            r"Estimation : NaN Generated"):
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+                                            r"Estimation: NaN Generated"):
         eq_ACAF.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
-                                            r"No scalars in your system\n"
-                                            r"Estimation : No current estimation"):
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+                                            r"No scalars to estimate in your block of equations\n"
+                                            r"Estimation: No current estimation"):
         eq_ACAG.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\n"
-                                            r"Estimation : NaN Generated"):
+    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+                                            r"Estimation: NaN Generated"):
         equations.estimate("1980Y1", "1996Y1", "ACAF")
 
     # ======== test quiet mode ========
@@ -1049,8 +1049,8 @@ def test_simulation(capsys):
     simu.initialization_method = 'TM1'
 
     with pytest.warns(RuntimeWarning, match=r"Could not simulate the model for the sample "
-                                            r"2000Y1:2010Y1:\nModel does not converge after "
-                                            r"2 iterations"):
+                                            r"2000Y1:2010Y1:\nerrors:\nModel does not converge "
+                                            r"after 2 iterations\n"):
         simu.model_simulate("2000Y1", "2010Y1")
 
     # ======== test quiet mode ========

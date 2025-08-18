@@ -29,7 +29,7 @@ void Simulation::model_exchange(const std::string& list_exo)
 void Simulation::model_compile(const std::string& list_eqs)
 {
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     if (list_eqs.empty()) 
         KE_compile(K_WS[EQUATIONS]);            // EndoExo whole WS
@@ -47,7 +47,7 @@ void Simulation::model_compile(const std::string& list_eqs)
             SCR_free_tbl((unsigned char**) eqs);
             if (rc < 0)
             {
-                std::string last_error = get_last_error();
+                std::string last_error = error_manager.get_last_error();
                 if(!last_error.empty()) 
                 {
                     std::string error_msg = "Could not compile the model";
@@ -68,7 +68,7 @@ void Simulation::model_compile(const std::string& list_eqs)
 void Simulation::model_simulate(const std::string& from, const std::string& to, const std::string& list_eqs)
 {
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     Sample* sample = nullptr;
     try
@@ -102,7 +102,7 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
 
     if (rc < 0)
     {
-        std::string c_api_error = get_last_error();
+        std::string c_api_error = error_manager.get_last_error();
         if(!c_api_error.empty())
         {
             std::string error_msg = "Could not simulate the model for the sample ";
@@ -126,7 +126,7 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     std::string error_msg;
 
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     // result list names
     if (pre_name.empty())   
@@ -167,7 +167,7 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     
     if (rc < 0)
     {
-        std::string c_api_error = get_last_error();
+        std::string c_api_error = error_manager.get_last_error();
         if(!c_api_error.empty())
         {
             std::string error_msg = "Could not not calculate SCC";
@@ -189,7 +189,7 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
 void Simulation::model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
 {
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     Sample* sample = nullptr;
     try
@@ -238,7 +238,7 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
 
     if (rc < 0)
     {
-        std::string c_api_error = get_last_error();
+        std::string c_api_error = error_manager.get_last_error();
         if(!c_api_error.empty())
         {
             std::string error_msg = "Could not simulate SCC:\n"; 

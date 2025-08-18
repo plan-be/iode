@@ -33,7 +33,7 @@ static int HP_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
     int     nbper;
 
     if((nbper = PER_nbper(&(ws_smpl->s_p1))) <= 0) {
-        B_seterror("Set Ws periodicity first");
+        error_manager.append_error("Set periodicity first");
         goto err;
     }
 

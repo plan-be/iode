@@ -81,7 +81,8 @@ int B_ModelSimulate(char *const_arg, int unused)
     smpl = PER_atosmpl(from, to);
 
     if(smpl == NULL) {
-        B_seterror("ModelSimulate: %s %s wrong sample", from, to);
+        std::string error_msg = "ModelSimulate: invalid sample '" + std::string(from) + ":" + std::string(to) + "'";
+        error_manager.append_error(error_msg);
         goto err;
     }
 
@@ -116,7 +117,7 @@ int B_ModelSimulateParms(char* arg, int unused)
     args = (char **) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
     nargs = SCR_tbl_size((unsigned char**) args);
     if(nargs < 6) {
-        B_seterror("ModelSimulateParms : incorrect nb of parameters");
+        error_manager.append_error("ModelSimulateParms: incorrect number of parameters");
         rc = -1;
         goto fin;
     }
@@ -187,7 +188,7 @@ int KE_compile(KDB* dbe)
     EQ      *eq;
 
     if(dbe == NULL || KNB(dbe) == 0) {
-        B_seterrn(110);
+        error_manager.append_error("Empty set of equations");
         return(-1);
     }
 
@@ -298,15 +299,16 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     smpl = PER_atosmpl(from, to);
 
     if(smpl == NULL) {
-        B_seterror("ModelSimulateSCC: %s %s wrong sample", from, to);
         SCR_free(arg);
+        std::string error_msg = "ModelSimulateSCC: invalid sample '" + std::string(from) + ":" + std::string(to) + "'";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
     // Extrait les listes restantes
     lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
     if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) {
-        B_seterror("ModelSimulateSCC: syntax error in lists");
+        error_manager.append_error("ModelSimulateSCC: syntax error in lists");
         SCR_free_tbl((unsigned char**) lsts);
         rc = -1;
         goto err;
@@ -319,7 +321,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     if(prepos < 0 || interpos < 0 || postpos < 0) {
         rc = -1;
-        B_seterror("ModelSimulateSCC: pre, post or inter list not in WS");
+        error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         goto err;
     }
 
@@ -435,7 +437,9 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     B_CreateEmptyVar(name);
     x = B_GetVarPtr(name);
     if(x == 0) {
-        B_seterror("B_CreateVarFromVecOfInts %s failed", name);
+        std::string error_msg = "B_CreateVarFromVecOfInts: failed to create the variable '";
+        error_msg += std::string(name) + "'";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 

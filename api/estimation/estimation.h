@@ -11,10 +11,6 @@
 #include "api/objs/variables.h"
 #include "api/lec/lec.h"
 
-#undef min
-#undef max
-#include <algorithm>    // for std::min, std::max
-
 #ifndef SKBUILD
     #include "gtest/gtest.h"
 #endif
@@ -46,22 +42,6 @@ enum IodeAdjustmentMethod
     AM_ERROR_CORRECTION_METHOD
 };
 
-/* ---------------------- GLOBALS ---------------------- */
-
-// Texts corresponding to E_errno codes
-const static char* E_ERRORS[] = {
-    "EST_NO_EQ_ERR",
-    "EST_MEM_ERR",
-    "EST_SYNTAX_ERR",
-    "EST_LINK_ERR",
-    "EST_DREG_ERR",
-    "EST_NAN_ERR",
-    "EST_VCC_SING_ERR",
-    "EST_VCU_SING_ERR",
-    "EST_GMG_SING_ERR",
-    "EST_NO_SCALARS"
-};
-
 /* ---------------------- CLASSES ---------------------- */
 
 class Estimation
@@ -76,7 +56,6 @@ class Estimation
     int       est_method;     // estimation method
 
 protected:
-    int       E_errno;        // Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS)
     int       E_IT;           // Number of iterations of the last estimation
     int       E_CONV;         // Boolean. Indicates if the estimation iteration has converged
     int       E_NEQ;          // Number of equations in the current block of equations
@@ -235,15 +214,11 @@ public:
         if(free_smpl)
             SCR_free(smpl);
 
-        if(E_errno != 0 || rc != 0)
+        if(rc != 0)
         {
-            if(E_errno != 0)
-                E_error_n(E_errno);
-            std::string error_msg = "Estimation failed";
-            std::string last_error(B_get_last_error());
+            std::string last_error = error_manager.get_last_error();
             if(!last_error.empty())
-                error_msg += ":\n" + last_error;
-            throw std::runtime_error(error_msg);
+                throw std::runtime_error("Estimation failed:\n" + last_error);
         }
 
         return 0;
@@ -361,12 +336,6 @@ private:
     void E_put_C(void);
     void E_get_SMO(void);
     void E_free_work(void);
-
-    /* e_error.c */
-    static void E_msg_n(int, ...);
-    static void E_error_n(int, ...);
-    static void E_msg(char* fmt, ...);
-    static void E_error(char* fmt, ...);
 
     /* e_print.c */
     void E_print_parms();

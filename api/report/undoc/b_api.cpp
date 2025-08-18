@@ -93,7 +93,7 @@ int IodeEnd()
     RP_proc_free_all();         
     RP_free_bufs();             
     // B_reset_error();  
-    B_clear_last_error();      // JMP 16/01/2022 
+    error_manager.clear();      // JMP 16/01/2022 
     SCR_free(ODE_INIFILE);     // JMP 30/10/2022
     ODE_INIFILE = 0;
     

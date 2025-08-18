@@ -92,7 +92,7 @@ int PER_nb(int ch)
  *  @param [in] p2 PERIOD * Second period
  *  @return        int      Number of periods bw p1 and p2. -1 if periodicities are different or illegal.
  *  
- *  @details On error, call B_seterrn(85) and returns -1.
+ *  @details On error, call IodeErrorManager::append_error() and returns -1.
  */
 int PER_diff_per(PERIOD *p1, PERIOD *p2)
 {
@@ -100,13 +100,12 @@ int PER_diff_per(PERIOD *p1, PERIOD *p2)
     int     period_pos;
 
     if(p1->p_p != p2->p_p) {
-        //B_seterrn(85);
-        B_seterror("Different periodicities");
+        error_manager.append_error("Different periodicities");
         return(-1);
     }
     period_pos = L_pos(L_PERIOD_CH, p1->p_p);
     if(period_pos < 0) {
-        B_seterror("Illegal periodicity");
+        error_manager.append_error("Illegal periodicity");
         return(-1);
     }
     nb = L_PERIOD_NB[period_pos];
@@ -136,7 +135,7 @@ PERIOD  *PER_addper(PERIOD *period, int shift)
 
     period_pos = L_pos(L_PERIOD_CH, period->p_p);
     if(period_pos < 0) {
-        B_seterror("Illegal periodicity");
+        error_manager.append_error("Illegal periodicity");
         return(NULL);
     }
 
@@ -197,8 +196,8 @@ char *PER_pertoa(PERIOD* per, char* text)
  *  @param [in] aper    char*       period in a string (Ex. : "1990M2")
  *  @return             PERIOD*     pointer to an allocated struct PERIOD or null on error.
  *  
- *  @details On error, call B_seterrn(86) and returns NULL.
- *  @details The resulting PERIOD being allocated, it is the programmer's responsability to free it later (SW_nfree()).
+ *  @details On error, call IodeErrorManager::append_error() and returns NULL.
+ *  @details The resulting PERIOD being allocated, it is the programmer's responsibility to free it later (SW_nfree()).
  */
  
 PERIOD *PER_atoper(char *aper)
@@ -250,8 +249,10 @@ PERIOD *PER_atoper(char *aper)
 
 fin:
     if(per->p_y == 0) {
-        //B_seterrn(86, text);
-        B_seterror("'%s' : incorrect period", text);
+        std::string error_msg = "'";
+        error_msg += std::string(text);
+        error_msg += "' : illegal period";
+        error_manager.append_error(error_msg);
         SW_nfree(per);
         per = 0;
     }
@@ -267,13 +268,12 @@ fin:
  *  @param [out] res  SAMPLE* Intersection of the 2 samples
  *  @return           int 0 if ok. On error returns -1 and set B_errno.
  *  
- *  @details On error, call B_seterrn(85) or B_seterrn(87) and returns -1.
+ *  @details On error, call IodeErrorManager::append_error() and returns -1.
  */
 int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)
 {
     if((smp1->s_p1).p_p != (smp2->s_p1).p_p) {
-        //B_seterrn(85);
-        B_seterror("Different periodicities");
+        error_manager.append_error("Different periodicities");
         return(-1);
     }
 
@@ -288,8 +288,7 @@ int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)
         res->s_p2 = smp1->s_p2;
 
     if((res->s_nb = PER_diff_per(&(res->s_p2), &(res->s_p1))) < 0) {
-        //B_seterrn(87);
-        B_seterror("Sample out of WS boundaries");
+        error_manager.append_error("Sample out of workspace boundaries");
         return(-1);
     }
 
@@ -304,7 +303,7 @@ int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)
  *  @param [in] a2 char*    text of period 2
  *  @return        SAMPLE   allocated SAMPLE on success, null on error.
  *  
- *  @details On error, call B_seterrn(86) or B_seterrn(88) and returns NULL.
+ *  @details On error, call IodeErrorManager::append_error() and returns NULL.
  *  @details The resulting SAMPLE being allocated, it is the programmer's responsability to free it later (SW_nfree()).
  */
 SAMPLE  *PER_atosmpl(char* a1, char* a2)
@@ -320,8 +319,13 @@ SAMPLE  *PER_atosmpl(char* a1, char* a2)
     smpl = PER_pertosmpl(p1, p2);
 
 err:
-//    if(smpl == 0) B_seterrn(88, a1, a2);
-    if(smpl == 0) B_seterror("Illegal sample : %s %s", (a1 == 0)? "":a1, (a2 == 0)? "":a2);
+    if(smpl == 0)
+    {
+        std::string error_msg = "Illegal sample : ";
+        if (a1 != 0) error_msg += std::string(a1);
+        if (a2 != 0) error_msg += " " + std::string(a2);
+        error_manager.append_error(error_msg);
+    }
     SW_nfree(p1);
     SW_nfree(p2);
     return(smpl);

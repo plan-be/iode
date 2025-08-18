@@ -1,65 +1,83 @@
 #pragma once
 
 #include "api/constants.h"
+#include "api/k_super.h"
+#include "api/write/write.h"
 
-/* ---------------- ENUMS ---------------- */
+#include <string>
+#include <vector>
 
-enum IodeBErrorMsg
+
+class IodeErrorManager
 {
-    OM_ILL_ARGS = 28,
-    OM_DEL_FAILED_1,
-    OM_DREN_FAILED_2,
-    OM_DDUP_NO_SENSE,
-    OM_DDUP_FAILED_2,
-    OM_DUPD_SCL_ERR,
-    OM_UPD_TBLS,
-    OM_DUPD_VAR_ERR_1,
-    OM_PATTERN_1,
-    OM_LIST_SET_ERR_1,
-    OM_NO_FILE_1,
-    OM_EEST_SMPL_2,
-    OM_EEST_EMPTY,
-    OM_FCOPY_OPEN_1,
-    OM_FCOPY_CREATE_1,
-    OM_FCOPY_WRITE_1,
-    OM_CANNOT_DEL_1,
-    OM_FPRINT_OPEN_1,
-    OM_FPRINT_WRITE_1,
-    OM_CANNOT_RENAME_1,
-    OM_EXEC_SMPL_2,
-    OM_SIM_SMPL_2,
-    OM_PRINT_ERR_1,
-    OM_OBJ_NOT_FOUND_1,
-    OM_CANNOT_OPEN,
-    OM_NBDEC_ERR_1,
-    OM_TBL_NOT_FOUND_1,
-    OM_TBL_NOT_PRINTED_1,
-    OM_SMPL_ERR,
-    OM_PROF_CANNOT_LOAD_1,
-    OM_PROF_CANNOT_SAVE_1,
-    OM_TBL_NOT_VIEWED_1,
-    OM_INV_ODE_FILE_1,
-    OM_NO_SCL,
-    OM_SMPL_SYNTAX_1,
-    OM_CANNOT_PRINT_LINE_1
+    inline static std::vector<std::string> B_ERROR_MSG;
+    inline const static std::string B_ERROR_DFT_MSG = "Unknown error";
+
+    // Private constructor to prevent instantiation
+    IodeErrorManager() = default;
+    // Delete copy constructor and assignment operator
+    IodeErrorManager(const IodeErrorManager&) = delete;
+    IodeErrorManager& operator=(const IodeErrorManager&) = delete;
+
+public:
+    static IodeErrorManager& instance()
+    {
+        static IodeErrorManager instance;
+        return instance;
+    }
+
+    void append_error(const std::string& msg)
+    {
+        if(msg.empty()) 
+            return;
+
+        if(std::find(B_ERROR_MSG.begin(), B_ERROR_MSG.end(), msg) != B_ERROR_MSG.end())
+            return; // error message already present
+
+        B_ERROR_MSG.push_back(msg);
+    }
+
+    void display_last_error()
+    {
+        if(B_ERROR_MSG.empty()) 
+            return;
+
+        std::string errors = "errors:\n";
+        for(const auto& msg : B_ERROR_MSG)
+            errors += msg + "\n";
+        kerror(0, errors.c_str());
+        kpause();
+        B_ERROR_MSG.clear();
+    }
+
+    std::string get_last_error()
+    {
+        if(B_ERROR_MSG.empty())
+            return "";
+        
+        std::string errors = "errors:\n";
+        for(const auto& msg : B_ERROR_MSG)
+            errors += msg + "\n";
+        B_ERROR_MSG.clear();
+        return errors;
+    }
+
+    void print_last_error()
+    {
+        if(B_ERROR_MSG.empty()) 
+            return;
+
+        for(const std::string& msg : B_ERROR_MSG) 
+            W_printf("%s\n", msg.c_str());
+
+        B_ERROR_MSG.clear();
+    }
+
+    void clear()
+    {
+        B_ERROR_MSG.clear();
+    }
 };
 
-/* ---------------- GLOBALS ---------------- */
-
-inline char**  B_ERROR_MSG = NULL;                  // Table of last recorded error messages 
-inline int     B_ERROR_NB = 0;                      // Nb of last recorded error messages 
-inline char*   B_ERROR_DFT_MSG = "Unknown error";   // Default message if not found in iode_msg_map
-
-/* ---------------- FUNCS ---------------- */
-
-void B_seterror(char *,...);
-void B_seterrn(int , ...);
-
-void B_add_error(char* msg);
-char* B_get_last_error(void);
-void B_display_last_error(void);
-void B_print_last_error(void);
-void B_clear_last_error(void);
-//void B_reset_error(void);
-char *B_msg(int );
-int B_get1int(char *);
+// Global variable holding the singleton instance
+inline IodeErrorManager& error_manager = IodeErrorManager::instance();

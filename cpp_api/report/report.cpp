@@ -19,7 +19,7 @@ void execute_report(const std::string& filepath, const std::string& parameters)
     if(success != 0)
     {
         std::string error_msg = "Execution of report " + filepath_ + " " + parameters + " has failed";
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if (!last_error.empty())
             error_msg += ":\n" + last_error;
         throw std::runtime_error(error_msg);
@@ -46,7 +46,7 @@ void execute_report_line(const std::string& commands)
     if(success != 0)
     {
         std::string error_msg = "Execution of report command(s):\n" + commands + "\n\nhas failed";
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if (!last_error.empty())
             error_msg += ":\n" + last_error;
         throw std::runtime_error(error_msg);

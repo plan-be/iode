@@ -914,50 +914,6 @@ public:
 };
 
 
-TEST_F(IodeCAPITest, Tests_IODEMSG)
-{
-    char    *msg;
-
-    U_test_print_title("Tests IODEMSG");
-    
-    // 1016 -> Sample modified
-    msg = B_msg(16);
-    EXPECT_EQ(std::string(msg), "Sample modified");
-
-    // Illegal sample : %.80s %.80s
-    B_seterror("Illegal sample : %.80s %.80s", "2010Y1", "1960Y1");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Illegal sample : 2010Y1 1960Y1");
-
-    // 1088 -> "Illegal sample : %.80s %.80s"
-    B_seterrn(88, "2010Y1", "1960Y1");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Illegal sample : 2010Y1 1960Y1");
-
-    // 1206 -> "Estimation : NaN Generated"
-    Estimation::E_error("Estimation : NaN Generated");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
-
-    // 1206 -> "Estimation : NaN Generated"
-    Estimation::E_error_n(6);
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Estimation : NaN Generated");
-
-    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    Estimation::E_error("Estimation : Equation %.80s : compiling error %.80s", "ACAF", "???");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
-
-    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    Estimation::E_error_n(12, "ACAF", "???");
-    msg = B_get_last_error();
-    EXPECT_EQ(std::string(msg), "Estimation : Equation ACAF : compiling error ???");
-
-    // 1212, "Estimation : Equation %.80s : compiling error %.80s"
-    Estimation::E_msg_n(12, "ACAF", "???");
-}
-
 TEST_F(IodeCAPITest, Tests_BUF)
 {
     U_test_print_title("Tests BUF");
@@ -1193,7 +1149,7 @@ TEST_F(IodeCAPITest, Tests_ERRMSGS)
 {
     U_test_print_title("Tests Err Msgs");
 
-    B_seterrn(86, "bla bla");
+    error_manager.append_error("bla bla: incorrect period");
     kerror(0, "Coucou de kerror %s", "Hello");
     kmsg("Coucou de kmsg %s -- %g", "Hello", 3.2);
 }

@@ -98,7 +98,8 @@ int K_load_RWS(int ref, char *filename)
     KDB     *kdb = NULL;
 
     if(ref < 2 || ref > 5) {
-        B_seterrn(73);
+        error_manager.append_error(std::string("Invalid Reference number. Must be between 2 and 5. Got") +
+                                   std::to_string(ref));
         return(-1);
     }
     

@@ -57,7 +57,10 @@ int B_IdtExecute(char* arg, int unused)
     smpl = PER_atosmpl(from, to);
 
     if(smpl == NULL) {
-        B_seterror("IdtExecute: %s %s wrong sample", from, to);
+        std::string error_msg = "IdtExecute: '";
+        error_msg += std::string(from) + ":" + std::string(to);
+        error_msg += "' wrong sample";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 

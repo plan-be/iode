@@ -22,6 +22,10 @@
 #include "api/utils/time.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
 
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
+
 
 /**
  *  Expands an argument by replacing @filename and $listname by their contents : 
@@ -42,7 +46,7 @@
  *  If nb is > 0, the function checks that, after expanding arg, the resulting number or arguments 
  *  equals nb (the expected value). 
  *  
- *  On error, B_seterrn() is called and the function returns NULL.
+ *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
  *  
  *  Calls A_init() and A_check() functions from the s_args group (see http://xon.be/scr4/libs1/libs12.htm)
  *  
@@ -63,7 +67,7 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
     if(args == 0) return(args);
     if((adef && A_check(args, adef)) ||
             (nb > 0 && SCR_tbl_size((unsigned char**) args) != nb)) {
-        B_seterrn(OM_ILL_ARGS);
+        error_manager.append_error("Illegal argument(s)");
         A_free((unsigned char**) args);
         args = 0;
     }
@@ -78,7 +82,7 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
  *  
  *  If nb is not null, checks that the number of parameters is equal to n. 
  *  
- *  On error, B_seterrn() is called and the function returns NULL.
+ *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
  *  
  *  @param [in] arg char*   argument
  *  @param [in] nb  int     if not null, expected nb of args after splitting arg
@@ -95,7 +99,7 @@ char **B_vtom_chk(char* arg, int nb)
     args = SCR_vtomsq(tmp, B_SEPS, '"');
     if(args == 0) return((char**) args);
     if((nb > 0 && SCR_tbl_size(args) != nb)) {
-        B_seterrn(OM_ILL_ARGS);
+        error_manager.append_error("Illegal argument(s)");
         SCR_free_tbl(args);
         args = 0;
     }

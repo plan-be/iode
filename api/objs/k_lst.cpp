@@ -40,7 +40,10 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
     KDB     *exo = NULL, *scal = NULL;
 
     if(kdb == NULL || KNB(kdb) == 0) {
-        B_seterrn(110);
+        std::string error_msg = "scan : '";
+        error_msg += v_iode_types[kdb->k_type];
+        error_msg += "' database is empty";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 

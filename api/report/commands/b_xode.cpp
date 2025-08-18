@@ -40,7 +40,7 @@ int B_FileImportCmt(char* arg, int unused)
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 5) {
-        B_seterrn(67);
+        error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
     }
@@ -86,7 +86,7 @@ int B_FileImportVar(char* arg, int unused)
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
     if(nb_args < 6) {
-        B_seterrn(67);
+        error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
     }

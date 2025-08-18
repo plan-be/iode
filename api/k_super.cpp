@@ -74,7 +74,6 @@
 
 #include "api/constants.h"
 #include "api/k_super.h"
-#include "api/messages.hpp"
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
@@ -591,28 +590,6 @@ int ODE_end(const int st)
     return(IodeEnd());
 }
 
-
-/**
- * @brief return a message given its code.
- * 
- * @param val 
- * @return char* 
- */
-char* SCR_err_txt_super_impl(int val)
-{
-    char* msg;
-    static char buf[256];
-
-    msg = get_iode_message(val);
-    if(msg == NULL) 
-        return NULL;
-
-    memset(buf, '\0', sizeof(buf));
-    strcpy(buf, msg);
-    return buf;
-}
-
-
 /**
  *  Assigns default values to "super" (virtual) functions. 
  *  Specifically, implements scr4 functions that can be superseeded (2022 version only).
@@ -626,6 +603,4 @@ void IODE_assign_super_API()
 {
     A_expand_super = A_expand_super_API;   // Ok for other implementations (DOS, IODECOM, PYTHON, Qt)
     // A_error_super  = A_error_super_API; //  To be implemented for DOS and Qt (IODECOM ?)
-    SCR_err_txt_super = SCR_err_txt_super_impl;
 }
-

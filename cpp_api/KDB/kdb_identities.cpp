@@ -73,7 +73,7 @@ void KDBIdentities::execute_identities(const Period& from, const Period& to, con
     SCR_free_tbl((unsigned char**) idts);
     if (rc != 0)
     {
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
             throw std::runtime_error("Cannot execute identities '" + identities_list + "'\n" + last_error);
     }

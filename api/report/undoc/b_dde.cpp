@@ -1008,13 +1008,15 @@ int B_ExcelSet(char *arg, int type)
     rc = B_ExcelSetItem(item, ptr, nc, nl);
 
 the_end:
-    if(pos < 0) B_seterror(B_msg(98), args[0]);  /* JMP 10-08-00 */
+    if(pos < 0)
+        error_manager.append_error(std::string(args[0]) + " : not found");  /* JMP 10-08-00 */
 
     SCR_free_tbl((unsigned char**) args);
     SCR_free(per);
     SCR_free(ptr);
 
-    if(rc >= 0) rc = 0;
+    if(rc >= 0) 
+        rc = 0;
 
     return(rc);
 }

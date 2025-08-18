@@ -18,6 +18,7 @@
 #include "scr4/s_args.h"
 #include "scr4/s_prodt.h"
 
+#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -28,6 +29,10 @@
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/objs/tables.h"
+
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
 
 
 // Utilities 
@@ -421,7 +426,7 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
     if(rc < 0) {
         rc = -1;
-        B_seterror(L_error());
+        error_manager.append_error(std::string(L_error()));
     }
     else rc = 0;
 
@@ -456,7 +461,7 @@ int K_upd_tbl(char* name, char* arg)
 
     tbl = T_create(2);
     if(tbl == NULL) {
-        B_seterror("Memory error");
+        error_manager.append_error("Memory error");
         return(-1);
     }
     A_SEPS = T_SEPS;
