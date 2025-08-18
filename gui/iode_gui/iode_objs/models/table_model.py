@@ -7,7 +7,7 @@ from iode_gui.utils import MAX_PRECISION_NUMBERS, NAN_REP
 from typing import Union, List, Tuple, Any
 import numpy as np
 from iode import (IodeType, VarsMode, comments, equations, identities, lists, 
-                  scalars, tables, variables, Scalar, Table, NA, is_NA)
+                  scalars, tables, variables, Scalar, Table, Period, NA, is_NA)
 
 
 class CommentsModel(IodeAbstractTableModel):
@@ -76,12 +76,12 @@ class IdentitiesModel(IodeAbstractTableModel):
             QMessageBox.warning(None, "WARNING", str(e))
             return False
         
-    def execute_identity(self, row: int) -> None:
+    def execute_identity(self, row: int, from_period: Period, to_period: Period) -> None:
         name = self.headerData(row, Qt.Orientation.Vertical, Qt.ItemDataRole.DisplayRole)
         try:
-            sample = variables.sample
-            self._displayed_database.execute(name, sample.start, sample.end)
-            QMessageBox.information(None, "INFO", f"Identity {name} successfully executed")
+            self._displayed_database.execute(name, from_period, to_period)
+            QMessageBox.information(None, "INFO", f"Identity {name} successfully executed over the "
+                                    f"periods range {from_period} to {to_period}.")
         except Exception as e:
             QMessageBox.warning(None, "WARNING", f"Could not execute identity {name}:\n\n{str(e)}")
 
