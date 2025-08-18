@@ -34,21 +34,16 @@
  *      int      A2M_BOXWIDTH = 1       Width of the box around the graphs (0 for no box)
  *      int      A2M_BACKBRUSH = 50     Intensity of the graph background brushes
  *      int      A2M_BACKCOLOR = 'b'    Color of the graph background: one of "Bwrgbcmy"
- *      int      A2M_GIF_BGCOLOR_NB     Number of the BG color of the gif graphs // JMP 1/5/2022
  *      int      A2M_GIF_TRCOLOR_NB     Number of the TR color of the gif graphs // JMP 1/5/2022 
  *  
  */
+#include <s_a2m.h>
 
+#include "api/constants.h"
 #include "api/b_a2mini.h"
 #include "api/write/write.h"
 #include "b_iodeini.h"
-#include <s_a2m.h>
 
-
-// Variables
-// ---------
-int      A2M_GIF_BGCOLOR_NB;   // Number of the BG color of the gif graphs // JMP 1/5/2022
-int      A2M_GIF_TRCOLOR_NB;   // Number of the TR color of the gif graphs // JMP 1/5/2022 
 
 /**
  *  Reads the Section "A2MGNL" of the iode.ini file and stores the
@@ -63,8 +58,6 @@ int      A2M_GIF_TRCOLOR_NB;   // Number of the TR color of the gif graphs // JM
  */
 void B_A2mGetGnlParms()
 {
-    extern int W_a2mapp; /* JMP 25-02-98 */
-
     A2M_ESCCH   = B_IniReadChar("A2MGNL", "ESC", '\\');     // See https://iode.plan.be/doku.php?id=caracteres_reserves
     A2M_DEFCH   = B_IniReadChar("A2MGNL", "DEF", '&');      // Id.
     A2M_CMDCH   = B_IniReadChar("A2MGNL", "CMD", '.');      // Id.
@@ -82,7 +75,7 @@ void B_A2mGetGnlParms()
     A2M_BACKBRUSH = B_IniReadNum ("A2MGNL", "PCT", 0);
     A2M_BOXWIDTH  = B_IniReadNum ("A2MGNL", "BOX", 0);
     
-    B_IniReadText("A2MGNL", "TAG", A2M_CURTAG, 40, "par_1");
+    B_IniReadText("A2MGNL", "TAG", (char*) A2M_CURTAG, 40, "par_1");
     SCR_sqz(A2M_CURTAG);
 }
 
@@ -90,9 +83,7 @@ void B_A2mGetGnlParms()
  *  Rewrites the Section "A2MGNL" of the iode.ini file with the current values of A2M* variables.
  */
 void B_A2mSaveGnlParms()
-{
-    extern int W_a2mapp; /* JMP 25-02-98 */
-    
+{    
     B_IniWriteChar("A2MGNL", "ESC", A2M_ESCCH);             // See https://iode.plan.be/doku.php?id=caracteres_reserves
     B_IniWriteChar("A2MGNL", "SEP", A2M_SEPCH);             // Id.
     B_IniWriteChar("A2MGNL", "DEF", A2M_DEFCH);             // Id.
@@ -109,7 +100,7 @@ void B_A2mSaveGnlParms()
     B_IniWriteNum ("A2MGNL", "BOX", A2M_BOXWIDTH );
     
     SCR_sqz(A2M_CURTAG);
-    B_IniWriteText("A2MGNL", "TAG", A2M_CURTAG);
+    B_IniWriteText("A2MGNL", "TAG", (char*) A2M_CURTAG);
 }
 
 /**
@@ -180,9 +171,9 @@ void B_A2mGetRtfParms()
     W_rtfhelp        = B_IniReadYN  ("A2MRTF", "HCW",           0);
     
     B_IniReadText("A2MRTF", "TITLE", title, 511, "");
-    B_A2mSetRtfTitle(title);
+    B_A2mSetRtfTitle((unsigned char*) title);
     B_IniReadText("A2MRTF", "COPYR", title, 511, "");
-    B_A2mSetRtfCopy(title);
+    B_A2mSetRtfCopy((unsigned char*) title);
 }
 
 
@@ -217,12 +208,12 @@ void B_A2mSaveRtfParms()
     B_IniWriteYN  ("A2MRTF", "TOC",      A2M_RTF_TOC     );
     B_IniWriteYN  ("A2MRTF", "HCW",      W_rtfhelp       );
     
-    SCR_strlcpy(title, A2M_RTF_TITLE, sizeof(title) - 1);
-    SCR_AnsiToOem(title, title);
+    SCR_strlcpy((unsigned char*) title, A2M_RTF_TITLE, sizeof(title) - 1);
+    SCR_AnsiToOem((unsigned char*) title, (unsigned char*) title);
     B_IniWriteText("A2MRTF", "TITLE", title); 
 
-    SCR_strlcpy(title, A2M_RTF_COPYRIGHT, sizeof(title) - 1);
-    SCR_AnsiToOem(title, title);
+    SCR_strlcpy((unsigned char*) title, A2M_RTF_COPYRIGHT, sizeof(title) - 1);
+    SCR_AnsiToOem((unsigned char*) title, (unsigned char*) title);
     B_IniWriteText("A2MRTF", "COPYR", title); 
 }
 
@@ -252,13 +243,13 @@ void B_A2mGetHtmlParms()
 
     SCR_free(A2M_HTML_TITLE);
     B_IniReadText("A2MHTML", "TITLE", buffer, 511, "");
-    A2M_HTML_TITLE = SCR_stracpy(buffer);
+    A2M_HTML_TITLE = SCR_stracpy((unsigned char*) buffer);
     SCR_strip(A2M_HTML_TITLE);
 
     SCR_free(A2M_HTML_BODY);
     B_IniReadText("A2MHTML", "BODYTAG", buffer, 511, "");
-    A2M_HTML_BODY = SCR_stracpy(buffer);
-    SCR_strip(A2M_HTML_BODY);   
+    A2M_HTML_BODY = (char*) SCR_stracpy((unsigned char*) buffer);
+    SCR_strip((unsigned char*) A2M_HTML_BODY);   
 }
 
 
@@ -269,55 +260,23 @@ void B_A2mGetHtmlParms()
  */
 void B_A2mSaveHtmlParms()
 {
-    B_IniWriteYN  ("A2MHTML", "PARANUM",     A2M_NUMBERS      );
-    B_IniWriteNum ("A2MHTML", "FONTSIZE",    A2M_FONTSIZE     );
-    B_IniWriteChar("A2MHTML", "FONTFAMILY",  A2M_FONTFAMILY   );
-    B_IniWriteNum ("A2MHTML", "FONTINCR",    A2M_FONTINCR     );
-    B_IniWriteChar("A2MHTML", "TFONTFAMILY", A2M_TFONTFAMILY  );
-    B_IniWriteNum ("A2MHTML", "TFONTSIZE",   A2M_TFONTSIZE    );
-    B_IniWriteYN  ("A2MHTML", "TCOLOR",      A2M_HTML_TCOLOR  );
-    B_IniWriteYN  ("A2MHTML", "TBORDER",     A2M_HTML_TBORDER );
-    B_IniWriteYN  ("A2MHTML", "TOC",         A2M_HTML_TOC     );
-    B_IniWriteText("A2MHTML", "TITLE",       A2M_HTML_TITLE   );
-    B_IniWriteText("A2MHTML", "BODYTAG",     A2M_HTML_BODY    );
+    B_IniWriteYN  ("A2MHTML", "PARANUM",       A2M_NUMBERS      );
+    B_IniWriteNum ("A2MHTML", "FONTSIZE",      A2M_FONTSIZE     );
+    B_IniWriteChar("A2MHTML", "FONTFAMILY",    A2M_FONTFAMILY   );
+    B_IniWriteNum ("A2MHTML", "FONTINCR",      A2M_FONTINCR     );
+    B_IniWriteChar("A2MHTML", "TFONTFAMILY",   A2M_TFONTFAMILY  );
+    B_IniWriteNum ("A2MHTML", "TFONTSIZE",     A2M_TFONTSIZE    );
+    B_IniWriteYN  ("A2MHTML", "TCOLOR",        A2M_HTML_TCOLOR  );
+    B_IniWriteYN  ("A2MHTML", "TBORDER",       A2M_HTML_TBORDER );
+    B_IniWriteYN  ("A2MHTML", "TOC",           A2M_HTML_TOC     );
+    B_IniWriteText("A2MHTML", "TITLE", (char*) A2M_HTML_TITLE   );
+    B_IniWriteText("A2MHTML", "BODYTAG",       A2M_HTML_BODY    );
 }
 
 
 // ANNULE JMP 4/5/2022
 void B_A2mGetGIFParms() {}
 void B_A2mSaveGIFParms() {}
-/*
-void B_A2mGetGIFParms()
-{
-    int col;
-
-    col = B_IniReadNum ("A2MGIF", "BGCOLOR", 1); 
-    if(col > 7 || col < 0) col = 1;
-    B_A2mSetCol(A2M_GIF_BGCOLOR, col);
-    A2M_GIF_BGCOLOR_NB = col;
-    
-    col = B_IniReadNum ("A2MGIF", "TRCOLOR", 1); 
-    if(col > 7 || col < 0) col = 1;
-    B_A2mSetCol(A2M_GIF_TRCOLOR, col);
-    A2M_GIF_TRCOLOR_NB = col;
-
-    A2M_GIF_TRANS     = B_IniReadYN  ("A2MGIF", "TRANS", 0);
-    A2M_GIF_INTER     = B_IniReadYN  ("A2MGIF", "INTER", 0);
-    A2M_GIF_FONT      = B_IniReadNum ("A2MGIF", "FONT",  1);
-    A2M_GIF_FILLED    = B_IniReadYN  ("A2MGIF", "FILLED", 0);    
-}
-
-void B_A2mSaveGIFParms()
-{
-    B_IniWriteNum("A2MGIF", "BGCOLOR", A2M_GIF_BGCOLOR_NB);
-    B_IniWriteNum("A2MGIF", "TRCOLOR", A2M_GIF_TRCOLOR_NB);
-
-    B_IniWriteYN  ("A2MGIF", "TRANS",  A2M_GIF_TRANS );
-    B_IniWriteYN  ("A2MGIF", "INTER",  A2M_GIF_INTER );
-    B_IniWriteNum ("A2MGIF", "FONT",   A2M_GIF_FONT  );
-    B_IniWriteYN  ("A2MGIF", "FILLED", A2M_GIF_FILLED);    
-}
-*/
 void B_A2mGetCsvParms() {}
 void B_A2mSaveCsvParms() {}
 
@@ -390,8 +349,6 @@ void B_A2mSaveMifParms()
  */
 void B_A2mGetGdiParms()
 {
-    extern  int W_gdiask; /* GB 23/03/98 */
-    extern  int W_gdiduplex, W_gdiorient; /* JMP 18-04-98 */
     int     table_shading;
     char    buffer[512];
 
@@ -430,12 +387,12 @@ void B_A2mGetGdiParms()
    
     SCR_free(A2M_PGHEAD);
     B_IniReadText("A2MGDI", "PGHEADER", buffer, 511, "");
-    A2M_PGHEAD = SCR_stracpy(buffer);
+    A2M_PGHEAD = SCR_stracpy((unsigned char*) buffer);
     SCR_strip(A2M_PGHEAD);   
     
     SCR_free(A2M_PGFOOT);
     B_IniReadText("A2MGDI", "PGFOOTER", buffer, 511, "");
-    A2M_PGFOOT = SCR_stracpy(buffer);
+    A2M_PGFOOT = SCR_stracpy((unsigned char*) buffer);
     SCR_strip(A2M_PGFOOT);   
 
     //W_gdiask    = p_a2mgdi_PGPROMPT;    /* GB 23/03/98 */
@@ -451,10 +408,6 @@ void B_A2mGetGdiParms()
  */
 void B_A2mSaveGdiParms()
 {
-    extern  int W_gdiask;                 /* GB 23/03/98 */
-    extern  int W_gdiduplex, 
-                W_gdiorient;              /* JMP 18-04-98 */
-
     // B_A2mGetGnlParms();
     B_IniWriteYN  ("A2MGDI", "PROMPT",      W_gdiask);
     B_IniWriteNum ("A2MGDI", "FONTSIZE",    A2M_FONTSIZE   );
@@ -480,8 +433,8 @@ void B_A2mSaveGdiParms()
     
     B_IniWriteYN ("A2MGDI", "TABLESHADING", A2M_TSHADING_BRUSH[0]);
    
-    B_IniWriteText("A2MGDI", "PGHEADER", A2M_PGHEAD);
-    B_IniWriteText("A2MGDI", "PGFOOTER", A2M_PGFOOT);
+    B_IniWriteText("A2MGDI", "PGHEADER", (char*) A2M_PGHEAD);
+    B_IniWriteText("A2MGDI", "PGFOOTER", (char*) A2M_PGFOOT);
 }
 
 

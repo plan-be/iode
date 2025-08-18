@@ -95,7 +95,6 @@ int B_WsLoad(char* arg, int type)
 int X_findtype(char* filename)
 {
     int         i, lg = (int)strlen(filename);
-    extern char k_ext[][4];
     char        buf[5];
 
     // Check std extensions .cmt => .var
@@ -196,7 +195,6 @@ int B_WsSave(char* arg, int type)
  int B_WsSaveCmp(char* arg, int type)
 {
     char        buf[K_MAX_FILE + 1];
-    extern int  K_LZH;                  /* JMP 28-05-00 */
     int         rc = 0, klzh;
 
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */

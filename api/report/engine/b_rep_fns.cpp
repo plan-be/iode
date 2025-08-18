@@ -1665,11 +1665,7 @@ U_ch *RPF_SimCpuSort(U_ch** unused)
     return(SCR_stracpy(buf));
 }
 
-
-
 /*=================== VTake, ... ==============================*/
-
-extern char    *RP_VSEPS; // Separators (see RP_vseps())
 
 /**
  *  Takes the first n (or the last if n < 0) elements of a argument list.

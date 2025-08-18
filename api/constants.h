@@ -55,15 +55,11 @@
 #define MINFLOAT  FLT_MIN
 #endif
 
-#ifdef __cplusplus
 #include <set>
 #include <map>
 #include <string>
 #include <vector>
 #include <stdexcept>
-
-extern "C" {
-#endif
 
 /* ALLOCS DOC 28/8/2012 */
 // A PLACER DEVANT LES INCLUDES DE SCR (ou dans cc -c -DALLOCDOCON ...)
@@ -205,16 +201,10 @@ const static int IODE_NB_FILE_EXT = 31;
 
 /*---------------- GLOBALS ------------------------*/
 
-extern char    *BUF_DATA;
-extern int      K_SCR;
-extern  char    STATIC_BUF[];
-extern  int     STATIC_BUF_LG;
-extern  char    B_SEPS[];
-// extern  int     B_NBDEC;  // JMP 18-04-2022
-// extern  int     B_LANG;    // JMP 18/04/2022
-extern  int     B_MULTIBAR; /* GB 30/10/2007 */
-
-extern void (*B_MessageBox_impl)(unsigned char* title, unsigned char* message, unsigned char* buts[]);
+inline char    *BUF_DATA = NULL;
+inline char    B_SEPS[] = " ,\n\t";     // Accepted separators for fn arguments (in report, DOS GUI..)
+                                        // !! Semi-colon not accepted !!
+inline int     B_MULTIBAR = 0;          // Graph parameter (Geert Bryon)
 
 /*---------------- MACROS ------------------------*/
 
@@ -222,7 +212,3 @@ extern void (*B_MessageBox_impl)(unsigned char* title, unsigned char* message, u
 #define K_ISFILE(filename)    (filename != 0 && filename[0] != '-' && filename[0] != 0)
 #define IODE_IS_A_NUMBER(x)   ((x) >= (double)(-1.0e37))
 #define IODE_IS_0(x)          (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
-
-#ifdef __cplusplus
-}
-#endif

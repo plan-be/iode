@@ -203,10 +203,7 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
  */
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
-    //extern int KT_nb;
-    int     rc = 0, pos, hg, ng, i, 
-            //app = KT_nb, 
-            view = !B_viewmode;
+    int     rc = 0, pos, hg, ng, i, view = !B_viewmode;
     TBL     *tbl;
     char    **tbls;
 
@@ -228,7 +225,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         }
         tbl = KTVAL(K_WS[TABLES], pos);
         //KT_nb++;
-        hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode); // JMP 11-05-2022 to avoid extern in k_graph.c
+        hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
         if(view) W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
 
@@ -271,9 +268,6 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     int     rc = 0;
     char    *smpl;
     U_ch    **args;
-    //extern int KT_nb;
-
-    //KT_nb = 0;
 
     B_viewmode = mode;
     if(arg == 0 || arg[0] == 0) {

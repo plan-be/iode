@@ -13,6 +13,22 @@ inline int      A2M_BOXWIDTH = 1;     // Width of the box around the graphs (0 f
 inline int      A2M_BACKBRUSH = 50;   // Intensity of the graph background brushes
 inline int      A2M_BACKCOLOR = 'b';  // Color of the graph background: one of "Bwrgbcmy"
 
+inline char    W_filename[K_MAX_FILE + 1] = "";     // Output file name
+inline int     W_type = 0;                          // Current A2M output destination:
+
+inline int     W_gdiask = 0;                        // Ask the user which printer to send the data to. If null, selects the default printer.
+inline int     W_gdiorient = 0;                     // Unused -- Printer page orientation: 0 = Portrait, 1 = Landscape
+inline int     W_gdiduplex = 0;                     // Unused -- Printer duplex:
+                                                    //      0 for simplex
+                                                    //      1 for duplex
+                                                    //      2 for vertical duplex
+inline char    W_gdiprinter[80] = "";               // Printer name
+inline int     W_a2mapp = 0;                        // A2M Dest only:
+                                                    //      0 => output file is reset,
+                                                    //      1 => output is appended to the file
+inline int     W_rtfhelp = 0;                       // RTF only: generate RTF output for the outdated Windows help format (.hlp).
+inline int     W_htmlhelp = 0;                      // RTF only: generate HTML output for the Windows HEML help format (.chm).
+
 /* w_wrt.c (MSC) */
 int W_dest(char *filename,int type);
 // int W_InitParms();

@@ -276,6 +276,9 @@ inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (m
 inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
 inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
+inline KDB*     L_EXEC_DBV = nullptr;   
+inline KDB*     L_EXEC_DBS = nullptr; 
+
 // --- PRIORITY OF OPERATORS  and number of functions args ---
 // See iode.h FOR POSITIONS in the vectors
 inline int L_PRIOR[13]    = {2, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7};

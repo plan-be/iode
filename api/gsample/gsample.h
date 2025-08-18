@@ -115,7 +115,6 @@ struct FILS
 /*----------------------- GLOBALS ---------------------------------*/
 
 #define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
-//extern  FREF    fref[K_MAX_FREF + 1];
 
 // Operator representations used when printing (only valid for period operations)
 // TODO: distinguish bw operations between periods and between files ?

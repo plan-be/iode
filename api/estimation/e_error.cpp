@@ -14,9 +14,6 @@
 #include "api/k_super.h"
 #include "api/estimation/estimation.h"
 
-// TODO: remove the following declaration when b_errors.c is refactored to use the C++ style
-extern "C" char* B_ERROR_DFT_MSG;
-
 
 /**
  *  Displays a message using kmsg().

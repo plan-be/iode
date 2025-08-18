@@ -98,6 +98,8 @@
 #include "api/simulation/simulation.h"
             
 
+extern "C" int SCR_vtime;
+
 double  CSimulation::KSIM_EPS = 0.001;
 double  CSimulation::KSIM_RELAX = 1.0;
 int     CSimulation::KSIM_MAXIT = 100;
@@ -426,7 +428,6 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
  */
 int CSimulation::K_simul_1(int t)
 {
-    extern  int SCR_vtime;
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime; /* JMP 27-09-96 */
     char    buf[10], msg[80];
     long    ms_iter;

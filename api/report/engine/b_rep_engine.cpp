@@ -149,7 +149,6 @@
 // ------------------------
 char            **RP_ARGV = NULL;          // Current report arguments
 int             RP_DEPTH = 0;              // Level of the current report in the report "stack"
-extern KDB      *RP_MACRO;              // Special KDB with all $defines (see also b_proc_defs.c)
 
 // Function declarations
 // ---------------------

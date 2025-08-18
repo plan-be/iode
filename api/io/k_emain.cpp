@@ -103,10 +103,6 @@
 #include "api/io/import.h"
 #include "api/io/export.h"
 
-extern  char    **IMP_rule; // See k_rule.c
-extern  char    **IMP_pat;  // See k_rule.c
-extern  int     IMP_trace;  // See k_rule.c
-
 
 /**
  *  Replaces the value of EXP_SEP and EXP_NA. Strips the 2 strings and/or set a default value if needed.

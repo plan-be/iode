@@ -307,7 +307,6 @@ void T_print_files(COLS* cls, int dim)
 void T_print_mode(COLS* cls, int dim)
 {
     int    i;
-    extern char *KLG_OPERS_TEXTS[][3];
 
     for(i = 0; i < MAX_MODE; i++) {
         if(KT_mode[i] == 0) continue;
@@ -391,16 +390,6 @@ unsigned char *T_get_title(TBL* tbl)
     
     for(k = 0; k < T_NL(tbl); k++)
         if(tbl->t_line[k].tl_type == TABLE_LINE_TITLE) break;
-    
-// OLD VERSION USING STATIC_BUF
-//    if(k == T_NL(tbl) ||
-//            ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)
-//        strcpy(STATIC_BUF, "No title");
-//    else
-//        SCR_strlcpy(STATIC_BUF, (char *)((TCELL *) tbl->t_line[k].tl_val)->tc_val, STATIC_BUF_LG);
-//
-//    return(STATIC_BUF);
-
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
     if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)

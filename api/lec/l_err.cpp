@@ -41,7 +41,6 @@ char  *L_ERR_TEXT[] = {
 char *L_error()
 {
     static char     msg[128];
-    extern YYFILE*  L_YY; // LEC stream the compiler is reading from
 
     msg[0] = 0;
     if(L_errno <= 0) return(msg);

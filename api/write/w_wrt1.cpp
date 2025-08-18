@@ -19,9 +19,6 @@
 #include "api/write/write.h"
 
 
-extern "C" int W_rtfhelp;
-extern int W_type;
-
 /**
  *  Starts an A2M enum paragraph (enum_*) of level n (only the next paragraph is changed). 
  *  

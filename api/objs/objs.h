@@ -4,6 +4,9 @@
 #include "api/utils/time.h"
 #include "api/objs/kdb.h"
 
+// K_LZH : indicates if a saved WS must be compressed or not 
+// -> https://en.wikipedia.org/wiki/LHA_(file_format).
+inline int  K_LZH = 0; 
 
 inline char K_LABELS[] = "KOBJS 4.02\032";  // Version 1
 inline char K_LABELD[] = "KOBJS 504d\032";  // Version 2

@@ -115,27 +115,9 @@ static int W_SetPrinterSettings();
 // Variable definitions 
 // ----------------------------------------------------------------------------------------------------
 
-char    W_filename[K_MAX_FILE + 1] = "";        // Output file name
-int     W_type = 0;                             // Current A2M output destination:
-
-int     W_gdiask = 0;                           // Ask the user which printer to send the data to. If null, selects the default printer.
-int     W_gdiorient = 0;                        // Unused -- Printer page orientation: 0 = Portrait, 1 = Landscape
-int     W_gdiduplex = 0;                        // Unused -- Printer duplex:
-                                                //      0 for simplex
-                                                //      1 for duplex
-                                                //      2 for vertical duplex
-char    W_gdiprinter[80] = "";                  // Printer name
-int     W_a2mapp = 0;                           // A2M Dest only:
-                                                //      0 => output file is reset,
-                                                //      1 => output is appended to the file
-int     W_rtfhelp = 0;                          // RTF only: generate RTF output for the outdated Windows help format (.hlp).
-int     W_htmlhelp = 0;                         // RTF only: generate HTML output for the Windows HEML help format (.chm).
-
 static int      W_cont = 0;                     // Indicates that a printing session is active
 static int      W_cancel = 0;                   // Indicates that the current printing session is cancelled (cannot open the output file for ex.) until the next call to W_open().
 static A2MFILE* W_af;                           // Current A2M memory stream
-
-
 
 // ====================================================================================================
 // FUNCTIONS
@@ -548,9 +530,9 @@ int W_record(char *str)
  
 #ifndef UNIX
 #ifdef SCRW32
-extern  HWND    hMainWnd; /* JMP 01-02-98 */
+extern "C"  HWND    hMainWnd; /* JMP 01-02-98 */
 #else
-extern  HWND    hWndDOS;
+extern "C"  HWND    hWndDOS;
 #endif
 #endif
 

@@ -2,10 +2,6 @@
 
 #include "api/constants.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* ---------------- ENUMS ---------------- */
 
 enum IodeBErrorMsg
@@ -50,22 +46,20 @@ enum IodeBErrorMsg
 
 /* ---------------- GLOBALS ---------------- */
 
-extern char** B_ERROR_MSG;
+inline char**  B_ERROR_MSG = NULL;                  // Table of last recorded error messages 
+inline int     B_ERROR_NB = 0;                      // Nb of last recorded error messages 
+inline char*   B_ERROR_DFT_MSG = "Unknown error";   // Default message if not found in iode_msg_map
 
 /* ---------------- FUNCS ---------------- */
 
-extern void B_seterror(char *,...);
-extern void B_seterrn(int , ...);
+void B_seterror(char *,...);
+void B_seterrn(int , ...);
 
-extern void B_add_error(char* msg);
-extern char* B_get_last_error(void);
-extern void B_display_last_error(void);
-extern void B_print_last_error(void);
-extern void B_clear_last_error(void);
-//extern void B_reset_error(void);
-extern char *B_msg(int );
-extern int B_get1int(char *);
-
-#ifdef __cplusplus
-}
-#endif
+void B_add_error(char* msg);
+char* B_get_last_error(void);
+void B_display_last_error(void);
+void B_print_last_error(void);
+void B_clear_last_error(void);
+//void B_reset_error(void);
+char *B_msg(int );
+int B_get1int(char *);
