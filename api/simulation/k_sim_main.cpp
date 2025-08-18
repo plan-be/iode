@@ -96,7 +96,11 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
-            
+
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
+
 
 extern "C" int SCR_vtime;
 
@@ -470,7 +474,10 @@ int CSimulation::K_simul_1(int t)
         return(0);
     }
     else {
-        B_seterrn(114, KSIM_MAXIT, "_DIVER");
+        std::string err_msg = "Model does not converge after ";
+        err_msg += std::to_string(KSIM_MAXIT);
+        err_msg += " iterations";
+        error_manager.append_error(err_msg);
         K_restore_XK(t);
         K_diverge(t, "_DIVER", KSIM_EPS); // Saves the list of non convergent eqs in the list _DIVER
     }
@@ -524,7 +531,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
     double    *x;
 
     if(KNB(dbe) == 0) {
-        B_seterrn(110);
+        std::string err_msg = "Empty set of equations";
+        error_manager.append_error(err_msg);
         return(rc);
     }
 
@@ -538,7 +546,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
     // and check that the simulation sample is included in KSIM_DBV sample
     t = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
     if(t < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
-        B_seterrn(111);
+        std::string err_msg = "Simulation sample out of the Variables sample boundaries";
+        error_manager.append_error(err_msg);
         return(rc);
     }
 
@@ -565,7 +574,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
         posvar = K_find(dbv, KONAME(dbe,i));
         KSIM_POSXK[i] = posvar;
         if(posvar < 0) {
-            B_seterrn(112, KONAME(dbe, i));
+            std::string err_msg = std::string("'") + std::string(KONAME(dbe, i)) + "': cannot find variable";
+            error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
         }
@@ -573,7 +583,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
-            B_seterrn(113, KONAME(dbe, i));
+            std::string err_msg = std::string("'") + std::string(KONAME(dbe, i)) + "': cannot link equation";
+            error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
         }
@@ -587,20 +598,25 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
         for(i = 0; i < endo_exonb; i ++) {
             var = (char**) SCR_vtom((unsigned char*) endo_exo[i], (int) '-');
             if(var == NULL || SCR_tbl_size((unsigned char**) var) != 2) {
-                B_seterrn(115, endo_exo[i]);
+                std::string err_msg = std::string(endo_exo[i]) + ": syntax error in goal seeking parameter";
+                error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }
 
             posendo = K_find(KSIM_DBV, var[0]); // Position of the endogenous var in dbv
             if(posendo < 0) {
-                B_seterrn(116, var[0]);
+                std::string err_msg = "Goal Seeking: '";
+                err_msg += std::string(var[0]);
+                err_msg += "': no such equation in the Equations workspace";
+                error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }
             posexo = K_find(KSIM_DBV, var[1]);  // Position of the exogenous var in dbv
             if(posexo < 0) {
-                B_seterrn(112, var[1]);
+                std::string err_msg = std::string("'") + std::string(var[1]) + "': cannot find variable";
+                error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }

@@ -9,10 +9,6 @@
 #include "api/objs/kdb.h"
 #include "api/objs/variables.h"
 
-#undef min
-#undef max
-#include <algorithm>    // for std::min, std::max
-
 #include <vector>
 #include <string>
 

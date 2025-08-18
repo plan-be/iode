@@ -267,19 +267,16 @@ int K_clear(KDB* kdb)
  *  
  *  The data is **not** duplicated ("shallow copy") .
  *  
- *  On error, calls B_seterrn: 
- *      - 98 if one of the names is not found
- *      - 99 if an entry cannot be created in the new DB
+ *  On error, calls IodeErrorManager::append_error() with the following messages:
+ *      - " %.80s : not found" if one of the names is not found
+ *      - " %.80s : skipped (low memory)" if an entry cannot be created in the new DB
  *  
  *  @param [in] kdb   KDB*      source kdb
  *  @param [in] nb    int       number of names 
  *  @param [in] names char*[]   null terminated list of names
  *  @return           KDB*      shallow copy of kdb[names] on success
  *                              NULL if kdb is null or one of the names cannot be found
- *  
- *  TODO: replace B_seterrn() by sth else ?
  */
- 
 KDB *K_refer(KDB* kdb, int nb, char* names[])
 {
     int     i, pos1, pos2, err = 0;
@@ -292,14 +289,16 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
     for(i = 0 ; i < nb && names[i]; i++) {
         pos2 = K_find(kdb, names[i]);
         if(pos2 < 0)  {
-            B_seterrn(98, names[i]);
+            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + 
+                                       " not found: ");
             err = 1;
             continue;
         }
 
         pos1 = K_add_entry(tkdb, names[i]);
         if(pos1 < 0) {
-            B_seterrn(99, names[i]);
+            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + 
+                                       " skipped: (low memory)");
             K_free_kdb(tkdb);
             tkdb = NULL;
             err = 1;
@@ -307,7 +306,10 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
         }
         KSOVAL(tkdb, pos1) = KSOVAL(kdb, pos2);
     }
-    if(err) B_display_last_error();
+
+    if(err) 
+        error_manager.display_last_error();
+
     return(tkdb);
 }
 

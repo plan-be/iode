@@ -61,6 +61,10 @@
 #include <vector>
 #include <stdexcept>
 
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
+
 /* ALLOCS DOC 28/8/2012 */
 // A PLACER DEVANT LES INCLUDES DE SCR (ou dans cc -c -DALLOCDOCON ...)
 #define ALLOCDOCON
@@ -146,6 +150,10 @@ enum IodeType
 
 #define IODE_NB_TYPES   7
 #define K_OBJ           7
+
+const static std::vector<std::string> v_iode_types = 
+{ "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
+
 
 enum IodeFileType
 {

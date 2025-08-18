@@ -732,19 +732,6 @@ Basic functions for managing function and report arguments.
 |`int B_get_arg0(char* arg0, char*arg, int lg)`|computes arg0, the first arg ('word') of max lg bytes, in the string arg.|
 |`int B_argpos(char* str, int ch)`|returns the position of a char in a string.|
 
-### b\_errors.c {#T56}
-
-Basic functions for managing error messages.
-
-|Syntax|Description|
-|:---|:---|
-|`char *B_msg(int n)`|Returns a static buffer containing the message n from file iode.msg.|
-|`void B_seterror(char* fmt, ...)`|Formats an error message and adds the text of the message to the global table of last errors.|
-|`void B_seterrn(int n, ...)`|Formats a message found in iode.msg and adds the result to the list of last errors.|
-|`void B_display_last_error()`|Displays the last recorded errors (in B\_ERROR\_MSG) using kmsgbox().|
-|`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
-|`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
-
 ## Group "Execution of identities" {#T57}
 
 See [IDENTITIES.md](identities.md).

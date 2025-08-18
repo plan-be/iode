@@ -49,7 +49,10 @@ static char **B_EqsSplitSmplName(char* arg, SAMPLE **psmpl)
     *psmpl = PER_atosmpl(from, to);
 
     if(*psmpl == NULL) {
-        B_seterrn(39, from, to);
+        std::string err_msg = "EqsEstimate: '"; 
+        err_msg += std::string(from) + ":" + std::string(to);
+        err_msg += "' wrong sample";
+        error_manager.append_error(err_msg);
         return(eqs);
     }
 
@@ -73,7 +76,7 @@ int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)
     int  rc;
 
     if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) {
-        B_seterrn(40);
+        error_manager.append_error("EqsEstimate: empty equations list");
         return(-1);
     }
     else {

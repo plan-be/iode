@@ -38,13 +38,14 @@ int B_SysRename(char* arg, int unused)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
-        B_seterror("Syntax error %s", arg);
+        error_manager.append_error("Failed to rename file due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
     rc = SCR_rename((char*) tbl[0], (char*) tbl[1]);
-    if(rc) B_seterror("Rename failed (%s)", arg);
+    if(rc) 
+        error_manager.append_error("Failed to rename file: '" + std::string(arg) + "'");
 
 fin:
     SCR_free_tbl(tbl);
@@ -65,13 +66,14 @@ int B_SysCopy(char* arg, int unused)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
-        B_seterror("Syntax error %s", arg);
+        error_manager.append_error("Failed to copy file dut to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
     rc = SCR_copy_file((char*) tbl[0], (char*) tbl[1]);
-    if(rc) B_seterror("Copy failed (%s)", arg);
+    if(rc) 
+        error_manager.append_error("Failed to copy file: '" + std::string(arg) + "'");
 
 fin:
     SCR_free_tbl(tbl);
@@ -92,13 +94,14 @@ int B_SysAppend(char* arg, int unused)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
-        B_seterror("Syntax error %s", arg);
+        error_manager.append_error("Failed to append file due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
     rc = SCR_append_file((char*) tbl[0], (char*) tbl[1]);
-    if(rc) B_seterror("Copy failed (%s)", arg);
+    if(rc) 
+        error_manager.append_error("Failed to append file: '" + std::string(arg) + "'");
 
 fin:
     SCR_free_tbl(tbl);
@@ -119,7 +122,7 @@ int B_SysDelete(char* arg, int unused)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl < 1) {
-        B_seterror("Syntax error %s", arg);
+        error_manager.append_error("Failed to delete file(s) due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
@@ -151,15 +154,20 @@ static int B_SysOemAnsiToUTF8(char *arg, int isansi)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
-        B_seterror("Input and output file required %s", arg);
+        std::string error_msg = "Failed to convert to UTF-8. Input and output file required: '";
+        error_msg += std::string(arg) + "'";
+        error_manager.append_error(error_msg);
         rc = -1;
         goto fin;
     }
 
-    if(isansi) rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 1);
-    else       rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 0);
+    if(isansi) 
+        rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 1);
+    else 
+        rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 0);
 
-    if(rc) B_seterror("Conversion to UTF8 failed (%s)", arg);
+    if(rc) 
+        error_manager.append_error("Failed to convert to UTF-8: '" + std::string(arg) + "'");
 
 fin:
     SCR_free_tbl(tbl);
@@ -208,7 +216,7 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
     if(ntbl != 2) {
-        B_seterror("Input and output file required %s", arg);
+        error_manager.append_error("Input and output file required: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
@@ -221,7 +229,9 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
 	fd2 = fopen((char*) tbl[1], "w+");
 #endif
 	if(fd1 == 0 || fd2 == 0) {
-	    B_seterror("%s or %s: access denied\n", tbl[0], tbl[1]);
+        std::string error_msg = std::string((char*) tbl[0]) + " or " + std::string((char*) tbl[1]);
+        error_msg += ": access denied";
+	    error_manager.append_error(error_msg);
 	    if(fd1 != 0) fclose(fd1);
 	    if(fd2 != 0) fclose(fd2);
 	    rc = -1;

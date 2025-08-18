@@ -98,7 +98,6 @@ Main estimation functions \+ some utilities.
 
 |Declaration|Description|
 |:---|:---|
-|`int E_errno;`|Last estimation error number (between E\_NO\_EQ\_ERR and E\_NO\_SCALARS|
 |`int E_NEQ;`|Number of equations in the current block of equations|
 |`int E_NCE;`|Number of estimated coefficients in the current block of equations|
 |`int E_NC;`|Number of coefficients (est and non est) in the current block of equations|
@@ -163,15 +162,6 @@ Computation of statistical tests.
 |`double M_c_line(MAT* m1, int line, int oper)`|Adds, substracts or multiplies all elements of a matrix line.|
 |`double E_div_0(double a, double b)`|Divides a by b if b is not null. If b is null, returns 0.0.|
 |`double E_sqrt(double val)`|Returns the square root of val if val >= 0. If not, returns 0.0.|
-
-### e\_error.c {#T8}
-
-Functions to send information and error messages from estimation functions.
-
-|Syntax|Description|
-|:---|:---|
-|`void E_msg(char* fmt,...)`|Displays a message using kmsg().|
-|`void E_error(char* fmt,...)`|Displays an estimation error message using B\_seterror().|
 
 ### e\_print.c {#T9}
 

@@ -241,7 +241,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
         eps = DEFAULT_EPS;
 
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     // frees all allocated variables for the last estimation
     if(estimation_done)
@@ -296,7 +296,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
         if(m_corr) delete m_corr;
         m_corr = nullptr;
 
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
             throw std::runtime_error("Could not estimate equation(s) " + join(v_equations, ";") + "\n" + last_error);
     }
@@ -366,7 +366,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
                   int maxit, double eps)
 {
     // clear C API errors stack
-    B_clear_last_error();
+    error_manager.clear();
 
     Sample* sample = Variables.get_sample();
     if(sample->nb_periods() == 0)
@@ -380,7 +380,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     if(res != 0)
     {
         std::string error_msg = "Could not estimate equation(s) '" + eqs + "' from '" + from + "' to '" + to + "'";
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
             throw std::runtime_error(error_msg + ":\n" + last_error);
     }

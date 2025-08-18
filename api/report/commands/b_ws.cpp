@@ -172,7 +172,7 @@ int B_WsSave(char* arg, int type)
 
     SCR_strip((unsigned char*) arg);
     if(strlen(arg) >= sizeof(FNAME)) {
-        B_seterror(B_msg(256));   /* File name too long */
+        error_manager.append_error("Save workspace: filename too long");
         return(-1);
     }
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
@@ -264,7 +264,7 @@ int B_WsSample(char* arg, int unused)
 err:
     SW_nfree(new_smpl); /* JMP 25-05-92 */
     A_free((unsigned char **) args);
-    B_seterror(B_msg(4));   /* New sample invalid */
+    error_manager.append_error("New sample invalid");
     return(-1);
 }
 
@@ -368,7 +368,7 @@ int B_WsCopy(char* arg, int type)
     
     /*    data0 = B_ainit_chk(arg + lg, NULL, 0); */
     if(data0 == 0 || data0[0] == 0) {   /* JMP 24-06-98 */
-        B_seterror(B_msg(134));
+        error_manager.append_error("WsCopy : invalid argument(s)");
         SCR_free_tbl((unsigned char**) files);
         SCR_free_tbl((unsigned char**) data0);
         return(-1);
@@ -376,12 +376,14 @@ int B_WsCopy(char* arg, int type)
 
     if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) {
         smpl = PER_atosmpl(data0[0], data0[1]);
-        if(smpl != NULL) shift = 2;
-        else B_clear_last_error();
+        if(smpl != NULL) 
+            shift = 2;
+        else 
+            error_manager.clear();
     }
 
     if(data0 + shift == NULL) {
-        B_seterror(B_msg(135));
+        error_manager.append_error("WsCopy : object list required");
         rc = -1;
     }
     else {
@@ -448,7 +450,7 @@ int B_WsExtrapolate(char* arg, int unused)
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 2) {
-        B_seterror(B_msg(130));
+        error_manager.append_error("WsExtrapolate : syntax error (method from to vars ...)");
         goto done;
     }
     else {
@@ -459,7 +461,7 @@ int B_WsExtrapolate(char* arg, int unused)
 
     smpl = PER_atosmpl(args[p], args[p + 1]);
     if(smpl == 0 || smpl->s_nb <= 0) {
-        B_seterror(B_msg(131));
+        error_manager.append_error("WsExtrapolate : sample definition error");
         goto done;
     }
 
@@ -490,7 +492,7 @@ int B_WsAggr(int method, char* arg)
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 1) {
-        B_seterror(B_msg(136));
+        error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
         goto done;
     }
     pattern = (char*) SCR_stracpy((unsigned char*) args[0]);
@@ -674,7 +676,7 @@ int B_CsvSave(char* arg, int type)
         if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) {
             shift = 2;
             smpl = PER_atosmpl(data0[0], data0[1]);
-            B_clear_last_error();
+            error_manager.clear();
         }
         if(SCR_tbl_size((unsigned char**) data0) <= shift) {
             SCR_free_tbl((unsigned char**) data0);
@@ -703,7 +705,7 @@ int B_CsvNbDec(char *nbdec, int unused)
 {
     AsciiVariables::CSV_NBDEC = atoi(nbdec);
     if(AsciiVariables::CSV_NBDEC > 99 || (AsciiVariables::CSV_NBDEC < 0 && AsciiVariables::CSV_NBDEC != -1)) {
-        B_seterrn(53, nbdec);
+        error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
         AsciiVariables::CSV_NBDEC = 10;
         return(-1);
     }

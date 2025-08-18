@@ -80,7 +80,7 @@ int Estimation::E_c_rhs()
             x = E_rhs_ij(i, t);
             if(IODE_IS_A_NUMBER(x)) MATE(E_RHS, i, t) = x;
             else  {
-                E_errno = EST_NAN_ERR;
+                error_manager.append_error("Estimation: NaN Generated");
                 return(-1);
             }
         }
@@ -108,12 +108,16 @@ int Estimation::E_residuals()
  *  Solves the linear system E_VCC * E_dC = E_GMU.
  *  The solution is saved in the MAT E_dC.
  *  
- *  @return  int    0 or error code E_errno
+ *  @return  int    0 or -1 on error
  */
 int Estimation::E_deltac()
 {
     M_solve(E_dC, E_VCC, E_GMU);
-    if(M_errno) return(E_errno = EST_VCC_SING_ERR);
+    if(M_errno)
+    {
+        error_manager.append_error("Estimation: Singular Matrix (VCC)");
+        return(-1);
+    } 
     return(0);
 }
 
@@ -134,7 +138,7 @@ int Estimation::E_deltac()
  *  @param [in] int     coef_nb     coefficient position in the list of all coefs, non estimed include
  *  @param [in] int     est_coef_nb coefficient position in the list of estimated coefs
  *  @param [in] double  h           step used to compute the numerical derivative
- *  @return     int                 0 on success, -1 on error (E_errno set to EST_NAN_ERR)
+ *  @return     int                 0 on success, -1 on error
  */
 int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
 {
@@ -153,7 +157,7 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
                     MATE(E_G, est_coef_nb, i * E_T + j) =
                         (x - MATE(E_RHS, i, j)) / h;
                 else  {
-                    E_errno = EST_NAN_ERR;
+                    error_manager.append_error("Estimation: NaN Generated");
                     return(-1);
                 }
             }
@@ -332,12 +336,16 @@ int Estimation::E_c_vcu()
  *  
  *      IVCU = VCU^-1  (NEQ x NEQ)
  *  
- *  @return     int     0 on success, E_errno = EST_VCU_SING_ERR on error
+ *  @return     int     0 on success, -1 on error
  */
 int Estimation::E_c_ivcu()
 {
     M_inv_1(E_IVCU, E_VCU);
-    if(M_errno) return(E_errno = EST_VCU_SING_ERR);
+    if(M_errno)
+    {
+        error_manager.append_error("Estimation : Singular Matrix (VCU)");
+        return(-1);
+    } 
     return(0);
 }
 
@@ -371,12 +379,16 @@ int Estimation::E_c_mcu()
  *  
  *      VCC = VCC^-1 (NCE x NCE)
  *  
- *  @return     int     0 on success, E_errno = EST_VCC_SING_ERR on error
+ *  @return     int     0 on success, -1 on error
  */
 int Estimation::E_c_ivcc()
 {
     M_inv_1(E_VCCTMP, E_VCC);
-    if(M_errno != 0) return(E_errno = EST_VCC_SING_ERR);
+    if(M_errno)
+    {
+        error_manager.append_error("Estimation: Singular Matrix (VCC)");
+        return(-1);
+    }
     M_copy(E_VCC, E_VCCTMP);
     return(0);
 }
@@ -384,14 +396,15 @@ int Estimation::E_c_ivcc()
 /**
  * Computes VCC. TODO: describe
  *    
- *  @return     int     0 on success, E_errno on error
+ *  @return     int     0 on success, -1 on error
  */
 int Estimation::E_c_vcc()
 {
     M_clear(E_IVCU);
     E_c_ivcu();
     E_c_gmg();
-    if(E_c_ivcc()) return(E_errno);
+    if(E_c_ivcc()) 
+        return(-1);
     E_c_vcu();
     return(0);
 }
@@ -428,7 +441,7 @@ again: /* first step of all methods and second step for Zellner and 3 stages met
         if(E_c_gmg() || E_c_gmu() || E_deltac()) goto err;
         E_IT++;
         conv = E_testcv();
-        E_msg("Estimating : iteration %d (||eps|| = %g)", E_IT, E_CONV_TEST);
+        kmsg("Estimating : iteration %d (||eps|| = %g)", E_IT, E_CONV_TEST);
         if(E_adaptcoef()) goto err;
     }
 
@@ -454,12 +467,12 @@ again: /* first step of all methods and second step for Zellner and 3 stages met
 
     if(E_IT < E_MAXIT && conv != 0) E_CONV = 1;
     else E_CONV = 0;
-    E_msg("Solution%s reached after %d iteration(s). Creating results file ...",
-          ((E_CONV == 0) ? " not" : ""), E_IT);
+    kmsg("Solution%s reached after %d iteration(s). Creating results file ...",
+        ((E_CONV == 0) ? " not" : ""), E_IT);
     return((E_CONV == 1) ? 0 : -1);
 
 err :
-    E_msg_n(E_errno);
+    error_manager.print_last_error();
     return(-1);
 }
 
@@ -492,9 +505,8 @@ err :
  */
 int Estimation::E_est(char** endos, char** lecs, char** instrs)
 {
-    int  rc_prep = -1, rc_est = -1;
+    int  rc = -1, rc_prep = -1, rc_est = -1;
 
-    E_errno = 0;
     M_errno = 0;
     E_ENDOS = endos;
     E_LECS = lecs;
@@ -506,20 +518,16 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     E_T    = E_SMPL->s_nb;
 
     rc_prep = E_prep(lecs, instrs);
-    if(rc_prep != 0){
-        if(E_errno != 0)
-            E_error_n(E_errno);
-        std::string error_msg(B_get_last_error());
-        throw std::runtime_error("Could not prepare estimation:\n" + error_msg);
+    if(rc_prep != 0)
+    {
+        std::string error_msg = error_manager.get_last_error();
+        if(!error_msg.empty())
+            throw std::runtime_error("Could not prepare estimation:\n" + error_msg);
     }
     
     rc_est = E_gls();
     if(rc_prep == 0 && rc_est == 0) 
-        E_output();
+        rc = E_output();
     
-    if(E_errno != 0) 
-        E_error_n(E_errno);
-    
-    return(E_errno);
+    return(rc);
 }
-

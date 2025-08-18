@@ -52,6 +52,9 @@
 #include "api/write/write.h"
 #include "api/report/undoc/undoc.h"
 
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
 
 /*================================= UTILITIES ===============================*/
 
@@ -270,9 +273,10 @@ static int     BEG = 0;     // Nb of the current printed variable (to limit each
 
 
 /**
- *  Print the definition of the object named arg of the given type.
+ * Print the definition of the object named arg of the given type.
  *  
- *  If the object does not exist or type is illegal, a message is stored in the error table via B_seterror()
+ * If the object does not exist or type is illegal, 
+ * an error message is added to the stack using IodeErrorManager::append_error().
  *  
  *  @param [in] arg     char*   object name
  *  @param [in] type    int     object type
@@ -344,13 +348,13 @@ int B_PrintObjDef_1(char* arg, int* type)
             break;
         default    :
             rc = -1;
-            B_seterror("Error printing object %.80s !", arg);
+            error_manager.append_error("Error printing object '" + std::string(arg) + "' !");
             break;
     }
     /*    W_flush(); /* JMP 19-12-97 */
     return(rc);
 err:
-    B_seterror("Object %.80s not found !", arg);
+    error_manager.append_error("Object '" + std::string(arg) + "' not found !");
     return(-1);
 }
 
@@ -766,58 +770,3 @@ int B_PrintDefVar(KDB* kdb, int pos)
     W_printf("\n");
     return(0);
 }
-
-
-/*================================= TBL ================================*/
-
-/* Table
-B_PrintTbl_1(name, smpl)
-char    *name, *smpl;
-{
-    int rc, pos;
-    TBL *tbl;
-
-    pos = K_find(K_WS[TABLES], name);
-    if (pos < 0) {
-	B_seterror("Table %.80s not found", name);
-	return(-1);
-    }
-
-    tbl = KTVAL(K_WS[TABLES], pos);
-    rc = T_print_tbl(tbl, smpl);
-    if(rc < 0) B_seterror("Table %.80s not printed", name);
-
-    T_free(tbl);
-    return(rc);
-}
-
-B_PrintTbl(arg)
-char    *arg;
-{
-    int     rc;
-    char    *smpl;
-    U_ch    **args;
-
-    if(arg == 0 || arg[0] == 0) {
-	B_seterror("Invalid Argument");
-	return(-1);
-    }
-    else {
-	args = SCR_vtom(arg, ' ');
-	if(args == NULL) {
-	    B_seterror("Invalid Argument");
-	    return(-1);
-	}
-
-	smpl = SCR_stracpy(args[0]);
-	SCR_free_tbl(args);
-
-	rc = B_ainit_loop(arg + strlen(smpl) + 1, B_PrintTbl_1, smpl);
-    }
-
-    SCR_free(smpl);
-    B_ViewTblEnd();
-    W_close();
-    return(rc);
-}
-*/

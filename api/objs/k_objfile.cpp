@@ -720,10 +720,9 @@ KDB *K_interpret(int type, char* filename)
  *                                      0 if the vector "found" contains only ones or
  *                                      if none of the objects in objs are found in file.
  *  
- * @note Error codes are accumulated via a call to B_seterror().
+ * @note Error codes are accumulated via a call to IodeErrorManager::append_error().
  *
- *  TODO: review usage of B_seterror() ?
- *  TODO: refactor to, from...
+ * TODO: refactor to, from...
  */
 static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, SAMPLE* smpl)
 {
@@ -740,7 +739,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, SAMPLE
         else rc = PER_common_smpl(smpl, KSMPL(from), &csmpl);
 
         if(rc < 0) {
-            B_seterror("File sample and copy sample do not overlap");
+            error_manager.append_error("File sample and copy sample do not overlap");
             goto the_end;
         }
         /* delete already found variables */
@@ -805,11 +804,8 @@ the_end:
  *  @return                             -1 on error: kdb is null, no list is given, one of the files does not exist
  *                                      -2 if not all object could be found
  *                                      0 if all objects have been found
- * @note Error codes are accumulated via a call to B_seterror().
- *
- *  TODO: review usage of B_seterror() ?
+ * @note Error codes are accumulated via a call to IodeErrorManager::append_error().
  */
-
 int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)
 {
     int     i, j, nb, nb_found = 0, *found = NULL;
@@ -832,10 +828,13 @@ int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)
 fin:
     if(nb_found < no) {
         for(i = 0, j = 0 ; i < no && j < 10; i++) {
-            if(found[i] == 0) B_seterrn(98, objs[i]);
+            if(found[i] == 0)
+                error_manager.append_error(std::string("Var ") + std::string(objs[i]) + 
+                                           " not found");
             j++;
         }
-        if(j == 10) B_seterrn(91);
+        if(j == 10) 
+            error_manager.append_error("... others skipped");
         return(-2);
     }
 

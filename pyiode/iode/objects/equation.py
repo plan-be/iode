@@ -384,11 +384,8 @@ class Equation:
         >>> # estimate the ACAF equation
         >>> success = eq_ACAF.estimate("1980Y1", "2000Y1") 
         Estimating : iteration 1 (||eps|| = 0.173205)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 9.24137e-09)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         >>> success
         True
         >>> scalars["acaf1"]

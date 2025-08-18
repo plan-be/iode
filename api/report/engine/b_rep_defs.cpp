@@ -41,7 +41,7 @@ int RP_macro_createdb()
     if(RP_MACRO) return(0);
     RP_MACRO = K_create(K_OBJ, ASIS_CASE);
     if(RP_MACRO == NULL) {
-        B_seterrn(250);
+        error_manager.append_error("Report : Memory Full");
         return(-3);
     }
     return(0);
@@ -81,7 +81,9 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) macro = "";
     lg = (int)strlen(macro) + 1;
     if(K_add(RP_MACRO, name, macro, &lg) < 0) {
-        B_seterrn(251, name, macro);
+        std::string error_msg = "Report: Define of " + std::string(name);
+        error_msg += " (" + std::string(macro) + ") not possible";
+        error_manager.append_error(error_msg);
         return(-1);
     }
     return(0);

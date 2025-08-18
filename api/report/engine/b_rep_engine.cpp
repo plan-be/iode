@@ -267,11 +267,12 @@ unsigned char **RP_read_file(char* filename)
             default:
                 if(len < sizeof(buffer) - 1) buffer[len++] = ch;
                 else {
-                    B_seterror("Report line exceeds %d characters", RP_LINELENGTH);
                     SCR_add_ptr(&txt, &nb_line, NULL);
                     fclose(fd);
                     SCR_free_tbl(txt);
                     SCR_ADD_PTR_CHUNCK = o_add_ptr; // JMP 13-12-2012
+                    std::string error_msg = "Report line exceeds " + std::to_string(RP_LINELENGTH) + " characters";
+                    error_manager.append_error(error_msg);
                     return(NULL);
                 }
                 break;
@@ -506,15 +507,17 @@ int RP_exec_fn(char* name, char* arg, int fs)
  */
 int RP_err_dump(char* name, char* arg)
 {
-    if(RP_PRINT == 1) { /* File */
+    /* File */
+    if(RP_PRINT == 1) {
         W_printf("Error : %s %s\n", name, arg);
-        B_print_last_error();
+        error_manager.print_last_error();
         return(0);
     }
 
     /* Display */
-    B_seterror("Error : %.70s %.70s", name, arg);
-    B_display_last_error();
+    std::string error_msg = "Error: " + std::string(name) + " " + std::string(arg);
+    error_manager.append_error(error_msg);
+    error_manager.display_last_error();
     return(0);
 }
 
@@ -595,7 +598,7 @@ char *RP_gmacro(char* str)
         else {
             pos += RP_ARG0;
             if(pos < 0 || pos > SCR_tbl_size((unsigned char**) RP_ARGV)) {
-                B_seterrn(252, pos);
+                error_manager.append_error("Report : Argument (" + std::to_string(pos) + ") is missing");
                 SCR_free(tmp); // JMP 24/8/2012
                 return(NULL);
             }
@@ -609,7 +612,7 @@ char *RP_gmacro(char* str)
         else {
             pos = K_find(RP_MACRO, tmp);
             if(pos < 0) {
-                B_seterrn(253, tmp);
+                error_manager.append_error("Report: Macro '" + std::string(tmp) + "' is not defined");
                 SCR_free(tmp); // JMP&GB 26/1/09
                 return(NULL);
             }
@@ -690,7 +693,7 @@ double RP_evallec(char* lec)
     if(lec[0]) {
         clec = L_cc(lec);
         if(clec == NULL) {
-            B_seterror("Syntax error %.80s", L_error());
+            error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
         if(clec != 0 && !L_link(K_WS[VARIABLES], K_WS[SCALARS], clec))
@@ -1353,7 +1356,7 @@ int RP_ReportExec_1(char* file)
     K_set_ext(filename, file1, FILE_REP);  // For Sanitizer
     tbl = RP_read_file(filename);
     if(tbl == 0) {
-        B_seterrn(52, filename);
+        error_manager.append_error("Cannot open file '" + std::string(filename) + "'");
         return(-1);
     }
     rf = RP_create_repfile(filename, tbl);

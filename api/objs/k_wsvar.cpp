@@ -387,12 +387,12 @@ calc2:
 int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
 {
     int         rc = -1, i, v, bt, t;
-    double   *val;
+    double      *val;
     KDB         *edbv = NULL;
 
     bt = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
     if(bt < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
-        B_seterror(B_msg(131));
+        error_manager.append_error("WsExtrapolate : sample definition error");
         goto done;
     }
 

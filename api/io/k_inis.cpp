@@ -16,8 +16,6 @@
 #include "api/utils/time.h"
 #include "api/io/import.h"
 
-#include <algorithm>    // for std::min, std::max
-
 
 int ImportObjsNIS::read_header(YYFILE* yy, SAMPLE* smpl)
 {

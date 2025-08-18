@@ -19,6 +19,9 @@
 
 #include "api/report/undoc/undoc.h"
 
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
 
 double  SEASON_EPS = 5.0;
 
@@ -45,7 +48,8 @@ int B_season(char* arg)
     if(nb == 0) goto done;
 
     eps = atof(data[nb - 1]);
-    if(IODE_IS_0(eps)) SEASON_EPS = 5.0;
+    if(IODE_IS_0(eps)) 
+        SEASON_EPS = 5.0;
     else {
         SEASON_EPS = eps;
         nb --;
@@ -53,7 +57,7 @@ int B_season(char* arg)
 
     from = K_load(VARIABLES, name, nb, data);
     if(from == NULL || nb != KNB(from)) {
-        B_seterror("Empty data set or inexistant variable");
+        error_manager.append_error("Empty data set or inexistent variable");
         goto done;
     }
 
@@ -420,12 +424,12 @@ int DS_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
 
 
     if((nbper = PER_nbper(&(ws_smpl->s_p1))) <= 0) {
-        B_seterror("Set Ws periodicity first");
+        error_manager.append_error("Set periodicity first");
         return(-1);
     }
 
     if(nbper != 12 && nbper !=4) {
-        B_seterror("Only Monthly and Quarterly series can be seasonally adjusted");
+        error_manager.append_error("Only Monthly and Quarterly series can be seasonally adjusted");
         return(-1);
     }
 

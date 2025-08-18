@@ -304,7 +304,8 @@ lire $if cond
 //         line = 0;
 //         rc = RP_readline(CUR_REPFILE, &line, 0);
 //         if(rc == EOF) {
-//             B_seterror("%s %.80s not found", command, parm);
+//             std::string error_msg = std::string(command) + " " + std::string(parm) + " not found"; 
+//             error_manager.append_error(error_msg);
 //             rc = -3;
 //             goto done;
 //         }
@@ -327,6 +328,3 @@ lire $if cond
 //  done:
 //     SW_nfree(line);
 // }
-
-
-

@@ -178,7 +178,7 @@ int B_PrintNbDec(char* nbdec, int unused)
 {
     K_NBDEC = atoi(nbdec); 
     if(K_NBDEC > 99 || (K_NBDEC < 0 && K_NBDEC != -1)) {
-        B_seterrn(53, nbdec);
+        error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
         K_NBDEC = 2;
         return(-1);
     }
@@ -207,7 +207,7 @@ int B_PrintLang(char* lang, int unused)
             K_LANG = 2; // JMP 18-04-2022
             break;
         default  :
-            B_seterrn(83);
+            error_manager.append_error("Invalid language");
             return(-1);
     }
     return(0);
@@ -232,7 +232,7 @@ int B_PrintMulti(char* multi, int unused)
             B_MULTIBAR = A2M_GR_MULTIBAR = 2;
             break;
         default  :
-            B_seterrn(303);
+            error_manager.append_error("Invalid PrintMulti option (None, Stacked, Percent)");
             return(-1);
     }
     return(0);

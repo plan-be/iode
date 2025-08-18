@@ -44,7 +44,8 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
         osort = KSIM_SORT;
 
     if(KNB(dbe) == 0) {
-        B_seterrn(110);
+        std::string error_msg = "Empty set of equations";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -104,7 +105,8 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     int     i, t, rc = 0;
 
     if(KNB(dbe) == 0) {
-        B_seterrn(110);
+        std::string error_msg = "Empty set of equations";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -116,7 +118,8 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     // Check Sample dans les bornes du WS
     t = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
     if(t < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
-        B_seterrn(111);
+        std::string error_msg = "Simulation sample out of the Variables sample boundaries";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -137,14 +140,16 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     for(i = 0 ; i < KNB(dbe); i++) {
         KSIM_POSXK[i] = K_find(dbv, KONAME(dbe,i));
         if(KSIM_POSXK[i] < 0) {
-            B_seterrn(112, KONAME(dbe, i));
+            std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot find variable";
+            error_manager.append_error(error_msg);
             rc = -1;
             goto fin;
         }
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
-            B_seterrn(113, KONAME(dbe, i));
+            std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot link equation";
+            error_manager.append_error(error_msg);
             rc = -1;
             goto fin;
         }

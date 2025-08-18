@@ -246,7 +246,8 @@ int RP_goto_label(char *command, char *parm)
         line = 0;
         rc = RP_readline(CUR_REPFILE, &line, 0);
         if(rc == EOF) {
-            B_seterror("%s %.80s not found", command, parm);
+            std::string error_msg = std::string(command) + " " + std::string(parm) + " not found";
+            error_manager.append_error(error_msg);
             rc = -3;
             goto done;
         }
@@ -543,7 +544,8 @@ int RP_settime(char* arg, int unused)
 
     rp_per = PER_atoper(arg);
     if(rp_per == NULL) {
-        B_seterror("SetTime %.80s: invalid syntax", arg);
+        std::string error_msg = "SetTime " + std::string(arg) + ": invalid syntax";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -611,7 +613,7 @@ int B_GraphDefault(char* type, int unused)
             T_GRAPHDEFAULT = 2;
             break;
         default  :
-            B_seterrn(304);
+            error_manager.append_error("Invalid GraphDefault option (Line, Scatter, Bar)");
             return(-1);
     }
     return(0);

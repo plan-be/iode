@@ -149,7 +149,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     memcpy(&(smpl.s_p1), PER_addper(&(smpl.s_p1), 1), sizeof(PERIOD));
     smpl.s_nb--;
     if(smpl.s_nb < (drift + trend + order + 1) * 2) {
-        B_seterror("Sample too small for this test");
+        error_manager.append_error("Sample too small for this test");
         goto cleanup;
     }
 

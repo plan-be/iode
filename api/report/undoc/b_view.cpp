@@ -73,12 +73,12 @@ int B_ViewPrintVar(char* arg, int mode)
     char    *oldseps = A_SEPS, *lst;  /* JMP 14-07-96 */
 
     if(arg == 0 || arg[0] == 0) {
-        B_seterrn(74);
+        error_manager.append_error("Invalid argument");
         return(-1);
     }
     args = SCR_vtom((unsigned char*) arg, (int) ' ');
     if(args == NULL) {
-        B_seterrn(74);
+        error_manager.append_error("Invalid argument");
         return(-1);
     }
 
@@ -91,7 +91,7 @@ int B_ViewPrintVar(char* arg, int mode)
     SCR_free(lst);
     A_SEPS = oldseps;    /* JMP 14-07-96 */
     if(args == 0 || args[0] == 0) {
-        B_seterrn(74);
+        error_manager.append_error("Invalid argument");
         rc = -1;
         goto fin;
     }
@@ -176,7 +176,7 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
 
     pos = K_find(K_WS[TABLES], name);
     if(pos < 0) {
-        B_seterrn(80, name);
+        error_manager.append_error("Table '" + std::string(name) + "' not found");
         return(-1);
     }
 
@@ -186,7 +186,8 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
     else
         rc = T_print_tbl(tbl, smpl);
 
-    if(rc < 0) B_seterrn(81, name);
+    if(rc < 0) 
+        error_manager.append_error("Table '" + std::string(name) + "' not printed");
 
     T_free(tbl);
     return(rc);
@@ -210,7 +211,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     tbls = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
     ng = SCR_tbl_size((unsigned char**) tbls);
     if(ng == 0) {
-        B_seterrn(82);
+        error_manager.append_error("No tables defined");
         return(-1);
     }
 
@@ -219,7 +220,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
 
         pos = K_find(K_WS[TABLES], tbls[i]);
         if(pos < 0) {
-            B_seterrn(80, tbls[i]);
+            error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");
             rc = -1;
             break;
         }
@@ -271,13 +272,13 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 
     B_viewmode = mode;
     if(arg == 0 || arg[0] == 0) {
-        B_seterrn(74);
+        error_manager.append_error("Invalid argument");
         return(-1);
     }
     else {
         args = SCR_vtom((unsigned char*) arg, ' ');
         if(args == NULL || args[0] == NULL) {
-            B_seterrn(74);
+            error_manager.append_error("Invalid argument");
             return(-1);
         }
 
@@ -318,13 +319,13 @@ int B_ViewTblFile(char* arg, int unused)
     U_ch    **args = NULL;
 
     if(arg == 0 || arg[0] == 0) {
-        B_seterrn(74);
+        error_manager.append_error("Invalid argument");
         return(-1);
     }
     else {
         args = SCR_vtom((unsigned char*) arg, ' ');
         if(args == NULL)  {
-            B_seterrn(74);
+            error_manager.append_error("Invalid argument");
             rc = -1;
             goto err;
         }
@@ -333,7 +334,7 @@ int B_ViewTblFile(char* arg, int unused)
 
         ref = atoi((char*) args[0]);
         if(ref < 2 || ref > 5) {
-            B_seterrn(73);
+            error_manager.append_error("Invalid Reference number");
             rc = -1;
             goto err;
         }

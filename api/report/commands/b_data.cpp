@@ -105,8 +105,11 @@
 #include "api/objs/variables.h"
 #include "api/objs/compare.h"
 #include "api/print/print.h"
-
 #include "api/report/commands/commands.h"
+
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
 
 
 /**
@@ -250,7 +253,8 @@ int B_DataCalcVar(char* arg, int unused)
             SW_nfree(clec);
         }
         else {
-            B_seterror("%.80s : %.80s", L_error(), lec);
+            std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
+            error_manager.append_error(error_msg);
             SW_nfree(clec);
             return(-1);
         }
@@ -341,7 +345,7 @@ int B_DataDelete_1(char* arg, int* ptype)
 
     pos = K_find(kdb, arg);
     if(pos < 0 || K_del(kdb, pos) < 0) {
-        B_seterrn(29, arg);
+        error_manager.append_error("Failed to delete '" + std::string(arg) + "'");
         return(-1);
     }
     return(0);
@@ -398,7 +402,9 @@ int B_DataRename(char* arg, int type)
     if(args == NULL) return(-1);
 
     if(K_ren(K_WS[type], args[0], args[1]) < 0) {
-        B_seterrn(OM_DREN_FAILED_2, args[0], args[1]);
+        std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
+        error_msg += std::string(args[1]) + "' failed";
+        error_manager.append_error(error_msg);
         rc = -1;
     }
 
@@ -426,7 +432,7 @@ int B_DataRename(char* arg, int type)
     KDB     *kdb = K_WS[type];
 
     if(type == EQUATIONS) {
-        B_seterrn(OM_DDUP_NO_SENSE);
+        error_manager.append_error("DataDuplicate of Equations has no sense");
         return(-1); /* Duplicate of EQS has no sense */
     }
 
@@ -434,7 +440,9 @@ int B_DataRename(char* arg, int type)
     if(args == NULL) return(-1);
 
     if(K_dup(kdb, args[0], kdb, args[1]) < 0) {
-        B_seterrn(OM_DDUP_FAILED_2, args[0], args[1]);
+        std::string error_msg = "DataDuplicate '" + std::string(args[0]) + "' as '";
+        error_msg += std::string(args[1]) + " failed";
+        error_manager.append_error(error_msg);
         rc = -1;
     }
 
@@ -481,7 +489,8 @@ int B_DataUpdate(char* arg, int type)
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     pos = K_find(kdb, name);
     if(pos < 0) {
-        if(B_DataCreate(name, type)) return(-1);
+        if(B_DataCreate(name, type)) 
+            return(-1);
         pos = K_find(kdb, name);
     }
 
@@ -517,11 +526,12 @@ int B_DataUpdate(char* arg, int type)
             scl.relax = (double) atof(args[2]);
             break;
         default :
-            B_seterrn(OM_DUPD_SCL_ERR);
+            error_manager.append_error("DataUpdateScl : Invalid Argument");
             rc = -1;
             break;
         }
-        if(rc == 0) rc = K_add(kdb, args[0], &scl);
+        if(rc == 0) 
+            rc = K_add(kdb, args[0], &scl);
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
@@ -534,13 +544,15 @@ int B_DataUpdate(char* arg, int type)
             case 'D' :
                 nb_p = 2;
                 mode = VAR_MODE_DIFF;
-                if(U_is_in(args[1][1], "Yy")) mode = VAR_MODE_Y0Y_DIFF;
+                if(U_is_in(args[1][1], "Yy")) 
+                    mode = VAR_MODE_Y0Y_DIFF;
                 break;
             case 'g' :
             case 'G' :
                 nb_p = 2;
                 mode = VAR_MODE_GROWTH_RATE;
-                if(U_is_in(args[1][1], "Yy")) mode = VAR_MODE_Y0Y_GROWTH_RATE;
+                if(U_is_in(args[1][1], "Yy")) 
+                    mode = VAR_MODE_Y0Y_GROWTH_RATE;
                 break;
 
             case 'l' :
@@ -554,7 +566,7 @@ int B_DataUpdate(char* arg, int type)
 
             per = PER_atoper(args[nb_p]);
             if(per == 0) {
-                B_seterror("Syntax error - Period not defined"); /* JMP 23-05-00 */
+                error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
                 rc = -1;
                 break;
             }
@@ -567,21 +579,26 @@ int B_DataUpdate(char* arg, int type)
                 nb_p ++;
                 for(i = 0; i < nb_upd; i++) {
                     var = (double) atof(args[i + nb_p]);
-                    if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) var = IODE_NAN; /* JMP 06-09-2004 */
+                    if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
+                        var = IODE_NAN; /* JMP 06-09-2004 */
                     KV_set(kdb, pos, shift + i, mode, var);
                 }
             }
         }
-        else rc = -1;
+        else 
+            rc = -1;
 
-        if(rc < 0) B_seterrn(OM_DUPD_VAR_ERR_1, arg);
+        if(rc < 0) 
+            error_manager.append_error("DataUpdateVar : '" + std::string(arg) + "' Invalid Argument");
         break;
     }
 
     A_free((unsigned char**) args);
     SCR_free(per);
-    if(rc >= 0) rc = 0;
-    if(rc < 0) rc = -1; // Pour éviter return dans les rapports si rc = -2
+    if(rc >= 0) 
+        rc = 0;
+    if(rc < 0) 
+        rc = -1; // Pour éviter return dans les rapports si rc = -2
     return(rc);
 }
 
@@ -768,13 +785,15 @@ int B_DataListSort(char* arg, int unused)
     p = K_find(KL_WS, in);
 
     if(p < 0) {
-        B_seterrn(65, args[0]);
+        error_manager.append_error("List '" + std::string(args[0]) + 
+                                   "' not found in the Lists workspace");
         rc = -1;
         goto done;
     }
     else lst = KLVAL(KL_WS, p);
     if(lst == NULL) {
-        B_seterrn(65, args[0]);
+        error_manager.append_error("List '" + std::string(args[0]) + 
+                                   "' not found in the Lists workspace");
         rc = -1;
         goto done;
     }
@@ -793,7 +812,7 @@ int B_DataListSort(char* arg, int unused)
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
     if(K_add(K_WS[LISTS], out, lst) < 0) {
-        B_seterrn(66, out);
+        error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
     }
 
@@ -828,7 +847,7 @@ int B_DataScan(char* arg, int type)
     int     rc = -1;
 
     if(type != IDENTITIES && type != EQUATIONS && type != TABLES) {
-        B_seterrn(122);
+        error_manager.append_error("DataScan : only IDT, EQ and TBL are supported");
         return(-1);
     }
 
@@ -907,7 +926,7 @@ int B_DataAppend(char* arg, int type)
     case SCALARS :
     case TABLES :
     case VARIABLES :
-        B_seterror("DataAppend : only lists and comments");
+        error_manager.append_error("DataAppend : only lists and comments");
         return(-1);
     }
 
@@ -1061,7 +1080,10 @@ int B_DataCalcLst(char* arg, int unused)
     p1 = K_find(K_WS[LISTS], (char*) list1);
     p2 = K_find(K_WS[LISTS], (char*) list2);
     if(p1 < 0 || p2 < 0) {
-        B_seterror("List %s not in WS", (p1 < 0) ? list1:list2); // JMP 4/02/09
+        std::string error_msg = "List '";
+        error_msg += (p1 < 0) ? std::string((char*) list1) : std::string((char*) list2);
+        error_msg += "' not found in the Lists workspace";
+        error_manager.append_error(error_msg); // JMP 4/02/09
         rc = -1;
         goto done;
     }
@@ -1244,7 +1266,7 @@ static int B_DataEditGraph(int view, char* arg)
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
     if(nb_args < 10) {
-	B_seterrn(67);
+	error_manager.append_error("DataEditGraph : Syntax error");
 	rc = -1;
 	goto fin;
     }
@@ -1266,7 +1288,7 @@ static int B_DataEditGraph(int view, char* arg)
 
     smpl = PER_atosmpl(args[7], args[8]);
     if(smpl == 0) {
-	B_seterrn(56);
+	error_manager.append_error("Wrong sample definition");
 	rc = -1;
 	goto fin;
     }

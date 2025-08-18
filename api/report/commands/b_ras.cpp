@@ -28,10 +28,12 @@ static int RasSetVar(char  *name, int t, double var)
 
     pos = K_find(kdb, name);
     if(pos < 0) {
-        B_seterror(B_msg(300), name);
+        std::string error_msg = "RAS: Variable '" + std::string(name) + "' not found";
+        error_manager.append_error(error_msg);
         return(-1);
     }
-    else          *KVVAL(kdb, pos, t) = var;
+    else          
+        *KVVAL(kdb, pos, t) = var;
 
     return(0);
 }
@@ -44,10 +46,12 @@ static double RasGetVar(char  *name, int t)
 
     pos = K_find(kdb, name);
     if(pos < 0) {
-        B_seterror(B_msg(300), name);
+        std::string error_msg = "RAS: Variable '" + std::string(name) + "' not found";
+        error_manager.append_error(error_msg);
         var = IODE_NAN;
     }
-    else          var = *KVVAL(kdb, pos, t);
+    else          
+        var = *KVVAL(kdb, pos, t);
 
     // set if almost 0 to 0
     if(fabs(var) < 1e-10) var = 0.0;
@@ -69,7 +73,9 @@ static int RasCalc(MAT *A, double *row, double *col, int maxiter, double eps)
     for(i = 0; i < nrows; i++) rsum += row[i];
     for(j = 0; j < ncols; j++) csum += col[j];
     if(fabs(csum - rsum) > eps) {
-        B_seterror(B_msg(302), csum, rsum);
+        std::string error_msg = "RAS : sum of rows (" + std::to_string(rsum);
+        error_msg += ") != sum of cols (" + std::to_string(csum) + ")";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -116,7 +122,9 @@ top:
     if(iter <= maxiter && dismax > eps) goto top;
 
     if(dismax > eps) {
-        B_seterror(B_msg(301), dismax, eps);
+        std::string error_msg = "RAS : diverges (" + std::to_string(dismax);
+        error_msg += " > " + std::to_string(eps) + ")";
+        error_manager.append_error(error_msg);
         rc = -1;
     }
     else {

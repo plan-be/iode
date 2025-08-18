@@ -201,7 +201,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     if(res != 0)
     {
-        std::string last_error = get_last_error();
+        std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
             throw std::runtime_error("Cannot export variables\n" + last_error);
     }

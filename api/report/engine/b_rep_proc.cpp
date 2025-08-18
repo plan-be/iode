@@ -241,7 +241,8 @@ int RP_procdef(char* arg, int unused)
 
     // Checks that a $procend statement has  been found (if not -> error)
     if(rf->curline > rf->nblines)  {
-        B_seterror("Procedure %s: no $procend statement", name);
+        std::string error_msg = "Procedure '" + std::string((char*) name) + "': missing $procend statement";
+        error_manager.append_error(error_msg);
         //TODO: delete the REP_PROCS[proc_nb]
         return(-1);
     }
@@ -273,7 +274,7 @@ int RP_procexec(char* arg, int unused)
     // Searches the proc definition
     proc_nb = RP_proc_find((char*) name);
     if(proc_nb < 0) {
-        B_seterror("Procedure %s: not defined", name);
+        error_manager.append_error("Procedure '" + std::string((char*) name) + "': not defined");
         return(-1);
     }
     proc = REP_PROCS[proc_nb];

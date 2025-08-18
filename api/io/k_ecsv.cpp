@@ -54,7 +54,8 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
 
     expdef->file_descriptor = fopen(outfile, "w+");
     if(expdef->file_descriptor == 0) {
-        B_seterror("Cannot create %s", outfile);
+        std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -171,7 +172,8 @@ int ExportObjsRevertCSV::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, 
 {
     expdef->file_descriptor = fopen(outfile, "w+");
     if(expdef->file_descriptor == 0) {
-        B_seterror("Cannot create %s", outfile);
+        std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
+        error_manager.append_error(error_msg);
         return(-1);
     }
     return(0);

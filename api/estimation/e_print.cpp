@@ -16,6 +16,10 @@
 #include "api/write/write.h"
 #include "api/estimation/estimation.h"
 
+#undef min
+#undef max
+#include <algorithm>    // for std::min, std::max
+
 
 // Declarations
 static int E_graph_calc_lhs(char* name, char* res, char* rhs);

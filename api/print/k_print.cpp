@@ -50,7 +50,8 @@ int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)
 
     *cls = COL_cc(smpl);
     if(*cls == NULL) {
-        B_seterror("Sample %.80s : syntax error", smpl);
+        std::string error_msg = "Illegal sample '" + std::string(smpl) + "': syntax error";
+        error_manager.append_error(error_msg);
         return(-1);
     }
 
@@ -258,7 +259,8 @@ char **T_find_files(COLS* cls)
         if(files[i] == 0) continue;
         kdb = K_RWS[VARIABLES][i - 1];
         if(kdb == NULL) {
-            B_seterror("File %d not present", i);
+            std::string error_msg = "File " + std::to_string(i) + " not present";
+            error_manager.append_error(error_msg);
             SCR_add_ptr((unsigned char***) &names, &nf, 0L);
             SCR_free_tbl((unsigned char**) names);
             return(NULL);
@@ -453,8 +455,9 @@ int T_print_tbl(TBL* tbl, char* smpl)
                 break;
             case TABLE_LINE_CELL  :
                 if(T_print_line(tbl, i, cls) < 0) {
+                    std::string error_msg = "Unable to print line '" + std::to_string(i) + "'";
+                    error_manager.append_error(error_msg);
                     rc = -1;
-                    B_seterror("Unable to print line %d ", i);
                 }
                 break;
         }

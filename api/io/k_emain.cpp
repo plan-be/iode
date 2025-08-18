@@ -386,6 +386,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     K_free(dbv);
     K_free(dbc);
     K_WARN_DUP = 0;
-    if(rc) B_display_last_error();
+    if(rc)
+        error_manager.display_last_error(); 
     return(rc);
 }

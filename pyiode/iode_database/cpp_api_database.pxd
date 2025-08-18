@@ -36,7 +36,6 @@ cdef extern from "api/all.h":
 
     double* KVVAL(KDB* kdb, int pos, int t)
 
-    void B_display_last_error()
     int B_PrintNbDec(char* nbdec)
     int B_PrintLang(char* lang)
     int B_PrintObjTblTitle(char* arg)
@@ -146,6 +145,17 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
     void _c_operation_between_two_vars(const int op, KDBVariables* database, const string& name, const int t_first, const int t_last, 
                                        KDBVariables* other, const string& other_name, const int other_t_first, const int other_t_last) except +
 
+
+cdef extern from "api/b_errors.h":
+    cdef cppclass IodeErrorManager:
+        void append_error(string& msg)
+        void display_last_error()
+        string get_last_error()
+        void print_last_error()
+        void clear()
+
+    # Define the global IodeErrorManager instance
+    cdef IodeErrorManager error_manager
 
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    

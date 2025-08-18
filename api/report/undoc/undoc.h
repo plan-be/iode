@@ -14,10 +14,6 @@
 #    define IODE_CDECL __cdecl
 #endif
 
-#undef min
-#undef max
-#include <algorithm>    // for std::min, std::max
-
 
 /* b_api.c */
 int IodeInit();

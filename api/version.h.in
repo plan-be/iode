@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "api/constants.h"
 
 #define IODE_VERSION "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
@@ -15,7 +16,7 @@
     #endif
 #endif
 
-const static char* IODE_WEBSITE = "${PROJECT_HOMEPAGE_URL}";
-const static char* CHANGELOG_URL = "${CHANGELOG_URL}";
-const static char* PYTHON_API_URL = "${PYTHON_API_URL}";
-const static char* ORGANIZATION_NAME = "${IODE_COMPANY}";
+inline const static std::string IODE_WEBSITE = "${PROJECT_HOMEPAGE_URL}";
+inline const static std::string CHANGELOG_URL = "${CHANGELOG_URL}";
+inline const static std::string PYTHON_API_URL = "${PYTHON_API_URL}";
+inline const static std::string ORGANIZATION_NAME = "${IODE_COMPANY}";

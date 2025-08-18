@@ -50,7 +50,8 @@ int T_GraphTest(TBL *tbl)
             PER_pertoa(&(smpl->s_p1), NULL), smpl->s_nb); /* JMP 28-11-93 */
     //KT_nb = 1; // JMP 11/05/2022
     if(T_graph_tbl_1(tbl, gsmpl, 1)) { // JMP 11-05-2022 : mode = 1 => display 
-        B_seterrn(72);
+        std::string err_msg = "Testing failed ...";
+        error_manager.append_error(err_msg);
         return(-1);
     }
 
@@ -130,7 +131,8 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
 
 //    KT_attr = 4;
     if(tbl->t_nc != 2) {
-        B_seterrn(71);
+        std::string err_msg = "Only dimension 2 tables can be graphed";
+        error_manager.append_error(err_msg);
         return(-1);
     }
 
@@ -458,7 +460,8 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
     ng = SCR_tbl_size((unsigned char**) vars);
     if(ng == 0) {
-        B_seterrn(68);
+        std::string err_msg = "No variable defined";
+        error_manager.append_error(err_msg);
         return(-1);
     }
 
@@ -475,7 +478,10 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     for(i = 0 ; i < ng ; i++) {
         var_nb = K_find(kdb, vars[i]);
         if(var_nb < 0) {
-            B_seterrn(64, vars[i]);
+            std::string err_msg = "DataDisplayGraph : '";
+            err_msg += std::string(vars[i]);
+            err_msg += "' undefined variable";
+            error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
         }
@@ -513,14 +519,16 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
 
     ng = SCR_tbl_size((unsigned char**) names);
     if(ng == 0) {
-        B_seterrn(69);
+        std::string err_msg = "DataDisplayGraph : empty variable list";
+        error_manager.append_error(err_msg);
         return(-1);
     }
 
     nt = smpl->s_nb;
     dt = PER_diff_per(&(smpl->s_p1), &(KSMPL(kdb)->s_p1));
     if(dt < 0 || dt + nt > KSMPL(kdb)->s_nb) {
-        B_seterrn(70);
+        std::string err_msg = "DataDisplayGraph : Sample out of the Variables sample boundaries";
+        error_manager.append_error(err_msg);
         return(-1);
     }
 
@@ -852,7 +860,8 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     TCELL   *cell;
 
     if(tbl->t_nc != 2) {
-        B_seterrn(71);
+        std::string err_msg = "Only dimension 2 tables can be graphed";
+        error_manager.append_error(err_msg);
         return(-1);
     }
     dim = T_prep_cls(tbl, gsmpl, &cls);
