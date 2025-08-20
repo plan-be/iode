@@ -18,7 +18,6 @@ set(CPP_REPORT
 
 set(CPP_OBJS
     objects/equation.h      objects/equation.cpp
-    objects/identity.h      objects/identity.cpp
     objects/table.h         objects/table.cpp
     objects/scalar.h        objects/scalar.cpp
     )

@@ -108,27 +108,6 @@ static int K_cmpeqs(char* p1, char* p2, char* name)
     return(rc);
 }
 
-int K_cmp_idt(IDT* idt1, IDT* idt2)
-{
-    int     rc = 1;
-    CLEC    *cl1 = NULL, *cl2 = NULL;
-
-    cl1 = L_cc(idt1->lec);
-    cl2 = L_cc(idt2->lec);
-
-    if(cl1 == NULL || cl2 == NULL ||
-            cl1->tot_lg != cl2->tot_lg ||
-            memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
-
-    rc = 0;
-
-done :
-    SCR_free(cl1);
-    SCR_free(cl2);
-
-    return(rc);
-}
-
 /**
  *  Compares 2 packed identities. 
  *  

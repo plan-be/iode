@@ -10,7 +10,6 @@
 #include "cpp_api/time/period.h"
 #include "cpp_api/time/sample.h"
 #include "cpp_api/objects/equation.h"
-#include "cpp_api/objects/identity.h"
 #include "cpp_api/objects/table.h"
 #include "cpp_api/objects/scalar.h"
 #include "cpp_api/KDB/kdb_global.h"

@@ -1,42 +1,6 @@
 #include "cpp_api/lec/lec.h"
 
 
-CLEC* clec_deep_copy(const CLEC* other)
-{
-    // NOTE : see end of function L_cc2() from l_cc2.c to calculate tot_lg (= len)
-    CLEC* copy = (CLEC*) SW_nalloc(other->tot_lg);
-
-    copy->tot_lg = other->tot_lg,      
-	copy->exec_lg = other->exec_lg;       
-    copy->nb_names = other->nb_names;
-    copy->dupendo = other->dupendo;
-    copy->pad = '\0';
-    for(int i = 0; i < other->nb_names; i++)
-    {
-        strncpy(copy->lnames[i].name, other->lnames[i].name, sizeof(ONAME) / sizeof(char));
-        memset(copy->lnames[i].pad, '\0', sizeof(LNAME::pad) / sizeof(char));
-        copy->lnames[i].pos = other->lnames[i].pos;
-    }
-
-    return copy;
-}
-
-bool clec_equal(const CLEC* clec_1, const CLEC* clec_2)
-{
-    if(clec_1->tot_lg != clec_2->tot_lg) return false;
-    if(clec_1->exec_lg != clec_2->exec_lg) return false;
-    if(clec_1->nb_names != clec_2->nb_names) return false;
-    if(clec_1->dupendo != clec_2->dupendo) return false;
-    if(clec_1->pad != clec_2->pad) return false;
-    for(int i = 0; i < clec_1->nb_names; i++)
-    {
-        if(strcmp(clec_1->lnames[i].name, clec_2->lnames[i].name)) return false;
-        if(strcmp(clec_1->lnames[i].pad, clec_2->lnames[i].pad)) return false;
-        if(clec_1->lnames[i].pos, clec_2->lnames[i].pos) return false;
-    }
-    return true;
-}
-
 /**
  *  Compile and link the LEC expression with the current Scalars and Variables workspaces.
  *  

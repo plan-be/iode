@@ -43,6 +43,6 @@ cdef class Identity:
         return self.c_identity == other.c_identity
 
     def _str_(self) -> str:
-        return self.c_identity.get_lec().decode("utf-8")
+        return self.c_identity.lec.decode("utf-8")
 
 
