@@ -1,67 +1,4 @@
-#include "identity.h"
-
-
-void Identity::copy_from_IDT_obj(const IDT* obj)
-{
-    this->lec = copy_char_array(obj->lec);
-    // NOTE : we do not use memcpy() because memcpy() actually makes  
-    //        a shallow copy of a struct instead of a deep copy
-    this->clec = clec_deep_copy(obj->clec);
-}
-
-Identity::Identity(const std::string& lec)
-{
-    set_lec(lec);
-}
-
-Identity::Identity(const IDT* c_other)
-{
-    copy_from_IDT_obj(c_other);
-}
-
-Identity::Identity(const Identity& other)
-{
-    copy_from_IDT_obj(static_cast<const IDT*>(&other));
-}
-
-Identity::~Identity()
-{
-    if(this->lec)
-        SW_nfree(this->lec);
-
-    if(this->clec)
-        SW_nfree(this->clec);
-}
-
-std::string Identity::get_lec() const 
-{ 
-    return std::string(this->lec); 
-}
-
-void Identity::set_lec(const std::string& lec) 
-{
-    this->lec = copy_string_to_char(lec);
-    // L_cc returns an allocated CLEC struct pointer.
-    this->clec = L_cc(to_char_array(lec));
-}
-
-CLEC* Identity::get_clec() const 
-{ 
-    return this->clec; 
-}
-
-// required to be used in std::map
-Identity& Identity::operator=(const Identity& other)
-{
-    copy_from_IDT_obj(static_cast<const IDT*>(&other));
-    return *this;
-}
-
-bool Identity::operator==(const Identity& other) const
-{
-    return K_cmp_idt(static_cast<IDT*>(const_cast<Identity*>(this)), 
-                     static_cast<IDT*>(const_cast<Identity*>(&other))) == 0;
-}
+#include "api/objs/identities.h"
 
 std::vector<std::string> Identity::get_coefficients_list(const bool create_if_not_exit)
 {
@@ -100,7 +37,7 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
         SAMPLE* sample = KSMPL(K_WS[VARIABLES]);
         if(sample == NULL || sample->s_nb == 0)
             throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
-                                     std::string(this->lec) +"\nThe global sample is not yet defined");
+                                    std::string(this->lec) +"\nThe global sample is not yet defined");
 
         char* c_name;
         int nb_obs = sample->s_nb;

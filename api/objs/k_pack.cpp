@@ -32,7 +32,7 @@
  * -------------------- 
  *      TBL* K_tunpack(char *pack)                   Creates a TBL struct from a packed TBL 
  *      EQ*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
- *      IDT* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
+ *      Identity* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & SCL only)
  * -------------------------------------
@@ -865,17 +865,11 @@ EQ* K_eunpack(char *pack, char *name)
  * @return      IDT *            allocated IDT structure 
 */
 
-IDT* K_iunpack(char* pack)
+Identity* K_iunpack(char* pack)
 {
-    int len = 0;
-    IDT* idt = (IDT*) SW_nalloc(sizeof(IDT));
-
-    len = P_get_len(pack, 0);
-    idt->lec = (char*) SCR_stracpy((unsigned char*) P_get_ptr(pack, 0));
-    len = P_get_len(pack, 1);
-    idt->clec = (CLEC*) SW_nalloc(len);
-    memcpy(idt->clec, P_get_ptr(pack, 1), len);
-
+    int len = P_get_len(pack, 0);
+    std::string lec = std::string((char*) SCR_stracpy((unsigned char*) P_get_ptr(pack, 0)));
+    Identity* idt = new Identity(lec);
     return idt;
 }
 

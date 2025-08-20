@@ -29,7 +29,7 @@ int K_opack(char **,char *,int *);
 //void K_vunpack(void);
 TBL *K_tunpack(char *);
 EQ *K_eunpack(char *, char *);
-IDT* K_iunpack(char *);
+Identity* K_iunpack(char *);
 //void K_sunpack(void);
 //void K_cunpack(void);
 //void K_lunpack(void);

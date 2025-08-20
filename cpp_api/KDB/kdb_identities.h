@@ -1,6 +1,6 @@
 #pragma once
 #include "kdb_template.h"
-#include "cpp_api/objects/identity.h"
+#include "api/objs/identities.h"
 
 
 class KDBIdentities : public KDBTemplate<Identity*>

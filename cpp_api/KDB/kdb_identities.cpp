@@ -12,13 +12,9 @@ Identity* KDBIdentities::copy_obj(Identity* const original) const
 Identity* KDBIdentities::get_unchecked(const int pos) const
 {
 	KDB* kdb = get_database();
-	
-	IDT* c_idt = (IDT*) SW_nalloc(sizeof(IDT));
-    c_idt->lec = copy_char_array(KILEC(kdb, pos));
-    // NOTE : we do not use memcpy() because memcpy() actually makes  
-    //        a shallow copy of a struct instead of a deep copy
-    c_idt->clec = clec_deep_copy(KICLEC(kdb, pos));
-	return static_cast<Identity*>(c_idt);
+	std::string lec(KILEC(kdb, pos));
+	Identity* idt = new Identity(lec);
+	return idt;
 }
 
 std::string KDBIdentities::get_lec(const int pos) const
@@ -43,7 +39,7 @@ int KDBIdentities::add(const std::string& name, const std::string& lec)
 
 int KDBIdentities::add(const std::string& name, const Identity& obj)
 {
-    return KDBTemplate::add(name, obj.lec);
+    return KDBTemplate::add(name, (char*) obj.lec.c_str());
 }
 
 void KDBIdentities::update(const std::string& name, const std::string& lec)

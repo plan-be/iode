@@ -99,9 +99,9 @@ TEST_F(KDBIdentitiesTest, Get)
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by position
-    Identity identity_pos = Identities.get(pos);
-    EXPECT_EQ(identity_pos.get_lec(), expected_lec);
-    clec = identity_pos.get_clec();
+    Identity* identity_pos = Identities.get(pos);
+    EXPECT_EQ(identity_pos->lec, expected_lec);
+    clec = identity_pos->clec;
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -113,11 +113,12 @@ TEST_F(KDBIdentitiesTest, Get)
         EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
     }
     EXPECT_TRUE(clec_equal(clec, expected_clec));
+    delete identity_pos;
 
     // by name
-    Identity identity_name = Identities.get(name);
-    EXPECT_EQ(identity_name.get_lec(), expected_lec);
-    clec = identity_name.get_clec();
+    Identity* identity_name = Identities.get(name);
+    EXPECT_EQ(identity_name->lec, expected_lec);
+    clec = identity_name->clec;
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -129,6 +130,7 @@ TEST_F(KDBIdentitiesTest, Get)
         EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
     }
     EXPECT_TRUE(clec_equal(clec, expected_clec));
+    delete identity_name;
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)
@@ -164,14 +166,14 @@ TEST_F(KDBIdentitiesTest, Copy)
 {
     int pos = 0;
     std::string name = Identities.get_name(pos);
-    Identity identity = Identities.get(name);
+    Identity* identity = Identities.get(name);
 
-    Identity identity_copy = Identities.copy(name);
+    Identity* identity_copy = Identities.copy(name);
 
-    EXPECT_EQ(identity_copy.get_lec(), identity.get_lec());
+    EXPECT_EQ(identity_copy->lec, identity->lec);
 
-    CLEC* clec = identity.get_clec();
-    CLEC* clec_copy = identity_copy.get_clec();
+    CLEC* clec = identity->clec;
+    CLEC* clec_copy = identity_copy->clec;
     EXPECT_EQ(clec->tot_lg, clec_copy->tot_lg);
     EXPECT_EQ(clec->exec_lg, clec_copy->exec_lg);
     EXPECT_EQ(clec->nb_names, clec_copy->nb_names);
@@ -185,7 +187,10 @@ TEST_F(KDBIdentitiesTest, Copy)
     EXPECT_TRUE(clec_equal(clec, clec_copy));
 
     // add copy
-    Identities.add("DUP_" + name, identity_copy);
+    Identities.add("DUP_" + name, *identity_copy);
+
+    delete identity;
+    delete identity_copy;
 }
 
 TEST_F(KDBIdentitiesTest, Filter)
