@@ -195,7 +195,7 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
  * Save a KDB of Scalar in a .csv file.
  * NOT IMPLEMENTED.
  */
-int AsciiScalars::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
+int AsciiScalars::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
 {
     return(-1);
 }

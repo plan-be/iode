@@ -73,25 +73,33 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg, int unused)                                                 
 {
-    char    *from, *to, *eqs, *cond, *test, *tmp;
+    char    *eqs, *cond, *test, *tmp;
     char**  args;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     args = B_vtom_chk(arg, 5);
     if(args == NULL) 
         return(1);
 
-    from = args[0];                                              
-    to = args[1];                                                
-    smpl = PER_atosmpl(from, to);                                /*Calcule le sample*/
-    if(smpl == NULL) {                                           /*Gère les erreurs de sample*/
-        kerror(0,"Incorrect sample");
+    std::string from = std::string(args[0]);                                              
+    std::string to = std::string(args[1]);
+    try
+    {
+        /*Calcule le sample*/
+        smpl = new Sample(from, to);
+    }
+    catch(const std::exception& e)
+    {   
+        /*Gère les erreurs de sample */                                    
         SCR_free_tbl((unsigned char**) args);
+        kerror(0,e.what());
         return(1);
     }
 
-    eqs = args[2];                                               
-    if(K_find(K_WS[EQUATIONS], eqs)== -1) {                            /*Gère les erreurs d'équation*/
+    eqs = args[2];                       
+    /*Gère les erreurs d'équation*/                        
+    if(K_find(K_WS[EQUATIONS], eqs)== -1) 
+    {                            
         kerror(0,"Eqs %s not found",eqs);
         SCR_free_tbl((unsigned char**) args);
         return(1);
@@ -121,8 +129,9 @@ int B_EqsStepWise(char* arg, int unused)
         return(1);                      
     }
 
-    estimate_step_wise(smpl, eqs, cond, test);                          /*Effectue les estimations*/
+    estimate_step_wise(smpl, eqs, cond, test);                  /*Effectue les estimations*/
     
+    delete smpl;
     SCR_free_tbl((unsigned char**) args);
     return(0);
 }

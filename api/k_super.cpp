@@ -29,7 +29,7 @@
  *     int khitkey()                                            Checks whether the keyboard buffer is not empty (GUI only).
  *     int kgetkey()                                            Reads the next character in the keyboard buffer (GUI only).
  *     void kbeep()                                             Plays a sound (GUI only).
- *     SAMPLE *kasksmpl()                                       Asks the user to give a SAMPLE (GUI only).
+ *     Sample *kasksmpl()                                       Asks the user to give a Sample (GUI only).
  *     int kexecsystem()                                        Calls the fonction system().
  *     int kshellexec()                                         Call the Win32 function ShellExecuteEx().
  *
@@ -58,7 +58,7 @@
  *      int  (*khitkey_super)();
  *      int  (*kgetkey_super)();
  *      void (*kbeep_super)(void);
- *      SAMPLE *(*kasksmpl_super)(void);
+ *      Sample *(*kasksmpl_super)(void);
  *      int kexecsystem_super(const char*);
  *      int kshellexec_super(const char*);    
  *      int ODE_end_super(const int);    
@@ -468,16 +468,16 @@ void kbeep()
 }
 
 /**
- *  Asks the user to give a SAMPLE (GUI only).
+ *  Asks the user to give a Sample (GUI only).
  *  
  *  The default behaviour is to return the sample of KV_WS or NULL is KV_WS is NULL
  *  
  *  If the function pointer kasksmpl_super is not null, it is called instead.
  */
 
-SAMPLE* kasksmpl()
+Sample* kasksmpl()
 {
-    SAMPLE  *smpl = KSMPL(K_WS[VARIABLES]);
+    Sample  *smpl = KSMPL(K_WS[VARIABLES]);
 
     if(kasksmpl_super) 
         return((*kasksmpl_super)());

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include "api/constants.h"
+#include "api/b_errors.h"
 #include "api/objs/kdb.h"
 
 #include <iostream> // for std::cout

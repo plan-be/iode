@@ -25,7 +25,8 @@
  *                                                  big-endian to little-endian and vice-versa
  */
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/lec/lec.h"
 #include "api/objs/equations.h"
 #include "api/objs/tables.h"
@@ -140,29 +141,29 @@ int (*K_xdrobj[])(unsigned char* ptr, unsigned char** xdr_ptr) =
 #define K_xdrREAL(a)    XDR_rev(a, 1, sizeof(double))
 
 /**
- *  Translates a PERIOD struct from little-endian to big-endian or the other way round.
+ *  Translates a Period struct from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    a   unsigned char*  pointer to a PERIOD. 
+ *  @param [in, out]    a   unsigned char*  pointer to a Period. 
  *                                          in: little-endian, out:big-endian
  */
-static void K_xdrPERIOD(unsigned char* a)
+static void K_xdrPeriod(unsigned char* a)
 {
-    XDR_rev(a, 2, sizeof(long));    /* PERIOD LONG */
+    XDR_rev(a, 2, sizeof(long));    /* Period LONG */
 }
 
 
 /**
- *  Translates a SAMPLE struct from little-endian to big-endian or the other way round.
+ *  Translates a Sample struct from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    a   unsigned char*  pointer to a PERIOD. 
+ *  @param [in, out]    a   unsigned char*  pointer to a Period. 
  *                                          in: little-endian, out:big-endian
  */
 static void K_xdrSMPL(unsigned char* a)
 {
-    K_xdrPERIOD(a);
-    a += sizeof(PERIOD);
-    K_xdrPERIOD(a);
-    a += sizeof(PERIOD);
+    K_xdrPeriod(a);
+    a += sizeof(Period);
+    K_xdrPeriod(a);
+    a += sizeof(Period);
     K_xdrSHORT(a);
 }
 
@@ -209,7 +210,7 @@ static void K_xdrCVAR(unsigned char* a)
     CVAR    *cv = a;
 
     XDR_rev(a, 4, sizeof(short));
-    K_xdrPERIOD(&(cv->per));
+    K_xdrPeriod(&(cv->per));
 }
 
 /**
@@ -286,9 +287,9 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
                     K_xdrCVAR(expr + j);
                     j += sizeof(CVAR);
                     break;
-                case L_PERIOD :
-                    K_xdrPERIOD(expr + j);
-                    j += sizeof(PERIOD);
+                case L_Period :
+                    K_xdrPeriod(expr + j);
+                    j += sizeof(Period);
                     K_xdrSHORT(expr + j);
                     j += s_short;
                     break;
@@ -719,7 +720,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
 {
     short   type;
     KDB     *xdr_kdb;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     type = ikdb->k_type;
 
@@ -741,7 +742,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
     XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
 
     if(type == VARIABLES) {
-        smpl = (SAMPLE *) KDATA(xdr_kdb);
+        smpl = (Sample *) KDATA(xdr_kdb);
         K_xdrSMPL(smpl);
     }
 }

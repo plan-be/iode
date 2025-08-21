@@ -79,7 +79,7 @@ After the estimation, if a solution is found, the results are stored in the work
 
 |Syntax|Description|
 |:---|:---|
-|`int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names)`|Estimates an equation or a block of equations|
+|`int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** names)`|Estimates an equation or a block of equations|
 |`int KE_estim(char* veqs, char* afrom, char* ato)`|Estimates an equation or a block of equations on the specified sample. Simplified version of KE\_est\_s()|
 |**Utility function**||
 |`void E_tests2scl(EQ* eq, int j, int n, int k)`|Creates the scalars containing the results of an estimated equation|
@@ -90,7 +90,7 @@ Main estimation functions \+ some utilities.
 
 |Syntax|Description|
 |:---|:---|
-|`int E_est(char** endos, char** lecs, KDB* dbv, KDB* dbs, SAMPLE* smpl, int met, char** instrs, int maxit, double eps)`|Estimates a block of equations|
+|`int E_est(char** endos, char** lecs, KDB* dbv, KDB* dbs, Sample* smpl, int met, char** instrs, int maxit, double eps)`|Estimates a block of equations|
 |**Utility function**||
 |`int E_scl_in_eq(int coef_nb, int eq_nb)`|Checks if the coefficient coef\_nb is in the equation eq\_nb.|
 
@@ -107,7 +107,7 @@ Main estimation functions \+ some utilities.
 |`int *E_C_NBS;`|Positions in E\_DBS of the estimated coefs|
 |`KDB *E_DBV;`|KDB of variables used for the estimation|
 |`KDB *E_DBS;`|KDB of scalars used for the estimation|
-|`SAMPLE *E_SMPL;`|Current estimation sample|
+|`Sample *E_SMPL;`|Current estimation sample|
 |`char E_MET;`|Current estimation method|
 |`double E_CONV_TEST;`|Sum of the squares of the relative differences between 2 iterations|
 |`double E_EPS;`|Convergence criterion (threshold) for the estimation|
@@ -169,7 +169,7 @@ Functions to generate the results of an estimation in A2M format.
 
 |Syntax|Description|
 |:---|:---|
-|`int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res)`|Displays or prints the graphs of residuals or observed / fitted values|
+|`int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res)`|Displays or prints the graphs of residuals or observed / fitted values|
 |`int E_print_results(int corr, int corru, int obs, int grobs, int grres)`|Prints the estimation input and output of a block of equations.|
 
 ### e\_dftest.c {#T10}
@@ -193,7 +193,7 @@ The selection is done by blocking all possible combinaisons of coefficients.
 |Syntax|Description|
 |:---|:---|
 |`double C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
-|`double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
+|`double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
 
 # IODE: Equation Edition and Estimation GUI {#T12}
 

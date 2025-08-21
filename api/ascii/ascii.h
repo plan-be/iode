@@ -3,7 +3,8 @@
 #include "scr4/s_yy.h"
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/utils/yy.h"
 #include "api/objs/kdb.h"
 #include "api/objs/tables.h"
@@ -29,49 +30,49 @@ struct AbstractAscii
 {
     virtual KDB* load_asc(char* filename) = 0;
     virtual int save_asc(KDB* kdb, char* filename) = 0;
-    virtual int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) = 0;
+    virtual int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) = 0;
 };
 
 struct AsciiComments : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiEquations : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiIdentities : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiLists : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiScalars : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiTables : public AbstractAscii
 {
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiVariables : public AbstractAscii
@@ -94,7 +95,7 @@ struct AsciiVariables : public AbstractAscii
 
     KDB* load_asc(char* filename) override;
     int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, SAMPLE* sample, char** varlist) override;
+    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 
 private:
     KDB* load_asc_type_ask(char *file_or_string, int type, int ask);

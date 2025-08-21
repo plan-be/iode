@@ -2,10 +2,10 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.time.period cimport PERIOD
+from pyiode.time.period cimport CPeriod
 
 cdef extern from "api/all.h":
-    cdef PERIOD RP_PER
+    cdef CPeriod RP_PER
     cdef int RP_settime(char* arg)
     cdef int RP_incrtime(char* arg)
 

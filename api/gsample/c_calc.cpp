@@ -1,12 +1,12 @@
 /**
  *  @header4iode
  *  
- *  Calculation of TBL cells on a GSAMPLE
+ *  Calculation of TBL cells on a GSample
  *  --------------------------------------
  *  
  *  This module calculates the values of table cells based on:
  *  - a list of files loaded in memory and stored in K_RWS[VARIABLES].
- *  - a group of column definitions (COLS = GSAMPLE compiled by COL_cc(gsample))
+ *  - a group of column definitions (COLS = GSample compiled by COL_cc(gsample))
  *      where each column defines:
  *          - the period(s) to be used for the calculations (1 or 2 periods)
  *          - an optional operation between the periods (ex growth rates)
@@ -16,7 +16,7 @@
  *  - the LEC formulas defined in the table cells 
  *  
  *  How to use these functions to print a table ?
- *      1. call COL_cc(smpl) to compile the GSAMPLE in a COLS struct, say cls.
+ *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
  *      2. call COL_resize() to extend COLS according to the number of columns in the TBL 
  *      3. for each TBL line, call: 
  *          COL_clear(cls) to reset the COLS values 
@@ -25,15 +25,16 @@
  *  
  *  List of functions 
  *  -----------------
- *      int COL_exec(TBL* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one TBL line for all columns of a GSAMPLE.
- *      int COL_resize(TBL* tbl, COLS* cls)         Extends the number of COL's (compiled GSAMPLE) by multiplying by the number of columns in a TBL definition
+ *      int COL_exec(TBL* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one TBL line for all columns of a GSample.
+ *      int COL_resize(TBL* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a TBL definition
  *      void COL_clear(COLS* cls)                   Resets the values in a COLS structure. 
  */
 #include <math.h>
 
 #include "api/constants.h"
 #include "api/k_super.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/gsample/gsample.h"
 #include "api/lec/lec.h"
 #include "api/objs/pack.h"
@@ -83,7 +84,7 @@ static int COL_link(int i, CLEC* clec)
 
 
 /**
- *  Calculates the value of a table CELL on a specific GSAMPLE column (COL).
+ *  Calculates the value of a table CELL on a specific GSample column (COL).
  *  
  *  First links clec and dclec (divisor) according to the COL definition (which 
  *  includes the files numbers and periods, that both refer to K_WS[VARIABLES]). 
@@ -116,7 +117,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 vy[1] = vy[0];
                 break;
             }
-            t[j]  = PER_diff_per(&(cl->cl_per[j]), &(KSMPL(kdb)->s_p1));
+            t[j]  = cl->cl_per[j].difference(KSMPL(kdb)->start_period);
             vy[j] = L_exec(kdb, KS_WS, clec, t[j]);
             if(!IODE_IS_A_NUMBER(vy[j])) goto err; /* JMP 16-12-93 */
             div = 1.0;
@@ -219,14 +220,14 @@ err:
 
 
 /**
- *  After the compilation of a GSAMPLE into a COLS structure, multiply the resulting number of COL's 
+ *  After the compilation of a GSample into a COLS structure, multiply the resulting number of COL's 
  *  by the number of columns in the TBL definition (usually 2).
  *  
- *  For example, if the GSAMPLE is "2020/2019:5" and the table consists of 2 columns, the 
+ *  For example, if the GSample is "2020/2019:5" and the table consists of 2 columns, the 
  *  resulting COLS* will contain 5 x 2 COL's.
  *    
  *  @param [in]         TBL*    tbl     TBL to be calculated
- *  @param [in, out]    COLS*   cls     compiled GSAMPLE (via COL_cc())
+ *  @param [in, out]    COLS*   cls     compiled GSample (via COL_cc())
  *  @return             int             new number of columns in cls
  *  
  */
@@ -273,13 +274,13 @@ void COL_clear(COLS* cls)
 
 /**
  *  Calculates the values of all LEC formulas in one TBL line for all columns 
- *  of a GSAMPLE (precompiled into a COLS structure).
+ *  of a GSample (precompiled into a COLS structure).
  *  
  *  Stores each column calculated values in cls[i]->cl_res.
  *      
  *  @param [in]      TBL*    tbl     TBL to be calculated
  *  @param [in]      int     i       line position to be calculated
- *  @param [in, out] COLS*   cls     compiled GSAMPLE (group of COL structures)
+ *  @param [in, out] COLS*   cls     compiled GSample (group of COL structures)
  *  @return          int             0 on success, -1 on failure   
  *  
  */

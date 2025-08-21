@@ -163,11 +163,11 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
 	Sample* sample = get_sample();
-	if (sample->nb_periods() == 0) 
+	if (sample->nb_periods == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
-	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
 	return calculate_var_from_lec(lec, t_first, t_last);
 }
@@ -260,11 +260,11 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
 {
 	Sample* sample = get_sample();
-	if (sample->nb_periods() == 0) 
+	if (sample->nb_periods == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
-	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
 	update(name, values, t_first, t_last);
 }
@@ -278,11 +278,11 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 void KDBVariables::update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
 	Sample* sample = get_sample();
-	if (sample->nb_periods() == 0) 
+	if (sample->nb_periods == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 	
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
-	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
 	update(name, lec, t_first, t_last);
 }
@@ -299,14 +299,14 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 		return;
 	
 	Sample* sample = get_sample();
-    if (sample->nb_periods() == 0 && (from.empty() || to.empty()))
+    if (sample->nb_periods == 0 && (from.empty() || to.empty()))
 	{
         throw std::invalid_argument(std::string("Current sample is empty.\n") + 
 			"Please provide a value for both 'from' and 'to' arguments"); 
 	}
 
-	std::string from_ = from.empty() ? sample->start_period().to_string() : from;
-	std::string to_ = to.empty() ? sample->end_period().to_string() : to;
+	std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+	std::string to_ = to.empty() ? sample->end_period.to_string() : to;
 
 	Period period_from(from_);
 	Period period_to(to_);
@@ -322,7 +322,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	// NOTE: prevent changing the sample on a subset (shallow copy).
 	//       A shallow copy is created by calling the C function K_quick_refer().
 	//       Each 'key' in the shallow copy points to the same data as the original.
-	//       The C function KV_sample(KDB*, SAMPLE*) used below does the following things: 
+	//       The C function KV_sample(KDB*, Sample*) used below does the following things: 
 	//       1. changes the 'sample' attribute of the passed KDB
 	//       2. reallocates the data for each 'key' (IODE variable) [a bit more more complicated than that but that's not the point]
 	//       Problem: if the 'sample' attribute is changed on the subset (passed KDB), the 'sample' attribute of 
@@ -344,18 +344,18 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 
 int KDBVariables::get_nb_periods() const
 {
-    return get_sample()->nb_periods();
+    return get_sample()->nb_periods;
 }
 
 std::string KDBVariables::get_period(const int t) const
 {
-    PERIOD period = KSMPL(get_database())->s_p1;
+    Period period = KSMPL(get_database())->start_period;
     return Period(period).shift(t).to_string();
 }
 
 float KDBVariables::get_period_as_float(const int t) const
 {
-    PERIOD period = KSMPL(get_database())->s_p1;
+    Period period = KSMPL(get_database())->start_period;
     return Period(period).shift(t).to_float();
 }
 
@@ -366,8 +366,8 @@ std::vector<std::string> KDBVariables::get_list_periods(const std::string& from,
 		return sample->get_list_periods();
 	else
 	{
-		std::string from_ = from.empty() ? sample->start_period().to_string() : from;
-		std::string to_ = to.empty() ? sample->end_period().to_string() : to;
+		std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period.to_string() : to;
 		return Sample(from_, to_).get_list_periods();
 	}
 }
@@ -379,8 +379,8 @@ std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& fr
 		return sample->get_list_periods_as_float();
 	else
 	{
-		std::string from_ = from.empty() ? sample->start_period().to_string() : from;
-		std::string to_ = to.empty() ? sample->end_period().to_string() : to;
+		std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period.to_string() : to;
 		return Sample(from_, to_).get_list_periods_as_float();
 	}
 }
@@ -393,8 +393,8 @@ void KDBVariables::copy_from(const std::string& input_file, const std::string& f
 		if((!from.empty()) || (!to.empty()))
 		{
 			Sample* var_sample = get_sample();
-			buf += from.empty() ? var_sample->start_period().to_string() + " " : from + " ";
-			buf += to.empty() ? var_sample->end_period().to_string() + " " : to + " ";
+			buf += from.empty() ? var_sample->start_period.to_string() + " " : from + " ";
+			buf += to.empty() ? var_sample->end_period.to_string() + " " : to + " ";
 			// throw error if wrong samples
 			Sample copy_sample(from, to);
 		}

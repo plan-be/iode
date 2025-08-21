@@ -28,8 +28,8 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     std::string lec = equation->get_lec();
     std::string method = equation->get_method();
     Sample sample = equation->get_sample();
-    std::string from = sample.start_period().to_string();
-    std::string to = sample.end_period().to_string();
+    std::string from = sample.start_period.to_string();
+    std::string to = sample.end_period.to_string();
     std::string comment = equation->get_comment();
     std::string instruments = equation->get_instruments();
     std::string block = equation->get_block();
@@ -251,7 +251,7 @@ TEST_F(EquationTest, GetVariables)
 {
     Sample eq_sample = equation->get_sample();
     KDBVariables kdb_var;
-    kdb_var.set_sample(eq_sample.start_period(), eq_sample.end_period());
+    kdb_var.set_sample(eq_sample.start_period, eq_sample.end_period);
 
     std::vector<std::string> expected_vars_list = {name, "VAF", "GOSF", "TIME"};
     std::vector<std::string> vars_list = equation->get_variables_list();

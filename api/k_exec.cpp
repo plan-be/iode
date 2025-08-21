@@ -67,7 +67,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl)   Executes all identities in dbi using the input series of dbv and scalars of dbs.
+ *      KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* smpl)   Executes all identities in dbi using the input series of dbv and scalars of dbs.
  *                                                                                                                 Missing vars and scalars are collected from vfiles and sfiles.
  */
 #include "api/b_errors.h"
@@ -93,9 +93,9 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[]);
 static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name);
 static int KI_read_scls_file(KDB* dbs, char* file);
 static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[]);
-static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl);
+static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl);
 static int KI_quick_extract(KDB* dbv, KDB* dbi);
-KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl);
+KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* smpl);
 
 /**
  *  Helper function used to compare 2 strings in KI_series_list().
@@ -355,39 +355,40 @@ static int *KI_reorder(KDB* dbi)
  */
 static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 {
-    int     j, pos, nb_found = 0,
-            start, start_tmp;
-    SAMPLE  smpl, *vsmpl, *tsmpl;
-    //char    *filename;
+    int     j, pos, nb_found = 0, start, start_tmp;
 
-    vsmpl = (SAMPLE *) KDATA(dbv);
-    tsmpl = (SAMPLE *) KDATA(dbv_tmp);
-
-    PER_common_smpl(vsmpl, tsmpl, &smpl);
-    if(smpl.s_nb > 0) {
-        start     = PER_diff_per(&(smpl.s_p1), &(vsmpl->s_p1)); /* always >= 0 */
-        start_tmp = PER_diff_per(&(smpl.s_p1), &(tsmpl->s_p1)); /* always >= 0 */
+    Sample* vsmpl = (Sample *) KDATA(dbv);
+    Sample* tsmpl = (Sample *) KDATA(dbv_tmp);
+    Sample smpl = vsmpl->intersection(*tsmpl);
+    if(smpl.nb_periods > 0) 
+    {
+        start     = smpl.start_period.difference(vsmpl->start_period);  /* always >= 0 */
+        start_tmp = smpl.start_period.difference(tsmpl->start_period);  /* always >= 0 */
     }
-    else return(-3);
+    else 
+        return(-3);
 
-    if(KEXEC_TRACE) {
-        //W_printfDbl(".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); 
-        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); 
-    }    
-    for(j = 0 ; j < KNB(dbv); j++) {
-        if(KSOVAL(dbv, j) != 0) continue;  /* series already present */
+    if(KEXEC_TRACE) 
+        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
+
+    for(j = 0 ; j < KNB(dbv); j++) 
+    {
+        if(KSOVAL(dbv, j) != 0) 
+            continue;  /* series already present */
 
         pos = K_find(dbv_tmp, KONAME(dbv, j));
         if(pos < 0) continue;
-        KSOVAL(dbv, j) = KV_alloc_var(vsmpl->s_nb);
-        memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp),
-               sizeof(double) * smpl.s_nb);
+        KSOVAL(dbv, j) = KV_alloc_var(vsmpl->nb_periods);
+        memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp), 
+               sizeof(double) * smpl.nb_periods);
         if(KEXEC_TRACE)
             W_printf("%s ", KONAME(dbv, j));
         nb_found++;
     }
 
-    if(KEXEC_TRACE) W_printf("\n");
+    if(KEXEC_TRACE) 
+        W_printf("\n");
+    
     return(nb_found);
 }
 
@@ -472,7 +473,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 
     // If all target VARs are not found, creates them with NaN values
     if(nb_found < KNB(dbv)) {
-        dim = KSMPL(dbv)->s_nb;
+        dim = KSMPL(dbv)->nb_periods;
         for(i = 0, j = 0 ; i < KNB(dbv) && j < 10; i++) {
             if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
             if(K_find(dbi, KONAME(dbv, i)) >= 0) {          // series = identity ("endogenous") => creates an IODE_NAN VA
@@ -633,7 +634,7 @@ KDB     *dbv,  *dbi;
 {
     int     i, nb, pos;
 
-    nb = KSMPL(dbv)->s_nb;
+    nb = KSMPL(dbv)->nb_periods;
     for(i = 0; i < KNB(dbi); i++)  {
 	if(K_find(dbv, KONAME(dbi, i)) < 0) {
 	    K_add(dbv, KONAME(dbi, i), NULL, &nb);
@@ -653,27 +654,29 @@ KDB     *dbv,  *dbi;
  *  @param [in] KDB*    dbs   Input Scalar KDB
  *  @param [in] KDB*    dbi   KDB of identities to compute
  *  @param [in] int*    order order of execution of the identities
- *  @param [in] SAMPLE* smpl  execution SAMPLE
+ *  @param [in] Sample* smpl  execution Sample
  *  @return     int           0 on success
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl)
+static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
 {
     int     i, t, pos, tot_lg, start;
     char    *tmp;
     double  d;
 
-    start = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
-    if(start < 0) start = 0;
+    start = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    if(start < 0) 
+        start = 0;
 
-    for(i = 0; i < KNB(dbi); i++) {
+    for(i = 0; i < KNB(dbi); i++) 
+    {
         tot_lg = KICLEC(dbi, order[i])->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, KICLEC(dbi, order[i]), tot_lg);
         if(L_link(dbv, dbs, (CLEC *)tmp)) return(-1);
         pos = K_find(dbv, KONAME(dbi, order[i]));
-        for(t = start ; t < start + smpl->s_nb ; t++) {
+        for(t = start ; t < start + smpl->nb_periods ; t++) {
             d = L_exec(dbv, dbs, (CLEC *)tmp, t);
             *(KVVAL(dbv, pos, t)) = d;
         }
@@ -695,32 +698,35 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl)
  *  @param [in] KDB*    dbs         Input Scalar KDB
  *  @param [in] int     ns          number of input Scalar files
  *  @param [in] char*   sfiles[]    Input Scalar files
- *  @param [in] SAMPLE* smpl        execution SAMPLE or NULL to select the current VAR KDB sample
- *  @return     KDB*                NULL on error (illegal SAMPLE, empty dbi, vars or scls not found...).
+ *  @param [in] Sample* smpl        execution Sample or NULL to select the current VAR KDB sample
+ *  @return     KDB*                NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* in_smpl)
+KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* in_smpl)
 {
     KDB     *dbv_i, *dbs_i;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     int     *order;
-    char    buf[80];
 
     smpl = KSMPL(KV_WS);
     if(in_smpl != 0) smpl = in_smpl;
     
-    if(smpl->s_nb == 0) {
+    if(smpl->nb_periods == 0) 
+    {
         error_manager.append_error("Empty execution sample");
         return((KDB *)0);
     }
     
-    if(KSMPL(KV_WS)->s_nb != 0 &&
-            (PER_diff_per(&(KSMPL(KV_WS)->s_p2), &(smpl->s_p2)) < 0
-             || PER_diff_per(&(smpl->s_p1), &(KSMPL(KV_WS)->s_p1)) < 0)) {
+    if(KSMPL(KV_WS)->nb_periods != 0 &&
+       (KSMPL(KV_WS)->end_period.difference(smpl->end_period)) < 0 || 
+       (smpl->start_period.difference(KSMPL(KV_WS)->start_period)) < 0) 
+    {
         error_manager.append_error("Empty execution sample");
         return((KDB *)0);
     }
-    if(KNB(dbi) == 0) {
+    
+    if(KNB(dbi) == 0) 
+    {
         error_manager.append_error("Empty set of identities");
         return((KDB *)0);
     }
@@ -732,20 +738,20 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     }
 
     dbv_i = KI_series_list(dbi);
-    if(KSMPL(KV_WS)->s_nb == 0) 
-        memcpy(KDATA(dbv_i), smpl, sizeof(SAMPLE));
+    if(KSMPL(KV_WS)->nb_periods == 0) 
+        memcpy(KDATA(dbv_i), smpl, sizeof(Sample));
     else  
-        memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(SAMPLE));
+        memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(Sample));
 
     if(KEXEC_TRACE) {
         W_printf("\n.par1 tit_0\nExecution of identities\n");
         W_printf(".par1 tit_1\nParameters\n");
-        /*        W_printf(".par1 par_1\nList of identities :\n"); */
-        W_printf(".par1 par_1\nExecution sample : %s\n",
-                 PER_smpltoa(smpl, buf));
+        W_printf(".par1 par_1\nExecution sample : %s\n", (char*) smpl->to_string().c_str());
         W_printf(".par1 tit_1\nVariables loaded\n");
     }
-    if(KI_read_vars(dbi, dbv_i, dbv, nv, vfiles)) {
+    
+    if(KI_read_vars(dbi, dbv_i, dbv, nv, vfiles)) 
+    {
         SW_nfree(order);
         K_free(dbv_i);
         return((KDB *)0);

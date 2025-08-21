@@ -14,12 +14,13 @@
  *  
  *  List of functions 
  *  -----------------
- *      int read_header(YYFILE* yy, SAMPLE* smpl)                               Reads the sample (required) and the list of VARs in a rotated ASCII variable file.
+ *      int read_header(YYFILE* yy, Sample* smpl)                               Reads the sample (required) and the list of VARs in a rotated ASCII variable file.
  *      int read_variable(YYFILE* yy, char* name, int* shift, double* value) Reads one value in an ASCII variable file format. 
  *      int close()                                                      Frees the allocated vars during the rotated ASCII file import session.
  */
 #include "api/utils/yy.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/io/import.h"
 
 
@@ -28,19 +29,19 @@
  *  Stores the list of VAR names (to be read) in RASC_toc.
  *    
  *  @param [in, out] YYFILE*    yy   open YY stream 
- *  @param [out]     SAMPLE*    smpl read SAMPLE on the YY stream
+ *  @param [out]     Sample*    smpl read Sample on the YY stream
  *  @return          int        0 on success, -1 if there is an error in the sample
  */
-int ImportObjsRevertASCII::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
 {
     int     done = 0, nbtoc = 0;
-    SAMPLE  *rsmpl;
+    Sample  *rsmpl;
 
     if(YY_lex(yy) != ASC_SMPL)  return(-1);
 
     rsmpl = K_read_smpl(yy);
     if(rsmpl == NULL) return(-1);
-    memcpy(smpl, rsmpl, sizeof(SAMPLE));
+    memcpy(smpl, rsmpl, sizeof(Sample));
 
     while(!done) {
         switch(YY_lex(yy)) {

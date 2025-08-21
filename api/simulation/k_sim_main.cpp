@@ -82,7 +82,7 @@
  * List of functions 
  * -----------------
  *
- *      int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
+ *      int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
  *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
@@ -433,7 +433,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 int CSimulation::K_simul_1(int t)
 {
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime; /* JMP 27-09-96 */
-    char    buf[10], msg[80];
+    char    msg[80];
     long    ms_iter;
 
     K_init_values(t);
@@ -452,9 +452,10 @@ int CSimulation::K_simul_1(int t)
             ktermvkey(ovtime);  // Resets the interval between 2 keyboard readings
             return(-1);
         }
-        PER_pertoa(PER_addper(&(KSMPL(KSIM_DBV)->s_p1), t), buf);
+        Period period = KSMPL(KSIM_DBV)->start_period.shift(t);
         sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
-                      buf, it, KSIM_NORM, WscrGetMS() - ms_iter);
+                      (char*) period.to_string().c_str(), it, KSIM_NORM, 
+                      WscrGetMS() - ms_iter);
         kmsg("%.80s", msg);
         conv = (KSIM_NORM <= KSIM_EPS) ? 1 : 0;
         if(khitkey() != 0) {                    // Checks the keyboard for a buffered key 
@@ -498,7 +499,7 @@ int CSimulation::K_simul_1(int t)
  *  @param [in] KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
  *  @param [in] KDB*    dbv         KDB containing the model variables (endo + exo)
  *  @param [in] KDB*    dbs         KDB containing the model scalars
- *  @param [in] SAMPLE* smpl        simulation SAMPLE
+ *  @param [in] Sample* smpl        simulation Sample
  *  @param [in] char**  endo_exo    optional goal-seeking specification: list of strings in the form "endo1-exo1,endo2-exo2..." 
  *                                      where endo1 and endo2 become exogenous (instead of endogenous) 
  *                                      and exo1, exo2 replace endo1 and endo2 as endogenous to the model.
@@ -521,9 +522,9 @@ int CSimulation::K_simul_1(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)
+int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs)
 {
-    int     i, t, j, k, endo_exonb,
+    int     i, t, bt, at, j, k, endo_exonb,
             posendo, posexo, posvar,
             rc = -1,
             cpu_iter;
@@ -544,12 +545,14 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
 
     // Find in the KSIM_DBV sample the position t of the first period to simulate
     // and check that the simulation sample is included in KSIM_DBV sample
-    t = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
-    if(t < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
+    at = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    bt = KSMPL(dbv)->end_period.difference(smpl->end_period);
+    if(bt < 0 || at < 0) {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
         return(rc);
     }
+    t = at; // t = index of the first period to simulate
 
     // KSIM_POSXK[i] = pos in KSIM_DBV of the endo of equation i (endo var = eq name)
     // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
@@ -563,9 +566,9 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->s_nb);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->nb_periods);
 
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
@@ -642,7 +645,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
     KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
     KSIM_XK1 = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
 
-    for(i = 0; i < smpl->s_nb; i++, t++) {
+    for(i = 0; i < smpl->nb_periods; i++, t++) {
         cpu_iter = WscrGetMS();
         if(rc = K_simul_1(t)) goto fin;
         KSIM_CPUS[t] = WscrGetMS() - cpu_iter;
@@ -653,7 +656,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo
                 posexo = K_find(KSIM_DBV, var[1]);
 
                 x = KVVAL(KSIM_DBV, posexo, 0);
-                for(j = t + 1; j < KSMPL(dbv)->s_nb; j++)  x[j] = x[t];
+                for(j = t + 1; j < KSMPL(dbv)->nb_periods; j++)  x[j] = x[t];
 
                 SCR_free_tbl((unsigned char**) var);
                 var = NULL;
@@ -692,7 +695,6 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     int     lg, eqvarnb = -1;
     CLEC    *clec;
     double  x;
-    char    buf[10];
 
 //Debug("Eq %s\n", KONAME(KSIM_DBE, eqnb));
     lg = KECLEC(KSIM_DBE, eqnb)->tot_lg;
@@ -704,11 +706,14 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     else
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
     if(!IODE_IS_A_NUMBER(x) && msg)
+    {
+        Period period = KSMPL(KSIM_DBV)->start_period.shift(t);
         kerror(0, "%s : becomes unavailable at %s%s",
                KONAME(KSIM_DBV, varnb), /* JMP 16-06-99 a la place de eqvarnb */
-               PER_pertoa(PER_addper(&(KSMPL(KSIM_DBV)->s_p1), t), buf),
+               (char*) period.to_string().c_str(),
                ((clec->dupendo || varnb != eqvarnb) ? "(Newton)" : "")
               );
+    }
     SW_nfree(clec);
     return(x);
 }

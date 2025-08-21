@@ -3,7 +3,7 @@
  *  
  *  Functions to generate IODE graphs in A2M format.
  *  The graphs are based on 
- *      - TBL structures and a GSAMPLE definition, or
+ *      - TBL structures and a GSample definition, or
  *      - VAR list(s) or combination(s) or VARS. 
  *  
  *  Includes some A2M helper functions. 
@@ -13,16 +13,16 @@
  *      int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)    Initialises a graph by sending a2m commands to W_printf().
  *      int T_GraphTest(TBL *tbl)                                               Displays the table tbl as a graph (in level) on the full sample of the current WS.
  *      int T_GraphEnd()                                                        Ends a A2M graph definition by sending the a2m command ".ge" to W_printf().
- *      int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a TBL struct and a GSAMPLE.
+ *      int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a TBL struct and a GSample.
  *      int T_GraphTitle(char *txt)                                             Defines the graph title by sending a2m command ".gtitle" to W_printf().
  *      int T_GraphLegend(int axis, int type, char *txt, char *fileop)          Adds (in A2M) graph *time* axis (.gty or .gtz, see a2m language) with its position, type and title.
  *      int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)        Adds (in A2M) graph *xy* axis with its position, type and title.
- *      int T_GraphTimeData(SAMPLE *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
+ *      int T_GraphTimeData(Sample *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
  *      int T_GraphXYData(int nb, double *x, double *y)                   Adds numerical data on a *xy* graph line or bar.
- *      int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSAMPLE. 
+ *      int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSample. 
  *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
- *      int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)                   Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.
- *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
+ *      int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)                   Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.
+ *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
 #include "api/constants.h"
 #include "api/b_errors.h"
@@ -43,11 +43,11 @@
 int T_GraphTest(TBL *tbl)
 {
     char    gsmpl[20];
-    SAMPLE  *smpl = (SAMPLE *) KDATA(KV_WS);
+    Sample  *smpl = (Sample *) KDATA(KV_WS);
 
     W_InitDisplay();
-    sprintf(gsmpl, "%s:%d",
-            PER_pertoa(&(smpl->s_p1), NULL), smpl->s_nb); /* JMP 28-11-93 */
+    std::string str_period = smpl->start_period.to_string();
+    sprintf(gsmpl, "%s:%d", (char*) str_period.c_str(), smpl->nb_periods); /* JMP 28-11-93 */
     //KT_nb = 1; // JMP 11/05/2022
     if(T_graph_tbl_1(tbl, gsmpl, 1)) { // JMP 11-05-2022 : mode = 1 => display 
         std::string err_msg = "Testing failed ...";
@@ -112,10 +112,10 @@ int T_GraphEnd()
 
 
 /**
- *  Generates one graph in A2M format from a TBL struct and a GSAMPLE.
+ *  Generates one graph in A2M format from a TBL struct and a GSample.
  *  
  *  @param [in] TBL*    tbl     source TBL
- *  @param [in] char*   gsmpl   GSAMPLE definition
+ *  @param [in] char*   gsmpl   GSample definition
  *  @param [in] int     mode    0 for view mode, not null for print mode (generates A2M RTF topic)
  *  @return     int             0 on success, -1 on error (more than 2 cols in tbl or one of the ref files is not in K_RWS)
  */
@@ -125,7 +125,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     char    **files;
     COLS    *cls, *fcls;
     TLINE   *line;
-    SAMPLE  smpl;
+    Sample  smpl;
     double    step, *x, *y;
     TCELL   *cell;   
 
@@ -143,13 +143,13 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     files = T_find_files(cls);
     if(files == 0) return(-1); /* JMP 11-06-99 */
 
-    x = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
-    step = 1.0 / PER_nbper(&(smpl.s_p1));
-    x[0] = PER_per2real(&(smpl.s_p1), 0);
+    x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
+    step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
+    x[0] = smpl.start_period.to_float();
     if(step < 1) x[0] += step/2; /* GB 23-11-2010, center Q en M  */
-    for(i = 1; i < smpl.s_nb; i++) x[i] = x[i - 1] + step;
+    for(i = 1; i < smpl.nb_periods; i++) x[i] = x[i - 1] + step;
 
-    y = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
+    y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
 
     //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
     //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
@@ -234,8 +234,8 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
  *  Adds (in A2M) the graph *time* axis corresponding to a TLINE and a specific COL.
  *  
  *  @param [in] TLINE* line     pointer to a TBL line
- *  @param [in] COLS*  fcls     compiled GSAMPLE (combination of files, op on files, periods, op on periods)
- *  @param [in] int    i        nb of the GSAMPLE column to use for generating the legend
+ *  @param [in] COLS*  fcls     compiled GSample (combination of files, op on files, periods, op on periods)
+ *  @param [in] int    i        nb of the GSample column to use for generating the legend
  *  @return 
  */
 static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i) 
@@ -275,19 +275,18 @@ int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
  *  Adds numerical data on a *time* graph line or bar.
  *  Example of result: "2000Y1 2.3 2.5 ..."
  *  
- *  @param [in] SAMPLE*     smpl    sample of the data in y
+ *  @param [in] Sample*     smpl    sample of the data in y
  *  @param [in] double*  y       y-values
  *  @return     int                 0 always
  */
-int T_GraphTimeData(SAMPLE *smpl, double *y)
+int T_GraphTimeData(Sample *smpl, double *y)
 {
-    int     i = 0;
     char    buf[21];
 
-    PER_pertoa(&(smpl->s_p1), buf);
-    W_printf("%s ", buf);
+    std::string str_period = smpl->start_period.to_string();
+    W_printf("%s ", (char*) str_period.c_str());
 
-    for(i = 0; i < smpl->s_nb; i++) {
+    for(int i = 0; i < smpl->nb_periods; i++) {
         T_fmt_val(buf, y[i], 16, -1);
         W_printf(" %s ", buf);
     }
@@ -320,24 +319,24 @@ int T_GraphXYData(int nb, double *x, double *y)
 
 
 /**
- *  Adds graph curves from a table line definition and a calculated GSAMPLE. 
- *  The number of generated curves depends on the GSAMPLE definition. 
- *  For example, if the GSAMPLE is 
+ *  Adds graph curves from a table line definition and a calculated GSample. 
+ *  The number of generated curves depends on the GSample definition. 
+ *  For example, if the GSample is 
  *      2000Y1:20[1;2;1%2]
  *  3 curves will be generated: [1],[2] and [1%2].
  *  
  *  @param [in]  TBL*        tbl    Source table
  *  @param [in]  int         i      line number
- *  @param [in]  COLS*       cls    compiled GSAMPLE containing the calculated values 
+ *  @param [in]  COLS*       cls    compiled GSample containing the calculated values 
  *                                  for each operation on files and periods
- *  @param [in]  SAMPLE*     smpl   SAMPLE of the data
+ *  @param [in]  Sample*     smpl   Sample of the data
  *  @param [in]  double*  x      unused  
  *  @param [out] double*  y      data of the 
  *  @param [in]  COLS*       fcls   
  *  @return 
  *  
  */
-int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)
+int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TLINE   *line = T_L(tbl) + i;
@@ -349,11 +348,11 @@ int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, 
     for(k = 0 ; k < fcls->cl_nb ; k++) {
         T_GraphLineTitle(line, fcls, k);
 
-        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = IODE_NAN;
+        for(j = 0 ; j < smpl->nb_periods ; j++) y[j] = IODE_NAN;
         for(j = 1; j < cls->cl_nb; j += 2) {
             cl = cls->cl_cols + j;
             if(T_find_opf(fcls, cl) != k) continue;
-            dt = PER_diff_per(cl->cl_per, &(smpl->s_p1));
+            dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
         }
 
@@ -389,24 +388,24 @@ int T_find_opf(COLS *fcls, COL *cl)
 
 
 /**
- *  Given a COLS struct (compiled GSAMPLE), constructs:
+ *  Given a COLS struct (compiled GSample), constructs:
  *      - a new COLS struct containing unique files and operation on files
- *      - the minimum SAMPLE smpl containing all periods present in cls.
+ *      - the minimum Sample smpl containing all periods present in cls.
  *  
- *  @param [in]  COLS*   cls    compiled GSAMPLE
+ *  @param [in]  COLS*   cls    compiled GSample
  *  @param [out] COLS**  fcls   unique files / op on files
- *  @param [out] SAMPLE* smpl   minimum SAMPLE enclosing cls periods
+ *  @param [out] Sample* smpl   minimum Sample enclosing cls periods
  *  @return 
  */
-int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
+int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
 {
     int     i, pos;
     COL     *cl;
 
     *fcls = 0;
     cl = cls->cl_cols;  // First col in cls
-    memcpy(&(smpl->s_p1), cl->cl_per, sizeof(PERIOD));
-    memcpy(&(smpl->s_p2), cl->cl_per, sizeof(PERIOD));
+    smpl->start_period = cl->cl_per[0];
+    smpl->end_period = cl->cl_per[0];
 
     for(i = 0; i < cls->cl_nb; i++) {
         cl = cls->cl_cols + i;
@@ -416,12 +415,12 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
             memcpy((*fcls)->cl_cols + (*fcls)->cl_nb - 1, cl, sizeof(COL));
         }
 
-        if(PER_diff_per(cl->cl_per, &(smpl->s_p1)) < 0)
-            memcpy(&(smpl->s_p1), cl->cl_per, sizeof(PERIOD));
-        if(PER_diff_per(cl->cl_per, &(smpl->s_p2)) > 0)
-            memcpy(&(smpl->s_p2), cl->cl_per, sizeof(PERIOD));
+        if(cl->cl_per[0].difference(smpl->start_period) < 0)
+            smpl->start_period = cl->cl_per[0];
+        if(cl->cl_per[0].difference(smpl->end_period) > 0)
+            smpl->end_period = cl->cl_per[0];
     }
-    smpl->s_nb = 1 + PER_diff_per(&(smpl->s_p2), &(smpl->s_p1));
+    smpl->nb_periods = 1 + smpl->end_period.difference(smpl->start_period);
     return(0);
 }
 
@@ -440,7 +439,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
  *  @param [in] int     axis        unused
  *  @param [in] double  ymin        IODE_NAN or min value of the y axis
  *  @param [in] double  ymax        IODE_NAN or max value of the y axis
- *  @param [in] SAMPLE* smpl        printing sample
+ *  @param [in] Sample* smpl        printing sample
  *  @param [in] int     dt          shift from the sample beginning of the first observation to keep for the graph
  *  @param [in] int     nt          nb of obs to print
  *  @param [in] KDB*    kdb         KDB containing the variables to graph
@@ -451,7 +450,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, SAMPLE* smpl, int dt, int nt, KDB* kdb, char* names, int mode)
+           double ymin, double ymax, Sample* smpl, int dt, int nt, KDB* kdb, char* names, int mode)
 {
     char    *buf, **vars;
     int     i, t, ng, var_nb, rc = 0;
@@ -513,7 +512,7 @@ fin:
  *  See V_graph() for the other parameter definitions.
  */
  
-static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, KDB* kdb, char** names, int mode)
+static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, KDB* kdb, char** names, int mode)
 {
     int     i, dt, nt, ng;
 
@@ -524,9 +523,9 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
         return(-1);
     }
 
-    nt = smpl->s_nb;
-    dt = PER_diff_per(&(smpl->s_p1), &(KSMPL(kdb)->s_p1));
-    if(dt < 0 || dt + nt > KSMPL(kdb)->s_nb) {
+    nt = smpl->nb_periods;
+    dt = smpl->start_period.difference(KSMPL(kdb)->start_period);
+    if(dt < 0 || dt + nt > KSMPL(kdb)->nb_periods) {
         std::string err_msg = "DataDisplayGraph : Sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
         return(-1);
@@ -548,7 +547,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
  *  Example
  *  -------
  *      varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", ",;");
- *      smpl = PER_atosmpl("1990Y1", "2010Y1");
+ *      smpl = new Sample("1990Y1", "2010Y1");
  *      rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
  *  
  *  @param [in] int     view    0 for printing, 1 for displaying the graphs
@@ -559,11 +558,11 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
  *  @param [in] int     axis    unused
  *  @param [in] double  ymin    IODE_NAN or min value of the y axis
  *  @param [in] double  ymax    IODE_NAN or max value of the y axis
- *  @param [in] SAMPLE* smpl    printing sample
+ *  @param [in] Sample* smpl    printing sample
  *  @param [in] char**  names   list of VARs to print
  *  @return     int             0 on success, -1 on error
  */
-int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)
+int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)
 {
     int     rc;
     //int old_mode = global_VM, rc;
@@ -597,8 +596,8 @@ APICHRT** API_CHARTS = NULL;
 int       API_NBCHARTS = 0;
 
 // Functions declarations 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
-int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y);
+int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
 int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
@@ -615,7 +614,7 @@ double *APIChartData(int hdl, int i);
 int APIPrepareChart(TBL *tbl, char *gsmpl);
 
 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)
+int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TLINE   *line = T_L(tbl) + i;
@@ -626,11 +625,11 @@ int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, d
     if(COL_exec(tbl, i, cls) < 0) return(-1);
     for(k = 0 ; k < fcls->cl_nb ; k++) {
         APIGraphLineTitle(hdl, line, fcls, k);
-        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = IODE_NAN;
+        for(j = 0 ; j < smpl->nb_periods ; j++) y[j] = IODE_NAN;
         for(j = 1; j < cls->cl_nb; j += 2) {
             cl = cls->cl_cols + j;
             if(T_find_opf(fcls, cl) != k) continue;
-            dt = PER_diff_per(cl->cl_per, &(smpl->s_p1));
+            dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
         }
         APIGraphTimeData(hdl, smpl, y);
@@ -643,13 +642,13 @@ int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, d
 /**
  *  
  *  @param [in] int         hdl  
- *  @param [in] SAMPLE*     smpl 
+ *  @param [in] Sample*     smpl 
  *  @param [in] double*  y    
  *  @return 
  */
-int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y)
+int APIGraphTimeData(int hdl, Sample *smpl, double *y)
 {
-    int         nb = smpl->s_nb;
+    int         nb = smpl->nb_periods;
     APICHRT    *Chrt = API_CHARTS[hdl];
     Chrt->ChrtData[Chrt->ChrtI] = (double *)SW_nalloc(sizeof(double) * nb);
     memcpy(Chrt->ChrtData[Chrt->ChrtI], y, sizeof(double) * nb);
@@ -855,7 +854,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     char    **files;
     COLS    *cls, *fcls;
     TLINE   *line;
-    SAMPLE  smpl;
+    Sample  smpl;
     double    step, *x, *y;
     TCELL   *cell;
 
@@ -869,11 +868,11 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
     if(files == 0) return(-1); /* JMP 11-06-99 */
-    x = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
-    step = 1.0 / PER_nbper(&(smpl.s_p1));
-    x[0] = PER_per2real(&(smpl.s_p1), 0);
-    for(i = 1; i < smpl.s_nb; i++) x[i] = x[i - 1] + step;
-    y = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
+    x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
+    step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
+    x[0] = smpl.start_period.to_float();
+    for(i = 1; i < smpl.nb_periods; i++) x[i] = x[i - 1] + step;
+    y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     hdl = APIChartAlloc(T_NL(tbl));
     w = 1;
     for(i = 0; i < T_NL(tbl) && w > 0; i++) {
@@ -885,14 +884,14 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
                 if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) w = -1;
                 break;
             case TABLE_LINE_TITLE :
-                APIGraphTitle(hdl, T_cell_cont(cell, 0), x, smpl.s_nb);
+                APIGraphTitle(hdl, T_cell_cont(cell, 0), x, smpl.nb_periods);
                 break;
             case TABLE_LINE_FILES :
             default :
                 break;
         }
     }
-    API_CHARTS[hdl]->ChrtNb = smpl.s_nb;
+    API_CHARTS[hdl]->ChrtNb = smpl.nb_periods;
     SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);

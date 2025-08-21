@@ -53,7 +53,7 @@ TEST_F(IdentityTest, GetVariables)
 
     Equation eq = Equations.get("ACAF");
     Sample eq_sample = eq.get_sample();
-    Variables.set_sample(eq_sample.start_period(), eq_sample.end_period());
+    Variables.set_sample(eq_sample.start_period, eq_sample.end_period);
 
     std::vector<std::string> expected_vars_list = {"WCRH", "QL", "VAFF", "VM", "PM"};
     std::vector<std::string> vars_list = idt_vars->get_variables_list();

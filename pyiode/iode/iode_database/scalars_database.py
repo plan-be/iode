@@ -35,8 +35,8 @@ class Scalars(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import scalars, SAMPLE_DATA_DIR
-    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import scalars, Sample_DATA_DIR
+    >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.scl
     161 objects loaded 
     >>> len(scalars)
@@ -86,8 +86,8 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import scalars, SAMPLE_DATA_DIR
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import scalars, Sample_DATA_DIR
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> # get the first scalar
@@ -203,9 +203,9 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
 
@@ -277,9 +277,9 @@ class Scalars(IodeDatabase):
         Examples
         --------
         >>> import pandas as pd
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import scalars, Scalar
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         
@@ -419,9 +419,9 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
 
@@ -643,9 +643,9 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, scalars
+        >>> from iode import Sample_DATA_DIR, scalars
         >>> import pandas as pd
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> len(scalars)
@@ -710,9 +710,9 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, scalars
+        >>> from iode import Sample_DATA_DIR, scalars
         >>> import pandas as pd
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> len(scalars)
@@ -840,9 +840,9 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import scalars, SAMPLE_DATA_DIR
+        >>> from iode import scalars, Sample_DATA_DIR
         >>> output_dir = getfixture('tmp_path')
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
         >>> scalars.print_nb_decimals = 4
@@ -871,8 +871,8 @@ class Scalars(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, scalars
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, scalars
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> len(scalars)

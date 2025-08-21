@@ -13,10 +13,11 @@ TEST(TestPeriod, Create)
 	// passing a string
 	Period period2("2020Y1");
 
-	// passing a PERIOD C_API struct
-	char buf[10] = "2020Y1";
-	PERIOD* c_period = PER_atoper(buf);
-	Period period3(*c_period);
+	// using a Period pointer
+	std::string buf = "2020Y1";
+	Period* ptr_period = new Period(buf);
+	Period period3(*ptr_period);
+	delete ptr_period;
 }
 
 TEST(TestPeriod, NbPeriodsPerYear)
@@ -24,7 +25,7 @@ TEST(TestPeriod, NbPeriodsPerYear)
 	for (auto const& [periodicity, expected_nb_periods] : map_periodicities)
 	{
 		Period period(2020, periodicity, 1);
-		int nb_periods = period.nb_periods_per_year();
+		int nb_periods = get_nb_periods_per_year(period.periodicity);
 		EXPECT_EQ(nb_periods, expected_nb_periods);
 	}
 }
@@ -139,7 +140,7 @@ TEST(TestPeriod, Hash)
 
 	Period period(2020, 'Y', 1);
 
-	std::hash<PERIOD> period_hasher;
+	std::hash<Period> period_hasher;
     hash_before = period_hasher(period);
 
 	// modify

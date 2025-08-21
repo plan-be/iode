@@ -4,7 +4,7 @@
  *  Functions to display or print calculated tables and tables of variables. The same functions are used
  *  to print and to display tables as graphs or as text.
  *  
- *  The functions generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
+ *  The functions generate IODE tables in A2M format based on TBL structures and GSample definition.
  *  
  *  List of functions 
  *  -----------------
@@ -16,8 +16,8 @@
  *      int B_PrintTbl(char* arg, int unused)                           | $PrintTbl gsample table1 [table2...]
  *      int B_ViewGr(char* arg, int unused)                             | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
  *      int B_PrintGr(char* arg, int unused)                            | $PrintGr gsample table1 [table2...]
- *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSAMPLE.
- *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSAMPLE, based on TBL definition(s).
+ *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSample.
+ *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on TBL definition(s).
  *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).
  *      int B_ViewTblFile(char* arg, int unused)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
@@ -40,7 +40,7 @@
 int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table
 
 int     ODE_VIEW = 0;   // Used in the DOS GUI to differentiate between display & print
-char    ODE_SMPL[81];   // Current GSAMPLE for printing / displaying tables and graphs
+char    ODE_SMPL[81];   // Current GSample for printing / displaying tables and graphs
 
 
 // Display a list of variables in the form of tables of max 50 variables.
@@ -163,10 +163,10 @@ int B_PrintGr(char* arg, int unused)
 
 
 /**
- *  Calculate and display (or print, according to the value of B_viewmode) a table on a specified GSAMPLE.
+ *  Calculate and display (or print, according to the value of B_viewmode) a table on a specified GSample.
  *  
  *  @param [in] name char*  table name
- *  @param [in] smpl char*  GSAMPLE
+ *  @param [in] smpl char*  GSample
  *  @return          int    0 on success, -1 on error (table not found, illegal gsample...)
  */
 int B_ViewPrintTbl_1(char* name, char* smpl)
@@ -195,11 +195,11 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
 
 
 /**
- *  Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSAMPLE, 
+ *  Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, 
  *  based on TBL definition(s).
  *  
  *  @param [in] names   char*  list of table names
- *  @param [in] smpl    char*  GSAMPLE
+ *  @param [in] smpl    char*  GSample
  *  @return             int    0 on success, -1 on error (table not found, illegal gsample...)
  */
 int B_ViewPrintGr_1(char* names, char* gsmpl)

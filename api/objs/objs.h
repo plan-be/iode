@@ -1,7 +1,8 @@
 #pragma once 
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 
 // K_LZH : indicates if a saved WS must be compressed or not 
@@ -22,7 +23,7 @@ int K_find(KDB *,char *);
 int K_del(KDB *,int );
 int K_del_entry(KDB *,int );
 int K_del_by_name(KDB* kdb, char* name);
-int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date);
+int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date);
 int K_upd_tbl(char* name, char* arg);
 
 /* k_objsv.c */
@@ -43,7 +44,7 @@ int K_merge(KDB *,KDB *,int );
 int K_merge_del(KDB *,KDB *,int );
 KDB *K_load(int ,char *,int ,char **);
 KDB *K_interpret(int ,char *);
-int K_copy(KDB *,int ,char **,int ,char **,SAMPLE *);
+int K_copy(KDB *,int ,char **,int ,char **,Sample *);
 int K_cat(KDB *,char *);
 int K_set_backup_on_save(int take_backup);
 int K_get_backup_on_save();
@@ -51,4 +52,4 @@ int K_backup(char *);
 int K_save(KDB *,char *);
 int K_save_ws(KDB *);
 int K_setname(char *,char *);
-int K_filetype(char *,char *,int *,SAMPLE *);
+int K_filetype(char *,char *,int *,Sample *);

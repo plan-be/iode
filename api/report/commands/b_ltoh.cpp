@@ -252,23 +252,23 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
 
 
 /**
- *  Computes the target SAMPLE of a conversion of variables from a low to a high periodicity.
+ *  Computes the target Sample of a conversion of variables from a low to a high periodicity.
  *  
- *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
- *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
- *  @param [out]  SAMPLE** t_smpl     allocated target sample
+ *  @param [in]   Sample*  f_smpl     sample of the input var file
+ *  @param [in]   Sample*  ws_smpl    sample of the current WS 
+ *  @param [out]  Sample** t_smpl     allocated target sample
  *  @param [out]  int*     skip       nb of periods to skip (i.e. set to IODE_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */
-static int LTOH_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* skip, int* shift)
+static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip, int* shift)
 {
     int     f_nbper, ws_nbper;
     long    s, y;
-    PERIOD  p1, p2;
+    Period  p1, p2;
 
-    f_nbper = PER_nbper(&(f_smpl->s_p1));
-    ws_nbper = PER_nbper(&(ws_smpl->s_p1));
+    f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
+    ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
     if(ws_nbper <= 0) {
         error_manager.append_error("Set the periodicity first");
@@ -280,25 +280,34 @@ static int LTOH_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* skip
         return(-1);
     }
 
-    memcpy(&p1, &(f_smpl->s_p1), sizeof(PERIOD));
-    memcpy(&p2, &(f_smpl->s_p2), sizeof(PERIOD));
+    p1 = f_smpl->start_period;
+    p2 = f_smpl->end_period;
 
-    s = p1.p_s;
-    y = p1.p_y;
+    s = p1.step;
+    y = p1.year;
     *shift = ws_nbper/f_nbper;
 
-    p1.p_p = p2.p_p = (ws_smpl->s_p1).p_p;
-    p1.p_s = 1;
+    p1.periodicity = p2.periodicity = (ws_smpl->start_period).periodicity;
+    p1.step = 1;
 
-    memcpy(&p1, PER_addper(&p1, (s - 1)/(*shift)), sizeof(PERIOD));
+    p1 = p1.shift((s - 1)/(*shift));
     /*
-        *skip = (p1.p_y - y ) * ws_nbper + (p1.p_s - 1) * (*shift) - (s - 1);
+        *skip = (p1.year - y ) * ws_nbper + (p1.step - 1) * (*shift) - (s - 1);
     */
     *skip = 0;
-    p2.p_s = ws_nbper;
+    p2.step = ws_nbper;
 
-
-    *t_smpl = PER_pertosmpl(&p1, &p2);
+    try
+    {
+        *t_smpl = new Sample(p1, p2);
+    }
+    catch(const std::exception& e)
+    {
+        *t_smpl = nullptr;
+        std::string error_msg = "Low to High: invalid sample\n" + std::string(e.what());
+        error_manager.append_error(e.what());
+        return(-1);
+    }
 
     return(0);
 }
@@ -319,7 +328,7 @@ static int B_ltoh(int type, char* arg)
     char    method[81], file[K_MAX_FILE + 1], **data = NULL;
     double    *t_vec = NULL, *f_vec = NULL;
     KDB     *from = NULL, *to = NULL;
-    SAMPLE  *t_smpl = NULL;
+    Sample  *t_smpl = NULL;
 
 
     lg = B_get_arg0(method, arg, 80);
@@ -343,36 +352,36 @@ static int B_ltoh(int type, char* arg)
     }
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(double));
+    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->nb_periods) * sizeof(double));
 
     for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(double));
+        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->nb_periods * sizeof(double));
         switch(method[0]) {
             case LTOH_CS :
                 LTOH_cs(type,
-                        f_vec, (int) KSMPL(from)->s_nb,
-                        t_vec, (int) t_smpl->s_nb,
+                        f_vec, (int) KSMPL(from)->nb_periods,
+                        t_vec, (int) t_smpl->nb_periods,
                         shift);
                 break;
 
             case LTOH_STEP:
                 LTOH_step(type,
-                          f_vec, (int) KSMPL(from)->s_nb,
-                          t_vec, (int) t_smpl->s_nb,
+                          f_vec, (int) KSMPL(from)->nb_periods,
+                          t_vec, (int) t_smpl->nb_periods,
                           shift);
                 break;
 
             default       :
             case LTOH_LIN :
                 LTOH_lin(type,
-                         f_vec, (int) KSMPL(from)->s_nb,
-                         t_vec, (int) t_smpl->s_nb,
+                         f_vec, (int) KSMPL(from)->nb_periods,
+                         t_vec, (int) t_smpl->nb_periods,
                          shift);
                 break;
         }
-        nb = t_smpl->s_nb;
+        nb = t_smpl->nb_periods;
         K_add(to, KONAME(from, i), t_vec, &(nb));
     }
     KV_merge(KV_WS, to, 1);

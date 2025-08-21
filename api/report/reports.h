@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/utils/time.h"         // PERIOD
+#include "api/time/period.h"         // Period
+#include "api/time/sample.h"         // Sample
 
 /*------------------------ DEFINE ----------------------- */
 
@@ -59,4 +60,4 @@ inline int      RP_ALLOW_NOPARSING = 1;     // If set, text between '`' is left 
 inline int      RP_NOPARSING_CHAR = '`';    // If set, strings between RP_NOPARSING_CHAR are not parsed
 inline int      RP_PRINT = 2;               // 2 = print and display messages, 1 = print only, 0 = ignore
 inline int      RP_T = 0;                   // current value of t for LEC evaluations in reports
-inline PERIOD   RP_PER;                     // current PERIOD for LEC evaluations in reports
+inline Period   RP_PER;                     // current Period for LEC evaluations in reports

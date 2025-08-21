@@ -403,7 +403,7 @@ int   K_epack(char **pack, char *a1, char *endo)
     *pack = (char*) P_add(*pack, (char*)clec, clec->tot_lg);                /* clec */
     *pack = (char*) P_add(*pack, &(eq->solved), 1);                         /* solved */
     *pack = (char*) P_add(*pack, &(eq->method), 1);                         /* method */
-    *pack = (char*) P_add(*pack, (char*)&(eq->smpl), sizeof(SAMPLE));       /* sample */
+    *pack = (char*) P_add(*pack, (char*)&(eq->smpl), sizeof(Sample));       /* sample */
 
     if(eq->cmt == NULL) 
         *pack = (char*) P_add(*pack, NULL, 1);
@@ -836,7 +836,7 @@ EQ* K_eunpack(char *pack, char *name)
     if(eq->method < 0 || eq->method >= IODE_NB_EQ_METHODS)
         eq->method = EQ_LSQ;    // Default method is LSQ
     
-    memcpy(&(eq->smpl), P_get_ptr(pack, 4), sizeof(SAMPLE));
+    memcpy(&(eq->smpl), P_get_ptr(pack, 4), sizeof(Sample));
 
     len = P_get_len(pack, 5);
     eq->cmt = SW_nalloc(len);

@@ -1,23 +1,23 @@
 /**
  *  @header4iode
  *  
- *  Functions to generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
+ *  Functions to generate IODE tables in A2M format based on TBL structures and GSample definition.
  *  Includes some A2M helper functions. 
  *  
  *  Note that the functions needed to generate graphs from tables can be found in k_graph.c.
  *  
  *  List of functions 
  *  -----------------
- *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL
+ *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in TBL
  *      void T_fmt_val(char* buf, double val, int lg, int nd)       Formats a double value
  *      void T_print_val(double val)                                Prints a double value using W_printf()
  *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
- *      void T_print_cell(TCELL* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSAMPLE column. 
- *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line TABLE_LINE_FILES.
+ *      void T_print_cell(TCELL* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSample column. 
+ *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
  *      unsigned char *T_get_title(TBL* tbl)                        Retrieves a TBL title, i.e. the contents of the first line of type TABLE_LINE_TITLE
- *      int T_print_tbl(TBL* tbl, char* smpl)                       Computes a table on a GSAMPLE and saves the result in A2M format
+ *      int T_print_tbl(TBL* tbl, char* smpl)                       Computes a table on a GSample and saves the result in A2M format
  *  
  *  Global variables
  *  ----------------
@@ -36,10 +36,10 @@
 
 
 /**
- *  Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL.
+ *  Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in TBL.
  *  
  *  @param [in] TBL*   tbl      table to compute
- *  @param [in] char*  smpl     GSAMPLE 
+ *  @param [in] char*  smpl     GSample 
  *  @param [in] COLS** cls      result = column definition for computing of the table
  *  @return     int             total number of columns for the computed table
  *  
@@ -98,7 +98,7 @@ void T_print_val(double val)
 /**
  *  Translates a TCELL of type KT_TEXT into a text using COL_text(). Sends the result to W_printf().
  *  
- *  @param  [in] cl         the column of the GSAMPLE to be printed (period, file nb, operation...)
+ *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
  *  @param  [in] string     the table column definition (ex "#s")  
  *  @global [in] KT_nbnames number of compared files in the COLS definition
  *  
@@ -167,10 +167,10 @@ void T_close_attr(int attr)
 
 
 /**
- *  Prints a TBL cell on a specific GSAMPLE column. 
+ *  Prints a TBL cell on a specific GSample column. 
  *  
  *  @param [in] TCELL*  cell        table cell to print
- *  @param [in] COL*    cl          GSAMPLE column definition with the value already calculated
+ *  @param [in] COL*    cl          GSample column definition with the value already calculated
  *  @param [in] int     straddle    nb of spanned columns int the resulting a2m table 
  *  
  */
@@ -206,7 +206,7 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
  *  
  *  @param [in] TBL*    tbl     source table
  *  @param [in] int     i       line to print
- *  @param [in] COLS*   cls     columns to print = compiled GSAMPLE
+ *  @param [in] COLS*   cls     columns to print = compiled GSample
  *  @return     int             0 on success, -1 on error.        
  *  
  */
@@ -232,9 +232,9 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
 
 
 /**
- *  Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line TABLE_LINE_FILES. 
+ *  Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES. 
  *   
- *  @param [in] COLS*   cls     list of columns (from GSAMPLE)
+ *  @param [in] COLS*   cls     list of columns (from GSample)
  *  @return     char**          NULL if one of the ref files is not loaded in K_RWS
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
  *  
@@ -277,8 +277,8 @@ char **T_find_files(COLS* cls)
 /**
  *  Prints the special TBL line of type TABLE_LINE_FILES.
  *  
- *  @param  [in] COLS*  cls         columns to print = compiled GSAMPLE
- *  @param  [in] int    dim         total number of columns in the resulting table (size of GSAMPLE x nb table cols)
+ *  @param  [in] COLS*  cls         columns to print = compiled GSample
+ *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
  *  @global [in] char** KT_names    list of formatted filenames
  *  @global [in] int    KT_nbnames  number if filenames
  *  
@@ -300,8 +300,8 @@ void T_print_files(COLS* cls, int dim)
 /**
  *  Prints the special TBL line of type TABLE_LINE_MODE (growth rates, diff...).
  *  
- *  @param  [in] COLS*  cls         columns to print = compiled GSAMPLE
- *  @param  [in] int    dim         total number of columns in the resulting table (size of GSAMPLE x nb table cols)
+ *  @param  [in] COLS*  cls         columns to print = compiled GSample
+ *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
  *  @global [in] char** KT_mode     list of modes used in COLS (computed in T_begin_tbl())
  *  
  */
@@ -322,7 +322,7 @@ void T_print_mode(COLS* cls, int dim)
 /**
  *  Prints the special TBL line of type TABLE_LINE_DATE.
  *  
- *  @param  [in] int    dim   total number of columns in the resulting table (size of GSAMPLE x nb table cols)
+ *  @param  [in] int    dim   total number of columns in the resulting table (size of GSample x nb table cols)
  *  
  */
 
@@ -341,8 +341,8 @@ void T_print_date(int dim)
  *  Prints a table header in A2M.
  *  Initialises globals KT_names, KT_nbnames and KT_mode.
  *  
- *  @param [in] int     dim     total number of columns in the resulting table (size of GSAMPLE x nb table cols)
- *  @param [in] COLS*   cls     columns to print = compiled GSAMPLE
+ *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
+ *  @param [in] COLS*   cls     columns to print = compiled GSample
  *  @return 
  *  
  */
@@ -404,11 +404,11 @@ unsigned char *T_get_title(TBL* tbl)
 
 
 /**
- *  Computes a table on a GSAMPLE and saves the result in A2M format (see https://iode.plan.be/doku.php?id=le_langage_a2m for
+ *  Computes a table on a GSample and saves the result in A2M format (see https://iode.plan.be/doku.php?id=le_langage_a2m for
  *  the syntax of a2m files).
  *  
  *  @param [in] TBL*    tbl     table to print
- *  @param [in] char*   smpl    GSAMPLE on which the tbl must be computed
+ *  @param [in] char*   smpl    GSample on which the tbl must be computed
  *  @return     int             0 on success, -1 on error (smpl syntax error, files not defined...) 
  *  
  */

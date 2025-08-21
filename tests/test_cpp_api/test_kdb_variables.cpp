@@ -75,7 +75,7 @@ TEST_F(KDBVariablesTest, GetSetVar)
     double new_value;
     int nb_periods = Variables.get_nb_periods();
     std::string name = Variables.get_name(pos + 1);
-    Period start = Variables.get_sample()->start_period();
+    Period start = Variables.get_sample()->start_period;
 
     // period as int
     value = 1.2130001;
@@ -134,7 +134,7 @@ TEST_F(KDBVariablesTest, GetSetVar)
 TEST_F(KDBVariablesEmptyTest, Sample)
 {
     Sample* sample_undef = Variables.get_sample();
-    EXPECT_EQ(sample_undef->nb_periods(), 0);
+    EXPECT_EQ(sample_undef->nb_periods, 0);
     EXPECT_EQ(sample_undef->to_string(), ":");
 
     EXPECT_THROW(Variables.set_sample("", "2015Y1"), std::invalid_argument);

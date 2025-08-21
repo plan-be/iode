@@ -19,21 +19,23 @@
 
 #include "api/k_super.h"
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/io/dif.h"
 #include "api/io/import.h"
 
 
-int ImportObjsBST::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsBST::read_header(YYFILE* yy, Sample* smpl)
 {
     double  value;
 
-    memcpy(&BST_smpl, smpl, sizeof(SAMPLE));
-    BST_freq = (BST_smpl.s_p1).p_p;
-    BST_nbper = PER_nbper(&(BST_smpl.s_p1));
-    if(BST_nbper < 0) {
+    memcpy(&BST_smpl, smpl, sizeof(Sample));
+    BST_freq = (BST_smpl.start_period).periodicity;
+    BST_nbper = get_nb_periods_per_year(BST_smpl.start_period.periodicity);
+    if(BST_nbper < 0) 
+    {
         kerror(0, "Please specify FROM and TO period");
         return(-1);
     }
@@ -48,7 +50,7 @@ int ImportObjsBST::read_header(YYFILE* yy, SAMPLE* smpl)
 
     if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
 
-    memcpy(&BST_smpl, smpl, sizeof(SAMPLE));
+    memcpy(&BST_smpl, smpl, sizeof(Sample));
     return(0);
 }
 
@@ -57,7 +59,6 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     char    buf[21], *str = NULL;
     long    y, s, nbper;
     double  value, status;
-    PERIOD  *per;
 
     while(1) {
         if(dif_read_cell(yy, &str, NULL) < 0) return(-1);
@@ -77,9 +78,9 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
     s = (long)floor(value);
     sprintf(buf, "%ld%c%ld", y, BST_freq, s);
-    per = PER_atoper(buf);
-    *shift = PER_diff_per(per, &(BST_smpl.s_p1));
-    SW_nfree(per);
+    Period* per = new Period(std::string(buf));
+    *shift = per->difference(BST_smpl.start_period);
+    delete per;
 
     if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
     if(dif_read_cell(yy, NULL, &status) < 0) return(-1);

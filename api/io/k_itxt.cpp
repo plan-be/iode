@@ -15,7 +15,8 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/k_super.h"
 #include "api/io/import.h"
 
@@ -26,12 +27,13 @@
 */
 
 
-int ImportObjsTXT::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsTXT::read_header(YYFILE* yy, Sample* smpl)
 {
-    memcpy(&TXT_smpl, smpl, sizeof(SAMPLE));
-    TXT_freq = (TXT_smpl.s_p1).p_p;
-    TXT_nbper = PER_nbper(&(TXT_smpl.s_p1));
-    if(TXT_nbper < 0) {
+    memcpy(&TXT_smpl, smpl, sizeof(Sample));
+    TXT_freq = (TXT_smpl.start_period).periodicity;
+    TXT_nbper = get_nb_periods_per_year(TXT_smpl.start_period.periodicity);
+    if(TXT_nbper < 0) 
+    {
         kerror(0, "Please specify FROM and TO period");
         return(-1);
     }
@@ -42,7 +44,6 @@ int ImportObjsTXT::read_header(YYFILE* yy, SAMPLE* smpl)
 
 int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
 {
-    PERIOD  *per;
     char    buf[21], y[5], m[3];
     int     pos;
     long    ly, lm;
@@ -64,9 +65,9 @@ int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
     }
 
     sprintf(buf, "%ld%c%ld", ly, TXT_freq, lm);
-    per = PER_atoper(buf);
-    *shift = PER_diff_per(per, &(TXT_smpl.s_p1));
-    SW_nfree(per);
+    Period* per = new Period(std::string(buf));
+    *shift = per->difference(TXT_smpl.start_period);
+    delete per;
 
     pos = U_pos(',', (unsigned char*) tval);
     if(pos>=0) tval[pos] = '.';

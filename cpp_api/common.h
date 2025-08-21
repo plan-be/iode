@@ -1,6 +1,10 @@
 #pragma once
 
 #include "api/all.h"
+#include "api/utils/utils.h"
+#include "api/time/sample.h"
+#include "api/objs/kdb.h"
+#include "api/k_super.h"
 
 extern "C" 
 {
@@ -33,76 +37,6 @@ extern int  K_LZH;
 /* ****************************** *
  *         MISCELLANEOUS          *
  * ****************************** */
-
-struct IodeRegexName
-{
-    std::string regex;
-    std::string type;
-};
-
-struct FileType
-{
-    std::string name;
-    std::vector<std::string> v_ext;
-
-    FileType(const std::string& name = "", const std::vector<std::string>& v_ext = {}) 
-        : name(name), v_ext(v_ext) {} 
-};
-
-const static std::vector<std::string> v_table_langs = { "English", "Dutch", "French" };
-
-const static std::string report_ext = ".rep";
-
-const static FileType file_comments("Comment", {".cmt", ".ac"});
-const static FileType file_equations("Equation", {".eqs", ".ae"});
-const static FileType file_identities("Identity", {".idt", ".ai"});
-const static FileType file_lists("List", {".lst", ".al"});
-const static FileType file_scalars("Scalar", {".scl", ".as"});
-const static FileType file_tables("Table", {".tbl", ".at"});
-const static FileType file_variables("Variable", {".var", ".av"});
-
-// see IodeFileType in api/iode.h
-const static std::vector<FileType> v_file_types = 
-{
-    file_comments,
-    file_equations,
-    file_identities,
-    file_lists,
-    file_scalars,
-    file_tables,
-    file_variables,
-    FileType(),
-    file_comments,
-    file_equations,
-    file_identities,
-    file_lists,
-    file_scalars,
-    file_tables,
-    file_variables,
-    FileType(), 
-    FileType("Report", {".rep"}), 
-    FileType("A2m", {".a2m"}), 
-    FileType("Agl", {".agl"}), 
-    FileType("Profile", {".prf"}), 
-    FileType("Dif", {".dif"}), 
-    FileType("Mif", {".mif"}), 
-    FileType("Rtf", {".rtf"}), 
-    FileType("PostScript", {".ps"}), 
-    FileType("Ascii", {".asc"}), 
-    FileType("Text", {".txt"}), 
-    FileType("Csv", {".csv"}), 
-    FileType(),
-    FileType("Html", {".html"}),
-    FileType("Ref", {".ref"}), 
-    FileType("Logs", {".log"}), 
-    FileType("Settings", {".ini"}), 
-    FileType("Any", {}), 
-    FileType("Directory", {})
-};
-
-const static std::vector<std::string> vExportFormats = 
-	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
-
 
 // ====== Graphs ======
 

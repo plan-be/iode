@@ -24,10 +24,10 @@ def load_extra_files(extra_files: Union[str, Path, List[Union[str, Path]]], quie
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode import SAMPLE_DATA_DIR
+    >>> from iode import Sample_DATA_DIR
     >>> from iode import load_extra_files
 
-    >>> sample_data_dir = Path(SAMPLE_DATA_DIR)
+    >>> sample_data_dir = Path(Sample_DATA_DIR)
     >>> extra_files = [sample_data_dir / "ref.av", sample_data_dir / "fun.av", 
     ...                sample_data_dir / "fun2.av", sample_data_dir / "a.var"]
     >>> extra_files = load_extra_files(extra_files)         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -83,10 +83,10 @@ def reset_extra_files():
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode import SAMPLE_DATA_DIR
+    >>> from iode import Sample_DATA_DIR
     >>> from iode import load_extra_files, reset_extra_files
 
-    >>> sample_data_dir = Path(SAMPLE_DATA_DIR)
+    >>> sample_data_dir = Path(Sample_DATA_DIR)
     >>> extra_files = [sample_data_dir / "ref.av", sample_data_dir / "fun.av", 
     ...                sample_data_dir / "fun2.av", sample_data_dir / "a.var"]
     >>> extra_files = load_extra_files(extra_files, quiet=True)

@@ -34,13 +34,13 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
-        SAMPLE* sample = KSMPL(K_WS[VARIABLES]);
-        if(sample == NULL || sample->s_nb == 0)
+        Sample* sample = KSMPL(K_WS[VARIABLES]);
+        if(sample == NULL || sample->nb_periods == 0)
             throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
                                     std::string(this->lec) +"\nThe global sample is not yet defined");
 
         char* c_name;
-        int nb_obs = sample->s_nb;
+        int nb_obs = sample->nb_periods;
         for(const std::string& var_name: vars)
         {
             c_name = const_cast<char*>(var_name.data());

@@ -416,7 +416,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
 
     /* 1. Calc val after t */
     vy[0] = vy[1] = IODE_NAN;
-    nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
+    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
     for(vt[1] = t + 1 ; vt[1] < nobs ; vt[1]++) {
         vy[1] = L_exec_sub(expr1, len1, vt[1], stack);
         if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) break;
@@ -482,7 +482,7 @@ L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int n
 
     /* 2. Calc values around t */
     L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 0);
-    nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
+    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
 
     /* 3. Calc result */
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
@@ -510,7 +510,7 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 
     /* 2. Calc values around t */
     L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 1);
-    nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
+    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
 
     /* if NO value after AND before t, return IODE_NAN */
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
@@ -573,7 +573,7 @@ L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
 
     /* 2. Calc values around t */
     L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 0);
-    nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
+    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
 
     /* if NO value after AND before t, return IODE_NAN */
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);

@@ -193,7 +193,7 @@ int B_WsSeasonAdj(char* arg, int unused=-1);
 int B_season(char* arg);
 int DS_test(double *,int ,int *,int *,int ,double *);
 int DS_vec(double *,double *,double *,double *,int ,int ,double );
-int DS_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
+int DS_smpl(Sample *,Sample *,Sample **,int *);
 int DS_extr(double *,int ,int ,double *,double );
 
 /* b_sql.c */
@@ -213,7 +213,7 @@ int B_EqsStepWise(char* arg, int unused=-1);
 /* b_trend.c */
 int B_WsTrend(char* arg, int unused=-1);
 int B_WsTrendStd(char* arg, int unused=-1);
-//int HP_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
+//int HP_smpl(Sample *,Sample *,Sample **,int *);
 //int HP_calc(double *,double *,int ,int );
 //int HP_calc(double *,double *,int , double);     // JMP 7-3-2019
 //int HP_calc(double *,double *,int , double, int);  // JMP 12-4-2019

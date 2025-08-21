@@ -13,9 +13,9 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
     this->method = obj->method;
     if(this->method < 0 || this->method >= IODE_NB_EQ_METHODS)
         this->method = EQ_LSQ;  // Default method is LSQ
-    // NOTE : we can use memcpy() on SAMPLE because SAMPLE does 
+    // NOTE : we can use memcpy() on Sample because Sample does 
     //        not contain attributes which are pointers
-    memcpy(&this->smpl, &obj->smpl, sizeof(SAMPLE));
+    memcpy(&this->smpl, &obj->smpl, sizeof(Sample));
     this->cmt = copy_char_array(obj->cmt);
     this->blk = copy_char_array(obj->blk);
     this->instr = copy_char_array(obj->instr);
@@ -200,16 +200,16 @@ void Equation::set_sample(std::string from, std::string to)
 {
     if (from.empty() || to.empty())
     {
-        SAMPLE* c_vars_sample = KSMPL(KV_WS);
-        if(c_vars_sample == NULL || c_vars_sample->s_nb == 0)
+        Sample* c_vars_sample = KSMPL(KV_WS);
+        if(c_vars_sample == NULL || c_vars_sample->nb_periods == 0)
         {
-            this->smpl.s_nb = 0;
-            this->smpl.s_p1.p_y = 0;
-            this->smpl.s_p1.p_p = '\0';
-            this->smpl.s_p1.p_s = 0;
-            this->smpl.s_p2.p_y = 0;
-            this->smpl.s_p2.p_p = '\0';
-            this->smpl.s_p2.p_s = 0;
+            this->smpl.nb_periods = 0;
+            this->smpl.start_period.year = 0;
+            this->smpl.start_period.periodicity = '\0';
+            this->smpl.start_period.step = 0;
+            this->smpl.end_period.year = 0;
+            this->smpl.end_period.periodicity = '\0';
+            this->smpl.end_period.step = 0;
             kwarning("Variables sample not yet set. Set equation sample to 0.");
             return;
         }
@@ -217,14 +217,14 @@ void Equation::set_sample(std::string from, std::string to)
         Sample vars_sample(*c_vars_sample);
 
         if(from.empty()) 
-            from = vars_sample.start_period().to_string();
+            from = vars_sample.start_period.to_string();
 
         if(to.empty())   
-            to = vars_sample.end_period().to_string();
+            to = vars_sample.end_period.to_string();
     }
 
     Sample new_sample(from, to);
-    memcpy(&(this->smpl), &new_sample, sizeof(SAMPLE));
+    memcpy(&(this->smpl), &new_sample, sizeof(Sample));
 }
 
 // -- comment --
@@ -376,12 +376,12 @@ std::vector<std::string> Equation::get_variables_list(const bool create_if_not_e
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
-        SAMPLE* sample = KSMPL(K_WS[VARIABLES]);
-        if(sample == NULL || sample->s_nb == 0)
+        Sample* sample = KSMPL(K_WS[VARIABLES]);
+        if(sample == NULL || sample->nb_periods == 0)
             throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
         char* c_name;
-        int nb_obs = sample->s_nb;
+        int nb_obs = sample->nb_periods;
         for(const std::string& var_name: vars)
         {
             c_name = const_cast<char*>(var_name.data());

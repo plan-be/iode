@@ -6,7 +6,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
-from iode.common import PERIODICITY_LIST
+from iode.common import PeriodICITY_LIST
 from iode.iode_cython import Period as CythonPeriod
 
 
@@ -78,8 +78,8 @@ class Period:
             year = period_or_year
             if len(periodicity) != 1:
                 raise ValueError("'periodicity': Expected string of length 1")
-            if periodicity not in PERIODICITY_LIST:
-                raise ValueError(f"Wrong periodicity. Valid values for the periodicity are: {', '.join(PERIODICITY_LIST)}")
+            if periodicity not in PeriodICITY_LIST:
+                raise ValueError(f"Wrong periodicity. Valid values for the periodicity are: {', '.join(PeriodICITY_LIST)}")
             self._cython_instance = CythonPeriod(year, periodicity, step)
 
     @classmethod

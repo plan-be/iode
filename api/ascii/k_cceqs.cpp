@@ -61,7 +61,7 @@ static EQ* read_eq(YYFILE* yy)
     int     keyw;
     char    *lec;
     EQ      *eq = NULL;
-    SAMPLE  *smpl = NULL;
+    Sample  *smpl = NULL;
 
     eq = (EQ *) SW_nalloc(sizeof(EQ));
     eq->method = 0;
@@ -118,7 +118,7 @@ static EQ* read_eq(YYFILE* yy)
             case EQ_ASCII_SMPL :
                 smpl = K_read_smpl(yy);
                 if(smpl == NULL) goto err;
-                memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
+                memcpy(&(eq->smpl), smpl, sizeof(Sample));
                 break;
             case EQ_ASCII_BLK  :
                 eq->blk = K_read_str(yy);
@@ -183,7 +183,7 @@ err :
  *        "LEC expression := LEC expression"
  *        [COMMENT "text" ]       free comment
  *        [{LSQ|ZELLNER|INF|GLS}] estimation method
- *        [SAMPLE from to]                estimation sample
+ *        [Sample from to]                estimation sample
  *        [DATE yyyymmdd]                 date of estimation
  *        [BLOC "eq1;eq2;..."]            bloc of simultaneous estimated equations
  *        [INSTRUMENTS "lec1;lec2..."]    instruments for INF method
@@ -339,8 +339,6 @@ static void print_test(FILE* fd, char* txt, double val)
  */
 static void print_eq(FILE* fd, EQ* eq, char* name)
 {
-    char    from[21], to[21], *SCR_long_to_date();
-
     fprintf(fd, "{\n\t\"%s\"\n", eq->lec);
     if(eq->cmt != NULL && eq->cmt[0] != 0 && strcmp(eq->cmt, " ") !=0 ) { // JMP 30/10/2023
         fprintf(fd, "\tCOMMENT ");
@@ -348,8 +346,8 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
         fprintf(fd, "\n");
     }
 
-    // Estimated equation => SAMPLE not null 30/10/2023
-    if((eq->smpl).s_nb != 0) {
+    // Estimated equation => Sample not null 30/10/2023
+    if((eq->smpl).nb_periods != 0) {
         switch(eq->method) {
             case 0 :
                 fprintf(fd, "\tLSQ\n");
@@ -371,10 +369,10 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
                 break;
         }
 
-        fprintf(fd, "\tSAMPLE %s %s\n",
-                    PER_pertoa(&(eq->smpl.s_p1), from),
-                    PER_pertoa(&(eq->smpl.s_p2), to)
-                   );
+        std::string from = eq->smpl.start_period.to_string();
+        std::string to   = eq->smpl.end_period.to_string();
+
+        fprintf(fd, "\tSAMPLE %s %s\n", (char*) from.c_str(), (char*) to.c_str());
 
         if(eq->blk != NULL && eq->blk[0] != 0 && strcmp(eq->blk, name) != 0) // JMP 30/10/2023
             fprintf(fd, "\tBLOCK \"%s\"\n", eq->blk);
@@ -437,7 +435,7 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
  * Save a KDB of EQs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int AsciiEquations::save_csv(KDB *kdb, char *filename,SAMPLE* sample, char** varlist)
+int AsciiEquations::save_csv(KDB *kdb, char *filename,Sample* sample, char** varlist)
 {
     return(-1);
 }

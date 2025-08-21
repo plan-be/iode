@@ -31,7 +31,7 @@ Functions to print object definitions are defined in the file `b_print.c` like `
 
 ### Printing tables and graphs {#T4}
 
-Functions to print (and display) tables and graphs on a generalised SAMPLE (GSAMPLE) are defined in the file `b_view.c`. Again, some of these functions are also report commands, hence b\_view.c has been included in [REPORTS.md](REPORTS.md).
+Functions to print (and display) tables and graphs on a generalised Sample (GSample) are defined in the file `b_view.c`. Again, some of these functions are also report commands, hence b\_view.c has been included in [REPORTS.md](REPORTS.md).
 
 ### Available output destinations {#T5}
 

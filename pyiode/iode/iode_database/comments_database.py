@@ -36,8 +36,8 @@ class Comments(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import comments, SAMPLE_DATA_DIR
-    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import comments, Sample_DATA_DIR
+    >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.cmt
     317 objects loaded 
     >>> len(comments)
@@ -88,8 +88,8 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import comments, SAMPLE_DATA_DIR
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import comments, Sample_DATA_DIR
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> # get the first comment
@@ -156,9 +156,9 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
 
@@ -214,9 +214,9 @@ class Comments(IodeDatabase):
         Examples
         --------
         >>> import pandas as pd
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         
@@ -313,9 +313,9 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
 
@@ -367,9 +367,9 @@ class Comments(IodeDatabase):
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> len(comments)
@@ -381,7 +381,7 @@ class Comments(IodeDatabase):
         []
 
         >>> # load all comments with a name starting with 'A'
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.copy_from(f"{Sample_DATA_DIR}/fun.cmt", "A*")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading ...\fun.cmt
         317 objects loaded
         >>> comments.get_names("A*")
@@ -389,7 +389,7 @@ class Comments(IodeDatabase):
 
         >>> comments.clear()
         >>> # load all comments
-        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.copy_from(f"{Sample_DATA_DIR}/fun.cmt")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading ...\fun.cmt
         317 objects loaded
         >>> len(comments)
@@ -469,9 +469,9 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, comments
+        >>> from iode import Sample_DATA_DIR, comments
         >>> import pandas as pd
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> len(comments)
@@ -525,9 +525,9 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, comments
+        >>> from iode import Sample_DATA_DIR, comments
         >>> import pandas as pd
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> len(comments)
@@ -628,13 +628,13 @@ class Comments(IodeDatabase):
         Examples
         --------
         >>> from pathlib import Path
-        >>> from iode import SAMPLE_DATA_DIR, comments, ImportFormats
+        >>> from iode import Sample_DATA_DIR, comments, ImportFormats
         >>> output_dir = getfixture('tmp_path')
 
-        >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.ac.ref"
+        >>> input_file = f"{Sample_DATA_DIR}/fun_xode.ac.ref"
         >>> input_format = ImportFormats.ASCII
         >>> save_file = str(output_dir / "imported_cmt.cmt")
-        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
+        >>> rule_file = f"{Sample_DATA_DIR}/rules.txt"
         >>> debug_file = str(output_dir / "debug.log")
 
         >>> # print rules
@@ -781,9 +781,9 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import comments, SAMPLE_DATA_DIR
+        >>> from iode import comments, Sample_DATA_DIR
         >>> output_dir = getfixture('tmp_path')
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded
         >>> comments.print_to_file(output_dir / "comments.csv", ["ACAF", "ACAG"])     # doctest: +ELLIPSIS
@@ -806,8 +806,8 @@ class Comments(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, comments
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
         >>> len(comments)

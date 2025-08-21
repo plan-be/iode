@@ -134,9 +134,9 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
             d_ptr = L_getvar(L_EXEC_DBV, L_EXEC_NAMES[cvar.pos].pos);
             j += sizeof(CVAR);
             len = cvar.ref;
-            if(cvar.per.p_y == 0)  len += t;
+            if(cvar.per.year == 0)  len += t;
             stack++;
-            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->s_nb) {
+            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) {
                 *stack = IODE_NAN;
                 /*                L_errno = L_BOUNDS_ERR;
                 		longjmp(L_JMP, 1);
@@ -181,8 +181,8 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                     *stack = L_getscl(L_EXEC_DBS, L_EXEC_NAMES[cvar.pos].pos);
                     j += sizeof(CVAR);
                     break;
-                case L_PERIOD :
-                    j += sizeof(PERIOD);
+                case L_Period :
+                    j += sizeof(Period);
                     stack++;
                     memcpy(&s, expr + j, sizeof(short));
                     *stack = s;
@@ -361,7 +361,7 @@ L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
     if(lec == 0 || lec[0] == 0) return(vec);
     clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) {
-        nb = KSMPL(dbv)->s_nb;
+        nb = KSMPL(dbv)->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
         for(t = 0 ; t < nb ; t++) {
             vec[t] = L_exec(dbv, dbs, clec, t);

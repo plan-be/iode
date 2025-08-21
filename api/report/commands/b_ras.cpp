@@ -5,7 +5,7 @@
  *  
  *  List of functions
  *  -----------------
- *      int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps) | Implementation of a RAS algorithm
+ *      int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper, int maxit, double eps) | Implementation of a RAS algorithm
  *  
  *  
  */
@@ -143,17 +143,16 @@ top:
  *  @param [in] char*   pattern     the variables that meet the following criteria are used: x is replaced with all values from $X, y with those from $Y 
  *  @param [in] char*   X_dimensie  list of the values that "x" from the pattern can take. ATTENTION: the last one in the list is the SUM over the x dimension 
  *  @param [in] char*   Y_dimensie  list of the values that "y" from the pattern can take. ATTENTION: the last one from the list is the SUM over the y dimension 
- *  @param [in] PERIOD* ref_jaar    reference year: the year for which all data is known 
- *  @param [in] PERIOD* h_jaar      reference year: the year for which only the sums are known 
+ *  @param [in] Period* ref_jaar    reference year: the year for which all data is known 
+ *  @param [in] Period* h_jaar      reference year: the year for which only the sums are known 
  *  @param [in] int     maxit       maximum number of iterations (default=100) 
  *  @param [in] double  eps         convergence threshold (default=0.001) 
  *  @return     int                 0 on success, -1 on error
  *  
  *  @note Developed by gb@plan.be 
  */
-
 int RasExecute(char *pattern, char *xdim, char *ydim,
-               PERIOD *rper, PERIOD *cper, int maxit, double eps)
+               Period *rper, Period *cper, int maxit, double eps)
 {
     int     rc = -1, nrows, ncols, crow, ccol, rt, ct;
     char    **xvars = NULL;
@@ -165,10 +164,12 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     double  var, fvar;
     KDB     *kdb = K_WS[VARIABLES];
 
-    if(rper != NULL && cper != NULL) {
-        rt = PER_diff_per(rper, &(KSMPL(kdb)->s_p1));
-        ct = PER_diff_per(cper, &(KSMPL(kdb)->s_p1));
-        if(rt < 0 || ct < 0) goto cleanup;
+    if(rper != NULL && cper != NULL) 
+    {
+        rt = rper->difference(KSMPL(kdb)->start_period);
+        ct = cper->difference(KSMPL(kdb)->start_period);
+        if(rt < 0 || ct < 0) 
+            goto cleanup;
 
         xvars = B_ainit_chk(xdim, NULL, 0);
         nrows = SCR_tbl_size((unsigned char**) xvars) - 1;
@@ -248,10 +249,7 @@ cleanup:
     if(xvars != NULL) SCR_free_tbl((unsigned char**) xvars);
     if(yvars != NULL) SCR_free_tbl((unsigned char**) yvars);
     if(A != NULL) M_free(A);
-    if(rper != NULL) SCR_free((unsigned char**) rper);
-    if(cper != NULL) SCR_free((unsigned char**) cper);
     if(row != NULL) SCR_free((unsigned char**) row);
     if(col != NULL) SCR_free((unsigned char**) col);
     return(rc);
 }
-

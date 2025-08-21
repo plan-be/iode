@@ -230,7 +230,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case VARIABLES :
             if(vers == 2) return;
             opos = KOBJS(kdb)[i].o_val;
-            nb = KSMPL(kdb)->s_nb;
+            nb = KSMPL(kdb)->nb_periods;
             pos = KV_alloc_var(nb);
             ptr = SW_getptr(pos);
             d = (double *)P_get_ptr(ptr, 0);

@@ -32,8 +32,8 @@ class Lists(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import lists, SAMPLE_DATA_DIR
-    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import lists, Sample_DATA_DIR
+    >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.lst
     17 objects loaded 
     >>> len(lists)
@@ -130,8 +130,8 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import lists, SAMPLE_DATA_DIR
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import lists, Sample_DATA_DIR
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
         >>> # get the first list
@@ -204,9 +204,9 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
 
@@ -262,12 +262,12 @@ class Lists(IodeDatabase):
         Examples
         --------
         >>> import pandas as pd
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import lists, variables
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         
@@ -384,9 +384,9 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
 
@@ -519,9 +519,9 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, lists
+        >>> from iode import Sample_DATA_DIR, lists
         >>> import pandas as pd
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
         >>> len(lists)
@@ -575,9 +575,9 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, lists
+        >>> from iode import Sample_DATA_DIR, lists
         >>> import pandas as pd
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
         >>> len(lists)
@@ -667,9 +667,9 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import lists, SAMPLE_DATA_DIR
+        >>> from iode import lists, Sample_DATA_DIR
         >>> output_dir = getfixture('tmp_path')
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded
         >>> lists.print_to_file(output_dir / "lists.csv", ["ENVI", "IDT", "MAINEQ"])      # doctest: +ELLIPSIS
@@ -693,8 +693,8 @@ class Lists(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, lists
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, lists
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded 
         >>> len(lists)

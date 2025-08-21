@@ -67,7 +67,7 @@ int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
     int dim, nb, i;
 
     expdef->file_descriptor = fopen(outfile, "w+");
-    dim = KSMPL(dbv)->s_nb;
+    dim = KSMPL(dbv)->nb_periods;
     nb = KNB(dbv);
 
     fprintf(expdef->file_descriptor,
@@ -76,9 +76,10 @@ int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
     fprintf(expdef->file_descriptor,
             "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n");
 
-    for(i = 0; i < dim; i++) {
-        fprintf(expdef->file_descriptor, "1,0\n\"%s\"\n",
-                PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), i), NULL));
+    for(i = 0; i < dim; i++) 
+    {
+        Period per = KSMPL(dbv)->start_period.shift(i);
+        fprintf(expdef->file_descriptor, "1,0\n\"%s\"\n", (char*) per.to_string().c_str());
     }
     return(0);
 }

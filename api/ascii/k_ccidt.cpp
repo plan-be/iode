@@ -138,7 +138,7 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
  * Save a KDB of IDTs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int AsciiIdentities::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
+int AsciiIdentities::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
 {
     return(-1);
 }

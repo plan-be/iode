@@ -7,16 +7,16 @@
  *  
  *  List of functions 
  *  -----------------
- *      char *B_DSPeriod2Date(PERIOD *per, char *date, char *freq)
+ *      char *B_DSPeriod2Date(Period *per, char *date, char *freq)
  *      int B_DSLog(char *log)
  *      int B_DSTimedOut(char *name)
  *      long B_DSa2y(year)
- *      int B_DSDate2Period(PERIOD *per, char *date, char freq)
+ *      int B_DSDate2Period(Period *per, char *date, char freq)
  *      int B_DSCode(char *name)
  *      int B_DSUpdateCmt(char *name, char *val)
- *      int B_DSUpdateVar(char *name, PERIOD *per, char *val)
+ *      int B_DSUpdateVar(char *name, Period *per, char *val)
  *      int B_DSInterpret(char *code, char freq, char *contents)
- *      int B_DSImportDb_1(char *arg, SAMPLE *smpl)
+ *      int B_DSImportDb_1(char *arg, Sample *smpl)
  *      int B_DSImportDb(char *arg, int unused)
  */ 
 #include "scr4/s_a2m.h"
@@ -34,26 +34,26 @@
 #include "api/report/undoc/undoc.h"
 
 
-char    *B_DSPeriod2Date(PERIOD *per, char *date, char *freq)
+char    *B_DSPeriod2Date(Period *per, char *date, char *freq)
 {
     char  year[8];
 
-    if(per->p_y < 2000) sprintf(year, "%ld", per->p_y - 1900L);
+    if(per->year < 2000) sprintf(year, "%ld", per->year - 1900L);
     else {
-        if(per->p_y < 2010) sprintf(year, "0%ld", per->p_y - 2000L);
-        else                sprintf(year, "%ld", per->p_y - 2000L);
+        if(per->year < 2010) sprintf(year, "0%ld", per->year - 2000L);
+        else                sprintf(year, "%ld", per->year - 2000L);
     }
 
-    *freq = per->p_p;
-    switch(per->p_p) {
+    *freq = per->periodicity;
+    switch(per->periodicity) {
         case 'Y':
             sprintf(date, "1/1/%s", year);
             break;
         case 'Q':
-            sprintf(date, "1/%ld/%s", 3 * per->p_s, year);
+            sprintf(date, "1/%ld/%s", 3 * per->step, year);
             break;
         case 'M':
-            sprintf(date, "1/%ld/%s", per->p_s, year);
+            sprintf(date, "1/%ld/%s", per->step, year);
             break;
     }
 
@@ -89,25 +89,25 @@ long B_DSa2y(char* year)
     return(y);
 }
 
-int B_DSDate2Period(PERIOD *per, char *date, char freq)
+int B_DSDate2Period(Period *per, char *date, char freq)
 {
     char    **tbl;
 
-    per->p_p = freq;
-    per->p_s = 1L;
-    per->p_y = 1970L;
+    per->periodicity = freq;
+    per->step = 1L;
+    per->year = 1970L;
 
     if(U_is_in('/', date)) { /* DD/MM/YY */
         tbl = (char**) SCR_vtom((unsigned char*) date, (int) '/');
-        per->p_y = B_DSa2y(tbl[2]);
+        per->year = B_DSa2y(tbl[2]);
         switch(freq) {
             case 'Y' :
                 break;
             case 'Q' :
-                per->p_s = atol(tbl[1]) / 4;
+                per->step = atol(tbl[1]) / 4;
                 break;
             case 'M' :
-                per->p_s = atol(tbl[1]);
+                per->step = atol(tbl[1]);
                 break;
         }
         SCR_free_tbl((unsigned char**) tbl);
@@ -116,22 +116,22 @@ int B_DSDate2Period(PERIOD *per, char *date, char freq)
 
     if(U_is_in('Q', date)) {    /* "Q1 70" */
         tbl = (char**) SCR_vtom((unsigned char*) date, (int) ' ');
-        per->p_y = B_DSa2y(tbl[1]);
+        per->year = B_DSa2y(tbl[1]);
         switch(freq) {
             case 'Y' :
                 break;
             case 'Q' :
-                per->p_s = atol(tbl[0] + 1);
+                per->step = atol(tbl[0] + 1);
                 break;
             case 'M' :
-                per->p_s = atol(tbl[0] + 1) * 3;
+                per->step = atol(tbl[0] + 1) * 3;
                 break;
         }
         SCR_free_tbl((unsigned char**) tbl);
         return(0);
     }
 
-    per->p_y = B_DSa2y(date);
+    per->year = B_DSa2y(date);
     return(0);
 }
 
@@ -165,17 +165,17 @@ int B_DSUpdateCmt(char *name, char *val)
     return(rc);
 }
 
-int B_DSUpdateVar(char *name, PERIOD *per, char *val)
+int B_DSUpdateVar(char *name, Period *per, char *val)
 {
     int     rc = -1;
-    char    *update, period[11];
+    char    *update;
 
     update = SCR_malloc(K_MAX_NAME + 23 + (int)strlen(val)); /* IODE64K */
     if(update) {
         SCR_replace((unsigned char*) val, (unsigned char*) ",", (unsigned char*) ".");
         SCR_replace((unsigned char*) val, (unsigned char*) "#n/a", (unsigned char*) "na"); // Modif na au lieu de -- 27/08/2009
 
-        sprintf(update, "%s %s %s", name, PER_pertoa(per, period), val);
+        sprintf(update, "%s %s %s", name, (char*) per->to_string().c_str(), val);
         rc = B_DataUpdate(update, VARIABLES);
         SCR_free(update);
     }
@@ -185,7 +185,7 @@ int B_DSUpdateVar(char *name, PERIOD *per, char *val)
 int B_DSInterpret(char *code, char freq, char *contents)
 {
     char    **line = NULL, **tbl = NULL;
-    PERIOD  stp;
+    Period  stp;
     int     i, nl, rc = 0;
 
     line = (char**) SCR_vtom((unsigned char*) contents, (int) '\n');
@@ -226,7 +226,7 @@ int B_DSInterpret(char *code, char freq, char *contents)
 }
 
 /* DATA stream interface */
-int B_DSImportDb_1(char *arg, SAMPLE *smpl)
+int B_DSImportDb_1(char *arg, Sample *smpl)
 {
 #ifdef WIN32
     char            freq;
@@ -234,8 +234,8 @@ int B_DSImportDb_1(char *arg, SAMPLE *smpl)
              request[81],
              st_date[20], nd_date[20];
 
-    B_DSPeriod2Date(&(smpl->s_p1), (char*) st_date, &freq);
-    B_DSPeriod2Date(&(smpl->s_p2), (char*) nd_date, &freq);
+    B_DSPeriod2Date(&(smpl->start_period), (char*) st_date, &freq);
+    B_DSPeriod2Date(&(smpl->end_period), (char*) nd_date, &freq);
 
     sprintf((char*) request, "TRH>%s;;%s;%s;%c", arg, st_date, nd_date, freq);
 
@@ -258,15 +258,15 @@ int B_DSImportDb_1(char *arg, SAMPLE *smpl)
 
 int wrapper_B_DSImportDb_1(char *arg, void *smpl)
 {
-    return B_DSImportDb_1(arg, (SAMPLE *) smpl);
+    return B_DSImportDb_1(arg, (Sample *) smpl);
 }
 
 int B_DSImportDb(char *arg, int unused)
 {
 #ifdef WIN32
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
-    if(KSMPL(K_WS[VARIABLES])->s_nb == 0) return(-1);
+    if(KSMPL(K_WS[VARIABLES])->nb_periods == 0) return(-1);
 
     WscrDdeSetTimeOut(10000, 3);
     smpl = KSMPL(K_WS[VARIABLES]);

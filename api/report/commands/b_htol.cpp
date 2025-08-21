@@ -22,54 +22,68 @@
 // Core functions
 
 /**
- *  Computes the target SAMPLE of a conversion of variables from a high to a low periodicity.
+ *  Computes the target Sample of a conversion of variables from a high to a low periodicity.
  *  
- *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
- *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
- *  @param [out]  SAMPLE** t_smpl     allocated target sample
+ *  @param [in]   Sample*  f_smpl     sample of the input var file
+ *  @param [in]   Sample*  ws_smpl    sample of the current WS 
+ *  @param [out]  Sample** t_smpl     allocated target sample
  *  @param [out]  int*     skip       nb of periods to skip (i.e. set to IODE_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */
-static int HTOL_smpl(SAMPLE *f_smpl, SAMPLE *ws_smpl, SAMPLE **t_smpl, int* skip, int* shift)
+static int HTOL_smpl(Sample *f_smpl, Sample *ws_smpl, Sample **t_smpl, int* skip, int* shift)
 {
     int     f_nbper, ws_nbper;
     long    s, y;
-    PERIOD  p1, p2;
+    Period  p1, p2;
 
-    f_nbper = PER_nbper(&(f_smpl->s_p1));
-    ws_nbper = PER_nbper(&(ws_smpl->s_p1));
+    f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
+    ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
-    if(ws_nbper <= 0 || ws_nbper == 12) {
+    if(ws_nbper <= 0 || ws_nbper == 12) 
+    {
         error_manager.append_error("Set the periodicity first");
         return(-1);
     }
 
-    if(ws_nbper >= f_nbper) {
+    if(ws_nbper >= f_nbper) 
+    {
         error_manager.append_error("File has less observations than the current workspace");
         return(-1);
     }
 
-    memcpy(&p1, &(f_smpl->s_p1), sizeof(PERIOD));
-    memcpy(&p2, &(f_smpl->s_p2), sizeof(PERIOD));
+    p1 = f_smpl->start_period;
+    p2 = f_smpl->end_period;
 
-    s = p1.p_s;
-    y = p1.p_y;
+    s = p1.step;
+    y = p1.year;
     *shift = f_nbper/ws_nbper;
 
-    p1.p_p = p2.p_p = (ws_smpl->s_p1).p_p;
-    p1.p_s = 1;
+    p1.periodicity = p2.periodicity = (ws_smpl->start_period).periodicity;
+    p1.step = 1;
 
-    memcpy(&p1, PER_addper(&p1, (s - 1)/(*shift)), sizeof(PERIOD));
-    *skip = (p1.p_y - y) * f_nbper + (p1.p_s - 1) * (*shift) - (s - 1);
-    p2.p_s = ws_nbper;
+    p1 = p1.shift((s - 1)/(*shift));
+    *skip = (p1.year - y) * f_nbper + (p1.step - 1) * (*shift) - (s - 1);
+    p2.step = ws_nbper;
 
-    if(*skip < 0) {
+    if(*skip < 0) 
+    {
         *skip += *shift;
-        p1.p_y += 1;
+        p1.year += 1;
     }
 
-    *t_smpl = PER_pertosmpl(&p1, &p2);
+    try
+    {
+        *t_smpl = new Sample(p1, p2);
+    }
+    catch(const std::exception& e)
+    {
+        *t_smpl = nullptr;
+        std::string err_msg = "High to Low: invalid sample\n" + std::string(e.what()); 
+        error_manager.append_error(err_msg);
+        return(-1);
+    }
+
     return(0);
 }
 
@@ -87,7 +101,7 @@ static int HTOL_smpl(SAMPLE *f_smpl, SAMPLE *ws_smpl, SAMPLE **t_smpl, int* skip
  *  
  *  @param [in] int     method  aggregation method : HTOL_LAST, HTOL_MEAN or HTOL_SUM
  *  @param [in] char*   arg     parameter of the report function (see B_WsHtoLLast() for an example of the syntax)
- *  @return     int             0 on success, -1 on error (file not found, SAMPLEs incompatible...)    
+ *  @return     int             0 on success, -1 on error (file not found, Samples incompatible...)    
  */
 
 static int B_htol(int method, char* arg)
@@ -97,7 +111,7 @@ static int B_htol(int method, char* arg)
     char    file[K_MAX_FILE + 1], **data = NULL;
     double    *t_vec = NULL, *f_vec = NULL;
     KDB     *from = NULL, *to = NULL;
-    SAMPLE  *t_smpl = NULL;
+    Sample  *t_smpl = NULL;
 
 
     lg = B_get_arg0(file, arg, K_MAX_FILE);
@@ -118,13 +132,13 @@ static int B_htol(int method, char* arg)
     }
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(double));
+    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->nb_periods) * sizeof(double));
 
     for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(double));
-        memset(t_vec, 0, t_smpl->s_nb * sizeof(double));
+        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->nb_periods * sizeof(double));
+        memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {
@@ -133,7 +147,7 @@ static int B_htol(int method, char* arg)
             }
         }
 
-        for(; f + shift <= KSMPL(from)->s_nb; t++, f += shift) { /* JMP_M 4.20 21-07-95 */
+        for(; f + shift <= KSMPL(from)->nb_periods; t++, f += shift) { /* JMP_M 4.20 21-07-95 */
             if(method == HTOL_LAST)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
@@ -148,7 +162,7 @@ static int B_htol(int method, char* arg)
             if(method == HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
-        nb = t_smpl->s_nb;
+        nb = t_smpl->nb_periods;
         for(; t < nb; t++) t_vec[t] = IODE_NAN;
 
         K_add(to, KONAME(from, i), t_vec, &(nb));
@@ -177,7 +191,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
     int         nb, rc = 0, i, j, f, t, shift, skip;
     double   *t_vec = NULL, *f_vec = NULL;
     KDB         *kdb_to = NULL;
-    SAMPLE      *t_smpl = NULL;
+    Sample      *t_smpl = NULL;
 
     if(HTOL_smpl(KSMPL(kdb_from), KSMPL(kdb_from), &t_smpl, &skip, &shift) < 0) {
         rc = -1;
@@ -185,13 +199,13 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
     }
 
     kdb_to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((SAMPLE *) KDATA(kdb_to), t_smpl, sizeof(SAMPLE));
-    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(double));
+    memcpy((Sample *) KDATA(kdb_to), t_smpl, sizeof(Sample));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(kdb_from)->nb_periods) * sizeof(double));
 
     for(i = 0; i < KNB(kdb_from); i++) {
-        memcpy(f_vec, KVVAL(kdb_from, i, 0), KSMPL(kdb_from)->s_nb * sizeof(double));
-        memset(t_vec, 0, t_smpl->s_nb * sizeof(double));
+        memcpy(f_vec, KVVAL(kdb_from, i, 0), KSMPL(kdb_from)->nb_periods * sizeof(double));
+        memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {
@@ -200,7 +214,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
             }
         }
 
-        for(; f + shift <= KSMPL(kdb_from)->s_nb; t++, f += shift) { 
+        for(; f + shift <= KSMPL(kdb_from)->nb_periods; t++, f += shift) { 
             if(method == HTOL_LAST)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
@@ -215,7 +229,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
             if(method == HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
-        nb = t_smpl->s_nb;
+        nb = t_smpl->nb_periods;
         for(; t < nb; t++) t_vec[t] = IODE_NAN;
 
         K_add(kdb_to, KONAME(kdb_from, i), t_vec, &(nb));

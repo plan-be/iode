@@ -1,7 +1,8 @@
 #pragma once 
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 
 
 inline int     MSG_DISABLED = 0;    // if 1, kmsg() is disabled
@@ -24,7 +25,7 @@ inline int     (*ktermvkey_super)(const int vkey) = nullptr;
 inline int     (*khitkey_super)() = nullptr;
 inline int     (*kgetkey_super)() = nullptr;
 inline void    (*kbeep_super)(void) = nullptr;
-inline SAMPLE* (*kasksmpl_super)(void) = nullptr;
+inline Sample* (*kasksmpl_super)(void) = nullptr;
 inline int     (*kexecsystem_super)(const char*) = nullptr;
 inline int     (*kshellexec_super )(const char*) = nullptr;
 inline int     (*ODE_end_super)(const int) = nullptr;
@@ -46,7 +47,7 @@ int     ktermvkey(const int vkey);
 int     khitkey();
 int     kgetkey();
 void    kbeep();
-SAMPLE* kasksmpl();
+Sample* kasksmpl();
 int     kexecsystem(const char*);
 int     kshellexec(const char*);
 char    *A_expand_super_API(char* name);

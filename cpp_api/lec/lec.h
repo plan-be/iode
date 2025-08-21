@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "cpp_api/common.h"
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/period.h"
+#include "api/utils/utils.h"
+#include "api/time/period.h"
 #include "cpp_api/KDB/kdb_variables.h"
 
 /**

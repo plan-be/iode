@@ -38,11 +38,11 @@
  *  
  *  Sub-function of B_ModelSimulate().
  *  
- *  @param [in] SAMPLE* smpl    simulation SAMPLE
+ *  @param [in] Sample* smpl    simulation Sample
  *  @param [in] char**  eqs     NULL or list of equations defining the model 
  *  @return     int             0 on success, return code of K_simul() on error.    
  */
-static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
+static int B_ModelSimulateEqs(Sample* smpl, char** eqs)
 {
     KDB     *tdbe;
     int     rc;
@@ -70,7 +70,7 @@ int B_ModelSimulate(char *const_arg, int unused)
     int     lg1, lg2;
     int     rc = -1;
     char    from[16], to[16], **eqs = 0;
-    SAMPLE  *smpl = 0;
+    Sample  *smpl = nullptr;
     char    *arg;
 
     // Copy for C++ strings = read only (const)
@@ -78,22 +78,26 @@ int B_ModelSimulate(char *const_arg, int unused)
     
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
-    smpl = PER_atosmpl(from, to);
-
-    if(smpl == NULL) {
-        std::string error_msg = "ModelSimulate: invalid sample '" + std::string(from) + ":" + std::string(to) + "'";
+    try
+    {
+        smpl = new Sample(std::string((char*) from), std::string((char*) to));
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "ModelSimulate: invalid sample\n" + std::string(e.what()); 
         error_manager.append_error(error_msg);
         goto err;
     }
 
     eqs = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(eqs == 0) goto err;
+    if(eqs == 0) 
+        goto err;
     
     rc = B_ModelSimulateEqs(smpl, eqs);
 
 err:
+    if(smpl) delete smpl;
     SCR_free_tbl((unsigned char**) eqs);
-    SCR_free(smpl);
     SCR_free(arg);
     return(rc);
 }
@@ -286,7 +290,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 {
     int     lg1, lg2, rc, prepos, interpos, postpos;
     char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
-    SAMPLE  *smpl;
+    Sample  *smpl = nullptr;
     KDB     *tdbe;
     char    *arg;
     CSimulation simu;
@@ -296,18 +300,22 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
-    smpl = PER_atosmpl(from, to);
-
-    if(smpl == NULL) {
+    try
+    {
+        smpl = new Sample(std::string((char*) from), std::string((char*) to));
+    }
+    catch(const std::exception& e)
+    {
         SCR_free(arg);
-        std::string error_msg = "ModelSimulateSCC: invalid sample '" + std::string(from) + ":" + std::string(to) + "'";
+        std::string error_msg = "ModelSimulateSCC: invalid sample\n" + std::string(e.what());
         error_manager.append_error(error_msg);
         return(-1);
     }
 
     // Extrait les listes restantes
     lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) {
+    if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) 
+    {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");
         SCR_free_tbl((unsigned char**) lsts);
         rc = -1;
@@ -319,7 +327,8 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     postpos  = K_find(K_WS[LISTS], lsts[2]);
     SCR_free_tbl((unsigned char**) lsts);
 
-    if(prepos < 0 || interpos < 0 || postpos < 0) {
+    if(prepos < 0 || interpos < 0 || postpos < 0) 
+    {
         rc = -1;
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         goto err;
@@ -346,7 +355,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     SCR_free_tbl((unsigned char**) post);
 
 err:
-    SCR_free(smpl);
+    if(smpl) delete smpl;
     SCR_free(arg);
     return(rc);
 }
@@ -414,7 +423,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 
     // Copy values
     if(vec) {
-        for(t = 0; t < KSMPL(dbv)->s_nb; t++)
+        for(t = 0; t < KSMPL(dbv)->nb_periods; t++)
             x[t] = vec[t];
     }
     return(0);
@@ -445,7 +454,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
 
     // Copy values
     if(vec) {
-        for(t = 0; t < KSMPL(dbv)->s_nb; t++)
+        for(t = 0; t < KSMPL(dbv)->nb_periods; t++)
             x[t] = vec[t];
     }
     return(0);

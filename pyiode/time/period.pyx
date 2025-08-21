@@ -2,6 +2,7 @@ from libcpp.string cimport string
 
 from typing import Union, Tuple, List
 from pyiode.time.period cimport CPeriod
+from pyiode.time.period cimport get_nb_periods_per_year
 
 
 cdef class Period:
@@ -17,30 +18,30 @@ cdef class Period:
             self.c_period = CPeriod(<int>period_or_year, ch_periodicity, <int>step)
 
     def get_nb_periods_per_year(self) -> int:
-        return self.c_period.nb_periods_per_year()
+        return get_nb_periods_per_year(self.c_period.periodicity)
 
     def difference(self, other: Period) -> int:
         return self.c_period.difference(other.c_period)
 
     def shift(self, nb_periods: int) -> Period:
         shifted_period = self.c_period.shift(nb_periods)
-        return Period(shifted_period.p_y, chr(shifted_period.p_p), shifted_period.p_s)
+        return Period(shifted_period.year, chr(shifted_period.periodicity), shifted_period.step)
 
     def get_year(self) -> int:
-        return self.c_period.p_y
+        return self.c_period.year
 
     def get_periodicity(self) -> str:
-        return chr(self.c_period.p_p)
+        return chr(self.c_period.periodicity)
 
     def get_step(self) -> int:
-        return self.c_period.p_s
+        return self.c_period.step
 
     def __eq__(self, other: Period) -> bool:
-        if self.c_period.p_y != other.c_period.p_y:
+        if self.c_period.year != other.c_period.year:
             return False
-        if self.c_period.p_p != other.c_period.p_p:
+        if self.c_period.periodicity != other.c_period.periodicity:
             return False 
-        if self.c_period.p_s != other.c_period.p_s:
+        if self.c_period.step != other.c_period.step:
             return False
         return True
 

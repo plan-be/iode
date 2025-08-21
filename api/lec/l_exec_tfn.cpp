@@ -21,7 +21,7 @@
  *  where:
  *      - expr points to the current position in the CLEC expression (in "sum(A + B))", expr points to "A + B")
  *      - len is the length of the (sub-) expression expr (here the length of "A+B" compiled)
- *      - t is the current execution time (index in the SAMPLE) 
+ *      - t is the current execution time (index in the Sample) 
  *      - stack points to the top of the stack 
  *      - nargs is the number of arguments of the call to the function 
  *  
@@ -74,7 +74,7 @@
  *  
  *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
  *  @param [in] len     short           length of expr
- *  @param [in] t       int             position in the current KDB SAMPLE for which the expression will be calculated
+ *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
  *  @param [in] stack   L_REAL*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (1 or 2)
  *  @return             L_REAL          result of "expr in t"
@@ -198,7 +198,7 @@ L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
  *  @param [in] len     short           length of expr
- *  @param [in] t       int             position in the current KDB SAMPLE for which the expression will be calculated
+ *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
  *  @param [in] stack   L_REAL*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (2 or 3)
  *  @return             L_REAL          the maximum of expr on the period [p1, p2]

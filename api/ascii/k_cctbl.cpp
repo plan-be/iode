@@ -633,7 +633,7 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
  * Save a KDB of TBLs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int AsciiTables::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
+int AsciiTables::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
 {
     return(-1);
 }

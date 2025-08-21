@@ -671,7 +671,7 @@ Implementation of a RAS algorithm.
 
 |Syntax|Description|
 |:---|:---|
-|`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
+|`int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
 
 ### b\_data.c {#T49}
 
@@ -765,7 +765,7 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
 
 |Syntax|Description|
 |:---|:---|
-|`int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)`|Estimates a bloc of equations on a defined SAMPLE.|
+|`int B_EqsEstimateEqs(Sample* smpl, char** eqs)`|Estimates a bloc of equations on a defined Sample.|
 |`int B_EqsEstimate(char* arg, int unused)`|Implementation of the report function $EqsEstimate.|
 |`int B_EqsSetSample(char* arg, int unused)`|Implementation of the report function $EqsSetSample.|
 |`int B_EqsSetMethod(char* arg, int unused)`|Implementation of the report function $EqsSetMethod.|
@@ -972,7 +972,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 
 Functions to display or print calculated tables and tables of variables. The same functions are used to print and to display tables as graphs or as text.
 
-The functions generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
+The functions generate IODE tables in A2M format based on TBL structures and GSample definition.
 
 #### List of functions {#T67}
 
@@ -986,8 +986,8 @@ The functions generate IODE tables in A2M format based on TBL structures and GSA
 |`int B_PrintTbl(char* arg, int unused)`|$PrintTbl gsample table1 \[table2...\]|
 |`int B_ViewGr(char* arg, int unused)`|$ViewGr gsample tbl1\[\+tbl2\] tbl3 ...|
 |`int B_PrintGr(char* arg, int unused)`|$PrintGr gsample table1 \[table2...\]|
-|`int B_ViewPrintTbl_1(char* name, char* smpl)`|Calculate and display (or print according to the value of B\_viewmode) a table on a specified GSAMPLE.|
-|`int B_ViewPrintGr_1(char* names, char* gsmpl)`|Calculate and display (or print according to the value of B\_viewmode) a graph on a specified GSAMPLE, based on TBL definition(s).|
+|`int B_ViewPrintTbl_1(char* name, char* smpl)`|Calculate and display (or print according to the value of B\_viewmode) a table on a specified GSample.|
+|`int B_ViewPrintGr_1(char* names, char* gsmpl)`|Calculate and display (or print according to the value of B\_viewmode) a graph on a specified GSample, based on TBL definition(s).|
 |`int B_ViewPrintTbl(char* arg, int type, int mode)`|Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).|
 |`int B_ViewTblFile(char* arg, int unused)`|$PrintTblFile n varfilename (n := 2, 3, 4, 5)|
 |`int B_ViewTblEnd()`|Close a Print tables or Print variables session.|

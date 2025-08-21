@@ -6,7 +6,7 @@ void ComputedTable::initialize()
     std::string error_msg = "Cannot compute table with the generalized sample '" + gsample + "'";
 
     /* ---- see c_calc.c ----
-     *      1. call COL_cc(smpl) to compile the GSAMPLE in a COLS struct, say cls.
+     *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
      *      2. call COL_resize() to extend COLS according to the number of columns in the TBL 
      *      3. for each TBL line, call: 
      *          COL_clear(cls) to reset the COLS values 
@@ -14,7 +14,7 @@ void ComputedTable::initialize()
      *          COL_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
-    // Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in the passed table.
+    // Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in the passed table.
     columns = COL_cc(to_char_array(gsample));
     if(columns == NULL) 
         throw std::invalid_argument(error_msg);
@@ -37,13 +37,13 @@ void ComputedTable::initialize()
         Period per(columns->cl_cols[col].cl_per[0]);
         if(per.difference(start_per) < 0)
         {
-            start_per.p_y = per.p_y;
-            start_per.p_s = per.p_s;
+            start_per.year = per.year;
+            start_per.step = per.step;
         }
         if(per.difference(end_per) > 0)
         {
-            end_per.p_y = per.p_y;
-            end_per.p_s = per.p_s;
+            end_per.year = per.year;
+            end_per.step = per.step;
         }
     }
     sample = new Sample(start_per, end_per);
@@ -77,7 +77,7 @@ void ComputedTable::initialize()
 
     // Get column names
     // QUESTION FOR JMP: Would it be possible to have a table with several cells containing the '#' character ?
-    //                   How the GSAMPLE is build in that case ? -> What would be the column names ?
+    //                   How the GSample is build in that case ? -> What would be the column names ?
     // TODO JMP: please check the code to get column names below carefully.
     //           For instance, when there is only 1 file involved (current workspace), the returned column name 
     //           does not ends with '[1]' while it is the case in the old GUI. 
@@ -189,7 +189,7 @@ void ComputedTable::compute_values()
         COL_clear(columns);
         
         // Calculates the values of all LEC formulas in ONE table line for all columns 
-        // of a GSAMPLE (precompiled into a COLS structure). 
+        // of a GSample (precompiled into a COLS structure). 
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
         res = COL_exec(ref_table, line, columns);
@@ -318,7 +318,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     // get period position 
     COL column = columns->cl_cols[col_pos];
     Sample var_sample(*KSMPL(KV_WS));
-    int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period());
+    int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 
     // get lec
     std::string lec = cell_ref->get_content(false);

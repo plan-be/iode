@@ -3,12 +3,9 @@
 #pragma once
 
 #include "cpp_api/common.h"
-#include "cpp_api/utils/utils.h"
 #include "utils/super.h"
 #include "report/report.h"
 #include "report/rep_list.h"
-#include "cpp_api/time/period.h"
-#include "cpp_api/time/sample.h"
 #include "cpp_api/objects/equation.h"
 #include "cpp_api/objects/table.h"
 #include "cpp_api/KDB/kdb_global.h"

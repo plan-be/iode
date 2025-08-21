@@ -17,7 +17,7 @@ int B_DataDelete_1(char *,int *);
 int B_DataDelete(char* arg, int type);
 int B_DataRename(char* arg, int type);
 int B_DataDuplicate(char* arg, int type);
-//int B_DataUpdateEqs(char *,char *,char *,int ,SAMPLE *,char *,char *,float *,int );
+//int B_DataUpdateEqs(char *,char *,char *,int ,Sample *,char *,char *,float *,int );
 //int B_DataUpdateTbl(char *,char *);
 int B_DataUpdate(char* arg, int type);
 char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type);
@@ -38,9 +38,9 @@ int B_DataDisplayGraph(char* arg, int unused=-1);
 int B_DataPrintGraph(char* arg, int unused=-1);
 
 /* b_est.c */
-//char **B_EqsSplitSmplName(char *,SAMPLE **);
+//char **B_EqsSplitSmplName(char *,Sample **);
 int B_EqsEstimate(char* arg, int unused=-1);
-int B_EqsEstimateEqs(SAMPLE *,char **);
+int B_EqsEstimateEqs(Sample *,char **);
 int B_EqsSetSample(char* arg, int unused=-1);
 int B_EqsSetMethod(char* arg, int unused=-1);
 int B_EqsSetBloc(char* arg, int unused=-1);
@@ -68,12 +68,12 @@ int B_SysOemToAnsi(char* arg, int unused=-1);
 int B_WsHtoLLast(char* arg, int unused=-1);
 int B_WsHtoLMean(char* arg, int unused=-1);
 int B_WsHtoLSum(char* arg, int unused=-1);
-//int HTOL_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
+//int HTOL_smpl(Sample *,Sample *,Sample **,int *,int *);
 //int B_htol(int ,char *);
 
 /* b_idt.c */
 int B_IdtExecute(char* arg, int unused=-1);
-int B_IdtExecuteIdts(SAMPLE *,char **);
+int B_IdtExecuteIdts(Sample *,char **);
 int B_IdtExecuteVarFiles(char* arg, int unused=-1);
 int B_IdtExecuteSclFiles(char* arg, int unused=-1);
 int B_IdtExecuteTrace(char* arg, int unused=-1);
@@ -81,7 +81,7 @@ int B_IdtExecuteTrace(char* arg, int unused=-1);
 /* b_ltoh.c */
 int B_WsLtoHStock(char* arg, int unused=-1);
 int B_WsLtoHFlow(char* arg, int unused=-1);
-//int LTOH_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
+//int LTOH_smpl(Sample *,Sample *,Sample **,int *,int *);
 // int B_ltoh(int ,char *);
 //double LTOH_ylin(double *,double );
 //int LTOH_lin(int ,double *,int ,double *,int ,int );
@@ -91,7 +91,7 @@ int B_WsLtoHFlow(char* arg, int unused=-1);
 
 /* b_model.c */
 int B_ModelSimulate(char* arg, int unused=-1);
-//int B_ModelSimulateEqs(SAMPLE *,char **);
+//int B_ModelSimulateEqs(Sample *,char **);
 int B_ModelSimulateParms(char* arg, int unused=-1);
 int B_ModelExchange(char* arg, int unused=-1);
 int B_ModelCompile(char* arg, int unused=-1);
@@ -102,7 +102,7 @@ int B_ModelSimulateSaveNIters(char* arg, int unused=-1);
 int B_ModelSimulateSaveNorms(char* arg, int unused=-1);
 
 /* b_ras.c */
-int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps);
+int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper, int maxit, double eps);
 
 /* b_ws.c */
 int B_WsLoad(char* arg, int type);

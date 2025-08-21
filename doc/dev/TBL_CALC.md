@@ -5,8 +5,8 @@
 
 
 - [IODE: Table calculations](#T1)
-    - [GSAMPLE](#T2)
-      - [Formal definition of a GSAMPLE](#T3)
+    - [GSample](#T2)
+      - [Formal definition of a GSample](#T3)
     - [c\_cc.c](#T4)
     - [c\_calc.c](#T5)
     - [k\_print.c](#T6)
@@ -16,19 +16,19 @@
 
 # IODE: Table calculations {#T1}
 
-When a table is printed, the cell values are simple texts or numbers calculated from the LEC formulas included in the table definition on a GSAMPLE. The same is true for the line or bar charts generated from IODE TBLs.
+When a table is printed, the cell values are simple texts or numbers calculated from the LEC formulas included in the table definition on a GSample. The same is true for the line or bar charts generated from IODE TBLs.
 
 Indeed, the table formulas don't give indication on the period(s), the files, nor the representation of the values (growth rates, differences...).
 
-The purpose of the GSAMPLE is to provide these informations.
+The purpose of the GSample is to provide these informations.
 
-### GSAMPLE {#T2}
+### GSample {#T2}
 
-A GSAMPLE (generalised printing sample) determines the source of the variables and the transformations applied to these values like growth rates of differences in percents.
+A GSample (generalised printing sample) determines the source of the variables and the transformations applied to these values like growth rates of differences in percents.
 
-For tables, each column of a table is printed for every (period / file) given in the GSAMPLE.
+For tables, each column of a table is printed for every (period / file) given in the GSample.
 
-The GSAMPLE contains informations about:
+The GSample contains informations about:
 
 - the periods to be printed
 - the operations to perform on the selected periods, such as growth rates...
@@ -55,9 +55,9 @@ The available operations on files include :
 - differences in % (\[1/2\])
 - etc
 
-Examples and more details on GSAMPLE can be found in the IODE manual (https://iode.plan.be/doku.php?id=sample\_d\_impression).
+Examples and more details on GSample can be found in the IODE manual (https://iode.plan.be/doku.php?id=sample\_d\_impression).
 
-#### Formal definition of a GSAMPLE {#T3}
+#### Formal definition of a GSample {#T3}
 
 ```
      gsample    ::= gsample_n[';'gsample_n...]
@@ -81,42 +81,42 @@ Examples and more details on GSAMPLE can be found in the IODE manual (https://io
 
 ### c\_cc.c {#T4}
 
-GSAMPLE compilation functions.
+GSample compilation functions.
 
 |Syntax|Description|
 |:---|:---|
-|`COLS *COL_cc(char* gsample)`|GSAMPLE compiler|
+|`COLS *COL_cc(char* gsample)`|GSample compiler|
 |`int COL_free_cols(COLS* cls)`|Frees the allocated space for a COLS structure created by COL\_cc()|
 |`char *COL_text(COL* cl, char* str, int nbnames)`|Constructs a string based on a special table cell text value containing a "\#"|
-|`COLS *COL_add_col(COLS* cls)`|Adds a new COL struct to the COLS (list of periods in a GSAMPLE)|
+|`COLS *COL_add_col(COLS* cls)`|Adds a new COL struct to the COLS (list of periods in a GSample)|
 |`int COL_find_mode(COLS* cls, int* mode, int type)`|Analyses a COLS struct and set 1 in the vector mode for each found operation|
 
 ### c\_calc.c {#T5}
 
-Table calculation on a GSAMPLE.
+Table calculation on a GSample.
 
 |Syntax|Description|
 |:---|:---|
-|`int COL_exec(TBL* tbl, int i, COLS* cls)`|Calculates the values of all LEC formulas in one TBL line for all columns of a GSAMPLE.|
-|`int COL_resize(TBL* tbl, COLS* cls)`|Extends the number of COL's (compiled GSAMPLE) by multiplying by the number of columns in a TBL definition|
+|`int COL_exec(TBL* tbl, int i, COLS* cls)`|Calculates the values of all LEC formulas in one TBL line for all columns of a GSample.|
+|`int COL_resize(TBL* tbl, COLS* cls)`|Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a TBL definition|
 |`void COL_clear(COLS* cls)`|Resets the calculated values in a COLS structure.|
 
 ### k\_print.c {#T6}
 
-Functions to generate IODE tables in A2M format based on TBL structures and GSAMPLE definition. Includes some A2M helper functions.
+Functions to generate IODE tables in A2M format based on TBL structures and GSample definition. Includes some A2M helper functions.
 
 |Syntax|Description|
 |:---|:---|
-|`int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)`|Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL|
+|`int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)`|Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in TBL|
 |`void T_fmt_val(char* buf, double val, int lg, int nd)`|Formats a double value|
 |`void T_print_val(double val)`|Prints a IODE\_REAL value using W\_printf()|
 |`void T_open_cell(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
 |`void T_open_attr(int attr)`|Opens an A2M attribute sequence.|
 |`void T_close_attr(int attr)`|Closes an A2M attribute sequence.|
-|`void T_print_cell(TCELL* cell, COL* cl, int straddle)`|Prints a TBL cell on a specific GSAMPLE column.|
-|`char **T_find_files(COLS* cls)`|Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line KT\_FILES.|
+|`void T_print_cell(TCELL* cell, COL* cl, int straddle)`|Prints a TBL cell on a specific GSample column.|
+|`char **T_find_files(COLS* cls)`|Retrieves the filenames used in the COLS (from GSample) needed to print the special table line KT\_FILES.|
 |`unsigned char *T_get_title(TBL* tbl)`|Retrieves a TBL title, i.e. the contents of the first line of type KT\_TITLE|
-|`int T_print_tbl(TBL* tbl, char* smpl)`|Computes a table on a GSAMPLE and saves the result in A2M format|
+|`int T_print_tbl(TBL* tbl, char* smpl)`|Computes a table on a GSample and saves the result in A2M format|
 
 Global variables
 
@@ -127,7 +127,7 @@ Global variables
 
 ### k\_graph.c {#T7}
 
-Functions to generate IODE graphs in A2M format based on a TBL structure and a GSAMPLE definition. Contains also V\_graph(), a function to print or display variables or combinations of variables on a (simple) SAMPLE.
+Functions to generate IODE graphs in A2M format based on a TBL structure and a GSample definition. Contains also V\_graph(), a function to print or display variables or combinations of variables on a (simple) Sample.
 
 Includes some A2M helper functions.
 
@@ -136,16 +136,16 @@ Includes some A2M helper functions.
 |`int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)`|Initialises a graph by sending a2m commands to W\_printf().|
 |`int T_GraphTest(TBL *tbl)`|Displays the table tbl as a graph (in level) on the full sample of the current WS.|
 |`int T_GraphEnd()`|Ends a A2M graph definition by sending the a2m command ".ge" to W\_printf().|
-|`int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)`|Generates one graph in A2M format from a TBL struct and a GSAMPLE.|
+|`int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)`|Generates one graph in A2M format from a TBL struct and a GSample.|
 |`int T_GraphTitle(char *txt)`|Defines the graph title by sending a2m command ".gtitle" to W\_printf().|
 |`int T_GraphLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*time\* axis (.gty or .gtz, see a2m language) with its position, type and title.|
 |`int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*xy\* axis with its position, type and title.|
-|`int T_GraphTimeData(SAMPLE *smpl, double *y)`|Adds numerical data on a \*time\* graph line or bar.|
+|`int T_GraphTimeData(Sample *smpl, double *y)`|Adds numerical data on a \*time\* graph line or bar.|
 |`int T_GraphXYData(int nb, double *x, double *y)`|Adds numerical data on a \*xy\* graph line or bar.|
-|`int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSAMPLE.|
+|`int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSample.|
 |`int T_find_opf(COLS *fcls, COL *cl)`|Tries to find the position in \*fcls of the opf (operation on files) in cl.|
-|`int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)`|Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.|
-|`int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)`|Prints or displays graph(s) from variable list(s) or combination(s) or variables.|
+|`int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)`|Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.|
+|`int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)`|Prints or displays graph(s) from variable list(s) or combination(s) or variables.|
 
 ### Translations {#T8}
 

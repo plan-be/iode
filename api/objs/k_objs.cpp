@@ -12,7 +12,7 @@
  *     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB **without** deleting the referenced object. 
  *     int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
  *     int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. 
- *     int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)  Updates equation field(s). Creates the equation if it doesn't exist).
+ *     int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)  Updates equation field(s). Creates the equation if it doesn't exist).
  *     int K_upd_tbl(char* name, char* arg)                         Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi-colons.
  */
 #include "scr4/s_args.h"
@@ -375,7 +375,7 @@ int K_del_by_name(KDB* kdb, char* name)
  *  @param [in] char*   lec     NULL or LEC equation    
  *  @param [in] char*   cmt     NULL or free comment
  *  @param [in] int     method  -1 or estimation method
- *  @param [in] SAMPLE* smpl    NULL or estimation sample
+ *  @param [in] Sample* smpl    NULL or estimation sample
  *  @param [in] char*   instr   NULL or list of instruments 
  *  @param [in] char*   blk     NULL or list of simultaneously esstimated equations (block) 
  *  @param [in] float*  tests   NULL or vector of statistical tests
@@ -383,7 +383,7 @@ int K_del_by_name(KDB* kdb, char* name)
  *  @return     int             0 on success, -1 on error
  *   
  */
-int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)
+int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)
 {
     int     pos, rc;
     EQ      *eq;
@@ -420,8 +420,8 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
     if(tests != NULL)  memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
     else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
 
-    if(smpl != NULL) memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
-    /*    else memset(&(eq->smpl), 0, sizeof(SAMPLE)); */
+    if(smpl != NULL) memcpy(&(eq->smpl), smpl, sizeof(Sample));
+    /*    else memset(&(eq->smpl), 0, sizeof(Sample)); */
 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
     if(rc < 0) {

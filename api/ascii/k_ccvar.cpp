@@ -5,7 +5,7 @@
  *
  *      - KDB *load_asc(char *filename)
  *      - save_asc(KDB* kdb, char* filename)
- *      - int save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
+ *      - int save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)
  */
 #include "scr4.h"
 
@@ -38,13 +38,13 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
 {
     int     i, keyw, pos, nb;
     double    *vec;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
-    smpl = (SAMPLE *) KDATA(kdb);
-    vec = (double *) SW_nalloc(smpl->s_nb * sizeof(double));
+    smpl = (Sample *) KDATA(kdb);
+    vec = (double *) SW_nalloc(smpl->nb_periods * sizeof(double));
 
     /* READ AT MOST nobs OBSERVATIONS */
-    for(i = 0; i < smpl->s_nb; i++)  vec[i] = K_read_real(yy);
+    for(i = 0; i < smpl->nb_periods; i++)  vec[i] = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
     while(1) {
@@ -53,7 +53,7 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    nb = smpl->s_nb;
+    nb = smpl->nb_periods;
     pos = K_add(kdb, name, vec, &nb);
     if(pos < 0) {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
@@ -84,8 +84,8 @@ static KDB* load_yy(YYFILE* yy, int ask)
     KDB     *kdb = 0;
     int     cmpt = 0;
     ONAME   name;
-    //PERIOD  one, two;
-    SAMPLE  *smpl, *kasksmpl();
+    //Period  one, two;
+    Sample  *smpl, *kasksmpl();
 
     // Create and empty KDB for vars
     kdb = K_create(VARIABLES, UPPER_CASE);
@@ -109,7 +109,7 @@ static KDB* load_yy(YYFILE* yy, int ask)
     else smpl = K_read_smpl(yy);
 
     if(smpl == NULL) goto err;
-    memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
+    memcpy((Sample *) KDATA(kdb), smpl, sizeof(Sample));
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
@@ -121,7 +121,7 @@ static KDB* load_yy(YYFILE* yy, int ask)
                 return(kdb);
 
             case YY_WORD :
-                if(smpl->s_nb == 0) {
+                if(smpl->nb_periods == 0) {
                     kerror(0, "%s : undefined sample", YY_error(yy));
                     goto err;
                 }
@@ -245,7 +245,7 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
     FILE    *fd;
     int     i, j;
     double    *val;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     if(filename[0] == '-') fd = stdout;
     else {
@@ -256,14 +256,14 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    smpl = (SAMPLE *) KDATA(kdb);
-    fprintf(fd, "sample %s ", PER_pertoa(&(smpl->s_p1), 0L));
-    fprintf(fd, "%s\n", PER_pertoa(&(smpl->s_p2), 0L));
+    smpl = (Sample *) KDATA(kdb);
+    fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
+    fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         val = KVVAL(kdb, i, 0);
-        for(j = 0 ; j < smpl->s_nb; j++, val++) print_val(fd, *val);
+        for(j = 0 ; j < smpl->nb_periods; j++, val++) print_val(fd, *val);
         fprintf(fd, "\n");
     }
 
@@ -287,18 +287,17 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
  *  
  *  @param [in] kdb      KDB*       KDB of vars to save
  *  @param [in] filename char*      output file or "-" for stdout 
- *  @param [in] smpl     SAMPLE*    sample to save
+ *  @param [in] smpl     Sample*    sample to save
  *  @param [in] varlist  char**     list of variables to save in the file
  *  @return 
  *  
  */
-int AsciiVariables::save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
+int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)
 {
     FILE        *fd;
     int         i, j, nb, pos;
     char        fmt[80], buf[256], *sep, *dec, *nan, *axes, **lst;
-    double   *val;
-    PERIOD      *per;
+    double      *val;
 
     // Parameters : sep, dec, nbdec, nan,
     sep = this->CSV_SEP;
@@ -321,9 +320,9 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varl
     axes = this->CSV_AXES;
     if(axes == 0 || axes[0] == 0) axes = "var";
 
-    // sample : if CSV_SAMPLE == NULL => tout le sample
+    // sample : if CSV_Sample == NULL => tout le sample
     if(smpl == 0)
-        smpl = (SAMPLE *) KDATA(kdb);
+        smpl = (Sample *) KDATA(kdb);
 
     // Liste
     lst = varlist;
@@ -347,12 +346,13 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varl
 
     // Ligne 1
     fprintf(fd, "%s\\time", axes);
-    for(i = 0 ; i < smpl->s_nb ; i++) {
-        if(smpl->s_p1.p_p == 'Y')
-            fprintf(fd, "%s%d", sep, smpl->s_p1.p_y + i);
+    for(i = 0 ; i < smpl->nb_periods ; i++) 
+    {
+        if(smpl->start_period.periodicity == 'Y')
+            fprintf(fd, "%s%d", sep, smpl->start_period.year + i);
         else {
-            per = PER_addper(&(smpl->s_p1), i);
-            fprintf(fd, "%s%s", sep, PER_pertoa(per, 0L));
+            Period period = smpl->start_period.shift(i);
+            fprintf(fd, "%s%s", sep, (char*) period.to_string().c_str());
         }
     }
     fprintf(fd, "\n");
@@ -364,7 +364,7 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varl
         pos = K_find(kdb, lst[i]);
         if(pos >= 0) {
             val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->s_nb; j++, val++) {
+            for(j = 0 ; j < smpl->nb_periods; j++, val++) {
                 if(IODE_IS_A_NUMBER(*val)) {
                     sprintf(buf, fmt, (double)(*val));
                     if(dec[0] != '.') SCR_replace((unsigned char *) buf, (unsigned char *) ".", (unsigned char *) dec);

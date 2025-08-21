@@ -18,14 +18,15 @@
  *  
  *  List of functions 
  *  -----------------
- *      int read_header(YYFILE* yy, SAMPLE* smpl)                            Reads the sample (required) in an ASCII variable file.
+ *      int read_header(YYFILE* yy, Sample* smpl)                            Reads the sample (required) in an ASCII variable file.
  *      int read_variable(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in an ASCII variable file format. 
  *      int read_header(ImportFromFile* impdef, char* file, int lang)               Opens an ASCII comment file for reading with the YY library functions. 
  *      int read_comment(char* name, char** cmt)                            Reads one comment on the open YY stream.
  */
 #include "api/k_super.h"
 #include "api/utils/yy.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/io/import.h"
 
 
@@ -33,19 +34,19 @@
  *  Reads the sample (required) in an ASCII variable file.
  *  
  *  @param [in, out] YYFILE*    yy   open YY stream 
- *  @param [out]     SAMPLE*    smpl read SAMPLE on the YY stream
+ *  @param [out]     Sample*    smpl read Sample on the YY stream
  *  @return          int        0 on success, -1 if there is an error in the sample
  */
-int ImportObjsASCII::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsASCII::read_header(YYFILE* yy, Sample* smpl)
 {
-    SAMPLE  *rsmpl;
+    Sample  *rsmpl;
 
     if(YY_lex(yy) != ASC_SMPL)  return(-1);
 
     rsmpl = K_read_smpl(yy);
     if(rsmpl == NULL) return(-1);
 
-    memcpy(smpl, rsmpl, sizeof(SAMPLE));
+    memcpy(smpl, rsmpl, sizeof(Sample));
     SW_nfree(rsmpl);
     return(0);
 }

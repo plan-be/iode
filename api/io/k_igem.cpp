@@ -19,7 +19,8 @@
 #include "api/k_super.h"
 #include "api/constants.h"
 #include "api/utils/yy.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/io/dif.h"
 #include "api/io/import.h"
 
@@ -34,12 +35,13 @@
 */
 
 
-int ImportObjsGEM::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsGEM::read_header(YYFILE* yy, Sample* smpl)
 {
-    memcpy(&GEM_smpl, smpl, sizeof(SAMPLE));
-    GEM_freq = (GEM_smpl.s_p1).p_p;
-    GEM_nbper = PER_nbper(&(GEM_smpl.s_p1));
-    if(GEM_nbper < 0) {
+    memcpy(&GEM_smpl, smpl, sizeof(Sample));
+    GEM_freq = (GEM_smpl.start_period).periodicity;
+    GEM_nbper = get_nb_periods_per_year(GEM_smpl.start_period.periodicity);
+    if(GEM_nbper < 0) 
+    {
         kerror(0, "Please specify FROM and TO period");
         return(-1);
     }
@@ -106,10 +108,10 @@ int ImportObjsGEM::read_variable(YYFILE* yy, char* name, int dim, double* vector
     }
 
     GEM_name(name);
-    from = GEM_smpl.s_nb - GEM_nobs;                            /* JMP 16-05-00 */
+    from = GEM_smpl.nb_periods - GEM_nobs;                            /* JMP 16-05-00 */
     if(from < 0) from = 0;                                      /* JMP 16-05-00 */
     for(i = 0; i < from; i++) vector[i] = IODE_NAN;                /* JMP 16-05-00 */
-    for(i = from; i < GEM_smpl.s_nb; i++) {     /* JMP 16-05-00 */
+    for(i = from; i < GEM_smpl.nb_periods; i++) {     /* JMP 16-05-00 */
         if(i < dim) vector[i] = GEM_mat[GEM_cser + (i - from) *(GEM_nser)];
     }
 

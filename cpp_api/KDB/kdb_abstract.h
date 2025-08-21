@@ -1,6 +1,14 @@
 #pragma once
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/sample.h"
+#include "api/time/sample.h"
+#include "api/objs/kdb.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "cpp_api/common.h"
 #include "kdb_global.h"
 
 #include <string>

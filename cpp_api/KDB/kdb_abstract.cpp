@@ -1,5 +1,6 @@
 #pragma once
 #include "kdb_abstract.h"
+#include "cpp_api/utils/super.h"
 
 
 KDBAbstract::KDBAbstract(const IodeType iode_type, const std::string& filepath)

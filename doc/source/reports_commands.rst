@@ -567,7 +567,7 @@ Syntax::
 
 .. _wssample:
 
-COMMAND WSSAMPLE
+COMMAND WSSample
 ^^^^^^^^^^^^^^^^
 
 This function allows the user to modify the sample of the IODE variables workspace.
@@ -1884,7 +1884,7 @@ Example::
 
 .. _eqssetsample:
 
-COMMAND EQSSETSAMPLE
+COMMAND EQSSETSample
 ^^^^^^^^^^^^^^^^^^^^
 
 This function sets the estimation period for a list of equations.

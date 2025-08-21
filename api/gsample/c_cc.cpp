@@ -1,14 +1,14 @@
 /**
  *  @header4iode
  * 
- *  GSAMPLE compiler.
+ *  GSample compiler.
  *  
- *  A GSAMPLE (or generalised SAMPLE) defines groups of periods and files on which 
+ *  A GSample (or generalised Sample) defines groups of periods and files on which 
  *  the tables formulas are to be calculated. 
  *  
  *  See https://iode.plan.be/doku.php?id=sample_d_impression for more details.
  *  
- *  Formal definition of a GSAMPLE (tentative)
+ *  Formal definition of a GSample (tentative)
  *  ------------------------------------------
  *      gsample    ::= gsample_n[';'gsample_n...]
  *      gsample_n  ::= gsample_1[repetition['*'['-']increment]] 
@@ -35,10 +35,10 @@
  *  
  *  List of functions 
  *  -----------------
- *      COLS *COL_cc(char* gsample)                         GSAMPLE compiler
+ *      COLS *COL_cc(char* gsample)                         GSample compiler
  *      int COL_free_cols(COLS* cls)                        Frees the allocated space for a COLS structure created by COL_cc()
  *      char *COL_text(COL* cl, char* str, int nbnames)     Constructs a string based on a special table cell text value containing a "#"
- *      COLS *COL_add_col(COLS* cls)                        Adds a new COL struct to the COLS (list of periods in a GSAMPLE)
+ *      COLS *COL_add_col(COLS* cls)                        Adds a new COL struct to the COLS (list of periods in a GSample)
  *      int COL_find_mode(COLS* cls, int* mode, int type)   Analyses a COLS struct and set 1 in the vector mode for each found operation
  *
  */
@@ -55,9 +55,9 @@
 static void COL_free_fils(FILS* fils);
 static FILS* COL_add_fil(FILS* fils);
 static void COL_apply_fil(COL* cl, FIL* fl);
-static void COL_calc_now(PERIOD *per);
+static void COL_calc_now(Period *per);
 static int COL_read_long_per(YYFILE *yy);
-static int COL_read_per(YYFILE* yy, PERIOD* per);
+static int COL_read_per(YYFILE* yy, Period* per);
 static COLS *COL_read_y(YYFILE* yy);
 static int COL_calc_subper();
 static int COL_read_rep(YYFILE* yy, REP* rep);
@@ -68,7 +68,7 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
 static COLS *COL_read_cols(YYFILE* yy);
 
 
-// GSAMPLE tokens -- may be expanded
+// GSample tokens -- may be expanded
 YYKEYS COL_KEYWS[] = {
     (unsigned char*) "[",    COL_OBRACK,
     (unsigned char*) "]",    COL_CBRACK,
@@ -128,7 +128,7 @@ YYKEYS COL_KEYWS[] = {
 };
 
 /*
-    Compile un GSAMPLE (définitions des colonnes à imprimer). 
+    Compile un GSample (définitions des colonnes à imprimer). 
     
     Cette définition contient une liste de périodes, éventuellement affectées 
     d'une opération (taux de croissance, différence...)  appliquées à des fichiers représentés
@@ -229,7 +229,7 @@ static void COL_free_fils(FILS* fils)
  *  @param [in] COL*    cl      COL struct containing the current periods, files and operations 
  *  @param [in] int     ch      character following # in the cell definition (ex 'y' for "#y")
  *  @param [in] int     n       position of the period to print (#y1 => n=1, #y2 => n=2 )
- *  @param [in] int     nbf     number of compared files in the current GSAMPLE
+ *  @param [in] int     nbf     number of compared files in the current GSample
  *  @return     char*           static buffer with the formatting of the TBL text cell
  *  
  */
@@ -237,53 +237,58 @@ static void COL_free_fils(FILS* fils)
 char *COL_ctoa(COL* cl, int ch, int n, int nbf)
 {
     static char res[30];
-    PERIOD      *per;
+    Period      *per;
 
     res[0] = res[1] = 0;
 
     if(U_is_in(ch, "yYpPrRnNmMoO")) {
         if(cl->cl_opy == COL_NOP && n == 1) return(res);
         per = &(cl->cl_per[n]);
-        if(U_is_in(ch, "PpMmRrNn") && per->p_p == 'Y') return(res);
+        if(U_is_in(ch, "PpMmRrNn") && per->periodicity == 'Y') return(res);
         switch(ch) {
             case 'y' :
-                sprintf(res, "%02ld", (per->p_y) % 100L);
+                sprintf(res, "%02ld", (per->year) % 100L);
                 break;
             case 'Y' :
-                sprintf(res, "%04ld", per->p_y);
+                sprintf(res, "%04ld", per->year);
                 break;
             case 'p' :
-                res[0] = SCR_lower_char(per->p_p);
+                res[0] = SCR_lower_char(per->periodicity);
                 break;
             case 'P' :
-                res[0] = per->p_p;
+                res[0] = per->periodicity;
                 break;
             case 'M' :
             case 'm' :
-                if(per->p_p != 'M') goto Rom;
-                //strcpy(res, KLG_MONTHS[per->p_s -1][B_LANG]);
-                strcpy(res, KLG_MONTHS[per->p_s -1][K_LANG]);
-                if(ch == 'm') res[3] = 0;
+                if(per->periodicity != 'M') 
+                    goto Rom;
+                //strcpy(res, KLG_MONTHS[per->step -1][B_LANG]);
+                strcpy(res, KLG_MONTHS[per->step -1][K_LANG]);
+                if(ch == 'm') 
+                    res[3] = 0;
                 break;
 Rom:
             case 'r' :
             case 'R' :
-                if(!U_is_in(per->p_p, "QM")) goto Num;
-                strcpy(res, KLG_ROM[per->p_s - 1]);
-                if(SCR_is_lower(ch)) SCR_lower((unsigned char*) res);
+                if(!U_is_in(per->periodicity, "QM")) 
+                    goto Num;
+                strcpy(res, KLG_ROM[per->step - 1]);
+                if(SCR_is_lower(ch)) 
+                    SCR_lower((unsigned char*) res);
                 break;
 Num:
             case 'n' :
             case 'N' :
-                sprintf(res, "%ld", per->p_s);
+                sprintf(res, "%ld", per->step);
                 break;
             case 'o' :
-                if(cl->cl_opy == COL_NOP) return(res);
+                if(cl->cl_opy == COL_NOP) 
+                    return(res);
                 strcpy(res, COL_OPERS[cl->cl_opy - COL_NOP]);
                 break;
             case 'O' :
-                if(cl->cl_opy == COL_NOP) return(res);
-                //strcpy(res, KLG_OPERS_TEXTS[cl->cl_opy - COL_NOP][B_LANG]);
+                if(cl->cl_opy == COL_NOP) 
+                    return(res);
                 strcpy(res, KLG_OPERS_TEXTS[cl->cl_opy - COL_NOP][K_LANG]);
                 break;
         }
@@ -291,11 +296,14 @@ Num:
     }
 
     if(U_is_in(ch, "fF")) {
-        if(nbf < 2) return(res);
-        if(cl->cl_opf == COL_NOP) sprintf(res, "[%d]", cl->cl_fnb[0]);
-        else    sprintf(res, "[%d%s%d]", cl->cl_fnb[0],
-                            COL_OPERS[cl->cl_opf - COL_NOP],
-                            cl->cl_fnb[1]);
+        if(nbf < 2) 
+            return(res);
+        if(cl->cl_opf == COL_NOP) 
+            sprintf(res, "[%d]", cl->cl_fnb[0]);
+        else    
+            sprintf(res, "[%d%s%d]", cl->cl_fnb[0],
+                          COL_OPERS[cl->cl_opf - COL_NOP],
+                          cl->cl_fnb[1]);
 
         return(res);
     }
@@ -310,7 +318,7 @@ Num:
  *  
  *  @param [in] COL*    cl      COL struct containing the current periods, files and operations 
  *  @param [in] char*   str     contents of a table cell of type "text"
- *  @param [in] int     nbnames number of files compared in the current GSAMPLE
+ *  @param [in] int     nbnames number of files compared in the current GSample
  *  @return     char*           allocated string    
  *  
  *  TODO: check the allocated length (40+3+..) that could be too small!
@@ -362,7 +370,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
 
 
 /**
- *  Adds a new COL struct to the COLS (list of periods in a GSAMPLE).
+ *  Adds a new COL struct to the COLS (list of periods in a GSample).
  *  
  *  @param [in, out] COLS*  cls     current COLS (before adding a new COL) or NULL 
  *  @return          COLS*          if cols == NULL : newly allocated COLS structure
@@ -384,7 +392,7 @@ COLS *COL_add_col(COLS* cls)
 
 
 /**
- *  Adds a new FIL struct to the FILS (list of files in a GSAMPLE).
+ *  Adds a new FIL struct to the FILS (list of files in a GSample).
  *  
  *  @param [in, out] FILS*  fils    current FILS (before adding a new FIL) or NULL 
  *  @return          FILS*          if fils == NULL : newly allocated FILS structure
@@ -425,31 +433,31 @@ static void COL_apply_fil(COL* cl, FIL* fl)
 
 
 /**
- *  Constructs the PERIOD corresponding to TODAY in the current workspace periodicity.
+ *  Constructs the Period corresponding to TODAY in the current workspace periodicity.
  *  
  *  For example, if the periodicity is Q and the date of the day is 15/4/2022, the
  *  result will be equivalent to "2002Q2".
  *  
- *  @param [in, out] PERIOD*    per   constructed PERIOD (not allocated in the function, must exist)
+ *  @param [in, out] Period*    per   constructed Period (not allocated in the function, must exist)
  *  
  */
  
-static void COL_calc_now(PERIOD *per)
+static void COL_calc_now(Period *per)
 {
-    memcpy(per, &(KSMPL(KV_WS)->s_p1), sizeof(PERIOD));
-    per->p_y = SCR_current_date() / 10000L;
-    switch(per->p_p) {
+    memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
+    per->year = SCR_current_date() / 10000L;
+    switch(per->periodicity) {
         case 'M' :
-            per->p_s = (SCR_current_date() / 100) % 100;
+            per->step = (SCR_current_date() / 100) % 100;
             break;
         case 'Q' :
-            per->p_s = 1 + ((SCR_current_date() / 100) % 100 - 1) / 3;
+            per->step = 1 + ((SCR_current_date() / 100) % 100 - 1) / 3;
             break;
         case 'W' :
-            per->p_s = DT_week_number(SCR_current_date());
-            if(per->p_s == 0) {
-                per->p_y--;
-                per->p_s = 53;
+            per->step = DT_week_number(SCR_current_date());
+            if(per->step == 0) {
+                per->year--;
+                per->step = 53;
             }
             break;
         case 'Y' :
@@ -478,37 +486,40 @@ static int COL_read_long_per(YYFILE *yy)
 {
     int     keyw = YY_lex(yy);
 
-    if(keyw == YY_LONG)         return(yy->yy_long);
-    else if(keyw == COL_PER)    return(PER_nb(KSMPL(KV_WS)->s_p1.p_p));
-    else if(keyw == COL_SUBPER) return(COL_calc_subper());
-    else                        return(-1);
+    if(keyw == YY_LONG)         
+        return(yy->yy_long);
+    else if(keyw == COL_PER)    
+        return(get_nb_periods_per_year(KSMPL(KV_WS)->start_period.periodicity));
+    else if(keyw == COL_SUBPER) 
+        return(COL_calc_subper());
+    else                        
+        return(-1);
 }
 
 
 /**
- *  Reads a GSAMPLE valid period on the YY stream yy.
+ *  Reads a GSample valid period on the YY stream yy.
  *  
- *  Syntax:  PERIOD[Pppp][<n|>n]
+ *  Syntax:  Period[Pppp][<n|>n]
  *  where 
- *      PERIOD ::= {yyyy | yy | EOS | EOS1 | BOS | BOS1 | NOW | NOW1} (year or position in sample)
+ *      Period ::= {yyyy | yy | EOS | EOS1 | BOS | BOS1 | NOW | NOW1} (year or position in sample)
  *      P      ::= {Y|Q|M|W}  (periodicity)
  *      ppp    ::= integer   (sub period)
  *      n      ::= integer   (shift) 
  *  
  *  @param [in] YYFILE* yy      open YY stream
- *  @param [in] PERIOD* per     pointer to the resulting period 
+ *  @param [in] Period* per     pointer to the resulting period 
  *  @return     int             0 on success, -1 on error
  *  
  */
 
-static int COL_read_per(YYFILE* yy, PERIOD* per)
+static int COL_read_per(YYFILE* yy, Period* per)
 {
     int     ch, ch1, pos, sign = 1, keyw, shiftval;
-    PERIOD	*pertmp;
 
-    per->p_p = 'Y';
-    per->p_y = 1970;
-    per->p_s = 1;
+    per->periodicity = 'Y';
+    per->year = 1970;
+    per->step = 1;
 
     // Syntaxe : year[Pper][<n] ex 2000Y1<5  == 1995Y1
     //    ou     year[Pper][>n] ex 2000Y1>5  == 2005Y1
@@ -517,27 +528,27 @@ static int COL_read_per(YYFILE* yy, PERIOD* per)
     keyw = YY_lex(yy);
     switch(keyw) {
         case YY_LONG :
-            per->p_y = yy->yy_long;
-            if(per->p_y < 50) per->p_y += 2000;
-            else if(per->p_y < 200) per->p_y += 1900;
+            per->year = yy->yy_long;
+            if(per->year < 50) per->year += 2000;
+            else if(per->year < 200) per->year += 1900;
             break;
 
         case COL_EOS :
-            memcpy(per, &(KSMPL(KV_WS)->s_p2), sizeof(PERIOD));
+            memcpy(per, &(KSMPL(KV_WS)->end_period), sizeof(Period));
             break;
 
         case COL_EOS1 :
-            memcpy(per, &(KSMPL(KV_WS)->s_p2), sizeof(PERIOD));
-            per->p_s = 1;
+            memcpy(per, &(KSMPL(KV_WS)->end_period), sizeof(Period));
+            per->step = 1;
             break;
 
         case COL_BOS :
-            memcpy(per, &(KSMPL(KV_WS)->s_p1), sizeof(PERIOD));
+            memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
             break;
 
         case COL_BOS1 :
-            memcpy(per, &(KSMPL(KV_WS)->s_p1), sizeof(PERIOD));
-            per->p_s = 1;
+            memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
+            per->step = 1;
             break;
 
         case COL_NOW :
@@ -546,7 +557,7 @@ static int COL_read_per(YYFILE* yy, PERIOD* per)
 
         case COL_NOW1 :
             COL_calc_now(per);
-            per->p_s = 1;
+            per->step = 1;
             break;
 
         default :
@@ -556,12 +567,12 @@ static int COL_read_per(YYFILE* yy, PERIOD* per)
     // 2. Pper
     ch1 = ch = YY_getc(yy);
     if(ch1 >= 'a' && ch1 <= 'z')  ch1 += 'A' - 'a'; // JMP 21-05-2012
-    pos = L_pos(L_PERIOD_CH, ch1);
+    pos = get_pos_in_char_array((char*) periodicities.c_str(), ch1);
     if(pos >= 0) {
-        per->p_p = ch1;
+        per->periodicity = ch1;
         if(YY_lex(yy) != YY_LONG) return(-1);
-        per->p_s = yy->yy_long;
-        if(per->p_s < 1 || per->p_s > L_PERIOD_NB[pos]) return(-1);
+        per->step = yy->yy_long;
+        if(per->step < 1 || per->step > L_Period_NB[pos]) return(-1);
         YY_skip_spaces(yy);
         ch	= YY_getc(yy); // Lit la suite
     }
@@ -573,21 +584,28 @@ nextshift:
         return(0);
     }
 
-    if(ch == '<') sign = -1;			   	// JMP 21-05-2012
-    else          sign = 1;
+    if(ch == '<') 
+        sign = -1;			   	// JMP 21-05-2012
+    else          
+        sign = 1;
     shiftval = COL_read_long_per(yy);
-    if(shiftval < 0) return(-1);
+    if(shiftval < 0) 
+        return(-1);
 
     /*
     if(YY_lex(yy) != YY_LONG) return(-1);
     */
     if(shiftval == 0) {
-        if(sign > 0) per->p_s = PER_nb(per->p_p);
-        else         per->p_s = 1;
+        if(sign > 0) 
+            per->step = get_nb_periods_per_year(per->periodicity);
+        else         
+            per->step = 1;
     }
     else {
-        pertmp = PER_addper(per, sign * shiftval);
-        memcpy(per, pertmp, sizeof(PERIOD));
+        Period pertmp = per->shift(sign * shiftval);
+        per->year = pertmp.year;
+        per->periodicity = pertmp.periodicity;
+        per->step = pertmp.step;
     }
 
     // Lit la suite des <> s'il y en a pour pouvoir écrire 2000Q5<0>1/2000Q5<0 => 2000Q2/2000Q1
@@ -614,14 +632,14 @@ nextshift:
  
 static COLS *COL_read_y(YYFILE* yy)
 {
-    PERIOD  per;
+    Period  per;
     COLS    *cls;
     int     op;
 
     if(COL_read_per(yy, &per)) return((COLS *)0);
     cls = COL_add_col((COLS *)0);
     cls->cl_cols[0].cl_opy = COL_NOP;
-    memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(PERIOD));
+    memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(Period));
 
     op = YY_lex(yy);
     if(op <= COL_NOP || op >= COL_LAST_OP) {
@@ -635,7 +653,7 @@ static COLS *COL_read_y(YYFILE* yy)
         COL_free_cols(cls);
         return((COLS *)0);
     }
-    memcpy(&(cls->cl_cols[0].cl_per[1]), &per, sizeof(PERIOD));
+    memcpy(&(cls->cl_cols[0].cl_per[1]), &per, sizeof(Period));
     return(cls);
 }
 
@@ -650,12 +668,12 @@ static COLS *COL_read_y(YYFILE* yy)
  
 static int COL_calc_subper()
 {
-    PERIOD  *per;
+    Period  *per;
     int     p;
 
-    per = &(KSMPL(KV_WS)->s_p1);
+    per = &(KSMPL(KV_WS)->start_period);
 
-    switch(per->p_p) {
+    switch(per->periodicity) {
         case 'M' :
             return((SCR_current_date() / 100) % 100);
         case 'Q' :
@@ -673,7 +691,7 @@ static int COL_calc_subper()
 
 
 /**
- *  Reads an optional repetition factor in a GSAMPLE.
+ *  Reads an optional repetition factor in a GSample.
  *  
  *  Syntax : [:n[*[-]incr]]
  *  
@@ -717,7 +735,7 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
 
 
 /**
- *  Reads one FILE operation in a GSAMPLE (containing optionnaly an operator and a second file).
+ *  Reads one FILE operation in a GSample (containing optionnaly an operator and a second file).
  *  
  *  Syntax: 
  *      file_op ::= file1 [op file2]
@@ -756,7 +774,7 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
 
 
 /**
- *  Reads in a GSAMPLE a list of FILE operations surrounded by brackets [].
+ *  Reads in a GSample a list of FILE operations surrounded by brackets [].
  *  
  *  Syntax: 
  *      file_op_1;file_op_2...]
@@ -798,7 +816,7 @@ err:
 
 
 /**
- *  Modifies a partial GSAMPLE by shifting all periods by nb positions
+ *  Modifies a partial GSample by shifting all periods by nb positions
  *  to the left (COL_SHIFTL)or the right (COL_SHIFTR) according to the value of key.
  *  
  *  Examples
@@ -807,7 +825,7 @@ err:
  *      2000Q1<0 or 2000Q3<0 or ...  === 2000Q1
  *      2000Q3>0 or 2000Q4>0 or ...  === 2000Q4
  *  
- *  @param [in, out] COLS*   cls    partial compiled GSAMPLE 
+ *  @param [in, out] COLS*   cls    partial compiled GSample 
  *  @param [in]      int     key    period shift direction: COL_SHIFTL or COL_SHIFTR 
  *  @param [in]      in      nb     if not 0: nb of period to shift 
  *                                  if 0 and key == COL_SHIFTL: shift to the 1st period of the year
@@ -818,24 +836,24 @@ err:
 static void COL_shift(COLS *cls, int key, int nb)
 {
     COL   	*cl;
-    PERIOD  *per;
-    int    	i;
+    Period  per;
 
-    for(i = 0; i < cls->cl_nb; i++) {
+    for(int i = 0; i < cls->cl_nb; i++) {
         cl = cls->cl_cols + i;
         if(nb == 0) {
             if(key == COL_SHIFTR)
-                cl->cl_per[0].p_s = cl->cl_per[1].p_s = PER_nb(cl->cl_per[0].p_p);
+                cl->cl_per[0].step = cl->cl_per[1].step = get_nb_periods_per_year(cl->cl_per[0].periodicity);
             else
-                cl->cl_per[0].p_s = cl->cl_per[1].p_s = 1;
+                cl->cl_per[0].step = cl->cl_per[1].step = 1;
         }
         else {
-            if(key == COL_SHIFTL) nb = -nb;
-            per = PER_addper(cl->cl_per, nb);
-            memcpy(cl->cl_per, per, sizeof(PERIOD));
+            if(key == COL_SHIFTL) 
+                nb = -nb;
+            per = cl->cl_per->shift(nb);
+            cl->cl_per[0] = per;
             if(cl->cl_opy != COL_NOP) {
-                per = PER_addper(cl->cl_per + 1, nb);
-                memcpy(cl->cl_per + 1, per, sizeof(PERIOD));
+                per = cl->cl_per[1].shift(nb);
+                cl->cl_per[1] = per;
             }
         }
     }
@@ -848,10 +866,10 @@ static FILS    COL_FILS = {1, &COL_FIL};
 
 
 /**
- *  Completes the construction of a GSAMPLE compiled form.
+ *  Completes the construction of a GSample compiled form.
  *  
- *  Given a COLS struct cltmp (result of a partial GSAMPLE compilation, 
- *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSAMPLE 
+ *  Given a COLS struct cltmp (result of a partial GSample compilation, 
+ *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSample 
  *  compiled struct cls.
  *  
  *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. 
@@ -860,7 +878,7 @@ static FILS    COL_FILS = {1, &COL_FIL};
  *  See more examples in COL_read_cols().
  *  
  *  @param [in, out] COLS*  cls         resulting columns
- *  @param [in]      COLS*  cltmp       compiled GSAMPLE to be added to cls rep->r_nb times
+ *  @param [in]      COLS*  cltmp       compiled GSample to be added to cls rep->r_nb times
  *  @param [in]      FILS*  fils        FILS on which to cltmp must be applied
  *  @param [in]      REP*   rep         repetition format (n * m)
  *  @param [in]      int    shiftdir    unused ? Replaced by COL_shift() ?
@@ -873,7 +891,7 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
 {
     int     i, nbtmp, j, nbfils, k;
     COL     *cl, *tmp;
-    PERIOD  *per;
+    Period  per;
 
     if(fils == 0) fils = &COL_FILS; // if no fils, use a default  value
     nbfils = fils->fl_nb;
@@ -893,13 +911,9 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
                 cls = COL_add_col(cls);
                 cl = cls->cl_cols + cls->cl_nb - 1;
                 memcpy(cl, tmp + j, sizeof(COL));
-                memcpy(&(cl->cl_per[0]),
-                       PER_addper(&(tmp[j].cl_per[0]), i * rep->r_incr),
-                       sizeof(PERIOD));
+                cl->cl_per[0] = tmp[j].cl_per[0].shift(i * rep->r_incr);
                 if(cl->cl_opy != COL_NOP && cl->cl_opy != COL_BASE)
-                    memcpy(&(cl->cl_per[1]),
-                           PER_addper(&(tmp[j].cl_per[1]), i * rep->r_incr),
-                           sizeof(PERIOD));
+                    cl->cl_per[1] = tmp[j].cl_per[1].shift(i * rep->r_incr);
                 if(cl->cl_fnb[0] == 0)
                     COL_apply_fil(cl, fils->fl_fils + k);
                 else
@@ -914,17 +928,18 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
             cl = cls->cl_cols + i;
             if(shiftval == 0) {
                 if(shiftdir == COL_SHIFTR)
-                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = PER_nb(cl->cl_per[0].p_p);
+                    cl->cl_per[0].step = cl->cl_per[1].step = get_nb_periods_per_year(cl->cl_per[0].periodicity);
                 else
-                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = 1;
+                    cl->cl_per[0].step = cl->cl_per[1].step = 1;
             }
             else {
-                if(shiftdir == COL_SHIFTL) shiftval = -shiftval;
-                per = PER_addper(cl->cl_per, shiftval);
-                memcpy(cl->cl_per, per, sizeof(PERIOD));
+                if(shiftdir == COL_SHIFTL) 
+                    shiftval = -shiftval;
+                per = cl->cl_per[0].shift(shiftval);
+                cl->cl_per[0] = per;
                 if(cl->cl_opy != COL_NOP) {
-                    per = PER_addper(cl->cl_per + 1, shiftval);
-                    memcpy(cl->cl_per + 1, per, sizeof(PERIOD));
+                    per = cl->cl_per[1].shift(shiftval);
+                    cl->cl_per[1] = per;
                 }
             }
         }
@@ -934,7 +949,7 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
 
 
 /**
- *  Recursive function to compile a GSAMPLE.
+ *  Recursive function to compile a GSample.
  *  Returns a COLS* struct containing the column definitions.
  *  
  *  @param [in, out] YYFILE*    yy  YY stream
@@ -942,10 +957,10 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *
  *  Example 1
  *  ---------
- *  Compile the GSAMPLE 
+ *  Compile the GSample 
  *      "2000:5[1;2];2000/1999:2"
  *  
- *  There are 2 sub GSAMPLE's separated by a ';'
+ *  There are 2 sub GSample's separated by a ';'
  *      "2000:5[1;2]" 
  *      "2000/1999:2"
  *  
@@ -967,14 +982,14 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *  
  *  Example 2
  *  ---------
- *  GSAMPLE : "(99Y1;2000Y1;2000Y1/1999Y1)[1;2]:2"
+ *  GSample : "(99Y1;2000Y1;2000Y1/1999Y1)[1;2]:2"
  *  
  *  In this case, COL_read_cols() is called recursively and the total number 
  *  of columns will be 3 x 2 x 2 = 12.
  *  
  *  Example 3
  *  ---------
- *  GSAMPLE : "(99:3;2000/99:3)[1;2]:2"
+ *  GSample : "(99:3;2000/99:3)[1;2]:2"
  *  
  *  Again, COL_read_cols() is called recursively and the total number 
  *  of columns will be (3 + 3) x 2 x 2 = 24.
@@ -1065,9 +1080,9 @@ err:
 
 
 /**
- *  GSAMPLE compiler.
+ *  GSample compiler.
  *  
- *  @param [in]     char*   gsample text representing a GSAMPLE 
+ *  @param [in]     char*   gsample text representing a GSample 
  *  @return         COLS*           group of COL struct result of the compilation of gsample
  *  
  */
@@ -1130,7 +1145,7 @@ int COL_free_cols(COLS* cls)
  *  
  *  @note The same vector is used for the operations on periods and on files (TODO: check why)
  *  
- *  @param [in]      COLS*   cls     compiled GSAMPLE
+ *  @param [in]      COLS*   cls     compiled GSample
  *  @param [in, out] int*    mode    boolean vector containing a 1 for each operation found in cls (COL_DIFF, COL_GRT...)
  *  @param [in]      int     type    0: search in period operations, 
  *                                   1: search in file operations

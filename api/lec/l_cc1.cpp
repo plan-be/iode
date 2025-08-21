@@ -91,7 +91,7 @@ static int L_add_new_series(char* name)
 
 /**
  *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name but also 
- *  a Scalar, a PERIOD or a numerical constant.
+ *  a Scalar, a Period or a numerical constant.
  *  
  *  The token is saved in the union al_val (see iode.h).
  *  
@@ -106,10 +106,10 @@ static int L_save_var()
     al = L_EXPR + L_NB_EXPR;
     al->al_type = L_TOKEN.tk_def;
     switch(L_TOKEN.tk_def) {
-        case L_PERIOD :
-            al->al_val.v_per.p_y = L_TOKEN.tk_period.p_y;
-            al->al_val.v_per.p_p = L_TOKEN.tk_period.p_p;
-            al->al_val.v_per.p_s = L_TOKEN.tk_period.p_s;
+        case L_Period :
+            al->al_val.v_per.year = L_TOKEN.tk_period.year;
+            al->al_val.v_per.periodicity = L_TOKEN.tk_period.periodicity;
+            al->al_val.v_per.step = L_TOKEN.tk_period.step;
             break;
         case L_DCONST:
             al->al_val.v_real = L_TOKEN.tk_real;
@@ -121,9 +121,9 @@ static int L_save_var()
             if(is_val(L_TOKEN.tk_def)) break;
             al->al_val.v_var.pos = L_add_new_series(L_TOKEN.tk_name);
             al->al_val.v_var.lag  = 0;
-            al->al_val.v_var.per.p_y = 0;
-            al->al_val.v_var.per.p_p = 0;
-            al->al_val.v_var.per.p_s = 0;
+            al->al_val.v_var.per.year = 0;
+            al->al_val.v_var.per.periodicity= 0;
+            al->al_val.v_var.per.step = 0;
             break;
     }
 
@@ -304,7 +304,7 @@ static int L_lag_expr(int lag)
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
         if(al->al_type != L_VAR) continue;
-        if(al->al_val.v_var.per.p_s != 0) continue;
+        if(al->al_val.v_var.per.step != 0) continue;
         al->al_val.v_var.lag += lag;
     }
     return(0);
@@ -332,8 +332,8 @@ static int L_time_expr()
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
         if(al->al_type != L_VAR) continue;
-        if(al->al_val.v_var.per.p_s != 0) continue;
-        memcpy(&(al->al_val.v_var.per), &(L_TOKEN.tk_period), sizeof(PERIOD));
+        if(al->al_val.v_var.per.step != 0) continue;
+        memcpy(&(al->al_val.v_var.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
     return(0);
 }
@@ -370,7 +370,7 @@ static int L_anal_lag()
             L_lag_expr(lag);
             break;
 
-        case L_PERIOD :
+        case L_Period :
             L_time_expr();
             break;
 
@@ -416,7 +416,7 @@ int L_cc1(int nb_names)
         if(L_errno) goto ended;
 again:
         switch(keyw) {
-            case L_PERIOD:
+            case L_Period:
             case L_LCONST :
             case L_DCONST :
             case L_VAR :

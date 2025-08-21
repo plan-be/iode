@@ -28,23 +28,31 @@
 #include "api/report/undoc/undoc.h"
 
 
-static int HP_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
+static int HP_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
 {
-    int     nbper;
+    int nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
-    if((nbper = PER_nbper(&(ws_smpl->s_p1))) <= 0) {
+    if(nbper <= 0) 
+    {
         error_manager.append_error("Set periodicity first");
         goto err;
     }
 
-    *t_smpl = (SAMPLE *) SW_nalloc(sizeof(SAMPLE));
-    if(PER_common_smpl(f_smpl, ws_smpl, *t_smpl) < 0) goto err;
-    *shift = PER_diff_per(&((*t_smpl)->s_p1), &(f_smpl->s_p1));
-    return(nbper);
+    try
+    {
+        *t_smpl = new Sample(f_smpl->intersection(*ws_smpl));
+        *shift = (*t_smpl)->start_period.difference(f_smpl->start_period);
+        return(nbper);
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error(e.what());
+        goto err;
+    }
 
 err:
-    SW_nfree(*t_smpl);
-    t_smpl = NULL;
+    if(*t_smpl) delete *t_smpl;
+    t_smpl = nullptr;
     return(-1);
 }
 
@@ -55,7 +63,7 @@ static int B_WsTrendAll(char* arg, int std)
     char        file[K_MAX_FILE + 1], **data = NULL;
     double   *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
     KDB         *from = NULL, *to = NULL;
-    SAMPLE      *t_smpl = NULL;
+    Sample      *t_smpl = NULL;
 
 
     lg = B_get_arg0(file, arg, 80);
@@ -75,8 +83,8 @@ static int B_WsTrendAll(char* arg, int std)
     if(HP_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift) < 0) goto done;
 
     to = K_create(VARIABLES, UPPER_CASE);
-    nb = t_smpl->s_nb;
-    memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
+    nb = t_smpl->nb_periods;
+    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 

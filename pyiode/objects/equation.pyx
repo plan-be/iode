@@ -105,9 +105,9 @@ cdef class Equation:
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
-                from_period = c_sample.start_period().to_string().decode()
+                from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
-                to_period = c_sample.end_period().to_string().decode()
+                to_period = c_sample.end_period.to_string().decode()
         
         try:
             # NOTE: In the C API, the estimation is made on equations stored in the global equations workspace. 
@@ -136,9 +136,9 @@ cdef class Equation:
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
-                from_period = c_sample.start_period().to_string().decode()
+                from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
-                to_period = c_sample.end_period().to_string().decode()
+                to_period = c_sample.end_period.to_string().decode()
 
         arg: str = f'{from_period} {to_period} {self.get_endogenous()} "{lec_condition}" {test}'
         b_arg = arg.encode()

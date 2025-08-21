@@ -7,8 +7,9 @@ from libcpp.pair cimport pair
 from libcpp cimport bool
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
-from pyiode.time.sample cimport CSample, SAMPLE
+from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport KDB
+
 
 cdef extern from "api/all.h":
     ctypedef char ONAME[21]
@@ -33,7 +34,7 @@ cdef extern from "api/all.h":
         CLEC* clec
         char solved
         char method
-        SAMPLE smpl
+        CSample smpl
         char* cmt
         char* blk
         char* instr

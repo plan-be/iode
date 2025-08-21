@@ -3,7 +3,8 @@
 #include "scr4/s_yy.h"
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/tables.h"
 
 /*----------------------- ENUMS ----------------------------*/
@@ -48,13 +49,13 @@ enum IodeColOperation
 
 /*----------------------- STRUCTS ---------------------------------*/
 
-// COL struct: contains all infos needed to compute one table CELL on one specific GSAMPLE column
-//             + cl_val = the result of the LEC formulas on each FILE / PERIOD needed (i.e. max 4 values)
+// COL struct: contains all infos needed to compute one table CELL on one specific GSample column
+//             + cl_val = the result of the LEC formulas on each FILE / Period needed (i.e. max 4 values)
 //             + cl_res = final result
 struct COL 
 {
     short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1])
-    PERIOD  cl_per[2];          // period 1 , period 2
+    Period  cl_per[2];          // period 1 , period 2
     short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1]
     short   cl_fnb[2];          // position in K_RWS of file1 and file2 (starts at 1)
     double  cl_val[2][2];       // computed values of the LEC formulas on periods / files => max 4 values see table below
@@ -74,7 +75,7 @@ struct COL
     */
 };
 
-// COLS: group of COL's = result of a GSAMPLE compilation
+// COLS: group of COL's = result of a GSample compilation
 struct COLS 
 {
     int     cl_nb;          // Number of columns
@@ -83,7 +84,7 @@ struct COLS
 
 
 // REP: definition of the repetition of a group of periods / file
-// GSAMPLE example.: (2000/1999):5*4
+// GSample example.: (2000/1999):5*4
 struct REP 
 {
     short   r_nb;           // Nb of repetitions  (in example => 5)
@@ -91,7 +92,7 @@ struct REP
 };
 
 // FIL: files and operation used in a COL
-// GSAMPLE example: (2000:10)[2%3]
+// GSample example: (2000:10)[2%3]
 struct FIL 
 {
     short   fl_op;      // Operation on files (in example => %)
@@ -114,7 +115,7 @@ struct FILS
 
 /*----------------------- GLOBALS ---------------------------------*/
 
-#define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
+#define K_MAX_FREF          5           // Max number of file references in GSample's
 
 // Operator representations used when printing (only valid for period operations)
 // TODO: distinguish bw operations between periods and between files ?
@@ -150,7 +151,7 @@ char *COL_text(COL *,char *,int );
 COLS *COL_add_col(COLS *);
 //COLS *COL_construct(COLS *,COLS *,FILS *,REP *, int, int);
 //int COL_apply_fil(COL *,FIL *);
-//int COL_read_per(YYFILE *,PERIOD *);
+//int COL_read_per(YYFILE *,Period *);
 //COLS *COL_read_y(YYFILE *);
 //int COL_read_rep(YYFILE *,REP *);
 //int COL_read_1f(YYFILE *,FIL *);

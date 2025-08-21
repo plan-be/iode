@@ -433,11 +433,11 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode import IodeFileType, SAMPLE_DATA_DIR
+    >>> from iode import IodeFileType, Sample_DATA_DIR
     >>> from iode.util import check_filepath
 
 	>>> # No extension but an IODE objects file -> extension added automatically
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "fun")
     >>> checked_filepath = check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)
     >>> Path(checked_filepath).name
     'fun.cmt'
@@ -445,7 +445,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     'data'
 
     >>> # any file
-    >>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun_xode.ac.ref")
+    >>> filepath = str(Path(Sample_DATA_DIR) / "fun_xode.ac.ref")
     >>> checked_filepath = check_filepath(filepath, IodeFileType.FILE_ANY, True)
     >>> Path(checked_filepath).name
     'fun_xode.ac.ref'
@@ -460,7 +460,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     ValueError: Directory '...fake_dir' in filepath '...fun.cmt' does not exist
     
 	>>> # wrong extension -> expect a COMMENTS file
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun.eqs")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "fun.eqs")
     >>> check_filepath(filepath, IodeFileType.FILE_COMMENTS, False)
     Traceback (most recent call last):
     ...
@@ -468,7 +468,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     Expected extensions are: ['.cmt', '.ac']
     
     >>> # wrong extension
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun.docx")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "fun.docx")
     >>> check_filepath(filepath, IodeFileType.FILE_TXT, False)
     Traceback (most recent call last):
     ...
@@ -476,14 +476,14 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     Expected extensions are: ['.txt']
 
 	>>> # file does not exist
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "funxxx.cmt")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "funxxx.cmt")
     >>> check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)     # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     FileNotFoundError: The file '...funxxx.cmt' does not exist
 
 	>>> # file does not exist (no extension given)
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "funxxx")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "funxxx")
 	>>> check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)     # doctest: +SKIP
 
     Traceback (most recent call last):
@@ -491,7 +491,7 @@ def check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_ex
     FileNotFoundError: Neither 'funxxx.cmt' nor 'funxxx.ac' could be found in directory '...'
 
 	>>> # No extension but not an IODE objects file
-	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
+	>>> filepath = str(Path(Sample_DATA_DIR) / "fun")
     >>> check_filepath(filepath, IodeFileType.FILE_TXT, True)          # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
@@ -552,7 +552,7 @@ def get_iode_file_type(filepath: str) -> IodeFileType:
     Examples
     --------
     >>> from pathlib import Path
-    >>> from iode import IodeFileType, SAMPLE_DATA_DIR
+    >>> from iode import IodeFileType, Sample_DATA_DIR
     >>> from iode.util import get_iode_file_type
 
     >>> filename = ""
@@ -562,7 +562,7 @@ def get_iode_file_type(filepath: str) -> IodeFileType:
     >>> get_iode_file_type(filename)
     <IodeFileType.FILE_ANY: 32>
 
-    >>> get_iode_file_type(SAMPLE_DATA_DIR)
+    >>> get_iode_file_type(Sample_DATA_DIR)
     <IodeFileType.DIRECTORY: 33>
 
     >>> filename = "fun.cmt"

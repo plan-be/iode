@@ -9,7 +9,7 @@
  *   
  *  Main functions
  * 
- *      int L_link(KDB* dbv, KDB* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns PERIOD's to the SAMPLE of dbv.
+ *      int L_link(KDB* dbv, KDB* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
  *      void L_link_endos(KDB *dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
 #include "api/b_errors.h"
@@ -55,7 +55,7 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
  *      A[2001Y1] will be interpreted as the value of the 2d element of A
  *      2002Y1 will be replaced by 2 (2000Y1 == 0, 2001Y1 == 1,...)
  * 
- * @param [in]      dbv     KDB*    KDB of variables (only its SAMPLE is needed here)
+ * @param [in]      dbv     KDB*    KDB of variables (only its Sample is needed here)
  * @param [in, out] expr    char*   pointer to the CLEC (sub-)expression
  * @param [in]      lg      int     length of expr
  * 
@@ -66,8 +66,8 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
     int     j, keyw;
     short   len, s;
     CVAR    cvar;
-    SAMPLE  *smpl;
-    PERIOD  per;
+    Sample  *smpl;
+    Period  per;
 
     smpl = L_getsmpl(dbv);
     for(j = 0 ; j < lg ;) {
@@ -76,8 +76,8 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
             case L_VAR   :
                 memcpy(&cvar, expr + j, sizeof(CVAR));
                 cvar.ref = cvar.lag;
-                if(cvar.per.p_s != 0)
-                    cvar.ref += PER_diff_per(&(cvar.per), &(smpl->s_p1));
+                if(cvar.per.step != 0)
+                    cvar.ref += cvar.per.difference(smpl->start_period);
                 memcpy(expr + j, &cvar, sizeof(CVAR));
                 j += sizeof(CVAR);
                 break;
@@ -90,14 +90,11 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
             case L_LCONST    :
                 j += s_long;
                 break;
-            case L_PERIOD    :
-                memcpy(&per, expr + j, sizeof(PERIOD));
-                s = PER_diff_per(&per, &(smpl->s_p1));
-                memcpy(expr + j + sizeof(PERIOD), &s, sizeof(short));
-                /*                *(short *)(expr + j + sizeof(PERIOD)) =
-                		    PER_diff_per((PERIOD *)(expr + j), &(smpl->s_p1));
-                */
-                j += s_short + sizeof(PERIOD);
+            case L_Period    :
+                memcpy(&per, expr + j, sizeof(Period));
+                s = per.difference(smpl->start_period);
+                memcpy(expr + j + sizeof(Period), &s, sizeof(short));
+                j += s_short + sizeof(Period);
                 break;
             default :
                 if(is_fn(keyw)) {
@@ -118,7 +115,7 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
 
 
 /**
- * Second step of linking CLEC. Each time displacement in the CLEC struct is aligned to the dbv's SAMPLE.
+ * Second step of linking CLEC. Each time displacement in the CLEC struct is aligned to the dbv's Sample.
  * For example, the position of A[1970Y1] in the vector A depends on the sample of dbv.
  *
  * @param [in]      dbv     KDB*    KDB of variables
@@ -136,8 +133,8 @@ static void L_link_sample(KDB* dbv, CLEC* cl)
 
 
 /**
- * Links a CLEC expression to KDB's of variables and of scalars. If some PERIOD's are present in CLEC,
- * they are aligned to the SAMPLE of dbv.
+ * Links a CLEC expression to KDB's of variables and of scalars. If some Period's are present in CLEC,
+ * they are aligned to the Sample of dbv.
  * 
  * The CLEC, although modified by L_link(), can be relinked later with other KDB's. 
  *
