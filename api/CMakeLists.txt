@@ -32,8 +32,6 @@ target_sources(iode_c_api PRIVATE b_a2mini.cpp) 	# A2M
 # (as declared in <math.h>) are bundled separately in the mathematical library libm.
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(iode_c_api PUBLIC m)
-  	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-int")
-  	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-function-declaration")
 endif()
 if(NOT SKBUILD)
 	target_link_libraries(iode_c_api PUBLIC gtest_main)

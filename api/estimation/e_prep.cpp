@@ -372,10 +372,10 @@ void Estimation::E_get_C()
     double    c;
 
     for(i = 0 ; i < E_NC ; i++) {
-        c = KSVAL(E_DBS, E_C_NBS[i])->val;
+        c = KSVAL(E_DBS, E_C_NBS[i])->value;
         if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0.0 && fabs(c) < 1e-15) {
             c = 0.1;
-            KSVAL(E_DBS, E_C_NBS[i])->val = c; // GB 24/01/2013
+            KSVAL(E_DBS, E_C_NBS[i])->value = c; // GB 24/01/2013
         }
         MATE(E_C, i, 0) = c;
     }
@@ -394,7 +394,7 @@ void Estimation::E_put_C()
     int     i;
 
     for(i = 0 ; i < E_NC ; i++)
-        KSVAL(E_DBS, E_C_NBS[i])->val = MATE(E_C, i, 0);
+        KSVAL(E_DBS, E_C_NBS[i])->value = MATE(E_C, i, 0);
 }
 
 

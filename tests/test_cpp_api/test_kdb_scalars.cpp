@@ -22,11 +22,11 @@ TEST_F(KDBScalarsTest, Load)
 TEST_F(KDBScalarsTest, Subset)
 {
     std::string pattern = "a*";
-    Scalar scalar = Scalars.get("acaf1");
+    Scalar* scalar = Scalars.get("acaf1");
     double value = 0.0158;
     double relax = 0.98;
     double std = 0.0;
-    Scalar new_scalar(value, relax, std);
+    Scalar* new_scalar = new Scalar(value, relax, std);
 
     // GLOBAL KDB
     KDBScalars kdb_global;
@@ -39,16 +39,18 @@ TEST_F(KDBScalarsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("acaf1", value, relax, std);
-    EXPECT_EQ(kdb_global.get("acaf1"), scalar);
-    EXPECT_EQ(kdb_subset_deep_copy->get("acaf1"), new_scalar);
+    EXPECT_EQ(*kdb_global.get("acaf1"), *scalar);
+    EXPECT_EQ(*kdb_subset_deep_copy->get("acaf1"), *new_scalar);
 
     // SHALLOW COPY SUBSET
     KDBScalars* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("acaf1", value, relax, std);
-    EXPECT_EQ(kdb_global.get("acaf1"), new_scalar);
-    EXPECT_EQ(kdb_subset_shallow_copy->get("acaf1"), new_scalar);
+    EXPECT_EQ(*kdb_global.get("acaf1"), *new_scalar);
+    EXPECT_EQ(*kdb_subset_shallow_copy->get("acaf1"), *new_scalar);
+
+    delete new_scalar;
 }
 
 TEST_F(KDBScalarsTest, Save)
@@ -66,17 +68,17 @@ TEST_F(KDBScalarsTest, Get)
     Scalar expected_scalar(0.015768406912684, 1.0, 0.0013687137980013999);
 
     // by position
-    Scalar scalar = Scalars.get(pos);
-    EXPECT_DOUBLE_EQ(expected_scalar.val, scalar.val);
-    EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar.relax);
-    EXPECT_DOUBLE_EQ(expected_scalar.std, scalar.std);
+    Scalar* scalar = Scalars.get(pos);
+    EXPECT_DOUBLE_EQ(expected_scalar.value, scalar->value);
+    EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar->relax);
+    EXPECT_DOUBLE_EQ(expected_scalar.std, scalar->std);
 
     // by name
     std::string name = Scalars.get_name(pos);
-    Scalar scalar2 = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(expected_scalar.val, scalar2.val);
-    EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar2.relax);
-    EXPECT_DOUBLE_EQ(expected_scalar.std, scalar2.std);
+    Scalar* scalar2 = Scalars.get(name);
+    EXPECT_DOUBLE_EQ(expected_scalar.value, scalar2->value);
+    EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar2->relax);
+    EXPECT_DOUBLE_EQ(expected_scalar.std, scalar2->std);
 }
 
 TEST_F(KDBScalarsTest, GetNames)
@@ -94,10 +96,10 @@ TEST_F(KDBScalarsTest, CreateRemove)
     double relax = 1.;
 
     Scalars.add(name, value, relax);
-    Scalar new_scalar = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(new_scalar.val, value);
-    EXPECT_DOUBLE_EQ(new_scalar.relax, relax);
-    EXPECT_TRUE(new_scalar.std < 1e-100);
+    Scalar* new_scalar = Scalars.get(name);
+    EXPECT_DOUBLE_EQ(new_scalar->value, value);
+    EXPECT_DOUBLE_EQ(new_scalar->relax, relax);
+    EXPECT_TRUE(new_scalar->std < 1e-100);
 
     Scalars.remove(name);
     EXPECT_THROW(Scalars.get(name), std::invalid_argument);
@@ -110,22 +112,22 @@ TEST_F(KDBScalarsTest, Update)
     double relax = 0.98;
 
     Scalars.update(name, value, relax);
-    Scalar updated_scalar = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(updated_scalar.val, value);
-    EXPECT_DOUBLE_EQ(updated_scalar.relax, relax);
-    EXPECT_TRUE(updated_scalar.std < 1e-100);
+    Scalar* updated_scalar = Scalars.get(name);
+    EXPECT_DOUBLE_EQ(updated_scalar->value, value);
+    EXPECT_DOUBLE_EQ(updated_scalar->relax, relax);
+    EXPECT_TRUE(updated_scalar->std < 1e-100);
 }
 
 TEST_F(KDBScalarsTest, Copy)
 {
     std::string name = Scalars.get_name(0);
-    Scalar scalar = Scalars.get(name);
+    Scalar* scalar = Scalars.get(name);
 
-    Scalar scalar_copy = Scalars.copy(name);
-    EXPECT_EQ(scalar_copy, scalar);
+    Scalar* scalar_copy = Scalars.copy(name);
+    EXPECT_EQ(*scalar_copy, *scalar);
 
     // add copy
-    Scalars.add("dup_" + name, scalar_copy);
+    Scalars.add("dup_" + name, *scalar_copy);
 }
 
 TEST_F(KDBScalarsTest, Filter)
@@ -161,12 +163,12 @@ TEST_F(KDBScalarsTest, Filter)
     double updated_value = 0.0158;
     double updated_relax = 0.98;
     double updated_std = 0.0;
-    Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
+    Scalar* expected_updated_scalar = new Scalar(updated_value, updated_relax, updated_std);
     kdb_subset->update(name, updated_value, updated_relax, updated_std);
-    Scalar updated_scalar_local = kdb_subset->get(name);
-    EXPECT_EQ(updated_scalar_local, expected_updated_scalar);
-    Scalar updated_scalar_global = Scalars.get(name);
-    EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
+    Scalar* updated_scalar_local = kdb_subset->get(name);
+    EXPECT_EQ(*updated_scalar_local, *expected_updated_scalar);
+    Scalar* updated_scalar_global = Scalars.get(name);
+    EXPECT_EQ(*updated_scalar_global, *expected_updated_scalar);
 
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
@@ -174,23 +176,24 @@ TEST_F(KDBScalarsTest, Filter)
     double value = 0.012365879;
     double relax = 1.0;
     double std = 0.0;
-    Scalar expected_new_scalar(value, relax, std);
+    Scalar* expected_new_scalar = new Scalar(value, relax, std);
     kdb_subset->add(new_name, value, relax, std);
-    Scalar new_scalar_local = kdb_subset->get(new_name);
-    EXPECT_EQ(new_scalar_local, expected_new_scalar);
-    Scalar new_scalar_global = Scalars.get(new_name);
-    EXPECT_EQ(new_scalar_global, expected_new_scalar);
+    Scalar* new_scalar_local = kdb_subset->get(new_name);
+    EXPECT_EQ(*new_scalar_local, *expected_new_scalar);
+    Scalar* new_scalar_global = Scalars.get(new_name);
+    EXPECT_EQ(*new_scalar_global, *expected_new_scalar);
+    delete expected_new_scalar;
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
-    Scalar old_scalar = Scalars.get(old_name);
+    Scalar* old_scalar = Scalars.get(old_name);
     new_name = "scalar_new";
     kdb_subset->rename(old_name, new_name);
     new_scalar_local = kdb_subset->get(new_name);
-    EXPECT_EQ(new_scalar_local, old_scalar);
+    EXPECT_EQ(*new_scalar_local, *old_scalar);
     new_scalar_global = Scalars.get(new_name);
-    EXPECT_EQ(new_scalar_global, old_scalar);
+    EXPECT_EQ(*new_scalar_global, *old_scalar);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
@@ -200,13 +203,14 @@ TEST_F(KDBScalarsTest, Filter)
 
     // try to add an element to the local KDB which is already present 
     // in the global KDB
-    EXPECT_THROW(kdb_subset->add("gamma_", new_scalar_local), std::invalid_argument);
+    EXPECT_THROW(kdb_subset->add("gamma_", *new_scalar_local), std::invalid_argument);
 
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Scalars.count(), nb_total_scalars);
     updated_scalar_global = Scalars.get(name);
-    EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
+    EXPECT_EQ(*updated_scalar_global, *expected_updated_scalar);
+    delete expected_updated_scalar;
 
     // wrong pattern
     pattern = "anjfks";
@@ -243,20 +247,22 @@ TEST_F(KDBScalarsTest, DeepCopy)
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "acaf1";
-    Scalar scalar = Scalars.get(name);
-    double value = scalar.val;
-    double relax = scalar.relax;
-    double std = scalar.std;
-    Scalar expected_scalar(value, relax, std);
+    Scalar* scalar = Scalars.get(name);
+    double value = scalar->value;
+    double relax = scalar->relax;
+    double std = scalar->std;
+    Scalar* expected_scalar = new Scalar(value, relax, std);
     double updated_value = 0.0158;
     double updated_relax = 0.98;
     double updated_std = 0.0;
-    Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
+    Scalar* expected_updated_scalar = new Scalar(updated_value, updated_relax, updated_std);
     kdb_subset->update(name, updated_value, updated_relax, updated_std);
-    Scalar updated_scalar_local = kdb_subset->get(name);
-    EXPECT_EQ(updated_scalar_local, expected_updated_scalar);
-    Scalar scalar_global = Scalars.get(name); 
-    EXPECT_EQ(scalar_global, expected_scalar);
+    Scalar* updated_scalar_local = kdb_subset->get(name);
+    EXPECT_EQ(*updated_scalar_local, *expected_updated_scalar);
+    Scalar* scalar_global = Scalars.get(name); 
+    EXPECT_EQ(*scalar_global, *expected_scalar);
+    delete expected_scalar;
+    delete expected_updated_scalar;
 
     // add an element to the local KDB and check if it has not 
     // been added to the global KDB
@@ -264,22 +270,23 @@ TEST_F(KDBScalarsTest, DeepCopy)
     value = 0.012365879;
     relax = 1.0;
     std = 0.0;
-    Scalar expected_new_scalar(value, relax, std);
+    Scalar* expected_new_scalar = new Scalar(value, relax, std);
     kdb_subset->add(new_name, value, relax, std);
     EXPECT_TRUE(kdb_subset->contains(new_name));
-    Scalar new_scalar_local = kdb_subset->get(new_name);
-    EXPECT_EQ(new_scalar_local, expected_new_scalar);
+    Scalar* new_scalar_local = kdb_subset->get(new_name);
+    EXPECT_EQ(*new_scalar_local, *expected_new_scalar);
     EXPECT_FALSE(Scalars.contains(new_name));
+    delete expected_new_scalar;
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
     name = "acaf2";
-    Scalar old_scalar = Scalars.get(name);
+    Scalar* old_scalar = Scalars.get(name);
     new_name = "scalar_new";
     kdb_subset->rename(name, new_name);
     EXPECT_TRUE(kdb_subset->contains(new_name));
     new_scalar_local = kdb_subset->get(new_name);
-    EXPECT_EQ(new_scalar_local, old_scalar);
+    EXPECT_EQ(*new_scalar_local, *old_scalar);
     EXPECT_FALSE(Scalars.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
@@ -332,30 +339,33 @@ TEST_F(KDBScalarsTest, Merge)
     double value = 0.012365879;
     double relax = 1.0;
     double std = 0.0;
-    Scalar new_scalar(value, relax, std);
+    Scalar* new_scalar = new Scalar(value, relax, std);
     kdb_to_merge->add(new_name, value, relax, std);
 
     // modify an existing element of the KDB to be merge
     std::string name = "acaf1";
-    Scalar unmodified_scalar = kdb_to_merge->get(name);
+    Scalar* unmodified_scalar = kdb_to_merge->get(name);
     double updated_value = 0.0158;
     double updated_relax = 0.98;
     double updated_std = 0.0;
-    Scalar modified_scalar(updated_value, updated_relax, updated_std);
+    Scalar* modified_scalar = new Scalar(updated_value, updated_relax, updated_std);
     kdb_to_merge->update(name, updated_value, updated_relax, updated_std);
 
     // merge (overwrite)
     kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
-    EXPECT_EQ(kdb0->get(new_name), new_scalar);
+    EXPECT_EQ(*kdb0->get(new_name), *new_scalar);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0->get(name), modified_scalar); 
+    EXPECT_EQ(*kdb0->get(name), *modified_scalar); 
 
     // merge (NOT overwrite)
     kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1->get(name), unmodified_scalar);
+    EXPECT_EQ(*kdb1->get(name), *unmodified_scalar);
+
+    delete new_scalar;
+    delete modified_scalar;
 }
 
 TEST_F(KDBScalarsTest, Search)

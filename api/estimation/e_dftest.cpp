@@ -239,15 +239,15 @@ cleanup:
 void E_SclToReal(char* name, double* res)
 {
     int pos;
-    SCL *scl;
+    Scalar *scl;
 
     pos = K_find(KS_WS, name);
     if(pos < 0) return;
 
     scl = KSVAL(KS_WS, pos);
-    res[0] = scl->val;
+    res[0] = scl->value;
     res[1] = scl->std;
-    if(!IODE_IS_0(scl->std)) res[2] = scl->val/scl->std;
+    if(!IODE_IS_0(scl->std)) res[2] = scl->value/scl->std;
 }
 
 

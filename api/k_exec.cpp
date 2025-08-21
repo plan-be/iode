@@ -24,7 +24,7 @@
  *  The order of execution is automatically calcuted => [1, 0, 2].
  *  Indeed, B must be computed before A because A is a successor of B. E remains in 3d position.
  *
- * VAR and SCL source
+ * VAR and Scalar source
  * ------------------
  *  The variables and scalars needed to compute the identities are read either in the current WS or 
  *  in a set of external files. 
@@ -500,12 +500,12 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 
 
 /**
- *  Copies from the KDB dbs_tmp the unallocated SCLs of dbs (i.e. the SCL with no associated object).
+ *  Copies from the KDB dbs_tmp the unallocated Scalars of dbs (i.e. the Scalar with no associated object).
  *  
- *  @param [in] KDB*    dbs         KDB of SCLs to read
- *  @param [in] KDB*    dbs_tmp     temporary KDB (read from an external file) where the needed SCLs must be copied from
+ *  @param [in] KDB*    dbs         KDB of Scalars to read
+ *  @param [in] KDB*    dbs_tmp     temporary KDB (read from an external file) where the needed Scalars must be copied from
  *  @param [in] char*   source_name name of the input source (WS or filename)
- *  @return     int                 nb of SCLs copied
+ *  @return     int                 nb of Scalars copied
  *                                  -3 if there is no common sample between dbv_tmp and dbv
  */
 static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
@@ -524,7 +524,7 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
         if(pos < 0) continue;
 
         KSOVAL(dbs, j) = KS_alloc_scl();
-        memcpy(KSVAL(dbs, j), KSVAL(dbs_tmp, pos), sizeof(SCL));
+        memcpy(KSVAL(dbs, j), KSVAL(dbs_tmp, pos), sizeof(Scalar));
         if(KEXEC_TRACE) W_printf("%s ", KONAME(dbs, j));
         nb_found++;
     }
@@ -535,11 +535,11 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 
 
 /**
- *  Tries to read in file the unallocated SCLs of dbs (i.e. the SCLs with no associated object).
+ *  Tries to read in file the unallocated Scalars of dbs (i.e. the Scalars with no associated object).
  *  
- *  @param [in] KDB*    dbs     KDB of all needed SCLs for calculating the identities
- *  @param [in] char*   file    name of a SCL file
- *  @return     int             nb of SCLs read 
+ *  @param [in] KDB*    dbs     KDB of all needed Scalars for calculating the identities
+ *  @param [in] char*   file    name of a Scalar file
+ *  @return     int             nb of Scalars read 
  *                              -1 if the file cannot be opened
  *  
  */
@@ -573,17 +573,17 @@ static int KI_read_scls_file(KDB* dbs, char* file)
 
 
 /**
- *  Reads, from a list of files, the SCLs needed to compute identities. 
- *  For the SCLs to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
+ *  Reads, from a list of files, the Scalars needed to compute identities. 
+ *  For the Scalars to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
  *  
- *  @param [in] KDB*    dbs         SCLs to be read
- *  @param [in] KDB*    dbs_ws      current SCL KDB (KS_WS)
- *  @param [in] int     nb          Number of SCL input files
- *  @param [in] char*   files[]     list of input SCL files, including "WS" for the current KDB of SCLs 
- *                                  if nb == 0, the needed SCLs are read from dbs_ws
- *  @return     int                 0 on success (all SCLs have been found)
+ *  @param [in] KDB*    dbs         Scalars to be read
+ *  @param [in] KDB*    dbs_ws      current Scalar KDB (KS_WS)
+ *  @param [in] int     nb          Number of Scalar input files
+ *  @param [in] char*   files[]     list of input Scalar files, including "WS" for the current KDB of Scalars 
+ *                                  if nb == 0, the needed Scalars are read from dbs_ws
+ *  @return     int                 0 on success (all Scalars have been found)
  *                                  -1 if one of the files is not found
- *                                  -2 if some SCLs were not found in the files
+ *                                  -2 if some Scalars were not found in the files
  */
 
 static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
@@ -646,11 +646,11 @@ KDB     *dbv,  *dbi;
 
 /**
  *  Sub function of KI_exec() that links and computes all identities in dbi after 
- *  all needed VARs and SCLs have been read and saved in dbv and dbs.
+ *  all needed VARs and Scalars have been read and saved in dbv and dbs.
  *  
  *  
  *  @param [in] KDB*    dbv   Input VAR KDB
- *  @param [in] KDB*    dbs   Input SCL KDB
+ *  @param [in] KDB*    dbs   Input Scalar KDB
  *  @param [in] KDB*    dbi   KDB of identities to compute
  *  @param [in] int*    order order of execution of the identities
  *  @param [in] SAMPLE* smpl  execution SAMPLE
@@ -692,9 +692,9 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl)
  *  @param [in] KDB*    dbv         Input VAR KDB
  *  @param [in] int     nv          Number of input VAR files
  *  @param [in] char*   vfiles[]    Input VAR files
- *  @param [in] KDB*    dbs         Input SCL KDB
- *  @param [in] int     ns          number of input SCL files
- *  @param [in] char*   sfiles[]    Input SCL files
+ *  @param [in] KDB*    dbs         Input Scalar KDB
+ *  @param [in] int     ns          number of input Scalar files
+ *  @param [in] char*   sfiles[]    Input Scalar files
  *  @param [in] SAMPLE* smpl        execution SAMPLE or NULL to select the current VAR KDB sample
  *  @return     KDB*                NULL on error (illegal SAMPLE, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().

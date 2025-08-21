@@ -63,7 +63,7 @@ void L_alloc_expr(int nb)
  *  
  *  If necessary, reallocates L_NAMES by blocks of 10 elements at a time.
  *  
- *  @param [in]     name    char*   VAR of SCL name
+ *  @param [in]     name    char*   VAR of Scalar name
  *  @return                 int     position of name in L_NAMES
  *  
  */
@@ -91,7 +91,7 @@ static int L_add_new_series(char* name)
 
 /**
  *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name but also 
- *  a SCL, a PERIOD or a numerical constant.
+ *  a Scalar, a PERIOD or a numerical constant.
  *  
  *  The token is saved in the union al_val (see iode.h).
  *  

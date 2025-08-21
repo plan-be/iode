@@ -8,7 +8,7 @@ HWND WscrStatusCreate(HWND hWnd)
 
     hWndStatus = CreateWindowEx(
 	    0L,                              // no extended styles
-	    STATUSCLASSNAME,                 // status bar
+	    STATUScalarASSNAME,                 // status bar
 	    "",                              // no text
 	    WS_CHILD | WS_BORDER | WS_VISIBLE | WS_GROUP | SBT_POPOUT,  // styles
 	    -100, -100, 10, 10,              // x, y, cx, cy

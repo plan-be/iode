@@ -62,10 +62,10 @@ cdef class Scalars(CythonIodeDatabase):
         
         # update a scalar
         if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), c_scalar.val, c_scalar.relax, c_scalar.std)
+            self.database_ptr.update(name.encode(), c_scalar.value, c_scalar.relax, c_scalar.std)
         # add a new scalar
         else:
-            self.database_ptr.add(name.encode(), c_scalar.val, c_scalar.relax, c_scalar.std)
+            self.database_ptr.add(name.encode(), c_scalar.value, c_scalar.relax, c_scalar.std)
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

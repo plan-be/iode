@@ -23,7 +23,7 @@
  *      int K_epack(char **pack, char *a1, char *a2)        Packs an IODE EQ object 
  *      int K_ipack(char **pack, char *a1)                  Packs an IODE IDT object 
  *      int K_lpack(char** pack, char* a1)                  Packs an IODE LST object 
- *      int K_spack(char **pack, char *a1)                  Packs an IODE SCL object 
+ *      int K_spack(char **pack, char *a1)                  Packs an IODE Scalar object 
  *      int K_tpack(char** pack, char* a1)                  Packs an IODE TBL object 
  *      int K_vpack(char **pack, double *a1, int *a2)    Packs an IODE VAR object. 
  *      int K_opack(char** pack, char* a1, int* a2)         Reserved for future new objects
@@ -34,9 +34,9 @@
  *      EQ*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
  *      Identity* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
  * 
- * Allocation functions (VAR & SCL only)
+ * Allocation functions (VAR & Scalar only)
  * -------------------------------------
- *      int KS_alloc_scl()          Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.
+ *      int KS_alloc_scl()          Allocates space for a new Scalar (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.
  *      int KV_alloc_var(int nb)    Allocates space for a new VAR of length nb in the swap area, initialises it to IODE_NAN and returns the "swap" handle.
  * 
  * @note The "modern" terminology for pack and unpack is "serialize" and "deserialize".
@@ -429,25 +429,25 @@ int   K_epack(char **pack, char *a1, char *endo)
 
 
 /**
- * Packs a SCL object. 
+ * Packs a Scalar object. 
  *
  * @param [out] pack    (char **)       placeholder for the pointer to the packed object
- * @param [in]  a1      (char *)        pointer to the SCL. If NULL, a1 is replaced by a default SCL (.9, 1.0, NaN).
+ * @param [in]  a1      (char *)        pointer to the Scalar. If NULL, a1 is replaced by a default Scalar (.9, 1.0, NaN).
  *
  * @return int 0 
  *
- * @note No pointer in SCL, thus the pack == binary copy of the SCL
+ * @note No pointer in Scalar, thus the pack == binary copy of the Scalar
  */
 
 int K_spack(char **pack, char *a1)
 {
-    static    SCL scl = { 0.9, 1.0, IODE_NAN };
+    static    Scalar scl = { 0.9, 1.0, IODE_NAN };
 
     *pack = (char*) P_create();
     if(a1 == NULL)
-        *pack = (char*) P_add(*pack, &scl, sizeof(SCL));
+        *pack = (char*) P_add(*pack, &scl, sizeof(Scalar));
     else
-        *pack = (char*) P_add(*pack, a1, sizeof(SCL));
+        *pack = (char*) P_add(*pack, a1, sizeof(Scalar));
     return(0);
 }
 

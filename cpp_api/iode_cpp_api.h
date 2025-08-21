@@ -11,7 +11,6 @@
 #include "cpp_api/time/sample.h"
 #include "cpp_api/objects/equation.h"
 #include "cpp_api/objects/table.h"
-#include "cpp_api/objects/scalar.h"
 #include "cpp_api/KDB/kdb_global.h"
 #include "cpp_api/KDB/kdb_reference.h"
 #include "cpp_api/KDB/kdb_comments.h"

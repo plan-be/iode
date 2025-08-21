@@ -547,7 +547,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     KDB     *kdb;
     double  x;
     char    buf[80], *res;
-    SCL     *scl;
+    Scalar     *scl;
 
     SCR_vtime = 1;
     SCR_upper((unsigned char*) szTopic);
@@ -596,9 +596,9 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         case SCALARS :
             res = SCR_malloc(40);
             scl = KSVAL(kdb, objnb);
-            if(!IODE_IS_A_NUMBER(scl->val)) strcpy(res, "0");
-            //else                  SCR_fmt_dbl(scl->val, res, 16, -1); /* JMP 01-02-99 */
-            else                  IodeFmtVal(res, scl->val);    /* JMP 01-02-99 */
+            if(!IODE_IS_A_NUMBER(scl->value)) strcpy(res, "0");
+            //else                  SCR_fmt_dbl(scl->value, res, 16, -1); /* JMP 01-02-99 */
+            else                  IodeFmtVal(res, scl->value);    /* JMP 01-02-99 */
             return(res);
         default:
             return((char *)0);
@@ -951,7 +951,7 @@ int B_ExcelSet(char *arg, int type)
     int         pos, shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
     KDB         *kdb = K_WS[type];
-    SCL         *scl;
+    Scalar         *scl;
     PERIOD      *per = NULL;
     double   d;
     char        **args = NULL,
@@ -980,7 +980,7 @@ int B_ExcelSet(char *arg, int type)
             break;
         case SCALARS :
             scl = KSVAL(kdb, pos); /* JMP 10-08-00 */
-            d = scl->val;          /* JMP 10-08-00 */
+            d = scl->value;          /* JMP 10-08-00 */
             ptr = SCR_malloc(80);  /* JMP 10-08-00 */
             IodeFmtVal(ptr, d);    /* JMP 01-02-99 */
             break;                 /* JMP 10-08-00 */

@@ -84,7 +84,7 @@ une valeur négative est retournée par la fonction, valeur correspondant
        ">19  short  1  EQS file                  ",
        ">19  short  2  IDT file                  ",
        ">19  short  3  LST file                  ",
-       ">19  short  4  SCL file                  ",
+       ">19  short  4  Scalar file                  ",
        ">19  short  5  TBL file                  ",
        ">19  short  6  VAR file                  ",
        ".obj Object Module                       ",

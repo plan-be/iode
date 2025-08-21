@@ -37,10 +37,10 @@ cdef class Scalar:
         return wrapper
 
     def get_value(self) -> float:
-        return self.c_scalar.val if IODE_IS_A_NUMBER(self.c_scalar.val) else np.nan
+        return self.c_scalar.value if IODE_IS_A_NUMBER(self.c_scalar.value) else np.nan
 
-    def set_value(self, val: float):
-        self.c_scalar.val = val
+    def set_value(self, value: float):
+        self.c_scalar.value = value
         self.c_scalar.std = NA
 
     def get_relax(self) -> float:
@@ -57,7 +57,7 @@ cdef class Scalar:
         self.c_scalar.std = value
 
     def _as_tuple(self) -> Tuple[float, float, float]:
-        value = self.c_scalar.val if IODE_IS_A_NUMBER(self.c_scalar.val) else np.nan
+        value = self.c_scalar.value if IODE_IS_A_NUMBER(self.c_scalar.value) else np.nan
         relax = self.c_scalar.relax
         std = self.c_scalar.std if IODE_IS_A_NUMBER(self.c_scalar.std) else np.nan
         return value, relax, std

@@ -34,7 +34,7 @@
     - [k\_pack.c](#T28)
       - [Packing functions](#T29)
       - [Unpacking functions (for TBL and EQ only ?)](#T30)
-      - [Allocation functions (SCL & VAR only)](#T31)
+      - [Allocation functions (Scalar & VAR only)](#T31)
     - [k\_val.c](#T32)
     - [k\_eqs.c](#T33)
     - [k\_lst.c](#T34)
@@ -397,7 +397,7 @@ How to create IODE objects using K\_add():
 |Equations|K\_add(KDB\* kdb, char\* name, EQ\* eq, char\* endo) \[where endo = name\]|
 |Identities|K\_add(KDB\* kdb, char\* name, char\* lec)|
 |Lists|K\_add(KDB\* kdb, char\* name, char\* list)|
-|Scalars|K\_add(KDB\* kdb, char\* name, SCL\* scalar)|
+|Scalars|K\_add(KDB\* kdb, char\* name, Scalar\* scalar)|
 |Tables|K\_add(KDB\* kdb, char\* name, TBL \*tbl)|
 |Variables|K\_add(KDB\* kdb, char\* name, IODE\_REAL\* var, int nb\_obs) \[nb\_obs = kdb SAMPLE size\]|
 
@@ -441,7 +441,7 @@ Functions for "packing" and "unpacking" IODE objects.
 |`int K_epack(char **pack, char *a1, char *a2)`|Packs an IODE EQ object|
 |`int K_ipack(char **pack, char *a1)`|Packs an IODE IDT object|
 |`int K_lpack(char** pack, char* a1)`|Packs an IODE LST object|
-|`int K_spack(char **pack, char *a1)`|Packs an IODE SCL object|
+|`int K_spack(char **pack, char *a1)`|Packs an IODE Scalar object|
 |`int K_tpack(char** pack, char* a1)`|Packs an IODE TBL object|
 |`int K_vpack(char **pack, double *a1, int *a2)`|Packs an IODE VAR object.|
 |`int K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
@@ -456,11 +456,11 @@ Functions for "packing" and "unpacking" IODE objects.
 
 s
 
-#### Allocation functions (SCL & VAR only) {#T31}
+#### Allocation functions (Scalar & VAR only) {#T31}
 
 |Syntax|Description|
 |:---|:---|
-|`int KS_alloc_scl()`|Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.|
+|`int KS_alloc_scl()`|Allocates space for a new Scalar (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.|
 |`int KV_alloc_var(int nb)`|Allocates space for a new VAR of length nb in the swap area, initialises it to L\_NAN and returns the "swap" handle.|
 
 ### k\_val.c {#T32}
@@ -493,15 +493,15 @@ List of functions
 |`double K_e_dw (KDB* kdb, char*name)`|Returns dw calculated during the last estimation of equation name|
 |`double K_e_loglik(KDB* kdb, char*name)`|Returns loglik calculated during the last estimation of equation name|
 |**Scalar data**||
-|`double K_s_get_info(KDB* kdb, char*name, int info_nb)`|Retrieves a SCL info|
-|`double K_s_get_value (KDB* kdb, char*name)`|Retrieves a SCL value|
-|`double K_s_get_relax (KDB* kdb, char*name)`|Retrieves a SCL relax|
-|`double K_s_get_stderr(KDB* kdb, char*name)`|Retrieves a SCL stderr|
-|`double K_s_get_ttest (KDB* kdb, char*name)`|Retrieves a SCL ttest|
-|`double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)`|Sets a SCL info|
-|`double K_s_set_value (KDB* kdb, char*name)`|Sets a SCL value|
-|`double K_s_set_relax (KDB* kdb, char*name)`|Sets a SCL relax|
-|`double K_s_set_stderr(KDB* kdb, char*name)`|Sets a SCL stderr|
+|`double K_s_get_info(KDB* kdb, char*name, int info_nb)`|Retrieves a Scalar info|
+|`double K_s_get_value (KDB* kdb, char*name)`|Retrieves a Scalar value|
+|`double K_s_get_relax (KDB* kdb, char*name)`|Retrieves a Scalar relax|
+|`double K_s_get_stderr(KDB* kdb, char*name)`|Retrieves a Scalar stderr|
+|`double K_s_get_ttest (KDB* kdb, char*name)`|Retrieves a Scalar ttest|
+|`double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)`|Sets a Scalar info|
+|`double K_s_set_value (KDB* kdb, char*name)`|Sets a Scalar value|
+|`double K_s_set_relax (KDB* kdb, char*name)`|Sets a Scalar relax|
+|`double K_s_set_stderr(KDB* kdb, char*name)`|Sets a Scalar stderr|
 
 ### k\_eqs.c {#T33}
 
@@ -515,14 +515,14 @@ Functions to manipulate equation expressions and objects.
 
 ### k\_lst.c {#T34}
 
-Basic functions to manipulate lists and to extract lists of VARs and SCLs from IODE objects.
+Basic functions to manipulate lists and to extract lists of VARs and Scalars from IODE objects.
 
 |`Syntax`|Description|
 |:---|:---|
-|`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all SCL found in the kdb objects (limited to IDT, EQ or TBL).|
-|`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all SCLs from the CLEC struct.|
-|`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all SCLs from the LEC expression.|
-|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of TBLs and extracts all VARs and all SCLs from the LEC expressions found in the TCELLs.|
+|`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).|
+|`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.|
+|`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.|
+|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.|
 |`int KL_lst(char* name, char** lst, int chunck)`|Creates a list from a table of strings. The elements in the new list are separated by semi\-colons.|
 |`unsigned char **KL_expand(char *str)`|Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.|
 
@@ -707,7 +707,7 @@ For the LEC implementation, see [LEC.md](LEC.md).
 
 ### k\_lec.c {#T53}
 
-Implemention of the LEC library virtual functions for SCL and VAR references.
+Implemention of the LEC library virtual functions for Scalar and VAR references.
 
 |Syntax|Description|
 |:---|:---|

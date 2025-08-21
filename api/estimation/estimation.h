@@ -143,7 +143,7 @@ public:
      *  @param [in] char*   endos           comma separated list of equation names (endos = eqs names)
      *  @param [in] KDB*    dbe             EQS KDB (default to KV_EQS)
      *  @param [in] KDB*    dbv             VAR KDB (default to KV_VAR)
-     *  @param [in] KDB*    dbs             SCL KDB (default to KS_SCL)
+     *  @param [in] KDB*    dbs             Scalar KDB (default to KS_Scalar)
      *  @param [in] char*   from_period     first period of the estimation sample
      *  @param [in] char*   to_period       last period of the estimation sample
      *  @param [in] char    method          estimation method (0-IODE_NB_EQ_METHODS)

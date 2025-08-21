@@ -1437,7 +1437,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(int i = 0; i < 4; i++)
     {
-        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->value = 0.9;
         KSVAL(KS_WS, i)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
@@ -1445,7 +1445,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
     for(int i = 0; i < 4; i++)
     {
-        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->value = 0.9;
         KSVAL(KS_WS, i)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
@@ -1453,7 +1453,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
     for(int i = 0; i < 4; i++)
     {
-        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->value = 0.9;
         KSVAL(KS_WS, i)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
@@ -1461,7 +1461,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
     for(int i = 0; i < 4; i++)
     {
-        KSVAL(KS_WS, i)->val = 0.9;
+        KSVAL(KS_WS, i)->value = 0.9;
         KSVAL(KS_WS, i)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");

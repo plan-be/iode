@@ -39,8 +39,10 @@ static int K_cmplg(char* p1, char* p2, char* name)
     l1 = * (OSIZE *) p1;
     l2 = * (OSIZE *) p2;
 
-    if(l1 != l2 || memcmp(p1, p2, l1) != 0) return(1);
-    else return(0);
+    if(l1 != l2 || memcmp(p1, p2, l1) != 0) 
+        return(1);
+    else 
+        return(0);
 }
 
 int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
@@ -143,25 +145,12 @@ done :
     return(rc);
 }
 
-int K_cmp_scl(SCL* scl1, SCL* scl2)
+int K_cmp_scl(Scalar* scl1, Scalar* scl2)
 {
-    int rc;
-    char* p1 = NULL; 
-    char* p2 = NULL;
-
     if(scl1 == NULL || scl2 == NULL) 
         return 1;
 
-    rc = K_spack(&p1, (char*) scl1);
-    rc = K_spack(&p2, (char*) scl2);
-    if(p1 == NULL || p2 == NULL || rc)
-        return 1;
-        
-    rc = K_cmplg(p1, p2, NULL);
-
-    SCR_free(p1);
-    SCR_free(p2);
-    return rc;
+    return *scl1 == *scl2;
 }
 
 int K_cmp_tbl(TBL* tbl1, TBL* tbl2)

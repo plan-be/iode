@@ -38,7 +38,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, c
  *  Retrieves (in a list of char*) the names of all scalars in a CLEC structure.
  *  
  *  @param [in] CLEC*   clec    compiled LEC expression
- *  @param [in] char*** scl     table of SCL names found in clec
+ *  @param [in] char*** scl     table of Scalar names found in clec
  *  @return     int             nb of scalars in clec
  */
 static int E_GetScls(CLEC* clec, char*** scl)                                            
@@ -61,7 +61,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
  *  
  *  @param [in] int     relax   if 1, sets the scalar VALUE to 0.9 and its relax to 1.0
  *                              else, sets the scalar VALUE to 0.0 and its relax to 0.0
- *  @param [in] char*   name    name of the SCL
+ *  @param [in] char*   name    name of the Scalar
  */
 static void E_SetScl(int relax, char* name)                                             
 {
@@ -177,7 +177,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, c
  *      nbscl : 3
  *  
  *      RUN 1 (i = 1)  => c1
- *                               RUN & CSCL
+ *                               RUN & CScalar
  *      j=0: 001 & 001  = 001 => c1 est
  *      j=1: 001 & 010  = 000 => c2 non est
  *      j=2: 001 & 100  = 000 => c3 non est

@@ -594,7 +594,7 @@ static int K_lxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 
 
 /**
- *  Translates a little-endian packed SCL into a big-endian packed SCL or the opposite.
+ *  Translates a little-endian packed Scalar into a big-endian packed Scalar or the opposite.
  *  Same behaviour as K_cxdr().
  */
  

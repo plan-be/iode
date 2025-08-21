@@ -1,7 +1,7 @@
 /**
  * @header4iode
  *
- * Functions to load and save ascii definitions of IODE SCL objects.
+ * Functions to load and save ascii definitions of IODE Scalar objects.
  *
  *      KDB *load_asc(char* filename)
  *      int save_asc(KDB* kdb, char* filename)
@@ -16,7 +16,7 @@
 
 
 /**
- *  Reads on an open YY stream (file or string) the ascii definition of an IODE SCL and adds the new SCL to kdb. 
+ *  Reads on an open YY stream (file or string) the ascii definition of an IODE Scalar and adds the new Scalar to kdb. 
  *  Subfn of load_asc().
  *  
  *  Reads 3 values on yy. Each token must be a number (long or double). If not : 
@@ -24,20 +24,20 @@
  *      the second value (relax) is replaced by 1.0
  *      the 3d value (stderr) is replaced by IODE_NAN
  *  
- *  @param [in, out ]   kdb     KDB*    KDB of SCLs
+ *  @param [in, out ]   kdb     KDB*    KDB of Scalars
  *  @param [in, out]    yy      YYFILE* stream (file or string) to be read 
- *  @param [in]         name    char*   SCL name
- *  @return                     int     0 if the SCL is read and saved, -1 if it can't be created.
+ *  @param [in]         name    char*   Scalar name
+ *  @return                     int     0 if the Scalar is read and saved, -1 if it can't be created.
  *  
  */
 static int read_scl(KDB* kdb, YYFILE* yy, char* name)
 {
     int     keyw, pos;
-    SCL     scl;
+    Scalar     scl;
 
     /* READ AT MOST 3 REALS */
-    scl.val = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl.val)) scl.val = 0.9;
+    scl.value = K_read_real(yy);
+    if(!IODE_IS_A_NUMBER(scl.value)) scl.value = 0.9;
     scl.relax = K_read_real(yy);
     if(!IODE_IS_A_NUMBER(scl.relax)) scl.relax = 1.0;
     scl.std = K_read_real(yy);
@@ -59,9 +59,9 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
 }
 
 /**
- *  Loads SCLs from an ASCII file and saves the SCLs into a new KDB.
+ *  Loads Scalars from an ASCII file and saves the Scalars into a new KDB.
  *  
- *  Syntax of SCL ascii definitions 
+ *  Syntax of Scalar ascii definitions 
  *  -------------------------------
  *      sclname [value [relax [stderr]]]
  *  
@@ -80,8 +80,8 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
  *  The implementations of kerror() and kmsg() depend on the context.
  *  
  *  @param [in] filename    char*   name of the ascii file to be read or 
- *                                  string containing the definition of the SCLs
- *  @return                 KDB*    new KDB of SCL or NULL on error
+ *                                  string containing the definition of the Scalars
+ *  @return                 KDB*    new KDB of Scalar or NULL on error
  *  
  *  TODO: what if read_cmt returns an error code ?
  *  
@@ -137,15 +137,15 @@ KDB* AsciiScalars::load_asc(char* filename)
 }
 
 /**
- *  Writes the definition of a SCL to a file. IODE_NAN are represented by na.
+ *  Writes the definition of a Scalar to a file. IODE_NAN are represented by na.
  *  
  *  @param [in] fd  pointer to a FILE
- *  @param [in] scl pointer to the SCL
+ *  @param [in] scl pointer to the Scalar
  *  
  */
-static void print_scl(FILE* fd, SCL* scl)
+static void print_scl(FILE* fd, Scalar* scl)
 {
-    if(IODE_IS_A_NUMBER(scl->val)) fprintf(fd, "%.14lg ", (double)(scl->val)); /* JMP 06/10/2022 */ 
+    if(IODE_IS_A_NUMBER(scl->value)) fprintf(fd, "%.14lg ", (double)(scl->value)); /* JMP 06/10/2022 */ 
     else fprintf(fd, "na ");
 
     if(IODE_IS_A_NUMBER(scl->relax)) fprintf(fd, "%.14lg ", (double)(scl->relax)); /* JMP 06/10/2022 */
@@ -156,11 +156,11 @@ static void print_scl(FILE* fd, SCL* scl)
 }
 
 /**
- *  Saves a KDB of SCLs into an ascii file (.as) or to the stdout.
+ *  Saves a KDB of Scalars into an ascii file (.as) or to the stdout.
  *  
  *  @see load_asc() for the syntax. 
  *  
- *  @param [in] kdb         KDB*    KDB of SCLs
+ *  @param [in] kdb         KDB*    KDB of Scalars
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
@@ -169,7 +169,7 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
-    SCL     *scl;
+    Scalar     *scl;
 
     if(filename[0] == '-') fd = stdout;
     else {
@@ -192,7 +192,7 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
 }
 
 /* 
- * Save a KDB of SCL in a .csv file.
+ * Save a KDB of Scalar in a .csv file.
  * NOT IMPLEMENTED.
  */
 int AsciiScalars::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)

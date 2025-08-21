@@ -1,14 +1,14 @@
 /**
  * @header4iode
  *
- *  Basic functions to manipulate lists and to extract lists of VARs and SCLs from IODE objects.
+ *  Basic functions to manipulate lists and to extract lists of VARs and Scalars from IODE objects.
  *  
  *  List of functions 
  *  -----------------
- *    int K_scan(KDB* kdb, char* l_var, char* l_scal)       Analyses a KDB content and creates 2 lists with all VAR and all SCL found in the kdb objects (limited to IDT, EQ or TBL).
- *    void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of EQs and extracts all VARs and all SCLs from the CLEC struct.
- *    void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB dbi of IDTs and extracts all VARs and all SCLs from the LEC expression.
- *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of TBLs and extracts all VARs and all SCLs from the LEC expressions found in the TCELLs.
+ *    int K_scan(KDB* kdb, char* l_var, char* l_scal)       Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).
+ *    void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
+ *    void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
+ *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.
  *    int KL_lst(char* name, char** lst, int chunck)        Creates a list from a table of strings. The elements in the new list are separated by semi-colons.
  *    unsigned char **KL_expand(char *str)                  Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.
  */ 
@@ -25,11 +25,11 @@
 
 
 /**
- *  Analyses a KDB content and creates 2 lists with all VAR and all SCL found in the kdb objects (limited to IDT, EQ or TBL).
+ *  Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).
  *  
  *  @param [in] KDB*  kdb    KDB to be analysed. Only possible for IDT, EQ or TBL KDB.
  *  @param [in] char* l_var  name of the list that will contain the resulting list of VAR
- *  @param [in] char* l_scal name of the list that will contain the resulting list of SCL
+ *  @param [in] char* l_scal name of the list that will contain the resulting list of Scalar
  *  @return     int        
  *  
  */
@@ -118,13 +118,13 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
 
 
 /**
- *  Analyses object i from a KDB of EQs and extracts all VARs and all SCLs from the CLEC struct.
+ *  Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
  *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbe    KDB of equations
  *  @param [in]      int  i      position of the equation in the dbe
  *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbe[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all SCL names found in dbe[i]
+ *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbe[i]
  *  @return          void
  *  
  */
@@ -141,14 +141,14 @@ void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
 
 
 /**
- *  Analyses object i from a KDB dbi of IDTs and extracts all VARs and all SCLs from the LEC expression.
+ *  Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
  *  
  *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbi    KDB of identities
  *  @param [in]      int  i      position of the identity in the dbi
  *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbi[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all SCL names found in dbi[i]
+ *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbi[i]
  *  @return          void
  *  
  */
@@ -167,14 +167,14 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
 
 
 /**
- *  Analyses object i from a KDB of TBLs and extracts all VARs and all SCLs from the LEC expressions found in the TCELLs.
+ *  Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.
  *  
  *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbt    KDB of tables
  *  @param [in]      int  i      position of the table in the dbt
  *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbt[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all SCL names found in dbt[i]
+ *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbt[i]
  *  @return          void
  *  
  */

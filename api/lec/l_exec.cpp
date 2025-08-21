@@ -347,7 +347,7 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
  *  
  *  @param [in] char*       lec     LEC expression 
  *  @param [in] KDB*        dbv     KDB of variables used in lec 
- *  @param [in] KDB*        dbs     KDB of SCL used in lec
+ *  @param [in] KDB*        dbs     KDB of Scalar used in lec
  *  @return     double*          calculated lec expression on the whole dbv sample    
  *                                  NULL on error (error can be retrieved via a call to L_error()
  */

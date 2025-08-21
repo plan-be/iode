@@ -8,7 +8,7 @@
     - [Introduction](#T2)
     - [Order of execution](#T3)
       - [Example](#T4)
-    - [VAR and SCL source files](#T5)
+    - [VAR and Scalar source files](#T5)
     - [Execution sample](#T6)
     - [List of functions](#T7)
 
@@ -34,7 +34,7 @@ Suppose we have 3 identities to execute:
 
 The order of execution is automatically calcuted => \[1, 0, 2\]. Indeed, B must be computed before A because A is a successor of B. E remains in 3d position.
 
-### VAR and SCL source files {#T5}
+### VAR and Scalar source files {#T5}
 
 The variables and scalars needed to compute the identities are read either in the current WS or in a set of external files.
 

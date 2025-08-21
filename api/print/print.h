@@ -142,7 +142,7 @@ enum IodeGraphChartType
     G_LINE = 100,
     G_SCATTER,
     G_BAR,
-    G_SCLINE,
+    G_ScalarINE,
     G_SBAR,
     G_PBAR,
     G_FILL
