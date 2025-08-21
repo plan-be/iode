@@ -641,7 +641,7 @@ U_ch *RPF_month(U_ch** args)
 U_ch *RPF_sstderr(U_ch** args)
 {
     int     i, pos;
-    SCL     *scl;
+    Scalar     *scl;
     U_ch    *res = 0, buf[80];
 
     for(i = 0 ; args[i] ; i++) {
@@ -673,7 +673,7 @@ U_ch *RPF_sstderr(U_ch** args)
 U_ch *RPF_srelax(U_ch** args)
 {
     int     i, pos;
-    SCL     *scl;
+    Scalar     *scl;
     U_ch    *res = 0, buf[80];
 
     for(i = 0 ; args[i] ; i++) {

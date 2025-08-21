@@ -473,7 +473,7 @@ Example::
 
 .. _wsclear:
 
-COMMAND WSCLEARXXX
+COMMAND WScalarEARXXX
 ^^^^^^^^^^^^^^^^^^
 
 *XXX* takes one of the following values::
@@ -494,7 +494,7 @@ Example::
 
 .. _wsclearall:
 
-COMMAND WSCLEARALL
+COMMAND WScalarEARALL
 ^^^^^^^^^^^^^^^^^^
 
 Clear all workspaces.
@@ -1675,7 +1675,7 @@ Syntax::
     $DataWidthTbl n
     n between 2 and 60
 
-COMMAND DATAWIDTHSCL
+COMMAND DATAWIDTHScalar
 ^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify the number of decimals when editing scalars.
@@ -3524,7 +3524,7 @@ Example::
 
 .. _idtexecutesclfiles:
 
-COMMAND IDTEXECUTESCLFILES
+COMMAND IDTEXECUTEScalarFILES
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command is part of a group of commands that allow you to specify additional parameters 

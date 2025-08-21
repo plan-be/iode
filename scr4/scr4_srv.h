@@ -35,11 +35,11 @@ typedef struct _issclient_ {
     char    ip[30];
     char    iptxt[50];
     int     defunct;
-} ISSCLIENT;
+} ISScalarIENT;
 
 extern HWND        hWndServer, hWndClient;
 extern int         ISS_NB_CLIENTS, ISS_MAX_CLIENTS;
-extern ISSCLIENT   *ISS_CLIENTS;
+extern ISScalarIENT   *ISS_CLIENTS;
 #endif
 
 

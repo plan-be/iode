@@ -194,8 +194,8 @@ void EditAndEstimateEquations::update_scalars()
             if(Scalars.contains(name))
             {
                 // yes -> copy scalars from the global database to 'kdb_scl' 
-                Scalar scl = Scalars.get(name);
-                kdb_scl->add(name, scl);
+                Scalar* scl = Scalars.get(name);
+                kdb_scl->add(name, *scl);
             }
             else
                 // no -> add a new scalar with value = 0.0 and relax = 1.0 to 'kdb_scl'

@@ -34,17 +34,17 @@ double *L_getvar(KDB* kdb, int pos)
 /**
  *  Implementation of L_getscl() in the context of IODE objects. Retrieves a scalar value.
  *  
- *  @param [in] kdb     KDB*        KDB of SCL from which the scalar value has to be retrieved
- *  @param [in] pos     int         pos of the SCL in kdb
+ *  @param [in] kdb     KDB*        KDB of Scalar from which the scalar value has to be retrieved
+ *  @param [in] pos     int         pos of the Scalar in kdb
  *  @return             IODE_READ   value of the scalar
  *  
  */
 double L_getscl(KDB* kdb, int pos)
 {
-    SCL *scl;
+    Scalar *scl;
 
     scl = KSVAL(kdb, pos);
-    return(scl->val);
+    return(scl->value);
 }
 
 
@@ -65,7 +65,7 @@ SAMPLE *L_getsmpl(KDB* kdb)
 /**
  *  Implementation of L_findscl() in the context of IODE objects. Retrieves a scalar position.
  *  
- *  @param [in] kdb     KDB*        KDB of SCL from which the scalar postion has to be retrieved
+ *  @param [in] kdb     KDB*        KDB of Scalar from which the scalar postion has to be retrieved
  *  @param [in] name    char*       name of the scalar
  *  @return             int         position of name in KDB 
  *  

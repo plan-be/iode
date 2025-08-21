@@ -37,7 +37,7 @@ No differences are made between linear and non linear equations: in both cases, 
 
 The functions related to estimation are divided in the following source files:
 
-- k\_est.c: functions linking the estimation package (e\_\*.c) to the workspaces of EQ and SCL
+- k\_est.c: functions linking the estimation package (e\_\*.c) to the workspaces of EQ and Scalar
 - e\_estim.c: main estimation functions
 - e\_prep.c: construction (and destruction) of the matrices needed during the estimation process
 - e\_tests.c: calculation of statistical tests
@@ -71,9 +71,9 @@ These scalars and variables are "volatile" in the sense that they will be replac
 
 ### k\_est.c {#T3}
 
-These functions link the data in the current workspaces (EQ, SCL) and the estimation package.
+These functions link the data in the current workspaces (EQ, Scalar) and the estimation package.
 
-Before starting the estimation itself, the values of the coefficients, the LEC forms, the estimation methods, etc, are read from the EQ and the SCL in the current workspaces.
+Before starting the estimation itself, the values of the coefficients, the LEC forms, the estimation methods, etc, are read from the EQ and the Scalar in the current workspaces.
 
 After the estimation, if a solution is found, the results are stored in the workspaces by the functions in that group.
 

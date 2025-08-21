@@ -6,7 +6,7 @@
  *  List of functions 
  *  -----------------
  *    int B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
- *    double B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or IODE_NAN if it cannot be determined.
+ *    double B_calc_ttest(Scalar* scl)                                 | Return the t-test of a scalar or IODE_NAN if it cannot be determined.
  *    int B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
  *    int B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
  *    int B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
@@ -29,7 +29,7 @@
  *    int B_PrintDefEqs(KDB* kdb, int pos)                             | Print a equation.
  *    int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs) | Print a LEC expression. Set the engogenous (name) in bold.
  *    int B_PrintEqs(char* name, EQ* eq)                               | Print an equation and optionally its statistical tests.
- *    int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)             | Print a scalar in an enumeration list.
+ *    int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)             | Print a scalar in an enumeration list.
  *    int B_PrintDefScl(KDB* kdb, int pos)                             | Print the scalar kdb[pos].
  *    int B_PrintDefVar(KDB* kdb, int pos)                             | Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
  *
@@ -79,13 +79,13 @@ int B_PrintVal(double val)
 /**
  *  Return the t-test of a scalar or IODE_NAN if it cannot be determined.
  *      
- *  @param [in] scl SCL*    given scalar 
+ *  @param [in] scl Scalar*    given scalar 
  *  @return         double  value / stderr 
  */
-double B_calc_ttest(SCL* scl)
+double B_calc_ttest(Scalar* scl)
 {
-    if(IODE_IS_A_NUMBER(scl->val) && IODE_IS_A_NUMBER(scl->std) && !IODE_IS_0(scl->std))
-        return(scl->val / scl->std);
+    if(IODE_IS_A_NUMBER(scl->value) && IODE_IS_A_NUMBER(scl->std) && !IODE_IS_0(scl->std))
+        return(scl->value / scl->std);
     return(IODE_NAN);
 }
 
@@ -605,7 +605,7 @@ int B_PrintDefEqs(KDB* kdb, int pos)
 int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
 {
     CLEC    *clec;
-    SCL     *scl;
+    Scalar     *scl;
     char    *lec, *sname, buf[80], tcoef[128], ttest[128];
     int     j, pos, lg;
 
@@ -625,9 +625,9 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
             pos = K_find(KS_WS, sname);
             if(pos >= 0) {
                 scl = KSVAL(KS_WS, pos);
-                // T_fmt_val(tcoef, scl->val, 9, -1); /* JMP 27-10-08 */
+                // T_fmt_val(tcoef, scl->value, 9, -1); /* JMP 27-10-08 */
                 // T_fmt_val(ttest, B_calc_ttest(scl), 9, -1); /* JMP 27-10-08 */
-                T_fmt_val(tcoef, scl->val, 15, K_NBDEC);           // JMP 18-04-2022
+                T_fmt_val(tcoef, scl->value, 15, K_NBDEC);           // JMP 18-04-2022
                 T_fmt_val(ttest, B_calc_ttest(scl), 15, K_NBDEC);  // JMP 18-04-2022
                 if(coefs == 1) sprintf(buf, "%ci%s%cI", A2M_ESCCH, tcoef, A2M_ESCCH);
                 if(coefs == 2) sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef, ttest, A2M_ESCCH);
@@ -713,17 +713,17 @@ int B_PrintEqs(char* name, EQ* eq)
 }
 
 
-/*================================= SCL ================================*/
+/*================================= Scalar ================================*/
 
 /**
  *  Print a scalar.
  *  
- *  @param [in] scl   SCL*      scalar struct  
+ *  @param [in] scl   Scalar*      scalar struct  
  *  @param [in] name  char*     scalar name
  *  @param [in] enum_ int       enum level 
  *  @return           int       -1 is scl is NULL, 0 otherwise
  */
-int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)
+int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)
 {
     double  ttest;
     char    tcoef[128], trelax[128], tstd[128], tttest[128];
@@ -734,7 +734,7 @@ int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)
         return(-1);
     }
 
-    T_fmt_val(tcoef, (double)scl->val, 15, K_NBDEC); // JMP 18-04-2022
+    T_fmt_val(tcoef, (double)scl->value, 15, K_NBDEC); // JMP 18-04-2022
     T_fmt_val(trelax, (double)scl->relax, 15, -1);
     T_fmt_val(tstd, (double)scl->std, 15, K_NBDEC);  // JMP 18-04-2022
     ttest = B_calc_ttest(scl);

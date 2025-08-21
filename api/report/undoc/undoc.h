@@ -163,7 +163,7 @@ inline int B_EQS_LEC;      // Specify how to print a LEC expression
                            //    2 : replaced all scalars by their values + t-tests
 
 int B_PrintVal(double );
-double B_calc_ttest(SCL *);
+double B_calc_ttest(Scalar *);
 int B_replesc(unsigned char *,unsigned char *);
 int B_PrintDefGnl(char *,char *);
 int B_isdef(char* arg);
@@ -184,7 +184,7 @@ int B_PrintDefIdt(KDB *,int );
 int B_PrintDefEqs(KDB *,int );
 int B_PrintLec(char *,char *,CLEC *,int );
 int B_PrintEqs(char *,EQ *);
-int B_PrintDefSclPtr(SCL *,char *,int );
+int B_PrintDefSclPtr(Scalar *,char *,int );
 int B_PrintDefScl(KDB *,int );
 int B_PrintDefVar(KDB *,int );
 

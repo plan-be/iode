@@ -223,7 +223,7 @@ int Estimation::E_c_mcorru()
 int Estimation::E_c_ttests()
 {
     int     i, j;
-    SCL     *scl;
+    Scalar     *scl;
 
     for(i = 0, j = 0 ; i < E_NC ; i++) {
         scl = KSVAL(E_DBS, E_C_NBS[i]);

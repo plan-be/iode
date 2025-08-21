@@ -190,15 +190,15 @@ int Estimation::E_jacobian()
 
     for(i = 0, j = 0 ; i < E_NC ; i++) {
         if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0) {      // Uniquement pour les coef estimés (relax <> 0)
-            oldc = KSVAL(E_DBS, E_C_NBS[i])->val;       // Stocke l'ancienne valeur du coef
+            oldc = KSVAL(E_DBS, E_C_NBS[i])->value;       // Stocke l'ancienne valeur du coef
             if(fabs(oldc) < 1e-15) oldc = 0.1;          //   ou 0.1 si coef proche de nul
-            KSVAL(E_DBS, E_C_NBS[i])->val = oldc * (1.0 + h); // coef augmenté de h pourcents
+            KSVAL(E_DBS, E_C_NBS[i])->value = oldc * (1.0 + h); // coef augmenté de h pourcents
             if(0 != E_mod_residuals(i, j, oldc * h)) {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                KSVAL(E_DBS, E_C_NBS[i])->val = oldc;   // remet l'ancienne valeur du coef
+                KSVAL(E_DBS, E_C_NBS[i])->value = oldc;   // remet l'ancienne valeur du coef
                 return(-1);
             }
-            KSVAL(E_DBS, E_C_NBS[i])->val = oldc;       /* reset coef */
+            KSVAL(E_DBS, E_C_NBS[i])->value = oldc;       /* reset coef */
             j++;
         }
     }

@@ -156,20 +156,6 @@ inline std::string trim(const std::string& str)
 }
 
 
-/**
- * @brief Combines a hash value with a new value using bitwise XOR and shifts.
- * 
- * @tparam T The type of the value to be combined with the hash.
- * @param seed The current hash value to be combined with the new value.
- * @param value The new value to be combined with the hash.
- */
-template <typename T>
-inline void hash_combine(std::size_t& seed, const T& value) 
-{
-    std::hash<T> hasher;
-    seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
 static IodeRegexName get_regex_name(const int type)
 {
     IodeRegexName nre;

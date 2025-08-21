@@ -76,7 +76,7 @@ int B_IdtExecute(char* arg, int unused)
 /**
  *  Executes a group of identities on a defined sample. 
  *  
- *  The input VAR and SCL files are found in the globals KEXEC_VFILES and KEXEC_SFILES that
+ *  The input VAR and Scalar files are found in the globals KEXEC_VFILES and KEXEC_SFILES that
  *  are specified via the functions B_IdtExecuteVarFiles() and B_IdtExecuteSclFiles().
  *  
  *  At the end of the functions, KEXEC_VFILES and KEXEC_SFILES are reset to NULL.
@@ -144,7 +144,7 @@ int B_IdtExecuteVarFiles(char* arg, int unused)
 
 
 /**
- *  Report function that defines the list of external SCL files where the next call to B_IdtExecute() 
+ *  Report function that defines the list of external Scalar files where the next call to B_IdtExecute() 
  *  will search the scalars needed to compute the identities.
  *  
  *  Syntax: $IdtExecuteSclFiles file1 [file2 ...]

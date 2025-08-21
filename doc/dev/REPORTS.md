@@ -736,7 +736,7 @@ For these functions, the parameters and return values are as follows:
 |`int B_DataUpdate(char* arg, int type)`|Updates an object. The syntax can differ according to the object type.|
 |`int B_DataSearch(char* arg, int type)`|Searches all objects containing a given string in their names and/or definitions.|
 |`int B_DataListSort(char* arg, int unused)`|Sorts a list alphanumerically.|
-|`int B_DataScan(char* arg, int type)`|Analyses a KDB content and creates 2 lists \_EXO and \_SCAL with all VAR and all SCL found in the kdb objects.|
+|`int B_DataScan(char* arg, int type)`|Analyses a KDB content and creates 2 lists \_EXO and \_SCAL with all VAR and all Scalar found in the kdb objects.|
 |`int B_DataExist(char* arg, int type)`|Checks that an object exists. Returns \-1 if not, the object position in WS otherwise.|
 |`int B_DataAppend(char* arg, int type)`|Appends data (a string) to a CMT or a LST.|
 |`int B_DataList(char* arg, int type)`|Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.|
@@ -941,7 +941,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 |Syntax|Description or equivalent in Reports|||
 |:---|:---|:---|:---|
 |`int B_PrintVal(double val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
-|`double B_calc_ttest(SCL* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
+|`double B_calc_ttest(Scalar* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
 |`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
 |`int B_PrintDefGnl(char* name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
 |`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||
@@ -964,7 +964,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||
 |`int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
 |`int B_PrintEqs(char* name, EQ* eq)`|Print an equation and optionally its statistical tests.|||
-|`int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)`|Print a scalar in an enumeration list.|||
+|`int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)`|Print a scalar in an enumeration list.|||
 |`int B_PrintDefScl(KDB* kdb, int pos)`|Print the scalar kdb\[pos\].|||
 |`int B_PrintDefVar(KDB* kdb, int pos)`|Print the variable kdb\[pos\] in a table. Sub\-function of B\_PrintObjDef\_1().|||
 

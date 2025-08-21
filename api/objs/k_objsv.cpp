@@ -40,7 +40,7 @@
  *    - Equations   K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
  *    - Identities  K_add(KDB* kdb, char* name, char* lec)
  *    - Lists       K_add(KDB* kdb, char* name, char* list)
- *    - Scalars     K_add(KDB* kdb, char* name, SCL* scalar)
+ *    - Scalars     K_add(KDB* kdb, char* name, Scalar* scalar)
  *    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
  *    - Variables   K_add(KDB* kdb, char* name, double* var, int* nb_obs) [nb_obs = kdb SAMPLE size]
  *  
@@ -76,7 +76,7 @@ int K_add(KDB* kdb, char* name, ...)
     char*   endo;
     char*   txt;
     char*   lec;
-    SCL*    scl;
+    Scalar*    scl;
     TBL*    tbl;
     double* var;
     int*    lgptr;
@@ -107,7 +107,7 @@ int K_add(KDB* kdb, char* name, ...)
           rc = K_lpack(&pack, txt);
           break;            
       case SCALARS: 
-          scl = va_arg(vargs, SCL *);
+          scl = va_arg(vargs, Scalar *);
           rc = K_spack(&pack, (char*) scl);
           break;            
       case TABLES: 

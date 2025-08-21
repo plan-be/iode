@@ -6,11 +6,12 @@ from libcpp cimport bool
 
 # declare C++ Scalar class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
-cdef extern from "cpp_api/objects/scalar.h":
+cdef extern from "api/objs/scalars.h":
     cdef cppclass CScalar "Scalar":
-        double val
+        double value
         double relax
         double std
+        
         CScalar() except +
         CScalar(const CScalar& other) except +
         CScalar(const double, const double) except +

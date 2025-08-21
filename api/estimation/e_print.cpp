@@ -88,7 +88,7 @@ void Estimation::E_print_instrs()
 void Estimation::E_print_coefs()
 {
     int     i;
-    SCL     *scl;
+    Scalar     *scl;
 
     W_print_tb("Coefficients and tests", 5);
     W_printfRepl("&1CName&1CValue&1CStandard Error&1CT-Statistic&1CRelax\n");
@@ -98,9 +98,9 @@ void Estimation::E_print_coefs()
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
                  KONAME(E_DBS, E_C_NBS[i]),
-                 (double) scl->val,
+                 (double) scl->value,
                  (double) scl->std,
-                 (double) E_div_0(scl->val, scl->std),
+                 (double) E_div_0(scl->value, scl->std),
                  (double) scl->relax);
     }
     W_printf(".te\n");

@@ -840,9 +840,9 @@ Syntax::
 
 Example::
 
-     $DataUpdateLst SCLLST @sliste(@eexpand(*))
+     $DataUpdateLst ScalarLST @sliste(@eexpand(*))
 
-creates the list *SCLLST* containing all IODE scalars used in the equations of the workspace.
+creates the list *ScalarLST* containing all IODE scalars used in the equations of the workspace.
 
 See also :ref:`@vliste <vliste>`.
 

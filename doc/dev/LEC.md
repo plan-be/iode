@@ -377,7 +377,7 @@ Hodrick\-Prescott filter. These functions are subfunctions of L\_hp\*() defined 
 
 ### k\_lec.c {#T30}
 
-Implemention of the LEC library virtual functions for SCL and VAR references.
+Implemention of the LEC library virtual functions for Scalar and VAR references.
 
 |Syntax|Description|
 |:---|:---|

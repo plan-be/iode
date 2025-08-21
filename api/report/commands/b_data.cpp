@@ -81,7 +81,7 @@
  *      int B_DataUpdate(char* arg, int type)       Updates an object. The syntax can differ according to the object type.
  *      int B_DataSearch(char* arg, int type)       Searches all objects containing a given string in their names and/or definitions.
  *      int B_DataListSort(char* arg, int unused)               Sorts a list alphanumerically. 
- *      int B_DataScan(char* arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all SCL found in the kdb objects.
+ *      int B_DataScan(char* arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects.
  *      int B_DataExist(char* arg, int type)        Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
  *      int B_DataAppend(char* arg, int type)       Appends data (a string) to a CMT or a LST.
  *      int B_DataList(char* arg, int type)         Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.
@@ -482,7 +482,7 @@ int B_DataUpdate(char* arg, int type)
                             i, mode;
     double  var;
     KDB     *kdb = K_WS[type];
-    SCL     scl;
+    Scalar     scl;
     PERIOD  *per = NULL;
     char    name[K_MAX_NAME + 1], **args = NULL;
 
@@ -512,17 +512,17 @@ int B_DataUpdate(char* arg, int type)
     case SCALARS : /* Name Val [Relax] */
         args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
         nb_args = SCR_tbl_size((unsigned char**) args);
-        scl.val = 0.9;
+        scl.value = 0.9;
         scl.relax = 1.0;
         scl.std = IODE_NAN;
 
         switch(nb_args) {
         case 2:
-            scl.val = (double) atof(args[1]);
+            scl.value = (double) atof(args[1]);
             break;
 
         case 3:
-            scl.val = (double) atof(args[1]);
+            scl.value = (double) atof(args[1]);
             scl.relax = (double) atof(args[2]);
             break;
         default :
@@ -826,7 +826,7 @@ done:
 
 
 /**
- *  Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all SCL found in the kdb objects (limited to IDT, EQ or TBL).
+ *  Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).
  *  
  *  Syntax
  *  ------

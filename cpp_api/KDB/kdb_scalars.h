@@ -1,6 +1,6 @@
 #pragma once
 #include "kdb_template.h"
-#include "cpp_api/objects/scalar.h"
+#include "api/objs/scalars.h"
 
 
 class KDBScalars : public KDBTemplate<Scalar*>
@@ -56,7 +56,7 @@ inline std::size_t hash_value(KDBScalars const& cpp_kdb)
     {
         char* o_name = kdb->k_objs[pos].o_name;
         hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
-        hash_combine<SCL>(seed, *KSVAL(kdb, pos));
+        hash_combine<Scalar>(seed, *KSVAL(kdb, pos));
     }
     return seed;
 }

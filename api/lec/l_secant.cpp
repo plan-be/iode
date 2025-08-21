@@ -117,7 +117,7 @@ static int L_bracket(double* x1, double* x2, int t)
  *      
  *  
  *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
- *  @param [in] KDB*    dbs     KDB of SCL with which the equation has been linked
+ *  @param [in] KDB*    dbs     KDB of Scalar with which the equation has been linked
  *  @param [in] CLEC*   clec    compiled LEC expression 
  *  @param [in] int     t       time of calculation (index in dbv SAMPLE)
  *  @param [in] int     varnb   position of the endogenous variable in dbv

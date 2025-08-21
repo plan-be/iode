@@ -60,7 +60,7 @@ static CLEC *COL_cp_clec(CLEC* clec)
 
 
 /**
- *  Links a CLEC. The VAR KDB file is K_RWS[VARIABLES][i - 1]. The SCL KDB is the current workspace. 
+ *  Links a CLEC. The VAR KDB file is K_RWS[VARIABLES][i - 1]. The Scalar KDB is the current workspace. 
  *  
  *  @param [in] int     i       position of the KBD pointer in K_RWS[VARIABLES], starting at 1 for pos 0
  *  @param [in] CLEC*   clec    Compiled LEC to link with K_RWS[VARIABLES]]i - 1]
@@ -87,7 +87,7 @@ static int COL_link(int i, CLEC* clec)
  *  
  *  First links clec and dclec (divisor) according to the COL definition (which 
  *  includes the files numbers and periods, that both refer to K_WS[VARIABLES]). 
- *  The linking of scalars is always done with KS_WS, the current SCL workspace.
+ *  The linking of scalars is always done with KS_WS, the current Scalar workspace.
  *  
  *  The result is stored in cl->cl_res, which is IODE_NAN on error.
  *       

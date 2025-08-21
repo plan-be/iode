@@ -45,9 +45,9 @@
 void Estimation::E_savescl(double val, int eqnb, char*txt)  
 {
     char    buf[40];                        // JMP 25/04/2022 : 20 -> 40 
-    static SCL  scl = {0.9, 1.0, IODE_NAN}; // Why static ?
+    static Scalar  scl = {0.9, 1.0, IODE_NAN}; // Why static ?
 
-    scl.val = val;
+    scl.value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
     K_add(KS_WS, buf, &scl);
 }
@@ -173,7 +173,7 @@ int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float
  *  Estimates an equation or a block of equations.
  *  
  *  On success, the following results are produced:
- *      - estimated coefficients + stderr in SCL under their names (c1, c2 ...)
+ *      - estimated coefficients + stderr in Scalar under their names (c1, c2 ...)
  *      - equation tests : 
  *          - in the equations themselves (in eq->eq_tests)
  *          - in global scalars in the form e<eqnb>_<testname> (e.g.: e0_dw, e1_r2...)

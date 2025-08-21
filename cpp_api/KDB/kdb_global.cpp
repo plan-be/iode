@@ -130,10 +130,8 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     std::string caller_name = "export_as";
     std::string error_msg = "Cannot export ";
         
-    SAMPLE* smpl;
-    if(from.empty() || to.empty()) 
-        smpl = NULL;
-    else 
+    SAMPLE* smpl = NULL;
+    if(!(from.empty() || to.empty())) 
     {
         // raise an error if not valid
         Sample sample(from, to);
