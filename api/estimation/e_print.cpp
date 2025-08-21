@@ -5,7 +5,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res)   Displays or prints the graphs of residuals or observed / fitted values 
+ *      int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res)   Displays or prints the graphs of residuals or observed / fitted values 
  *      int E_print_results(int corr, int corru, int obs, int grobs, int grres)             Prints the estimation input and output of a block of equations. 
  */
 #include "api/constants.h"
@@ -29,14 +29,12 @@ static int E_graph_calc_lhs(char* name, char* res, char* rhs);
  */
 void Estimation::E_print_parms()
 {
-    char    from[20], to[20];
-
     W_print_tb("Parameters", 2);
 
-    PER_pertoa(&(E_SMPL->s_p1), from);
-    PER_pertoa(&(E_SMPL->s_p2), to);
+    std::string from = E_SMPL->start_period.to_string();
+    std::string to = E_SMPL->end_period.to_string();
 
-    W_printfRepl("&1NEstimation period        &1L%s:%s\n", from, to);
+    W_printfRepl("&1NEstimation period        &1L%s:%s\n", (char*) from.c_str(), (char*) to.c_str());
     W_printfRepl("&1NEstimation method        &1L%c\n", "LZIG"[E_MET]);
     W_printfRepl("&1LNumber of observations   &1L%d\n", E_T);
     W_printfRepl("&1LNumber of equations      &1L%d\n", E_NEQ);
@@ -201,19 +199,17 @@ void Estimation::E_print_eqres_1(int eq_nb)
 void Estimation::E_print_eqres_2(int eq_nb)
 {
     int     i;
-    char    c_date[21];
-    PERIOD  *per;
     double  respct;
 
     W_print_tb("Actual and fitted values", 5);
     W_printfRepl("&1CPeriod&1CObservations&1CFitted Values&1CResiduals&1CResiduals (%%)\n");
     W_printfRepl(".tl\n");
     for(i = 0 ; i < E_T ; i++) {
-        per = PER_addper(&(E_SMPL->s_p1), i);
-        PER_pertoa(per, c_date);
+        Period per = E_SMPL->start_period.shift(i);
+        std::string str_period = per.to_string();
         respct = 100 * E_div_0(MATE(E_U, eq_nb, i), MATE(E_LHS, eq_nb, i));
         W_printfRepl("&1L%s&1C%lf&1C%lf&1C%lf&1C%lf\n",
-                 c_date,
+                 (char*) str_period.c_str(),
                  (double) MATE(E_LHS, eq_nb, i),
                  (double) MATE(E_RHS, eq_nb, i),
                  (double) MATE(E_U, eq_nb, i),
@@ -281,14 +277,14 @@ static int E_graph_calc_lhs(char* name, char* res, char* rhs)
  *  for an equation block estimation.
  *  
  *  @param [in] char**      titles  titles, 1/graph
- *  @param [in] SAMPLE*     smpl    sample of the estimation
+ *  @param [in] Sample*     smpl    sample of the estimation
  *  @param [in] MAT*        mlhs    array of LHS values
  *  @param [in] MAT*        mrhs    array of RHS values
  *  @param [in] int         view    displays (1) or print (0) the graph
  *  @param [in] int         res     print residuals 
  *  @return     int                 0 always
  */
-int Estimation::E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res)
+int Estimation::E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res)
 {
     char    buf[256], lhs[80], rhs[80];
     int     i, t, nt, ng;

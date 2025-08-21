@@ -21,7 +21,7 @@
 
 // List of functions
 int B_IdtExecute(char* arg, int unused);
-int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
+int B_IdtExecuteIdts(Sample* smpl, char** idts);
 int B_IdtExecuteVarFiles(char* arg, int unused);
 int B_IdtExecuteSclFiles(char* arg, int unused);
 int B_IdtExecuteTrace(char* arg, int unused);
@@ -50,16 +50,17 @@ int B_IdtExecute(char* arg, int unused)
     int     lg1, lg2;
     int     rc = 0;
     char    from[16], to[16], **idts;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
-    smpl = PER_atosmpl(from, to);
-
-    if(smpl == NULL) {
-        std::string error_msg = "IdtExecute: '";
-        error_msg += std::string(from) + ":" + std::string(to);
-        error_msg += "' wrong sample";
+    try
+    {
+        smpl = new Sample(std::string((char*) from), std::string((char*) to));
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "IdtExecute: wrong sample\n" + std::string(e.what());
         error_manager.append_error(error_msg);
         return(-1);
     }
@@ -69,7 +70,7 @@ int B_IdtExecute(char* arg, int unused)
     rc = B_IdtExecuteIdts(smpl, idts);
 
     SCR_free_tbl((unsigned char**) idts);
-    SCR_free(smpl);
+    delete smpl;
     return(rc);
 }
 
@@ -84,12 +85,12 @@ int B_IdtExecute(char* arg, int unused)
  *  
  *  @see https://iode.plan.be/doku.php?id=idtexecute
  *  
- *  @param   [in]   SAMPLE* smpl    SAMPLE on which the identities must be calculated.
+ *  @param   [in]   Sample* smpl    Sample on which the identities must be calculated.
  *  @param   [in]   char**  idts    list of identity names or NULL to execute all the idts present in KI_WS.
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
-int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
+int B_IdtExecuteIdts(Sample* smpl, char** idts)
 {
     KDB     *tdbi, *tkdb;
 

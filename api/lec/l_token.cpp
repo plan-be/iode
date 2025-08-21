@@ -45,7 +45,7 @@
  *      static void L_ungetc(int ch)                Records (pushes) a char on the stream L_YY. 
  *      static void L_skip()                        Skips the tokens on L_YY until having reached "end of expression" or end of file.
  *      int L_get_token()                           Main function to browse a LEC expression token by token in the stream L_YY. 
- *      static int L_get_int()                      Reads an integer or a PERIOD on the stream L_YY.
+ *      static int L_get_int()                      Reads an integer or a Period on the stream L_YY.
  *  
  */
 #include "api/objs/grep.h"
@@ -245,17 +245,17 @@ static void L_ungetc(int ch)
 
 
 /** 
- * Reads an integer or a PERIOD on the stream L_YY.
+ * Reads an integer or a Period on the stream L_YY.
  *
- * After having read a integer on L_YY (stored in LYYLONG), tries to read a PERIOD (yyyyPppp) on the stream L_YY.
- * If the next character is invalid for a PERIOD, unreads it and returns L_LCONST. Otherwise, reads the second part of the PERIOD and
- * return L_PERIOD. 
+ * After having read a integer on L_YY (stored in LYYLONG), tries to read a Period (yyyyPppp) on the stream L_YY.
+ * If the next character is invalid for a Period, unreads it and returns L_LCONST. Otherwise, reads the second part of the Period and
+ * return L_Period. 
  *
  * @return     int     L_LCONST: value in L_TOKEN.tk_long
- *                     L_PERIOD: value in L_TOKEN.tk_period
+ *                     L_Period: value in L_TOKEN.tk_period
  *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
  *
- * On error L_errno is set to L_PERIOD_ERR.
+ * On error L_errno is set to L_Period_ERR.
  */   
 static int L_get_int()
 {
@@ -265,26 +265,26 @@ static int L_get_int()
 
     l = LYYLONG;
     ch = L_getc();
-    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
+    nb_per = get_pos_in_char_array((char*) periodicities.c_str(), toupper(ch));
     if(nb_per < 0) {
         L_ungetc(ch);
         L_TOKEN.tk_long = LYYLONG;
         return(L_LCONST);
     }
 
-    if(L_read() != YY_LONG || L_PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) {
+    if(L_read() != YY_LONG || L_Period_NB[nb_per] < LYYLONG || LYYLONG == 0) {
         L_unread();
-        L_errno = L_PERIOD_ERR;
+        L_errno = L_Period_ERR;
         return(YY_ERROR);
     }
 
     if(l < 50) l+= 2000;
     else if(l < 200) l+= 1900;
-    L_TOKEN.tk_period.p_y = l;
-    L_TOKEN.tk_period.p_p = toupper(ch);
-    L_TOKEN.tk_period.p_s = LYYLONG;
+    L_TOKEN.tk_period.year = l;
+    L_TOKEN.tk_period.periodicity = toupper(ch);
+    L_TOKEN.tk_period.step = LYYLONG;
 
-    return(L_PERIOD);
+    return(L_Period);
 }
 
 
@@ -335,7 +335,7 @@ static void L_skip()
  *  - stores the real value, if any, in L_TOKEN.tk_real
  * 
  * @return     int     - group the token read belongs to (L_FN, L_OP...) or 
- *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_PERIOD...)
+ *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_Period...)
  *                     - L_SYNTAX_ERR if the token is not valid.
  *                     - L_MACRO_ERR if the next token was a incorrect macro or if an expand cannot be done
  */ 
@@ -421,7 +421,7 @@ char    *a, *b;
 /*
     Reads a period from a opened file (yy)
 
-static int L_get_period(YYFILE* yy, PERIOD* per)
+static int L_get_period(YYFILE* yy, Period* per)
 {
     int     l, ch, nb_per;
 
@@ -433,19 +433,19 @@ static int L_get_period(YYFILE* yy, PERIOD* per)
     if(l < 50) l+= 2000;
     else if(l < 200) l+= 1900;
     ch = YY_getc(yy);
-    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
+    nb_per = get_pos_in_char_array(periodicities, toupper(ch));
     if(nb_per < 0) {
         YY_ungetc(ch, yy);
         YY_unread(yy);
         return(-1);
     }
-    if(YY_lex(yy) != YY_LONG || L_PERIOD_NB[nb_per] < yy->yy_long) {
+    if(YY_lex(yy) != YY_LONG || L_Period_NB[nb_per] < yy->yy_long) {
         YY_unread(yy);
         return(-1);
     }
-    per->p_y = l;
-    per->p_p = toupper(ch);
-    per->p_s = yy->yy_long;
+    per->year = l;
+    per->periodicity = toupper(ch);
+    per->step = yy->yy_long;
 
     return(0);
 }

@@ -52,8 +52,8 @@ def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str='
 
     Examples
     --------
-    >>> from iode import SAMPLE_DATA_DIR, equations, dynamic_adjustment, AdjustmentMethod
-    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import Sample_DATA_DIR, equations, dynamic_adjustment, AdjustmentMethod
+    >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.eqs
     274 objects loaded 
     >>> lec = equations["ACAF"].lec                         # doctest: +NORMALIZE_WHITESPACE
@@ -106,9 +106,9 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
 
     Examples
     --------
-    >>> from iode import SAMPLE_DATA_DIR, scalars, variables
+    >>> from iode import Sample_DATA_DIR, scalars, variables
     >>> from iode import dickey_fuller_test
-    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.var
     394 objects loaded
 
@@ -268,14 +268,14 @@ class EditAndEstimateEquations:
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -358,14 +358,14 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -545,14 +545,14 @@ class EditAndEstimateEquations:
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, EqMethod
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, EqMethod
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -600,14 +600,14 @@ class EditAndEstimateEquations:
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -668,14 +668,14 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -716,14 +716,14 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -764,14 +764,14 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -818,14 +818,14 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -870,8 +870,8 @@ class EditAndEstimateEquations:
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Equation
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations.clear()
@@ -919,8 +919,8 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Equation
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations.clear()
@@ -966,8 +966,8 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Equation
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations.clear()
@@ -1013,8 +1013,8 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Equation
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations.clear()
@@ -1081,8 +1081,8 @@ class EditAndEstimateEquations:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Equation
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations.clear()

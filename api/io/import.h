@@ -3,7 +3,9 @@
 #include "scr4/s_yy.h"
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/b_errors.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/io/dif.h"
 
@@ -63,7 +65,7 @@ struct ImportVarFromFile {
     YYKEYS  *imp_keys = NULL;                                                       // Table of keywords (see YY group of functions in scr4 libs)
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
     bool read_variable_implemented;
-    virtual int read_header(YYFILE*, SAMPLE*) { return 0; }                         // method to open the input file and to read its header
+    virtual int read_header(YYFILE*, Sample*) { return 0; }                         // method to open the input file and to read its header
     virtual int read_variable(YYFILE*, char*, int, double*) { return 0; }           // method to read full variable (i.e. a name + a series of values)
     virtual int read_numerical_value(YYFILE*, char*, int*, double*) { return 0; }   // method to read a single numerical value (a double)
     virtual int close(void) { return 0; }                                           // method to close the input file
@@ -80,7 +82,7 @@ struct ImportObjsASCII : public ImportVarFromFile
         read_variable_implemented = true;
     }
 
-    int read_header(YYFILE*, SAMPLE*) override;
+    int read_header(YYFILE*, Sample*) override;
     int read_variable(YYFILE*, char*, int, double*) override;
 };
 
@@ -99,7 +101,7 @@ public:
         read_variable_implemented = false;
     }
 
-    int read_header(YYFILE *,SAMPLE *) override;
+    int read_header(YYFILE *,Sample *) override;
     int read_numerical_value(YYFILE*, char*, int*, double*) override;
     int close(void) override;
 };
@@ -107,7 +109,7 @@ public:
 /* k_idif.c */
 class ImportObjsDIF : public ImportVarFromFile 
 {
-    SAMPLE* DIF_smpl;
+    Sample* DIF_smpl;
     char    DIF_freq;
     int     DIF_nl; 
     int     DIF_ny;
@@ -124,7 +126,7 @@ public:
         read_variable_implemented = true;
     }
 
-    int read_header(YYFILE*, SAMPLE*) override;
+    int read_header(YYFILE*, Sample*) override;
     int read_variable(YYFILE *,char *,int ,double *) override;
     int close(void) override;
 };
@@ -132,13 +134,13 @@ public:
 /* k_ibst.c */
 class ImportObjsBST : public ImportObjsDIF 
 {
-    SAMPLE  BST_smpl;
+    Sample  BST_smpl;
     char    BST_freq = 0;
     int     BST_nbper = 0;
 
 public:
     bool read_variable_implemented = false;
-    int read_header(YYFILE *,SAMPLE *) override;
+    int read_header(YYFILE *,Sample *) override;
     int read_numerical_value(YYFILE *,char *,int *,double *) override;
 };
 
@@ -146,14 +148,14 @@ public:
 struct ImportObjsNIS : public ImportVarFromFile 
 {
     bool read_variable_implemented = true;
-    int read_header(YYFILE *,SAMPLE *) override;
+    int read_header(YYFILE *,Sample *) override;
     int read_variable(YYFILE *,char *,int ,double *) override;
 };
 
 /* k_igem.c */
 class ImportObjsGEM : public ImportVarFromFile 
 {
-    SAMPLE  GEM_smpl;
+    Sample  GEM_smpl;
     char    GEM_freq = 0;
     int     GEM_nbper = 0;
     char    GEM_rubr[81];
@@ -164,7 +166,7 @@ class ImportObjsGEM : public ImportVarFromFile
 
 public:
     bool read_variable_implemented = true;
-    int read_header(YYFILE *,SAMPLE *) override;
+    int read_header(YYFILE *,Sample *) override;
     int read_variable(YYFILE *,char *,int ,double *) override;
     int close(void) override;
     
@@ -189,14 +191,14 @@ private:
 class ImportObjsTXT : public ImportVarFromFile 
 {
     FILE*   TXT_fd = NULL;
-    SAMPLE  TXT_smpl;
+    Sample  TXT_smpl;
     char    TXT_freq = 0;
     int     TXT_nbper = 0;
     int     TXT_lang = 0;
 
 public:
     bool read_variable_implemented = false;
-    int read_header(YYFILE*, SAMPLE*) override;
+    int read_header(YYFILE*, Sample*) override;
     int read_numerical_value(YYFILE*, char*, int*, double*) override;
 
 private:
@@ -273,7 +275,7 @@ public:
 class ImportCommentsTXT : public ImportCmtFromFile 
 {
     FILE*   TXT_fd = NULL;
-    SAMPLE  TXT_smpl;
+    Sample  TXT_smpl;
     char    TXT_freq = 0;
     int     TXT_nbper = 0;
     int     TXT_lang = 0;
@@ -299,7 +301,7 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-KDB *IMP_InterpretVar(ImportVarFromFile *,char *,char *,SAMPLE *);
+KDB *IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
 KDB *IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
 int IMP_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
 

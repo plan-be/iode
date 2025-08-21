@@ -945,7 +945,7 @@ Result::
 
 .. _sample:
 
-FUNCTION @SAMPLE
+FUNCTION @Sample
 ~~~~~~~~~~~~~~~~
 
 This function returns the current sample.
@@ -990,14 +990,14 @@ Result::
 
 .. _eqsample:
 
-FUNCTION @EQSAMPLE(EQNAME)
+FUNCTION @EQSample(EQNAME)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the estimation sample of the equation *eqname*.
 
 .. _eqsamplefrom:
 
-FUNCTION @EQSAMPLEFROM(EQNAME)
+FUNCTION @EQSampleFROM(EQNAME)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the *FROM* part of the estimation sample.
@@ -1012,7 +1012,7 @@ Example::
 
 .. _eqsampleto:
 
-FUNCTION @EQSAMPLETO(EQNAME)
+FUNCTION @EQSampleTO(EQNAME)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the *TO* part of the estimation sample.
@@ -1371,7 +1371,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _simniter:
 
-FUNCTION @SIMNITER(PERIOD)
+FUNCTION @SIMNITER(Period)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the number of iterations required to solve the model for year *period*.
@@ -1380,7 +1380,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _simnorm:
 
-FUNCTION @SIMNORM (PERIOD)
+FUNCTION @SIMNORM (Period)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the convergence threshold reached when solving the model for year *period*.

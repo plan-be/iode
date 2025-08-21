@@ -288,11 +288,12 @@ int B_PrintObjDef_1(char* arg, int* type)
     int     pos, rc = 0;
 
     kdb = K_WS[*type];
-    if((pos = K_find(kdb, arg)) == -1) goto err;
+    if((pos = K_find(kdb, arg)) == -1) 
+        goto err;
 
     kmsg("Printing %s ...", arg);
-    //if(SCR_hit_key() != 0) SCR_get_key();
-    if(khitkey() != 0) kgetkey();               // JMP 11/12/2021
+    if(khitkey() != 0) 
+        kgetkey();               // JMP 11/12/2021
 
     switch(*type) {
         case COMMENTS :
@@ -321,25 +322,20 @@ int B_PrintObjDef_1(char* arg, int* type)
             break;
         case VARIABLES :
             if(BEG % 47 == 0) {
-                SAMPLE  *smpl;
-                PERIOD  *per;
-                char txt[20];
-                int j;
-
                 if(BEG > 0) {
                     W_printf(".tl\n.te\n\n");  /* JMP 19-12-97 */
                     W_flush();
                 }
-                smpl = (SAMPLE *) KDATA(kdb);
-                per = &(smpl->s_p1);
-                W_printfRepl(".tb %d\n.sep &\n", smpl->s_nb + 1);
-                PER_pertoa(&(smpl->s_p1), txt);
-                /*                W_printfRepl("&%dLSample: %s - %s\n",smpl->s_nb + 1, txt, PER_pertoa(&(smpl->s_p2), 0L)); */
-                /*                W_printfRepl("&1LSample&1C%s&1C%s\n", txt, PER_pertoa(&(smpl->s_p2), 0L)); */
+
+                Sample* smpl = (Sample *) KDATA(kdb);
+                Period start_period = smpl->start_period;
+                W_printfRepl(".tb %d\n.sep &\n", smpl->nb_periods + 1);
                 W_printfRepl(".tl\n&1LName");
-                for(j = 0 ; j < smpl->s_nb; j++) {
-                    PER_pertoa(PER_addper(per, j), txt);
-                    W_printfRepl("&1C%s", txt);
+                std::string txt;
+                for(int j = 0; j < smpl->nb_periods; j++) 
+                {
+                    txt = start_period.shift(j).to_string();
+                    W_printfRepl("&1C%s", (char*) txt.c_str());
                 }
                 W_printf("\n.tl\n");
             }
@@ -659,7 +655,7 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
 int B_PrintEqs(char* name, EQ* eq)
 {
     CLEC    *clec;
-    char    from[21], to[21], buf[256], *sname;
+    char    buf[256], *sname;
     int     j, pos;
 
     if(B_EQS_INFOS > 1) B_PrintRtfTopic(name);
@@ -672,12 +668,12 @@ int B_PrintEqs(char* name, EQ* eq)
     }    
 
     if(B_EQS_INFOS < 2) return(0);
-    if(eq->method >= 0 && eq->method < 4 &&
-            (eq->smpl).s_nb != 0 && eq->tests[3]) {
-        /*        W_printf(".par enum_2\nEndogenous : \\i%s\\I\n\n", name); */
+    if(eq->method >= 0 && eq->method < 4 && (eq->smpl).nb_periods != 0 && eq->tests[3]) 
+    {
+        std::string from = eq->smpl.start_period.to_string();
+        std::string to = eq->smpl.end_period.to_string();
         W_printf(".par enum_2\nEstimation : %ci%c%cI on %s-%s\n\n", A2M_ESCCH, "LZIG"[eq->method], A2M_ESCCH, 
-                 PER_pertoa(&(eq->smpl.s_p1), from),
-                 PER_pertoa(&(eq->smpl.s_p2), to));
+                 (char*) from.c_str(), (char*) to.c_str());
         if(B_isdef(eq->blk))   B_dump_str((unsigned char*) "Block : ", (unsigned char*) eq->blk);
         if(B_isdef(eq->instr)) B_dump_str((unsigned char*) "Instruments : ", (unsigned char*) eq->instr);
 
@@ -756,14 +752,14 @@ int B_PrintDefScl(KDB* kdb, int pos)
 int B_PrintDefVar(KDB* kdb, int pos)
 {
     double    *val;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     int     j;
 
-    smpl = (SAMPLE *) KDATA(kdb);
+    smpl = (Sample *) KDATA(kdb);
 
     if((val = KVVAL(kdb, pos, 0)) == NULL) return (-1);
     W_printfRepl("&1L%s ", KONAME(kdb, pos));
-    for(j = 0 ; j < smpl->s_nb; j++, val++) {
+    for(j = 0 ; j < smpl->nb_periods; j++, val++) {
         W_printfRepl("&1D");
         B_PrintVal(*val);
     }

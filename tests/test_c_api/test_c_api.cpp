@@ -46,7 +46,7 @@
 //    extern char    SCR_NAME_ERR[255 + 1];
 //    int     A2M_SEPCH;
 //
-//    //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
+//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
 //    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
 //    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
 //    //int B_PrintRtfTopic(char* x) { return(0); }
@@ -276,7 +276,7 @@ public:
 	void U_test_CreateObjects()
 	{
 	    char*       lst;
-	    SAMPLE*     smpl;
+	    Sample*     smpl;
 	    double   A[64], B[64];
 	    int         nb, i, pos;
 	    static int  done = 0;
@@ -294,13 +294,13 @@ public:
 	    //S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 	
 	    // Set the sample for the variable WS
-	    smpl = PER_atosmpl("2000Y1", "2020Y1");
+	    smpl = new Sample("2000Y1", "2020Y1");
 	    KV_sample(KV_WS, smpl);
 	    //SW_nfree(smpl);
 	
 	    // Creates new vars
-	    nb = smpl->s_nb;
-	    for(i = 0; i < smpl->s_nb; i++) {
+	    nb = smpl->nb_periods;
+	    for(i = 0; i < smpl->nb_periods; i++) {
 	       A[i] = i;
 	       B[i] = i*2;
 	    }
@@ -322,14 +322,10 @@ public:
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
 	{
 	    CLEC*   clec;
-	    //char    buf[256];
 	    double  calc_val;
-	    PERIOD  *per;
-	    char    aper[24];
 	    int     rc;
 	
-	    per = PER_addper(&(KSMPL(KV_WS)->s_p1), t);
-	    PER_pertoa(per, aper);
+	    Period per = KSMPL(KV_WS)->start_period.shift(t);
 	
 	    clec = L_cc(lec);
 	    //S4ASSERT ("L_cc", clec != 0);
@@ -704,7 +700,7 @@ public:
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
-	    // 2. Merge into an existing WS inb a different SAMPLE
+	    // 2. Merge into an existing WS inb a different Sample
 	    B_WsClearAll("");
 	    B_WsSample("2000Y1 2020Y1");
 	    // Create ACAF = 0 1 2...
@@ -772,7 +768,7 @@ public:
 	    if(KV_WS == NULL) 
             return false;
         
-	    nb = KSMPL(KV_WS)->s_nb;
+	    nb = KSMPL(KV_WS)->nb_periods;
 	    A = L_cc_link_exec(lec, KV_WS, KS_WS);
 	    K_add(KV_WS, name, A, &nb);
 	    SCR_free(A);
@@ -931,7 +927,6 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     char*       lst;
     int         pos;
     static int  done = 0;
-    char        asmpl1[80], asmpl2[80];
 
     U_test_print_title("Tests OBJECTS");
     U_test_CreateObjects();
@@ -950,10 +945,10 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     EXPECT_TRUE(K_find(KV_WS, "AAA") >= 0);
 
     // Test KV_sample()
-    PER_smpltoa(KSMPL(KV_WS), asmpl1);
+    std::string asmpl1 = KSMPL(KV_WS)->to_string();
     KV_sample(KV_WS, NULL);
-    PER_smpltoa(KSMPL(KV_WS), asmpl2);
-    EXPECT_EQ(std::string(asmpl1), std::string(asmpl2));
+    std::string asmpl2 = KSMPL(KV_WS)->to_string();
+    EXPECT_EQ(asmpl1, asmpl2);
 }
 
 
@@ -1226,7 +1221,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     KDB         *kdbv,
                 *kdbe,
                 *kdbs;
-    SAMPLE      *smpl;
+    Sample      *smpl;
     char        *filename = "fun";
     U_ch**      endo_exo;
     int         rc;
@@ -1256,7 +1251,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     CSimulation simu;
 
     // Simulation parameters
-    smpl = PER_atosmpl("2000Y1", "2002Y1");
+    smpl = new Sample("2000Y1", "2002Y1");
     CSimulation::KSIM_START = VAR_INIT_TM1;
     CSimulation::KSIM_EPS = 0.0001;
     CSimulation::KSIM_MAXIT = 100;
@@ -1319,7 +1314,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Cleanup
     SCR_free_tbl(endo_exo);
-    SCR_free(smpl);
+    delete smpl;
     kmsg_super = kmsg_super_ptr; // reset default value
 }
 
@@ -1328,7 +1323,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 {
     char    fullfilename[256];
     char    **varlist;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     KDB     *kdbv, *kdbt;
     TBL     *tbl;
     int     rc;
@@ -1373,11 +1368,11 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 
     // Print vars as graphs
     varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
-    smpl = PER_atosmpl("1990Y1", "2010Y1");
+    smpl = new Sample("1990Y1", "2010Y1");
     rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
     EXPECT_EQ(rc, 0);
     SCR_free_tbl((U_ch**)varlist);
-    SCR_free(smpl);
+    delete smpl;
 
     // Close the output file
     W_close();
@@ -1394,7 +1389,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 {
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
-    SAMPLE      *smpl;
+    Sample      *smpl;
     double      r2, *df;
 
     U_test_suppress_a2m_msgs();
@@ -1429,10 +1424,10 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
 
     // estimate_step_wise
-    smpl = PER_atosmpl("1980Y1", "1995Y1");
+    smpl = new Sample("1980Y1", "1995Y1");
     r2 = estimate_step_wise(smpl, "ACAF", "", "r2");
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
-    SCR_free(smpl);
+    delete smpl;
 
     // B_EqsStepWise
     for(int i = 0; i < 4; i++)
@@ -1559,7 +1554,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     char        *lst, buf[512];
     int         rc, i;
     double   *A1, val;
-    SAMPLE      *smpl;
+    Sample      *smpl;
     char        *filename = "fun";
 
     U_test_print_title("Tests B_DATA");
@@ -1715,7 +1710,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     // B_DataPrintGraph()
     //smpl = KSMPL(KV_WS);
-    //printf("%d\n", smpl->s_p1);
+    //printf("%d\n", smpl->start_period);
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
 
@@ -1727,7 +1722,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 TEST_F(IodeCAPITest, Tests_B_EQS)
 {
     int     rc, pos;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
 
@@ -1749,7 +1744,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     pos = K_find(KE_WS, "ACAF");
     smpl = &KESMPL(KE_WS, pos);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(smpl->s_p1.p_y, 1981);
+    EXPECT_EQ(smpl->start_period.year, 1981);
 
     // TODO: implement next utests with the same canevas
         //B_EqsSetMethod(char* arg, int unused)
@@ -1882,7 +1877,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     char        idtexec[] = "2002Y1 2007Y1 C D";
     char        idtexec2[] = "2002Y1 2007Y1 C D";
     int         rc;
-    double   *C, *D;
+    double      *C, *D;
 
     U_test_print_title("Tests B_IDT");
 
@@ -1895,7 +1890,6 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
     K_add(KI_WS, "C", "D*2+ACAF");
     K_add(KI_WS, "D", "A+B");
-
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -1935,7 +1929,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
 {
     char    **idts;
-    SAMPLE  *smpl = NULL;
+    Sample  *smpl = NULL;
     double  *AOUC;
     int     rc;
 
@@ -1962,7 +1956,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     //print(f"rc={rc}")
 
     // Sample (null => full sample, see K_exec())
-    smpl = PER_atosmpl("1961Y1", "2015Y1");   
+    smpl = new Sample("1961Y1", "2015Y1");   
     idts = (char**) SCR_vtoms((U_ch*) "AOUC", (U_ch*) " ,;\t");
     rc = B_IdtExecuteIdts(smpl, idts);
     printf("rc=%d\n", rc);
@@ -2079,7 +2073,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
 {
     char    cmd[512];
     char    varfile[256];
-    SAMPLE  *smpl;
+    Sample  *smpl;
     int     rc;
 
     U_test_print_title("Tests B_LTOH: convert low periodicity to high periodicity");
@@ -2087,9 +2081,9 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
 
     // Clear the vars and set the sample for the variable WS
     K_clear(KV_WS);
-    smpl = PER_atosmpl("2010Q1", "2020Q4");
+    smpl = new Sample("2010Q1", "2020Q4");
     KV_sample(KV_WS, smpl);
-    SCR_free(smpl);
+    delete smpl;
 
     sprintf(varfile, "%sfun.av", IODE_DATA_DIR);
 
@@ -2137,7 +2131,7 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
 {
     char    cmd[512];
     char    varfile[256];
-    SAMPLE  *smpl;
+    Sample  *smpl;
     int     rc;
     //char    current_dir[256];
 
@@ -2149,9 +2143,9 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
 
     // Clear the vars and set the sample for the variable WS
     K_clear(KV_WS);
-    smpl = PER_atosmpl("2000Y1", "2020Y1");
+    smpl = new Sample("2000Y1", "2020Y1");
     KV_sample(KV_WS, smpl);
-    SCR_free(smpl);
+    delete smpl;
 
     sprintf(varfile, "%sfun_q.var", IODE_DATA_DIR);
 
@@ -2293,7 +2287,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 TEST_F(IodeCAPITest, Tests_B_WS)
 {
     int     rc;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     // List of tested report functions:
     //   - int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
@@ -2396,10 +2390,10 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     // int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
     U_test_print_title("B_WsSample()");
     rc = B_WsSample("1965Y1 2020Y1");
-    smpl = PER_atosmpl("1965Y1", "2020Y1");
+    smpl = new Sample("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(memcmp((char*) KSMPL(KV_WS), (char*) smpl, sizeof(SAMPLE)), 0);
-    SCR_free(smpl);
+    EXPECT_EQ(*KSMPL(KV_WS), *smpl);
+    delete smpl;
 
     // int B_WsClearAll(char* arg, int unused)                       $WsClearAll
     U_test_print_title("B_WsClearAll()");
@@ -2521,11 +2515,11 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 
     rc = B_ReportLine("$settime 2000Y1", 0);
     EXPECT_EQ(rc, 0);
-    EXPECT_STREQ(PER_pertoa(&RP_PER, NULL), "2000Y1");
+    EXPECT_EQ(RP_PER.to_string(), "2000Y1");
 
     rc = B_ReportLine("$incrtime 2", 0);
     EXPECT_EQ(rc, 0);
-    EXPECT_STREQ(PER_pertoa(&RP_PER, NULL), "2002Y1");
+    EXPECT_EQ(RP_PER.to_string(), "2002Y1");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2592,8 +2586,8 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     char* pattern = "xy";
     char* xdim = "$X";
     char* ydim = "$Y";
-    PERIOD* ref_period = PER_atoper("2000Y1");
-    PERIOD* sum_period = PER_atoper("2001Y1");
+    Period* ref_period = new Period("2000Y1");
+    Period* sum_period = new Period("2001Y1");
     int maxit = 100;
     double eps = 0.0001;
 
@@ -2682,6 +2676,8 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
 
     // Note: ref_period and sum_period are freed in RasExecute()
     res = RasExecute(pattern, xdim, ydim, ref_period, sum_period, maxit, eps);
+    delete ref_period;
+    delete sum_period;
 
     EXPECT_EQ(res, 0);
 }

@@ -3,9 +3,9 @@
 #include <algorithm>
 
 #include "cpp_api/common.h"
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/period.h"
-#include "cpp_api/time/sample.h"
+#include "api/utils/utils.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "cpp_api/lec/lec.h"
 
 const static std::vector<std::string> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
@@ -170,7 +170,7 @@ struct std::hash<EQ>
         hash_combine<std::string_view>(seed, std::string_view(eq.endo, strlen(eq.endo)));
         hash_combine<std::string_view>(seed, std::string_view(eq.lec, strlen(eq.lec)));
         hash_combine<char>(seed, eq.method);
-        hash_combine<SAMPLE>(seed, eq.smpl);
+        hash_combine<Sample>(seed, eq.smpl);
         hash_combine<std::string_view>(seed, std::string_view(eq.cmt, strlen(eq.cmt)));
         hash_combine<std::string_view>(seed, std::string_view(eq.blk, strlen(eq.blk)));
         hash_combine<std::string_view>(seed, std::string_view(eq.instr, strlen(eq.instr)));

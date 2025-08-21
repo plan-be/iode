@@ -163,8 +163,8 @@ class Scalar:
 
         Examples
         --------
-        >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Scalar, scalars, Sample_DATA_DIR
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> scalars["acaf1"]
@@ -185,8 +185,8 @@ class Scalar:
         Examples
         --------
         >>> from copy import copy
-        >>> from iode import Scalar, scalars, SAMPLE_DATA_DIR
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Scalar, scalars, Sample_DATA_DIR
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
         >>> scalars["acaf1"]

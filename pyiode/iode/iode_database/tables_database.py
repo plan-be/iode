@@ -34,8 +34,8 @@ class Tables(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import tables, SAMPLE_DATA_DIR
-    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import tables, Sample_DATA_DIR
+    >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.tbl
     46 objects loaded 
     >>> len(tables)
@@ -93,8 +93,8 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import tables, SAMPLE_DATA_DIR
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import tables, Sample_DATA_DIR
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
         >>> tables.get_title("ANAKNFF")
@@ -114,8 +114,8 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import tables, SAMPLE_DATA_DIR, TableLineType
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import tables, Sample_DATA_DIR, TableLineType
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
         >>> # get the first table
@@ -302,9 +302,9 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
 
@@ -393,15 +393,15 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables, Table, comments, lists, TableGraphAxis
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> comments.load(f"{Sample_DATA_DIR}/fun.cmt")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
-        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> lists.load(f"{Sample_DATA_DIR}/fun.lst")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.lst
         17 objects loaded
         
@@ -744,9 +744,9 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
 
@@ -792,9 +792,9 @@ class Tables(IodeDatabase):
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
         >>> tables["A*"].coefficients
@@ -809,9 +809,9 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
         >>> tables["A*"].variables
@@ -959,16 +959,16 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import tables, scalars, variables, PrintTablesAs, load_extra_files
         >>> output_dir = getfixture('tmp_path')
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -1162,7 +1162,7 @@ class Tables(IodeDatabase):
         "Rentabilité","-0.0093","34.5565","-0.0100","7.5121","-0.0100","0.3108","-0.0100","0.1740","-0.0103","2.4613",
         <BLANKLINE>
 
-        >>> extra_files = load_extra_files(f"{SAMPLE_DATA_DIR}/ref.av")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> extra_files = load_extra_files(f"{Sample_DATA_DIR}/ref.av")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading ...ref.av
         ...
         394 objects loaded
@@ -1228,8 +1228,8 @@ class Tables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, tables, Table
-        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, tables, Table
+        >>> tables.load(f"{Sample_DATA_DIR}/fun.tbl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded 
         >>> len(tables)

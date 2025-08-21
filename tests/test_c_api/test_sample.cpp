@@ -12,21 +12,21 @@ TEST(TestSample, Create)
 	std::string str_end = end.to_string();
 	Sample sample2(str_start, str_end);
 
-	// passing 2 C PERIOD structures
-	PERIOD* c_start = PER_atoper("2015Y1");
-	PERIOD* c_end = PER_atoper("2020Y1");
+	// passing 2 Period pointers
+	Period* ptr_start = new Period("2015Y1");
+	Period* ptr_end = new Period("2020Y1");
 
-	Sample sample3(*c_start, *c_end);
+	Sample sample3(*ptr_start, *ptr_end);
 	
-	SW_nfree(c_start);
-	SW_nfree(c_end);
+	delete ptr_start;
+	delete ptr_end;
 
-	// passing a C SAMPLE structure
-	SAMPLE* c_sample = PER_pertosmpl((PERIOD*) &start, (PERIOD*) &end);
+	// passing a Sample pointer
+	Sample* ptr_sample = new Sample(start, end);
 
-	Sample sample4(*c_sample);
+	Sample sample4(*ptr_sample);
 	
-	SW_nfree(c_sample);
+	delete ptr_sample;
 }
 
 TEST(TestSample, GetPeriodPosition)
@@ -37,7 +37,7 @@ TEST(TestSample, GetPeriodPosition)
 	int expected_pos = 18;
 
 	// Period object
-	Period period = sample.start_period().shift(expected_pos);
+	Period period = sample.start_period.shift(expected_pos);
 	EXPECT_EQ(sample.get_period_position(period), expected_pos);
 
 	// string
@@ -61,9 +61,9 @@ TEST(TestSample, Intersection)
 	Period inter_end_period(2020, 'M', 6);
 	int nb_periods = inter_end_period.difference(inter_start_period) + 1;
 
-	EXPECT_EQ(sample_intersection.start_period(), inter_start_period);
-	EXPECT_EQ(sample_intersection.end_period(), inter_end_period);
-	EXPECT_EQ(sample_intersection.nb_periods(), nb_periods);
+	EXPECT_EQ(sample_intersection.start_period, inter_start_period);
+	EXPECT_EQ(sample_intersection.end_period, inter_end_period);
+	EXPECT_EQ(sample_intersection.nb_periods, nb_periods);
 }
 
 TEST(TestSample, ToString)
@@ -85,7 +85,7 @@ TEST(TestSample, Hash)
 	Period end(2020, 'Y', 1);
 	Sample sample(start, end);
 
-	std::hash<SAMPLE> sample_hasher;
+	std::hash<Sample> sample_hasher;
     hash_before = sample_hasher(sample);
 
 	// different starting year

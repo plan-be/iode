@@ -3,7 +3,8 @@
 #include "scr4/s_yy.h"          // YYKEYS
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 
 /* ---------------------- DEFINE ---------------------- */
@@ -31,9 +32,9 @@ enum LecError
     L_ARGS_ERR,
     L_STACK_ERR,
     L_MEMORY_ERR,
-    L_PERIOD_ERR,
+    L_Period_ERR,
     L_LAG_ERR,
-    L_PERIODY_ERR,
+    L_PeriodY_ERR,
     L_BOUNDS_ERR,
     L_LINK_ERR,
     L_DIVIDE_ERR,
@@ -58,7 +59,7 @@ enum LecSpecial
     L_CLOSEB,
     L_COMMA,
     L_OCPAR,  /* () */
-    L_PERIOD,
+    L_Period,
     L_VART,   /* VARIABLE [time] */
     L_COLON,
     L_LCONST,
@@ -194,11 +195,11 @@ struct ALEC
         int     v_nb_args;      // nb of args for fn
         struct {
             short   pos;        // coef or series pos in table ??
-            PERIOD  per;        // PERIOD if any
+            Period  per;        // Period if any
             short   lag;        // lag if any
         } v_var;                // variable
         short   v_coef;         // coef number
-        PERIOD  v_per;          // period
+        Period  v_per;          // period
     } al_val;
 };
 
@@ -207,13 +208,13 @@ struct CVAR {
             lag,
             ref,
             pad;
-    PERIOD  per;
+    Period  per;
 };
 
 struct TOKEN {
     LECREAL tk_real;
     long    tk_long;
-    PERIOD  tk_period;
+    Period  tk_period;
     int     tk_def;
     char    tk_name[L_MAX_NAME + 1];
 };
@@ -491,7 +492,7 @@ void L_close(void);
 int L_get_token(void);
 //int L_include(char *,char *);
 //int L_get_int(void);
-//int L_get_period(YYFILE *,PERIOD *);
+//int L_get_period(YYFILE *,Period *);
 
 /* l_cc1.c */
 void L_alloc_expr(int );
@@ -656,7 +657,7 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 
 double *L_getvar(KDB *,int );
 double L_getscl(KDB *,int );
-SAMPLE *L_getsmpl(KDB *);
+Sample *L_getsmpl(KDB *);
 int L_findscl(KDB *,char *);
 int L_findvar(KDB *,char *);
 char* L_expand(char* list_name);

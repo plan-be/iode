@@ -55,7 +55,7 @@ void Estimation::E_savescl(double val, int eqnb, char*txt)
 /**
  *  Creates the scalars containing the results of an estimated equation:
  *  
- *      - e<eqnb>_n      : number of observations in estimation SAMPLE 
+ *      - e<eqnb>_n      : number of observations in estimation Sample 
  *      - e<eqnb>_k      : number of degrees of freedom 
  *      - e<eqnb>_stdev  : stddev of the residuals
  *      - e<eqnb>_meany  : mean of the observed values (Y)
@@ -133,12 +133,12 @@ void Estimation::E_tests2scl(EQ* eq, int j, int n, int k)
  *  @param [in] char*   name    endogenous name
  *  @param [in] char*   lec     equation
  *  @param [in] int     method  estimation method
- *  @param [in] SAMPLE* smpl    estimation sample or NULL. If NULL, the estimation 
+ *  @param [in] Sample* smpl    estimation sample or NULL. If NULL, the estimation 
  *                              sample is read from the equation itself
  *  @param [in] float*  tests   list of tests (see KE_est_s() for the complete list)
  *  @return     int     0 on success, -1 on error
  */
-int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tests)
+int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float* tests)
 {
     int     pos, rc;
     EQ      *eq;
@@ -157,7 +157,7 @@ int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float
     eq->date = SCR_current_date();
     
     memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
-    memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
+    memcpy(&(eq->smpl), smpl, sizeof(Sample));
     rc = K_add(E_DBE, name, eq, name);
     if(rc < 0) {
         error_manager.append_error(std::string(L_error()));
@@ -184,11 +184,11 @@ int Estimation::KE_update(char* name, char* lec, int method, SAMPLE* smpl, float
  *  
  *  @return     int                  0 on success, -1 on error
  */
-int Estimation::KE_est_s(SAMPLE* smpl)
+int Estimation::KE_est_s(Sample* smpl)
 {
     static  char met[6] = {"LZIGM"};
     int     i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
-    SAMPLE  eq_smpl;
+    Sample  eq_smpl;
     U_ch    **endos = 0;
     U_ch    **blk = 0;
     U_ch    **lecs = 0;
@@ -220,17 +220,17 @@ int Estimation::KE_est_s(SAMPLE* smpl)
             E_MET = est_method;
 
         if(smpl == NULL) {
-            memcpy(&eq_smpl, &(KESMPL(E_DBE, pos)), sizeof(SAMPLE));
+            memcpy(&eq_smpl, &(KESMPL(E_DBE, pos)), sizeof(Sample));
             E_SMPL = &eq_smpl;
         }
         else
             E_SMPL = smpl;
-        if(E_SMPL->s_nb < 1) {
+        if(E_SMPL->nb_periods < 1) {
             std::string error_msg = "Equation '" + std::string(est_endos[i]) + "': estimation sample undefined";
             error_manager.append_error(error_msg);
             goto err;
         }
-        E_T = E_SMPL->s_nb;
+        E_T = E_SMPL->nb_periods;
 
         if(KEINSTR(E_DBE, pos) == NULL) 
             instrs = NULL;

@@ -774,7 +774,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double    *val;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     KDB     *kdb = K_WS[VARIABLES];
     int     pos, i, j;
 
@@ -788,9 +788,9 @@ U_ch *RPF_vvalue(U_ch** args)
             res = SCR_strafcat(res, buf);
         }
         else {
-            smpl = (SAMPLE *) KDATA(kdb);
+            smpl = (Sample *) KDATA(kdb);
             val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->s_nb; j++, val++) {
+            for(j = 0 ; j < smpl->nb_periods; j++, val++) {
                 IodeFmtVal((char*) buf, *val);
                 res = SCR_strafcat(res, buf);
                 res = SCR_strafcat(res, (unsigned char*) " ");
@@ -929,14 +929,21 @@ U_ch *RPF_eqsample(U_ch** args)
     int     pos;
     KDB     *kdb = K_WS[EQUATIONS];
 
-    if(kdb == NULL) return(res);             // Equation WS  empty
-    if(SCR_tbl_size(args) != 1) return(res); // 1! eq
+    if(kdb == NULL) 
+        return(res);                // Equation WS  empty
+    if(SCR_tbl_size(args) != 1) 
+        return(res);                // 1! eq
 
     res = (unsigned char*) SCR_malloc(80);
     pos = K_find(kdb, (char*) args[0]);
 
-    if(pos < 0) sprintf((char*) res, "[Eqs %s not found]", args[0]);
-    else        PER_smpltoa(&(KESMPL(kdb, pos)), (char*) res);
+    if(pos < 0) 
+        sprintf((char*) res, "[Eqs %s not found]", args[0]);
+    else
+    {
+        std::string str_smpl = KESMPL(kdb, pos).to_string();
+        sprintf((char*) res, (char*) str_smpl.c_str());
+    }       
 
     return(res);
 }
@@ -947,7 +954,7 @@ U_ch *RPF_eqsample(U_ch** args)
  *  
  *  @param [in] char**  args    args of RPF_eqsample*() => equation name
  *  @param [in] int     fromto  0 if sample.from must be returned, 1 for sample.to
- *  @return     char*           sample.from or .to in text format
+ *  @return     char*           sample.from or sample.to in text format
  *                              " " if there is no sample in the equation
  *                              "[Eq ... not found]" if the eq does not exist
  */
@@ -956,21 +963,30 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
     U_ch    *res = 0;
     int     pos;
     KDB     *kdb = K_WS[EQUATIONS];
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
-    if(kdb == NULL) return(res);             // Equation WS  empty
-    if(SCR_tbl_size(args) != 1) return(res); // 1! eq
+    if(kdb == NULL) 
+        return(res);             // Equation WS  empty
+
+    if(SCR_tbl_size(args) != 1) 
+        return(res);            // 1! eq
 
     res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
     pos = K_find(kdb, (char*) args[0]);
 
-    if(pos < 0) sprintf((char*) res, "[Eqs %s not found]", args[0]);
-    else {
+    if(pos < 0) 
+        sprintf((char*) res, "[Eqs %s not found]", args[0]);
+    else 
+    {
         smpl = &KESMPL(kdb, pos);
-        if(fromto == 0) PER_pertoa(&smpl->s_p1, (char*) res);
-        else            PER_pertoa(&smpl->s_p2, (char*) res);
+        if(fromto == 0) 
+            sprintf((char*) res, (char*) smpl->start_period.to_string().c_str());
+        else            
+            sprintf((char*) res, (char*) smpl->end_period.to_string().c_str());
     }
-    if(res[0] == 0) strcpy((char*) res, " "); // pour éviter de quitter le rapport si sample vide
+
+    if(res[0] == 0) 
+        strcpy((char*) res, " ");   // pour éviter de quitter le rapport si sample vide
 
     return(res);
 }
@@ -1092,28 +1108,28 @@ U_ch *RPF_eqrhs(U_ch **args)
 U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
-    char    per1[20], per2[20];
-    SAMPLE  *smpl;
+    Sample  *smpl;
     KDB     *kdb = K_WS[VARIABLES];
     char     what = 'F';
 
-    smpl = (SAMPLE *) KDATA(kdb);
+    smpl = (Sample *) KDATA(kdb);
 
-    if(args[0]) what = args[0][0];
+    if(args[0]) 
+        what = args[0][0];
     
     what = toupper(what);
-    strcpy(per1, PER_pertoa(&(smpl->s_p1), 0L));
-    strcpy(per2, PER_pertoa(&(smpl->s_p2), 0L));
+    std::string s_per1 = smpl->start_period.to_string();
+    std::string s_per2 = smpl->end_period.to_string();
     
     switch(what) {
         case 'B':
-            sprintf((char*) buf, "%s", per1);
+            sprintf((char*) buf, "%s", (char*) s_per1.c_str());
             break;
         case 'E':
-            sprintf((char*) buf, "%s", per2);
+            sprintf((char*) buf, "%s", (char*) s_per2.c_str());
             break;
         default :
-            sprintf((char*) buf, "%s %s", per1, per2);
+            sprintf((char*) buf, "%s %s", (char*) s_per1.c_str(), (char*) s_per2.c_str());
             break;
     }
 
@@ -1387,22 +1403,23 @@ U_ch *RPF_vexpand(U_ch **args)
  */
 int RPF_CalcPeriod(U_ch** args)
 {
-    PERIOD 	*per;
-    int     t;
-
     // Check args
-    if(SCR_tbl_size(args) == 0) return(-1); // Erreur, arg required
-    per = PER_atoper((char*) args[0]);
-    if(per == 0) return(-1); // Error
+    if(SCR_tbl_size(args) == 0) 
+        return(-1); // Erreur, arg required
+    
+    Period per(std::string((char*) args[0]));
+    if(per.year == 0) 
+        return(-1); // Error
 
     // Calc diff bw per and WS sample
-    t = PER_diff_per(per, &(KSMPL(KV_WS)->s_p1));
-    if(t < 0)  return(-1);
-    if(PER_diff_per(per, &(KSMPL(KV_WS)->s_p2)) > 0) {
-        SCR_free(per);
+    int t = per.difference(KSMPL(KV_WS)->start_period);
+    if(t < 0)  
         return(-1);
-    }
-    SCR_free(per);
+
+    int at = per.difference(KSMPL(KV_WS)->end_period);
+    if(at > 0)
+        return(-1);
+
     return(t);
 }
 

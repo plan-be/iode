@@ -60,10 +60,13 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
     }
 
     fprintf(expdef->file_descriptor, "code%scomment%s", EXP_SEP, EXP_SEP);
-    dim = KSMPL(dbv)->s_nb;
-    for(i = 0; i < dim; i++) {
-        fprintf(expdef->file_descriptor, "%s%s",
-                PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), i), NULL), EXP_SEP);
+    dim = KSMPL(dbv)->nb_periods;
+    std::string str_period;
+    for(i = 0; i < dim; i++) 
+    {
+        Period period = KSMPL(dbv)->start_period.shift(i);
+        str_period = period.to_string();
+        fprintf(expdef->file_descriptor, "%s%s", (char*) str_period.c_str(), EXP_SEP);
     }
     fprintf(expdef->file_descriptor, "\n");
     return(0);

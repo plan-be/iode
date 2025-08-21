@@ -11,7 +11,7 @@ std::vector<Period> ComputedTableGraph::get_series_periods()
     std::vector<Period> x;
     x.reserve(get_nb_periods());
 
-    Period start = sample->start_period();
+    Period start = sample->start_period;
     x.push_back(start);
     
     for(int i=1; i < get_nb_periods(); i++)
@@ -75,7 +75,7 @@ std::vector<double> ComputedTableGraph::get_series_values(const int row, const i
         pos = find_file_op(column);
         if(pos == fileop)
         {
-            period_pos = Period(column.cl_per[0]).difference(sample->start_period());
+            period_pos = Period(column.cl_per[0]).difference(sample->start_period);
             y[period_pos] = get_value(row, col_val, true);
         }
         col_val++;

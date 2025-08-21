@@ -1,6 +1,6 @@
 #pragma once
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/sample.h"
+#include "cpp_api/common.h"
+
 
 const std::map<char, std::string> mLowToHigh = 
 {

@@ -187,7 +187,7 @@ int AsciiLists::save_asc(KDB* kdb, char* filename)
  * NOT IMPLEMENTED.
  */
 
-int AsciiLists::save_csv(KDB *kdb, char *filename, SAMPLE* sample, char** varlist)
+int AsciiLists::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
 {
     return(-1);
 }

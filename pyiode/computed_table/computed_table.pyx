@@ -2,7 +2,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.util cimport IODE_IS_A_NUMBER
-from pyiode.time.period cimport PERIOD
+from pyiode.time.period cimport CPeriod
 from pyiode.objects.table cimport CTable
 from pyiode.common cimport IODE_NAN
 from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
@@ -108,7 +108,7 @@ cdef class ComputedTable:
     def plotting_series_values(self, row: int, op_files: int) -> Tuple[np.ndarray, np.ndarray]:
         cdef int pos
         cdef COL column
-        cdef PERIOD c_period
+        cdef CPeriod c_period
         cdef double c_value
 
         sample: Sample = self.get_sample()
@@ -128,7 +128,7 @@ cdef class ComputedTable:
             pos = self.c_computed_table.find_file_op(column)
             if pos == op_files:
                 c_period = column.cl_per[0]
-                period = Period(c_period.p_y, chr(c_period.p_p), c_period.p_s)
+                period = Period(c_period.year, chr(c_period.periodicity), c_period.step)
                 period_pos = period.difference(first_period)
                 c_value = self.c_computed_table.get_value(row, col_val, <bint>True)
                 y[period_pos] = c_value if IODE_IS_A_NUMBER(c_value) else np.nan

@@ -482,7 +482,7 @@ static int L_count_endo(ALEC* al, int lg, char* endo)
 
     for(count = 0, i = 0; i < lg; i++, al++)
         if(al->al_type == L_VAR &&
-                al->al_val.v_var.per.p_s == 0 &&
+                al->al_val.v_var.per.step == 0 &&
                 al->al_val.v_var.lag == 0 &&
                 strcmp(L_NAMES[al->al_val.v_var.pos], endo) == 0)
             count++;

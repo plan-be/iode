@@ -14,7 +14,7 @@
  *  
  *  List of functions 
  *  -----------------
- * int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)   Estimates a bloc of equations on a defined SAMPLE.
+ * int B_EqsEstimateEqs(Sample* smpl, char** eqs)   Estimates a bloc of equations on a defined Sample.
  * int B_EqsEstimate(char* arg, int unused)                     Implementation of the report function $EqsEstimate.
  * int B_EqsSetSample(char* arg, int unused)                    Implementation of the report function $EqsSetSample.
  * int B_EqsSetMethod(char* arg, int unused)                    Implementation of the report function $EqsSetMethod.   
@@ -33,25 +33,26 @@
 
 /**
  *  Extracts the first 2 args of a report command and tries to translated
- *  them to a SAMPLE. Returns the remaining args as a list of equation names.
+ *  them to a Sample. Returns the remaining args as a list of equation names.
  *  
  *  @param [in] char*       arg     report line (w/o command)
- *  @param [in] SAMPLE**    psmpl   pointer to the result SAMPLE
+ *  @param [in] Sample**    psmpl   pointer to the result Sample
  *  @return     char**              table of equations names        
  */
-static char **B_EqsSplitSmplName(char* arg, SAMPLE **psmpl)
+static char **B_EqsSplitSmplName(char* arg, Sample **psmpl)
 {
     int     lg1, lg2;
     char    from[16], to[16], **eqs = 0;
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
-    *psmpl = PER_atosmpl(from, to);
-
-    if(*psmpl == NULL) {
-        std::string err_msg = "EqsEstimate: '"; 
-        err_msg += std::string(from) + ":" + std::string(to);
-        err_msg += "' wrong sample";
+    try
+    {
+        *psmpl = new Sample(std::string((char*) from), std::string((char*) to));
+    }
+    catch(const std::exception& e)
+    {
+        std::string err_msg = "EqsEstimate: invalid sample\n" + std::string(e.what()); 
         error_manager.append_error(err_msg);
         return(eqs);
     }
@@ -62,15 +63,15 @@ static char **B_EqsSplitSmplName(char* arg, SAMPLE **psmpl)
 
 
 /**
- *  Estimates a bloc of equations on a defined SAMPLE. On success, the results
+ *  Estimates a bloc of equations on a defined Sample. On success, the results
  *  are saved in the equations themselves (tests) and the scalars (coefficients).
  *  
- *  @param [in] SAMPLE* smpl    estimation sample
+ *  @param [in] Sample* smpl    estimation sample
  *  @param [in] char**  eqs     block of equations to be simultaneously estimated 
  *  @return     int             -1 if some eqs are not found
  *                              rc of KE_est_s() otherwise 
  */
-int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)
+int B_EqsEstimateEqs(Sample* smpl, char** eqs)
 {
     KDB* dbe;
     int  rc;
@@ -105,7 +106,7 @@ int B_EqsEstimate(char* arg, int unused)
 {
     int     rc = -1;
     char    **eqs;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     eqs = B_EqsSplitSmplName(arg, &smpl);
     if(smpl == 0) return(-1);
@@ -123,8 +124,8 @@ int B_EqsEstimate(char* arg, int unused)
  *      $EqsSetSample from to eqname1 eqname2 ...
  *
  *      where:
- *         from and to define the estimation SAMPLE
- *         eqname1 eqname2... are existing the (existing equations) whose estimation SAMPLE must be replaced.
+ *         from and to define the estimation Sample
+ *         eqname1 eqname2... are existing the (existing equations) whose estimation Sample must be replaced.
  *  
  *  @See https://iode.plan.be/doku.php?id=eqssetsample for details. 
  *  
@@ -133,7 +134,7 @@ int B_EqsSetSample(char* arg, int unused)
 {
     int     rc = 0, i;
     char    **eqs;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     eqs = B_EqsSplitSmplName(arg, &smpl);
     if(smpl == 0) return(-1);

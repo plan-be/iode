@@ -4,7 +4,7 @@ from typing import List, Tuple
 from enum import IntEnum
 
 
-PERIODICITY_LIST: List[str] = ["Y", "S", "Q", "M", "W", "D"]
+PeriodICITY_LIST: List[str] = ["Y", "S", "Q", "M", "W", "D"]
 
 PRINT_DEF_TABLES: Tuple[str, str] = (
     "Print full definitions",

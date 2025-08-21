@@ -127,7 +127,7 @@ static double  L_newton_1();
  *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
  *  @param [in] KDB*    dbs     KDB of Scalar with which the equation has been linked
  *  @param [in] CLEC*   clec    compiled LEC expression 
- *  @param [in] int     t       time of calculation (index in dbv SAMPLE)
+ *  @param [in] int     t       time of calculation (index in dbv Sample)
  *  @param [in] int     varnb   position of the endogenous variable in dbv
  *  @param [in] int     eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
  *  @return     double          root of the equation (varnb value that solves the equation)

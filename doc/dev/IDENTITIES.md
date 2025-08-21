@@ -89,5 +89,5 @@ On the other hand, one can execute identities on a sub\-sample. In this case, th
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl)`|Executes all identities in dbi using the input series of dbv and scalars of dbs. Missing vars and scalars are collected from vfiles and sfiles.|
+|`KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* smpl)`|Executes all identities in dbi using the input series of dbv and scalars of dbs. Missing vars and scalars are collected from vfiles and sfiles.|
 

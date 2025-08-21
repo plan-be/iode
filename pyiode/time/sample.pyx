@@ -47,11 +47,11 @@ cdef class Sample:
         cdef CPeriod c_period
         if self.c_sample is NULL:
             return True
-        c_period = self.c_sample.start_period()
-        if c_period.p_y == 0:
+        c_period = self.c_sample.start_period
+        if c_period.year == 0:
             return True
-        c_period = self.c_sample.end_period()
-        if c_period.p_y ==0:
+        c_period = self.c_sample.end_period
+        if c_period.year ==0:
             return True
         return False
 
@@ -88,7 +88,7 @@ cdef class Sample:
             warnings.warn("'sample' is not defined")
             return None
         
-        c_period = self.c_sample.start_period()
+        c_period = self.c_sample.start_period
         return Period(c_period.to_string().decode())
 
     def get_end(self) -> Period:
@@ -96,7 +96,7 @@ cdef class Sample:
             warnings.warn("'sample' is not defined")
             return None
         
-        c_period = self.c_sample.end_period()
+        c_period = self.c_sample.end_period
         return Period(c_period.to_string().decode())
 
     def get_nb_periods(self) -> int:
@@ -104,14 +104,14 @@ cdef class Sample:
             warnings.warn("'sample' is not defined")
             return 0
         
-        return self.c_sample.nb_periods()
+        return self.c_sample.nb_periods
 
     def __len__(self) -> int:
         if self.is_undefined():
             warnings.warn("'sample' is not defined")
             return 0
         
-        return self.c_sample.nb_periods()
+        return self.c_sample.nb_periods
 
     def __eq__(self, other: Sample) -> bool:
         if self.is_undefined():

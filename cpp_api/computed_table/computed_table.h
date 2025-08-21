@@ -1,8 +1,6 @@
 #pragma once
 
 #include "cpp_api/common.h"
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/sample.h"
 #include "cpp_api/objects/table.h"
 #include "cpp_api/KDB/kdb_variables.h"
 
@@ -114,7 +112,7 @@ public:
 
     int get_nb_periods() const
     {
-        return sample->nb_periods();
+        return sample->nb_periods;
     }
 
     int get_nb_files_ops() const

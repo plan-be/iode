@@ -540,17 +540,18 @@ int RP_mkdir(char* arg, int unused)
 // $settime <period>
 int RP_settime(char* arg, int unused)
 {
-    PERIOD *rp_per;
+    Period *rp_per;
 
-    rp_per = PER_atoper(arg);
-    if(rp_per == NULL) {
+    rp_per = new Period(arg);
+    if(!rp_per) 
+    {
         std::string error_msg = "SetTime " + std::string(arg) + ": invalid syntax";
         error_manager.append_error(error_msg);
         return(-1);
     }
 
-    memcpy(&RP_PER, rp_per, sizeof(PERIOD));
-    SCR_free(rp_per); // JMP 15/2/2013
+    RP_PER = *rp_per;
+    delete rp_per;
     return(0);
 }
 
@@ -558,13 +559,12 @@ int RP_settime(char* arg, int unused)
 int RP_incrtime(char* arg, int unused)
 {
     int     incr = 1;
-    PERIOD  *per;
 
     SCR_strip((unsigned char*) arg);
     if(arg[0]) incr = atoi(arg);
 
-    per = PER_addper(&RP_PER, incr);
-    memcpy(&RP_PER, per, sizeof(PERIOD));
+    Period per = RP_PER.shift(incr);
+    RP_PER = per;
     return(0);
 }
 

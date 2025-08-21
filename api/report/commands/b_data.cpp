@@ -202,11 +202,21 @@ int B_DataRasVar(char* arg, int unused)
 
     args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
     nbargs = SCR_tbl_size((unsigned char**) args);
-    if(nbargs < 5) rc = -1;
-    else {
-        if(nbargs > 5) maxit = atoi(args[5]);
-        if(nbargs > 6) eps = atof(args[6]);
-        rc = RasExecute(args[0], args[1], args[2], PER_atoper(args[3]), PER_atoper(args[4]), maxit, eps);
+    if(nbargs < 5) 
+        rc = -1;
+    else 
+    {
+        if(nbargs > 5) 
+            maxit = atoi(args[5]);
+        
+        if(nbargs > 6) 
+            eps = atof(args[6]);
+
+        Period *rper = new Period(std::string(args[3]));
+        Period *cper = new Period(std::string(args[4]));
+        rc = RasExecute(args[0], args[1], args[2], rper, cper, maxit, eps);
+        delete rper;
+        delete cper;
     }
 
     SCR_free_tbl((unsigned char**) args);
@@ -239,14 +249,14 @@ int B_DataCalcVar(char* arg, int unused)
     lec = arg + lg + 1;
     SCR_strip((unsigned char*) lec);
 
-    nb = KSMPL(kdb)->s_nb;
+    nb = KSMPL(kdb)->nb_periods;
     if((pos = K_find(kdb, name)) < 0) pos = K_add(kdb, name, NULL, &nb);
     if(pos < 0) return(-1);
 
     if(lec[0]) {
         clec = L_cc(lec);
         if(clec != 0 && !L_link(kdb, K_WS[SCALARS], clec)) {
-            for(t = 0 ; t < KSMPL(kdb)->s_nb ; t++) {
+            for(t = 0 ; t < KSMPL(kdb)->nb_periods ; t++) {
                 d = L_exec(kdb, K_WS[SCALARS], clec, t);
                 *(KVVAL(kdb, pos, t)) = d;
             }
@@ -288,7 +298,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             else return(0);
 
         case VARIABLES :
-            nb_per = KSMPL(kdb)->s_nb;
+            nb_per = KSMPL(kdb)->nb_periods;
             if(K_add(kdb, arg, NULL, &nb_per) < 0) return(-1);
             else return(0);
 
@@ -483,7 +493,7 @@ int B_DataUpdate(char* arg, int type)
     double  var;
     KDB     *kdb = K_WS[type];
     Scalar     scl;
-    PERIOD  *per = NULL;
+    Period  *per = NULL;
     char    name[K_MAX_NAME + 1], **args = NULL;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
@@ -564,18 +574,18 @@ int B_DataUpdate(char* arg, int type)
             }
             nb_upd = nb_args - nb_p - 1;
 
-            per = PER_atoper(args[nb_p]);
+            per = new Period(std::string(args[nb_p]));
             if(per == 0) {
                 error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
                 rc = -1;
                 break;
             }
-            nb_upd = std::min(nb_upd, PER_diff_per(&(KSMPL(kdb)->s_p2), per) + 1);
-            if(per == NULL
-                    || (shift = PER_diff_per(per, &(KSMPL(kdb)->s_p1))) < 0)
-                /*                    || (PER_diff_per(&(KSMPL(kdb)->s_p2), per) + 1 - nb_upd) < 0) */
+            nb_upd = std::min(nb_upd, (KSMPL(kdb)->end_period.difference(*per) + 1));
+            shift = per->difference(KSMPL(kdb)->start_period);
+            if(per == NULL || shift < 0)
                 rc = -1;
-            else {
+            else 
+            {
                 nb_p ++;
                 for(i = 0; i < nb_upd; i++) {
                     var = (double) atof(args[i + nb_p]);
@@ -594,11 +604,14 @@ int B_DataUpdate(char* arg, int type)
     }
 
     A_free((unsigned char**) args);
-    SCR_free(per);
+    delete per;
+
     if(rc >= 0) 
         rc = 0;
+
     if(rc < 0) 
         rc = -1; // Pour éviter return dans les rapports si rc = -2
+
     return(rc);
 }
 
@@ -1261,17 +1274,18 @@ static int B_DataEditGraph(int view, char* arg)
     int     rc = 0, nb_args, mode, type, xgrid, ygrid, axis;
     double  ymin, ymax;
     char    **args = NULL;
-    SAMPLE  *smpl = 0;
+    Sample  *smpl = 0;
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
-    if(nb_args < 10) {
-	error_manager.append_error("DataEditGraph : Syntax error");
-	rc = -1;
-	goto fin;
+    if(nb_args < 10) 
+    {
+        error_manager.append_error("DataEditGraph : Syntax error");
+        rc = -1;
+        goto fin;
     }
 
-    mode = L_pos("LDGdg", args[0][0]); /* GB 10/08/98 */
+    mode = get_pos_in_char_array("LDGdg", args[0][0]); /* GB 10/08/98 */
     mode = std::max(0, mode);
 
     type  = B_argpos("LSBM", args[1][0]);
@@ -1286,11 +1300,15 @@ static int B_DataEditGraph(int view, char* arg)
     if(memcmp(args[6], "--", 2) == 0) ymax = IODE_NAN;
     else                              ymax = atof(args[6]);
 
-    smpl = PER_atosmpl(args[7], args[8]);
-    if(smpl == 0) {
-	error_manager.append_error("Wrong sample definition");
-	rc = -1;
-	goto fin;
+    try
+    {
+        smpl = new Sample(std::string(args[7]), std::string(args[8]));
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error(std::string(e.what()));
+        rc = -1;
+        goto fin;
     }
 
     rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
@@ -1298,7 +1316,7 @@ static int B_DataEditGraph(int view, char* arg)
 
 fin:
     A_free((unsigned char**) args);
-    SCR_free(smpl);
+    if(smpl) delete smpl;
     return(rc);
 }
 

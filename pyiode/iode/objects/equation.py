@@ -135,8 +135,8 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> # date as default format "dd-mm-yyyy"
@@ -159,12 +159,12 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import Equation, scalars, variables
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
@@ -190,7 +190,7 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import Equation, scalars, variables
         >>> scalars.clear()
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
@@ -219,12 +219,12 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import Equation, scalars, variables
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
@@ -250,7 +250,7 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import Equation, scalars, variables
         >>> variables.clear()
         >>> variables.sample = "1960Y1:2015Y1"
@@ -279,7 +279,7 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Sample_DATA_DIR
         >>> from iode import Equation
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> lhs, rhs = eq_ACAF.split_equation()
@@ -364,11 +364,11 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -533,14 +533,14 @@ class Equation:
             
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Scalar
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
@@ -956,8 +956,8 @@ class Equation:
            
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["ACAF"].block             # doctest: +NORMALIZE_WHITESPACE
@@ -982,8 +982,8 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["ACAF"].tests             # doctest: +NORMALIZE_WHITESPACE
@@ -1005,8 +1005,8 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["ACAF"].date
@@ -1084,8 +1084,8 @@ class Equation:
         r"""
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
@@ -1122,11 +1122,11 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
@@ -1181,11 +1181,11 @@ class Equation:
         Examples
         --------
         >>> from copy import copy
-        >>> from iode import SAMPLE_DATA_DIR, equations, variables
-        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Sample_DATA_DIR, equations, variables
+        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE

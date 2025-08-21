@@ -61,7 +61,7 @@ int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
             || memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
 
     if(eq1->method != eq2->method) goto done;
-    if(memcmp(&(eq1->smpl), &(eq2->smpl), sizeof(SAMPLE)) != 0) goto done;
+    if(memcmp(&(eq1->smpl), &(eq2->smpl), sizeof(Sample)) != 0) goto done;
     if(strcmp(eq1->blk, eq2->blk) != 0) goto done;
     if(strcmp(eq1->instr, eq2->instr) != 0) goto done;
 
@@ -82,7 +82,7 @@ done :
  *  The function compares:
  *      - the compiled LEC form (the text of the LEC expression may differ as long as the compiled versions are equal).
  *      - the estimation method if present
- *      - the estimation SAMPLE if defined
+ *      - the estimation Sample if defined
  *      - the estimation block of simultaneous equations
  *      - the metric instruments if any
  *  
@@ -201,7 +201,7 @@ static int K_cmpvar_1(double v1, double v2)
 int K_cmp_var(VAR var1, VAR var2)
 {
     int i;
-    int nb = KSMPL(KV_WS)->s_nb;
+    int nb = KSMPL(KV_WS)->nb_periods;
 
     for(i = 0 ; i < nb ; i++)
         if(K_cmpvar_1(var1[i], var2[i])) 
@@ -225,7 +225,7 @@ int K_cmp_var(VAR var1, VAR var2)
 static int K_cmpvar(char* p1, char* p2, char* name)
 {
     double *r1, *r2;
-    int     i, nb = KSMPL(KV_WS)->s_nb;
+    int     i, nb = KSMPL(KV_WS)->nb_periods;
 
     r1 = (double*) P_get_ptr(p1, 0);
     r2 = (double*) P_get_ptr(p2, 0);

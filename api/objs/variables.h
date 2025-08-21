@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 
 /*----------------------- TYPEDEF ----------------------------*/
@@ -58,25 +59,25 @@ double *K_vval(KDB *, int, int);
 double *K_vptr(KDB *, char*, int);
 
 /* k_wsvar.c */
-int KV_sample(KDB *,SAMPLE *);
+int KV_sample(KDB *,Sample *);
 int KV_merge(KDB *,KDB *,int );
 void KV_merge_del(KDB *,KDB *,int );
 int KV_add(KDB* kdb, char* varname);
 double KV_get(KDB *,int ,int ,int );
 void KV_set(KDB *,int ,int ,int ,double );
-int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
+int KV_extrapolate(KDB *,int ,Sample *,char **);
 KDB *KV_aggregate(KDB *,int ,char *,char *);
 void KV_init_values_1(double* val, int t, int method);
-//int KV_GetSmpl(SAMPLE *,char *);
+//int KV_GetSmpl(Sample *,char *);
 double KV_get_at_t(char*varname, int t);
-double KV_get_at_per(char*varname, PERIOD* per);
+double KV_get_at_per(char*varname, Period* per);
 double KV_get_at_aper(char*varname, char* aper);
 int KV_set_at_t(char*varname, int t, double val);
-int KV_set_at_per(char*varname, PERIOD* per, double val);
+int KV_set_at_per(char*varname, Period* per, double val);
 int KV_set_at_aper(char*varname, char* aper, double val);
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KSMPL(kdb)          ((SAMPLE *) (kdb)->k_data)
+#define KSMPL(kdb)          ((Sample *) (kdb)->k_data)
 #define KVVAL(kdb, pos, t)  K_vval(kdb, pos, t)
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)

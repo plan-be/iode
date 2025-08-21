@@ -19,7 +19,8 @@
 #include "api/constants.h"
 #include "b_args.h"
 #include "b_errors.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
 
 #undef min
@@ -208,7 +209,7 @@ int B_argpos(char* str, int ch)
     int     pos;
 
     ch = SCR_upper_char(ch);
-    pos = L_pos(str, ch);
+    pos = get_pos_in_char_array(str, ch);
     pos = std::max(0, pos);
     return(pos);
 }

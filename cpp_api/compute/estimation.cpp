@@ -304,8 +304,8 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
 
 std::vector<std::string> EditAndEstimateEquations::save(const std::string& from, const std::string& to)
 {
-    std::string est_from = sample->start_period().to_string();
-    std::string est_to = sample->end_period().to_string();
+    std::string est_from = sample->start_period.to_string();
+    std::string est_to = sample->end_period.to_string();
 
     std::string no_est_from;
     std::string no_est_to;
@@ -313,9 +313,9 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     {
         Sample* vars_sample = Variables.get_sample();  
         // throw an error if the string does not represent a valid period
-        Period from_per = (!from.empty()) ? Period(from) : vars_sample->start_period();
+        Period from_per = (!from.empty()) ? Period(from) : vars_sample->start_period;
         // throw an error if the string does not represent a valid period
-        Period to_per = (!to.empty()) ? Period(to) : vars_sample->end_period();
+        Period to_per = (!to.empty()) ? Period(to) : vars_sample->end_period;
         // check that from is before to
         Sample no_est_sample(from_per, to_per);
 
@@ -369,10 +369,10 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     error_manager.clear();
 
     Sample* sample = Variables.get_sample();
-    if(sample->nb_periods() == 0)
+    if(sample->nb_periods == 0)
         throw std::runtime_error("Could not perform estimation: No estimation sample is defined");
-    std::string from_period = (from.empty()) ? sample->start_period().to_string() : from;
-    std::string to_period = (to.empty()) ? sample->end_period().to_string() : to;
+    std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
+    std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;
 
     Estimation estimation(to_char_array(eqs), KE_WS, KV_WS, KS_WS, to_char_array(from_period), 
                           to_char_array(to_period), -1, maxit, eps);

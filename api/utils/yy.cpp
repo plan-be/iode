@@ -8,8 +8,8 @@
  *    double K_read_real(YYFILE *yy):    reads a token on the YY stream and interprets the token as a double (double) if possible.
  *    long K_read_long(YYFILE* yy):         reads the next token on the YY stream and returns a long. 
  *    char* K_read_str(YYFILE* yy):         reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.  
- *    PERIOD *K_read_per(YYFILE* yy):       reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (<long><char><long>).
- *    SAMPLE *K_read_smpl(YYFILE* yy):      reads the next tokens on the YY stream and tries to interpret them as a SAMPLE.
+ *    Period *K_read_per(YYFILE* yy):       reads the next tokens on the YY stream and tries to interpret them as a Period definition (<long><char><long>).
+ *    Sample *K_read_smpl(YYFILE* yy):      reads the next tokens on the YY stream and tries to interpret them as a Sample.
  *    int K_read_align(YYFILE* yy):         reads the next token on the YY stream: LEFT, RIGHT or CENTER.
  *  
  *    void K_stracpy(char** to, char* from):         allocates and copies a null terminated string. 
@@ -126,18 +126,18 @@ char* K_read_str(YYFILE* yy)
 }
 
 /**
- *  Reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (<long><char><long>).
+ *  Reads the next tokens on the YY stream and tries to interpret them as a Period definition (<long><char><long>).
  *  If it is not possible, returns NULL.
  *  
  *  @param [in, out]    yy  YYFILE*     YY stream
- *  @return                 PERIOD*     NULL or pointer to an allocated PERIOD 
+ *  @return                 Period*     NULL or pointer to an allocated Period 
  *  
  */
 
-PERIOD  *K_read_per(YYFILE* yy)
+Period  *K_read_per(YYFILE* yy)
 {
     char    buf[30], buf1[2];
-    PERIOD  *tmp = NULL;
+    Period  *tmp = NULL;
 
     buf[0] = 0;
     if(YY_lex(yy) != YY_LONG) goto err;
@@ -148,7 +148,7 @@ PERIOD  *K_read_per(YYFILE* yy)
     if(YY_lex(yy) != YY_LONG) goto err;
     strcat(buf, (char*) yy->yy_text);
 
-    tmp = PER_atoper(buf);
+    tmp = new Period(std::string(buf));
     return(tmp);
 
 err:
@@ -157,30 +157,31 @@ err:
 
 
 /**
- *  Reads the next tokens on the YY stream and tries to interpret them as a SAMPLE (2 x PERIOD) definition (<long><char><long> <long><char><long>).
+ *  Reads the next tokens on the YY stream and tries to interpret them as a Sample (2 x Period) definition (<long><char><long> <long><char><long>).
  *  If it is not possible, returns NULL.
  *  
  *  @param [in, out]    yy  YYFILE*     YY stream
- *  @return                 PERIOD*     NULL or pointer to an allocated PERIOD 
+ *  @return                 Period*     NULL or pointer to an allocated Period 
  *  
  *  TODO: improve (correct) if the syntax is incorrect on YY stream.
  */
 
-SAMPLE  *K_read_smpl(YYFILE* yy)
+Sample  *K_read_smpl(YYFILE* yy)
 {
     int     nb;
-    SAMPLE  *smpl = NULL;
-    PERIOD  *one, *two;
+    Sample  *smpl = NULL;
+    Period  *one, *two;
 
     one = K_read_per(yy);
     two = K_read_per(yy);
-    if(one == 0 || two == 0 || (nb = PER_diff_per(two, one)) < 0)
+    nb = two->difference(*one);
+    if(one == 0 || two == 0 || nb < 0)
         kerror(0, "%s incorrect period", YY_error(yy));
     else {
-        smpl = (SAMPLE *) SW_nalloc(sizeof(SAMPLE));
-        memcpy(&(smpl->s_p1), one, sizeof(PERIOD));
-        memcpy(&(smpl->s_p2), two, sizeof(PERIOD));
-        smpl->s_nb = nb + 1;
+        smpl = (Sample *) SW_nalloc(sizeof(Sample));
+        memcpy(&(smpl->start_period), one, sizeof(Period));
+        memcpy(&(smpl->end_period), two, sizeof(Period));
+        smpl->nb_periods = nb + 1;
     }
 
     SW_nfree(one);

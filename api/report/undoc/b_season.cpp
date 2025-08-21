@@ -40,7 +40,7 @@ int B_season(char* arg)
     double    *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
                   eps, scale, season[12];
     KDB     *from = NULL, *to = NULL;
-    SAMPLE  *t_smpl = NULL;
+    Sample  *t_smpl = NULL;
 
     lg = B_get_arg0(name, arg, 80);
     data = B_ainit_chk(arg + lg, NULL, 0);
@@ -65,8 +65,8 @@ int B_season(char* arg)
     if(nbper < 0) goto done;
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    nb = t_smpl->s_nb;
+    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));
     i_vec = (double *) SW_nalloc(nb * sizeof(double));
@@ -417,13 +417,12 @@ int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbpe
     return(0);
 }
 
-int DS_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
+int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
 {
-    int     nbper;
-    PERIOD  p1, p2;
+    int nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
-
-    if((nbper = PER_nbper(&(ws_smpl->s_p1))) <= 0) {
+    if(nbper <= 0) 
+    {
         error_manager.append_error("Set periodicity first");
         return(-1);
     }
@@ -433,23 +432,33 @@ int DS_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
         return(-1);
     }
 
-    *t_smpl = (SAMPLE *) SW_nalloc(sizeof(SAMPLE));
-    PER_common_smpl(f_smpl, ws_smpl, *t_smpl);
-    memcpy(&p1, &((*t_smpl)->s_p1), sizeof(PERIOD));
-    if(p1.p_s != 1) {
-        p1.p_y += 1;
-        p1.p_s =  1;
+    try
+    {
+        *t_smpl = new Sample(f_smpl->intersection(*ws_smpl));
+        Period p1 = (*t_smpl)->start_period;
+        if(p1.step != 1) 
+        {
+            p1.year += 1;
+            p1.step =  1;
+        }
+    
+        Period p2 = (*t_smpl)->end_period;
+        if(p2.step != nbper) 
+        {
+            p2.year -= 1;
+            p2.step =  nbper;
+        }
+        delete (*t_smpl);
+
+        *t_smpl = new Sample(p1, p2);
+        *shift = (*t_smpl)->start_period.difference(f_smpl->start_period);
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error(e.what());
+        return(-1);
     }
 
-    memcpy(&p2, &((*t_smpl)->s_p2), sizeof(PERIOD));
-    if(p2.p_s != nbper) {
-        p2.p_y -= 1;
-        p2.p_s =  nbper;
-    }
-    SW_nfree(*t_smpl);
-
-    *t_smpl = PER_pertosmpl(&p1, &p2);
-    *shift = PER_diff_per(&((*t_smpl)->s_p1), &(f_smpl->s_p1));
     return(nbper);
 }
 

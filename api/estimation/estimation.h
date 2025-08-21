@@ -4,7 +4,8 @@
 
 #include "api/constants.h"
 #include "api/b_errors.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/equations.h"
 #include "api/objs/scalars.h"
@@ -52,7 +53,7 @@ class Estimation
 #endif
 
     char**    est_endos;      // list of equation names (endos = eqs names)
-    SAMPLE    est_smpl;       // sample used for the estimation
+    Sample    est_smpl;       // sample used for the estimation
     int       est_method;     // estimation method
 
 protected:
@@ -69,7 +70,7 @@ protected:
     KDB       *E_DBE;         // KDB of equations used for the estimation
     KDB       *E_DBS;         // KDB of scalars used for the estimation
     KDB       *E_DBV;         // KDB of variables used for the estimation 
-    SAMPLE    *E_SMPL;        // Current estimation sample
+    Sample    *E_SMPL;        // Current estimation sample
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
     double    E_EPS;          // Convergence criterion (threshold) for the estimation
@@ -157,19 +158,24 @@ public:
         // TODO: replace hard-coded separators by a (new?) variable 
         char** tmp_endos = (char**) SCR_vtoms((unsigned char*) endos, (unsigned char*) ",; ");
         
-        SAMPLE* smpl = NULL;
+        Sample* smpl = NULL;
         if(from_period != NULL && to_period != NULL)
         {
-            smpl = PER_atosmpl(from_period, to_period);
-            if(smpl == NULL)
-                throw std::invalid_argument("Invalid period range: " + std::string(from_period) + " - " + std::string(to_period));
+            try
+            {
+                smpl = new Sample(std::string(from_period), std::string(to_period));
+            }
+            catch(const std::exception& e)
+            {
+                throw std::invalid_argument("Cannot initialize estimation: " + std::string(e.what()));
+            }
         }
 
         initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
         if(smpl != NULL) SCR_free(smpl);
     }
 
-    Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, SAMPLE* smpl = NULL,
+    Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, Sample* smpl = NULL,
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         initialize(endos, dbe, dbv, dbs, smpl, method, maxit, eps);
@@ -197,13 +203,18 @@ public:
     {
         int     rc;
         bool    free_smpl = false;
-        SAMPLE* smpl = NULL;
+        Sample* smpl = NULL;
 
         if(from_period != NULL && to_period != NULL)
         {
-            smpl = PER_atosmpl(from_period, to_period);
-            if(smpl == NULL)
-                throw std::invalid_argument("Invalid period range: " + std::string(from_period) + " - " + std::string(to_period));
+            try
+            {
+                smpl = new Sample(std::string(from_period), std::string(to_period));
+            }
+            catch(const std::exception& e)
+            {
+                throw std::invalid_argument("Cannot initialize estimation: " + std::string(e.what()));
+            }
             free_smpl = true;               // We will free the sample after the estimation  
         }
         else
@@ -212,7 +223,7 @@ public:
         rc = KE_est_s(smpl);                // Perform the estimation
         
         if(free_smpl)
-            SCR_free(smpl);
+            delete smpl;
 
         if(rc != 0)
         {
@@ -256,7 +267,7 @@ public:
     }
 
 private:
-    void initialize(char** endos, KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, int method, 
+    void initialize(char** endos, KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, int method, 
                     int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)
@@ -282,13 +293,13 @@ private:
         E_DBS  = (dbs != NULL) ? dbs : KS_WS;
 
         if(smpl != NULL)
-            memcpy(&est_smpl, smpl, sizeof(SAMPLE));
+            memcpy(&est_smpl, smpl, sizeof(Sample));
         else
         {
             // If no sample is provided, we will use the one from the global variables database
             if(KSMPL(KV_WS) == NULL)
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            memcpy(&est_smpl, KSMPL(KV_WS), sizeof(SAMPLE));
+            memcpy(&est_smpl, KSMPL(KV_WS), sizeof(Sample));
         }
     }
 
@@ -347,15 +358,15 @@ private:
     void E_print_eqres_1(int eq_nb);
     void E_print_eqres_2(int eq_nb);
     void E_print_eqres(int obs);
-    int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res);
+    int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res);
     int E_print_results(int ,int ,int ,int ,int );
 
     /* k_est.c */
     void E_tests2scl(EQ *,int ,int ,int );
     void E_savescl(double, int, char*);
     void E_savevar(char*, int, MAT*);
-    int KE_est_s(SAMPLE* smpl);
-    int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tests);
+    int KE_est_s(Sample* smpl);
+    int KE_update(char* name, char* lec, int method, Sample* smpl, float* tests);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -368,4 +379,4 @@ int E_GetLecName(char *,char *);
 
 /* e_step.c */
 double C_evallec(char *,int);
-double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test);
+double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test);

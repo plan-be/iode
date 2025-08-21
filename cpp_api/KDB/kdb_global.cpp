@@ -130,15 +130,15 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     std::string caller_name = "export_as";
     std::string error_msg = "Cannot export ";
         
-    SAMPLE* smpl = NULL;
+    Sample* smpl = NULL;
     if(!(from.empty() || to.empty())) 
     {
         // raise an error if not valid
         Sample sample(from, to);
 
-        memcpy(&(smpl->s_p1), &(sample.s_p1), sizeof(PERIOD));
-        memcpy(&(smpl->s_p2), &(sample.s_p2), sizeof(PERIOD));
-        smpl->s_nb = sample.s_nb;
+        memcpy(&(smpl->start_period), &(sample.start_period), sizeof(Period));
+        memcpy(&(smpl->end_period), &(sample.end_period), sizeof(Period));
+        smpl->nb_periods = sample.nb_periods;
     }
 
     KDB* dbc;

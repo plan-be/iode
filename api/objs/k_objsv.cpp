@@ -42,7 +42,7 @@
  *    - Lists       K_add(KDB* kdb, char* name, char* list)
  *    - Scalars     K_add(KDB* kdb, char* name, Scalar* scalar)
  *    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
- *    - Variables   K_add(KDB* kdb, char* name, double* var, int* nb_obs) [nb_obs = kdb SAMPLE size]
+ *    - Variables   K_add(KDB* kdb, char* name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
  *  
  *  @note: the name of an equation MUST be the name of its endogenous variable
  *  

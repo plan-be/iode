@@ -220,7 +220,7 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
     if(rc < 0)
         goto err;
 
-    dim = KSMPL(dbv)->s_nb;
+    dim = KSMPL(dbv)->nb_periods;
     for(i = 0; i < KNB(dbv); i++) {
         strcpy(iname, KONAME(dbv, i));
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
@@ -275,7 +275,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
     if(rc < 0) 
         goto err;
 
-    nl = KSMPL(dbv)->s_nb;
+    nl = KSMPL(dbv)->nb_periods;
     nc = KNB(dbv);
 
     expdef->write_variable_and_comment(expdef, EXP_SEP, 0, 0);
@@ -291,8 +291,10 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
     expdef->write_variable_and_comment(expdef, 0, 0, 0);
 
-    for(j = 0; j < nl; j++) {
-        sprintf(oname, "%s%s", PER_pertoa(PER_addper(&(KSMPL(dbv)->s_p1), j), NULL), EXP_SEP);
+    for(j = 0; j < nl; j++) 
+    {
+        Period per = KSMPL(dbv)->start_period.shift(j);
+        sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(expdef, oname, 0, 0);
 
         for(i = 0; i < nc; i++) {
@@ -337,7 +339,7 @@ err:
 int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
 {
     KDB     *dbv = NULL, *dbc = NULL;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     ExportToFile  *expdef;
     int     rc = 0;
 
@@ -349,8 +351,20 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
 
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
-    if(from[0] == 0 || to[0] == 0) smpl = NULL;
-    else smpl = PER_atosmpl(from, to);
+    if(from[0] == 0 || to[0] == 0) 
+        smpl = nullptr;
+    else
+    {
+        try
+        {
+            smpl = new Sample(std::string(from), std::string(to));
+        }
+        catch(const std::exception& e)
+        {
+            error_manager.append_error("RuleExport:\n" + std::string(e.what()));
+            error_manager.display_last_error(); 
+        }
+    }
 
     if(trace[0] != 0) {
         IMP_trace = 1;
@@ -368,10 +382,13 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     // Get the ExportToFile handler for the requested format
     expdef = export_handlers[fmt].get();
 
-    if(vfile && vfile[0] != 0) {
+    if(vfile && vfile[0] != 0) 
+    {
         dbv = K_interpret(VARIABLES, vfile);
-        if(dbv == 0) return(-1); // JMP 29-05-2012
-        if(smpl != NULL) KV_sample(dbv, smpl);
+        if(dbv == 0) 
+            return(-1); // JMP 29-05-2012
+        if(smpl) 
+            KV_sample(dbv, smpl);
     }
 
     if(cfile && cfile[0] != 0)

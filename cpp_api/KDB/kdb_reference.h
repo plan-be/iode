@@ -1,5 +1,5 @@
 #pragma once
-#include "cpp_api/utils/utils.h"
+#include "cpp_api/common.h"
 
 
 // TODO ALD: remove K_RWS and make KDB classes to be able to represent a reference kdb

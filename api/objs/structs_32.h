@@ -64,7 +64,7 @@ struct EQ32
     PTR32   clec;
     char    solved;
     char    method;
-    SAMPLE  smpl;
+    Sample  smpl;
     PTR32   cmt;
     PTR32   blk;
     PTR32   instr;

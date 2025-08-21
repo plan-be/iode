@@ -5,7 +5,7 @@
  *  
  *      double *L_getvar(KDB* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
  *      double L_getscl(KDB* kdb, int pos)   Retrieves a scalar value.
- *      SAMPLE *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
+ *      Sample *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
  *      int L_findscl(KDB* kdb, char *name)     Retrieves a scalar position.
  *      int L_findvar(KDB* kdb, char* name)     Retrieves a variable position.
  */
@@ -52,13 +52,13 @@ double L_getscl(KDB* kdb, int pos)
  *  Implementation of L_getsmpl() in the context of IODE objects. 
  *  Retrieves the pointer to the sample a the KDB.
  *  
- *  @param [in] kdb     KDB*    KDB of VAR from which the PERIOD has to be retrieved
- *  @return             SAMPLE* pointer to the SAMPLE struct (not allocated)
+ *  @param [in] kdb     KDB*    KDB of VAR from which the Period has to be retrieved
+ *  @return             Sample* pointer to the Sample struct (not allocated)
  *  
  */
-SAMPLE *L_getsmpl(KDB* kdb)
+Sample *L_getsmpl(KDB* kdb)
 {
-    return((SAMPLE *) KDATA(kdb));
+    return((Sample *) KDATA(kdb));
 }
 
 

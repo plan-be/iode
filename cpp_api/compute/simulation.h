@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cpp_api/common.h"
-#include "cpp_api/utils/utils.h"
-#include "cpp_api/time/sample.h"
+#include "api/utils/utils.h"
+#include "api/time/sample.h"
 #include "cpp_api/KDB/kdb_lists.h"
 
 

@@ -5,7 +5,8 @@
 
 #include "api/constants.h"
 #include "api/b_args.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/variables.h"
 
@@ -207,11 +208,11 @@ public:
     }
 
 	/* k_sim_main.c */
-	int K_simul(KDB *,KDB *,KDB *,SAMPLE *,char **, char **);
+	int K_simul(KDB *,KDB *,KDB *,Sample *,char **, char **);
 
 	/* k_sim_scc.c */
 	int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post);
-	int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, 
+	int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, 
 		                   char** pre, char** inter, char** post);
 
 protected:
@@ -271,7 +272,7 @@ private:
 	int KE_findpath(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl);
+	int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl);
 };
 
 /* ---------------------- MACROS ---------------------- */

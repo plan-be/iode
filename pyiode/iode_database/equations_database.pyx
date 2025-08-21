@@ -80,9 +80,9 @@ cdef class Equations(CythonIodeDatabase):
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
             if from_period is None:
-                from_period = c_sample.start_period().to_string().decode()
+                from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
-                to_period = c_sample.end_period().to_string().decode()
+                to_period = c_sample.end_period.to_string().decode()
         
         if isinstance(from_period, Period):
             from_period = str(from_period)

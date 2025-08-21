@@ -14,8 +14,8 @@
  *                                  - position of the variable or scalar in the list of names LNAME's
  *                                  - lag (for variables)
  *                                  - ref (used only at execution time)
- *                                  - PERIOD (for variables)
- *                           - PERIOD for type "period"
+ *                                  - Period (for variables)
+ *                           - Period for type "period"
  *                           - long for type "integer constant"
  *                           - char for the nb of args in case of type "function"
  *                           - more complex (recursive) struct for types "TFN's" or "MTFN's"
@@ -52,8 +52,8 @@ static int L_calc_len(ALEC* expr, int from, int to)
             case L_VAR:
                 lg += sizeof(CVAR);
                 break;
-            case L_PERIOD:
-                lg += sizeof(PERIOD) + s_short;
+            case L_Period:
+                lg += sizeof(Period) + s_short;
                 break;
             case L_DCONST:
                 lg += sizeof(LECREAL);
@@ -89,7 +89,7 @@ CLEC *L_cc2(ALEC* expr)
     unsigned char    *ll = 0, *tmp;
     CLEC    *ptr = 0;
     int     lg = 0, i, pos, pos1, alg = 0, j, nvargs;
-    //PERIOD  *per;
+    //Period  *per;
     //long    l;
     //short   lag; // GB 11/12/12
     long    len, len1; // GB 11/12/12
@@ -114,9 +114,9 @@ CLEC *L_cc2(ALEC* expr)
                 memcpy(ll + lg, &cvar, sizeof(CVAR));
                 lg += sizeof(CVAR);
                 break;
-            case L_PERIOD:
-                memcpy(ll + lg, &(al->al_val.v_per), sizeof(PERIOD));
-                lg += sizeof(PERIOD) + s_short;
+            case L_Period:
+                memcpy(ll + lg, &(al->al_val.v_per), sizeof(Period));
+                lg += sizeof(Period) + s_short;
                 break;
             case L_DCONST:
                 memcpy(ll + lg, &(al->al_val.v_real), sizeof(LECREAL)); /* FLOAT 11-04-98 */

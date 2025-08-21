@@ -21,7 +21,7 @@ from pathlib import Path
 from datetime import datetime
 
 # GLOBALS
-SAMPLE_DATA_DIR = Path(SAMPLE_DATA_DIR).absolute()
+Sample_DATA_DIR = Path(Sample_DATA_DIR).absolute()
 IODE_OUTPUT_DIR = (Path(__file__).parent.parent / "output").absolute()
 IODE_VERBOSE = 1
 
@@ -55,7 +55,7 @@ def test_sample():
 
 def test_check_same_names():
     comments.clear()
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
 
     update_cmt = {"ACAF": "updated ACAF", "AOUC": "updated AOUC"}
     # works fine
@@ -78,13 +78,13 @@ def test_check_same_names():
 
 def test_workspace_save_compressed(tmp_path):
     # check that the workspace is saved in compressed format
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    identities.load(f"{Sample_DATA_DIR}/fun.idt")
+    lists.load(f"{Sample_DATA_DIR}/fun.lst")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # save the workspace in compressed format
     comments.save(str(tmp_path / "fun_compressed.cmt"), compress=True)
@@ -105,13 +105,13 @@ def test_workspace_save_compressed(tmp_path):
     variables.load(str(tmp_path / "fun_compressed.var"))
 
 def test_subset_type():
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    identities.load(f"{Sample_DATA_DIR}/fun.idt")
+    lists.load(f"{Sample_DATA_DIR}/fun.lst")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # check that the subset type is correct
     assert isinstance(comments["A*"], Comments)
@@ -123,13 +123,13 @@ def test_subset_type():
     assert isinstance(variables["A*"], Variables)
 
 def test_type_database_copy():
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    identities.load(f"{Sample_DATA_DIR}/fun.idt")
+    lists.load(f"{Sample_DATA_DIR}/fun.lst")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     assert isinstance(comments["A*"].copy(), Comments)
     assert isinstance(equations["A*"].copy(), Equations)
@@ -140,13 +140,13 @@ def test_type_database_copy():
     assert isinstance(variables["A*"].copy(), Variables)
 
 def test_database_getitem_returned_type():
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    identities.load(f"{Sample_DATA_DIR}/fun.idt")
+    lists.load(f"{Sample_DATA_DIR}/fun.lst")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     assert isinstance(comments["ACAF"], str)
     assert isinstance(equations["ACAF"], Equation)
@@ -159,10 +159,10 @@ def test_database_getitem_returned_type():
     assert isinstance(variables["ACAF", "2000Y1"], float) 
 
 def test_type_copy_iode_objects():
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    identities.load(f"{Sample_DATA_DIR}/fun.idt")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
 
     eq_ACAF = equations["ACAF"]
     assert isinstance(eq_ACAF.copy(), Equation)
@@ -174,8 +174,8 @@ def test_type_copy_iode_objects():
     assert isinstance(table_C8_1.copy(), Table)
 
 def test_database_delete():
-    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     cmt_subset = comments["A*"]
     var_subset = variables["A*"]
@@ -196,7 +196,7 @@ def test_database_delete():
 # ---------
 
 def test_print_equation():
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
     eq_ACAF = equations["ACAF"]
     string_eq_ACAF = ("Equation(endogenous = ACAF,\n"
                       "         lec = (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995),\n"
@@ -227,7 +227,7 @@ def test_table_language():
         table.language = "Spanish"
 
 def test_table_content():
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
     # specify list of line titles and list of LEC expressions
     lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
     lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
@@ -248,11 +248,11 @@ def test_table_content():
     assert str(table[index][1]) == 'YSSG+COTRES'
 
 def test_computed_table_extra_files():
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # too long list of files
-    sample_dir = Path(SAMPLE_DATA_DIR)
+    sample_dir = Path(Sample_DATA_DIR)
     extra_files = [sample_dir / "fun.av", sample_dir / "fun2.av", 
                    sample_dir / "ref.av", sample_dir / "a.var", sample_dir / "b.var"]
     with pytest.raises(ValueError, match=r"The number of extra files cannot exceed 4"):
@@ -264,16 +264,16 @@ def test_computed_table_extra_files():
         computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=extra_files)
 
 def test_computed_table_nb_decimals():
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # nb decimals must be in range [0, 99]
     with pytest.raises(ValueError, match=r"nb_decimals must be between 0 and 99"):
         computed_table = tables["C8_1"].compute("2010[1;2]:5", nb_decimals=-1)
 
 def test_computed_table_NA_values():
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     computed_table = tables["C8_1"].compute("(1960;1961/1960):5")
     col_names = computed_table.columns
     line_names = computed_table.lines
@@ -302,7 +302,7 @@ def test_computed_table_NA_values():
 def test_table_getitem_returned_type():
     from iode.objects.table import TableLine, TableCell
     
-    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
     table = tables["ANAPRIX"]
 
     assert isinstance(table.divider, TableLine)
@@ -315,7 +315,7 @@ def test_table_getitem_returned_type():
 def test_variables_setitem():
     # ==== select periods as 'first_period:' and 'last_period:' ====
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     vars_subset = variables["A*;*_", "1990Y1:"]
     assert str(vars_subset.sample) == "1990Y1:2015Y1"
@@ -328,7 +328,7 @@ def test_variables_setitem():
     
     # ==== 1) periods = unique period ====
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     vars_subset = variables["A*", "1990Y1":"1992Y1"].copy()
 
@@ -411,7 +411,7 @@ def test_variables_setitem():
 
     # ==== 2) periods = tuple(from_period, to_period) ====
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     vars_subset = variables["A*", "1990Y1":"1996Y1"].copy()
     periods = ("1991Y1", "1995Y1")
 
@@ -538,7 +538,7 @@ def test_variables_setitem():
 
     # ==== 3) periods = slice ====
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     vars_subset = variables["A*", "1990Y1":"1996Y1"].copy()
 
     # **** 3.a) values = float **** 
@@ -682,7 +682,7 @@ def test_variables_setitem():
 
     # ==== make subset of a subset and test if modifications propagate ====
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # a) create subset of a subset
     copy_ACAG = variables["ACAG"].copy()
@@ -712,7 +712,7 @@ def test_variables_setitem():
 
     # c) make subset of subset to be a copy and check if modifications do not propagate
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     vars_subset = variables["A*;*_", "1990Y1:2010Y1"]
     assert str(vars_subset.sample) == "1990Y1:2010Y1"
     assert not vars_subset.is_detached
@@ -736,7 +736,7 @@ def test_variables_setitem():
 @pytest.mark.skipif(la is None, reason="larray is not installed")
 def test_variables_binary_op():
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     variables["SUM"] = variables["ACAF"] + variables["ACAG"]
 
     # ==== larray 1D ====
@@ -764,7 +764,7 @@ def test_variables_binary_op():
 
 def test_variables_numpy_1D():
     variables.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     # exporting a subset representing a single variable returns 
     # a 1D numpy ndarray
@@ -841,7 +841,7 @@ def test_estimation(capsys):
     tables.clear()
     variables.clear()
 
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
@@ -867,7 +867,7 @@ def test_estimation(capsys):
 
 
     variables["VAF"] = 0.0
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
     eq_ACAF = equations["ACAF"]
     eq_ACAG = equations["ACAG"]
 
@@ -891,7 +891,7 @@ def test_estimation(capsys):
         equations.estimate("1980Y1", "1996Y1", "ACAF")
 
     # ======== test quiet mode ========
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
     equations.clear()
     scalars.clear()
 
@@ -907,8 +907,8 @@ def test_estimation(capsys):
     assert captured.out == ""
     assert success
 
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
 
     # create scalars
     scalars.clear()
@@ -937,9 +937,9 @@ def test_estimation(capsys):
     assert success
 
     # ======== test step-wise estimation ========
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
     scalars.clear()
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     assert eq_ACAF.lec == '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
@@ -961,9 +961,9 @@ def test_estimation(capsys):
     assert round(eq_ACAF.tests["fstat"], 10) == 34.6629257202
 
 
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     eq_ACAF = equations["ACAF"]
     assert eq_ACAF.tests["r2"] == equations["ACAF"].tests["r2"]
@@ -986,9 +986,9 @@ def test_estimation(capsys):
     assert round(eq_ACAF.tests["r2"], 10) == 0.7938754559
     assert round(eq_ACAF.tests["fstat"], 10) == 34.6629257202
 
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     scalars[eq_ACAF.coefficients] = Scalar(0., 1.)
     success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1", "acaf2 > 0", "r2")
@@ -1019,10 +1019,10 @@ def test_simulation(capsys):
     tables.clear()
     variables.clear()
 
-    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
+    lists.load(f"{Sample_DATA_DIR}/fun.lst")
+    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
+    variables.load(f"{Sample_DATA_DIR}/fun.var")
 
     simu = Simulation()
     simu.convergence_threshold = 0.01

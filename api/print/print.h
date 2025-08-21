@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/gsample/gsample.h"
 #include "api/objs/tables.h"
 
@@ -9,9 +10,9 @@
 //inline char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
 inline int      K_NBDEC = -1;          // Default nb of decimals
 
-inline char     **KT_names = NULL;     // Names of the files used in a GSAMPLE
+inline char     **KT_names = NULL;     // Names of the files used in a GSample
 inline int      KT_nbnames = 0;        // Number of names in KT_names
-inline int      KT_mode[MAX_MODE];     // Modes used in a GSAMPLE
+inline int      KT_mode[MAX_MODE];     // Modes used in a GSample
 inline int      KT_CUR_TOPIC = 0;      // Used in A2M file generation
 inline int      KT_CUR_LEVEL = 0;      // Used in A2M file generation
 
@@ -198,26 +199,26 @@ int APIChartNl(int hdl);
 char *APIChartTitle(int hdl, int i);
 int APIChartType(int hdl, int i);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
+int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
-int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y);
+int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIPrepareChart(TBL *tbl, char *gsmpl);
 int T_GraphEnd();
 int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
+int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 // int T_GraphLineData(int nb, double *x, double *y);
 // int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
 int T_GraphTest(TBL *tbl);
-int T_GraphTimeData(SAMPLE *smpl, double *y);
+int T_GraphTimeData(Sample *smpl, double *y);
 int T_GraphTitle(char *txt);
 int T_GraphXYData(int nb, double *x, double *y);
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 int T_find_opf(COLS *fcls, COL *cl);
 int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
-int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl);
-int V_graph(int ,int ,int ,int ,int ,int ,double ,double ,SAMPLE *,char **);
+int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl);
+int V_graph(int ,int ,int ,int ,int ,int ,double ,double ,Sample *,char **);
 
 /* int.c */
 int T_prep_cls(TBL *,char *,COLS **);

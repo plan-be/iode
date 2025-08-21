@@ -14,7 +14,7 @@
  *  List of functions 
  *  -----------------
  *      double C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
- *      double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
+ *      double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
  *                                                                                  coefficient configuration that gives 
  *                                                                                  the best statistical result (for a chosen test).
  */
@@ -31,7 +31,7 @@
 // Function declarations
 static int E_GetScls(CLEC* clec, char*** scl);
 static void E_SetScl(int relax, char* name);
-static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
+static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, char** eqs, char* test);
 
 
 /**
@@ -120,12 +120,12 @@ double C_evallec(char* lec, int t)
  *  @param [in] int         i       current run number
  *  @param [in] int         nbscl   total number of coefficients in *eqs
  *  @param [in] char**      scl     list of scalar names
- *  @param [in] SAMPLE*     smpl    estimation sample
+ *  @param [in] Sample*     smpl    estimation sample
  *  @param [in] char**      eqs     table of equation names (only eqs[0] is used)
  *  @param [in] char*       test    name of the statistical test to optimize: "fstat" or "r2"
  *  @return     double              value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
-static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
+static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, char** eqs, char* test)   
 {
     int         j, cscl, nscl;
     char        buf[512];
@@ -213,14 +213,14 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, SAMPLE* smpl, c
  *      j=2: 111 & 100 = 100 => c3 est
 
  *
- *  @param [in] SAMPLE* smpl    estimation SAMPLE
+ *  @param [in] Sample* smpl    estimation Sample
  *  @param [in] char*   eqname  equation name (if more than one name, only the first is used)
  *  @param [in] char*   cond    LEC expression that must satisfy "cond[0] == 0" to accept the estimation (?)
  *  @param [in] char*   test    name of the test to optimize: "n", "k", "stdev", "meany", "ssres", "stderr", 
  *                                              "fstat" , "r2"    , "r2adj" , "dw" or "loglik"
  *  @return     double          best test "test" value
  */
-double estimate_step_wise(SAMPLE* smpl, char* eqname, char* cond, char* test)
+double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;

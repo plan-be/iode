@@ -515,20 +515,22 @@ int B_PrintGBand(char* arg, int unused)
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
     char    **args;
     int     rc = 0, nbargs;
-    PERIOD  *per;
     double  startvalue = 0, endvalue = 0;
 
     args = SCR_vtom(arg, ' ');
     nbargs = SCR_tbl_size(args);
 
-    if(nbargs == 2) {
-        per = PER_atoper(args[0]);
+    if(nbargs == 2) 
+    {
+        Period  *per;
+        
+        per = new Period(std::string(args[0]));
         startvalue = PER_per2real(per, 0);
-        SW_nfree(per);
+        delete per;
 
-        per = PER_atoper(args[1]);
+        per = new Period(std::string(args[1]));
         endvalue = PER_per2real(per, 0);
-        SW_nfree(per);
+        delete per;
     }
 
     ChrtColorBand(startvalue, endvalue);

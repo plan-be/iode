@@ -13,7 +13,7 @@
  *  -----------------
  *  
  *   int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
- *   int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
+ *   int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *
  */
 #include "api/constants.h"
@@ -93,16 +93,16 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
  *  @param [in]         KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
  *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
  *  @param [in]         KDB*    dbs         KDB containing the model scalars
- *  @param [in]         SAMPLE* smpl        simulation SAMPLE
+ *  @param [in]         Sample* smpl        simulation Sample
  *  @return             int                 0 on success, -1 if dbe is empty or
  *                                                              smpl in incompatible with that of dbs or
  *                                                              le link is impossible
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
+int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
 {
-    int     i, t, rc = 0;
+    int     i, t, at, rc = 0;
 
     if(KNB(dbe) == 0) {
         std::string error_msg = "Empty set of equations";
@@ -116,8 +116,10 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     KSIM_DBS = dbs;
 
     // Check Sample dans les bornes du WS
-    t = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
-    if(t < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
+    t = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    at = KSMPL(dbv)->end_period.difference(smpl->end_period);
+    if(t < 0 || at < 0) 
+    {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(error_msg);
         return(-1);
@@ -131,9 +133,9 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->s_nb);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->nb_periods);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
@@ -172,14 +174,14 @@ fin:
  *  @param [in]         KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
  *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
  *  @param [in]         KDB*    dbs         KDB containing the model scalars
- *  @param [in]         SAMPLE* smpl        simulation SAMPLE
+ *  @param [in]         Sample* smpl        simulation Sample
  *  @param [in]         char*   pre         name of the prolog list 
  *  @param [in]         char*   inter       name of the interdependent list
  *  @param [in]         char*   post        name of the epilog list 
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)
+int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 
@@ -196,9 +198,9 @@ int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** 
     for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = K_find(dbe, post[i]);
 
     // Simulation
-    t = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
+    t = smpl->start_period.difference(KSMPL(dbv)->start_period);
 
-    for(i = 0; i < smpl->s_nb; i++, t++) {
+    for(i = 0; i < smpl->nb_periods; i++, t++) {
         if(rc = K_simul_1(t)) goto fin;
     }
 

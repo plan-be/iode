@@ -16,7 +16,7 @@ except ImportError:
 from iode.time.period import Period
 
 from iode.iode_cython import Sample as CythonSample
-_ALLOWED_TYPES_FOR_PERIOD = {'str', 'float', 'Period'}
+_ALLOWED_TYPES_FOR_Period = {'str', 'float', 'Period'}
 
 
 class Sample:
@@ -97,8 +97,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, Sample_DATA_DIR
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.index("1982Y1")
@@ -129,8 +129,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS
+        >>> from iode import variables, Sample_DATA_DIR
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.get_period_list()                  # doctest: +ELLIPSIS
@@ -144,8 +144,8 @@ class Sample:
             astype = astype.__name__
         if not isinstance(astype, str):
             raise TypeError(f"Expected 'astype' to be a string or a type. Got {type(astype).__name__} instead.")
-        if astype not in _ALLOWED_TYPES_FOR_PERIOD:
-            raise ValueError(f"Allowed types for 'astype' are {list(_ALLOWED_TYPES_FOR_PERIOD)}")
+        if astype not in _ALLOWED_TYPES_FOR_Period:
+            raise ValueError(f"Allowed types for 'astype' are {list(_ALLOWED_TYPES_FOR_Period)}")
         
         if astype == 'Period':
             list_periods = self._cython_instance.get_period_list('str')
@@ -163,8 +163,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, Sample_DATA_DIR
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -218,8 +218,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, SAMPLE_DATA_DIR
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, Sample_DATA_DIR
+        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.periods    # doctest: +ELLIPSIS

@@ -514,8 +514,8 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
 
     if(E_SMPL == NULL)
         throw std::runtime_error("Estimation sample has not been set for estimation");
-    E_FROM = PER_diff_per(&(E_SMPL->s_p1), &(KSMPL(E_DBV)->s_p1));
-    E_T    = E_SMPL->s_nb;
+    E_FROM = E_SMPL->start_period.difference(KSMPL(E_DBV)->start_period);
+    E_T    = E_SMPL->nb_periods;
 
     rc_prep = E_prep(lecs, instrs);
     if(rc_prep != 0)

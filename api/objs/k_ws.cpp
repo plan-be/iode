@@ -23,7 +23,7 @@
  *      - void K_init_ws(int ws)                    Initialises the "in mem" KDB structures and optionnaly loads the ws.* files
  *      - void K_end_ws(int ws)                     Deletes the current workspaces defined in K_WS[] and their content after having optionnaly 
  *                                                  saved their content in ws.* files.
- *      - int K_load_RWS(int ref, char *filename)   Load a VAR file for use in GSAMPLE (print tables and graphs)
+ *      - int K_load_RWS(int ref, char *filename)   Load a VAR file for use in GSample (print tables and graphs)
  */
 #include "api/b_errors.h" 
 #include "api/objs/kdb.h" 
@@ -76,16 +76,16 @@ void K_end_ws(int ws)
 
 
 /**
- *  Loads a VAR file for use in GSAMPLE (print tables and graphs).
+ *  Loads a VAR file for use in GSample (print tables and graphs).
  *  Stores its KDB pointer in K_RWS[VARIABLES][ref - 1]. 
  *  If filename is NULL, frees K_RWS[VARIABLES][ref - 1].
  *  
- *  Example: the files [1], [2] and [3] used in a GSAMPLE "2000Y1[1,2,3]" are loaded:
+ *  Example: the files [1], [2] and [3] used in a GSample "2000Y1[1,2,3]" are loaded:
  *      - [1] == current content of the VAR workspace
  *      - [2] by a call to K_load_RWS(2, "file2.var")
  *      - [3] by a call to K_load_RWS(3, "file3.var")
  *  
- *  @param [in] int     ref         reference number that will be used in GSAMPLE. 
+ *  @param [in] int     ref         reference number that will be used in GSample. 
  *                                  Restriction : 2 <= ref <= 5
  *  @param [in] char*   filename    file to load. 
  *                                  If NULL, frees K_RWS[VARIABLES][ref-1]

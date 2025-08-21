@@ -16,13 +16,14 @@
  *  -----------------
  *      int dif_skip_to(YYFILE* yy, int skey)                               Moves forward to the keyword skey or EOF or EOD.
  *      int dif_read_cell(YYFILE* yy, char** str, double* value)                 Reads the next cell which can contain a real or a string.
- *      int read_header(YYFILE* yy, SAMPLE* smpl)                            Reads the header of a DIF file and determines the sample of the content.
+ *      int read_header(YYFILE* yy, Sample* smpl)                            Reads the header of a DIF file and determines the sample of the content.
  *      int read_variable(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in a DIF file.
  *      int close()                                                   Cleanup the DIF global variables.
  *
  */
 #include "api/utils/yy.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/io/dif.h"
 #include "api/io/import.h"
 
@@ -102,15 +103,15 @@ int dif_read_cell(YYFILE* yy, char** str, double* value)
  *  Reads the header of a DIF file and determines the sample of the content.
  *  
  *  @param [in, out] YYFILE* yy      open YY stream
- *  @param [out]     SAMPLE* smpl    sample of the DIF file
+ *  @param [out]     Sample* smpl    sample of the DIF file
  *  @return          int             0 if a value is read, -1 if EOF or EOD is reached
  */
-int ImportObjsDIF::read_header(YYFILE* yy, SAMPLE* smpl)
+int ImportObjsDIF::read_header(YYFILE* yy, Sample* smpl)
 {
     double  value;
     char    *str;
     int     i;
-    PERIOD  per1, per2, *per;
+    Period  per1, per2, *per;
 
     if(YY_lex(yy) != DIF_TABLE) return(-1);
 
@@ -128,38 +129,56 @@ int ImportObjsDIF::read_header(YYFILE* yy, SAMPLE* smpl)
     SW_nfree(str);
     for(i = 0; i < DIF_ny; i++) {
         dif_read_cell(yy, &str, NULL);
-        per = PER_atoper(str); /* no valid samples defined, take input sample */
-        if(per == NULL) goto done;
+        /* no valid samples defined, take input sample */
+        per = new Period(std::string(str));
+        if(per == NULL) 
+            goto done;
         SW_nfree(str);
 
-        if(i == 0) {
-            memcpy(&per1, per, sizeof(PERIOD));
-            memcpy(&per2, per, sizeof(PERIOD));
-            DIF_freq = per->p_p;
+        if(i == 0) 
+        {
+            per1 = *per;
+            per2 = *per;
+            DIF_freq = per->periodicity;
             continue;
         }
 
-        if(per->p_p != DIF_freq) {
-            SW_nfree(per);
+        if(per->periodicity= DIF_freq) 
+        {
+            delete per;
             return(-1);
         }
 
-        if(PER_diff_per(per, &per1) < 0)
-            memcpy(&per1, per, sizeof(PERIOD));
+        if(per->difference(per1) < 0)
+            per1 = *per;
 
-        if(PER_diff_per(&per2, per) < 0)
-            memcpy(&per2, per, sizeof(PERIOD));
+        if(per2.difference(*per) < 0)
+            per2 = *per;
 
-        SW_nfree(per);
+        delete per;
     }
 
-    DIF_smpl = PER_pertosmpl(&per1, &per2);
-    if(DIF_smpl != NULL) memcpy(smpl, DIF_smpl, sizeof(SAMPLE));
+    try
+    {
+        DIF_smpl = new Sample(per1, per2);
+        *smpl = *DIF_smpl;
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "Cannot read the header of the DIF file: invalid sample\n";
+        error_msg += std::string(e.what());
+        error_manager.append_error(error_msg);
+        return(-1);
+    }
 
 done :
 
-    if(DIF_ny != smpl->s_nb) return(-1);
-    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(DIF_ny != smpl->nb_periods) 
+        return(-1);
+
+    if(dif_skip_to(yy, DIF_BOT) < 0) 
+        return(-1);
+    
     return(0);
 }
 

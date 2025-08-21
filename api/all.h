@@ -1,5 +1,8 @@
 #pragma once
 
+#include "api/time/period.h"
+#include "api/time/sample.h"
+
 #include "api/b_a2mini.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
@@ -49,8 +52,8 @@
 
 #include "api/simulation/simulation.h"
 
+#include "api/utils/utils.h"
 #include "api/utils/buf.h"
-#include "api/utils/time.h"
 #include "api/utils/yy.h"
 
 #include "api/write/write.h"

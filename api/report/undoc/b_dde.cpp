@@ -140,40 +140,50 @@ char *IodeDdeGetWS(char *szItem)
 
     SCR_upper((unsigned char*) szItem);
     type = IodeDdeType(szItem);
-    if(type < 0 || type > 6) return((char*) SCR_stracpy((unsigned char*) "Error"));
+    if(type < 0 || type > 6) 
+        return((char*) SCR_stracpy((unsigned char*) "Error"));
 
     kdb = K_WS[type];
-    if(strcmp(szItem, "SAMPLE") == 0) {
-        res = SCR_malloc(40);
-        PER_smpltoa(KSMPL(K_WS[VARIABLES]), res);
+    if(strcmp(szItem, "Sample") == 0) 
+    {
+        res = (char*) KSMPL(K_WS[VARIABLES])->to_string().c_str();
         return(res);
     }
-    else if(strcmp(szItem + 1, "LIST") == 0) {
-        if(kdb == 0 || KNB(kdb) == 0) return((char *)0);
+    else if(strcmp(szItem + 1, "LIST") == 0) 
+    {
+        if(kdb == 0 || KNB(kdb) == 0) 
+            return((char *)0);
         res = SCR_malloc((sizeof(ONAME) + 1) * (1 + KNB(kdb))); /* IODE64K */
-        for(i = 0 ; i < KNB(kdb) ; i++) {
+        for(i = 0 ; i < KNB(kdb) ; i++) 
+        {
             strcat(res, KONAME(kdb, i));
             strcat(res, "\t");
         }
         return(res);
     }
-    else if(strcmp(szItem + 1, "NAME") == 0) {
-        if(kdb == 0) return((char *)0);
+    else if(strcmp(szItem + 1, "NAME") == 0) 
+    {
+        if(kdb == 0) 
+            return((char*) 0);
         res = (char*) SCR_stracpy((unsigned char*) KNAMEPTR(kdb)); /* JMP 03-06-2015 */
         return(res);
     }
-    else if(strcmp(szItem + 1, "DESCR") == 0) {
-        if(kdb == 0) return((char *)0);
+    else if(strcmp(szItem + 1, "DESCR") == 0) 
+    {
+        if(kdb == 0) 
+            return((char*) 0);
         res = (char*) SCR_stracpy((unsigned char*) KDESC(kdb));
         return(res);
     }
-    else if(strcmp(szItem + 1, "NB") == 0) {
-        if(kdb == 0) return((char *)0);
+    else if(strcmp(szItem + 1, "NB") == 0) 
+    {
+        if(kdb == 0) 
+            return((char*) 0);
         res = SCR_malloc(20);
         sprintf(res, "%d", KNB(kdb));
         return(res);
     }
-    return((char *)0);
+    return((char*) 0);
 }
 
 char *IodeDdeCreateSeries(int objnb, int bt)
@@ -183,10 +193,10 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     int     t;
     double  x;
 
-    res = SCR_malloc(40 * (1 + KSMPL(kdb)->s_nb - bt)); /* JMP 29-06-00 */
+    res = SCR_malloc(40 * (1 + KSMPL(kdb)->nb_periods - bt)); /* JMP 29-06-00 */
     strcpy(res, KONAME(kdb, objnb));
     strcat(res, "\t");
-    for(t = bt ; t < KSMPL(kdb)->s_nb ; t++) {
+    for(t = bt ; t < KSMPL(kdb)->nb_periods ; t++) {
         x = *(KVVAL(kdb, objnb, t));
         if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "#N/A");
         // else           SCR_fmt_dbl(x, buf, 16, -1); /* JMP 01-02-99 */
@@ -203,13 +213,13 @@ char *IodeDdeCreatePer(int bt)
 {
     char    *res;
     KDB     *kdb = K_WS[VARIABLES];
-    PERIOD  *per;
     int     t;
 
-    res = SCR_malloc(11 * (1 + KSMPL(kdb)->s_nb - bt));
-    for(t = bt ; t < KSMPL(kdb)->s_nb ; t++) {
-        per = PER_addper(&(KSMPL(kdb)->s_p1), t);
-        strcat(res, PER_pertoa(per, 0L));
+    res = SCR_malloc(11 * (1 + KSMPL(kdb)->nb_periods - bt));
+    for(t = bt ; t < KSMPL(kdb)->nb_periods ; t++) 
+    {
+        Period per = KSMPL(kdb)->start_period.shift(t);
+        strcat(res, (char*) per.to_string().c_str());
         strcat(res, "\t");
     }
 
@@ -291,7 +301,7 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
 
 
 /**
- *  Compute the table objnb on the GSAMPLE ismpl and return a string containing the result.
+ *  Compute the table objnb on the GSample ismpl and return a string containing the result.
  */
 
 char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
@@ -303,21 +313,20 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     TBL     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
     TLINE   *line;
-    SAMPLE  *smpl = (SAMPLE *) KDATA(KV_WS);
+    Sample  *smpl = (Sample *) KDATA(KV_WS);
 
     /* date */
-    long    SCR_current_date();
     char    date[11];
+
     /* mode */
-    if(ismpl == NULL) {
-        sprintf(gsmpl, "%s:%d",
-                PER_pertoa(&(smpl->s_p1), NULL), smpl->s_nb);
-    }
+    if(ismpl == NULL)
+        sprintf(gsmpl, "%s:%d", (char*) smpl->start_period.to_string().c_str(), smpl->nb_periods);
     else
         sprintf(gsmpl, "%s", ismpl);
 
     dim = T_prep_cls(tbl, gsmpl, &cls);
-    if(dim < 0) return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    if(dim < 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
@@ -477,7 +486,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
         case VARIABLES:
             if(SCR_tbl_size(lst) == 0) {
                 res = IodeDdeCreatePer(0);
-                WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1,  KSMPL(kdb)->s_nb, 1), 
+                WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1,  KSMPL(kdb)->nb_periods, 1), 
                                (unsigned char*) res);
                 SCR_free(res);
             }
@@ -485,7 +494,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
             if(SCR_tbl_size(lst) == 0) {
                 for(i = 0 ; i < KNB(kdb) ; i++) {
                     res = IodeDdeCreateSeries(i, 0);
-                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + KSMPL(kdb)->s_nb, 1), 
+                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + KSMPL(kdb)->nb_periods, 1), 
                                    (unsigned char*) res);
                     SCR_free(res);
                 }
@@ -495,7 +504,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                 for(i = 0 ; lst[i] ; i++) {
                     if(strcmp((char*) lst[i], "t") == 0) {
                         res = IodeDdeCreatePer(0);
-                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + KSMPL(kdb)->s_nb, 1), 
+                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + KSMPL(kdb)->nb_periods, 1), 
                                        (unsigned char*) res);
                         SCR_free(res);
                     }
@@ -504,7 +513,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                         if(objnb < 0) continue;
 
                         res = IodeDdeCreateSeries(objnb, 0);
-                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + KSMPL(kdb)->s_nb, 1), 
+                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + KSMPL(kdb)->nb_periods, 1), 
                                        (unsigned char*) res);
                         SCR_free(res);
                     }
@@ -582,8 +591,8 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             return(res);
 
         case VARIABLES :
-            res = SCR_malloc(40 * (1 + KSMPL(kdb)->s_nb)); /* JMP 29-06-00 */
-            for(t = 0 ; t < KSMPL(kdb)->s_nb ; t++) {
+            res = SCR_malloc(40 * (1 + KSMPL(kdb)->nb_periods)); /* JMP 29-06-00 */
+            for(t = 0 ; t < KSMPL(kdb)->nb_periods ; t++) {
                 x = *(KVVAL(kdb, objnb, t));
                 if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "0");
                 //else           SCR_fmt_dbl(x, buf, 16, -1);  /* JMP 01-02-99 */
@@ -616,7 +625,7 @@ int IodeDdeSetWS(char *szItem, char *szBuffer)
     if(type < 0 || type > 6) return(-1);
 
     kdb = K_WS[type];
-    if(strcmp(szItem, "SAMPLE") == 0) rc = B_WsSample(szBuffer);
+    if(strcmp(szItem, "Sample") == 0) rc = B_WsSample(szBuffer);
     else if(strcmp(szItem + 1, "NAME") == 0)  rc = B_WsName(szBuffer, type);
     else if(strcmp(szItem + 1, "DESCR") == 0) rc = B_WsDescr(szBuffer, type);
     else if(strcmp(szItem + 1, "CLEAR") == 0) rc = B_WsClear("", type);
@@ -682,7 +691,7 @@ int DdeTsfKey(char *key)
 
 int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
 {
-    char    *tmp, buf[30];
+    char    *tmp;
     KDB     *kdb;
     int     type;
 
@@ -699,13 +708,13 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
     kdb = K_WS[type];
 
     tmp = SCR_malloc((int)strlen(szBuffer) + 30);
-    if(type == VARIABLES) {
+    if(type == VARIABLES) 
+    {
         sprintf(tmp, "%s %s %s", szItem,
-                PER_pertoa(&(KSMPL(kdb)->s_p1), buf), szBuffer);
+                (char*) KSMPL(kdb)->start_period.to_string().c_str(), szBuffer);
     }
-    else {
+    else
         sprintf(tmp, "%s %s", szItem, szBuffer);
-    }
 
     SCR_replace((unsigned char*) tmp, (unsigned char*) "\t", (unsigned char*) " ");
     B_DataUpdate(tmp, type);
@@ -716,7 +725,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
 /* Interface to EXCEL via DDE */
 /* fn rapport
     $ExcelSetVar VARNAME [Sheet] [R1C1]
-    $ExcelGetVar VARNAME [PERIODE] [Sheet] [R1C1]
+    $ExcelGetVar VARNAME [PeriodE] [Sheet] [R1C1]
 
     $ExcelExecute Open("c:\usr\iode\test.xls")
     $ExcelExecute Close
@@ -952,8 +961,8 @@ int B_ExcelSet(char *arg, int type)
                 nb_args, nbr = 1, nc = 1, nl = 1;
     KDB         *kdb = K_WS[type];
     Scalar         *scl;
-    PERIOD      *per = NULL;
-    double   d;
+    Period      *per = NULL;
+    double      d;
     char        **args = NULL,
                 *ptr = NULL,
                 *item, *smpl;
@@ -993,13 +1002,15 @@ int B_ExcelSet(char *arg, int type)
             break;
 
         case VARIABLES : /* Name Period nVal */
-            per = PER_atoper(args[1]);
-            if(per == NULL
-                    || (shift = PER_diff_per(per, &(KSMPL(kdb)->s_p1))) < 0) shift = 0;
-            else item = args[2];
+            per = new Period(std::string(args[1]));
+            shift = per->difference(KSMPL(kdb)->start_period);
+            if(per == NULL || shift< 0) 
+                shift = 0;
+            else 
+                item = args[2];
 
             ptr = IodeDdeCreateSeries(pos, shift);
-            nc = 1 + KSMPL(kdb)->s_nb - shift; /* JMP 04-10-99 */
+            nc = 1 + KSMPL(kdb)->nb_periods - shift; /* JMP 04-10-99 */
             break;
     }
 
@@ -1012,7 +1023,7 @@ the_end:
         error_manager.append_error(std::string(args[0]) + " : not found");  /* JMP 10-08-00 */
 
     SCR_free_tbl((unsigned char**) args);
-    SCR_free(per);
+    delete per;
     SCR_free(ptr);
 
     if(rc >= 0) 

@@ -3,23 +3,23 @@
  *
  * Functions acting on workspaces of variables.
  *
- *    int KV_sample(KDB *kdb, SAMPLE *nsmpl)                                  Changes the SAMPLE of a KDB of variables.
+ *    int KV_sample(KDB *kdb, Sample *nsmpl)                                  Changes the Sample of a KDB of variables.
  *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
  *    int KV_add(KDB* kdb, char* varname)                                               Adds a new variable in KV_WS. Fills it with IODE_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
  *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
+ *    int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)     Extrapolates variables on a selected Sample according to one of the available methods.
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(double* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
- *    int KV_per_pos(PERIOD* per2)                                            Retrieves the position of a PERIOD in the current KV_WS sample.
+ *    int KV_per_pos(Period* per2)                                            Retrieves the position of a Period in the current KV_WS sample.
  *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current KV_WS sample.  
  *    double KV_get_at_t(char*varname, int t)                                 Retrieves the value of varname[t] 
- *    double KV_get_at_per(char*varname, PERIOD* per)                         Retrieves the value of varname[per] 
+ *    double KV_get_at_per(char*varname, Period* per)                         Retrieves the value of varname[per] 
  *    double KV_get_at_aper(char*varname, char* aper)                         Retrieves the value of varname[aper]
  *    int KV_set_at_t(char*varname, int t, double val)                        Replaces the value of varname[t] by val.
- *    int KV_set_at_per(char*varname, PERIOD* per, double val)                Replaces the value of varname[per] by val.
+ *    int KV_set_at_per(char*varname, Period* per, double val)                Replaces the value of varname[per] by val.
  *    int KV_set_at_aper(char*varname, char* aper, double val)                Replaces the value of varname[aper] by val.
  */
 #include "api/b_errors.h"
@@ -31,41 +31,42 @@
 
 
 /**
- * Changes the SAMPLE of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.
+ * Changes the Sample of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.
  * 
  * @param [in, out] kdb     KDB*            pointer to a KDB of variables
- * @param [in]      nsmpl   SAMPLE* | NULL  new sample or NULL. If NULL or empty, no changes are made to the current WS
+ * @param [in]      nsmpl   Sample* | NULL  new sample or NULL. If NULL or empty, no changes are made to the current WS
  * @return                  int             -1 if the kdb's sample and nsmpl don't overlap or the resulting set is empty
  *                                          0 otherwise
  */
  
-int KV_sample(KDB *kdb, SAMPLE *nsmpl)
+int KV_sample(KDB *kdb, Sample *nsmpl)
 {
     int     i, start1 = 0, start2 = 0, new_val;
     char    *ptr;
-    SAMPLE  *ksmpl, smpl;
+    Sample  *ksmpl, smpl;
 
-    if(nsmpl == NULL || nsmpl->s_nb == 0) return(0);
+    if(nsmpl == NULL || nsmpl->nb_periods == 0) 
+        return(0);
     
-    ksmpl = (SAMPLE *) KDATA(kdb);
+    ksmpl = (Sample *) KDATA(kdb);
 
-    if(ksmpl->s_nb != 0) {
-        if(PER_common_smpl(ksmpl, nsmpl, &smpl) < 0) return(-1);
-        if(smpl.s_nb > 0) {
-            start1 = PER_diff_per(&(smpl.s_p1), &(ksmpl->s_p1));
-            start2 = PER_diff_per(&(smpl.s_p1), &(nsmpl->s_p1));
+    if(ksmpl->nb_periods != 0) {
+        smpl = ksmpl->intersection(*nsmpl);
+        if(smpl.nb_periods > 0) {
+            start1 = smpl.start_period.difference(ksmpl->start_period);
+            start2 = smpl.start_period.difference(nsmpl->start_period);
         }
     }
 
-    memcpy(ksmpl, nsmpl, sizeof(SAMPLE));
+    memcpy(ksmpl, nsmpl, sizeof(Sample));
     for(i = 0 ; i < KNB(kdb); i++) {
-        new_val = KV_alloc_var(ksmpl->s_nb);
+        new_val = KV_alloc_var(ksmpl->nb_periods);
         ptr = SW_getptr(new_val);
         if(KSOVAL(kdb, i) != 0) {
-            if(smpl.s_nb > 0)
+            if(smpl.nb_periods > 0)
                 memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
                        KVVAL(kdb, i, start1),
-                       sizeof(double) * smpl.s_nb);
+                       sizeof(double) * smpl.nb_periods);
             SW_free(KSOVAL(kdb, i));
         }
         KSOVAL(kdb, i) = new_val;
@@ -90,21 +91,21 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 {
     int     i, start1, start2, pos, nb1;
     //int     *p_pos;
-    SAMPLE  *k1smpl, *k2smpl, smpl;
+    Sample  *k1smpl, *k2smpl, smpl;
 
     if(kdb2 == NULL) return(0);  // JMP 30/09/2022
-    k1smpl = (SAMPLE *) KDATA(kdb1);
-    k2smpl = (SAMPLE *) KDATA(kdb2);
+    k1smpl = (Sample *) KDATA(kdb1);
+    k2smpl = (Sample *) KDATA(kdb2);
 
-    if(k1smpl->s_nb == 0) memcpy(k1smpl, k2smpl, sizeof(SAMPLE));
+    if(k1smpl->nb_periods == 0) memcpy(k1smpl, k2smpl, sizeof(Sample));
 
-    if(PER_common_smpl(k1smpl, k2smpl, &smpl) < 0) return(-1);
-    if(smpl.s_nb > 0) {
-        start1 = PER_diff_per(&(smpl.s_p1), &(k1smpl->s_p1)); /* always >= 0 */
-        start2 = PER_diff_per(&(smpl.s_p1), &(k2smpl->s_p1)); /* always >= 0 */
+    smpl = k1smpl->intersection(*k2smpl);
+    if(smpl.nb_periods > 0) {
+        start1 = smpl.start_period.difference(k1smpl->start_period); /* always >= 0 */
+        start2 = smpl.start_period.difference(k2smpl->start_period); /* always >= 0 */
     }
 
-    nb1 = k1smpl->s_nb;
+    nb1 = k1smpl->nb_periods;
     for(i = 0; i < KNB(kdb2); i++) {
         pos = K_find(kdb1, KONAME(kdb2, i));
         if(pos < 0) pos = K_add(kdb1, KONAME(kdb2, i), NULL, &nb1);
@@ -113,7 +114,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         if(pos >= 0 && KSOVAL(kdb2, i) != 0)
             memcpy((double *) KVVAL(kdb1, pos, start1),
                    (double *) KVVAL(kdb2, i, start2),
-                   sizeof(double) * smpl.s_nb);
+                   sizeof(double) * smpl.nb_periods);
     }
 
     return(0);
@@ -135,18 +136,18 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 
 void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 {
-    SAMPLE  *k1smpl, *k2smpl;
+    Sample  *k1smpl, *k2smpl;
 
     if(kdb2 == NULL) return;  // JMP 30/09/2022
-    k1smpl = (SAMPLE *) KDATA(kdb1);
-    k2smpl = (SAMPLE *) KDATA(kdb2);
+    k1smpl = (Sample *) KDATA(kdb1);
+    k2smpl = (Sample *) KDATA(kdb2);
 
     if(KNB(kdb2) == 0) return;
     if(KNB(kdb1) == 0) {
-        if(k1smpl->s_nb != 0)
+        if(k1smpl->nb_periods != 0)
             KV_sample(kdb2, k1smpl);
         else
-            memcpy(k1smpl, k2smpl, sizeof(SAMPLE));
+            memcpy(k1smpl, k2smpl, sizeof(Sample));
         KNB(kdb1)   = KNB(kdb2);
         KOBJS(kdb1) = KOBJS(kdb2);
         KNB(kdb2)   = 0;
@@ -179,7 +180,7 @@ int KV_add(KDB* kdb, char* varname)
     // Create varname with NaN 
     pos = K_find(kdb, varname);
     if(pos < 0) {
-        nobs = KSMPL(kdb)->s_nb;
+        nobs = KSMPL(kdb)->nb_periods;
         pos = K_add(kdb, varname, NULL, &nobs); // Set IODE_NAN if the new var
     }
     else { 
@@ -187,7 +188,7 @@ int KV_add(KDB* kdb, char* varname)
         vptr = K_vptr(kdb, varname, 0);
         if(vptr == NULL) 
             return(-1);
-        for(t = 0; t < KSMPL(kdb)->s_nb; t++) 
+        for(t = 0; t < KSMPL(kdb)->nb_periods; t++) 
             vptr[t] = IODE_NAN;
     }
         
@@ -214,10 +215,10 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
     int     pernb;
     double  var;
     double    *vt;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
-    smpl = (SAMPLE *) KDATA(kdb);
-    pernb = PER_nb((smpl->s_p1).p_p);
+    smpl = (Sample *) KDATA(kdb);
+    pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
     switch(mode) {
         case VAR_MODE_LEVEL :
@@ -277,10 +278,10 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double value)
 {
     int     pernb;
     double    *var;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
-    smpl = (SAMPLE *) KDATA(kdb);
-    pernb = PER_nb((smpl->s_p1).p_p);
+    smpl = (Sample *) KDATA(kdb);
+    pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
     var = KVVAL(kdb, pos, 0);
     switch(mode) {
@@ -370,28 +371,30 @@ calc2:
 
 
 /**
- *  Extrapolates variables on a selected SAMPLE according to one of the available methods. These extrapolation methods are
+ *  Extrapolates variables on a selected Sample according to one of the available methods. These extrapolation methods are
  *  described in the function KV_init_values(). 
  *  
  *  @param [in, out]    dbv    KDB*     KDB of variables on which the operation will be applied
  *  @param [in]         method int      identification of the extrapolation method (see K_init_values())
- *  @param [in]         smpl   SAMPLE*  SAMPLE on which the operation is to be carried out
+ *  @param [in]         smpl   Sample*  Sample on which the operation is to be carried out
  *  @param [in]         vars   char**   if not NULL, restricted list of variables to extrapolate
  *                                      if NULL, all variables in KDB will be modified
  *  @return                             0 on success,
- *                                      -1 if the SAMPLE is invalid or the KDB is empty or dbv does not contain any variable 
+ *                                      -1 if the Sample is invalid or the KDB is empty or dbv does not contain any variable 
  *                                          from the list vars
  *  @details 
  */
  
-int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
+int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)
 {
-    int         rc = -1, i, v, bt, t;
+    int         rc = -1, i, v, bt, t, at;
     double      *val;
     KDB         *edbv = NULL;
 
-    bt = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
-    if(bt < 0 || PER_diff_per(&(KSMPL(dbv)->s_p2), &(smpl->s_p2)) < 0) {
+    bt = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    at = KSMPL(dbv)->end_period.difference(smpl->end_period);
+    if(bt < 0 || at < 0) 
+    {
         error_manager.append_error("WsExtrapolate : sample definition error");
         goto done;
     }
@@ -405,7 +408,7 @@ int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
 
     for(v = 0; v < KNB(edbv); v++) {
         val = KVVAL(edbv, v, 0);
-        for(i = 0, t = bt; i < smpl->s_nb; i++, t++)
+        for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
     rc = 0;
@@ -435,20 +438,20 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     ONAME   ename, nname;
     double    *eval = NULL, *nval;
     KDB     *edbv = NULL, *ndbv = NULL;
-    SAMPLE  *smpl;
+    Sample  *smpl;
 
     if(filename == NULL || filename[0] == 0) edbv = dbv;
     else edbv = K_interpret(VARIABLES, filename);
     if(edbv == NULL) goto done;
 
     smpl = KSMPL(edbv);
-    nb_per = KSMPL(edbv)->s_nb;
+    nb_per = KSMPL(edbv)->nb_periods;
     eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = K_create(VARIABLES, UPPER_CASE);
     if(ndbv == NULL) goto done;
-    else memcpy(KDATA(ndbv), KSMPL(edbv), sizeof(SAMPLE));
+    else memcpy(KDATA(ndbv), KSMPL(edbv), sizeof(Sample));
 
     for(epos = 0; epos < KNB(edbv); epos++) {
         strcpy(ename, KONAME(edbv, epos));
@@ -473,7 +476,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 
         memcpy(eval, KVVAL(edbv, epos, 0), nb_per * sizeof(double));
         nval = KVVAL(ndbv, npos, 0);
-        for(t = 0; t < smpl->s_nb; t++) {
+        for(t = 0; t < smpl->nb_periods; t++) {
             if(added) nval[t] = eval[t];
             else {
                 if(method == 1) { /* m = 1 PROD */
@@ -492,7 +495,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     if(method == 2) {
         for(npos = 0; npos < KNB(ndbv); npos++) {
             nval = KVVAL(ndbv, npos, 0);
-            for(t = 0; t < smpl->s_nb; t++)
+            for(t = 0; t < smpl->nb_periods; t++)
                 if(IODE_IS_A_NUMBER(nval[t])) nval[t] /= times[npos];
         }
     }
@@ -506,21 +509,21 @@ done:
 
 
 /**
- *  Retrieves the position of a PERIOD in the current KV_WS sample.
+ *  Retrieves the position of a Period in the current KV_WS sample.
  *  
- *  @param [in] PERIOD* per2    PERIOD whose position is searched
+ *  @param [in] Period* per2    Period whose position is searched
  *  @return     int             position in the current WS sample (starting at 0)
  *                              -1 if no WS is loaded or no sample is defined
  */
  
-int KV_per_pos(PERIOD* per2)
+int KV_per_pos(Period* per2)
 {
-    SAMPLE* smpl;
+    Sample* smpl;
     int     diff;
     
     if(KV_WS == NULL) return(-1);
     smpl = KSMPL(KV_WS);
-    diff = PER_diff_per(per2, &(smpl->s_p1));
+    diff = per2->difference(smpl->start_period);
     return(diff);
 }
 
@@ -532,7 +535,7 @@ int KV_per_pos(PERIOD* per2)
  *      Let the current sample be 2000Y1 2020Y1
  *      Then KV_aper_pos("2002Y1") = 2
  *  
- *  @param [in] char*   aper2 PERIOD in text format (e.g.: "2001Y1")
+ *  @param [in] char*   aper2 Period in text format (e.g.: "2001Y1")
  *  @return     int           position in the current WS sample (starting at 0)
  *                            or -1 if no WS is loaded or no sample is defined
  *  
@@ -540,12 +543,12 @@ int KV_per_pos(PERIOD* per2)
  
 int KV_aper_pos(char* aper2)
 {
-    PERIOD  *per2;
+    Period  *per2;
     int     pos;
     
-    per2 = PER_atoper(aper2);
+    per2 = new Period(std::string(aper2));
     pos = KV_per_pos(per2);
-    SCR_free(per2);
+    delete per2;
     return(pos);
 }
 
@@ -571,7 +574,7 @@ double KV_get_at_t(char*varname, int t)
     var_ptr = KVPTR(varname);
     if(var_ptr == NULL) return(IODE_NAN);
     
-    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(IODE_NAN);
+    if(t < 0 || KSMPL(KV_WS)->nb_periods < t) return(IODE_NAN);
     return(var_ptr[t]);
 }
 
@@ -582,14 +585,14 @@ double KV_get_at_t(char*varname, int t)
  *      KV_get_at_aper("A", "2002Y1")
  *  
  *  @param [in] char*   varname Variable name 
- *  @param [in] PERIOD* per     PERIOD to retrieve
+ *  @param [in] Period* per     Period to retrieve
  *  
  *  @return     double          value of varname[per]
  *                              IODE_NAN on error
  *  
  */
  
-double KV_get_at_per(char*varname, PERIOD* per)
+double KV_get_at_per(char*varname, Period* per)
 {
     int     t;
     
@@ -605,7 +608,7 @@ double KV_get_at_per(char*varname, PERIOD* per)
  *      KV_get_at_aper("A", "2002Y1")
  *  
  *  @param [in] char*   varname Variable name 
- *  @param [in] char*   aper    PERIOD in text format (e.g.: "2001Y1")
+ *  @param [in] char*   aper    Period in text format (e.g.: "2001Y1")
  *  
  *  @return     double          value of varname[aper]
  *                              IODE_NAN on error
@@ -641,7 +644,7 @@ int KV_set_at_t(char*varname, int t, double val)
     var_ptr = KVPTR(varname);
     if(var_ptr == NULL) return(-1);
 
-    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(-1);
+    if(t < 0 || KSMPL(KV_WS)->nb_periods < t) return(-1);
     
     var_ptr[t] = val;
     return(0);
@@ -651,13 +654,13 @@ int KV_set_at_t(char*varname, int t, double val)
  *  Replaces the value of varname[per] by val.
  *  
  *  @param [in] char*   varname Variable name 
- *  @param [in] PERIOD* per     PERIOD to modify
+ *  @param [in] Period* per     Period to modify
  *  @param [in] double  val     new value of varname[per]
  *  @return     int             0 on success, -1 on error
  *  
  */
  
-int KV_set_at_per(char*varname, PERIOD* per, double val)
+int KV_set_at_per(char*varname, Period* per, double val)
 {
     int     t;
     
@@ -673,7 +676,7 @@ int KV_set_at_per(char*varname, PERIOD* per, double val)
  *      KV_set_at_aper("A", "2002Y1", 2.0) => A[2] = 2.0
  *  
  *  @param [in] char*   varname Variable name 
- *  @param [in] char*   aper    PERIOD in text format (e.g.: "2001Y1")
+ *  @param [in] char*   aper    Period in text format (e.g.: "2001Y1")
  *  @param [in] double  val     new value of varname[aper]
  *  @return     int             0 on success, -1 on error  
  */

@@ -282,7 +282,7 @@ Main functions for model simulations.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
+|`int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void K_simul_free()`|Frees all temporary allocated memory for the simulation.|
 |`double K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
@@ -305,7 +305,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 |Syntax|Description|
 |:---|:---|
 |`int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
-|`int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
+|`int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}
 

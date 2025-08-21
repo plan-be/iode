@@ -20,7 +20,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.util cimport IODE_IS_A_NUMBER
-from pyiode.time.period cimport CPeriod, PERIOD, PER_atoper
+from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add, K_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
@@ -569,12 +569,16 @@ cdef class Variables(CythonIodeDatabase):
         cdef char* c_pattern = b_pattern
         cdef char* c_xdim = b_xdim
         cdef char* c_ydim = b_ydim
-        cdef PERIOD* c_ref_period = PER_atoper(ref_period.encode('utf-8'))
-        cdef PERIOD* c_sum_period = PER_atoper(sum_period.encode('utf-8'))
+        cdef bytes b_ref_period = ref_period.encode('utf-8')
+        cdef bytes b_sum_period = sum_period.encode('utf-8')
+        cdef CPeriod* c_ref_period = new CPeriod(<string>b_ref_period)
+        cdef CPeriod* c_sum_period = new CPeriod(<string>b_sum_period)
         
         # Note: c_ref_period and c_sum_period are freed at the end of RasExecute
         res: int = RasExecute(c_pattern, c_xdim, c_ydim, c_ref_period, c_sum_period, 
                               max_nb_iterations, epsilon)
+        del c_ref_period
+        del c_sum_period
         return res == 0
 
     @classmethod

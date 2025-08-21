@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/constants.h"
+#include "api/utils/utils.h"
 
 
 /*----------------------- STRUCTS ----------------------------*/

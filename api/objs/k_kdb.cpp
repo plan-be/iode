@@ -20,7 +20,7 @@
  *      KDB *K_create(int type, int mode)                    // allocates and initialises a KDB object.    
  *      int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
  *      int K_free(KDB* kdb)                                 // frees a KDB and its contents.
- *      int K_clear(KDB* kdb)                                // deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I_DEFAULT_FILENAME. 
+ *      int K_clear(KDB* kdb)                                // deletes all objects in a KDB, reset the Sample and replaces the filename by I_DEFAULT_FILENAME. 
  *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
  *      KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
@@ -29,7 +29,8 @@
 #include "scr4/s_dir.h"
 
 #include "api/b_errors.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
@@ -239,7 +240,7 @@ int K_free(KDB* kdb)
 
 
 /**
- *  Deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I_DEFAULT_FILENAME. 
+ *  Deletes all objects in a KDB, reset the Sample and replaces the filename by I_DEFAULT_FILENAME. 
  *  But does not free the KDB struct.
  *  
  *  @param [in, out] kdb    KDB* kdb to be cleared
@@ -256,7 +257,7 @@ int K_clear(KDB* kdb)
     KNB(kdb) = 0;
     SCR_free(KNAMEPTR(kdb)); // JMP 3/6/2015
     KNAMEPTR(kdb) = 0;              // JMP 3/6/2015
-    memset(KSMPL(kdb), 0, sizeof(SAMPLE)); /* JMP 28-03-92 */
+    memset(KSMPL(kdb), 0, sizeof(Sample)); /* JMP 28-03-92 */
     KNAMEPTR(kdb) = (char*) SCR_stracpy((unsigned char*) I_DEFAULT_FILENAME); // JMP 29/9/2015
     return(0);
 }

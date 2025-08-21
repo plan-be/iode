@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/lec/lec.h"
 
 /*----------------------- DEFINE ----------------------------*/
@@ -78,7 +79,7 @@ struct EQ
     CLEC    *clec;      // Compiled equation for the simulation
     char    solved;     // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
     char    method;     // Estimation method
-    SAMPLE  smpl;       // Estimation sample
+    Sample  smpl;       // Estimation sample
     char    *cmt;       // Free comment
     char    *blk;       // List of equations estimated simultaneously
     char    *instr;     // List of instruments used to modify metric in the estimation process (INSTR method)
@@ -102,7 +103,7 @@ int E_DynamicAdjustment(int ,char **,char *,char *);
 #define KECLEC(kdb, pos)    ((CLEC *)     K_oval1(kdb, pos))
 #define KESOLV(kdb, pos)    (* (char *)   K_oval(kdb, pos, 2))
 #define KEMETH(kdb, pos)    (* (char *)   K_oval(kdb, pos, 3))
-#define KESMPL(kdb, pos)    (* (SAMPLE *) K_oval(kdb, pos, 4))
+#define KESMPL(kdb, pos)    (* (Sample *) K_oval(kdb, pos, 4))
 #define KECMT(kdb, pos)                   K_oval(kdb, pos, 5)
 #define KEBLK(kdb, pos)                   K_oval(kdb, pos, 6)
 #define KEINSTR(kdb, pos)                 K_oval(kdb, pos, 7)

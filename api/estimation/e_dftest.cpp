@@ -26,34 +26,34 @@
 
 
 /**
- *  Returns the first (partial) SAMPLE on which a specific variable is 
+ *  Returns the first (partial) Sample on which a specific variable is 
  *  defined (i.e.: is not NaN).
  *  
- *  @param [in, out]  SAMPLE*  smpl     First sample on which the variable is not IODE_NAN
+ *  @param [in, out]  Sample*  smpl     First sample on which the variable is not IODE_NAN
  *  @param [in]       char*    name     variable to be analysed (from KV_WS)
  *  @return           int               0 if name is found in KV_WS, -1 otherwise
  */
-static int E_GetSmpl(SAMPLE *smpl, char *name)
+static int E_GetSmpl(Sample *smpl, char *name)
 {
     int     pos, t;
     double    *val;
-    SAMPLE  *wsmpl = KSMPL(K_WS[VARIABLES]);
+    Sample  *wsmpl = KSMPL(K_WS[VARIABLES]);
 
     pos = K_find(K_WS[VARIABLES], name);
     if(pos < 0) return(-1);
     val = KVVAL(K_WS[VARIABLES], pos, 0);
 
-    for(t = 0 ; t < wsmpl->s_nb ; t++)
+    for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
 
-    memcpy(&(smpl->s_p1), PER_addper(&(wsmpl->s_p1), t), sizeof(PERIOD));
+    smpl->start_period = wsmpl->start_period.shift(t);
 
-    for(; t < wsmpl->s_nb ; t++)
+    for(; t < wsmpl->nb_periods ; t++)
         if(!IODE_IS_A_NUMBER(val[t])) break;
 
-    memcpy(&(smpl->s_p2), PER_addper(&(wsmpl->s_p1), t), sizeof(PERIOD));
+    smpl->end_period = wsmpl->start_period.shift(t);
 
-    smpl->s_nb = PER_diff_per(&(smpl->s_p2), &(smpl->s_p1));
+    smpl->nb_periods = smpl->end_period.difference(smpl->start_period);
     
     return(0);
 }
@@ -87,11 +87,11 @@ int E_GetLecName(char* lec, char* name)
 /**
  *  Sub-function of E_UnitRoot(). Creates and estimates the D-F equation.
  *  
- *  @param [in] SAMPLE*     smpl    estimation sample
+ *  @param [in] Sample*     smpl    estimation sample
  *  @param [in] char*       buf     LEC expression of the equation _DF.
  *  @return     int                 result the estimation: 0 on success, -1 on error.
  */
-static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
+static int E_UnitRoot_1(Sample* smpl, char* buf)
 {
     int     rc = -1, neqs = 0;
     char    **eqs = NULL;
@@ -133,7 +133,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
     int         i, pos, rc = -1;
     char        buf[1024], scl[11], varname[64];
-    SAMPLE      smpl;
+    Sample      smpl;
     double   *res = NULL, *vec;
 
 
@@ -141,14 +141,14 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     vec = L_cc_link_exec(lec, KV_WS, KS_WS);
     if(vec == NULL) return(NULL);
     strcpy(varname, "_DF");
-    K_add(KV_WS, varname, vec, &(KSMPL(KV_WS)->s_nb));
+    K_add(KV_WS, varname, vec, &(KSMPL(KV_WS)->nb_periods));
     SW_nfree(vec);
         
     // Checks that the sample is large enough for the estimation 
     E_GetSmpl(&smpl, varname);
-    memcpy(&(smpl.s_p1), PER_addper(&(smpl.s_p1), 1), sizeof(PERIOD));
-    smpl.s_nb--;
-    if(smpl.s_nb < (drift + trend + order + 1) * 2) {
+    smpl.start_period = smpl.start_period.shift(1);
+    smpl.nb_periods--;
+    if(smpl.nb_periods < (drift + trend + order + 1) * 2) {
         error_manager.append_error("Sample too small for this test");
         goto cleanup;
     }
@@ -183,8 +183,8 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         }
     }
 
-    memcpy(&(smpl.s_p1), PER_addper(&(smpl.s_p1), order), sizeof(PERIOD));
-    smpl.s_nb -= order;
+    smpl.start_period = smpl.start_period.shift(order);
+    smpl.nb_periods -= order;
     rc = E_UnitRoot_1(&smpl, buf);
 
 

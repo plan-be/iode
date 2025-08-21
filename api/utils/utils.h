@@ -1,7 +1,6 @@
 #pragma once
 
-#include "cpp_api/common.h"
-#include "super.h"
+#include "api/constants.h"
 
 #include <regex>
 #include <string>
@@ -22,6 +21,76 @@
     #include <iconv.h>
     #define CP_OEMCP -1
 #endif
+
+
+struct IodeRegexName
+{
+    std::string regex;
+    std::string type;
+};
+
+struct FileType
+{
+    std::string name;
+    std::vector<std::string> v_ext;
+
+    FileType(const std::string& name = "", const std::vector<std::string>& v_ext = {}) 
+        : name(name), v_ext(v_ext) {} 
+};
+
+const static std::vector<std::string> v_table_langs = { "English", "Dutch", "French" };
+
+const static std::string report_ext = ".rep";
+
+const static FileType file_comments("Comment", {".cmt", ".ac"});
+const static FileType file_equations("Equation", {".eqs", ".ae"});
+const static FileType file_identities("Identity", {".idt", ".ai"});
+const static FileType file_lists("List", {".lst", ".al"});
+const static FileType file_scalars("Scalar", {".scl", ".as"});
+const static FileType file_tables("Table", {".tbl", ".at"});
+const static FileType file_variables("Variable", {".var", ".av"});
+
+// see IodeFileType in api/iode.h
+const static std::vector<FileType> v_file_types = 
+{
+    file_comments,
+    file_equations,
+    file_identities,
+    file_lists,
+    file_scalars,
+    file_tables,
+    file_variables,
+    FileType(),
+    file_comments,
+    file_equations,
+    file_identities,
+    file_lists,
+    file_scalars,
+    file_tables,
+    file_variables,
+    FileType(), 
+    FileType("Report", {".rep"}), 
+    FileType("A2m", {".a2m"}), 
+    FileType("Agl", {".agl"}), 
+    FileType("Profile", {".prf"}), 
+    FileType("Dif", {".dif"}), 
+    FileType("Mif", {".mif"}), 
+    FileType("Rtf", {".rtf"}), 
+    FileType("PostScript", {".ps"}), 
+    FileType("Ascii", {".asc"}), 
+    FileType("Text", {".txt"}), 
+    FileType("Csv", {".csv"}), 
+    FileType(),
+    FileType("Html", {".html"}),
+    FileType("Ref", {".ref"}), 
+    FileType("Logs", {".log"}), 
+    FileType("Settings", {".ini"}), 
+    FileType("Any", {}), 
+    FileType("Directory", {})
+};
+
+const static std::vector<std::string> vExportFormats = 
+	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
 
 
 /* ****************************** *
@@ -155,8 +224,36 @@ inline std::string trim(const std::string& str)
     return str.substr(start, end - start + 1);
 }
 
+/**
+ *  Compute position of character ch in char* array.
+ */
+inline int get_pos_in_char_array(char* str, int ch)
+{
+    if(str == 0) 
+        return(-1);
 
-static IodeRegexName get_regex_name(const int type)
+    for(int i = 0 ; str[i] != 0 ; i++)
+        if(str[i] == ch) 
+            return(i);
+    
+    return(-1);
+}
+
+/**
+ * @brief Combines a hash value with a new value using bitwise XOR and shifts.
+ * 
+ * @tparam T The type of the value to be combined with the hash.
+ * @param seed The current hash value to be combined with the new value.
+ * @param value The new value to be combined with the hash.
+ */
+template <typename T>
+inline void hash_combine(std::size_t& seed, const T& value) 
+{
+    std::hash<T> hasher;
+    seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+inline IodeRegexName get_regex_name(const int type)
 {
     IodeRegexName nre;
     if (type == COMMENTS)

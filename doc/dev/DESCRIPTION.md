@@ -99,7 +99,7 @@
 
 ## Function names in IODE {#T2}
 
-As C does not allow "namespacing", we always give prefixes to function names, the prefix giving an indication of the group the function belongs to. For example, P\*() is the group of function for "packing" (aka serializing) IODE objects, PER\*() for manipulating PERIOD, L\_\* () for LEC compilation / execution, etc.
+As C does not allow "namespacing", we always give prefixes to function names, the prefix giving an indication of the group the function belongs to. For example, P\*() is the group of function for "packing" (aka serializing) IODE objects, PER\*() for manipulating Period, L\_\* () for LEC compilation / execution, etc.
 
 Most filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
 
@@ -141,7 +141,7 @@ The web page http://www.xon.be/scr4/libs1/libs1.htm contains a list of all avail
 |:---|:---|
 |buf.c|shares a large allocated buffer in different parts of the application|
 |pack.c|packs (serialize) and unpacks (deserialize) objects.|
-|per.c|functions for manipulating PERIOD and SAMPLE in IODE.|
+|per.c|functions for manipulating Period and Sample in IODE.|
 |yy.c|helper functions for reading and writing IODE ascii files.|
 |b\_iodeini.c|reading and writing parameters in the iode.ini file|
 
@@ -174,36 +174,6 @@ Packing (serialize) and unpacking (deserialize) objects.
 |`void *P_alloc_get_ptr(void *ptr, int p)`|allocates space for the p'th element of a pack. Copies the pth element in the allocated space.|
 |`int P_nb(char *ptr)`|retrieves the number of elements in the pack pointed to by ptr.|
 
-### per.c {#T8}
-
-Functions for manipulating PERIOD and SAMPLE in IODE.
-
-#### Calculation functions {#T9}
-
-|Syntax|Description|
-|:---|:---|
-|`int PER_diff_per(PERIOD *p1, PERIOD *p2)`|calculates the number of sub periods between two periods.|
-|`PERIOD *PER_addper(PERIOD *period, int shift)`|adds (sub\-)periods to period.|
-|`int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)`|calculates the intersection between 2 SAMPLEs.|
-
-#### Conversion functions {#T10}
-
-|Syntax|Description|
-|:---|:---|
-|`char *PER_pertoa(per, text)`|creates a text representation of a PERIOD.|
-|`PERIOD *PER_atoper(char *text)`|translates a text in a PERIOD.|
-|`char *PER_smpltoa(SAMPLE* smpl, char* text)`|writes a SAMPLE in a string.|
-|`SAMPLE *PER_atosmpl(char* a1, char* a2)`|creates a SAMPLE based on two strings containing PERIODs.|
-|`SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2)`|returns a new allocated SAMPLE build on two given PERIOD.|
-
-#### Miscellaneous functions {#T11}
-
-|Syntax|Description|
-|:---|:---|
-|`int PER_nb(int ch)`|gives the nbr of periods in one year for the periodicity ch|
-|`int PER_nbper(PERIOD* period)`|retrieves the number of periods in one year in a period|
-|`double PER_per2real(PERIOD* from, int i)`|adds a number of sub\-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).|
-
 ### yy.c {#T12}
 
 Helper functions for reading and writing IODE ascii files.
@@ -213,8 +183,8 @@ Helper functions for reading and writing IODE ascii files.
 |`double K_read_real(YYFILE *yy)`|reads a token on the YY stream and interprets the token as a IODE\_REAL (double) if possible.|
 |`long K_read_long(YYFILE* yy)`|reads the next token on the YY stream and returns a long.|
 |`char* K_read_str(YYFILE* yy)`|reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.|
-|`PERIOD *K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (\{long\}\{char\}\{long\}).|
-|`SAMPLE *K_read_smpl(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a SAMPLE.|
+|`Period *K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Period definition (\{long\}\{char\}\{long\}).|
+|`Sample *K_read_smpl(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Sample.|
 |`int K_read_align(YYFILE* yy)`|reads the next token on the YY stream: LEFT, RIGHT or CENTER.|
 |                                          ||
 |`void K_stracpy(char** to, char* from)`|allocates and copies a null terminated string.|
@@ -274,7 +244,7 @@ Functions used only in a GUI context.
 |`int khitkey()`|Checks whether the keyboard buffer is not empty (GUI only).|
 |`int kgetkey()`|Reads the next character in the keyboard buffer (GUI only).|
 |`void kbeep()`|Plays a sound (GUI only).|
-|`SAMPLE *kasksmpl()`|Asks the user to give a SAMPLE (GUI only).|
+|`Sample *kasksmpl()`|Asks the user to give a Sample (GUI only).|
 |`int kexecsystem()`|Calls the fonction system().|
 |`int kshellexec()`|Call the Win32 function ShellExecuteEx().|
 
@@ -298,7 +268,7 @@ Functions used only in a GUI context.
 |`int (*khitkey_super)();`|
 |`int (*kgetkey_super)();`|
 |`void (*kbeep_super)(void);`|
-|`SAMPLE *(*kasksmpl_super)(void);`|
+|`Sample *(*kasksmpl_super)(void);`|
 |\`cint kexecsystem\_super(char\*);|
 |\`cint kshellexec\_super(char\*);|
 
@@ -327,7 +297,7 @@ Function to manage KDB, i.e. IODE object groups.
 |`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
 |`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
 |`int K_free(KDB* kdb)`|frees a KDB and its contents.|
-|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I\_DEFAULT\_FILENAME (default "ws").|
+|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the Sample and replaces the filename by I\_DEFAULT\_FILENAME (default "ws").|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
@@ -342,7 +312,7 @@ Variables and functions for initializing and cleaning up the "in memory" workspa
 |`KDB *K_WS[7]`|Table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)|
 |`void K_init_ws(int ws)`|Initialises the "in mem" KDB structures and optionaly loads the ws.\* files|
 |`void K_end_ws(int ws)`|Deletes the current workspaces defined in K\_WS\[\] and their content after having optionaly saved their content in ws.\* files.|
-|`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSAMPLE (print tables and graphs)|
+|`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSample (print tables and graphs)|
 
 ### k\_wsvar.c {#T23}
 
@@ -350,22 +320,22 @@ Functions acting on workspaces of variables.
 
 |Syntax|Description|
 |:---|:---|
-|`int KV_sample(KDB *kdb, SAMPLE *nsmpl)`|Changes the SAMPLE of a KDB of variables.|
+|`int KV_sample(KDB *kdb, Sample *nsmpl)`|Changes the Sample of a KDB of variables.|
 |`int KV_merge(KDB *kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
 |`int KV_add(KDB* kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
 |`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB *kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
-|`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|
+|`int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)`|Extrapolates variables on a selected Sample according to one of the available methods.|
 |`KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
 |`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 |`double KV_get_at_t(char*varname, int t)`|Retrieves the value of varname\[t\]|
-|`double KV_get_at_per(char*varname, PERIOD* per)`|Retrieves the value of varname\[per\]|
+|`double KV_get_at_per(char*varname, Period* per)`|Retrieves the value of varname\[per\]|
 |`double KV_get_at_aper(char*varname, char* aper)`|Retrieves the value of varname\[aper\]|
 |`int KV_set_at_t(char*varname, int t, double val)`|Replaces the value of varname\[t\] by val.|
-|`int KV_set_at_per(char*varname, PERIOD* per, double val)`|Replaces the value of varname\[per\] by val.|
+|`int KV_set_at_per(char*varname, Period* per, double val)`|Replaces the value of varname\[per\] by val.|
 |`int KV_set_at_aper(char*varname, char* aper, double val)`|Replaces the value of varname\[aper\] by val.|
-|`int KV_per_pos(PERIOD* per2)`|Retrieves the position of a PERIOD in the current KV\_WS sample.|
+|`int KV_per_pos(Period* per2)`|Retrieves the position of a Period in the current KV\_WS sample.|
 |`int KV_aper_pos(char* aper2)`|Retrieves the position of a period in text format in the current KV\_WS sample.|
 
 ## Group "Object management" {#T24}
@@ -399,7 +369,7 @@ How to create IODE objects using K\_add():
 |Lists|K\_add(KDB\* kdb, char\* name, char\* list)|
 |Scalars|K\_add(KDB\* kdb, char\* name, Scalar\* scalar)|
 |Tables|K\_add(KDB\* kdb, char\* name, TBL \*tbl)|
-|Variables|K\_add(KDB\* kdb, char\* name, IODE\_REAL\* var, int nb\_obs) \[nb\_obs = kdb SAMPLE size\]|
+|Variables|K\_add(KDB\* kdb, char\* name, IODE\_REAL\* var, int nb\_obs) \[nb\_obs = kdb Sample size\]|
 
 Note: the name of an equation MUST be the name of its endogenous variable.
 
@@ -417,7 +387,7 @@ Functions to manipulate IODE objects.
 |`int K_del_entry(KDB* kdb, int pos):`|Deletes an entry in a KDB \_\_without\_\_ deleting the referenced object.|
 |`int K_del(KDB* kdb, int pos):`|Deletes an object (and its data) from a KDB.|
 |`int K_del_by_name(KDB* kdb, char* name):`|Deletes an object identified by its name from a KDB.|
-|`int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
+|`int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
 |`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
 
 ### k\_objvers.c {#T27}
@@ -579,9 +549,9 @@ Functions to manipulate IODE object files.
 |`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type).|
 |`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
 |`KDB *K_load(int ftype, FNAME fname, int no, char** objs)`|loads a IODE object file.|
-|`int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)`|retrieves infos on an IODE file: type, number of objects, SAMPLE|
+|`int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)`|retrieves infos on an IODE file: type, number of objects, Sample|
 |`KDB *K_interpret(int type, char* filename): generalisation of K_load()`|interprets the content of a file, ascii files includes, and try to load ist content into a KDB.|
-|`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
+|`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
 |\`cint K\_cat(KDB\* ikdb, char\* filename)|concatenates the content of a file to an existing kdb.|
 |\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
 |\`cint K\_get\_backup\_on\_save()|indicates if a backup must be taken before saving a kdb.|
@@ -699,7 +669,7 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 |:---|
 |`KDB *KV_load_asc(char *filename)`|
 |`KV_save_asc(KDB* kdb, char* filename)`|
-|`int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)`|
+|`int KV_save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)`|
 
 ## Group "LEC language" {#T52}
 
@@ -713,7 +683,7 @@ Implemention of the LEC library virtual functions for Scalar and VAR references.
 |:---|:---|
 |`double *L_getvar(KDB* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
 |`double L_getscl(KDB* kdb, int pos)`|Retrieves a scalar value.|
-|`SAMPLE *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
+|`Sample *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
 |`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
 

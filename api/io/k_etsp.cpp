@@ -49,26 +49,26 @@ int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
 
     expdef->file_descriptor = fopen(outfile, "w+");
 
-    freq = PER_nb((KSMPL(dbv)->s_p1).p_p);
+    freq = get_nb_periods_per_year((KSMPL(dbv)->start_period).periodicity);
     switch(freq) {
         case 1:
             fprintf(expdef->file_descriptor,
                     "FREQ A;\nSMPL %ld %ld ;\n",
-                    (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p2).p_y);
+                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->end_period).year);
             break;
 
         case 4:
             fprintf(expdef->file_descriptor,
                     "FREQ Q;\nSMPL %ld:%ld %ld:%ld ;\n",
-                    (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p1).p_s,
-                    (KSMPL(dbv)->s_p2).p_y, (KSMPL(dbv)->s_p2).p_s);
+                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->start_period).step,
+                    (KSMPL(dbv)->end_period).year, (KSMPL(dbv)->end_period).step);
             break;
 
         case 12:
             fprintf(expdef->file_descriptor,
                     "FREQ M;\nSMPL %ld:%ld %ld:%ld ;\n",
-                    (KSMPL(dbv)->s_p1).p_y, (KSMPL(dbv)->s_p1).p_s,
-                    (KSMPL(dbv)->s_p2).p_y, (KSMPL(dbv)->s_p2).p_s);
+                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->start_period).step,
+                    (KSMPL(dbv)->end_period).year, (KSMPL(dbv)->end_period).step);
             break;
     }
     return(0);

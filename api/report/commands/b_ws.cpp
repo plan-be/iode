@@ -247,24 +247,42 @@ int B_WsImport(char* arg, int type)
 int B_WsSample(char* arg, int unused)
 {
     char    **args;
-    SAMPLE  *new_smpl = NULL;
+    Sample  *new_smpl = NULL;
     KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) goto err;
+    if(args == NULL) 
+        goto err;
 
-    new_smpl = PER_atosmpl(args[0], args[1]);
-    if(new_smpl == 0 || new_smpl->s_nb <= 0) goto err; /* JMP 25-05-92 */
-    if(KV_sample(kdb, new_smpl) < 0) goto err;
+    try
+    {
+        new_smpl = new Sample(std::string(args[0]), std::string(args[1]));
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error(e.what());
+        goto err;
+    }
 
-    SW_nfree(new_smpl);
+    if(new_smpl->nb_periods <= 0)
+    {
+        error_manager.append_error("New sample invalid");
+        goto err;
+    }
+
+    if(KV_sample(kdb, new_smpl) < 0)
+    {
+        error_manager.append_error("New sample invalid");
+        goto err;
+    } 
+
+    delete new_smpl;
     A_free((unsigned char**) args);
     return(0);
 
 err:
-    SW_nfree(new_smpl); /* JMP 25-05-92 */
+    if(new_smpl) delete new_smpl;
     A_free((unsigned char **) args);
-    error_manager.append_error("New sample invalid");
     return(-1);
 }
 
@@ -352,12 +370,13 @@ int B_WsCopy(char* arg, int type)
     int     lg, shift = 0, rc = 0;
     char    file[K_MAX_FILE + 1], **files;
     char    **data, **data0, *lst;
-    SAMPLE  *smpl = NULL;
+    Sample  *smpl = nullptr;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
     lg = B_get_arg0(file, arg, K_MAX_FILE);
     files = B_ainit_chk(file, NULL, 0);
-    if(files == 0) return(-1);
+    if(files == 0) 
+        return(-1);
 
     //A_SEPS = " ;\t\n"; // JMP 27/09/2022
     A_SEPS = " ,;\t\n"; // JMP 25/04/2023
@@ -367,26 +386,41 @@ int B_WsCopy(char* arg, int type)
     A_SEPS = oldseps; // JMP 27/09/2022   
     
     /*    data0 = B_ainit_chk(arg + lg, NULL, 0); */
-    if(data0 == 0 || data0[0] == 0) {   /* JMP 24-06-98 */
+    if(data0 == 0 || data0[0] == 0) 
+    {   /* JMP 24-06-98 */
         error_manager.append_error("WsCopy : invalid argument(s)");
         SCR_free_tbl((unsigned char**) files);
         SCR_free_tbl((unsigned char**) data0);
         return(-1);
     }
 
-    if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) {
-        smpl = PER_atosmpl(data0[0], data0[1]);
-        if(smpl != NULL) 
-            shift = 2;
-        else 
-            error_manager.clear();
+    if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
+    {
+        // check if from to passed as arguments
+        if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0]))
+        {
+            try
+            {
+                smpl = new Sample(std::string(data0[0]), std::string(data0[1]));
+                shift = 2;
+            }
+            catch(const std::exception& e)
+            {
+                error_manager.append_error("WsCopy : invalid sample\n" + std::string(e.what()));
+                SCR_free_tbl((unsigned char**) files);
+                SCR_free_tbl((unsigned char**) data0);
+                return(-1);
+            }
+        }
     }
 
-    if(data0 + shift == NULL) {
+    if(data0 + shift == NULL) 
+    {
         error_manager.append_error("WsCopy : object list required");
         rc = -1;
     }
-    else {
+    else 
+    {
         data = (char**) SCR_inter(((unsigned char**) data0) + shift, ((unsigned char**) data0) + shift);
         rc = K_copy(K_WS[type],
                     SCR_tbl_size((unsigned char**) files), files,
@@ -396,10 +430,12 @@ int B_WsCopy(char* arg, int type)
     }
     SCR_free_tbl((unsigned char**) data0);
     SCR_free_tbl((unsigned char**) files);
-    SCR_free(smpl);
+    delete smpl;
 
-    if(rc < 0) return(-1);
-    else return(0);
+    if(rc < 0) 
+        return(-1);
+    else 
+        return(0);
 }
 
 
@@ -444,13 +480,13 @@ int B_WsExtrapolate(char* arg, int unused)
 {
     int     nb_args, p = 0, method = 0, rc = -1;
     char    **args, **vars;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 2) {
-        error_manager.append_error("WsExtrapolate : syntax error (method from to vars ...)");
+        error_manager.append_error("WsExtrapolate: syntax error (method from to vars ...)");
         goto done;
     }
     else {
@@ -459,9 +495,19 @@ int B_WsExtrapolate(char* arg, int unused)
         else p = 1;
     }
 
-    smpl = PER_atosmpl(args[p], args[p + 1]);
-    if(smpl == 0 || smpl->s_nb <= 0) {
-        error_manager.append_error("WsExtrapolate : sample definition error");
+    try
+    {
+        smpl = new Sample(std::string(args[p]), std::string(args[p + 1]));
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error("WsExtrapolate: invalid sample\n" + std::string(e.what()));
+        goto done;
+    }
+    
+    if(smpl->nb_periods <= 0) 
+    {
+        error_manager.append_error("WsExtrapolate : invalid sample");
         goto done;
     }
 
@@ -469,7 +515,7 @@ int B_WsExtrapolate(char* arg, int unused)
     rc = KV_extrapolate(kdb, method, smpl, vars);
 
 done:
-    SW_nfree(smpl);
+    if(smpl) delete smpl;
     SCR_free_tbl((unsigned char**) args);
     return(rc);
 }
@@ -652,7 +698,7 @@ int B_CsvSave(char* arg, int type)
     int     lg, shift = 0, rc = 0;
     char    file[K_MAX_FILE + 1], file_ext[K_MAX_FILE + 1];
     char    **data0, *lst;
-    SAMPLE  *smpl = NULL;
+    Sample  *smpl = nullptr;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
     // filename
@@ -667,18 +713,32 @@ int B_CsvSave(char* arg, int type)
     SCR_free(lst);
     A_SEPS = oldseps; // JMP 27/09/2022   
     
-    if(SCR_tbl_size((unsigned char**) data0) == 0) {
+    if(SCR_tbl_size((unsigned char**) data0) == 0) 
+    {
         SCR_free_tbl((unsigned char**) data0);
         data0 = 0;
     }
 
-    if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) {
-        if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) {
-            shift = 2;
-            smpl = PER_atosmpl(data0[0], data0[1]);
-            error_manager.clear();
+    if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
+    {
+        // check if from to passed as arguments
+        if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) 
+        {
+            try
+            {
+                smpl = new Sample(std::string(data0[0]), std::string(data0[1]));
+                shift = 2;
+            }
+            catch(const std::exception& e)
+            {
+                error_manager.append_error("CsvSave : invalid sample\n" + std::string(e.what()));
+                SCR_free_tbl((unsigned char**) data0);
+                data0 = 0;
+            }
         }
-        if(SCR_tbl_size((unsigned char**) data0) <= shift) {
+        
+        if(SCR_tbl_size((unsigned char**) data0) <= shift) 
+        {
             SCR_free_tbl((unsigned char**) data0);
             data0 = 0;
             shift = 0;
@@ -688,10 +748,12 @@ int B_CsvSave(char* arg, int type)
     rc = ascii_handlers[type]->save_csv(K_WS[type], file_ext, smpl, data0 + shift);
 
     SCR_free_tbl((unsigned char**) data0);
-    SCR_free(smpl);
+    if(smpl) delete smpl;
 
-    if(rc < 0) return(rc);
-    else return(0);
+    if(rc < 0) 
+        return(rc);
+    else 
+        return(0);
 }
 
 

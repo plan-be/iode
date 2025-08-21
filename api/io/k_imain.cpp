@@ -39,19 +39,21 @@
  *      
  *  List of functions 
  *  -----------------
- *    KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)              Interprets a text file containing VAR definitions
+ *    KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)              Interprets a text file containing VAR definitions
  *    KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
  *    int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)    Imports variables or comments in various formats.
  *  
  */
 #include "api/b_a2mini.h"
 #include "api/k_super.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/variables.h"
 #include "api/write/write.h"
 #include "api/io/import.h"
+
 
 static int compare(const void *a, const void *b)
 {
@@ -66,10 +68,10 @@ static int compare(const void *a, const void *b)
  *  @param [in] ImportFromFile* impdef      struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
  *  @param [in] char*   rulefile    (opt.) rule file. By default, the rule "* ++++++++++++++" is used
  *  @param [in] char*   vecfile     input ASCII file
- *  @param [in] SAMPLE* smpl        output SAMPLE (required)
+ *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)
+KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     KDB     *kdb = 0;
     int     i, nb, size, pos, shift = 0, cmpt = 0, rc;
@@ -99,8 +101,8 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
         goto err;
 
     kdb = K_create(VARIABLES, UPPER_CASE);
-    memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
-    nb = smpl->s_nb;
+    memcpy((Sample *) KDATA(kdb), smpl, sizeof(Sample));
+    nb = smpl->nb_periods;
 
     if(impdef->read_variable_implemented) {
         vector = (double *) SW_nalloc(nb * sizeof(double));
@@ -290,7 +292,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
     int     rc = -1;
-    SAMPLE  *smpl;
+    Sample  *smpl;
     KDB     *kdb;
     ImportVarFromFile  *impdef;
 
@@ -314,17 +316,27 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
     if(from[0] == 0 || to[0] == 0)
-        smpl = (SAMPLE *) SW_nalloc(sizeof(SAMPLE));
-    else smpl = PER_atosmpl(from, to);
-    if(smpl == 0) return(-1);
-
+        return(-1);
+    try
+    {
+        smpl = new Sample(std::string(from), std::string(to));
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "Cannot imports variables:\n" + std::string(e.what());
+        error_manager.append_error(error_msg);
+        return(-1);
+    }
+    
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb != NULL) {
         rc = K_save(kdb, ode);
         K_free(kdb);
     }
 
-    if(IMP_trace) W_close();
+    if(IMP_trace) 
+        W_close();
+    
     return(rc);
 }
 

@@ -668,8 +668,8 @@ char *RP_gcmd(char* str)
 int RP_evaltime()
 {
     RP_T = 0;
-    if(RP_PER.p_y == 0) return(0);
-    RP_T = PER_diff_per(&RP_PER, &(KSMPL(KV_WS)->s_p1));
+    if(RP_PER.year == 0) return(0);
+    RP_T = RP_PER.difference(KSMPL(KV_WS)->start_period);
     if(RP_T < 0) return(-3);
     return(0);
 }
@@ -711,7 +711,7 @@ double RP_evallec(char* lec)
  *  
  *  The number value is formatted according to the value of format.
  *      - format empty => default format (20 positions, free # of decimal places)
- *      - format = "T" => format as a PERIOD (e.g.: {3@T} => 1990Y1)
+ *      - format = "T" => format as a Period (e.g.: {3@T} => 1990Y1)
  *      - format = "99999.99" => format as 8.2lf
  *      - format = ".99" => format as 30.2lf
  *      - format = "999" => format as 3.0lf
@@ -735,10 +735,11 @@ int RP_fmt(char* buf, char* format, double value)
     SCR_upper((unsigned char*) format);
     if(format[0] == '\0') goto normal;
 
-    if(format[0] == 'T') {
-        // t = (int) fabs((double) value); /* JMP 24-05-00 */
+    if(format[0] == 'T') 
+    {
         t = (int) value; /* JMP 24-05-00 */
-        strcpy(buf, PER_pertoa(PER_addper(&(KSMPL(KV_WS)->s_p1), t), NULL));
+        Period per = KSMPL(KV_WS)->start_period.shift(t);
+        strcpy(buf, (char*) per.to_string().c_str());
         return(0);
     }
 
@@ -1399,7 +1400,7 @@ int B_ReportExec(char* arg, int unused)
 
     if(RP_DEPTH == 0) {
         RP_T = 0;
-        memset(&RP_PER, 0, sizeof(PERIOD));
+        memset(&RP_PER, 0, sizeof(Period));
     }
     
     // Changes the report context
@@ -1460,7 +1461,7 @@ int B_ReportLine(char* line, int cleanup)
     // Premier rapport ? (début de session de rapport)
     if(RP_DEPTH == 0 && cleanup) {
         RP_T = 0;
-        memset(&RP_PER, 0, sizeof(PERIOD));
+        memset(&RP_PER, 0, sizeof(Period));
     }
 
     // Sauve les arguments pour usage dans les ss fonctions

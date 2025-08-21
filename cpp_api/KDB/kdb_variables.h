@@ -1,6 +1,6 @@
 #pragma once
-#include "cpp_api/time/period.h"
-#include "cpp_api/time/sample.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "kdb_template.h"
 #include <stdexcept>
 
@@ -193,7 +193,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
-	SAMPLE* smpl = KSMPL(kdb);
+	Sample* smpl = KSMPL(kdb);
 
     std::size_t seed = 0;
     for(int pos=0; pos < kdb->k_nb; pos++)
@@ -204,7 +204,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
         // We need to compute the hash with the values of kdb[pos], not the pointers. 
         // Otherwise, hash_value() and hash_combine() will only compare pointer 
         // addresses and not the values.
-		for(int t=0; t < smpl->s_nb; t++)
+		for(int t=0; t < smpl->nb_periods; t++)
         	hash_combine<double>(seed, *KVVAL(kdb, pos, t));
     }
     return seed;

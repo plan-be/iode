@@ -221,19 +221,3 @@ inline int     B_MULTIBAR = 0;          // Graph parameter (Geert Bryon)
 #define K_ISFILE(filename)    (filename != 0 && filename[0] != '-' && filename[0] != 0)
 #define IODE_IS_A_NUMBER(x)   ((x) >= (double)(-1.0e37))
 #define IODE_IS_0(x)          (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
-
-/*-------------------- FUNCTIONS ------------------------*/
-
-/**
- * @brief Combines a hash value with a new value using bitwise XOR and shifts.
- * 
- * @tparam T The type of the value to be combined with the hash.
- * @param seed The current hash value to be combined with the new value.
- * @param value The new value to be combined with the hash.
- */
-template <typename T>
-inline void hash_combine(std::size_t& seed, const T& value) 
-{
-    std::hash<T> hasher;
-    seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}

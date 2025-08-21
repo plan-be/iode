@@ -10,9 +10,9 @@
  *      char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
  *      void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
  *      KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
- *      int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
+ *      int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)           retrieves infos on an IODE file: type, number of objects, Sample
  *      KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
- *      int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
+ *      int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
  *      int K_cat(KDB* ikdb, char* filename)                                            concatenates the content of a file to an existing kdb.
  *      int K_set_backup_on_save(int take_backup)                                       sets the backup choice before saving a kdb. 
  *      int K_get_backup_on_save()                                                      indicates if a backup must be taken before saving a kdb. 
@@ -30,7 +30,8 @@
 #include "api/constants.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
-#include "api/utils/time.h"
+#include "api/time/period.h"
+#include "api/time/sample.h"
 #include "api/ascii/ascii.h"
 #include "api/objs/xdr.h"
 #include "api/objs/objs.h"
@@ -553,7 +554,7 @@ error:
 
 /**
  *  Retrieves infos on an IODE file: type, number of objects and, if defined, 
- *  the file description (free info on the file contents) and SAMPLE (for var files only).
+ *  the file description (free info on the file contents) and Sample (for var files only).
  *  
  *  @note: opens the IODE file to retrieve these informations from the file header, but does not 
  *  read the objects themselves.
@@ -561,7 +562,7 @@ error:
  *  @param [in]  filename   char*   file to analyze
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
  *  @param [out] nobjs      int*    NULL or pointer to the number of objs in the file
- *  @param [out] smpl       SAMPLE* NULL or pointer to the sample of the file (for VARIABLES only)
+ *  @param [out] smpl       Sample* NULL or pointer to the sample of the file (for VARIABLES only)
  *  @return                 int     on success: file type (FILE_COMMENTS...)
  *                                  on error: 
  *                                      -1 if filename is empty 
@@ -570,7 +571,7 @@ error:
  *  
  *  descr, nobjs and smpl may be NULL. In this case, nothing is copied.
  */
-int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
+int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
 {
     FILE* fd;
     int     vers;
@@ -580,7 +581,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
 
     if (descr) descr[0] = 0;
     if (nobjs) *nobjs = 0;
-    if (smpl)  memset(smpl, 0, sizeof(SAMPLE));
+    if (smpl)  memset(smpl, 0, sizeof(Sample));
     if (filename == 0 ||
         filename[0] == 0 || filename[0] == '-') return(-1);
 
@@ -606,7 +607,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
     if (descr) strcpy(descr, kdb.k_desc);
     if (nobjs) *nobjs = KNB(&kdb);
     if (smpl && kdb.k_type == VARIABLES)
-        memcpy(smpl, KSMPL(&kdb), sizeof(SAMPLE));
+        memcpy(smpl, KSMPL(&kdb), sizeof(Sample));
 
     return(kdb.k_type);
 }
@@ -713,7 +714,7 @@ KDB *K_interpret(int type, char* filename)
  *  @param [in]      no      int        number of object names in objs
  *  @param [in]      objs    char**     list of object names to copy
  *  @param [in, out] found   int*       indicates which names have been read (0 for still to read, 1 for already read) 
- *  @param [in]      smpl    SAMPLE*    larger sample to read. 
+ *  @param [in]      smpl    Sample*    larger sample to read. 
  *                                      If the sample in file is smaller, only the common sample will be read.
  *  @return                             -1 on error 
  *                                      number of read objects on success. 
@@ -724,19 +725,21 @@ KDB *K_interpret(int type, char* filename)
  *
  * TODO: refactor to, from...
  */
-static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, SAMPLE* smpl)
+static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample* smpl)
 {
     int     i, pf, pt, rc = 0, nb_found = 0;
     KDB     *from;
     char    *ptr, *pack;
-    SAMPLE  csmpl;
+    Sample  csmpl;
 
     from = K_load(KTYPE(to), file, no, objs);
     if(from == NULL) return(-1);
 
     if(KTYPE(to) == VARIABLES) {
-        if(smpl == NULL) memcpy(&csmpl, KSMPL(from), sizeof(SAMPLE));
-        else rc = PER_common_smpl(smpl, KSMPL(from), &csmpl);
+        if(smpl == NULL) 
+            csmpl = *KSMPL(from);
+        else
+            csmpl = smpl->intersection(*KSMPL(from)); 
 
         if(rc < 0) {
             error_manager.append_error("File sample and copy sample do not overlap");
@@ -799,14 +802,14 @@ the_end:
  *  @param [in]      files   char**     list of files to be read
  *  @param [in]      no      int        number of object names in objs (may not be 0)
  *  @param [in]      objs    char**     list of object names to copy (may not be 0)
- *  @param [in]      smpl    SAMPLE*    larger sample to read. 
+ *  @param [in]      smpl    Sample*    larger sample to read. 
  *
  *  @return                             -1 on error: kdb is null, no list is given, one of the files does not exist
  *                                      -2 if not all object could be found
  *                                      0 if all objects have been found
  * @note Error codes are accumulated via a call to IodeErrorManager::append_error().
  */
-int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)
+int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)
 {
     int     i, j, nb, nb_found = 0, *found = NULL;
 

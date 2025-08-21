@@ -348,7 +348,7 @@ A set of rules can also be defined to select and/or determine (transform) the na
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, SAMPLE* smpl)`|Interprets a text file containing VAR definitions|
+|`KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)`|Interprets a text file containing VAR definitions|
 |`KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)`|Interprets an ASCII file containing COMMENTS definitions|
 |`int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)`|Imports variables or comments in various formats.|
 
@@ -377,7 +377,7 @@ Functions to import variables and comments in ASCII format.
 
 |Syntax|Description|
 |:---|:---|
-|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) in an ASCII variable file.|
+|`int read_header(YYFILE* yy, Sample* smpl)`|Reads the sample (required) in an ASCII variable file.|
 |`int read_variable(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in an ASCII variable file format.|
 |`int read_header(ImportFromFile* impdef, char* file, int lang)`|Opens an ASCII comment file for reading with the YY library functions.|
 |`int read_comment(char* name, char** cmt)`|Reads one comment on the open YY stream.|
@@ -402,7 +402,7 @@ See also k\_edif.c for an example of DIF format.
 |:---|:---|
 |`int dif_skip_to(YYFILE* yy, int skey)`|Moves forward to the keyword skey or EOF or EOD.|
 |`int dif_read_cell(YYFILE* yy, char** str, double* value)`|Reads the next cell which can contain a real or a string.|
-|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the header of a DIF file and determines the sample of the content.|
+|`int read_header(YYFILE* yy, Sample* smpl)`|Reads the header of a DIF file and determines the sample of the content.|
 |`int read_variable(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in a DIF file.|
 |`int close()`|Cleanup the DIF global variables.|
 
@@ -498,7 +498,7 @@ Functions to import variables in rotated ASCII format.
 
 |Syntax|Description|
 |:---|:---|
-|`int read_header(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) and the list of VARs in a rotated ASCII variable file.|
+|`int read_header(YYFILE* yy, Sample* smpl)`|Reads the sample (required) and the list of VARs in a rotated ASCII variable file.|
 |`int read_variable(YYFILE* yy, char* name, int* shift, double* value)`|Reads one value in an ASCII variable file format.|
 |`int close()`|Frees the allocated vars during the rotated ASCII file import session.|
 

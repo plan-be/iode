@@ -2,13 +2,7 @@
 message(STATUS "\n---- C++ API ----\n")
 
 set(CPP_UTILS
-    utils/utils.h
     utils/super.h     utils/super.cpp
-    )
-
-set(CPP_TIME
-    time/period.h   time/period.cpp
-    time/sample.h   time/sample.cpp
     )
 
 set(CPP_REPORT
@@ -56,7 +50,6 @@ add_library(iode_cpp_api STATIC
             common.h
             ${CPP_UTILS}
             ${CPP_REPORT}
-            ${CPP_TIME}
             ${CPP_OBJS}
             ${CPP_KDB}
             ${CPP_COMPUTE}
