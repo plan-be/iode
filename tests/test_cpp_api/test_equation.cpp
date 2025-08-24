@@ -47,10 +47,10 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
-    ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
-    ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
-    ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
+    ASSERT_EQ(Sample(c_eq->sample), eq.get_sample());
+    ASSERT_EQ(std::string(c_eq->comment), eq.get_comment());
+    ASSERT_EQ(std::string(c_eq->instruments), eq.get_instruments());
+    ASSERT_EQ(std::string(c_eq->block), eq.get_block());
     ASSERT_EQ(c_eq->date, eq.get_date());
 
     // test memcpy between a Equation object and a EQ object
@@ -61,10 +61,10 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
-    ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
-    ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
-    ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
+    ASSERT_EQ(Sample(c_eq->sample), eq.get_sample());
+    ASSERT_EQ(std::string(c_eq->comment), eq.get_comment());
+    ASSERT_EQ(std::string(c_eq->instruments), eq.get_instruments());
+    ASSERT_EQ(std::string(c_eq->block), eq.get_block());
     ASSERT_EQ(c_eq->date, eq.get_date());
 
     // test if a Equation object can be passed to the hash function for the objects of type EQ.

@@ -401,16 +401,16 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* 
         eq->lec = (char*) SCR_stracpy((unsigned char*) lec);
     }
     if(cmt != NULL) {
-        SW_nfree(eq->cmt);
-        eq->cmt = (char*) SCR_stracpy((unsigned char*) cmt);
+        SW_nfree(eq->comment);
+        eq->comment = (char*) SCR_stracpy((unsigned char*) cmt);
     }
     if(instr != NULL) {
-        SW_nfree(eq->instr);
-        eq->instr = (char*) SCR_stracpy((unsigned char*) instr);
+        SW_nfree(eq->instruments);
+        eq->instruments = (char*) SCR_stracpy((unsigned char*) instr);
     }
     if(blk != NULL) {
-        SW_nfree(eq->blk);
-        eq->blk = (char*) SCR_stracpy((unsigned char*) blk);
+        SW_nfree(eq->block);
+        eq->block = (char*) SCR_stracpy((unsigned char*) blk);
     }
 
     if(method >= 0) eq->method = method;
@@ -420,8 +420,8 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* 
     if(tests != NULL)  memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
     else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
 
-    if(smpl != NULL) memcpy(&(eq->smpl), smpl, sizeof(Sample));
-    /*    else memset(&(eq->smpl), 0, sizeof(Sample)); */
+    if(smpl != NULL) memcpy(&(eq->sample), smpl, sizeof(Sample));
+    /*    else memset(&(eq->sample), 0, sizeof(Sample)); */
 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
     if(rc < 0) {

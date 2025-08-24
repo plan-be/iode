@@ -28,9 +28,9 @@ void E_free(EQ* eq)
     SW_nfree(eq->endo);
     SW_nfree(eq->lec);
     SW_nfree(eq->clec);
-    SW_nfree(eq->cmt);
-    SW_nfree(eq->blk);
-    SW_nfree(eq->instr);
+    SW_nfree(eq->comment);
+    SW_nfree(eq->block);
+    SW_nfree(eq->instruments);
 
     SW_nfree(eq);
 }
