@@ -5,6 +5,8 @@
 #include "api/time/sample.h"
 #include "api/lec/lec.h"
 
+#include <string>
+
 /*----------------------- DEFINE ----------------------------*/
 
 #define EQS_NBTESTS     20
@@ -74,17 +76,17 @@ enum IodeEquationAscii
 // the allowed values for method were 'l', 'z', instead of 0, 1...
 struct EQ 
 {
-    char    *endo;      // endogeneous variable (= equation name)   
-    char    *lec;       // LEC form of the equation (LHS := RHS)
-    CLEC    *clec;      // Compiled equation for the simulation
-    char    solved;     // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
-    char    method;     // Estimation method
-    Sample  smpl;       // Estimation sample
-    char    *cmt;       // Free comment
-    char    *blk;       // List of equations estimated simultaneously
-    char    *instr;     // List of instruments used to modify metric in the estimation process (INSTR method)
-    long    date;       // Estimation date
-    float   tests[EQS_NBTESTS]; // Estimation tests
+    char*   endo;           // endogeneous variable (= equation name)   
+    char*   lec;            // LEC form of the equation (LHS := RHS)
+    CLEC*   clec;           // Compiled equation for the simulation
+    char    solved;         // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
+    char    method;         // Estimation method
+    Sample  sample;         // Estimation sample
+    char*   comment;        // Free comment
+    char*   block;          // List of equations estimated simultaneously
+    char*   instruments;    // List of instruments used to modify metric in the estimation process (INSTR method)
+    long    date;           // Estimation date
+    float   tests[EQS_NBTESTS];     // Estimation tests
 };
 
 /*----------------------- FUNCS ----------------------------*/

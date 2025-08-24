@@ -118,19 +118,19 @@ static EQ* read_eq(YYFILE* yy)
             case EQ_ASCII_SMPL :
                 smpl = K_read_smpl(yy);
                 if(smpl == NULL) goto err;
-                memcpy(&(eq->smpl), smpl, sizeof(Sample));
+                memcpy(&(eq->sample), smpl, sizeof(Sample));
                 break;
             case EQ_ASCII_BLK  :
-                eq->blk = K_read_str(yy);
-                if(eq->blk == NULL) goto err;
+                eq->block = K_read_str(yy);
+                if(eq->block == NULL) goto err;
                 break;
             case EQ_ASCII_CMT  :
-                eq->cmt = K_read_str(yy);
-                if(eq->cmt == NULL) goto err;
+                eq->comment = K_read_str(yy);
+                if(eq->comment == NULL) goto err;
                 break;
             case EQ_ASCII_INSTR:
-                eq->instr = K_read_str(yy);
-                if(eq->instr == NULL) goto err;
+                eq->instruments = K_read_str(yy);
+                if(eq->instruments == NULL) goto err;
                 break;
 
             case EQ_ASCII_STDEV :
@@ -283,7 +283,7 @@ KDB* AsciiEquations::load_asc(char* filename)
                 }
 
                 eq->endo = (char*) SCR_stracpy((unsigned char *) name);
-                if(eq->blk == NULL) eq->blk = (char*) SCR_stracpy((unsigned char *) name);
+                if(eq->block == NULL) eq->block = (char*) SCR_stracpy((unsigned char *) name);
 
                 pos = K_add(kdb, name, eq, name);
                 if(pos < 0)  {
@@ -340,14 +340,14 @@ static void print_test(FILE* fd, char* txt, double val)
 static void print_eq(FILE* fd, EQ* eq, char* name)
 {
     fprintf(fd, "{\n\t\"%s\"\n", eq->lec);
-    if(eq->cmt != NULL && eq->cmt[0] != 0 && strcmp(eq->cmt, " ") !=0 ) { // JMP 30/10/2023
+    if(eq->comment != NULL && eq->comment[0] != 0 && strcmp(eq->comment, " ") !=0 ) { // JMP 30/10/2023
         fprintf(fd, "\tCOMMENT ");
-        SCR_fprintf_esc(fd, eq->cmt, 1);
+        SCR_fprintf_esc(fd, eq->comment, 1);
         fprintf(fd, "\n");
     }
 
     // Estimated equation => Sample not null 30/10/2023
-    if((eq->smpl).nb_periods != 0) {
+    if((eq->sample).nb_periods != 0) {
         switch(eq->method) {
             case 0 :
                 fprintf(fd, "\tLSQ\n");
@@ -369,15 +369,15 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
                 break;
         }
 
-        std::string from = eq->smpl.start_period.to_string();
-        std::string to   = eq->smpl.end_period.to_string();
+        std::string from = eq->sample.start_period.to_string();
+        std::string to   = eq->sample.end_period.to_string();
 
         fprintf(fd, "\tSAMPLE %s %s\n", (char*) from.c_str(), (char*) to.c_str());
 
-        if(eq->blk != NULL && eq->blk[0] != 0 && strcmp(eq->blk, name) != 0) // JMP 30/10/2023
-            fprintf(fd, "\tBLOCK \"%s\"\n", eq->blk);
-        if(eq->instr != NULL && eq->instr[0] != 0)
-            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instr);
+        if(eq->block != NULL && eq->block[0] != 0 && strcmp(eq->block, name) != 0) // JMP 30/10/2023
+            fprintf(fd, "\tBLOCK \"%s\"\n", eq->block);
+        if(eq->instruments != NULL && eq->instruments[0] != 0)
+            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instruments);
         
         //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);

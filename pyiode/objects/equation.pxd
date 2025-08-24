@@ -21,25 +21,25 @@ cdef extern from "api/all.h":
         long  pos
 
     cdef struct CLEC:
-        long tot_lg
-        long exec_lg
+        long  tot_lg
+        long  exec_lg
         short nb_names
-        char dupendo
-        char pad
+        char  dupendo
+        char  pad
         LNAME lnames[1]
 
     cdef struct EQ:
-        char* endo
-        char* lec
-        CLEC* clec
-        char solved
-        char method
-        CSample smpl
-        char* cmt
-        char* blk
-        char* instr
-        long date
-        float tests[20]
+        char*   endo
+        char*   lec
+        CLEC*   clec
+        char    solved
+        char    method
+        CSample sample
+        char*   comment
+        char*   block
+        char*   instruments
+        long    date
+        float   tests[20]
 
     int B_EqsStepWise(char* arg)    
 

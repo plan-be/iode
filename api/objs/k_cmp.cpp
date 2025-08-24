@@ -61,9 +61,9 @@ int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
             || memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
 
     if(eq1->method != eq2->method) goto done;
-    if(memcmp(&(eq1->smpl), &(eq2->smpl), sizeof(Sample)) != 0) goto done;
-    if(strcmp(eq1->blk, eq2->blk) != 0) goto done;
-    if(strcmp(eq1->instr, eq2->instr) != 0) goto done;
+    if(memcmp(&(eq1->sample), &(eq2->sample), sizeof(Sample)) != 0) goto done;
+    if(strcmp(eq1->block, eq2->block) != 0) goto done;
+    if(strcmp(eq1->instruments, eq2->instruments) != 0) goto done;
 
 //    if(memcmp(eq1->tests, eq2->tests, EQS_NBTESTS * sizeof(float)) != 0) goto done; /* FLOAT 12-04-98 */
 //        test 0 and 5 and 11..20 are not stored in ascii

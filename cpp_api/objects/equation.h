@@ -170,10 +170,10 @@ struct std::hash<EQ>
         hash_combine<std::string_view>(seed, std::string_view(eq.endo, strlen(eq.endo)));
         hash_combine<std::string_view>(seed, std::string_view(eq.lec, strlen(eq.lec)));
         hash_combine<char>(seed, eq.method);
-        hash_combine<Sample>(seed, eq.smpl);
-        hash_combine<std::string_view>(seed, std::string_view(eq.cmt, strlen(eq.cmt)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.blk, strlen(eq.blk)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.instr, strlen(eq.instr)));
+        hash_combine<Sample>(seed, eq.sample);
+        hash_combine<std::string_view>(seed, std::string_view(eq.comment, strlen(eq.comment)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.block, strlen(eq.block)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.instruments, strlen(eq.instruments)));
 
         return seed;
     }

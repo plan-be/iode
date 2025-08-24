@@ -15,10 +15,10 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
         this->method = EQ_LSQ;  // Default method is LSQ
     // NOTE : we can use memcpy() on Sample because Sample does 
     //        not contain attributes which are pointers
-    memcpy(&this->smpl, &obj->smpl, sizeof(Sample));
-    this->cmt = copy_char_array(obj->cmt);
-    this->blk = copy_char_array(obj->blk);
-    this->instr = copy_char_array(obj->instr);
+    memcpy(&this->sample, &obj->sample, sizeof(Sample));
+    this->comment = copy_char_array(obj->comment);
+    this->block = copy_char_array(obj->block);
+    this->instruments = copy_char_array(obj->instruments);
     this->date = obj->date;
     memcpy(&(this->tests), &(obj->tests), EQS_NBTESTS * sizeof(float));
 }
@@ -28,9 +28,9 @@ Equation::Equation(const std::string& name, const std::string& lec, const IodeEq
 {
     this->lec = NULL, 
     this->clec = NULL, 
-    this->cmt = NULL, 
-    this->instr = NULL, 
-    this->blk = NULL;
+    this->comment = NULL, 
+    this->instruments = NULL, 
+    this->block = NULL;
     this->date = 0L;
     this->solved = '\0';
 
@@ -51,9 +51,9 @@ Equation::Equation(const std::string& name, const std::string& lec, const std::s
 {
     this->lec = NULL, 
     this->clec = NULL, 
-    this->cmt = NULL, 
-    this->instr = NULL, 
-    this->blk = NULL;
+    this->comment = NULL, 
+    this->instruments = NULL, 
+    this->block = NULL;
     this->date = 0L;
     this->solved = '\0';
 
@@ -84,9 +84,9 @@ Equation::~Equation()
     SW_nfree(this->endo);
     SW_nfree(this->lec);
     SW_nfree(this->clec);
-    SW_nfree(this->cmt);
-    SW_nfree(this->blk);
-    SW_nfree(this->instr);
+    SW_nfree(this->comment);
+    SW_nfree(this->block);
+    SW_nfree(this->instruments);
 }
 
 // required to be used in std::map
@@ -175,25 +175,25 @@ void Equation::set_method(const std::string& method)
 
 std::string Equation::get_block() const
 {
-    return std::string(this->blk);
+    return std::string(this->block);
 }
 
 void Equation::set_block(const std::string& block)
 {
-    if(this->blk != NULL)
-        SW_nfree(this->blk);
+    if(this->block != NULL)
+        SW_nfree(this->block);
 
     if (block.empty()) 
-        this->blk = copy_char_array("");
+        this->block = copy_char_array("");
     else 
-        this->blk = copy_string_to_char(block);
+        this->block = copy_string_to_char(block);
 }
 
 // -- sample --
 
 Sample Equation::get_sample() const
 {
-    return Sample(this->smpl);
+    return Sample(this->sample);
 }
 
 void Equation::set_sample(std::string from, std::string to)
@@ -203,13 +203,13 @@ void Equation::set_sample(std::string from, std::string to)
         Sample* c_vars_sample = KSMPL(KV_WS);
         if(c_vars_sample == NULL || c_vars_sample->nb_periods == 0)
         {
-            this->smpl.nb_periods = 0;
-            this->smpl.start_period.year = 0;
-            this->smpl.start_period.periodicity = '\0';
-            this->smpl.start_period.step = 0;
-            this->smpl.end_period.year = 0;
-            this->smpl.end_period.periodicity = '\0';
-            this->smpl.end_period.step = 0;
+            this->sample.nb_periods = 0;
+            this->sample.start_period.year = 0;
+            this->sample.start_period.periodicity = '\0';
+            this->sample.start_period.step = 0;
+            this->sample.end_period.year = 0;
+            this->sample.end_period.periodicity = '\0';
+            this->sample.end_period.step = 0;
             kwarning("Variables sample not yet set. Set equation sample to 0.");
             return;
         }
@@ -224,14 +224,14 @@ void Equation::set_sample(std::string from, std::string to)
     }
 
     Sample new_sample(from, to);
-    memcpy(&(this->smpl), &new_sample, sizeof(Sample));
+    memcpy(&(this->sample), &new_sample, sizeof(Sample));
 }
 
 // -- comment --
 
 std::string Equation::get_comment() const
 {
-    std::string comment_oem = std::string(this->cmt);
+    std::string comment_oem = std::string(this->comment);
     std::string comment = oem_to_utf8(comment_oem);
     return comment;
 }
@@ -239,15 +239,15 @@ std::string Equation::get_comment() const
 // we assume that comment string is in UTF8 format
 void Equation::set_comment(const std::string& comment)
 {
-    if(this->cmt != NULL)
-        SW_nfree(this->cmt);
+    if(this->comment != NULL)
+        SW_nfree(this->comment);
 
     if(comment.empty()) 
-        this->cmt = copy_char_array("");
+        this->comment = copy_char_array("");
     else
     {
         std::string comment_oem = utf8_to_oem(comment);
-        this->cmt = copy_string_to_char(comment_oem);
+        this->comment = copy_string_to_char(comment_oem);
     }
 }
 
@@ -255,18 +255,18 @@ void Equation::set_comment(const std::string& comment)
 
 std::string Equation::get_instruments() const
 {
-    return std::string(this->instr);
+    return std::string(this->instruments);
 }
 
 void Equation::set_instruments(const std::string& instruments)
 {
-    if(this->instr != NULL)
-        SW_nfree(this->instr);
+    if(this->instruments != NULL)
+        SW_nfree(this->instruments);
 
     if(instruments.empty()) 
-        this->instr = copy_char_array("");
+        this->instruments = copy_char_array("");
     else 
-        this->instr = copy_string_to_char(instruments);
+        this->instruments = copy_string_to_char(instruments);
 }
 
 // -- date --

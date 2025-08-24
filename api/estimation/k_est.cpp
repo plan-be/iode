@@ -157,7 +157,7 @@ int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float
     eq->date = SCR_current_date();
     
     memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
-    memcpy(&(eq->smpl), smpl, sizeof(Sample));
+    memcpy(&(eq->sample), smpl, sizeof(Sample));
     rc = K_add(E_DBE, name, eq, name);
     if(rc < 0) {
         error_manager.append_error(std::string(L_error()));
