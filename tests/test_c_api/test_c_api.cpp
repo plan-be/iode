@@ -180,9 +180,10 @@ public:
 	    return(rc);
 	}
 
-	int U_diff_files(char*file1, char*file2)
+	bool U_test_same_files(char*file1, char*file2)
 	{
-	    int     rc = -1, i, j, nbdiffs = 0;        // ==
+        bool    rc = false;        
+	    int     i, j, nbdiffs = 0;
 	    long    size1, size2;
 	    char    *content1, *content2;
 	    char    **tbl1, **tbl2;
@@ -193,35 +194,38 @@ public:
 	    content2 = U_test_read_file(file2, &size2);
 	    printf("   '%s': size=%ld\n", file2, size2);
 	
-	    if(content1 == NULL && content2 == NULL) {              // ==
-	        rc = 0;     // JMP 23/10/2022
-	        goto fin;
-	    }
+	    if(content1 == NULL && content2 == NULL)
+	        return true;
 	
-	    if(content1 == NULL || content2 == NULL) {
+	    if(content1 == NULL || content2 == NULL) 
+        {
 	        if(content1 == NULL) printf("File %s not found\n", file1);
 	        if(content2 == NULL) printf("File %s not found\n", file2);
-	        rc = 0;
-	        goto fin;      // !=
+            SCR_free(content1);
+            SCR_free(content2);
+	        return false;
 	    }
 	
-	    if(size1 != size2) {
-	        rc = 0;              // !=
-	        goto cmp;
-	    }
+	    bool is_equal = size1 == size2;
 	
-	    rc = !memcmp(content1, content2, size1);
-	cmp:
-	    if(rc == 0) { // files are different
+	    if(is_equal) 
+            is_equal = memcmp(content1, content2, size1) == 0;
+
+        // files are different
+	    if(!is_equal) 
+        {
 	        printf("Comparing '%s' and '%s'\n", file1, file2);
 	        tbl1 = (char**) SCR_vtom((U_ch*)content1, '\n');
 	        tbl2 = (char**) SCR_vtom((U_ch*)content2, '\n');
-	        for(i = 0; tbl1[i] && tbl2[i]; i++) {
-	            if(strcmp(tbl1[i], tbl2[i])) {
+	        for(i = 0; tbl1[i] && tbl2[i]; i++) 
+            {
+	            if(strcmp(tbl1[i], tbl2[i])) 
+                {
 	                nbdiffs++;
 	                // Print diff bw the 2 lines
 	                printf("Line %-5d:%s\n           %s\n           ", i + 1, tbl1[i], tbl2[i]);
-	                for(j = 0; tbl1[i][j] && tbl2[i][j]; j++) {
+	                for(j = 0; tbl1[i][j] && tbl2[i][j]; j++) 
+                    {
 	                    if(tbl1[i][j] == tbl2[i][j])
 	                        printf(" ");
 	                    else
@@ -229,7 +233,8 @@ public:
 	                }
 	                printf("\n");
 	            }
-	            if(nbdiffs >= 10) {
+	            if(nbdiffs >= 10) 
+                {
 	                printf("......\n");
 	                break;
 	            }
@@ -237,11 +242,8 @@ public:
 	        SCR_free_tbl((U_ch**)tbl1);
 	        SCR_free_tbl((U_ch**)tbl2);
 	    }
-	
-	fin:
-	    SCR_free(content1);
-	    SCR_free(content2);
-	    return(rc);
+
+        return is_equal;
 	}
 
 	void U_test_print_title(char* title)
@@ -430,12 +432,10 @@ public:
 	    W_dest(filename, typeint);
 	    U_test_W_printf_cmds();
 	    W_close();
-	    //printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
-	    //S4ASSERT(U_cmp_files(reffilename, filename), "W_printf -> %s", typeext);
-	    EXPECT_NE(U_diff_files(reffilename, filename), 0);
+	    EXPECT_TRUE(U_test_same_files(reffilename, filename));
 	}
 
-	int U_test_compare_outfile_to_reffile(char* outdir, char* outfile, char* refdir, char* reffile)
+	bool U_test_compare_outfile_to_reffile(char* outdir, char* outfile, char* refdir, char* reffile)
 	{
 	    char reffilename[512];
 	    char filename[512];
@@ -454,9 +454,7 @@ public:
 	    printf("Output    file: '%s'\n", filename);
 	    printf("Reference file: '%s'\n", reffilename);
 	
-	    //printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
-	    //return(U_cmp_files(reffilename, filename));
-	    return(U_diff_files(reffilename, filename));
+	    return U_test_same_files(reffilename, filename);
 	}
 
 	bool U_test_compare_localfile_to_reffile(char* outfile, char* reffile)
@@ -466,7 +464,7 @@ public:
 	
 	    sprintf(filename, ".%s%s", SEPARATOR, outfile);
 	    sprintf(reffilename, "%s%s", IODE_OUTPUT_DIR, reffile);
-	    return U_diff_files(reffilename, filename) == 1;
+	    return U_test_same_files(reffilename, filename);
 	}
 
 	void U_test_create_a_file(char* filename, int type)
@@ -563,9 +561,9 @@ public:
 	    _unlink(full_out_file);
 	    rc = B_WsExport(full_out_file, type);
 	    EXPECT_EQ(rc, 0);
-	    rc = U_diff_files(ref_out_file, full_out_file);
-	    EXPECT_NE(rc, 0);
-	    return rc != 0;
+	    bool success = U_test_same_files(ref_out_file, full_out_file);
+	    EXPECT_TRUE(success);
+	    return true;
 	}
 
 	bool U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
@@ -887,8 +885,9 @@ public:
 	    sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-	    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "funcsv.csv", IODE_OUTPUT_DIR, "funcsv.csv.ref");
-	
+	    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "funcsv.csv", IODE_OUTPUT_DIR, "funcsv.csv.ref");
+        EXPECT_TRUE(success);
+
 	    return true;
 	}
 
@@ -1980,6 +1979,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     char    rulefile[256];
     char    trace[] = " ";
     int     rc;
+    bool    success;
 
     U_test_print_title("Tests EXP: Export CSV and rcsv");
 
@@ -1996,13 +1996,15 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(reffile, "%sfun_xode.csv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_CSV);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.csv", IODE_DATA_DIR, "fun_xode.csv.ref");
+    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.csv", IODE_DATA_DIR, "fun_xode.csv.ref");
+    EXPECT_TRUE(success);
 
     sprintf(outfile, "%sfun_xode.rcsv", IODE_OUTPUT_DIR);
     sprintf(reffile, "%sfun_xode.rcsv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_RCSV);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.rcsv", IODE_DATA_DIR, "fun_xode.rcsv.ref");
+    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.rcsv", IODE_DATA_DIR, "fun_xode.rcsv.ref");
+    EXPECT_TRUE(success);
 
     // Export with rules (partial /+ change names)
     sprintf(outfile, "%sfun2.tsp", IODE_OUTPUT_DIR);
@@ -2010,7 +2012,8 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun2.tsp", IODE_OUTPUT_DIR, "fun2.ref.tsp");
+    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun2.tsp", IODE_OUTPUT_DIR, "fun2.ref.tsp");
+    EXPECT_TRUE(success);
 
     U_test_print_title("Tests IMP VAR: Import Ascii Variables");
 
@@ -2539,7 +2542,8 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     sprintf(cmd,  "%srep_expand.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_expand.a2m", IODE_OUTPUT_DIR, "rep_expand.ref.a2m");
+    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_expand.a2m", IODE_OUTPUT_DIR, "rep_expand.ref.a2m");
+    EXPECT_TRUE(success);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2557,7 +2561,8 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     sprintf(cmd,  "%srep_fns.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_fns.a2m", IODE_OUTPUT_DIR, "rep_fns.ref.a2m");
+    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_fns.a2m", IODE_OUTPUT_DIR, "rep_fns.ref.a2m");
+    EXPECT_TRUE(success);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2575,7 +2580,8 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     sprintf(cmd,  "%srep_proc.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_proc.a2m", IODE_OUTPUT_DIR, "rep_proc.ref.a2m");
+    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_proc.a2m", IODE_OUTPUT_DIR, "rep_proc.ref.a2m");
+    EXPECT_TRUE(success);
 
     U_test_reset_kmsg_msgs();
 }
