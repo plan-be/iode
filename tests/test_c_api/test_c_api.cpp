@@ -435,14 +435,14 @@ public:
 	    EXPECT_NE(U_diff_files(reffilename, filename), 0);
 	}
 
-	int U_test_compare_outfile_to_reffile(char* outfile, char* reffile)
+	int U_test_compare_outfile_to_reffile(char* outdir, char* outfile, char* refdir, char* reffile)
 	{
 	    char reffilename[512];
 	    char filename[512];
 	    char curdir[512];
 	
-	    sprintf(filename, "%s%s", IODE_OUTPUT_DIR, outfile);
-	    sprintf(reffilename, "%s%s", IODE_DATA_DIR, reffile);
+	    sprintf(filename, "%s%s", outdir, outfile);
+	    sprintf(reffilename, "%s%s", refdir, reffile);
 #ifdef __GNUC__
 	    //getcwd(curdir, 500);
 	    getcwd(curdir, 511);
@@ -887,7 +887,7 @@ public:
 	    sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-	    U_test_compare_outfile_to_reffile("funcsv.csv", "funcsv.csv");
+	    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "funcsv.csv", IODE_OUTPUT_DIR, "funcsv.csv.ref");
 	
 	    return true;
 	}
@@ -1996,13 +1996,13 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(reffile, "%sfun_xode.csv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_CSV);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.csv", IODE_DATA_DIR, "fun_xode.csv.ref");
 
     sprintf(outfile, "%sfun_xode.rcsv", IODE_OUTPUT_DIR);
     sprintf(reffile, "%sfun_xode.rcsv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_RCSV);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.rcsv", IODE_DATA_DIR, "fun_xode.rcsv.ref");
 
     // Export with rules (partial /+ change names)
     sprintf(outfile, "%sfun2.tsp", IODE_OUTPUT_DIR);
@@ -2010,7 +2010,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("fun2.tsp", "fun2.ref.tsp");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun2.tsp", IODE_OUTPUT_DIR, "fun2.ref.tsp");
 
     U_test_print_title("Tests IMP VAR: Import Ascii Variables");
 
@@ -2539,7 +2539,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     sprintf(cmd,  "%srep_expand.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("rep_expand.a2m", "rep_expand.ref.a2m");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_expand.a2m", IODE_OUTPUT_DIR, "rep_expand.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2557,7 +2557,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     sprintf(cmd,  "%srep_fns.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("rep_fns.a2m", "rep_fns.ref.a2m");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_fns.a2m", IODE_OUTPUT_DIR, "rep_fns.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2575,7 +2575,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     sprintf(cmd,  "%srep_proc.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_compare_outfile_to_reffile("rep_proc.a2m", "rep_proc.ref.a2m");
+    U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_proc.a2m", IODE_OUTPUT_DIR, "rep_proc.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
