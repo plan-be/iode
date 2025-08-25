@@ -61,8 +61,11 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     TLINE   *tline;
     TCELL   *tcell;
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
+    std::string lec;
+    std::string cmt;
     
-    if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) {     // JMP 19/01/2023 => speed
+    if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) 
+    {
         n = KNB(kdb);
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
         for(i = 0; i < n ; i++) 
@@ -74,23 +77,31 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     SCR_ADD_PTR_CHUNCK = 1000;
     for(i = 0; i < KNB(kdb); i++) {
         found = 0;
-        if(names) found = !SCR_grep_gnl(pattern, KONAME(kdb, i), ecase, all);
+        if(names) 
+            found = !SCR_grep_gnl(pattern, KONAME(kdb, i), ecase, all);
 
-        if(!found) {
+        if(!found) 
+        {
             switch(KTYPE(kdb)) {
                 case COMMENTS :
-                    if(texts) found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
+                    if(texts) 
+                        found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
                     break;
                 case LISTS :
-                    if(texts) found = !SCR_grep_gnl(pattern, KLVAL(kdb, i), ecase, all);
+                    if(texts) 
+                        found = !SCR_grep_gnl(pattern, KLVAL(kdb, i), ecase, all);
                     break;
                 case IDENTITIES :
-                    if(forms) found = !SCR_grep_gnl(pattern, KILEC(kdb, i), ecase, all);
+                    if(forms) 
+                        found = !SCR_grep_gnl(pattern, KILEC(kdb, i), ecase, all);
                     break;
                 case EQUATIONS :
-                    if(forms) found = !SCR_grep_gnl(pattern, KELEC(kdb, i), ecase, all);
+                    lec = KELEC(kdb, i);
+                    cmt = KECMT(kdb, i);
+                    if(forms) 
+                        found = !SCR_grep_gnl(pattern, (char*) lec.c_str(), ecase, all);
                     if(!found && texts)
-                        found = !SCR_grep_gnl(pattern, KECMT(kdb, i), ecase, all);
+                        found = !SCR_grep_gnl(pattern, (char*) cmt.c_str(), ecase, all);
                     break;
 
                 case TABLES:

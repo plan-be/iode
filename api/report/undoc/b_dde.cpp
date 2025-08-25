@@ -405,8 +405,9 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
 char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
 {
-    char    *obj, *res;
-    KDB     *kdb = K_WS[type];
+    char        *obj, *res;
+    KDB         *kdb = K_WS[type];
+    std::string lec;
 
     if(type != TABLES) {
         *nc = 2;
@@ -416,7 +417,8 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
                 obj = (char*) KCVAL(kdb, objnb);
                 break;
             case EQUATIONS :
-                obj = (char*) KELEC(kdb, objnb);
+                lec = KELEC(kdb, objnb);
+                obj = (char*) lec.c_str();
                 break;
             case IDENTITIES :
                 obj = (char*) KILEC(kdb, objnb);
@@ -966,6 +968,7 @@ int B_ExcelSet(char *arg, int type)
     char        **args = NULL,
                 *ptr = NULL,
                 *item, *smpl;
+    std::string lec;
 
     args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
     nb_args = SCR_tbl_size((unsigned char**) args);
@@ -985,7 +988,8 @@ int B_ExcelSet(char *arg, int type)
             ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, pos));
             break;
         case EQUATIONS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KELEC(kdb, pos));
+            lec = KELEC(kdb, pos);
+            ptr = (char*) SCR_stracpy((unsigned char*) lec.c_str());
             break;
         case SCALARS :
             scl = KSVAL(kdb, pos); /* JMP 10-08-00 */

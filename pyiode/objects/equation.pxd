@@ -29,15 +29,15 @@ cdef extern from "api/all.h":
         LNAME lnames[1]
 
     cdef struct EQ:
-        char*   endo
-        char*   lec
+        string   endo
+        string   lec
         CLEC*   clec
         char    solved
         char    method
         CSample sample
-        char*   comment
-        char*   block
-        char*   instruments
+        string   comment
+        string   block
+        string   instruments
         long    date
         float   tests[20]
 

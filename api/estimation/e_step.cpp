@@ -163,7 +163,9 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
         kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);        // JMP 08/07/2022
         L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);   // JMP 08/07/2022
     }
-    else res = 0.0;
+    else 
+        res = 0.0;
+    
     return(res);
 }
 
@@ -224,16 +226,19 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;
-    double   lnumtest,numtest;
+    double      lnumtest, numtest;
     EQ          *eq;
     CLEC        *cl;
     char        **scl = NULL, **eqs = NULL;
 
     // Crée le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
     eqs = B_ainit_chk(eqname, NULL, 0);         
-    if(eqs == NULL) return(0.0);
+    if(eqs == NULL) 
+        return(0.0);
+    
     pos = K_find(K_WS[EQUATIONS], eqs[0]);
-    if(pos < 0) return(0.0);
+    if(pos < 0) 
+        return(0.0);
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
     eq = KEVAL(K_WS[EQUATIONS], pos);               
@@ -242,7 +247,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     E_free(eq);
 
     // Effectue les estimations pour toutes les combi
-    nbcom = (int)pow(2.0, nbscl);
+    nbcom = (int) pow(2.0, nbscl);
     lnumtest = -999999999999.0;
     lasti = 0;
     for(i = 1; i < nbcom; i++) {                                                

@@ -254,19 +254,24 @@ void Estimation::E_print_eqres(int obs)
  */
 static int E_graph_calc_lhs(char* name, char* res, char* rhs)
 {
-    int     i, pos;
-    char    *lec;
+    int   i, pos;
 
     memset(res, 0, 71);
     memset(rhs, 0, 71);
+
     pos = K_find(K_WS[EQUATIONS], name);
-    if(pos < 0) return(-1);
-    lec = KELEC(K_WS[EQUATIONS], pos);
-    i = L_split_eq(lec);
-    if(i < 0) return(-1);
+    if(pos < 0) 
+        return(-1);
+    
+    std::string lec = KELEC(K_WS[EQUATIONS], pos);
+    char* c_lec = (char*) lec.c_str();
+    i = L_split_eq(c_lec);
+    if(i < 0) 
+        return(-1);
     i = std::min(i, 70);
-    memcpy(res, lec, i);
-    SCR_strlcpy((unsigned char*) rhs, ((unsigned char*) lec) + i + 2, 70);
+    memcpy(res, c_lec, i);
+
+    SCR_strlcpy((unsigned char*) rhs, ((unsigned char*) c_lec) + i + 2, 70);
     SCR_replace((unsigned char*) rhs, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 07-10-98 */
     SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 07-10-98 */
     return(0);

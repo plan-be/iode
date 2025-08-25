@@ -4,6 +4,7 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/lec/lec.h"
+#include "api/objs/kdb.h"
 
 #include <string>
 
@@ -76,17 +77,17 @@ enum IodeEquationAscii
 // the allowed values for method were 'l', 'z', instead of 0, 1...
 struct EQ 
 {
-    char*   endo;           // endogeneous variable (= equation name)   
-    char*   lec;            // LEC form of the equation (LHS := RHS)
-    CLEC*   clec;           // Compiled equation for the simulation
-    char    solved;         // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
-    char    method;         // Estimation method
-    Sample  sample;         // Estimation sample
-    char*   comment;        // Free comment
-    char*   block;          // List of equations estimated simultaneously
-    char*   instruments;    // List of instruments used to modify metric in the estimation process (INSTR method)
-    long    date;           // Estimation date
-    float   tests[EQS_NBTESTS];     // Estimation tests
+    std::string   endo;             // endogenous variable (= equation name)   
+    std::string   lec;              // LEC form of the equation (LHS := RHS)
+    CLEC*         clec;             // Compiled equation for the simulation
+    char          solved;           // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
+    char          method;           // Estimation method
+    Sample        sample;           // Estimation sample
+    std::string   comment;          // Free comment
+    std::string   block;            // List of equations estimated simultaneously
+    std::string   instruments;      // List of instruments used to modify metric in the estimation process (INSTR method)
+    long          date;             // Estimation date
+    float         tests[EQS_NBTESTS];   // Estimation tests
 };
 
 /*----------------------- FUNCS ----------------------------*/
@@ -99,28 +100,67 @@ int E_split_eq(char *,char **,char **);
 int E_dynadj(int ,char *,char *,char *,char **);
 int E_DynamicAdjustment(int ,char **,char *,char *);
 
-/*----------------------- MACROS ----------------------------*/
+/*----------------------- FUNCS ----------------------------*/
 
-#define KELEC(kdb, pos)                   K_oval0(kdb, pos)
-#define KECLEC(kdb, pos)    ((CLEC *)     K_oval1(kdb, pos))
-#define KESOLV(kdb, pos)    (* (char *)   K_oval(kdb, pos, 2))
-#define KEMETH(kdb, pos)    (* (char *)   K_oval(kdb, pos, 3))
-#define KESMPL(kdb, pos)    (* (Sample *) K_oval(kdb, pos, 4))
-#define KECMT(kdb, pos)                   K_oval(kdb, pos, 5)
-#define KEBLK(kdb, pos)                   K_oval(kdb, pos, 6)
-#define KEINSTR(kdb, pos)                 K_oval(kdb, pos, 7)
-#define KEDATE(kdb, pos)    (* (long *)   K_oval(kdb, pos, 8))
-#define KETESTS(kdb, pos)   ((float *)    K_oval(kdb, pos, 9))
+int K_epack(char **,char *,char *);
+EQ* K_eunpack(char *, char *);
 
-//#define EQ_STDEV (kdb, pos)  KETESTS(kdb, pos)[1]
-//#define EQ_MEANY (kdb, pos)  KETESTS(kdb, pos)[2]
-//#define EQ_SSRES (kdb, pos)  KETESTS(kdb, pos)[3]
-//#define EQ_STDERR(kdb, pos)  KETESTS(kdb, pos)[4]
-//#define EQ_FSTAT (kdb, pos)  KETESTS(kdb, pos)[6]
-//#define EQ_R2    (kdb, pos)  KETESTS(kdb, pos)[7]
-//#define EQ_R2ADJ (kdb, pos)  KETESTS(kdb, pos)[8]
-//#define EQ_DW    (kdb, pos)  KETESTS(kdb, pos)[9]
-//#define EQ_LOGLIK(kdb, pos)  KETESTS(kdb, pos)[10]
+inline std::string KELEC(KDB* kdb, int pos) 
+{                  
+    return std::string(K_oval0(kdb, pos));
+}
 
-#define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name) )
-#define KEPTR(name)         K_eptr(KE_WS, name)      // returns an allocated EQ
+inline CLEC* KECLEC(KDB* kdb, int pos) 
+{    
+    return ((CLEC *) K_oval1(kdb, pos));
+}
+
+inline char KESOLV(KDB* kdb, int pos) 
+{    
+    return *((char *) K_oval(kdb, pos, 2));
+}
+
+inline char KEMETH(KDB* kdb, int pos) 
+{    
+    return *((char *) K_oval(kdb, pos, 3));
+}
+
+inline Sample KESMPL(KDB* kdb, int pos) 
+{    
+    return *((Sample *) K_oval(kdb, pos, 4));
+}
+
+inline std::string KECMT(KDB* kdb, int pos) 
+{                  
+    return std::string(K_oval(kdb, pos, 5));
+}
+
+inline std::string KEBLK(KDB* kdb, int pos) 
+{                  
+    return std::string(K_oval(kdb, pos, 6));
+}
+
+inline std::string KEINSTR(KDB* kdb, int pos) 
+{                
+    return std::string(K_oval(kdb, pos, 7));
+}
+
+inline long KEDATE(KDB* kdb, int pos) 
+{    
+    return *((long *) K_oval(kdb, pos, 8));
+}
+
+inline float* KETESTS(KDB* kdb, int pos) 
+{   
+    return ((float *) K_oval(kdb, pos, 9));
+}
+
+inline EQ* KEVAL(KDB* kdb, int pos) 
+{     
+    return K_eunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name);
+}
+
+inline EQ* KEPTR(char* name) 
+{         
+    return K_eptr(KE_WS, name);      // returns an allocated EQ
+}

@@ -1232,19 +1232,13 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     rc = est.estimate("1980Y1", "1996Y1");
     EXPECT_EQ(rc, 0);
 
-    //x = U_test_calc_lec("_YRES0[1980Y1]", 0);
-    //printf("x = %lf\n", x);
-    //x = fabs(x + 0.001150);
     EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-
-    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
     EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS, "ACAF") * 1e6) / 1e6, 0.821815);
 
     //TODO:add some tests with other estimation methods / on blocks / with instruments
 
     //W_flush();
     W_close();
-
 
     // estimate_step_wise
     smpl = new Sample("1980Y1", "1995Y1");
@@ -1294,7 +1288,6 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -2.638717);
     df = E_UnitRoot("ACAF+ACAG", 0, 0, 1);
     EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -1.300049);
-
 
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to
@@ -1545,7 +1538,6 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 TEST_F(IodeCAPITest, Tests_B_EQS)
 {
     int     rc, pos;
-    Sample  *smpl;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
 
@@ -1565,9 +1557,9 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
     pos = K_find(KE_WS, "ACAF");
-    smpl = &KESMPL(KE_WS, pos);
+    Sample smpl = KESMPL(KE_WS, pos);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(smpl->start_period.year, 1981);
+    EXPECT_EQ(smpl.start_period.year, 1981);
 
     // TODO: implement next utests with the same canevas
         //B_EqsSetMethod(char* arg, int unused)
@@ -2178,7 +2170,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // check equation->endo == equation name
     for(int i = 0; i < KNB(KE_WS); i++)
-        ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
+        ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
 
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
