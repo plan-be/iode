@@ -416,7 +416,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
                 obj = (char*) KCVAL(kdb, objnb);
                 break;
             case EQUATIONS :
-                obj = (char*) KELEC(kdb, objnb);
+                obj = (char*) KELEC(kdb, objnb).c_str();
                 break;
             case IDENTITIES :
                 obj = (char*) KILEC(kdb, objnb);
@@ -985,7 +985,7 @@ int B_ExcelSet(char *arg, int type)
             ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, pos));
             break;
         case EQUATIONS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KELEC(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KELEC(kdb, pos).c_str());
             break;
         case SCALARS :
             scl = KSVAL(kdb, pos); /* JMP 10-08-00 */

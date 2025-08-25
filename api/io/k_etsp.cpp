@@ -107,10 +107,12 @@ char* ExportObjsTSP::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 
     write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
     write_pre_post("", " ", tmp, &buf);
-    lg = (int)strlen(buf) + 1;
+    lg = (int) strlen(buf) + 1;
 
-    if(*vec == NULL) olg = 0;
-    else olg = (int)strlen(*vec);
+    if(*vec == NULL) 
+        olg = 0;
+    else 
+        olg = (int)strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
@@ -124,14 +126,17 @@ int ExportObjsTSP::write_variable_and_comment(ExportToFile* expdef, char* code, 
     char    **text;
 
     fprintf(expdef->file_descriptor, "%s \n", code);
-    if(cmt) { /* JMP 04-03-99 */
+    if(cmt) 
+    {
         text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
-        for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "? %s\n", text[i]);
+        for(i = 0; text[i]; i++)  
+            fprintf(expdef->file_descriptor, "? %s\n", text[i]);
         SCR_free_tbl((unsigned char**) text);
     }
 
     text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
-    for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "%s\n", text[i]);
+    for(i = 0; text[i]; i++)  
+        fprintf(expdef->file_descriptor, "%s\n", text[i]);
     fprintf(expdef->file_descriptor, " ;\n");
     SCR_free_tbl((unsigned char**) text);
     return(0);

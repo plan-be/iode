@@ -158,7 +158,7 @@ public:
         // TODO: replace hard-coded separators by a (new?) variable 
         char** tmp_endos = (char**) SCR_vtoms((unsigned char*) endos, (unsigned char*) ",; ");
         
-        Sample* smpl = NULL;
+        Sample* smpl = nullptr;
         if(from_period != NULL && to_period != NULL)
         {
             try
@@ -172,7 +172,8 @@ public:
         }
 
         initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
-        if(smpl != NULL) SCR_free(smpl);
+        if(smpl) 
+            delete smpl;
     }
 
     Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, Sample* smpl = NULL,
@@ -203,7 +204,7 @@ public:
     {
         int     rc;
         bool    free_smpl = false;
-        Sample* smpl = NULL;
+        Sample* smpl = nullptr;
 
         if(from_period != NULL && to_period != NULL)
         {
@@ -292,14 +293,14 @@ private:
         E_DBV  = (dbv != NULL) ? dbv : KV_WS;
         E_DBS  = (dbs != NULL) ? dbs : KS_WS;
 
-        if(smpl != NULL)
-            memcpy(&est_smpl, smpl, sizeof(Sample));
+        if(smpl != nullptr)
+            est_smpl = *smpl;
         else
         {
             // If no sample is provided, we will use the one from the global variables database
             if(KSMPL(KV_WS) == NULL)
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            memcpy(&est_smpl, KSMPL(KV_WS), sizeof(Sample));
+            est_smpl = *KSMPL(KV_WS);
         }
     }
 

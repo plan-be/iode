@@ -394,45 +394,45 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* 
     else 
         eq = KEVAL(K_WS[EQUATIONS], pos);
 
-    SW_nfree(eq->endo);
-    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
-    if(lec != NULL) {
-        SW_nfree(eq->lec);
-        eq->lec = (char*) SCR_stracpy((unsigned char*) lec);
-    }
-    if(cmt != NULL) {
-        SW_nfree(eq->comment);
-        eq->comment = (char*) SCR_stracpy((unsigned char*) cmt);
-    }
-    if(instr != NULL) {
-        SW_nfree(eq->instruments);
-        eq->instruments = (char*) SCR_stracpy((unsigned char*) instr);
-    }
-    if(blk != NULL) {
-        SW_nfree(eq->block);
-        eq->block = (char*) SCR_stracpy((unsigned char*) blk);
-    }
+    eq->endo = std::string(name);
 
-    if(method >= 0) eq->method = method;
-    if(date > 0) eq->date = SCR_current_date();
-    else eq->date = 0L;
+    if(lec != NULL)
+        eq->lec = std::string(lec);
 
-    if(tests != NULL)  memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
-    else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
+    if(cmt != NULL)
+        eq->comment = std::string(cmt);
 
-    if(smpl != NULL) memcpy(&(eq->sample), smpl, sizeof(Sample));
-    /*    else memset(&(eq->sample), 0, sizeof(Sample)); */
+    if(instr != NULL)
+        eq->instruments = std::string(instr);
+
+    if(blk != NULL)
+        eq->block = std::string(blk);
+
+    if(method >= 0) 
+        eq->method = method;
+
+    if(date > 0) 
+        eq->date = SCR_current_date();
+    else 
+        eq->date = 0L;
+
+    if(tests != NULL)  
+        memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
+    else 
+        memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float));       /* JMP 12-04-98 */
+
+    if(smpl != NULL) 
+        memcpy(&(eq->sample), smpl, sizeof(Sample));
 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
-    if(rc < 0) {
+    if(rc < 0) 
+    {
         rc = -1;
         error_manager.append_error(std::string(L_error()));
     }
-    else rc = 0;
+    else 
+        rc = 0;
 
-    /* GB 27/9/96
-        E_tests2scl(eq, E_T, E_NCE);
-    */
     E_free(eq);
     return(rc);
 }

@@ -198,7 +198,7 @@ int KE_compile(KDB* dbe)
 
     for(i = 0; i < KNB(dbe); i++) {
         eq = KEVAL(dbe, i);
-        K_upd_eqs(KONAME(dbe, i), eq->lec, NULL, 0, NULL, NULL, NULL, NULL, 0);
+        K_upd_eqs(KONAME(dbe, i), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         E_free(eq);
     }
     return(0);

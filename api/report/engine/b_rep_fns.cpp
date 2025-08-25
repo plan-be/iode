@@ -895,17 +895,23 @@ U_ch *RPF_evalue(U_ch** args)
     int     pos, i;
     KDB     *kdb = K_WS[EQUATIONS];
 
-    if(kdb == NULL) return(res);
+    if(kdb == NULL) 
+        return(res);
 
-    for(i = 0 ; args[i] ; i++) {
-        if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
+    for(i = 0 ; args[i] ; i++) 
+    {
+        if(i > 0) 
+            res = SCR_strafcat(res, (unsigned char*) ";");
+        
         pos = K_find(kdb, (char*) args[i]);
-        if(pos < 0) {
+        if(pos < 0) 
+        {
             sprintf((char*) buf, "Eqs %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
-        else {
-            res = SCR_strafcat(res, (unsigned char*) KELEC(kdb, pos));
+        else 
+        {
+            res = SCR_strafcat(res, (unsigned char*) KELEC(kdb, pos).c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
@@ -1044,8 +1050,9 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
         eq = (unsigned char*) SCR_malloc(80);
         sprintf((char*) eq, "[Eqs %s not found]", args[0]);
     }
-    else {
-        eq = SCR_stracpy((unsigned char*) KELEC(kdb, pos));
+    else 
+    {
+        eq = SCR_stracpy((unsigned char*) KELEC(kdb, pos).c_str());
         poscolon = L_split_eq((char*) eq);
         if(poscolon > 0) {
             if(lhsrhs == 0) eq[poscolon] = 0;

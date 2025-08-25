@@ -149,21 +149,21 @@ int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float
     else 
         eq = KEVAL(E_DBE, pos);
 
-    SW_nfree(eq->endo);
-    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
-    SW_nfree(eq->lec);
-    eq->lec = (char*) SCR_stracpy((unsigned char*) lec);
+    eq->endo = std::string(name);
+    eq->lec = std::string(lec);
     eq->method = method;
     eq->date = SCR_current_date();
     
     memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
     memcpy(&(eq->sample), smpl, sizeof(Sample));
     rc = K_add(E_DBE, name, eq, name);
-    if(rc < 0) {
+    if(rc < 0) 
+    {
         error_manager.append_error(std::string(L_error()));
         rc = -1;
     }
-    else rc = 0;
+    else 
+        rc = 0;
 
     E_free(eq);
     return(rc);
@@ -232,31 +232,34 @@ int Estimation::KE_est_s(Sample* smpl)
         }
         E_T = E_SMPL->nb_periods;
 
-        if(KEINSTR(E_DBE, pos) == NULL) 
+        if(KEINSTR(E_DBE, pos).empty()) 
             instrs = NULL;
         else 
-            instrs = SCR_vtoms((unsigned char*) KEINSTR(E_DBE, pos), (unsigned char*) ",;");
+            instrs = SCR_vtoms((unsigned char*) KEINSTR(E_DBE, pos).c_str(), (unsigned char*) ",;");
 
-        blk =  SCR_vtoms((unsigned char*) KEBLK(E_DBE, pos), (unsigned char*) " ,;");
+        blk =  SCR_vtoms((unsigned char*) KEBLK(E_DBE, pos).c_str(), (unsigned char*) " ,;");
         nblk = SCR_tbl_size(blk);
 
         if(nblk == 0)  {
-            SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(E_DBE, pos));
+            SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(E_DBE, pos).c_str());
             SCR_add_ptr(&endos, &nbe, (unsigned char*) est_endos[i]);
         }
-        else {
+        else 
+        {
             /* add elements of block */
-            for(j = 0; j < nblk; j++) {
+            for(j = 0; j < nblk; j++) 
+            {
                 SCR_sqz(blk[j]);
                 pos = K_find(KE_WS, (char*) blk[j]);
-                if(pos < 0) {
+                if(pos < 0) 
+                {
                     std::string error_msg = "Equation '";
                     error_msg += std::string((char*) blk[j]); 
                     error_msg += "' not found";
                     error_manager.append_error(error_msg);
                     goto err;
                 }
-                SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(KE_WS, pos));
+                SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(KE_WS, pos).c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) KONAME(KE_WS, pos));
             }
         }

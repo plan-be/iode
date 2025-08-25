@@ -1408,19 +1408,13 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     rc = est.estimate("1980Y1", "1996Y1");
     EXPECT_EQ(rc, 0);
 
-    //x = U_test_calc_lec("_YRES0[1980Y1]", 0);
-    //printf("x = %lf\n", x);
-    //x = fabs(x + 0.001150);
     EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-
-    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
     EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS, "ACAF") * 1e6) / 1e6, 0.821815);
 
     //TODO:add some tests with other estimation methods / on blocks / with instruments
 
     //W_flush();
     W_close();
-
 
     // estimate_step_wise
     smpl = new Sample("1980Y1", "1995Y1");
@@ -1470,7 +1464,6 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -2.638717);
     df = E_UnitRoot("ACAF+ACAG", 0, 0, 1);
     EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -1.300049);
-
 
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to
@@ -2008,7 +2001,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     // Export with rules (partial /+ change names)
     sprintf(outfile, "%sfun2.tsp", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%sfun2.ref.tsp", IODE_DATA_DIR);
+    sprintf(reffile, "%sfun2.ref.tsp", IODE_OUTPUT_DIR);
     sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
     EXPECT_EQ(rc, 0);
@@ -2333,7 +2326,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // check equation->endo == equation name
     for(int i = 0; i < KNB(KE_WS); i++)
-        ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
+        ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
 
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");

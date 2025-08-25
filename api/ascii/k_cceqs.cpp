@@ -8,8 +8,10 @@
  *     int save_csv(KDB *kdb, char *filename) : not implemented
  *
  */
+#include "api/constants.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
+#include "api/utils/utils.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
 #include "api/objs/equations.h"
@@ -64,14 +66,18 @@ static EQ* read_eq(YYFILE* yy)
     Sample  *smpl = NULL;
 
     eq = (EQ *) SW_nalloc(sizeof(EQ));
+
     eq->method = 0;
-    if((keyw = YY_lex(yy)) != EQ_ASCII_OPEN)  {
+    
+    if((keyw = YY_lex(yy)) != EQ_ASCII_OPEN)  
+    {
         YY_unread(yy);
         lec = K_read_str(yy);
-        eq->lec = K_wrap(lec, 60);  
+        eq->lec = std::string(K_wrap(lec, 60));  
         SW_nfree(lec);
 
-        if(eq->lec == NULL) {
+        if(eq->lec.empty()) 
+        {
             kerror(0, "%s: Expected LEC definition, [%s]", lec, YY_error(yy));
             return(NULL);
         }
@@ -79,10 +85,11 @@ static EQ* read_eq(YYFILE* yy)
     }
 
     lec = K_read_str(yy);
-    eq->lec = K_wrap(lec, 60);
+    eq->lec = std::string(K_wrap(lec, 60));
     SW_nfree(lec);
 
-    if(eq->lec == NULL) {
+    if(eq->lec.empty()) 
+    {
         kerror(0, "%s: Expected LEC definition, [%s]", lec, YY_error(yy));
         return(NULL);
     }
@@ -117,20 +124,24 @@ static EQ* read_eq(YYFILE* yy)
 
             case EQ_ASCII_SMPL :
                 smpl = K_read_smpl(yy);
-                if(smpl == NULL) goto err;
+                if(smpl == NULL) 
+                    goto err;
                 memcpy(&(eq->sample), smpl, sizeof(Sample));
                 break;
             case EQ_ASCII_BLK  :
                 eq->block = K_read_str(yy);
-                if(eq->block == NULL) goto err;
+                if(eq->block.empty()) 
+                    goto err;
                 break;
             case EQ_ASCII_CMT  :
                 eq->comment = K_read_str(yy);
-                if(eq->comment == NULL) goto err;
+                if(eq->comment.empty()) 
+                    goto err;
                 break;
             case EQ_ASCII_INSTR:
                 eq->instruments = K_read_str(yy);
-                if(eq->instruments == NULL) goto err;
+                if(eq->instruments.empty()) 
+                    goto err;
                 break;
 
             case EQ_ASCII_STDEV :
@@ -282,8 +293,10 @@ KDB* AsciiEquations::load_asc(char* filename)
                     goto err;
                 }
 
-                eq->endo = (char*) SCR_stracpy((unsigned char *) name);
-                if(eq->block == NULL) eq->block = (char*) SCR_stracpy((unsigned char *) name);
+                eq->endo = std::string(name);
+
+                if(eq->block.empty()) 
+                    eq->block = std::string(name);
 
                 pos = K_add(kdb, name, eq, name);
                 if(pos < 0)  {
@@ -339,15 +352,19 @@ static void print_test(FILE* fd, char* txt, double val)
  */
 static void print_eq(FILE* fd, EQ* eq, char* name)
 {
-    fprintf(fd, "{\n\t\"%s\"\n", eq->lec);
-    if(eq->comment != NULL && eq->comment[0] != 0 && strcmp(eq->comment, " ") !=0 ) { // JMP 30/10/2023
+    fprintf(fd, "{\n\t\"%s\"\n", (char*) eq->lec.c_str());
+
+    std::string comment = trim(eq->comment);
+    if(!comment.empty()) 
+    {
         fprintf(fd, "\tCOMMENT ");
-        SCR_fprintf_esc(fd, eq->comment, 1);
+        SCR_fprintf_esc(fd, (char*) comment.c_str(), 1);
         fprintf(fd, "\n");
     }
 
     // Estimated equation => Sample not null 30/10/2023
-    if((eq->sample).nb_periods != 0) {
+    if((eq->sample).nb_periods != 0) 
+    {
         switch(eq->method) {
             case 0 :
                 fprintf(fd, "\tLSQ\n");
@@ -374,13 +391,15 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
 
         fprintf(fd, "\tSAMPLE %s %s\n", (char*) from.c_str(), (char*) to.c_str());
 
-        if(eq->block != NULL && eq->block[0] != 0 && strcmp(eq->block, name) != 0) // JMP 30/10/2023
-            fprintf(fd, "\tBLOCK \"%s\"\n", eq->block);
-        if(eq->instruments != NULL && eq->instruments[0] != 0)
-            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instruments);
+        if((!eq->block.empty()) && eq->block != std::string(name))
+            fprintf(fd, "\tBLOCK \"%s\"\n", eq->block.c_str());
+        
+        if(!eq->instruments.empty())
+            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instruments.c_str());
         
         //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);
+
         print_test(fd, "STDEV",  eq->tests[1]);
         print_test(fd, "MEANY",  eq->tests[2]);
         print_test(fd, "SSRES",  eq->tests[3]);

@@ -660,11 +660,15 @@ int B_PrintEqs(char* name, EQ* eq)
 
     if(B_EQS_INFOS > 1) B_PrintRtfTopic(name);
     W_printf(".par1 enum_1\n");
-    B_PrintLec(name, eq->lec, eq->clec, B_EQS_LEC);
-    if(B_EQS_INFOS < 1) return(0);
-    if(B_isdef(eq->comment)) {
+
+    B_PrintLec(name, (char*) eq->lec.c_str(), eq->clec, B_EQS_LEC);
+    if(B_EQS_INFOS < 1) 
+        return(0);
+
+    if(B_isdef((char*) eq->comment.c_str())) 
+    {
         sprintf(buf, ".par1 par_1\n%ci ", A2M_ESCCH);
-        B_dump_str((unsigned char*) buf, (unsigned char*) eq->comment);
+        B_dump_str((unsigned char*) buf, (unsigned char*) eq->comment.c_str());
     }    
 
     if(B_EQS_INFOS < 2) return(0);
@@ -674,8 +678,10 @@ int B_PrintEqs(char* name, EQ* eq)
         std::string to = eq->sample.end_period.to_string();
         W_printf(".par enum_2\nEstimation : %ci%c%cI on %s-%s\n\n", A2M_ESCCH, "LZIG"[eq->method], A2M_ESCCH, 
                  (char*) from.c_str(), (char*) to.c_str());
-        if(B_isdef(eq->block))   B_dump_str((unsigned char*) "Block : ", (unsigned char*) eq->block);
-        if(B_isdef(eq->instruments)) B_dump_str((unsigned char*) "Instruments : ", (unsigned char*) eq->instruments);
+        if(B_isdef((char*) eq->block.c_str()))   
+            B_dump_str((unsigned char*) "Block : ", (unsigned char*) eq->block.c_str());
+        if(B_isdef((char*) eq->instruments.c_str())) 
+            B_dump_str((unsigned char*) "Instruments : ", (unsigned char*) eq->instruments.c_str());
 
         W_printf("\nTests :\n");
         W_printf(".par enum_3\n");
