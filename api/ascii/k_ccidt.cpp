@@ -116,8 +116,10 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
     FILE    *fd;
     int     i;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
         if(fd == 0) {
             kerror(0, "Cannot create '%s'", filename);
@@ -125,12 +127,14 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < KNB(kdb) ; i++) {
+    for(i = 0 ; i < KNB(kdb) ; i++) 
+    {
         fprintf(fd, "%s ", KONAME(kdb, i));
-        fprintf(fd, "\"%s\"\n", KELEC(kdb, i));
+        fprintf(fd, "\"%s\"\n", KILEC(kdb, i));
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
     return(0);
 }
 

@@ -1,9 +1,13 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/objs/identities.h"
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 
 /* pack.c */
@@ -20,7 +24,6 @@ int KV_alloc_var(int );
 int K_ipack(char **,char *);
 //char *K_tcell_pack(char *,TCELL *);
 int K_tpack(char **,char *);
-int K_epack(char **,char *,char *);
 int K_spack(char **,char *);
 int KS_alloc_scl(void);
 int K_cpack(char **,char *);
@@ -28,7 +31,6 @@ int K_lpack(char **,char *);
 int K_opack(char **,char *,int *);
 //void K_vunpack(void);
 TBL *K_tunpack(char *);
-EQ *K_eunpack(char *, char *);
 Identity* K_iunpack(char *);
 //void K_sunpack(void);
 //void K_cunpack(void);

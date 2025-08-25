@@ -392,36 +392,39 @@ int   K_epack(char **pack, char *a1, char *endo)
     EQ* eq;
     CLEC* clec;
 
-    eq = (EQ*)a1;
+    eq = (EQ*) a1;
 
     *pack = (char*) P_create();
-    if(eq->lec == NULL) return(-1);
-    clec = L_solve(eq->lec, endo);
-    if(clec == 0)  return(-1);
+    if(eq->lec.empty()) 
+        return(-1);
+    
+    clec = L_solve((char*) eq->lec.c_str(), endo);
+    if(clec == 0)  
+        return(-1);
 
-    *pack = (char*) P_add(*pack, eq->lec, (int) strlen(eq->lec) + 1);             /* lec */
-    *pack = (char*) P_add(*pack, (char*)clec, clec->tot_lg);                /* clec */
-    *pack = (char*) P_add(*pack, &(eq->solved), 1);                         /* solved */
-    *pack = (char*) P_add(*pack, &(eq->method), 1);                         /* method */
-    *pack = (char*) P_add(*pack, (char*)&(eq->sample), sizeof(Sample));       /* sample */
+    *pack = (char*) P_add(*pack, (char*) eq->lec.c_str(), eq->lec.size() + 1);  /* lec */
+    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);                   /* clec */
+    *pack = (char*) P_add(*pack, &(eq->solved), 1);                             /* solved */
+    *pack = (char*) P_add(*pack, &(eq->method), 1);                             /* method */
+    *pack = (char*) P_add(*pack, (char*) &(eq->sample), sizeof(Sample));        /* sample */
 
-    if(eq->comment == NULL) 
+    if(eq->comment.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*)eq->comment, (int)strlen(eq->comment) + 1);    /* cmt */
+        *pack = (char*) P_add(*pack, (char*) eq->comment.c_str(), eq->comment.size() + 1);          /* cmt */
 
-    if(eq->block == NULL) 
+    if(eq->block.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*)eq->block, (int)strlen(eq->block) + 1);    /* blk */
+        *pack = (char*) P_add(*pack, (char*) eq->block.c_str(), eq->block.size() + 1);              /* blk */
 
-    if(eq->instruments == NULL) 
+    if(eq->instruments.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*)eq->instruments, (int)strlen(eq->instruments) + 1);/* instr */
+        *pack = (char*) P_add(*pack, (char*) eq->instruments.c_str(), eq->instruments.size() + 1);  /* instr */
 
-    *pack = (char*) P_add(*pack, (char*)&(eq->date), sizeof(long));                 /* date */
-    *pack = (char*) P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float)); /* tests*/ /* FLOAT 12-04-98 */
+    *pack = (char*) P_add(*pack, (char*)&(eq->date), sizeof(long));                     /* date */
+    *pack = (char*) P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
 
     SW_nfree(clec);
     return(0);
@@ -820,11 +823,13 @@ EQ* K_eunpack(char *pack, char *name)
 
     eq = (EQ*)SW_nalloc(sizeof(EQ));
 
-    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
+    eq->endo = std::string(name);
 
     len = P_get_len(pack, 0);
-    eq->lec = SW_nalloc(len);
-    memcpy(eq->lec, P_get_ptr(pack, 0), len);
+    char* c_lec = SW_nalloc(len);
+    memcpy(c_lec, P_get_ptr(pack, 0), len);
+    eq->lec = std::string(c_lec);
+    SW_nfree(c_lec);
 
     len = P_get_len(pack, 1);
     eq->clec = (CLEC*)SW_nalloc(len);
@@ -839,16 +844,22 @@ EQ* K_eunpack(char *pack, char *name)
     memcpy(&(eq->sample), P_get_ptr(pack, 4), sizeof(Sample));
 
     len = P_get_len(pack, 5);
-    eq->comment = SW_nalloc(len);
-    memcpy(eq->comment, P_get_ptr(pack, 5), len);
+    char* c_cmt = SW_nalloc(len);
+    memcpy(c_cmt, P_get_ptr(pack, 5), len);
+    eq->comment = std::string(c_cmt);
+    SW_nfree(c_cmt);
 
     len = P_get_len(pack, 6);
-    eq->block = SW_nalloc(len);
-    memcpy(eq->block, P_get_ptr(pack, 6), len);
+    char* c_block = SW_nalloc(len);
+    memcpy(c_block, P_get_ptr(pack, 6), len);
+    eq->block = std::string(c_block);
+    SW_nfree(c_block);
 
     len = P_get_len(pack, 7);
-    eq->instruments = SW_nalloc(len);
-    memcpy(eq->instruments, P_get_ptr(pack, 7), len);
+    char* c_instr = SW_nalloc(len);
+    memcpy(c_instr, P_get_ptr(pack, 7), len);
+    eq->instruments = std::string(c_instr);
+    SW_nfree(c_instr);
 
     eq->date = *(long*)(P_get_ptr(pack, 8));
 

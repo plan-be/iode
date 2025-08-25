@@ -14,7 +14,7 @@ Equation* KDBEquations::get_unchecked(const int pos) const
     // Note: KEVAL allocate a new pointer EQ*
     EQ* c_eq = KEVAL(kdb, pos);
     // re-compute CLEC
-    c_eq->clec = L_solve(c_eq->lec, c_eq->endo);
+    c_eq->clec = L_solve((char*) c_eq->lec.c_str(), (char*) c_eq->endo.c_str());
     if (c_eq->clec == NULL)
         throw std::runtime_error("Failed to compute LEC expression '" + std::string(c_eq->lec) + 
                     "' of equation named '" + std::string(c_eq->endo) + "'");

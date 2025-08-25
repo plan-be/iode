@@ -164,16 +164,13 @@ struct std::hash<EQ>
     {
 		std::size_t seed = 0;
 
-        // need to wrap with std::string() because hash_value() and
-        // hash_combine() only compare pointer addresses when applied 
-        // on char* arrays
-        hash_combine<std::string_view>(seed, std::string_view(eq.endo, strlen(eq.endo)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.lec, strlen(eq.lec)));
+        hash_combine<std::string>(seed, eq.endo);
+        hash_combine<std::string>(seed, eq.lec);
         hash_combine<char>(seed, eq.method);
         hash_combine<Sample>(seed, eq.sample);
-        hash_combine<std::string_view>(seed, std::string_view(eq.comment, strlen(eq.comment)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.block, strlen(eq.block)));
-        hash_combine<std::string_view>(seed, std::string_view(eq.instruments, strlen(eq.instruments)));
+        hash_combine<std::string>(seed, eq.comment);
+        hash_combine<std::string>(seed, eq.block);
+        hash_combine<std::string>(seed, eq.instruments);
 
         return seed;
     }

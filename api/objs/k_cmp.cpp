@@ -53,17 +53,24 @@ int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
     if(eq1 == NULL || eq2 == NULL) goto done;
 
     /* same unlinked CLEC, method, sample, cmt, instr, blk, --plus tests -- */
-    cl1 = L_solve(eq1->lec, name);
-    cl2 = L_solve(eq2->lec, name);
+    cl1 = L_solve((char*) eq1->lec.c_str(), name);
+    cl2 = L_solve((char*) eq2->lec.c_str(), name);
 
     if(cl1 == NULL || cl2 == NULL
             || cl1->tot_lg != cl2->tot_lg
             || memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
 
-    if(eq1->method != eq2->method) goto done;
-    if(memcmp(&(eq1->sample), &(eq2->sample), sizeof(Sample)) != 0) goto done;
-    if(strcmp(eq1->block, eq2->block) != 0) goto done;
-    if(strcmp(eq1->instruments, eq2->instruments) != 0) goto done;
+    if(eq1->method != eq2->method) 
+        goto done;
+
+    if(memcmp(&(eq1->sample), &(eq2->sample), sizeof(Sample)) != 0) 
+        goto done;
+
+    if(eq1->block != eq2->block) 
+        goto done;
+
+    if(eq1->instruments != eq2->instruments) 
+        goto done;
 
 //    if(memcmp(eq1->tests, eq2->tests, EQS_NBTESTS * sizeof(float)) != 0) goto done; /* FLOAT 12-04-98 */
 //        test 0 and 5 and 11..20 are not stored in ascii

@@ -109,10 +109,12 @@ char* ExportObjsTSP::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 
     write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
     write_pre_post("", " ", tmp, &buf);
-    lg = (int)strlen(buf) + 1;
+    lg = (int) strlen(buf) + 1;
 
-    if(*vec == NULL) olg = 0;
-    else olg = (int)strlen(*vec);
+    if(*vec == NULL) 
+        olg = 0;
+    else 
+        olg = (int)strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);

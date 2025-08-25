@@ -155,10 +155,12 @@ public:
                char* from_period = NULL, char* to_period = NULL, int method = -1, 
                int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
+        est_endos = NULL;
+
         // TODO: replace hard-coded separators by a (new?) variable 
         char** tmp_endos = (char**) SCR_vtoms((unsigned char*) endos, (unsigned char*) ",; ");
         
-        Sample* smpl = NULL;
+        Sample* smpl = nullptr;
         if(from_period != NULL && to_period != NULL)
         {
             try
@@ -172,12 +174,14 @@ public:
         }
 
         initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
-        if(smpl != NULL) SCR_free(smpl);
+        if(smpl) 
+            delete smpl;
     }
 
     Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, Sample* smpl = NULL,
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
+        est_endos = NULL;
         initialize(endos, dbe, dbv, dbs, smpl, method, maxit, eps);
     }
 
@@ -203,7 +207,7 @@ public:
     {
         int     rc;
         bool    free_smpl = false;
-        Sample* smpl = NULL;
+        Sample* smpl = nullptr;
 
         if(from_period != NULL && to_period != NULL)
         {
@@ -221,7 +225,7 @@ public:
             smpl = &est_smpl;               // Use the sample provided at initialization
 
         rc = KE_est_s(smpl);                // Perform the estimation
-        
+
         if(free_smpl)
             delete smpl;
 
@@ -230,9 +234,10 @@ public:
             std::string last_error = error_manager.get_last_error();
             if(!last_error.empty())
                 throw std::runtime_error("Estimation failed:\n" + last_error);
+            else
+                throw std::runtime_error("Estimation failed with unknown error.");
         }
-
-        return 0;
+        return rc;
     }
 
     std::vector<double> get_observed_values(const int eq_nb) const
@@ -292,14 +297,14 @@ private:
         E_DBV  = (dbv != NULL) ? dbv : KV_WS;
         E_DBS  = (dbs != NULL) ? dbs : KS_WS;
 
-        if(smpl != NULL)
-            memcpy(&est_smpl, smpl, sizeof(Sample));
+        if(smpl != nullptr)
+            est_smpl = *smpl;
         else
         {
             // If no sample is provided, we will use the one from the global variables database
             if(KSMPL(KV_WS) == NULL)
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            memcpy(&est_smpl, KSMPL(KV_WS), sizeof(Sample));
+            est_smpl = *KSMPL(KV_WS);
         }
     }
 

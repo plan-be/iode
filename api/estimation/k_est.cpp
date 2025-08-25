@@ -149,21 +149,21 @@ int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float
     else 
         eq = KEVAL(E_DBE, pos);
 
-    SW_nfree(eq->endo);
-    eq->endo = (char*) SCR_stracpy((unsigned char*) name);
-    SW_nfree(eq->lec);
-    eq->lec = (char*) SCR_stracpy((unsigned char*) lec);
+    eq->endo = std::string(name);
+    eq->lec = std::string(lec);
     eq->method = method;
     eq->date = SCR_current_date();
     
     memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
     memcpy(&(eq->sample), smpl, sizeof(Sample));
     rc = K_add(E_DBE, name, eq, name);
-    if(rc < 0) {
+    if(rc < 0) 
+    {
         error_manager.append_error(std::string(L_error()));
         rc = -1;
     }
-    else rc = 0;
+    else 
+        rc = 0;
 
     E_free(eq);
     return(rc);
@@ -200,16 +200,16 @@ int Estimation::KE_est_s(Sample* smpl)
     
     std::string endo;
     std::set<std::string> estimated_eqs;
-    for(i = 0; i < nb; i++) {
-        
+    for(i = 0; i < nb; i++) 
+    {    
         // check if the equation has already been estimated (through a block)
         endo = std::string(est_endos[i]);
         if(estimated_eqs.contains(endo))
             continue;
 
-        pos = K_find(E_DBE, est_endos[i]);
+        pos = K_find(E_DBE, (char*) endo.c_str());
         if(pos < 0) {
-            std::string error_msg  = "Equation '" + std::string(est_endos[i]) + "' not found";
+            std::string error_msg  = "Equation '" + endo + "' not found";
             error_manager.append_error(error_msg);
             goto err;
         }
@@ -219,44 +219,61 @@ int Estimation::KE_est_s(Sample* smpl)
         else 
             E_MET = est_method;
 
-        if(smpl == NULL) {
-            memcpy(&eq_smpl, &(KESMPL(E_DBE, pos)), sizeof(Sample));
+        if(smpl == NULL) 
+        {
+            Sample _sample = KESMPL(E_DBE, pos);
+            memcpy(&eq_smpl, &_sample, sizeof(Sample));
             E_SMPL = &eq_smpl;
         }
         else
             E_SMPL = smpl;
-        if(E_SMPL->nb_periods < 1) {
-            std::string error_msg = "Equation '" + std::string(est_endos[i]) + "': estimation sample undefined";
+        if(E_SMPL->nb_periods < 1) 
+        {
+            std::string error_msg = "Equation '" + endo + "': estimation sample undefined";
             error_manager.append_error(error_msg);
             goto err;
         }
         E_T = E_SMPL->nb_periods;
 
-        if(KEINSTR(E_DBE, pos) == NULL) 
+        std::string _instruments = KEINSTR(E_DBE, pos);
+        if(_instruments.empty()) 
             instrs = NULL;
         else 
-            instrs = SCR_vtoms((unsigned char*) KEINSTR(E_DBE, pos), (unsigned char*) ",;");
+            instrs = SCR_vtoms((unsigned char*) _instruments.c_str(), (unsigned char*) ",;");
 
-        blk =  SCR_vtoms((unsigned char*) KEBLK(E_DBE, pos), (unsigned char*) " ,;");
+        std::string _block = KEBLK(E_DBE, pos);
+        blk =  SCR_vtoms((unsigned char*) _block.c_str(), (unsigned char*) " ,;");
         nblk = SCR_tbl_size(blk);
 
-        if(nblk == 0)  {
-            SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(E_DBE, pos));
-            SCR_add_ptr(&endos, &nbe, (unsigned char*) est_endos[i]);
+        std::string _lec;
+        if(nblk == 0)  
+        {
+            _lec = KELEC(E_DBE, pos);
+            SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
+            SCR_add_ptr(&endos, &nbe, (unsigned char*) endo.c_str());
         }
-        else {
+        else 
+        {
             /* add elements of block */
-            for(j = 0; j < nblk; j++) {
+            for(j = 0; j < nblk; j++) 
+            {
                 SCR_sqz(blk[j]);
                 pos = K_find(KE_WS, (char*) blk[j]);
-                if(pos < 0) {
+                if(pos < 0) 
+                {
                     std::string error_msg = "Equation '";
                     error_msg += std::string((char*) blk[j]); 
-                    error_msg += "' not found";
+                    error_msg += "' not found in block of equation";
                     error_manager.append_error(error_msg);
+                    SCR_free_tbl(lecs);
+                    SCR_free_tbl(endos);
+                    SCR_free_tbl(instrs);
+                    SCR_free_tbl(blk);
                     goto err;
                 }
-                SCR_add_ptr(&lecs, &nbl, (unsigned char*) KELEC(KE_WS, pos));
+
+                _lec = KELEC(KE_WS, pos);
+                SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) KONAME(KE_WS, pos));
             }
         }
@@ -266,7 +283,8 @@ int Estimation::KE_est_s(Sample* smpl)
 
         error = E_est((char**) endos, (char**) lecs, (char**) instrs);
 
-        if(error == 0) {
+        if(error == 0) 
+        {
             E_print_results(1, 1, 1, 1, 1);  /* JMP 23-03-98 */
 
             for(j = 0; j < nbe - 1; j++) {
@@ -312,5 +330,8 @@ int Estimation::KE_est_s(Sample* smpl)
 
 err :
     SCR_free_tbl(blk);
+    lecs = endos = instrs = blk = NULL;
+    nbl = nbe = 0;
+    estimated_eqs.clear();
     return(-1);
 }

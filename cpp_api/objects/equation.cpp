@@ -4,8 +4,8 @@
 
 void Equation::copy_from_EQ_obj(const EQ* obj)
 {
-    this->endo = copy_char_array(obj->endo); 
-    this->lec = copy_char_array(obj->lec);
+    this->endo = obj->endo; 
+    this->lec = obj->lec;
     // NOTE : we do not use memcpy() because memcpy() actually makes  
     //        a shallow copy of a struct instead of a deep copy
     this->clec = clec_deep_copy(obj->clec);
@@ -16,9 +16,9 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
     // NOTE : we can use memcpy() on Sample because Sample does 
     //        not contain attributes which are pointers
     memcpy(&this->sample, &obj->sample, sizeof(Sample));
-    this->comment = copy_char_array(obj->comment);
-    this->block = copy_char_array(obj->block);
-    this->instruments = copy_char_array(obj->instruments);
+    this->comment = obj->comment;
+    this->block = obj->block;
+    this->instruments = obj->instruments;
     this->date = obj->date;
     memcpy(&(this->tests), &(obj->tests), EQS_NBTESTS * sizeof(float));
 }
@@ -26,15 +26,12 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
 Equation::Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method, const std::string& from, 
     const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
-    this->lec = NULL, 
-    this->clec = NULL, 
-    this->comment = NULL, 
-    this->instruments = NULL, 
-    this->block = NULL;
+    this->clec = NULL;
     this->date = 0L;
     this->solved = '\0';
 
-    this->endo = copy_string_to_char(name);
+    this->endo = name;
+    // set this->lec and this->clec in the same time
     set_lec(lec);
     set_method(method);
     set_sample(from, to);
@@ -49,15 +46,12 @@ Equation::Equation(const std::string& name, const std::string& lec, const IodeEq
 Equation::Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
     const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
-    this->lec = NULL, 
-    this->clec = NULL, 
-    this->comment = NULL, 
-    this->instruments = NULL, 
-    this->block = NULL;
+    this->clec = NULL;
     this->date = 0L;
     this->solved = '\0';
 
-    this->endo = copy_string_to_char(name);
+    this->endo = name;
+    // set this->lec and this->clec in the same time
     set_lec(lec);
     set_method(method);
     set_sample(from, to);
@@ -81,12 +75,8 @@ Equation::Equation(const Equation& other)
 
 Equation::~Equation()
 {
-    SW_nfree(this->endo);
-    SW_nfree(this->lec);
-    SW_nfree(this->clec);
-    SW_nfree(this->comment);
-    SW_nfree(this->block);
-    SW_nfree(this->instruments);
+    if(this->clec != NULL)
+        SW_nfree(this->clec);
 }
 
 // required to be used in std::map
@@ -114,17 +104,15 @@ void Equation::set_lec(const std::string& lec)
 {
     if(lec.empty())
         throw std::invalid_argument("Passed LEC expression is empty");
-
-    char* c_lec = to_char_array(lec);
     
     // check if LEC expression is valid
-    this->clec = L_solve(c_lec, this->endo);
+    this->clec = L_solve((char*) lec.c_str(), (char*) this->endo.c_str());
     if(this->clec == NULL) 
-        throw std::invalid_argument("Cannot set LEC '" + lec + "' to the equation named '" + endo + "'");
+        throw std::invalid_argument("Cannot set LEC '" + lec + "' to the equation named '" + 
+                                    endo + "'");
 
-    if(this->lec != NULL) 
-        SW_nfree(this->lec);
-    this->lec = copy_char_array(c_lec);
+    this->lec.clear();
+    this->lec = lec;
 }
 
 // -- solved --
@@ -180,13 +168,8 @@ std::string Equation::get_block() const
 
 void Equation::set_block(const std::string& block)
 {
-    if(this->block != NULL)
-        SW_nfree(this->block);
-
-    if (block.empty()) 
-        this->block = copy_char_array("");
-    else 
-        this->block = copy_string_to_char(block);
+    this->block.clear();
+    this->block = block.empty() ? "" : block;
 }
 
 // -- sample --
@@ -239,16 +222,8 @@ std::string Equation::get_comment() const
 // we assume that comment string is in UTF8 format
 void Equation::set_comment(const std::string& comment)
 {
-    if(this->comment != NULL)
-        SW_nfree(this->comment);
-
-    if(comment.empty()) 
-        this->comment = copy_char_array("");
-    else
-    {
-        std::string comment_oem = utf8_to_oem(comment);
-        this->comment = copy_string_to_char(comment_oem);
-    }
+    this->comment.clear();
+    this->comment = comment.empty() ? "" : utf8_to_oem(comment);
 }
 
 // -- instruments --
@@ -260,13 +235,8 @@ std::string Equation::get_instruments() const
 
 void Equation::set_instruments(const std::string& instruments)
 {
-    if(this->instruments != NULL)
-        SW_nfree(this->instruments);
-
-    if(instruments.empty()) 
-        this->instruments = copy_char_array("");
-    else 
-        this->instruments = copy_string_to_char(instruments);
+    this->instruments.clear();
+    this->instruments = instruments.empty() ? "" : instruments; 
 }
 
 // -- date --
@@ -418,7 +388,8 @@ std::pair<std::string, std::string> Equation::split_equation()
 bool Equation::operator==(const Equation& other) const
 {
     return K_cmp_eqs(static_cast<EQ*>(const_cast<Equation*>(this)), 
-                     static_cast<EQ*>(const_cast<Equation*>(&other)), this->endo) == 0;
+                     static_cast<EQ*>(const_cast<Equation*>(&other)), 
+                     (char*) this->endo.c_str()) == 0;
 }
 
 std::size_t hash_value(const Equation& equation)
