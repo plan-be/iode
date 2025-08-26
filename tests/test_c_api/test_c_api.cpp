@@ -6,8 +6,10 @@
 
 #include "pch.h"
 #include <math.h>
+#include <string>
 #include <regex>
 #include <filesystem>
+#include <iostream>
 
 
 // BEGIN_KEEP
@@ -20,20 +22,6 @@
 //}
 //#endif
 // END_KEEP
-
-
-// BEGIN_KEEP
-#ifdef __GNUC__
-    char    *SEPARATOR = "/";
-    char    *IODE_DATA_DIR   = "../data/";
-    char    *IODE_OUTPUT_DIR = "../data/output/";
-    char    *IODE_REPORT_DIR = "../data/reports/";
-    #else
-    char    *SEPARATOR = "\\";
-    char    *IODE_DATA_DIR   = "..\\data\\";
-    char    *IODE_OUTPUT_DIR = "..\\data\\output\\";
-    char    *IODE_REPORT_DIR = "..\\data\\reports\\";
-#endif
 
 // Temporarily removed fns (to allow linking)
 
@@ -62,38 +50,31 @@ int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
 // END_KEEP
 
 
-
-
-class IodeCAPITest : public ::testing::Test 
+class IodeCAPITest : public TestAbstract, public ::testing::Test
 {
-protected:
-    char build_dir[256];
-	char input_test_dir[256];
-	char output_test_dir[256];
+public:
+    char* separator;
+	char* input_test_dir;
+	char* output_test_dir;
+	char* report_test_dir;
 
 public:
     void SetUp() override 
     {
-        // NOTE: we assume that: 
-		//       - current path is binaryDir/tests/test_cpp_api
-		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
-		std::filesystem::path cwd = std::filesystem::current_path();
-		std::filesystem::path tests_dir = cwd.parent_path();
-		std::filesystem::path build = tests_dir.parent_path();
-        std::filesystem::path data_dir = tests_dir / "data";
-        std::filesystem::path output_dir = tests_dir / "output";
-#ifdef __GNUC__
-		std::string separator = "/";
-#else
-        std::string separator = "\\";
-#endif
-        strcpy(build_dir, build.string().c_str());
-		strcpy(input_test_dir, (data_dir.string() + separator).c_str());
-		strcpy(output_test_dir, (output_dir.string() + separator).c_str());
+        separator = (char*) str_separator.c_str();
+        input_test_dir  = (char*) str_input_test_dir.c_str();
+        output_test_dir = (char*) str_output_test_dir.c_str();
+        report_test_dir = (char*) str_report_test_dir.c_str();
+        
+	    IODE_assign_super_API();    // set *_super fn pointers
+	    K_init_ws(0);               // Initialises 7 empty WS
+	    B_A2mGetAllParms();
+    }
 
-        // other initializations
-        U_test_init();
-        kpause_continue = 1;
+    void TearDown() override 
+    {
+        K_end_ws(0);                // Deletes the 7 WS
+        error_manager.clear();
     }
 
 	int U_cmp_tbls(char** tbl1, char* vec)
@@ -138,112 +119,6 @@ public:
 	//    content[*size] = 0; // Juste pour dire
 	//    fclose(fd);
 	//    return(content);
-	}
-
-	int U_cmp_files(char*file1, char*file2)
-	{
-	    int     rc = -1;        // ==
-	    long    size1, size2;
-	    char    *content1, *content2;
-	    char curdir[512];
-	
-	    //printf("Comparing '%s' and '%s'\n", file1, file2);
-#ifdef __GNUC__
-	    getcwd(curdir, 511);
-#else
-        _getcwd(curdir, 511);
-#endif
-	    printf("Current dir   : '%s'\n", curdir);
-	
-	    content1 = U_test_read_file(file1, &size1);
-	    //printf("   '%s': size=%ld\n", file1, size1);
-	    content2 = U_test_read_file(file2, &size2);
-	    //printf("   '%s': size=%ld\n", file2, size2);
-	
-	    if(size1 != size2) {
-	        rc = 0;              // !=
-	        goto fin;
-	    }
-	    if(content1 == NULL && content2 == NULL) {              // ==
-	        goto fin;
-	    }
-	
-	    if(content1 == NULL || content2 == NULL) {
-	        rc = 0;
-	        goto fin;      // !=
-	    }
-	
-	    rc = !memcmp(content1, content2, size1);
-	fin:
-	    SCR_free(content1);
-	    SCR_free(content2);
-	    return(rc);
-	}
-
-	bool U_test_same_files(char*file1, char*file2)
-	{
-        bool    rc = false;        
-	    int     i, j, nbdiffs = 0;
-	    long    size1, size2;
-	    char    *content1, *content2;
-	    char    **tbl1, **tbl2;
-	
-	    printf("Comparing '%s' and '%s'\n", file1, file2);
-	    content1 = U_test_read_file(file1, &size1);
-	    printf("   '%s': size=%ld\n", file1, size1);
-	    content2 = U_test_read_file(file2, &size2);
-	    printf("   '%s': size=%ld\n", file2, size2);
-	
-	    if(content1 == NULL && content2 == NULL)
-	        return true;
-	
-	    if(content1 == NULL || content2 == NULL) 
-        {
-	        if(content1 == NULL) printf("File %s not found\n", file1);
-	        if(content2 == NULL) printf("File %s not found\n", file2);
-            SCR_free(content1);
-            SCR_free(content2);
-	        return false;
-	    }
-	
-	    bool is_equal = size1 == size2;
-	
-	    if(is_equal) 
-            is_equal = memcmp(content1, content2, size1) == 0;
-
-        // files are different
-	    if(!is_equal) 
-        {
-	        printf("Comparing '%s' and '%s'\n", file1, file2);
-	        tbl1 = (char**) SCR_vtom((U_ch*)content1, '\n');
-	        tbl2 = (char**) SCR_vtom((U_ch*)content2, '\n');
-	        for(i = 0; tbl1[i] && tbl2[i]; i++) 
-            {
-	            if(strcmp(tbl1[i], tbl2[i])) 
-                {
-	                nbdiffs++;
-	                // Print diff bw the 2 lines
-	                printf("Line %-5d:%s\n           %s\n           ", i + 1, tbl1[i], tbl2[i]);
-	                for(j = 0; tbl1[i][j] && tbl2[i][j]; j++) 
-                    {
-	                    if(tbl1[i][j] == tbl2[i][j])
-	                        printf(" ");
-	                    else
-	                        printf("^");
-	                }
-	                printf("\n");
-	            }
-	            if(nbdiffs >= 10) 
-                {
-	                printf("......\n");
-	                break;
-	            }
-	        }
-	        SCR_free_tbl((U_ch**)tbl1);
-	        SCR_free_tbl((U_ch**)tbl2);
-	    }
-
-        return is_equal;
 	}
 
 	void U_test_print_title(char* title)
@@ -358,7 +233,7 @@ public:
 	    char    fullfilename[256];
 	    KDB     *kdb;
 	
-	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, filename);
+	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
 	    kdb = K_interpret(type, fullfilename);
 	    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
 	    return(kdb);
@@ -427,44 +302,12 @@ public:
 	    char reffilename[512];
 	    char filename[512];
 	
-	    sprintf(filename, "%stest1.%s", IODE_OUTPUT_DIR, typeext);
-	    sprintf(reffilename, "%stest1.ref.%s", IODE_OUTPUT_DIR, typeext);
+	    sprintf(filename, "%stest1.%s", output_test_dir, typeext);
+	    sprintf(reffilename, "%stest1.ref.%s", output_test_dir, typeext);
 	    W_dest(filename, typeint);
 	    U_test_W_printf_cmds();
 	    W_close();
-	    EXPECT_TRUE(U_test_same_files(reffilename, filename));
-	}
-
-	bool U_test_compare_outfile_to_reffile(char* outdir, char* outfile, char* refdir, char* reffile)
-	{
-	    char reffilename[512];
-	    char filename[512];
-	    char curdir[512];
-	
-	    sprintf(filename, "%s%s", outdir, outfile);
-	    sprintf(reffilename, "%s%s", refdir, reffile);
-#ifdef __GNUC__
-	    //getcwd(curdir, 500);
-	    getcwd(curdir, 511);
-#else
-	    //_getcwd(curdir, 500);
-        _getcwd(curdir, 511);
-#endif
-	    printf("Current dir   : '%s'\n", curdir);
-	    printf("Output    file: '%s'\n", filename);
-	    printf("Reference file: '%s'\n", reffilename);
-	
-	    return U_test_same_files(reffilename, filename);
-	}
-
-	bool U_test_compare_localfile_to_reffile(char* outfile, char* reffile)
-	{
-	    char reffilename[512];
-	    char filename[512];
-	
-	    sprintf(filename, ".%s%s", SEPARATOR, outfile);
-	    sprintf(reffilename, "%s%s", IODE_OUTPUT_DIR, reffile);
-	    return U_test_same_files(reffilename, filename);
+	    compare_files(reffilename, filename);
 	}
 
 	void U_test_create_a_file(char* filename, int type)
@@ -501,7 +344,7 @@ public:
 	    char    fullfilename[256];
 	    int     rc;
 	
-	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, filename);
+	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
 	    rc = B_WsLoad(fullfilename, type);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
@@ -514,7 +357,7 @@ public:
 	    int     rc;
 	
 	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename,  "%s%s", input_test_dir, source_file);
 	    rc = B_WsLoad(fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    rc = B_WsSave(out_file, type);
@@ -532,7 +375,7 @@ public:
 	    int     rc;
 	
 	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename,  "%s%s", input_test_dir, source_file);
 	    rc = B_WsLoad(fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    rc = B_WsSaveCmp(out_file, type);
@@ -551,9 +394,9 @@ public:
 	    char    ref_out_file[256];
 	    int     rc;
 	
-	    sprintf(full_source_file,  "%s%s", IODE_DATA_DIR, source_file);
-	    sprintf(full_out_file,  "%s%s", IODE_OUTPUT_DIR, out_file);
-	    sprintf(ref_out_file,  "%s%s", IODE_DATA_DIR, out_file);
+	    sprintf(full_source_file,  "%s%s", input_test_dir, source_file);
+	    sprintf(full_out_file,  "%s%s", output_test_dir, out_file);
+	    sprintf(ref_out_file,  "%s%s", input_test_dir, out_file);
 	
 	    rc = B_WsLoad(full_source_file, type);
 	    EXPECT_EQ(rc, 0);
@@ -561,8 +404,7 @@ public:
 	    _unlink(full_out_file);
 	    rc = B_WsExport(full_out_file, type);
 	    EXPECT_EQ(rc, 0);
-	    bool success = U_test_same_files(ref_out_file, full_out_file);
-	    EXPECT_TRUE(success);
+	    compare_files(ref_out_file, full_out_file);
 	    return true;
 	}
 
@@ -572,7 +414,7 @@ public:
 	    int     rc;
 	
 	    B_WsClear("", type);
-	    sprintf(fullfilename, "%s%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
 	    rc = B_WsImport(fullfilename, type);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
@@ -619,7 +461,7 @@ public:
 	
 	    // 1. Copy full VAR file (Att: * required)
 	    B_WsClearAll("");
-	    sprintf(arg,  "%sfun.av *", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
@@ -637,7 +479,7 @@ public:
 	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
-	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
 	
 	    // 2.3 Tests
@@ -657,7 +499,7 @@ public:
 	    B_WsSample("1990Y1 2000Y1");
 	
 	    // Copy ACAF and ACAG (does not specify a sample)
-	    sprintf(arg,  "%sfun.av ACAF ACAG", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av ACAF ACAG", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
@@ -675,7 +517,7 @@ public:
 	
 	    // 1. Copy entire file (Att: * required)
 	    B_WsClear("", type);
-	    sprintf(arg,  "%s%s *", IODE_DATA_DIR, filename);
+	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsCopy(arg, type);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
@@ -690,7 +532,7 @@ public:
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
-	    sprintf(arg,  "%sfun.av", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
@@ -706,7 +548,7 @@ public:
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
 	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
 	    // Merge
-	    sprintf(arg,  "%sfun.av", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
 	    //Check
 	    ACAF00 = U_test_calc_lec("ACAF[2000Y1]", 0);
@@ -727,7 +569,7 @@ public:
 	
 	    // 1. Copy entire file (Att: * required)
 	    B_WsClear("", type);
-	    sprintf(arg,  "%s%s *", IODE_DATA_DIR, filename);
+	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsMerge(arg, type);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
@@ -820,7 +662,7 @@ public:
         EXPECT_DOUBLE_EQ(B_2000, 75.0);
 	
 	    // $WsAggrSum  pattern filename
-	    sprintf(arg,  "(AC)[??] %sfun.av", IODE_DATA_DIR);
+	    sprintf(arg,  "(AC)[??] %sfun.av", input_test_dir);
 	    rc = B_WsAggrSum(arg);
 	    AC_2000 = U_test_calc_lec("AC[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
@@ -882,30 +724,13 @@ public:
 	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
 	
 	    U_test_B_WsLoad("fun", VARIABLES, 394);
-	    sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
+	    sprintf(arg, "%s\\funcsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-	    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "funcsv.csv", IODE_OUTPUT_DIR, "funcsv.csv.ref");
-        EXPECT_TRUE(success);
+	    compare_files(output_test_dir, "funcsv.csv", output_test_dir, "funcsv.ref.csv");
 
 	    return true;
 	}
-
-	void U_test_init()
-	{
-	    static int  done = 0;
-	
-	    if(done) return;
-	    done = 1;
-		
-	    IODE_assign_super_API();    // set *_super fn pointersressed for GitHub
-	    K_init_ws(0);               // Initialises 7 empty WS
-	    B_A2mGetAllParms();
-	
-	}
-
-	//void TearDown() override {}
-
 };
 
 
@@ -1128,11 +953,10 @@ TEST_F(IodeCAPITest, Tests_ARGS)
     args = B_ainit_chk("$LST1", NULL, 0);
     EXPECT_TRUE(U_cmp_tbls(args, "A|B"));
     SCR_free_tbl((unsigned char**) args);
-    //args = B_ainit_chk("A*", NULL, 0);
 
-    // Test parameters in a file. test.args must exist in the current dir and contain the line
-    // A1 A2
-    sprintf(filename, "@%stest.args", IODE_DATA_DIR);
+    // Test parameters in a file. test.args must exist in the current dir 
+    // and contain the line A1 A2
+    sprintf(filename, "@%stest.args", input_test_dir);
     args = B_ainit_chk(filename, NULL, 0);
     EXPECT_TRUE(U_cmp_tbls(args, "A1|A2"));
     SCR_free_tbl((unsigned char**) args);
@@ -1158,8 +982,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     U_test_print_title("Tests K_OBJFILE");
 
-    sprintf(in_filename,  "%sfun.av", IODE_DATA_DIR);
-    sprintf(out_filename, "%sfun_copy.av", IODE_OUTPUT_DIR);
+    sprintf(in_filename,  "%sfun.av", input_test_dir);
+    sprintf(out_filename, "%sfun_copy.av", output_test_dir);
 
     kdb_var = K_interpret(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
@@ -1185,12 +1009,12 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
 #ifdef _MSC_VER
     U_test_print_title("Tests conversion 32 to 64 bits");
 
-    sprintf(in_filename,  "%sfun.tbl", IODE_DATA_DIR);
+    sprintf(in_filename,  "%sfun.tbl", input_test_dir);
 
     kdb_tbl = K_interpret(TABLES, in_filename);
     EXPECT_NE(kdb_tbl, nullptr);
     if(kdb_tbl) {
-        sprintf(out_filename, "%s\\fun_copy.at", IODE_OUTPUT_DIR);
+        sprintf(out_filename, "%s\\fun_copy.at", output_test_dir);
         rc = ascii_handlers[TABLES]->save_asc(kdb_tbl, out_filename);
         EXPECT_EQ(rc, 0);
     }
@@ -1340,7 +1164,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
-    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, "fun.av");
+    sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
 
@@ -1696,7 +1520,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(std::string(KLPTR("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
-    sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
+    sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", input_test_dir);
     rc = B_DataCompare(buf, LISTS);
     //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
     //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
@@ -1796,75 +1620,100 @@ TEST_F(IodeCAPITest, Tests_B_FILE)
 TEST_F(IodeCAPITest, Tests_B_FSYS)
 {
     int     rc;
-    char    arg[512];
+    char    arg[1024];
 
     U_test_print_title("Tests B_FSYS");
 
-    // Cleanup files
-    _unlink("test.a2m");
-    _unlink("test.a2m.oem");
-    _unlink("test.a2m.ansi");
-    _unlink("testdbl.a2m.ansi");
-    _unlink("brol.a2m.ansi");
-    _unlink("brol2.a2m.ansi");
+    char test_a2m_file[1024];
+    sprintf(test_a2m_file, "%stest.a2m", output_test_dir);
 
+    char test_a2m_oem_file[1024]; 
+    sprintf(test_a2m_oem_file, "%stest.a2m.oem", output_test_dir);
+
+    char test_a2m_utf8_file[1024];
+    sprintf(test_a2m_utf8_file, "%stest.a2m.utf8", output_test_dir);
+
+    char test_a2m_ansi_file[1024];
+    sprintf(test_a2m_ansi_file, "%stest.a2m.ansi", output_test_dir);
+
+    char testdbl_a2m_ansi_file[1024];
+    sprintf(testdbl_a2m_ansi_file, "%stestdbl.a2m.ansi", output_test_dir);
+
+    char brol_a2m_ansi_file[1024];
+    sprintf(brol_a2m_ansi_file, "%sbrol.a2m.ansi", output_test_dir);
+
+    char brol2_a2m_ansi_file[1024];
+    sprintf(brol2_a2m_ansi_file, "%sbrol2.a2m.ansi", output_test_dir);
+
+    // Cleanup files
+    _unlink(test_a2m_file);
+    _unlink(test_a2m_oem_file);
+    _unlink(test_a2m_utf8_file);
+    _unlink(test_a2m_ansi_file);
+    _unlink(testdbl_a2m_ansi_file);
+    _unlink(brol_a2m_ansi_file);
+    _unlink(brol2_a2m_ansi_file);
 
     //  Create test.a2m -> ansi-coded file
-    // sprintf(arg, "%s\\test", IODE_OUTPUT_DIR);
+    // sprintf(arg, "%s\\test", output_test_dir);
     // U_test_create_a_file("test", W_A2M); // Ansi-coded file
     // => Pb with conversions => files created by test1.c differ from those created by test_c_api.cpp.
     // Therefore, we copy data\test.a2m into local test.a2m
-    sprintf(arg, "%stest.a2m test.a2m", IODE_DATA_DIR);
+    sprintf(arg, "%stest.a2m %s", input_test_dir, test_a2m_file);
     rc = B_SysCopy(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("test.a2m", "test.a2m");
+    compare_files(input_test_dir, "test.a2m", output_test_dir, "test.a2m");
 
     // B_SysAnsiToOem() : translate ansi to oem -> test.a2m.oem
-    sprintf(arg, "test.a2m test.a2m.oem");
+    sprintf(arg, "%stest.a2m %s", input_test_dir, test_a2m_oem_file);
     rc = B_SysAnsiToOem(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("test.a2m.oem", "test.a2m.oem.ref");
+    compare_files(output_test_dir, "test.a2m.oem", output_test_dir, "test.a2m.oem.ref");
 
     // B_SysAnsiToUTF8() : translate ansi to utf8 -> test.a2m.utf8
-    sprintf(arg, "test.a2m test.a2m.utf8");
+    sprintf(arg, "%stest.a2m %s", input_test_dir, test_a2m_utf8_file);
     rc = B_SysAnsiToUTF8(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("test.a2m.utf8", "test.a2m.utf8.ref");
+    compare_files(output_test_dir, "test.a2m.utf8", output_test_dir, "test.a2m.utf8.ref");
 
     // B_SysOemToAnsi() : translate oem to ansi -> test.a2m.ansi
-    sprintf(arg, "test.a2m.oem test.a2m.ansi");
+    sprintf(arg, "%stest.a2m.oem %s", output_test_dir, test_a2m_ansi_file);
     rc = B_SysOemToAnsi(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("test.a2m.ansi", "test.a2m.ansi.ref");
+    compare_files(output_test_dir, "test.a2m.ansi", output_test_dir, "test.a2m.ansi.ref");
 
     // B_SysOemToUTF8() : translate ansi to utf8 -> test.a2m.utf8
-    sprintf(arg, "test.a2m.oem test.a2m.utf8");
-    rc = B_SysOemToUTF8("test.a2m.oem test.a2m.utf8");
+    sprintf(arg, "%stest.a2m.oem %s", output_test_dir, test_a2m_utf8_file);
+    rc = B_SysOemToUTF8(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("test.a2m.utf8", "test.a2m.utf8.ref");
+    compare_files(output_test_dir, "test.a2m.utf8", output_test_dir, "test.a2m.utf8.ref");
 
     // B_SysRename(char* arg, int unused) : rename test.a2m.ansi -> brol.a2m.ansi
-    sprintf(arg, "test.a2m.ansi brol.a2m.ansi");
-    EXPECT_EQ(rc, 0);
+    sprintf(arg, "%stest.a2m.ansi %s", output_test_dir, brol_a2m_ansi_file);
     rc = B_SysRename(arg);
-    U_test_compare_localfile_to_reffile("brol.a2m.ansi", "test.a2m.ansi.ref");
+    EXPECT_EQ(rc, 0);
+    compare_files(output_test_dir, "brol.a2m.ansi", output_test_dir, "test.a2m.ansi.ref");
 
     // B_SysCopy(char* arg, int unused) : copy brol.a2m.ansi dans testdbl.a2m.ansi
-    sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
+    sprintf(arg, "%sbrol.a2m.ansi %s", output_test_dir, testdbl_a2m_ansi_file);
     rc = B_SysCopy(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "test.a2m.ansi.ref");
+    compare_files(output_test_dir, "testdbl.a2m.ansi", output_test_dir, "test.a2m.ansi.ref");
 
     // B_SysAppend(char* arg, int unused) : append testdbl.a2m.ansi to brol.a2m.ansi
-    sprintf(arg, "brol.a2m.ansi testdbl.a2m.ansi");
+    sprintf(arg, "%sbrol.a2m.ansi %s", output_test_dir, testdbl_a2m_ansi_file);
     rc = B_SysAppend(arg);
     EXPECT_EQ(rc, 0);
-    U_test_compare_localfile_to_reffile("testdbl.a2m.ansi", "testdbl.a2m.ansi.ref");
+    compare_files(output_test_dir, "testdbl.a2m.ansi", output_test_dir, "testdbl.a2m.ansi.ref");
 
     // B_SysDelete(char* arg, int unused) : delete totdbl.a2m.ansi and brol.a2m.ansi
-    rc = B_SysDelete("brol.a2m.ansi testdbl.a2m.ansi tutu.a2m test.a2m test.a2m.oem test.a2m.utf8");
-    rc = U_test_file_not_exists("brol.a2m.ansi",  "B_SysDelete(\"brol.a2m.ansi\")");
-    rc = U_test_file_not_exists("brol2.a2m.ansi", "B_SysDelete(\"testdbl.a2m.ansi\")");
+    char tutu_a2m_file[1024];
+    sprintf(tutu_a2m_file, "%stutu.a2m", output_test_dir);
+    sprintf(arg, "%s %s %s %s %s %s", brol_a2m_ansi_file, testdbl_a2m_ansi_file, 
+            tutu_a2m_file, test_a2m_file, test_a2m_oem_file, test_a2m_utf8_file);
+    rc = B_SysDelete(arg);
+    rc = U_test_file_not_exists(brol_a2m_ansi_file,  "B_SysDelete(\"brol.a2m.ansi\")");
+    rc = U_test_file_not_exists(testdbl_a2m_ansi_file, "B_SysDelete(\"testdbl.a2m.ansi\")");
 
     U_test_reset_a2m_msgs();
 }
@@ -1895,7 +1744,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     rc = B_IdtExecuteTrace("Yes");
 
     // Erroneously define input filenames (WS forgotten !!)
-    sprintf(filename,  "%sfun", IODE_DATA_DIR);
+    sprintf(filename,  "%sfun", input_test_dir);
     rc = B_IdtExecuteVarFiles(filename);
     EXPECT_EQ(rc, 0);
 
@@ -1907,7 +1756,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     K_clear(KV_WS);
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
 
-    sprintf(filename,  "WS %sfun", IODE_DATA_DIR);
+    sprintf(filename,  "WS %sfun", input_test_dir);
     rc = B_IdtExecuteVarFiles(filename);
     EXPECT_EQ(rc, 0);
 
@@ -1943,9 +1792,9 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, "fun");
     //KS_RWS = KS_WS = U_test_K_interpret(SCALARS, "fun");
 
-    //iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
-    //iode.ws_load_var(f"{IODE_DATA_DIR}fun")
-    //iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
+    //iode.ws_load_idt(f"{input_test_dir}fun")
+    //iode.ws_load_var(f"{input_test_dir}fun")
+    //iode.ws_load_scl(f"{input_test_dir}fun")
 
     AOUC = KVPTR("AOUC");
     AOUC[1] = 0.1;
@@ -1979,7 +1828,6 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     char    rulefile[256];
     char    trace[] = " ";
     int     rc;
-    bool    success;
 
     U_test_print_title("Tests EXP: Export CSV and rcsv");
 
@@ -1989,36 +1837,33 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     // Exports VAR files into external formats.
     // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
 
-    sprintf(varfile, "%sfun.av", IODE_DATA_DIR);
-    sprintf(cmtfile, "%sfun.ac", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun.av", input_test_dir);
+    sprintf(cmtfile, "%sfun.ac", input_test_dir);
 
-    sprintf(outfile, "%sfun_xode.csv", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%sfun_xode.csv.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.csv", output_test_dir);
+    sprintf(reffile, "%sfun_xode.csv.ref", input_test_dir);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_CSV);
     EXPECT_EQ(rc, 0);
-    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.csv", IODE_DATA_DIR, "fun_xode.csv.ref");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "fun_xode.csv", input_test_dir, "fun_xode.csv.ref");
 
-    sprintf(outfile, "%sfun_xode.rcsv", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%sfun_xode.rcsv.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.rcsv", output_test_dir);
+    sprintf(reffile, "%sfun_xode.rcsv.ref", input_test_dir);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_RCSV);
     EXPECT_EQ(rc, 0);
-    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun_xode.rcsv", IODE_DATA_DIR, "fun_xode.rcsv.ref");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "fun_xode.rcsv", input_test_dir, "fun_xode.rcsv.ref");
 
     // Export with rules (partial /+ change names)
-    sprintf(outfile, "%sfun2.tsp", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%sfun2.ref.tsp", IODE_DATA_DIR);
-    sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun2.tsp", output_test_dir);
+    sprintf(reffile, "%sfun2.ref.tsp", output_test_dir);
+    sprintf(rulefile, "%srules.txt", input_test_dir);
     rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
     EXPECT_EQ(rc, 0);
-    success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "fun2.tsp", IODE_OUTPUT_DIR, "fun2.ref.tsp");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "fun2.tsp", output_test_dir, "fun2.ref.tsp");
 
     U_test_print_title("Tests IMP VAR: Import Ascii Variables");
 
-    sprintf(reffile, "%sfun_xode.av.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%sfun_xode.var", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.av.ref", input_test_dir);
+    sprintf(outfile, "%sfun_xode.var", output_test_dir);
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
@@ -2028,8 +1873,8 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     U_test_print_title("Tests IMP CMT: Import Ascii Comments");
 
-    sprintf(reffile, "%sfun_xode.ac.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%sfun_xode.cmt", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.ac.ref", input_test_dir);
+    sprintf(outfile, "%sfun_xode.cmt", output_test_dir);
     rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
@@ -2056,9 +1901,9 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     U_test_print_title("Tests XODE: Import ASCII via report function");
     U_test_suppress_kmsg_msgs();
 
-    sprintf(reffile, "%sfun_xode.av.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%sfun_xode.var", IODE_OUTPUT_DIR);
-    sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
+    sprintf(reffile, "%sfun_xode.av.ref", input_test_dir);
+    sprintf(outfile, "%sfun_xode.var", output_test_dir);
+    sprintf(rulefile, "%srules.txt", input_test_dir);
     sprintf(cmd, "ASCII \"%s\" %s %s 2000Y1 2010Y1", rulefile, reffile, outfile);
 
     rc = B_FileImportVar(cmd);
@@ -2088,7 +1933,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     KV_sample(KV_WS, smpl);
     delete smpl;
 
-    sprintf(varfile, "%sfun.av", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun.av", input_test_dir);
 
     // Linear interpolation / stock
     sprintf(cmd, "L %s ACAF", varfile);
@@ -2150,7 +1995,7 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
     KV_sample(KV_WS, smpl);
     delete smpl;
 
-    sprintf(varfile, "%sfun_q.var", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun_q.var", input_test_dir);
 
     // Last Obs
     sprintf(cmd, "%s ACAF", varfile);
@@ -2507,7 +2352,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
     U_test_suppress_kmsg_msgs();
 
     // Simple test of a call to B_ReportLine(). More elaborate commands are tested with B_ReportExec()
-    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, "fun.av");
+    sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
     sprintf(cmd, "\n"
                  "$WsClearVar\n"
                  "$WsLoadVar %s\n", fullfilename);
@@ -2539,11 +2384,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     // Calls to B_ReportExec(reportfile)
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
 
-    sprintf(cmd,  "%srep_expand.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_expand.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
     rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
     EXPECT_EQ(rc, 0);
-    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_expand.a2m", IODE_OUTPUT_DIR, "rep_expand.ref.a2m");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "rep_expand.a2m", output_test_dir, "rep_expand.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2558,11 +2402,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%srep_fns.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_fns.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_fns.a2m", IODE_OUTPUT_DIR, "rep_fns.ref.a2m");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "rep_fns.a2m", output_test_dir, "rep_fns.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2577,11 +2420,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%srep_proc.rep %s %s", IODE_REPORT_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_proc.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
-    bool success = U_test_compare_outfile_to_reffile(IODE_OUTPUT_DIR, "rep_proc.a2m", IODE_OUTPUT_DIR, "rep_proc.ref.a2m");
-    EXPECT_TRUE(success);
+    compare_files(output_test_dir, "rep_proc.a2m", output_test_dir, "rep_proc.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
