@@ -52,23 +52,24 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
 {
     int dim, i;
 
-    expdef->file_descriptor = fopen(outfile, "w+");
-    if(expdef->file_descriptor == 0) {
+    expdef->file_descriptor.open(outfile);
+    if((expdef->file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
+    {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
         return(-1);
     }
 
-    fprintf(expdef->file_descriptor, "code%scomment%s", EXP_SEP, EXP_SEP);
+    expdef->file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
     dim = KSMPL(dbv)->nb_periods;
     std::string str_period;
     for(i = 0; i < dim; i++) 
     {
         Period period = KSMPL(dbv)->start_period.shift(i);
         str_period = period.to_string();
-        fprintf(expdef->file_descriptor, "%s%s", (char*) str_period.c_str(), EXP_SEP);
+        expdef->file_descriptor << str_period << EXP_SEP;
     }
-    fprintf(expdef->file_descriptor, "\n");
+    expdef->file_descriptor << "\n";
     return(0);
 }
 
@@ -83,8 +84,7 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
 int ExportObjsCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
-    fprintf(expdef->file_descriptor, "\n");
-    fclose(expdef->file_descriptor);
+    expdef->file_descriptor.close();
     return(0);
 }
 
@@ -113,12 +113,14 @@ char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
     U_ch    *ccmt;                     /* JMP 19-09-96 */
 
     pos = K_find(dbc, name);
-    if(pos >= 0)  {
+    if(pos >= 0)  
+    {
         ccmt = (unsigned char*) KCVAL(dbc, pos);        /* JMP 19-09-96 */
-        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 19-09-96 */
+        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");  /* JMP 19-09-96 */
         return(write_separator((char*) ccmt, cmt)); /* JMP 19-09-96 */
     }
-    else return(write_separator("", cmt));
+    else 
+        return(write_separator("", cmt));
 }
 
 /**
@@ -139,8 +141,10 @@ char* ExportObjsCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
     write_separator(tmp, &buf);
     lg = (int)strlen(buf) + 1;
 
-    if(*vec == NULL) olg = 0;
-    else olg = (int)strlen(*vec);
+    if(*vec == NULL) 
+        olg = 0;
+    else 
+        olg = (int)strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
@@ -159,10 +163,8 @@ char* ExportObjsCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
  */
 int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
-    fprintf(expdef->file_descriptor, "%s %s %s\n",
-            (code == NULL ? "" : code),
-            (cmt == NULL  ? "" : cmt),
-            (vec == NULL  ? "" : vec));
+    expdef->file_descriptor << (code == NULL ? "" : code) << " " << (cmt == NULL  ? "" : cmt)
+                            << " " << (vec == NULL  ? "" : vec) << "\n";
     return(0);        
 }
 
@@ -173,8 +175,9 @@ int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, 
 
 int ExportObjsRevertCSV::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)
 {
-    expdef->file_descriptor = fopen(outfile, "w+");
-    if(expdef->file_descriptor == 0) {
+    expdef->file_descriptor.open(outfile);
+    if((expdef->file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
+    {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
         return(-1);
@@ -199,18 +202,18 @@ char* ExportObjsRevertCSV::get_variable_value(KDB* dbv, int nb, int t, char** ve
 
 int ExportObjsRevertCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
-    if(code == 0) {
-        fprintf(expdef->file_descriptor, "\n");
+    if(code == 0) 
+    {
+        expdef->file_descriptor << "\n";
         return(0);
     }
-    fprintf(expdef->file_descriptor, "%s ", code);
+    expdef->file_descriptor << code << " ";
     return(0);
 }
 
 int ExportObjsRevertCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
-    fprintf(expdef->file_descriptor, "\n");
-    fclose(expdef->file_descriptor);
+    expdef->file_descriptor.close();
     return(0);
 }

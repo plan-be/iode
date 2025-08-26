@@ -64,30 +64,27 @@
 
 int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    int dim, nb, i;
+    int dim = KSMPL(dbv)->nb_periods;
+    int nb  = KNB(dbv);
 
-    expdef->file_descriptor = fopen(outfile, "w+");
-    dim = KSMPL(dbv)->nb_periods;
-    nb = KNB(dbv);
+    expdef->file_descriptor.open(outfile);
 
-    fprintf(expdef->file_descriptor,
-            "TABLE\n0,1\n\"\"\nVECTORS\n0,%d\n\"\"\nTUPLES\n0,%d\n\"\"\n",
-            dim + 2, nb + 1);
-    fprintf(expdef->file_descriptor,
-            "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n");
+    expdef->file_descriptor << "TABLE\n0,1\n\"\"\nVECTORS\n0," << std::to_string(dim + 2)
+                            << "\n\"\"\nTUPLES\n0," << std::to_string(nb + 1) << "\n\"\"\n";
+    expdef->file_descriptor << "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n";
 
-    for(i = 0; i < dim; i++) 
+    for(int i = 0; i < dim; i++) 
     {
         Period per = KSMPL(dbv)->start_period.shift(i);
-        fprintf(expdef->file_descriptor, "1,0\n\"%s\"\n", (char*) per.to_string().c_str());
+        expdef->file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
     return(0);
 }
 
 int ExportObjsDIF::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    fprintf(expdef->file_descriptor, "-1,0\nEOD\n");
-    fclose(expdef->file_descriptor);
+    expdef->file_descriptor <<  "-1,0\nEOD\n";
+    expdef->file_descriptor.close();
     return(0);
 }
 
@@ -127,6 +124,6 @@ char* ExportObjsDIF::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 
 int ExportObjsDIF::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
-    fprintf(expdef->file_descriptor, "%s%s%s", code, cmt, vec);
+    expdef->file_descriptor << code << cmt << vec;
     return(0);
 }

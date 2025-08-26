@@ -45,40 +45,42 @@
 
 int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    int     freq;
+    int freq = get_nb_periods_per_year((KSMPL(dbv)->start_period).periodicity);
+    std::string start_period_year = std::to_string((KSMPL(dbv)->start_period).year);
+    std::string end_period_year   = std::to_string((KSMPL(dbv)->end_period).year);
+    std::string start_period_step = std::to_string((KSMPL(dbv)->start_period).step);
+    std::string end_period_step   = std::to_string((KSMPL(dbv)->end_period).step);
 
-    expdef->file_descriptor = fopen(outfile, "w+");
+    expdef->file_descriptor.open(outfile);
 
-    freq = get_nb_periods_per_year((KSMPL(dbv)->start_period).periodicity);
+    std::string str_sample;
+    std::string str_periodicity;
     switch(freq) {
         case 1:
-            fprintf(expdef->file_descriptor,
-                    "FREQ A;\nSMPL %ld %ld ;\n",
-                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->end_period).year);
+            str_periodicity = "A";
+            str_sample = start_period_year + " " + end_period_year;
             break;
 
         case 4:
-            fprintf(expdef->file_descriptor,
-                    "FREQ Q;\nSMPL %ld:%ld %ld:%ld ;\n",
-                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->start_period).step,
-                    (KSMPL(dbv)->end_period).year, (KSMPL(dbv)->end_period).step);
+            str_periodicity = "Q";
+            str_sample = start_period_year + ":" + start_period_step + " "; 
+            str_sample += end_period_year + ":" + end_period_step;
             break;
 
         case 12:
-            fprintf(expdef->file_descriptor,
-                    "FREQ M;\nSMPL %ld:%ld %ld:%ld ;\n",
-                    (KSMPL(dbv)->start_period).year, (KSMPL(dbv)->start_period).step,
-                    (KSMPL(dbv)->end_period).year, (KSMPL(dbv)->end_period).step);
+            str_periodicity = "M";
+            str_sample = start_period_year + ":" + start_period_step + " "; 
+            str_sample += end_period_year + ":" + end_period_step;
             break;
     }
+
+    expdef->file_descriptor << "FREQ " + str_periodicity + ";\nSMPL " << str_sample << " ;\n";
     return(0);
 }
 
 int ExportObjsTSP::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    fprintf(expdef->file_descriptor, " ;\n");
-    fprintf(expdef->file_descriptor, "END\n");
-    fclose(expdef->file_descriptor);
+    expdef->file_descriptor.close();
     return(0);
 }
 
@@ -123,16 +125,19 @@ int ExportObjsTSP::write_variable_and_comment(ExportToFile* expdef, char* code, 
     int     i;
     char    **text;
 
-    fprintf(expdef->file_descriptor, "%s \n", code);
-    if(cmt) { /* JMP 04-03-99 */
+    expdef->file_descriptor <<  code << " \n";
+    if(cmt) 
+    {
         text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
-        for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "? %s\n", text[i]);
+        for(i = 0; text[i]; i++)  
+            expdef->file_descriptor <<  "? " << text[i] << "\n";
         SCR_free_tbl((unsigned char**) text);
     }
 
     text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
-    for(i = 0; text[i]; i++)  fprintf(expdef->file_descriptor, "%s\n", text[i]);
-    fprintf(expdef->file_descriptor, " ;\n");
+    for(i = 0; text[i]; i++)  
+        expdef->file_descriptor << text[i] << "\n";
+    expdef->file_descriptor <<  " ;\n";
     SCR_free_tbl((unsigned char**) text);
     return(0);
 }
