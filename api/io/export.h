@@ -6,6 +6,7 @@
 #include "api/objs/kdb.h"
 
 #include <iostream> // for std::cout
+#include <fstream>  // std::ofstream
 #include <array>    // for std::array
 #include <memory>   // for std::unique_ptr
 
@@ -31,7 +32,7 @@ inline char EXP_NA[11];         // string to indicate a NaN value in CSV
 
 // struct defining output File descriptor and fn pointers for one type of data format to export
 struct ExportToFile {
-    FILE  *file_descriptor;                                                                         // Output file descriptor (output of fopen)
+    std::ofstream file_descriptor;                                                                         // Output file descriptor (output of fopen)
     virtual int   write_header(ExportToFile*, KDB*, KDB*, char*) { return 0; }                      // method that creates the output file and writes the header
     virtual char* write_object_name(char* oname, char** code)                                       // method to create the output object name + the separator
     {
