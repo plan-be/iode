@@ -517,14 +517,21 @@ generate_stub_files.py
 
 # TESTS
 /tests/**/*.ini
-/tests/output
-!/tests/output/empty
-!/tests/data/test.a2m
 /tests/sandbox
+
+!/tests/data/test.a2m
+!/tests/data/*.rep
+
+/tests/data/output
+!/tests/data/output/empty
+!/tests/data/output/fun.xml
+!/tests/data/output/*.ref*
+!/tests/data/output/test_*
+
+!/tests/data/reports/*.rep
+
 /tests/cli/ex.ansi.*
 /tests/cli/ex.oem.*
 /tests/cli/test*.csv
 /tests/cli/*.exe
 !/tests/cli/*.rep
-!/tests/data/*.rep
-!/tests/data/reports/*.rep
