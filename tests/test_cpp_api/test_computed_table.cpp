@@ -18,7 +18,7 @@ protected:
         var_file[0] = tolower(var_file[0]);
         kdb_var = new KDBVariables(var_file);
 
-        ref_file = input_test_dir + "ref.av";
+        ref_file = input_test_dir + "ref2.av";
         // slightly modify variables
         double value;
         KDBVariables* kdb_ref = kdb_var->subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
