@@ -7873,8 +7873,6 @@ class Variables(IodeDatabase):
         4922.5664 5138.9458 5341.3233 5556.2476 5696.1652 5814.7965 6015.8951 6295.5108
         6650.3069 6861.5824 7072.7855
          ;
-         ;
-        END
         <BLANKLINE>
         """
         variables_file = check_filepath(variables_file, IodeFileType.FILE_VARIABLES, file_must_exist=True)
