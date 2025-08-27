@@ -557,7 +557,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     std::string names = "C8_1 C8_2 C8_3 C8_4";
 
     // slightly modify variables
-    std::string ref_file = input_test_dir + "ref.av";
+    std::string ref_file = input_test_dir + "ref2.av";
     double value;
     KDBVariables kdb_var(input_test_dir + "fun.av");
     KDBVariables* kdb_ref = Variables.subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
