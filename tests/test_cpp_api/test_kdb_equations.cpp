@@ -406,6 +406,8 @@ TEST_F(KDBEquationsTest, Hash)
     // restore original entry
     eq.set_lec(lec);
     Equations.update("ACAF", eq);
+    Equation eq_restored = Equations.get("ACAF");
+    EXPECT_EQ(eq_restored, eq);
     std::size_t hash_val_restored = hash_value(Equations);
     EXPECT_EQ(hash_val, hash_val_restored);
 
