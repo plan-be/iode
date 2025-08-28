@@ -13,6 +13,9 @@ Improvements
 ------------
 
 
+- Right-clicking on a Identity or a Table in the Graphical User Interface (GUI) 
+  now shows a context menu with relevant possible actions (closes :issue:`1037`)
+
 Fixed Bugs 
 ----------
 
