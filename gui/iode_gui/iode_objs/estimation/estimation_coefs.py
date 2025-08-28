@@ -1,6 +1,6 @@
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QDialog
 from PySide6.QtGui import QKeySequence, QShortcut
-from PySide6.QtCore import Qt
 
 from .ui_estimation_coefs import Ui_EstimationCoefsDialog
 from iode_gui.iode_objs.models.table_model import ScalarsModel
@@ -39,4 +39,12 @@ class EstimationCoefsDialog(QDialog):
         self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+        self.full_screen_shortcut.activated.connect(self.toggle_maximize)
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
