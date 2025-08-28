@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, Slot, QSettings
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtGui import QCloseEvent, QShortcut, QKeySequence
 
 from iode_gui.settings import get_settings, class_name_to_settings_group_name
 from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget
@@ -31,6 +31,12 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         self.bottom_layout.addSpacerItem(horizontalSpacer)
 
         self.vertical_layout.addLayout(self.bottom_layout)
+
+        # Set up shortcut for full screen
+        self.setWindowFlags(Qt.WindowType.Window)
+        self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
+        self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.full_screen_shortcut.activated.connect(self.showMaximized)
 
         self.settings_group_name = class_name_to_settings_group_name(self)
         self.load_settings()

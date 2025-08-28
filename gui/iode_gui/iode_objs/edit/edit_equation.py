@@ -34,6 +34,7 @@ class EditEquationDialog(MixinSettingsDialog):
         self.ui.textEdit_lec.setup_completer(main_window=main_window, iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
         self.ui.textEdit_lec.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
 
+        self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.full_screen_shortcut.activated.connect(self.showMaximized)
@@ -272,11 +273,3 @@ class EditEquationDialog(MixinSettingsDialog):
             dialog.exec()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
-
-    @Slot()
-    def toggle_full_screen(self):
-        """Toggles full screen mode."""
-        if self.isFullScreen():
-            self.showNormal()
-        else:
-            self.showFullScreen()

@@ -23,9 +23,6 @@ class EstimationCoefsDialog(QDialog):
             parent: The parent widget.
         """
         super().__init__(parent)
-        flags: Qt.WindowType = Qt.WindowType.WindowMinMaxButtonsHint | Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(flags)
-
         self.ui = Ui_EstimationCoefsDialog()
         self.ui.setupUi(self)
 
@@ -39,6 +36,7 @@ class EstimationCoefsDialog(QDialog):
         self.ui.tableView_coefs.setModel(scalarsModel)
 
         # Set up the full screen shortcut
+        self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.full_screen_shortcut.activated.connect(self.showMaximized)
