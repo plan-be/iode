@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Slot, Signal, QSettings
-from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit
+from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit, QMenu
 from PySide6.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
 
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -103,9 +103,15 @@ class IdentitiesView(IodeAbstractTableView):
     def __init__(self, parent=None):
         super().__init__(IodeType.IDENTITIES, IdentitiesDelegate(parent), parent)
 
+        self.context_menu: QMenu = None
+
         # headers
         self.horizontalHeader().setStretchLastSection(True)
         self.verticalHeader().setStretchLastSection(False)
+
+
+        # main window will be set in setup() method
+        self.main_window: AbstractMainWindow = None
 
         # ---- keyboard shortcuts ----
         self.shortcut_execute_current_idt = QShortcut(QKeySequence(Qt.Key.Key_F7), self)
@@ -117,8 +123,10 @@ class IdentitiesView(IodeAbstractTableView):
     # override IodeAbstractTableView method 
     def setup(self, main_window: AbstractMainWindow):
         super().setup(main_window)
+        self.main_window = main_window
         self.shortcut_execute_current_idt.activated.connect(self.execute_current_identity)
-        self.shortcut_execute_idts.activated.connect(main_window.open_compute_identities_dialog)
+        self.shortcut_execute_idts.activated.connect(self.main_window.open_compute_identities_dialog)
+        self.setup_context_menu()
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
@@ -128,6 +136,41 @@ class IdentitiesView(IodeAbstractTableView):
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
         return AddIdentityDialog(model.displayed_database, self)
+
+    def setup_context_menu(self):
+        self.context_menu = QMenu(self)
+
+        # Create a new action for executing the selected identity
+        action = QAction("Execute Identity", self)
+        action.setShortcut(self.shortcut_execute_current_idt.key())
+        action.setToolTip("Execute the selected identity")
+        action.setVisible(True)
+        action.triggered.connect(self.execute_current_identity)
+        self.context_menu.addAction(action)
+
+        # Create a new action for opening the compute identities dialog
+        action = QAction("Open Execute Identities Menu", self)
+        action.setShortcut(self.shortcut_execute_idts.key())
+        action.setToolTip("Open the 'Execute Identities' menu")
+        action.setVisible(True)
+        action.triggered.connect(self.main_window.open_compute_identities_dialog)
+        self.context_menu.addAction(action)
+
+    @Slot(QContextMenuEvent)
+    def popup_context_menu(self, event: QContextMenuEvent):
+        """
+        Popup context menu at the event's global position.
+
+        :param event: The context menu event.
+        :type event: QContextMenuEvent
+        """
+        self.context_menu.popup(event.globalPos())
+
+    # override QTableView method
+    @Slot(QContextMenuEvent)
+    def contextMenuEvent(self, event: QContextMenuEvent):
+        self.popup_context_menu(event)
+        event.accept()
 
     @Slot()
     def execute_current_identity(self):
@@ -200,6 +243,8 @@ class TablesView(IodeAbstractTableView):
     def __init__(self, parent=None):
         super().__init__(IodeType.TABLES, TablesDelegate(parent), parent)
 
+        self.context_menu: QMenu = None
+
         # headers
         self.horizontalHeader().setStretchLastSection(True)
         self.verticalHeader().setStretchLastSection(False)
@@ -212,6 +257,11 @@ class TablesView(IodeAbstractTableView):
         self.shortcut_plot = QShortcut(QKeySequence(Qt.Key.Key_F8), self)
         self.shortcut_plot.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.shortcut_plot.activated.connect(self.plot)
+
+    # override IodeAbstractTableView method 
+    def setup(self, main_window: AbstractMainWindow):
+        super().setup(main_window)
+        self.setup_context_menu()
 
     def _open_edit_dialog(self, obj_name: str):
         model: IodeAbstractTableModel = self.model()
@@ -237,7 +287,42 @@ class TablesView(IodeAbstractTableView):
             return {'generalized_sample': dialog.generalized_sample}
         else:
             return dict()
-    
+
+    def setup_context_menu(self):
+        self.context_menu = QMenu(self)
+
+        # Create a new action for plotting selected variables
+        action = QAction("Display", self)
+        action.setShortcut(self.shortcut_display.key())
+        action.setToolTip("Display the edition window of the selected table")
+        action.setVisible(True)
+        action.triggered.connect(self.display)
+        self.context_menu.addAction(action)
+
+        # Create a new action for opening the plot dialog
+        action = QAction("Plot", self)
+        action.setShortcut(self.shortcut_plot.key())
+        action.setToolTip("Compute and plot the selected table")
+        action.setVisible(True)
+        action.triggered.connect(self.plot)
+        self.context_menu.addAction(action)
+
+    @Slot(QContextMenuEvent)
+    def popup_context_menu(self, event: QContextMenuEvent):
+        """
+        Popup context menu at the event's global position.
+
+        :param event: The context menu event.
+        :type event: QContextMenuEvent
+        """
+        self.context_menu.popup(event.globalPos())
+
+    # override QTableView method
+    @Slot(QContextMenuEvent)
+    def contextMenuEvent(self, event: QContextMenuEvent):
+        self.popup_context_menu(event)
+        event.accept()
+
     @Slot()
     def display(self):
         # import here to avoid circular import
