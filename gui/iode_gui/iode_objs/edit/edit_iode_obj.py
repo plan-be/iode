@@ -22,6 +22,8 @@ class AbstractEditObjDialog(QDialog):
         self.previous_value = None
 
         iode_type = database.iode_type
+        
+        self.setWindowFlags(Qt.WindowType.Window)
         self.setWindowTitle("Editing " + IODE_DATABASE_TYPE_NAMES[int(iode_type)] + " " + name)
 
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
