@@ -48,7 +48,7 @@ class EstimationResultsDialog(QDialog):
         self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+        self.full_screen_shortcut.activated.connect(self.toggle_maximize)
 
     def setup(self, main_window: AbstractMainWindow):
         self.new_plot.connect(main_window.append_plot)
@@ -283,3 +283,11 @@ class EstimationResultsDialog(QDialog):
     def help(self):
         """Shows the help dialog."""
         QDesktopServices.openUrl(URL_MANUAL)
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()

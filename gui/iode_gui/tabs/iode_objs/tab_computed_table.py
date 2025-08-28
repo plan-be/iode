@@ -36,7 +36,7 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+        self.full_screen_shortcut.activated.connect(self.toggle_maximize)
 
         self.settings_group_name = class_name_to_settings_group_name(self)
         self.load_settings()
@@ -80,3 +80,11 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         settings.beginGroup(self.settings_group_name)
         self.save_numeric_settings(settings)
         settings.endGroup()
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()

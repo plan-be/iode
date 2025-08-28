@@ -37,7 +37,7 @@ class EditEquationDialog(MixinSettingsDialog):
         self.setWindowFlags(Qt.WindowType.Window)
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+        self.full_screen_shortcut.activated.connect(self.toggle_maximize)
 
         # initialize combobox listing the possible estimation methods
         self.v_estimation_methods_names = [name.upper() for name in EqMethod.__members__]
@@ -273,3 +273,11 @@ class EditEquationDialog(MixinSettingsDialog):
             dialog.exec()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()

@@ -28,7 +28,7 @@ class AbstractEditObjDialog(QDialog):
 
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.full_screen_shortcut.activated.connect(self.showMaximized)
+        self.full_screen_shortcut.activated.connect(self.toggle_maximize)
 
     def _edit(self, name: str, value: Any):
         try:
@@ -62,6 +62,14 @@ class AbstractEditObjDialog(QDialog):
         Opens the manual in a web browser.
         """
         QDesktopServices.openUrl(URL_MANUAL)
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
 
 
 class EditCommentDialog(AbstractEditObjDialog):

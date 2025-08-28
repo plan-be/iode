@@ -186,7 +186,7 @@ class MainWindow(AbstractMainWindow):
 
             # ---- signals and slots ----
             self.ui.lineEdit_iode_command.ask_compute_hash.connect(self.ui.tabWidget_IODE_objs.compute_hash)
-            self.full_screen_shortcut.activated.connect(self.showMaximized)
+            self.full_screen_shortcut.activated.connect(self.toggle_maximize)
 
             # ---- load project (if any) ----
             # first time launching the GUI -> ask the user to either start a new project
@@ -545,6 +545,14 @@ class MainWindow(AbstractMainWindow):
     @Slot()
     def ipython_cell_executed(self):
         self.update_tab_and_completer()
+
+    @Slot()
+    def toggle_maximize(self):
+        """Toggles full screen mode."""
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
 
     # File Menu
 
