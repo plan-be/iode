@@ -104,7 +104,7 @@ int B_ViewPrintVar(char* arg, int mode)
         tbl = T_create(2);
         if(mode == 0) {
             T_default(tbl, 0L, ((char**) args) + i, ((char**) args) + i, 0, 0, 0);
-            rc = T_view_tbl(tbl, smpl, "of series");
+            rc = T_view_tbl(tbl, smpl, "TABLE_OF_VARIABLES");
         }
         else {
             T_default(tbl, 0L, ((char**) args) + i, ((char**) args) + i, 1, 1, 1);

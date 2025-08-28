@@ -24,6 +24,8 @@ Fixed Bugs
   Graphical User Interface (GUI) (closes :issue:`1007`)
 - allowed users to display Computed Table windows to in full screen in the Graphical User 
   Interface (GUI) (closes :issue:`1033`)
+- fixed error message displayed when trying to open a Computed Table window using the 
+  IODE report command `$ViewVar` via the Graphical User Interface (GUI) (closes :issue:`1032`)
 
 Miscellaneous 
 -------------
