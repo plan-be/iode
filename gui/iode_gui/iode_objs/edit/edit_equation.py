@@ -4,6 +4,7 @@ from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.abstract_main_window import AbstractMainWindow
+from iode_gui.iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 from iode_gui.iode_objs.estimation.estimation_coefs import EstimationCoefsDialog
 from iode_gui.iode_objs.estimation.estimation_results import EstimationResultsDialog
 from iode_gui.iode_objs.misc.unit_root import UnitRootDialog
@@ -14,7 +15,7 @@ from .ui_edit_equation import Ui_EditEquationDialog
 
 from typing import Dict
 import warnings
-from iode import equations, Equation, EqMethod, Sample, IodeType
+from iode import equations, variables, Equation, EqMethod, Sample, IodeType
 from iode.compute.estimation import EditAndEstimateEquations
 
 
@@ -46,8 +47,8 @@ class EditEquationDialog(MixinSettingsDialog):
 
         # initialize fields and EditAndEstimateEquations instance
         try:
+            # existing equation
             if equation_name and equation_name in equations:
-                # Existing equation
                 self.setWindowTitle(f"Editing equation {equation_name}")
                 self.ui.lineEdit_name.setReadOnly(True)
 
@@ -62,22 +63,39 @@ class EditEquationDialog(MixinSettingsDialog):
                     estimation_method_index = 0
                 self.ui.comboBox_method.setCurrentIndex(estimation_method_index)
 
-                sample: Sample = self.eq.sample
-                from_period: str = str(sample.start) if sample.start is not None else ""
-                self.ui.sampleEdit_from.setText(from_period)
-                to_period: str = str(sample.end) if sample.end is not None else ""
-                self.ui.sampleEdit_to.setText(to_period)
-
                 self.ui.lineEdit_block.setText(self.eq.block)
                 self.ui.lineEdit_instruments.setText(self.eq.instruments)
 
-                self.edit_est_eqs = EditAndEstimateEquations(from_period, to_period)
+                eq_sample = self.eq.sample
+                self.edit_est_eqs = EditAndEstimateEquations(str(eq_sample.start), str(eq_sample.end))
                 self._update_list_of_equations_to_estimate()
+            # new equation
             else:
-                # New equation
                 self.setWindowTitle("Add a new equation")
                 self.ui.lineEdit_name.setReadOnly(False)
-                self.edit_est_eqs = EditAndEstimateEquations()
+
+                # try to get the sample from the Variables workspace
+                from_period = ""
+                to_period = ""
+                vars_sample = variables.sample
+                if vars_sample.start is None or vars_sample.end is None:
+                    try:
+                        # ask the user to define the sample of the Variables workspace
+                        dialog = EditIodeSampleDialog(self)
+                        if dialog.exec() == QDialog.DialogCode.Accepted:
+                            from_period = dialog.from_period
+                            to_period = dialog.to_period
+                            variables.sample = f"{from_period}:{to_period}"
+                    except Exception as e:
+                        QMessageBox.warning(None, "WARNING", str(e)) 
+                else:
+                    from_period = str(vars_sample.start)
+                    to_period = str(vars_sample.end)
+                
+                self.ui.sampleEdit_from.setText(from_period)
+                self.ui.sampleEdit_to.setText(to_period)
+
+                self.edit_est_eqs = EditAndEstimateEquations(from_period, to_period)
         except Exception as e:
             self.edit_est_eqs = EditAndEstimateEquations()
             QMessageBox.warning(None, "WARNING", str(e))
@@ -112,6 +130,40 @@ class EditEquationDialog(MixinSettingsDialog):
         block = self.edit_est_eqs.block
         self.ui.lineEdit_block.setText(block)
 
+    def _update_estimation_sample(self):
+        """Updates the estimation sample."""
+        if not self.eq:
+            return
+
+        eq_sample: Sample = self.eq.sample
+        from_period: str = str(eq_sample.start) if eq_sample.start is not None else ""
+        to_period: str = str(eq_sample.end) if eq_sample.end is not None else ""
+        
+        if not from_period or not to_period:
+            # try to get the sample from the Variables workspace
+            vars_sample = variables.sample
+            if vars_sample.start is None or vars_sample.end is None:
+                try:
+                    # ask the user to define the sample of the Variables workspace
+                    dialog = EditIodeSampleDialog(self)
+                    if dialog.exec() == QDialog.DialogCode.Accepted:
+                        from_period = dialog.from_period
+                        to_period = dialog.to_period
+                        variables.sample = f"{from_period}:{to_period}"
+                except Exception as e:
+                    from_period = ""
+                    to_period = ""
+                    QMessageBox.warning(None, "WARNING", str(e))
+            else:
+                if not from_period:
+                    from_period = str(vars_sample.start)
+                if not to_period:
+                    to_period = str(vars_sample.end)
+            self.eq.sample = f"{from_period}:{to_period}"
+        
+        self.ui.sampleEdit_from.setText(from_period)
+        self.ui.sampleEdit_to.setText(to_period)
+
     # same as ODE_blk_cur() from o_est.c from the old GUI
     def _display_equation(self):
         """Displays the equation."""
@@ -121,6 +173,7 @@ class EditEquationDialog(MixinSettingsDialog):
         self.ui.lineEdit_name.setText(self.eq.endogenous)
 
         # editable values
+        self._update_estimation_sample()
         self.ui.textEdit_lec.setPlainText(self.eq.lec)
         self.ui.lineEdit_comment.setText(self.eq.comment)
 

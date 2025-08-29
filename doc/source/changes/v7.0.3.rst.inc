@@ -12,9 +12,11 @@ New Features
 Improvements 
 ------------
 
-
 - Right-clicking on a Identity or a Table in the Graphical User Interface (GUI) 
   now shows a context menu with relevant possible actions (closes :issue:`1037`)
+- Avoid warning message saying there is no estimation sample defined when 
+  opening the Edit Equation window for an equation for which the estimation sample 
+  has not been specified yet in the Graphical User Interface (GUI) (closes :issue:`1040`)
 
 Fixed Bugs 
 ----------
