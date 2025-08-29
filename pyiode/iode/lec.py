@@ -29,15 +29,15 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
 
     Examples
     --------
-    >>> from iode import Sample_DATA_DIR
+    >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import execute_lec, equations, scalars, variables
-    >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS
     Loading .../fun.eqs
     274 objects loaded
-    >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS
     Loading .../fun.scl
     161 objects loaded
-    >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS
     Loading .../fun.var
     394 objects loaded
 

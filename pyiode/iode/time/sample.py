@@ -97,8 +97,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.index("1982Y1")
@@ -129,8 +129,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.get_period_list()                  # doctest: +ELLIPSIS
@@ -163,8 +163,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -218,8 +218,8 @@ class Sample:
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")    # doctest: +ELLIPSIS
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample.periods    # doctest: +ELLIPSIS

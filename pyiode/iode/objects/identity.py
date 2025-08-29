@@ -50,12 +50,12 @@ class Identity:
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Identity, scalars, variables
-        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> idt = Identity("1 - exp((gamma2 + gamma3 * ln(W/ZJ)[-1] + gamma4 * ln(WMIN/ZJ)) / gamma_)")
@@ -77,12 +77,12 @@ class Identity:
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Identity, scalars, variables
-        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded 
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> idt = Identity("1 - exp((gamma2 + gamma3 * ln(W/ZJ)[-1] + gamma4 * ln(WMIN/ZJ)) / gamma_)")

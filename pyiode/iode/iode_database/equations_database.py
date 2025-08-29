@@ -40,8 +40,8 @@ class Equations(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import equations, Sample_DATA_DIR
-    >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import equations, SAMPLE_DATA_DIR
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.eqs
     274 objects loaded 
     >>> len(equations)
@@ -99,8 +99,8 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import equations, Sample_DATA_DIR
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations.get_lec("ACAF")   # doctest: +NORMALIZE_WHITESPACE
@@ -120,8 +120,8 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import equations, Sample_DATA_DIR
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import equations, SAMPLE_DATA_DIR
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> # get the first equation
@@ -285,9 +285,9 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
 
@@ -368,12 +368,12 @@ class Equations(IodeDatabase):
         Examples
         --------
         >>> import pandas as pd
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations, variables, Equation, EqMethod
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         
@@ -570,9 +570,9 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
 
@@ -618,9 +618,9 @@ class Equations(IodeDatabase):
         
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["A*"].coefficients
@@ -635,9 +635,9 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import equations
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> equations["A*"].variables
@@ -709,11 +709,11 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, equations, scalars, variables
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -1003,14 +1003,14 @@ class Equations(IodeDatabase):
             
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, equations, scalars, variables, Scalar
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
-        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> coefficient_names = equations["ACAF"].coefficients
@@ -1516,9 +1516,9 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, equations
+        >>> from iode import SAMPLE_DATA_DIR, equations
         >>> import pandas as pd
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> len(equations)
@@ -1690,9 +1690,9 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, equations
+        >>> from iode import SAMPLE_DATA_DIR, equations
         >>> import pandas as pd
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> len(equations)
@@ -2019,13 +2019,13 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import equations, scalars, Sample_DATA_DIR
+        >>> from iode import equations, scalars, SAMPLE_DATA_DIR
         >>> from iode import PrintEquationsAs, PrintEquationsLecAs
         >>> output_dir = getfixture('tmp_path')
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
-        >>> scalars.load(f"{Sample_DATA_DIR}/fun.scl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.scl
         161 objects loaded
         >>> equations.print_nb_decimals = 4
@@ -2121,8 +2121,8 @@ class Equations(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, equations
-        >>> equations.load(f"{Sample_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
         >>> len(equations)

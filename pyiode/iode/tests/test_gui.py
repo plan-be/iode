@@ -1,6 +1,6 @@
 from pathlib import Path
 from iode import comments, equations, identities, lists, scalars, tables, variables
-from iode import Sample_DATA_DIR, Sample, view_workspace
+from iode import SAMPLE_DATA_DIR, Sample, view_workspace
 import pytest
 try:
     import larray as la
@@ -12,13 +12,13 @@ except ImportError:
                          "overrides the 'super' functions")
 def test_gui():
     # load IODE objects
-    comments.load(f"{Sample_DATA_DIR}/fun.cmt")
-    equations.load(f"{Sample_DATA_DIR}/fun.eqs")
-    identities.load(f"{Sample_DATA_DIR}/fun.idt")
-    lists.load(f"{Sample_DATA_DIR}/fun.lst")
-    scalars.load(f"{Sample_DATA_DIR}/fun.scl")
-    tables.load(f"{Sample_DATA_DIR}/fun.tbl")
-    variables.load(f"{Sample_DATA_DIR}/fun.var")
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
     # create subsets
     cmt_subset = comments["A*;*_"]
