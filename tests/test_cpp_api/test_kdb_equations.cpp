@@ -110,6 +110,17 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_W.get_instruments(), "");
     EXPECT_EQ(eq_W.get_block(), "W");
     EXPECT_EQ(eq_W.get_date_as_string(), "");
+
+    // other
+    Equation eq = Equations.get("DTH1");
+    EXPECT_EQ(eq.endo, "DTH1");
+    EXPECT_EQ(eq.lec, "DTH1:=DTH1C");
+    EXPECT_EQ(eq.solved, 0);
+    EXPECT_EQ(eq.method, EQ_LSQ);
+    EXPECT_EQ(eq.sample.to_string(), ":");
+    EXPECT_EQ(eq.comment, "");
+    EXPECT_EQ(eq.block, "DTH1");
+    EXPECT_EQ(eq.instruments, "");
 }
 
 TEST_F(KDBEquationsTest, GetNames)
