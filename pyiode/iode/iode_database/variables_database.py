@@ -124,8 +124,8 @@ class Variables(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import variables, Sample_DATA_DIR
-    >>> variables.load(f"{Sample_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import variables, SAMPLE_DATA_DIR
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.var
     394 objects loaded 
     >>> len(variables)
@@ -237,9 +237,9 @@ class Variables(IodeDatabase):
         
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded 
 
@@ -383,8 +383,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Period, Sample, variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import Period, Sample, variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         
@@ -509,8 +509,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> # get the value of the first period of the first variable
@@ -550,8 +550,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import variables, SAMPLE_DATA_DIR, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -676,9 +676,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -1246,9 +1246,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         
@@ -1708,7 +1708,7 @@ class Variables(IodeDatabase):
 
         >>> # d) -------- working on a subset (whole sample) --------
         >>> # reset variables database to initial state
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> # 1) get subset
@@ -1947,9 +1947,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -2152,9 +2152,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -2412,9 +2412,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -2581,9 +2581,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -2846,9 +2846,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -3093,9 +3093,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -3172,9 +3172,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -3436,9 +3436,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -3695,9 +3695,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -3864,9 +3864,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -4129,9 +4129,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -4378,9 +4378,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -4458,9 +4458,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -4726,9 +4726,9 @@ class Variables(IodeDatabase):
         >>> import numpy as np
         >>> import pandas as pd
         >>> import larray as la
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables, NA, Sample
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> vars_subset = variables["A*", "1991Y1:1995Y1"]
@@ -4995,9 +4995,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR, Sample
+        >>> from iode import variables, SAMPLE_DATA_DIR, Sample
         >>> import numpy as np
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded  
         >>> # define the list of Variables to override, the first and last periods to copy
@@ -5170,8 +5170,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> len(variables)
@@ -5280,8 +5280,8 @@ class Variables(IodeDatabase):
         Examples
         --------
         >>> import numpy as np
-        >>> from iode import variables, Sample_DATA_DIR
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> len(variables)
@@ -5567,10 +5567,10 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> import pandas as pd
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -5895,9 +5895,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
 
@@ -6047,8 +6047,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, variables, VarsMode
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, variables, VarsMode
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.mode
@@ -6117,13 +6117,13 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> variables.clear()
         >>> variables.sample
         None
 
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         
@@ -6262,9 +6262,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -6286,9 +6286,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -6310,9 +6310,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -6334,9 +6334,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -6375,9 +6375,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.threshold
@@ -6413,10 +6413,10 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> import pandas as pd
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> len(variables)
@@ -6544,9 +6544,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.sample
@@ -6655,12 +6655,12 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, variables, LowToHighType, LowToHighMethod
+        >>> from iode import SAMPLE_DATA_DIR, variables, LowToHighType, LowToHighMethod
         >>> variables.clear()
         >>> # define a yearly sample
         >>> variables.sample = "2010Q1:2020Q4"
         >>> # input filepath
-        >>> filepath = f"{Sample_DATA_DIR}/fun.var"
+        >>> filepath = f"{SAMPLE_DATA_DIR}/fun.var"
         
         Linear interpolation / stock
         
@@ -6880,12 +6880,12 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, variables, HighToLowType
+        >>> from iode import SAMPLE_DATA_DIR, variables, HighToLowType
         >>> variables.clear()
         >>> # define a yearly sample
         >>> variables.sample = "2000Y1:2020Y1"
         >>> # input filepath
-        >>> filepath = f"{Sample_DATA_DIR}/fun_q.var"
+        >>> filepath = f"{SAMPLE_DATA_DIR}/fun_q.var"
         
         Last Obs in year
         
@@ -7475,13 +7475,13 @@ class Variables(IodeDatabase):
         Examples
         --------
         >>> from pathlib import Path
-        >>> from iode import Sample_DATA_DIR, variables, ImportFormats
+        >>> from iode import SAMPLE_DATA_DIR, variables, ImportFormats
         >>> output_dir = getfixture('tmp_path')
 
-        >>> input_file = f"{Sample_DATA_DIR}/fun_xode.av.ref"
+        >>> input_file = f"{SAMPLE_DATA_DIR}/fun_xode.av.ref"
         >>> input_format = ImportFormats.ASCII
         >>> save_file = str(output_dir / "imported_var.var")
-        >>> rule_file = f"{Sample_DATA_DIR}/rules.txt"
+        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
         >>> debug_file = str(output_dir / "debug.log")
 
         >>> # print rules
@@ -7659,12 +7659,12 @@ class Variables(IodeDatabase):
         Examples
         --------
         >>> from pathlib import Path
-        >>> from iode import Sample_DATA_DIR, comments, variables, ExportFormats
+        >>> from iode import SAMPLE_DATA_DIR, comments, variables, ExportFormats
         >>> output_dir = getfixture('tmp_path')
 
-        >>> variables_file = f"{Sample_DATA_DIR}/fun.av"
-        >>> comments_file = f"{Sample_DATA_DIR}/fun.ac"
-        >>> rule_file = f"{Sample_DATA_DIR}/rules.txt"
+        >>> variables_file = f"{SAMPLE_DATA_DIR}/fun.av"
+        >>> comments_file = f"{SAMPLE_DATA_DIR}/fun.ac"
+        >>> rule_file = f"{SAMPLE_DATA_DIR}/rules.txt"
         >>> from_period = "2000Y1"
         >>> to_period = "2010Y1"
         
@@ -7965,8 +7965,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> ax = variables.plot("ACAF;ACAG", "2000Y1;2010Y1", title="ACAF and ACAG variables")   # doctest: +SKIP
@@ -8088,9 +8088,9 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import variables, Sample_DATA_DIR
+        >>> from iode import variables, SAMPLE_DATA_DIR
         >>> output_dir = getfixture('tmp_path')
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> variables.print_to_file(output_dir / "variables.csv", ["ACAF", "ACAG"])       # doctest: +ELLIPSIS
@@ -8116,8 +8116,8 @@ class Variables(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, variables
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> len(variables)

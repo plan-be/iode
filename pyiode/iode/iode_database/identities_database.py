@@ -35,8 +35,8 @@ class Identities(IodeDatabase):
 
     Examples
     --------
-    >>> from iode import identities, Sample_DATA_DIR
-    >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> from iode import identities, SAMPLE_DATA_DIR
+    >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.idt
     48 objects loaded 
     >>> len(identities)
@@ -86,8 +86,8 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import identities, Sample_DATA_DIR
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import identities, SAMPLE_DATA_DIR
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> # get the first identity
@@ -157,9 +157,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
 
@@ -215,9 +215,9 @@ class Identities(IodeDatabase):
         Examples
         --------
         >>> import pandas as pd
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         
@@ -314,9 +314,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
 
@@ -362,9 +362,9 @@ class Identities(IodeDatabase):
         
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> identities["A*;N*"].coefficients
@@ -379,9 +379,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> identities["A*;N*"].variables                       # doctest: +ELLIPSIS
@@ -435,11 +435,11 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import identities, variables, Sample_DATA_DIR
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import identities, variables, SAMPLE_DATA_DIR
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
-        >>> variables.load(f"{Sample_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
         >>> sample = variables.sample
@@ -534,7 +534,7 @@ class Identities(IodeDatabase):
         []
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
-        >>> identities.execute("GAP_;GAP2", var_files=f"{Sample_DATA_DIR}/fun.var")
+        >>> identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
         Workspace: Variables
         nb variables: 1
@@ -633,9 +633,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, identities
+        >>> from iode import SAMPLE_DATA_DIR, identities
         >>> import pandas as pd
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> len(identities)
@@ -689,9 +689,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, identities
+        >>> from iode import SAMPLE_DATA_DIR, identities
         >>> import pandas as pd
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> len(identities)
@@ -781,9 +781,9 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import identities, Sample_DATA_DIR
+        >>> from iode import identities, SAMPLE_DATA_DIR
         >>> output_dir = getfixture('tmp_path')
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded
         >>> identities.print_to_file(output_dir / "identities.csv", "G*")     # doctest: +ELLIPSIS
@@ -807,8 +807,8 @@ class Identities(IodeDatabase):
 
         Examples
         --------
-        >>> from iode import Sample_DATA_DIR, identities
-        >>> identities.load(f"{Sample_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import SAMPLE_DATA_DIR, identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.idt
         48 objects loaded 
         >>> len(identities)
