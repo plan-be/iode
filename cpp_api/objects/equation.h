@@ -133,7 +133,7 @@ public:
         this->tests[t] = value;
     }
 
-    void set_tests(const std::array<float, EQS_NBTESTS> tests);
+    void set_tests(const std::array<float, EQS_NBTESTS>& tests);
 
     // -- misc --
 

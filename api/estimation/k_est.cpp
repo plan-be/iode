@@ -78,16 +78,16 @@ void Estimation::E_tests2scl(EQ* eq, int j, int n, int k)
 
     E_savescl((double)n, j, "n");
     E_savescl((double)k, j, "k");
-    E_savescl(eq->tests[1], j,  "stdev");
-    E_savescl(eq->tests[2], j,  "meany");
-    E_savescl(eq->tests[3], j,  "ssres");
-    E_savescl(eq->tests[4], j,  "stderr");
-    E_savescl(eq->tests[5], j,  "sderrp");
-    E_savescl(eq->tests[6], j,  "fstat");
-    E_savescl(eq->tests[7], j,  "r2");
-    E_savescl(eq->tests[8], j,  "r2adj");
-    E_savescl(eq->tests[9], j,  "dw");
-    E_savescl(eq->tests[10], j, "loglik");
+    E_savescl(eq->tests[EQ_STDEV], j,   "stdev");
+    E_savescl(eq->tests[EQ_MEANY], j,   "meany");
+    E_savescl(eq->tests[EQ_SSRES], j,   "ssres");
+    E_savescl(eq->tests[EQ_STDERR], j,  "stderr");
+    E_savescl(eq->tests[EQ_STDERRP], j, "stderrp");
+    E_savescl(eq->tests[EQ_FSTAT], j,   "fstat");
+    E_savescl(eq->tests[EQ_R2], j,      "r2");
+    E_savescl(eq->tests[EQ_R2ADJ], j,   "r2adj");
+    E_savescl(eq->tests[EQ_DW], j,      "dw");
+    E_savescl(eq->tests[EQ_LOGLIK], j,  "loglik");
 }
 
 /**
@@ -154,7 +154,7 @@ int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float
     eq->method = method;
     eq->date = SCR_current_date();
     
-    memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
+    memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
     memcpy(&(eq->sample), smpl, sizeof(Sample));
     rc = K_add(E_DBE, name, eq, name);
     if(rc < 0) 
@@ -288,17 +288,17 @@ int Estimation::KE_est_s(Sample* smpl)
             E_print_results(1, 1, 1, 1, 1);  /* JMP 23-03-98 */
 
             for(j = 0; j < nbe - 1; j++) {
-                tests[0] = (float)MATE(E_MCORRU,      0, j);
-                tests[1] = (float)MATE(E_STDEV,       0, j);
-                tests[2] = (float)MATE(E_MEAN_Y,      0, j);
-                tests[3] = (float)MATE(E_SSRES,       0, j);
-                tests[4] = (float)MATE(E_STDERR,      0, j);
-                tests[5] = (float)MATE(E_STD_PCT,     0, j);
-                tests[6] = (float)MATE(E_FSTAT,       0, j);
-                tests[7] = (float)MATE(E_RSQUARE,     0, j);
-                tests[8] = (float)MATE(E_RSQUARE_ADJ, 0, j);
-                tests[9] = (float)MATE(E_DW,          0, j);
-                tests[10]= (float)MATE(E_LOGLIK,      0, j);
+                tests[EQ_CORR]    = (float)MATE(E_MCORRU,      0, j);
+                tests[EQ_STDEV]   = (float)MATE(E_STDEV,       0, j);
+                tests[EQ_MEANY]   = (float)MATE(E_MEAN_Y,      0, j);
+                tests[EQ_SSRES]   = (float)MATE(E_SSRES,       0, j);
+                tests[EQ_STDERR]  = (float)MATE(E_STDERR,      0, j);
+                tests[EQ_STDERRP] = (float)MATE(E_STD_PCT,     0, j);
+                tests[EQ_FSTAT]   = (float)MATE(E_FSTAT,       0, j);
+                tests[EQ_R2]      = (float)MATE(E_RSQUARE,     0, j);
+                tests[EQ_R2ADJ]   = (float)MATE(E_RSQUARE_ADJ, 0, j);
+                tests[EQ_DW]      = (float)MATE(E_DW,          0, j);
+                tests[EQ_LOGLIK]  = (float)MATE(E_LOGLIK,      0, j);
 
                 KE_update((char*) endos[j], (char*) lecs[j], E_MET, E_SMPL, tests);
                 pos = K_find(E_DBE, (char*) endos[j]);   /* JMP 24-06-98 */

@@ -417,9 +417,9 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* 
         eq->date = 0L;
 
     if(tests != NULL)  
-        memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
+        memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
     else 
-        memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float));       /* JMP 12-04-98 */
+        eq->tests.fill(0.0f);
 
     if(smpl != NULL) 
         memcpy(&(eq->sample), smpl, sizeof(Sample));

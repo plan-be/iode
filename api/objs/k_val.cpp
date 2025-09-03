@@ -225,27 +225,25 @@ TBL* K_tptr(KDB* kdb, char* name)
  *  
  */
 double K_etest(KDB* kdb, char*name, int test_nb)
-{
-    int     pos;
-    float   *tests;
-    
-    pos = K_find(kdb, name);
+{   
+    int pos = K_find(kdb, name);
     if(pos < 0) return(IODE_NAN);         // name not found
     
-    tests = KETESTS(kdb, pos);
-    return((double) tests[test_nb]);
+    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, pos);
+    double value = (double) tests[test_nb];
+    return value;
 }
 
 // Returns test calculated during the last estimation of equation name
-double K_e_stdev (KDB* kdb, char*name) {return(K_etest(kdb, name, 1));}
-double K_e_meany (KDB* kdb, char*name) {return(K_etest(kdb, name, 2));}
-double K_e_ssres (KDB* kdb, char*name) {return(K_etest(kdb, name, 3));}
-double K_e_stderr(KDB* kdb, char*name) {return(K_etest(kdb, name, 4));}
-double K_e_fstat (KDB* kdb, char*name) {return(K_etest(kdb, name, 6));}
-double K_e_r2    (KDB* kdb, char*name) {return(K_etest(kdb, name, 7));}
-double K_e_r2adj (KDB* kdb, char*name) {return(K_etest(kdb, name, 8));}
-double K_e_dw    (KDB* kdb, char*name) {return(K_etest(kdb, name, 9));}
-double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, 10));}
+double K_e_stdev (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
+double K_e_meany (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
+double K_e_ssres (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
+double K_e_stderr(KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
+double K_e_fstat (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
+double K_e_r2    (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
+double K_e_r2adj (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
+double K_e_dw    (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
+double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
 
 
 /**

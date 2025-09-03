@@ -685,15 +685,15 @@ int B_PrintEqs(char* name, EQ* eq)
 
         W_printf("\nTests :\n");
         W_printf(".par enum_3\n");
-        /*        W_printf("Correlation                 : %f\n\n", eq->tests[0]); */
-        W_printf("St dev of residuals         : %f\n\n", eq->tests[1]);
-        W_printf("Mean of YOBS                : %f\n\n", eq->tests[2]);
-        W_printf("Sum of Squares of Residuals : %f\n\n", eq->tests[3]);
-        W_printf("Standard error (%%)          : %f (%ci%f%cI)\n\n", eq->tests[4], A2M_ESCCH, eq->tests[5], A2M_ESCCH);
-        W_printf("F-stat                      : %f\n\n", eq->tests[6]);
-        W_printf("R2 (R2 adjusted)            : %f (%ci%f%cI)\n\n", eq->tests[7], A2M_ESCCH, eq->tests[8], A2M_ESCCH);
-        W_printf("Durbin-Watson               : %f\n\n", eq->tests[9]);
-        W_printf("Log Likelihood              : %f\n\n", eq->tests[10]);
+        /*        W_printf("Correlation                 : %f\n\n", eq->tests[EQ_CORR]); */
+        W_printf("St dev of residuals         : %f\n\n", eq->tests[EQ_STDEV]);
+        W_printf("Mean of YOBS                : %f\n\n", eq->tests[EQ_MEANY]);
+        W_printf("Sum of Squares of Residuals : %f\n\n", eq->tests[EQ_SSRES]);
+        W_printf("Standard error (%%)          : %f (%ci%f%cI)\n\n", eq->tests[EQ_STDERR], A2M_ESCCH, eq->tests[EQ_STDERRP], A2M_ESCCH);
+        W_printf("F-stat                      : %f\n\n", eq->tests[EQ_FSTAT]);
+        W_printf("R2 (R2 adjusted)            : %f (%ci%f%cI)\n\n", eq->tests[EQ_R2], A2M_ESCCH, eq->tests[EQ_R2ADJ], A2M_ESCCH);
+        W_printf("Durbin-Watson               : %f\n\n", eq->tests[EQ_DW]);
+        W_printf("Log Likelihood              : %f\n\n", eq->tests[EQ_LOGLIK]);
         W_printf(".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
         clec = (CLEC *) SW_nalloc(eq->clec->tot_lg + 1);
         memcpy(clec, eq->clec, eq->clec->tot_lg);

@@ -72,8 +72,6 @@ int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
     if(eq1->instruments != eq2->instruments) 
         goto done;
 
-//    if(memcmp(eq1->tests, eq2->tests, EQS_NBTESTS * sizeof(float)) != 0) goto done; /* FLOAT 12-04-98 */
-//        test 0 and 5 and 11..20 are not stored in ascii
     rc = 0;
 
 done :

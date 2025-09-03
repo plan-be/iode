@@ -279,10 +279,7 @@ void Equation::set_date(const std::string& date, const std::string& date_format)
 
 std::array<float, EQS_NBTESTS> Equation::get_tests() const
 {
-    std::array<float, EQS_NBTESTS> tests;
-    for(int i = 0; i < EQS_NBTESTS; i++) 
-        tests[i] = this->tests[i];
-    return tests;
+    return this->tests;
 }
 
 std::map<std::string, float> Equation::get_tests_as_map() const
@@ -310,10 +307,9 @@ float Equation::get_test(const IodeEquationTest t) const
     return this->tests[t];
 }
 
-void Equation::set_tests(const std::array<float, EQS_NBTESTS> tests)
+void Equation::set_tests(const std::array<float, EQS_NBTESTS>& tests)
 {
-    for(int i = 0; i < EQS_NBTESTS; i++) 
-        this->tests[i] = tests[i];
+    memcpy(&(this->tests), &tests, EQS_NBTESTS * sizeof(float));
 }
 
 // -- misc --

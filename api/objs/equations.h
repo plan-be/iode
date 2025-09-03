@@ -7,6 +7,8 @@
 #include "api/objs/kdb.h"
 
 #include <string>
+#include <array>
+#include <vector>
 
 /*----------------------- DEFINE ----------------------------*/
 
@@ -38,6 +40,12 @@ enum IodeEquationTest
     EQ_R2ADJ,
     EQ_DW,
     EQ_LOGLIK,
+};
+
+const static std::vector<std::string> v_eq_tests_names = 
+{ 
+    "corr", "stdev", "meany", "ssres", "stderr", "stderrp",
+    "fstat", "r2", "r2adj", "dw", "loglik"
 };
 
 const static int IODE_NB_EQ_TESTS = 11;
@@ -77,17 +85,17 @@ enum IodeEquationAscii
 // the allowed values for method were 'l', 'z', instead of 0, 1...
 struct EQ 
 {
-    std::string   endo;             // endogenous variable (= equation name)   
-    std::string   lec;              // LEC form of the equation (LHS := RHS)
-    CLEC*         clec;             // Compiled equation for the simulation
-    char          solved;           // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
-    char          method;           // Estimation method
-    Sample        sample;           // Estimation sample
-    std::string   comment;          // Free comment
-    std::string   block;            // List of equations estimated simultaneously
-    std::string   instruments;      // List of instruments used to modify metric in the estimation process (INSTR method)
-    long          date;             // Estimation date
-    float         tests[EQS_NBTESTS];   // Estimation tests
+    std::string   endo;                     // endogenous variable (= equation name)   
+    std::string   lec;                      // LEC form of the equation (LHS := RHS)
+    CLEC*         clec;                     // Compiled equation for the simulation
+    char          solved;                   // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
+    char          method;                   // Estimation method
+    Sample        sample;                   // Estimation sample
+    std::string   comment;                  // Free comment
+    std::string   block;                    // List of equations estimated simultaneously
+    std::string   instruments;              // List of instruments used to modify metric in the estimation process (INSTR method)
+    long          date;                     // Estimation date
+    std::array<float, EQS_NBTESTS> tests;   // Estimation tests
 };
 
 /*----------------------- FUNCS ----------------------------*/
@@ -150,9 +158,11 @@ inline long KEDATE(KDB* kdb, int pos)
     return *((long *) K_oval(kdb, pos, 8));
 }
 
-inline float* KETESTS(KDB* kdb, int pos) 
+inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, int pos) 
 {   
-    return ((float *) K_oval(kdb, pos, 9));
+    std::array<float, EQS_NBTESTS> tests;
+    memcpy(tests.data(), K_oval(kdb, pos, 9), EQS_NBTESTS * sizeof(float));
+    return tests;
 }
 
 inline EQ* KEVAL(KDB* kdb, int pos) 
