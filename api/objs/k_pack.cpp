@@ -863,7 +863,7 @@ EQ* K_eunpack(char *pack, char *name)
 
     eq->date = *(long*)(P_get_ptr(pack, 8));
 
-    memcpy(&(eq->tests), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float)); /* FLOAT 12-04-98 */
+    memcpy(eq->tests.data(), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float)); /* FLOAT 12-04-98 */
 
     return(eq);
 }

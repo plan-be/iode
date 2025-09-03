@@ -400,15 +400,15 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
         //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);
 
-        print_test(fd, "STDEV",  eq->tests[1]);
-        print_test(fd, "MEANY",  eq->tests[2]);
-        print_test(fd, "SSRES",  eq->tests[3]);
-        print_test(fd, "STDERR", eq->tests[4]);
-        print_test(fd, "FSTAT",  eq->tests[6]);
-        print_test(fd, "R2",     eq->tests[7]);
-        print_test(fd, "R2ADJ",  eq->tests[8]);
-        print_test(fd, "DW",     eq->tests[9]);
-        print_test(fd, "LOGLIK", eq->tests[10]);
+        print_test(fd, "STDEV",  eq->tests[EQ_STDEV]);
+        print_test(fd, "MEANY",  eq->tests[EQ_MEANY]);
+        print_test(fd, "SSRES",  eq->tests[EQ_SSRES]);
+        print_test(fd, "STDERR", eq->tests[EQ_STDERR]);
+        print_test(fd, "FSTAT",  eq->tests[EQ_FSTAT]);
+        print_test(fd, "R2",     eq->tests[EQ_R2]);
+        print_test(fd, "R2ADJ",  eq->tests[EQ_R2ADJ]);
+        print_test(fd, "DW",     eq->tests[EQ_DW]);
+        print_test(fd, "LOGLIK", eq->tests[EQ_LOGLIK]);
     }
     
     fprintf(fd, "}\n");

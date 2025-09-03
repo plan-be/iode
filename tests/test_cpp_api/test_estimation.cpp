@@ -277,7 +277,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_meany")->value) / 1e6, 0.008185);
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_ssres")->value) / 1e6, 5.2e-05);
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stderr")->value) / 1e6, 0.001927);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_sderrp")->value) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stderrp")->value) / 1e6, 23.542242);
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_fstat")->value) / 1e6, 32.285107);
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2")->value) / 1e6, 0.821815);
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2adj")->value) / 1e6, 0.79636);
