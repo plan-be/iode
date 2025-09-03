@@ -76,51 +76,57 @@ TEST_F(KDBEquationsTest, GetLec)
 TEST_F(KDBEquationsTest, Get)
 {
     int pos = 0;
+    Equation* eq = nullptr;
     std::string name = Equations.get_name(pos);
     std::string expected_lec;
 
     // by pos
-    Equation eq1 = Equations.get(pos);
-    EXPECT_EQ(eq1.get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    EXPECT_EQ(eq1.get_date_as_string(), "12-06-1998");
-    EXPECT_EQ(eq1.get_sample().to_string(), "1980Y1:1996Y1");
-    EXPECT_EQ(eq1.get_method(), "LSQ");
+    eq = Equations.get(pos);
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(eq->get_method(), "LSQ");
+    delete eq;
 
     // by name
-    Equation eq2 = Equations.get(name);
-    EXPECT_EQ(eq2.get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    EXPECT_EQ(eq2.get_date_as_string(), "12-06-1998");
-    EXPECT_EQ(eq2.get_sample().to_string(), "1980Y1:1996Y1");
-    EXPECT_EQ(eq2.get_method(), "LSQ");
+    eq = Equations.get(name);
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(eq->get_method(), "LSQ");
+    delete eq;
 
-    Equation eq3 = Equations.get("BVY");
-    EXPECT_EQ(eq3.get_lec(), "BVY:=YN+YK");
-    EXPECT_EQ(eq3.get_date_as_string(), "");
-    EXPECT_EQ(eq3.get_sample().to_string(), ":");
-    EXPECT_EQ(eq3.get_method(), "LSQ");
+    eq = Equations.get("BVY");
+    EXPECT_EQ(eq->lec, "BVY:=YN+YK");
+    EXPECT_EQ(eq->get_date_as_string(), "");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_EQ(eq->get_method(), "LSQ");
+    delete eq;
 
-    Equation eq_W = Equations.get("W");
+    eq = Equations.get("W");
     expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
     expected_lec += "+gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)\n";
     expected_lec += "+gamma5*ln PROD[-1])+(XW)+XWC";
-    EXPECT_EQ(eq_W.get_lec(), expected_lec);
-    EXPECT_EQ(eq_W.get_method(), "LSQ");
-    EXPECT_EQ(eq_W.get_sample().to_string(), "1975Y1:1997Y1");
-    EXPECT_EQ(eq_W.get_comment(), "");
-    EXPECT_EQ(eq_W.get_instruments(), "");
-    EXPECT_EQ(eq_W.get_block(), "W");
-    EXPECT_EQ(eq_W.get_date_as_string(), "");
+    EXPECT_EQ(eq->lec, expected_lec);
+    EXPECT_EQ(eq->get_method(), "LSQ");
+    EXPECT_EQ(eq->sample.to_string(), "1975Y1:1997Y1");
+    EXPECT_EQ(eq->get_comment(), "");
+    EXPECT_EQ(eq->instruments, "");
+    EXPECT_EQ(eq->block, "W");
+    EXPECT_EQ(eq->get_date_as_string(), "");
+    delete eq;
 
     // other
-    Equation eq = Equations.get("DTH1");
-    EXPECT_EQ(eq.endo, "DTH1");
-    EXPECT_EQ(eq.lec, "DTH1:=DTH1C");
-    EXPECT_EQ(eq.solved, 0);
-    EXPECT_EQ(eq.method, EQ_LSQ);
-    EXPECT_EQ(eq.sample.to_string(), ":");
-    EXPECT_EQ(eq.comment, "");
-    EXPECT_EQ(eq.block, "DTH1");
-    EXPECT_EQ(eq.instruments, "");
+    eq = Equations.get("DTH1");
+    EXPECT_EQ(eq->endo, "DTH1");
+    EXPECT_EQ(eq->lec, "DTH1:=DTH1C");
+    EXPECT_EQ(eq->solved, 0);
+    EXPECT_EQ(eq->method, EQ_LSQ);
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_EQ(eq->comment, "");
+    EXPECT_EQ(eq->block, "DTH1");
+    EXPECT_EQ(eq->instruments, "");
+    delete eq;
 }
 
 TEST_F(KDBEquationsTest, GetNames)
@@ -165,10 +171,11 @@ TEST_F(KDBEquationsTest, Update)
 TEST_F(KDBEquationsTest, Copy)
 {
     std::string name = "ACAF";
-    Equation eq = Equations.get(name);
-
-    Equation copy_eq = Equations.copy(name);
-    EXPECT_EQ(copy_eq, eq);
+    Equation* eq = Equations.get(name);
+    Equation* copy_eq = Equations.copy(name);
+    EXPECT_EQ(*copy_eq, *eq);
+    delete eq;
+    delete copy_eq;
 }
 
 TEST_F(KDBEquationsTest, Filter)
@@ -405,32 +412,36 @@ TEST_F(KDBEquationsTest, Search)
 
 TEST_F(KDBEquationsTest, Hash)
 {
+    Equation* eq = nullptr;
     std::size_t hash_val = hash_value(Equations);
 
     // modify an entry
-    Equation eq = Equations.get("ACAF");
-    std::string lec = eq.get_lec();
-    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    Equations.update("ACAF", eq);
+    eq = Equations.get("ACAF");
+    std::string lec = eq->lec;
+    eq->set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    Equations.update("ACAF", *eq);
     std::size_t hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    eq.set_lec(lec);
-    Equations.update("ACAF", eq);
-    Equation eq_restored = Equations.get("ACAF");
-    EXPECT_EQ(eq_restored, eq);
+    eq->set_lec(lec);
+    Equations.update("ACAF", *eq);
+    Equation* eq_restored = Equations.get("ACAF");
+    EXPECT_EQ(*eq_restored, *eq);
     std::size_t hash_val_restored = hash_value(Equations);
     EXPECT_EQ(hash_val, hash_val_restored);
+    delete eq;
+    delete eq_restored;
 
     // remove an entry
-    Equation eq2 = Equations.get("ACAG");
+    eq = Equations.get("ACAG");
     Equations.remove("ACAG");
     hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    Equations.add("ACAG", eq2);
+    Equations.add("ACAG", *eq);
     hash_val_restored = hash_value(Equations);
     EXPECT_EQ(hash_val, hash_val_restored);
+    delete eq;
 
     // add an entry
     lec = "TEST := 0";

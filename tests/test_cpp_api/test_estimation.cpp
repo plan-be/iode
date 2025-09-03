@@ -48,18 +48,18 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     Equation* current_eq = est.current_equation();
-    EXPECT_EQ(current_eq->get_endo(), "ACAF");
-    EXPECT_EQ(current_eq->get_lec(), eq_ACAF->get_lec());
+    EXPECT_EQ(current_eq->endo, "ACAF");
+    EXPECT_EQ(current_eq->lec, eq_ACAF->lec);
 
     // next equation 
     Equation* next_eq = est.next_equation();
-    EXPECT_EQ(next_eq->get_endo(), "DPUH");
-    EXPECT_EQ(next_eq->get_lec(), eq_DPUH->get_lec());
+    EXPECT_EQ(next_eq->endo, "DPUH");
+    EXPECT_EQ(next_eq->lec, eq_DPUH->lec);
 
     // go back to first eq
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq->get_endo(), "ACAF");
-    EXPECT_EQ(next_eq->get_lec(), eq_ACAF->get_lec());
+    EXPECT_EQ(next_eq->endo, "ACAF");
+    EXPECT_EQ(next_eq->lec, eq_ACAF->lec);
 
     // ---- add a non existing equation to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -79,18 +79,18 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq->get_endo(), "DPUH");
-    EXPECT_EQ(current_eq->get_lec(), eq_DPUH->get_lec());
+    EXPECT_EQ(current_eq->endo, "DPUH");
+    EXPECT_EQ(current_eq->lec, eq_DPUH->lec);
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq->get_endo(), "TEST");
-    EXPECT_EQ(next_eq->get_lec(), "TEST := 0");
+    EXPECT_EQ(next_eq->endo, "TEST");
+    EXPECT_EQ(next_eq->lec, "TEST := 0");
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq->get_endo(), "ACAF");
-    EXPECT_EQ(next_eq->get_lec(), eq_ACAF->get_lec());
+    EXPECT_EQ(next_eq->endo, "ACAF");
+    EXPECT_EQ(next_eq->lec, eq_ACAF->lec);
 
     // ---- remove an equation from the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -111,13 +111,13 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq->get_endo(), "ACAF");
-    EXPECT_EQ(current_eq->get_lec(), eq_ACAF->get_lec());
+    EXPECT_EQ(current_eq->endo, "ACAF");
+    EXPECT_EQ(current_eq->lec, eq_ACAF->lec);
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq->get_endo(), "TEST");
-    EXPECT_EQ(next_eq->get_lec(), "TEST := 0");
+    EXPECT_EQ(next_eq->endo, "TEST");
+    EXPECT_EQ(next_eq->lec, "TEST := 0");
 
     // ---- currently displayed equation not in the block -> add it to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -141,8 +141,8 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq->get_endo(), "DPUH");
-    EXPECT_EQ(current_eq->get_lec(), eq_DPUH->get_lec());
+    EXPECT_EQ(current_eq->endo, "DPUH");
+    EXPECT_EQ(current_eq->lec, eq_DPUH->lec);
 
     // ---- some scalars does not exist yet ----
     Scalars.remove("dpuh_1");
@@ -285,7 +285,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_loglik")->value) / 1e6, 83.810104);
 
     Equation* eq_est = Equations.get("ACAF");
-    std::array<float, EQS_NBTESTS> tests = eq_est->get_tests();
+    std::array<float, EQS_NBTESTS> tests = eq_est->tests;
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDEV]) / 1e6, 0.00427);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_MEANY]) / 1e6, 0.008185);

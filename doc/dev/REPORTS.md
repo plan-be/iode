@@ -963,7 +963,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_PrintDefIdt(KDB* kdb, int pos)`|Print a identity.|||
 |`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||
 |`int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
-|`int B_PrintEqs(char* name, EQ* eq)`|Print an equation and optionally its statistical tests.|||
+|`int B_PrintEqs(char* name, Equation* eq)`|Print an equation and optionally its statistical tests.|||
 |`int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)`|Print a scalar in an enumeration list.|||
 |`int B_PrintDefScl(KDB* kdb, int pos)`|Print the scalar kdb\[pos\].|||
 |`int B_PrintDefVar(KDB* kdb, int pos)`|Print the variable kdb\[pos\] in a table. Sub\-function of B\_PrintObjDef\_1().|||

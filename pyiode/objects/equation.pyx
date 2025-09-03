@@ -8,7 +8,6 @@ from libc.string cimport memset
 from cython.operator cimport dereference
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
-from pyiode.objects.equation cimport EQ
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport B_EqsStepWise
 from pyiode.objects.equation cimport hash_value as hash_value_eq
@@ -45,7 +44,7 @@ cdef class Equation:
 
     cdef void update_owner_database(self):
         if self.c_database is not NULL:
-            self.c_database.update(self.c_equation.get_endo(), dereference(self.c_equation))
+            self.c_database.update(self.c_equation.endo, dereference(self.c_equation))
 
     cdef void extract_eq_from_database(self):
         cdef string endo
@@ -55,7 +54,7 @@ cdef class Equation:
         if self.lock:
             return
         if self.c_database is not NULL:
-            endo = self.c_equation.get_endo()
+            endo = self.c_equation.endo
             if self.ptr_owner and self.c_equation is not NULL:
                 del self.c_equation
             self.c_equation = self.c_database.get(endo)
@@ -100,7 +99,7 @@ cdef class Equation:
 
     def estimate(self, from_period: str, to_period: str, maxit: int, epsilon: float) -> bool:
         cdef CEquation* c_global_equation = NULL
-        cdef string eq_name = self.c_equation.get_endo()
+        cdef string eq_name = self.c_equation.endo
 
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
@@ -131,7 +130,7 @@ cdef class Equation:
         cdef char* c_arg = NULL
         cdef int res
         cdef CEquation* c_global_equation = NULL
-        cdef string eq_name = self.c_equation.get_endo()
+        cdef string eq_name = self.c_equation.endo
         
         if from_period is None or to_period is None:
             c_sample = cpp_global_variables.get_sample()
@@ -157,11 +156,11 @@ cdef class Equation:
         return res == 0
 
     def get_endogenous(self) -> str:
-        return self.c_equation.get_endo().decode()
+        return self.c_equation.endo.decode()
 
     def get_lec(self) -> str:
         self.extract_eq_from_database()
-        return self.c_equation.get_lec().decode()
+        return self.c_equation.lec.decode()
 
     def set_lec(self, value: str):
         value = value.strip()
@@ -178,7 +177,7 @@ cdef class Equation:
 
     def get_sample(self) -> Sample:
         self.extract_eq_from_database()
-        cdef CSample sample = self.c_equation.get_sample()
+        cdef CSample sample = self.c_equation.sample
         return Sample._from_ptr(new CSample(sample), <bint>True)
 
     def set_sample(self, from_period: str, to_period: str):
@@ -195,19 +194,19 @@ cdef class Equation:
 
     def get_instruments(self) -> Union[str, List[str]]:
         self.extract_eq_from_database()
-        _instruments = self.c_equation.get_instruments().decode().split(';')
+        _instruments = self.c_equation.instruments.decode().split(';')
         return _instruments[0] if len(_instruments) == 1 else _instruments
 
     def set_instruments(self, value: str):
-        self.c_equation.set_instruments(value.encode())
+        self.c_equation.instruments = value.encode()
         self.update_owner_database()
 
     def get_block(self) -> str:
         self.extract_eq_from_database()
-        return self.c_equation.get_block().decode()
+        return self.c_equation.block.decode()
 
     def set_block(self, value: str):
-        self.c_equation.set_block(value.encode())
+        self.c_equation.block = value.encode()
         self.update_owner_database()
 
     def get_tests(self) -> Dict[str, float]:

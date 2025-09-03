@@ -55,133 +55,159 @@ YYKEYS KE_TABLE[] = {
  *  Splits the LEC expression in multiple lines of max 60 chars.
  *  
  *  @param [in, out]    yy      YY*     YY stream to read data from
- *  @return                     EQ*     a new allocated EQ or NULL on error
+ *  @return                     Equation*     a new allocated EQ or NULL on error
  *  
  */
-static EQ* read_eq(YYFILE* yy)
+static Equation* read_eq(YYFILE* yy, char* name)
 {
-    int     keyw;
-    char    *lec;
-    EQ      *eq = NULL;
-    Sample  *smpl = NULL;
+    int         keyw;
+    char*       c_lec;
+    Sample*     smpl = NULL;
+    long        date = 0L;
+    std::string block;
+    std::string comment;
+    std::string instruments;
+    float       tests[EQS_NBTESTS] = { 0.0f };
 
-    eq = (EQ *) SW_nalloc(sizeof(EQ));
-
-    eq->method = 0;
+    std::string endo(name);
+    IodeEquationMethod method = EQ_LSQ;
     
     if((keyw = YY_lex(yy)) != EQ_ASCII_OPEN)  
     {
         YY_unread(yy);
-        lec = K_read_str(yy);
-        eq->lec = std::string(K_wrap(lec, 60));  
-        SW_nfree(lec);
+        c_lec = K_read_str(yy);
+        c_lec = K_wrap(c_lec, 60);  
+        std::string lec(c_lec);
+        SW_nfree(c_lec);
 
-        if(eq->lec.empty()) 
+        if(lec.empty()) 
         {
-            kerror(0, "%s: Expected LEC definition, [%s]", lec, YY_error(yy));
-            return(NULL);
+            kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
+                   (char*) lec.c_str(), name, YY_error(yy));
+            return nullptr;
         }
-        return(eq);
+        
+        Equation* eq = new Equation(endo, lec, method, "", "", "", "", "", false);
+        return eq;
     }
 
-    lec = K_read_str(yy);
-    eq->lec = std::string(K_wrap(lec, 60));
-    SW_nfree(lec);
+    c_lec = K_read_str(yy);
+    c_lec = K_wrap(c_lec, 60);
+    std::string lec(c_lec);
+    SW_nfree(c_lec);
 
-    if(eq->lec.empty()) 
+    if(lec.empty()) 
     {
-        kerror(0, "%s: Expected LEC definition, [%s]", lec, YY_error(yy));
-        return(NULL);
+        kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
+               (char*) lec.c_str(), name, YY_error(yy));
+        return nullptr;
     }
 
-    while(1) {
+    bool exit = false;
+    while(!exit) 
+    {
         keyw = YY_lex(yy);
         switch(keyw) {
             case YY_WORD :
             case YY_EOF  :
                 YY_unread(yy);
             case EQ_ASCII_CLOSE:
-                return(eq);
+                exit = true;
+                break;
             case EQ_ASCII_DATE :
-                eq->date = K_read_long(yy);
+                date = K_read_long(yy);
                 break;
 
             case EQ_ASCII_LSQ :
-                eq->method = EQ_LSQ;
+                method = EQ_LSQ;
                 break;
             case EQ_ASCII_ZEL :
-                eq->method = EQ_ZELLNER;
+                method = EQ_ZELLNER;
                 break;
             case EQ_ASCII_INF :
-                eq->method = EQ_INSTRUMENTAL;
+                method = EQ_INSTRUMENTAL;
                 break;
             case EQ_ASCII_GLS :
-                eq->method = EQ_GLS;
+                method = EQ_GLS;
                 break;
             case EQ_ASCII_MAXLIK :
-                eq->method = EQ_MAX_LIKELIHOOD;
+                method = EQ_MAX_LIKELIHOOD;
                 break;
 
             case EQ_ASCII_SMPL :
                 smpl = K_read_smpl(yy);
-                if(smpl == NULL) 
-                    goto err;
-                memcpy(&(eq->sample), smpl, sizeof(Sample));
+                if(smpl == NULL)
+                {
+                    kerror(0, "Failed to read sample for equation '%s', [%s]", name, YY_error(yy));
+                    return nullptr;
+                }
                 break;
             case EQ_ASCII_BLK  :
-                eq->block = K_read_str(yy);
-                if(eq->block.empty()) 
-                    goto err;
+                block = std::string(K_read_str(yy));
+                if(block.empty()) 
+                {
+                    kerror(0, "Missing block value for equation '%s', [%s]", name, YY_error(yy));
+                    return nullptr;
+                }
                 break;
             case EQ_ASCII_CMT  :
-                eq->comment = K_read_str(yy);
-                if(eq->comment.empty()) 
-                    goto err;
+                comment = std::string(K_read_str(yy));
+                if(comment.empty()) 
+                {
+                    kerror(0, "Missing comment value for equation '%s', [%s]", name, YY_error(yy));
+                    return nullptr;
+                }
                 break;
             case EQ_ASCII_INSTR:
-                eq->instruments = K_read_str(yy);
-                if(eq->instruments.empty()) 
-                    goto err;
+                instruments = std::string(K_read_str(yy));
+                if(instruments.empty()) 
+                {
+                    kerror(0, "Missing instruments value for equation '%s', [%s]", name, YY_error(yy));
+                    return nullptr;
+                }
                 break;
 
             case EQ_ASCII_STDEV :
-                eq->tests[EQ_STDEV] = (float) K_read_real(yy);
+                tests[EQ_STDEV] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_MEANY :
-                eq->tests[EQ_MEANY] = (float) K_read_real(yy);
+                tests[EQ_MEANY] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_SSRES :
-                eq->tests[EQ_SSRES] = (float) K_read_real(yy);
+                tests[EQ_SSRES] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_STDERR :
-                eq->tests[EQ_STDERR] = (float) K_read_real(yy);
+                tests[EQ_STDERR] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_FSTAT :
-                eq->tests[EQ_FSTAT] = (float) K_read_real(yy);
+                tests[EQ_FSTAT] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_R2 :
-                eq->tests[EQ_R2] = (float) K_read_real(yy);
+                tests[EQ_R2] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_R2ADJ :
-                eq->tests[EQ_R2ADJ] = (float) K_read_real(yy);
+                tests[EQ_R2ADJ] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_DW :
-                eq->tests[EQ_DW] = (float) K_read_real(yy);
+                tests[EQ_DW] = (float) K_read_real(yy);
                 break;
             case EQ_ASCII_LOGLIK :
-                eq->tests[EQ_LOGLIK] = (float) K_read_real(yy);
+                tests[EQ_LOGLIK] = (float) K_read_real(yy);
                 break;
 
             default :
-                kerror(0, "Incorrect entry : %s", YY_error(yy));
+                kerror(0, "Incorrect entry for equation '%s':\n%s", name, YY_error(yy));
                 break;
         }
     }
 
-err :
-    E_free(eq);
-    return(NULL);
-
+    Period from_period = (smpl != NULL) ? smpl->start_period : Period();
+    Period to_period = (smpl != NULL) ? smpl->end_period : Period();
+    Equation* eq = new Equation(endo, lec, method, from_period.to_string(), 
+                                to_period.to_string(), comment, instruments, block, false);
+    memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));
+    eq->date = date;
+    return eq;
 }
 
 /**
@@ -251,11 +277,11 @@ err :
  */
 KDB* AsciiEquations::load_asc(char* filename)
 {
-    KDB     *kdb = NULL;
-    EQ      *eq = NULL;
-    YYFILE  *yy;
-    char    name[K_MAX_NAME + 1];
-    int     cmpt = 0, pos, K_compare();
+    KDB*       kdb = NULL;
+    Equation*  eq = NULL;
+    YYFILE*    yy;
+    char       name[K_MAX_NAME + 1];
+    int        cmpt = 0, pos;
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
@@ -287,13 +313,11 @@ KDB* AsciiEquations::load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                eq = read_eq(yy);
-                if(eq == NULL) {
+                eq = read_eq(yy, name);
+                if(eq == nullptr) {
                     kerror(0, "%s : equation not defined", YY_error(yy));
                     goto err;
                 }
-
-                eq->endo = std::string(name);
 
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
@@ -308,7 +332,7 @@ KDB* AsciiEquations::load_asc(char* filename)
                 }
                 
                 kmsg("Reading object %d : %s", cmpt, name);
-                E_free(eq);
+                delete eq;
                 break;
 
             default :
@@ -346,11 +370,11 @@ static void print_test(FILE* fd, char* txt, double val)
  *  @see read_eq() the detailed syntax of an ascii equation. 
  *  
  *  @param [in, out]    fd      FILE*       output stream    
- *  @param [in]         eq      EQ*         pointer to the EQ to print  
+ *  @param [in]         eq      Equation*         pointer to the EQ to print  
  *  @param [in]         name    char*       equation endo (i.e. equation name)
  *  
  */
-static void print_eq(FILE* fd, EQ* eq, char* name)
+static void print_eq(FILE* fd, Equation* eq, char* name)
 {
     fprintf(fd, "{\n\t\"%s\"\n", (char*) eq->lec.c_str());
 
@@ -384,11 +408,10 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
             default: 
                 fprintf(fd, "\t/* UNKNOWN ESTIMATION METHOD: %d*/\n", eq->method);
                 break;
-        }
-
+            }
+        
         std::string from = eq->sample.start_period.to_string();
         std::string to   = eq->sample.end_period.to_string();
-
         fprintf(fd, "\tSAMPLE %s %s\n", (char*) from.c_str(), (char*) to.c_str());
 
         if((!eq->block.empty()) && eq->block != std::string(name))
@@ -426,27 +449,32 @@ static void print_eq(FILE* fd, EQ* eq, char* name)
  */
 int AsciiEquations::save_asc(KDB* kdb, char* filename)
 {
-    FILE    *fd;
-    int     i;
-    EQ      *eq;
+    FILE* fd;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    for(i = 0 ; i < KNB(kdb); i++) {
+    Equation* eq;
+    for(int i = 0 ; i < KNB(kdb); i++) 
+    {
         fprintf(fd, "%s ", KONAME(kdb, i));
         eq = KEVAL(kdb, i);
         print_eq(fd, eq, KONAME(kdb, i));
-        E_free(eq);
+        delete eq;
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
+    
     return(0);
 }
 

@@ -1452,8 +1452,6 @@ class Equations(IodeDatabase):
         Equation(endogenous = 'F',
                  lec = 'd(F) := t + 1',
                  method = 'GLS',
-                 from_period = '1960Y1',
-                 to_period = '2015Y1',
                  tests = {corr = 1,
                           dw = 0,
                           fstat = 0.05,

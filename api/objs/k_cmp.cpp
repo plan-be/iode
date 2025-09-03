@@ -45,42 +45,6 @@ static int K_cmplg(char* p1, char* p2, char* name)
         return(0);
 }
 
-int K_cmp_eqs(EQ* eq1, EQ* eq2, char* name)
-{
-    int     rc = 1;
-    CLEC    *cl1 = NULL, *cl2 = NULL;
-
-    if(eq1 == NULL || eq2 == NULL) goto done;
-
-    /* same unlinked CLEC, method, sample, cmt, instr, blk, --plus tests -- */
-    cl1 = L_solve((char*) eq1->lec.c_str(), name);
-    cl2 = L_solve((char*) eq2->lec.c_str(), name);
-
-    if(cl1 == NULL || cl2 == NULL
-            || cl1->tot_lg != cl2->tot_lg
-            || memcmp(cl1, cl2, cl1->tot_lg) != 0) goto done;
-
-    if(eq1->method != eq2->method) 
-        goto done;
-
-    if(memcmp(&(eq1->sample), &(eq2->sample), sizeof(Sample)) != 0) 
-        goto done;
-
-    if(eq1->block != eq2->block) 
-        goto done;
-
-    if(eq1->instruments != eq2->instruments) 
-        goto done;
-
-    rc = 0;
-
-done :
-    SCR_free(cl1);
-    SCR_free(cl2);
-
-    return(rc);
-}
-
 /**
  *  Compares 2 packed equations. 
  *  
@@ -101,18 +65,16 @@ done :
 
 static int K_cmpeqs(char* p1, char* p2, char* name)
 {
-    int     rc;
-    EQ      *eq1 = NULL, *eq2 = NULL;
+    int rc = 1;     // not equal
+    Equation* eq1 = K_eunpack(p1, name);
+    Equation* eq2 = K_eunpack(p2, name);
 
-    eq1 = K_eunpack(p1, name);
-    eq2 = K_eunpack(p2, name);
-
-    rc = K_cmp_eqs(eq1, eq2, name);
-
-    E_free(eq1);
-    E_free(eq2);
-
-    return(rc);
+    if(eq1 != NULL && eq2 != NULL) 
+        rc = *eq1 == *eq2 ? 0 : 1;
+    
+    if(eq1) delete eq1;
+    if(eq2) delete eq2;
+    return rc;
 }
 
 /**

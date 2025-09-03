@@ -892,11 +892,10 @@ class Equation:
         >>> eq_ACAF.sample
         Sample("1960Y1:2010Y1")
 
-        >>> # specify nothing
-        >>> # new equation sample = Variables sample
+        >>> # specify nothing -> reset the sample
         >>> eq_ACAF.sample = ":"
         >>> eq_ACAF.sample
-        Sample("1960Y1:2015Y1")
+        None
         """
         sample = Sample.get_instance()
         sample._cython_instance = self._cython_instance.get_sample()

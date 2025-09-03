@@ -1181,18 +1181,20 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
  */
 U_ch *RPF_vsliste(U_ch** args, int type)
 {
-    EQ      *eq;
-    U_ch    **tbl = 0, *res;
-    int     i, nb = 0, pos;
+    U_ch  **tbl = 0, *res;
+    int   i, nb = 0, pos;
 
-    if(SCR_tbl_size(args) < 1) return(NULL);
+    if(SCR_tbl_size(args) < 1) 
+        return(NULL);
 
-    for(i = 0 ; args[i] ; i++) {
+    Equation* eq;
+    for(i = 0 ; args[i] ; i++) 
+    {
         pos = K_find(K_WS[EQUATIONS], (char*) args[i]);
         if(pos < 0) continue;
         eq = KEVAL(K_WS[EQUATIONS], pos);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
-        E_free(eq);
+        if(eq) delete eq;
     }
 
     SCR_add_ptr(&tbl, &nb, 0L);

@@ -31,34 +31,40 @@
  */
 static int check_scl_var(char *eqs)
 {
-    int     pos,j;
-    EQ*     eq;
-    CLEC*   cl;
-    char    buf[1024];
+    char  buf[1024];
 
-    pos = K_find(K_WS[EQUATIONS], eqs);
-    if(pos < 0) return(-1);             // JMP 04/07/2022
-    eq = KEVAL(K_WS[EQUATIONS], pos);
-    cl = eq->clec;
+    int pos = K_find(K_WS[EQUATIONS], eqs);
+    if(pos < 0) 
+        return(-1);             // JMP 04/07/2022
+    
+    Equation* eq = KEVAL(K_WS[EQUATIONS], pos);
+    if(!eq) 
+        return(-1);
 
-    for(j = 0 ; j < cl->nb_names ; j++) {
-        if(L_ISCOEF(cl->lnames[j].name)) {
-            if(K_find(K_WS[SCALARS],cl->lnames[j].name)== -1) {
+    CLEC* cl = eq->clec;
+
+    for(int j = 0 ; j < cl->nb_names ; j++) 
+    {
+        if(L_ISCOEF(cl->lnames[j].name)) 
+        {
+            if(K_find(K_WS[SCALARS],cl->lnames[j].name)== -1) 
+            {
                 sprintf(buf, "%s 0.9 1", cl->lnames[j].name);
                 B_DataUpdate(buf, SCALARS);
             }
         }
         else {
-            if(K_find(K_WS[VARIABLES],cl->lnames[j].name)== -1) {
+            if(K_find(K_WS[VARIABLES],cl->lnames[j].name)== -1) 
+            {
                 kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
-                E_free(eq); // JMP 08/07/2022
-                return(-1);
+                delete eq;
+                return -1;
             }
         }
     }
     
-    E_free(eq);  // JMP 08/07/2022
-    return(1);
+    delete eq;
+    return 1;
 }
 
 

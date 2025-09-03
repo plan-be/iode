@@ -14,7 +14,7 @@
  *    char* K_optr1(KDB *kdb, char* name)              ~ kdb[name][1]
  *    double *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
  *    double *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
- *    EQ* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
+ *    Equation* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
  *    TBL* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
  *  
  *    double K_etest(KDB* kdb, char*name, int test_nb)  Retrieves a statistical test stored the equation whose endo is name.
@@ -186,10 +186,10 @@ double *K_vptr(KDB* kdb, char* name, int t)
  *  
  *  @param [in] kdb     KDB*    KDB of equations
  *  @param [in] name    int     equation object name
- *  @return             EQ*     pointer to an allocated EQ ~ kdb[name]
+ *  @return             Equation*     pointer to an allocated EQ ~ kdb[name]
  *  
  */
-EQ* K_eptr(KDB* kdb, char* name)
+Equation* K_eptr(KDB* kdb, char* name)
 {
     int pos;
     
@@ -203,7 +203,7 @@ EQ* K_eptr(KDB* kdb, char* name)
  *  
  *  @param [in] kdb     KDB*    KDB of tables
  *  @param [in] name    int     table object name
- *  @return             EQ*     pointer to an allocated TBL ~ kdb[name]
+ *  @return             Equation*     pointer to an allocated TBL ~ kdb[name]
  *  
  */
 TBL* K_tptr(KDB* kdb, char* name)

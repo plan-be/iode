@@ -922,7 +922,7 @@ TEST_F(IodeCAPITest, Tests_LEC)
 
 TEST_F(IodeCAPITest, Tests_EQS)
 {
-//    EQ*     eq;
+//    Equation*     eq;
 //    char    lec[521];
 //
 //    K_upd_eqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);

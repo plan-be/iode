@@ -11,7 +11,6 @@ set(CPP_REPORT
 )
 
 set(CPP_OBJS
-    objects/equation.h      objects/equation.cpp
     objects/table.h         objects/table.cpp
     )
 

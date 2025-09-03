@@ -121,7 +121,7 @@ cdef extern from "api/all.h":
 
     cdef int EQS_NBTESTS
 
-cdef extern from "cpp_api/objects/equation.h":
+cdef extern from "api/objs/equations.h":
     cdef vector[string] v_eq_methods
 
 cdef extern from "cpp_api/objects/table.h":

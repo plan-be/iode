@@ -1,7 +1,7 @@
 #pragma once
 #include "api/time/period.h"
 #include "api/time/sample.h"
-#include "cpp_api/objects/equation.h"
+#include "api/objs/equations.h"
 #include "kdb_template.h"
 
 
@@ -65,7 +65,7 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     {
         char* o_name = kdb->k_objs[pos].o_name;
         hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
-        hash_combine<EQ>(seed, *KEVAL(kdb, pos));
+        hash_combine<Equation>(seed, *KEVAL(kdb, pos));
     }
     return seed;
 }

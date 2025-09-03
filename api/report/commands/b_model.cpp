@@ -188,20 +188,20 @@ int B_ModelExchange(char* const_arg, int unused)
  */
 int KE_compile(KDB* dbe)
 {
-    int     i;
-    EQ      *eq;
-
     if(dbe == NULL || KNB(dbe) == 0) {
         error_manager.append_error("Empty set of equations");
-        return(-1);
+        return -1;
     }
 
-    for(i = 0; i < KNB(dbe); i++) {
+    Equation* eq;
+    for(int i = 0; i < KNB(dbe); i++) 
+    {
         eq = KEVAL(dbe, i);
         K_upd_eqs(KONAME(dbe, i), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
-        E_free(eq);
+        delete eq;
     }
-    return(0);
+    
+    return 0;
 }
 
 
