@@ -383,58 +383,79 @@ int K_del_by_name(KDB* kdb, char* name)
  *  @return     int             0 on success, -1 on error
  *   
  */
-int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)
+int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, char* instr, char* blk, float* tests, int i_date)
 {
-    int     pos, rc;
-    EQ      *eq;
+    int pos, rc;
 
-    pos = K_find(K_WS[EQUATIONS], name);
-    if(pos < 0) 
-        eq = (EQ *) SW_nalloc(sizeof(EQ));
-    else 
-        eq = KEVAL(K_WS[EQUATIONS], pos);
+    std::string endo(name);
+    std::string lec;
+    std::string comment;
+    std::string instruments;
+    std::string block;
+    IodeEquationMethod method = EQ_LSQ;
 
-    eq->endo = std::string(name);
-
-    if(lec != NULL)
-        eq->lec = std::string(lec);
+    if(c_lec != NULL)
+        lec = std::string(c_lec);
 
     if(cmt != NULL)
-        eq->comment = std::string(cmt);
+        comment = std::string(cmt);
 
     if(instr != NULL)
-        eq->instruments = std::string(instr);
+        instruments = std::string(instr);
 
     if(blk != NULL)
-        eq->block = std::string(blk);
+        block = std::string(blk);
 
-    if(method >= 0) 
-        eq->method = method;
+    if(i_method >= 0 && i_method < IODE_NB_EQ_METHODS) 
+        method = (IodeEquationMethod) i_method;
 
-    if(date > 0) 
-        eq->date = SCR_current_date();
-    else 
-        eq->date = 0L;
+    Equation* eq;
+    pos = K_find(KE_WS, name);
+    if(pos < 0)
+    {
+        Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
+        Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
+        eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+                          comment, instruments, block, false);
+    } 
+    else
+    {
+        eq = KEVAL(KE_WS, pos);
+        // modify only if not empty
+        if(!lec.empty())
+            eq->set_lec(lec);
+        // modify only if not null (negative)
+        if(i_method >= 0)
+            eq->set_method(method);
+        // modify only if not empty
+        if(!comment.empty()) 
+            eq->set_comment(comment);
+        // modify only if not empty
+        if(!instruments.empty())
+            eq->instruments = instruments;
+        // modify only if not empty
+        if(!block.empty())
+            eq->block = block;
+        // modify only if not null
+        if(smpl != NULL) 
+            eq->sample = *smpl;
+    }
 
     if(tests != NULL)  
-        memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
-    else 
-        eq->tests.fill(0.0f);
+        memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));
 
-    if(smpl != NULL) 
-        memcpy(&(eq->sample), smpl, sizeof(Sample));
+    if(i_date > 0)
+        eq->update_date();
 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
+    delete eq;
     if(rc < 0) 
     {
-        rc = -1;
         error_manager.append_error(std::string(L_error()));
+        return -1;
     }
-    else 
-        rc = 0;
-
-    E_free(eq);
-    return(rc);
+    
+    return 0;
 }
 
 

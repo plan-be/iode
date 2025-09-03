@@ -130,13 +130,10 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
  */
 void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
 {
-    EQ      *eq;
-    CLEC    *cl;
-
-    eq = KEVAL(dbe, i);
-    cl = eq->clec;
+    Equation* eq = KEVAL(dbe, i);
+    CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
-    E_free(eq);
+    delete eq;
 }
 
 

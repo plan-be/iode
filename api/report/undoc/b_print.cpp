@@ -28,7 +28,7 @@
  *    int B_PrintDefIdt(KDB* kdb, int pos)                             | Print a identity.
  *    int B_PrintDefEqs(KDB* kdb, int pos)                             | Print a equation.
  *    int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs) | Print a LEC expression. Set the engogenous (name) in bold.
- *    int B_PrintEqs(char* name, EQ* eq)                               | Print an equation and optionally its statistical tests.
+ *    int B_PrintEqs(char* name, Equation* eq)                               | Print an equation and optionally its statistical tests.
  *    int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)             | Print a scalar in an enumeration list.
  *    int B_PrintDefScl(KDB* kdb, int pos)                             | Print the scalar kdb[pos].
  *    int B_PrintDefVar(KDB* kdb, int pos)                             | Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
@@ -579,12 +579,13 @@ int B_PrintDefIdt(KDB* kdb, int pos)
 // Print an equation.
 int B_PrintDefEqs(KDB* kdb, int pos)
 {
-    EQ      *eq = NULL;
-
-    if((eq = KEVAL(kdb, pos)) == NULL) return (-1);
+    Equation* eq = KEVAL(kdb, pos);
+    if(!eq) 
+        return -1;
+    
     B_PrintEqs(KONAME(kdb, pos), eq);
-    E_free(eq);
-    return(0);
+    delete eq;
+    return 0;
 }
 
 /**
@@ -649,10 +650,10 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
  *                       tests (if the equation was estimated)
  *  
  *  @param [in] name  char*     equation name 
- *  @param [in] eq    EQ*       equation struct 
+ *  @param [in] eq    Equation*       equation struct 
  *  @return           int       0    
  */
-int B_PrintEqs(char* name, EQ* eq)
+int B_PrintEqs(char* name, Equation* eq)
 {
     CLEC    *clec;
     char    buf[256], *sname;

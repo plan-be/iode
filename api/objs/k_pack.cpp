@@ -31,7 +31,7 @@
  * Unpacking functions
  * -------------------- 
  *      TBL* K_tunpack(char *pack)                   Creates a TBL struct from a packed TBL 
- *      EQ*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
+ *      Equation*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
  *      Identity* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & Scalar only)
@@ -389,10 +389,10 @@ int K_ipack(char **pack, char *a1)
 
 int   K_epack(char **pack, char *a1, char *endo)
 {
-    EQ* eq;
+    Equation* eq;
     CLEC* clec;
 
-    eq = (EQ*) a1;
+    eq = (Equation*) a1;
 
     *pack = (char*) P_create();
     if(eq->lec.empty()) 
@@ -402,7 +402,7 @@ int   K_epack(char **pack, char *a1, char *endo)
     if(clec == 0)  
         return(-1);
 
-    *pack = (char*) P_add(*pack, (char*) eq->lec.c_str(), eq->lec.size() + 1);  /* lec */
+    *pack = (char*) P_add(*pack, (char*) eq->lec.c_str(), (int) eq->lec.size() + 1);  /* lec */
     *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);                   /* clec */
     *pack = (char*) P_add(*pack, &(eq->solved), 1);                             /* solved */
     *pack = (char*) P_add(*pack, &(eq->method), 1);                             /* method */
@@ -411,17 +411,17 @@ int   K_epack(char **pack, char *a1, char *endo)
     if(eq->comment.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*) eq->comment.c_str(), eq->comment.size() + 1);          /* cmt */
+        *pack = (char*) P_add(*pack, (char*) eq->comment.c_str(), (int) eq->comment.size() + 1);          /* cmt */
 
     if(eq->block.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*) eq->block.c_str(), eq->block.size() + 1);              /* blk */
+        *pack = (char*) P_add(*pack, (char*) eq->block.c_str(), (int) eq->block.size() + 1);              /* blk */
 
     if(eq->instruments.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*) eq->instruments.c_str(), eq->instruments.size() + 1);  /* instr */
+        *pack = (char*) P_add(*pack, (char*) eq->instruments.c_str(), (int) eq->instruments.size() + 1);  /* instr */
 
     *pack = (char*) P_add(*pack, (char*)&(eq->date), sizeof(long));                     /* date */
     *pack = (char*) P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
@@ -815,56 +815,56 @@ TBL* K_tunpack(char *pack)
  * @return EQ *     allocated EQ (32|64 bits according to the current architecture)
 */
 
-EQ* K_eunpack(char *pack, char *name)
+Equation* K_eunpack(char *pack, char *name)
 {
-    EQ* eq;
-    //char* ptr;
-    int     len = 0;
+    int len = 0;
 
-    eq = (EQ*)SW_nalloc(sizeof(EQ));
-
-    eq->endo = std::string(name);
+    std::string endo(name);
 
     len = P_get_len(pack, 0);
     char* c_lec = SW_nalloc(len);
     memcpy(c_lec, P_get_ptr(pack, 0), len);
-    eq->lec = std::string(c_lec);
+    std::string lec(c_lec);
     SW_nfree(c_lec);
 
-    len = P_get_len(pack, 1);
-    eq->clec = (CLEC*)SW_nalloc(len);
-    memcpy(eq->clec, P_get_ptr(pack, 1), len);
+    // len = P_get_len(pack, 1);
+    // CLEC* clec = (CLEC*) SW_nalloc(len);
+    // memcpy(eq->clec, P_get_ptr(pack, 1), len);
 
-    eq->solved = *(char*)(P_get_ptr(pack, 2));
-
-    eq->method = *(char*)(P_get_ptr(pack, 3));
-    if(eq->method < 0 || eq->method >= IODE_NB_EQ_METHODS)
-        eq->method = EQ_LSQ;    // Default method is LSQ
-    
-    memcpy(&(eq->sample), P_get_ptr(pack, 4), sizeof(Sample));
+    char char_method = *(char*)(P_get_ptr(pack, 3));
+    int i_method = (int) char_method;
+    IodeEquationMethod method = EQ_LSQ;
+    if(i_method >= 0 && i_method < IODE_NB_EQ_METHODS)
+        method = (IodeEquationMethod) i_method;
 
     len = P_get_len(pack, 5);
     char* c_cmt = SW_nalloc(len);
     memcpy(c_cmt, P_get_ptr(pack, 5), len);
-    eq->comment = std::string(c_cmt);
+    std::string comment(c_cmt);
     SW_nfree(c_cmt);
 
     len = P_get_len(pack, 6);
     char* c_block = SW_nalloc(len);
     memcpy(c_block, P_get_ptr(pack, 6), len);
-    eq->block = std::string(c_block);
+    std::string block(c_block);
     SW_nfree(c_block);
 
     len = P_get_len(pack, 7);
     char* c_instr = SW_nalloc(len);
     memcpy(c_instr, P_get_ptr(pack, 7), len);
-    eq->instruments = std::string(c_instr);
-    SW_nfree(c_instr);
+    std::string instruments(c_instr);
+    SW_nfree(c_instr); 
 
-    eq->date = *(long*)(P_get_ptr(pack, 8));
+    Sample* smpl = (Sample*) SW_nalloc(sizeof(Sample));
+    memcpy(smpl, P_get_ptr(pack, 4), sizeof(Sample));
+    Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
+    Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
 
+    Equation* eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+                                comment, instruments, block, false);
+    eq->solved = *((char*) (P_get_ptr(pack, 2)));
+    eq->date = *((long*) (P_get_ptr(pack, 8)));    
     memcpy(eq->tests.data(), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float)); /* FLOAT 12-04-98 */
-
     return(eq);
 }
 

@@ -127,6 +127,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
             check_name(name, EQUATIONS);
 
         // for each equation name from the block
+        Equation* eq;
         for(const std::string& name: v_equations_)
         {
             // a. check if the equation is already present in the local database 'kdb_eqs'
@@ -136,8 +137,9 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
                 if(Equations.contains(name))
                 {
                     // yes -> copy equation from the global database to 'kdb_eqs' 
-                    Equation eq = Equations.get(name);
-                    kdb_eqs->add(name, eq);
+                    eq = Equations.get(name);
+                    kdb_eqs->add(name, *eq);
+                    delete eq;
                 }
                 else
                     // no -> add a new equation with LEC '<name> := 0' to 'kdb_eqs'
@@ -170,15 +172,20 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 
 void EditAndEstimateEquations::update_scalars()
 {
+    Equation* eq;
     std::vector<std::string> coefficients_list;
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
     for (int i=0; i < kdb_eqs->count(); i++)
     {
-        Equation eq = kdb_eqs->get(i);
-        tmp_coefs_list = eq.get_coefficients_list();
+        eq = kdb_eqs->get(i);
+        if(!eq)
+            throw std::runtime_error("Estimation: Cannot get equation at position " 
+                + std::to_string(i) + " from the local Equations database.");
+        tmp_coefs_list = eq->get_coefficients_list();
         std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
+        delete eq;
     }
 
     // remove duplicated scalars names
@@ -209,8 +216,11 @@ void EditAndEstimateEquations::update_scalars()
         // if eq_name is not contained in v_equations
         if(find(v_equations.begin(), v_equations.end(), eq_name) == v_equations.end())
         {
-            Equation eq = kdb_eqs->get(eq_name);
-            for(const std::string& scl_name: eq.get_coefficients_list())
+            eq = kdb_eqs->get(eq_name);
+            if(!eq)
+                throw std::runtime_error("Estimation: Could not find equation named '" + eq_name +
+                                         " from the local Equations database.");
+            for(const std::string& scl_name: eq->get_coefficients_list())
                 if(kdb_scl->contains(scl_name))
                     kdb_scl->remove(scl_name);
         }
@@ -226,10 +236,23 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
         return;
 
     std::string name = *current_eq;
-    Equation eq = kdb_eqs->get(name);
-    eq.set_lec(lec);
-    eq.set_comment(comment);
-    kdb_eqs->update(name, eq);
+    Equation* eq = kdb_eqs->get(name);
+    if(!eq)
+        throw std::runtime_error("Estimation: Could not find equation named '" + name +
+                                  " from the local Equations database.");
+    try
+    {
+        eq->set_lec(lec);
+        eq->set_comment(comment);
+        kdb_eqs->update(name, *eq);
+        delete eq;
+    }
+    catch(std::exception& e)
+    {
+        if(eq) delete eq;
+        throw std::runtime_error("Estimation: Cannot update equation named '" + name + 
+                                 "':\n" + std::string(e.what()));
+    }
 }
 
 void EditAndEstimateEquations::estimate(int maxit, double eps)
@@ -264,13 +287,27 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
 
     // copy the values of class attributes 'block', 'method' and 'instruments' 
     // to each local equation 
+    Equation* eq;
     for(const std::string& eq_name: v_equations) 
     {
-        Equation eq = kdb_eqs->get(eq_name);
-        eq.set_block(block);
-        eq.set_method(method);
-        eq.set_instruments(instruments);
-        kdb_eqs->update(eq_name, eq);
+        eq = kdb_eqs->get(eq_name);
+        if(!eq)
+            throw std::runtime_error("Estimation: Could not find equation named '" + eq_name +
+                                     " from the local Equations database.");
+        try
+        {
+            eq->set_method(method);
+            eq->block = block;
+            eq->instruments = instruments;
+            kdb_eqs->update(eq_name, *eq);
+            delete eq;
+        }
+        catch(std::exception& e)
+        {
+            if(eq) delete eq;
+            throw std::runtime_error("Estimation: Cannot update equation named '" + eq_name + 
+                                     "':\n" + std::string(e.what()));
+        }
     }
 
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
@@ -324,35 +361,49 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     }
 
     // copy the Equations referenced in v_equations from the local database to the global one.
+    Equation* eq;
     std::string eq_name;
     std::vector<std::string> v_new_eqs;
     for(int i = 0; i < v_equations.size(); i++) 
     {
         eq_name = v_equations[i];
-        Equation eq = kdb_eqs->get(eq_name);    // get the equation from the local database
-        eq.set_block(block);
-        eq.set_method(method);
-        eq.set_instruments(instruments);
-
-        if(estimation_done)
+        eq = kdb_eqs->get(eq_name);    // get the equation from the local database
+        if(!eq)
+            throw std::runtime_error("Estimation: Could not find equation named '" + eq_name +
+                                     " from the local Equations database.");
+        try
         {
-            eq.set_sample(est_from, est_to);
-            eq.update_date();
+            eq->set_method(method);
+            eq->block = block;
+            eq->instruments = instruments;
+    
+            if(estimation_done)
+            {
+                eq->set_sample(est_from, est_to);
+                eq->update_date();
+            }
+            else
+            {
+                eq->set_sample(no_est_from, no_est_to);
+                eq->tests.fill(0.0f);
+                eq->reset_date();
+            }
+    
+            // update/add the equation in the global database
+            if(Equations.contains(eq_name))
+                Equations.update(eq_name, *eq);
+            else
+            {
+                Equations.add(eq_name, *eq);
+                v_new_eqs.push_back(eq_name);
+            }
         }
-        else
+        catch(std::exception& e)
         {
-            eq.set_sample(no_est_from, no_est_to);
-            eq.set_tests({0.0});
-            eq.reset_date();
-        }
-
-        // update/add the equation in the global database
-        if(Equations.contains(eq_name))
-            Equations.update(eq_name, eq);
-        else
-        {
-            Equations.add(eq_name, eq);
-            v_new_eqs.push_back(eq_name);
+            if(eq) delete eq;
+            throw std::runtime_error("Estimation: Cannot copy/update the equation named '" + 
+                                     eq_name + "' from the local estimation database to " + 
+                                     "the global database:\n" + std::string(e.what()));
         }
     }
 

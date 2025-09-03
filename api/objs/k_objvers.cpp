@@ -214,15 +214,15 @@ static char *K_repack_tbl(TBL *tbl)
  
 void K_setvers(KDB* kdb, int i, int vers)
 {
-    float   *f;
-    double  *d;
-    int     j, nb, lg;
-    char    *ptr, *optr, *pack;
-    SWHDL   pos, opos;
-    char    buf[512];
+    float*    f;
+    double*   d;
+    int       j, nb, lg;
+    char      *ptr, *optr, *pack;
+    SWHDL     pos, opos;
+    char      buf[512];
     //unsigned char *dptr;
-    EQ      *eq;
-    TBL     *tbl;
+    Equation* eq;
+    TBL*      tbl;
 
     if(vers == 0 || vers == 3) return;
     K_repack(kdb, i);
@@ -289,8 +289,8 @@ void K_setvers(KDB* kdb, int i, int vers)
             optr = SW_getptr(opos);
             eq = K_eunpack(optr, KONAME(kdb, i));
             SW_free(opos);
-            K_epack(&pack, (char *)eq, KOBJS(kdb)[i].o_name);
-            E_free(eq);
+            K_epack(&pack, (char*) eq, KOBJS(kdb)[i].o_name);
+            delete eq;
             lg = P_get_len(pack, -1);
             pos = SW_alloc(lg);
             memcpy(SW_getptr(pos), pack, lg);

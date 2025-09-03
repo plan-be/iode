@@ -37,7 +37,7 @@
  *  How to create IODE objects with K_add()
  *  ---------------------------------------
  *    - Comments    K_add(KDB* kdb, char* name, CMT cmt)
- *    - Equations   K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
+ *    - Equations   K_add(KDB* kdb, char* name, Equation* eq, char* endo) [where endo = name]
  *    - Identities  K_add(KDB* kdb, char* name, char* lec)
  *    - Lists       K_add(KDB* kdb, char* name, char* list)
  *    - Scalars     K_add(KDB* kdb, char* name, Scalar* scalar)
@@ -48,7 +48,7 @@
  *  
  *  Example
  *  -------
- *      EQ*     eq;
+ *      Equation*     eq;
  *      char*   name;
  *      ...
  *      rc = K_add(K_WS[EQUATIONS], name, eq, name);
@@ -69,17 +69,17 @@
 
 int K_add(KDB* kdb, char* name, ...)
 {
-    va_list vargs;
-    char    *pack = NULL;
-    int     pos = -1, lg, rc;
-    EQ*     eq;
-    char*   endo;
-    char*   txt;
-    char*   lec;
-    Scalar*    scl;
-    TBL*    tbl;
-    double* var;
-    int*    lgptr;
+    va_list   vargs;
+    char*     pack = NULL;
+    int       pos = -1, lg, rc;
+    Equation* eq;
+    char*     endo;
+    char*     txt;
+    char*     lec;
+    Scalar*   scl;
+    TBL*      tbl;
+    double*   var;
+    int*      lgptr;
 
     va_start(vargs, name);
 
@@ -90,32 +90,32 @@ int K_add(KDB* kdb, char* name, ...)
 
     switch(KTYPE(kdb)) {
       case COMMENTS: 
-          txt = va_arg(vargs, char *);
+          txt = va_arg(vargs, char*);
           rc = K_cpack(&pack, txt);
           break;            
       case EQUATIONS: 
-          eq = va_arg(vargs, EQ *);
+          eq = va_arg(vargs, Equation*);
           endo = va_arg(vargs, char *);
           rc = K_epack(&pack, (char*) eq, endo);
           break;            
       case IDENTITIES: 
-          lec = va_arg(vargs, char *);
+          lec = va_arg(vargs, char*);
           rc = K_ipack(&pack, lec);
           break;            
       case LISTS: 
-          txt = va_arg(vargs, char *);
+          txt = va_arg(vargs, char*);
           rc = K_lpack(&pack, txt);
           break;            
       case SCALARS: 
-          scl = va_arg(vargs, Scalar *);
+          scl = va_arg(vargs, Scalar*);
           rc = K_spack(&pack, (char*) scl);
           break;            
       case TABLES: 
-          tbl = va_arg(vargs, TBL *);
+          tbl = va_arg(vargs, TBL*);
           rc = K_tpack(&pack, (char*)tbl);
           break;            
       case VARIABLES: 
-          var = va_arg(vargs, double *);  
+          var = va_arg(vargs, double*);  
           lgptr = va_arg(vargs, int*);
           rc = K_vpack(&pack, var, lgptr);
           break;            
@@ -123,14 +123,13 @@ int K_add(KDB* kdb, char* name, ...)
           txt = va_arg(vargs, char*);     
           lgptr = va_arg(vargs, int*);
           rc = K_opack(&pack, txt, lgptr);
-          break;            
-     
+          break;
     } 
-    if(rc < 0) {
+    if(rc < 0) 
+    {
         pos = -2;
         goto einde;
     }    
-
 
     // Add entry (name) into kdb
     pos = K_add_entry(kdb, name);

@@ -227,8 +227,8 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;
     double      lnumtest, numtest;
-    EQ          *eq;
-    CLEC        *cl;
+    Equation*   eq;
+    CLEC*       cl;
     char        **scl = NULL, **eqs = NULL;
 
     // Crée le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
@@ -244,7 +244,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     eq = KEVAL(K_WS[EQUATIONS], pos);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
-    E_free(eq);
+    if(eq) delete eq;
 
     // Effectue les estimations pour toutes les combi
     nbcom = (int) pow(2.0, nbscl);

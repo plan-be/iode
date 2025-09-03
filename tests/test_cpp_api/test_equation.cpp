@@ -22,72 +22,20 @@ protected:
 };
 
 
-TEST_F(EquationTest, Equivalence_C_CPP)
-{
-    char* c_name = const_cast<char*>(name.c_str());
-    std::string lec = equation->get_lec();
-    std::string method = equation->get_method();
-    Sample sample = equation->get_sample();
-    std::string from = sample.start_period.to_string();
-    std::string to = sample.end_period.to_string();
-    std::string comment = equation->get_comment();
-    std::string instruments = equation->get_instruments();
-    std::string block = equation->get_block();
-
-    kdb_eqs->remove(name);
-
-    // test if a Equation object can be added to the Equations KDB via K_add()
-    Equation eq(name, lec, method, from, to, comment, instruments, block, true);
-    // NOTE: for equations --> K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
-    K_add(KE_WS, c_name, static_cast<EQ*>(&eq), c_name);
-    int pos = K_find(KE_WS, c_name);
-    ASSERT_GT(pos, -1);
-
-    EQ* c_eq = KEVAL(KE_WS, pos);
-    ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
-    ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
-    ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(c_eq->sample), eq.get_sample());
-    ASSERT_EQ(std::string(c_eq->comment), eq.get_comment());
-    ASSERT_EQ(std::string(c_eq->instruments), eq.get_instruments());
-    ASSERT_EQ(std::string(c_eq->block), eq.get_block());
-    ASSERT_EQ(c_eq->date, eq.get_date());
-
-    // test memcpy between a Equation object and a EQ object
-    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    eq.set_sample("2000Y1", "2020Y1");
-    eq.set_method("MAX_LIKELIHOOD");
-    memcpy(c_eq, &eq, sizeof(EQ));
-    ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
-    ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
-    ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(c_eq->sample), eq.get_sample());
-    ASSERT_EQ(std::string(c_eq->comment), eq.get_comment());
-    ASSERT_EQ(std::string(c_eq->instruments), eq.get_instruments());
-    ASSERT_EQ(std::string(c_eq->block), eq.get_block());
-    ASSERT_EQ(c_eq->date, eq.get_date());
-
-    // test if a Equation object can be passed to the hash function for the objects of type EQ.
-    std::hash<EQ> eq_hasher;
-    std::size_t c_hash = eq_hasher(*c_eq);
-    std::size_t cpp_hash = eq_hasher(static_cast<EQ>(eq));
-    ASSERT_EQ(c_hash, cpp_hash);
-}
-
 TEST_F(EquationTest, Endo)
 {
-    EXPECT_EQ(equation->get_endo(), "ACAF");
+    EXPECT_EQ(equation->endo, "ACAF");
 }
 
 TEST_F(EquationTest, Lec)
 {
     // get
-    EXPECT_EQ(equation->get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(equation->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
 
     // set
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     equation->set_lec(new_lec);
-    EXPECT_EQ(equation->get_lec(), new_lec);
+    EXPECT_EQ(equation->lec, new_lec);
 }
 
 TEST_F(EquationTest, SplitEquation)
@@ -117,22 +65,11 @@ TEST_F(EquationTest, Method)
     }
 }
 
-TEST_F(EquationTest, Block)
-{
-    // get
-    EXPECT_EQ(equation->get_block(), name);
-
-    // set
-    std::string new_block = "ACAF;AGAF";
-    equation->set_block(new_block);
-    EXPECT_EQ(equation->get_block(), new_block);
-}
-
 TEST_F(EquationTest, Sample)
 {
     // get
     Sample expected_sample("1980Y1", "1996Y1");
-    Sample sample = equation->get_sample();
+    Sample sample = equation->sample;
     EXPECT_EQ(sample.to_string(), expected_sample.to_string());
 
     // set
@@ -140,7 +77,7 @@ TEST_F(EquationTest, Sample)
     std::string to = "2020Y1";
     Sample new_sample(from, to);
     equation->set_sample(from, to);
-    Sample sample_res = equation->get_sample();
+    Sample sample_res = equation->sample;
     EXPECT_EQ(sample_res.to_string(), new_sample.to_string());
 }
 
@@ -155,52 +92,35 @@ TEST_F(EquationTest, Comment)
     EXPECT_EQ(equation->get_comment(), new_comment);
 }
 
-TEST_F(EquationTest, Instruments)
-{
-    // get
-    EXPECT_EQ(equation->get_instruments(), "");
-
-    // set
-    // TODO : find a realistic value for new_instruments
-    std::string new_instruments = "random_text";
-    equation->set_instruments(new_instruments);
-    EXPECT_EQ(equation->get_instruments(), new_instruments);
-}
-
 TEST_F(EquationTest, Date)
 {
     // get
-    EXPECT_EQ(equation->get_date(), 19980612);
+    EXPECT_EQ(equation->date, 19980612);
     EXPECT_EQ(equation->get_date_as_string(), "12-06-1998");
 
     // set
     int current_date = SCR_current_date();
     equation->update_date();
-    EXPECT_EQ(equation->get_date(), current_date);
-
-    long date = 20240618;
-    equation->set_date(date);
-    EXPECT_EQ(equation->get_date(), date);
+    EXPECT_EQ(equation->date, current_date);
 
     std::string s_date = "20-05-2010";
     equation->set_date(s_date);
-    EXPECT_EQ(equation->get_date(), 20100520);
+    EXPECT_EQ(equation->date, 20100520);
 
     s_date = "07/08/2016";
     equation->set_date(s_date, "dd/mm/yyyy");
-    EXPECT_EQ(equation->get_date(), 20160807);
+    EXPECT_EQ(equation->date, 20160807);
 }
 
 TEST_F(EquationTest, Tests)
 {
-    std::array<float, EQS_NBTESTS> tests;
     std::array<float, EQS_NBTESTS> expected_tests = { 0.f, 0.0042699f, 0.00818467f, 5.19945e-05f, 
                                                       0.0019271461f, 0.f, 32.2732f, 0.82176137f, 
                                                       0.79629868f, 2.3293459f, 83.8075f };
     std::map<std::string, float> m_tests;
 
     // get
-    tests = equation->get_tests();
+    std::array<float, EQS_NBTESTS> tests = equation->tests;
     EXPECT_FLOAT_EQ(tests[EQ_CORR], expected_tests[EQ_CORR]);
     EXPECT_FLOAT_EQ(tests[EQ_STDEV], expected_tests[EQ_STDEV]);
     EXPECT_FLOAT_EQ(tests[EQ_MEANY], expected_tests[EQ_MEANY]);
@@ -228,9 +148,11 @@ TEST_F(EquationTest, Tests)
 
     // set
     std::array<float, EQS_NBTESTS> new_tests = { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11. };
-    equation->set_tests(new_tests);
-    tests = equation->get_tests();
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
+    for(int i = 0; i < EQS_NBTESTS; i++)
+    {
+        equation->set_test(static_cast<IodeEquationTest>(i), new_tests[i]);
+        EXPECT_FLOAT_EQ(equation->tests[i], new_tests[i]);
+    }
 }
 
 TEST_F(EquationTest, GetCoefficients)
@@ -249,7 +171,7 @@ TEST_F(EquationTest, GetCoefficients)
 
 TEST_F(EquationTest, GetVariables)
 {
-    Sample eq_sample = equation->get_sample();
+    Sample eq_sample = equation->sample;
     KDBVariables kdb_var;
     kdb_var.set_sample(eq_sample.start_period, eq_sample.end_period);
 
@@ -267,7 +189,7 @@ TEST_F(EquationTest, GetVariables)
 
 TEST_F(EquationTest, Hash)
 {
-    std::hash<EQ> equation_hasher;
+    std::hash<Equation> equation_hasher;
     std::size_t hash_before;
     std::size_t hash_after;
 
@@ -311,14 +233,14 @@ TEST_F(EquationTest, Hash)
     // different block
     hash_before = hash_after;
     std::string new_block = "ACAF;AGAF";
-    equation->set_block(new_block); 
+    equation->block = new_block; 
     hash_after = equation_hasher(*equation);
     EXPECT_NE(hash_before, hash_after);
 
     // different instrument
     hash_before = hash_after;
     std::string new_instruments = "random_text";
-    equation->set_instruments(new_instruments); 
+    equation->instruments = new_instruments; 
     hash_after = equation_hasher(*equation);
     EXPECT_NE(hash_before, hash_after);
 }

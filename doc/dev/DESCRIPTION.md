@@ -421,7 +421,7 @@ Functions for "packing" and "unpacking" IODE objects.
 |Syntax|Description|
 |:---|:---|
 |`TBL* K_tunpack(char *pack)`|Creates a TBL struct from a packed TBL|
-|`EQ* K_eunpack(char *pack, char *name)`|Creates an EQ struct from a packed EQ|
+|`Equation* K_eunpack(char *pack, char *name)`|Creates an EQ struct from a packed EQ|
 |`Identity* K_iunpack(char *pack)`|Creates an IDT struct from a packed IDT|
 
 s
@@ -449,7 +449,7 @@ List of functions
 |`char* K_optr1(KDB *kdb, char* name)`| kdb\[name\]\[1\]|
 |`double *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
 |`double *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
-|`EQ* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
+|`Equation* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
 |`TBL* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
 |**Equation tests**||
 |`double K_etest(KDB* kdb, char*name, int test_nb)`|Retrieves a statistical test stored the equation whose endo is name.|
@@ -477,7 +477,7 @@ List of functions
 
 Functions to manipulate equation expressions and objects.
 
-|`void E_free(EQ* eq)`|Frees an EQ struct and all its elements|
+|`void E_free(Equation* eq)`|Frees an EQ struct and all its elements|
 |:---|:---|
 |`int E_split_eq(char* lec, char** lhs, char** rhs)`|Extracts the left and right sides of a lec equation|
 |`int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)`|Transforms a LEC equation to add dynamic adjustment|

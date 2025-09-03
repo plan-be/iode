@@ -131,9 +131,9 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
  
 double *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
-    int         i, pos, rc = -1;
-    char        buf[1024], scl[11], varname[64];
-    Sample      smpl;
+    int      i, pos, rc = -1;
+    char     buf[1024], scl[11], varname[64];
+    Sample   smpl;
     double   *res = NULL, *vec;
 
 

@@ -137,8 +137,11 @@ int B_EqsSetSample(char* arg, int unused)
     Sample  *smpl;
 
     eqs = B_EqsSplitSmplName(arg, &smpl);
-    if(smpl == 0) return(-1);
-    for(i = 0 ; eqs[i] ; i++) {
+    if(smpl == 0) 
+        return(-1);
+    
+    for(i = 0 ; eqs[i] ; i++) 
+    {
         rc = K_upd_eqs(eqs[i], 0L, 0L, -1, smpl, 0L, 0L, 0L, 0);
         if(rc) break;
     }

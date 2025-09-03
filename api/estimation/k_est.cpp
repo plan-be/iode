@@ -14,7 +14,7 @@
  *  
  *  Utility function
  *  ----------------
- *      void E_tests2scl(EQ* eq, int j, int n, int k)   Creates the scalars containing the results of an estimated equation
+ *      void E_tests2scl(Equation* eq, int j, int n, int k)   Creates the scalars containing the results of an estimated equation
  *  
  */
 #include "scr4/s_prodt.h"
@@ -67,17 +67,18 @@ void Estimation::E_savescl(double val, int eqnb, char*txt)
  *      - e<eqnb>_dw     : Durbin-Watson test
  *      - e<eqnb>_loglik : Log-likelihood
  *  
- *  @param [in] EQ*     eq  equation 
+ *  @param [in] Equation*     eq  equation 
  *  @param [in] int     j   position of the equation in the block 
  *  @param [in] int     n   number of observations
  *  @param [in] int     k   number of degrees of freedom
  */
-void Estimation::E_tests2scl(EQ* eq, int j, int n, int k)
+void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
 {
-    if(eq == NULL) return;
+    if(!eq) 
+        return;
 
-    E_savescl((double)n, j, "n");
-    E_savescl((double)k, j, "k");
+    E_savescl((double) n, j, "n");
+    E_savescl((double) k, j, "k");
     E_savescl(eq->tests[EQ_STDEV], j,   "stdev");
     E_savescl(eq->tests[EQ_MEANY], j,   "meany");
     E_savescl(eq->tests[EQ_SSRES], j,   "ssres");
@@ -138,35 +139,48 @@ void Estimation::E_tests2scl(EQ* eq, int j, int n, int k)
  *  @param [in] float*  tests   list of tests (see KE_est_s() for the complete list)
  *  @return     int     0 on success, -1 on error
  */
-int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float* tests)
+int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, float* tests)
 {
     int     pos, rc;
-    EQ      *eq;
 
+    std::string endo(name);
+    std::string lec(c_lec);
+    IodeEquationMethod method = EQ_LSQ;
+    if (i_method >= 0 && i_method < IODE_NB_EQ_METHODS)
+        method = (IodeEquationMethod) i_method;
+
+    Equation* eq;
     pos = K_find(E_DBE, name);
     if(pos < 0) 
-        eq = (EQ *) SW_nalloc(sizeof(EQ));
-    else 
+    {
+        std::string comment = "";
+        std::string instruments = "";
+        std::string block = endo;
+        Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
+        Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
+        eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+                          comment, instruments, block, true);
+    }
+    else
+    {
         eq = KEVAL(E_DBE, pos);
+        eq->sample = *smpl;
+        eq->set_lec(lec);
+        eq->set_method(method);
+        eq->update_date();
+    }
 
-    eq->endo = std::string(name);
-    eq->lec = std::string(lec);
-    eq->method = method;
-    eq->date = SCR_current_date();
-    
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
-    memcpy(&(eq->sample), smpl, sizeof(Sample));
+
     rc = K_add(E_DBE, name, eq, name);
+    delete eq;
     if(rc < 0) 
     {
         error_manager.append_error(std::string(L_error()));
-        rc = -1;
+        return -1;
     }
-    else 
-        rc = 0;
 
-    E_free(eq);
-    return(rc);
+    return 0;
 }
 
 /**
@@ -186,15 +200,15 @@ int Estimation::KE_update(char* name, char* lec, int method, Sample* smpl, float
  */
 int Estimation::KE_est_s(Sample* smpl)
 {
-    static  char met[6] = {"LZIGM"};
-    int     i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
-    Sample  eq_smpl;
-    U_ch    **endos = 0;
-    U_ch    **blk = 0;
-    U_ch    **lecs = 0;
-    U_ch    **instrs = 0;
-    float   tests[EQS_NBTESTS]; /* FLOAT 12-04-98 */
-    EQ      *eq;
+    static char met[6] = {"LZIGM"};
+    int        i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
+    Sample     eq_smpl;
+    U_ch**     endos = 0;
+    U_ch**     blk = 0;
+    U_ch**     lecs = 0;
+    U_ch**     instrs = 0;
+    float      tests[EQS_NBTESTS]; /* FLOAT 12-04-98 */
+    Equation*  eq;
     
     nb = SCR_tbl_size((unsigned char**) est_endos);
     
@@ -305,8 +319,8 @@ int Estimation::KE_est_s(Sample* smpl)
                 eq = KEVAL(E_DBE, pos);          /* JMP 24-06-98 */
                 // create the Scalars containing the results of an estimated equation
                 E_tests2scl(eq, j, E_T, E_NCE);  /* JMP 27-09-96 */
-                E_free(eq);
-                eq = NULL;           // GB 14/11/2012
+                if(eq) delete eq;
+                eq = nullptr;
                 // create the Variables containing the fitted, observed and residual values
                 E_savevar("_YCALC", j, E_RHS);   /* JMP 27-09-96 */
                 E_savevar("_YOBS", j, E_LHS);    /* JMP 27-09-96 */
