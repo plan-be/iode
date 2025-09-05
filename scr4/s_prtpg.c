@@ -55,8 +55,8 @@ PAGE *pg;
 
     if(!pg->pg_fld_mem) PG_fld_free(pg);
 
-    SCR_TMP_IMAGE->im_line   = max(0, line - box); /* JMP 11-03-92 */
-    SCR_TMP_IMAGE->im_column = max(0, col - box);  /* JMP 11-03-92 */
+    SCR_TMP_IMAGE->im_line   = _max_(0, line - box); /* JMP 11-03-92 */
+    SCR_TMP_IMAGE->im_column = _max_(0, col - box);  /* JMP 11-03-92 */
     PR_write_im(SCR_TMP_IMAGE);
     SCR_free_image(SCR_TMP_IMAGE);
     SCR_TMP_IMAGE = 0;

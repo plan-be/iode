@@ -689,7 +689,7 @@ int A2mGdiPrepTblWs(A2MTBL* at, int w)
 		tc = at->at_tls[i].atl_tcs + j;
 		ap = tc->atc_par;
 		if(ap && tc->atc_ncells == 1) {
-		    at->at_ws[j] = max(at->at_ws[j], (ap->ap_wmax + ap->ap_lmarg + 2 * marg));
+		    at->at_ws[j] = _max_(at->at_ws[j], (ap->ap_wmax + ap->ap_lmarg + 2 * marg));
 		    totw += ap->ap_wmax + 2 * marg;
 		    }
 		}
@@ -710,8 +710,8 @@ int A2mGdiPrepTblWs(A2MTBL* at, int w)
 	    ap = tc->atc_par;
 	    if(ap && tc->atc_ncells == 1) {
 		if(A2M_GDI_TWIDTH_FIXED == 0)
-		    at->at_ws[j] = max(at->at_ws[j], (ap->ap_wmin + ap->ap_lmarg + 2 * marg));
-		// at->at_ws[j] = min(at->at_ws[j], ap->ap_wmax);
+		    at->at_ws[j] = _max_(at->at_ws[j], (ap->ap_wmin + ap->ap_lmarg + 2 * marg));
+		// at->at_ws[j] = _min_(at->at_ws[j], ap->ap_wmax);
 		}
 	    }
 	}
@@ -757,7 +757,7 @@ int A2mGdiCalcTblH(A2MTBL* at)
 	    lh = 0;
 	    for(j = 0 ; j < at->at_nc ; j++) {
 		ap = at->at_tls[i].atl_tcs[j].atc_par;
-		if(ap) lh = max(lh, ap->ap_h);
+		if(ap) lh = _max_(lh, ap->ap_h);
 		}
 	    }
 	h += lh;
@@ -765,7 +765,7 @@ int A2mGdiCalcTblH(A2MTBL* at)
 	    case 0 : at->at_hhead += lh; break;
 	    case 2 : at->at_hfoot += lh; break;
 	    default: at->at_hbody += lh;
-		     at->at_hbody1 = max(at->at_hbody1, lh);
+		     at->at_hbody1 = _max_(at->at_hbody1, lh);
 		     break;
 	    }
 	}
@@ -810,7 +810,7 @@ int A2mGdiSubTblH(A2MTBL* at, int from, int nc, int hbf)
 	if(ap) ch = ap->ap_h;
 	for(j = 0 ; j < nc ; j++) {
 	    ap = at->at_tls[i].atl_tcs[from + j].atc_par;
-	    if(ap) ch = max(ch, ap->ap_h);
+	    if(ap) ch = _max_(ch, ap->ap_h);
 	    }
 	h += ch;
 	if(hbf == 1 && at->at_break) break; /* Body1 */

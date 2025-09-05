@@ -106,7 +106,7 @@ int     size;
 /* DEBUT Correction */
 	memcpy(buf + lg, rec, lgrec + 1);       /* JMP 21/9/2006 */
 	lg += lgrec;                            /* JMP 21/9/2006 */
-	posf = max(0, lg - lgrec - 10);          /* JMP 22-09-06 */
+	posf = _max_(0, lg - lgrec - 10);          /* JMP 22-09-06 */
 	pos = U_index(buf + posf, "\r\n.\r");    /* JMP 21/9/2006 */
 	if(pos >= 0) buf[posf + pos] = 0;       /* JMP 25/9/2006 */
 /* FIN Correction */

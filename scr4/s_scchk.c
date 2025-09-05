@@ -83,7 +83,7 @@ int             type, lg;
 		SCR_strip(bufc2);
 		return(SCR_grep_1(bufc2, bufc1, 0, 0, '%'));           /* JMP 23-11-2003 */
 		}
-	    lg = min(lg, 120);                  /* JMP 17-02-92 */
+	    lg = _min_(lg, 120);                  /* JMP 17-02-92 */
 	    SCR_compress(bufc1, rec1, lg);      /* JMP 17-02-92 */
 	    SCR_compress(bufc2, rec2, lg);      /* JMP 17-02-92 */
 	    return(strncmp(bufc1, bufc2, lg));  /* JMP 17-02-92 */

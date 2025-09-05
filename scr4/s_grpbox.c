@@ -19,19 +19,19 @@ int     nb;
 	if(fld->fld_grp - 1 == nb) {
 	    j = 0;
 	    if(fld->fld_type == SCR_TYPE_RADIO || fld->fld_type == SCR_CHECK_BOX) j = 2;
-	    min_l = min(min_l, fld->fld_line);
-	    max_l = max(max_l, fld->fld_line + fld->fld_nb_line);
-	    min_c = min(min_c, fld->fld_column);
-	    max_c = max(max_c, fld->fld_column + fld->fld_nb_column + j);
+	    min_l = _min_(min_l, fld->fld_line);
+	    max_l = _max_(max_l, fld->fld_line + fld->fld_nb_line);
+	    min_c = _min_(min_c, fld->fld_column);
+	    max_c = _max_(max_c, fld->fld_column + fld->fld_nb_column + j);
 	}
     for(i = 0 ; i < nb_drws ; i++) {
 	drw = drws->dw_drws + i;
 	if(drw->drw_grp - 1 == nb) {
 	    j = 0;
-	    min_l = min(min_l, drw->drw_line);
-	    max_l = max(max_l, drw->drw_line + drw->drw_nb_line);
-	    min_c = min(min_c, drw->drw_column);
-	    max_c = max(max_c, drw->drw_column + drw->drw_nb_column + j);
+	    min_l = _min_(min_l, drw->drw_line);
+	    max_l = _max_(max_l, drw->drw_line + drw->drw_nb_line);
+	    min_c = _min_(min_c, drw->drw_column);
+	    max_c = _max_(max_c, drw->drw_column + drw->drw_nb_column + j);
 	}
     }
     if(!gr->gr_f_line) gr->gr_line = min_l ;

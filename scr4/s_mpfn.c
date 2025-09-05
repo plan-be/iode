@@ -701,10 +701,10 @@ MPAGE   *mp;
     mc   = col + lpg->pg_nb_column;
 
     if(mp->mp_apg != 0) {
-	line = min(line, apg->pg_line);
-	ml   = max(ml, apg->pg_line + apg->pg_nb_line);
-	col  = min(col, apg->pg_column);
-	mc   = max(mc, apg->pg_column + apg->pg_nb_column);
+	line = _min_(line, apg->pg_line);
+	ml   = _max_(ml, apg->pg_line + apg->pg_nb_line);
+	col  = _min_(col, apg->pg_column);
+	mc   = _max_(mc, apg->pg_column + apg->pg_nb_column);
 	}
     return(SCR_save_image(line, col, ml-line, mc-col));
 }

@@ -1337,7 +1337,7 @@ BC  *bc;
     lg = ((PAGE *)SCR_PTR(bc->bc_lpg))->pg_rec_len;
     for(i = 0 ; i < bc->bc_nb_views ; i++) {
 	lg2 = ((PAGE *)SCR_PTR(bc->bc_views[i].v_lpg))->pg_rec_len;
-	lg = max(lg, lg2);
+	lg = _max_(lg, lg2);
 	}
     return(lg);
 }

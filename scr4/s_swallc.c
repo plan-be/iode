@@ -151,7 +151,7 @@ SWSIZE      size;
 
 
     if(SW_BLKS == 0) SW_panic(5);
-    size = max(size, SW_SEG_SIZE); /* JMP 23-05-00 */
+    size = _max_(size, SW_SEG_SIZE); /* JMP 23-05-00 */
     SW_init_blk(SW_NB_BLKS, size);
 
     /* TRY TO CREATE NEW SEG */
@@ -268,7 +268,7 @@ SWSIZE  size;
     buf = SW_getptr(item);
     osize = *(SWSIZE *)(buf - h_size);
     if(size == osize) return(item);
-    osize = min(osize, size);
+    osize = _min_(osize, size);
     if(SW_MIN_SEGS < 2) {  /* PEUT ETRE AMELIORE */
         // tmp = (char *)malloc(osize);
         tmp = (char *)SCR_malloc(osize);

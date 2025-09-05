@@ -37,9 +37,9 @@ char *SW_alloc_seg(SWSIZE size)
 //////// OBSOLETE ////////////////////
     if(SW_MAX_RES == 0) {
 #ifdef DOS
-	resmem = max(64000L, SW_MIN_MEM);
+	resmem = _max_(64000L, SW_MIN_MEM);
 #else
-	resmem = max(1024000L, SW_MIN_MEM);
+	resmem = _max_(1024000L, SW_MIN_MEM);
 #endif
 	SW_MAX_RES = 1 + resmem / SW_SEG_SIZE;
 	//SW_RES = malloc((2 * SW_MAX_RES) * sizeof(char *));
@@ -148,7 +148,7 @@ SW_oldest_ems_seg()
     long    age = SW_AGE, age1;
     int     old = 0, i, old1;
 
-    for(i = 0 ; i < min(4, SW_NB_EMS) ; i++) {
+    for(i = 0 ; i < _min_(4, SW_NB_EMS) ; i++) {
 	old1 = EMS_DEF.log_pgs[i];
 	age1 = SW_SEGS[old1].seg_age;
 	if(age1 < age) {

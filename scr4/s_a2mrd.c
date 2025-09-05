@@ -894,7 +894,7 @@ int     pos;
         if(tag) ap = A2mNewPar(str);
         else {
             sprintf(str, "%s%s",
-                    A2M_TBLHBF[pos], A2M_TBLTAGS[min(4,tc->atc_center)]); // CORR JMP 31/3/2017 atc_center = 6 !!
+                    A2M_TBLHBF[pos], A2M_TBLTAGS[_min_(4,tc->atc_center)]); // CORR JMP 31/3/2017 atc_center = 6 !!
             ap = A2mNewPar(str);
         }
         if(A2M_BLON == 0) A2mSupdbl(cell, col);
