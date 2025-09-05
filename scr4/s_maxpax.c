@@ -14,20 +14,20 @@ n'est pas effectuée , la variable M_errno est positionnée et la
 fonction retourne un pointeur nul.
 
 &EX
-    M_xprimax(m3, m1, m2);
-    m3 = M_xprimax((MAT*)0, m1, m2)
+    M_xpri_max_(m3, m1, m2);
+    m3 = M_xpri_max_((MAT*)0, m1, m2)
 &TX
 &SA M_free(), M_alloc(), M_trans().
 ======================================================================= */
 
 #ifdef __cplusplus
-MAT *M_xprimax(
+MAT *M_xpri_max_(
 MAT     *m1,
 MAT     *m2,
 MAT     *m3
 )
 #else
-MAT *M_xprimax(m3, m1, m2)
+MAT *M_xpri_max_(m3, m1, m2)
 MAT   *m1, *m2, *m3;
 #endif
 {

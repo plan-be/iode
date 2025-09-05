@@ -210,17 +210,17 @@ MENU    *mn;
 		    opt->opt_letter = opt->opt_text[j];
 		    break;
 		}
-	nc = max(nc, strlen(opt->opt_text));
+	nc = _max_(nc, strlen(opt->opt_text));
 	}
 
 
-    if(mn->mn_title != 0) nc = max(strlen(mn->mn_title), nc);
-    if(mn->mn_foot  != 0) nc = max(strlen(mn->mn_foot),  nc);
+    if(mn->mn_title != 0) nc = _max_(strlen(mn->mn_title), nc);
+    if(mn->mn_foot  != 0) nc = _max_(strlen(mn->mn_foot),  nc);
 
     mn->mn_nb_column = nc + sel;
 
     if(mn->mn_nb_line == 0)
-	mn->mn_nb_line = min(mn->mn_nb_opts, SCR_PAGE_SIZE[0] - 2);
+	mn->mn_nb_line = _min_(mn->mn_nb_opts, SCR_PAGE_SIZE[0] - 2);
 
     return(0);
 }

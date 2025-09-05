@@ -63,13 +63,13 @@ int A2mSWF_HTML(FILE* fd, int w, int h, A2MGRF* grf, int cnt)
     showlegend = 0;
     for(i = 0; grf->ag_gxy[i]; i++) {
 	vals = grf->ag_gxy[i]->xy_vals;
-	maxobs = max(maxobs, grf->ag_gxy[i]->xy_nobs);
+	maxobs = _max_(maxobs, grf->ag_gxy[i]->xy_nobs);
 	if(grf->ag_gxy[i]->xy_title) if(grf->ag_gxy[i]->xy_title->ap_strs[0]->as_txt) showlegend++;
 	if(grf->ag_gxy[i]->xy_axis) showsecondary = 1;
 	if(maxobs > 1 && !SCR_ISAN(step)) step = vals[2] - vals[0];
 	for(j = 0; j < grf->ag_gxy[i]->xy_nobs; j++)  {
-	    minx = min(minx, vals[j*2]);
-	    maxx = max(maxx, vals[j*2]);
+	    minx = _min_(minx, vals[j*2]);
+	    maxx = _max_(maxx, vals[j*2]);
 	}
     }
 

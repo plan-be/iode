@@ -41,7 +41,7 @@ int     len;
 
     if(len == 0) len = (int)strlen(txt) + 1;
     for(i = 0 , tb = TBL_STR ; i < NB_TBL_STR ; i++, tb++)
-	if(memcmp(txt, tb->ts_ptr, min(len, tb->ts_len)) == 0)
+	if(memcmp(txt, tb->ts_ptr, _min_(len, tb->ts_len)) == 0)
 	    return(i);
 
     return(-1);

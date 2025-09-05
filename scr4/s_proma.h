@@ -78,7 +78,7 @@ extern MAT *M_xxprim(MAT *m2,MAT *m1);
 extern MAT *M_xaxprim(MAT *m3,MAT *m1,MAT *m2);
 
 /* s_maxpax.c */ 
-extern MAT *M_xprimax(MAT *m3,MAT *m1,MAT *m2);
+extern MAT *M_xpri_max_(MAT *m3,MAT *m1,MAT *m2);
 
 /* s_maprt.c */ 
 extern int M_tprintf(FILE *fd,MAT *m1,char *title,char **t_line,char **t_col);

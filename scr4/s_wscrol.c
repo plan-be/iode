@@ -464,19 +464,19 @@ WscrScrollCalcPos(WSCROLL *wscrl)
     int     nl = WscrScrollGetNl(wscrl);
     int     nc = WscrScrollGetNc(wscrl);
 
-    wscrl->cline = max(0, wscrl->cline);
-    wscrl->cline = min(wscrl->cline, nl - 1);
-    wscrl->line = min(wscrl->line, nl - wscrl->nlv);
-    wscrl->line = max(0, wscrl->line);
+    wscrl->cline = _max_(0, wscrl->cline);
+    wscrl->cline = _min_(wscrl->cline, nl - 1);
+    wscrl->line = _min_(wscrl->line, nl - wscrl->nlv);
+    wscrl->line = _max_(0, wscrl->line);
     if(wscrl->line + wscrl->nlv <= wscrl->cline)
 	wscrl->line = 1 + wscrl->cline - wscrl->nlv;
     if(wscrl->cline < wscrl->line) wscrl->line = wscrl->cline;
 
 
-    wscrl->ccol = max(0, wscrl->ccol);
-    wscrl->ccol = min(wscrl->ccol, nc - 1);
-    wscrl->col = min(wscrl->col, nc - wscrl->ncv);
-    wscrl->col = max(0, wscrl->col);
+    wscrl->ccol = _max_(0, wscrl->ccol);
+    wscrl->ccol = _min_(wscrl->ccol, nc - 1);
+    wscrl->col = _min_(wscrl->col, nc - wscrl->ncv);
+    wscrl->col = _max_(0, wscrl->col);
     if(wscrl->col + wscrl->ncv <= wscrl->ccol)
 	wscrl->col = 1 + wscrl->ccol - wscrl->ncv;
     if(wscrl->ccol < wscrl->col) wscrl->col = wscrl->ccol;
@@ -587,10 +587,10 @@ WscrScrollMouse(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 	    }
 	}
 
-    j = max(0, j);
-    j = min(j, WscrScrollGetNc(wscrl) - 1);
-    i = max(0, i);
-    i = min(i, WscrScrollGetNl(wscrl) - 1);
+    j = _max_(0, j);
+    j = _min_(j, WscrScrollGetNc(wscrl) - 1);
+    i = _max_(0, i);
+    i = _min_(i, WscrScrollGetNl(wscrl) - 1);
 
     switch(wMsg) {
 	case WM_MOUSEMOVE :
@@ -685,10 +685,10 @@ WscrScrollMouse(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 	    }
 	}
 
-    wscrl->ccol = max(0, j);
-    wscrl->ccol = min(wscrl->ccol, WscrScrollGetNc(wscrl) - 1);
-    wscrl->cline = max(0, i);
-    wscrl->cline = min(wscrl->cline, WscrScrollGetNl(wscrl) - 1);
+    wscrl->ccol = _max_(0, j);
+    wscrl->ccol = _min_(wscrl->ccol, WscrScrollGetNc(wscrl) - 1);
+    wscrl->cline = _max_(0, i);
+    wscrl->cline = _min_(wscrl->cline, WscrScrollGetNl(wscrl) - 1);
 
     switch(wMsg) {
 	case WM_MOUSEMOVE :
@@ -932,7 +932,7 @@ WscrScrollPaint(HWND hWnd)
 	LineTo(hDC, X1, Y0 + y);
 	wscrl->nlv++;
 	}
-    wscrl->nlv = max(1, wscrl->nlv);
+    wscrl->nlv = _max_(1, wscrl->nlv);
 
     x = WSCRL_WIDTHS[0];
     wscrl->ncv = 0;
@@ -944,7 +944,7 @@ WscrScrollPaint(HWND hWnd)
 	LineTo(hDC, X0 + x, Y1);
 	wscrl->ncv++;
 	}
-    wscrl->ncv = max(1, wscrl->ncv);
+    wscrl->ncv = _max_(1, wscrl->ncv);
 
     /* Titles Separation lines */
     SelectObject(hDC, hPenBox);

@@ -64,7 +64,7 @@ int     (*fn)();
     }
 
     IS_empty_rec(is1);                              /* JMP 17-06-91 */
-    lg = min(is1->is_rec_len, is2->is_rec_len); /* JMP 17-06-91 */
+    lg = _min_(is1->is_rec_len, is2->is_rec_len); /* JMP 17-06-91 */
 
     while(1) {
 	nb_read++;

@@ -671,7 +671,7 @@ double  mins[3], maxs[3];
 		maxnobs = 0;
 		for(i = 0; agrf->ag_gxy[i]; i++) {
 			gxy = agrf->ag_gxy[i];
-			maxnobs = max(maxnobs, gxy->xy_nobs);
+			maxnobs = _max_(maxnobs, gxy->xy_nobs);
 		}
 */
 		multiy = SCR_malloc(A2MGRFMAXOBS * sizeof(double));
@@ -739,8 +739,8 @@ double  mins[3], maxs[3];
 	}
 
 	for(i = 0; i < 3; i++) {
-		if(SCR_ISAN(agrf->ag_mins[i])) mins[i] = min(mins[i], agrf->ag_mins[i]);
-		if(SCR_ISAN(agrf->ag_maxs[i])) maxs[i] = max(maxs[i], agrf->ag_maxs[i]);
+		if(SCR_ISAN(agrf->ag_mins[i])) mins[i] = _min_(mins[i], agrf->ag_mins[i]);
+		if(SCR_ISAN(agrf->ag_maxs[i])) maxs[i] = _max_(maxs[i], agrf->ag_maxs[i]);
 
 		if(mins[i] == maxs[i]) {
 			mins[i] -= 1.0;
@@ -776,7 +776,7 @@ int     *nbdec;
 
 	if(grid == 'T' || grid == 't') {  /* GB 22/04/2004  */
 		if (A2M_GALIGN == 'M' || A2M_GALIGN == 'm') *incr = 1;
-		else *incr = max(1.0, floor(*incr));
+		else *incr = _max_(1.0, floor(*incr));
 	}
 
 	/* get nbr of significant decimals */

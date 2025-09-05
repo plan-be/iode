@@ -1,11 +1,10 @@
 #include "s_date.h"
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-    #define max(x,y)        ((x)<(y)?(y):(x))
-    #define min(x,y)        ((x)<(y)?(x):(y))
-#endif
+#define _max_(x,y)        ((x)<(y)?(y):(x))
+#define _min_(x,y)        ((x)<(y)?(x):(y))
+
 #define DT_eq_month(d1, d2)     (DT_month(d1) == DT_month(d2))
 
 int     DT_MONTHS[] = {0,31,59,90,120,151,181,212,243,273,304,334} ;
@@ -100,7 +99,7 @@ long    day;
 	}                                     /* JMP 23-02-96 */
     else {                                    /* JMP 23-02-96 */
 	if(day <= 59 && DT_bix(1900L + d[2])) day++;  /* JMP 23-02-96 */
-	d[1] = min(12, 1 + day / 30L);                /* JMP 23-02-96 */
+	d[1] = _min_(12, 1 + day / 30L);                /* JMP 23-02-96 */
 	if(DT_MONTHS[d[1] - 1] >= day) d[1] --;       /* JMP 23-02-96 */
 	d[0] = day - DT_MONTHS[d[1] - 1];             /* JMP 23-02-96 */
 	}                                             /* JMP 23-02-96 */
@@ -209,7 +208,7 @@ int     nbm;
 	DT_DAYS[1] = 29;
     else
 	DT_DAYS[1] = 28;
-    d[0] = min(DT_DAYS[d[1] - 1], d[0]);
+    d[0] = _min_(DT_DAYS[d[1] - 1], d[0]);
 
     return(DT_dmy_date(d));
 }
@@ -352,7 +351,7 @@ long    vd1[3];
 	else if(vd1[0] == 28) vd1[0] = 30;
 	}
     else
-	vd1[0] = min(30, vd1[0]);
+	vd1[0] = _min_(30, vd1[0]);
 
     return(0);
 }

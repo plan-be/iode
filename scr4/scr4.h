@@ -1506,8 +1506,8 @@ extern int  (*SCR_HIT_KEY_FN)(void);
     extern  int GMSG_LEVEL;             \
     char    GMSG_BUF[80];               \
     memset(GMSG_BUF, ' ', sizeof(GMSG_BUF)); \
-    GMSG_LEVEL = max(0, GMSG_LEVEL);    \
-    GMSG_LEVEL = min(40, GMSG_LEVEL);   \
+    GMSG_LEVEL = _max_(0, GMSG_LEVEL);    \
+    GMSG_LEVEL = _min_(40, GMSG_LEVEL);   \
     GMSG_BUF[GMSG_LEVEL] = 0;                \
     Gdbg(GMSG_BUF);                     \
     }
@@ -1564,8 +1564,8 @@ extern int  (*SCR_HIT_KEY_FN)(void);
     extern  int GMSG_LEVEL;             \
     char    GMSG_BUF[80];               \
     memset(GMSG_BUF, ' ', sizeof(GMSG_BUF)); \
-    GMSG_LEVEL = max(0, GMSG_LEVEL);    \
-    GMSG_LEVEL = min(40, GMSG_LEVEL);   \
+    GMSG_LEVEL = _max_(0, GMSG_LEVEL);    \
+    GMSG_LEVEL = _min_(40, GMSG_LEVEL);   \
     GMSG_BUF[GMSG_LEVEL] = 0;                \
     Gdbg(GMSG_BUF);                     \
     }

@@ -24,8 +24,8 @@ char    *text, *s2, *s3, *s4, *s5, *s6, *s7;
 {
     int     i;
 
-    opt_nb = min(opt_nb, mn->mn_nb_opts);
-    opt_nb = max(opt_nb, 0);
+    opt_nb = _min_(opt_nb, mn->mn_nb_opts);
+    opt_nb = _max_(opt_nb, 0);
     MN_add_option(mn);
     for(i = mn->mn_nb_opts - 1 ; i > opt_nb; i--)
 	memcpy(mn->mn_opts + i, mn->mn_opts + i - 1, sizeof(OPTION));

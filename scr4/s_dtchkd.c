@@ -4,16 +4,14 @@
 #include <string.h>
 #include <ctype.h>
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-	#ifndef WATCOM
-		#ifndef max
-			#define max(x,y)        ((x)<(y)?(y):(x))
-		#endif
-		#ifndef min
-			#define min(x,y)        ((x)<(y)?(x):(y))
-		#endif
+#ifndef WATCOM
+	#ifndef _max_
+		#define _max_(x,y)        ((x)<(y)?(y):(x))
+	#endif
+	#ifndef _min_
+		#define _min_(x,y)        ((x)<(y)?(x):(y))
 	#endif
 #endif
 
@@ -177,7 +175,7 @@ char    *fmt;
 
     if(DT_bix((long)dt[2])) DT_DAYS[1] = 29;
     else                    DT_DAYS[1] = 28;
-    dt[0] = min(d, DT_DAYS[dt[1] - 1]);
+    dt[0] = _min_(d, DT_DAYS[dt[1] - 1]);
 
     return(DT_dmy_date2000(dt));
 
@@ -193,7 +191,7 @@ char    *fmt;
 	    case 'D': nbd++;          break;
 	    case 'M': nbm++;          break;
 	}
-    nby = min(4, nby);
+    nby = _min_(4, nby);
     cdate = SCR_current_date();
     switch(nby) {
 	case 0: date = (cdate / 10000L) * 10000L; break;

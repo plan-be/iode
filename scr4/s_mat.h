@@ -11,14 +11,10 @@
 #define MREAL           double
 #define ZERO(x)         (fabs(x) < 1e-25)
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-	#undef min
-	#undef max
-	#define max(a,b)        (((a) > (b)) ? (a) : (b))
-	#define min(a,b)        (((a) < (b)) ? (a) : (b))
-#endif
+#define _max_(a,b)        (((a) > (b)) ? (a) : (b))
+#define _min_(a,b)        (((a) < (b)) ? (a) : (b))
 
 #define M_NC(m)           ((m)->m_nc)
 #define M_NL(m)           ((m)->m_nl)
@@ -145,7 +141,7 @@ extern  MAT     *M_extr();
 extern  MAT     *M_xprimx();
 extern  MAT     *M_xxprim();
 extern  MAT     *M_xaxprim();
-extern  MAT     *M_xprimax();
+extern  MAT     *M_xpri_max_();
 
 #ifdef __cplusplus
 }

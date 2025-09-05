@@ -4,15 +4,13 @@
 #ifndef _SCR4_D_H_
 #define _SCR4_D_H_
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-	#ifndef max
-		#define max(x,y)        ((x)<(y)?(y):(x))
-	#endif
-	#ifndef min
-		#define min(x,y)        ((x)<(y)?(x):(y))
-	#endif
+#ifndef _max_
+	#define _max_(x,y)        ((x)<(y)?(y):(x))
+#endif
+#ifndef _min_
+	#define _min_(x,y)        ((x)<(y)?(x):(y))
 #endif
 
 #define SCR_NULL        ((char *)0)

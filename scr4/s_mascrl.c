@@ -328,7 +328,7 @@ int  lc0, lc;        /* Largeur de la colonne 1 et des autres  JMP38 21-09-92 */
     LC0 = lc0;
     M_LC = lc;
     NCC = (72 - lc0) /  (1 + lc);     /* JMP38 21-09-92 */
-    NCC = min(NC1, NCC);              /* JMP38 21-09-92 */
+    NCC = _min_(NC1, NCC);              /* JMP38 21-09-92 */
     NCC = lc0 + 4 + NCC * (lc + 1);   /* JMP38 21-09-92 */
     SCRL_edit(scrol);
     SCRL = old_scroll;

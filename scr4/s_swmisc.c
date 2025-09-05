@@ -64,7 +64,7 @@ int     ems;
 	SEG(i) = i;
 	}
 
-    for(i = 0 ; i < min(4, SW_NB_EMS) ; i++) {
+    for(i = 0 ; i < _min_(4, SW_NB_EMS) ; i++) {
 	if(EMS_map(i, i)) {
 	    fprintf(stderr, "EMS Map error : %s\n",
 				    EMS_error_text(EMS_DEF.swerrno));

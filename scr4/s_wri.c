@@ -16,7 +16,7 @@ int     line, col, nc;
 
     if(text == 0) return(0);
     lg = strlen(text);
-    lg = min(lg, nc);
+    lg = _min_(lg, nc);
     pos = col + (nc - lg) / 2;
     SCR_write_xattrs(line, pos, 0, lg);
     SCR_write_im_xbox(line, pos, 1, lg, 1);

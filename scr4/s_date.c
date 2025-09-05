@@ -4,16 +4,14 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-    #ifndef WATCOM
-        #ifndef max
-            #define max(x,y)        ((x)<(y)?(y):(x))
-        #endif
-        #ifndef min
-            #define min(x,y)        ((x)<(y)?(x):(y))
-        #endif
+#ifndef WATCOM
+    #ifndef _max_
+        #define _max_(x,y)        ((x)<(y)?(y):(x))
+    #endif
+    #ifndef _min_
+        #define _min_(x,y)        ((x)<(y)?(x):(y))
     #endif
 #endif
 
@@ -199,7 +197,7 @@ char *SCR_long_to_fdate(long date, char* str, char* fmt)
 
     for(i = 0 ; fmt[i] != 0 ; i++)
 	if(SCR_date_upper_char(fmt[i]) == 'Y') nby++;
-    nby = min(4, nby);
+    nby = _min_(4, nby);
     yy += 4 - nby;
 
     for(i = 0 ; fmt[i] != 0 ; i++) {

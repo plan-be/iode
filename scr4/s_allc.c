@@ -4,12 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// WARNING: the min and max macro make conflicts with the GNU implementation 
+// WARNING: using min and max as macro names makes conflicts with the GNU implementation 
 //          of the C++ standard library
-#if !defined(__GNUC__) || !defined(__cplusplus)
-    #ifndef min
-        #define min(x, y)     (((x) < (y)) ? (x) : (y))
-    #endif
+#ifndef _min_
+    #define _min_(x, y)     (((x) < (y)) ? (x) : (y))
 #endif
 
 #define SCR_CHUNCK      5
@@ -318,7 +316,7 @@ char *SCR_realloc_chk(void* old_ptr, unsigned int el_size, unsigned int old_coun
     }
 
     /* SAVE OLD VALUES IN BUFFER */
-    memcpy(SCR_ALLOC_BUF, old_ptr, min(old_count, new_count));
+    memcpy(SCR_ALLOC_BUF, old_ptr, _min_(old_count, new_count));
 
     /* FREE OLD PTR */
     SCR_free(old_ptr);
@@ -328,7 +326,7 @@ char *SCR_realloc_chk(void* old_ptr, unsigned int el_size, unsigned int old_coun
     if(ptr == 0) return(ptr);
 
     /* SAVE VALUES */
-    memcpy(ptr, SCR_ALLOC_BUF, min(old_count, new_count));
+    memcpy(ptr, SCR_ALLOC_BUF, _min_(old_count, new_count));
     return(ptr);
 }
 

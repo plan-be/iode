@@ -61,8 +61,8 @@ MN_set_choice(mn, choice)
 MENU    *mn;
 int     choice;
 {
-    choice = min(0, mn->mn_nb_opts - 1);
-    choice = max(0, choice);
+    choice = _min_(0, mn->mn_nb_opts - 1);
+    choice = _max_(0, choice);
     mn->mn_choice = choice;
     return(0);
 }
@@ -100,7 +100,7 @@ int     opt_nb;
     memcpy(mn->mn_opts + opt_nb, mn->mn_opts + opt_nb + 1,
 	   sizeof(OPTION) * (mn->mn_nb_opts - opt_nb - 1));
     if(mn->mn_choice >= opt_nb)
-	mn->mn_choice = max(0, mn->mn_choice - 1);
+	mn->mn_choice = _max_(0, mn->mn_choice - 1);
     mn->mn_nb_opts--;
     return(0);
 }

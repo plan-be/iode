@@ -45,7 +45,7 @@ IMAGE   *im2;
 		SCR_mv_im(s_im, im1, im2);
 		break;
 	    case SCR_CSR_DOWN:
-		im2->im_line = min(SCR_PAGE_SIZE[0] - im2->im_nb_line,
+		im2->im_line = _min_(SCR_PAGE_SIZE[0] - im2->im_nb_line,
 					im2->im_line + 1);
 		SCR_mv_im(s_im, im1, im2);
 		break;
@@ -54,7 +54,7 @@ IMAGE   *im2;
 		SCR_mv_im(s_im, im1, im2);
 		break;
 	    case SCR_CSR_RIGHT:
-		im2->im_column = min(SCR_PAGE_SIZE[1] - im2->im_nb_column,
+		im2->im_column = _min_(SCR_PAGE_SIZE[1] - im2->im_nb_column,
 					im2->im_column + 1);
 		SCR_mv_im(s_im, im1, im2);
 		break;

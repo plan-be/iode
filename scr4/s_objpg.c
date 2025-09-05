@@ -229,9 +229,9 @@ unsigned char   *text;
     if(fld->fld_dtext == 0) return(0);
     len = fld->fld_nb_column * fld->fld_nb_line;
     txtlen = strlen(text);                      /* JMP 01-06-91 */
-    len = min(txtlen, len);                     /* JMP 01-06-91 */
+    len = _min_(txtlen, len);                     /* JMP 01-06-91 */
     txtlen = strlen(fld->fld_dtext);            /* JMP 01-06-91 */
-    len = min(txtlen, len);                     /* JMP 01-06-91 */
+    len = _min_(txtlen, len);                     /* JMP 01-06-91 */
 
     strncpy(fld->fld_dtext, text, len);
     return(0);

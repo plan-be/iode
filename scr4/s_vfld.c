@@ -285,8 +285,8 @@ long    rec_len;
     IS_free_vptr(is);       /* BP_M 26-10-95 */
     vfld = is->is_vfld;
     len = sizeof(short);
-    for(i = 0 ; i < min(nb_vfld, is->is_nb_vfld) && len < rec_len ; i++, vfld++) { /* JMP 14-01-98 */
-/*    for(i = 0 ; i < min(nb_vfld, is->is_nb_vfld) , len < rec_len ; i++, vfld++) { /* JMP 14-01-98 */
+    for(i = 0 ; i < _min_(nb_vfld, is->is_nb_vfld) && len < rec_len ; i++, vfld++) { /* JMP 14-01-98 */
+/*    for(i = 0 ; i < _min_(nb_vfld, is->is_nb_vfld) , len < rec_len ; i++, vfld++) { /* JMP 14-01-98 */
 
 	isf = IS_get_vfld_isf(is, i);
 

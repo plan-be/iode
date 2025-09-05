@@ -800,7 +800,7 @@ ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
     // Copier le retour dans ss
     for(i = 0, j = 0 ; ss[i] ; i++) {
 	if(ss[i]->ss_name[0] == 0) continue;
-	memcpy(&(ss[i]->ss_size), buf + j * rstatsize, min(rstatsize, lstatsize));
+	memcpy(&(ss[i]->ss_size), buf + j * rstatsize, _min_(rstatsize, lstatsize));
 	j++;
 
 // Debug("%s : %d\n", ss[i]->ss_name, ss[i]->ss_size);

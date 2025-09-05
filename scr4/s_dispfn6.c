@@ -54,7 +54,7 @@ unsigned char    *edtxt;
 
     if((fld->fld_pv + FLD_VSIZE - FLD_ISLBR) >= FLD_RSIZE) return(0);
     last = PG_edfl_calc_eof(fld, edtxt) - 1;
-    last = max(0, last);
+    last = _max_(0, last);
     if(last < fld->fld_pv + FLD_VSIZE - FLD_ISLBR) return(0);
     return(1);
 }

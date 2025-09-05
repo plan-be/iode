@@ -37,10 +37,10 @@ int     line,
 
     if(in_im == 0) return((IMAGE *)0);
 
-    line      = min(max(0, line),      in_im->im_nb_line - 1);
-    column    = min(max(0, column),    in_im->im_nb_column - 1);
-    nb_line   = min(max(1, nb_line),   in_im->im_nb_line - line);
-    nb_column = min(max(1, nb_column), in_im->im_nb_column - column);
+    line      = _min_(_max_(0, line),      in_im->im_nb_line - 1);
+    column    = _min_(_max_(0, column),    in_im->im_nb_column - 1);
+    nb_line   = _min_(_max_(1, nb_line),   in_im->im_nb_line - line);
+    nb_column = _min_(_max_(1, nb_column), in_im->im_nb_column - column);
 
     im = SCR_alloc_image(nb_line, nb_column);
     cl = im->im_cells;

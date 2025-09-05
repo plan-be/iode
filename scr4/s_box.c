@@ -255,10 +255,10 @@ int nc;
     lline = nl + line;
     lcol  = nc + col;
 
-    line   = max(0, min(line,  SCR_PAGE_SIZE[0] - 1));
-    lline  = max(0, min(lline, SCR_PAGE_SIZE[0] ));
-    col    = max(0, min(col,   SCR_PAGE_SIZE[1] - 1));
-    lcol   = max(0, min(lcol,  SCR_PAGE_SIZE[1]));
+    line   = _max_(0, _min_(line,  SCR_PAGE_SIZE[0] - 1));
+    lline  = _max_(0, _min_(lline, SCR_PAGE_SIZE[0] ));
+    col    = _max_(0, _min_(col,   SCR_PAGE_SIZE[1] - 1));
+    lcol   = _max_(0, _min_(lcol,  SCR_PAGE_SIZE[1]));
 
     if(SCR_TMP_IMAGE != 0) {
 	max_col    = SCR_TMP_IMAGE->im_nb_column;

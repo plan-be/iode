@@ -289,7 +289,7 @@ WscrDlgCommand(HWND hWnd, UINT iId, HWND hCtl, UINT nNotify)
             PG_user_fn(pg, fld_nb, edtxt);
 
             /* BP_M 17-02-2003 17:12 */
-            if(pg_fldtxt == pg && strncmp(edtxt, fldtxt, max(strlen(edtxt), strlen(fldtxt)) - 1) != 0)
+            if(pg_fldtxt == pg && strncmp(edtxt, fldtxt, _max_(strlen(edtxt), strlen(fldtxt)) - 1) != 0)
                 fld->fld_modified = 1;
             else
                 fld->fld_modified = 0;
