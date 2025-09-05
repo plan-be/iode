@@ -51,9 +51,6 @@
 #include "api/objs/variables.h"
 #include "api/write/write.h"
 #include "api/report/undoc/undoc.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 /*================================= UTILITIES ===============================*/

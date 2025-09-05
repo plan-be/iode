@@ -61,10 +61,8 @@
 #include <vector>
 #include <stdexcept>
 #include <functional>       // for std::hash
+#include <algorithm>        // for std::min, std::max
 
-#undef min
-#undef max
-#include <algorithm>    // for std::min, std::max
 
 /* ALLOCS DOC 28/8/2012 */
 // A PLACER DEVANT LES INCLUDES DE SCR (ou dans cc -c -DALLOCDOCON ...)

@@ -96,9 +96,6 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 

@@ -18,9 +18,6 @@
 #include "api/objs/variables.h"
 
 #include "api/report/undoc/undoc.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 double  SEASON_EPS = 5.0;

@@ -29,9 +29,6 @@
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/objs/tables.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 
