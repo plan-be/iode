@@ -13,9 +13,6 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-
-#undef min
-#undef max
 #include <algorithm> 	// for std::min, std::max
 
 

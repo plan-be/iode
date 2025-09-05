@@ -22,9 +22,6 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 

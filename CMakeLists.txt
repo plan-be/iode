@@ -50,9 +50,11 @@ set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
 # SET(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /Ot")
 
 # ---- compile options ----
-# Debug info flag
 if(MSVC)
   add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+  # to use std::min/max -> prevent windows.h to define min and max as macros
+  # see https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max 
+  add_compile_options(-DNOMINMAX)
 endif()
 
 # /Zi | g:	Generates complete debugging information
@@ -62,34 +64,9 @@ else()
   set(IODE_DEBUG_INFO_FLAG "-g")
 endif()
 
-# VISUAL STUDIO 2019 vs 2022 
-# --------------------------
-# Some code in the C++ API requires C++ 20.
-# C++20 (required for the module std format) makes the compiler MSVC 
-# much more strict by default when passing a string literal 
-# "string" value for a char* argument of a C function: the string "string" 
-# is considered as "const char*" and cannot be converted to "char*").
-#
-# The option /Zc:strictStrings with the minus at the end deactivates 
-# this behavior of the MSVC compiler.
-
-# In VStudio 2019, set(CMAKE_CXX_STANDARD 20) generates a compiler parameter "-std:c++latest" which
-# takes precedence on "/Zc:strictStrings-". 
-# The equivalent in VStudio 2019 is "/std:c++latest" (note the / instead of a -).
-# Therefore, in Visual Studio 2019, the first block below must be commented out and the next block uncommented.
-
-# VISUAL STUDIO > 2019
-# --------------------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# VISUAL STUDIO <= 2019 
-# ---------------------
-#if(MSVC)
-#  add_compile_options("/std:c++latest")
-#endif()
-
-# All versions of VS
 if(MSVC)
   add_compile_options("/Zc:strictStrings-")
 endif()

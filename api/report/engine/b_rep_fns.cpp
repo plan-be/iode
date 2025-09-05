@@ -141,8 +141,6 @@
 #endif
 #include <time.h>
 
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 

@@ -16,9 +16,6 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/io/import.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 

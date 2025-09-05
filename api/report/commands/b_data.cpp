@@ -106,9 +106,6 @@
 #include "api/objs/compare.h"
 #include "api/print/print.h"
 #include "api/report/commands/commands.h"
-
-#undef min
-#undef max
 #include <algorithm>    // for std::min, std::max
 
 
