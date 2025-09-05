@@ -18,6 +18,9 @@
     #define NOEMF
 #endif
 
+#define _max_(a, b)        (((a) > (b)) ? (a) : (b))
+#define _min_(a, b)        (((a) < (b)) ? (a) : (b))
+
 #include "scr4/s_strs.h"
 
 /*---------------- DEFINE ------------------------*/
