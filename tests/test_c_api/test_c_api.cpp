@@ -832,12 +832,12 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->t_align, extracted_tbl->t_align);
 
     // ----- check div line
-    EXPECT_EQ(tbl->t_div.tl_type, extracted_tbl->t_div.tl_type);
-    EXPECT_EQ(tbl->t_div.tl_graph, extracted_tbl->t_div.tl_graph);
-    EXPECT_EQ(tbl->t_div.tl_axis, extracted_tbl->t_div.tl_axis);
-    EXPECT_EQ(tbl->t_div.tl_pbyte, extracted_tbl->t_div.tl_pbyte);
-    cells_0 = (TCELL*) tbl->t_div.tl_val;
-    cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
+    EXPECT_EQ(tbl->t_div.type, extracted_tbl->t_div.type);
+    EXPECT_EQ(tbl->t_div.graph_type, extracted_tbl->t_div.graph_type);
+    EXPECT_EQ(tbl->t_div.right_axis, extracted_tbl->t_div.right_axis);
+    EXPECT_EQ(tbl->t_div.unused, extracted_tbl->t_div.unused);
+    cells_0 = (TCELL*) tbl->t_div.cells;
+    cells_1 = (TCELL*) extracted_tbl->t_div.cells;
 
     for(j = 0; j < tbl->t_nc; j++)
     {
@@ -851,14 +851,14 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         line_0 = tbl->t_line + i;
         line_1 = extracted_tbl->t_line + i;
 
-        EXPECT_EQ(line_0->tl_type, line_1->tl_type);
-        EXPECT_EQ(line_0->tl_graph, line_1->tl_graph);
-        EXPECT_EQ(line_0->tl_axis, line_1->tl_axis);
-        EXPECT_EQ(line_0->tl_pbyte, line_1->tl_pbyte);
+        EXPECT_EQ(line_0->type, line_1->type);
+        EXPECT_EQ(line_0->graph_type, line_1->graph_type);
+        EXPECT_EQ(line_0->right_axis, line_1->right_axis);
+        EXPECT_EQ(line_0->unused, line_1->unused);
 
-        cells_0 = (TCELL*) line_0->tl_val;
-        cells_1 = (TCELL*) line_1->tl_val;
-        switch (line_0->tl_type)
+        cells_0 = (TCELL*) line_0->cells;
+        cells_1 = (TCELL*) line_1->cells;
+        switch (line_0->type)
         {
           case TABLE_LINE_TITLE:
             cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
@@ -1024,7 +1024,7 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     c_table = KTVAL(kdb_tbl, pos);
 
     // divider
-    cells = (TCELL*) c_table->t_div.tl_val;
+    cells = (TCELL*) c_table->t_div.cells;
     //printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
     printf("Address(cells) =     %p\nAddress(cells + 1) = %p\n", cells, cells + 1);
     printf("Diff(cells, cells+1) = %d\n", (int)((char*)(cells + 1) - (char*)(cells)));

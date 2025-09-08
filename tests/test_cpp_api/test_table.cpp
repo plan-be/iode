@@ -68,12 +68,12 @@ TEST_F(TablesTest, AddGetTBL)
     // ----- check div line 
     TCELL* cells_0;
     TCELL* cells_1;
-    ASSERT_EQ(tbl->t_div.tl_type, extracted_tbl->t_div.tl_type);
-    ASSERT_EQ(tbl->t_div.tl_graph, extracted_tbl->t_div.tl_graph);
-    ASSERT_EQ(tbl->t_div.tl_axis, extracted_tbl->t_div.tl_axis);
-    ASSERT_EQ(tbl->t_div.tl_pbyte, extracted_tbl->t_div.tl_pbyte);
-    cells_0 = (TCELL*) tbl->t_div.tl_val;
-    cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
+    ASSERT_EQ(tbl->t_div.type, extracted_tbl->t_div.type);
+    ASSERT_EQ(tbl->t_div.graph_type, extracted_tbl->t_div.graph_type);
+    ASSERT_EQ(tbl->t_div.right_axis, extracted_tbl->t_div.right_axis);
+    ASSERT_EQ(tbl->t_div.unused, extracted_tbl->t_div.unused);
+    cells_0 = (TCELL*) tbl->t_div.cells;
+    cells_1 = (TCELL*) extracted_tbl->t_div.cells;
     for(int j = 0; j < tbl->t_nc; j++)
     {
         ASSERT_EQ(cells_0[j].type, TABLE_CELL_LEC);
@@ -95,14 +95,14 @@ TEST_F(TablesTest, AddGetTBL)
         line_0 = tbl->t_line + i;
         line_1 = extracted_tbl->t_line + i;
 
-        ASSERT_EQ(line_0->tl_type, line_1->tl_type);
-        ASSERT_EQ(line_0->tl_graph, line_1->tl_graph);
-        ASSERT_EQ(line_0->tl_axis, line_1->tl_axis);
-        ASSERT_EQ(line_0->tl_pbyte, line_1->tl_pbyte);
+        ASSERT_EQ(line_0->type, line_1->type);
+        ASSERT_EQ(line_0->graph_type, line_1->graph_type);
+        ASSERT_EQ(line_0->right_axis, line_1->right_axis);
+        ASSERT_EQ(line_0->unused, line_1->unused);
 
-        cells_0 = (TCELL*) line_0->tl_val;
-        cells_1 = (TCELL*) line_1->tl_val;
-        switch (line_0->tl_type)
+        cells_0 = (TCELL*) line_0->cells;
+        cells_1 = (TCELL*) line_1->cells;
+        switch (line_0->type)
         {
         case TableLineType::TABLE_LINE_TITLE:
             ASSERT_EQ(std::string(T_cell_cont(cells_0, 0)), std::string(T_cell_cont(cells_1, 0)));
@@ -150,7 +150,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     // test if a Table object can be added to the Tables KDB via K_add()
     Table table(nb_columns, def, vars, mode, files, date);
-    div_cells = (TCELL*) table.t_div.tl_val;
+    div_cells = (TCELL*) table.t_div.cells;
     ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
     ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
 

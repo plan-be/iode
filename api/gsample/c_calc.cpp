@@ -290,8 +290,8 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     int     j, lg, d;    /* last used DB to compile */
     COL     *cl;
     TLINE   *line = T_L(tbl) + i;
-    TCELL   *cell = (TCELL *) line->tl_val;
-    TCELL   *dcell = (TCELL *)(tbl->t_div).tl_val;
+    TCELL   *cell = (TCELL *) line->cells;
+    TCELL   *dcell = (TCELL *)(tbl->t_div).cells;
     CLEC    *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
 
     lg = cls->cl_nb / T_NC(tbl);

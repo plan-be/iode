@@ -114,7 +114,7 @@ static void read_div(TBL* tbl, YYFILE* yy)
     int     i;
     TCELL   *cell;
 
-    cell = (TCELL *) (tbl->t_div).tl_val;
+    cell = (TCELL *) (tbl->t_div).cells;
     for(i = 0; i < tbl->t_nc; i++)
         read_cell(cell + i, yy, 0);
 }
@@ -182,52 +182,52 @@ static int read_line(TBL* tbl, YYFILE* yy)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                if(c_line->tl_type != 0) {
+                if(c_line->type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->tl_type = keyw;
+                c_line->type = keyw;
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                if(c_line->tl_type != 0) {
+                if(c_line->type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->tl_type = keyw;
-                c_line->tl_val = SW_nalloc(sizeof(TCELL));
-                read_cell((TCELL *) c_line->tl_val, yy, YY_STRING);
+                c_line->type = keyw;
+                c_line->cells = SW_nalloc(sizeof(TCELL));
+                read_cell((TCELL *) c_line->cells, yy, YY_STRING);
                 break;
 
             case TABLE_ASCII_BREAK :
-                if(c_line->tl_type != 0) {
+                if(c_line->type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->tl_type = TABLE_ASCII_LINE_TITLE; /* empty string */
-                c_line->tl_val = SW_nalloc(sizeof(TCELL));
+                c_line->type = TABLE_ASCII_LINE_TITLE; /* empty string */
+                c_line->cells = SW_nalloc(sizeof(TCELL));
                 YY_unread(yy);
                 return(0);
 
             case TABLE_ASCII_LEFT_AXIS :
-                c_line->tl_axis = 0;
+                c_line->right_axis = 0;
                 break;
             case TABLE_ASCII_RIGHT_AXIS :
-                c_line->tl_axis = 1;
+                c_line->right_axis = 1;
                 break;
 
             case TABLE_ASCII_GRAPH_LINE :
-                c_line->tl_graph= 0;
+                c_line->graph_type= 0;
                 break;
             case TABLE_ASCII_GRAPH_SCATTER:
-                c_line->tl_graph= 1;
+                c_line->graph_type= 1;
                 break;
             case TABLE_ASCII_GRAPH_BAR  :
-                c_line->tl_graph= 2;
+                c_line->graph_type= 2;
                 break;
 
             default       :
-                if(c_line->tl_type != 0) {
+                if(c_line->type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
@@ -556,25 +556,25 @@ static void print_tbl(FILE* fd, TBL* tbl)
     fprintf(fd, "\nDIV ");
     /* div */
     for(i = 0; i < T_NC(tbl); i++)
-        print_cell(fd, (TCELL *)(tbl->t_div.tl_val) + i);
+        print_cell(fd, (TCELL *)(tbl->t_div.cells) + i);
 
     /* lines */
 
     for(j = 0; j < T_NL(tbl); j++) {
         fprintf(fd, "\n- ");
-        switch(tbl->t_line[j].tl_type) {
+        switch(tbl->t_line[j].type) {
             case TABLE_ASCII_LINE_CELL :
-                cell = (TCELL *) tbl->t_line[j].tl_val;
+                cell = (TCELL *) tbl->t_line[j].cells;
                 for(i = 0; i < T_NC(tbl); i++)
                     print_cell(fd, cell + i);
 
                 /* append GR info */
-                grinfo(fd, tbl->t_line[j].tl_axis, tbl->t_line[j].tl_graph);
+                grinfo(fd, tbl->t_line[j].right_axis, tbl->t_line[j].graph_type);
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                K_wrdef(fd, TABLE, tbl->t_line[j].tl_type);
-                print_cell(fd, (TCELL *) tbl->t_line[j].tl_val);
+                K_wrdef(fd, TABLE, tbl->t_line[j].type);
+                print_cell(fd, (TCELL *) tbl->t_line[j].cells);
                 break;
 
             case TABLE_ASCII_LINE_SEP   :
@@ -582,7 +582,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                K_wrdef(fd, TABLE, tbl->t_line[j].tl_type);
+                K_wrdef(fd, TABLE, tbl->t_line[j].type);
                 break;
 
             default       :

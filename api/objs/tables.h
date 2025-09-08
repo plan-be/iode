@@ -99,17 +99,17 @@ struct TCELL {
 };
 
 struct TLINE {
-    char    *tl_val;    // if tl_type == TABLE_LINE_CELL  : tl_val is TCELL*
-                        // if tl_type == TABLE_LINE_TITLE : tl_val is TCELL*
-                        // if tl_type == TABLE_LINE  : tl_val is NULL
-                        // if tl_type == TABLE_LINE_MODE  : tl_val is NULL
-                        // if tl_type == TABLE_LINE_DATE  : tl_val is NULL
-                        // if tl_type == TABLE_LINE_FILES : tl_val is NULL
-    char    tl_type;    // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_TITLE, TABLE_LINE or TABLE_LINE_CELL
-    char    tl_graph;   // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
-    U_ch    tl_axis:1;  // 0 if values are relative to the left axis, 1 to the right axis
-    U_ch    tl_pbyte:7; // available free space
-    char    tl_pad[1];  // Padding for struct alignment
+    char*   cells;          // if type == TABLE_LINE_CELL  : cells is TCELL*
+                            // if type == TABLE_LINE_TITLE : cells is TCELL*
+                            // if type == TABLE_LINE  : cells is NULL
+                            // if type == TABLE_LINE_MODE  : cells is NULL
+                            // if type == TABLE_LINE_DATE  : cells is NULL
+                            // if type == TABLE_LINE_FILES : cells is NULL
+    char    type;           // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_TITLE, TABLE_LINE or TABLE_LINE_CELL
+    char    graph_type;     // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
+    U_ch    right_axis:1;   // 0 if values are relative to the left axis, 1 to the right axis
+    U_ch    unused:7;       // unused -> for struct alignment 
+    char    pad[1];         // Padding for struct alignment
 };
 
 struct TBL {
@@ -164,7 +164,7 @@ void T_auto(TBL *,char *,char **,int ,int ,int );
 #define T_NL(tbl)           (tbl->t_nl)
 #define T_LANG(tbl)         (tbl->t_lang)
 #define T_L(tbl)            (tbl->t_line)
-#define T_C(tbl, i, j)      ((tbl->t_line[i]).tl_val[j])
+#define T_C(tbl, i, j)      ((tbl->t_line[i]).cells[j])
 
 #define TABLE_CELL_ALIGN(attr, align)   (((attr) & 7) | (align))
 #define TABLE_CELL_FONT(attr, font)     ((attr) | (font))

@@ -163,9 +163,9 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
 
     for(i = 0; i < T_NL(tbl) && w >= 0; i++) {
         line = T_L(tbl) + i;
-        cell = (TCELL *) line->tl_val;
+        cell = (TCELL *) line->cells;
 
-        switch(line->tl_type) {
+        switch(line->type) {
             case TABLE_LINE_CELL  :
                 if(cell[1].type != TABLE_CELL_LEC) break;
                 begin = 0;
@@ -242,10 +242,10 @@ static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i)
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
-    TCELL   *cell = (TCELL *) line->tl_val;
+    TCELL   *cell = (TCELL *) line->cells;
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) fileop = COL_ctoa(cl, 'f', 0, 2);
-    T_GraphLegend(line->tl_axis, "LLBL"[line->tl_graph], T_cell_cont(cell, 0), fileop);
+    T_GraphLegend(line->right_axis, "LLBL"[line->graph_type], T_cell_cont(cell, 0), fileop);
     return(0);
 }
 
@@ -718,11 +718,11 @@ int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i)
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
-    TCELL   *cell = (TCELL *) line->tl_val;
+    TCELL   *cell = (TCELL *) line->cells;
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
         fileop = COL_ctoa(cl, 'f', 0, 2);
-    APIGraphLegendTitle(hdl, line->tl_axis,
-                        "LLBL"[line->tl_graph], T_cell_cont(cell, 0), fileop);
+    APIGraphLegendTitle(hdl, line->right_axis,
+                        "LLBL"[line->graph_type], T_cell_cont(cell, 0), fileop);
     return(0);
 }
 
@@ -877,8 +877,8 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     w = 1;
     for(i = 0; i < T_NL(tbl) && w > 0; i++) {
         line = T_L(tbl) + i;
-        cell = (TCELL *) line->tl_val;
-        switch(line->tl_type) {
+        cell = (TCELL *) line->cells;
+        switch(line->type) {
             case TABLE_LINE_CELL  :
                 if(cell[1].type != TABLE_CELL_LEC) break;
                 if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) w = -1;

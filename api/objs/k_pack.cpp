@@ -131,7 +131,7 @@ static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
 {
     int pos_type;
 
-    // Binary copy from tl_type to the end of the struct
+    // Binary copy from type to the end of the struct
     pos_type = K_pos_struct(tc32, &tc32->type);
     memcpy((char*)&tc32->type, (char*)&tc64->type, sizeof(TCELL32) - pos_type);
     if(tc64->content)
@@ -152,11 +152,11 @@ static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
  
 static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
 {
-    int pos_tl_type;
+    int pos_type;
 
-    // Binary copy from tl_type to the end of the struct
-    pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
-    memcpy((char*)&tl32->tl_type, (char*)&tl64->tl_type, sizeof(TLINE32) - pos_tl_type);
+    // Binary copy from type to the end of the struct
+    pos_type = K_pos_struct(tl32, &tl32->type);
+    memcpy((char*)&tl32->type, (char*)&tl64->type, sizeof(TLINE32) - pos_type);
 }
 
 /**
@@ -210,7 +210,7 @@ static int K_tpack32(char **pack, char *a1)
 
     /* div */
     /* 1. : [nc x TCELL] */
-    cell = (TCELL*)tbl->t_div.tl_val;
+    cell = (TCELL*)tbl->t_div.cells;
     *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
 
     /* 2. : nc x [TCELL->content] */
@@ -221,9 +221,9 @@ static int K_tpack32(char **pack, char *a1)
     /* 1. : [nl x TLINE] */
     *pack = (char*) P_add(*pack, (char*)tbl->t_line, sizeof(TLINE) * (int)T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
-        switch(tbl->t_line[i].tl_type) {
+        switch(tbl->t_line[i].type) {
             case TABLE_LINE_CELL:
-                cell = (TCELL*)tbl->t_line[i].tl_val;
+                cell = (TCELL*)tbl->t_line[i].cells;
                 /* [nc x TCELL] */
                 *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
                 /* 2. : nc x [TCELL->content] */
@@ -231,7 +231,7 @@ static int K_tpack32(char **pack, char *a1)
                     *pack = K_tcell_pack(*pack, cell + j);
                 break;
             case TABLE_LINE_TITLE:
-                cell = (TCELL*)tbl->t_line[i].tl_val;
+                cell = (TCELL*)tbl->t_line[i].cells;
                 /* [1 x TCELL] */
                 *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL));
                 /* 1 x [TCELL->content] */
@@ -272,7 +272,7 @@ static int K_tpack64(char **pack, char *a1)
 
     /* div */
     /* 1. : [nc x TCELL32] */
-    cell = (TCELL*)tbl->t_div.tl_val;
+    cell = (TCELL*)tbl->t_div.cells;
     cell32 = (TCELL32*)SW_nalloc(sizeof(TCELL32) * (int)T_NC(tbl));
     for(j = 0; j < T_NC(tbl); j++)
         K_tcell64_32(cell + j, cell32 + j);
@@ -295,10 +295,10 @@ static int K_tpack64(char **pack, char *a1)
     /* 2. For each line and each col, pack cell
       [cell] [cell] ... */
     for(i = 0; i < T_NL(tbl); i++) {
-        switch(tbl->t_line[i].tl_type) {
+        switch(tbl->t_line[i].type) {
             case TABLE_LINE_CELL:
                 /* [TLINE32 * NC] */
-                cell = (TCELL*)tbl->t_line[i].tl_val;
+                cell = (TCELL*)tbl->t_line[i].cells;
                 for(j = 0; j < T_NC(tbl); j++) 
                     K_tcell64_32(cell + j, cell32 + j);
                 *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
@@ -309,7 +309,7 @@ static int K_tpack64(char **pack, char *a1)
                 break;
 
             case TABLE_LINE_TITLE:
-                cell = (TCELL*)tbl->t_line[i].tl_val;
+                cell = (TCELL*)tbl->t_line[i].cells;
                 /* [1 x TCELL] */
                 K_tcell64_32(cell + 0, cell32 + 0);
                 *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * 1);
@@ -570,11 +570,11 @@ static TBL* K_tunpack32(char *pack)
 
     /* div */
     len = P_get_len(pack, 1);
-    ptbl->t_div.tl_val = (char*) P_get_ptr(pack, 1);
-    pcell = (TCELL*)ptbl->t_div.tl_val;
+    ptbl->t_div.cells = (char*) P_get_ptr(pack, 1);
+    pcell = (TCELL*)ptbl->t_div.cells;
 
-    tbl->t_div.tl_val = SW_nalloc(len);
-    cell = (TCELL*)tbl->t_div.tl_val;
+    tbl->t_div.cells = SW_nalloc(len);
+    cell = (TCELL*)tbl->t_div.cells;
     memcpy((char*)cell, (char*)pcell, len);
 
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
@@ -598,13 +598,13 @@ static TBL* K_tunpack32(char *pack)
     memcpy(T_L(tbl), T_L(ptbl), len);
 
     for(i = 0; i < T_NL(tbl); i++) {
-        switch(ptbl->t_line[i].tl_type) {
+        switch(ptbl->t_line[i].type) {
             case TABLE_LINE_CELL:
                 len = P_get_len(pack, p);
                 pcell = (TCELL*) P_get_ptr(pack, p);
-                ptbl->t_line[i].tl_val = (char *)pcell;
+                ptbl->t_line[i].cells = (char *)pcell;
                 cell = (TCELL*) SW_nalloc(len);
-                tbl->t_line[i].tl_val = (char *)cell;
+                tbl->t_line[i].cells = (char *)cell;
                 memcpy(cell, pcell, len);
                 p++;
 
@@ -622,14 +622,14 @@ static TBL* K_tunpack32(char *pack)
             case TABLE_LINE_TITLE:
                 len = P_get_len(pack, p);
                 /*
-                pcell = (TCELL *) ptbl->t_line[i].tl_val = P_get_ptr(pack, p);
-                tbl->t_line[i].tl_val = SW_nalloc(len);
-                cell = (TCELL*)tbl->t_line[i].tl_val;
+                pcell = (TCELL *) ptbl->t_line[i].cells = P_get_ptr(pack, p);
+                tbl->t_line[i].cells = SW_nalloc(len);
+                cell = (TCELL*)tbl->t_line[i].cells;
                 */
                 pcell = (TCELL *) P_get_ptr(pack, p);
-                ptbl->t_line[i].tl_val = (char *)pcell;
+                ptbl->t_line[i].cells = (char *)pcell;
                 cell = (TCELL *)SW_nalloc(len);
-                tbl->t_line[i].tl_val = (char *)cell;
+                tbl->t_line[i].cells = (char *)cell;
                 memcpy(cell, pcell, len);
                 p++;
 
@@ -679,11 +679,11 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
  */
 static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
-    int pos_tl_type;
+    int pos_type;
 
-    // Binary copy from tl_type to the end of the struct
-    pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
-    memcpy((char*)&tl64->tl_type, (char*)&tl32->tl_type, sizeof(TLINE32) - pos_tl_type);
+    // Binary copy from type to the end of the struct
+    pos_type = K_pos_struct(tl32, &tl32->type);
+    memcpy((char*)&tl64->type, (char*)&tl32->type, sizeof(TLINE32) - pos_type);
 }
 
 /**
@@ -733,12 +733,12 @@ static TBL* K_tunpack64(char *pack)
 
     /* tbl */
     tbl = (TBL*)SW_nalloc(sizeof(TBL));
-    K_tbl32_64((TBL32*)P_get_ptr(pack, 0), tbl); // Inclut la transposition de t_div (sans t_div.tl_val)
+    K_tbl32_64((TBL32*)P_get_ptr(pack, 0), tbl); // Inclut la transposition de t_div (sans t_div.cells)
 
     /* div (TLINE) */
     cell32 = (TCELL32*)P_get_ptr(pack, 1);
     cell = (TCELL*)SW_nalloc(T_NC(tbl) * sizeof(TCELL));
-    tbl->t_div.tl_val = (char*)cell;
+    tbl->t_div.cells = (char*)cell;
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
         K_tcell32_64(cell32 + j, cell + j);
         if(cell32[j].content != 0) {
@@ -756,10 +756,10 @@ static TBL* K_tunpack64(char *pack)
 
     for(i = 0; i < T_NL(tbl); i++) {
         K_tline32_64(line32 + i, tbl->t_line + i);
-        switch(tbl->t_line[i].tl_type) {
+        switch(tbl->t_line[i].type) {
             case TABLE_LINE_CELL:
                 cell = (TCELL*)SW_nalloc(T_NC(tbl) * sizeof(TCELL));
-                tbl->t_line[i].tl_val = (char*)cell;
+                tbl->t_line[i].cells = (char*)cell;
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
                 p++;
                 for(j = 0; j < T_NC(tbl); j++) {
@@ -774,7 +774,7 @@ static TBL* K_tunpack64(char *pack)
 
             case TABLE_LINE_TITLE:
                 cell = (TCELL*)SW_nalloc(sizeof(TCELL));
-                tbl->t_line[i].tl_val = (char*)cell;
+                tbl->t_line[i].cells = (char*)cell;
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
                 p++;
                 K_tcell32_64(cell32 + 0, cell + 0);

@@ -341,7 +341,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
         buf[0] = 0;
         line = T_L(tbl) + i;
 
-        switch(line->tl_type) {
+        switch(line->type) {
             case TABLE_LINE_SEP   :
                 break;
             case TABLE_LINE_DATE  :
@@ -366,7 +366,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                 }
                 break;
             case TABLE_LINE_TITLE :
-                strcat(buf, IodeTblCell((TCELL *) line->tl_val, NULL, nbdec));
+                strcat(buf, IodeTblCell((TCELL *) line->cells, NULL, nbdec));
                 //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
                 break;
             case TABLE_LINE_CELL  :
@@ -377,7 +377,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                     for(j = 0; j < cls->cl_nb; j++) {
                         d = j % T_NC(tbl);
                         if(tbl->t_free == 0 && d == 0 && j != 0) continue;
-                        strcat(buf, IodeTblCell((TCELL *) line->tl_val + d, cls->cl_cols + j, nbdec));
+                        strcat(buf, IodeTblCell((TCELL *) line->cells + d, cls->cl_cols + j, nbdec));
                         strcat(buf, "\t");
                     }
                 break;

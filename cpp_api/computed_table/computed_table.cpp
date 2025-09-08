@@ -436,7 +436,7 @@ void ComputedTable::print_to_file()
                     first_title = false;
                     break;
                 }
-                T_print_cell((TCELL *) line->tl_val, NULL, dim);
+                T_print_cell((TCELL *) line->cells, NULL, dim);
                 W_printf("\n");
                 break;
             case TABLE_LINE_DATE  :

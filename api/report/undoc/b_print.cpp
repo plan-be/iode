@@ -444,16 +444,16 @@ int B_DumpTblDef(TBL* tbl)
     /*    W_printfRepl("&%dL\\bTable lines\\B\n", T_NC(tbl)); */
     /*    W_printfRepl("&%dL \n", T_NC(tbl)); */
     for(j = 0; j < T_NL(tbl); j++) {
-        switch(tbl->t_line[j].tl_type) {
+        switch(tbl->t_line[j].type) {
             case TABLE_LINE_CELL :
-                cell = (TCELL *) tbl->t_line[j].tl_val;
+                cell = (TCELL *) tbl->t_line[j].cells;
                 for(i = 0; i < T_NC(tbl); i++)
                     B_PrintTblCell(cell + i, 1);
                 W_printf("\n");
                 break;
 
             case TABLE_LINE_TITLE :
-                B_PrintTblCell((TCELL *) tbl->t_line[j].tl_val, T_NC(tbl));
+                B_PrintTblCell((TCELL *) tbl->t_line[j].cells, T_NC(tbl));
                 W_printf("\n");
                 break;
 
@@ -479,11 +479,11 @@ int B_DumpTblDef(TBL* tbl)
 
     /* div */
     for(i = 0; i < T_NC(tbl); i++)
-        if(B_CellDef((TCELL *)(tbl->t_div.tl_val) + i)) break;
+        if(B_CellDef((TCELL *)(tbl->t_div.cells) + i)) break;
     if(i < T_NC(tbl)) {
         W_printfRepl(".tl\n&%dC%cbColumn divisors%cB\n.tl\n", T_NC(tbl), A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
         for(i = 0; i < T_NC(tbl); i++)
-            B_PrintTblCell((TCELL *)(tbl->t_div.tl_val) + i, 1);
+            B_PrintTblCell((TCELL *)(tbl->t_div.cells) + i, 1);
     }
 
     W_printf("\n.tl\n");

@@ -215,7 +215,7 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
 {
     int     j, d;
     TLINE   *line = T_L(tbl) + i;
-    TCELL   *cell = (TCELL *) line->tl_val;
+    TCELL   *cell = (TCELL *) line->cells;
 
     COL_clear(cls);
     if(COL_exec(tbl, i, cls) < 0)   return(-1);
@@ -391,13 +391,13 @@ unsigned char *T_get_title(TBL* tbl)
     static unsigned char    buf[256];
     
     for(k = 0; k < T_NL(tbl); k++)
-        if(tbl->t_line[k].tl_type == TABLE_LINE_TITLE) break;
+        if(tbl->t_line[k].type == TABLE_LINE_TITLE) break;
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].tl_val)->content == 0)
+    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].cells)->content == 0)
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].tl_val)->content, sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].cells)->content, sizeof(buf) - 1);
 
     return(buf);
 }
@@ -432,7 +432,7 @@ int T_print_tbl(TBL* tbl, char* smpl)
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) {
         line = T_L(tbl) + i;
 
-        switch(line->tl_type) {
+        switch(line->type) {
             case TABLE_LINE_SEP   :
                 W_printf(".tl\n");
                 break;
@@ -441,7 +441,7 @@ int T_print_tbl(TBL* tbl, char* smpl)
                     first = 0;
                     break;
                 }
-                T_print_cell((TCELL *) line->tl_val, NULL, dim);
+                T_print_cell((TCELL *) line->cells, NULL, dim);
                 W_printf("\n");
                 break;
             case TABLE_LINE_DATE  :
