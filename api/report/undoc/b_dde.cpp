@@ -280,14 +280,17 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
     buf[0] = 0;
     if(cell->type != 0) {
         if(cl == NULL || cell->type == TABLE_CELL_STRING) {
-            ptr = (char *) COL_text(cl, cell->content, KT_nbnames);
+            ptr = (char *) COL_text(cl, (char*) cell->content.c_str(), KT_nbnames);
             SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
             buf[DDECELLSIZE] = 0;
             SW_nfree(ptr);
         }
-        else {
-            if(!IODE_IS_A_NUMBER(cl->cl_res)) strcpy(buf, "#N/A");
-            else {
+        else 
+        {
+            if(!IODE_IS_A_NUMBER(cl->cl_res)) 
+                strcpy(buf, "#N/A");
+            else 
+            {
                 sprintf(buf, "%80.20lf", cl->cl_res); /* JMP 18-10-07 */
                 SCR_sqz((unsigned char*) buf);                         /* JMP 18-10-07 */
                 SCR_pstrip((unsigned char*) buf, (unsigned char*) "0");                 /* JMP 18-10-07 */

@@ -812,7 +812,6 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     pos = K_find(KT_WS, name);
     extracted_tbl = KTVAL(KT_WS, pos);
 
-
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TLINE
     EXPECT_EQ(tbl->language, extracted_tbl->language);
@@ -861,8 +860,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         switch (line_0->type)
         {
           case TABLE_LINE_TITLE:
-            cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
-            cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
+            cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_0, 0));
+            cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_1, 0));
             EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
             SCR_free(cell_cont_0);
             SCR_free(cell_cont_1);
@@ -872,8 +871,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
             {
                 EXPECT_EQ(cells_0[j].type, cells_1[j].type);
                 EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-                cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0 + j, 0));
-                cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1 + j, 0));
+                cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_0 + j, 0));
+                cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_1 + j, 0));
                 EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
                 SCR_free(cell_cont_0);
                 SCR_free(cell_cont_1);

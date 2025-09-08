@@ -136,18 +136,25 @@ static char *Pack16To32(char* opack)
 
 static char *T_cell_repack(char* pack, TCELL* cell)
 {
-    char    *npack, *ipack;
-
-    if(cell->content == NULL) return(pack);
-    if(cell->type == TABLE_CELL_LEC) {
-        npack = Pack16To32(cell->content);
+    char    *npack, *ipack, *opack;
+    
+    if(cell->type == TABLE_CELL_LEC) 
+    {
+        if(cell->idt == NULL) 
+            return(pack);
+        opack = cell->idt;
+        npack = Pack16To32(opack);
         ipack = 0;
         K_ipack(&ipack, (char*) P_get_ptr(npack, 0));
         pack = (char*) P_add(pack, ipack, P_len(ipack));
         SW_nfree(npack);
     }
     else
-        pack = (char*) P_add(pack, cell->content, (int) strlen(cell->content) + 1);
+    {
+        if(cell->content.empty()) 
+            return(pack);
+        pack = (char*) P_add(pack, (void*) cell->content.c_str(), (int) cell->content.size() + 1);
+    }
 
     return(pack);
 }

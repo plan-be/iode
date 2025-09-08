@@ -7,8 +7,7 @@
  *  -----------------
  *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
- *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.
- *      void T_free_cell(TCELL* cell)                                                              | Frees a TCELL struct.
+ *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.                                                             | Frees a TCELL struct.
  *      int T_add_line(TBL* tbl)                                                                   | Extents a TBL by adding at least one line.
  *      TCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type TABLE_LINE_CELL. 
  *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type TABLE_LINE_TITLE. 
@@ -47,16 +46,16 @@
 TBL *T_create(int dim)
 {
     TBL     *tbl = NULL;
-    TCELL   *cell;
+    TCELL   *cells;
     int     i;
 
-
     tbl = (TBL *)SW_nalloc(sizeof(TBL));
-    if(tbl == NULL) {
+    if(tbl == NULL) 
+    {
         kerror(0, "Allocation error");
         return(NULL);
-
     }
+    
     T_NC(tbl)   = dim;
     T_LANG(tbl) = TABLE_ENGLISH;
 
@@ -65,15 +64,19 @@ TBL *T_create(int dim)
     tbl->y_min = (float)IODE_NAN;
     tbl->y_max = (float)IODE_NAN;
 
-    tbl->divider_line.type = TABLE_LINE_CELL;
-    tbl->divider_line.cells  = SW_nalloc(dim * sizeof(TCELL));
-    cell               = (TCELL *) tbl->divider_line.cells;
+    tbl->divider_line.type  = TABLE_LINE_CELL;
+    tbl->divider_line.cells = SW_nalloc(dim * sizeof(TCELL));
+    cells = (TCELL *) tbl->divider_line.cells;
 
-    for(i = 0; i < dim; i++) {
-        cell[i].type = TABLE_CELL_LEC;
-        cell[i].attribute = TABLE_CELL_LEFT;
+    for(i = 0; i < dim; i++) 
+    {
+        cells[i].type = TABLE_CELL_LEC;
+        cells[i].attribute = TABLE_CELL_LEFT;
+        cells[i].content = "";
+        cells[i].idt = NULL;
     }
-    K_ipack(&(cell[0].content), "1");
+
+    K_ipack(&cells[0].idt, "1");
     /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
 
     return(tbl);
@@ -91,7 +94,8 @@ void T_free(TBL* tbl)
     int     i;
 
     T_free_line(&(tbl->divider_line), T_NC(tbl));
-    for(i = 0; i < T_NL(tbl); i++) T_free_line(tbl->lines + i, T_NC(tbl));
+    for(i = 0; i < T_NL(tbl); i++) 
+        T_free_line(tbl->lines + i, T_NC(tbl));
 
     SW_nfree(tbl->lines);
     SW_nfree(tbl);
@@ -108,32 +112,7 @@ void T_free(TBL* tbl)
  */
 void T_free_line(TLINE* line, int dim)
 {
-    int     i;
-    TCELL   *cell;
-
-
-    cell = (TCELL *) line->cells;
-    if(line->type == TABLE_LINE_CELL)
-        for(i = 0; i < dim; i++) T_free_cell(cell + i);
-
-    if(line->type == TABLE_LINE_TITLE) T_free_cell(cell);
-
-
     SW_nfree(line->cells);
-}
-
-
-/**
- *  Frees a TCELL struct.
- *  
- *  @param [in, out]    cell    TCELL*      TCELL to delete
- *  @return             void
- *  
- */
-void T_free_cell(TCELL* cell)
-{
-    SW_nfree(cell->content);
-    cell->content = NULL;
 }
 
 
@@ -169,15 +148,19 @@ int T_add_line(TBL* tbl)
  */
 TCELL   *T_create_cell(TBL* tbl, TLINE* line)
 {
-    int     i, nc = T_NC(tbl);
+    int    nc = T_NC(tbl);
+    TCELL* cell;
 
     line->type = TABLE_LINE_CELL;
     line->cells = SW_nalloc(nc * sizeof(TCELL));
     line->graph_type = T_GRAPHDEFAULT; /* GB 10/03/2011 */
-    for(i = 0; i < nc; i++) {
-        ((TCELL *) line->cells + i)->type = TABLE_CELL_LEC;
-        ((TCELL *) line->cells + i)->attribute = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
-        ((TCELL *) line->cells + i)->content = NULL; 
+    for(int i = 0; i < nc; i++) 
+    {
+        cell = (TCELL *) line->cells + i;
+        cell->type = TABLE_CELL_LEC;
+        cell->attribute = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
+        cell->content = "";
+        cell->idt = NULL;
     }
 
     return((TCELL *) line->cells);
@@ -205,11 +188,9 @@ TCELL *T_create_title(TBL* tbl, TLINE* line)
 
 
 /**
- *  Returns the formated contents of a TCELL: 
+ *  Returns the formatted contents of a TCELL: 
  *      - lec expression or (A+B)
  *      - text possibly between double quotes (if mode == 1 => "Line title:", if not => Line title)
- *  
- *  The returned value is the global allocated buffer BUF_DATA (see buf.c) or a pointer to a static memory "".
  *  
  *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
  *  
@@ -219,21 +200,36 @@ TCELL *T_create_title(TBL* tbl, TLINE* line)
  *  @return             char*   pointer to BUF_DATA (big buffer - see buf.c) -- Do NOT free!
  */
 char* T_cell_cont(TCELL* cell, int mode)
-{
-    char    *buf;
-
-    if(cell->content == NULL) return(""); /* JMP 20-11-93 */
+{   
     if(cell->type == TABLE_CELL_LEC)
-        return(BUF_strcpy((char*) P_get_ptr(cell->content, 0)));
-    buf = BUF_alloc((int)strlen(cell->content) + 3);
-    if(mode) sprintf(buf, "\"%s\"", cell->content);
-    else BUF_strcpy(cell->content);
-    return(BUF_DATA);
+    {
+        if(cell->idt == NULL) 
+            return("");
+        char* lec = (char*) P_get_ptr((void*) cell->idt, 0);
+        if(lec == NULL)
+        {
+            kwarning("Invalid LEC expression in table cell");
+            return(NULL);
+        }
+        return lec;
+    }
+    else
+    {
+        if(cell->content.empty()) 
+            return("");
+        char* buf = SW_nalloc((int) cell->content.size() + 3);
+        char* text = (char*) cell->content.c_str();
+        if(mode) 
+            sprintf(buf, "\"%s\"", text);
+        else 
+            sprintf(buf, "%s", text);
+        return buf;
+    }
 }
 
 
 /**
- *  Returns the formated contents of a TCELL:
+ *  Returns the formatted contents of a TCELL:
  *      - lec expression or (A+B)
  *      - text possibly between double quotes (if mode == 1 => "Line title:", if not => Line title)
  *
@@ -253,7 +249,7 @@ char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
     switch (line.type)
     {
         case TABLE_LINE_TITLE:
-            return(cell->content);
+            return((char*) cell->content.c_str());
             break;
         case TABLE_LINE_CELL:
             return(T_cell_cont(cell + col, mode));
@@ -345,14 +341,15 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 
     cell->type = TABLE_CELL_LEC;
     cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
-    if(K_ipack((char**) &ptr, (char*) lec) < 0 && L_errno) {
+    cell->content = "";
+    if(K_ipack((char**) &ptr, (char*) lec) < 0 && L_errno) 
+    {
         kerror(0, "Illegal lec-formula");
         return(-1);
     }
-    else {
-        T_free_cell(cell);
-        cell->content = (char*) ptr;
-    }
+    else 
+        cell->idt = (char*) ptr;
+    
     return(0);
 }
 
@@ -392,21 +389,29 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     int     len, attr;
 
     cell->type = TABLE_CELL_STRING;
-    /*    cell->attribute |= TABLE_CELL_LEFT; /* JMP 11-11-93 */
+
     attr = cell->attribute;
-    if(attr & TABLE_CELL_DECIMAL) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);  /* JMP 19-11-93 */
-    if(U_is_in('#', (char*) txt)) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);  /* JMP 19-11-93 */
+    if(attr & TABLE_CELL_DECIMAL) 
+        attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);
+    if(U_is_in('#', (char*) txt)) 
+        attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);
     cell->attribute = attr;
+
     len = (int) strlen((char*) txt);
-    if (len > 0) {
-        if (txt[0] == '\"') {
+    if (len > 0) 
+    {
+        if (txt[0] == '\"') 
+        {
             txt++;
             len--;
         }
-        if (len > 0 && txt[len - 1] == '\"') txt[len - 1] = 0;
+
+        if (len > 0 && txt[len - 1] == '\"') 
+            txt[len - 1] = 0;
     }
-    T_free_cell(cell);
-    cell->content = (char*) SCR_stracpy(txt);
+
+    cell->content = std::string((char*) txt);
+    cell->idt = NULL;
 }
 
 /**
