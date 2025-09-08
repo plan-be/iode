@@ -171,7 +171,6 @@ Packing (serialize) and unpacking (deserialize) objects.
 |`void *P_add(void *vptr1, void *vptr2, int lg)`|appends to the pack pointed to by vptr1 the content pointed to by vptr2 which has a length of lg bytes.|
 |`void *P_get_ptr(void *vptr, int i)`|retrieves the pointer to the i'th element of a pack.|
 |`OSIZE P_get_len(void *vptr, int i)`|retrieves the length (in bytes) of the i'th element of a pack or the length of the full pack if i < 0.|
-|`void *P_alloc_get_ptr(void *ptr, int p)`|allocates space for the p'th element of a pack. Copies the pth element in the allocated space.|
 |`int P_nb(char *ptr)`|retrieves the number of elements in the pack pointed to by ptr.|
 
 ### yy.c {#T12}
@@ -505,7 +504,6 @@ Functions to manage TBL objects.
 |`TBL *T_create(int dim)`|Creates a new TBL objects.|
 |`void T_free(TBL* tbl)`|Frees a TBL object|
 |`void T_free_line(TLINE* line, int dim)`|Frees a TLINE struct and all its TCELL.|
-|`void T_free_cell(TCELL* cell)`|Frees a TCELL struct.|
 |`int T_add_line(TBL* tbl)`|Extents a TBL by adding at least one line.|
 |`TCELL *T_create_cell(TBL* tbl, TLINE* line)`|Initialises a TLINE of the type KT\_CELL.|
 |`TCELL *T_create_title(TBL* tbl, TLINE* line)`|Initialises a TLINE of the type KT\_TITLE.|

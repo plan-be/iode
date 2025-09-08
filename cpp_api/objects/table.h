@@ -49,9 +49,6 @@ struct TableCell: public TCELL
 	// WARNING: a table cell must be deleted (freed) from a Table instance
 	~TableCell();
 
-	// WARNING: must NOT be exposed to Python API -> called from a Table instance
-	void free();
-
 	bool is_null() const;
 
 	CLEC* get_compiled_lec();

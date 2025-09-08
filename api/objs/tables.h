@@ -3,6 +3,8 @@
 #include "api/constants.h"
 #include "api/objs/kdb.h"       // KDB
 
+#include <string>
+
 /*----------------------- ENUMS ----------------------------*/
 
 enum TableCellFont
@@ -90,12 +92,11 @@ inline int T_GRAPHDEFAULT = 0;
 /*----------------------- STRUCTS ----------------------------*/
 
 struct TCELL {
-    char*   content;   // NULL or
-                        // char* if type == TABLE_CELL_STRING or
-                        // packed IDT (i.e. char*) if type == TABLE_CELL_LEC
-    char    type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
-    char    attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
-    char    pad[2];     // Padding for struct alignment
+    std::string content;    // if type == TABLE_CELL_STRING
+    char*       idt;        // packed IDT (as char*) if type == TABLE_CELL_LEC
+    char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
+    char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
+    char        pad[2];     // Padding for struct alignment
 };
 
 struct TLINE {
@@ -142,7 +143,6 @@ TBL* K_tptr(KDB* kdb, char* name);
 TBL *T_create(int );
 void T_free(TBL *);
 void T_free_line(TLINE *,int );
-void T_free_cell(TCELL *);
 int T_add_line(TBL *);
 TCELL *T_create_cell(TBL *,TLINE *);
 TCELL *T_create_title(TBL *,TLINE *);

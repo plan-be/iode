@@ -373,12 +373,15 @@ static void K_xdrCLEC(CLEC* expr, int mode)
  */
 static void K_xdrCELL(unsigned char* ptr, char type, int mode)
 {
-    if(type == TABLE_CELL_LEC) {
-        if(mode == 0) {
+    if(type == TABLE_CELL_LEC) 
+    {
+        if(mode == 0) 
+        {
             K_xdrPACK(ptr, mode);
             K_xdrCLEC(P_get_ptr(ptr, 1), mode);
         }
-        else {
+        else 
+        {
             K_xdrCLEC(P_get_ptr(ptr, 1), mode);
             K_xdrPACK(ptr, mode);
         }
@@ -422,7 +425,9 @@ static void K_xdrTBL(unsigned char* pack, int mode)
 
     /* div:2..nc + 2 */
     for(j = 0, p = 2; j < nc; j++)
-        if(cell[j].content !=  NULL) {
+        if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
+           (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+        {
             K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
             p++;
         }
@@ -435,8 +440,10 @@ static void K_xdrTBL(unsigned char* pack, int mode)
     memcpy((char *) line, (char *) pline, len);
     p++;
 
-    for(i = 0; i < nl; i++) {
-        switch(line[i].type) {
+    for(i = 0; i < nl; i++) 
+    {
+        switch(line[i].type) 
+        {
             case TABLE_LINE_CELL :
                 len = P_get_len(pack, p);
                 pcell = P_get_ptr(pack, p);
@@ -445,7 +452,9 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 p++;
 
                 for(j = 0; j < nc; j++)
-                    if(cell[j].content != NULL) {
+                    if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
+                      (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+                    {
                         K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
                         p++;
                     }
@@ -459,7 +468,9 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 memcpy(cell, pcell, len);
                 p++;
 
-                if(cell->content != NULL) {
+                if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
+                   (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+                {
                     K_xdrCELL(P_get_ptr(pack, p), cell->type, mode);
                     p++;
                 }

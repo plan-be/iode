@@ -176,14 +176,18 @@ void T_close_attr(int attr)
  */
 void T_print_cell(TCELL* cell, COL* cl, int straddle)
 {
-    if(cell == 0 || cell->content == 0) {                /* JMP 24-06-98 */
+    if(cell == 0 || (cell->type == TABLE_CELL_STRING && cell->content.empty()) || 
+      (cell->type == TABLE_CELL_LEC && cell->idt == NULL)) 
+    {
         //W_printf("%c1R", KT_sep); 
         W_printf("%c1R", A2M_SEPCH); 
         return;                
     }
-    if(cell->type == TABLE_CELL_STRING && U_is_in('#', cell->content))
+
+    if(cell->type == TABLE_CELL_STRING && U_is_in('#', (char*) cell->content.c_str()))
         //cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_CENTER); /* JMP 05-01-02 */
         cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_RIGHT); /* JMP 05-01-02 */
+    
     if(cell->type == TABLE_CELL_LEC)
         cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
 
@@ -191,10 +195,10 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
     T_open_attr(cell->attribute);
 
     if(cell->type != 0) {
-        if(cl == NULL || cell->type == TABLE_CELL_STRING) {
-            T_print_string(cl, cell->content);
-        }
-        else T_print_val(cl->cl_res);
+        if(cl == NULL || cell->type == TABLE_CELL_STRING)
+            T_print_string(cl, (char*) cell->content.c_str());
+        else 
+            T_print_val(cl->cl_res);
     }
 
     T_close_attr(cell->attribute);
@@ -394,10 +398,11 @@ unsigned char *T_get_title(TBL* tbl)
         if(tbl->lines[k].type == TABLE_LINE_TITLE) break;
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || ((TCELL *) tbl->lines[k].cells)->content == 0)
+    if(k == T_NL(tbl) || ((TCELL *) tbl->lines[k].cells)->content.empty())
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->lines[k].cells)->content, sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char*) ((TCELL *) tbl->lines[k].cells)->content.c_str(), 
+                    sizeof(buf) - 1);
 
     return(buf);
 }

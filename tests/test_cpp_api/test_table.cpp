@@ -189,12 +189,10 @@ TEST_F(TablesTest, CopyConstructor)
     TableCell* cell0 = line5->get_cell(0, nb_columns);
     TableCell copied_cell0(*cell0);
     ASSERT_EQ(*cell0, copied_cell0);
-    copied_cell0.free();
  
     TableCell* cell1 = line5->get_cell(1, nb_columns);
     TableCell copied_cell1(*cell1);
     ASSERT_EQ(*cell1, copied_cell1);
-    copied_cell1.free();
 }
 
 TEST_F(TablesTest, Dimension)
@@ -332,15 +330,15 @@ TEST_F(TablesTest, LineCells)
     int expected_align;
 
     // first CELL line
-    TableLine* firslines = table->get_line(1);
-    EXPECT_EQ(firslines->get_line_type(), expected_type);
-    EXPECT_EQ(firslines->get_line_graph(), TABLE_GRAPH_LINE);
-    EXPECT_TRUE(firslines->is_left_axis());
-    firslines->set_line_graph(TABLE_GRAPH_BAR);
-    EXPECT_EQ(firslines->get_line_graph(), TABLE_GRAPH_BAR);
+    TableLine* first_line = table->get_line(1);
+    EXPECT_EQ(first_line->get_line_type(), expected_type);
+    EXPECT_EQ(first_line->get_line_graph(), TABLE_GRAPH_LINE);
+    EXPECT_TRUE(first_line->is_left_axis());
+    first_line->set_line_graph(TABLE_GRAPH_BAR);
+    EXPECT_EQ(first_line->get_line_graph(), TABLE_GRAPH_BAR);
     EXPECT_EQ(table->get_line(1)->get_line_graph(), TABLE_GRAPH_BAR);
     // ---- column 0
-    TableCell* first_cell = firslines->get_cell(0, nb_cells);
+    TableCell* first_cell = first_line->get_cell(0, nb_cells);
     EXPECT_EQ(first_cell->get_type(), TABLE_CELL_STRING);
     EXPECT_EQ(first_cell->get_align(), TABLE_CELL_LEFT);
     EXPECT_FALSE(first_cell->is_bold());
@@ -349,7 +347,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(first_cell->get_content(false), "(divisé par les prix à la consommation)");
     EXPECT_EQ(first_cell->get_content(true), "\"(divisé par les prix à la consommation)\"");
     // ---- column 1
-    TableCell* second_cell = firslines->get_cell(1, nb_cells);
+    TableCell* second_cell = first_line->get_cell(1, nb_cells);
     expected_align = ((int) TABLE_CELL_DECIMAL) + ((int) TABLE_CELL_LEFT);
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_STRING);
     EXPECT_EQ((int) second_cell->get_align(), expected_align);
@@ -579,6 +577,36 @@ TEST_F(TablesTest, LineDate)
     new_pos = 26;
     EXPECT_EQ(table->nb_lines, nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_DATE);
+}
+
+TEST_F(TablesTest, ListCoefficients)
+{
+    Table* table = Tables.get("ANAKNFF");    
+    TableLine* line_5 = table->get_line(5);
+    EXPECT_EQ(line_5->get_line_type(), TABLE_LINE_CELL);
+    TableCell* cell = line_5->get_cell(0, table->nb_columns);
+    EXPECT_EQ(cell->get_content(false), "Output gap ");
+    cell = line_5->get_cell(1, table->nb_columns);
+    EXPECT_EQ(cell->get_content(false), "knff1*ln (QAFF_/(Q_F+Q_I))");
+
+    std::vector<std::string> expected_coeffs = { "knff1" };
+    std::vector<std::string> coeffs = cell->get_coefficients_from_lec();
+    EXPECT_EQ(coeffs, expected_coeffs);
+}
+
+TEST_F(TablesTest, ListVariables)
+{
+    Table* table = Tables.get("ANAKNFF");    
+    TableLine* line_5 = table->get_line(5);
+    EXPECT_EQ(line_5->get_line_type(), TABLE_LINE_CELL);
+    TableCell* cell = line_5->get_cell(0, table->nb_columns);
+    EXPECT_EQ(cell->get_content(false), "Output gap ");
+    cell = line_5->get_cell(1, table->nb_columns);
+    EXPECT_EQ(cell->get_content(false), "knff1*ln (QAFF_/(Q_F+Q_I))");
+
+    std::vector<std::string> expected_vars = { "QAFF_", "Q_F", "Q_I" };
+    std::vector<std::string> vars = cell->get_variables_from_lec();
+    EXPECT_EQ(vars, expected_vars);
 }
 
 TEST_F(TablesTest, Hash)

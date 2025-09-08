@@ -37,20 +37,20 @@ TableCell::TableCell(const TableCellType cell_type, const std::string& content, 
 
 TableCell::TableCell(const TableCell& other)
 {
-	this->content = NULL;
+	this->content = "";
+	this->idt = NULL;
 	copy_cell(this, &other);
 }
 
 TableCell::~TableCell() {}
 
-void TableCell::free()
-{
-	T_free_cell(this);
-}
-
 bool TableCell::is_null() const
 {
-	return content == NULL;
+	if (type == TABLE_CELL_LEC && idt == NULL)
+		return true;
+	if (type == TABLE_CELL_STRING && content.empty())
+		return true;
+	return false;
 }
 
 // The table cell contains a "packed" IDT object (lec + clec) 
@@ -60,11 +60,11 @@ CLEC* TableCell::get_compiled_lec()
 	if(type != TABLE_CELL_LEC)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
 
-	if(content == NULL)
+	if(idt == NULL)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
 
 	// see VT_edit() from o_vt.c from the old GUI
-	return (CLEC*) P_get_ptr(content, 1);
+	return (CLEC*) P_get_ptr((char*) idt, 1);
 }
 
 std::vector<std::string> TableCell::get_variables_from_lec()
@@ -252,7 +252,7 @@ TableLine::TableLine(const TableLine& other, const int nb_cells)
 		this->cells = SW_nalloc(nb_cells * sizeof(TCELL));
 		cells = (TCELL*) this->cells;
 		for (int col = 0; col < nb_cells; col++)
-			cells[col].content = NULL;
+			cells[col].content = "";
 		break;
 	default:
 		break;

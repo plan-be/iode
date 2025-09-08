@@ -29,17 +29,21 @@
  */
 static void read_cell(TCELL* cell, YYFILE* yy, int mode)
 {
-    int     keyw, ok = 0, align = TABLE_CELL_LEFT;
+    int   keyw, ok = 0, align = TABLE_CELL_LEFT;
+    char* content;
 
     keyw = YY_lex(yy);
-    if(mode != 0 && mode != keyw) {
+    if(mode != 0 && mode != keyw) 
+    {
         YY_unread(yy);
         return;
     }
 
     cell->type = TABLE_CELL_STRING;
-    while(1) {
-        switch(keyw) {
+    while(1) 
+    {
+        switch(keyw) 
+        {
             case TABLE_CELL_RIGHT  :
             case TABLE_CELL_LEFT   :
             case TABLE_CELL_CENTER :
@@ -54,29 +58,32 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                 break;
 
             case TABLE_ASCII_CELL_LEC    :
-                if(ok == 1) goto ret;
+                if(ok == 1) 
+                    goto ret;
                 ok = 1;
-                if(YY_lex(yy) != YY_STRING) {
+                if(YY_lex(yy) != YY_STRING) 
+                {
                     YY_unread(yy);
                     break;
                 }
-                T_free_cell(cell);
-                if(K_ipack(&(cell->content), (char*) yy->yy_text) < 0)
-                    cell->content = NULL;
+                if(K_ipack(&cell->idt, (char*) yy->yy_text) < 0)
+                cell->idt = NULL;
+                cell->content = "";
                 cell->type = TABLE_CELL_LEC;
                 align = TABLE_CELL_DECIMAL;
                 break;
 
             case YY_STRING :
-                if(ok == 1) goto ret;
+                if(ok == 1) 
+                    goto ret;
                 ok = 1;
-                T_free_cell(cell);
                 /*            cell->attribute = TABLE_CELL_LEFT; */
-                if(U_is_in('#', (char*) yy->yy_text)) cell->attribute = TABLE_CELL_CENTER;
-                K_stracpy(&(cell->content), (char*) yy->yy_text);
+                if(U_is_in('#', (char*) yy->yy_text)) 
+                    cell->attribute = TABLE_CELL_CENTER;
+                cell->content = std::string((char*) yy->yy_text);
+                cell->idt = NULL;
                 cell->type = TABLE_CELL_STRING;
                 break;
-
 
             case YY_EOF   :
             case TABLE_ASCII_BREAK :
@@ -254,24 +261,31 @@ static TBL* read_tbl(YYFILE* yy)
     TBL     *tbl = NULL;
 
     keyw = YY_lex(yy);
-    if(keyw != TABLE_ASCII_OPEN) {
+    if(keyw != TABLE_ASCII_OPEN) 
+    {
         kerror(0, "%s: Expected { - Got %s ", yy->yy_text, YY_error(yy));
         return(NULL);
     }
 
     keyw = YY_lex(yy);
-    if(keyw != TABLE_ASCII_DIM) YY_unread(yy);
-    else {
-        if(YY_lex(yy) != YY_LONG)  YY_unread(yy);
-        else dim = yy->yy_long;
+    if(keyw != TABLE_ASCII_DIM) 
+        YY_unread(yy);
+    else 
+    {
+        if(YY_lex(yy) != YY_LONG)  
+            YY_unread(yy);
+        else 
+            dim = yy->yy_long;
     }
 
     tbl = T_create(dim);
     if(tbl == NULL) return(NULL);
 
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
-        switch(keyw) {
+        switch(keyw) 
+        {
             case TABLE_ASCII_CLOSE   :
                 return(tbl);
 
@@ -320,7 +334,8 @@ static TBL* read_tbl(YYFILE* yy)
                 break;
 
             case TABLE_ASCII_BREAK   :
-                if(read_line(tbl, yy)< 0) {
+                if(read_line(tbl, yy)< 0) 
+                {
                     T_free(tbl);
                     return(NULL);
                 }
@@ -426,7 +441,7 @@ err:
  *  @return             void
  *  
  */
-void align(FILE* fd, int align)
+static void print_align(FILE* fd, int align)
 {
     fprintf(fd, "\nALIGN ");
     switch(align) {
@@ -452,7 +467,7 @@ void align(FILE* fd, int align)
  *  @return             void
  *  
  */
-static void grinfo(FILE *fd, int axis, int type)
+static void print_graph_info(FILE *fd, int axis, int type)
 {
     if(axis == 0) fprintf(fd, " LAXIS ");
     else          fprintf(fd, " RAXIS ");
@@ -469,7 +484,7 @@ static void grinfo(FILE *fd, int axis, int type)
  *  @return             void
  *  
  */
-static void princhart_axis_type(FILE* fd, char* str, float value)
+static void print_chart_axis_type(FILE* fd, char* str, float value)
 {
     if(IODE_IS_A_NUMBER(value)) fprintf(fd, "\n%s %f ", str, value);
 }
@@ -482,7 +497,7 @@ static void princhart_axis_type(FILE* fd, char* str, float value)
  *  @return             void
  *  
  */
-static void prinattribute(FILE* fd, int attr)
+static void print_attribute(FILE* fd, int attr)
 {
     if(attr & TABLE_CELL_BOLD)      fprintf(fd, "BOLD ");
     if(attr & TABLE_CELL_ITALIC)    fprintf(fd, "ITALIC ");
@@ -505,27 +520,28 @@ static void prinattribute(FILE* fd, int attr)
  */
 static void print_cell(FILE *fd, TCELL *cell)
 {
-    if((cell->content) == NULL) {
+    char* c_content = T_cell_cont(cell, 0);
+    if(strlen(c_content) == 0)
+    {
         fprintf(fd, "\"\" ");
         return;
     }
-    switch(cell->type) {
-        case TABLE_ASCII_CELL_STRING :
-            //fprintf(fd, "\"%s\" ", cell->content);
-            // JMP 8/4/2015 -> escape "
-            SCR_fprintf_esc(fd, cell->content, 1);
-            fprintf(fd, " ");
-            break;
 
+    switch(cell->type) 
+    {
+        case TABLE_ASCII_CELL_STRING :
+            SCR_fprintf_esc(fd, c_content, 1);
+            fprintf(fd, " ");
+            print_attribute(fd, cell->attribute);
+            break;
         case TABLE_ASCII_CELL_LEC :
-            fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->content, 0));
+            fprintf(fd, "LEC \"%s\" ", c_content);
+            print_attribute(fd, cell->attribute);
             break;
         default :
             fprintf(fd, "\"\" ");
             break;
     }
-    if(cell->content[0] != '\0') 
-        prinattribute(fd, cell->attribute);
 }
 
 /**
@@ -547,11 +563,11 @@ static void print_tbl(FILE* fd, TBL* tbl)
     /* GB 2/3/00 */
     fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ",
             tbl->chart_box, tbl->chart_axis_type, tbl->chart_gridx, tbl->chart_gridy);
-    align(fd, tbl->text_alignment);
-    princhart_axis_type(fd, "YMIN", tbl->y_min);
-    princhart_axis_type(fd, "YMAX", tbl->y_max);
-    princhart_axis_type(fd, "ZMIN", tbl->z_min);
-    princhart_axis_type(fd, "ZMAX", tbl->z_max);
+    print_align(fd, tbl->text_alignment);
+    print_chart_axis_type(fd, "YMIN", tbl->y_min);
+    print_chart_axis_type(fd, "YMAX", tbl->y_max);
+    print_chart_axis_type(fd, "ZMIN", tbl->z_min);
+    print_chart_axis_type(fd, "ZMAX", tbl->z_max);
 
     fprintf(fd, "\nDIV ");
     /* div */
@@ -569,7 +585,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
                     print_cell(fd, cell + i);
 
                 /* append GR info */
-                grinfo(fd, tbl->lines[j].right_axis, tbl->lines[j].graph_type);
+                print_graph_info(fd, tbl->lines[j].right_axis, tbl->lines[j].graph_type);
                 break;
 
             case TABLE_ASCII_LINE_TITLE :

@@ -296,18 +296,23 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
 
     lg = cls->cl_nb / T_NC(tbl);
 
-    for(d = 0; d < T_NC(tbl); d++) {
-        if(cell[d].type != TABLE_CELL_LEC) continue;
-        if(cell[d].content == 0) continue;
-        clec = (CLEC *) P_get_ptr(cell[d].content, 1);
+    for(d = 0; d < T_NC(tbl); d++) 
+    {
+        if(cell[d].type != TABLE_CELL_LEC) 
+            continue;
+        if(cell[d].idt == NULL) 
+            continue;
+        clec = (CLEC *) P_get_ptr((void*) cell[d].idt, 1);
         aclec = COL_cp_clec(clec);
         /*GB    if(dcell[d].content) dclec = (CLEC *) P_get_ptr(dcell[d].content, 1); */
-        if(dcell[d].type == TABLE_CELL_LEC && dcell[d].content) /* JMP 27-09-96 */
-            dclec = (CLEC *) P_get_ptr(dcell[d].content, 1);
-        else dclec = NULL;
+        if(dcell[d].idt != NULL) /* JMP 27-09-96 */
+            dclec = (CLEC *) P_get_ptr((void*) dcell[d].idt, 1);
+        else 
+            dclec = NULL;
         adclec = COL_cp_clec(dclec);
 
-        for(j = 0; j < lg; j++) {
+        for(j = 0; j < lg; j++) 
+        {
             cl = cls->cl_cols + d + (j * T_NC(tbl));
             if(COL_calc(cl, aclec, adclec) < 0) return(-1);
         }
