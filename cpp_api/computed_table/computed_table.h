@@ -147,22 +147,22 @@ public:
 
     double get_ymin() const
     {
-        return (double) ref_table->t_ymin;
+        return (double) ref_table->y_min;
     }
 
     double get_ymax() const
     {
-        return (double) ref_table->t_ymax;
+        return (double) ref_table->y_max;
     }
 
     double get_zmin() const
     {
-        return (double) ref_table->t_zmin;
+        return (double) ref_table->z_min;
     } 
 
     double get_zmax() const
     {
-        return (double) ref_table->t_zmax;
+        return (double) ref_table->z_max;
     }
 
     bool logScale() const
@@ -182,12 +182,12 @@ public:
 
     short get_graph_box() const
     {
-        return (short) ref_table->t_box;
+        return (short) ref_table->chart_box;
     }
 
     short get_graph_shadow() const
     {
-        return (short) ref_table->t_shadow;
+        return (short) ref_table->chart_shadow;
     }
 
     std::string get_line_name(const int line) const

@@ -107,7 +107,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                 case TABLES:
                     tbl = KTVAL(kdb, i);
                     for(k = 0; k < T_NL(tbl) && !found; k++) {
-                        tline = tbl->t_line + k;
+                        tline = tbl->lines + k;
                         tcell = (TCELL *) tline->cells;
                         switch(tline->type) {
                             case TABLE_LINE_SEP   :

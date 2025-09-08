@@ -222,7 +222,7 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
 
     for(j = 0; j < cls->cl_nb; j++) {
         d = j % T_NC(tbl);
-        if(tbl->t_free == 0 && d == 0 && j != 0) continue;
+        if(tbl->repeat_columns == 0 && d == 0 && j != 0) continue;
         T_print_cell(cell + d, cls->cl_cols + j, 1);
     }
     W_printf("\n");
@@ -391,13 +391,13 @@ unsigned char *T_get_title(TBL* tbl)
     static unsigned char    buf[256];
     
     for(k = 0; k < T_NL(tbl); k++)
-        if(tbl->t_line[k].type == TABLE_LINE_TITLE) break;
+        if(tbl->lines[k].type == TABLE_LINE_TITLE) break;
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].cells)->content == 0)
+    if(k == T_NL(tbl) || ((TCELL *) tbl->lines[k].cells)->content == 0)
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].cells)->content, sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->lines[k].cells)->content, sizeof(buf) - 1);
 
     return(buf);
 }

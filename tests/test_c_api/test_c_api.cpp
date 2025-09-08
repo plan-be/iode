@@ -815,41 +815,41 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TLINE
-    EXPECT_EQ(tbl->t_lang, extracted_tbl->t_lang);
-    EXPECT_EQ(tbl->t_free, extracted_tbl->t_free);
-    EXPECT_EQ(tbl->t_nc, extracted_tbl->t_nc);
-    EXPECT_EQ(tbl->t_nl, extracted_tbl->t_nl);
-    EXPECT_EQ(tbl->t_zmin, extracted_tbl->t_zmin);
-    EXPECT_EQ(tbl->t_zmax, extracted_tbl->t_zmax);
-    EXPECT_EQ(tbl->t_ymin, extracted_tbl->t_ymin);
-    EXPECT_EQ(tbl->t_ymax, extracted_tbl->t_ymax);
-    EXPECT_EQ(tbl->t_attr, extracted_tbl->t_attr);
-    EXPECT_EQ(tbl->t_box, extracted_tbl->t_box);
-    EXPECT_EQ(tbl->t_shadow, extracted_tbl->t_shadow);
-    EXPECT_EQ(tbl->t_gridx, extracted_tbl->t_gridx);
-    EXPECT_EQ(tbl->t_gridy, extracted_tbl->t_gridy);
-    EXPECT_EQ(tbl->t_axis, extracted_tbl->t_axis);
-    EXPECT_EQ(tbl->t_align, extracted_tbl->t_align);
+    EXPECT_EQ(tbl->language, extracted_tbl->language);
+    EXPECT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
+    EXPECT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
+    EXPECT_EQ(tbl->nb_lines, extracted_tbl->nb_lines);
+    EXPECT_EQ(tbl->z_min, extracted_tbl->z_min);
+    EXPECT_EQ(tbl->z_max, extracted_tbl->z_max);
+    EXPECT_EQ(tbl->y_min, extracted_tbl->y_min);
+    EXPECT_EQ(tbl->y_max, extracted_tbl->y_max);
+    EXPECT_EQ(tbl->attribute, extracted_tbl->attribute);
+    EXPECT_EQ(tbl->chart_box, extracted_tbl->chart_box);
+    EXPECT_EQ(tbl->chart_shadow, extracted_tbl->chart_shadow);
+    EXPECT_EQ(tbl->chart_gridx, extracted_tbl->chart_gridx);
+    EXPECT_EQ(tbl->chart_gridy, extracted_tbl->chart_gridy);
+    EXPECT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
+    EXPECT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
 
     // ----- check div line
-    EXPECT_EQ(tbl->t_div.type, extracted_tbl->t_div.type);
-    EXPECT_EQ(tbl->t_div.graph_type, extracted_tbl->t_div.graph_type);
-    EXPECT_EQ(tbl->t_div.right_axis, extracted_tbl->t_div.right_axis);
-    EXPECT_EQ(tbl->t_div.unused, extracted_tbl->t_div.unused);
-    cells_0 = (TCELL*) tbl->t_div.cells;
-    cells_1 = (TCELL*) extracted_tbl->t_div.cells;
+    EXPECT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
+    EXPECT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
+    EXPECT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
+    EXPECT_EQ(tbl->divider_line.unused, extracted_tbl->divider_line.unused);
+    cells_0 = (TCELL*) tbl->divider_line.cells;
+    cells_1 = (TCELL*) extracted_tbl->divider_line.cells;
 
-    for(j = 0; j < tbl->t_nc; j++)
+    for(j = 0; j < tbl->nb_columns; j++)
     {
         EXPECT_EQ(cells_0[j].type, cells_1[j].type);
         EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
     }
 
     // ----- check all lines
-    for(i = 0; i < tbl->t_nl; i++)
+    for(i = 0; i < tbl->nb_lines; i++)
     {
-        line_0 = tbl->t_line + i;
-        line_1 = extracted_tbl->t_line + i;
+        line_0 = tbl->lines + i;
+        line_1 = extracted_tbl->lines + i;
 
         EXPECT_EQ(line_0->type, line_1->type);
         EXPECT_EQ(line_0->graph_type, line_1->graph_type);
@@ -868,7 +868,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
             SCR_free(cell_cont_1);
             break;
           case TABLE_LINE_CELL:
-            for(j = 0; j < tbl->t_nc; j++)
+            for(j = 0; j < tbl->nb_columns; j++)
             {
                 EXPECT_EQ(cells_0[j].type, cells_1[j].type);
                 EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
@@ -1024,13 +1024,13 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     c_table = KTVAL(kdb_tbl, pos);
 
     // divider
-    cells = (TCELL*) c_table->t_div.cells;
+    cells = (TCELL*) c_table->divider_line.cells;
     //printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
     printf("Address(cells) =     %p\nAddress(cells + 1) = %p\n", cells, cells + 1);
     printf("Diff(cells, cells+1) = %d\n", (int)((char*)(cells + 1) - (char*)(cells)));
 
     // Next lines temporarily deleted because the do not work in VS 64
-    //for(col = 0; col < c_table->t_nc; col++) {
+    //for(col = 0; col < c_table->nb_columns; col++) {
     //    //cell_content = T_cell_cont(&cells[col], 1);
     //    cell_content = T_div_cont_tbl(c_table, col, 1);
     //    printf("Cell %d:%s\n",col, cell_content);

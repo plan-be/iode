@@ -81,7 +81,7 @@ void ComputedTable::initialize()
     // TODO JMP: please check the code to get column names below carefully.
     //           For instance, when there is only 1 file involved (current workspace), the returned column name 
     //           does not ends with '[1]' while it is the case in the old GUI. 
-    for(int row=0; row < (int) ref_table->nb_lines(); row++)
+    for(int row=0; row < (int) ref_table->nb_lines; row++)
     {
         TableLine* line = ref_table->get_line(row);
 
@@ -89,7 +89,7 @@ void ComputedTable::initialize()
             continue;
         
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
-        TableCell* cell = line->get_cell(1, ref_table->nb_columns());
+        TableCell* cell = line->get_cell(1, ref_table->nb_columns);
         if(cell->get_type() == TableCellType::TABLE_CELL_STRING)
         {
             std::string content = cell->get_content(false);
@@ -98,7 +98,7 @@ void ComputedTable::initialize()
                 std::string column_name;
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
-                int step = ref_table->nb_columns();          // to skip first column of the reference table containing text 
+                int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
                 for(int col=1; col < columns->cl_nb; col+=step)
                 {
                     column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
@@ -112,7 +112,7 @@ void ComputedTable::initialize()
 
     // For each table line, get line name + add a NaN value for each column
     std::string name;
-    for(int row=0; row < (int) ref_table->nb_lines(); row++)
+    for(int row=0; row < (int) ref_table->nb_lines; row++)
     {
         TableLine* line = ref_table->get_line(row);
 
@@ -127,9 +127,9 @@ void ComputedTable::initialize()
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
         if(line->get_line_type() == TableLineType::TABLE_LINE_CELL && 
-           line->get_cell(1, ref_table->nb_columns())->get_type() == TableCellType::TABLE_CELL_LEC)
+           line->get_cell(1, ref_table->nb_columns)->get_type() == TableCellType::TABLE_CELL_LEC)
         {
-            name = line->get_cell(0, ref_table->nb_columns())->get_content(false);
+            name = line->get_cell(0, ref_table->nb_columns)->get_content(false);
             line_names.push_back(name);
             v_line_pos_in_ref_table.push_back(row);
 
@@ -221,7 +221,7 @@ bool ComputedTable::is_editable(const int line, const int col)
     //         reference table starts with 0+
     int line_ref_pos = v_line_pos_in_ref_table.at(line);
     TableLine* line_ref = ref_table->get_line(line_ref_pos);
-    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns());
+    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns);
     std::string lec = cell_ref->get_content(false);
     if(lec.substr(0, 2) == "0+")
         return false;
@@ -309,7 +309,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     int col_pos = v_pos_in_columns_struct[col];
 
     TableLine* line_ref = ref_table->get_line(line_ref_pos);
-    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns());
+    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns);
 
     // RULE 4: Only the first variable found in the LEC expression is updated
     // see https://iode.plan.be/doku.php?id=edit_tables for the rules
@@ -325,7 +325,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
 
     // get divider
     TableLine* line_divider = ref_table->get_divider_line();
-    TableCell* cell_divider = line_divider->get_cell(1, ref_table->nb_columns());
+    TableCell* cell_divider = line_divider->get_cell(1, ref_table->nb_columns);
     std::string div_lec = cell_divider->get_content(false);
     if(div_lec.empty())
         div_lec = "1";
@@ -421,7 +421,7 @@ void ComputedTable::print_to_file()
 
     TableLine* line;
     bool first_title = true;
-    for(int i = 0; i < ref_table->nb_lines(); i++) 
+    for(int i = 0; i < ref_table->nb_lines; i++) 
     {
         line = ref_table->get_line(i);
 

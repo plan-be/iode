@@ -93,22 +93,22 @@ struct TLINE32
 
 struct TBL32 
 {
-    short   t_lang;
-    short   t_free;     /* = 0, first column is frozen */
-    short   t_nc;
-    short   t_nl;
-    TLINE32 t_div;     /* t_nc CELLS, each CELL contains a divider, attr */
-    PTR32   t_line;    /* t_nl TLINE of t_nc CELLS */
-    float   t_zmin;    /* FLOAT 12-04-98 */
-    float   t_zmax;    /* FLOAT 12-04-98 */
-    float   t_ymin;    /* FLOAT 12-04-98 */
-    float   t_ymax;    /* FLOAT 12-04-98 */
-    char    t_attr;    /* 0, ... 9 */
-    char    t_box;     /* 0, ... 9 */
-    char    t_shadow;  /* 0, ... 9 */
-    char    t_gridx;   /* G_NONE, G_MINOR, G_MAJOR */
-    char    t_gridy;   /* G_NONE, G_MINOR, G_MAJOR */
-    char    t_axis;    /* G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
-    char    t_align;   /* G_LEFT, G_MIDDLE, G_RIGHT */
-    char    t_pad[13];
+    short   language;
+    short   repeat_columns;     /* = 0, first column is frozen */
+    short   nb_columns;
+    short   nb_lines;
+    TLINE32 divider_line;     /* nb_columns CELLS, each CELL contains a divider, attr */
+    PTR32   lines;    /* nb_lines TLINE of nb_columns CELLS */
+    float   z_min;    /* FLOAT 12-04-98 */
+    float   z_max;    /* FLOAT 12-04-98 */
+    float   y_min;    /* FLOAT 12-04-98 */
+    float   y_max;    /* FLOAT 12-04-98 */
+    char    attribute;    /* 0, ... 9 */
+    char    chart_box;     /* 0, ... 9 */
+    char    chart_shadow;  /* 0, ... 9 */
+    char    chart_gridx;   /* G_NONE, G_MINOR, G_MAJOR */
+    char    chart_gridy;   /* G_NONE, G_MINOR, G_MAJOR */
+    char    chart_axis_type;    /* G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
+    char    text_alignment;   /* G_LEFT, G_MIDDLE, G_RIGHT */
+    char    pad[13];
 };

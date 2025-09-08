@@ -114,8 +114,8 @@ static void read_div(TBL* tbl, YYFILE* yy)
     int     i;
     TCELL   *cell;
 
-    cell = (TCELL *) (tbl->t_div).cells;
-    for(i = 0; i < tbl->t_nc; i++)
+    cell = (TCELL *) (tbl->divider_line).cells;
+    for(i = 0; i < tbl->nb_columns; i++)
         read_cell(cell + i, yy, 0);
 }
 
@@ -158,7 +158,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
     TCELL   *cell;
 
     if(T_add_line(tbl) < 0) return(-1);
-    c_line = tbl->t_line + (tbl->t_nl - 1);
+    c_line = tbl->lines + (tbl->nb_lines - 1);
 
     while(1) {
         keyw = YY_lex(yy);
@@ -278,7 +278,7 @@ static TBL* read_tbl(YYFILE* yy)
             case TABLE_ASCII_DUTCH   :
             case TABLE_ASCII_FRENCH  :
             case TABLE_ASCII_ENGLISH :
-                tbl->t_lang = keyw;
+                tbl->language = keyw;
                 break;
 
             case TABLE_ASCII_DIM     :
@@ -290,33 +290,33 @@ static TBL* read_tbl(YYFILE* yy)
                 break;
 
             case TABLE_ASCII_BOX     :
-                tbl->t_box = (char)K_read_long(yy);
+                tbl->chart_box = (char)K_read_long(yy);
                 break;
             case TABLE_ASCII_AXIS     :
-                tbl->t_axis = (char)K_read_long(yy);
+                tbl->chart_axis_type = (char)K_read_long(yy);
                 break;
             case TABLE_ASCII_XGRID    :
-                tbl->t_gridx = (char)K_read_long(yy);
+                tbl->chart_gridx = (char)K_read_long(yy);
                 break;
             case TABLE_ASCII_YGRID    :
-                tbl->t_gridy = (char)K_read_long(yy);
+                tbl->chart_gridy = (char)K_read_long(yy);
                 break;
 
             case TABLE_ASCII_YMIN     :
-                tbl->t_ymin  = (float)K_read_real(yy);
+                tbl->y_min  = (float)K_read_real(yy);
                 break;
             case TABLE_ASCII_YMAX     :
-                tbl->t_ymax  = (float)K_read_real(yy);
+                tbl->y_max  = (float)K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMIN     :
-                tbl->t_zmin  = (float)K_read_real(yy);
+                tbl->z_min  = (float)K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMAX     :
-                tbl->t_zmax  = (float)K_read_real(yy);
+                tbl->z_max  = (float)K_read_real(yy);
                 break;
 
             case TABLE_ASCII_ALIGN:
-                tbl->t_align = K_read_align(yy);
+                tbl->text_alignment = K_read_align(yy);
                 break;
 
             case TABLE_ASCII_BREAK   :
@@ -469,7 +469,7 @@ static void grinfo(FILE *fd, int axis, int type)
  *  @return             void
  *  
  */
-static void print_axis(FILE* fd, char* str, float value)
+static void princhart_axis_type(FILE* fd, char* str, float value)
 {
     if(IODE_IS_A_NUMBER(value)) fprintf(fd, "\n%s %f ", str, value);
 }
@@ -482,7 +482,7 @@ static void print_axis(FILE* fd, char* str, float value)
  *  @return             void
  *  
  */
-static void print_attr(FILE* fd, int attr)
+static void prinattribute(FILE* fd, int attr)
 {
     if(attr & TABLE_CELL_BOLD)      fprintf(fd, "BOLD ");
     if(attr & TABLE_CELL_ITALIC)    fprintf(fd, "ITALIC ");
@@ -525,7 +525,7 @@ static void print_cell(FILE *fd, TCELL *cell)
             break;
     }
     if(cell->content[0] != '\0') 
-        print_attr(fd, cell->attribute);
+        prinattribute(fd, cell->attribute);
 }
 
 /**
@@ -546,35 +546,35 @@ static void print_tbl(FILE* fd, TBL* tbl)
     K_wrdef(fd, TABLE, T_LANG(tbl));
     /* GB 2/3/00 */
     fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ",
-            tbl->t_box, tbl->t_axis, tbl->t_gridx, tbl->t_gridy);
-    align(fd, tbl->t_align);
-    print_axis(fd, "YMIN", tbl->t_ymin);
-    print_axis(fd, "YMAX", tbl->t_ymax);
-    print_axis(fd, "ZMIN", tbl->t_zmin);
-    print_axis(fd, "ZMAX", tbl->t_zmax);
+            tbl->chart_box, tbl->chart_axis_type, tbl->chart_gridx, tbl->chart_gridy);
+    align(fd, tbl->text_alignment);
+    princhart_axis_type(fd, "YMIN", tbl->y_min);
+    princhart_axis_type(fd, "YMAX", tbl->y_max);
+    princhart_axis_type(fd, "ZMIN", tbl->z_min);
+    princhart_axis_type(fd, "ZMAX", tbl->z_max);
 
     fprintf(fd, "\nDIV ");
     /* div */
     for(i = 0; i < T_NC(tbl); i++)
-        print_cell(fd, (TCELL *)(tbl->t_div.cells) + i);
+        print_cell(fd, (TCELL *)(tbl->divider_line.cells) + i);
 
     /* lines */
 
     for(j = 0; j < T_NL(tbl); j++) {
         fprintf(fd, "\n- ");
-        switch(tbl->t_line[j].type) {
+        switch(tbl->lines[j].type) {
             case TABLE_ASCII_LINE_CELL :
-                cell = (TCELL *) tbl->t_line[j].cells;
+                cell = (TCELL *) tbl->lines[j].cells;
                 for(i = 0; i < T_NC(tbl); i++)
                     print_cell(fd, cell + i);
 
                 /* append GR info */
-                grinfo(fd, tbl->t_line[j].right_axis, tbl->t_line[j].graph_type);
+                grinfo(fd, tbl->lines[j].right_axis, tbl->lines[j].graph_type);
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                K_wrdef(fd, TABLE, tbl->t_line[j].type);
-                print_cell(fd, (TCELL *) tbl->t_line[j].cells);
+                K_wrdef(fd, TABLE, tbl->lines[j].type);
+                print_cell(fd, (TCELL *) tbl->lines[j].cells);
                 break;
 
             case TABLE_ASCII_LINE_SEP   :
@@ -582,7 +582,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                K_wrdef(fd, TABLE, tbl->t_line[j].type);
+                K_wrdef(fd, TABLE, tbl->lines[j].type);
                 break;
 
             default       :

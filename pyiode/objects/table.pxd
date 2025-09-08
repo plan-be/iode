@@ -25,24 +25,24 @@ cdef extern from "api/all.h":
 
     # Define the TBL structure
     cdef struct TBL:
-        short  t_lang
-        short  t_free
-        short  t_nc
-        short  t_nl
-        TLINE  t_div
-        TLINE* t_line
-        float  t_zmin
-        float  t_zmax
-        float  t_ymin
-        float  t_ymax
-        char   t_attr
-        char   t_box
-        char   t_shadow
-        char   t_gridx
-        char   t_gridy
-        char   t_axis
-        char   t_align
-        char   t_pad[13]
+        short  language
+        short  repeat_columns
+        short  nb_columns
+        short  nb_lines
+        TLINE  divider_line
+        TLINE* lines
+        float  z_min
+        float  z_max
+        float  y_min
+        float  y_max
+        char   attribute
+        char   chart_box
+        char   chart_shadow
+        char   chart_gridx
+        char   chart_gridy
+        char   chart_axis_type
+        char   text_alignment
+        char   pad[13]
 
 
 cdef extern from "cpp_api/objects/table.h":
@@ -118,16 +118,15 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ Table class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CTable "Table":
+        short  nb_columns
+        short  nb_lines
+
         # Constructor
         CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, bint date) except +
         CTable(int nb_columns, string& def_, vector[string]& titles, vector[string]& lecs, bint mode, bint files, bint date) except +
         CTable(int nb_columns, string& def_, string& lecs, bint mode, bint files, bint date) except +
         # Copy constructor
         CTable(const CTable& table) except +
-
-        # Getters and Setters
-        short nb_lines()
-        short nb_columns()
 
         string get_language()
         void set_language(TableLang lang) except +

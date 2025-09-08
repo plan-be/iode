@@ -60,14 +60,14 @@ TBL *T_create(int dim)
     T_NC(tbl)   = dim;
     T_LANG(tbl) = TABLE_ENGLISH;
 
-    tbl->t_zmin = (float)IODE_NAN;
-    tbl->t_zmax = (float)IODE_NAN;
-    tbl->t_ymin = (float)IODE_NAN;
-    tbl->t_ymax = (float)IODE_NAN;
+    tbl->z_min = (float)IODE_NAN;
+    tbl->z_max = (float)IODE_NAN;
+    tbl->y_min = (float)IODE_NAN;
+    tbl->y_max = (float)IODE_NAN;
 
-    tbl->t_div.type = TABLE_LINE_CELL;
-    tbl->t_div.cells  = SW_nalloc(dim * sizeof(TCELL));
-    cell               = (TCELL *) tbl->t_div.cells;
+    tbl->divider_line.type = TABLE_LINE_CELL;
+    tbl->divider_line.cells  = SW_nalloc(dim * sizeof(TCELL));
+    cell               = (TCELL *) tbl->divider_line.cells;
 
     for(i = 0; i < dim; i++) {
         cell[i].type = TABLE_CELL_LEC;
@@ -90,10 +90,10 @@ void T_free(TBL* tbl)
 {
     int     i;
 
-    T_free_line(&(tbl->t_div), T_NC(tbl));
-    for(i = 0; i < T_NL(tbl); i++) T_free_line(tbl->t_line + i, T_NC(tbl));
+    T_free_line(&(tbl->divider_line), T_NC(tbl));
+    for(i = 0; i < T_NL(tbl); i++) T_free_line(tbl->lines + i, T_NC(tbl));
 
-    SW_nfree(tbl->t_line);
+    SW_nfree(tbl->lines);
     SW_nfree(tbl);
 }
 
@@ -152,7 +152,7 @@ int T_add_line(TBL* tbl)
                                         sizeof(TLINE) * nl, sizeof(TLINE) * (nl + KT_CHUNCK));
     if(T_L(tbl) == 0) return(-1);
 
-    tbl->t_nl++;
+    tbl->nb_lines++;
     return(0);
 }
 
@@ -248,7 +248,7 @@ char* T_cell_cont(TCELL* cell, int mode)
  */
 char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
 {
-    TLINE line = tbl->t_line[row];
+    TLINE line = tbl->lines[row];
     TCELL* cell = (TCELL*) line.cells;
     switch (line.type)
     {
@@ -278,7 +278,7 @@ char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
 
 char* T_div_cont_tbl(TBL* tbl, int col, int mode)
 {
-    TCELL* cell = (TCELL*)tbl->t_div.cells;;
+    TCELL* cell = (TCELL*)tbl->divider_line.cells;;
     return(T_cell_cont(cell + col, mode));
 }
 
@@ -295,11 +295,11 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
  */
 int T_insert_line(TBL* tbl, int nbr, int type, int where)
 {
-    TLINE   *oline, *nline;
+    TLINE   *old_lines, *new_lines;
 
     if(type < 0) return(nbr);
-    oline = tbl->t_line;
-    nline = (TLINE *)
+    old_lines = tbl->lines;
+    new_lines = (TLINE *)
             SW_nalloc(((T_NL(tbl) + 1)/KT_CHUNCK + 1) * KT_CHUNCK * sizeof(TLINE));
 
     if(nbr < 0) {
@@ -309,19 +309,23 @@ int T_insert_line(TBL* tbl, int nbr, int type, int where)
     if(where == 0) nbr += 1;
     if(T_NL(tbl) > 0) {
         if(nbr > 0)
-            memcpy(nline, oline, nbr * sizeof(TLINE));
+            memcpy(new_lines, old_lines, nbr * sizeof(TLINE));
         if(T_NL(tbl) > nbr)
-            memcpy(nline + nbr + 1, oline + nbr, (T_NL(tbl) - nbr) * sizeof(TLINE));
+            memcpy(new_lines + nbr + 1, old_lines + nbr, (T_NL(tbl) - nbr) * sizeof(TLINE));
     }
     else nbr = 0;
 
-    if(type == TABLE_LINE_CELL)  T_create_cell(tbl, nline + nbr);
-    if(type == TABLE_LINE_TITLE) T_create_title(tbl, nline + nbr);
+    if(type == TABLE_LINE_CELL)  T_create_cell(tbl, new_lines + nbr);
+    if(type == TABLE_LINE_TITLE) T_create_title(tbl, new_lines + nbr);
 
-    nline[nbr].type = type;
-    tbl->t_line = nline;
+    if(&new_lines[nbr] == NULL)
+        throw std::runtime_error("Table: failed to insert a line in the table at position " 
+                                 + std::to_string(nbr));
+
+    new_lines[nbr].type = type;
+    tbl->lines = new_lines;
     T_NL(tbl)++;
-    SW_nfree(oline);
+    SW_nfree(old_lines);
     return(nbr);
 }
 
@@ -366,7 +370,7 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
  */
 int T_set_lec_cel_tbl(TBL* tbl, int row, int col, unsigned char* lec)
 {
-    TLINE line = tbl->t_line[row];
+    TLINE line = tbl->lines[row];
     TCELL* cell = (TCELL*) line.cells;
     return(T_set_lec_cell(cell + col, lec));
 }
@@ -420,7 +424,7 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
  */
 void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)
 {
-    TLINE line = tbl->t_line[row];
+    TLINE line = tbl->lines[row];
     TCELL* cell = (TCELL*) line.cells;
     T_set_string_cell(cell + col, txt);
 }
@@ -430,7 +434,7 @@ T_get_cell_attr(tbl, i, j)
 TBL *tbl;
 int i, j;
 {
-    TLINE   *line = tbl->t_line + i;
+    TLINE   *line = tbl->lines + i;
     TCELL   *cell;
 
     switch(line->type) {
@@ -456,7 +460,7 @@ int i, j;
  */
 void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
 {
-    TLINE   *line = tbl->t_line + i;
+    TLINE   *line = tbl->lines + i;
     TCELL   *cell;
 
     switch(line->type) {
@@ -494,12 +498,12 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
         T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_TITLE, 0);
         SCR_strip((unsigned char*) titg);
         if(titg[0])
-            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].cells), (unsigned char*) titg);
+            T_set_string_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells), (unsigned char*) titg);
         T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
     }
     T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
     for(j = 1 ; j < T_NC(tbl) ; j++) {
-        T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].cells) + j, (unsigned char*) "\"#S");  /* JMP 24-03-2004 */
+        T_set_string_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells) + j, (unsigned char*) "\"#S");  /* JMP 24-03-2004 */
         T_set_cell_attr(tbl, T_NL(tbl) - 1, j, TABLE_CELL_CENTER); /* JMP 11-11-93 */
     }
     T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
@@ -507,9 +511,9 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
     if(lecs && titls) {
         for(i = 0 ; lecs[i] && titls[i]; i++) {
             T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
-            T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].cells), (unsigned char*) titls[i]);
+            T_set_string_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells), (unsigned char*) titls[i]);
             for(j = 1 ; j < T_NC(tbl) ; j++)
-                T_set_lec_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].cells) + j, (unsigned char*) lecs[i]);
+                T_set_lec_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells) + j, (unsigned char*) lecs[i]);
         }
     }
     else T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_CELL, 0);
