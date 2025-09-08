@@ -412,7 +412,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
         K_xdrSHORT(&nl);
     }
     XDR_rev(tbl, 4, sizeof(short));
-    XDR_rev(&(tbl->t_zmin), 4, sizeof(double));
+    XDR_rev(&(tbl->z_min), 4, sizeof(double));
 
     /* div:1  TCELL machine independent */
     len = P_get_len(pack, 1);

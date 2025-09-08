@@ -130,7 +130,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     TCELL   *cell;   
 
 //    KT_attr = 4;
-    if(tbl->t_nc != 2) {
+    if(tbl->nb_columns != 2) {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
         return(-1);
@@ -156,10 +156,10 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     if(mode != 0) W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
     
     w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,  /* JMP 19-02-98 */
-                    tbl->t_gridx, tbl->t_gridy,
-                    (double)tbl->t_ymin, (double)tbl->t_ymax,
-                    (double)tbl->t_zmin, (double)tbl->t_zmax,
-                    tbl->t_align, tbl->t_box, 50 * tbl->t_shadow); /* JMP 23-02-98 */
+                    tbl->chart_gridx, tbl->chart_gridy,
+                    (double)tbl->y_min, (double)tbl->y_max,
+                    (double)tbl->z_min, (double)tbl->z_max,
+                    tbl->text_alignment, tbl->chart_box, 50 * tbl->chart_shadow); /* JMP 23-02-98 */
 
     for(i = 0; i < T_NL(tbl) && w >= 0; i++) {
         line = T_L(tbl) + i;
@@ -858,7 +858,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     double    step, *x, *y;
     TCELL   *cell;
 
-    if(tbl->t_nc != 2) {
+    if(tbl->nb_columns != 2) {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
         return(-1);

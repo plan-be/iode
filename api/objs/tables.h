@@ -113,25 +113,25 @@ struct TLINE {
 };
 
 struct TBL {
-    short   t_lang;     // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
-    short   t_free;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
-    short   t_nc;       // Number of columns (of text and lec, not calculated values)
-    short   t_nl;       // Number of lines
-    TLINE   t_div;      // t_nc TCELL's, each TCELL contains a divider
-    TLINE   *t_line;    // t_nl TLINE's of t_nc TCELL's
-    float   t_zmin;     // Min on the right axis
-    float   t_zmax;     // Max on the right axis
-    float   t_ymin;     // Min on left axis
-    float   t_ymax;     // Max on left axis
-    char    t_attr;     // Combination (logical &) of attributes: TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_CENTER,
-                        // TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
-    char    t_box;      // 1 to surround the chart by a box
-    char    t_shadow;   // 1 to place a shadow behind the chart
-    char    t_gridx;    // 0 = major grids, 1 = no grids, 2 = minor + major grids
-    char    t_gridy;    // idem
-    char    t_axis;     // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
-    char    t_align;    // Text alignment: 0=left, 1=centered, 2 = right
-    char    t_pad[13];  // Padding for struct alignment
+    short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
+    short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
+    short   nb_columns;         // Number of columns (of text and lec, not calculated values)
+    short   nb_lines;           // Number of lines
+    TLINE   divider_line;       // nb_columns TCELL's, each TCELL contains a divider
+    TLINE*  lines;              // nb_lines TLINE's of nb_columns TCELL's
+    float   z_min;              // Min on the right axis
+    float   z_max;              // Max on the right axis
+    float   y_min;              // Min on left axis
+    float   y_max;              // Max on left axis
+    char    attribute;          // Combination (logical &) of attributes: TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_CENTER,
+                                // TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
+    char    chart_box;          // 1 to surround the chart by a box
+    char    chart_shadow;       // 1 to place a shadow behind the chart
+    char    chart_gridx;        // 0 = major grids, 1 = no grids, 2 = minor + major grids
+    char    chart_gridy;        // idem
+    char    chart_axis_type;    // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
+    char    text_alignment;     // Text alignment: 0=left, 1=centered, 2 = right
+    char    pad[13];            // Padding for struct alignment
 };
 
 /*----------------------- FUNCS ----------------------------*/
@@ -160,11 +160,11 @@ void T_auto(TBL *,char *,char **,int ,int ,int );
 
 /*----------------------- MACROS ----------------------------*/
 
-#define T_NC(tbl)           (tbl->t_nc)
-#define T_NL(tbl)           (tbl->t_nl)
-#define T_LANG(tbl)         (tbl->t_lang)
-#define T_L(tbl)            (tbl->t_line)
-#define T_C(tbl, i, j)      ((tbl->t_line[i]).cells[j])
+#define T_NC(tbl)           (tbl->nb_columns)
+#define T_NL(tbl)           (tbl->nb_lines)
+#define T_LANG(tbl)         (tbl->language)
+#define T_L(tbl)            (tbl->lines)
+#define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
 
 #define TABLE_CELL_ALIGN(attr, align)   (((attr) & 7) | (align))
 #define TABLE_CELL_FONT(attr, font)     ((attr) | (font))

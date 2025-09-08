@@ -66,15 +66,15 @@ TEST_F(KDBTablesTest, Get)
     // by position
     Table table = Tables.get(pos);
     EXPECT_EQ(table.get_title(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table.nb_lines(), 31);
-    EXPECT_EQ(table.nb_columns(), 2);
+    EXPECT_EQ(table.nb_lines, 31);
+    EXPECT_EQ(table.nb_columns, 2);
     EXPECT_EQ(table.get_line(0)->get_line_type(), TABLE_LINE_TITLE);
 
     // by name
     Table table2 = Tables.get("GFRPC");
     EXPECT_EQ(table2.get_title(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table2.nb_lines(), 31);
-    EXPECT_EQ(table2.nb_columns(), 2);
+    EXPECT_EQ(table2.nb_lines, 31);
+    EXPECT_EQ(table2.nb_columns, 2);
     EXPECT_EQ(table2.get_line(0)->get_line_type(), TABLE_LINE_TITLE);
 }
 
@@ -122,7 +122,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     int nb_lines_footnotes = 0;
     int nb_lines_vars = 0;
     Table table1 = Tables.get(name);
-    EXPECT_EQ(table1.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(table1.nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
     Tables.remove(name);
@@ -141,7 +141,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     nb_lines_vars = vars.size() + vars_envi_list.size() - 1;    // -1 for list_name which is expanded
     Table table2 = Tables.get(name);
-    EXPECT_EQ(table2.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(table2.nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // check lines
     std::vector<std::string> expanded_vars = vars;
@@ -196,7 +196,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     // check lines
     nb_lines_vars = (int) lecs.size();
     Table table3 = Tables.get(name);
-    EXPECT_EQ(table3.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(table3.nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     line = table3.get_line(0);
     EXPECT_EQ(line->get_line_type(), TABLE_LINE_TITLE);
@@ -248,7 +248,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     // check lines
     nb_lines_vars = lecs.size() + vars_envi_list.size();
     Table table4 = Tables.get(name);
-    EXPECT_EQ(table4.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(table4.nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     std::vector<std::string> expanded_lecs = lecs;
     expanded_lecs.insert(expanded_lecs.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
@@ -347,9 +347,9 @@ TEST_F(KDBTablesTest, Filter)
     int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
-    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(Tables.get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), Tables.get(new_name)->nb_lines());
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(Tables.get(new_name)->nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines, Tables.get(new_name)->nb_lines);
     EXPECT_EQ(*kdb_subset->get(new_name), *Tables.get(new_name));
 
     // rename an element in the local KDB and check if the 
@@ -357,7 +357,7 @@ TEST_F(KDBTablesTest, Filter)
     std::string old_name = new_name;
     new_name = "TABLE_NEW";
     kdb_subset->rename(old_name, new_name);
-    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), Tables.get(new_name)->nb_lines());
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines, Tables.get(new_name)->nb_lines);
     EXPECT_EQ(*kdb_subset->get(new_name), *Tables.get(new_name));
 
     // delete an element from the local KDB and check if it has also 
@@ -424,7 +424,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Tables.contains(new_name));
-    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB

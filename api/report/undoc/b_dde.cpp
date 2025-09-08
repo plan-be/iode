@@ -376,7 +376,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                 else
                     for(j = 0; j < cls->cl_nb; j++) {
                         d = j % T_NC(tbl);
-                        if(tbl->t_free == 0 && d == 0 && j != 0) continue;
+                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) continue;
                         strcat(buf, IodeTblCell((TCELL *) line->cells + d, cls->cl_cols + j, nbdec));
                         strcat(buf, "\t");
                     }

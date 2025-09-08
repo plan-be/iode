@@ -74,9 +74,9 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_EQ(lst_pre, expected_lst_pre);
 
     // Check _DIVER list (divergent equations)
-    std::string lst_diver = Lists.get("_DIVER");
-    std::string expected_lst_diver = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_EQ(lst_diver, expected_lst_diver);
+    std::string lsdivider_lineer = Lists.get("_DIVER");
+    std::string expected_lsdivider_lineer = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
+    EXPECT_EQ(lsdivider_lineer, expected_lsdivider_lineer);
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;

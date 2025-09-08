@@ -240,7 +240,7 @@ int COL_resize(TBL* tbl, COLS* cls)
     old = cls->cl_cols;
     old_nb = cls->cl_nb;
 
-    dim = tbl->t_nc;
+    dim = tbl->nb_columns;
     new_nb = cls->cl_nb * dim;
 
     cls->cl_cols = (COL *) SW_nalloc(sizeof(COL)* new_nb);
@@ -252,7 +252,7 @@ int COL_resize(TBL* tbl, COLS* cls)
 
     if(old_nb != 0) SW_nfree(old);
 
-    if(tbl->t_free == 0) return(1 + old_nb * (dim - 1));
+    if(tbl->repeat_columns == 0) return(1 + old_nb * (dim - 1));
     else return(new_nb);
 }
 
@@ -291,7 +291,7 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     COL     *cl;
     TLINE   *line = T_L(tbl) + i;
     TCELL   *cell = (TCELL *) line->cells;
-    TCELL   *dcell = (TCELL *)(tbl->t_div).cells;
+    TCELL   *dcell = (TCELL *)(tbl->divider_line).cells;
     CLEC    *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
 
     lg = cls->cl_nb / T_NC(tbl);

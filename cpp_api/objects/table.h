@@ -219,10 +219,6 @@ public:
 
 	void set_language(const TableLang lang);
 
-	short nb_columns() const;
-
-	short nb_lines() const;
-
 	TableGraphGrid get_gridx() const;
 
 	void set_gridx(const TableGraphGrid gridx);
@@ -327,27 +323,27 @@ struct std::hash<TBL>
     {
 		std::size_t seed = 0;
 
-		hash_combine<short>(seed, table.t_lang);
-		hash_combine<short>(seed, table.t_free);
-		hash_combine<short>(seed, table.t_nl);
-		hash_combine<short>(seed, table.t_nc);
+		hash_combine<short>(seed, table.language);
+		hash_combine<short>(seed, table.repeat_columns);
+		hash_combine<short>(seed, table.nb_lines);
+		hash_combine<short>(seed, table.nb_columns);
 
-		_nb_columns_ = table.t_nc;
-		hash_combine<TLINE>(seed, table.t_div);
-		for (int i = 0; i < table.t_nl; i++)
-			hash_combine<TLINE>(seed, table.t_line[i]);
+		_nb_columns_ = table.nb_columns; 	// used in std::hash<TLINE>
+		hash_combine<TLINE>(seed, table.divider_line);
+		for (int i = 0; i < table.nb_lines; i++)
+			hash_combine<TLINE>(seed, table.lines[i]);
 
-		hash_combine<float>(seed, table.t_zmin);
-		hash_combine<float>(seed, table.t_zmax);
-		hash_combine<float>(seed, table.t_ymin);
-		hash_combine<float>(seed, table.t_ymax);
-		hash_combine<char>(seed, table.t_attr);
-		hash_combine<char>(seed, table.t_box);
-		hash_combine<char>(seed, table.t_shadow);
-		hash_combine<char>(seed, table.t_gridx);
-		hash_combine<char>(seed, table.t_gridy);
-		hash_combine<char>(seed, table.t_axis);
-		hash_combine<char>(seed, table.t_align);
+		hash_combine<float>(seed, table.z_min);
+		hash_combine<float>(seed, table.z_max);
+		hash_combine<float>(seed, table.y_min);
+		hash_combine<float>(seed, table.y_max);
+		hash_combine<char>(seed, table.attribute);
+		hash_combine<char>(seed, table.chart_box);
+		hash_combine<char>(seed, table.chart_shadow);
+		hash_combine<char>(seed, table.chart_gridx);
+		hash_combine<char>(seed, table.chart_gridy);
+		hash_combine<char>(seed, table.chart_axis_type);
+		hash_combine<char>(seed, table.text_alignment);
 
 		return seed;
     }
