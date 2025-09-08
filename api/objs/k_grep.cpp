@@ -120,8 +120,8 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                                 break;
                             case TABLE_LINE_CELL  :
                                 for(j = 0; j < T_NC(tbl) && !found; j++)
-                                    if((texts && tcell[j].tc_type == TABLE_CELL_STRING) ||
-                                            (forms && tcell[j].tc_type == TABLE_CELL_LEC))
+                                    if((texts && tcell[j].type == TABLE_CELL_STRING) ||
+                                            (forms && tcell[j].type == TABLE_CELL_LEC))
                                         found = !SCR_grep_gnl(pattern, T_cell_cont(tcell + j, 1), ecase, all);
                                 break;
                         }

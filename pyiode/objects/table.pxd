@@ -9,10 +9,10 @@ from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellF
 cdef extern from "api/all.h":
     # Define the TCELL structure
     cdef struct TCELL:
-        char* tc_val
-        char  tc_type
-        char  tc_attr
-        char  tc_pad[2]
+        char* content
+        char  type
+        char  attribute
+        char  pad[2]
 
     # Define the TLINE structure
     cdef struct TLINE:

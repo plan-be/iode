@@ -499,9 +499,9 @@ int B_DumpTblDef(TBL* tbl)
  */
 int B_CellDef(TCELL* cell)
 {
-    if((cell->tc_val) == NULL) return(0);
-    if(cell->tc_type == TABLE_CELL_LEC &&
-            strcmp("1", (char*) P_get_ptr(cell->tc_val, 0)) == 0) return(0);
+    if((cell->content) == NULL) return(0);
+    if(cell->type == TABLE_CELL_LEC &&
+            strcmp("1", (char*) P_get_ptr(cell->content, 0)) == 0) return(0);
     return(1);
 }
 
@@ -519,21 +519,21 @@ int B_PrintTblCell(TCELL* cell, int straddle)
         return(0);
     }
 
-    switch(cell->tc_type) {
+    switch(cell->type) {
         case TABLE_CELL_STRING :
-            T_open_cell(cell->tc_attr, straddle, TABLE_CELL_STRING); /* JMP 16-12-93 */
+            T_open_cell(cell->attribute, straddle, TABLE_CELL_STRING); /* JMP 16-12-93 */
             /*      W_printf("&%d%c", straddle, ((straddle > 1) ? 'C' : 'L')); /* JMP 16-12-93 */
-            T_open_attr(cell->tc_attr);
-            W_printf("\"%s\"", cell->tc_val);
+            T_open_attr(cell->attribute);
+            W_printf("\"%s\"", cell->content);
             break;
 
         case TABLE_CELL_LEC :
             W_printfRepl("&%dL", straddle);
-            T_open_attr(cell->tc_attr);
-            W_printf("%s", P_get_ptr(cell->tc_val, 0));
+            T_open_attr(cell->attribute);
+            W_printf("%s", P_get_ptr(cell->content, 0));
             break;
     }
-    T_close_attr(cell->tc_attr);
+    T_close_attr(cell->attribute);
     return(0);
 }
 

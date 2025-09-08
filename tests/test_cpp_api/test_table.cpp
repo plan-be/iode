@@ -76,14 +76,14 @@ TEST_F(TablesTest, AddGetTBL)
     cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
     for(int j = 0; j < tbl->t_nc; j++)
     {
-        ASSERT_EQ(cells_0[j].tc_type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[j].tc_type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[0].tc_type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[1].tc_type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
-        ASSERT_EQ(cells_0[j].tc_attr, TABLE_CELL_LEFT);
-        ASSERT_EQ(cells_1[0].tc_attr, TABLE_CELL_LEFT);
-        ASSERT_EQ(cells_1[1].tc_attr, TABLE_CELL_LEFT);
+        ASSERT_EQ(cells_0[j].type, TABLE_CELL_LEC);
+        ASSERT_EQ(cells_1[j].type, TABLE_CELL_LEC);
+        ASSERT_EQ(cells_1[0].type, TABLE_CELL_LEC);
+        ASSERT_EQ(cells_1[1].type, TABLE_CELL_LEC);
+        ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
+        ASSERT_EQ(cells_0[j].attribute, TABLE_CELL_LEFT);
+        ASSERT_EQ(cells_1[0].attribute, TABLE_CELL_LEFT);
+        ASSERT_EQ(cells_1[1].attribute, TABLE_CELL_LEFT);
         ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
     }
 
@@ -110,15 +110,15 @@ TEST_F(TablesTest, AddGetTBL)
         case TableLineType::TABLE_LINE_CELL:
             for(int j = 0; j < tbl->t_nc; j++)
             {
-                ASSERT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
-                ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                ASSERT_EQ(cells_0[j].type, cells_1[j].type);
+                ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
                 if(i == 2 && j == 0)
                 {
-                    ASSERT_EQ(cells_0[j].tc_attr, TABLE_CELL_LEFT);
-                    ASSERT_EQ(cells_1[j].tc_attr, TABLE_CELL_LEFT);
+                    ASSERT_EQ(cells_0[j].attribute, TABLE_CELL_LEFT);
+                    ASSERT_EQ(cells_1[j].attribute, TABLE_CELL_LEFT);
                 }
                 else
-                    ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                    ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
                 ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
             }
             break;
@@ -151,8 +151,8 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     // test if a Table object can be added to the Tables KDB via K_add()
     Table table(nb_columns, def, vars, mode, files, date);
     div_cells = (TCELL*) table.t_div.tl_val;
-    ASSERT_EQ(div_cells[0].tc_type, TABLE_CELL_LEC);
-    ASSERT_EQ(div_cells[1].tc_type, TABLE_CELL_LEC);
+    ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
+    ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
 
     K_add(KT_WS, c_name, static_cast<TBL*>(&table));
     int pos = K_find(KT_WS, c_name);
@@ -460,7 +460,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->nb_lines(), nb_lines);
 
     // ---- insert line
-    // WARNING: When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::tc_type of cells is undefined!
+    // WARNING: When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::type of cells is undefined!
     //          See function `T_create_cell()` in file `k_tbl.c` from the C API 
     TableLine* new_line_cell = table->insert_line_with_cells(25, true);
     new_pos = 26;

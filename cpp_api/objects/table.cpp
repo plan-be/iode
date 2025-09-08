@@ -8,23 +8,23 @@
 static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 {
 	unsigned char* cell_src_content = (unsigned char*) T_cell_cont(const_cast<TCELL*>(c_cell_src), 0);
-	if (c_cell_src->tc_type == TABLE_CELL_LEC) 
+	if (c_cell_src->type == TABLE_CELL_LEC) 
 		T_set_lec_cell(c_cell_dest, cell_src_content);
 	else 
 		T_set_string_cell(c_cell_dest, cell_src_content);
-	if(c_cell_src->tc_attr != 0)
-		c_cell_dest->tc_attr = c_cell_src->tc_attr;
+	if(c_cell_src->attribute != 0)
+		c_cell_dest->attribute = c_cell_src->attribute;
 }
 
 TableCell::TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align, 
 	const bool bold, const bool italic, const bool underline)
 {
-	this->tc_type = (char) cell_type;
+	this->type = (char) cell_type;
 	if(cell_type == TableCellType::TABLE_CELL_STRING)
 		set_text(content);
 	else
 		set_lec(content);
-	this->tc_attr = (char) align;
+	this->attribute = (char) align;
 	set_bold(bold);
 	set_italic(italic);
 	set_underline(underline);
@@ -32,7 +32,7 @@ TableCell::TableCell(const TableCellType cell_type, const std::string& content, 
 
 TableCell::TableCell(const TableCell& other)
 {
-	this->tc_val = NULL;
+	this->content = NULL;
 	copy_cell(this, &other);
 }
 
@@ -45,21 +45,21 @@ void TableCell::free()
 
 bool TableCell::is_null() const
 {
-	return tc_val == NULL;
+	return content == NULL;
 }
 
 // The table cell contains a "packed" IDT object (lec + clec) 
 // -> see T_set_lec_cell from k_tbl.c
 CLEC* TableCell::get_compiled_lec()
 {
-	if(tc_type != TABLE_CELL_LEC)
+	if(type != TABLE_CELL_LEC)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
 
-	if(tc_val == NULL)
+	if(content == NULL)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
 
 	// see VT_edit() from o_vt.c from the old GUI
-	return (CLEC*) P_get_ptr(tc_val, 1);
+	return (CLEC*) P_get_ptr(content, 1);
 }
 
 std::vector<std::string> TableCell::get_variables_from_lec()
@@ -78,7 +78,7 @@ std::string TableCell::get_content(const bool quotes) const
 {
 	int mode = quotes ? 1 : 0;
 	std::string content_oem = std::string(T_cell_cont((TCELL*) this, mode));
-	std::string content = (tc_type == TABLE_CELL_STRING) ? oem_to_utf8(content_oem) : content_oem;
+	std::string content = (type == TABLE_CELL_STRING) ? oem_to_utf8(content_oem) : content_oem;
 	return content;
 }
 
@@ -111,7 +111,7 @@ void TableCell::set_lec(const std::string& lec)
  * 
  * @param content 
  * 
- * @note When inserting a new line of type TABLE_CELL, the attribute TCELL::tc_type of cells is undefined!
+ * @note When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
  *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
  */
 void TableCell::set_content(const std::string& content)
@@ -124,66 +124,66 @@ void TableCell::set_content(const std::string& content)
 
 TableCellType TableCell::get_type() const
 {
-	return static_cast<TableCellType>(tc_type);
+	return static_cast<TableCellType>(type);
 }
 
 void TableCell::set_type(const TableCellType cell_type)
 {
-	this->tc_type = cell_type;
+	this->type = cell_type;
 }
 
 // TODO: check if it is correct
 TableCellAlign TableCell::get_align() const
 {
-	return static_cast<TableCellAlign>((int) (this->tc_attr / 8) * 8);
+	return static_cast<TableCellAlign>((int) (this->attribute / 8) * 8);
 }
 
 void TableCell::set_align(const TableCellAlign align)
 {
-	char font = ((int) this->tc_attr) % 8;
-	this->tc_attr = ((char) align) + font;
+	char font = ((int) this->attribute) % 8;
+	this->attribute = ((char) align) + font;
 }
 
 bool TableCell::is_bold() const
 {
-	return bitset_8(this->tc_attr).test(0);
+	return bitset_8(this->attribute).test(0);
 }
 
 void TableCell::set_bold(const bool value)
 {
-	bitset_8 attr(this->tc_attr);
+	bitset_8 attr(this->attribute);
 	attr.set(0, value);
-	this->tc_attr = (char) attr.to_ulong();
+	this->attribute = (char) attr.to_ulong();
 }
 
 bool TableCell::is_italic() const
 {
-	return bitset_8(this->tc_attr).test(1);
+	return bitset_8(this->attribute).test(1);
 }
 
 void TableCell::set_italic(const bool value)
 {
-	bitset_8 attr(this->tc_attr);
+	bitset_8 attr(this->attribute);
 	attr.set(1, value);
-	this->tc_attr = (char) attr.to_ulong();
+	this->attribute = (char) attr.to_ulong();
 }
 
 bool TableCell::is_underline() const
 {
-	return bitset_8(this->tc_attr).test(2);
+	return bitset_8(this->attribute).test(2);
 }
 
 void TableCell::set_underline(const bool value)
 {
-	bitset_8 attr(this->tc_attr);
+	bitset_8 attr(this->attribute);
 	attr.set(2, value);
-	this->tc_attr = (char) attr.to_ulong();
+	this->attribute = (char) attr.to_ulong();
 }
 
 bool TableCell::operator==(const TableCell& other) const
 {
-	if (tc_type != other.tc_type) return false;
-	if (tc_attr != other.tc_attr) return false;
+	if (type != other.type) return false;
+	if (attribute != other.attribute) return false;
 	// need to create a copy because T_cell_cont returns a pointer to the global 
 	// allocated buffer BUF_DATA (see buf.c)
 	char* content1 = copy_char_array(T_cell_cont((TCELL*) this, 0));
@@ -212,8 +212,8 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 	case TABLE_LINE_TITLE:
 		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
 		T_set_string_cell(cells_dest, cell_src_content);
-		if(cells_src->tc_attr != 0)
-			cells_dest->tc_attr = cells_src->tc_attr;
+		if(cells_src->attribute != 0)
+			cells_dest->attribute = cells_src->attribute;
 		break;
 	case TABLE_LINE_CELL:
 		for (int col = 0; col < nb_columns; col++) 
@@ -247,7 +247,7 @@ TableLine::TableLine(const TableLine& other, const int nb_cells)
 		this->tl_val = SW_nalloc(nb_cells * sizeof(TCELL));
 		cells = (TCELL*) this->tl_val;
 		for (int col = 0; col < nb_cells; col++)
-			cells[col].tc_val = NULL;
+			cells[col].content = NULL;
 		break;
 	default:
 		break;
@@ -658,7 +658,7 @@ TableLine* Table::insert_line(const int pos, const TableLineType line_type, cons
 			"New line index must be in range [0, " + std::to_string(nb_lines() - 1) + "]");
 
 	int where_ = after ? 0 : 1;
-	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::tc_type of cells is undefined!
+	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
 	int new_pos = T_insert_line(this, pos, line_type, where_);
 	if (new_pos < 0) 
 		throw std::runtime_error("Cannot insert table line at position " + std::to_string(pos));

@@ -90,12 +90,12 @@ inline int T_GRAPHDEFAULT = 0;
 /*----------------------- STRUCTS ----------------------------*/
 
 struct TCELL {
-    char    *tc_val;    // NULL or
+    char*   content;   // NULL or
                         // char* if type == TABLE_CELL_STRING or
                         // packed IDT (i.e. char*) if type == TABLE_CELL_LEC
-    char    tc_type;    // TABLE_CELL_STRING or TABLE_CELL_LEC
-    char    tc_attr;    // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
-    char    tc_pad[2];  // Padding for struct alignment
+    char    type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
+    char    attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
+    char    pad[2];     // Padding for struct alignment
 };
 
 struct TLINE {

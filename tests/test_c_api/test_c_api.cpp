@@ -841,8 +841,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 
     for(j = 0; j < tbl->t_nc; j++)
     {
-        EXPECT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
-        EXPECT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+        EXPECT_EQ(cells_0[j].type, cells_1[j].type);
+        EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
     }
 
     // ----- check all lines
@@ -870,8 +870,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
           case TABLE_LINE_CELL:
             for(j = 0; j < tbl->t_nc; j++)
             {
-                EXPECT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
-                EXPECT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                EXPECT_EQ(cells_0[j].type, cells_1[j].type);
+                EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
                 cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
                 cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
                 EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));

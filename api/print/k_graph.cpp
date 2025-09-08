@@ -167,7 +167,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
 
         switch(line->tl_type) {
             case TABLE_LINE_CELL  :
-                if(cell[1].tc_type != TABLE_CELL_LEC) break;
+                if(cell[1].type != TABLE_CELL_LEC) break;
                 begin = 0;
                 if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
                 break;
@@ -880,7 +880,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
         cell = (TCELL *) line->tl_val;
         switch(line->tl_type) {
             case TABLE_LINE_CELL  :
-                if(cell[1].tc_type != TABLE_CELL_LEC) break;
+                if(cell[1].type != TABLE_CELL_LEC) break;
                 if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) w = -1;
                 break;
             case TABLE_LINE_TITLE :
