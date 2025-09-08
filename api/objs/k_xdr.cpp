@@ -436,7 +436,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
     p++;
 
     for(i = 0; i < nl; i++) {
-        switch(line[i].tl_type) {
+        switch(line[i].type) {
             case TABLE_LINE_CELL :
                 len = P_get_len(pack, p);
                 pcell = P_get_ptr(pack, p);

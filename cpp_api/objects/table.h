@@ -144,22 +144,22 @@ struct std::hash<TLINE>
     {
 		std::size_t seed = 0;
 
-		hash_combine<char>(seed, line.tl_type);
-		hash_combine<unsigned char>(seed, line.tl_axis);
-		hash_combine<char>(seed, line.tl_graph);
+		hash_combine<char>(seed, line.type);
+		hash_combine<unsigned char>(seed, line.right_axis);
+		hash_combine<char>(seed, line.graph_type);
 
 		TCELL* cells;
 		TCELL* cell;
-		switch(line.tl_type)
+		switch(line.type)
 		{
 		case TABLE_LINE_TITLE:
-			cells = (TCELL*) line.tl_val;
+			cells = (TCELL*) line.cells;
 			hash_combine<char>(seed, cells->type);
 			hash_combine<char>(seed, cells->attribute);
 			hash_combine<std::string>(seed, std::string(cells->content));
 			break;
 		case TABLE_LINE_CELL:
-			cells = (TCELL*) line.tl_val;
+			cells = (TCELL*) line.cells;
 			for(int col = 0; col < _nb_columns_; col++)
 			{
 				cell = &cells[col];

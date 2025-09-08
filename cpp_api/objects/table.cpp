@@ -199,15 +199,15 @@ bool TableCell::operator==(const TableCell& other) const
 void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src)
 {
 	unsigned char* cell_src_content;
-	TCELL* cells_dest = (TCELL*)c_line_dest->tl_val;
-	TCELL* cells_src = (TCELL*)c_line_src->tl_val;
+	TCELL* cells_dest = (TCELL*)c_line_dest->cells;
+	TCELL* cells_src = (TCELL*)c_line_src->cells;
 
-	c_line_dest->tl_type = c_line_src->tl_type;
-	c_line_dest->tl_axis = c_line_src->tl_axis;
-	c_line_dest->tl_graph = c_line_src->tl_graph;
-	c_line_dest->tl_pbyte = c_line_src->tl_pbyte;
+	c_line_dest->type = c_line_src->type;
+	c_line_dest->right_axis = c_line_src->right_axis;
+	c_line_dest->graph_type = c_line_src->graph_type;
+	c_line_dest->unused = c_line_src->unused;
 
-	switch (c_line_src->tl_type)
+	switch (c_line_src->type)
 	{
 	case TABLE_LINE_TITLE:
 		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
@@ -226,10 +226,10 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 
 TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left)
 {
-	this->tl_type = (char) line_type;
-	this->tl_val = NULL;
+	this->type = (char) line_type;
+	this->cells = NULL;
 	set_line_graph(graph_type);
-	this->tl_pbyte = 0;
+	this->unused = 0;
 	set_line_axis(axis_left);
 }
 
@@ -237,15 +237,15 @@ TableLine::TableLine(const TableLine& other, const int nb_cells)
 {
 	TCELL* cells;
 
-	this->tl_val = NULL;
-	switch (other.tl_type)
+	this->cells = NULL;
+	switch (other.type)
 	{
 	case TABLE_LINE_TITLE:
-		this->tl_val = SW_nalloc(sizeof(TCELL));
+		this->cells = SW_nalloc(sizeof(TCELL));
 		break;
 	case TABLE_LINE_CELL:
-		this->tl_val = SW_nalloc(nb_cells * sizeof(TCELL));
-		cells = (TCELL*) this->tl_val;
+		this->cells = SW_nalloc(nb_cells * sizeof(TCELL));
+		cells = (TCELL*) this->cells;
 		for (int col = 0; col < nb_cells; col++)
 			cells[col].content = NULL;
 		break;
@@ -265,42 +265,42 @@ void TableLine::free(const int nb_cells)
 
 TableLineType TableLine::get_line_type() const
 {
-	return static_cast<TableLineType>(tl_type);
+	return static_cast<TableLineType>(type);
 }
 
 void TableLine::set_line_type(const TableLineType line_type)
 {
-	tl_type = line_type;
+	type = line_type;
 }
 
 TableGraphType TableLine::get_line_graph() const
 {
-	return static_cast<TableGraphType>(tl_graph);
+	return static_cast<TableGraphType>(graph_type);
 }
 
 void TableLine::set_line_graph(const TableGraphType graph_type)
 {
-	tl_graph = graph_type;
+	this->graph_type = graph_type;
 }
 
 bool TableLine::is_left_axis() const
 {
-	return tl_axis == 0;
+	return right_axis == 0;
 }
 
 void TableLine::set_line_axis(const bool is_left)
 {
-	tl_axis = is_left ? 0 : 1;
+	right_axis = is_left ? 0 : 1;
 }
 
 unsigned char TableLine::get_line_pbyte() const
 {
-	return tl_pbyte;
+	return unused;
 }
 
 void TableLine::set_line_pbyte(const unsigned char pbyte)
 {
-	tl_pbyte = pbyte;
+	unused = pbyte;
 }
 
 TableCell* TableLine::get_cell(const int column, const int nb_cells) const
@@ -308,7 +308,7 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	if(column < 0)
 		throw std::invalid_argument("Table cell position cannot be negative");
 
-	TableLineType line_type = (TableLineType) this->tl_type;
+	TableLineType line_type = (TableLineType) this->type;
 	if(line_type != TABLE_LINE_TITLE && line_type != TABLE_LINE_CELL)
 		throw std::runtime_error("Table line of type " + get_line_type_as_string(line_type) + " has no cells"); 
 
@@ -318,29 +318,29 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	if(line_type == TABLE_LINE_CELL && column >= nb_cells)
 		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
 
-	TableCell* cells = reinterpret_cast<TableCell*>(this->tl_val);
+	TableCell* cells = reinterpret_cast<TableCell*>(this->cells);
 	return &cells[column];
 }
 
 bool TableLine::equals(const TableLine& other, const int nb_cells) const
 {
-	if (tl_type != other.tl_type) return false;
-	if (tl_axis != other.tl_axis) return false;
-	if (tl_graph != other.tl_graph) return false;
-	if (tl_pbyte != other.tl_pbyte) return false;
+	if (type != other.type) return false;
+	if (right_axis != other.right_axis) return false;
+	if (graph_type != other.graph_type) return false;
+	if (unused != other.unused) return false;
 
-	TableCell* cells = (TableCell*) tl_val;
-	TableCell* cells_other = (TableCell*) other.tl_val;
-	if(tl_type == TABLE_LINE_TITLE)
-		return cells->get_content(false) == cells_other->get_content(false);
-	else if(tl_type == TABLE_LINE_CELL)
+	TableCell* cells_this = (TableCell*) cells;
+	TableCell* cells_other = (TableCell*) other.cells;
+	if(type == TABLE_LINE_TITLE)
+		return cells_this->get_content(false) == cells_other->get_content(false);
+	else if(type == TABLE_LINE_CELL)
 	{
 		for (int col = 0; col < nb_cells; col++) 
-			if(cells[col] != cells_other[col]) return false;
+			if(cells_this[col] != cells_other[col]) return false;
 		return true;
 	}
 	else
-		// tl_val == NULL for FILES, MODE, LINE and DATE type
+		// cells == NULL for FILES, MODE, LINE and DATE type
 		return true;
 }
 
@@ -390,8 +390,8 @@ void Table::initialize(const int nb_columns)
 	//                  - initializes t_nc, t_lang, t_zmin, t_zmax, t_ymin, t_ymax and t_div
 	TBL* c_table = T_create(nb_columns);
 
-    t_div.tl_type = TABLE_LINE_CELL;
-    t_div.tl_val  = SW_nalloc(nb_columns * sizeof(TCELL));
+    t_div.type = TABLE_LINE_CELL;
+    t_div.cells  = SW_nalloc(nb_columns * sizeof(TCELL));
 	copy_line(nb_columns, &t_div, &c_table->t_div);
 
 	t_lang = c_table->t_lang;
@@ -427,7 +427,7 @@ void Table::copy_from_TBL_obj(const TBL* obj)
 	for (int i = 0; i < obj->t_nl; i++)
 	{
 		lines = &obj->t_line[i];
-		switch (lines->tl_type)
+		switch (lines->type)
 		{
 		case TABLE_LINE_TITLE:
 			T_insert_line(this, t_nl - 1, TABLE_LINE_TITLE, 0);

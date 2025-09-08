@@ -16,12 +16,12 @@ cdef extern from "api/all.h":
 
     # Define the TLINE structure
     cdef struct TLINE:
-        char*         tl_val
-        char          tl_type
-        char          tl_graph
-        unsigned char tl_axis
-        unsigned char tl_pbyte
-        char          tl_pad[1]
+        char*         cells
+        char          type
+        char          graph_type
+        unsigned char right_axis
+        unsigned char unused
+        char          pad[1]
 
     # Define the TBL structure
     cdef struct TBL:

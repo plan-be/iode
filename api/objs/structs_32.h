@@ -83,12 +83,12 @@ struct TCELL32
 
 struct TLINE32 
 {
-    PTR32   tl_val;        /* if tl_type = title then val = ptr unsigned char else ptr to TCELL */
-    char    tl_type;        /* FILES, MODE, TITLE, LINE, CELL */
-    char    tl_graph;       /* G_LINE = 0, .... */
-    U_ch    tl_axis:1;      /* was tl_attr, Unused before? */
-    U_ch    tl_pbyte:7;     /* was tl_attr, Unused before? */
-    char    tl_pad[1];
+    PTR32   cells;        /* if type = title then val = ptr unsigned char else ptr to TCELL */
+    char    type;        /* FILES, MODE, TITLE, LINE, CELL */
+    char    graph_type;       /* G_LINE = 0, .... */
+    U_ch    right_axis:1;      /* was tl_attr, Unused before? */
+    U_ch    unused:7;     /* was tl_attr, Unused before? */
+    char    pad[1];
 };
 
 struct TBL32 

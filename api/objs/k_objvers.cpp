@@ -176,7 +176,7 @@ static char *K_repack_tbl(TBL *tbl)
     pack = (char*) P_add(pack, (char *) tbl, sizeof(TBL));
 
     /* div */
-    cell = (TCELL *) tbl->t_div.tl_val;
+    cell = (TCELL *) tbl->t_div.cells;
     pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
     for(j = 0; j < T_NC(tbl); j++)
         pack = T_cell_repack(pack, cell + j);
@@ -184,15 +184,15 @@ static char *K_repack_tbl(TBL *tbl)
     /* lines */
     pack = (char*) P_add(pack, (char *) tbl->t_line, sizeof(TLINE) * (int) T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
-        switch(tbl->t_line[i].tl_type) {
+        switch(tbl->t_line[i].type) {
             case TABLE_LINE_CELL :
-                cell = (TCELL *) tbl->t_line[i].tl_val;
+                cell = (TCELL *) tbl->t_line[i].cells;
                 pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
                 for(j = 0; j < T_NC(tbl); j++)
                     pack = T_cell_repack(pack, cell + j);
                 break;
             case TABLE_LINE_TITLE :
-                cell = (TCELL *) tbl->t_line[i].tl_val;
+                cell = (TCELL *) tbl->t_line[i].cells;
                 pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL));
                 pack = T_cell_repack(pack, cell);
                 break;
