@@ -422,8 +422,8 @@ static void K_xdrTBL(unsigned char* pack, int mode)
 
     /* div:2..nc + 2 */
     for(j = 0, p = 2; j < nc; j++)
-        if(cell[j].tc_val !=  NULL) {
-            K_xdrCELL(P_get_ptr(pack, p), cell[j].tc_type, mode);
+        if(cell[j].content !=  NULL) {
+            K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
             p++;
         }
     SW_nfree(cell);
@@ -445,8 +445,8 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 p++;
 
                 for(j = 0; j < nc; j++)
-                    if(cell[j].tc_val != NULL) {
-                        K_xdrCELL(P_get_ptr(pack, p), cell[j].tc_type, mode);
+                    if(cell[j].content != NULL) {
+                        K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
                         p++;
                     }
                 SW_nfree(cell);
@@ -459,8 +459,8 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 memcpy(cell, pcell, len);
                 p++;
 
-                if(cell->tc_val != NULL) {
-                    K_xdrCELL(P_get_ptr(pack, p), cell->tc_type, mode);
+                if(cell->content != NULL) {
+                    K_xdrCELL(P_get_ptr(pack, p), cell->type, mode);
                     p++;
                 }
                 SW_nfree(cell);

@@ -154,17 +154,17 @@ struct std::hash<TLINE>
 		{
 		case TABLE_LINE_TITLE:
 			cells = (TCELL*) line.tl_val;
-			hash_combine<char>(seed, cells->tc_type);
-			hash_combine<char>(seed, cells->tc_attr);
-			hash_combine<std::string>(seed, std::string(cells->tc_val));
+			hash_combine<char>(seed, cells->type);
+			hash_combine<char>(seed, cells->attribute);
+			hash_combine<std::string>(seed, std::string(cells->content));
 			break;
 		case TABLE_LINE_CELL:
 			cells = (TCELL*) line.tl_val;
 			for(int col = 0; col < _nb_columns_; col++)
 			{
 				cell = &cells[col];
-				hash_combine<char>(seed, cell->tc_type);
-				hash_combine<char>(seed, cell->tc_attr);
+				hash_combine<char>(seed, cell->type);
+				hash_combine<char>(seed, cell->attribute);
 				hash_combine<std::string>(seed, std::string(T_cell_cont(cell, 0)));
 			}
 			break;

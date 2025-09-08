@@ -70,10 +70,10 @@ TBL *T_create(int dim)
     cell               = (TCELL *) tbl->t_div.tl_val;
 
     for(i = 0; i < dim; i++) {
-        cell[i].tc_type = TABLE_CELL_LEC;
-        cell[i].tc_attr = TABLE_CELL_LEFT;
+        cell[i].type = TABLE_CELL_LEC;
+        cell[i].attribute = TABLE_CELL_LEFT;
     }
-    K_ipack(&(cell[0].tc_val), "1");
+    K_ipack(&(cell[0].content), "1");
     /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
 
     return(tbl);
@@ -132,8 +132,8 @@ void T_free_line(TLINE* line, int dim)
  */
 void T_free_cell(TCELL* cell)
 {
-    SW_nfree(cell->tc_val);
-    cell->tc_val = NULL;
+    SW_nfree(cell->content);
+    cell->content = NULL;
 }
 
 
@@ -175,9 +175,9 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
     line->tl_val = SW_nalloc(nc * sizeof(TCELL));
     line->tl_graph = T_GRAPHDEFAULT; /* GB 10/03/2011 */
     for(i = 0; i < nc; i++) {
-        ((TCELL *) line->tl_val + i)->tc_type = TABLE_CELL_LEC;
-        ((TCELL *) line->tl_val + i)->tc_attr = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
-        ((TCELL *) line->tl_val + i)->tc_val = NULL; 
+        ((TCELL *) line->tl_val + i)->type = TABLE_CELL_LEC;
+        ((TCELL *) line->tl_val + i)->attribute = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
+        ((TCELL *) line->tl_val + i)->content = NULL; 
     }
 
     return((TCELL *) line->tl_val);
@@ -198,7 +198,7 @@ TCELL *T_create_title(TBL* tbl, TLINE* line)
 {
     line->tl_type = TABLE_LINE_TITLE;
     line->tl_val = SW_nalloc(sizeof(TCELL));
-    ((TCELL *) line->tl_val)->tc_attr = TABLE_CELL_CENTER + TABLE_CELL_BOLD; /* JMP 11-11-93 */
+    ((TCELL *) line->tl_val)->attribute = TABLE_CELL_CENTER + TABLE_CELL_BOLD; /* JMP 11-11-93 */
 
     return((TCELL *) line->tl_val);
 }
@@ -222,12 +222,12 @@ char* T_cell_cont(TCELL* cell, int mode)
 {
     char    *buf;
 
-    if(cell->tc_val == NULL) return(""); /* JMP 20-11-93 */
-    if(cell->tc_type == TABLE_CELL_LEC)
-        return(BUF_strcpy((char*) P_get_ptr(cell->tc_val, 0)));
-    buf = BUF_alloc((int)strlen(cell->tc_val) + 3);
-    if(mode) sprintf(buf, "\"%s\"", cell->tc_val);
-    else BUF_strcpy(cell->tc_val);
+    if(cell->content == NULL) return(""); /* JMP 20-11-93 */
+    if(cell->type == TABLE_CELL_LEC)
+        return(BUF_strcpy((char*) P_get_ptr(cell->content, 0)));
+    buf = BUF_alloc((int)strlen(cell->content) + 3);
+    if(mode) sprintf(buf, "\"%s\"", cell->content);
+    else BUF_strcpy(cell->content);
     return(BUF_DATA);
 }
 
@@ -253,7 +253,7 @@ char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
     switch (line.tl_type)
     {
         case TABLE_LINE_TITLE:
-            return(cell->tc_val);
+            return(cell->content);
             break;
         case TABLE_LINE_CELL:
             return(T_cell_cont(cell + col, mode));
@@ -339,15 +339,15 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 {
     unsigned char   *ptr = 0;
 
-    cell->tc_type = TABLE_CELL_LEC;
-    cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_DECIMAL);
+    cell->type = TABLE_CELL_LEC;
+    cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
     if(K_ipack((char**) &ptr, (char*) lec) < 0 && L_errno) {
         kerror(0, "Illegal lec-formula");
         return(-1);
     }
     else {
         T_free_cell(cell);
-        cell->tc_val = (char*) ptr;
+        cell->content = (char*) ptr;
     }
     return(0);
 }
@@ -387,12 +387,12 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
 {
     int     len, attr;
 
-    cell->tc_type = TABLE_CELL_STRING;
-    /*    cell->tc_attr |= TABLE_CELL_LEFT; /* JMP 11-11-93 */
-    attr = cell->tc_attr;
+    cell->type = TABLE_CELL_STRING;
+    /*    cell->attribute |= TABLE_CELL_LEFT; /* JMP 11-11-93 */
+    attr = cell->attribute;
     if(attr & TABLE_CELL_DECIMAL) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);  /* JMP 19-11-93 */
     if(U_is_in('#', (char*) txt)) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);  /* JMP 19-11-93 */
-    cell->tc_attr = attr;
+    cell->attribute = attr;
     len = (int) strlen((char*) txt);
     if (len > 0) {
         if (txt[0] == '\"') {
@@ -402,7 +402,7 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
         if (len > 0 && txt[len - 1] == '\"') txt[len - 1] = 0;
     }
     T_free_cell(cell);
-    cell->tc_val = (char*) SCR_stracpy(txt);
+    cell->content = (char*) SCR_stracpy(txt);
 }
 
 /**
@@ -439,7 +439,7 @@ int i, j;
 	default :       return(TABLE_CELL_BOLD & TABLE_CELL_LEFT);
 	}
     cell = (TCELL *)line->tl_val + j;
-    return(cell->tc_attr);
+    return(cell->attribute);
 }
 /* JMP 11-11-93 */
 
@@ -468,7 +468,7 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
             return;
     }
     cell = (TCELL *)line->tl_val + j;
-    cell->tc_attr = attr;
+    cell->attribute = attr;
 }
 
 

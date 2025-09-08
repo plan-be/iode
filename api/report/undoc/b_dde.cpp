@@ -278,9 +278,9 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
     char    *ptr = NULL;
 
     buf[0] = 0;
-    if(cell->tc_type != 0) {
-        if(cl == NULL || cell->tc_type == TABLE_CELL_STRING) {
-            ptr = (char *) COL_text(cl, cell->tc_val, KT_nbnames);
+    if(cell->type != 0) {
+        if(cl == NULL || cell->type == TABLE_CELL_STRING) {
+            ptr = (char *) COL_text(cl, cell->content, KT_nbnames);
             SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
             buf[DDECELLSIZE] = 0;
             SW_nfree(ptr);

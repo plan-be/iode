@@ -95,11 +95,11 @@ int K_vpack(char **pack, double *a1, int *a2)
  */
 static char* K_tcell_pack(char *pack, TCELL *cell)
 {
-    if(cell->tc_val == NULL) return(pack);
-    if(cell->tc_type == TABLE_CELL_LEC)
-        pack = (char*) P_add(pack, cell->tc_val, P_len(cell->tc_val));
+    if(cell->content == NULL) return(pack);
+    if(cell->type == TABLE_CELL_LEC)
+        pack = (char*) P_add(pack, cell->content, P_len(cell->content));
     else
-        pack = (char*) P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
+        pack = (char*) P_add(pack, cell->content, (int)strlen(cell->content) + 1);
 
     return(pack);
 }
@@ -123,21 +123,21 @@ static int K_pos_struct(void* base, void* element)
  *  @param [in]      tc32 pointer to a TCELL64 (Table cell in 64 bits arch)
  *  @return void
  *  
- *  @details Copy the the first bytes of tc64 up to tc_type, then set tc32->tc_val as 1 or 0 
- *           according to the value of tc64->tc_val.
+ *  @details Copy the the first bytes of tc64 up to type, then set tc32->content as 1 or 0 
+ *           according to the value of tc64->content.
  */
  
 static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
 {
-    int pos_tc_type;
+    int pos_type;
 
     // Binary copy from tl_type to the end of the struct
-    pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
-    memcpy((char*)&tc32->tc_type, (char*)&tc64->tc_type, sizeof(TCELL32) - pos_tc_type);
-    if(tc64->tc_val)
-        tc32->tc_val = 1;
+    pos_type = K_pos_struct(tc32, &tc32->type);
+    memcpy((char*)&tc32->type, (char*)&tc64->type, sizeof(TCELL32) - pos_type);
+    if(tc64->content)
+        tc32->content = 1;
     else
-        tc32->tc_val = 0;
+        tc32->content = 0;
 }
 
 /**
@@ -213,7 +213,7 @@ static int K_tpack32(char **pack, char *a1)
     cell = (TCELL*)tbl->t_div.tl_val;
     *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
 
-    /* 2. : nc x [TCELL->tc_val] */
+    /* 2. : nc x [TCELL->content] */
     for(j = 0; j < T_NC(tbl); j++)
         *pack = K_tcell_pack(*pack, cell + j);
 
@@ -226,7 +226,7 @@ static int K_tpack32(char **pack, char *a1)
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [nc x TCELL] */
                 *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
-                /* 2. : nc x [TCELL->tc_val] */
+                /* 2. : nc x [TCELL->content] */
                 for(j = 0; j < T_NC(tbl); j++)
                     *pack = K_tcell_pack(*pack, cell + j);
                 break;
@@ -234,7 +234,7 @@ static int K_tpack32(char **pack, char *a1)
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [1 x TCELL] */
                 *pack = (char*) P_add(*pack, (char*)cell, sizeof(TCELL));
-                /* 1 x [TCELL->tc_val] */
+                /* 1 x [TCELL->content] */
                 *pack = K_tcell_pack(*pack, cell);
                 break;
         }
@@ -279,7 +279,7 @@ static int K_tpack64(char **pack, char *a1)
 
     *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * (int)T_NC(tbl));
 
-    /* 2. : [cell] [cell] (nc x [TCELL->tc_val]) */
+    /* 2. : [cell] [cell] (nc x [TCELL->content]) */
     for(j = 0; j < T_NC(tbl); j++)
         *pack = K_tcell_pack(*pack, cell + j);
 
@@ -314,7 +314,7 @@ static int K_tpack64(char **pack, char *a1)
                 K_tcell64_32(cell + 0, cell32 + 0);
                 *pack = (char*) P_add(*pack, (char*)cell32, sizeof(TCELL32) * 1);
 
-                /* 1 x [TCELL->tc_val] */
+                /* 1 x [TCELL->content] */
                 *pack = K_tcell_pack(*pack, cell);
                 break;
         }
@@ -529,21 +529,21 @@ int K_opack(char** pack, char* a1, int* a2)
 static void K_tcell_div_sanitize(TCELL* cell, int j)
 {
     // if cell type not set, assume it is a LEC cell
-    if(cell->tc_type == 0){
-        cell->tc_type = TABLE_CELL_LEC;
-        cell->tc_val = NULL;
+    if(cell->type == 0){
+        cell->type = TABLE_CELL_LEC;
+        cell->content = NULL;
     }
-    if(j == 0 && cell->tc_val == NULL)
-        K_ipack(&(cell->tc_val), "1");
+    if(j == 0 && cell->content == NULL)
+        K_ipack(&(cell->content), "1");
 }
 
 static void K_tcell_sanitize(TCELL* cell, int j)
 {
     // if cell type not set, assume it is a LEC cell
-    if(cell->tc_type == 0)
-        cell->tc_type = TABLE_CELL_LEC;
+    if(cell->type == 0)
+        cell->type = TABLE_CELL_LEC;
     // if it is a string cell and its content is NULL, initialize it to an empty string
-    if(cell->tc_type == TABLE_CELL_STRING && cell->tc_val == NULL)
+    if(cell->type == TABLE_CELL_STRING && cell->content == NULL)
         T_set_string_cell(cell, (unsigned char*) "");
 }
 
@@ -578,11 +578,11 @@ static TBL* K_tunpack32(char *pack)
     memcpy((char*)cell, (char*)pcell, len);
 
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
-        if(pcell[j].tc_val != NULL) {
+        if(pcell[j].content != NULL) {
             len = P_get_len(pack, p);
-            pcell[j].tc_val = (char*) P_get_ptr(pack, p);
-            cell[j].tc_val = SW_nalloc(len);
-            memcpy(cell[j].tc_val, pcell[j].tc_val, len);
+            pcell[j].content = (char*) P_get_ptr(pack, p);
+            cell[j].content = SW_nalloc(len);
+            memcpy(cell[j].content, pcell[j].content, len);
             p++;
         }
         K_tcell_div_sanitize(cell + j, j);
@@ -609,11 +609,11 @@ static TBL* K_tunpack32(char *pack)
                 p++;
 
                 for(j = 0; j < T_NC(tbl); j++){
-                    if(cell[j].tc_val != NULL) {
+                    if(cell[j].content != NULL) {
                         len = P_get_len(pack, p);
-                        pcell[j].tc_val = (char*) P_get_ptr(pack, p);
-                        cell[j].tc_val = SW_nalloc(len);
-                        memcpy(cell[j].tc_val, pcell[j].tc_val, len);
+                        pcell[j].content = (char*) P_get_ptr(pack, p);
+                        cell[j].content = SW_nalloc(len);
+                        memcpy(cell[j].content, pcell[j].content, len);
                         p++;
                     }
                     K_tcell_sanitize(cell + j, j);
@@ -633,11 +633,11 @@ static TBL* K_tunpack32(char *pack)
                 memcpy(cell, pcell, len);
                 p++;
 
-                if(cell->tc_val != NULL) {
+                if(cell->content != NULL) {
                     len = P_get_len(pack, p);
-                    pcell->tc_val = (char*) P_get_ptr(pack, p);
-                    cell->tc_val = SW_nalloc(len);
-                    memcpy(cell->tc_val, pcell->tc_val, len);
+                    pcell->content = (char*) P_get_ptr(pack, p);
+                    cell->content = SW_nalloc(len);
+                    memcpy(cell->content, pcell->content, len);
                     p++;
                 }
                 K_tcell_sanitize(cell, 0);
@@ -659,12 +659,12 @@ static TBL* K_tunpack32(char *pack)
  */
 static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
 {
-    int pos_tc_type;
+    int pos_type;
 
-    // Binary copy from tc_type to the end of the struct
-    pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
-    memcpy((char*)&tc64->tc_type, (char*)&tc32->tc_type, sizeof(TCELL32) - pos_tc_type);
-    if(tc32->tc_val) tc64->tc_val = (char*)1;
+    // Binary copy from type to the end of the struct
+    pos_type = K_pos_struct(tc32, &tc32->type);
+    memcpy((char*)&tc64->type, (char*)&tc32->type, sizeof(TCELL32) - pos_type);
+    if(tc32->content) tc64->content = (char*)1;
 }
 
 /**
@@ -741,8 +741,8 @@ static TBL* K_tunpack64(char *pack)
     tbl->t_div.tl_val = (char*)cell;
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
         K_tcell32_64(cell32 + j, cell + j);
-        if(cell32[j].tc_val != 0) {
-            cell[j].tc_val = (char*) P_alloc_get_ptr(pack, p);
+        if(cell32[j].content != 0) {
+            cell[j].content = (char*) P_alloc_get_ptr(pack, p);
             p++;
         }
         K_tcell_div_sanitize(cell + j, j);
@@ -764,8 +764,8 @@ static TBL* K_tunpack64(char *pack)
                 p++;
                 for(j = 0; j < T_NC(tbl); j++) {
                     K_tcell32_64(cell32 + j, cell + j);
-                    if(cell32[j].tc_val != 0) {
-                        cell[j].tc_val = (char*) P_alloc_get_ptr(pack, p);
+                    if(cell32[j].content != 0) {
+                        cell[j].content = (char*) P_alloc_get_ptr(pack, p);
                         p++;
                     }
                     K_tcell_sanitize(cell + j, j);
@@ -778,8 +778,8 @@ static TBL* K_tunpack64(char *pack)
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
                 p++;
                 K_tcell32_64(cell32 + 0, cell + 0);
-                if(cell32[0].tc_val != 0) {
-                    cell[0].tc_val = (char *)P_alloc_get_ptr(pack, p);
+                if(cell32[0].content != 0) {
+                    cell[0].content = (char *)P_alloc_get_ptr(pack, p);
                     p++;
                 }
                 K_tcell_sanitize(cell, 0);

@@ -75,10 +75,10 @@ struct EQ32
 // Table definition internal format (for 32 and 64 bits)
 struct TCELL32 
 {
-    PTR32   tc_val;
-    char    tc_type;    /* TEXT, LEC */
-    char    tc_attr;    /* LEFT, CENTER, RIGHT, BOLD, ITALIC, UNDERLINE, NORMAL */
-    char    tc_pad[2];
+    PTR32   content;
+    char    type;    /* TEXT, LEC */
+    char    attribute;    /* LEFT, CENTER, RIGHT, BOLD, ITALIC, UNDERLINE, NORMAL */
+    char    pad[2];
 };
 
 struct TLINE32 

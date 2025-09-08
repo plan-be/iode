@@ -37,7 +37,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
         return;
     }
 
-    cell->tc_type = TABLE_CELL_STRING;
+    cell->type = TABLE_CELL_STRING;
     while(1) {
         switch(keyw) {
             case TABLE_CELL_RIGHT  :
@@ -50,7 +50,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
             case TABLE_CELL_BOLD   :
             case TABLE_CELL_UNDERLINE:
             case TABLE_CELL_NORMAL :
-                cell->tc_attr |= keyw;
+                cell->attribute |= keyw;
                 break;
 
             case TABLE_ASCII_CELL_LEC    :
@@ -61,9 +61,9 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                     break;
                 }
                 T_free_cell(cell);
-                if(K_ipack(&(cell->tc_val), (char*) yy->yy_text) < 0)
-                    cell->tc_val = NULL;
-                cell->tc_type = TABLE_CELL_LEC;
+                if(K_ipack(&(cell->content), (char*) yy->yy_text) < 0)
+                    cell->content = NULL;
+                cell->type = TABLE_CELL_LEC;
                 align = TABLE_CELL_DECIMAL;
                 break;
 
@@ -71,10 +71,10 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                 if(ok == 1) goto ret;
                 ok = 1;
                 T_free_cell(cell);
-                /*            cell->tc_attr = TABLE_CELL_LEFT; */
-                if(U_is_in('#', (char*) yy->yy_text)) cell->tc_attr = TABLE_CELL_CENTER;
-                K_stracpy(&(cell->tc_val), (char*) yy->yy_text);
-                cell->tc_type = TABLE_CELL_STRING;
+                /*            cell->attribute = TABLE_CELL_LEFT; */
+                if(U_is_in('#', (char*) yy->yy_text)) cell->attribute = TABLE_CELL_CENTER;
+                K_stracpy(&(cell->content), (char*) yy->yy_text);
+                cell->type = TABLE_CELL_STRING;
                 break;
 
 
@@ -87,7 +87,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
     }
 
 ret :
-    cell->tc_attr |= align;
+    cell->attribute |= align;
     YY_unread(yy);
     return;
 }
@@ -505,27 +505,27 @@ static void print_attr(FILE* fd, int attr)
  */
 static void print_cell(FILE *fd, TCELL *cell)
 {
-    if((cell->tc_val) == NULL) {
+    if((cell->content) == NULL) {
         fprintf(fd, "\"\" ");
         return;
     }
-    switch(cell->tc_type) {
+    switch(cell->type) {
         case TABLE_ASCII_CELL_STRING :
-            //fprintf(fd, "\"%s\" ", cell->tc_val);
+            //fprintf(fd, "\"%s\" ", cell->content);
             // JMP 8/4/2015 -> escape "
-            SCR_fprintf_esc(fd, cell->tc_val, 1);
+            SCR_fprintf_esc(fd, cell->content, 1);
             fprintf(fd, " ");
             break;
 
         case TABLE_ASCII_CELL_LEC :
-            fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->tc_val, 0));
+            fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->content, 0));
             break;
         default :
             fprintf(fd, "\"\" ");
             break;
     }
-    if(cell->tc_val[0] != '\0') 
-        print_attr(fd, cell->tc_attr);
+    if(cell->content[0] != '\0') 
+        print_attr(fd, cell->attribute);
 }
 
 /**

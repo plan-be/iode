@@ -176,28 +176,28 @@ void T_close_attr(int attr)
  */
 void T_print_cell(TCELL* cell, COL* cl, int straddle)
 {
-    if(cell == 0 || cell->tc_val == 0) {                /* JMP 24-06-98 */
+    if(cell == 0 || cell->content == 0) {                /* JMP 24-06-98 */
         //W_printf("%c1R", KT_sep); 
         W_printf("%c1R", A2M_SEPCH); 
         return;                
     }
-    if(cell->tc_type == TABLE_CELL_STRING && U_is_in('#', cell->tc_val))
-        //cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_CENTER); /* JMP 05-01-02 */
-        cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_RIGHT); /* JMP 05-01-02 */
-    if(cell->tc_type == TABLE_CELL_LEC)
-        cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_DECIMAL);
+    if(cell->type == TABLE_CELL_STRING && U_is_in('#', cell->content))
+        //cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_CENTER); /* JMP 05-01-02 */
+        cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_RIGHT); /* JMP 05-01-02 */
+    if(cell->type == TABLE_CELL_LEC)
+        cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
 
-    T_open_cell(cell->tc_attr, straddle, cell->tc_type);  /* JMP 17-12-93 */
-    T_open_attr(cell->tc_attr);
+    T_open_cell(cell->attribute, straddle, cell->type);  /* JMP 17-12-93 */
+    T_open_attr(cell->attribute);
 
-    if(cell->tc_type != 0) {
-        if(cl == NULL || cell->tc_type == TABLE_CELL_STRING) {
-            T_print_string(cl, cell->tc_val);
+    if(cell->type != 0) {
+        if(cl == NULL || cell->type == TABLE_CELL_STRING) {
+            T_print_string(cl, cell->content);
         }
         else T_print_val(cl->cl_res);
     }
 
-    T_close_attr(cell->tc_attr);
+    T_close_attr(cell->attribute);
 }
 
 
@@ -394,10 +394,10 @@ unsigned char *T_get_title(TBL* tbl)
         if(tbl->t_line[k].tl_type == TABLE_LINE_TITLE) break;
 
 // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)
+    if(k == T_NL(tbl) || ((TCELL *) tbl->t_line[k].tl_val)->content == 0)
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].tl_val)->tc_val, sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char *)((TCELL *) tbl->t_line[k].tl_val)->content, sizeof(buf) - 1);
 
     return(buf);
 }

@@ -138,16 +138,16 @@ static char *T_cell_repack(char* pack, TCELL* cell)
 {
     char    *npack, *ipack;
 
-    if(cell->tc_val == NULL) return(pack);
-    if(cell->tc_type == TABLE_CELL_LEC) {
-        npack = Pack16To32(cell->tc_val);
+    if(cell->content == NULL) return(pack);
+    if(cell->type == TABLE_CELL_LEC) {
+        npack = Pack16To32(cell->content);
         ipack = 0;
         K_ipack(&ipack, (char*) P_get_ptr(npack, 0));
         pack = (char*) P_add(pack, ipack, P_len(ipack));
         SW_nfree(npack);
     }
     else
-        pack = (char*) P_add(pack, cell->tc_val, (int) strlen(cell->tc_val) + 1);
+        pack = (char*) P_add(pack, cell->content, (int) strlen(cell->content) + 1);
 
     return(pack);
 }

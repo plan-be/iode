@@ -297,13 +297,13 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     lg = cls->cl_nb / T_NC(tbl);
 
     for(d = 0; d < T_NC(tbl); d++) {
-        if(cell[d].tc_type != TABLE_CELL_LEC) continue;
-        if(cell[d].tc_val == 0) continue;
-        clec = (CLEC *) P_get_ptr(cell[d].tc_val, 1);
+        if(cell[d].type != TABLE_CELL_LEC) continue;
+        if(cell[d].content == 0) continue;
+        clec = (CLEC *) P_get_ptr(cell[d].content, 1);
         aclec = COL_cp_clec(clec);
-        /*GB    if(dcell[d].tc_val) dclec = (CLEC *) P_get_ptr(dcell[d].tc_val, 1); */
-        if(dcell[d].tc_type == TABLE_CELL_LEC && dcell[d].tc_val) /* JMP 27-09-96 */
-            dclec = (CLEC *) P_get_ptr(dcell[d].tc_val, 1);
+        /*GB    if(dcell[d].content) dclec = (CLEC *) P_get_ptr(dcell[d].content, 1); */
+        if(dcell[d].type == TABLE_CELL_LEC && dcell[d].content) /* JMP 27-09-96 */
+            dclec = (CLEC *) P_get_ptr(dcell[d].content, 1);
         else dclec = NULL;
         adclec = COL_cp_clec(dclec);
 

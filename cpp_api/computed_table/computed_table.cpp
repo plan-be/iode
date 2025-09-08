@@ -121,7 +121,7 @@ void ComputedTable::initialize()
         //                   - the second cell will contain either the '#' character or a LEC expression ?
         // In k_graph.c, in function T_graph_tbl_1() lines 181 to 185, the code is:
         //    case TABLE_LINE_CELL  :
-        //        if(cell[1].tc_type != TABLE_CELL_LEC) break;
+        //        if(cell[1].type != TABLE_CELL_LEC) break;
         //        begin = 0;
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;

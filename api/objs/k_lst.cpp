@@ -188,9 +188,9 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
 
         cell = (TCELL *) tbl->t_line[k].tl_val;
         for(l = 0; l < T_NC(tbl); l++) {
-            if(cell[l].tc_type != TABLE_CELL_LEC) continue;
+            if(cell[l].type != TABLE_CELL_LEC) continue;
 
-            cl = (CLEC*) P_get_ptr(cell[l].tc_val, 1);
+            cl = (CLEC*) P_get_ptr(cell[l].content, 1);
             K_clecscan(NULL, cl, exo, scal);
         }
     }
