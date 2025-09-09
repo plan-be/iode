@@ -872,8 +872,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
             {
                 EXPECT_EQ(cells_0[j].type, cells_1[j].type);
                 EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-                cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
-                cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
+                cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0 + j, 0));
+                cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1 + j, 0));
                 EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
                 SCR_free(cell_cont_0);
                 SCR_free(cell_cont_1);
