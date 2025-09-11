@@ -425,8 +425,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
 
     /* div:2..nc + 2 */
     for(j = 0, p = 2; j < nc; j++)
-        if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
-           (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+        if(!cell[j].is_null()) 
         {
             K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
             p++;
@@ -452,8 +451,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 p++;
 
                 for(j = 0; j < nc; j++)
-                    if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
-                      (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+                    if(!cell[j].is_null()) 
                     {
                         K_xdrCELL(P_get_ptr(pack, p), cell[j].type, mode);
                         p++;
@@ -468,8 +466,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 memcpy(cell, pcell, len);
                 p++;
 
-                if((cell[j].type == TABLE_CELL_STRING && !cell[j].content.empty()) || 
-                   (cell[j].type == TABLE_CELL_LEC && cell[j].idt != NULL)) 
+                if(!cell[j].is_null()) 
                 {
                     K_xdrCELL(P_get_ptr(pack, p), cell->type, mode);
                     p++;

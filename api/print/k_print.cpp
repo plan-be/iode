@@ -176,8 +176,7 @@ void T_close_attr(int attr)
  */
 void T_print_cell(TCELL* cell, COL* cl, int straddle)
 {
-    if(cell == 0 || (cell->type == TABLE_CELL_STRING && cell->content.empty()) || 
-      (cell->type == TABLE_CELL_LEC && cell->idt == NULL)) 
+    if(cell == 0 || cell->is_null()) 
     {
         //W_printf("%c1R", KT_sep); 
         W_printf("%c1R", A2M_SEPCH); 
