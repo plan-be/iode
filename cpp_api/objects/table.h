@@ -49,8 +49,6 @@ struct TableCell: public TCELL
 	// WARNING: a table cell must be deleted (freed) from a Table instance
 	~TableCell();
 
-	bool is_null() const;
-
 	CLEC* get_compiled_lec();
 
 	std::string get_content(const bool quotes) const;

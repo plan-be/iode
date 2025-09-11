@@ -44,15 +44,6 @@ TableCell::TableCell(const TableCell& other)
 
 TableCell::~TableCell() {}
 
-bool TableCell::is_null() const
-{
-	if (type == TABLE_CELL_LEC && idt == NULL)
-		return true;
-	if (type == TABLE_CELL_STRING && content.empty())
-		return true;
-	return false;
-}
-
 // The table cell contains a "packed" IDT object (lec + clec) 
 // -> see T_set_lec_cell from k_tbl.c
 CLEC* TableCell::get_compiled_lec()

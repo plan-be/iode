@@ -97,6 +97,16 @@ struct TCELL {
     char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
     char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
     char        pad[2];     // Padding for struct alignment
+
+public:
+    bool is_null() const
+    {
+        if (type == TABLE_CELL_LEC && idt == NULL)
+            return true;
+        if (type == TABLE_CELL_STRING && content.empty())
+            return true;
+        return false;
+    }
 };
 
 struct TLINE {
