@@ -73,10 +73,10 @@ TBL *T_create(int dim)
         cells[i].type = TABLE_CELL_LEC;
         cells[i].attribute = TABLE_CELL_LEFT;
         cells[i].content = "";
-        cells[i].idt = NULL;
+        cells[i].idt = nullptr;
     }
 
-    K_ipack(&cells[0].idt, "1");
+    cells[0].idt = new Identity("1");
     /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
 
     return(tbl);
@@ -112,6 +112,35 @@ void T_free(TBL* tbl)
  */
 void T_free_line(TLINE* line, int dim)
 {
+    if(line->type == TABLE_LINE_TITLE) 
+    {
+        TCELL* cell = (TCELL*) line->cells;
+        if(cell != NULL)
+        {
+            cell->content.clear();
+            if(cell->idt)
+                delete cell->idt;
+            cell->idt = nullptr;
+        }
+    }
+
+    if(line->type == TABLE_LINE_CELL) 
+    {
+        TCELL* cells = (TCELL*) line->cells;
+        TCELL* cell;
+        for(int j = 0; j < dim; j++)
+        {
+            cell = cells + j;
+            if(cell != NULL)
+            {
+                cell->content.clear();
+                if(cell->idt)
+                    delete cell->idt;
+                cell->idt = nullptr;
+            }
+        }
+    }
+
     SW_nfree(line->cells);
 }
 
@@ -160,7 +189,7 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
         cell->type = TABLE_CELL_LEC;
         cell->attribute = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
         cell->content = "";
-        cell->idt = NULL;
+        cell->idt = nullptr;
     }
 
     return((TCELL *) line->cells);
@@ -203,20 +232,15 @@ char* T_cell_cont(TCELL* cell, int mode)
 {   
     if(cell->type == TABLE_CELL_LEC)
     {
-        if(cell->idt == NULL) 
-            return("");
-        char* lec = (char*) P_get_ptr((void*) cell->idt, 0);
-        if(lec == NULL)
-        {
-            kwarning("Invalid LEC expression in table cell");
-            return(NULL);
-        }
-        return lec;
+        if(!cell->idt) 
+            return "";
+        char* c_lec = (char*) cell->idt->lec.c_str();
+        return c_lec;
     }
     else
     {
         if(cell->content.empty()) 
-            return("");
+            return "";
         char* buf = SW_nalloc((int) cell->content.size() + 3);
         char* text = (char*) cell->content.c_str();
         if(mode) 
@@ -335,20 +359,28 @@ int T_insert_line(TBL* tbl, int nbr, int type, int where)
  *  
  *  In case of LEC error, kerror() is called and L_errno is set.
  */
-int T_set_lec_cell(TCELL* cell, unsigned char* lec)
+int T_set_lec_cell(TCELL* cell, unsigned char* u_lec)
 {
-    unsigned char   *ptr = 0;
+    unsigned char* ptr = NULL;
 
     cell->type = TABLE_CELL_LEC;
     cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
     cell->content = "";
-    if(K_ipack((char**) &ptr, (char*) lec) < 0 && L_errno) 
+    if(cell->idt)
+        delete cell->idt;
+    cell->idt = nullptr;
+
+    if(u_lec == NULL || strlen((char*) u_lec) == 0) 
+        return(0);
+
+    char* lec_copy = (char*) SCR_stracpy(u_lec);
+    if(K_ipack((char**) &ptr, lec_copy) < 0 && L_errno) 
     {
-        kerror(0, "Illegal lec-formula");
+        kerror(0, "Illegal lec-formula: %s", (char*) u_lec);
         return(-1);
     }
-    else 
-        cell->idt = (char*) ptr;
+    std::string lec((char*) u_lec);
+    cell->idt = new Identity(lec);
     
     return(0);
 }
@@ -411,7 +443,9 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     }
 
     cell->content = std::string((char*) txt);
-    cell->idt = NULL;
+    if(cell->idt)
+        delete cell->idt;
+    cell->idt = nullptr;
 }
 
 /**
@@ -507,6 +541,7 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
         T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
     }
     T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
+    T_set_lec_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells), (unsigned char*) "");
     for(j = 1 ; j < T_NC(tbl) ; j++) {
         T_set_string_cell((TCELL *)(tbl->lines[T_NL(tbl) - 1].cells) + j, (unsigned char*) "\"#S");  /* JMP 24-03-2004 */
         T_set_cell_attr(tbl, T_NL(tbl) - 1, j, TABLE_CELL_CENTER); /* JMP 11-11-93 */

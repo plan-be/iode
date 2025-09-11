@@ -504,10 +504,10 @@ int B_CellDef(TCELL* cell)
 
     if(cell->type == TABLE_CELL_LEC)
     {
-        if(cell->idt == NULL) 
+        if(!cell->idt) 
             return(0);
-        char* lec = (char*) P_get_ptr((void*) cell->idt, 0);
-        if(strcmp("1", lec) == 0) 
+        
+        if(cell->idt->lec == "1")
             return(0);
     } 
 
@@ -529,7 +529,7 @@ int B_PrintTblCell(TCELL* cell, int straddle)
     }
 
     char* c_content;
-    char* lec;
+    char* c_lec;
     switch(cell->type) {
         case TABLE_CELL_STRING :
             T_open_cell(cell->attribute, straddle, TABLE_CELL_STRING); /* JMP 16-12-93 */
@@ -542,8 +542,13 @@ int B_PrintTblCell(TCELL* cell, int straddle)
         case TABLE_CELL_LEC :
             W_printfRepl("&%dL", straddle);
             T_open_attr(cell->attribute);
-            lec = (char*) P_get_ptr((void*) cell->idt, 0);
-            W_printf("%s", lec);
+            if(!cell->idt) 
+                W_printf("");
+            else
+            {
+                c_lec = (char*) cell->idt->lec.c_str();
+                W_printf("%s", c_lec);
+            }
             break;
     }
     T_close_attr(cell->attribute);

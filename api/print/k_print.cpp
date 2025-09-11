@@ -216,17 +216,21 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
 
 int T_print_line(TBL* tbl, int i, COLS* cls)
 {
-    int     j, d;
-    TLINE   *line = T_L(tbl) + i;
-    TCELL   *cell = (TCELL *) line->cells;
-
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0)   return(-1);
+    if(COL_exec(tbl, i, cls) < 0)   
+        return(-1);
 
-    for(j = 0; j < cls->cl_nb; j++) {
+    int d;
+    TCELL* cell = nullptr;
+    TLINE* line = T_L(tbl) + i;
+    TCELL* cells = (TCELL*) line->cells;
+    for(int j = 0; j < cls->cl_nb; j++) 
+    {
         d = j % T_NC(tbl);
-        if(tbl->repeat_columns == 0 && d == 0 && j != 0) continue;
-        T_print_cell(cell + d, cls->cl_cols + j, 1);
+        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+            continue;
+        cell = (cells != NULL) ? (cells + d) : NULL;
+        T_print_cell(cell, cls->cl_cols + j, 1);
     }
     W_printf("\n");
 
@@ -458,7 +462,8 @@ int T_print_tbl(TBL* tbl, char* smpl)
                 T_print_files(cls, dim);
                 break;
             case TABLE_LINE_CELL  :
-                if(T_print_line(tbl, i, cls) < 0) {
+                if(T_print_line(tbl, i, cls) < 0) 
+                {
                     std::string error_msg = "Unable to print line '" + std::to_string(i) + "'";
                     error_manager.append_error(error_msg);
                     rc = -1;

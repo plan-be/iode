@@ -36,3 +36,50 @@ Identity* K_iunpack(char *);
 //void K_cunpack(void);
 //void K_lunpack(void);
 //void K_onpack(void);
+
+
+extern bool debug_pack;
+extern bool debug_unpack;
+
+inline void debug_packing(const std::string& element, const std::string& code, int p, int line=-1, 
+    int col=-1, const std::string& value = "", int len=-1)
+{
+    if(!debug_pack)
+        return;
+    
+    std::cout << "Packing " << element << " " << code << " (p = " << p << ") ";
+    if(line >= 0)
+        std::cout << "(line " << line;
+    if(col >= 0)
+        std::cout << ", column " << col;
+    if(line >= 0)
+        std::cout << ") ";
+
+    if(len >= 0)
+        std::cout << "(len=" << len << ") ";
+
+    if(!value.empty())
+        std::cout << value;
+    
+    std::cout << std::endl;
+}
+
+inline void debug_unpacking(const std::string& element, const std::string& code, int p, int line=-1, 
+    int col=-1, const std::string& value="")
+{
+    if(!debug_unpack)
+        return;
+    
+    std::cout << "Unpacking " << element << " " << code << " (p = " << p << ") ";
+    if(line >= 0)
+        std::cout << "(line " << line;
+    if(col >= 0)
+        std::cout << ", column " << col;
+    if(line >= 0)
+        std::cout << ") ";
+
+    if(!value.empty())
+        std::cout << value;
+    
+    std::cout << std::endl;
+}

@@ -136,13 +136,14 @@ static char *Pack16To32(char* opack)
 
 static char *T_cell_repack(char* pack, TCELL* cell)
 {
-    char    *npack, *ipack, *opack;
+    char *npack, *ipack, *opack, *c_lec;
     
     if(cell->type == TABLE_CELL_LEC) 
     {
-        if(cell->idt == NULL) 
+        if(cell->idt == nullptr) 
             return(pack);
-        opack = cell->idt;
+        c_lec = (char*) cell->idt->lec.c_str();
+        K_ipack(&opack, c_lec);
         npack = Pack16To32(opack);
         ipack = 0;
         K_ipack(&ipack, (char*) P_get_ptr(npack, 0));

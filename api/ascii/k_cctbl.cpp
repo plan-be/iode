@@ -30,7 +30,7 @@
 static void read_cell(TCELL* cell, YYFILE* yy, int mode)
 {
     int   keyw, ok = 0, align = TABLE_CELL_LEFT;
-    char* content;
+    char* c_lec;
 
     keyw = YY_lex(yy);
     if(mode != 0 && mode != keyw) 
@@ -40,6 +40,9 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
     }
 
     cell->type = TABLE_CELL_STRING;
+    cell->content = "";
+    cell->idt = nullptr;
+
     while(1) 
     {
         switch(keyw) 
@@ -66,8 +69,17 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                     YY_unread(yy);
                     break;
                 }
-                if(K_ipack(&cell->idt, (char*) yy->yy_text) < 0)
-                cell->idt = NULL;
+
+                c_lec = (char*) yy->yy_text;
+                try
+                {
+                    cell->idt = new Identity(std::string(c_lec));
+                }
+                catch(const std::exception& e)
+                {
+                    kwarning(e.what());
+                    cell->idt = nullptr;
+                }
                 cell->content = "";
                 cell->type = TABLE_CELL_LEC;
                 align = TABLE_CELL_DECIMAL;
@@ -81,7 +93,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                 if(U_is_in('#', (char*) yy->yy_text)) 
                     cell->attribute = TABLE_CELL_CENTER;
                 cell->content = std::string((char*) yy->yy_text);
-                cell->idt = NULL;
+                cell->idt = nullptr;
                 cell->type = TABLE_CELL_STRING;
                 break;
 

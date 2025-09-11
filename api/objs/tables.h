@@ -1,9 +1,11 @@
 #pragma once
 
 #include "api/constants.h"
-#include "api/objs/kdb.h"       // KDB
+#include "api/objs/kdb.h"           // KDB
+#include "api/objs/identities.h"    // Identity
 
 #include <string>
+#include <vector>
 
 /*----------------------- ENUMS ----------------------------*/
 
@@ -91,14 +93,29 @@ inline int T_GRAPHDEFAULT = 0;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct TCELL {
+struct TCELL 
+{
     std::string content;    // if type == TABLE_CELL_STRING
-    char*       idt;        // packed IDT (as char*) if type == TABLE_CELL_LEC
+    Identity*   idt;        // if type == TABLE_CELL_LEC
     char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
     char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
     char        pad[2];     // Padding for struct alignment
 
 public:
+    TCELL() : content(""), idt(nullptr), type(TABLE_CELL_STRING), attribute(TABLE_CELL_NORMAL)
+    {
+        pad[0] = 0;
+        pad[1] = 0;
+    }
+
+     ~TCELL()
+    {
+        content.clear();
+        if(idt)
+            delete idt;
+        idt = nullptr;
+    }
+
     bool is_null() const
     {
         if (type == TABLE_CELL_LEC && idt == NULL)
@@ -109,7 +126,8 @@ public:
     }
 };
 
-struct TLINE {
+struct TLINE 
+{
     char*   cells;          // if type == TABLE_LINE_CELL  : cells is TCELL*
                             // if type == TABLE_LINE_TITLE : cells is TCELL*
                             // if type == TABLE_LINE  : cells is NULL
@@ -123,7 +141,8 @@ struct TLINE {
     char    pad[1];         // Padding for struct alignment
 };
 
-struct TBL {
+struct TBL 
+{
     short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
     short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   nb_columns;         // Number of columns (of text and lec, not calculated values)

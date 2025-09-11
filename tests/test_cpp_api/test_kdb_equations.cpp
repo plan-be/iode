@@ -376,7 +376,6 @@ TEST_F(KDBEquationsTest, Search)
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
     KDBIdentities kdb_idt(input_test_dir + "fun.ai");
     KDBLists kdb_lst(input_test_dir + "fun.al");
     KDBScalars kdb_scl(input_test_dir + "fun.as");
