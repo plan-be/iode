@@ -385,7 +385,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     std::vector<std::string> expected_names;
     KDBTables* kdb_subset;
 
-    KDBVariables kdb_var (input_test_dir + "fun.av");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
@@ -424,7 +424,9 @@ TEST_F(KDBTablesTest, DeepCopy)
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Tables.contains(new_name));
-    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    Table* new_table = kdb_subset->get(new_name);
+    EXPECT_EQ(new_table->nb_lines, nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    delete new_table;
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
@@ -520,7 +522,6 @@ TEST_F(KDBTablesTest, Search)
     KDBIdentities kdb_idt(input_test_dir + "fun.ai");
     KDBLists kdb_lst(input_test_dir + "fun.al");
     KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
     objs_list = Comments.search(tbl_name);

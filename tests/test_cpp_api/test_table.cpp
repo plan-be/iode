@@ -23,7 +23,6 @@ protected:
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTBL)
 {
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
     // --- create a C struct TBL
@@ -65,9 +64,12 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
     ASSERT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
 
-    // ----- check div line 
+    TCELL* cell_0;
     TCELL* cells_0;
+    TCELL* cell_1;
     TCELL* cells_1;
+
+    // ----- check div line 
     ASSERT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
     ASSERT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
     ASSERT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
@@ -76,15 +78,13 @@ TEST_F(TablesTest, AddGetTBL)
     cells_1 = (TCELL*) extracted_tbl->divider_line.cells;
     for(int j = 0; j < tbl->nb_columns; j++)
     {
-        ASSERT_EQ(cells_0[j].type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[j].type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[0].type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_1[1].type, TABLE_CELL_LEC);
-        ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-        ASSERT_EQ(cells_0[j].attribute, TABLE_CELL_LEFT);
-        ASSERT_EQ(cells_1[0].attribute, TABLE_CELL_LEFT);
-        ASSERT_EQ(cells_1[1].attribute, TABLE_CELL_LEFT);
-        ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
+        cell_0 = cells_0 + j;
+        cell_1 = cells_1 + j;
+        ASSERT_EQ(cell_0->type, TABLE_CELL_LEC);
+        ASSERT_EQ(cell_1->type, TABLE_CELL_LEC);
+        ASSERT_EQ(cell_0->attribute, cell_1->attribute);
+        ASSERT_EQ(cell_0->attribute, TABLE_CELL_LEFT);
+        ASSERT_EQ(std::string(T_cell_cont(cell_0, j)), std::string(T_cell_cont(cell_1, j)));
     }
 
     // ----- check all lines 
@@ -110,16 +110,11 @@ TEST_F(TablesTest, AddGetTBL)
         case TableLineType::TABLE_LINE_CELL:
             for(int j = 0; j < tbl->nb_columns; j++)
             {
-                ASSERT_EQ(cells_0[j].type, cells_1[j].type);
-                ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-                if(i == 2 && j == 0)
-                {
-                    ASSERT_EQ(cells_0[j].attribute, TABLE_CELL_LEFT);
-                    ASSERT_EQ(cells_1[j].attribute, TABLE_CELL_LEFT);
-                }
-                else
-                    ASSERT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-                ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
+                cell_0 = cells_0 + j;
+                cell_1 = cells_1 + j;
+                ASSERT_EQ(cell_0->type, cell_1->type);
+                ASSERT_EQ(cell_0->attribute, cell_1->attribute);
+                ASSERT_EQ(std::string(T_cell_cont(cell_0, j)), std::string(T_cell_cont(cell_1, j)));
             }
             break;
         default:
@@ -136,7 +131,11 @@ TEST_F(TablesTest, AddGetTBL)
 
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
+    TLINE* lines;
+    TLINE* line;
     TCELL* div_cells;
+    TCELL* cells;
+    TCELL* cell;
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
@@ -150,15 +149,124 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     // test if a Table object can be added to the Tables KDB via K_add()
     Table table(nb_columns, def, vars, mode, files, date);
+
+    // test if the Table object has been correctly initialized
+    // --- divider line ---
     div_cells = (TCELL*) table.divider_line.cells;
     ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(&div_cells[0], 0)), "1");
     ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(&div_cells[1], 0)), "");
+    // --- title line ---
+    int i = 0;
+    line = table.get_line(i++);
+    cells = (TCELL*) line->cells;
+    ASSERT_EQ(line->type, TABLE_LINE_TITLE);
+    ASSERT_EQ(std::string(T_cell_cont(cells, 0)), "A title");
+    // --- separator line ---
+    line = table.get_line(i++);
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- first line ---
+    line = table.get_line(i++);
+    ASSERT_EQ(line->type, TABLE_LINE_CELL);
+    cells = (TCELL*) line->cells;
+    ASSERT_EQ(cells[0].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(cells + 0, 0)), "");
+    ASSERT_EQ(cells[1].type, TABLE_CELL_STRING);
+    ASSERT_EQ(std::string(T_cell_cont(cells + 1, 0)), "#S");
+    // --- separator line ---
+    line = table.get_line(i++);
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- variables lines ---
+    for(int v = 0; v < vars.size(); v++)
+    {
+        // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
+        line = table.get_line(i++);
+        ASSERT_EQ(line->type, TABLE_LINE_CELL);
+        cells = (TCELL*) line->cells;
+        for(int j = 0; j < nb_columns; j++)
+        {
+            cell = cells + j;
+            if(j == 0)
+            {
+                ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+            }
+            else
+            {
+                ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+            }
+        }
+    }
+    // --- separator line ---
+    line = table.get_line(i++);
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- mode/files/date lines ---
+    ASSERT_EQ(table.get_line(i++)->type, TABLE_LINE_MODE);
+    ASSERT_EQ(table.get_line(i++)->type, TABLE_LINE_FILES);
+    ASSERT_EQ(table.get_line(i++)->type, TABLE_LINE_DATE);
 
     K_add(KT_WS, c_name, static_cast<TBL*>(&table));
     int pos = K_find(KT_WS, c_name);
     ASSERT_GT(pos, -1);
 
-    TBL* tbl = KTVAL(KT_WS, pos);    
+    TBL* tbl = KTVAL(KT_WS, pos);
+    // test if the restored Table object is the same as the original one
+    // --- divider line ---
+    div_cells = (TCELL*) tbl->divider_line.cells;
+    ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(&div_cells[0], 0)), "1");
+    ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(&div_cells[1], 0)), "");
+    // --- title line ---
+    i = 0;
+    lines = (TLINE*) tbl->lines;
+    line = &lines[i++];
+    cells = (TCELL*) line->cells;
+    ASSERT_EQ(line->type, TABLE_LINE_TITLE);
+    ASSERT_EQ(std::string(T_cell_cont(cells, 0)), "A title");
+    // --- separator line ---
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    // --- first line ---
+    line = &lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_CELL);
+    cells = (TCELL*) line->cells;
+    ASSERT_EQ(cells[0].type, TABLE_CELL_LEC);
+    ASSERT_EQ(std::string(T_cell_cont(cells + 0, 0)), "");
+    ASSERT_EQ(cells[1].type, TABLE_CELL_STRING);
+    ASSERT_EQ(std::string(T_cell_cont(cells + 1, 0)), "#S");
+    // --- separator line ---
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    // --- variables lines ---
+    for(int v = 0; v < vars.size(); v++)
+    {
+        // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
+        line = &lines[i++];
+        ASSERT_EQ(line->type, TABLE_LINE_CELL);
+        cells = (TCELL*) line->cells;
+        for(int j = 0; j < nb_columns; j++)
+        {
+            cell = cells + j;
+            if(j == 0)
+            {
+                ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+            }
+            else
+            {
+                ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+            }
+        }
+    }
+    // --- separator line ---
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    // --- mode/files/date lines ---
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_MODE);
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_FILES);
+    ASSERT_EQ(lines[i++].type, TABLE_LINE_DATE);
+
     ASSERT_TRUE(table_equal(table, *tbl));
 
     // test if a Table object can be passed to the hash function for the objects of type TBL.

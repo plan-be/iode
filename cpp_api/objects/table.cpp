@@ -38,7 +38,7 @@ TableCell::TableCell(const TableCellType cell_type, const std::string& content, 
 TableCell::TableCell(const TableCell& other)
 {
 	this->content = "";
-	this->idt = NULL;
+	this->idt = nullptr;
 	copy_cell(this, &other);
 }
 
@@ -51,11 +51,11 @@ CLEC* TableCell::get_compiled_lec()
 	if(type != TABLE_CELL_LEC)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
 
-	if(idt == NULL)
+	if(!idt)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
 
 	// see VT_edit() from o_vt.c from the old GUI
-	return (CLEC*) P_get_ptr((char*) idt, 1);
+	return idt->clec;
 }
 
 std::vector<std::string> TableCell::get_variables_from_lec()
@@ -178,16 +178,24 @@ void TableCell::set_underline(const bool value)
 
 bool TableCell::operator==(const TableCell& other) const
 {
-	if (type != other.type) return false;
-	if (attribute != other.attribute) return false;
-	// need to create a copy because T_cell_cont returns a pointer to the global 
-	// allocated buffer BUF_DATA (see buf.c)
-	char* content1 = copy_char_array(T_cell_cont((TCELL*) this, 0));
-	char* content2 = copy_char_array(T_cell_cont((TCELL*)(&other), 0));
-	bool is_same_content = strcmp(content1, content2) == 0;
-	delete[] content1;
-	delete[] content2;
-	return is_same_content;
+	if (type != other.type) 
+		return false;
+
+	if (attribute != other.attribute) 
+		return false;
+	
+	if(type == TABLE_CELL_STRING)
+		return this->content == other.content;
+	else if(type == TABLE_CELL_LEC)
+	{
+		if(idt == nullptr && other.idt == nullptr) 
+			return true;
+		if(idt == nullptr || other.idt == nullptr) 
+			return false;
+		return idt->lec == other.idt->lec;
+	}
+	else
+		return true;
 }
 
 // ================ LINE ================
@@ -327,12 +335,31 @@ bool TableLine::equals(const TableLine& other, const int nb_cells) const
 
 	TableCell* cells_this = (TableCell*) cells;
 	TableCell* cells_other = (TableCell*) other.cells;
+	TableCell* cell_this;
+	TableCell* cell_other;
 	if(type == TABLE_LINE_TITLE)
-		return cells_this->get_content(false) == cells_other->get_content(false);
+	{
+		cell_this = cells_this;
+		cell_other = cells_other;
+		if(cell_this == nullptr && cell_other == nullptr) 
+			return true;
+		if(cell_this == nullptr || cell_other == nullptr) 
+			return false;
+		return cell_this->get_content(false) == cell_other->get_content(false);
+	}
 	else if(type == TABLE_LINE_CELL)
 	{
-		for (int col = 0; col < nb_cells; col++) 
-			if(cells_this[col] != cells_other[col]) return false;
+		for (int col = 0; col < nb_cells; col++)
+		{
+			cell_this = cells_this + col;
+			cell_other = cells_other + col;
+			if(cell_this == nullptr && cell_other == nullptr) 
+				continue;
+			if(cell_this == nullptr || cell_other == nullptr) 
+				return false;
+			if(*cell_this != *cell_other) 
+				return false;
+		} 
 		return true;
 	}
 	else

@@ -53,6 +53,10 @@
 
 #include <string>
 
+bool debug_pack = false;
+bool debug_unpack = false;
+
+
 /**
  * Packs an IODE VAR object. 
  * 
@@ -98,22 +102,29 @@ int K_vpack(char **pack, double *a1, int *a2)
  *  @param [in]         cell 
  *  @return             pointer to the new pack
  */
-static char* K_tcell_pack(char *pack, TCELL *cell, int& p)
+static char* K_tcell_pack(char *pack, TCELL *cell, int& p, int i, int j)
 {
+    int len;
+
     if(cell->type == TABLE_CELL_LEC)
     {
-        if(cell->idt == NULL) 
+        if(cell->idt == nullptr) 
             return(pack);
-        pack = (char*) P_add(pack, cell->idt, P_len(cell->idt));
+        char* c_lec = (char*) cell->idt->lec.c_str();
+        char* pack_idt = NULL;
+        K_ipack(&pack_idt, c_lec);
+        len = P_len(pack_idt);
+        pack = (char*) P_add(pack, pack_idt, len);
         p++;
+        debug_packing("cell", "LEC  ", p, i, j, cell->idt->lec, len);
     }
     else
     {
-        if(cell->content.empty()) 
-            return(pack);
         char* c_content = (char*) cell->content.c_str();
-        pack = (char*) P_add(pack, c_content, (int) strlen(c_content) + 1);
+        len = (int) strlen(c_content) + 1;
+        pack = (char*) P_add(pack, c_content, len);
         p++;
+        debug_packing("cell", "STR  ", p, i, j, cell->content, len);
     }
 
     return(pack);
@@ -130,15 +141,36 @@ static char* K_tcell_pack(char *pack, TCELL *cell, int& p)
  *           according to the value of tc64->content.
  */
  
-static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
+static void K_tcell64_32(TCELL* tc64, TCELL32* tc32, int p, int i, int j)
 {
-    if(tc64->type == TABLE_CELL_LEC)
-        tc32->content = (tc64->idt == NULL) ? 0 : 1;
+    if(tc64->type == TABLE_CELL_STRING)
+    {
+        tc32->content = 1; 
+        tc32->type = tc64->type;
+        tc32->attribute = tc64->attribute;
+    }
+    else if(tc64->type == TABLE_CELL_LEC)
+    {
+        tc32->content = (tc64->idt == nullptr) ? 0 : 1;
+        tc32->type = tc64->type;
+        tc32->attribute = tc64->attribute;
+    }
+    else if(tc64->type == 0)
+    {
+        // old files may have empty cells with type = 0
+        tc32->content = (tc64->idt == nullptr) ? 0 : 1;
+        tc32->type = TABLE_CELL_LEC;
+        tc32->attribute = TABLE_CELL_LEFT;
+    }
     else
-        tc32->content = (tc64->content.empty()) ? 0 : 1;
-    
-    tc32->type = tc64->type;
-    tc32->attribute = tc64->attribute;
+    {
+        std::string msg = "Packing table cell: invalid cell type " + std::to_string(tc32->type); 
+        msg += " at line " + std::to_string(i) + ", column " + std::to_string(j); 
+        kwarning(msg.c_str());
+        tc32->content = 0;
+        tc32->type = TABLE_CELL_LEC;
+        tc32->attribute = TABLE_CELL_LEFT;
+    }
     memset(tc32->pad, '\0', 2);
 }
 
@@ -226,7 +258,7 @@ static int K_tpack32(char **pack, char *a1)
 
     /* 2. : nc x [TCELL->content] */
     for(j = 0; j < T_NC(tbl); j++)
-        *pack = K_tcell_pack(*pack, cells + j, p);
+        *pack = K_tcell_pack(*pack, cells + j, p, -1, j);
 
     /* lines */
     /* 1. : [nl x TLINE] */
@@ -244,7 +276,7 @@ static int K_tpack32(char **pack, char *a1)
 
                 /* 2. : nc x [TCELL->content] */
                 for(j = 0; j < T_NC(tbl); j++)
-                    *pack = K_tcell_pack(*pack, cells + j, p);
+                    *pack = K_tcell_pack(*pack, cells + j, p, i, j);
                 break;
             case TABLE_LINE_TITLE:
                 cells = (TCELL*) tbl->lines[i].cells;
@@ -253,7 +285,7 @@ static int K_tpack32(char **pack, char *a1)
                 p++;
 
                 /* 1 x [TCELL->content] */
-                *pack = K_tcell_pack(*pack, cells, p);
+                *pack = K_tcell_pack(*pack, cells, p, i, 0);
                 break;
         }
     }
@@ -290,20 +322,24 @@ static int K_tpack64(char **pack, char *a1)
     K_tbl64_32(tbl, &tbl32);
     *pack = (char*) P_add(*pack, (char*) &tbl32, sizeof(TBL32));
     p++;
+    debug_packing("TBL      ", "", p);
 
     /* div */
     /* 1. : [nc x TCELL32] */
     cells = (TCELL*) tbl->divider_line.cells;
     cells32 = (TCELL32*) SW_nalloc(sizeof(TCELL32) * (int)T_NC(tbl));
     for(j = 0; j < T_NC(tbl); j++)
-        K_tcell64_32(cells + j, cells32 + j);
+        K_tcell64_32(cells + j, cells32 + j, p+1, -1, j);
 
     *pack = (char*) P_add(*pack, (char*) cells32, sizeof(TCELL32) * (int) T_NC(tbl));
     p++;
+    debug_packing("line", "DIV  ", p);
+    for(j = 0; j < T_NC(tbl); j++)
+        debug_packing("content? ", "", p+j+1, 0, j, (cells32[j].content == 1) ? "YES" : "NO");
 
     /* 2. : [cell] [cell] (nc x [TCELL->content]) */
     for(j = 0; j < T_NC(tbl); j++)
-        *pack = K_tcell_pack(*pack, cells + j, p);
+        *pack = K_tcell_pack(*pack, cells + j, p, 0, j);
 
     /* pack lines */
     /* 1. : [nl x TLINE] */
@@ -315,6 +351,8 @@ static int K_tpack64(char **pack, char *a1)
     *pack = (char*) P_add(*pack, (char*) lines32, sizeof(TLINE32) * (int) T_NL(tbl));
     p++;
 
+    debug_packing("LINES    ", "", p);
+
     /* 2. For each line and each col, pack cell [cell] [cell] ... */
     for(i = 0; i < T_NL(tbl); i++) 
     {
@@ -325,24 +363,49 @@ static int K_tpack64(char **pack, char *a1)
                 /* [TLINE32 * NC] */
                 cells = (TCELL*) line->cells;
                 for(j = 0; j < T_NC(tbl); j++) 
-                    K_tcell64_32(cells + j, cells32 + j);
+                    K_tcell64_32(cells + j, cells32 + j, p+1, i, j);
                 *pack = (char*) P_add(*pack, (char*) cells32, sizeof(TCELL32) * (int) T_NC(tbl));
                 p++;
+                debug_packing("line", "CELL ", p, i);
+                for(j = 0; j < T_NC(tbl); j++)
+                    debug_packing("content? ", "", p+j+1, i, j, (cells32[j].content == 1) ? "YES" : "NO");
                 
                 /* [TCELL32] [TCELL32] ... */
                 for(j = 0; j < T_NC(tbl); j++)
-                    *pack = K_tcell_pack(*pack, cells + j, p);
+                    *pack = K_tcell_pack(*pack, cells + j, p, i, j);
                 break;
 
             case TABLE_LINE_TITLE:
                 cells = (TCELL*) line->cells;
                 /* [1 x TCELL] */
-                K_tcell64_32(cells + 0, cells32 + 0);
+                K_tcell64_32(cells + 0, cells32 + 0, p+1, i, 0);
                 *pack = (char*) P_add(*pack, (char*) cells32, sizeof(TCELL32));
                 p++;
 
+                debug_packing("line", "TITLE", p, i);
+                debug_packing("content? ", "", p+1, i, 0, (cells32[0].content == 1) ? "YES" : "NO");
+
                 /* 1 x [TCELL->content] */
-                *pack = K_tcell_pack(*pack, cells, p);
+                *pack = K_tcell_pack(*pack, cells, p, i, 0);
+                break;
+
+            case TABLE_LINE_SEP:
+                debug_packing("line", "SEP  ", p, i);
+                break;
+            case TABLE_ASCII_LINE_MODE:
+                debug_packing("line", "MODE ", p, i);
+                break;
+            case TABLE_LINE_FILES:
+                debug_packing("line", "FILES", p, i);
+                break;
+            case TABLE_LINE_DATE:
+                debug_packing("line", "DATE ", p, i);
+                break;
+
+            default:
+                std::string msg = "Packing table line: invalid line type " + std::to_string(line->type); 
+                msg += " at line " + std::to_string(i);
+                kwarning(msg.c_str());
                 break;
         }
     }
@@ -560,21 +623,43 @@ static void K_tcell_div_sanitize(TCELL* cell, int j)
     {
         cell->type = TABLE_CELL_LEC;
         cell->content = "";
+        cell->idt = nullptr;
     }
 
-    if(j == 0 && cell->idt == NULL)
-        K_ipack(&cell->idt, "1");
+    if(cell->type == TABLE_CELL_STRING)
+    {
+        cell->type = TABLE_CELL_LEC;
+        std::string content = cell->content;
+        if(!trim(content).empty())
+        {
+            cell->idt = new Identity(content);
+            cell->content = "";
+        }
+        else
+            cell->idt = nullptr;
+    }
+
+    if(j == 0 && cell->idt == nullptr)
+        cell->idt = new Identity("1");
 }
 
 static void K_tcell_sanitize(TCELL* cell, int j)
 {
-    // if cell type not set, assume it is a LEC cell
+    // if cell type not set, assume it is a STRING cell
     if(cell->type == 0)
     {
-        cell->type = TABLE_CELL_LEC;
+        cell->type = TABLE_CELL_STRING;
         cell->content = "";
+        cell->idt = nullptr;
+        cell->attribute = TABLE_CELL_LEFT;
         return;
     }
+
+    if(cell->type == TABLE_CELL_STRING)
+        cell->idt = nullptr;
+
+    if(cell->type == TABLE_CELL_LEC)
+        cell->content = "";
 }
 
 /**
@@ -691,7 +776,7 @@ static TBL* K_tunpack32(char *pack)
 static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
 {
     tc64->content = "";
-    tc64->idt = NULL;
+    tc64->idt = nullptr;
     tc64->type = tc32->type;
     tc64->attribute = tc32->attribute;
     memset(tc64->pad, '\0', sizeof(tc64->pad));
@@ -749,6 +834,48 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
 }
 
 /**
+ *   Function to unpack a TBL cell
+ */
+static int K_tcell_unpack(char *pack, int& p, TCELL *cell, int i, int j)
+{
+    char* value = (char*) P_get_ptr(pack, p);
+
+    if(cell->type == TABLE_CELL_STRING)
+    {
+        debug_unpacking("cell", "STR  ", p, i, j, std::string(value));
+        cell->content = (value == NULL) ? "" : std::string(value);
+        cell->idt = nullptr;
+        p++;
+        return 0;
+    }
+    
+    if(cell->type == TABLE_CELL_LEC)
+    {
+        cell->content = "";
+        
+        // 'value' is a packed IDT
+        char* c_lec = (char*) P_get_ptr(value, 0);
+        std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
+        debug_unpacking("cell", "LEC  ", p, i, j, lec);
+        cell->idt = new Identity(lec);
+
+        // if(!lec.empty())
+        // {
+        //     CLEC* clec = (CLEC*) P_get_ptr(value, 1);
+        //     cell->idt->clec = clec_deep_copy(clec);
+        // }
+
+        p++;
+        return 0;
+    }
+
+    std::string msg = "Unpacking table cell: invalid cell type " + std::to_string(cell->type); 
+    msg += " (line " + std::to_string(i) + ", column " + std::to_string(j) + ")";
+    kwarning(msg.c_str());
+    return 1;
+}
+
+/**
  * Unpacks a packed TBL into a TBL structure in the 64 bits architecture.
  * @note Only used in 64 bit architecture.
  * 
@@ -759,7 +886,6 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
 
 static TBL* K_tunpack64(char *pack)
 {
-    char* value;
     // 64 bits structs
     TBL* tbl;
     TCELL* cell;
@@ -770,36 +896,31 @@ static TBL* K_tunpack64(char *pack)
     TLINE32* lines32;
     TCELL32* cell32;
     TCELL32* cells32;
-    int     i, j, p;
+    int      i, j, p=0;
 
     /* tbl */
     tbl = (TBL*) SW_nalloc(sizeof(TBL));
     K_tbl32_64((TBL32*) P_get_ptr(pack, 0), tbl); // Inclut la transposition de divider_line (sans divider_line.cells)
+    debug_unpacking("TBL      ", "", 0);
 
     /* div (TLINE) */
     cells32 = (TCELL32*) P_get_ptr(pack, 1);
     cells = (TCELL*) SW_nalloc(T_NC(tbl) * sizeof(TCELL));
     tbl->divider_line.cells = (char*) cells;
+    debug_unpacking("line", "DIV  ", 1);
+
     for(j = 0, p = 2; j < T_NC(tbl); j++) 
     {
         cell32 = cells32 + j;
         cell = cells + j;
         K_tcell32_64(cell32, cell);
-        if(cell32->content != 0) 
+        debug_unpacking("line", "DIV  ", p, -1, j, (cell32->content == 0) ? " NO" : " YES");
+        if(cell32->content != 0)
+            K_tcell_unpack(pack, p, cell, 0, j);
+        else
         {
-            value = (char*) P_alloc_get_ptr(pack, p);
-            if(cell->type == TABLE_CELL_STRING)
-            {
-                cell->content = std::string(value);
-                cell->idt = NULL;
-                SW_nfree(value);
-            }
-            else
-            {
-                cell->content = "";
-                cell->idt = value;
-            }
-            p++;
+            cell->content = "";
+            cell->idt = nullptr;
         }
         K_tcell_div_sanitize(cells + j, j);
     }
@@ -808,6 +929,7 @@ static TBL* K_tunpack64(char *pack)
     /* alloc must be a multiple of KT_CHUNCK */
     T_L(tbl) = (TLINE*) SW_nalloc(sizeof(TLINE) * ((int)T_NL(tbl) / KT_CHUNCK + 1) * KT_CHUNCK);
     lines32 = (TLINE32*) P_get_ptr(pack, p);
+    debug_unpacking("LINES    ", "", p);
     p++;
 
     for(i = 0; i < T_NL(tbl); i++) 
@@ -821,27 +943,20 @@ static TBL* K_tunpack64(char *pack)
                 cells = (TCELL*) SW_nalloc(T_NC(tbl) * sizeof(TCELL));
                 line->cells = (char*) cells;
                 cells32 = (TCELL32*) P_get_ptr(pack, p);
+                debug_unpacking("line", "CELL ", p, i);
                 p++;
+
                 for(j = 0; j < T_NC(tbl); j++) 
                 {
                     cell32 = cells32 + j;
                     cell = cells + j;
                     K_tcell32_64(cell32, cell);
                     if(cell32->content != 0) 
+                        K_tcell_unpack(pack, p, cell, i, j);
+                    else
                     {
-                        value = (char*) P_alloc_get_ptr(pack, p);
-                        if(cell->type == TABLE_CELL_STRING)
-                        {
-                            cell->content = std::string(value);
-                            cell->idt = NULL;
-                            SW_nfree(value);
-                        }
-                        else
-                        {
-                            cell->content = "";
-                            cell->idt = value;
-                        }
-                        p++;
+                        cell->content = "";
+                        cell->idt = nullptr;
                     }
                     K_tcell_sanitize(cells + j, j);
                 }
@@ -851,20 +966,39 @@ static TBL* K_tunpack64(char *pack)
                 cells = (TCELL*) SW_nalloc(sizeof(TCELL));
                 line->cells = (char*) cells;
                 cells32 = (TCELL32*) P_get_ptr(pack, p);
+                debug_unpacking("line", "TITLE", p, i);
                 p++;
 
                 cell32 = cells32 + 0;
                 cell = cells + 0;
                 K_tcell32_64(cell32, cell);
                 if(cell32->content != 0) 
+                    K_tcell_unpack(pack, p, cell, i, 0);
+                else
                 {
-                    value = (char*) P_alloc_get_ptr(pack, p);
-                    cell->content = std::string(value);
-                    cell->idt = NULL;
-                    SW_nfree(value);
-                    p++;
+                    cell->content = "";
+                    cell->idt = nullptr;
                 }
                 K_tcell_sanitize(cells, 0);
+                break;
+
+            case TABLE_LINE_SEP:
+                debug_unpacking("line", "SEP  ", p, i);
+                break;
+            case TABLE_ASCII_LINE_MODE:
+                debug_unpacking("line", "MODE ", p, i);
+                break;
+            case TABLE_LINE_FILES:
+                debug_unpacking("line", "FILES", p, i);
+                break;
+            case TABLE_LINE_DATE:
+                debug_unpacking("line", "DATE ", p, i);
+                break;
+
+            default:
+                std::string msg = "Unpacking table line: invalid line type " + std::to_string(line->type); 
+                msg += " at line " + std::to_string(i);
+                kwarning(msg.c_str());
                 break;
         }
     }

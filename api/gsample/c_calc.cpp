@@ -105,51 +105,71 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
     KDB     *kdb = NULL;
     double  vy[2], vf[2], div, mant, sign;
 
-    for(i = 0; i < 2; i++) { /* deux fichiers */
-        if(cl->cl_fnb[i] == 0) continue;
-        if(COL_link(cl->cl_fnb[i], clec)) goto err;                 // TODO: consistency: impossible clec link returns 0, but -1 for dclec
-        if(dclec && COL_link(cl->cl_fnb[i], dclec)) return(-1);
+    /* deux fichiers */
+    for(i = 0; i < 2; i++) 
+    {
+        if(cl->cl_fnb[i] == 0) 
+            continue;
+        
+        // TODO: consistency: impossible clec link returns 0, but -1 for dclec
+        if(COL_link(cl->cl_fnb[i], clec)) 
+            goto err;                 
+        
+        if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
+            return(-1);
+        
         kdb = K_RWS[VARIABLES][cl->cl_fnb[i] - 1];
 
-        for(j = 0 ; j < 2 ; j++) {
-            if(j == 1 && cl->cl_opy == COL_NOP) {
+        for(j = 0 ; j < 2 ; j++) 
+        {
+            if(j == 1 && cl->cl_opy == COL_NOP) 
+            {
                 t[1]  = t[0];
                 vy[1] = vy[0];
                 break;
             }
             t[j]  = cl->cl_per[j].difference(KSMPL(kdb)->start_period);
             vy[j] = L_exec(kdb, KS_WS, clec, t[j]);
-            if(!IODE_IS_A_NUMBER(vy[j])) goto err; /* JMP 16-12-93 */
+            if(!IODE_IS_A_NUMBER(vy[j])) 
+                goto err; /* JMP 16-12-93 */
             div = 1.0;
-            if(dclec) div = L_exec(kdb, KS_WS, dclec, t[j]);
-            if(!IODE_IS_A_NUMBER(div) || div == 0) goto err; /* JMP 16-12-93 */
+            if(dclec) 
+                div = L_exec(kdb, KS_WS, dclec, t[j]);
+            if(!IODE_IS_A_NUMBER(div) || div == 0) 
+                goto err; /* JMP 16-12-93 */
             vy[j] /= div;
         }
 
-        if(t[0] > t[1]) {
+        if(t[0] > t[1]) 
+        {
             tmp = t[0];
             t[0] = t[1];
             t[1] = tmp;
         }
         per = t[1] - t[0];
-        switch(cl->cl_opy) {
+        switch(cl->cl_opy) 
+        {
             case COL_NOP  :
                 vf[i] = vy[0];
                 break;
             case COL_MDIFF:
                 vf[i] = 0.0;
-                if(per == 0) break;
+                if(per == 0) 
+                    break;
                 vf[i] = (vy[0] - vy[1]) / per;
                 break;
             case COL_MGRT :
                 vf[i] = 0.0;
-                if(per == 0) break;
-                if(vy[1] == 0.0) goto err;
+                if(per == 0) 
+                    break;
+                if(vy[1] == 0.0) 
+                    goto err;
 
                 // Correction JMP 13/4/2018 pour taux de croissance négatifs
                 mant = vy[0] / vy[1]; // JMP 16/5/2019
                 sign = 1;
-                if(mant < 0) {
+                if(mant < 0) 
+                {
                     mant = -mant;
                     sign = -1;
                 }
@@ -159,35 +179,43 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 //vf[i] = 100 * (pow((vy[0] / vy[1]), (1.0 / per)) -1) ;
                 break;
             case COL_BASE :
-                if(vy[1] == 0.0) goto err;
+                if(vy[1] == 0.0) 
+                    goto err;
                 vf[i] = 100 * (vy[0] / vy[1]);
                 break;
             case COL_DIFF :
                 vf[i] = vy[0] - vy[1];
                 break;
             case COL_GRT  :
-                if(vy[1] == 0.0) goto err;
+                if(vy[1] == 0.0) 
+                    goto err;
                 vf[i] = 100 * (vy[0] / vy[1] - 1.0);
                 break;
             case COL_MEAN :
             case COL_ADD  :
                 vf[i] = 0.0;
-                for(j = t[0]; j <= t[1] ; j++) {
+                for(j = t[0]; j <= t[1] ; j++) 
+                {
                     vy[0] = L_exec(kdb, KS_WS, clec, j);
-                    if(!IODE_IS_A_NUMBER(vy[0])) goto err; /* JMP 16-12-93 */
+                    if(!IODE_IS_A_NUMBER(vy[0])) 
+                        goto err; /* JMP 16-12-93 */
                     div = 1.0;
-                    if(dclec) div = L_exec(kdb, KS_WS, dclec, j);
-                    if(!IODE_IS_A_NUMBER(div) || div == 0) goto err; /* JMP 16-12-93 */
+                    if(dclec) 
+                        div = L_exec(kdb, KS_WS, dclec, j);
+                    if(!IODE_IS_A_NUMBER(div) || div == 0) 
+                        goto err; /* JMP 16-12-93 */
                     vf[i] += vy[0] / div;
                 }
-                if(cl->cl_opy == COL_MEAN) vf[i] /= per + 1;
+                if(cl->cl_opy == COL_MEAN) 
+                    vf[i] /= per + 1;
                 break;
             default :
                 goto err;
         }
     }
 
-    switch(cl->cl_opf) {
+    switch(cl->cl_opf) 
+    {
         case COL_NOP  :
             cl->cl_res = vf[0];
             break;
@@ -198,11 +226,13 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
             cl->cl_res = 0.5 * (vf[0] + vf[1]);
             break;
         case COL_GRT  :
-            if(vf[1] == 0) goto err;
+            if(vf[1] == 0) 
+                goto err;
             cl->cl_res = 100 * (vf[0] / vf[1] - 1);
             break;
         case COL_BASE  :
-            if(vf[1] == 0) goto err;
+            if(vf[1] == 0) 
+                goto err;
             cl->cl_res = 100 * (vf[0] / vf[1]);
             break;
         case COL_ADD  :
@@ -287,35 +317,40 @@ void COL_clear(COLS* cls)
  
 int COL_exec(TBL* tbl, int i, COLS* cls)
 {
-    int     j, lg, d;    /* last used DB to compile */
-    COL     *cl;
-    TLINE   *line = T_L(tbl) + i;
-    TCELL   *cell = (TCELL *) line->cells;
-    TCELL   *dcell = (TCELL *)(tbl->divider_line).cells;
-    CLEC    *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
+    int lg = cls->cl_nb / T_NC(tbl);
 
-    lg = cls->cl_nb / T_NC(tbl);
-
-    for(d = 0; d < T_NC(tbl); d++) 
+    COL*   cl;
+    TLINE* line = T_L(tbl) + i;
+    TCELL* cells = (TCELL*) line->cells;
+    TCELL* dcells = (TCELL*) (tbl->divider_line).cells;
+    CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
+    TCELL* cell = nullptr;
+    TCELL* dcell = nullptr;
+    for(int d = 0; d < T_NC(tbl); d++) 
     {
-        if(cell[d].type != TABLE_CELL_LEC) 
+        cell = (cells != NULL) ? (cells + d) : NULL;
+
+        if(cell->type != TABLE_CELL_LEC) 
             continue;
-        if(cell[d].idt == NULL) 
+
+        if(!cell->idt) 
             continue;
-        clec = (CLEC *) P_get_ptr((void*) cell[d].idt, 1);
+
+        clec = cell->idt->clec;
         aclec = COL_cp_clec(clec);
-        /*GB    if(dcell[d].content) dclec = (CLEC *) P_get_ptr(dcell[d].content, 1); */
-        if(dcell[d].idt != NULL) /* JMP 27-09-96 */
-            dclec = (CLEC *) P_get_ptr((void*) dcell[d].idt, 1);
-        else 
-            dclec = NULL;
+
+        dcell = (dcells != NULL) ? (dcells + d) : NULL; 
+        dclec = (dcell->idt != nullptr) ? dcell->idt->clec : NULL;
+        
         adclec = COL_cp_clec(dclec);
 
-        for(j = 0; j < lg; j++) 
+        for(int j = 0; j < lg; j++) 
         {
             cl = cls->cl_cols + d + (j * T_NC(tbl));
-            if(COL_calc(cl, aclec, adclec) < 0) return(-1);
+            if(COL_calc(cl, aclec, adclec) < 0) 
+                return(-1);
         }
+
         SW_nfree(aclec);
         SW_nfree(adclec);
     }

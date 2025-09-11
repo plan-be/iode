@@ -681,7 +681,6 @@ TEST_F(KDBVariablesTest, Search)
     KDBLists kdb_lst(input_test_dir + "fun.al");
     KDBScalars kdb_scl(input_test_dir + "fun.as");
     KDBTables kdb_tbl(input_test_dir + "fun.at");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     std::vector<std::string> expected_cmts = { var_name };
     objs_list = Comments.search(var_name);

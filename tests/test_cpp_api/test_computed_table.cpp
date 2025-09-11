@@ -525,11 +525,11 @@ TEST_F(ComputedTableTest, PrintToFile)
     std::string arg;
     std::string gsample;
     std::string table_name = "C8_1";
-    Table ref_table = kdb_tbl->get(table_name); 
+    Table* ref_table = kdb_tbl->get(table_name); 
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
-    ComputedTable table_simple(&ref_table, gsample, 4);
+    ComputedTable table_simple(ref_table, gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -556,7 +556,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
-    ComputedTable table_grt(&ref_table, gsample, 4);
+    ComputedTable table_grt(ref_table, gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -584,7 +584,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // simple time series (current workspace + one extra file) - 5 observations
     gsample = "2010[1-2]:5";
-    ComputedTable table_2_files(&ref_table, gsample, 4);
+    ComputedTable table_2_files(ref_table, gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -609,4 +609,99 @@ TEST_F(ComputedTableTest, PrintToFile)
     load_reference_kdb(2, VARIABLES, ref_file);
     table_2_files.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+
+    // ---- binary table files ----
+
+    KDBTables* bin_kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
+    Table* bin_ref_table = bin_kdb_tbl->get(table_name);
+
+    TCELL* cell;
+    TCELL* bin_cell;
+    
+    EXPECT_EQ(ref_table->nb_lines, bin_ref_table->nb_lines);
+    EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
+
+    // divider lines 
+    TLINE line_div = ref_table->divider_line;
+    TLINE bin_line_div = bin_ref_table->divider_line;
+    EXPECT_EQ(line_div.type, bin_line_div.type);
+    TCELL* cells = (TCELL*) line_div.cells;
+    TCELL* bin_cells = (TCELL*) bin_line_div.cells;
+    for(int j=0; j<ref_table->nb_columns; j++)
+    {
+        cell = cells + j;
+        bin_cell = bin_cells + j;
+        EXPECT_EQ(cell->type, bin_cell->type);
+        EXPECT_EQ(cell->content, bin_cell->content);
+        if(cell->idt != nullptr && bin_cell->idt != nullptr)
+            EXPECT_EQ(cell->idt->lec, bin_cell->idt->lec);
+        EXPECT_EQ(cell->attribute, bin_cell->attribute);
+    }
+
+    // lines
+    for(int i=0; i < ref_table->nb_lines; i++)
+    {
+        TLINE line = ref_table->lines[i];
+        TLINE bin_line = bin_ref_table->lines[i];
+        EXPECT_EQ(line.type, bin_line.type);
+        if(line.type == TABLE_LINE_TITLE)
+        {
+            cells = (TCELL*) line.cells;
+            bin_cells = (TCELL*) bin_line.cells;
+            cell = cells;
+            bin_cell = bin_cells;
+            EXPECT_EQ(cell->type, bin_cell->type);
+            EXPECT_EQ(cell->content, bin_cell->content);
+            EXPECT_EQ(cell->idt, nullptr);
+            EXPECT_EQ(bin_cell->idt, nullptr);
+            EXPECT_EQ(cell->attribute, bin_cell->attribute);
+        }
+        else if(line.type == TABLE_LINE_CELL)
+        {
+            cells = (TCELL*) line.cells;
+            bin_cells = (TCELL*) bin_line.cells;
+            for(int j=0; j<ref_table->nb_columns; j++)
+            {
+                cell = cells + j;
+                bin_cell = bin_cells + j;
+                EXPECT_EQ(cell->type, bin_cell->type);
+                EXPECT_EQ(std::string(T_cell_cont(cell, 0)), std::string(T_cell_cont(bin_cell, 0)));
+                EXPECT_EQ(cell->attribute, bin_cell->attribute);
+            }
+        }
+        else
+            continue;
+    }
+
+    delete ref_table;
+
+    // simple time series (current workspace) - 10 observations
+    gsample = "2000:10";
+    ComputedTable table_simple_bin(bin_ref_table, gsample, 4);
+
+    // ---- CSV format ----
+    arg = output_test_dir + "bin_file.csv C";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.csv", 'C');
+    compare_files(output_test_dir + "bin_file.csv", output_test_dir + "bin_cpp_file.csv");
+    
+    // ---- HTML format ----
+    arg = output_test_dir + "bin_file.html H";
+    res = B_PrintDest(arg.data());
+    res = B_PrintNbDec("4");
+    arg = gsample + " " + table_name;
+    res = B_PrintTbl(to_char_array(arg));
+    EXPECT_EQ(res, 0);
+    load_reference_kdb(2, VARIABLES, ref_file);
+    table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.html", 'H');
+    compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
+
+    delete bin_ref_table;
+    delete bin_kdb_tbl;
 }
