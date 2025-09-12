@@ -406,21 +406,34 @@ inline int YY_compare(const void *a, const void *b)
 
 inline CLEC* clec_deep_copy(const CLEC* other)
 {
-    // NOTE : see end of function L_cc2() from l_cc2.c to calculate tot_lg (= len)
-    CLEC* copy = (CLEC*) SW_nalloc(other->tot_lg);
-
-    copy->tot_lg = other->tot_lg,      
-	copy->exec_lg = other->exec_lg;       
-    copy->nb_names = other->nb_names;
-    copy->dupendo = other->dupendo;
-    copy->pad = '\0';
-    for(int i = 0; i < other->nb_names; i++)
+    CLEC* copy = NULL;
+    if(other->tot_lg == 0)
     {
-        strncpy(copy->lnames[i].name, other->lnames[i].name, sizeof(ONAME) / sizeof(char));
-        memset(copy->lnames[i].pad, '\0', sizeof(LNAME::pad) / sizeof(char));
-        copy->lnames[i].pos = other->lnames[i].pos;
+        copy = (CLEC*) SW_nalloc(sizeof(CLEC));
+        copy->tot_lg = 0;
+        copy->exec_lg = 0;
+        copy->nb_names = 0;
+        copy->dupendo = 0;
+        copy->pad = '\0';    
     }
-
+    else
+    {
+        // NOTE : see end of function L_cc2() from l_cc2.c to calculate tot_lg (= len)
+        copy = (CLEC*) SW_nalloc(other->tot_lg);
+    
+        copy->tot_lg = other->tot_lg,      
+        copy->exec_lg = other->exec_lg;       
+        copy->nb_names = other->nb_names;
+        copy->dupendo = other->dupendo;
+        copy->pad = '\0';
+        for(int i = 0; i < other->nb_names; i++)
+        {
+            strncpy(copy->lnames[i].name, other->lnames[i].name, sizeof(ONAME) / sizeof(char));
+            memset(copy->lnames[i].pad, '\0', sizeof(LNAME::pad) / sizeof(char));
+            copy->lnames[i].pos = other->lnames[i].pos;
+        }
+    }
+    
     return copy;
 }
 
