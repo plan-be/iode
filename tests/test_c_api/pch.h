@@ -29,7 +29,9 @@ public:
 	TestAbstract()
 	{
 		kpause_continue = 1;
-
+		// suppress messages from kmsg()
+		kmsg_toggle(0);
+		
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
