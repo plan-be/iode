@@ -188,7 +188,7 @@ static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
 {
     tl32->type = tl64->type;
     tl32->graph_type = tl64->graph_type;
-    tl32->right_axis = tl64->right_axis;
+    tl32->right_axis = tl64->right_axis ? 1 : 0;
     tl32->pad[0] = '\0';
 }
 
@@ -779,7 +779,6 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
     tc64->idt = nullptr;
     tc64->type = tc32->type;
     tc64->attribute = tc32->attribute;
-    memset(tc64->pad, '\0', sizeof(tc64->pad));
 }
 
 /**
@@ -796,8 +795,7 @@ static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
     tl64->type = tl32->type;
     tl64->graph_type = tl32->graph_type;
-    tl64->right_axis = tl32->right_axis;
-    memset(tl64->pad, '\0', sizeof(tl64->pad));
+    tl64->right_axis = (bool) tl32->right_axis;
 }
 
 /**
@@ -830,7 +828,6 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     tbl64->chart_gridy = tbl32->chart_gridy;
     tbl64->chart_axis_type = tbl32->chart_axis_type;
     tbl64->text_alignment = tbl32->text_alignment;
-    memset(tbl64->pad, '\0', sizeof(tbl64->pad));
 }
 
 /**

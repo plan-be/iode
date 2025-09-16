@@ -13,16 +13,13 @@ cdef extern from "api/all.h":
         char*  idt
         char   type
         char   attribute
-        char   pad[2]
 
     # Define the TLINE structure
     cdef struct TLINE:
-        char*         cells
-        char          type
-        char          graph_type
-        unsigned char right_axis
-        unsigned char unused
-        char          pad[1]
+        char* cells
+        char  type
+        char  graph_type
+        bint  right_axis
 
     # Define the TBL structure
     cdef struct TBL:
@@ -43,7 +40,6 @@ cdef extern from "api/all.h":
         char   chart_gridy
         char   chart_axis_type
         char   text_alignment
-        char   pad[13]
 
 
 cdef extern from "cpp_api/objects/table.h":
@@ -104,9 +100,6 @@ cdef extern from "cpp_api/objects/table.h":
 
         bint is_left_axis()
         void set_line_axis(bint is_left) except +
-
-        unsigned char get_line_pbyte()
-        void set_line_pbyte(unsigned char pbyte) except +
 
         # Methods
         void free(int nb_cells) except +

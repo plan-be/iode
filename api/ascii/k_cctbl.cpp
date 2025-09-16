@@ -229,10 +229,10 @@ static int read_line(TBL* tbl, YYFILE* yy)
                 return(0);
 
             case TABLE_ASCII_LEFT_AXIS :
-                c_line->right_axis = 0;
+                c_line->right_axis = false;
                 break;
             case TABLE_ASCII_RIGHT_AXIS :
-                c_line->right_axis = 1;
+                c_line->right_axis = true;
                 break;
 
             case TABLE_ASCII_GRAPH_LINE :

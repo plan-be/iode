@@ -114,12 +114,6 @@ struct TableLine: public TLINE
 
 	void set_line_axis(const bool is_left);
 
-	// TODO : returned value should be an enum
-	unsigned char get_line_pbyte() const;
-
-	// TODO : passed value should be an enum
-	void set_line_pbyte(const unsigned char pbyte);
-
 	TableCell* get_cell(const int column, const int nb_cells) const;
 
 	// WARNING: We cannot override the operator == since the number of cells is not 
@@ -140,7 +134,7 @@ struct std::hash<TLINE>
 		std::size_t seed = 0;
 
 		hash_combine<char>(seed, line.type);
-		hash_combine<unsigned char>(seed, line.right_axis);
+		hash_combine<bool>(seed, line.right_axis);
 		hash_combine<char>(seed, line.graph_type);
 
 		TCELL* cells;
