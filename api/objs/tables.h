@@ -102,7 +102,35 @@ struct TCELL
                             // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
 
 public:
-    TCELL() : content(""), idt(nullptr), type(TABLE_CELL_STRING), attribute(TABLE_CELL_NORMAL) {}
+    TCELL(char type, int col=0) : type(type)
+    {
+        if(type != TABLE_CELL_STRING && type != TABLE_CELL_LEC)
+            this->type = TABLE_CELL_STRING;
+        
+        if(this->type == TABLE_CELL_STRING)
+        {
+            content = "";
+            idt = nullptr;
+            attribute = TABLE_CELL_NORMAL;
+        }
+        else
+        {
+            attribute = (col > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
+            content = "";
+            idt = nullptr;
+        }
+    }
+
+    TCELL(const TCELL& other)
+    {
+        type = other.type;
+        attribute = other.attribute;
+        content = other.content;
+        if(other.idt)
+            idt = new Identity(*(other.idt));
+        else
+            idt = nullptr;
+    }
 
      ~TCELL()
     {
@@ -110,6 +138,19 @@ public:
         if(idt)
             delete idt;
         idt = nullptr;
+    }
+
+    TCELL& operator=(const TCELL& other)
+    {
+        type = other.type;
+        attribute = other.attribute;
+        content = other.content;
+        if(idt)
+            delete idt;
+        idt = nullptr;
+        if(other.idt)
+            idt = new Identity(*(other.idt));
+        return *this;
     }
 
     bool is_null() const
@@ -124,15 +165,11 @@ public:
 
 struct TLINE 
 {
-    char*   cells;          // if type == TABLE_LINE_CELL  : cells is TCELL*
-                            // if type == TABLE_LINE_TITLE : cells is TCELL*
-                            // if type == TABLE_LINE  : cells is NULL
-                            // if type == TABLE_LINE_MODE  : cells is NULL
-                            // if type == TABLE_LINE_DATE  : cells is NULL
-                            // if type == TABLE_LINE_FILES : cells is NULL
-    char    type;           // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_TITLE, TABLE_LINE or TABLE_LINE_CELL
-    char    graph_type;     // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
-    bool    right_axis;     // false if values are relative to the left axis, true to the right axis
+    std::vector<TCELL> cells;
+    char    type;               // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_DATE, TABLE_LINE_SEP, 
+                                // TABLE_LINE_TITLE or TABLE_LINE_CELL
+    char    graph_type;         // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
+    bool    right_axis;         // false if values are relative to the left axis, true to the right axis
 };
 
 struct TBL 
@@ -166,8 +203,8 @@ TBL *T_create(int );
 void T_free(TBL *);
 void T_free_line(TLINE *,int );
 int T_add_line(TBL *);
-TCELL *T_create_cell(TBL *,TLINE *);
-TCELL *T_create_title(TBL *,TLINE *);
+TLINE* T_create_line_cells(int nb_columns=2);
+TLINE* T_create_line_title();
 char *T_cell_cont(TCELL *,int );
 char *T_cell_cont_tbl(TBL *,int, int, int );
 char *T_div_cont_tbl(TBL *, int, int );

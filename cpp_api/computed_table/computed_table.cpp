@@ -419,6 +419,7 @@ void ComputedTable::print_to_file()
 
     W_printf(".ttitle %s\n", T_get_title(ref_table));  /* JMP 27-02-98 */
 
+    TCELL* c_cells;
     TableLine* line;
     bool first_title = true;
     for(int i = 0; i < ref_table->nb_lines; i++) 
@@ -436,7 +437,8 @@ void ComputedTable::print_to_file()
                     first_title = false;
                     break;
                 }
-                T_print_cell((TCELL *) line->cells, NULL, dim);
+                c_cells = line->cells.data();
+                T_print_cell(c_cells, NULL, dim);
                 W_printf("\n");
                 break;
             case TABLE_LINE_DATE  :

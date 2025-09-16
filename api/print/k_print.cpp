@@ -193,7 +193,8 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
     T_open_cell(cell->attribute, straddle, cell->type);  /* JMP 17-12-93 */
     T_open_attr(cell->attribute);
 
-    if(cell->type != 0) {
+    if(cell->type != 0) 
+    {
         if(cl == NULL || cell->type == TABLE_CELL_STRING)
             T_print_string(cl, (char*) cell->content.c_str());
         else 
@@ -221,16 +222,20 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
         return(-1);
 
     int d;
-    TCELL* cell = nullptr;
+    COL* cl;
+    TCELL* cell;
     TLINE* line = T_L(tbl) + i;
-    TCELL* cells = (TCELL*) line->cells;
     for(int j = 0; j < cls->cl_nb; j++) 
     {
         d = j % T_NC(tbl);
         if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
             continue;
-        cell = (cells != NULL) ? (cells + d) : NULL;
-        T_print_cell(cell, cls->cl_cols + j, 1);
+        if(line->cells.size() > d)
+        {
+            cl = cls->cl_cols + j;
+            cell = &line->cells[d];
+            T_print_cell(cell, cl, 1);
+        }
     }
     W_printf("\n");
 
@@ -397,15 +402,19 @@ unsigned char *T_get_title(TBL* tbl)
     int                     k;
     static unsigned char    buf[256];
     
+    // get the first line of type TABLE_LINE_TITLE
     for(k = 0; k < T_NL(tbl); k++)
-        if(tbl->lines[k].type == TABLE_LINE_TITLE) break;
+        if(tbl->lines[k].type == TABLE_LINE_TITLE) 
+            break;
 
-// New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || ((TCELL *) tbl->lines[k].cells)->content.empty())
+    TLINE line = tbl->lines[k];
+    TCELL cell = line.cells[0];
+
+    // New version using local static buffer to solve link problems // JMP 11/04/2022
+    if(k == T_NL(tbl) || cell.content.empty())
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char*) ((TCELL *) tbl->lines[k].cells)->content.c_str(), 
-                    sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char*) cell.content.c_str(), sizeof(buf) - 1);
 
     return(buf);
 }
@@ -424,10 +433,10 @@ int T_print_tbl(TBL* tbl, char* smpl)
 {
     int     i, dim, rc = 0, first = 1;
     COLS    *cls;
-    TLINE   *line;
 
     dim = T_prep_cls(tbl, smpl, &cls);
-    if(dim < 0) return(-1);
+    if(dim < 0) 
+        return(-1);
 
     // Anciennement
     // B_PrintRtfTopic(T_get_title(tbl));
@@ -435,12 +444,17 @@ int T_print_tbl(TBL* tbl, char* smpl)
     W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(tbl));
     //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
     
-    if(T_begin_tbl(dim, cls)) return(-1);
+    if(T_begin_tbl(dim, cls)) 
+        return(-1);
+    
     W_printf(".ttitle %s\n", T_get_title(tbl));  /* JMP 27-02-98 */
-    for(i = 0; rc == 0 && i < T_NL(tbl); i++) {
+    
+    TLINE* line;
+    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    {
         line = T_L(tbl) + i;
-
-        switch(line->type) {
+        switch(line->type) 
+        {
             case TABLE_LINE_SEP   :
                 W_printf(".tl\n");
                 break;
@@ -449,7 +463,7 @@ int T_print_tbl(TBL* tbl, char* smpl)
                     first = 0;
                     break;
                 }
-                T_print_cell((TCELL *) line->cells, NULL, dim);
+                T_print_cell(&(line->cells[0]), NULL, dim);
                 W_printf("\n");
                 break;
             case TABLE_LINE_DATE  :

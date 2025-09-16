@@ -16,7 +16,7 @@ cdef extern from "api/all.h":
 
     # Define the TLINE structure
     cdef struct TLINE:
-        char* cells
+        vector[TCELL] cells
         char  type
         char  graph_type
         bint  right_axis

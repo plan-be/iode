@@ -167,3 +167,44 @@ int COL_exec(TBL *,int ,COLS *);
 //int COL_calc(COL *,CLEC *,CLEC *);
 // int COL_link(int ,CLEC *);
 
+extern bool debug_calc;
+
+inline void debug_calc_table(const COL* cl, const std::string& lec, const std::string& dlec, 
+    const CLEC* clec, const CLEC* dclec, const int line, const int d, const int j)
+{
+    if(!debug_calc)
+        return;
+    
+    std::cout << "computed COL* for line " << line << ", d=" << d << " and j=" << j << " :" << std::endl;
+    std::cout << "  LEC: " << lec << ", divider LEC:" << dlec << std::endl;
+    
+    std::cout << "  clec  -> ";
+    if(clec)
+    {
+        std::cout << "tot_lg: " << clec->tot_lg << ", exec_lg: " << clec->exec_lg 
+                  << ", nb_names: " << clec->nb_names << ", lnames: ";
+        for(int n = 0; n < clec->nb_names; n++)
+            std::cout << clec->lnames[n].name << ", ";
+        std::cout << ", dupendo: " << clec->dupendo << std::endl;
+    }
+    else
+        std::cout << "NULL" << std::endl;
+    
+    std::cout << "  dclec -> ";
+    if(dclec)
+    {
+        std::cout << "tot_lg: " << dclec->tot_lg << ", exec_lg: " << dclec->exec_lg 
+                  << ", nb_names: " << dclec->nb_names << ", lnames: ";
+        for(int n = 0; n < dclec->nb_names; n++)
+            std::cout << dclec->lnames[n].name << ", ";
+        std::cout << ", dupendo: " << dclec->dupendo << std::endl;
+    }
+    else
+        std::cout << "NULL" << std::endl;
+    
+    std::cout << "  cl_opy: " << cl->cl_opy << ", cl_per[0]: " << cl->cl_per[0].to_string()
+              << ", cl_per[1]: " << cl->cl_per[1].to_string() << std::endl;
+    std::cout << "  cl_opf: " << cl->cl_opf << ", cl_fnb[0]: " << cl->cl_fnb[0] 
+              << ", cl_fnb[1]: " << cl->cl_fnb[1] << std::endl;
+    std::cout << "  cl_res: " << cl->cl_res << "\n" << std::endl;
+}

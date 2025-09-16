@@ -315,7 +315,6 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
     TBL     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
-    TLINE   *line;
     Sample  *smpl = (Sample *) KDATA(KV_WS);
 
     /* date */
@@ -333,26 +332,32 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    if(KT_nbnames == 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
     COL_find_mode(cls, KT_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
 
+    TLINE* line;
     buf = SCR_malloc(256 + dim * 128);
-    for(i = 0; rc == 0 && i < T_NL(tbl); i++) {
+    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    {
         buf[0] = 0;
         line = T_L(tbl) + i;
 
-        switch(line->type) {
+        switch(line->type) 
+        {
             case TABLE_LINE_SEP   :
                 break;
             case TABLE_LINE_DATE  :
                 strcat(buf, SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy"));
                 break;
             case TABLE_LINE_MODE  :
-                for(j = 0; j < MAX_MODE; j++) {
-                    if(KT_mode[j] == 0) continue;
+                for(j = 0; j < MAX_MODE; j++) 
+                {
+                    if(KT_mode[j] == 0) 
+                        continue;
                     sprintf(date, "(%s) ", COL_OPERS[j + 1]);
                     strcat(buf, date);
                     //strcat(buf, KLG_OPERS_TEXTS[j + 1][B_LANG]);
@@ -362,14 +367,15 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                 }
                 break;
             case TABLE_LINE_FILES :
-                for(j = 0; KT_names[j]; j++) {
+                for(j = 0; KT_names[j]; j++) 
+                {
                     strcat(buf, KT_names[j]);
                     strcat(buf, "\n");
                     nf ++;
                 }
                 break;
             case TABLE_LINE_TITLE :
-                strcat(buf, IodeTblCell((TCELL *) line->cells, NULL, nbdec));
+                strcat(buf, IodeTblCell(&(line->cells[0]), NULL, nbdec));
                 //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
                 break;
             case TABLE_LINE_CELL  :
@@ -377,20 +383,24 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                 if(COL_exec(tbl, i, cls) < 0)
                     strcat(buf, "Error in calc");
                 else
-                    for(j = 0; j < cls->cl_nb; j++) {
+                    for(j = 0; j < cls->cl_nb; j++) 
+                    {
                         d = j % T_NC(tbl);
-                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) continue;
-                        strcat(buf, IodeTblCell((TCELL *) line->cells + d, cls->cl_cols + j, nbdec));
+                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+                            continue;
+                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
                         strcat(buf, "\t");
                     }
                 break;
         }
 
-        if(buf[0]) {
+        if(buf[0]) 
+        {
             SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
             (*nl)++;
         }
     }
+    
     SCR_add_ptr((unsigned char***) &l, &nli, NULL);
     *nl += nf + nm;
     res = (char*) SCR_mtov((unsigned char**) l, '\n');

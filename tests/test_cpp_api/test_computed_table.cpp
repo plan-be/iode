@@ -536,24 +536,22 @@ TEST_F(ComputedTableTest, PrintToFile)
     int i = 0;
     TLINE* line;
     TCELL* cell;
-    TCELL* cells;
 
     // divider lines 
     // --- divider line ---
     TLINE line_div = ref_table->divider_line;
-    cells = (TCELL*) line_div.cells;
-    cell = cells + 0;
+    ASSERT_EQ(line_div.cells.size(), 2);
+    cell = &(line_div.cells[0]);
     ASSERT_EQ(cell->type, TABLE_CELL_LEC);
     ASSERT_TRUE(cell->idt != nullptr);
     ASSERT_EQ(cell->idt->lec, "1");
-    cell = cells + 1;
+    cell = &(line_div.cells[1]);
     ASSERT_EQ(cell->type, TABLE_CELL_LEC);
     ASSERT_EQ(cell->content, "");
     ASSERT_TRUE(cell->idt == nullptr);
     // --- title line ---
     line = &(ref_table->lines[i++]);
-    cells = (TCELL*) line->cells;
-    cell = cells + 0;
+    cell = &(line->cells[0]);
     ASSERT_EQ(oem_to_utf8(cell->content), title);
     ASSERT_TRUE(cell->idt == nullptr);
     // --- separator line ---
@@ -561,12 +559,12 @@ TEST_F(ComputedTableTest, PrintToFile)
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
     // --- first line ---
     line = &(ref_table->lines[i++]);
-    cells = (TCELL*) line->cells;
-    cell = cells + 0;
+    ASSERT_EQ(line->cells.size(), 2);
+    cell = &(line->cells[0]);
     ASSERT_EQ(cell->type, TABLE_CELL_STRING);
     ASSERT_EQ(cell->content, "");
     ASSERT_TRUE(cell->idt == nullptr);
-    cell = cells + 1;
+    cell = &(line->cells[1]);
     ASSERT_EQ(cell->type, TABLE_CELL_STRING);
     ASSERT_EQ(cell->content, "#s");
     // --- separator line ---
@@ -576,14 +574,14 @@ TEST_F(ComputedTableTest, PrintToFile)
     for (size_t l = 0; l < v_titles.size(); l++)
     {
         line = &(ref_table->lines[i++]);
-        cells = (TCELL*) line->cells;
+        ASSERT_EQ(line->cells.size(), 2);
 
-        cell = cells + 0;
+        cell = &(line->cells[0]);
         ASSERT_EQ(cell->type, TABLE_CELL_STRING);
         ASSERT_EQ(oem_to_utf8(cell->content), v_titles[l]);
         ASSERT_TRUE(cell->idt == nullptr);
 
-        cell = cells + 1;
+        cell = &(line->cells[1]);
         ASSERT_EQ(cell->type, TABLE_CELL_LEC);
         ASSERT_EQ(cell->content, "");
         ASSERT_TRUE(cell->idt != nullptr);
@@ -679,7 +677,6 @@ TEST_F(ComputedTableTest, PrintToFile)
     Table* bin_ref_table = bin_kdb_tbl->get(table_name);
 
     TCELL* bin_cell;
-    TCELL* bin_cells;
     
     EXPECT_EQ(ref_table->nb_lines, bin_ref_table->nb_lines);
     EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
@@ -687,12 +684,11 @@ TEST_F(ComputedTableTest, PrintToFile)
     // divider lines 
     TLINE bin_line_div = bin_ref_table->divider_line;
     EXPECT_EQ(line_div.type, bin_line_div.type);
-    cells = (TCELL*) line_div.cells;
-    bin_cells = (TCELL*) bin_line_div.cells;
+    ASSERT_EQ(line_div.cells.size(), 2);
     for(int j=0; j<ref_table->nb_columns; j++)
     {
-        cell = cells + j;
-        bin_cell = bin_cells + j;
+        cell = &(line_div.cells[j]);
+        bin_cell = &(bin_line_div.cells[j]);
         EXPECT_EQ(cell->type, bin_cell->type);
         EXPECT_EQ(cell->content, bin_cell->content);
         if(cell->idt != nullptr && bin_cell->idt != nullptr)
@@ -706,12 +702,10 @@ TEST_F(ComputedTableTest, PrintToFile)
         TLINE line = ref_table->lines[i];
         TLINE bin_line = bin_ref_table->lines[i];
         EXPECT_EQ(line.type, bin_line.type);
-        cells = (TCELL*) line.cells;
-        bin_cells = (TCELL*) bin_line.cells;
         if(line.type == TABLE_LINE_TITLE)
         {
-            cell = cells + 0;
-            bin_cell = bin_cells + 0;
+            cell = &line.cells[0];
+            bin_cell = &bin_line.cells[0];
             EXPECT_EQ(cell->type, bin_cell->type);
             EXPECT_EQ(cell->content, bin_cell->content);
             EXPECT_EQ(cell->idt, nullptr);
@@ -720,12 +714,16 @@ TEST_F(ComputedTableTest, PrintToFile)
         }
         else if(line.type == TABLE_LINE_CELL)
         {
+            ASSERT_EQ(line.cells.size(), 2);
             for(int j=0; j<ref_table->nb_columns; j++)
             {
-                cell = cells + j;
-                bin_cell = bin_cells + j;
-                EXPECT_EQ(cell->type, bin_cell->type);
-                EXPECT_EQ(std::string(T_cell_cont(cell, 0)), std::string(T_cell_cont(bin_cell, 0)));
+                cell = &line.cells[j];
+                bin_cell = &bin_line.cells[j];
+                if(!bin_cell->content.empty() || bin_cell->idt != nullptr)
+                    EXPECT_EQ(cell->type, bin_cell->type);
+                EXPECT_EQ(cell->content, bin_cell->content);
+                if(cell->idt != nullptr && bin_cell->idt != nullptr)
+                    EXPECT_EQ(cell->idt->lec, bin_cell->idt->lec);
                 EXPECT_EQ(cell->attribute, bin_cell->attribute);
             }
         }
