@@ -126,34 +126,40 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     COLS    *cls, *fcls;
     TLINE   *line;
     Sample  smpl;
-    double    step, *x, *y;
-    TCELL   *cell;   
+    double  step, *x, *y;
+    TCELL   *cells;   
 
 //    KT_attr = 4;
-    if(tbl->nb_columns != 2) {
+    if(tbl->nb_columns != 2) 
+    {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
         return(-1);
     }
 
     dim = T_prep_cls(tbl, gsmpl, &cls);
-    if(dim < 0) return(-1);
+    if(dim < 0) 
+        return(-1);
 
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
-    if(files == 0) return(-1); /* JMP 11-06-99 */
+    if(files == 0) 
+        return(-1); /* JMP 11-06-99 */
 
     x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
     x[0] = smpl.start_period.to_float();
-    if(step < 1) x[0] += step/2; /* GB 23-11-2010, center Q en M  */
-    for(i = 1; i < smpl.nb_periods; i++) x[i] = x[i - 1] + step;
+    if(step < 1) 
+        x[0] += step/2; /* GB 23-11-2010, center Q en M  */
+    for(i = 1; i < smpl.nb_periods; i++) 
+        x[i] = x[i - 1] + step;
 
     y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
 
     //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
     //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
-    if(mode != 0) W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
+    if(mode != 0) 
+        W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
     
     w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,  /* JMP 19-02-98 */
                     tbl->chart_gridx, tbl->chart_gridy,
@@ -161,19 +167,23 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
                     (double)tbl->z_min, (double)tbl->z_max,
                     tbl->text_alignment, tbl->chart_box, 50 * tbl->chart_shadow); /* JMP 23-02-98 */
 
-    for(i = 0; i < T_NL(tbl) && w >= 0; i++) {
+    for(i = 0; i < T_NL(tbl) && w >= 0; i++) 
+    {
         line = T_L(tbl) + i;
-        cell = (TCELL *) line->cells;
+        cells = line->cells.data();
 
-        switch(line->type) {
+        switch(line->type) 
+        {
             case TABLE_LINE_CELL  :
-                if(cell[1].type != TABLE_CELL_LEC) break;
+                if(cells[1].type != TABLE_CELL_LEC) 
+                    break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
+                if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) 
+                    w = -1;
                 break;
 
             case TABLE_LINE_TITLE :
-                T_GraphTitle(T_cell_cont(cell, 0));
+                T_GraphTitle(T_cell_cont(&cells[0], 0));
                 break;
 
             case TABLE_LINE_FILES :
@@ -242,9 +252,10 @@ static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i)
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
-    TCELL   *cell = (TCELL *) line->cells;
+    TCELL   *cell = &(line->cells[0]);
 
-    if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) fileop = COL_ctoa(cl, 'f', 0, 2);
+    if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
+        fileop = COL_ctoa(cl, 'f', 0, 2);
     T_GraphLegend(line->right_axis, "LLBL"[line->graph_type], T_cell_cont(cell, 0), fileop);
     return(0);
 }
@@ -343,22 +354,28 @@ int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, 
     COL     *cl;
 
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) return(-1);
+    if(COL_exec(tbl, i, cls) < 0) 
+        return(-1);
 
-    for(k = 0 ; k < fcls->cl_nb ; k++) {
+    for(k = 0 ; k < fcls->cl_nb ; k++) 
+    {
         T_GraphLineTitle(line, fcls, k);
 
-        for(j = 0 ; j < smpl->nb_periods ; j++) y[j] = IODE_NAN;
-        for(j = 1; j < cls->cl_nb; j += 2) {
+        for(j = 0 ; j < smpl->nb_periods ; j++) 
+            y[j] = IODE_NAN;
+        
+        for(j = 1; j < cls->cl_nb; j += 2) 
+        {
             cl = cls->cl_cols + j;
-            if(T_find_opf(fcls, cl) != k) continue;
+            if(T_find_opf(fcls, cl) != k) 
+                continue;
             dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
         }
 
         T_GraphTimeData(smpl, y);
-
     }
+
     return(0);
 }
 
@@ -718,7 +735,8 @@ int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i)
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
-    TCELL   *cell = (TCELL *) line->cells;
+    TCELL   *cell = &(line->cells[0]);
+
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
         fileop = COL_ctoa(cl, 'f', 0, 2);
     APIGraphLegendTitle(hdl, line->right_axis,
@@ -855,42 +873,54 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     COLS    *cls, *fcls;
     TLINE   *line;
     Sample  smpl;
-    double    step, *x, *y;
-    TCELL   *cell;
+    double  step, *x, *y;
 
-    if(tbl->nb_columns != 2) {
+    if(tbl->nb_columns != 2) 
+    {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
         return(-1);
     }
+    
     dim = T_prep_cls(tbl, gsmpl, &cls);
-    if(dim < 0) return(-1);
+    if(dim < 0) 
+        return(-1);
+    
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
-    if(files == 0) return(-1); /* JMP 11-06-99 */
+    if(files == 0) 
+        return(-1); /* JMP 11-06-99 */
+    
     x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
     x[0] = smpl.start_period.to_float();
-    for(i = 1; i < smpl.nb_periods; i++) x[i] = x[i - 1] + step;
+    for(i = 1; i < smpl.nb_periods; i++) 
+        x[i] = x[i - 1] + step;
     y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     hdl = APIChartAlloc(T_NL(tbl));
     w = 1;
-    for(i = 0; i < T_NL(tbl) && w > 0; i++) {
+    for(i = 0; i < T_NL(tbl) && w > 0; i++) 
+    {
         line = T_L(tbl) + i;
-        cell = (TCELL *) line->cells;
-        switch(line->type) {
+        switch(line->type) 
+        {
             case TABLE_LINE_CELL  :
-                if(cell[1].type != TABLE_CELL_LEC) break;
-                if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) w = -1;
+                if(line->cells[1].type != TABLE_CELL_LEC) 
+                    break;
+                if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) 
+                    w = -1;
                 break;
+
             case TABLE_LINE_TITLE :
-                APIGraphTitle(hdl, T_cell_cont(cell, 0), x, smpl.nb_periods);
+                APIGraphTitle(hdl, T_cell_cont(&(line->cells[0]), 0), x, smpl.nb_periods);
                 break;
+
             case TABLE_LINE_FILES :
             default :
                 break;
         }
     }
+
     API_CHARTS[hdl]->ChrtNb = smpl.nb_periods;
     SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);

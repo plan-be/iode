@@ -778,15 +778,21 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
 
 TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 {
-    TBL     *tbl, *extracted_tbl;
-    TCELL   *cells_0;
-    TCELL   *cells_1;
-    TLINE   *line_0;
-    TLINE   *line_1;
+    TBL*     tbl;
+    TBL*     extracted_tbl;
+    TLINE*   line;
+    TLINE*   line_original;
+    TLINE*   line_restored;
+    std::vector<TCELL> cells;
+    std::vector<TCELL> cells_original;
+    std::vector<TCELL> cells_restored;
 
     int     nb_columns = 2;
     char    *def = "A title";
     char    *vars = "GOSG,YDTG,DTH,DTF,IT,YSSG+COTRES,RIDG,OCUG"; // Note that semi-colon are not accepted by B_ainit_chk() (see b_args.c)
+    std::vector<std::string> v_lecs = {"GOSG", "YDTG", "DTH", "DTF", "IT", 
+                                       "YSSG+COTRES", "RIDG", "OCUG"};
+    
     char    **lecs;
     char    *name;
     char    *cell_cont_0;
@@ -803,6 +809,60 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     tbl = T_create(nb_columns);
 	T_auto(tbl, def, lecs, mode, files, date);
 	SCR_free_tbl((unsigned char**) lecs);
+
+    EXPECT_TRUE(tbl != NULL);
+    EXPECT_EQ(tbl->nb_columns, nb_columns);
+    // title + sep + line #S + sep + 8 cells + sep + mode + files + date
+    EXPECT_EQ(tbl->nb_lines, 16);
+    // title line
+    line = tbl->lines;
+    EXPECT_EQ(line->type, TABLE_LINE_TITLE);
+    cells = line->cells;
+    EXPECT_EQ(cells.size(), 1);
+    EXPECT_EQ(cells[0].content, std::string(def));
+    EXPECT_TRUE(cells[0].idt == nullptr);
+    cells.clear();
+    // sep line
+    EXPECT_EQ(tbl->lines[1].type, TABLE_LINE_SEP);
+    // line #S
+    line = tbl->lines + 2;
+    EXPECT_EQ(line->type, TABLE_LINE_CELL);
+    cells = line->cells;
+    EXPECT_EQ(cells.size(), nb_columns);
+    EXPECT_EQ(cells[0].type, TABLE_CELL_LEC);
+    EXPECT_EQ(cells[0].content, "");
+    EXPECT_TRUE(cells[0].idt == nullptr);
+    EXPECT_EQ(cells[1].type, TABLE_CELL_STRING);
+    EXPECT_EQ(cells[1].content, std::string("#S"));
+    cells.clear();
+    // sep line
+    EXPECT_EQ(tbl->lines[3].type, TABLE_LINE_SEP);
+    // variable lines
+    i = 4;
+    for(std::string& lec: v_lecs)
+    {
+        line = tbl->lines + i;
+        EXPECT_EQ(line->type, TABLE_LINE_CELL);
+        EXPECT_EQ(line->cells.size(), nb_columns);
+        cells = line->cells;
+        // left column: line name
+        EXPECT_EQ(cells[0].type, TABLE_CELL_STRING);
+        EXPECT_EQ(cells[0].content, lec);
+        // right column: lec expression
+        EXPECT_EQ(cells[1].type, TABLE_CELL_LEC);
+        EXPECT_EQ(cells[1].content, "");
+        EXPECT_TRUE(cells[1].idt != nullptr);
+        EXPECT_EQ(cells[1].idt->lec, lec);
+        // next line
+        cells.clear();
+        i++;
+    }
+    // sep line
+    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
+    // mode, files, date lines
+    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_MODE);
+    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
     name = "c_table";
@@ -834,32 +894,35 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
     EXPECT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
     EXPECT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
-    cells_0 = (TCELL*) tbl->divider_line.cells;
-    cells_1 = (TCELL*) extracted_tbl->divider_line.cells;
+    cells_original = tbl->divider_line.cells;
+    cells_restored = extracted_tbl->divider_line.cells;
 
     for(j = 0; j < tbl->nb_columns; j++)
     {
-        EXPECT_EQ(cells_0[j].type, cells_1[j].type);
-        EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
+        EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
+        EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
     }
+
+    cells_original.clear();
+    cells_restored.clear();
 
     // ----- check all lines
     for(i = 0; i < tbl->nb_lines; i++)
     {
-        line_0 = tbl->lines + i;
-        line_1 = extracted_tbl->lines + i;
+        line_original = tbl->lines + i;
+        line_restored = extracted_tbl->lines + i;
 
-        EXPECT_EQ(line_0->type, line_1->type);
-        EXPECT_EQ(line_0->graph_type, line_1->graph_type);
-        EXPECT_EQ(line_0->right_axis, line_1->right_axis);
+        EXPECT_EQ(line_original->type, line_restored->type);
+        EXPECT_EQ(line_original->graph_type, line_restored->graph_type);
+        EXPECT_EQ(line_original->right_axis, line_restored->right_axis);
 
-        cells_0 = (TCELL*) line_0->cells;
-        cells_1 = (TCELL*) line_1->cells;
-        switch (line_0->type)
+        cells_original = line_original->cells;
+        cells_restored = line_restored->cells;
+        switch (line_original->type)
         {
           case TABLE_LINE_TITLE:
-            cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_0, 0));
-            cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_1, 0));
+            cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_original[0], 0));
+            cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_restored[0], 0));
             EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
             SCR_free(cell_cont_0);
             SCR_free(cell_cont_1);
@@ -867,20 +930,22 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
           case TABLE_LINE_CELL:
             for(j = 0; j < tbl->nb_columns; j++)
             {
-                EXPECT_EQ(cells_0[j].type, cells_1[j].type);
-                EXPECT_EQ(cells_0[j].attribute, cells_1[j].attribute);
-                cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_0 + j, 0));
-                cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(cells_1 + j, 0));
+                EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
+                EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
+                cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_original[j], 0));
+                cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_restored[j], 0));
                 EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
                 SCR_free(cell_cont_0);
                 SCR_free(cell_cont_1);
             }
             break;
           default:
-            EXPECT_TRUE(cells_0 == NULL); 
-            EXPECT_TRUE(cells_1 == NULL);
+            EXPECT_TRUE(cells_original.size() == 0); 
+            EXPECT_TRUE(cells_restored.size() == 0);
             break;
         }
+        cells_original.clear();
+        cells_restored.clear();
     }
 
     // --- free memory
@@ -989,50 +1054,6 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
         rc = K_save(kdb_var, out_filename);
         EXPECT_EQ(rc, 0);
     }
-}
-
-
-TEST_F(IodeCAPITest, Tests_TBL32_64)
-{
-    char    in_filename[256];
-    char    out_filename[256];
-    KDB     *kdb_tbl;
-    int     rc;
-
-    int     pos;
-    TBL*    c_table;
-    TCELL*  cells;
-
-#ifdef _MSC_VER
-    U_test_print_title("Tests conversion 32 to 64 bits");
-
-    sprintf(in_filename,  "%sfun.tbl", input_test_dir);
-
-    kdb_tbl = K_interpret(TABLES, in_filename);
-    EXPECT_NE(kdb_tbl, nullptr);
-    if(kdb_tbl) {
-        sprintf(out_filename, "%s\\fun_copy.at", output_test_dir);
-        rc = ascii_handlers[TABLES]->save_asc(kdb_tbl, out_filename);
-        EXPECT_EQ(rc, 0);
-    }
-
-    // Plantage ALD 14/02/2022
-    pos = K_find(kdb_tbl, "GFRPC");
-    c_table = KTVAL(kdb_tbl, pos);
-
-    // divider
-    cells = (TCELL*) c_table->divider_line.cells;
-    //printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
-    printf("Address(cells) =     %p\nAddress(cells + 1) = %p\n", cells, cells + 1);
-    printf("Diff(cells, cells+1) = %d\n", (int)((char*)(cells + 1) - (char*)(cells)));
-
-    // Next lines temporarily deleted because the do not work in VS 64
-    //for(col = 0; col < c_table->nb_columns; col++) {
-    //    //cell_content = T_cell_cont(&cells[col], 1);
-    //    cell_content = T_div_cont_tbl(c_table, col, 1);
-    //    printf("Cell %d:%s\n",col, cell_content);
-    //}
-#endif
 }
 
 

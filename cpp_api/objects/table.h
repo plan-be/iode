@@ -137,24 +137,26 @@ struct std::hash<TLINE>
 		hash_combine<bool>(seed, line.right_axis);
 		hash_combine<char>(seed, line.graph_type);
 
-		TCELL* cells;
-		TCELL* cell;
+		const TCELL* cell;
+		const Identity* idt;
 		switch(line.type)
 		{
 		case TABLE_LINE_TITLE:
-			cells = (TCELL*) line.cells;
-			hash_combine<char>(seed, cells->type);
-			hash_combine<char>(seed, cells->attribute);
-			hash_combine<std::string>(seed, std::string(cells->content));
+			cell = &(line.cells[0]);
+			hash_combine<char>(seed, cell->type);
+			hash_combine<char>(seed, cell->attribute);
+			hash_combine<std::string>(seed, cell->content);
 			break;
 		case TABLE_LINE_CELL:
-			cells = (TCELL*) line.cells;
 			for(int col = 0; col < _nb_columns_; col++)
 			{
-				cell = &cells[col];
+				cell = &(line.cells[col]);
 				hash_combine<char>(seed, cell->type);
 				hash_combine<char>(seed, cell->attribute);
-				hash_combine<std::string>(seed, std::string(T_cell_cont(cell, 0)));
+				hash_combine<std::string>(seed, cell->content);
+				idt = cell->idt;
+				if(idt)
+					hash_combine<std::string>(seed, idt->lec);
 			}
 			break;
 		default:

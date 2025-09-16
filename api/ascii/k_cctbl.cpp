@@ -27,7 +27,7 @@
  *  @return          void
  *  
  */
-static void read_cell(TCELL* cell, YYFILE* yy, int mode)
+static TCELL* read_cell(YYFILE* yy, int mode)
 {
     int   keyw, ok = 0, align = TABLE_CELL_LEFT;
     char* c_lec;
@@ -36,13 +36,10 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
     if(mode != 0 && mode != keyw) 
     {
         YY_unread(yy);
-        return;
+        return nullptr;
     }
 
-    cell->type = TABLE_CELL_STRING;
-    cell->content = "";
-    cell->idt = nullptr;
-
+    TCELL* cell = new TCELL(TABLE_CELL_STRING);
     while(1) 
     {
         switch(keyw) 
@@ -70,6 +67,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                     break;
                 }
 
+                cell->type = TABLE_CELL_LEC;
                 c_lec = (char*) yy->yy_text;
                 try
                 {
@@ -80,8 +78,6 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                     kwarning(e.what());
                     cell->idt = nullptr;
                 }
-                cell->content = "";
-                cell->type = TABLE_CELL_LEC;
                 align = TABLE_CELL_DECIMAL;
                 break;
 
@@ -89,12 +85,11 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
                 if(ok == 1) 
                     goto ret;
                 ok = 1;
-                /*            cell->attribute = TABLE_CELL_LEFT; */
+                
+                cell->type = TABLE_CELL_STRING;
                 if(U_is_in('#', (char*) yy->yy_text)) 
                     cell->attribute = TABLE_CELL_CENTER;
                 cell->content = std::string((char*) yy->yy_text);
-                cell->idt = nullptr;
-                cell->type = TABLE_CELL_STRING;
                 break;
 
             case YY_EOF   :
@@ -108,7 +103,7 @@ static void read_cell(TCELL* cell, YYFILE* yy, int mode)
 ret :
     cell->attribute |= align;
     YY_unread(yy);
-    return;
+    return cell;
 }
 
 /**
@@ -130,12 +125,12 @@ ret :
  */
 static void read_div(TBL* tbl, YYFILE* yy)
 {
-    int     i;
-    TCELL   *cell;
-
-    cell = (TCELL *) (tbl->divider_line).cells;
-    for(i = 0; i < tbl->nb_columns; i++)
-        read_cell(cell + i, yy, 0);
+    TCELL* cell;
+    for(int i = 0; i < tbl->nb_columns; i++)
+    {
+        cell = read_cell(yy, 0);
+        tbl->divider_line.cells[i] = *cell;
+    }
 }
 
 /**
@@ -172,11 +167,13 @@ static void read_div(TBL* tbl, YYFILE* yy)
  */
 static int read_line(TBL* tbl, YYFILE* yy)
 {
-    int     keyw, i;
-    TLINE   *c_line;
-    TCELL   *cell;
+    int     keyw;
+    TLINE*  c_line;
+    TCELL*  cell = nullptr;
 
-    if(T_add_line(tbl) < 0) return(-1);
+    if(T_add_line(tbl) < 0) 
+        return(-1);
+    
     c_line = tbl->lines + (tbl->nb_lines - 1);
 
     while(1) {
@@ -214,8 +211,8 @@ static int read_line(TBL* tbl, YYFILE* yy)
                     return(0);
                 }
                 c_line->type = keyw;
-                c_line->cells = SW_nalloc(sizeof(TCELL));
-                read_cell((TCELL *) c_line->cells, yy, YY_STRING);
+                cell = read_cell(yy, YY_STRING);
+                c_line->cells.push_back(*cell);
                 break;
 
             case TABLE_ASCII_BREAK :
@@ -224,7 +221,8 @@ static int read_line(TBL* tbl, YYFILE* yy)
                     return(0);
                 }
                 c_line->type = TABLE_ASCII_LINE_TITLE; /* empty string */
-                c_line->cells = SW_nalloc(sizeof(TCELL));
+                cell = new TCELL(TABLE_CELL_STRING);
+                c_line->cells.push_back(*cell);
                 YY_unread(yy);
                 return(0);
 
@@ -245,14 +243,20 @@ static int read_line(TBL* tbl, YYFILE* yy)
                 c_line->graph_type= 2;
                 break;
 
-            default       :
+            default: 
                 if(c_line->type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
                 YY_unread(yy);
-                cell = T_create_cell(tbl, c_line);
-                for(i = 0; i < T_NC(tbl); i++)  read_cell(cell + i, yy, 0);
+                c_line->type = TABLE_LINE_CELL;
+                c_line->graph_type = T_GRAPHDEFAULT; /* GB 10/03/2011 */
+                c_line->cells.clear();
+                for(int i = 0; i < T_NC(tbl); i++)
+                {
+                    cell = read_cell(yy, 0);
+                    c_line->cells.push_back(*cell);
+                }  
                 break;
         }
     }
@@ -291,7 +295,8 @@ static TBL* read_tbl(YYFILE* yy)
     }
 
     tbl = T_create(dim);
-    if(tbl == NULL) return(NULL);
+    if(tbl == NULL) 
+        return(NULL);
 
     while(1) 
     {
@@ -391,7 +396,8 @@ KDB* AsciiTables::load_asc(char* filename)
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    if(sorted == 0) {
+    if(sorted == 0) 
+    {
         qsort(TABLE, sizeof(TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), ascii_compare);
         sorted = 1;
     }
@@ -399,7 +405,8 @@ KDB* AsciiTables::load_asc(char* filename)
     SCR_strip((unsigned char*) filename);
     yy = YY_open(filename, TABLE, sizeof(TABLE) / sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
-    if(yy == 0) {
+    if(yy == 0) 
+    {
         kerror(0, "Cannot open '%s'", filename);
         return(kdb);
     }
@@ -407,12 +414,15 @@ KDB* AsciiTables::load_asc(char* filename)
     /* READ FILE */
     kdb = K_create(TABLES, UPPER_CASE);
     K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 30/11/2022
-    
-    while(1) {
-        switch(YY_lex(yy)) {
+
+    char asc_filename[1024];
+    while(1) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
-                if(cmpt) {
-                    char    asc_filename[1024];
+                if(cmpt) 
+                {
                     K_set_ext_asc(asc_filename, filename, TABLES);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
@@ -422,11 +432,13 @@ KDB* AsciiTables::load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if((tbl = read_tbl(yy)) == NULL) {
+                if((tbl = read_tbl(yy)) == NULL) 
+                {
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(K_add(kdb, name, tbl) < 0)  goto err;
+                if(K_add(kdb, name, tbl) < 0)  
+                    goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 T_free(tbl);
                 break;
@@ -566,9 +578,6 @@ static void print_cell(FILE *fd, TCELL *cell)
  */
 static void print_tbl(FILE* fd, TBL* tbl)
 {
-    TCELL   *cell;
-    int     i, j;
-
     /* tbl */
     fprintf(fd, "\nDIM %d\n", T_NC(tbl));
     K_wrdef(fd, TABLE, T_LANG(tbl));
@@ -583,18 +592,18 @@ static void print_tbl(FILE* fd, TBL* tbl)
 
     fprintf(fd, "\nDIV ");
     /* div */
-    for(i = 0; i < T_NC(tbl); i++)
-        print_cell(fd, (TCELL *)(tbl->divider_line.cells) + i);
+    for(int i = 0; i < T_NC(tbl); i++)
+        print_cell(fd, &(tbl->divider_line.cells[i]));
 
     /* lines */
-
-    for(j = 0; j < T_NL(tbl); j++) {
+    for(int j = 0; j < T_NL(tbl); j++) 
+    {
         fprintf(fd, "\n- ");
-        switch(tbl->lines[j].type) {
-            case TABLE_ASCII_LINE_CELL :
-                cell = (TCELL *) tbl->lines[j].cells;
-                for(i = 0; i < T_NC(tbl); i++)
-                    print_cell(fd, cell + i);
+        switch(tbl->lines[j].type) 
+        {
+            case TABLE_ASCII_LINE_CELL:
+                for(TCELL& cell : tbl->lines[j].cells)
+                    print_cell(fd, &cell);
 
                 /* append GR info */
                 print_graph_info(fd, tbl->lines[j].right_axis, tbl->lines[j].graph_type);
@@ -602,7 +611,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
 
             case TABLE_ASCII_LINE_TITLE :
                 K_wrdef(fd, TABLE, tbl->lines[j].type);
-                print_cell(fd, (TCELL *) tbl->lines[j].cells);
+                print_cell(fd, &(tbl->lines[j].cells[0]));
                 break;
 
             case TABLE_ASCII_LINE_SEP   :

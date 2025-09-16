@@ -59,7 +59,6 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     char    **lst = NULL;
     TBL     *tbl;
     TLINE   *tline;
-    TCELL   *tcell;
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
     std::string lec;
     std::string cmt;
@@ -73,9 +72,10 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
         return(lst);
     }
 
-
+    TCELL* cell;
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(i = 0; i < KNB(kdb); i++) {
+    for(i = 0; i < KNB(kdb); i++) 
+    {
         found = 0;
         if(names) 
             found = !SCR_grep_gnl(pattern, KONAME(kdb, i), ecase, all);
@@ -106,9 +106,9 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
                 case TABLES:
                     tbl = KTVAL(kdb, i);
-                    for(k = 0; k < T_NL(tbl) && !found; k++) {
+                    for(k = 0; k < T_NL(tbl) && !found; k++) 
+                    {
                         tline = tbl->lines + k;
-                        tcell = (TCELL *) tline->cells;
                         switch(tline->type) {
                             case TABLE_LINE_SEP   :
                             case TABLE_LINE_MODE  :
@@ -116,13 +116,18 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                             case TABLE_LINE_FILES :
                                 break;
                             case TABLE_LINE_TITLE :
-                                if(texts) found = !SCR_grep_gnl(pattern, T_cell_cont(tcell, 1), ecase, all);
+                                cell = &(tline->cells[0]);
+                                if(texts) 
+                                    found = !SCR_grep_gnl(pattern, T_cell_cont(cell, 1), ecase, all);
                                 break;
                             case TABLE_LINE_CELL  :
                                 for(j = 0; j < T_NC(tbl) && !found; j++)
-                                    if((texts && tcell[j].type == TABLE_CELL_STRING) ||
-                                            (forms && tcell[j].type == TABLE_CELL_LEC))
-                                        found = !SCR_grep_gnl(pattern, T_cell_cont(tcell + j, 1), ecase, all);
+                                {
+                                    cell = &(tline->cells[j]);
+                                    if((texts && cell->type == TABLE_CELL_STRING) || 
+                                       (forms && cell->type == TABLE_CELL_LEC))
+                                        found = !SCR_grep_gnl(pattern, T_cell_cont(cell, 1), ecase, all);
+                                }
                                 break;
                         }
                     }
@@ -131,10 +136,12 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
             }
         }
 
-        if(found) SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) KONAME(kdb, i));
+        if(found) 
+            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) KONAME(kdb, i));
     }
 
-    if(lst != NULL) SCR_add_ptr((unsigned char***) &lst, &n, NULL);
+    if(lst != NULL) 
+        SCR_add_ptr((unsigned char***) &lst, &n, NULL);
     
     SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;    // JMP 19/01/2023
     return(lst);

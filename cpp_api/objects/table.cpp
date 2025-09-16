@@ -22,9 +22,8 @@ static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 }
 
 TableCell::TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align, 
-	const bool bold, const bool italic, const bool underline)
+	const bool bold, const bool italic, const bool underline): TCELL((char) cell_type)
 {
-	this->type = (char) cell_type;
 	if(cell_type == TableCellType::TABLE_CELL_STRING)
 		set_text(content);
 	else
@@ -35,10 +34,8 @@ TableCell::TableCell(const TableCellType cell_type, const std::string& content, 
 	set_underline(underline);
 }
 
-TableCell::TableCell(const TableCell& other)
+TableCell::TableCell(const TableCell& other): TCELL(other.type)
 {
-	this->content = "";
-	this->idt = nullptr;
 	copy_cell(this, &other);
 }
 
@@ -108,7 +105,7 @@ void TableCell::set_lec(const std::string& lec)
  * @param content 
  * 
  * @note When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
- *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
+ *       See function `T_create_line_cells()` in file `k_tbl.c` from the C API 
  */
 void TableCell::set_content(const std::string& content)
 {
@@ -202,14 +199,13 @@ bool TableCell::operator==(const TableCell& other) const
 
 void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src)
 {
-	unsigned char* cell_src_content;
-	TCELL* cells_dest = (TCELL*)c_line_dest->cells;
-	TCELL* cells_src = (TCELL*)c_line_src->cells;
-
 	c_line_dest->type = c_line_src->type;
 	c_line_dest->right_axis = c_line_src->right_axis;
 	c_line_dest->graph_type = c_line_src->graph_type;
 
+	unsigned char* cell_src_content;
+	TCELL* cells_dest = c_line_dest->cells.data();
+	TCELL* cells_src = (TCELL*) c_line_src->cells.data();
 	switch (c_line_src->type)
 	{
 	case TABLE_LINE_TITLE:
@@ -230,7 +226,6 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left)
 {
 	this->type = (char) line_type;
-	this->cells = NULL;
 	set_line_graph(graph_type);
 	set_line_axis(axis_left);
 }
@@ -239,17 +234,14 @@ TableLine::TableLine(const TableLine& other, const int nb_cells)
 {
 	TCELL* cells;
 
-	this->cells = NULL;
 	switch (other.type)
 	{
 	case TABLE_LINE_TITLE:
-		this->cells = SW_nalloc(sizeof(TCELL));
+		this->cells.push_back(TCELL(TABLE_CELL_STRING));
 		break;
 	case TABLE_LINE_CELL:
-		this->cells = SW_nalloc(nb_cells * sizeof(TCELL));
-		cells = (TCELL*) this->cells;
-		for (int col = 0; col < nb_cells; col++)
-			cells[col].content = "";
+		for(int col = 0; col < nb_cells; col++)
+			this->cells.push_back(TCELL(TABLE_CELL_STRING, col));
 		break;
 	default:
 		break;
@@ -310,8 +302,8 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	if(line_type == TABLE_LINE_CELL && column >= nb_cells)
 		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
 
-	TableCell* cells = reinterpret_cast<TableCell*>(this->cells);
-	return &cells[column];
+	const TCELL* cell = &(this->cells[column]);
+	return (TableCell*) cell;
 }
 
 bool TableLine::equals(const TableLine& other, const int nb_cells) const
@@ -320,30 +312,20 @@ bool TableLine::equals(const TableLine& other, const int nb_cells) const
 	if (right_axis != other.right_axis) return false;
 	if (graph_type != other.graph_type) return false;
 
-	TableCell* cells_this = (TableCell*) cells;
-	TableCell* cells_other = (TableCell*) other.cells;
-	TableCell* cell_this;
-	TableCell* cell_other;
+	const TableCell* cell_this;
+	const TableCell* cell_other;
 	if(type == TABLE_LINE_TITLE)
 	{
-		cell_this = cells_this;
-		cell_other = cells_other;
-		if(cell_this == nullptr && cell_other == nullptr) 
-			return true;
-		if(cell_this == nullptr || cell_other == nullptr) 
-			return false;
-		return cell_this->get_content(false) == cell_other->get_content(false);
+		cell_this = (TableCell*) &this->cells[0];
+		cell_other = (TableCell*) &other.cells[0];
+		return cell_this->content == cell_other->content;
 	}
 	else if(type == TABLE_LINE_CELL)
 	{
 		for (int col = 0; col < nb_cells; col++)
 		{
-			cell_this = cells_this + col;
-			cell_other = cells_other + col;
-			if(cell_this == nullptr && cell_other == nullptr) 
-				continue;
-			if(cell_this == nullptr || cell_other == nullptr) 
-				return false;
+			cell_this = (TableCell*) &this->cells[col];
+			cell_other = (TableCell*) &other.cells[col];
 			if(*cell_this != *cell_other) 
 				return false;
 		} 
@@ -401,7 +383,8 @@ void Table::initialize(const int nb_columns)
 	TBL* c_table = T_create(nb_columns);
 
     divider_line.type = TABLE_LINE_CELL;
-    divider_line.cells  = SW_nalloc(nb_columns * sizeof(TCELL));
+	for(int col = 0; col < nb_columns; col++)
+    	divider_line.cells.push_back(TCELL(TABLE_CELL_LEC, col));
 	copy_line(nb_columns, &divider_line, &c_table->divider_line);
 
 	this->language = c_table->language;

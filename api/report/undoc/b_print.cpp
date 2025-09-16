@@ -414,10 +414,15 @@ int B_PrintDefTbl(KDB* kdb, int pos)
 {
     TBL *tbl = NULL;
 
-    if((tbl = KTVAL(kdb, pos)) == NULL) return(-1);
-    if(B_TBL_TITLE) {
-        if(B_TBL_TITLE == 1) W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl));
-        else W_printf("\n%s\n", T_get_title(tbl));
+    if((tbl = KTVAL(kdb, pos)) == NULL) 
+        return(-1);
+    
+    if(B_TBL_TITLE) 
+    {
+        if(B_TBL_TITLE == 1) 
+            W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl));
+        else 
+            W_printf("\n%s\n", T_get_title(tbl));
         T_free(tbl);
         return(0);
     }
@@ -435,25 +440,24 @@ int B_PrintDefTbl(KDB* kdb, int pos)
 // Print a table definition.
 int B_DumpTblDef(TBL* tbl)
 {
-    TCELL   *cell;
-    int     i, j;
-
     W_printf("\n.tl\n");
 
     /* lines */
     /*    W_printfRepl("&%dL\\bTable lines\\B\n", T_NC(tbl)); */
     /*    W_printfRepl("&%dL \n", T_NC(tbl)); */
-    for(j = 0; j < T_NL(tbl); j++) {
-        switch(tbl->lines[j].type) {
+    for(int j = 0; j < T_NL(tbl); j++) 
+    {
+        TLINE line = tbl->lines[j];
+        switch(line.type) 
+        {
             case TABLE_LINE_CELL :
-                cell = (TCELL *) tbl->lines[j].cells;
-                for(i = 0; i < T_NC(tbl); i++)
-                    B_PrintTblCell(cell + i, 1);
+                for(TCELL& cell: line.cells)
+                    B_PrintTblCell(&cell, 1);
                 W_printf("\n");
                 break;
 
             case TABLE_LINE_TITLE :
-                B_PrintTblCell((TCELL *) tbl->lines[j].cells, T_NC(tbl));
+                B_PrintTblCell(&(line.cells[0]), T_NC(tbl));
                 W_printf("\n");
                 break;
 
@@ -478,12 +482,16 @@ int B_DumpTblDef(TBL* tbl)
     }
 
     /* div */
+    int i;
     for(i = 0; i < T_NC(tbl); i++)
-        if(B_CellDef((TCELL *)(tbl->divider_line.cells) + i)) break;
-    if(i < T_NC(tbl)) {
+        if(B_CellDef(&(tbl->divider_line.cells[i]))) 
+            break;
+    
+    if(i < T_NC(tbl)) 
+    {
         W_printfRepl(".tl\n&%dC%cbColumn divisors%cB\n.tl\n", T_NC(tbl), A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
-        for(i = 0; i < T_NC(tbl); i++)
-            B_PrintTblCell((TCELL *)(tbl->divider_line.cells) + i, 1);
+        for(TCELL& cell: tbl->divider_line.cells)
+            B_PrintTblCell(&cell, 1);
     }
 
     W_printf("\n.tl\n");

@@ -321,8 +321,8 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
 
     COL*   cl;
     TLINE* line = T_L(tbl) + i;
-    TCELL* cells = (TCELL*) line->cells;
-    TCELL* dcells = (TCELL*) (tbl->divider_line).cells;
+    TCELL* cells = line->cells.data();
+    TCELL* dcells = (tbl->divider_line).cells.data();
     CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
     TCELL* cell = nullptr;
     TCELL* dcell = nullptr;

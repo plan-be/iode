@@ -64,60 +64,67 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
     ASSERT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
 
-    TCELL* cell_0;
-    TCELL* cells_0;
-    TCELL* cell_1;
-    TCELL* cells_1;
+    TCELL* cell_original;
+    TCELL* cell_extracted;
 
     // ----- check div line 
     ASSERT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
     ASSERT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
     ASSERT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
-    cells_0 = (TCELL*) tbl->divider_line.cells;
-    cells_1 = (TCELL*) extracted_tbl->divider_line.cells;
     for(int j = 0; j < tbl->nb_columns; j++)
     {
-        cell_0 = cells_0 + j;
-        cell_1 = cells_1 + j;
-        ASSERT_EQ(cell_0->type, TABLE_CELL_LEC);
-        ASSERT_EQ(cell_1->type, TABLE_CELL_LEC);
-        ASSERT_EQ(cell_0->attribute, cell_1->attribute);
-        ASSERT_EQ(cell_0->attribute, TABLE_CELL_LEFT);
-        ASSERT_EQ(std::string(T_cell_cont(cell_0, j)), std::string(T_cell_cont(cell_1, j)));
+        cell_original = &(tbl->divider_line.cells[j]);
+        cell_extracted = &(extracted_tbl->divider_line.cells[j]);
+        ASSERT_EQ(cell_original->type, TABLE_CELL_LEC);
+        ASSERT_EQ(cell_extracted->type, TABLE_CELL_LEC);
+        ASSERT_EQ(cell_original->attribute, cell_extracted->attribute);
+        if(j == 0)
+            ASSERT_EQ(cell_original->attribute, TABLE_CELL_LEFT);
+        else
+            ASSERT_EQ(cell_original->attribute, TABLE_CELL_DECIMAL);
+        ASSERT_EQ(cell_original->content, cell_extracted->content);
+        if(j == 0)
+            ASSERT_EQ(*cell_original->idt, *cell_extracted->idt);
+        else
+            ASSERT_TRUE(cell_original->idt == nullptr && cell_extracted->idt == nullptr);
     }
 
     // ----- check all lines 
-    TLINE* line_0;
-    TLINE* line_1;
+    TLINE* line_original;
+    TLINE* line_extracted;
     for(int i = 0; i < tbl->nb_lines; i++)
     {
-        line_0 = tbl->lines + i;
-        line_1 = extracted_tbl->lines + i;
+        line_original = tbl->lines + i;
+        line_extracted = extracted_tbl->lines + i;
 
-        ASSERT_EQ(line_0->type, line_1->type);
-        ASSERT_EQ(line_0->graph_type, line_1->graph_type);
-        ASSERT_EQ(line_0->right_axis, line_1->right_axis);
+        ASSERT_EQ(line_original->type, line_extracted->type);
+        ASSERT_EQ(line_original->graph_type, line_extracted->graph_type);
+        ASSERT_EQ(line_original->right_axis, line_extracted->right_axis);
 
-        cells_0 = (TCELL*) line_0->cells;
-        cells_1 = (TCELL*) line_1->cells;
-        switch (line_0->type)
+        switch (line_original->type)
         {
         case TableLineType::TABLE_LINE_TITLE:
-            ASSERT_EQ(std::string(T_cell_cont(cells_0, 0)), std::string(T_cell_cont(cells_1, 0)));
+            cell_original = &line_original->cells[0];
+            cell_extracted = &line_extracted->cells[0];
+            ASSERT_EQ(cell_original->content, cell_extracted->content);
             break;
         case TableLineType::TABLE_LINE_CELL:
             for(int j = 0; j < tbl->nb_columns; j++)
             {
-                cell_0 = cells_0 + j;
-                cell_1 = cells_1 + j;
-                ASSERT_EQ(cell_0->type, cell_1->type);
-                ASSERT_EQ(cell_0->attribute, cell_1->attribute);
-                ASSERT_EQ(std::string(T_cell_cont(cell_0, j)), std::string(T_cell_cont(cell_1, j)));
+                cell_original = &line_original->cells[j];
+                cell_extracted = &line_extracted->cells[j];
+                ASSERT_EQ(cell_original->type, cell_extracted->type);
+                ASSERT_EQ(cell_original->attribute, cell_extracted->attribute);
+                ASSERT_EQ(cell_original->content, cell_extracted->content);
+                if(cell_original->idt != nullptr && cell_extracted->idt != nullptr)
+                    ASSERT_EQ(*cell_original->idt, *cell_extracted->idt);
+                else
+                    ASSERT_TRUE(cell_original->idt == nullptr && cell_extracted->idt == nullptr);
             }
             break;
         default:
-            ASSERT_TRUE(cells_0 == NULL);
-            ASSERT_TRUE(cells_1 == NULL);
+            ASSERT_EQ(line_original->cells.size(), 0);
+            ASSERT_EQ(line_extracted->cells.size(), 0);
             break;
         }
     }
@@ -129,10 +136,8 @@ TEST_F(TablesTest, AddGetTBL)
 
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
-    TLINE* lines;
     TLINE* line;
-    TCELL* div_cells;
-    TCELL* cells;
+    TLINE* lines;
     TCELL* cell;
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
@@ -150,28 +155,32 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     // test if the Table object has been correctly initialized
     // --- divider line ---
-    div_cells = (TCELL*) table.divider_line.cells;
-    ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(&div_cells[0], 0)), "1");
-    ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(&div_cells[1], 0)), "");
+    cell = &(table.divider_line.cells[0]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt != nullptr);
+    ASSERT_EQ(cell->idt->lec, "1");
+    cell = &(table.divider_line.cells[1]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt == nullptr);
     // --- title line ---
     int i = 0;
     line = table.get_line(i++);
-    cells = (TCELL*) line->cells;
     ASSERT_EQ(line->type, TABLE_LINE_TITLE);
-    ASSERT_EQ(std::string(T_cell_cont(cells, 0)), "A title");
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->content, "A title");
+    ASSERT_TRUE(cell->idt == nullptr);
     // --- separator line ---
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
     // --- first line ---
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_CELL);
-    cells = (TCELL*) line->cells;
-    ASSERT_EQ(cells[0].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(cells + 0, 0)), "");
-    ASSERT_EQ(cells[1].type, TABLE_CELL_STRING);
-    ASSERT_EQ(std::string(T_cell_cont(cells + 1, 0)), "#S");
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt == nullptr);
+    cell = &(line->cells[1]);
+    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+    ASSERT_EQ(cell->content, "#S");
     // --- separator line ---
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
@@ -181,10 +190,9 @@ TEST_F(TablesTest, Equivalence_C_CPP)
         // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
         line = table.get_line(i++);
         ASSERT_EQ(line->type, TABLE_LINE_CELL);
-        cells = (TCELL*) line->cells;
         for(int j = 0; j < nb_columns; j++)
         {
-            cell = cells + j;
+            cell = &line->cells[j];
             if(j == 0)
             {
                 ASSERT_EQ(cell->type, TABLE_CELL_STRING);
@@ -212,28 +220,30 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     TBL* tbl = KTVAL(KT_WS, pos);
     // test if the restored Table object is the same as the original one
     // --- divider line ---
-    div_cells = (TCELL*) tbl->divider_line.cells;
-    ASSERT_EQ(div_cells[0].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(&div_cells[0], 0)), "1");
-    ASSERT_EQ(div_cells[1].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(&div_cells[1], 0)), "");
+    cell = &(tbl->divider_line.cells[0]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt != nullptr);
+    ASSERT_EQ(cell->idt->lec, "1");
+    cell = &(tbl->divider_line.cells[1]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt == nullptr);
     // --- title line ---
     i = 0;
     lines = (TLINE*) tbl->lines;
     line = &lines[i++];
-    cells = (TCELL*) line->cells;
-    ASSERT_EQ(line->type, TABLE_LINE_TITLE);
-    ASSERT_EQ(std::string(T_cell_cont(cells, 0)), "A title");
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->content, "A title");
+    ASSERT_TRUE(cell->idt == nullptr);
     // --- separator line ---
     ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
     // --- first line ---
     line = &lines[i++];
-    ASSERT_EQ(line->type, TABLE_LINE_CELL);
-    cells = (TCELL*) line->cells;
-    ASSERT_EQ(cells[0].type, TABLE_CELL_LEC);
-    ASSERT_EQ(std::string(T_cell_cont(cells + 0, 0)), "");
-    ASSERT_EQ(cells[1].type, TABLE_CELL_STRING);
-    ASSERT_EQ(std::string(T_cell_cont(cells + 1, 0)), "#S");
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt == nullptr);
+    cell = &(line->cells[1]);
+    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+    ASSERT_EQ(cell->content, "#S");
     // --- separator line ---
     ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
     // --- variables lines ---
@@ -242,10 +252,9 @@ TEST_F(TablesTest, Equivalence_C_CPP)
         // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
         line = &lines[i++];
         ASSERT_EQ(line->type, TABLE_LINE_CELL);
-        cells = (TCELL*) line->cells;
         for(int j = 0; j < nb_columns; j++)
         {
-            cell = cells + j;
+            cell = &line->cells[j];
             if(j == 0)
             {
                 ASSERT_EQ(cell->type, TABLE_CELL_STRING);
@@ -354,9 +363,6 @@ TEST_F(TablesTest, NotLineMethods)
 
 TEST_F(TablesTest, Divider)
 {
-    TableCellType expected_type = TABLE_CELL_LEC;
-    int expected_align = ((int) TABLE_CELL_DECIMAL) + ((int) TABLE_CELL_LEFT);
-    // expected font = TABLE_CELL_NORMAL;
     std::string content;
     std::string expected_content;
     int nb_cells = table->nb_columns;
@@ -367,8 +373,8 @@ TEST_F(TablesTest, Divider)
 
     // first cell
     TableCell* first_cell = divider_line->get_cell(0, nb_cells);
-    EXPECT_EQ(first_cell->get_type(), expected_type);
-    EXPECT_EQ((int) first_cell->get_align(), expected_align);
+    EXPECT_EQ(first_cell->get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ((int) first_cell->get_align(), TABLE_CELL_DECIMAL);
     EXPECT_EQ(first_cell->is_bold(), false);
     EXPECT_EQ(first_cell->is_italic(), false);
     EXPECT_EQ(first_cell->is_underline(), false);
@@ -378,14 +384,30 @@ TEST_F(TablesTest, Divider)
 
     // second cell
     TableCell* second_cell = divider_line->get_cell(1, nb_cells);
-    EXPECT_EQ(second_cell->get_type(), expected_type);
-    EXPECT_EQ((int) second_cell->get_align(), expected_align);
+    EXPECT_EQ(second_cell->get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ((int) second_cell->get_align(), TABLE_CELL_DECIMAL);
     EXPECT_EQ(second_cell->is_bold(), false);
     EXPECT_EQ(second_cell->is_italic(), false);
     EXPECT_EQ(second_cell->is_underline(), false);
     expected_content = "PC";
     content = second_cell->get_content(false);
     EXPECT_EQ(content, expected_content);
+
+    // update first cell
+    std::string new_content = "0.5";
+    first_cell->set_content(new_content);
+    content = first_cell->get_content(false);
+    EXPECT_EQ(content, new_content);
+    content = table->get_divider_line()->get_cell(0, nb_cells)->get_content(false);
+    EXPECT_EQ(content, new_content);
+
+    // update second cell
+    std::string new_lec = "GOSG";
+    second_cell->set_content(new_lec);
+    content = second_cell->get_content(false);
+    EXPECT_EQ(content, new_lec);
+    content = table->get_divider_line()->get_cell(1, nb_cells)->get_content(false);
+    EXPECT_EQ(content, new_lec);
 }
 
 TEST_F(TablesTest, LineTitle)
@@ -433,7 +455,6 @@ TEST_F(TablesTest, LineCells)
 {
     int nb_cells = table->nb_columns;
     TableLineType expected_type = TABLE_LINE_CELL;
-    int expected_align;
 
     // first CELL line
     TableLine* first_line = table->get_line(1);
@@ -454,9 +475,8 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(first_cell->get_content(true), "\"(divisé par les prix à la consommation)\"");
     // ---- column 1
     TableCell* second_cell = first_line->get_cell(1, nb_cells);
-    expected_align = ((int) TABLE_CELL_DECIMAL) + ((int) TABLE_CELL_LEFT);
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ((int) second_cell->get_align(), expected_align);
+    EXPECT_EQ((int) second_cell->get_align(), TABLE_CELL_LEFT);
     EXPECT_FALSE(second_cell->is_bold());
     EXPECT_FALSE(second_cell->is_italic());
     EXPECT_FALSE(second_cell->is_underline());
@@ -538,6 +558,19 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(first_cell->is_italic());
     EXPECT_FALSE(first_cell->is_underline());
 
+    // update cells of a line
+    fifth_line = table->get_line(7);
+    // ---- column 0
+    first_cell = fifth_line->get_cell(0, nb_cells);
+    first_cell->set_text(" -- DTH -- ");
+    EXPECT_EQ(first_cell->get_content(false), " -- DTH -- ");
+    EXPECT_EQ(table->get_line(7)->get_cell(0, nb_cells)->get_content(false), " -- DTH -- ");
+    // ---- column 1
+    second_cell = fifth_line->get_cell(1, nb_cells);
+    second_cell->set_lec("DTH");
+    EXPECT_EQ(second_cell->get_content(false), "DTH");
+    EXPECT_EQ(table->get_line(7)->get_cell(1, nb_cells)->get_content(false), "DTH");
+
     // add - delete - insert
     int new_pos;
     std::string first_cell_content = third_line->get_cell(0, nb_cells)->get_content(false);      // string cell
@@ -565,7 +598,7 @@ TEST_F(TablesTest, LineCells)
 
     // ---- insert line
     // WARNING: When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::type of cells is undefined!
-    //          See function `T_create_cell()` in file `k_tbl.c` from the C API 
+    //          See function `T_create_line_cells()` in file `k_tbl.c` from the C API 
     TableLine* new_line_cell = table->insert_line_with_cells(25, true);
     new_pos = 26;
     EXPECT_EQ(table->nb_lines, nb_lines + 1);
@@ -738,31 +771,41 @@ TEST_F(TablesTest, Hash)
     EXPECT_EQ(hash_original, c_hash);
 
     // different title
+    Table* table_before = new Table(*table);
     std::string title = table->get_title(0);
     std::string new_title = "New Title";
     table->set_title(0, new_title);
+    EXPECT_NE(*table, *table_before);
     hash_after = table_hasher(*table);
     EXPECT_NE(hash_before, hash_after);
+    delete table_before;
 
     // different cell
+    table_before = new Table(*table);
     int nb_cells = table->nb_columns;
     TableLine* line = table->get_line(5);
     hash_before = hash_after;
     std::string cell_content = line->get_cell(0, nb_cells)->get_content(false);
     line->get_cell(0, nb_cells)->set_text("Nouvelles recettes");
+    EXPECT_NE(*table, *table_before);
     hash_after = table_hasher(*table);
     EXPECT_NE(hash_before, hash_after);
+    delete table_before;
 
+    table_before = new Table(*table);
     hash_before = hash_after;
     std::string lec_content = line->get_cell(1, nb_cells)->get_content(false);
     line->get_cell(1, nb_cells)->set_lec("GOSG+YDTG+IT+YSSG+COTRES+OCUG");
+    EXPECT_NE(*table, *table_before);
     hash_after = table_hasher(*table);
     EXPECT_NE(hash_before, hash_after);
+    delete table_before;
 
     // return to original title and cell content
     table->set_title(0, title);
     line->get_cell(0, nb_cells)->set_text(cell_content);
     line->get_cell(1, nb_cells)->set_lec(lec_content);
+    EXPECT_EQ(*table, *same_table);
     hash_after = table_hasher(*table);
     EXPECT_EQ(hash_original, hash_after);
 }
