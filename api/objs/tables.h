@@ -98,15 +98,11 @@ struct TCELL
     std::string content;    // if type == TABLE_CELL_STRING
     Identity*   idt;        // if type == TABLE_CELL_LEC
     char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
-    char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
-    char        pad[2];     // Padding for struct alignment
+    char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD,
+                            // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
 
 public:
-    TCELL() : content(""), idt(nullptr), type(TABLE_CELL_STRING), attribute(TABLE_CELL_NORMAL)
-    {
-        pad[0] = 0;
-        pad[1] = 0;
-    }
+    TCELL() : content(""), idt(nullptr), type(TABLE_CELL_STRING), attribute(TABLE_CELL_NORMAL) {}
 
      ~TCELL()
     {
@@ -136,9 +132,7 @@ struct TLINE
                             // if type == TABLE_LINE_FILES : cells is NULL
     char    type;           // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_TITLE, TABLE_LINE or TABLE_LINE_CELL
     char    graph_type;     // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
-    U_ch    right_axis:1;   // 0 if values are relative to the left axis, 1 to the right axis
-    U_ch    unused:7;       // unused -> for struct alignment 
-    char    pad[1];         // Padding for struct alignment
+    bool    right_axis;     // false if values are relative to the left axis, true to the right axis
 };
 
 struct TBL 
@@ -161,7 +155,6 @@ struct TBL
     char    chart_gridy;        // idem
     char    chart_axis_type;    // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
     char    text_alignment;     // Text alignment: 0=left, 1=centered, 2 = right
-    char    pad[13];            // Padding for struct alignment
 };
 
 /*----------------------- FUNCS ----------------------------*/

@@ -73,7 +73,6 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
     ASSERT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
     ASSERT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
-    ASSERT_EQ(tbl->divider_line.unused, extracted_tbl->divider_line.unused);
     cells_0 = (TCELL*) tbl->divider_line.cells;
     cells_1 = (TCELL*) extracted_tbl->divider_line.cells;
     for(int j = 0; j < tbl->nb_columns; j++)
@@ -98,7 +97,6 @@ TEST_F(TablesTest, AddGetTBL)
         ASSERT_EQ(line_0->type, line_1->type);
         ASSERT_EQ(line_0->graph_type, line_1->graph_type);
         ASSERT_EQ(line_0->right_axis, line_1->right_axis);
-        ASSERT_EQ(line_0->unused, line_1->unused);
 
         cells_0 = (TCELL*) line_0->cells;
         cells_1 = (TCELL*) line_1->cells;

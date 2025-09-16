@@ -209,7 +209,6 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 	c_line_dest->type = c_line_src->type;
 	c_line_dest->right_axis = c_line_src->right_axis;
 	c_line_dest->graph_type = c_line_src->graph_type;
-	c_line_dest->unused = c_line_src->unused;
 
 	switch (c_line_src->type)
 	{
@@ -233,7 +232,6 @@ TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_t
 	this->type = (char) line_type;
 	this->cells = NULL;
 	set_line_graph(graph_type);
-	this->unused = 0;
 	set_line_axis(axis_left);
 }
 
@@ -289,22 +287,12 @@ void TableLine::set_line_graph(const TableGraphType graph_type)
 
 bool TableLine::is_left_axis() const
 {
-	return right_axis == 0;
+	return !right_axis;
 }
 
 void TableLine::set_line_axis(const bool is_left)
 {
-	right_axis = is_left ? 0 : 1;
-}
-
-unsigned char TableLine::get_line_pbyte() const
-{
-	return unused;
-}
-
-void TableLine::set_line_pbyte(const unsigned char pbyte)
-{
-	unused = pbyte;
+	right_axis = !is_left;
 }
 
 TableCell* TableLine::get_cell(const int column, const int nb_cells) const
@@ -331,7 +319,6 @@ bool TableLine::equals(const TableLine& other, const int nb_cells) const
 	if (type != other.type) return false;
 	if (right_axis != other.right_axis) return false;
 	if (graph_type != other.graph_type) return false;
-	if (unused != other.unused) return false;
 
 	TableCell* cells_this = (TableCell*) cells;
 	TableCell* cells_other = (TableCell*) other.cells;
