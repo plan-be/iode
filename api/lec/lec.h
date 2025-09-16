@@ -237,7 +237,7 @@ struct CLEC {
     long    tot_lg,      
             exec_lg;       
     short   nb_names;   // number of scalar and variables names
-    char    dupendo;
+    char    dupendo;    // duplicate endogenous variable in the LEC expression
     char    pad;
     LNAME   lnames[1];  // list of of scalar and variable names
 };

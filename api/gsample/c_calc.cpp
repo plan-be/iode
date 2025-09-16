@@ -41,6 +41,8 @@
 #include "api/objs/variables.h"
 
 
+bool debug_calc = false; 
+
 /**
  *  Duplicates a CLEC structure.
  *   
@@ -321,14 +323,13 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
 
     COL*   cl;
     TLINE* line = T_L(tbl) + i;
-    TCELL* cells = (TCELL*) line->cells;
-    TCELL* dcells = (TCELL*) (tbl->divider_line).cells;
+    TLINE  divider_line = tbl->divider_line;
     CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
     TCELL* cell = nullptr;
     TCELL* dcell = nullptr;
     for(int d = 0; d < T_NC(tbl); d++) 
     {
-        cell = (cells != NULL) ? (cells + d) : NULL;
+        cell = &line->cells[d];
 
         if(cell->type != TABLE_CELL_LEC) 
             continue;
@@ -339,7 +340,7 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
         clec = cell->idt->get_compiled_lec();
         aclec = COL_cp_clec(clec);
 
-        dcell = (dcells != NULL) ? (dcells + d) : NULL; 
+        dcell = &divider_line.cells[d]; 
         dclec = (dcell->idt != nullptr) ? dcell->idt->get_compiled_lec() : NULL;
         
         adclec = COL_cp_clec(dclec);
@@ -349,6 +350,8 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
             cl = cls->cl_cols + d + (j * T_NC(tbl));
             if(COL_calc(cl, aclec, adclec) < 0) 
                 return(-1);
+            debug_calc_table(cl, cell->idt->lec, (dcell->idt) ? dcell->idt->lec : "", 
+                             aclec, adclec, i, d, j);
         }
 
         SW_nfree(aclec);

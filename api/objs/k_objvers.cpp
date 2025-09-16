@@ -172,35 +172,35 @@ static char *T_cell_repack(char* pack, TCELL* cell)
 
 static char *K_repack_tbl(TBL *tbl)
 {
-    //TLINE   *line;
-    TCELL   *cell;
-    int     i, j;
-    char    *pack;
-
-    pack = (char*) P_create();
-    if(tbl == NULL) return(NULL);
+    char* pack = (char*) P_create();
+    if(tbl == NULL) 
+        return(NULL);
 
     /* tbl */
     pack = (char*) P_add(pack, (char *) tbl, sizeof(TBL));
 
     /* div */
-    cell = (TCELL *) tbl->divider_line.cells;
-    pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
-    for(j = 0; j < T_NC(tbl); j++)
-        pack = T_cell_repack(pack, cell + j);
+    TCELL* cells = tbl->divider_line.cells.data();
+    pack = (char*) P_add(pack, (char *) cells, sizeof(TCELL) * (int) T_NC(tbl));
+    for(TCELL& cell: tbl->divider_line.cells)
+        pack = T_cell_repack(pack, &cell);
 
     /* lines */
+    TCELL* cell;
     pack = (char*) P_add(pack, (char *) tbl->lines, sizeof(TLINE) * (int) T_NL(tbl));
-    for(i = 0; i < T_NL(tbl); i++) {
-        switch(tbl->lines[i].type) {
+    for(int i = 0; i < T_NL(tbl); i++) 
+    {
+        switch(tbl->lines[i].type) 
+        {
             case TABLE_LINE_CELL :
-                cell = (TCELL *) tbl->lines[i].cells;
-                pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
-                for(j = 0; j < T_NC(tbl); j++)
-                    pack = T_cell_repack(pack, cell + j);
+                cells = tbl->lines[i].cells.data();
+                pack = (char*) P_add(pack, (char *) cells, sizeof(TCELL) * (int) T_NC(tbl));
+                for(TCELL& cell: tbl->lines[i].cells)
+                    pack = T_cell_repack(pack, &cell);
                 break;
+
             case TABLE_LINE_TITLE :
-                cell = (TCELL *) tbl->lines[i].cells;
+                cell = &(tbl->lines[i].cells[0]);
                 pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL));
                 pack = T_cell_repack(pack, cell);
                 break;

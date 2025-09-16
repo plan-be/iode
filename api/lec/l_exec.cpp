@@ -23,6 +23,7 @@
     #define _exception exception
 #endif
 
+
 /**
  *  Tables of LEC sub-functions pointers. Each function returns a L_REAL.
  *  
@@ -127,27 +128,27 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
     short   len, s;
     CVAR    cvar;
 
-    for(j = 0 ; j < lg ;) {
+    for(j = 0 ; j < lg ;) 
+    {
         keyw = expr[j++];
-        if(keyw == L_VAR || keyw == L_VART) {
+
+        if(keyw == L_VAR || keyw == L_VART) 
+        {
             memcpy(&cvar, expr + j, sizeof(CVAR));
             d_ptr = L_getvar(L_EXEC_DBV, L_EXEC_NAMES[cvar.pos].pos);
             j += sizeof(CVAR);
             len = cvar.ref;
-            if(cvar.per.year == 0)  len += t;
+            if(cvar.per.year == 0)  
+                len += t;
             stack++;
-            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) {
+            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) 
                 *stack = IODE_NAN;
-                /*                L_errno = L_BOUNDS_ERR;
-                		longjmp(L_JMP, 1);
-                */
-            }
-            else {
+            else 
                 *stack = d_ptr[len];
-            }
         }
 
-        else switch(keyw) {
+        else switch(keyw) 
+            {
                 case L_PLUS  :
                     if(L_stackna(&stack, 2)) break;
                     stack--;
@@ -237,10 +238,19 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         *stack = (L_VAL_FN[keyw - L_VAL])(t);
                         break;
                     }
-                    kerror(0, "Internal error (L_exec)");
+
+                    std::string sub_expression = std::string((char*) expr);
+                    std::string error_msg = "Could not execute compiled LEC sub expression ";
+                    if(sub_expression.empty())
+                        error_msg += "at period position " + std::to_string(t) + ": empty expression";
+                    else
+                    {
+                        error_msg += "'" + sub_expression + "' at period position ";
+                        error_msg += std::to_string(t) + ": invalid expression";
+                    }
+                    kerror(0, (char*) error_msg.c_str());
                     return((double)IODE_NAN);
             }
-        /*        if(*stack <= IODE_NAN) return((double)IODE_NAN); */
     }
     return((double)*stack);
 }
@@ -288,7 +298,6 @@ L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
         return((double)IODE_NAN); // On FPE, return IODE_NAN
     
     pos = sizeof(CLEC) + (expr->nb_names - 1) * sizeof(LNAME);
-    
     
     return(L_exec_sub((unsigned char*) expr + pos, expr->tot_lg - pos, t, stack));
 }
