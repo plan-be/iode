@@ -525,7 +525,70 @@ TEST_F(ComputedTableTest, PrintToFile)
     std::string arg;
     std::string gsample;
     std::string table_name = "C8_1";
+    std::string title = "Déterminants de l'output potentiel";
+    std::vector<std::string> v_titles = { "Output potentiel", 
+                                          "Stock de capital", "Intensité de capital", 
+                                          "Productivité totale des facteurs" };
+    std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
+
     Table* ref_table = kdb_tbl->get(table_name); 
+
+    int i = 0;
+    TLINE* line;
+    TCELL* cell;
+    TCELL* cells;
+
+    // divider lines 
+    // --- divider line ---
+    TLINE line_div = ref_table->divider_line;
+    cells = (TCELL*) line_div.cells;
+    cell = cells + 0;
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_TRUE(cell->idt != nullptr);
+    ASSERT_EQ(cell->idt->lec, "1");
+    cell = cells + 1;
+    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+    ASSERT_EQ(cell->content, "");
+    ASSERT_TRUE(cell->idt == nullptr);
+    // --- title line ---
+    line = &(ref_table->lines[i++]);
+    cells = (TCELL*) line->cells;
+    cell = cells + 0;
+    ASSERT_EQ(oem_to_utf8(cell->content), title);
+    ASSERT_TRUE(cell->idt == nullptr);
+    // --- separator line ---
+    line = &(ref_table->lines[i++]);
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- first line ---
+    line = &(ref_table->lines[i++]);
+    cells = (TCELL*) line->cells;
+    cell = cells + 0;
+    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+    ASSERT_EQ(cell->content, "");
+    ASSERT_TRUE(cell->idt == nullptr);
+    cell = cells + 1;
+    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+    ASSERT_EQ(cell->content, "#s");
+    // --- separator line ---
+    line = &(ref_table->lines[i++]);
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- other lines ---
+    for (size_t l = 0; l < v_titles.size(); l++)
+    {
+        line = &(ref_table->lines[i++]);
+        cells = (TCELL*) line->cells;
+
+        cell = cells + 0;
+        ASSERT_EQ(cell->type, TABLE_CELL_STRING);
+        ASSERT_EQ(oem_to_utf8(cell->content), v_titles[l]);
+        ASSERT_TRUE(cell->idt == nullptr);
+
+        cell = cells + 1;
+        ASSERT_EQ(cell->type, TABLE_CELL_LEC);
+        ASSERT_EQ(cell->content, "");
+        ASSERT_TRUE(cell->idt != nullptr);
+        ASSERT_EQ(cell->idt->lec, v_lecs[l]);
+    }
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -615,18 +678,17 @@ TEST_F(ComputedTableTest, PrintToFile)
     KDBTables* bin_kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
     Table* bin_ref_table = bin_kdb_tbl->get(table_name);
 
-    TCELL* cell;
     TCELL* bin_cell;
+    TCELL* bin_cells;
     
     EXPECT_EQ(ref_table->nb_lines, bin_ref_table->nb_lines);
     EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
 
     // divider lines 
-    TLINE line_div = ref_table->divider_line;
     TLINE bin_line_div = bin_ref_table->divider_line;
     EXPECT_EQ(line_div.type, bin_line_div.type);
-    TCELL* cells = (TCELL*) line_div.cells;
-    TCELL* bin_cells = (TCELL*) bin_line_div.cells;
+    cells = (TCELL*) line_div.cells;
+    bin_cells = (TCELL*) bin_line_div.cells;
     for(int j=0; j<ref_table->nb_columns; j++)
     {
         cell = cells + j;
@@ -644,12 +706,12 @@ TEST_F(ComputedTableTest, PrintToFile)
         TLINE line = ref_table->lines[i];
         TLINE bin_line = bin_ref_table->lines[i];
         EXPECT_EQ(line.type, bin_line.type);
+        cells = (TCELL*) line.cells;
+        bin_cells = (TCELL*) bin_line.cells;
         if(line.type == TABLE_LINE_TITLE)
         {
-            cells = (TCELL*) line.cells;
-            bin_cells = (TCELL*) bin_line.cells;
-            cell = cells;
-            bin_cell = bin_cells;
+            cell = cells + 0;
+            bin_cell = bin_cells + 0;
             EXPECT_EQ(cell->type, bin_cell->type);
             EXPECT_EQ(cell->content, bin_cell->content);
             EXPECT_EQ(cell->idt, nullptr);
@@ -658,8 +720,6 @@ TEST_F(ComputedTableTest, PrintToFile)
         }
         else if(line.type == TABLE_LINE_CELL)
         {
-            cells = (TCELL*) line.cells;
-            bin_cells = (TCELL*) bin_line.cells;
             for(int j=0; j<ref_table->nb_columns; j++)
             {
                 cell = cells + j;
