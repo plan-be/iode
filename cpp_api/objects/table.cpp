@@ -55,7 +55,7 @@ CLEC* TableCell::get_compiled_lec()
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
 
 	// see VT_edit() from o_vt.c from the old GUI
-	return idt->clec;
+	return idt->get_compiled_lec();
 }
 
 std::vector<std::string> TableCell::get_variables_from_lec()

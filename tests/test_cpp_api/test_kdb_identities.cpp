@@ -101,7 +101,7 @@ TEST_F(KDBIdentitiesTest, Get)
     // by position
     Identity* identity_pos = Identities.get(pos);
     EXPECT_EQ(identity_pos->lec, expected_lec);
-    clec = identity_pos->clec;
+    clec = identity_pos->get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -118,7 +118,7 @@ TEST_F(KDBIdentitiesTest, Get)
     // by name
     Identity* identity_name = Identities.get(name);
     EXPECT_EQ(identity_name->lec, expected_lec);
-    clec = identity_name->clec;
+    clec = identity_name->get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -172,8 +172,8 @@ TEST_F(KDBIdentitiesTest, Copy)
 
     EXPECT_EQ(identity_copy->lec, identity->lec);
 
-    CLEC* clec = identity->clec;
-    CLEC* clec_copy = identity_copy->clec;
+    CLEC* clec = identity->get_compiled_lec();
+    CLEC* clec_copy = identity_copy->get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, clec_copy->tot_lg);
     EXPECT_EQ(clec->exec_lg, clec_copy->exec_lg);
     EXPECT_EQ(clec->nb_names, clec_copy->nb_names);

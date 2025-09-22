@@ -16,8 +16,10 @@
 // Identity (struct with the identity LEC formula and the compiled CLEC structure)
 struct Identity
 {
-    std::string lec;      // LEC expression (may not be an equation)
-    CLEC*       clec;     // Compiled version of LEC
+    std::string lec;        // LEC expression (may not be an equation)
+
+private:
+    CLEC* clec;             // Compiled version of LEC
 
 public:
     Identity(const std::string& lec)
@@ -46,6 +48,14 @@ public:
         this->lec = lec;
         // L_cc returns an allocated CLEC struct pointer.
         this->clec = L_cc((char*) lec.c_str());
+    }
+
+    CLEC* get_compiled_lec()
+    {
+        if(this->clec)
+            SW_nfree(this->clec);
+        this->clec = L_cc((char*) lec.c_str());
+        return this->clec;
     }
 
     // required to be used in std::map

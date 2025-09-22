@@ -194,7 +194,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
             if(cell[l].type != TABLE_CELL_LEC) 
                 continue;
 
-            cl = cell[l].idt->clec;
+            cl = cell[l].idt->get_compiled_lec();
             K_clecscan(NULL, cl, exo, scal);
         }
     }
