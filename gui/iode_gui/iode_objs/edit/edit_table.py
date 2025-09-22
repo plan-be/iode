@@ -47,7 +47,7 @@ class EditTableDialog(AbstractEditObjDialog):
             self.delete_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Delete), self)
             self.delete_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
             
-            self.delete_shortcut.activated.connect(self.delete_line)
+            self.delete_shortcut.activated.connect(self.remove_line)
             self.new_plot.connect(main_window.append_plot)
 
             self.load_settings()
@@ -145,7 +145,7 @@ class EditTableDialog(AbstractEditObjDialog):
             QMessageBox.warning(None, "WARNING", str(e))
 
     @Slot()
-    def delete_line(self):
+    def remove_line(self):
         try:
             edit_table_model: EditTableModel = self.ui.tableView.model()
             selection = self.ui.tableView.selectionModel().selectedRows()

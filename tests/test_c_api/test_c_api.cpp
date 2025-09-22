@@ -678,8 +678,8 @@ public:
 	    char    arg[256], scalar[30];
 	
 	    // Load needed data
-	    //U_test_B_WsLoad("fun", SCALARS, 161);
-	    //U_test_B_WsLoad("fun", VARIABLES, 394);
+	    //B_WsLoad(fullfilename, SCALARS);
+	    //B_WsLoad(fullfilename, VARIABLES);
 	
 	    // Dickey-Fuller test (E_UnitRoot)
 	    // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
@@ -723,7 +723,7 @@ public:
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
 	
-	    U_test_B_WsLoad("fun", VARIABLES, 394);
+	    B_WsLoad("fun", VARIABLES);
 	    sprintf(arg, "%s\\funcsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
@@ -800,7 +800,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     int     mode = 1;
     int     files = 1;
     int     date = 1;
-    int     pos, i, j;
+    int     pos;
 
     U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
 
@@ -810,12 +810,12 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 	T_auto(tbl, def, lecs, mode, files, date);
 	SCR_free_tbl((unsigned char**) lecs);
 
-    EXPECT_TRUE(tbl != NULL);
+    EXPECT_TRUE(tbl != nullptr);
     EXPECT_EQ(tbl->nb_columns, nb_columns);
     // title + sep + line #S + sep + 8 cells + sep + mode + files + date
-    EXPECT_EQ(tbl->nb_lines, 16);
+    EXPECT_EQ(tbl->lines.size(), 16);
     // title line
-    line = tbl->lines;
+    line = &tbl->lines[0];
     EXPECT_EQ(line->type, TABLE_LINE_TITLE);
     cells = line->cells;
     EXPECT_EQ(cells.size(), 1);
@@ -825,7 +825,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     // sep line
     EXPECT_EQ(tbl->lines[1].type, TABLE_LINE_SEP);
     // line #S
-    line = tbl->lines + 2;
+    line = &tbl->lines[2];
     EXPECT_EQ(line->type, TABLE_LINE_CELL);
     cells = line->cells;
     EXPECT_EQ(cells.size(), nb_columns);
@@ -838,10 +838,10 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     // sep line
     EXPECT_EQ(tbl->lines[3].type, TABLE_LINE_SEP);
     // variable lines
-    i = 4;
+    int i = 4;
     for(std::string& lec: v_lecs)
     {
-        line = tbl->lines + i;
+        line = &tbl->lines[i];
         EXPECT_EQ(line->type, TABLE_LINE_CELL);
         EXPECT_EQ(line->cells.size(), nb_columns);
         cells = line->cells;
@@ -877,7 +877,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->language, extracted_tbl->language);
     EXPECT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
     EXPECT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
-    EXPECT_EQ(tbl->nb_lines, extracted_tbl->nb_lines);
+    EXPECT_EQ(tbl->lines.size(), extracted_tbl->lines.size());
     EXPECT_EQ(tbl->z_min, extracted_tbl->z_min);
     EXPECT_EQ(tbl->z_max, extracted_tbl->z_max);
     EXPECT_EQ(tbl->y_min, extracted_tbl->y_min);
@@ -897,7 +897,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     cells_original = tbl->divider_line.cells;
     cells_restored = extracted_tbl->divider_line.cells;
 
-    for(j = 0; j < tbl->nb_columns; j++)
+    for(int j = 0; j < tbl->nb_columns; j++)
     {
         EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
         EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
@@ -907,10 +907,10 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     cells_restored.clear();
 
     // ----- check all lines
-    for(i = 0; i < tbl->nb_lines; i++)
+    for(int i = 0; i < tbl->lines.size(); i++)
     {
-        line_original = tbl->lines + i;
-        line_restored = extracted_tbl->lines + i;
+        line_original = &tbl->lines[i];
+        line_restored = &extracted_tbl->lines[i];
 
         EXPECT_EQ(line_original->type, line_restored->type);
         EXPECT_EQ(line_original->graph_type, line_restored->graph_type);
@@ -928,7 +928,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
             SCR_free(cell_cont_1);
             break;
           case TABLE_LINE_CELL:
-            for(j = 0; j < tbl->nb_columns; j++)
+            for(int j = 0; j < tbl->nb_columns; j++)
             {
                 EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
                 EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
@@ -1316,20 +1316,13 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
 TEST_F(IodeCAPITest, Tests_ALIGN)
 {
-    TBL     tbl, *p_tbl = &tbl;
-    int     offset;
+    TBL* p_tbl = T_create(2);
+    int  offset;
 
     U_test_print_title("Tests ALIGN");
 
     offset = (int) ((char*)(p_tbl + 1) - (char*)p_tbl);
     printf("sizeof(TBL)    = %d -- Offset = %d\n", (int)sizeof(TBL), offset);
-    //printf("sizeof(TBL)    = %d\n", sizeof(TBL));
-    //printf("sizeof(TLINE)  = %d\n", sizeof(TLINE));
-    //printf("sizeof(TCELL)  = %d\n", sizeof(TCELL));
-    //
-    //printf("sizeof(TBL32)  = %d\n", sizeof(TBL32));
-    //printf("sizeof(TLINE32)= %d\n", sizeof(TLINE32));
-    //printf("sizeof(TCELL32)= %d\n", sizeof(TCELL32));
 }
 
 
@@ -2134,45 +2127,14 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     EXPECT_EQ(rc, 0);
     EXPECT_DOUBLE_EQ(round(KV_get_at_aper("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
 
-    // B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
-
-
-
+    // B_ModelSimulateSaveNIters(char *arg)                    
+    // $ModelSimulateSaveNiters varname
     U_test_reset_kmsg_msgs();
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WS)
+TEST_F(IodeCAPITest, Tests_B_WsLoad)
 {
-    int     rc;
-    Sample  *smpl;
-
-    // List of tested report functions:
-    //   - int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    //   - int B_WsSave(char* arg, int type)                 $WsSave<type> filename
-    //   - int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
-    //   - int B_WsExport(char* arg, int type)               $WsExport<type> filename
-    //   - int B_WsImport(char* arg, int type)               $WsImport<type> filename
-    //   - int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
-    //   - int B_WsClear(char* arg, int type)                $WsClear<type>
-    //   - int B_WsClearAll(char* arg, int unused)                       $WsClearAll
-    //   - int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
-    //   - int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
-    //   - int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
-    //   - int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-    //   - int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
-    //   - int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
-    //   - int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
-    //   - int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
-    //   - int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
-    //   - int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
-    //   - int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
-    //   - int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
-    //   - int B_CsvSep(char *sep, int unused)                           $CsvSep char
-    //   - int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
-    //   - int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
-    //   - int B_CsvDec(char *dec, int unused)                           $CsvDec char
-
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
 
@@ -2186,9 +2148,52 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsLoad("fun", TABLES, 46);
     U_test_B_WsLoad("fun", VARIABLES, 394);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_KEVAL)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // check equation->endo == equation name
     for(int i = 0; i < KNB(KE_WS); i++)
         ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
+
+    U_test_reset_kmsg_msgs();
+}
+
+TEST_F(IodeCAPITest, Tests_B_WsSave)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
@@ -2200,6 +2205,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSave("fun", "fun2", TABLES, 46);
     U_test_B_WsSave("fun", "fun2", VARIABLES, 394);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsSaveCmp)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
     U_test_print_title("B_WsSaveCmp()");
     U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
@@ -2210,6 +2237,30 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSaveCmp("fun", "fun2cmp", TABLES, 46);
     U_test_B_WsSaveCmp("fun", "fun2cmp", VARIABLES, 394);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsExport)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
+
+    
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS);
@@ -2220,6 +2271,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsExport("fun.tbl", "fun2.at", TABLES);
     U_test_B_WsExport("fun.var", "fun2.av", VARIABLES);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsClear)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsClear(char* arg, int type)                $WsClear<type>
     U_test_print_title("B_WsClear()");
     U_test_B_WsClear(COMMENTS);
@@ -2229,6 +2302,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsClear(SCALARS);
     U_test_B_WsClear(TABLES);
     U_test_B_WsClear(VARIABLES);
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsImport)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
     U_test_print_title("B_WsImport()");
@@ -2241,9 +2336,30 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsImport("fun2.av", VARIABLES, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
 
-    // check equation->endo == equation name
-    for(int i = 0; i < KNB(KE_WS); i++)
-        ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsSample)
+{
+    int     rc;
+    Sample  *smpl;
+
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
     U_test_print_title("B_WsSample()");
@@ -2252,6 +2368,30 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(*KSMPL(KV_WS), *smpl);
     delete smpl;
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsClearAll)
+{
+    int rc;
+
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsClearAll(char* arg, int unused)                       $WsClearAll
     U_test_print_title("B_WsClearAll()");
@@ -2265,6 +2405,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     EXPECT_EQ(KNB(KT_WS), 0);
     EXPECT_EQ(KNB(KV_WS), 0);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsDescr)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
     U_test_print_title("B_WsDescr()");
     U_test_B_WsDescr("Ws content description", COMMENTS);
@@ -2274,6 +2436,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsDescr("Ws content description", SCALARS);
     U_test_B_WsDescr("Ws content description", TABLES);
     U_test_B_WsDescr("Ws content description", VARIABLES);
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsName)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
     // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes)
@@ -2287,6 +2471,27 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsName("funtest", TABLES);
     U_test_B_WsName("funtest", VARIABLES);
 
+    U_test_reset_kmsg_msgs();
+}
+
+TEST_F(IodeCAPITest, Tests_B_WsCopy)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
     U_test_print_title("B_WsCopy() - VARIABLES");
     U_test_B_WsCopyVar();
@@ -2299,6 +2504,27 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsCopy("fun", SCALARS, 161);
     U_test_B_WsCopy("fun", TABLES, 46);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsMerge)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
     U_test_print_title("B_WsMerge() - VARIABLES");
@@ -2311,6 +2537,27 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsMerge("fun", SCALARS, 161);
     U_test_B_WsMerge("fun", TABLES, 46);
 
+    U_test_reset_kmsg_msgs();
+}
+
+TEST_F(IodeCAPITest, Tests_B_WsExtrapolate)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
     U_test_print_title("B_WsExtrapolate");
     U_test_B_WsExtrapolate(0, 6.0);
@@ -2321,6 +2568,28 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsExtrapolate(5, 6.0);
     U_test_B_WsExtrapolate(6, 7.0);
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WsAggregate)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
     // int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
     // int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
@@ -2328,15 +2597,59 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_print_title("B_WsAggregate");
     U_test_B_WsAggregate();
 
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_StatUnitRoot)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
+
     // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
     U_test_print_title("B_StatUnitRoot");
-    U_test_B_WsLoad("fun", SCALARS, 161);
-    U_test_B_WsLoad("fun", VARIABLES, 394);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, VARIABLES);
 
     U_test_B_StatUnitRoot(0, 0, 0, "ACAF", 0.958325);
     U_test_B_StatUnitRoot(1, 0, 0, "ACAF", 1.117498);
     U_test_B_StatUnitRoot(1, 1, 0, "ACAF", -0.798686);
     U_test_B_StatUnitRoot(0, 0, 2, "ACAF", 1.419631);
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_Csv)
+{
+	char fullfilename[256];
+	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    B_WsLoad(fullfilename, COMMENTS);
+    B_WsLoad(fullfilename, EQUATIONS);
+    B_WsLoad(fullfilename, IDENTITIES);
+    B_WsLoad(fullfilename, LISTS);
+    B_WsLoad(fullfilename, SCALARS);
+    B_WsLoad(fullfilename, TABLES);
+    B_WsLoad(fullfilename, VARIABLES);
 
     // int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
     // int B_CsvSep(char *sep, int unused)                           $CsvSep char
@@ -2348,7 +2661,6 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_Csv();
 
     U_test_reset_kmsg_msgs();
-
 }
 
 

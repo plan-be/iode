@@ -187,7 +187,8 @@ static char *K_repack_tbl(TBL *tbl)
 
     /* lines */
     TCELL* cell;
-    pack = (char*) P_add(pack, (char *) tbl->lines, sizeof(TLINE) * (int) T_NL(tbl));
+    TLINE* lines = tbl->lines.data();
+    pack = (char*) P_add(pack, (char *) lines, sizeof(TLINE) * (int) T_NL(tbl));
     for(int i = 0; i < T_NL(tbl); i++) 
     {
         switch(tbl->lines[i].type) 
@@ -309,7 +310,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case TABLES :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
-            tbl = K_tunpack(optr);
+            tbl = K_tunpack(optr, KONAME(kdb, i));
             SW_free(opos);
             pack = K_repack_tbl(tbl);
             T_free(tbl);

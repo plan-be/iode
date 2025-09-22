@@ -23,14 +23,14 @@ int K_vpack(char **,double *,int *);
 int KV_alloc_var(int );
 int K_ipack(char **,char *);
 //char *K_tcell_pack(char *,TCELL *);
-int K_tpack(char **,char *);
-int K_spack(char **,char *);
+int K_tpack(char**, char*, char* name = NULL);
+int K_spack(char**, char*);
 int KS_alloc_scl(void);
 int K_cpack(char **,char *);
 int K_lpack(char **,char *);
 int K_opack(char **,char *,int *);
 //void K_vunpack(void);
-TBL *K_tunpack(char *);
+TBL *K_tunpack(char*, char* name = NULL);
 Identity* K_iunpack(char *);
 //void K_sunpack(void);
 //void K_cunpack(void);
@@ -47,7 +47,9 @@ inline void debug_packing(const std::string& element, const std::string& code, i
     if(!debug_pack)
         return;
     
-    std::cout << "Packing " << element << " " << code << " (p = " << p << ") ";
+    std::cout << "Packing " << element << " " << code;
+    if(p >= 0)
+        std::cout << " (p = " << p << ") ";
     if(line >= 0)
         std::cout << "(line " << line;
     if(col >= 0)
@@ -70,7 +72,9 @@ inline void debug_unpacking(const std::string& element, const std::string& code,
     if(!debug_unpack)
         return;
     
-    std::cout << "Unpacking " << element << " " << code << " (p = " << p << ") ";
+    std::cout << "Unpacking " << element << " " << code;
+    if(p >= 0)
+        std::cout << " (p = " << p << ") ";
     if(line >= 0)
         std::cout << "(line " << line;
     if(col >= 0)

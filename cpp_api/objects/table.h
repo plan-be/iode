@@ -7,32 +7,6 @@
 
 using bitset_8 = std::bitset<8>;
 
-const static std::map<std::string, TableLineType> m_line_type =
-{
-	{"Cells", TABLE_LINE_CELL},
-	{"Line",  TABLE_LINE_SEP},
-	{"Title", TABLE_LINE_TITLE},
-	{"Files", TABLE_LINE_FILES},
-	{"Mode",  TABLE_LINE_MODE},
-	{"Date",  TABLE_LINE_DATE}
-};
-
-inline std::string get_line_type_as_string(TableLineType line_type)
-{
-	for(const auto& [key, value]: m_line_type)
-		if(line_type == value) return key;
-	return "";
-}
-
-const static std::vector<std::string> v_graph_chart_types = 
-    { "Line chart", "Scatter chart", "Bar chart" };
-
-const static std::vector<std::string> v_graph_axis_thicks = 
-    { "Major thicks", "No grids", "Minor thicks" };
-
-
-static int _nb_columns_;
-
 
 // WARNING: C++ allows functions returning a reference to be left-values. 
 //          This is currently not supported in Cython.
@@ -94,14 +68,6 @@ struct TableLine: public TLINE
 	TableLine(const TableLineType line_type, const TableGraphType graph_type = TableGraphType::TABLE_GRAPH_LINE, 
 		const bool axis_left = true);
 
-	TableLine(const TableLine& other, const int nb_cells);
-
-	// WARNING: a table line must be deleted (freed) from a Table instance
-	~TableLine();
-
-	// WARNING: must NOT be exposed to Python API -> called from a Table instance
-	void free(const int nb_cells);
-
 	TableLineType get_line_type() const;
 
 	void set_line_type(const TableLineType line_type);
@@ -116,74 +82,16 @@ struct TableLine: public TLINE
 
 	TableCell* get_cell(const int column, const int nb_cells) const;
 
-	// WARNING: We cannot override the operator == since the number of cells is not 
-	//          stored in the base structure TLINE (on purpose?) and to be able to 
-	//          cast TableLine as TLINE, we cannot add any new member to TableLine
-	bool equals(const TableLine& other, const int nb_cells) const;
+	bool operator==(const TableLine& other) const;
 };
 
 void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src);
 
 
-// Custom specialization of std::hash can be injected in namespace std.
-template<>
-struct std::hash<TLINE>
-{
-    std::size_t operator()(const TLINE& line) const noexcept
-    {
-		std::size_t seed = 0;
-
-		hash_combine<char>(seed, line.type);
-		hash_combine<bool>(seed, line.right_axis);
-		hash_combine<char>(seed, line.graph_type);
-
-		const TCELL* cell;
-		const Identity* idt;
-		switch(line.type)
-		{
-		case TABLE_LINE_TITLE:
-			cell = &(line.cells[0]);
-			hash_combine<char>(seed, cell->type);
-			hash_combine<char>(seed, cell->attribute);
-			hash_combine<std::string>(seed, cell->content);
-			break;
-		case TABLE_LINE_CELL:
-			for(int col = 0; col < _nb_columns_; col++)
-			{
-				cell = &(line.cells[col]);
-				hash_combine<char>(seed, cell->type);
-				hash_combine<char>(seed, cell->attribute);
-				hash_combine<std::string>(seed, cell->content);
-				idt = cell->idt;
-				if(idt)
-					hash_combine<std::string>(seed, idt->lec);
-			}
-			break;
-		default:
-			break;
-		}
-
-		return seed;
-    }
-};
-
-
 // ================ TABLE ================
-
-bool table_equal(const TBL& table1, const TBL& table2);
 
 struct Table: public TBL
 {
-private:
-	/**
-	 * @brief Call the C function T_create() and set a default value to the remaining attributes.
-	 * 
-	 * @param nb_columns 
-	 */
-	void initialize(const int nb_columns);
-
-    void copy_from_TBL_obj(const TBL* obj);
-
 public:
     Table(const int nb_columns);
 
@@ -198,13 +106,6 @@ public:
 
 	Table(const TBL* c_table);
 	Table(const Table& table);
-
-	~Table();
-
-	// required to be used in std::map
-    Table& operator=(const Table& table);
-
-	void extend();
 
 	std::string get_language() const;
 
@@ -229,6 +130,8 @@ public:
 	// -------- LINES --------
 
 	TableLine* get_line(const int row);
+
+	TableLine* append_line(const TableLineType line_type);
 
 	TableLine* insert_line(const int pos, const TableLineType line_type, const bool after = true);
 
@@ -276,68 +179,17 @@ public:
 
 	TableLine* add_line_date();
 
-	// -------- FREE --------
+	// -------- REMOVE --------
 
-	/**
-	 * @brief 
-	 * 
-	 * @param row 
-	 * 
-	 * @note see T_del_line() function from the source file o_tab.c from the old GUI.
-	 */
-	void delete_line(const int row);
-
-	void free_line(const int row);
-
-	void free_cell(const int row, const int column);
+	void remove_line(const int row)
+	{
+		if(row < 0 || row >= lines.size())
+			throw std::out_of_range("Table line index " + std::to_string(row) + " is out of range [0, " + 
+				std::to_string(lines.size()) + ").");
+		lines.erase(lines.begin() + row);
+	}
 
 	// -------- EQUAL --------
 
 	bool operator==(const Table& other) const;
-
-private:
-	// ================ TABLE (PRIVATE) ================
-
-	/**
-	 * @brief Same as C function T_free() but without its last line 
-	 *        calling SW_nfree(tbl)
-	 */
-	void free_all_lines();
 };
-
-
-// Custom specialization of std::hash can be injected in namespace std.
-template<>
-struct std::hash<TBL>
-{
-    std::size_t operator()(const TBL& table) const noexcept
-    {
-		std::size_t seed = 0;
-
-		hash_combine<short>(seed, table.language);
-		hash_combine<short>(seed, table.repeat_columns);
-		hash_combine<short>(seed, table.nb_lines);
-		hash_combine<short>(seed, table.nb_columns);
-
-		_nb_columns_ = table.nb_columns; 	// used in std::hash<TLINE>
-		hash_combine<TLINE>(seed, table.divider_line);
-		for (int i = 0; i < table.nb_lines; i++)
-			hash_combine<TLINE>(seed, table.lines[i]);
-
-		hash_combine<float>(seed, table.z_min);
-		hash_combine<float>(seed, table.z_max);
-		hash_combine<float>(seed, table.y_min);
-		hash_combine<float>(seed, table.y_max);
-		hash_combine<char>(seed, table.attribute);
-		hash_combine<char>(seed, table.chart_box);
-		hash_combine<char>(seed, table.chart_shadow);
-		hash_combine<char>(seed, table.chart_gridx);
-		hash_combine<char>(seed, table.chart_gridy);
-		hash_combine<char>(seed, table.chart_axis_type);
-		hash_combine<char>(seed, table.text_alignment);
-
-		return seed;
-    }
-};
-
-std::size_t hash_value(const Table& table);

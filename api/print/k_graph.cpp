@@ -169,7 +169,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
 
     for(i = 0; i < T_NL(tbl) && w >= 0; i++) 
     {
-        line = T_L(tbl) + i;
+        line = &tbl->lines[i];
         cells = line->cells.data();
 
         switch(line->type) 
@@ -350,7 +350,7 @@ int T_GraphXYData(int nb, double *x, double *y)
 int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
-    TLINE   *line = T_L(tbl) + i;
+    TLINE   *line = &tbl->lines[i];
     COL     *cl;
 
     COL_clear(cls);
@@ -634,7 +634,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl);
 int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
-    TLINE   *line = T_L(tbl) + i;
+    TLINE   *line = &tbl->lines[i];
     COL     *cl;
     APICHRT    *Chrt = API_CHARTS[hdl];
 
@@ -901,7 +901,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     w = 1;
     for(i = 0; i < T_NL(tbl) && w > 0; i++) 
     {
-        line = T_L(tbl) + i;
+        line = &tbl->lines[i];
         switch(line->type) 
         {
             case TABLE_LINE_CELL  :

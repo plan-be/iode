@@ -286,7 +286,7 @@ cdef class Table:
 
     def get_nb_lines(self) -> int:
         self.extract_tbl_from_database()
-        return <int>(self.c_table.nb_lines)
+        return <int>(self.c_table.lines.size())
 
     def get_nb_columns(self) -> int:
         self.extract_tbl_from_database()
@@ -297,7 +297,7 @@ cdef class Table:
         cdef CTableLine* c_line
         self.extract_tbl_from_database()
 
-        for i in range(self.c_table.nb_lines):
+        for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -309,7 +309,7 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef string c_title
 
-        for i in range(self.c_table.nb_lines):
+        for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -398,7 +398,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
 
-        for i in range(self.c_table.nb_lines):
+        for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -428,7 +428,7 @@ cdef class Table:
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
 
-        for i in range(self.c_table.nb_lines):
+        for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
@@ -486,7 +486,7 @@ cdef class Table:
 
         self.extract_tbl_from_database()
         nb_columns = self.c_table.nb_columns
-        for i in range(self.c_table.nb_lines):
+        for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
@@ -591,7 +591,7 @@ cdef class Table:
         self.update_owner_database()
 
     def _delitem_(self, row: int):
-        self.c_table.delete_line(row)
+        self.c_table.remove_line(row)
         self.update_owner_database()
 
     def _iadd_(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
@@ -653,7 +653,7 @@ cdef class Table:
         lines = []
 
         # lines (-1 for the divider line)
-        for i in range(-1, self.c_table.nb_lines):
+        for i in range(-1, self.c_table.lines.size()):
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:

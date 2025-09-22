@@ -51,7 +51,7 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->language, extracted_tbl->language);
     ASSERT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
     ASSERT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
-    ASSERT_EQ(tbl->nb_lines, extracted_tbl->nb_lines);
+    ASSERT_EQ(tbl->lines.size(), extracted_tbl->lines.size());
     ASSERT_EQ(tbl->z_min, extracted_tbl->z_min);
     ASSERT_EQ(tbl->z_max, extracted_tbl->z_max);
     ASSERT_EQ(tbl->y_min, extracted_tbl->y_min);
@@ -92,10 +92,10 @@ TEST_F(TablesTest, AddGetTBL)
     // ----- check all lines 
     TLINE* line_original;
     TLINE* line_extracted;
-    for(int i = 0; i < tbl->nb_lines; i++)
+    for(int i = 0; i < tbl->lines.size(); i++)
     {
-        line_original = tbl->lines + i;
-        line_extracted = extracted_tbl->lines + i;
+        line_original = &tbl->lines[i];
+        line_extracted = &extracted_tbl->lines[i];
 
         ASSERT_EQ(line_original->type, line_extracted->type);
         ASSERT_EQ(line_original->graph_type, line_extracted->graph_type);
@@ -137,7 +137,6 @@ TEST_F(TablesTest, AddGetTBL)
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
     TLINE* line;
-    TLINE* lines;
     TCELL* cell;
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
@@ -229,15 +228,14 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_TRUE(cell->idt == nullptr);
     // --- title line ---
     i = 0;
-    lines = (TLINE*) tbl->lines;
-    line = &lines[i++];
+    line = &tbl->lines[i++];
     cell = &(line->cells[0]);
     ASSERT_EQ(cell->content, "A title");
     ASSERT_TRUE(cell->idt == nullptr);
     // --- separator line ---
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
     // --- first line ---
-    line = &lines[i++];
+    line = &tbl->lines[i++];
     cell = &(line->cells[0]);
     ASSERT_EQ(cell->type, TABLE_CELL_LEC);
     ASSERT_TRUE(cell->idt == nullptr);
@@ -245,12 +243,12 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(cell->type, TABLE_CELL_STRING);
     ASSERT_EQ(cell->content, "#S");
     // --- separator line ---
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
     // --- variables lines ---
     for(int v = 0; v < vars.size(); v++)
     {
         // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
-        line = &lines[i++];
+        line = &tbl->lines[i++];
         ASSERT_EQ(line->type, TABLE_LINE_CELL);
         for(int j = 0; j < nb_columns; j++)
         {
@@ -268,13 +266,11 @@ TEST_F(TablesTest, Equivalence_C_CPP)
         }
     }
     // --- separator line ---
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_SEP);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
     // --- mode/files/date lines ---
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_MODE);
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_FILES);
-    ASSERT_EQ(lines[i++].type, TABLE_LINE_DATE);
-
-    ASSERT_TRUE(table_equal(table, *tbl));
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_MODE);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_FILES);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_DATE);
 
     // test if a Table object can be passed to the hash function for the objects of type TBL.
     std::hash<TBL> tbl_hasher;
@@ -289,17 +285,15 @@ TEST_F(TablesTest, CopyConstructor)
     KDBVariables kdb_var(input_test_dir + "fun.var");
 
     Table copied_table(*table);
-    ASSERT_TRUE(table_equal(*table, copied_table));
+    ASSERT_EQ(*table, copied_table);
 
     TableLine* line0 = table->get_line(0);
-    TableLine copied_line0(*line0, nb_columns);
-    ASSERT_TRUE(line0->equals(copied_line0, nb_columns));
-    copied_line0.free(nb_columns);    
+    TableLine copied_line0(*line0);
+    ASSERT_EQ(*line0, copied_line0);
 
     TableLine* line5 = table->get_line(5);
-    TableLine copied_line5(*line5, nb_columns);
-    ASSERT_TRUE(line5->equals(copied_line5, nb_columns));
-    copied_line5.free(nb_columns);
+    TableLine copied_line5(*line5);
+    ASSERT_EQ(*line5, copied_line5);
 
     TableCell* cell0 = line5->get_cell(0, nb_columns);
     TableCell copied_cell0(*cell0);
@@ -312,7 +306,7 @@ TEST_F(TablesTest, CopyConstructor)
 
 TEST_F(TablesTest, Dimension)
 {
-    EXPECT_EQ(table->nb_lines, 31);
+    EXPECT_EQ(table->lines.size(), 31);
     EXPECT_EQ(table->nb_columns, 2);
 }
 
@@ -430,21 +424,21 @@ TEST_F(TablesTest, LineTitle)
     EXPECT_EQ(title, new_title);
 
     // add
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     new_title = "New title";
     TableLine* new_line_title = table->add_title(new_title);
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
-    new_pos = table->nb_lines - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
+    new_pos = table->lines.size() - 1;
     title = table->get_title(new_pos);
     EXPECT_EQ(title, new_title);
 
     // delete
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // insert 
     new_line_title = table->insert_title(25, new_title, true);
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     new_pos = 26;
     title = table->get_title(new_pos);
     EXPECT_EQ(title, new_title);
@@ -577,10 +571,10 @@ TEST_F(TablesTest, LineCells)
     std::string second_cell_content = third_line->get_cell(1, nb_cells)->get_content(false);     // LEC cell
 
     // ---- add line
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     TableLine* new_line = table->add_line_with_cells();
-    new_pos = table->nb_lines - 1;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    new_pos = table->lines.size() - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
 
     first_cell = new_line->get_cell(0, nb_cells);
     first_cell->set_text(first_cell_content);
@@ -593,15 +587,13 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->get_line(new_pos)->get_cell(1, nb_cells)->get_content(false), second_cell_content);
 
     // ---- delete line
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // ---- insert line
-    // WARNING: When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::type of cells is undefined!
-    //          See function `T_create_line_cells()` in file `k_tbl.c` from the C API 
     TableLine* new_line_cell = table->insert_line_with_cells(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
 
     // Rule: If the content starts with a double quotes, we assume it is a string cell. 
     //       Otherwise, it is a LEC cell.
@@ -629,20 +621,20 @@ TEST_F(TablesTest, LineSeparator)
         EXPECT_EQ(table->get_line(row)->get_line_type(), TABLE_LINE_SEP);
 
     // add
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     TableLine* new_line = table->add_line_separator();
-    new_pos = table->nb_lines - 1;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    new_pos = table->lines.size() - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_SEP);
 
     // delete
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // insert 
     TableLine* line_inserted = table->insert_line_separator(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_SEP);
 }
 
@@ -653,20 +645,20 @@ TEST_F(TablesTest, LineMode)
     EXPECT_EQ(table->get_line(27)->get_line_type(), TABLE_LINE_MODE);
 
     // add
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     TableLine* new_line = table->add_line_mode();
-    new_pos = table->nb_lines - 1;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    new_pos = table->lines.size() - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_MODE);
 
     // delete
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // insert 
     TableLine* line_inserted = table->insert_line_mode(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_MODE);
 }
 
@@ -677,20 +669,20 @@ TEST_F(TablesTest, LineFiles)
     EXPECT_EQ(table->get_line(28)->get_line_type(), TABLE_LINE_FILES);
 
     // add
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     TableLine* new_line = table->add_line_files();
-    new_pos = table->nb_lines - 1;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    new_pos = table->lines.size() - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_FILES);
 
     // delete
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // insert 
     TableLine* line_inserted = table->insert_line_files(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_FILES);
 }
 
@@ -701,20 +693,20 @@ TEST_F(TablesTest, LineDate)
     EXPECT_EQ(table->get_line(29)->get_line_type(), TABLE_LINE_DATE);
 
     // add
-    int nb_lines = table->nb_lines;
+    int nb_lines = table->lines.size();
     TableLine* new_line = table->add_line_date();
-    new_pos = table->nb_lines - 1;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    new_pos = table->lines.size() - 1;
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_DATE);
 
     // delete
-    table->delete_line(new_pos);
-    EXPECT_EQ(table->nb_lines, nb_lines);
+    table->remove_line(new_pos);
+    EXPECT_EQ(table->lines.size(), nb_lines);
 
     // insert 
     TableLine* line_inserted = table->insert_line_date(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->nb_lines, nb_lines + 1);
+    EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->get_line(new_pos)->get_line_type(), TABLE_LINE_DATE);
 }
 

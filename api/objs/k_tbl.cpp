@@ -7,13 +7,10 @@
  *  -----------------
  *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
- *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.                                                             | Frees a TCELL struct.
- *      int T_add_line(TBL* tbl)                                                                   | Extents a TBL by adding at least one line.
- *      TLINE* T_create_line_cells(int nb_columns)                                                 | Initialises a TLINE of the type TABLE_LINE_CELL. 
- *      TLINE* T_create_line_title()                                                               | Initialises a TLINE of the type TABLE_LINE_TITLE. 
  *      char* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
  *      char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)                                | Returns the formated contents of a TCELL.
  *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
+ *      int T_append_line(TBL* tbl, int type)                                                      | Appends a TLINE to a TBL.
  *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
  *      int T_set_lec_cell(TCELL* cell, unsigned char* lec)                                        | Assigns a LEC expression to a TCELL. Checks the syntax.
  *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TCELL. Checks the syntax.
@@ -45,33 +42,14 @@
  */
 TBL *T_create(int dim)
 {
-    TBL     *tbl = NULL;
-    TCELL   *cells;
-    int     i;
-
-    tbl = (TBL *)SW_nalloc(sizeof(TBL));
-    if(tbl == NULL) 
+    if(dim < 1) 
     {
-        kerror(0, "Allocation error");
-        return(NULL);
+        kwarning("Table: could not create new table -> number of columns < 1");
+        return NULL;
     }
     
-    T_NC(tbl)   = dim;
-    T_LANG(tbl) = TABLE_ENGLISH;
-
-    tbl->z_min = (float)IODE_NAN;
-    tbl->z_max = (float)IODE_NAN;
-    tbl->y_min = (float)IODE_NAN;
-    tbl->y_max = (float)IODE_NAN;
-
-    tbl->divider_line.type = TABLE_LINE_CELL;
-    for(i = 0; i < dim; i++) 
-        tbl->divider_line.cells.push_back(TCELL(TABLE_CELL_LEC, i));
-
-    tbl->divider_line.cells[0].idt = new Identity("1");
-    /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
-
-    return(tbl);
+    TBL* tbl = new TBL(dim);
+    return tbl;
 }
 
 
@@ -83,92 +61,18 @@ TBL *T_create(int dim)
  */
 void T_free(TBL* tbl)
 {
-    int     i;
+    if(tbl == NULL) 
+        return;
+    
+    tbl->divider_line.cells.clear();
+    if(tbl->lines.size() > 0)
+    {
+        for(int i = 0; i < tbl->lines.size(); i++)
+            tbl->lines[i].cells.clear();
+        tbl->lines.clear();
+    }
 
-    T_free_line(&(tbl->divider_line), T_NC(tbl));
-    for(i = 0; i < T_NL(tbl); i++) 
-        T_free_line(tbl->lines + i, T_NC(tbl));
-
-    SW_nfree(tbl->lines);
-    SW_nfree(tbl);
-}
-
-
-/**
- *  Frees a TLINE struct and all its TCELL.
- *  
- *  @param [in, out]    line    TLINE*     pointer to the table line to delete
- *  @param [in]         dim     int        Number columns in the TBL which contains the TLINE.
- *  @return             void
- *
- */
-void T_free_line(TLINE* line, int dim)
-{
-    line->cells.clear();
-}
-
-
-/**
- *  Extents a table by adding KT_CHUNCK lines if the current number of lines is a multiple of KT_CHUNCK.
- *  
- *  @param  [in] tbl    TBL*    TBL to be extended
- *  @return             int     0 if ok, -1 if allocation is impossible
- */
-int T_add_line(TBL* tbl)
-{
-    int nl = T_NL(tbl);
-
-    if(nl % KT_CHUNCK == 0)
-        T_L(tbl) = (TLINE *) SW_nrealloc(T_L(tbl),
-                                        sizeof(TLINE) * nl, sizeof(TLINE) * (nl + KT_CHUNCK));
-    if(T_L(tbl) == 0) return(-1);
-
-    tbl->nb_lines++;
-    return(0);
-}
-
-
-/**
- *  Initialises a TLINE of the type TABLE_LINE_CELL. 
- *  
- *  All cells are "decimal" justified except the first one which is left justified.
- *  
- *  @param [in] tbl     TBL*    table to which line belongs
- *  @param [in] line    TLINE*  line to initialise
- *  @return             TCELL*  pointer to the first TCELL of TLINE
- *
- */
-TLINE* T_create_line_cells(int nb_columns)
-{
-    TLINE* line = new TLINE();
-    line->type = TABLE_LINE_CELL;
-    line->graph_type = T_GRAPHDEFAULT; /* GB 10/03/2011 */
-    for(int i = 0; i < nb_columns; i++)
-        line->cells.push_back(TCELL(TABLE_CELL_LEC, i));
-
-    return line;
-}
-
-
-/**
- *  Initialises a TLINE of the type TABLE_LINE_TITLE. 
- *  
- *  The first (and only) cell receives the attributes TABLE_CELL_CENTER and TABLE_CELL_BOLD.
- *  
- *  @param [in] tbl     TBL*    table to which line belongs
- *  @param [in] line    TLINE*  line to initialise
- *  @return             TCELL*  pointer to the first TCELL of TLINE
- *
- */
-TLINE* T_create_line_title()
-{
-    TLINE* line = new TLINE();
-    line->type = TABLE_LINE_TITLE;
-    TCELL cell(TABLE_CELL_STRING);
-    cell.attribute = TABLE_CELL_CENTER + TABLE_CELL_BOLD; /* JMP 11-11-93 */
-    line->cells.push_back(cell);
-
-    return line;
+    delete tbl;
 }
 
 
@@ -258,6 +162,53 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
 }
 
 
+static bool T_initialize_line(TLINE& line, const int nb_columns)
+{
+    bool success = true;
+    switch(line.type) 
+    {
+        case TABLE_LINE_CELL:
+            line.graph_type = T_GRAPHDEFAULT;
+            for(int i = 0; i < nb_columns; i++)
+                line.cells.push_back(TCELL(TABLE_CELL_LEC, i));
+            break;
+        case TABLE_LINE_TITLE:
+            line.cells.push_back(TCELL(TABLE_CELL_STRING));
+            line.cells.back().attribute = TABLE_CELL_CENTER + TABLE_CELL_BOLD;
+            break;
+        case TABLE_LINE_SEP:
+        case TABLE_LINE_FILES:
+        case TABLE_LINE_MODE:
+        case TABLE_LINE_DATE:
+            break;
+        default:
+            kwarning("Table: could not initialize new line -> unknown line type %d", line.type);
+            success = false;
+    }
+
+    return success;
+}
+
+
+/**
+ *  Inserts a TLINE in a TBL.
+ *  
+ *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
+ *  @param [in]      type    int     TLINE type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
+ *  @return                  int     position of the new line in TBL
+ *  **TODO: Check where definition 
+ */
+int T_append_line(TBL* tbl, int type)
+{
+    TLINE line((char) type);
+    bool success = T_initialize_line(line, tbl->nb_columns);
+    if(!success) 
+        return -1;
+
+    tbl->lines.push_back(line);
+    return tbl->lines.size() - 1;
+}
+
 /**
  *  Inserts a TLINE in a TBL.
  *  
@@ -270,67 +221,22 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
  */
 int T_insert_line(TBL* tbl, int nbr, int type, int where)
 {
-    TLINE* old_lines; 
-    TLINE* new_lines;
-
-    if(type < 0) 
-        return(nbr);
-    
-    old_lines = tbl->lines;
-    new_lines = (TLINE *)
-            SW_nalloc(((T_NL(tbl) + 1)/KT_CHUNCK + 1) * KT_CHUNCK * sizeof(TLINE));
-
-    if(nbr < 0) 
+    if(nbr < 0 || nbr > tbl->lines.size())
     {
-        where = 0;
-        nbr = -1;
+        std::string error_msg = "Table: failed to insert a line in the table at position " 
+                                + std::to_string(nbr) + ": position out of range [0," 
+                                + std::to_string(tbl->lines.size() - 1) + "]";
+        kerror(0, (char*) error_msg.c_str());
     }
 
-    if(where == 0) 
-        nbr += 1;
-    
-    if(T_NL(tbl) > 0) 
-    {
-        if(nbr > 0)
-            memcpy(new_lines, old_lines, nbr * sizeof(TLINE));
-        if(T_NL(tbl) > nbr)
-            memcpy(new_lines + nbr + 1, old_lines + nbr, (T_NL(tbl) - nbr) * sizeof(TLINE));
-    }
-    else 
-        nbr = 0;
+    TLINE line((char) type);
+    bool success = T_initialize_line(line, tbl->nb_columns);
+    if(!success) 
+        return -1;
 
-    tbl->lines = new_lines;
-    SW_nfree(old_lines);
-    T_NL(tbl)++;
-
-    TLINE* line;
-    switch(type) 
-    {
-        case TABLE_LINE_CELL:
-            line = T_create_line_cells(tbl->nb_columns);
-            break;
-        case TABLE_LINE_TITLE:
-            line = T_create_line_title();
-            break;
-        case TABLE_LINE_SEP:
-        case TABLE_LINE_FILES:
-        case TABLE_LINE_MODE:
-        case TABLE_LINE_DATE:
-            line = new TLINE();
-            line->type = type;
-            break;
-        default:
-            line = nullptr;
-    }
-
-    if(!line)
-        throw std::runtime_error("Table: failed to insert a line in the table at position " 
-                                 + std::to_string(nbr));
-
-    line->type = type;
-    tbl->lines[nbr] = *line;
-    delete line;
-    return(nbr);
+    int insert_pos = (where == 0) ? nbr : nbr + 1;
+    tbl->lines.insert(tbl->lines.begin() + insert_pos, line);
+    return insert_pos;
 }
 
 
@@ -481,9 +387,9 @@ int i, j;
  */
 void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
 {
-    TLINE   *line = tbl->lines + i;
+    TLINE& line = tbl->lines[i];
 
-    switch(line->type) 
+    switch(line.type) 
     {
         case TABLE_LINE_TITLE :
             if(j > 0) 
@@ -494,7 +400,7 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
             return;
     }
 
-    line->cells[j].attribute = attr;
+    line.cells[j].attribute = attr;
 }
 
 
@@ -514,57 +420,60 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
  */
 int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)
 {
-    int pos_last_line;
-    TLINE* last_line;
+    TCELL* cell;
 
     if(titg) 
     {
-        pos_last_line = T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_TITLE, 0);
+        T_append_line(tbl, TABLE_LINE_TITLE);
         SCR_strip((unsigned char*) titg);
         if(titg[0])
         {
-            last_line = &tbl->lines[pos_last_line];
-            T_set_string_cell(&(last_line->cells[0]), (unsigned char*) titg);
+            cell = &(tbl->lines.back().cells[0]);
+            T_set_string_cell(cell, (unsigned char*) titg);
         }
-        T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
+        T_append_line(tbl, TABLE_LINE_SEP);
     }
 
-    pos_last_line = T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
-    last_line = &tbl->lines[pos_last_line];
-    T_set_lec_cell(&(last_line->cells[0]), (unsigned char*) "");
+    T_append_line(tbl,  TABLE_LINE_CELL);
+    cell = &(tbl->lines.back().cells[0]);
+    T_set_lec_cell(cell, (unsigned char*) "");
     for(int j = 1 ; j < T_NC(tbl) ; j++) 
     {
-        T_set_string_cell(&(last_line->cells[j]), (unsigned char*) "\"#S");  /* JMP 24-03-2004 */
-        T_set_cell_attr(tbl, pos_last_line, j, TABLE_CELL_CENTER); /* JMP 11-11-93 */
+        cell = &(tbl->lines.back().cells[j]);
+        T_set_string_cell(cell, (unsigned char*) "\"#S");
+        T_set_cell_attr(tbl, tbl->lines.size() - 1, j, TABLE_CELL_CENTER);
     }
 
-    T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
+    T_append_line(tbl, TABLE_LINE_SEP);
 
     if(lecs && titls) 
     {
         for(int i = 0 ; lecs[i] && titls[i]; i++) 
         {
-            pos_last_line = T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
-            last_line = &tbl->lines[pos_last_line];
-            T_set_string_cell(&(last_line->cells[0]), (unsigned char*) titls[i]);
+            T_append_line(tbl, TABLE_LINE_CELL);
+            cell = &(tbl->lines.back().cells[0]);
+            T_set_string_cell(cell, (unsigned char*) titls[i]);
             for(int j = 1 ; j < T_NC(tbl) ; j++)
-                T_set_lec_cell(&(last_line->cells[j]), (unsigned char*) lecs[i]);
+            {
+                cell = &(tbl->lines.back().cells[j]);
+                T_set_lec_cell(cell, (unsigned char*) lecs[i]);
+            }
         }
     }
     else 
-        T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_CELL, 0);
+        T_append_line(tbl, TABLE_LINE_CELL);
     
     if(mode || files || date)
-        T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_SEP, 0);
+        T_append_line(tbl,  TABLE_LINE_SEP);
     
     if(mode)  
-        T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_MODE, 0);
+        T_append_line(tbl,  TABLE_LINE_MODE);
     
     if(files) 
-        T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_FILES, 0);
+        T_append_line(tbl,  TABLE_LINE_FILES);
     
     if(date)  
-        T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_DATE, 0);
+        T_append_line(tbl,  TABLE_LINE_DATE);
 
     return(0);
 }
@@ -620,4 +529,10 @@ void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)
     SCR_free(titg);
     SCR_free_tbl((unsigned char**) titls);
     SCR_free_tbl((unsigned char**) lecs);
+}
+
+std::size_t hash_value(const TBL& table)
+{
+    std::hash<TBL> tbl_hash;
+    return tbl_hash(table);
 }
