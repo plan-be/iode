@@ -336,11 +336,11 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
         if(!cell->idt) 
             continue;
 
-        clec = cell->idt->clec;
+        clec = cell->idt->get_compiled_lec();
         aclec = COL_cp_clec(clec);
 
         dcell = (dcells != NULL) ? (dcells + d) : NULL; 
-        dclec = (dcell->idt != nullptr) ? dcell->idt->clec : NULL;
+        dclec = (dcell->idt != nullptr) ? dcell->idt->get_compiled_lec() : NULL;
         
         adclec = COL_cp_clec(dclec);
 
