@@ -678,7 +678,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     TCELL* bin_cell;
     
-    EXPECT_EQ(ref_table->nb_lines, bin_ref_table->nb_lines);
+    EXPECT_EQ(ref_table->lines.size(), bin_ref_table->lines.size());
     EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
 
     // divider lines 
@@ -697,7 +697,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     }
 
     // lines
-    for(int i=0; i < ref_table->nb_lines; i++)
+    for(int i=0; i < ref_table->lines.size(); i++)
     {
         TLINE line = ref_table->lines[i];
         TLINE bin_line = bin_ref_table->lines[i];

@@ -103,9 +103,6 @@ void TableCell::set_lec(const std::string& lec)
  *        in a string table cell.
  * 
  * @param content 
- * 
- * @note When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
- *       See function `T_create_line_cells()` in file `k_tbl.c` from the C API 
  */
 void TableCell::set_content(const std::string& content)
 {
@@ -223,38 +220,12 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 	}
 }
 
-TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left)
+TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left): 
+	TLINE((char) line_type)
 {
 	this->type = (char) line_type;
 	set_line_graph(graph_type);
 	set_line_axis(axis_left);
-}
-
-TableLine::TableLine(const TableLine& other, const int nb_cells)
-{
-	TCELL* cells;
-
-	switch (other.type)
-	{
-	case TABLE_LINE_TITLE:
-		this->cells.push_back(TCELL(TABLE_CELL_STRING));
-		break;
-	case TABLE_LINE_CELL:
-		for(int col = 0; col < nb_cells; col++)
-			this->cells.push_back(TCELL(TABLE_CELL_STRING, col));
-		break;
-	default:
-		break;
-	}
-	
-	copy_line(nb_cells, this, &other);
-}
-
-TableLine::~TableLine() {}
-
-void TableLine::free(const int nb_cells)
-{
-	T_free_line(this, nb_cells);
 }
 
 TableLineType TableLine::get_line_type() const
@@ -306,7 +277,7 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	return (TableCell*) cell;
 }
 
-bool TableLine::equals(const TableLine& other, const int nb_cells) const
+bool TableLine::operator==(const TableLine& other) const
 {
 	if (type != other.type) return false;
 	if (right_axis != other.right_axis) return false;
@@ -322,7 +293,9 @@ bool TableLine::equals(const TableLine& other, const int nb_cells) const
 	}
 	else if(type == TABLE_LINE_CELL)
 	{
-		for (int col = 0; col < nb_cells; col++)
+		if(this->cells.size() != other.cells.size()) 
+			return false;
+		for(int col = 0; col < other.cells.size(); col++)
 		{
 			cell_this = (TableCell*) &this->cells[col];
 			cell_other = (TableCell*) &other.cells[col];
@@ -344,20 +317,23 @@ bool table_equal(const TBL& table1, const TBL& table2)
 {
 	if(table1.language != table2.language) return false;
 	if(table1.repeat_columns != table2.repeat_columns) return false;
-	if(table1.nb_lines != table2.nb_lines) return false;
 	if(table1.nb_columns != table2.nb_columns) return false;
-
+	
 	int nb_columns = table1.nb_columns;
-	TableLine* div1 = (TableLine*) const_cast<TLINE*>(&table1.divider_line);
-	TableLine* div2 = (TableLine*) const_cast<TLINE*>(&table2.divider_line);
-	if(!div1->equals(*div2, nb_columns))
-		return false;
-
-	TableLine* cells1 = (TableLine*) table1.lines;
-	TableLine* cells2 = (TableLine*) table2.lines;
-	for (int i = 0; i < table1.nb_lines; i++)
-		if (!cells1[i].equals(cells2[i], nb_columns)) 
+	TableLine* div1 = (TableLine*) &table1.divider_line;
+	TableLine* div2 = (TableLine*) &table2.divider_line;
+	if(*div1 != *div2) return false;
+	
+	if(table1.lines.size() != table2.lines.size()) return false;
+	TableLine* line1;
+	TableLine* line2;
+	for (int i = 0; i < table1.lines.size(); i++)
+	{
+		line1 = (TableLine*) &table1.lines[i];
+		line2 = (TableLine*) &table2.lines[i];
+		if (*line1 != *line2) 
 			return false;
+	}
 
 	if(table1.z_min != table2.z_min) return false;
 	if(table1.z_max != table2.z_max) return false;
@@ -374,97 +350,10 @@ bool table_equal(const TBL& table1, const TBL& table2)
 	return true;
 }
 
-void Table::initialize(const int nb_columns)
-{
-	this->nb_columns = nb_columns;
-
-	// NOTE: T_create() - returns an allocated TBL* pointer
-	//                  - initializes nb_columns, language, t_zmin, t_zmax, t_ymin, t_ymax and divider_line
-	TBL* c_table = T_create(nb_columns);
-
-    divider_line.type = TABLE_LINE_CELL;
-	for(int col = 0; col < nb_columns; col++)
-    	divider_line.cells.push_back(TCELL(TABLE_CELL_LEC, col));
-	copy_line(nb_columns, &divider_line, &c_table->divider_line);
-
-	this->language = c_table->language;
-	this->z_min = c_table->z_min;
-	this->z_max = c_table->z_max;
-	this->y_min = c_table->y_min;
-	this->y_max = c_table->y_max;
-
-	T_free(c_table);
-
-	this->nb_lines = 0;
-	this->lines = NULL;
-	this->attribute = TABLE_CELL_NORMAL;
-	this->chart_box = 0;
-	this->chart_shadow = 0;
-	this->chart_gridx = TABLE_GRAPH_MAJOR;
-	this->chart_gridy = TABLE_GRAPH_MAJOR;
-	this->chart_axis_type = TABLE_GRAPH_VALUES;
-	this->text_alignment = TABLE_GRAPH_LEFT;
-}
-
-void Table::copy_from_TBL_obj(const TBL* obj)
-{
-	initialize(obj->nb_columns);
-
-	this->language = obj->language;
-	this->repeat_columns = obj->repeat_columns;
-	this->nb_lines = 0;
-	this->nb_columns = obj->nb_columns;
-	copy_line(nb_columns, &divider_line, &obj->divider_line);
-
-	for (int i = 0; i < obj->nb_lines; i++)
-	{
-		switch (obj->lines[i].type)
-		{
-		case TABLE_LINE_TITLE:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_TITLE, 0);
-			copy_line(nb_columns, &this->lines[i], &obj->lines[i]);
-			break;
-		case TABLE_LINE_CELL:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_CELL, 0);
-			copy_line(nb_columns, &this->lines[i], &obj->lines[i]);
-			break;
-		case TABLE_LINE_SEP:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_SEP, 0);
-			break;
-		case TABLE_LINE_MODE:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_MODE, 0);
-			break;
-		case TABLE_LINE_FILES:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_FILES, 0);
-			break;
-		case TABLE_LINE_DATE:
-			T_insert_line(this, nb_lines - 1, TABLE_LINE_DATE, 0);
-			break;
-		default:
-			break;
-		}
-	}
-
-	this->z_min = obj->z_min;
-	this->z_max = obj->z_max;
-	this->y_min = obj->y_min;
-	this->y_max = obj->y_max;
-	this->attribute    = obj->attribute;
-	this->chart_box    = obj->chart_box;
-	this->chart_shadow = obj->chart_shadow;
-	this->chart_gridx  = obj->chart_gridx;
-	this->chart_gridy  = obj->chart_gridy;
-	this->chart_axis_type = obj->chart_axis_type;
-	this->text_alignment  = obj->text_alignment;
-}
-
-Table::Table(const int nb_columns)
-{
-	initialize(nb_columns);
-}
+Table::Table(const int nb_columns) : TBL(nb_columns) {}
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
-	bool mode, bool files, bool date)
+	bool mode, bool files, bool date): TBL(nb_columns)
 {
 	char* c_def = to_char_array(def);
 
@@ -481,14 +370,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 	int c_files = files ? 1 : 0;
 	int c_date = date ? 1 : 0;
 
-	initialize(nb_columns);
 	T_auto(this, c_def, c_lecs, c_mode, c_files, c_date);
 
 	SCR_free_tbl((unsigned char**) c_lecs);
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
-		     const std::vector<std::string>& lecs, bool mode, bool files, bool date)
+		     const std::vector<std::string>& lecs, bool mode, bool files, bool date): TBL(nb_columns)
 {
 	char* c_def = to_char_array(def);
 
@@ -505,7 +393,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 	int c_files = files ? 1 : 0;
 	int c_date = date ? 1 : 0;
 
-	initialize(nb_columns);
 	T_default(this, c_def, c_titles, c_lecs, c_mode, c_files, c_date);
 
 	SCR_free_tbl((unsigned char**) c_titles);
@@ -513,7 +400,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
-	bool mode, bool files, bool date)
+	bool mode, bool files, bool date): TBL(nb_columns)
 {
 	char* c_def = to_char_array(def);
 
@@ -532,44 +419,16 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
 	int c_files = files ? 1 : 0;
 	int c_date = date ? 1 : 0;
 
-	initialize(nb_columns);
 	T_auto(this, c_def, c_lecs, c_mode, c_files, c_date);
 
 	SCR_free_tbl((unsigned char**) c_lecs);
 }
 
-Table::Table(const TBL* c_table)
-{
-	copy_from_TBL_obj(c_table);
-}
+Table::Table(const TBL* c_table): TBL(*c_table) {}
 
-Table::Table(const Table& table)
-{
-	copy_from_TBL_obj(static_cast<const TBL*>(&table));
-}
-
-Table::~Table()
-{      
-    free_all_lines();
-}
-
-// required to be used in std::map
-Table& Table::operator=(const Table& table)
-{
-	free_all_lines();
-    copy_from_TBL_obj(static_cast<const TBL*>(&table));
-    return *this;
-}
+Table::Table(const Table& table): TBL((TBL&) table) {}
 
 // ================ TABLE ================
-
-void Table::extend()
-{
-	int res = T_add_line(this);
-	if (res < 0) 
-		throw std::runtime_error("Cannot extend table with title \"" + 
-								 std::string((char*)T_get_title(this)) + "\"");
-}
 
 std::string Table::get_language() const
 {
@@ -625,20 +484,29 @@ void Table::set_graph_alignment(const TableGraphAlign align)
 
 TableLine* Table::get_line(const int row)
 {
-	if (row < 0 || row > nb_lines)
+	if (row < 0 || row >= this->lines.size())
 		throw std::invalid_argument("Cannot get table line at index " + std::to_string(row) + ".\n" + 
-			"Line index must be in range [0, " + std::to_string(nb_lines) + "]");
+			"Line index must be in range [0, " + std::to_string(this->lines.size()) + "]");
 
 	return static_cast<TableLine*>(&this->lines[row]);
 }
 
+TableLine* Table::append_line(const TableLineType line_type)
+{
+	int new_pos = T_append_line(this, line_type);
+	if (new_pos < 0) 
+		throw std::runtime_error("Cannot append a new line to the table");
+
+	return static_cast<TableLine*>(&this->lines.back());
+}
+
 TableLine* Table::insert_line(const int pos, const TableLineType line_type, const bool after)
 {
-	if (pos < 0 || pos > nb_lines)
+	if (pos < 0 || pos >= this->lines.size())
 		throw std::invalid_argument("Cannot insert table line at index " + std::to_string(pos) + ".\n" +  
-			"New line index must be in range [0, " + std::to_string(nb_lines - 1) + "]");
+			"New line index must be in range [0, " + std::to_string(this->lines.size() - 1) + "]");
 
-	int where_ = after ? 0 : 1;
+	int where_ = after ? 1 : 0;
 	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
 	int new_pos = T_insert_line(this, pos, line_type, where_);
 	if (new_pos < 0) 
@@ -666,7 +534,9 @@ TableLine* Table::insert_title(const int pos, const std::string& title, const bo
 
 TableLine* Table::add_title(const std::string& title)
 {
-	return insert_title(nb_lines - 1, title);
+	TableLine* title_line = append_line(TABLE_LINE_TITLE);
+	title_line->get_cell(0, nb_columns)->set_text(title);
+	return title_line;
 }
 
 std::string Table::get_title(const int row)
@@ -699,7 +569,7 @@ TableLine* Table::insert_line_with_cells(const int pos, const bool after)
 
 TableLine* Table::add_line_with_cells()
 {
-	return insert_line_with_cells(nb_lines - 1);
+	return append_line(TABLE_LINE_CELL);
 }
 
 // -------- SEPARATOR --------
@@ -711,7 +581,7 @@ TableLine* Table::insert_line_separator(const int pos, const bool after)
 
 TableLine* Table::add_line_separator()
 {
-	return insert_line_separator(nb_lines - 1);
+	return append_line(TABLE_LINE_SEP);
 }
 
 // -------- MODE --------
@@ -723,7 +593,7 @@ TableLine* Table::insert_line_mode(const int pos, const bool after)
 
 TableLine* Table::add_line_mode()
 {
-	return insert_line_mode(nb_lines - 1);
+	return append_line(TABLE_LINE_MODE);
 }
 
 // -------- FILES --------
@@ -735,7 +605,7 @@ TableLine* Table::insert_line_files(const int pos, const bool after)
 
 TableLine* Table::add_line_files()
 {
-	return insert_line_files(nb_lines - 1);
+	return append_line(TABLE_LINE_FILES);
 }
 
 // -------- DATE --------
@@ -747,44 +617,7 @@ TableLine* Table::insert_line_date(const int pos, const bool after)
 
 TableLine* Table::add_line_date()
 {
-	return insert_line_date(nb_lines - 1);
-}
-
-// -------- FREE --------
-
-void Table::delete_line(const int row)
-{
-	if(row < 0)
-		throw std::invalid_argument("Cannot delete table line.\nTable line index cannot be negative.");
-
-	if(row >= nb_lines)
-		throw std::invalid_argument("Cannot delete line at index " + std::to_string(row) + ".\n" +
-			"Line index must be in range [0, " + std::to_string(nb_lines) + "]." );
-
-    /* free line at position row */
-    T_free_line(&lines[row], nb_columns);
-
-    /* shift all lines after position row + 1 */
-	if(row < nb_lines - 1)
-    	memcpy(lines + row, lines + row + 1, (nb_lines - row - 1) * sizeof(TLINE));
-
-	// update the total number of lines
-    nb_lines--;
-
-    if(nb_lines > 0) 
-	{
-		// set the last line of the table to 0 
-		memset(lines + nb_lines, 0, sizeof(TLINE));
-		// reserve memory if needed
-		if(nb_lines % KT_CHUNCK == 0)
-			lines = (TLINE *) SW_nrealloc(lines, 
-				sizeof(TLINE) * (nb_lines + KT_CHUNCK), sizeof(TLINE) * nb_lines);
-	}
-    else 
-	{
-		SW_nfree(lines);
-		lines = NULL;
-	}
+	return append_line(TABLE_LINE_DATE);
 }
 
 // -------- EQUAL --------
@@ -792,22 +625,4 @@ void Table::delete_line(const int row)
 bool Table::operator==(const Table& other) const
 {
 	return table_equal(static_cast<TBL>(*this), static_cast<TBL>(other));
-}
-
-// ================ TABLE (PRIVATE) ================
-
-void Table::free_all_lines()
-{
-
-    T_free_line(&divider_line, nb_columns);
-
-    for(int i = 0; i < nb_lines; i++)
-		T_free_line(&lines[i], nb_columns);
-    SW_nfree(lines);
-}
-
-std::size_t hash_value(const Table& table)
-{
-    std::hash<TBL> tbl_hash;
-    return tbl_hash(table);
 }

@@ -321,15 +321,16 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
 {
     int lg = cls->cl_nb / T_NC(tbl);
 
-    COL*   cl;
-    TLINE* line = T_L(tbl) + i;
-    TLINE  divider_line = tbl->divider_line;
+    COL*    cl;
+    TLINE&  line = tbl->lines[i];
+    TLINE&  divider_line = tbl->divider_line;
     CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
-    TCELL* cell = nullptr;
-    TCELL* dcell = nullptr;
+    TCELL*  cell = nullptr;
+    TCELL*  dcell = nullptr;
+    
     for(int d = 0; d < T_NC(tbl); d++) 
     {
-        cell = &line->cells[d];
+        cell = &line.cells[d];
 
         if(cell->type != TABLE_CELL_LEC) 
             continue;

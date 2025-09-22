@@ -221,19 +221,20 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
     if(COL_exec(tbl, i, cls) < 0)   
         return(-1);
 
-    int d;
-    COL* cl;
-    TCELL* cell;
-    TLINE* line = T_L(tbl) + i;
+    int     d;
+    COL*    cl;
+    TCELL*  cell;
+    TLINE&  line = tbl->lines[i];
+
     for(int j = 0; j < cls->cl_nb; j++) 
     {
         d = j % T_NC(tbl);
         if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
             continue;
-        if(line->cells.size() > d)
+        if(line.cells.size() > d)
         {
             cl = cls->cl_cols + j;
-            cell = &line->cells[d];
+            cell = &line.cells[d];
             T_print_cell(cell, cl, 1);
         }
     }
@@ -452,7 +453,7 @@ int T_print_tbl(TBL* tbl, char* smpl)
     TLINE* line;
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
     {
-        line = T_L(tbl) + i;
+        line = &tbl->lines[i];
         switch(line->type) 
         {
             case TABLE_LINE_SEP   :

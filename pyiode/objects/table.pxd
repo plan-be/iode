@@ -28,7 +28,7 @@ cdef extern from "api/all.h":
         short  nb_columns
         short  nb_lines
         TLINE  divider_line
-        TLINE* lines
+        vector[TLINE] lines
         float  z_min
         float  z_max
         float  y_min
@@ -89,8 +89,6 @@ cdef extern from "cpp_api/objects/table.h":
     cdef cppclass CTableLine "TableLine":
         # Constructor
         CTableLine(TableLineType line_type, TableGraphType graph_type, bint axis_left) except +
-        # Copy constructor
-        CTableLine(CTableLine& other, int nb_cells) except +
 
         # Getters and Setters
         TableLineType get_line_type()
@@ -112,8 +110,23 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ Table class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CTable "Table":
+        short  language
+        short  repeat_columns
         short  nb_columns
         short  nb_lines
+        TLINE  divider_line
+        vector[TLINE] lines
+        float  z_min
+        float  z_max
+        float  y_min
+        float  y_max
+        char   attribute
+        char   chart_box
+        char   chart_shadow
+        char   chart_gridx
+        char   chart_gridy
+        char   chart_axis_type
+        char   text_alignment
 
         # Constructor
         CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, bint date) except +
@@ -138,12 +151,12 @@ cdef extern from "cpp_api/objects/table.h":
         void set_graph_alignment(TableGraphAlign align) except +
 
         # Methods
-        void extend() except +
-
         # Lines
         CTableLine* get_line(int row) except +
-        CTableLine* insert_line(int pos, TableLineType line_type, bint after) except +
         CTableLine* get_divider_line() except +
+        CTableLine* add_line(TableLineType line_type) except +
+        CTableLine* insert_line(int pos, TableLineType line_type, bint after) except +
+        void remove_line(int row) except +
 
         # Title
         CTableLine* insert_title(int pos, string& title, bint after) except +
@@ -170,11 +183,6 @@ cdef extern from "cpp_api/objects/table.h":
         # Date
         CTableLine* insert_line_date(int pos, bint after) except +
         CTableLine* add_line_date() except +
-
-        # Free
-        void delete_line(int row) except +
-        void free_line(int row) except +
-        void free_cell(int row, int column) except +
 
         # Equal
         bint operator==(const CTable& other) except +

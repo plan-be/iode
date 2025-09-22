@@ -207,7 +207,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
     tbl32->language = tbl64->language;
     tbl32->repeat_columns = tbl64->repeat_columns;
     tbl32->nb_columns = tbl64->nb_columns;
-    tbl32->nb_lines = tbl64->nb_lines;
+    tbl32->nb_lines = (int) tbl64->lines.size();
 
     K_tline64_32((TLINE*) &tbl64->divider_line, (TLINE32*) &tbl32->divider_line);
 
@@ -237,10 +237,11 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 
 static int K_tpack32(char **pack, char *a1)
 {
-    TBL* tbl = (TBL*)a1;
+    TBL*    tbl = (TBL*) a1;
     TCELL*  cell;
     TCELL*  cells;
-    int     i, j, p=-1;
+    TLINE*  lines;
+    int     p=-1;
 
     *pack = (char*) P_create();
     if(a1 == NULL) 
@@ -257,29 +258,36 @@ static int K_tpack32(char **pack, char *a1)
     p++;
 
     /* 2. : nc x [TCELL->content] */
-    for(j = 0; j < T_NC(tbl); j++)
+    for(int j = 0; j < T_NC(tbl); j++)
         *pack = K_tcell_pack(*pack, cells + j, p, -1, j);
 
     /* lines */
     /* 1. : [nl x TLINE] */
-    *pack = (char*) P_add(*pack, (char*) tbl->lines, sizeof(TLINE) * (int) T_NL(tbl));
+    int nb_lines = (int) T_NL(tbl);
+    *pack = (char*) P_add(*pack, (char*) nb_lines, sizeof(int));
     p++;
-    for(i = 0; i < T_NL(tbl); i++) 
+
+    lines = (TLINE*) tbl->lines.data();
+    *pack = (char*) P_add(*pack, (char*) lines, sizeof(TLINE) * (int) T_NL(tbl));
+    p++;
+
+    int i = 0;
+    for(TLINE& line: tbl->lines) 
     {
-        switch(tbl->lines[i].type) 
+        switch(line.type) 
         {
             case TABLE_LINE_CELL:
-                cells = tbl->lines[i].cells.data();
+                cells = line.cells.data();
                 /* [nc x TCELL] */
                 *pack = (char*) P_add(*pack, (char*) cells, sizeof(TCELL) * (int) T_NC(tbl));
                 p++;
 
                 /* 2. : nc x [TCELL->content] */
-                for(j = 0; j < T_NC(tbl); j++)
+                for(int j = 0; j < T_NC(tbl); j++)
                     *pack = K_tcell_pack(*pack, cells + j, p, i, j);
                 break;
             case TABLE_LINE_TITLE:
-                cell = &(tbl->lines[i].cells[0]);
+                cell = &(line.cells[0]);
                 /* [1 x TCELL] */
                 *pack = (char*) P_add(*pack, (char*) cell, sizeof(TCELL));
                 p++;
@@ -288,6 +296,7 @@ static int K_tpack32(char **pack, char *a1)
                 *pack = K_tcell_pack(*pack, cell, p, i, 0);
                 break;
         }
+        i++;
     }
 
     return(0);
@@ -307,14 +316,13 @@ static int K_tpack64(char **pack, char *a1)
 {
     TBL*      tbl = (TBL*) a1;
     TBL32     tbl32;
-    TLINE*    line;
     TLINE*    lines;
     TLINE32*  lines32;
     TCELL*    cell;
     TCELL*    cells;
     TCELL32*  cell32;
     TCELL32*  cells32;
-    int       i, j, p=-1;
+    int       p=-1;
 
     *pack = (char*) P_create();
     if(a1 == NULL) 
@@ -330,24 +338,24 @@ static int K_tpack64(char **pack, char *a1)
     /* 1. : [nc x TCELL32] */
     cells = tbl->divider_line.cells.data();
     cells32 = (TCELL32*) SW_nalloc(sizeof(TCELL32) * (int)T_NC(tbl));
-    for(j = 0; j < T_NC(tbl); j++)
+    for(int j = 0; j < T_NC(tbl); j++)
         K_tcell64_32(cells + j, cells32 + j, p+1, -1, j);
 
     *pack = (char*) P_add(*pack, (char*) cells32, sizeof(TCELL32) * (int) T_NC(tbl));
     p++;
     debug_packing("line", "DIV  ", p);
-    for(j = 0; j < T_NC(tbl); j++)
+    for(int j = 0; j < T_NC(tbl); j++)
         debug_packing("cell", "DIV  ", p+j+1, 0, j, (cells32[j].content == 1) ? "YES" : "NO");
 
     /* 2. : [cell] [cell] (nc x [TCELL->content]) */
-    for(j = 0; j < T_NC(tbl); j++)
+    for(int j = 0; j < T_NC(tbl); j++)
         *pack = K_tcell_pack(*pack, cells + j, p, 0, j);
 
     /* pack lines */
     /* 1. : [nl x TLINE] */
-    lines = (TLINE*) tbl->lines;
-    lines32 = (TLINE32*) SW_nalloc(sizeof(TLINE32) * (int)T_NL(tbl));
-    for(j = 0; j < T_NL(tbl); j++)
+    lines = (TLINE*) tbl->lines.data();
+    lines32 = (TLINE32*) SW_nalloc(sizeof(TLINE32) * (int) T_NL(tbl));
+    for(int j = 0; j < T_NL(tbl); j++)
         K_tline64_32(lines + j, lines32 + j);
 
     *pack = (char*) P_add(*pack, (char*) lines32, sizeof(TLINE32) * (int) T_NL(tbl));
@@ -356,30 +364,30 @@ static int K_tpack64(char **pack, char *a1)
     debug_packing("LINES    ", "", p);
 
     /* 2. For each line and each col, pack cell [cell] [cell] ... */
-    for(i = 0; i < T_NL(tbl); i++) 
+    int i = 0;
+    for(TLINE& line: tbl->lines) 
     {
-        line = tbl->lines + i;
-        switch(line->type) 
+        switch(line.type) 
         {
             case TABLE_LINE_CELL:
                 /* [TLINE32 * NC] */
-                cells = line->cells.data();
-                for(j = 0; j < T_NC(tbl); j++) 
+                cells = line.cells.data();
+                for(int j = 0; j < T_NC(tbl); j++) 
                     K_tcell64_32(cells + j, cells32 + j, p+1, i, j);
                 *pack = (char*) P_add(*pack, (char*) cells32, sizeof(TCELL32) * (int) T_NC(tbl));
                 p++;
                 debug_packing("line", "CELL ", p, i);
-                for(j = 0; j < T_NC(tbl); j++)
+                for(int j = 0; j < T_NC(tbl); j++)
                     debug_packing("content? ", "", p+j+1, i, j, (cells32[j].content == 1) ? "YES" : "NO");
                 
                 /* [TCELL32] [TCELL32] ... */
-                for(j = 0; j < T_NC(tbl); j++)
+                for(int j = 0; j < T_NC(tbl); j++)
                     *pack = K_tcell_pack(*pack, cells + j, p, i, j);
                 break;
 
             case TABLE_LINE_TITLE:
                 cell32 = cells32;
-                cell = &(line->cells[0]);
+                cell = &(line.cells[0]);
                 /* [1 x TCELL] */
                 K_tcell64_32(cell, cell32, p+1, i, 0);
                 *pack = (char*) P_add(*pack, (char*) cell32, sizeof(TCELL32));
@@ -406,11 +414,12 @@ static int K_tpack64(char **pack, char *a1)
                 break;
 
             default:
-                std::string msg = "Packing table line: invalid line type " + std::to_string(line->type); 
+                std::string msg = "Packing table line: invalid line type " + std::to_string(line.type); 
                 msg += " at line " + std::to_string(i);
                 kwarning(msg.c_str());
                 break;
         }
+        i++;
     }
 
     SW_nfree(cells32);
@@ -427,8 +436,11 @@ static int K_tpack64(char **pack, char *a1)
  * @return int 0 
 */
 
-int K_tpack(char** pack, char* a1)
+int K_tpack(char** pack, char* a1, char* name)
 {
+    if(name != NULL)
+        debug_packing("table " + std::string(name), "--------------------------------", -1);
+
     if(X64)
         return(K_tpack64(pack, a1));
     else
@@ -666,24 +678,45 @@ static void K_tcell_sanitize(TCELL* cell, int j)
 */
 static TBL* K_tunpack32(char *pack)
 {
-    TBL     *ptbl, *tbl;
-    TCELL   *pcells, *cells;
-    int     p, len = 0;
+    TBL     *ptbl;
+    TBL     *tbl;
+    TCELL   *pcells;
+    TCELL   *cells;
+    TLINE   *lines;
+    int      len = 0;
 
     /* tbl */
     len = P_get_len(pack, 0);
     ptbl = (TBL*) P_get_ptr(pack, 0);
-    tbl = (TBL*) SW_nalloc(len);
-    memcpy((char*) tbl, (char*) ptbl, len);
+    tbl = new TBL(ptbl->nb_columns);
+
+    tbl->language = ptbl->language;
+    tbl->repeat_columns = ptbl->repeat_columns;
+    tbl->nb_columns = ptbl->nb_columns;
+    tbl->z_min = ptbl->z_min;
+    tbl->z_max = ptbl->z_max;
+    tbl->y_min = ptbl->y_min;
+    tbl->y_max = ptbl->y_max;
+    tbl->attribute = ptbl->attribute;
+    tbl->chart_box = ptbl->chart_box;
+    tbl->chart_shadow = ptbl->chart_shadow;
+    tbl->chart_gridx = ptbl->chart_gridx;
+    tbl->chart_gridy = ptbl->chart_gridy;
+    tbl->chart_axis_type = ptbl->chart_axis_type;
+    tbl->text_alignment = ptbl->text_alignment;
 
     /* div */
     len = P_get_len(pack, 1);
     cells = (TCELL*) P_get_ptr(pack, 1);
+    tbl->divider_line.type = ptbl->divider_line.type;
+    tbl->divider_line.graph_type = ptbl->divider_line.graph_type;
+    tbl->divider_line.right_axis = ptbl->divider_line.right_axis;
     for(int j = 0; j < T_NC(tbl); j++) 
-        tbl->divider_line.cells.push_back(cells[j]);
+        tbl->divider_line.cells[j] = cells[j];
 
     TCELL* cell;
-    for(int j = 0, p = 2; j < T_NC(tbl); j++) 
+    int p = 2;
+    for(int j = 0; j < T_NC(tbl); j++) 
     {
         cell = &(tbl->divider_line.cells[j]);
         if(!cell->content.empty()) 
@@ -696,18 +729,19 @@ static TBL* K_tunpack32(char *pack)
 
     /* lines */
     len = P_get_len(pack, p);
-    T_L(ptbl) = (TLINE*) P_get_ptr(pack, p);
+    int nb_lines = *((int*) P_get_ptr(pack, p));
     p++;
 
-    /* alloc must be a multiple of KT_CHUNCK */
-    T_L(tbl) = (TLINE*) SW_nalloc(sizeof(TLINE) * ((int)T_NL(tbl) / KT_CHUNCK + 1) * KT_CHUNCK);
-    memcpy(T_L(tbl), T_L(ptbl), len);
+    len = P_get_len(pack, p);
+    lines = (TLINE*) P_get_ptr(pack, p);
+    p++;
 
-    for(int i = 0; i < T_NL(tbl); i++) 
+    for(int i = 0; i < nb_lines; i++) 
     {
         switch(ptbl->lines[i].type) 
         {
             case TABLE_LINE_CELL:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_CELL));
                 pcells = (TCELL*) P_get_ptr(pack, p);
                 p++;
                 for(int j = 0; j < T_NC(tbl); j++)
@@ -724,9 +758,9 @@ static TBL* K_tunpack32(char *pack)
                 break;
             
             case TABLE_LINE_TITLE:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_TITLE));
                 cell = (TCELL*) P_get_ptr(pack, p);
                 p++;
-
                 if(!cell->content.empty()) 
                 {
                     cell->content = std::string((char*) P_get_ptr(pack, p));
@@ -734,6 +768,24 @@ static TBL* K_tunpack32(char *pack)
                 }
                 K_tcell_sanitize(cell, 0);
                 tbl->lines[i].cells.push_back(*cell);
+                break;
+
+            case TABLE_LINE_SEP:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_SEP));
+                break;
+            case TABLE_LINE_MODE:
+                tbl->lines.push_back(TLINE((char) TABLE_ASCII_LINE_MODE));
+                break;
+            case TABLE_LINE_FILES:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_FILES));
+                break;
+            case TABLE_LINE_DATE:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_DATE));
+                break;
+            default:
+                std::string msg = "Unpacking table line: invalid line type " + std::to_string(ptbl->lines[i].type); 
+                msg += " at line " + std::to_string(i);
+                kwarning(msg.c_str());
                 break;
         }
     }
@@ -771,7 +823,6 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
  */
 static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
-    tl64->type = tl32->type;
     tl64->graph_type = tl32->graph_type;
     tl64->right_axis = (bool) tl32->right_axis;
 }
@@ -791,7 +842,6 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     tbl64->language = tbl32->language;
     tbl64->repeat_columns = tbl32->repeat_columns;
     tbl64->nb_columns = tbl32->nb_columns;
-    tbl64->nb_lines = tbl32->nb_lines;
 
     K_tline32_64((TLINE32*) &tbl32->divider_line, (TLINE*) &tbl64->divider_line);
 
@@ -862,10 +912,11 @@ static int K_tcell_unpack(char *pack, int& p, TCELL *cell, int i, int j)
 static TBL* K_tunpack64(char *pack)
 {
     // 64 bits structs
-    TBL*   tbl;
-    TCELL* cells;
-    // 32 bits struct (iode std)
+    TBL*     tbl;
     TLINE*   line;
+    TCELL*   cell;
+    // 32 bits struct (iode std)
+    TBL32*   tbl32;
     TLINE32* line32;
     TLINE32* lines32;
     TCELL32* cell32;
@@ -873,8 +924,9 @@ static TBL* K_tunpack64(char *pack)
     int      p=0;
 
     /* tbl */
-    tbl = (TBL*) SW_nalloc(sizeof(TBL));
-    K_tbl32_64((TBL32*) P_get_ptr(pack, 0), tbl); // Inclut la transposition de divider_line (sans divider_line.cells)
+    tbl32 = (TBL32*) P_get_ptr(pack, 0);
+    tbl = new TBL(tbl32->nb_columns);
+    K_tbl32_64(tbl32, tbl);
     debug_unpacking("TBL      ", "", 0);
 
     /* div (TLINE) */
@@ -882,35 +934,34 @@ static TBL* K_tunpack64(char *pack)
     debug_unpacking("line", "DIV  ", 1);
 
     p = 2;
+    // NOTE: new TBL(tbl32->nb_columns) above creates a table with a 'divider' line 
+    //       with nb_columns cells of type TABLE_CELL_LEC and content = ""
     for(int j = 0; j < T_NC(tbl); j++) 
     {
         cell32 = cells32 + j;
-        TCELL* cell = new TCELL(TABLE_CELL_LEC, j);
+        cell = &(tbl->divider_line.cells[j]);
         K_tcell32_64(cell32, cell);
         debug_unpacking("cell", "DIV  ", p, 0, j, (cell32->content == 0) ? " NO" : " YES");
         if(cell32->content != 0)
             K_tcell_unpack(pack, p, cell, 0, j);
         K_tcell_div_sanitize(cell, j);
-        tbl->divider_line.cells.push_back(*cell);
     }
     
     /* lines */
-    /* alloc must be a multiple of KT_CHUNCK */
-    T_L(tbl) = (TLINE*) SW_nalloc(sizeof(TLINE) * ((int)T_NL(tbl) / KT_CHUNCK + 1) * KT_CHUNCK);
     lines32 = (TLINE32*) P_get_ptr(pack, p);
     debug_unpacking("LINES    ", "", p);
     p++;
 
-    for(int i = 0; i < T_NL(tbl); i++) 
+    for(int i = 0; i < tbl32->nb_lines; i++) 
     {
         line32 = lines32 + i;
-        line = tbl->lines + i;
-        K_tline32_64(line32, line);
-
-        TCELL* cell;
-        switch(line->type) 
+        switch(line32->type) 
         {
             case TABLE_LINE_CELL:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_CELL));
+                line = &tbl->lines[i];
+                K_tline32_64(line32, line);
+
                 cells32 = (TCELL32*) P_get_ptr(pack, p);
                 debug_unpacking("line", "CELL ", p, i);
                 p++;
@@ -935,6 +986,10 @@ static TBL* K_tunpack64(char *pack)
                 break;
 
             case TABLE_LINE_TITLE:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_TITLE));
+                line = &tbl->lines[i];
+                K_tline32_64(line32, line);
+
                 cell32 = (TCELL32*) P_get_ptr(pack, p);
                 debug_unpacking("line", "TITLE", p, i);
                 p++;
@@ -948,20 +1003,24 @@ static TBL* K_tunpack64(char *pack)
                 break;
 
             case TABLE_LINE_SEP:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_SEP));
                 debug_unpacking("line", "SEP  ", p, i);
                 break;
-            case TABLE_ASCII_LINE_MODE:
+            case TABLE_LINE_MODE:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_MODE));
                 debug_unpacking("line", "MODE ", p, i);
                 break;
             case TABLE_LINE_FILES:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_FILES));
                 debug_unpacking("line", "FILES", p, i);
                 break;
             case TABLE_LINE_DATE:
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_DATE));
                 debug_unpacking("line", "DATE ", p, i);
                 break;
 
             default:
-                std::string msg = "Unpacking table line: invalid line type " + std::to_string(line->type); 
+                std::string msg = "Unpacking table line: invalid line type " + std::to_string(line32->type); 
                 msg += " at line " + std::to_string(i);
                 kwarning(msg.c_str());
                 break;
@@ -979,8 +1038,11 @@ static TBL* K_tunpack64(char *pack)
  * @return TBL *    allocated TBL (32|64 bits according to the current architecture)
 */
 
-TBL* K_tunpack(char *pack)
+TBL* K_tunpack(char *pack, char* name)
 {
+    if(name != NULL)
+        debug_unpacking("table " + std::string(name), "--------------------------------", -1);
+
     if(X64)
         return(K_tunpack64(pack));
     else

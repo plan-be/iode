@@ -108,8 +108,9 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                     tbl = KTVAL(kdb, i);
                     for(k = 0; k < T_NL(tbl) && !found; k++) 
                     {
-                        tline = tbl->lines + k;
-                        switch(tline->type) {
+                        tline = &tbl->lines[k];
+                        switch(tline->type) 
+                        {
                             case TABLE_LINE_SEP   :
                             case TABLE_LINE_MODE  :
                             case TABLE_LINE_DATE  :

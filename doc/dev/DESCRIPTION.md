@@ -503,11 +503,8 @@ Functions to manage TBL objects.
 |:---|:---|
 |`TBL *T_create(int dim)`|Creates a new TBL objects.|
 |`void T_free(TBL* tbl)`|Frees a TBL object|
-|`void T_free_line(TLINE* line, int dim)`|Frees a TLINE struct and all its TCELL.|
-|`int T_add_line(TBL* tbl)`|Extents a TBL by adding at least one line.|
-|`TLINE* T_create_line_cells(int nb_columns)`|Initialises a TLINE of the type KT\_CELL.|
-|`TLINE* T_create_line_title()`|Initialises a TLINE of the type KT\_TITLE.|
 |`char* T_cell_cont(TCELL* cell, int mode)`|Returns the formated contents of a TCELL.|
+|`int T_append_line(TBL* tbl, int type)`|Appends a TLINE to a TBL.|
 |`int T_insert_line(TBL* tbl, int nbr, int type, int where)`|Inserts a TLINE in a TBL.|
 |`int T_set_lec_cell(TCELL* cell, unsigned char* lec)`|Assigns a LEC expression to a TCELL. Checks the syntax.|
 |`void T_set_string_cell(TCELL* cell, unsigned char* txt)`|Assigns a TEXT to a TCELL.|

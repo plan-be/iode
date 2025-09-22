@@ -344,7 +344,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
     {
         buf[0] = 0;
-        line = T_L(tbl) + i;
+        line = &tbl->lines[i];
 
         switch(line->type) 
         {

@@ -81,7 +81,7 @@ void ComputedTable::initialize()
     // TODO JMP: please check the code to get column names below carefully.
     //           For instance, when there is only 1 file involved (current workspace), the returned column name 
     //           does not ends with '[1]' while it is the case in the old GUI. 
-    for(int row=0; row < (int) ref_table->nb_lines; row++)
+    for(int row=0; row < (int) ref_table->lines.size(); row++)
     {
         TableLine* line = ref_table->get_line(row);
 
@@ -112,7 +112,7 @@ void ComputedTable::initialize()
 
     // For each table line, get line name + add a NaN value for each column
     std::string name;
-    for(int row=0; row < (int) ref_table->nb_lines; row++)
+    for(int row=0; row < (int) ref_table->lines.size(); row++)
     {
         TableLine* line = ref_table->get_line(row);
 
@@ -422,7 +422,7 @@ void ComputedTable::print_to_file()
     TCELL* c_cells;
     TableLine* line;
     bool first_title = true;
-    for(int i = 0; i < ref_table->nb_lines; i++) 
+    for(int i = 0; i < ref_table->lines.size(); i++) 
     {
         line = ref_table->get_line(i);
 

@@ -168,21 +168,17 @@ static void read_div(TBL* tbl, YYFILE* yy)
 static int read_line(TBL* tbl, YYFILE* yy)
 {
     int     keyw;
-    TLINE*  c_line;
     TCELL*  cell = nullptr;
+    TLINE*  line = nullptr;
 
-    if(T_add_line(tbl) < 0) 
-        return(-1);
-    
-    c_line = tbl->lines + (tbl->nb_lines - 1);
-
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
-        switch(keyw) {
+        switch(keyw) 
+        {
             case YY_EOF    :
                 YY_unread(yy);
                 return(0);
-
             case TABLE_CELL_RIGHT  :
             case TABLE_CELL_LEFT   :
             case TABLE_CELL_CENTER :
@@ -193,69 +189,78 @@ static int read_line(TBL* tbl, YYFILE* yy)
             case TABLE_CELL_NORMAL :
                 kerror(0, "Attribute definition %s, skipped", YY_error(yy));
                 break;
-
             case TABLE_ASCII_LINE_SEP   :
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                if(c_line->type != 0) {
+                // line already read
+                if(line) 
+                {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->type = keyw;
+                tbl->lines.push_back(TLINE((char) keyw));
+                line = &(tbl->lines.back());
                 break;
-
             case TABLE_ASCII_LINE_TITLE :
-                if(c_line->type != 0) {
+                // line already read
+                if(line) 
+                {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->type = keyw;
+                tbl->lines.push_back(TLINE((char) keyw));
+                line = &(tbl->lines.back());
                 cell = read_cell(yy, YY_STRING);
-                c_line->cells.push_back(*cell);
+                line->cells.push_back(*cell);
                 break;
-
             case TABLE_ASCII_BREAK :
-                if(c_line->type != 0) {
+                // line already read
+                if(line) 
+                {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->type = TABLE_ASCII_LINE_TITLE; /* empty string */
+                // empty string
+                tbl->lines.push_back(TLINE((char) TABLE_ASCII_LINE_TITLE));
+                line = &(tbl->lines.back());
                 cell = new TCELL(TABLE_CELL_STRING);
-                c_line->cells.push_back(*cell);
+                line->cells.push_back(*cell);
                 YY_unread(yy);
                 return(0);
-
             case TABLE_ASCII_LEFT_AXIS :
-                c_line->right_axis = false;
+                line->right_axis = false;
                 break;
             case TABLE_ASCII_RIGHT_AXIS :
-                c_line->right_axis = true;
+                line->right_axis = true;
                 break;
-
             case TABLE_ASCII_GRAPH_LINE :
-                c_line->graph_type= 0;
+                line->graph_type = 0;
                 break;
             case TABLE_ASCII_GRAPH_SCATTER:
-                c_line->graph_type= 1;
+                line->graph_type = 1;
                 break;
             case TABLE_ASCII_GRAPH_BAR  :
-                c_line->graph_type= 2;
+                line->graph_type = 2;
                 break;
-
             default: 
-                if(c_line->type != 0) {
+                // line already read
+                if(line) 
+                {
                     YY_unread(yy);
                     return(0);
                 }
                 YY_unread(yy);
-                c_line->type = TABLE_LINE_CELL;
-                c_line->graph_type = T_GRAPHDEFAULT; /* GB 10/03/2011 */
-                c_line->cells.clear();
+                // Assume it is a line of type CELL
+                tbl->lines.push_back(TLINE((char) TABLE_LINE_CELL));
+                line = &(tbl->lines.back());
+                line->type = TABLE_LINE_CELL;
+                line->graph_type = T_GRAPHDEFAULT;
+                line->cells.clear();
                 for(int i = 0; i < T_NC(tbl); i++)
                 {
                     cell = read_cell(yy, 0);
-                    c_line->cells.push_back(*cell);
+                    line->cells.push_back(*cell);
                 }  
                 break;
         }
@@ -542,9 +547,9 @@ static void print_attribute(FILE* fd, int attr)
  *  @return             void
  *  
  */
-static void print_cell(FILE *fd, TCELL *cell)
-{
-    char* c_content = T_cell_cont(cell, 0);
+static void print_cell(FILE *fd, const TCELL* cell)
+{ 
+    char* c_content = T_cell_cont((TCELL*) cell, 0);
     if(strlen(c_content) == 0)
     {
         fprintf(fd, "\"\" ");
@@ -596,22 +601,22 @@ static void print_tbl(FILE* fd, TBL* tbl)
         print_cell(fd, &(tbl->divider_line.cells[i]));
 
     /* lines */
-    for(int j = 0; j < T_NL(tbl); j++) 
+    for(const TLINE& line : tbl->lines) 
     {
         fprintf(fd, "\n- ");
-        switch(tbl->lines[j].type) 
+        switch(line.type) 
         {
             case TABLE_ASCII_LINE_CELL:
-                for(TCELL& cell : tbl->lines[j].cells)
+                for(const TCELL& cell : line.cells)
                     print_cell(fd, &cell);
 
                 /* append GR info */
-                print_graph_info(fd, tbl->lines[j].right_axis, tbl->lines[j].graph_type);
+                print_graph_info(fd, line.right_axis, line.graph_type);
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                K_wrdef(fd, TABLE, tbl->lines[j].type);
-                print_cell(fd, &(tbl->lines[j].cells[0]));
+                K_wrdef(fd, TABLE, line.type);
+                print_cell(fd, &(line.cells[0]));
                 break;
 
             case TABLE_ASCII_LINE_SEP   :
@@ -619,7 +624,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                K_wrdef(fd, TABLE, tbl->lines[j].type);
+                K_wrdef(fd, TABLE, line.type);
                 break;
 
             default       :
@@ -654,8 +659,11 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < KNB(kdb); i++) {
-        fprintf(fd, "%s {", KONAME(kdb, i));
+    char* name;
+    for(i = 0 ; i < KNB(kdb); i++) 
+    {
+        name = KONAME(kdb, i);
+        fprintf(fd, "%s {", name);
         tbl = KTVAL(kdb, i);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");

@@ -113,29 +113,12 @@ enum IodeGraphGrid
     G_MINOR
 };
 
-enum TableGraphGrid
-{
-	TABLE_GRAPH_MAJOR,
-	TABLE_GRAPH_NONE,
-	TABLE_GRAPH_MINOR
-};
-
-const static int IODE_NB_AXIS_THICKS = 3;
-
 enum IodeGraphAxis
 {
     G_VALUES = 40,
     G_LOG = 41,
     G_SEMILOG = 42,
     G_PERCENT = 50
-};
-
-enum TableGraphAxis
-{
-	TABLE_GRAPH_VALUES,
-	TABLE_GRAPH_LOG,
-	TABLE_GRAPH_SEMILOG,
-	TABLE_GRAPH_PERCENT
 };
 
 enum IodeGraphChartType
@@ -147,22 +130,6 @@ enum IodeGraphChartType
     G_SBAR,
     G_PBAR,
     G_FILL
-};
-
-enum TableGraphType
-{
-	TABLE_GRAPH_LINE,
-	TABLE_GRAPH_SCATTER,
-	TABLE_GRAPH_BAR
-};
-
-const static int IODE_NB_CHART_TYPES = 3;
-
-enum TableGraphAlign
-{
-	TABLE_GRAPH_LEFT,
-	TABLE_GRAPH_CENTER,
-	TABLE_GRAPH_RIGHT
 };
 
 #define G_SCATTER_SHAPE 250
