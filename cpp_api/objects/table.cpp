@@ -3,195 +3,6 @@
 #include "table.h"
 
 
-// ================ CELL ================
-
-static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
-{
-	if(c_cell_src == NULL)
-		throw std::runtime_error("Cannot copy the table cell. The source cell is NULL");
-	if(c_cell_dest == NULL)
-		throw std::runtime_error("Cannot copy the table cell. The destination cell is NULL");
-
-	unsigned char* cell_src_content = (unsigned char*) T_cell_cont(const_cast<TCELL*>(c_cell_src), 0);
-	if (c_cell_src->type == TABLE_CELL_LEC) 
-		T_set_lec_cell(c_cell_dest, cell_src_content);
-	else 
-		T_set_string_cell(c_cell_dest, cell_src_content);
-	if(c_cell_src->attribute != 0)
-		c_cell_dest->attribute = c_cell_src->attribute;
-}
-
-TableCell::TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align, 
-	const bool bold, const bool italic, const bool underline): TCELL((char) cell_type)
-{
-	if(cell_type == TableCellType::TABLE_CELL_STRING)
-		set_text(content);
-	else
-		set_lec(content);
-	this->attribute = (char) align;
-	set_bold(bold);
-	set_italic(italic);
-	set_underline(underline);
-}
-
-TableCell::TableCell(const TableCell& other): TCELL(other.type)
-{
-	copy_cell(this, &other);
-}
-
-TableCell::~TableCell() {}
-
-// The table cell contains a "packed" IDT object (lec + clec) 
-// -> see T_set_lec_cell from k_tbl.c
-CLEC* TableCell::get_compiled_lec()
-{
-	if(type != TABLE_CELL_LEC)
-		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
-
-	if(!idt)
-		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
-
-	// see VT_edit() from o_vt.c from the old GUI
-	return idt->get_compiled_lec();
-}
-
-std::vector<std::string> TableCell::get_variables_from_lec()
-{
-	CLEC* clec = get_compiled_lec();
-	return get_variables_from_clec(clec);
-}
-
-std::vector<std::string> TableCell::get_coefficients_from_lec()
-{
-	CLEC* clec = get_compiled_lec();
-	return get_scalars_from_clec(clec);
-}
-
-std::string TableCell::get_content(const bool quotes) const
-{
-	int mode = quotes ? 1 : 0;
-	std::string content_oem = std::string(T_cell_cont((TCELL*) this, mode));
-	std::string content = (type == TABLE_CELL_STRING) ? oem_to_utf8(content_oem) : content_oem;
-	return content;
-}
-
-/**
- * @brief 
- *
- * @param text text to be written in the cell. Note that leading and trailing double quotes are removed.
- * 
- * @note: The string argument `text` passed to this C++ method is assumed to be written with the UTF8 format
- */
-void TableCell::set_text(const std::string& text)
-{
-	std::string text_oem = utf8_to_oem(text);
-	unsigned char* c_text = reinterpret_cast<unsigned char*>(to_char_array(text_oem));
-	T_set_string_cell((TCELL*) this, c_text);
-}
-
-void TableCell::set_lec(const std::string& lec)
-{
-	unsigned char* c_lec = reinterpret_cast<unsigned char*>(to_char_array(lec));
-	T_set_lec_cell((TCELL*) this, c_lec);
-}
-
-/**
- * @brief Set the content of a cell.
- *        Rule: If the content starts with a double quotes, we assume it is a string cell. 
- *        Otherwise, it is a LEC cell.
- *        Note that the leading and trailing double quotes are removed when the text is written 
- *        in a string table cell.
- * 
- * @param content 
- */
-void TableCell::set_content(const std::string& content)
-{
-	if(content.starts_with('\"'))
-		set_text(content);
-	else
-		set_lec(content);
-}
-
-TableCellType TableCell::get_type() const
-{
-	return static_cast<TableCellType>(type);
-}
-
-void TableCell::set_type(const TableCellType cell_type)
-{
-	this->type = cell_type;
-}
-
-// TODO: check if it is correct
-TableCellAlign TableCell::get_align() const
-{
-	return static_cast<TableCellAlign>((int) (this->attribute / 8) * 8);
-}
-
-void TableCell::set_align(const TableCellAlign align)
-{
-	char font = ((int) this->attribute) % 8;
-	this->attribute = ((char) align) + font;
-}
-
-bool TableCell::is_bold() const
-{
-	return bitset_8(this->attribute).test(0);
-}
-
-void TableCell::set_bold(const bool value)
-{
-	bitset_8 attr(this->attribute);
-	attr.set(0, value);
-	this->attribute = (char) attr.to_ulong();
-}
-
-bool TableCell::is_italic() const
-{
-	return bitset_8(this->attribute).test(1);
-}
-
-void TableCell::set_italic(const bool value)
-{
-	bitset_8 attr(this->attribute);
-	attr.set(1, value);
-	this->attribute = (char) attr.to_ulong();
-}
-
-bool TableCell::is_underline() const
-{
-	return bitset_8(this->attribute).test(2);
-}
-
-void TableCell::set_underline(const bool value)
-{
-	bitset_8 attr(this->attribute);
-	attr.set(2, value);
-	this->attribute = (char) attr.to_ulong();
-}
-
-bool TableCell::operator==(const TableCell& other) const
-{
-	if (type != other.type) 
-		return false;
-
-	if (attribute != other.attribute) 
-		return false;
-	
-	if(type == TABLE_CELL_STRING)
-		return this->content == other.content;
-	else if(type == TABLE_CELL_LEC)
-	{
-		if(idt == nullptr && other.idt == nullptr) 
-			return true;
-		if(idt == nullptr || other.idt == nullptr) 
-			return false;
-		return idt->lec == other.idt->lec;
-	}
-	else
-		return true;
-}
-
 // ================ LINE ================
 
 void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src)
@@ -200,24 +11,8 @@ void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src
 	c_line_dest->right_axis = c_line_src->right_axis;
 	c_line_dest->graph_type = c_line_src->graph_type;
 
-	unsigned char* cell_src_content;
-	TCELL* cells_dest = c_line_dest->cells.data();
-	TCELL* cells_src = (TCELL*) c_line_src->cells.data();
-	switch (c_line_src->type)
-	{
-	case TABLE_LINE_TITLE:
-		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
-		T_set_string_cell(cells_dest, cell_src_content);
-		if(cells_src->attribute != 0)
-			cells_dest->attribute = cells_src->attribute;
-		break;
-	case TABLE_LINE_CELL:
-		for (int col = 0; col < nb_columns; col++) 
-			copy_cell(&cells_dest[col], &cells_src[col]);
-		break;
-	default:
-		break;
-	}
+	c_line_dest->cells.clear();
+	c_line_dest->cells = c_line_src->cells;
 }
 
 TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left): 
@@ -273,7 +68,7 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	if(line_type == TABLE_LINE_CELL && column >= nb_cells)
 		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
 
-	const TCELL* cell = &(this->cells[column]);
+	const TableCell* cell = &(this->cells[column]);
 	return (TableCell*) cell;
 }
 
@@ -286,22 +81,14 @@ bool TableLine::operator==(const TableLine& other) const
 	const TableCell* cell_this;
 	const TableCell* cell_other;
 	if(type == TABLE_LINE_TITLE)
-	{
-		cell_this = (TableCell*) &this->cells[0];
-		cell_other = (TableCell*) &other.cells[0];
-		return cell_this->content == cell_other->content;
-	}
+		return this->cells[0] == other.cells[0];
 	else if(type == TABLE_LINE_CELL)
 	{
 		if(this->cells.size() != other.cells.size()) 
 			return false;
 		for(int col = 0; col < other.cells.size(); col++)
-		{
-			cell_this = (TableCell*) &this->cells[col];
-			cell_other = (TableCell*) &other.cells[col];
-			if(*cell_this != *cell_other) 
+			if(this->cells[col] != other.cells[col])
 				return false;
-		} 
 		return true;
 	}
 	else
@@ -507,7 +294,7 @@ TableLine* Table::insert_line(const int pos, const TableLineType line_type, cons
 			"New line index must be in range [0, " + std::to_string(this->lines.size() - 1) + "]");
 
 	int where_ = after ? 1 : 0;
-	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::type of cells is undefined!
+	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TableCell::type of cells is undefined!
 	int new_pos = T_insert_line(this, pos, line_type, where_);
 	if (new_pos < 0) 
 		throw std::runtime_error("Cannot insert table line at position " + std::to_string(pos));

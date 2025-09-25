@@ -113,7 +113,7 @@ Functions to generate IODE tables in A2M format based on TBL structures and GSam
 |`void T_open_cell(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
 |`void T_open_attr(int attr)`|Opens an A2M attribute sequence.|
 |`void T_close_attr(int attr)`|Closes an A2M attribute sequence.|
-|`void T_print_cell(TCELL* cell, COL* cl, int straddle)`|Prints a TBL cell on a specific GSample column.|
+|`void T_print_cell(TableCell* cell, COL* cl, int straddle)`|Prints a TBL cell on a specific GSample column.|
 |`char **T_find_files(COLS* cls)`|Retrieves the filenames used in the COLS (from GSample) needed to print the special table line KT\_FILES.|
 |`unsigned char *T_get_title(TBL* tbl)`|Retrieves a TBL title, i.e. the contents of the first line of type KT\_TITLE|
 |`int T_print_tbl(TBL* tbl, char* smpl)`|Computes a table on a GSample and saves the result in A2M format|

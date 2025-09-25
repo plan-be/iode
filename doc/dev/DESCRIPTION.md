@@ -491,7 +491,7 @@ Basic functions to manipulate lists and to extract lists of VARs and Scalars fro
 |`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).|
 |`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.|
 |`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.|
-|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.|
+|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.|
 |`int KL_lst(char* name, char** lst, int chunck)`|Creates a list from a table of strings. The elements in the new list are separated by semi\-colons.|
 |`unsigned char **KL_expand(char *str)`|Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.|
 
@@ -503,12 +503,8 @@ Functions to manage TBL objects.
 |:---|:---|
 |`TBL *T_create(int dim)`|Creates a new TBL objects.|
 |`void T_free(TBL* tbl)`|Frees a TBL object|
-|`char* T_cell_cont(TCELL* cell, int mode)`|Returns the formated contents of a TCELL.|
 |`int T_append_line(TBL* tbl, int type)`|Appends a TLINE to a TBL.|
 |`int T_insert_line(TBL* tbl, int nbr, int type, int where)`|Inserts a TLINE in a TBL.|
-|`int T_set_lec_cell(TCELL* cell, unsigned char* lec)`|Assigns a LEC expression to a TCELL. Checks the syntax.|
-|`void T_set_string_cell(TCELL* cell, unsigned char* txt)`|Assigns a TEXT to a TCELL.|
-|`void T_set_cell_attr(TBL* tbl, int i, int j, int attr)`|Assigns justification (KT\_CENTER...) and typographic (KT\_BOLD...) attributes to a TCELL.|
 |`int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)`|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
 |`void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)`|Fills a TBL with a list of variables and their CMT.|
 
@@ -757,7 +753,7 @@ Some of IODE report commands line $ExcelGet are implemented here.
 |`char *IodeDdeCreatePer(int bt)`||
 |`char *ToBase26(int num)`||
 |`char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)`||
-|`char *IodeTblCell(TCELL *cell, COL *cl, int nbdec)`||
+|`char *IodeTblCell(TableCell *cell, COL *cl, int nbdec)`||
 |`char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)`||
 |`char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)`||
 |`char *IodeDdeGetReportRC(char *szItem)`||

@@ -5,62 +5,6 @@
 #include <stdexcept>
 
 
-using bitset_8 = std::bitset<8>;
-
-
-// WARNING: C++ allows functions returning a reference to be left-values. 
-//          This is currently not supported in Cython.
-
-// ================ CELL ================
-
-struct TableCell: public TCELL
-{
-	TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align = TableCellAlign::TABLE_CELL_LEFT, 
-		const bool bold = false, const bool italic = false, const bool underline = false);
-
-	TableCell(const TableCell& other);
-
-	// WARNING: a table cell must be deleted (freed) from a Table instance
-	~TableCell();
-
-	CLEC* get_compiled_lec();
-
-	std::string get_content(const bool quotes) const;
-
-	void set_text(const std::string& text);
-
-	void set_lec(const std::string& lec);
-
-	void set_content(const std::string& content);
-
-	TableCellType get_type() const;
-
-	void set_type(const TableCellType cell_type);
-
-	TableCellAlign get_align() const;
-
-	void set_align(const TableCellAlign align);
-
-	bool is_bold() const;
-
-	void set_bold(const bool value);
-
-	bool is_italic() const;
-
-	void set_italic(const bool value);
-
-	bool is_underline() const;
-
-	void set_underline(const bool value);
-
-	std::vector<std::string> get_variables_from_lec();
-
-	std::vector<std::string> get_coefficients_from_lec();
-
-	bool operator==(const TableCell& other) const;
-};
-
-
 // ================ LINE ================
 
 struct TableLine: public TLINE

@@ -23,12 +23,14 @@ protected:
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTBL)
 {
+    KDBComments kdb_cmt(input_test_dir + "fun.ac");
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
     // --- create a C struct TBL
     int nb_columns = 2;
     char* def = "A title";
     char* vars = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG";
+    std::vector<std::string> v_vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
     char** lecs = B_ainit_chk(vars, NULL, 0);
     int mode = 1;
     int files = 1;
@@ -37,6 +39,70 @@ TEST_F(TablesTest, AddGetTBL)
     TBL* tbl = T_create(nb_columns);
 	T_auto(tbl, def, lecs, mode, files, date);
 	SCR_free_tbl((unsigned char**) lecs);
+
+    // test if the Table object has been correctly initialized
+    TableCell* cell;
+    TLINE* line;
+    // --- divider line ---
+    cell = &(tbl->divider_line.cells[0]);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "1");
+    cell = &(tbl->divider_line.cells[1]);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    // --- title line ---
+    int i = 0;
+    line = &tbl->lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_TITLE);
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->get_content(), "A title");
+    // --- separator line ---
+    line = &tbl->lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- first line ---
+    line = &tbl->lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_CELL);
+    cell = &(line->cells[0]);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    cell = &(line->cells[1]);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+    ASSERT_EQ(cell->get_content(), "#S");
+    // --- separator line ---
+    line = &tbl->lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- variables lines ---
+    std::string comment;
+    std::string variable;
+    for(int v = 0; v < v_vars.size(); v++)
+    {
+        // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
+        line = &tbl->lines[i++];
+        variable = v_vars[v];
+        ASSERT_EQ(line->type, TABLE_LINE_CELL);
+        for(int j = 0; j < nb_columns; j++)
+        {
+            cell = &line->cells[j];
+            if(j == 0)
+            {
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+                if(kdb_cmt.contains(variable))
+                    ASSERT_EQ(cell->get_content(), kdb_cmt.get(variable));
+                else
+                    ASSERT_EQ(cell->get_content(), variable);
+            }
+            else
+            {
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+                ASSERT_EQ(cell->get_content(), variable);
+            }
+        }
+    }
+    // --- separator line ---
+    line = &tbl->lines[i++];
+    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    // --- mode/files/date lines ---
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_MODE);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_FILES);
+    ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
     char* name = "c_table";
@@ -64,8 +130,8 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
     ASSERT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
 
-    TCELL* cell_original;
-    TCELL* cell_extracted;
+    TableCell* cell_original;
+    TableCell* cell_extracted;
 
     // ----- check div line 
     ASSERT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
@@ -75,18 +141,14 @@ TEST_F(TablesTest, AddGetTBL)
     {
         cell_original = &(tbl->divider_line.cells[j]);
         cell_extracted = &(extracted_tbl->divider_line.cells[j]);
-        ASSERT_EQ(cell_original->type, TABLE_CELL_LEC);
-        ASSERT_EQ(cell_extracted->type, TABLE_CELL_LEC);
-        ASSERT_EQ(cell_original->attribute, cell_extracted->attribute);
+        ASSERT_EQ(cell_original->get_type(), TABLE_CELL_LEC);
+        ASSERT_EQ(cell_extracted->get_type(), TABLE_CELL_LEC);
+        ASSERT_EQ(cell_original->get_attribute(), cell_extracted->get_attribute());
         if(j == 0)
-            ASSERT_EQ(cell_original->attribute, TABLE_CELL_LEFT);
+            ASSERT_EQ(cell_original->get_attribute(), TABLE_CELL_LEFT);
         else
-            ASSERT_EQ(cell_original->attribute, TABLE_CELL_DECIMAL);
-        ASSERT_EQ(cell_original->content, cell_extracted->content);
-        if(j == 0)
-            ASSERT_EQ(*cell_original->idt, *cell_extracted->idt);
-        else
-            ASSERT_TRUE(cell_original->idt == nullptr && cell_extracted->idt == nullptr);
+            ASSERT_EQ(cell_original->get_attribute(), TABLE_CELL_DECIMAL);
+        ASSERT_EQ(cell_original->get_content(), cell_extracted->get_content());
     }
 
     // ----- check all lines 
@@ -106,20 +168,16 @@ TEST_F(TablesTest, AddGetTBL)
         case TableLineType::TABLE_LINE_TITLE:
             cell_original = &line_original->cells[0];
             cell_extracted = &line_extracted->cells[0];
-            ASSERT_EQ(cell_original->content, cell_extracted->content);
+            ASSERT_EQ(cell_original->get_content(), cell_extracted->get_content());
             break;
         case TableLineType::TABLE_LINE_CELL:
             for(int j = 0; j < tbl->nb_columns; j++)
             {
                 cell_original = &line_original->cells[j];
                 cell_extracted = &line_extracted->cells[j];
-                ASSERT_EQ(cell_original->type, cell_extracted->type);
-                ASSERT_EQ(cell_original->attribute, cell_extracted->attribute);
-                ASSERT_EQ(cell_original->content, cell_extracted->content);
-                if(cell_original->idt != nullptr && cell_extracted->idt != nullptr)
-                    ASSERT_EQ(*cell_original->idt, *cell_extracted->idt);
-                else
-                    ASSERT_TRUE(cell_original->idt == nullptr && cell_extracted->idt == nullptr);
+                ASSERT_EQ(cell_original->get_type(), cell_extracted->get_type());
+                ASSERT_EQ(cell_original->get_attribute(), cell_extracted->get_attribute());
+                ASSERT_EQ(cell_original->get_content(), cell_extracted->get_content());
             }
             break;
         default:
@@ -137,7 +195,7 @@ TEST_F(TablesTest, AddGetTBL)
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
     TLINE* line;
-    TCELL* cell;
+    TableCell* cell;
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
@@ -155,19 +213,16 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     // test if the Table object has been correctly initialized
     // --- divider line ---
     cell = &(table.divider_line.cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt != nullptr);
-    ASSERT_EQ(cell->idt->lec, "1");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "1");
     cell = &(table.divider_line.cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     // --- title line ---
     int i = 0;
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_TITLE);
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->content, "A title");
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_content(), "A title");
     // --- separator line ---
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
@@ -175,11 +230,10 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_CELL);
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     cell = &(line->cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-    ASSERT_EQ(cell->content, "#S");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+    ASSERT_EQ(cell->get_content(), "#S");
     // --- separator line ---
     line = table.get_line(i++);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
@@ -194,13 +248,13 @@ TEST_F(TablesTest, Equivalence_C_CPP)
             cell = &line->cells[j];
             if(j == 0)
             {
-                ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+                ASSERT_EQ(cell->get_content(), vars[v]);
             }
             else
             {
-                ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+                ASSERT_EQ(cell->get_content(), vars[v]);
             }
         }
     }
@@ -220,28 +274,24 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt != nullptr);
-    ASSERT_EQ(cell->idt->lec, "1");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "1");
     cell = &(tbl->divider_line.cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     // --- title line ---
     i = 0;
     line = &tbl->lines[i++];
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->content, "A title");
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_content(), "A title");
     // --- separator line ---
     ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
     // --- first line ---
     line = &tbl->lines[i++];
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     cell = &(line->cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-    ASSERT_EQ(cell->content, "#S");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+    ASSERT_EQ(cell->get_content(), "#S");
     // --- separator line ---
     ASSERT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
     // --- variables lines ---
@@ -255,13 +305,13 @@ TEST_F(TablesTest, Equivalence_C_CPP)
             cell = &line->cells[j];
             if(j == 0)
             {
-                ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+                ASSERT_EQ(cell->get_content(), vars[v]);
             }
             else
             {
-                ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-                ASSERT_EQ(std::string(T_cell_cont(cell, 0)), vars[v]);
+                ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+                ASSERT_EQ(cell->get_content(), vars[v]);
             }
         }
     }

@@ -21,8 +21,8 @@
  *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
  *    int B_PrintDefTbl(KDB* kdb, int pos)                             | Print the table in position pos in kdb.  
  *    int B_DumpTblDef(TBL* tbl)                                       | Print a table definition.
- *    int B_CellDef(TCELL* cell)                                       | Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).
- *    int B_PrintTblCell(TCELL* cell, int straddle)                    | Print a TABLE cell optionally on several columns.
+ *    int B_CellDef(TableCell* cell)                                       | Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells).
+ *    int B_PrintTblCell(TableCell* cell, int straddle)                    | Print a TABLE cell optionally on several columns.
  *    int B_PrintDefCmt(KDB* kdb, int pos)                             | Print a comment.
  *    int B_PrintDefLst(KDB* kdb, int pos)                             | Print a list.
  *    int B_PrintDefIdt(KDB* kdb, int pos)                             | Print a identity.
@@ -420,13 +420,13 @@ int B_PrintDefTbl(KDB* kdb, int pos)
     if(B_TBL_TITLE) 
     {
         if(B_TBL_TITLE == 1) 
-            W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl));
+            W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl, false));
         else 
-            W_printf("\n%s\n", T_get_title(tbl));
+            W_printf("\n%s\n", T_get_title(tbl, false));
         T_free(tbl);
         return(0);
     }
-    B_PrintRtfTopic((char*) T_get_title(tbl));
+    B_PrintRtfTopic((char*) T_get_title(tbl, false));
     W_printf(".tb %d\n", T_NC(tbl));
     W_printfRepl(".sep &\n");
     W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
@@ -451,7 +451,7 @@ int B_DumpTblDef(TBL* tbl)
         switch(line.type) 
         {
             case TABLE_LINE_CELL :
-                for(TCELL& cell: line.cells)
+                for(TableCell& cell: line.cells)
                     B_PrintTblCell(&cell, 1);
                 W_printf("\n");
                 break;
@@ -490,7 +490,7 @@ int B_DumpTblDef(TBL* tbl)
     if(i < T_NC(tbl)) 
     {
         W_printfRepl(".tl\n&%dC%cbColumn divisors%cB\n.tl\n", T_NC(tbl), A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
-        for(TCELL& cell: tbl->divider_line.cells)
+        for(TableCell& cell: tbl->divider_line.cells)
             B_PrintTblCell(&cell, 1);
     }
 
@@ -500,24 +500,18 @@ int B_DumpTblDef(TBL* tbl)
 
 
 /**
- *  Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).
+ *  Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells).
  *  
- *  @param [in] cell    TCELL*  input TCELL
+ *  @param [in] cell    TableCell*  input TableCell
  *  @return             int     0 if the value is NULL or == "1" for LEC cells
  */
-int B_CellDef(TCELL* cell)
+int B_CellDef(TableCell* cell)
 {
-    if(cell->type == TABLE_CELL_STRING && cell->content.empty()) 
+    if(cell->is_null()) 
         return(0);
 
-    if(cell->type == TABLE_CELL_LEC)
-    {
-        if(!cell->idt) 
-            return(0);
-        
-        if(cell->idt->lec == "1")
-            return(0);
-    } 
+    if(cell->get_type() == TABLE_CELL_LEC && cell->get_content() == "1")
+        return(0);
 
     return(1);
 }
@@ -525,41 +519,34 @@ int B_CellDef(TCELL* cell)
 /**
  *  Print a TABLE cell optionally on several columns.
  *  
- *  @param [in] cell     TCELL*     cell to print
+ *  @param [in] cell     TableCell*     cell to print
  *  @param [in] straddle int        number of columns occupied by the cell
  *  @return              int        0
  */
-int B_PrintTblCell(TCELL* cell, int straddle)
+int B_PrintTblCell(TableCell* cell, int straddle)
 {
     if(B_CellDef(cell) == 0) {
         W_printfRepl("&%dL ", straddle);
         return(0);
     }
 
-    char* c_content;
-    char* c_lec;
-    switch(cell->type) {
+    int attribute = (int) cell->get_attribute();
+    std::string content = cell->get_content(false, false);
+    switch(cell->get_type()) 
+    {
         case TABLE_CELL_STRING :
-            T_open_cell(cell->attribute, straddle, TABLE_CELL_STRING); /* JMP 16-12-93 */
-            /*      W_printf("&%d%c", straddle, ((straddle > 1) ? 'C' : 'L')); /* JMP 16-12-93 */
-            T_open_attr(cell->attribute);
-            c_content = (char*) cell->content.c_str();
-            W_printf("\"%s\"", c_content);
+            T_open_cell(attribute, straddle, TABLE_CELL_STRING);
+            T_open_attr(attribute);
+            W_printf("\"%s\"", (char*) content.c_str());
             break;
 
         case TABLE_CELL_LEC :
             W_printfRepl("&%dL", straddle);
-            T_open_attr(cell->attribute);
-            if(!cell->idt) 
-                W_printf("");
-            else
-            {
-                c_lec = (char*) cell->idt->lec.c_str();
-                W_printf("%s", c_lec);
-            }
+            T_open_attr(attribute);
+            W_printf("%s", (char*) content.c_str());
             break;
     }
-    T_close_attr(cell->attribute);
+    T_close_attr(attribute);
     return(0);
 }
 

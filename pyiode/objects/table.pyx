@@ -168,7 +168,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         
-        c_cell = self.c_line.get_cell(col, self.nb_columns)
+        c_cell = &(self.c_line.cells[col])
 
         cell.c_cell = c_cell
         cell.nb_columns = self.nb_columns
@@ -179,7 +179,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         
-        c_cell = self.c_line.get_cell(col, self.nb_columns)
+        c_cell = &(self.c_line.cells[col])
         c_cell.set_content(value.encode())
         self.py_parent_table.update_owner_database()
 
@@ -192,13 +192,13 @@ cdef class TableLine:
         line_type = <int>(self.c_line.get_line_type())
         nb_columns = self.nb_columns
         if line_type == TableLineType.TITLE:
-            content = self.c_line.get_cell(0, nb_columns).get_content(<bint>False).decode()
+            content = self.c_line.cells[0].get_content(<bint>False).decode()
             # remove newline characters
             return ''.join(content.splitlines())
         elif line_type == TableLineType.CELL:
             cells_content = []
             for j in range(nb_columns):
-                c_cell = self.c_line.get_cell(j, nb_columns)
+                c_cell = &(self.c_line.cells[j])
                 quotes = <int>(c_cell.get_type()) == TableCellType.STRING
                 content = c_cell.get_content(<bint>quotes).decode()
                 # remove newline characters
@@ -393,7 +393,7 @@ cdef class Table:
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
-            c_cell = c_line.get_cell(j, nb_columns)
+            c_cell = &c_line.cells[j]
             cell_type = <int>(c_cell.get_type())
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
@@ -403,7 +403,7 @@ cdef class Table:
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
-                    c_cell = c_line.get_cell(j, nb_columns)
+                    c_cell = &c_line.cells[j]
                     cell_type = <int>(c_cell.get_type())
                     if cell_type == TableCellType.LEC and not c_cell.is_null():
                         py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
@@ -423,7 +423,7 @@ cdef class Table:
 
         c_line = self.c_table.get_divider_line()
         for j in range(nb_columns):
-            c_cell = c_line.get_cell(j, nb_columns)
+            c_cell = &c_line.cells[j]
             cell_type = <int>(c_cell.get_type())
             if cell_type == TableCellType.LEC and not c_cell.is_null():
                 py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
@@ -433,7 +433,7 @@ cdef class Table:
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
-                    c_cell = c_line.get_cell(j, nb_columns)
+                    c_cell = &c_line.cells[j]
                     cell_type = <int>(c_cell.get_type())
                     if cell_type == TableCellType.LEC and not c_cell.is_null():
                         py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
@@ -471,7 +471,7 @@ cdef class Table:
                              f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
         
         for j, cell_content in enumerate(value):
-            c_cell = c_line.get_cell(j, nb_columns)
+            c_cell = &c_line.cells[j]
             c_cell.set_content(cell_content.encode())
 
         self.update_owner_database()
@@ -490,12 +490,12 @@ cdef class Table:
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
-                content = c_line.get_cell(0, nb_columns).get_content(<bint>False).decode().strip()
+                content = c_line.cells[0].get_content(<bint>False).decode().strip()
                 if content == key:
                     return i
             elif line_type == TableLineType.CELL:
                 for j in range(nb_columns):
-                    c_cell = c_line.get_cell(j, nb_columns)
+                    c_cell = &c_line.cells[j]
                     content = c_cell.get_content(<bint>False).decode().strip()
                     if content == key:
                         return i
@@ -535,7 +535,7 @@ cdef class Table:
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
-                c_line.get_cell(j, nb_columns).set_content(value[j].encode())
+                c_line.cells[j].set_content(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_line_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
@@ -571,7 +571,7 @@ cdef class Table:
             if not isinstance(value, str):
                 raise TypeError(f"Cannot update line {row}. Expected new content of type str. "
                                 f"Got new content of type {type(value).__name__} instead.")
-            c_line.get_cell(0, nb_columns).set_text(value.encode())
+            c_line.cells[0].set_text(value.encode())
         elif line_type == TableLineType.CELL:
             if not isinstance(value, (list, tuple)):
                 raise TypeError(f"Cannot update cells at line {row}. Expected new content of type list or tuple of str.\n"
@@ -583,7 +583,7 @@ cdef class Table:
                 raise ValueError(f"Cannot update cells at line {row}.\nThe length of the passed {type(value).__name__} "
                                  f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
             for j, cell_content in enumerate(value):
-                c_cell = c_line.get_cell(j, nb_columns)
+                c_cell = &c_line.cells[j]
                 c_cell.set_content(cell_content.encode())
         else:
             warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
@@ -622,7 +622,7 @@ cdef class Table:
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
-                c_line.get_cell(j, nb_columns).set_content(value[j].encode())
+                c_line.cells[j].set_content(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_line_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
@@ -657,14 +657,14 @@ cdef class Table:
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
             line_type = <int>(c_line.get_line_type())
             if line_type == TableLineType.TITLE:
-                content = c_line.get_cell(0, nb_cols).get_content(<bint>True).decode()
+                content = c_line.cells[0].get_content(<bint>True).decode()
                 if len(content) > max_title_length:
                     max_title_length = <int>len(content)
                 lines += [[line_type, content]]
             elif line_type == TableLineType.CELL:
                 cells_content = []
                 for j in range(nb_cols):
-                    c_cell = c_line.get_cell(j, nb_cols)
+                    c_cell = &(c_line.cells[j])
                     quotes = <int>(c_cell.get_type()) == TableCellType.STRING
                     cell_align = <int>(c_cell.get_align())
                     content = c_cell.get_content(<bint>quotes).decode()

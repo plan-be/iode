@@ -16,7 +16,7 @@
  *      char *IodeDdeCreatePer(int bt)
  *      char *ToBase26(int num)
  *      char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
- *      char *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
+ *      char *IodeTblCell(TableCell *cell, COL *cl, int nbdec)
  *      char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
  *      char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
  *      char *IodeDdeGetReportRC(char *szItem)
@@ -272,31 +272,35 @@ char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
 
 #define DDECELLSIZE 512
 
-char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
+char* IodeTblCell(TableCell *cell, COL *cl, int nbdec)
 {
     static char    buf[DDECELLSIZE + 1]; /* JMP 4/4/2016 (PS) !!! */
     char    *ptr = NULL;
 
     buf[0] = 0;
-    if(cell->type != 0) {
-        if(cl == NULL || cell->type == TABLE_CELL_STRING) {
-            ptr = (char *) COL_text(cl, (char*) cell->content.c_str(), KT_nbnames);
-            SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
-            buf[DDECELLSIZE] = 0;
-            SW_nfree(ptr);
-        }
+
+    if(cell->is_null()) 
+        return(buf);
+
+    if(cl == NULL || cell->get_type() == TABLE_CELL_STRING) 
+    {
+        std::string text = cell->get_content();
+        ptr = (char *) COL_text(cl, (char*) text.c_str(), KT_nbnames);
+        SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
+        buf[DDECELLSIZE] = 0;
+        SW_nfree(ptr);
+    }
+    else 
+    {
+        if(!IODE_IS_A_NUMBER(cl->cl_res)) 
+            strcpy(buf, "#N/A");
         else 
         {
-            if(!IODE_IS_A_NUMBER(cl->cl_res)) 
-                strcpy(buf, "#N/A");
-            else 
-            {
-                sprintf(buf, "%80.20lf", cl->cl_res); /* JMP 18-10-07 */
-                SCR_sqz((unsigned char*) buf);                         /* JMP 18-10-07 */
-                SCR_pstrip((unsigned char*) buf, (unsigned char*) "0");                 /* JMP 18-10-07 */
-            }
-            // T_fmt_val(buf, cl->cl_res, 20, nbdec); /* JMP 18-10-07 */
+            sprintf(buf, "%80.20lf", cl->cl_res); /* JMP 18-10-07 */
+            SCR_sqz((unsigned char*) buf);                         /* JMP 18-10-07 */
+            SCR_pstrip((unsigned char*) buf, (unsigned char*) "0");                 /* JMP 18-10-07 */
         }
+        // T_fmt_val(buf, cl->cl_res, 20, nbdec); /* JMP 18-10-07 */
     }
 
     return(buf);

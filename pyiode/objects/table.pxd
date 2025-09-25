@@ -6,41 +6,6 @@ from libcpp.vector cimport vector
 from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
-cdef extern from "api/all.h":
-    # Define the TCELL structure
-    cdef struct TCELL:
-        string content
-        char*  idt
-        char   type
-        char   attribute
-
-    # Define the TLINE structure
-    cdef struct TLINE:
-        vector[TCELL] cells
-        char  type
-        char  graph_type
-        bint  right_axis
-
-    # Define the TBL structure
-    cdef struct TBL:
-        short  language
-        short  repeat_columns
-        short  nb_columns
-        short  nb_lines
-        TLINE  divider_line
-        vector[TLINE] lines
-        float  z_min
-        float  z_max
-        float  y_min
-        float  y_max
-        char   attribute
-        char   chart_box
-        char   chart_shadow
-        char   chart_gridx
-        char   chart_gridy
-        char   chart_axis_type
-        char   text_alignment
-
 
 cdef extern from "cpp_api/objects/table.h":
 
@@ -54,18 +19,15 @@ cdef extern from "cpp_api/objects/table.h":
         CTableCell(CTableCell& other) except +
 
         # Methods
-        void free() except +
-
         bint is_null()
+
+        TableCellType get_type()
 
         string get_content(bint quotes) except +
 
         void set_text(string& text) except +
         void set_lec(string& lec) except +
         void set_content(string& content) except +
-
-        TableCellType get_type()
-        void set_type(TableCellType cell_type) except +
 
         TableCellAlign get_align()
         void set_align(TableCellAlign align) except +
@@ -84,9 +46,16 @@ cdef extern from "cpp_api/objects/table.h":
 
         bint operator==(const CTableCell& other) except +
 
+    size_t hash_value(CTableCell&)
+
 
     # declare C++ TableLine class
     cdef cppclass CTableLine "TableLine":
+        vector[CTableCell] cells
+        char  cell_type
+        char  graph_type
+        bint  right_axis
+
         # Constructor
         CTableLine(TableLineType line_type, TableGraphType graph_type, bint axis_left) except +
 
@@ -100,33 +69,31 @@ cdef extern from "cpp_api/objects/table.h":
         void set_line_axis(bint is_left) except +
 
         # Methods
-        void free(int nb_cells) except +
+        CTableCell* get_cell(int column) except +
+        bint operator==(const CTableLine& other) except +
 
-        CTableCell* get_cell(int column, int nb_cells) except +
-
-        bint equals(const CTableLine& other, int nb_cells) except +
-
+    size_t hash_value(CTableLine&)
 
     # declare C++ Table class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CTable "Table":
-        short  language
-        short  repeat_columns
-        short  nb_columns
-        short  nb_lines
-        TLINE  divider_line
-        vector[TLINE] lines
-        float  z_min
-        float  z_max
-        float  y_min
-        float  y_max
-        char   attribute
-        char   chart_box
-        char   chart_shadow
-        char   chart_gridx
-        char   chart_gridy
-        char   chart_axis_type
-        char   text_alignment
+        short language
+        short repeat_columns
+        short nb_columns
+        short nb_lines
+        CTableLine divider_line
+        vector[CTableLine] lines
+        float z_min
+        float z_max
+        float y_min
+        float y_max
+        char attribute
+        char chart_box
+        char chart_shadow
+        char chart_gridx
+        char chart_gridy
+        char chart_axis_type
+        char text_alignment
 
         # Constructor
         CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, bint date) except +

@@ -325,24 +325,24 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     TLINE&  line = tbl->lines[i];
     TLINE&  divider_line = tbl->divider_line;
     CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
-    TCELL*  cell = nullptr;
-    TCELL*  dcell = nullptr;
+    TableCell*  cell = nullptr;
+    TableCell*  dcell = nullptr;
     
     for(int d = 0; d < T_NC(tbl); d++) 
     {
         cell = &line.cells[d];
 
-        if(cell->type != TABLE_CELL_LEC) 
+        if(cell->get_type() != TABLE_CELL_LEC) 
             continue;
 
-        if(!cell->idt) 
+        if(cell->is_null()) 
             continue;
 
-        clec = cell->idt->get_compiled_lec();
+        clec = cell->get_compiled_lec();
         aclec = COL_cp_clec(clec);
 
         dcell = &divider_line.cells[d]; 
-        dclec = (dcell->idt != nullptr) ? dcell->idt->get_compiled_lec() : NULL;
+        dclec = (dcell->is_null()) ? NULL : dcell->get_compiled_lec();
         
         adclec = COL_cp_clec(dclec);
 
@@ -351,7 +351,7 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
             cl = cls->cl_cols + d + (j * T_NC(tbl));
             if(COL_calc(cl, aclec, adclec) < 0) 
                 return(-1);
-            debug_calc_table(cl, cell->idt->lec, (dcell->idt) ? dcell->idt->lec : "", 
+            debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 
                              aclec, adclec, i, d, j);
         }
 

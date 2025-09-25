@@ -783,9 +783,9 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     TLINE*   line;
     TLINE*   line_original;
     TLINE*   line_restored;
-    std::vector<TCELL> cells;
-    std::vector<TCELL> cells_original;
-    std::vector<TCELL> cells_restored;
+    std::vector<TableCell> cells;
+    std::vector<TableCell> cells_original;
+    std::vector<TableCell> cells_restored;
 
     int     nb_columns = 2;
     char    *def = "A title";
@@ -795,8 +795,6 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     
     char    **lecs;
     char    *name;
-    char    *cell_cont_0;
-    char    *cell_cont_1;
     int     mode = 1;
     int     files = 1;
     int     date = 1;
@@ -819,8 +817,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(line->type, TABLE_LINE_TITLE);
     cells = line->cells;
     EXPECT_EQ(cells.size(), 1);
-    EXPECT_EQ(cells[0].content, std::string(def));
-    EXPECT_TRUE(cells[0].idt == nullptr);
+    EXPECT_EQ(cells[0].get_content(), std::string(def));
     cells.clear();
     // sep line
     EXPECT_EQ(tbl->lines[1].type, TABLE_LINE_SEP);
@@ -829,11 +826,10 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(line->type, TABLE_LINE_CELL);
     cells = line->cells;
     EXPECT_EQ(cells.size(), nb_columns);
-    EXPECT_EQ(cells[0].type, TABLE_CELL_LEC);
-    EXPECT_EQ(cells[0].content, "");
-    EXPECT_TRUE(cells[0].idt == nullptr);
-    EXPECT_EQ(cells[1].type, TABLE_CELL_STRING);
-    EXPECT_EQ(cells[1].content, std::string("#S"));
+    EXPECT_EQ(cells[0].get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(cells[0].get_content(), "");
+    EXPECT_EQ(cells[1].get_type(), TABLE_CELL_STRING);
+    EXPECT_EQ(cells[1].get_content(), std::string("#S"));
     cells.clear();
     // sep line
     EXPECT_EQ(tbl->lines[3].type, TABLE_LINE_SEP);
@@ -846,13 +842,11 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         EXPECT_EQ(line->cells.size(), nb_columns);
         cells = line->cells;
         // left column: line name
-        EXPECT_EQ(cells[0].type, TABLE_CELL_STRING);
-        EXPECT_EQ(cells[0].content, lec);
+        EXPECT_EQ(cells[0].get_type(), TABLE_CELL_STRING);
+        EXPECT_EQ(cells[0].get_content(), lec);
         // right column: lec expression
-        EXPECT_EQ(cells[1].type, TABLE_CELL_LEC);
-        EXPECT_EQ(cells[1].content, "");
-        EXPECT_TRUE(cells[1].idt != nullptr);
-        EXPECT_EQ(cells[1].idt->lec, lec);
+        EXPECT_EQ(cells[1].get_type(), TABLE_CELL_LEC);
+        EXPECT_EQ(cells[1].get_content(), lec);
         // next line
         cells.clear();
         i++;
@@ -899,8 +893,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 
     for(int j = 0; j < tbl->nb_columns; j++)
     {
-        EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
-        EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
+        EXPECT_EQ(cells_original[j].get_type(), cells_restored[j].get_type());
+        EXPECT_EQ(cells_original[j].get_attribute(), cells_restored[j].get_attribute());
     }
 
     cells_original.clear();
@@ -921,22 +915,14 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         switch (line_original->type)
         {
           case TABLE_LINE_TITLE:
-            cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_original[0], 0));
-            cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_restored[0], 0));
-            EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
-            SCR_free(cell_cont_0);
-            SCR_free(cell_cont_1);
+            EXPECT_EQ(cells_original[0].get_content(), cells_restored[0].get_content());
             break;
           case TABLE_LINE_CELL:
             for(int j = 0; j < tbl->nb_columns; j++)
             {
-                EXPECT_EQ(cells_original[j].type, cells_restored[j].type);
-                EXPECT_EQ(cells_original[j].attribute, cells_restored[j].attribute);
-                cell_cont_0 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_original[j], 0));
-                cell_cont_1 = (char*) SCR_stracpy((unsigned char*) T_cell_cont(&cells_restored[j], 0));
-                EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
-                SCR_free(cell_cont_0);
-                SCR_free(cell_cont_1);
+                EXPECT_EQ(cells_original[j].get_type(), cells_restored[j].get_type());
+                EXPECT_EQ(cells_original[j].get_attribute(), cells_restored[j].get_attribute());
+                EXPECT_EQ(cells_original[j].get_content(), cells_restored[j].get_content());
             }
             break;
           default:
@@ -2260,7 +2246,7 @@ TEST_F(IodeCAPITest, Tests_B_WsExport)
     B_WsLoad(fullfilename, VARIABLES);
 
 
-    
+
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS);
@@ -2748,6 +2734,41 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     compare_files(output_test_dir, "rep_proc.a2m", output_test_dir, "rep_proc.ref.a2m");
 
     U_test_reset_kmsg_msgs();
+}
+
+TEST_F(IodeCAPITest, Tests_B_PRINT_TBL_DEF)
+{
+    char in_filename[256];
+    sprintf(in_filename,  "%s%s", input_test_dir, "fun");
+
+    U_test_print_title("Tests B_PrintObjDef()");
+
+    B_WsLoad(in_filename, COMMENTS);
+    B_WsLoad(in_filename, EQUATIONS);
+    B_WsLoad(in_filename, IDENTITIES);
+    B_WsLoad(in_filename, LISTS);
+    B_WsLoad(in_filename, SCALARS);
+    B_WsLoad(in_filename, TABLES);
+    B_WsLoad(in_filename, VARIABLES);
+
+    kmsg_toggle(1);
+    char output_filename[256];
+
+    B_TBL_TITLE = 1;
+    sprintf(output_filename, "%s%s", output_test_dir, "tables_titles.csv");
+    W_dest(output_filename, A2M_DESTCSV);
+    B_PrintObjDef("ANAKNFF ANAPRIX", TABLES);
+    W_close();
+    compare_files(output_test_dir, "tables_titles.csv", output_test_dir, "tables_titles.ref.csv");
+
+    B_TBL_TITLE = 0;
+    sprintf(output_filename, "%s%s", output_test_dir, "tables_full_defs.csv");
+    W_dest(output_filename, A2M_DESTCSV);
+    B_PrintObjDef("ANAKNFF ANAPRIX", TABLES);
+    W_close();
+    compare_files(output_test_dir, "tables_full_defs.csv", output_test_dir, "tables_full_defs.ref.csv");
+
+    kmsg_toggle(0);
 }
 
 

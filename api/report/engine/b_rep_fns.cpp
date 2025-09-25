@@ -716,7 +716,7 @@ U_ch *RPF_ttitle(U_ch** args)
             res = SCR_strafcat(res, buf);
         }
         else {
-            res = SCR_strafcat(res, T_get_title(tbl));
+            res = SCR_strafcat(res, T_get_title(tbl, false));
             T_free(tbl);
         }
     }

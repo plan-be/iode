@@ -125,24 +125,25 @@ static char *Pack16To32(char* opack)
 
 
 /**
- *  Transforms a TCELL from 16 bits integers to 32 bits integers and appends the result
- *  to a pack which accumulates the TCELLs of a TBL (see K_repack_tbl()).
+ *  Transforms a TableCell from 16 bits integers to 32 bits integers and appends the result
+ *  to a pack which accumulates the TableCells of a TBL (see K_repack_tbl()).
  *  
  *  @param [in]    pack    char*    NULL or pointer to a partial packed TBL 
- *  @param [in]    cell    TCELL*   16 bits integer packed object
+ *  @param [in]    cell    TableCell*   16 bits integer packed object
  *  @return                char*    pointer to pack with the cell appended
  *  
  */
 
-static char *T_cell_repack(char* pack, TCELL* cell)
+static char *T_cell_repack(char* pack, TableCell* cell)
 {
     char *npack, *ipack, *opack, *c_lec;
     
-    if(cell->type == TABLE_CELL_LEC) 
+    if(cell->get_type() == TABLE_CELL_LEC) 
     {
-        if(cell->idt == nullptr) 
+        if(cell->is_null()) 
             return(pack);
-        c_lec = (char*) cell->idt->lec.c_str();
+        std::string lec = cell->get_content();
+        c_lec = (char*) lec.c_str();
         K_ipack(&opack, c_lec);
         npack = Pack16To32(opack);
         ipack = 0;
@@ -152,9 +153,10 @@ static char *T_cell_repack(char* pack, TCELL* cell)
     }
     else
     {
-        if(cell->content.empty()) 
+        std::string text = cell->get_content(false, false);
+        if(text.empty()) 
             return(pack);
-        pack = (char*) P_add(pack, (void*) cell->content.c_str(), (int) cell->content.size() + 1);
+        pack = (char*) P_add(pack, (void*) text.c_str(), (int) text.size() + 1);
     }
 
     return(pack);
@@ -180,13 +182,13 @@ static char *K_repack_tbl(TBL *tbl)
     pack = (char*) P_add(pack, (char *) tbl, sizeof(TBL));
 
     /* div */
-    TCELL* cells = tbl->divider_line.cells.data();
-    pack = (char*) P_add(pack, (char *) cells, sizeof(TCELL) * (int) T_NC(tbl));
-    for(TCELL& cell: tbl->divider_line.cells)
+    TableCell* cells = tbl->divider_line.cells.data();
+    pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) T_NC(tbl));
+    for(TableCell& cell: tbl->divider_line.cells)
         pack = T_cell_repack(pack, &cell);
 
     /* lines */
-    TCELL* cell;
+    TableCell* cell;
     TLINE* lines = tbl->lines.data();
     pack = (char*) P_add(pack, (char *) lines, sizeof(TLINE) * (int) T_NL(tbl));
     for(int i = 0; i < T_NL(tbl); i++) 
@@ -195,14 +197,14 @@ static char *K_repack_tbl(TBL *tbl)
         {
             case TABLE_LINE_CELL :
                 cells = tbl->lines[i].cells.data();
-                pack = (char*) P_add(pack, (char *) cells, sizeof(TCELL) * (int) T_NC(tbl));
-                for(TCELL& cell: tbl->lines[i].cells)
+                pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) T_NC(tbl));
+                for(TableCell& cell: tbl->lines[i].cells)
                     pack = T_cell_repack(pack, &cell);
                 break;
 
             case TABLE_LINE_TITLE :
                 cell = &(tbl->lines[i].cells[0]);
-                pack = (char*) P_add(pack, (char *) cell, sizeof(TCELL));
+                pack = (char*) P_add(pack, (char *) cell, sizeof(TableCell));
                 pack = T_cell_repack(pack, cell);
                 break;
         }

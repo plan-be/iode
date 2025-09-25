@@ -62,6 +62,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
     std::string lec;
     std::string cmt;
+    std::string text;
     
     if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) 
     {
@@ -72,7 +73,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
         return(lst);
     }
 
-    TCELL* cell;
+    TableCell* cell;
     SCR_ADD_PTR_CHUNCK = 1000;
     for(i = 0; i < KNB(kdb); i++) 
     {
@@ -118,16 +119,22 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                                 break;
                             case TABLE_LINE_TITLE :
                                 cell = &(tline->cells[0]);
-                                if(texts) 
-                                    found = !SCR_grep_gnl(pattern, T_cell_cont(cell, 1), ecase, all);
+                                if(texts)
+                                {
+                                    text = cell->get_content(true);
+                                    found = !SCR_grep_gnl(pattern, (char*) text.c_str(), ecase, all);
+                                } 
                                 break;
                             case TABLE_LINE_CELL  :
                                 for(j = 0; j < T_NC(tbl) && !found; j++)
                                 {
                                     cell = &(tline->cells[j]);
-                                    if((texts && cell->type == TABLE_CELL_STRING) || 
-                                       (forms && cell->type == TABLE_CELL_LEC))
-                                        found = !SCR_grep_gnl(pattern, T_cell_cont(cell, 1), ecase, all);
+                                    if((texts && cell->get_type() == TABLE_CELL_STRING) || 
+                                       (forms && cell->get_type() == TABLE_CELL_LEC))
+                                       {
+                                            text = cell->get_content(true);
+                                            found = !SCR_grep_gnl(pattern, (char*) text.c_str(), ecase, all);
+                                       }
                                 }
                                 break;
                         }

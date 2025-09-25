@@ -167,9 +167,10 @@ protected:
 				error_msg += prefix2 + " -> " + line2 + "\n";
 				error_msg += std::string(prefix2.size() + 4, ' ') + diff_indicator2 + "\n";
 				error_msg += "Different character at positions: " + join(diff_positions, ", ") + "\n";
+				
+				error_msg += "\n";
 			} 
 			pos++;
-			error_msg += "\n";
 		}
 
 		if(is_different)

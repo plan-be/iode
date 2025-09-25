@@ -27,7 +27,6 @@ extern int  K_LZH;
 #include <array>
 #include <vector>
 #include <map>
-#include <bitset>
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
