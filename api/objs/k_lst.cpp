@@ -8,7 +8,7 @@
  *    int K_scan(KDB* kdb, char* l_var, char* l_scal)       Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).
  *    void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
  *    void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
- *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.
+ *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.
  *    int KL_lst(char* name, char** lst, int chunck)        Creates a list from a table of strings. The elements in the new list are separated by semi-colons.
  *    unsigned char **KL_expand(char *str)                  Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.
  */ 
@@ -164,7 +164,7 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
 
 
 /**
- *  Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TCELLs.
+ *  Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.
  *  
  *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
  *  
@@ -186,12 +186,12 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
         if(tbl->lines[k].type != TABLE_LINE_CELL) 
             continue;
         
-        for(TCELL& cell: tbl->lines[k].cells) 
+        for(TableCell& cell: tbl->lines[k].cells) 
         {
-            if(cell.type != TABLE_CELL_LEC) 
+            if(cell.get_type() != TABLE_CELL_LEC) 
                 continue;
 
-            clec = cell.idt->get_compiled_lec();
+            clec = cell.get_compiled_lec();
             K_clecscan(NULL, clec, exo, scal);
         }
     }

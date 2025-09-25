@@ -14,7 +14,7 @@
  *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
- *      void T_print_cell(TCELL* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSample column. 
+ *      void T_print_cell(TableCell* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSample column. 
  *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
  *      unsigned char *T_get_title(TBL* tbl)                        Retrieves a TBL title, i.e. the contents of the first line of type TABLE_LINE_TITLE
  *      int T_print_tbl(TBL* tbl, char* smpl)                       Computes a table on a GSample and saves the result in A2M format
@@ -96,7 +96,7 @@ void T_print_val(double val)
 
 
 /**
- *  Translates a TCELL of type KT_TEXT into a text using COL_text(). Sends the result to W_printf().
+ *  Translates a TableCell of type KT_TEXT into a text using COL_text(). Sends the result to W_printf().
  *  
  *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
  *  @param  [in] string     the table column definition (ex "#s")  
@@ -169,39 +169,39 @@ void T_close_attr(int attr)
 /**
  *  Prints a TBL cell on a specific GSample column. 
  *  
- *  @param [in] TCELL*  cell        table cell to print
+ *  @param [in] TableCell*  cell        table cell to print
  *  @param [in] COL*    cl          GSample column definition with the value already calculated
  *  @param [in] int     straddle    nb of spanned columns int the resulting a2m table 
  *  
  */
-void T_print_cell(TCELL* cell, COL* cl, int straddle)
+void T_print_cell(TableCell* cell, COL* cl, int straddle)
 {
-    if(cell == 0 || cell->is_null()) 
+    if(cell == nullptr || cell->is_null()) 
     {
         //W_printf("%c1R", KT_sep); 
         W_printf("%c1R", A2M_SEPCH); 
         return;                
     }
 
-    if(cell->type == TABLE_CELL_STRING && U_is_in('#', (char*) cell->content.c_str()))
-        //cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_CENTER); /* JMP 05-01-02 */
-        cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_RIGHT); /* JMP 05-01-02 */
+    TableCellType cell_type = cell->get_type();
+    std::string content = cell->get_content(false, false);
+
+    if(cell_type == TABLE_CELL_STRING && content.find('#') != std::string::npos)
+        cell->set_align(TABLE_CELL_RIGHT);
     
-    if(cell->type == TABLE_CELL_LEC)
-        cell->attribute = TABLE_CELL_ALIGN(cell->attribute, TABLE_CELL_DECIMAL);
+    if(cell_type == TABLE_CELL_LEC)
+        cell->set_align(TABLE_CELL_DECIMAL);
 
-    T_open_cell(cell->attribute, straddle, cell->type);  /* JMP 17-12-93 */
-    T_open_attr(cell->attribute);
+    int attribute = (int) cell->get_attribute();
+    T_open_cell(attribute, straddle, (int) cell_type);
+    T_open_attr(attribute);
 
-    if(cell->type != 0) 
-    {
-        if(cl == NULL || cell->type == TABLE_CELL_STRING)
-            T_print_string(cl, (char*) cell->content.c_str());
-        else 
-            T_print_val(cl->cl_res);
-    }
+    if(cl == NULL || cell_type == TABLE_CELL_STRING)
+        T_print_string(cl, (char*) content.c_str());
+    else 
+        T_print_val(cl->cl_res);
 
-    T_close_attr(cell->attribute);
+    T_close_attr(attribute);
 }
 
 
@@ -223,7 +223,7 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
 
     int     d;
     COL*    cl;
-    TCELL*  cell;
+    TableCell*  cell;
     TLINE&  line = tbl->lines[i];
 
     for(int j = 0; j < cls->cl_nb; j++) 
@@ -398,7 +398,7 @@ void T_end_tbl()
  *                              if no line of type TABLE_LINE_TITLE can be found or if the first line of that type is empty.
  */
 
-unsigned char *T_get_title(TBL* tbl)  
+unsigned char* T_get_title(TBL* tbl, const bool to_utf8)  
 {
     int                     k;
     static unsigned char    buf[256];
@@ -409,13 +409,15 @@ unsigned char *T_get_title(TBL* tbl)
             break;
 
     TLINE line = tbl->lines[k];
-    TCELL cell = line.cells[0];
+    TableCell cell = line.cells[0];
+    std::string title = cell.get_content(false, to_utf8);
 
     // New version using local static buffer to solve link problems // JMP 11/04/2022
-    if(k == T_NL(tbl) || cell.content.empty())
+
+    if(k == T_NL(tbl) || title.empty())
         strcpy((char*) buf, "No title");
     else
-        SCR_strlcpy(buf, (unsigned char*) cell.content.c_str(), sizeof(buf) - 1);
+        SCR_strlcpy(buf, (unsigned char*) title.c_str(), sizeof(buf) - 1);
 
     return(buf);
 }
@@ -442,13 +444,13 @@ int T_print_tbl(TBL* tbl, char* smpl)
     // Anciennement
     // B_PrintRtfTopic(T_get_title(tbl));
     // Nouveau JMP 18/04/2022
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(tbl));
+    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(tbl, false));
     //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
     
     if(T_begin_tbl(dim, cls)) 
         return(-1);
     
-    W_printf(".ttitle %s\n", T_get_title(tbl));  /* JMP 27-02-98 */
+    W_printf(".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
     
     TLINE* line;
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 

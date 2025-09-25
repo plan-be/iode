@@ -73,7 +73,7 @@ struct EQ32
 };
 
 // Table definition internal format (for 32 and 64 bits)
-struct TCELL32 
+struct TableCell32 
 {
     PTR32   content;
     char    type;    /* TEXT, LEC */
@@ -83,7 +83,7 @@ struct TCELL32
 
 struct TLINE32 
 {
-    PTR32   cells;        /* if type = title then val = ptr unsigned char else ptr to TCELL */
+    PTR32   cells;        /* if type = title then val = ptr unsigned char else ptr to TableCell */
     char    type;        /* FILES, MODE, TITLE, LINE, CELL */
     char    graph_type;       /* G_LINE = 0, .... */
     U_ch    right_axis:1;      /* was tl_attr, Unused before? */

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <bitset>
 
 /*----------------------- ENUMS ----------------------------*/
 
@@ -148,35 +149,51 @@ inline int T_GRAPHDEFAULT = 0;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct TCELL 
+using bitset_8 = std::bitset<8>;
+
+
+// WARNING: C++ allows functions returning a reference to be left-values. 
+//          This is currently not supported in Cython.
+
+
+class TableCell 
 {
+private:
+    char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
     std::string content;    // if type == TABLE_CELL_STRING
     Identity*   idt;        // if type == TABLE_CELL_LEC
-    char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
     char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD,
                             // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
 
 public:
-    TCELL(char type, int col=0) : type(type)
+	TableCell(const TableCellType cell_type, const std::string& content = "", const int col=0)
+        : type((char) cell_type), idt(nullptr)
     {
-        if(type != TABLE_CELL_STRING && type != TABLE_CELL_LEC)
-            this->type = TABLE_CELL_STRING;
-        
         if(this->type == TABLE_CELL_STRING)
         {
-            content = "";
-            idt = nullptr;
-            attribute = TABLE_CELL_NORMAL;
+            this->content = content;
+            this->attribute = TABLE_CELL_LEFT;
         }
         else
         {
-            attribute = (col > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
-            content = "";
-            idt = nullptr;
+            this->content = "";
+            if(!content.empty())
+            {
+                try
+                {
+                    this->idt = new Identity(content);
+                }
+                catch(std::exception& e)
+                {
+                    kwarning(e.what());
+                    this->idt = nullptr;
+                }
+            }
+            this->attribute = (col > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
         }
     }
 
-    TCELL(const TCELL& other)
+    TableCell(const TableCell& other)
     {
         type = other.type;
         attribute = other.attribute;
@@ -187,15 +204,14 @@ public:
             idt = nullptr;
     }
 
-     ~TCELL()
+     ~TableCell()
     {
-        content.clear();
         if(idt)
             delete idt;
         idt = nullptr;
     }
 
-    TCELL& operator=(const TCELL& other)
+    TableCell& operator=(const TableCell& other)
     {
         type = other.type;
         attribute = other.attribute;
@@ -208,6 +224,11 @@ public:
         return *this;
     }
 
+    TableCellType get_type() const
+    {
+        return (TableCellType) type;
+    }
+
     bool is_null() const
     {
         if (type == TABLE_CELL_LEC && idt == NULL)
@@ -216,15 +237,164 @@ public:
             return true;
         return false;
     }
+
+    TableCellAlign get_align() const
+    {
+        return static_cast<TableCellAlign>((int) (this->attribute / 8) * 8);
+    }
+
+    void set_align(const TableCellAlign align)
+    {
+        char font = ((int) this->attribute) % 8;
+        this->attribute = ((char) align) + font;
+    }
+
+    bool is_bold() const
+    {
+        return bitset_8(this->attribute).test(0);
+    }
+
+    void set_bold(const bool value)
+    {
+        bitset_8 attr(this->attribute);
+        attr.set(0, value);
+        this->attribute = (char) attr.to_ulong();
+    }
+
+    bool is_italic() const
+    {
+        return bitset_8(this->attribute).test(1);
+    }
+
+    void set_italic(const bool value)
+    {
+        bitset_8 attr(this->attribute);
+        attr.set(1, value);
+        this->attribute = (char) attr.to_ulong();
+    }
+
+    bool is_underline() const
+    {
+        return bitset_8(this->attribute).test(2);
+    }
+
+    void set_underline(const bool value)
+    {
+        bitset_8 attr(this->attribute);
+        attr.set(2, value);
+        this->attribute = (char) attr.to_ulong();
+    }
+
+    // NOTE: for (un)packing to old binary format
+    char get_attribute() const
+    {
+        return (char) this->attribute;
+    }
+
+    // NOTE: for (un)packing to old binary format
+    void set_attribute(const char attr)
+    {
+        this->attribute = attr;
+    }
+
+    // If quotes is true, the content is returned between double quotes.
+    std::string get_content(const bool quotes=false, const bool to_utf8=true) const;
+
+    // to_oem set to false means that the text is already in OEM encoding
+    // i.e. when reading from old binary files
+    void set_text(const std::string& text, const bool to_oem=true);
+
+    void set_lec(const std::string& lec);
+
+    // Rule: If the content starts with a double quotes, we assume it is a string cell. 
+    //       Otherwise, it is a LEC cell.
+    // to_oem set to false means that the text is already in OEM encoding
+    // i.e. when reading from old binary files
+    void set_content(const std::string& content, const bool to_oem=true);
+
+	CLEC* get_compiled_lec()
+    {
+        if(type != TABLE_CELL_LEC)
+            throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
+
+        if(!idt)
+            throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
+
+        // see VT_edit() from o_vt.c from the old GUI
+        return idt->get_compiled_lec();
+    }
+
+	std::vector<std::string> get_variables_from_lec()
+    {
+        CLEC* clec = get_compiled_lec();
+        return get_variables_from_clec(clec);
+    }
+
+	std::vector<std::string> get_coefficients_from_lec()
+    {
+        CLEC* clec = get_compiled_lec();
+        return get_scalars_from_clec(clec);
+    }
+
+	bool operator==(const TableCell& other) const
+    {	
+        if (type != other.type) 
+            return false;
+
+        if (attribute != other.attribute) 
+            return false;
+        
+        if(type == TABLE_CELL_STRING)
+            return this->content == other.content;
+        else
+        {
+            if(idt == nullptr && other.idt == nullptr) 
+                return true;
+            if(idt == nullptr || other.idt == nullptr) 
+                return false;
+            return idt->lec == other.idt->lec;
+        }
+    }
+
+    std::size_t hash() const
+    {
+		std::size_t seed = 0;
+
+        hash_combine<char>(seed, type);
+        if(type == TABLE_CELL_STRING)
+		    hash_combine<std::string>(seed, content);
+        else
+        {
+            if(idt)
+                hash_combine<std::string>(seed, idt->lec);
+        }
+        hash_combine<char>(seed, attribute);
+        
+		return seed;
+    }
 };
+
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<TableCell>
+{
+    std::size_t operator()(const TableCell& cell) const noexcept
+    {
+        return cell.hash();
+    }
+};
+
+std::size_t hash_value(const TableCell& cell);
+
 
 struct TLINE 
 {
-    std::vector<TCELL> cells;   // empty if type is FILES, MODE, DATE or SEP
-    char    type;               // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_DATE, TABLE_LINE_SEP, 
-                                // TABLE_LINE_TITLE or TABLE_LINE_CELL
-    char    graph_type;         // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
-    bool    right_axis;         // false if values are relative to the left axis, true to the right axis
+    // TODO: make type private
+    char    type;                   // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_DATE, TABLE_LINE_SEP, 
+                                    // TABLE_LINE_TITLE or TABLE_LINE_CELL
+    std::vector<TableCell> cells;   // empty if type is FILES, MODE, DATE or SEP
+    char    graph_type;             // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
+    bool    right_axis;             // false if values are relative to the left axis, true to the right axis
 
 public:
     TLINE(char type): type(type), graph_type(0), right_axis(false)
@@ -245,7 +415,7 @@ public:
         graph_type = other.graph_type;
         right_axis = other.right_axis;
         cells.clear();
-        for(const TCELL& cell : other.cells)
+        for(const TableCell& cell : other.cells)
             cells.push_back(cell);
     }
 
@@ -260,7 +430,7 @@ public:
         graph_type = other.graph_type;
         right_axis = other.right_axis;
         cells.clear();
-        for(const TCELL& cell : other.cells)
+        for(const TableCell& cell : other.cells)
             cells.push_back(cell);
         return *this;
     }
@@ -278,26 +448,14 @@ struct std::hash<TLINE>
 		hash_combine<bool>(seed, line.right_axis);
 		hash_combine<char>(seed, line.graph_type);
 
-        const TCELL* title_cell;
-		const Identity* idt;
 		switch(line.type)
 		{
 		case TABLE_LINE_TITLE:
-			title_cell = &(line.cells[0]);
-			hash_combine<char>(seed, title_cell->type);
-			hash_combine<char>(seed, title_cell->attribute);
-			hash_combine<std::string>(seed, title_cell->content);
+			hash_combine<TableCell>(seed, line.cells[0]);
 			break;
 		case TABLE_LINE_CELL:
-			for(const TCELL& cell : line.cells)
-			{
-				hash_combine<char>(seed, cell.type);
-				hash_combine<char>(seed, cell.attribute);
-				hash_combine<std::string>(seed, cell.content);
-				idt = cell.idt;
-				if(idt)
-					hash_combine<std::string>(seed, idt->lec);
-			}
+			for(const TableCell& cell : line.cells)
+				hash_combine<TableCell>(seed, cell);
 			break;
 		default:
 			break;
@@ -307,12 +465,15 @@ struct std::hash<TLINE>
     }
 };
 
+std::size_t hash_value(const TLINE& line);
+
+
 struct TBL 
 {
     short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
     short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   nb_columns;         // Number of columns (of text and lec, not calculated values)
-    TLINE   divider_line;       // nb_columns TCELL's, each TCELL contains a divider
+    TLINE   divider_line;       // nb_columns TableCell's, each TableCell contains a divider
     std::vector<TLINE> lines;   
     float   z_min;              // Min on the right axis
     float   z_max;              // Max on the right axis
@@ -345,10 +506,9 @@ public:
         this->chart_gridy = TABLE_GRAPH_MAJOR;
         this->chart_axis_type = TABLE_GRAPH_VALUES;
 
-        for(int i = 0; i < dim; i++) 
-            this->divider_line.cells.push_back(TCELL(TABLE_CELL_LEC, i));
-        this->divider_line.cells[0].idt = new Identity("1");
-        /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
+        this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1", 0));
+        for(int j = 1; j < dim; j++) 
+            this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
     }
 };
 
@@ -393,16 +553,11 @@ TBL* K_tptr(KDB* kdb, char* name);
 /* k_tbl.c */
 TBL *T_create(int );
 void T_free(TBL *);
-char *T_cell_cont(TCELL *,int );
-char *T_cell_cont_tbl(TBL *,int, int, int );
 char *T_div_cont_tbl(TBL *, int, int );
 int T_append_line(TBL*, int);
 int T_insert_line(TBL*, int, int, int);
-int T_set_lec_cell(TCELL *,unsigned char *);
 int T_set_lec_cell_tbl(TBL *, int, int, unsigned char *);
-void T_set_string_cell(TCELL *,unsigned char *);
 void T_set_string_cell_tbl(TBL *, int, int, unsigned char *);
-void T_set_cell_attr(TBL *,int ,int ,int );
 int T_default(TBL *,char *,char **,char **,int ,int ,int );
 void T_auto(TBL *,char *,char **,int ,int ,int );
 

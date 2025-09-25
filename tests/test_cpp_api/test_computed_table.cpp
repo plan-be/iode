@@ -535,25 +535,22 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     int i = 0;
     TLINE* line;
-    TCELL* cell;
+    TableCell* cell;
 
     // divider lines 
     // --- divider line ---
     TLINE line_div = ref_table->divider_line;
     ASSERT_EQ(line_div.cells.size(), 2);
     cell = &(line_div.cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_TRUE(cell->idt != nullptr);
-    ASSERT_EQ(cell->idt->lec, "1");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "1");
     cell = &(line_div.cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-    ASSERT_EQ(cell->content, "");
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "");
     // --- title line ---
     line = &(ref_table->lines[i++]);
     cell = &(line->cells[0]);
-    ASSERT_EQ(oem_to_utf8(cell->content), title);
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_content(), title);
     // --- separator line ---
     line = &(ref_table->lines[i++]);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
@@ -561,12 +558,11 @@ TEST_F(ComputedTableTest, PrintToFile)
     line = &(ref_table->lines[i++]);
     ASSERT_EQ(line->cells.size(), 2);
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-    ASSERT_EQ(cell->content, "");
-    ASSERT_TRUE(cell->idt == nullptr);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+    ASSERT_EQ(cell->get_content(), "");
     cell = &(line->cells[1]);
-    ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-    ASSERT_EQ(cell->content, "#s");
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+    ASSERT_EQ(cell->get_content(), "#s");
     // --- separator line ---
     line = &(ref_table->lines[i++]);
     ASSERT_EQ(line->type, TABLE_LINE_SEP);
@@ -577,15 +573,12 @@ TEST_F(ComputedTableTest, PrintToFile)
         ASSERT_EQ(line->cells.size(), 2);
 
         cell = &(line->cells[0]);
-        ASSERT_EQ(cell->type, TABLE_CELL_STRING);
-        ASSERT_EQ(oem_to_utf8(cell->content), v_titles[l]);
-        ASSERT_TRUE(cell->idt == nullptr);
+        ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
+        ASSERT_EQ(cell->get_content(), v_titles[l]);
 
         cell = &(line->cells[1]);
-        ASSERT_EQ(cell->type, TABLE_CELL_LEC);
-        ASSERT_EQ(cell->content, "");
-        ASSERT_TRUE(cell->idt != nullptr);
-        ASSERT_EQ(cell->idt->lec, v_lecs[l]);
+        ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+        ASSERT_EQ(cell->get_content(), v_lecs[l]);
     }
 
     // simple time series (current workspace) - 10 observations
@@ -676,7 +669,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     KDBTables* bin_kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
     Table* bin_ref_table = bin_kdb_tbl->get(table_name);
 
-    TCELL* bin_cell;
+    TableCell* bin_cell;
     
     EXPECT_EQ(ref_table->lines.size(), bin_ref_table->lines.size());
     EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
@@ -689,11 +682,9 @@ TEST_F(ComputedTableTest, PrintToFile)
     {
         cell = &(line_div.cells[j]);
         bin_cell = &(bin_line_div.cells[j]);
-        EXPECT_EQ(cell->type, bin_cell->type);
-        EXPECT_EQ(cell->content, bin_cell->content);
-        if(cell->idt != nullptr && bin_cell->idt != nullptr)
-            EXPECT_EQ(cell->idt->lec, bin_cell->idt->lec);
-        EXPECT_EQ(cell->attribute, bin_cell->attribute);
+        EXPECT_EQ(cell->get_type(), bin_cell->get_type());
+        EXPECT_EQ(cell->get_content(), bin_cell->get_content());
+        EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
     }
 
     // lines
@@ -706,11 +697,9 @@ TEST_F(ComputedTableTest, PrintToFile)
         {
             cell = &line.cells[0];
             bin_cell = &bin_line.cells[0];
-            EXPECT_EQ(cell->type, bin_cell->type);
-            EXPECT_EQ(cell->content, bin_cell->content);
-            EXPECT_EQ(cell->idt, nullptr);
-            EXPECT_EQ(bin_cell->idt, nullptr);
-            EXPECT_EQ(cell->attribute, bin_cell->attribute);
+            EXPECT_EQ(cell->get_type(), bin_cell->get_type());
+            EXPECT_EQ(cell->get_content(), bin_cell->get_content());
+            EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
         }
         else if(line.type == TABLE_LINE_CELL)
         {
@@ -719,12 +708,10 @@ TEST_F(ComputedTableTest, PrintToFile)
             {
                 cell = &line.cells[j];
                 bin_cell = &bin_line.cells[j];
-                if(!bin_cell->content.empty() || bin_cell->idt != nullptr)
-                    EXPECT_EQ(cell->type, bin_cell->type);
-                EXPECT_EQ(cell->content, bin_cell->content);
-                if(cell->idt != nullptr && bin_cell->idt != nullptr)
-                    EXPECT_EQ(cell->idt->lec, bin_cell->idt->lec);
-                EXPECT_EQ(cell->attribute, bin_cell->attribute);
+                if(!bin_cell->is_null())
+                    EXPECT_EQ(cell->get_type(), bin_cell->get_type());
+                EXPECT_EQ(cell->get_content(), bin_cell->get_content());
+                EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
             }
         }
         else

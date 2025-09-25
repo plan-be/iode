@@ -403,7 +403,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
     short           nc, nl;
     unsigned char   *pdiv;
     TBL             *tbl;
-    TCELL           *cell, *pcell;
+    TableCell           *cell, *pcell;
     TLINE           *line, *pline;
 
     /* TBL:0 */
@@ -417,9 +417,9 @@ static void K_xdrTBL(unsigned char* pack, int mode)
     XDR_rev(tbl, 4, sizeof(short));
     XDR_rev(&(tbl->z_min), 4, sizeof(double));
 
-    /* div:1  TCELL machine independent */
+    /* div:1  TableCell machine independent */
     len = P_get_len(pack, 1);
-    pcell = (TCELL *) P_get_ptr(pack, 1);
+    pcell = (TableCell *) P_get_ptr(pack, 1);
     cell = SW_nalloc(len);
     memcpy((char *) cell, (char *) pcell, len);
 

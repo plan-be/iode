@@ -410,16 +410,16 @@ void ComputedTable::print_to_file()
     // Anciennement
     // B_PrintRtfTopic(T_get_title(tbl));
     // Nouveau JMP 18/04/2022
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(ref_table));
+    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(ref_table, false));
     //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
     
     res = T_begin_tbl(dim, columns);
     if(res != 0) 
         throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
 
-    W_printf(".ttitle %s\n", T_get_title(ref_table));  /* JMP 27-02-98 */
+    W_printf(".ttitle %s\n", T_get_title(ref_table, false));  /* JMP 27-02-98 */
 
-    TCELL* c_cells;
+    TableCell* c_cells;
     TableLine* line;
     bool first_title = true;
     for(int i = 0; i < ref_table->lines.size(); i++) 

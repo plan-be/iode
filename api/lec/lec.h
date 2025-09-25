@@ -406,6 +406,9 @@ inline int YY_compare(const void *a, const void *b)
 
 inline CLEC* clec_deep_copy(const CLEC* other)
 {
+    if(other == NULL) 
+        return NULL;
+    
     CLEC* copy = NULL;
     if(other->tot_lg == 0)
     {

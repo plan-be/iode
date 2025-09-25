@@ -22,7 +22,7 @@ void *P_alloc_get_ptr(void *, int );
 int K_vpack(char **,double *,int *);
 int KV_alloc_var(int );
 int K_ipack(char **,char *);
-//char *K_tcell_pack(char *,TCELL *);
+//char *K_tcell_pack(char *,TableCell *);
 int K_tpack(char**, char*, char* name = NULL);
 int K_spack(char**, char*);
 int KS_alloc_scl(void);

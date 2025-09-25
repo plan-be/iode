@@ -16,21 +16,20 @@
 
 
 /**
- *  Reads a TCELL definition on a YY stream.
+ *  Reads a TableCell definition on a YY stream.
  *  
  *  If mode is not null, the next token read on yy must be of type mode. For example, if mode == YY_STRING, the 
  *  next token must be a string. If not, the stream yy is "rewound".
  *  
- *  @param [in, out] TCELL*     cell    cell to be read
+ *  @param [in, out] TableCell*     cell    cell to be read
  *  @param [in, out] YYFILE*    yy      stream 
  *  @param [in]      int        mode    if not null, type of the next token on the stream
  *  @return          void
  *  
  */
-static TCELL* read_cell(YYFILE* yy, int mode)
+static TableCell* read_cell(YYFILE* yy, int mode)
 {
-    int   keyw, ok = 0, align = TABLE_CELL_LEFT;
-    char* c_lec;
+    int keyw;
 
     keyw = YY_lex(yy);
     if(mode != 0 && mode != keyw) 
@@ -39,24 +38,39 @@ static TCELL* read_cell(YYFILE* yy, int mode)
         return nullptr;
     }
 
-    TCELL* cell = new TCELL(TABLE_CELL_STRING);
+    int ok = 0;
+    std::string content;
+    TableCell* cell = new TableCell(TABLE_CELL_STRING);
     while(1) 
     {
         switch(keyw) 
         {
             case TABLE_CELL_RIGHT  :
+                cell->set_align(TABLE_CELL_RIGHT);
+                break;
             case TABLE_CELL_LEFT   :
+                cell->set_align(TABLE_CELL_LEFT);
+                break;
             case TABLE_CELL_CENTER :
+                cell->set_align(TABLE_CELL_CENTER);
+                break;
             case TABLE_CELL_DECIMAL :
-                align = keyw;
+                cell->set_align(TABLE_CELL_DECIMAL);
                 break;
             case TABLE_CELL_ITALIC :
-            case TABLE_CELL_BOLD   :
-            case TABLE_CELL_UNDERLINE:
-            case TABLE_CELL_NORMAL :
-                cell->attribute |= keyw;
+                cell->set_italic(true);
                 break;
-
+            case TABLE_CELL_BOLD   :
+                cell->set_bold(true);
+                break;
+            case TABLE_CELL_UNDERLINE:
+                cell->set_underline(true);
+                break;
+            case TABLE_CELL_NORMAL :
+                cell->set_italic(false);
+                cell->set_bold(false);
+                cell->set_underline(false);
+                break;
             case TABLE_ASCII_CELL_LEC    :
                 if(ok == 1) 
                     goto ret;
@@ -66,30 +80,17 @@ static TCELL* read_cell(YYFILE* yy, int mode)
                     YY_unread(yy);
                     break;
                 }
-
-                cell->type = TABLE_CELL_LEC;
-                c_lec = (char*) yy->yy_text;
-                try
-                {
-                    cell->idt = new Identity(std::string(c_lec));
-                }
-                catch(const std::exception& e)
-                {
-                    kwarning(e.what());
-                    cell->idt = nullptr;
-                }
-                align = TABLE_CELL_DECIMAL;
+                content = std::string((char*) yy->yy_text);
+                cell->set_lec(content);
+                cell->set_align(TABLE_CELL_DECIMAL);
                 break;
 
             case YY_STRING :
                 if(ok == 1) 
                     goto ret;
                 ok = 1;
-                
-                cell->type = TABLE_CELL_STRING;
-                if(U_is_in('#', (char*) yy->yy_text)) 
-                    cell->attribute = TABLE_CELL_CENTER;
-                cell->content = std::string((char*) yy->yy_text);
+                content = std::string((char*) yy->yy_text);
+                cell->set_text(content, false);
                 break;
 
             case YY_EOF   :
@@ -101,7 +102,6 @@ static TCELL* read_cell(YYFILE* yy, int mode)
     }
 
 ret :
-    cell->attribute |= align;
     YY_unread(yy);
     return cell;
 }
@@ -125,7 +125,7 @@ ret :
  */
 static void read_div(TBL* tbl, YYFILE* yy)
 {
-    TCELL* cell;
+    TableCell* cell;
     for(int i = 0; i < tbl->nb_columns; i++)
     {
         cell = read_cell(yy, 0);
@@ -168,7 +168,7 @@ static void read_div(TBL* tbl, YYFILE* yy)
 static int read_line(TBL* tbl, YYFILE* yy)
 {
     int     keyw;
-    TCELL*  cell = nullptr;
+    TableCell*  cell = nullptr;
     TLINE*  line = nullptr;
 
     while(1) 
@@ -224,7 +224,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
                 // empty string
                 tbl->lines.push_back(TLINE((char) TABLE_ASCII_LINE_TITLE));
                 line = &(tbl->lines.back());
-                cell = new TCELL(TABLE_CELL_STRING);
+                cell = new TableCell(TABLE_CELL_STRING);
                 line->cells.push_back(*cell);
                 YY_unread(yy);
                 return(0);
@@ -513,7 +513,7 @@ static void print_graph_info(FILE *fd, int axis, int type)
  *  @return             void
  *  
  */
-static void print_chart_axis_type(FILE* fd, char* str, float value)
+static void print_chart_axis_type(FILE* fd, const char* str, float value)
 {
     if(IODE_IS_A_NUMBER(value)) fprintf(fd, "\n%s %f ", str, value);
 }
@@ -521,51 +521,64 @@ static void print_chart_axis_type(FILE* fd, char* str, float value)
 /**
  *  Prints the font attribute and the alignement of a cell. 
  *  
- *  @param [in] fd      FILE*     output stream
- *  @param [in] attr    int       cell alignment and font attribute
+ *  @param [in] fd      FILE*       output stream
+ *  @param [in] cell    TableCell*
  *  @return             void
  *  
  */
-static void print_attribute(FILE* fd, int attr)
+static void print_attribute(FILE* fd, const TableCell* cell)
 {
-    if(attr & TABLE_CELL_BOLD)      fprintf(fd, "BOLD ");
-    if(attr & TABLE_CELL_ITALIC)    fprintf(fd, "ITALIC ");
-    if(attr & TABLE_CELL_UNDERLINE) fprintf(fd, "UNDERLINE ");
+    if(cell->is_bold())      fprintf(fd, "BOLD ");
+    if(cell->is_italic())    fprintf(fd, "ITALIC ");
+    if(cell->is_underline()) fprintf(fd, "UNDERLINE ");
 
-    if(attr & TABLE_CELL_CENTER)    fprintf(fd, "CENTER ");
-    if(attr & TABLE_CELL_DECIMAL)   fprintf(fd, "DECIMAL ");
-    if(attr & TABLE_CELL_LEFT)      fprintf(fd, "LEFT ");
-    if(attr & TABLE_CELL_RIGHT)     fprintf(fd, "RIGHT ");
-    return;
+    switch (cell->get_align())
+    {
+    case TABLE_CELL_CENTER:
+        fprintf(fd, "CENTER ");
+        break;
+    case TABLE_CELL_DECIMAL:
+        fprintf(fd, "DECIMAL ");
+        break;
+    case TABLE_CELL_LEFT:
+        fprintf(fd, "LEFT ");
+        break;
+    case TABLE_CELL_RIGHT:
+        fprintf(fd, "RIGHT ");
+        break;
+    default:
+        break;
+    }
 }
 
 /**
  *  Prints a table cell definition. 
  *  
  *  @param [in] fd      FILE*       output stream
- *  @param [in] cell    TCELL*      cell to print
+ *  @param [in] cell    TableCell*      cell to print
  *  @return             void
  *  
  */
-static void print_cell(FILE *fd, const TCELL* cell)
+static void print_cell(FILE *fd, const TableCell* cell)
 { 
-    char* c_content = T_cell_cont((TCELL*) cell, 0);
-    if(strlen(c_content) == 0)
+    std::string content = cell->get_content(false, false);
+    if(content.empty())
     {
         fprintf(fd, "\"\" ");
         return;
     }
 
-    switch(cell->type) 
+    char* c_content = (char*) content.c_str();
+    switch(cell->get_type()) 
     {
-        case TABLE_ASCII_CELL_STRING :
+        case TABLE_CELL_STRING :
             SCR_fprintf_esc(fd, c_content, 1);
             fprintf(fd, " ");
-            print_attribute(fd, cell->attribute);
+            print_attribute(fd, cell);
             break;
-        case TABLE_ASCII_CELL_LEC :
+        case TABLE_CELL_LEC :
             fprintf(fd, "LEC \"%s\" ", c_content);
-            print_attribute(fd, cell->attribute);
+            print_attribute(fd, cell);
             break;
         default :
             fprintf(fd, "\"\" ");
@@ -607,7 +620,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
         switch(line.type) 
         {
             case TABLE_ASCII_LINE_CELL:
-                for(const TCELL& cell : line.cells)
+                for(const TableCell& cell : line.cells)
                     print_cell(fd, &cell);
 
                 /* append GR info */
