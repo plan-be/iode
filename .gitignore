@@ -525,7 +525,8 @@ generate_stub_files.py
 /tests/data/output
 !/tests/data/output/empty
 !/tests/data/output/fun.xml
-!/tests/data/output/*.ref*
+!/tests/data/output/*.ref
+!/tests/data/output/*.ref.*
 !/tests/data/output/test_*
 
 !/tests/data/reports/*.rep

@@ -1,0 +1,20 @@
+"ANAKNFF : definition",
+
+"""Déterminants de la croissance de K""",
+
+" ","""#s""",
+
+"""Croissance de K ""","dln KNFF",
+"""Output gap ""","knff1*ln (QAFF_/(Q_F+Q_I))",
+"""Rentabilité ""","knf2*ln mavg(3,RENT)",
+"""Croissance anticipée de l'output""","0.416*mavg(4,dln QAFF_)+0.023",
+
+"ANAPRIX : definition",
+
+"""Analyse des prix""",
+
+" ","""#s""",
+
+"""GAP_""","GAP_",
+"""dln (PC/(1+ITCR))-dln AOUC""","100*(dln (PC/(1+ITCR))-dln AOUC)",
+
