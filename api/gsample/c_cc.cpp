@@ -1141,7 +1141,7 @@ int COL_free_cols(COLS* cls)
  *  for each operation found in cls. Only the operations between COL_DIFF and COL_BASE 
  *  are saved. 
  *  
- *  The aim is to prepare the texts to be printed below a table in the "MODE" TLINE's.
+ *  The aim is to prepare the texts to be printed below a table in the "MODE" TableLine's.
  *  
  *  @note The same vector is used for the operations on periods and on files (TODO: check why)
  *  

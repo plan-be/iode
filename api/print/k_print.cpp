@@ -224,7 +224,7 @@ int T_print_line(TBL* tbl, int i, COLS* cls)
     int     d;
     COL*    cl;
     TableCell*  cell;
-    TLINE&  line = tbl->lines[i];
+    TableLine&  line = tbl->lines[i];
 
     for(int j = 0; j < cls->cl_nb; j++) 
     {
@@ -405,10 +405,10 @@ unsigned char* T_get_title(TBL* tbl, const bool to_utf8)
     
     // get the first line of type TABLE_LINE_TITLE
     for(k = 0; k < T_NL(tbl); k++)
-        if(tbl->lines[k].type == TABLE_LINE_TITLE) 
+        if(tbl->lines[k].get_type() == TABLE_LINE_TITLE) 
             break;
 
-    TLINE line = tbl->lines[k];
+    TableLine line = tbl->lines[k];
     TableCell cell = line.cells[0];
     std::string title = cell.get_content(false, to_utf8);
 
@@ -452,11 +452,11 @@ int T_print_tbl(TBL* tbl, char* smpl)
     
     W_printf(".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
     
-    TLINE* line;
+    TableLine* line;
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
     {
         line = &tbl->lines[i];
-        switch(line->type) 
+        switch(line->get_type()) 
         {
             case TABLE_LINE_SEP   :
                 W_printf(".tl\n");

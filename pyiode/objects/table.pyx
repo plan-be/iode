@@ -129,32 +129,32 @@ cdef class TableLine:
         wrapper.py_parent_table = py_parent_table
         return wrapper
 
-    def get_line_type(self) -> str:
-        return TableLineType(<int>(self.c_line.get_line_type())).name if self.c_line is not NULL else None
+    def get_type(self) -> str:
+        return TableLineType(<int>(self.c_line.get_type())).name if self.c_line is not NULL else None
 
     def get_graph_type(self) -> str:
-        return TableGraphType(<int>(self.c_line.get_line_graph())).name if self.c_line is not NULL else None
+        return TableGraphType(<int>(self.c_line.get_graph_type())).name if self.c_line is not NULL else None
 
     def set_graph_type(self, value: int):
         if self.c_line is NULL:
             return
-        self.c_line.set_line_graph(<CTableGraphType>value)
+        self.c_line.set_graph_type(<CTableGraphType>value)
         self.py_parent_table.update_owner_database()
 
     def get_axis_left(self) -> bool:
-        return self.c_line.is_left_axis() if self.c_line is not NULL else None
+        return not self.c_line.right_axis if self.c_line is not NULL else None
 
     def set_axis_left(self, value: bool):
         if self.c_line is NULL:
             return
-        self.c_line.set_line_axis(<bint>value)
+        self.c_line.right_axis = <bint>(not value)
         self.py_parent_table.update_owner_database()
 
     def size(self) -> int:
         if self.c_line is NULL:
             return 0
         
-        line_type: TableLineType = self.c_line.get_line_type()
+        line_type: TableLineType = self.c_line.get_type()
         if line_type == TableLineType.TITLE:
             return 1
         elif line_type == TableLineType.CELL:
@@ -189,7 +189,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return ''
 
-        line_type = <int>(self.c_line.get_line_type())
+        line_type = <int>(self.c_line.get_type())
         nb_columns = self.nb_columns
         if line_type == TableLineType.TITLE:
             content = self.c_line.cells[0].get_content(<bint>False).decode()
@@ -207,7 +207,7 @@ cdef class TableLine:
         elif line_type == TableLineType.SEP:
             return '---'
         else:
-            return f"<{self.get_line_type()}>"
+            return f"<{self.get_type()}>"
 
 
 cdef class Table:
@@ -299,7 +299,7 @@ cdef class Table:
 
         for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 c_title = self.c_table.get_title(i)
                 return c_title.decode()
@@ -311,7 +311,7 @@ cdef class Table:
 
         for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 c_title = value.encode()
                 self.c_table.set_title(i, c_title)
@@ -400,7 +400,7 @@ cdef class Table:
 
         for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
                     c_cell = &c_line.cells[j]
@@ -430,7 +430,7 @@ cdef class Table:
 
         for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
                     c_cell = &c_line.cells[j]
@@ -488,7 +488,7 @@ cdef class Table:
         nb_columns = self.c_table.nb_columns
         for i in range(self.c_table.lines.size()):
             c_line = self.c_table.get_line(i)
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 content = c_line.cells[0].get_content(<bint>False).decode().strip()
                 if content == key:
@@ -537,7 +537,7 @@ cdef class Table:
             for j in range(nb_columns):
                 c_line.cells[j].set_content(value[j].encode())
         elif isinstance(value, TableLine):
-            line_type = <int>(value.c_line.get_line_type())
+            line_type = <int>(value.c_line.get_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
                 self.insert(row, str(value))
             else:
@@ -565,7 +565,7 @@ cdef class Table:
         cdef CTableCell* c_cell
         
         c_line = self.c_table.get_line(row)
-        line_type = <int>(c_line.get_line_type())
+        line_type = <int>(c_line.get_type())
         nb_columns = self.c_table.nb_columns
         if line_type == TableLineType.TITLE:
             if not isinstance(value, str):
@@ -624,7 +624,7 @@ cdef class Table:
             for j in range(nb_columns):
                 c_line.cells[j].set_content(value[j].encode())
         elif isinstance(value, TableLine):
-            line_type = <int>(value.c_line.get_line_type())
+            line_type = <int>(value.c_line.get_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
                 self._iadd_(str(value))
             else:
@@ -655,7 +655,7 @@ cdef class Table:
         # lines (-1 for the divider line)
         for i in range(-1, self.c_table.lines.size()):
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
-            line_type = <int>(c_line.get_line_type())
+            line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 content = c_line.cells[0].get_content(<bint>True).decode()
                 if len(content) > max_title_length:

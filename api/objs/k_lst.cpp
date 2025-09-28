@@ -183,7 +183,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
     tbl = KTVAL(dbt, i);
     for(int k = 0; k < T_NL(tbl); k++)   
     {
-        if(tbl->lines[k].type != TABLE_LINE_CELL) 
+        if(tbl->lines[k].get_type() != TABLE_LINE_CELL) 
             continue;
         
         for(TableCell& cell: tbl->lines[k].cells) 

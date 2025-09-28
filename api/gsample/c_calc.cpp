@@ -322,8 +322,8 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     int lg = cls->cl_nb / T_NC(tbl);
 
     COL*    cl;
-    TLINE&  line = tbl->lines[i];
-    TLINE&  divider_line = tbl->divider_line;
+    TableLine&  line = tbl->lines[i];
+    TableLine&  divider_line = tbl->divider_line;
     CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
     TableCell*  cell = nullptr;
     TableCell*  dcell = nullptr;

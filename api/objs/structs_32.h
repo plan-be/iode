@@ -81,7 +81,7 @@ struct TableCell32
     char    pad[2];
 };
 
-struct TLINE32 
+struct TableLine32 
 {
     PTR32   cells;        /* if type = title then val = ptr unsigned char else ptr to TableCell */
     char    type;        /* FILES, MODE, TITLE, LINE, CELL */
@@ -97,8 +97,8 @@ struct TBL32
     short   repeat_columns;     /* = 0, first column is frozen */
     short   nb_columns;
     short   nb_lines;
-    TLINE32 divider_line;     /* nb_columns CELLS, each CELL contains a divider, attr */
-    PTR32   lines;    /* nb_lines TLINE of nb_columns CELLS */
+    TableLine32 divider_line;     /* nb_columns CELLS, each CELL contains a divider, attr */
+    PTR32   lines;    /* nb_lines TableLine of nb_columns CELLS */
     float   z_min;    /* FLOAT 12-04-98 */
     float   z_max;    /* FLOAT 12-04-98 */
     float   y_min;    /* FLOAT 12-04-98 */

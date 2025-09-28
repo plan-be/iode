@@ -503,8 +503,8 @@ Functions to manage TBL objects.
 |:---|:---|
 |`TBL *T_create(int dim)`|Creates a new TBL objects.|
 |`void T_free(TBL* tbl)`|Frees a TBL object|
-|`int T_append_line(TBL* tbl, int type)`|Appends a TLINE to a TBL.|
-|`int T_insert_line(TBL* tbl, int nbr, int type, int where)`|Inserts a TLINE in a TBL.|
+|`int T_append_line(TBL* tbl, int type)`|Appends a TableLine to a TBL.|
+|`int T_insert_line(TBL* tbl, int nbr, int type, int where)`|Inserts a TableLine in a TBL.|
 |`int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)`|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
 |`void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)`|Fills a TBL with a list of variables and their CMT.|
 

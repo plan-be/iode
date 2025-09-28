@@ -58,7 +58,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     int     i, j, k, n = 0, found;
     char    **lst = NULL;
     TBL     *tbl;
-    TLINE   *tline;
+    TableLine   *tline;
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
     std::string lec;
     std::string cmt;
@@ -110,7 +110,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                     for(k = 0; k < T_NL(tbl) && !found; k++) 
                     {
                         tline = &tbl->lines[k];
-                        switch(tline->type) 
+                        switch(tline->get_type()) 
                         {
                             case TABLE_LINE_SEP   :
                             case TABLE_LINE_MODE  :

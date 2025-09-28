@@ -511,7 +511,7 @@ class TableLine:
         >>> table[4].line_type
         'CELL'
         """
-        return self._cython_instance.get_line_type()
+        return self._cython_instance.get_type()
 
     @property
     def graph_type(self) -> str:

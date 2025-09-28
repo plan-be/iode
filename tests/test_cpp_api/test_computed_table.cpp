@@ -534,12 +534,12 @@ TEST_F(ComputedTableTest, PrintToFile)
     Table* ref_table = kdb_tbl->get(table_name); 
 
     int i = 0;
-    TLINE* line;
+    TableLine* line;
     TableCell* cell;
 
     // divider lines 
     // --- divider line ---
-    TLINE line_div = ref_table->divider_line;
+    TableLine line_div = ref_table->divider_line;
     ASSERT_EQ(line_div.cells.size(), 2);
     cell = &(line_div.cells[0]);
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
@@ -553,7 +553,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     ASSERT_EQ(cell->get_content(), title);
     // --- separator line ---
     line = &(ref_table->lines[i++]);
-    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
     // --- first line ---
     line = &(ref_table->lines[i++]);
     ASSERT_EQ(line->cells.size(), 2);
@@ -565,7 +565,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     ASSERT_EQ(cell->get_content(), "#s");
     // --- separator line ---
     line = &(ref_table->lines[i++]);
-    ASSERT_EQ(line->type, TABLE_LINE_SEP);
+    ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
     // --- other lines ---
     for (size_t l = 0; l < v_titles.size(); l++)
     {
@@ -675,8 +675,8 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(ref_table->nb_columns, bin_ref_table->nb_columns);
 
     // divider lines 
-    TLINE bin_line_div = bin_ref_table->divider_line;
-    EXPECT_EQ(line_div.type, bin_line_div.type);
+    TableLine bin_line_div = bin_ref_table->divider_line;
+    EXPECT_EQ(line_div.get_type(), bin_line_div.get_type());
     ASSERT_EQ(line_div.cells.size(), 2);
     for(int j=0; j<ref_table->nb_columns; j++)
     {
@@ -690,10 +690,10 @@ TEST_F(ComputedTableTest, PrintToFile)
     // lines
     for(int i=0; i < ref_table->lines.size(); i++)
     {
-        TLINE line = ref_table->lines[i];
-        TLINE bin_line = bin_ref_table->lines[i];
-        EXPECT_EQ(line.type, bin_line.type);
-        if(line.type == TABLE_LINE_TITLE)
+        TableLine line = ref_table->lines[i];
+        TableLine bin_line = bin_ref_table->lines[i];
+        EXPECT_EQ(line.get_type(), bin_line.get_type());
+        if(line.get_type() == TABLE_LINE_TITLE)
         {
             cell = &line.cells[0];
             bin_cell = &bin_line.cells[0];
@@ -701,7 +701,7 @@ TEST_F(ComputedTableTest, PrintToFile)
             EXPECT_EQ(cell->get_content(), bin_cell->get_content());
             EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
         }
-        else if(line.type == TABLE_LINE_CELL)
+        else if(line.get_type() == TABLE_LINE_CELL)
         {
             ASSERT_EQ(line.cells.size(), 2);
             for(int j=0; j<ref_table->nb_columns; j++)

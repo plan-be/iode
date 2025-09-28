@@ -343,14 +343,14 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     *nc = dim + 1;
     *nl = 1;
 
-    TLINE* line;
+    TableLine* line;
     buf = SCR_malloc(256 + dim * 128);
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
     {
         buf[0] = 0;
         line = &tbl->lines[i];
 
-        switch(line->type) 
+        switch(line->get_type()) 
         {
             case TABLE_LINE_SEP   :
                 break;

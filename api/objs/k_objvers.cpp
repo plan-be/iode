@@ -189,11 +189,11 @@ static char *K_repack_tbl(TBL *tbl)
 
     /* lines */
     TableCell* cell;
-    TLINE* lines = tbl->lines.data();
-    pack = (char*) P_add(pack, (char *) lines, sizeof(TLINE) * (int) T_NL(tbl));
+    TableLine* lines = tbl->lines.data();
+    pack = (char*) P_add(pack, (char *) lines, sizeof(TableLine) * (int) T_NL(tbl));
     for(int i = 0; i < T_NL(tbl); i++) 
     {
-        switch(tbl->lines[i].type) 
+        switch(tbl->lines[i].get_type()) 
         {
             case TABLE_LINE_CELL :
                 cells = tbl->lines[i].cells.data();
