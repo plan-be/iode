@@ -8,8 +8,8 @@
  *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
  *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
- *      int T_append_line(TBL* tbl, int type)                                                      | Appends a TLINE to a TBL.
- *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
+ *      int T_append_line(TBL* tbl, int type)                                                      | Appends a TableLine to a TBL.
+ *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TableLine in a TBL.
  *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TableCell. Checks the syntax.
  *      void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)                 | Assigns a TEXT to a TableCell.
  *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
@@ -134,9 +134,9 @@ std::size_t hash_value(const TableCell& cell)
 
 // ========================= TableLine methods ========================= //
 
-std::size_t hash_value(const TLINE& line)
+std::size_t hash_value(const TableLine& line)
 {
-    std::hash<TLINE> line_hash;
+    std::hash<TableLine> line_hash;
     return line_hash(line);
 }
 
@@ -204,13 +204,13 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
 }
 
 
-static bool T_initialize_line(TLINE& line, const int nb_columns)
+static bool T_initialize_line(TableLine& line, const int nb_columns)
 {
     bool success = true;
-    switch(line.type) 
+    switch(line.get_type()) 
     {
         case TABLE_LINE_CELL:
-            line.graph_type = T_GRAPHDEFAULT;
+            line.set_graph_type(T_GRAPHDEFAULT);
             for(int i = 0; i < nb_columns; i++)
                 line.cells.push_back(TableCell(TABLE_CELL_LEC, "", i));
             break;
@@ -225,7 +225,7 @@ static bool T_initialize_line(TLINE& line, const int nb_columns)
         case TABLE_LINE_DATE:
             break;
         default:
-            kwarning("Table: could not initialize new line -> unknown line type %d", line.type);
+            kwarning("Table: could not initialize new line -> unknown line type %d", line.get_type());
             success = false;
     }
 
@@ -234,16 +234,16 @@ static bool T_initialize_line(TLINE& line, const int nb_columns)
 
 
 /**
- *  Inserts a TLINE in a TBL.
+ *  Inserts a TableLine in a TBL.
  *  
  *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
- *  @param [in]      type    int     TLINE type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
+ *  @param [in]      type    int     TableLine type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
  *  @return                  int     position of the new line in TBL
  *  **TODO: Check where definition 
  */
 int T_append_line(TBL* tbl, int type)
 {
-    TLINE line((char) type);
+    TableLine line((TableLineType) type);
     bool success = T_initialize_line(line, tbl->nb_columns);
     if(!success) 
         return -1;
@@ -253,11 +253,11 @@ int T_append_line(TBL* tbl, int type)
 }
 
 /**
- *  Inserts a TLINE in a TBL.
+ *  Inserts a TableLine in a TBL.
  *  
  *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
  *  @param [in]      nbr     int     reference position of the new line in TBL (see param where below)
- *  @param [in]      type    int     TLINE type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
+ *  @param [in]      type    int     TableLine type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
  *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
  *  @return                  int     position of the new line in TBL
  *  **TODO: Check where definition 
@@ -272,7 +272,7 @@ int T_insert_line(TBL* tbl, int nbr, int type, int where)
         kerror(0, (char*) error_msg.c_str());
     }
 
-    TLINE line((char) type);
+    TableLine line((TableLineType) type);
     bool success = T_initialize_line(line, tbl->nb_columns);
     if(!success) 
         return -1;
@@ -370,7 +370,7 @@ int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int fil
         for(int i = 0 ; lecs[i] && titls[i]; i++) 
         {
             T_append_line(tbl, TABLE_LINE_CELL);
-            TLINE& line = tbl->lines.back();
+            TableLine& line = tbl->lines.back();
             // left column: line title
             std::string label = std::string(titls[i]);
             line.cells[0].set_text(label);

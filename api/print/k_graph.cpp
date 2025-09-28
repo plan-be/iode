@@ -124,7 +124,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     int     i, dim, begin = 1, w;
     char    **files;
     COLS    *cls, *fcls;
-    TLINE   *line;
+    TableLine   *line;
     Sample  smpl;
     double  step, *x, *y;
     TableCell   *cells;   
@@ -173,7 +173,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
         line = &tbl->lines[i];
         cells = line->cells.data();
 
-        switch(line->type) 
+        switch(line->get_type()) 
         {
             case TABLE_LINE_CELL  :
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
@@ -243,14 +243,14 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
 
 
 /**
- *  Adds (in A2M) the graph *time* axis corresponding to a TLINE and a specific COL.
+ *  Adds (in A2M) the graph *time* axis corresponding to a TableLine and a specific COL.
  *  
- *  @param [in] TLINE* line     pointer to a TBL line
+ *  @param [in] TableLine* line     pointer to a TBL line
  *  @param [in] COLS*  fcls     compiled GSample (combination of files, op on files, periods, op on periods)
  *  @param [in] int    i        nb of the GSample column to use for generating the legend
  *  @return 
  */
-static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i) 
+static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i) 
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
@@ -259,7 +259,8 @@ static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i)
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
         fileop = COL_ctoa(cl, 'f', 0, 2);
-    T_GraphLegend(line->right_axis, "LLBL"[line->graph_type], (char*) content.c_str(), fileop);
+    T_GraphLegend(line->right_axis, "LLBL"[(int) line->get_graph_type()], 
+                 (char*) content.c_str(), fileop);
     return(0);
 }
 
@@ -353,7 +354,7 @@ int T_GraphXYData(int nb, double *x, double *y)
 int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
-    TLINE   *line = &tbl->lines[i];
+    TableLine   *line = &tbl->lines[i];
     COL     *cl;
 
     COL_clear(cls);
@@ -620,7 +621,7 @@ int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, d
 int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
+int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
 APICHRT *APIChartInit(int nl);
 int APIChartEnd(APICHRT *Chrt);
 int APIChartAlloc(int nl);
@@ -637,7 +638,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl);
 int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
-    TLINE   *line = &tbl->lines[i];
+    TableLine   *line = &tbl->lines[i];
     COL     *cl;
     APICHRT    *Chrt = API_CHARTS[hdl];
 
@@ -728,13 +729,13 @@ int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
  *  
  *  
  *  @param [in] int     hdl  
- *  @param [in] TLINE*  line 
+ *  @param [in] TableLine*  line 
  *  @param [in] COLS*   fcls 
  *  @param [in] int     i    
  *  @return 
  *  
  */
-int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i) 
+int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i) 
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
@@ -743,7 +744,8 @@ int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i)
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
         fileop = COL_ctoa(cl, 'f', 0, 2);
-    APIGraphLegendTitle(hdl, line->right_axis, "LLBL"[line->graph_type], (char*) content.c_str(), fileop);
+    APIGraphLegendTitle(hdl, line->right_axis, "LLBL"[(int) line->get_graph_type()], 
+                       (char*) content.c_str(), fileop);
     return(0);
 }
 
@@ -874,7 +876,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     int     i, dim, begin = 1, w, hdl;
     char    **files;
     COLS    *cls, *fcls;
-    TLINE   *line;
+    TableLine   *line;
     Sample  smpl;
     double  step, *x, *y;
 
@@ -907,7 +909,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     for(i = 0; i < T_NL(tbl) && w > 0; i++) 
     {
         line = &tbl->lines[i];
-        switch(line->type) 
+        switch(line->get_type()) 
         {
             case TABLE_LINE_CELL  :
                 if(line->cells[1].get_type() != TABLE_CELL_LEC) 

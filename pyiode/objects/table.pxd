@@ -52,24 +52,17 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ TableLine class
     cdef cppclass CTableLine "TableLine":
         vector[CTableCell] cells
-        char  cell_type
-        char  graph_type
-        bint  right_axis
+        bint right_axis
 
         # Constructor
         CTableLine(TableLineType line_type, TableGraphType graph_type, bint axis_left) except +
 
         # Getters and Setters
-        TableLineType get_line_type()
-
-        TableGraphType get_line_graph()
-        void set_line_graph(TableGraphType graph_type) except +
-
-        bint is_left_axis()
-        void set_line_axis(bint is_left) except +
+        TableLineType get_type() except +
+        TableGraphType get_graph_type() except +
+        void set_graph_type(TableGraphType graph_type) except +
 
         # Methods
-        CTableCell* get_cell(int column) except +
         bint operator==(const CTableLine& other) except +
 
     size_t hash_value(CTableLine&)

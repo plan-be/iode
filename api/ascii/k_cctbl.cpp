@@ -169,7 +169,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
 {
     int     keyw;
     TableCell*  cell = nullptr;
-    TLINE*  line = nullptr;
+    TableLine*  line = nullptr;
 
     while(1) 
     {
@@ -199,7 +199,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
                     YY_unread(yy);
                     return(0);
                 }
-                tbl->lines.push_back(TLINE((char) keyw));
+                tbl->lines.push_back(TableLine((TableLineType) keyw));
                 line = &(tbl->lines.back());
                 break;
             case TABLE_ASCII_LINE_TITLE :
@@ -209,7 +209,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
                     YY_unread(yy);
                     return(0);
                 }
-                tbl->lines.push_back(TLINE((char) keyw));
+                tbl->lines.push_back(TableLine((TableLineType) keyw));
                 line = &(tbl->lines.back());
                 cell = read_cell(yy, YY_STRING);
                 line->cells.push_back(*cell);
@@ -222,7 +222,7 @@ static int read_line(TBL* tbl, YYFILE* yy)
                     return(0);
                 }
                 // empty string
-                tbl->lines.push_back(TLINE((char) TABLE_ASCII_LINE_TITLE));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_TITLE));
                 line = &(tbl->lines.back());
                 cell = new TableCell(TABLE_CELL_STRING);
                 line->cells.push_back(*cell);
@@ -235,13 +235,13 @@ static int read_line(TBL* tbl, YYFILE* yy)
                 line->right_axis = true;
                 break;
             case TABLE_ASCII_GRAPH_LINE :
-                line->graph_type = 0;
+                line->set_graph_type(TableGraphType::TABLE_GRAPH_LINE);
                 break;
             case TABLE_ASCII_GRAPH_SCATTER:
-                line->graph_type = 1;
+                line->set_graph_type(TableGraphType::TABLE_GRAPH_SCATTER);
                 break;
-            case TABLE_ASCII_GRAPH_BAR  :
-                line->graph_type = 2;
+            case TABLE_ASCII_GRAPH_BAR:
+                line->set_graph_type(TableGraphType::TABLE_GRAPH_BAR);
                 break;
             default: 
                 // line already read
@@ -252,10 +252,9 @@ static int read_line(TBL* tbl, YYFILE* yy)
                 }
                 YY_unread(yy);
                 // Assume it is a line of type CELL
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_CELL));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_CELL));
                 line = &(tbl->lines.back());
-                line->type = TABLE_LINE_CELL;
-                line->graph_type = T_GRAPHDEFAULT;
+                line->set_graph_type(T_GRAPHDEFAULT);
                 line->cells.clear();
                 for(int i = 0; i < T_NC(tbl); i++)
                 {
@@ -614,21 +613,21 @@ static void print_tbl(FILE* fd, TBL* tbl)
         print_cell(fd, &(tbl->divider_line.cells[i]));
 
     /* lines */
-    for(const TLINE& line : tbl->lines) 
+    for(const TableLine& line : tbl->lines) 
     {
         fprintf(fd, "\n- ");
-        switch(line.type) 
+        switch(line.get_type()) 
         {
             case TABLE_ASCII_LINE_CELL:
                 for(const TableCell& cell : line.cells)
                     print_cell(fd, &cell);
 
                 /* append GR info */
-                print_graph_info(fd, line.right_axis, line.graph_type);
+                print_graph_info(fd, line.right_axis, line.get_graph_type());
                 break;
 
             case TABLE_ASCII_LINE_TITLE :
-                K_wrdef(fd, TABLE, line.type);
+                K_wrdef(fd, TABLE, line.get_type());
                 print_cell(fd, &(line.cells[0]));
                 break;
 
@@ -637,7 +636,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
             case TABLE_ASCII_LINE_MODE  :
             case TABLE_ASCII_LINE_DATE  :
             case TABLE_ASCII_LINE_FILES :
-                K_wrdef(fd, TABLE, line.type);
+                K_wrdef(fd, TABLE, line.get_type());
                 break;
 
             default       :

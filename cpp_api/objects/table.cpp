@@ -3,100 +3,6 @@
 #include "table.h"
 
 
-// ================ LINE ================
-
-void copy_line(const int nb_columns, TLINE* c_line_dest, const TLINE* c_line_src)
-{
-	c_line_dest->type = c_line_src->type;
-	c_line_dest->right_axis = c_line_src->right_axis;
-	c_line_dest->graph_type = c_line_src->graph_type;
-
-	c_line_dest->cells.clear();
-	c_line_dest->cells = c_line_src->cells;
-}
-
-TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left): 
-	TLINE((char) line_type)
-{
-	this->type = (char) line_type;
-	set_line_graph(graph_type);
-	set_line_axis(axis_left);
-}
-
-TableLineType TableLine::get_line_type() const
-{
-	return static_cast<TableLineType>(type);
-}
-
-void TableLine::set_line_type(const TableLineType line_type)
-{
-	type = line_type;
-}
-
-TableGraphType TableLine::get_line_graph() const
-{
-	return static_cast<TableGraphType>(graph_type);
-}
-
-void TableLine::set_line_graph(const TableGraphType graph_type)
-{
-	this->graph_type = graph_type;
-}
-
-bool TableLine::is_left_axis() const
-{
-	return !right_axis;
-}
-
-void TableLine::set_line_axis(const bool is_left)
-{
-	right_axis = !is_left;
-}
-
-TableCell* TableLine::get_cell(const int column, const int nb_cells) const
-{
-	if(column < 0)
-		throw std::invalid_argument("Table cell position cannot be negative");
-
-	TableLineType line_type = (TableLineType) this->type;
-	if(line_type != TABLE_LINE_TITLE && line_type != TABLE_LINE_CELL)
-		throw std::runtime_error("Table line of type " + get_line_type_as_string(line_type) + " has no cells"); 
-
-	if(line_type == TABLE_LINE_TITLE && column > 0)
-		throw std::invalid_argument("Table cell position for a TITLE line must be 0");
-
-	if(line_type == TABLE_LINE_CELL && column >= nb_cells)
-		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
-
-	const TableCell* cell = &(this->cells[column]);
-	return (TableCell*) cell;
-}
-
-bool TableLine::operator==(const TableLine& other) const
-{
-	if (type != other.type) return false;
-	if (right_axis != other.right_axis) return false;
-	if (graph_type != other.graph_type) return false;
-
-	const TableCell* cell_this;
-	const TableCell* cell_other;
-	if(type == TABLE_LINE_TITLE)
-		return this->cells[0] == other.cells[0];
-	else if(type == TABLE_LINE_CELL)
-	{
-		if(this->cells.size() != other.cells.size()) 
-			return false;
-		for(int col = 0; col < other.cells.size(); col++)
-			if(this->cells[col] != other.cells[col])
-				return false;
-		return true;
-	}
-	else
-		// cells == NULL for FILES, MODE, LINE and DATE type
-		return true;
-}
-
-
 // ================ TABLE ================
 
 
@@ -315,36 +221,36 @@ TableLine* Table::get_divider_line()
 TableLine* Table::insert_title(const int pos, const std::string& title, const bool after)
 {
 	TableLine* title_line = insert_line(pos, TABLE_LINE_TITLE, after);
-	title_line->get_cell(0, nb_columns)->set_text(title);
+	title_line->cells[0].set_text(title);
 	return title_line;
 }
 
 TableLine* Table::add_title(const std::string& title)
 {
 	TableLine* title_line = append_line(TABLE_LINE_TITLE);
-	title_line->get_cell(0, nb_columns)->set_text(title);
+	title_line->cells[0].set_text(title);
 	return title_line;
 }
 
 std::string Table::get_title(const int row)
 {
 	TableLine* line = get_line(row);
-	if(line->get_line_type() != TableLineType::TABLE_LINE_TITLE) 
+	if(line->get_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
-			get_line_type_as_string(line->get_line_type()) + ".");
-	return line->get_cell(0, nb_columns)->get_content(false);
+			get_line_type_as_string(line->get_type()) + ".");
+	return line->cells[0].get_content(false);
 }
 
 // we assume that title string is written in UTF8 format
 void Table::set_title(const int row, const std::string title)
 {
 	TableLine* line = get_line(row);
-	if(line->get_line_type() != TableLineType::TABLE_LINE_TITLE) 
+	if(line->get_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot set table title at index " + std::to_string(row) + ".\n" + 
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
-			get_line_type_as_string(line->get_line_type()) + ".");
-	line->get_cell(0, nb_columns)->set_text(title);
+			get_line_type_as_string(line->get_type()) + ".");
+	line->cells[0].set_text(title);
 }
 
 // -------- CELLS --------

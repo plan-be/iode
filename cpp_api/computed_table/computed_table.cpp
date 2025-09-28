@@ -85,14 +85,14 @@ void ComputedTable::initialize()
     {
         TableLine* line = ref_table->get_line(row);
 
-        if(line->get_line_type() != TableLineType::TABLE_LINE_CELL) 
+        if(line->get_type() != TableLineType::TABLE_LINE_CELL) 
             continue;
         
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
-        TableCell* cell = line->get_cell(1, ref_table->nb_columns);
-        if(cell->get_type() == TableCellType::TABLE_CELL_STRING)
+        TableCell& cell = line->cells[1];
+        if(cell.get_type() == TableCellType::TABLE_CELL_STRING)
         {
-            std::string content = cell->get_content(false);
+            std::string content = cell.get_content(false);
             if(content.find('#') != std::string::npos)
             {
                 std::string column_name;
@@ -126,10 +126,10 @@ void ComputedTable::initialize()
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
-        if(line->get_line_type() == TableLineType::TABLE_LINE_CELL && 
-           line->get_cell(1, ref_table->nb_columns)->get_type() == TableCellType::TABLE_CELL_LEC)
+        if(line->get_type() == TableLineType::TABLE_LINE_CELL && 
+           line->cells[1].get_type() == TableCellType::TABLE_CELL_LEC)
         {
-            name = line->get_cell(0, ref_table->nb_columns)->get_content(false);
+            name = line->cells[0].get_content(false);
             line_names.push_back(name);
             v_line_pos_in_ref_table.push_back(row);
 
@@ -221,14 +221,14 @@ bool ComputedTable::is_editable(const int line, const int col)
     //         reference table starts with 0+
     int line_ref_pos = v_line_pos_in_ref_table.at(line);
     TableLine* line_ref = ref_table->get_line(line_ref_pos);
-    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns);
-    std::string lec = cell_ref->get_content(false);
+    TableCell& cell_ref = line_ref->cells[1];
+    std::string lec = cell_ref.get_content(false);
     if(lec.substr(0, 2) == "0+")
         return false;
 
     // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
     //         reference table does not refer to at least one variable
-    std::vector<std::string> variables = cell_ref->get_variables_from_lec();
+    std::vector<std::string> variables = cell_ref.get_variables_from_lec();
     if(variables.size() == 0)
         return false;
 
@@ -309,11 +309,11 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     int col_pos = v_pos_in_columns_struct[col];
 
     TableLine* line_ref = ref_table->get_line(line_ref_pos);
-    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns);
+    TableCell& cell_ref = line_ref->cells[1];
 
     // RULE 4: Only the first variable found in the LEC expression is updated
     // see https://iode.plan.be/doku.php?id=edit_tables for the rules
-    std::string var_to_update = cell_ref->get_variables_from_lec().at(0);
+    std::string var_to_update = cell_ref.get_variables_from_lec().at(0);
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
@@ -321,12 +321,12 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 
     // get lec
-    std::string lec = cell_ref->get_content(false);
+    std::string lec = cell_ref.get_content(false);
 
     // get divider
     TableLine* line_divider = ref_table->get_divider_line();
-    TableCell* cell_divider = line_divider->get_cell(1, ref_table->nb_columns);
-    std::string div_lec = cell_divider->get_content(false);
+    TableCell& cell_divider = line_divider->cells[1];
+    std::string div_lec = cell_divider.get_content(false);
     if(div_lec.empty())
         div_lec = "1";
 
@@ -426,7 +426,7 @@ void ComputedTable::print_to_file()
     {
         line = ref_table->get_line(i);
 
-        switch(line->get_line_type()) {
+        switch(line->get_type()) {
             case TABLE_LINE_SEP:
                 W_printf(".tl\n");
                 break;

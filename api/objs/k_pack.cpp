@@ -163,19 +163,19 @@ static void K_tcell64_32(TableCell* tc64, TableCell32* tc32, int p, int i, int j
 }
 
 /**
- *  Convert a TLINE64 into TLINE32 struct.
+ *  Convert a TableLine64 into TableLine32 struct.
  *  
- *  @param [in] tl64 TLINE in 64 bits arch
- *  @param [in] tl32 TLINE in 32 bit arch
+ *  @param [in] tl64 TableLine in 64 bits arch
+ *  @param [in] tl32 TableLine in 32 bit arch
  *  @return void
  *  
  *  @details See K_tcell64_32()
  */
  
-static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
+static void K_tline64_32(TableLine* tl64, TableLine32* tl32)
 {
-    tl32->type = tl64->type;
-    tl32->graph_type = tl64->graph_type;
+    tl32->type = (char) tl64->get_type();
+    tl32->graph_type = (char) tl64->get_graph_type();
     tl32->right_axis = tl64->right_axis ? 1 : 0;
     tl32->pad[0] = '\0';
 }
@@ -197,7 +197,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
     tbl32->nb_columns = tbl64->nb_columns;
     tbl32->nb_lines = (int) tbl64->lines.size();
 
-    K_tline64_32((TLINE*) &tbl64->divider_line, (TLINE32*) &tbl32->divider_line);
+    K_tline64_32((TableLine*) &tbl64->divider_line, (TableLine32*) &tbl32->divider_line);
 
     tbl32->z_min = tbl64->z_min;
     tbl32->z_max = tbl64->z_max;
@@ -215,7 +215,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 
 
 /**
- *  Packs a 64 bits TBL struct by first converting the TBL64, TLINE64 and TableCell64 into 32 bits struct.
+ *  Packs a 64 bits TBL struct by first converting the TBL64, TableLine64 and TableCell64 into 32 bits struct.
  *  
  *  @param [in] pack pointer to the packed table placeholder
  *  @param [in] a1   pointer to the 64 bits TBL
@@ -228,8 +228,8 @@ static int K_tpack64(char **pack, char *a1)
 {
     TBL*      tbl = (TBL*) a1;
     TBL32     tbl32;
-    TLINE*    lines;
-    TLINE32*  lines32;
+    TableLine*    lines;
+    TableLine32*  lines32;
     TableCell*    cell;
     TableCell*    cells;
     TableCell32*  cell32;
@@ -264,25 +264,25 @@ static int K_tpack64(char **pack, char *a1)
         *pack = K_tcell_pack(*pack, cells + j, p, 0, j);
 
     /* pack lines */
-    /* 1. : [nl x TLINE] */
-    lines = (TLINE*) tbl->lines.data();
-    lines32 = (TLINE32*) SW_nalloc(sizeof(TLINE32) * (int) T_NL(tbl));
+    /* 1. : [nl x TableLine] */
+    lines = (TableLine*) tbl->lines.data();
+    lines32 = (TableLine32*) SW_nalloc(sizeof(TableLine32) * (int) T_NL(tbl));
     for(int j = 0; j < T_NL(tbl); j++)
         K_tline64_32(lines + j, lines32 + j);
 
-    *pack = (char*) P_add(*pack, (char*) lines32, sizeof(TLINE32) * (int) T_NL(tbl));
+    *pack = (char*) P_add(*pack, (char*) lines32, sizeof(TableLine32) * (int) T_NL(tbl));
     p++;
 
     debug_packing("LINES    ", "", p);
 
     /* 2. For each line and each col, pack cell [cell] [cell] ... */
     int i = 0;
-    for(TLINE& line: tbl->lines) 
+    for(TableLine& line: tbl->lines) 
     {
-        switch(line.type) 
+        switch(line.get_type()) 
         {
             case TABLE_LINE_CELL:
-                /* [TLINE32 * NC] */
+                /* [TableLine32 * NC] */
                 cells = line.cells.data();
                 for(int j = 0; j < T_NC(tbl); j++) 
                     K_tcell64_32(cells + j, cells32 + j, p+1, i, j);
@@ -326,7 +326,7 @@ static int K_tpack64(char **pack, char *a1)
                 break;
 
             default:
-                std::string msg = "Packing table line: invalid line type " + std::to_string(line.type); 
+                std::string msg = "Packing table line: invalid line type " + std::to_string(line.get_type()); 
                 msg += " at line " + std::to_string(i);
                 kwarning(msg.c_str());
                 break;
@@ -574,18 +574,18 @@ static void K_tcell32_64(TableCell32* tc32, TableCell* tc64)
 }
 
 /**
- *  Converts a 32 bits table **line** (TLINE32) to a 64 bits TLINE. 
+ *  Converts a 32 bits table **line** (TableLine32) to a 64 bits TableLine. 
  *  
- *  @param [in]         tc32 TLINE32 * pointer to the TLINE32 
- *  @param [in, out]    tc64 TLINE *   pointer to the resulting TLINE (64 bits)
+ *  @param [in]         tc32 TableLine32 * pointer to the TableLine32 
+ *  @param [in, out]    tc64 TableLine *   pointer to the resulting TableLine (64 bits)
  *  @return void
  *  
  *  @note Only used in 64 bit architecture.
  *  
  */
-static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
+static void K_tline32_64(TableLine32* tl32, TableLine* tl64)
 {
-    tl64->graph_type = tl32->graph_type;
+    tl64->set_graph_type((TableGraphType) tl32->graph_type);
     tl64->right_axis = (bool) tl32->right_axis;
 }
 
@@ -605,7 +605,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     tbl64->repeat_columns = tbl32->repeat_columns;
     tbl64->nb_columns = tbl32->nb_columns;
 
-    K_tline32_64((TLINE32*) &tbl32->divider_line, (TLINE*) &tbl64->divider_line);
+    K_tline32_64((TableLine32*) &tbl32->divider_line, (TableLine*) &tbl64->divider_line);
 
     tbl64->z_min = tbl32->z_min;
     tbl64->z_max = tbl32->z_max;
@@ -660,12 +660,12 @@ static TBL* K_tunpack64(char *pack)
 {
     // 64 bits structs
     TBL*     tbl;
-    TLINE*   line;
+    TableLine*   line;
     TableCell*   cell;
     // 32 bits struct (iode std)
     TBL32*   tbl32;
-    TLINE32* line32;
-    TLINE32* lines32;
+    TableLine32* line32;
+    TableLine32* lines32;
     TableCell32* cell32;
     TableCell32* cells32;
     int      p=0;
@@ -676,7 +676,7 @@ static TBL* K_tunpack64(char *pack)
     K_tbl32_64(tbl32, tbl);
     debug_unpacking("TBL      ", "", 0);
 
-    /* div (TLINE) */
+    /* div (TableLine) */
     cells32 = (TableCell32*) P_get_ptr(pack, 1);
     debug_unpacking("line", "DIV  ", 1);
 
@@ -696,7 +696,7 @@ static TBL* K_tunpack64(char *pack)
     }
     
     /* lines */
-    lines32 = (TLINE32*) P_get_ptr(pack, p);
+    lines32 = (TableLine32*) P_get_ptr(pack, p);
     debug_unpacking("LINES    ", "", p);
     p++;
 
@@ -706,7 +706,7 @@ static TBL* K_tunpack64(char *pack)
         switch(line32->type) 
         {
             case TABLE_LINE_CELL:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_CELL));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_CELL));
                 line = &tbl->lines[i];
                 K_tline32_64(line32, line);
 
@@ -734,7 +734,7 @@ static TBL* K_tunpack64(char *pack)
                 break;
 
             case TABLE_LINE_TITLE:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_TITLE));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_TITLE));
                 line = &tbl->lines[i];
                 K_tline32_64(line32, line);
 
@@ -751,19 +751,19 @@ static TBL* K_tunpack64(char *pack)
                 break;
 
             case TABLE_LINE_SEP:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_SEP));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_SEP));
                 debug_unpacking("line", "SEP  ", p, i);
                 break;
             case TABLE_LINE_MODE:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_MODE));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_MODE));
                 debug_unpacking("line", "MODE ", p, i);
                 break;
             case TABLE_LINE_FILES:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_FILES));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_FILES));
                 debug_unpacking("line", "FILES", p, i);
                 break;
             case TABLE_LINE_DATE:
-                tbl->lines.push_back(TLINE((char) TABLE_LINE_DATE));
+                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_DATE));
                 debug_unpacking("line", "DATE ", p, i);
                 break;
 

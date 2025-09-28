@@ -5,33 +5,6 @@
 #include <stdexcept>
 
 
-// ================ LINE ================
-
-struct TableLine: public TLINE
-{
-	TableLine(const TableLineType line_type, const TableGraphType graph_type = TableGraphType::TABLE_GRAPH_LINE, 
-		const bool axis_left = true);
-
-	TableLineType get_line_type() const;
-
-	void set_line_type(const TableLineType line_type);
-
-	TableGraphType get_line_graph() const;
-
-	void set_line_graph(const TableGraphType graph_type);
-
-	bool is_left_axis() const;
-
-	void set_line_axis(const bool is_left);
-
-	TableCell* get_cell(const int column, const int nb_cells) const;
-
-	bool operator==(const TableLine& other) const;
-};
-
-void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src);
-
-
 // ================ TABLE ================
 
 struct Table: public TBL

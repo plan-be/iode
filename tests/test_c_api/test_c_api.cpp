@@ -780,9 +780,9 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 {
     TBL*     tbl;
     TBL*     extracted_tbl;
-    TLINE*   line;
-    TLINE*   line_original;
-    TLINE*   line_restored;
+    TableLine*   line;
+    TableLine*   line_original;
+    TableLine*   line_restored;
     std::vector<TableCell> cells;
     std::vector<TableCell> cells_original;
     std::vector<TableCell> cells_restored;
@@ -814,16 +814,16 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->lines.size(), 16);
     // title line
     line = &tbl->lines[0];
-    EXPECT_EQ(line->type, TABLE_LINE_TITLE);
+    EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     cells = line->cells;
     EXPECT_EQ(cells.size(), 1);
     EXPECT_EQ(cells[0].get_content(), std::string(def));
     cells.clear();
     // sep line
-    EXPECT_EQ(tbl->lines[1].type, TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[1].get_type(), TABLE_LINE_SEP);
     // line #S
     line = &tbl->lines[2];
-    EXPECT_EQ(line->type, TABLE_LINE_CELL);
+    EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     cells = line->cells;
     EXPECT_EQ(cells.size(), nb_columns);
     EXPECT_EQ(cells[0].get_type(), TABLE_CELL_LEC);
@@ -832,13 +832,13 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(cells[1].get_content(), std::string("#S"));
     cells.clear();
     // sep line
-    EXPECT_EQ(tbl->lines[3].type, TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[3].get_type(), TABLE_LINE_SEP);
     // variable lines
     int i = 4;
     for(std::string& lec: v_lecs)
     {
         line = &tbl->lines[i];
-        EXPECT_EQ(line->type, TABLE_LINE_CELL);
+        EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
         EXPECT_EQ(line->cells.size(), nb_columns);
         cells = line->cells;
         // left column: line name
@@ -852,11 +852,11 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         i++;
     }
     // sep line
-    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_SEP);
     // mode, files, date lines
-    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_MODE);
-    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_FILES);
-    EXPECT_EQ(tbl->lines[i++].type, TABLE_LINE_DATE);
+    EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_MODE);
+    EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
     name = "c_table";
@@ -867,7 +867,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     extracted_tbl = KTVAL(KT_WS, pos);
 
     // --- check that both table are exactly the same
-    // ----- check all attributes that are not of type TLINE
+    // ----- check all attributes that are not of type TableLine
     EXPECT_EQ(tbl->language, extracted_tbl->language);
     EXPECT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
     EXPECT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
@@ -885,8 +885,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
 
     // ----- check div line
-    EXPECT_EQ(tbl->divider_line.type, extracted_tbl->divider_line.type);
-    EXPECT_EQ(tbl->divider_line.graph_type, extracted_tbl->divider_line.graph_type);
+    EXPECT_EQ(tbl->divider_line.get_type(), extracted_tbl->divider_line.get_type());
+    EXPECT_EQ(tbl->divider_line.get_graph_type(), extracted_tbl->divider_line.get_graph_type());
     EXPECT_EQ(tbl->divider_line.right_axis, extracted_tbl->divider_line.right_axis);
     cells_original = tbl->divider_line.cells;
     cells_restored = extracted_tbl->divider_line.cells;
@@ -906,13 +906,13 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         line_original = &tbl->lines[i];
         line_restored = &extracted_tbl->lines[i];
 
-        EXPECT_EQ(line_original->type, line_restored->type);
-        EXPECT_EQ(line_original->graph_type, line_restored->graph_type);
+        EXPECT_EQ(line_original->get_type(), line_restored->get_type());
+        EXPECT_EQ(line_original->get_graph_type(), line_restored->get_graph_type());
         EXPECT_EQ(line_original->right_axis, line_restored->right_axis);
 
         cells_original = line_original->cells;
         cells_restored = line_restored->cells;
-        switch (line_original->type)
+        switch (line_original->get_type())
         {
           case TABLE_LINE_TITLE:
             EXPECT_EQ(cells_original[0].get_content(), cells_restored[0].get_content());

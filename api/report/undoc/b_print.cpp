@@ -447,8 +447,8 @@ int B_DumpTblDef(TBL* tbl)
     /*    W_printfRepl("&%dL \n", T_NC(tbl)); */
     for(int j = 0; j < T_NL(tbl); j++) 
     {
-        TLINE line = tbl->lines[j];
-        switch(line.type) 
+        TableLine line = tbl->lines[j];
+        switch(line.get_type()) 
         {
             case TABLE_LINE_CELL :
                 for(TableCell& cell: line.cells)

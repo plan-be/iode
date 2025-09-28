@@ -145,7 +145,7 @@ const static std::vector<std::string> v_graph_chart_types =
 const static std::vector<std::string> v_graph_axis_thicks = 
     { "Major thicks", "No grids", "Minor thicks" };
 
-inline int T_GRAPHDEFAULT = 0;
+inline TableGraphType T_GRAPHDEFAULT = TableGraphType::TABLE_GRAPH_LINE;
 
 /*----------------------- STRUCTS ----------------------------*/
 
@@ -387,29 +387,27 @@ struct std::hash<TableCell>
 std::size_t hash_value(const TableCell& cell);
 
 
-struct TLINE 
+class TableLine 
 {
-    // TODO: make type private
     char    type;                   // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_DATE, TABLE_LINE_SEP, 
                                     // TABLE_LINE_TITLE or TABLE_LINE_CELL
-    std::vector<TableCell> cells;   // empty if type is FILES, MODE, DATE or SEP
     char    graph_type;             // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
+
+public:
+    std::vector<TableCell> cells;   // empty if type is FILES, MODE, DATE or SEP
     bool    right_axis;             // false if values are relative to the left axis, true to the right axis
 
 public:
-    TLINE(char type): type(type), graph_type(0), right_axis(false)
+	TableLine(const TableLineType line_type, 
+              const TableGraphType graph_type = TableGraphType::TABLE_GRAPH_LINE, 
+		      const bool axis_left = true)
     {
-        if(type != TABLE_LINE_TITLE && type != TABLE_LINE_CELL && type != TABLE_LINE_FILES && 
-            type != TABLE_LINE_MODE && type != TABLE_LINE_DATE && type != TABLE_LINE_SEP)
-        {
-            std::string msg = "Creating a table line: invalid line type " + std::to_string(type) + ". ";
-            msg += "Defaulting to line of type CELL.";
-            kwarning((char*) msg.c_str());
-            this->type = TABLE_LINE_CELL;
-        }
+        this->type = (char) line_type;
+        this->graph_type = (char) graph_type;
+        this->right_axis = !axis_left;
     }
 
-    TLINE(const TLINE& other)
+    TableLine(const TableLine& other)
     {
         type = other.type;
         graph_type = other.graph_type;
@@ -419,12 +417,12 @@ public:
             cells.push_back(cell);
     }
 
-     ~TLINE()
+     ~TableLine()
     {
         cells.clear();
     }
 
-    TLINE& operator=(const TLINE& other)
+    TableLine& operator=(const TableLine& other)
     {
         type = other.type;
         graph_type = other.graph_type;
@@ -434,27 +432,59 @@ public:
             cells.push_back(cell);
         return *this;
     }
-};
 
-// Custom specialization of std::hash can be injected in namespace std.
-template<>
-struct std::hash<TLINE>
-{
-    std::size_t operator()(const TLINE& line) const noexcept
+    TableLineType get_type() const
+    {
+        return static_cast<TableLineType>(type);
+    }
+
+    TableGraphType get_graph_type() const
+    {
+        return static_cast<TableGraphType>(graph_type);
+    }
+
+    void set_graph_type(const TableGraphType graph_type)
+    {
+        this->graph_type = graph_type;
+    }
+
+    bool operator==(const TableLine& other) const
+    {
+        if (type != other.type) return false;
+        if (right_axis != other.right_axis) return false;
+        if (graph_type != other.graph_type) return false;
+
+        if(type == TABLE_LINE_TITLE)
+            return this->cells[0] == other.cells[0];
+        else if(type == TABLE_LINE_CELL)
+        {
+            if(this->cells.size() != other.cells.size()) 
+                return false;
+            for(int col = 0; col < other.cells.size(); col++)
+                if(this->cells[col] != other.cells[col])
+                    return false;
+            return true;
+        }
+        else
+            // cells == NULL for FILES, MODE, LINE and DATE type
+            return true;
+    }
+
+    std::size_t hash() const
     {
 		std::size_t seed = 0;
 
-		hash_combine<char>(seed, line.type);
-		hash_combine<bool>(seed, line.right_axis);
-		hash_combine<char>(seed, line.graph_type);
+		hash_combine<char>(seed, this->type);
+		hash_combine<bool>(seed, this->right_axis);
+		hash_combine<char>(seed, this->graph_type);
 
-		switch(line.type)
+		switch(this->type)
 		{
 		case TABLE_LINE_TITLE:
-			hash_combine<TableCell>(seed, line.cells[0]);
+			hash_combine<TableCell>(seed, this->cells[0]);
 			break;
 		case TABLE_LINE_CELL:
-			for(const TableCell& cell : line.cells)
+			for(const TableCell& cell : this->cells)
 				hash_combine<TableCell>(seed, cell);
 			break;
 		default:
@@ -465,7 +495,17 @@ struct std::hash<TLINE>
     }
 };
 
-std::size_t hash_value(const TLINE& line);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<TableLine>
+{
+    std::size_t operator()(const TableLine& line) const noexcept
+    {
+        return line.hash();
+    }
+};
+
+std::size_t hash_value(const TableLine& cell);
 
 
 struct TBL 
@@ -473,8 +513,8 @@ struct TBL
     short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
     short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   nb_columns;         // Number of columns (of text and lec, not calculated values)
-    TLINE   divider_line;       // nb_columns TableCell's, each TableCell contains a divider
-    std::vector<TLINE> lines;   
+    TableLine divider_line;     // nb_columns TableCell's, each TableCell contains a divider
+    std::vector<TableLine> lines;   
     float   z_min;              // Min on the right axis
     float   z_max;              // Max on the right axis
     float   y_min;              // Min on left axis
@@ -524,9 +564,9 @@ struct std::hash<TBL>
 		hash_combine<short>(seed, table.repeat_columns);
 		hash_combine<short>(seed, table.nb_columns);
 
-		hash_combine<TLINE>(seed, table.divider_line);
-		for(const TLINE& line : table.lines)
-			hash_combine<TLINE>(seed, line);
+		hash_combine<TableLine>(seed, table.divider_line);
+		for(const TableLine& line : table.lines)
+			hash_combine<TableLine>(seed, line);
 
 		hash_combine<float>(seed, table.z_min);
 		hash_combine<float>(seed, table.z_max);
@@ -568,10 +608,6 @@ void T_auto(TBL *,char *,char **,int ,int ,int );
 #define T_LANG(tbl)         (tbl->language)
 #define T_L(tbl)            (tbl->lines)
 #define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
-
-#define TABLE_CELL_ALIGN(attr, align)   (((attr) & 7) | (align))
-#define TABLE_CELL_FONT(attr, font)     ((attr) | (font))
-#define TABLE_CELL_SETFONT(attr, font)  (((attr) & 120) | (font))
 
 #define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val), KONAME(kdb, pos)) )
 #define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated TBL

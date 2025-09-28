@@ -167,7 +167,7 @@ char *APIChartTitle(int hdl, int i);
 int APIChartType(int hdl, int i);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
 int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
-int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
+int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
 int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIPrepareChart(TBL *tbl, char *gsmpl);
@@ -176,7 +176,7 @@ int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ym
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
 int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 // int T_GraphLineData(int nb, double *x, double *y);
-// int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
+// int T_GraphLineTitle(TableLine *line, COLS *fcls, int i);
 int T_GraphTest(TBL *tbl);
 int T_GraphTimeData(Sample *smpl, double *y);
 int T_GraphTitle(char *txt);

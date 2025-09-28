@@ -404,7 +404,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
     unsigned char   *pdiv;
     TBL             *tbl;
     TableCell           *cell, *pcell;
-    TLINE           *line, *pline;
+    TableLine           *line, *pline;
 
     /* TBL:0 */
     tbl = P_get_ptr(pack, 0);
@@ -434,7 +434,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
 
     /* lines */
     len = P_get_len(pack, p);
-    pline = (TLINE *) P_get_ptr(pack, p);
+    pline = (TableLine *) P_get_ptr(pack, p);
     line = SW_nalloc(len);
     memcpy((char *) line, (char *) pline, len);
     p++;

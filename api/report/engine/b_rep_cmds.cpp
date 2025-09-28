@@ -602,15 +602,15 @@ int B_GraphDefault(char* type, int unused)
     switch(type[0]) {
         case 'l' :
         case 'L' :
-            T_GRAPHDEFAULT = 0;
+            T_GRAPHDEFAULT = TableGraphType::TABLE_GRAPH_LINE;
             break;
         case 's' :
         case 'S' :
-            T_GRAPHDEFAULT = 1;
+            T_GRAPHDEFAULT = TableGraphType::TABLE_GRAPH_SCATTER;
             break;
         case 'b' :
         case 'B' :
-            T_GRAPHDEFAULT = 2;
+            T_GRAPHDEFAULT = TableGraphType::TABLE_GRAPH_BAR;
             break;
         default  :
             error_manager.append_error("Invalid GraphDefault option (Line, Scatter, Bar)");
