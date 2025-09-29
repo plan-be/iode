@@ -309,34 +309,33 @@ static TBL* read_tbl(YYFILE* yy)
         {
             case TABLE_ASCII_CLOSE   :
                 return(tbl);
-
             case TABLE_ASCII_DUTCH   :
-            case TABLE_ASCII_FRENCH  :
-            case TABLE_ASCII_ENGLISH :
-                tbl->language = keyw;
+                tbl->set_language(TableLang::TABLE_DUTCH);
                 break;
-
+            case TABLE_ASCII_FRENCH  :
+                tbl->set_language(TableLang::TABLE_FRENCH);
+                break;
+            case TABLE_ASCII_ENGLISH :
+                tbl->set_language(TableLang::TABLE_ENGLISH);
+                break;
             case TABLE_ASCII_DIM     :
                 kerror(0, "Double dim definition skipped : %s", YY_error(yy));
                 break;
-
             case TABLE_ASCII_DIVIDER     :
                 read_div(tbl, yy);
                 break;
-
             case TABLE_ASCII_BOX     :
                 tbl->chart_box = (char)K_read_long(yy);
                 break;
             case TABLE_ASCII_AXIS     :
-                tbl->chart_axis_type = (char)K_read_long(yy);
+                tbl->set_graph_axis((TableGraphAxis) K_read_long(yy));
                 break;
             case TABLE_ASCII_XGRID    :
-                tbl->chart_gridx = (char)K_read_long(yy);
+                tbl->set_gridx((TableGraphGrid) K_read_long(yy));
                 break;
             case TABLE_ASCII_YGRID    :
-                tbl->chart_gridy = (char)K_read_long(yy);
+                tbl->set_gridy((TableGraphGrid) K_read_long(yy));
                 break;
-
             case TABLE_ASCII_YMIN     :
                 tbl->y_min  = (float)K_read_real(yy);
                 break;
@@ -349,11 +348,9 @@ static TBL* read_tbl(YYFILE* yy)
             case TABLE_ASCII_ZMAX     :
                 tbl->z_max  = (float)K_read_real(yy);
                 break;
-
             case TABLE_ASCII_ALIGN:
-                tbl->text_alignment = K_read_align(yy);
+                tbl->set_text_alignment((TableTextAlign) K_read_long(yy));
                 break;
-
             case TABLE_ASCII_BREAK   :
                 if(read_line(tbl, yy)< 0) 
                 {
@@ -361,7 +358,6 @@ static TBL* read_tbl(YYFILE* yy)
                     return(NULL);
                 }
                 break;
-
             default :
                 kerror(0, "Incorrect entry : %s", YY_error(yy));
                 break;
@@ -597,11 +593,11 @@ static void print_tbl(FILE* fd, TBL* tbl)
 {
     /* tbl */
     fprintf(fd, "\nDIM %d\n", T_NC(tbl));
-    K_wrdef(fd, TABLE, T_LANG(tbl));
+    K_wrdef(fd, TABLE, (int) tbl->get_language());
     /* GB 2/3/00 */
-    fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ",
-            tbl->chart_box, tbl->chart_axis_type, tbl->chart_gridx, tbl->chart_gridy);
-    print_align(fd, tbl->text_alignment);
+    fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ", tbl->chart_box, 
+            (int) tbl->get_graph_axis(), (int) tbl->get_gridx(), (int) tbl->get_gridy());
+    print_align(fd, (int) tbl->get_text_alignment());
     print_chart_axis_type(fd, "YMIN", tbl->y_min);
     print_chart_axis_type(fd, "YMAX", tbl->y_max);
     print_chart_axis_type(fd, "ZMIN", tbl->z_min);

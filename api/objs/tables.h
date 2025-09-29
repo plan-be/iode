@@ -123,11 +123,11 @@ enum TableGraphAxis
 	TABLE_GRAPH_PERCENT
 };
 
-enum TableGraphAlign
+enum TableTextAlign
 {
-	TABLE_GRAPH_LEFT,
-	TABLE_GRAPH_CENTER,
-	TABLE_GRAPH_RIGHT
+	TABLE_TEXT_LEFT,
+	TABLE_TEXT_CENTER,
+	TABLE_TEXT_RIGHT
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -508,9 +508,15 @@ struct std::hash<TableLine>
 std::size_t hash_value(const TableLine& cell);
 
 
-struct TBL 
+class TBL 
 {
     short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
+    char    chart_gridx;        // 0 = major grids, 1 = no grids, 2 = minor + major grids
+    char    chart_gridy;        // idem
+    char    chart_axis_type;    // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
+    char    text_alignment;     // Text alignment: 0=left, 1=centered, 2=right
+
+public:
     short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   nb_columns;         // Number of columns (of text and lec, not calculated values)
     TableLine divider_line;     // nb_columns TableCell's, each TableCell contains a divider
@@ -523,10 +529,6 @@ struct TBL
                                 // TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
     char    chart_box;          // 1 to surround the chart by a box
     char    chart_shadow;       // 1 to place a shadow behind the chart
-    char    chart_gridx;        // 0 = major grids, 1 = no grids, 2 = minor + major grids
-    char    chart_gridy;        // idem
-    char    chart_axis_type;    // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
-    char    text_alignment;     // Text alignment: 0=left, 1=centered, 2 = right
 
 public:
     TBL(const int dim): nb_columns(dim), divider_line(TABLE_LINE_CELL)
@@ -539,7 +541,7 @@ public:
         this->y_min = (float) IODE_NAN;
         this->y_max = (float) IODE_NAN;
         this->attribute = TABLE_CELL_NORMAL;
-        this->text_alignment = TABLE_GRAPH_LEFT;
+        this->text_alignment = TABLE_TEXT_LEFT;
         this->chart_box = 0;
         this->chart_shadow = 0;
         this->chart_gridx = TABLE_GRAPH_MAJOR;
@@ -550,6 +552,88 @@ public:
         for(int j = 1; j < dim; j++) 
             this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
     }
+
+    TableLang get_language() const
+    {
+        return (TableLang) language;
+    }
+
+    std::string get_language_as_string() const
+    {
+        return v_table_langs.at(language - TABLE_ENGLISH);
+    }
+
+    void set_language(const TableLang lang)
+    {
+        language = (short) lang;
+    }
+
+    TableGraphGrid get_gridx() const
+    {
+        return static_cast<TableGraphGrid>(chart_gridx);
+    }
+
+    void set_gridx(const TableGraphGrid gridx)
+    {
+        chart_gridx = (char) (gridx - TABLE_GRAPH_MAJOR);
+    }
+
+    TableGraphGrid get_gridy() const
+    {
+        return static_cast<TableGraphGrid>(chart_gridy);
+    }
+
+    void set_gridy(const TableGraphGrid gridy)
+    {
+        chart_gridy = (char) gridy;
+    }
+
+    TableGraphAxis get_graph_axis() const
+    {
+        return static_cast<TableGraphAxis>(chart_axis_type);
+    }
+
+    void set_graph_axis(const TableGraphAxis axis)
+    {
+        chart_axis_type = (char) axis;
+    }
+
+    TableTextAlign get_text_alignment() const
+    {
+        return static_cast<TableTextAlign>(text_alignment);
+    }
+
+    void set_text_alignment(const TableTextAlign align)
+    {
+        text_alignment = (char) align;
+    }
+
+    std::size_t hash() const
+    {
+		std::size_t seed = 0;
+
+		hash_combine<short>(seed, this->language);
+		hash_combine<short>(seed, this->repeat_columns);
+		hash_combine<short>(seed, this->nb_columns);
+
+		hash_combine<TableLine>(seed, this->divider_line);
+		for(const TableLine& line : this->lines)
+			hash_combine<TableLine>(seed, line);
+
+		hash_combine<float>(seed, this->z_min);
+		hash_combine<float>(seed, this->z_max);
+		hash_combine<float>(seed, this->y_min);
+		hash_combine<float>(seed, this->y_max);
+		hash_combine<char>(seed, this->attribute);
+		hash_combine<char>(seed, this->chart_box);
+		hash_combine<char>(seed, this->chart_shadow);
+		hash_combine<char>(seed, this->chart_gridx);
+		hash_combine<char>(seed, this->chart_gridy);
+		hash_combine<char>(seed, this->chart_axis_type);
+		hash_combine<char>(seed, this->text_alignment);
+
+		return seed;
+    }
 };
 
 // Custom specialization of std::hash can be injected in namespace std.
@@ -558,29 +642,7 @@ struct std::hash<TBL>
 {
     std::size_t operator()(const TBL& table) const noexcept
     {
-		std::size_t seed = 0;
-
-		hash_combine<short>(seed, table.language);
-		hash_combine<short>(seed, table.repeat_columns);
-		hash_combine<short>(seed, table.nb_columns);
-
-		hash_combine<TableLine>(seed, table.divider_line);
-		for(const TableLine& line : table.lines)
-			hash_combine<TableLine>(seed, line);
-
-		hash_combine<float>(seed, table.z_min);
-		hash_combine<float>(seed, table.z_max);
-		hash_combine<float>(seed, table.y_min);
-		hash_combine<float>(seed, table.y_max);
-		hash_combine<char>(seed, table.attribute);
-		hash_combine<char>(seed, table.chart_box);
-		hash_combine<char>(seed, table.chart_shadow);
-		hash_combine<char>(seed, table.chart_gridx);
-		hash_combine<char>(seed, table.chart_gridy);
-		hash_combine<char>(seed, table.chart_axis_type);
-		hash_combine<char>(seed, table.text_alignment);
-
-		return seed;
+		return table.hash();
     }
 };
 
@@ -605,7 +667,7 @@ void T_auto(TBL *,char *,char **,int ,int ,int );
 
 #define T_NC(tbl)           (tbl->nb_columns)
 #define T_NL(tbl)           (tbl->lines.size())
-#define T_LANG(tbl)         (tbl->language)
+#define T_LANG(tbl)         (tbl->get_language())
 #define T_L(tbl)            (tbl->lines)
 #define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
 

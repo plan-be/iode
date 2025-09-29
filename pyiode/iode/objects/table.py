@@ -12,7 +12,7 @@ from iode.common import TableLang
 from iode.iode_database.extra_files import load_extra_files
 from iode.computed_table.computed_table import ComputedTable
 
-from iode.iode_cython import (TableGraphType, TableGraphGrid, TableGraphAlign, 
+from iode.iode_cython import (TableGraphType, TableGraphGrid, TableTextAlign, 
                               TableGraphAxis, TableLineType, TableCellAlign)
 from iode.iode_cython import TableCell as CythonTableCell
 from iode.iode_cython import TableLine as CythonTableLine
@@ -822,7 +822,7 @@ class Table:
          Y-grid options: MAJOR, NONE or MINOR.
     graph_axis: TableGraphAxis
          Y-axis scale: VALUES, LOG, SEMILOG or PERCENT.
-    graph_alignment: TableGraphAlign
+    graph_alignment: TableTextAlign
         Graph alignment: LEFT, CENTER or RIGHT.
     box: bool 
         Whether the graph should be boxed. 
@@ -1265,27 +1265,27 @@ class Table:
 
         Parameters
         ----------
-        value : TableGraphAlign or str
+        value : TableTextAlign or str
             Possible values are LEFT, CENTER or RIGHT.
 
         Examples
         --------
-        >>> from iode import Table, TableGraphAlign
+        >>> from iode import Table, TableTextAlign
         >>> table = Table()
         >>> table.graph_alignment
         'LEFT'
-        >>> table.graph_alignment = TableGraphAlign.CENTER
+        >>> table.graph_alignment = TableTextAlign.CENTER
         >>> table.graph_alignment
         'CENTER'
         >>> table.graph_alignment = "right"
         >>> table.graph_alignment
         'RIGHT'
         """
-        return self._cython_instance.get_graph_alignment()
+        return self._cython_instance.get_text_alignment()
 
     @graph_alignment.setter
-    def graph_alignment(self, value: Union[TableGraphAlign, str]):
-        self._cython_instance.set_graph_alignment(value)
+    def graph_alignment(self, value: Union[TableTextAlign, str]):
+        self._cython_instance.set_text_alignment(value)
 
     @property
     def box(self) -> bool:

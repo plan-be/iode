@@ -24,26 +24,6 @@ public:
 	Table(const TBL* c_table);
 	Table(const Table& table);
 
-	std::string get_language() const;
-
-	void set_language(const TableLang lang);
-
-	TableGraphGrid get_gridx() const;
-
-	void set_gridx(const TableGraphGrid gridx);
-
-	TableGraphGrid get_gridy() const;
-
-	void set_gridy(const TableGraphGrid gridy);
-
-	TableGraphAxis get_graph_axis() const;
-
-	void set_graph_axis(const TableGraphAxis axis);
-
-	TableGraphAlign get_graph_alignment() const;
-
-	void set_graph_alignment(const TableGraphAlign align);
-
 	// -------- LINES --------
 
 	TableLine* append_line(const TableLineType line_type);

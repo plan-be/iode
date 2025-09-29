@@ -868,7 +868,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
-    EXPECT_EQ(tbl->language, extracted_tbl->language);
+    EXPECT_EQ(tbl->get_language(), extracted_tbl->get_language());
     EXPECT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
     EXPECT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
     EXPECT_EQ(tbl->lines.size(), extracted_tbl->lines.size());
@@ -879,10 +879,10 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->attribute, extracted_tbl->attribute);
     EXPECT_EQ(tbl->chart_box, extracted_tbl->chart_box);
     EXPECT_EQ(tbl->chart_shadow, extracted_tbl->chart_shadow);
-    EXPECT_EQ(tbl->chart_gridx, extracted_tbl->chart_gridx);
-    EXPECT_EQ(tbl->chart_gridy, extracted_tbl->chart_gridy);
-    EXPECT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
-    EXPECT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
+    EXPECT_EQ(tbl->get_gridx(), extracted_tbl->get_gridx());
+    EXPECT_EQ(tbl->get_gridy(), extracted_tbl->get_gridy());
+    EXPECT_EQ(tbl->get_graph_axis(), extracted_tbl->get_graph_axis());
+    EXPECT_EQ(tbl->get_text_alignment(), extracted_tbl->get_text_alignment());
 
     // ----- check div line
     EXPECT_EQ(tbl->divider_line.get_type(), extracted_tbl->divider_line.get_type());

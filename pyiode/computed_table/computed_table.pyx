@@ -5,7 +5,7 @@ from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
 from pyiode.objects.table cimport CTable
 from pyiode.common cimport IODE_NAN
-from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableTextAlign as CTableTextAlign 
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
@@ -88,8 +88,8 @@ cdef class ComputedTable:
     def get_graph_axis(self) -> TableGraphAxis:
         return TableGraphAxis(self.c_computed_table.get_graph_axis())
 
-    def get_graph_alignment(self) -> TableGraphAlign:
-        return TableGraphAlign(<int>(self.c_computed_table.get_alignement()))
+    def get_text_alignment(self) -> TableTextAlign:
+        return TableTextAlign(<int>(self.c_computed_table.get_alignement()))
 
     def plotting_series_name(self, row: int, op_files: int) -> str:
         cdef int ch = ord('f')

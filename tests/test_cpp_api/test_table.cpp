@@ -114,7 +114,7 @@ TEST_F(TablesTest, AddGetTBL)
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
-    ASSERT_EQ(tbl->language, extracted_tbl->language);
+    ASSERT_EQ(tbl->get_language(), extracted_tbl->get_language());
     ASSERT_EQ(tbl->repeat_columns, extracted_tbl->repeat_columns);
     ASSERT_EQ(tbl->nb_columns, extracted_tbl->nb_columns);
     ASSERT_EQ(tbl->lines.size(), extracted_tbl->lines.size());
@@ -125,10 +125,10 @@ TEST_F(TablesTest, AddGetTBL)
     ASSERT_EQ(tbl->attribute, extracted_tbl->attribute);
     ASSERT_EQ(tbl->chart_box, extracted_tbl->chart_box);
     ASSERT_EQ(tbl->chart_shadow, extracted_tbl->chart_shadow);
-    ASSERT_EQ(tbl->chart_gridx, extracted_tbl->chart_gridx);
-    ASSERT_EQ(tbl->chart_gridy, extracted_tbl->chart_gridy);
-    ASSERT_EQ(tbl->chart_axis_type, extracted_tbl->chart_axis_type);
-    ASSERT_EQ(tbl->text_alignment, extracted_tbl->text_alignment);
+    ASSERT_EQ(tbl->get_gridx(), extracted_tbl->get_gridx());
+    ASSERT_EQ(tbl->get_gridy(), extracted_tbl->get_gridy());
+    ASSERT_EQ(tbl->get_graph_axis(), extracted_tbl->get_graph_axis());
+    ASSERT_EQ(tbl->get_text_alignment(), extracted_tbl->get_text_alignment());
 
     TableCell* cell_original;
     TableCell* cell_extracted;
@@ -362,9 +362,9 @@ TEST_F(TablesTest, Dimension)
 
 TEST_F(TablesTest, NotLineMethods)
 {
-    EXPECT_EQ(table->get_language(), "English");
+    EXPECT_EQ(table->get_language_as_string(), "English");
     table->set_language(TABLE_FRENCH);
-    EXPECT_EQ(table->get_language(), "French");
+    EXPECT_EQ(table->get_language_as_string(), "French");
 
     EXPECT_FLOAT_EQ(table->z_min, (float) IODE_NAN);
     EXPECT_FLOAT_EQ(table->z_max, (float) IODE_NAN);
@@ -382,9 +382,9 @@ TEST_F(TablesTest, NotLineMethods)
     EXPECT_EQ(table->attribute, '\0');
     // TODO : test setAttribute()
 
-    EXPECT_EQ(table->get_graph_alignment(), TABLE_GRAPH_LEFT);
-    table->set_graph_alignment(TABLE_GRAPH_RIGHT);
-    EXPECT_EQ(table->get_graph_alignment(), TABLE_GRAPH_RIGHT);
+    EXPECT_EQ(table->get_text_alignment(), TABLE_TEXT_LEFT);
+    table->set_text_alignment(TABLE_TEXT_RIGHT);
+    EXPECT_EQ(table->get_text_alignment(), TABLE_TEXT_RIGHT);
 
     EXPECT_EQ(table->chart_box, '\0');
     // TODO : test setGraphBox()
