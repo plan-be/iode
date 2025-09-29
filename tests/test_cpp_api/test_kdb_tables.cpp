@@ -68,14 +68,14 @@ TEST_F(KDBTablesTest, Get)
     EXPECT_EQ(table.get_title(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table.lines.size(), 31);
     EXPECT_EQ(table.nb_columns, 2);
-    EXPECT_EQ(table.get_line(0)->get_type(), TABLE_LINE_TITLE);
+    EXPECT_EQ(table.lines[0].get_type(), TABLE_LINE_TITLE);
 
     // by name
     Table table2 = Tables.get("GFRPC");
     EXPECT_EQ(table2.get_title(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table2.lines.size(), 31);
     EXPECT_EQ(table2.nb_columns, 2);
-    EXPECT_EQ(table2.get_line(0)->get_type(), TABLE_LINE_TITLE);
+    EXPECT_EQ(table2.lines[0].get_type(), TABLE_LINE_TITLE);
 }
 
 TEST_F(KDBTablesTest, GetNames)
@@ -148,39 +148,39 @@ TEST_F(KDBTablesTest, CreateRemove)
     expanded_vars.pop_back();                                                                   // remove list_name
     expanded_vars.insert(expanded_vars.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
     
-    line = table2.get_line(0);
+    line = &table2.lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = table2.get_line(1);
+    line = &table2.lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = table2.get_line(2);
+    line = &table2.lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = table2.get_line(3);
+    line = &table2.lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = table2.get_line(i + nb_lines_header);
+        line = &table2.lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), expanded_vars[i]);
         EXPECT_EQ(line->cells[1].get_content(false), expanded_vars[i]);
     }
     i += nb_lines_header;
-    line = table2.get_line(i++);
+    line = &table2.lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = table2.get_line(i++);
+        line = &table2.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = table2.get_line(i++);
+        line = &table2.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = table2.get_line(i++);
+        line = &table2.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
 
@@ -198,39 +198,39 @@ TEST_F(KDBTablesTest, CreateRemove)
     Table table3 = Tables.get(name);
     EXPECT_EQ(table3.lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
-    line = table3.get_line(0);
+    line = &table3.lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = table3.get_line(1);
+    line = &table3.lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = table3.get_line(2);
+    line = &table3.lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = table3.get_line(3);
+    line = &table3.lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = table3.get_line(i + nb_lines_header);
+        line = &table3.lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), titles[i]);
         EXPECT_EQ(line->cells[1].get_content(false), lecs[i]);
     }
     i += nb_lines_header;
-    line = table3.get_line(i++);
+    line = &table3.lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = table3.get_line(i++);
+        line = &table3.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = table3.get_line(i++);
+        line = &table3.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = table3.get_line(i++);
+        line = &table3.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
 
@@ -253,39 +253,39 @@ TEST_F(KDBTablesTest, CreateRemove)
     std::vector<std::string> expanded_lecs = lecs;
     expanded_lecs.insert(expanded_lecs.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
 
-    line = table4.get_line(0);
+    line = &table4.lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = table4.get_line(1);
+    line = &table4.lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = table4.get_line(2);
+    line = &table4.lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = table4.get_line(3);
+    line = &table4.lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = table4.get_line(i + nb_lines_header);
+        line = &table4.lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), expanded_lecs[i]);
         EXPECT_EQ(line->cells[1].get_content(false), expanded_lecs[i]);
     }
     i += nb_lines_header;
-    line = table4.get_line(i++);
+    line = &table4.lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = table4.get_line(i++);
+        line = &table4.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = table4.get_line(i++);
+        line = &table4.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = table4.get_line(i++);
+        line = &table4.lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
 

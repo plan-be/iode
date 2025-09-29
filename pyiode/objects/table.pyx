@@ -298,7 +298,7 @@ cdef class Table:
         self.extract_tbl_from_database()
 
         for i in range(self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i)
+            c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 c_title = self.c_table.get_title(i)
@@ -310,7 +310,7 @@ cdef class Table:
         cdef string c_title
 
         for i in range(self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i)
+            c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 c_title = value.encode()
@@ -391,7 +391,7 @@ cdef class Table:
         py_coeffs = []
         nb_columns = self.c_table.nb_columns
 
-        c_line = self.c_table.get_divider_line()
+        c_line = &(self.c_table.divider_line)
         for j in range(nb_columns):
             c_cell = &c_line.cells[j]
             cell_type = <int>(c_cell.get_type())
@@ -399,7 +399,7 @@ cdef class Table:
                 py_coeffs += [c_coeff.decode() for c_coeff in c_cell.get_coefficients_from_lec()]
 
         for i in range(self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i)
+            c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
@@ -421,7 +421,7 @@ cdef class Table:
         py_vars = []
         nb_columns = self.c_table.nb_columns
 
-        c_line = self.c_table.get_divider_line()
+        c_line = &(self.c_table.divider_line)
         for j in range(nb_columns):
             c_cell = &c_line.cells[j]
             cell_type = <int>(c_cell.get_type())
@@ -429,7 +429,7 @@ cdef class Table:
                 py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
 
         for i in range(self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i)
+            c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.CELL:
                 for j in range(nb_columns):
@@ -443,7 +443,7 @@ cdef class Table:
         cdef CTableLine* c_line
 
         self.extract_tbl_from_database()
-        c_line = self.c_table.get_divider_line()
+        c_line = &(self.c_table.divider_line)
 
         divider.c_line = c_line
         divider.nb_columns = <int>(self.c_table.nb_columns)
@@ -454,7 +454,7 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
         
-        c_line = self.c_table.get_divider_line()
+        c_line = &(self.c_table.divider_line)
         if c_line is NULL:
             raise RuntimeError("Cannot set divider line. No divider line found in the table.")
 
@@ -487,7 +487,7 @@ cdef class Table:
         self.extract_tbl_from_database()
         nb_columns = self.c_table.nb_columns
         for i in range(self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i)
+            c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 content = c_line.cells[0].get_content(<bint>False).decode().strip()
@@ -552,8 +552,7 @@ cdef class Table:
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def _getitem_(self, row: int, line: TableLine) -> TableLine:
-        cdef CTableLine* c_line
-        c_line = self.c_table.get_line(row)
+        cdef CTableLine* c_line = &(self.c_table.lines[row])
 
         line.c_line = c_line
         line.nb_columns = <int>(self.c_table.nb_columns)
@@ -561,10 +560,9 @@ cdef class Table:
         return line
 
     def _setitem_(self, row: int, value: Union[str, List[str], Tuple[str]]):
-        cdef CTableLine* c_line
         cdef CTableCell* c_cell
+        cdef CTableLine* c_line = &(self.c_table.lines[row])
         
-        c_line = self.c_table.get_line(row)
         line_type = <int>(c_line.get_type())
         nb_columns = self.c_table.nb_columns
         if line_type == TableLineType.TITLE:
@@ -654,7 +652,7 @@ cdef class Table:
 
         # lines (-1 for the divider line)
         for i in range(-1, self.c_table.lines.size()):
-            c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
+            c_line = &(self.c_table.lines[i]) if i >= 0 else &(self.c_table.divider_line)
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 content = c_line.cells[0].get_content(<bint>True).decode()

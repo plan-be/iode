@@ -112,8 +112,6 @@ cdef extern from "cpp_api/objects/table.h":
 
         # Methods
         # Lines
-        CTableLine* get_line(int row) except +
-        CTableLine* get_divider_line() except +
         CTableLine* add_line(TableLineType line_type) except +
         CTableLine* insert_line(int pos, TableLineType line_type, bint after) except +
         void remove_line(int row) except +

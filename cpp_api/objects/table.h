@@ -46,15 +46,9 @@ public:
 
 	// -------- LINES --------
 
-	TableLine* get_line(const int row);
-
 	TableLine* append_line(const TableLineType line_type);
 
 	TableLine* insert_line(const int pos, const TableLineType line_type, const bool after = true);
-
-	// -------- DIVIDER --------
-
-	TableLine* get_divider_line();
 
 	// -------- TITLE --------
 
