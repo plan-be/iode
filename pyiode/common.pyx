@@ -28,7 +28,7 @@ from pyiode.common cimport TableCellType as CTableCellType
 from pyiode.common cimport TableCellFont as CTableCellFont
 from pyiode.common cimport TableCellAlign as CTableCellAlign 
 from pyiode.common cimport TableLineType as CTableLineType
-from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableTextAlign as CTableTextAlign 
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
@@ -180,10 +180,10 @@ class TableGraphGrid(IntEnum):
     NONE = CTableGraphGrid.TABLE_GRAPH_NONE
     MINOR = CTableGraphGrid.TABLE_GRAPH_MINOR
 
-class TableGraphAlign(IntEnum):
-    LEFT = CTableGraphAlign.TABLE_GRAPH_LEFT
-    CENTER = CTableGraphAlign.TABLE_GRAPH_CENTER
-    RIGHT = CTableGraphAlign.TABLE_GRAPH_RIGHT
+class TableTextAlign(IntEnum):
+    LEFT = CTableTextAlign.TABLE_TEXT_LEFT
+    CENTER = CTableTextAlign.TABLE_TEXT_CENTER
+    RIGHT = CTableTextAlign.TABLE_TEXT_RIGHT
 
 class TableGraphAxis(IntEnum):
     VALUES = CTableGraphAxis.TABLE_GRAPH_VALUES

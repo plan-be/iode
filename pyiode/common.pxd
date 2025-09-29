@@ -159,10 +159,10 @@ cdef extern from "cpp_api/objects/table.h":
         TABLE_GRAPH_NONE,
         TABLE_GRAPH_MINOR
 
-    cdef enum TableGraphAlign:
-        TABLE_GRAPH_LEFT,
-        TABLE_GRAPH_CENTER,
-        TABLE_GRAPH_RIGHT
+    cdef enum TableTextAlign:
+        TABLE_TEXT_LEFT,
+        TABLE_TEXT_CENTER,
+        TABLE_TEXT_RIGHT
 
     cdef enum TableGraphAxis:
         TABLE_GRAPH_VALUES,

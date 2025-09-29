@@ -5,44 +5,6 @@
 
 // ================ TABLE ================
 
-
-bool table_equal(const TBL& table1, const TBL& table2)
-{
-	if(table1.language != table2.language) return false;
-	if(table1.repeat_columns != table2.repeat_columns) return false;
-	if(table1.nb_columns != table2.nb_columns) return false;
-	
-	int nb_columns = table1.nb_columns;
-	TableLine* div1 = (TableLine*) &table1.divider_line;
-	TableLine* div2 = (TableLine*) &table2.divider_line;
-	if(*div1 != *div2) return false;
-	
-	if(table1.lines.size() != table2.lines.size()) return false;
-	TableLine* line1;
-	TableLine* line2;
-	for (int i = 0; i < table1.lines.size(); i++)
-	{
-		line1 = (TableLine*) &table1.lines[i];
-		line2 = (TableLine*) &table2.lines[i];
-		if (*line1 != *line2) 
-			return false;
-	}
-
-	if(table1.z_min != table2.z_min) return false;
-	if(table1.z_max != table2.z_max) return false;
-	if(table1.y_min != table2.y_min) return false;
-	if(table1.y_max != table2.y_max) return false;
-	if(table1.attribute != table2.attribute) return false;
-	if(table1.chart_box != table2.chart_box) return false;
-	if(table1.chart_shadow != table2.chart_shadow) return false;
-	if(table1.chart_gridx != table2.chart_gridx) return false;
-	if(table1.chart_gridy != table2.chart_gridy) return false;
-	if(table1.chart_axis_type != table2.chart_axis_type) return false;
-	if(table1.text_alignment != table2.text_alignment) return false;
-
-	return true;
-}
-
 Table::Table(const int nb_columns) : TBL(nb_columns) {}
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
@@ -122,56 +84,6 @@ Table::Table(const TBL* c_table): TBL(*c_table) {}
 Table::Table(const Table& table): TBL((TBL&) table) {}
 
 // ================ TABLE ================
-
-std::string Table::get_language() const
-{
-	return v_table_langs.at(language - TABLE_ENGLISH);
-}
-
-void Table::set_language(const TableLang lang)
-{
-	language = (short) lang;
-}
-
-TableGraphGrid Table::get_gridx() const
-{
-	return static_cast<TableGraphGrid>(chart_gridx);
-}
-
-void Table::set_gridx(const TableGraphGrid gridx)
-{
-	chart_gridx = gridx - TABLE_GRAPH_MAJOR;
-}
-
-TableGraphGrid Table::get_gridy() const
-{
-	return static_cast<TableGraphGrid>(chart_gridy);
-}
-
-void Table::set_gridy(const TableGraphGrid gridy)
-{
-	chart_gridy = gridy;
-}
-
-TableGraphAxis Table::get_graph_axis() const
-{
-	return static_cast<TableGraphAxis>(chart_axis_type);
-}
-
-void Table::set_graph_axis(const TableGraphAxis axis)
-{
-	chart_axis_type = axis;
-}
-
-TableGraphAlign Table::get_graph_alignment() const
-{
-	return static_cast<TableGraphAlign>(text_alignment);
-}
-
-void Table::set_graph_alignment(const TableGraphAlign align)
-{
-	text_alignment = align;
-}
 
 // -------- LINES --------
 
@@ -301,5 +213,37 @@ TableLine* Table::add_line_date()
 
 bool Table::operator==(const Table& other) const
 {
-	return table_equal(static_cast<TBL>(*this), static_cast<TBL>(other));
+	if(this->get_language() != other.get_language()) return false;
+	if(this->repeat_columns != other.repeat_columns) return false;
+	if(this->nb_columns != other.nb_columns) return false;
+	
+	int nb_columns = this->nb_columns;
+	TableLine* div1 = (TableLine*) &this->divider_line;
+	TableLine* div2 = (TableLine*) &other.divider_line;
+	if(*div1 != *div2) return false;
+	
+	if(this->lines.size() != other.lines.size()) return false;
+	TableLine* line1;
+	TableLine* line2;
+	for (int i = 0; i < this->lines.size(); i++)
+	{
+		line1 = (TableLine*) &this->lines[i];
+		line2 = (TableLine*) &other.lines[i];
+		if (*line1 != *line2) 
+			return false;
+	}
+
+	if(this->z_min != other.z_min) return false;
+	if(this->z_max != other.z_max) return false;
+	if(this->y_min != other.y_min) return false;
+	if(this->y_max != other.y_max) return false;
+	if(this->attribute != other.attribute) return false;
+	if(this->chart_box != other.chart_box) return false;
+	if(this->chart_shadow != other.chart_shadow) return false;
+	if(this->get_gridx() != other.get_gridy()) return false;
+	if(this->get_gridy() != other.get_gridy()) return false;
+	if(this->get_graph_axis() != other.get_graph_axis()) return false;
+	if(this->get_text_alignment() != other.get_text_alignment()) return false;
+
+	return true;
 }

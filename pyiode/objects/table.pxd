@@ -4,7 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
-                            TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
+                            TableTextAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
 
 cdef extern from "cpp_api/objects/table.h":
@@ -70,7 +70,6 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ Table class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CTable "Table":
-        short language
         short repeat_columns
         short nb_columns
         short nb_lines
@@ -83,10 +82,6 @@ cdef extern from "cpp_api/objects/table.h":
         char attribute
         char chart_box
         char chart_shadow
-        char chart_gridx
-        char chart_gridy
-        char chart_axis_type
-        char text_alignment
 
         # Constructor
         CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, bint date) except +
@@ -95,7 +90,8 @@ cdef extern from "cpp_api/objects/table.h":
         # Copy constructor
         CTable(const CTable& table) except +
 
-        string get_language()
+        TableLang get_language() 
+        string get_language_as_string()
         void set_language(TableLang lang) except +
 
         TableGraphGrid get_gridx()
@@ -107,8 +103,8 @@ cdef extern from "cpp_api/objects/table.h":
         TableGraphAxis get_graph_axis()
         void set_graph_axis(TableGraphAxis axis) except +
 
-        TableGraphAlign get_graph_alignment()
-        void set_graph_alignment(TableGraphAlign align) except +
+        TableTextAlign get_text_alignment()
+        void set_text_alignment(TableTextAlign align) except +
 
         # Methods
         # Lines

@@ -10,7 +10,7 @@ from pyiode.common cimport TableCellType as CTableCellType
 from pyiode.common cimport TableCellFont as CTableCellFont
 from pyiode.common cimport TableCellAlign as CTableCellAlign 
 from pyiode.common cimport TableLineType as CTableLineType
-from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableTextAlign as CTableTextAlign 
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
@@ -319,7 +319,7 @@ cdef class Table:
 
     def get_language(self) -> str:
         self.extract_tbl_from_database()
-        return self.c_table.get_language().decode().upper()
+        return self.c_table.get_language_as_string().decode().upper()
 
     def set_language(self, value: Union[TableLang, str]):
         if isinstance(value, str):
@@ -368,16 +368,16 @@ cdef class Table:
         self.c_table.set_graph_axis(<CTableGraphAxis>value)
         self.update_owner_database()
 
-    def get_graph_alignment(self) -> str:
+    def get_text_alignment(self) -> str:
         self.extract_tbl_from_database()
-        return TableGraphAlign(<int>(self.c_table.get_graph_alignment())).name
+        return TableTextAlign(<int>(self.c_table.get_text_alignment())).name
 
-    def set_graph_alignment(self, value: Union[TableGraphAlign, str]):
+    def set_text_alignment(self, value: Union[TableTextAlign, str]):
         if isinstance(value, str):
             value = value.upper()
-            value = TableGraphAlign[value]
+            value = TableTextAlign[value]
         value = int(value)
-        self.c_table.set_graph_alignment(<CTableGraphAlign>value)
+        self.c_table.set_text_alignment(<CTableTextAlign>value)
         self.update_owner_database()
 
     def get_coefficients(self) -> List[str]:

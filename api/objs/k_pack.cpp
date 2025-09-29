@@ -192,7 +192,7 @@ static void K_tline64_32(TableLine* tl64, TableLine32* tl32)
 
 static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 {
-    tbl32->language = tbl64->language;
+    tbl32->language = (short) tbl64->get_language();
     tbl32->repeat_columns = tbl64->repeat_columns;
     tbl32->nb_columns = tbl64->nb_columns;
     tbl32->nb_lines = (int) tbl64->lines.size();
@@ -206,10 +206,10 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
     tbl32->attribute = tbl64->attribute;
     tbl32->chart_box = tbl64->chart_box;
     tbl32->chart_shadow = tbl64->chart_shadow;
-    tbl32->chart_gridx = tbl64->chart_gridx;
-    tbl32->chart_gridy = tbl64->chart_gridy;
-    tbl32->chart_axis_type = tbl64->chart_axis_type;
-    tbl32->text_alignment = tbl64->text_alignment;
+    tbl32->chart_gridx = (char) tbl64->get_gridx();
+    tbl32->chart_gridy = (char) tbl64->get_gridy();
+    tbl32->chart_axis_type = (char) tbl64->get_graph_axis();
+    tbl32->text_alignment = (char) tbl64->get_text_alignment();
     memset(tbl32->pad, '\0', sizeof(tbl32->pad));
 }
 
@@ -601,7 +601,7 @@ static void K_tline32_64(TableLine32* tl32, TableLine* tl64)
  */
 static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
 {
-    tbl64->language = tbl32->language;
+    tbl64->set_language((TableLang) tbl32->language);
     tbl64->repeat_columns = tbl32->repeat_columns;
     tbl64->nb_columns = tbl32->nb_columns;
 
@@ -614,10 +614,10 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     tbl64->attribute = tbl32->attribute;
     tbl64->chart_box = tbl32->chart_box;
     tbl64->chart_shadow = tbl32->chart_shadow;
-    tbl64->chart_gridx = tbl32->chart_gridx;
-    tbl64->chart_gridy = tbl32->chart_gridy;
-    tbl64->chart_axis_type = tbl32->chart_axis_type;
-    tbl64->text_alignment = tbl32->text_alignment;
+    tbl64->set_gridx((TableGraphGrid) tbl32->chart_gridx);
+    tbl64->set_gridy((TableGraphGrid) tbl32->chart_gridy);
+    tbl64->set_graph_axis((TableGraphAxis) tbl32->chart_axis_type);
+    tbl64->set_text_alignment((TableTextAlign) tbl32->text_alignment);
 }
 
 /**

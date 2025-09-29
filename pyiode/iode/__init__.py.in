@@ -8,7 +8,7 @@ DOC_DIR = str((Path(__file__).parent / "doc").resolve())
 # Constants
 from .iode_cython import (NA, IodeType, IodeFileType, TableLang, ImportFormats, ExportFormats, EqMethod, 
                           EqTest, TableCellType, TableCellFont, TableCellAlign, TableLineType, TableGraphType, 
-                          TableGraphGrid, TableGraphAlign, TableGraphAxis, VarsMode, LowToHighType, LowToHighMethod, 
+                          TableGraphGrid, TableTextAlign, TableGraphAxis, VarsMode, LowToHighType, LowToHighMethod, 
                           HighToLowType, SimulationInitialization, SimulationSort, ESTIMATION_MAXIT, ESTIMATION_EPS, 
                           AdjustmentMethod, WriteFileExt)
 
@@ -72,7 +72,7 @@ __all__ = [
     '__version__', 'SAMPLE_DATA_DIR', 'DOC_DIR', 'NA', 
     'IodeType', 'IodeFileType', 'TableLang', 'ImportFormats', 'ExportFormats', 
     'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 'TableLineType', 'TableGraphType', 
-    'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 
+    'TableGraphGrid', 'TableTextAlign', 'TableGraphAxis', 'VarsMode', 'LowToHighType', 'LowToHighMethod', 
     'HighToLowType', 'SimulationInitialization', 'SimulationSort', 'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 
     'AdjustmentMethod', 'WriteFileExt', 'WRITE_FILE_EXT', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
     'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 

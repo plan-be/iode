@@ -390,7 +390,7 @@ void ComputedTable::print_to_file()
     }
 
     // set language
-    std::string language = ref_table->get_language();
+    std::string language = ref_table->get_language_as_string();
     if(language.empty())
         throw std::invalid_argument("Cannot initialize printing. Language is empty.");
 

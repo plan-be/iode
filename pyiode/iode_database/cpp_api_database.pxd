@@ -7,7 +7,7 @@ from libcpp cimport bool
 from pyiode.common cimport (IodeType, IodeFileType, TableLang, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             TableCellType, TableCellAlign, TableCellFont, TableLineType, 
-                            TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType, 
+                            TableTextAlign, TableGraphAxis, TableGraphGrid, TableGraphType, 
                             IodeVarMode, VariablesInitialization)
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample

@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport TableGraphAxis, TableGraphGrid, TableGraphAlign
+from pyiode.common cimport TableGraphAxis, TableGraphGrid, TableTextAlign
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.table cimport CTable
@@ -51,7 +51,7 @@ cdef extern from "cpp_api/computed_table/computed_table.h":
         TableGraphAxis get_graph_axis()
         TableGraphGrid get_grid_xaxis()
         TableGraphGrid get_grid_yaxis()
-        TableGraphAlign get_alignement()
+        TableTextAlign get_alignement()
         double get_ymin()
         double get_ymax()
         CSample* get_sample()

@@ -161,11 +161,11 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     if(mode != 0) 
         W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
     
-    w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,  /* JMP 19-02-98 */
-                    tbl->chart_gridx, tbl->chart_gridy,
+    w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
+                    (int) tbl->get_gridx(), (int) tbl->get_gridy(),
                     (double)tbl->y_min, (double)tbl->y_max,
                     (double)tbl->z_min, (double)tbl->z_max,
-                    tbl->text_alignment, tbl->chart_box, 50 * tbl->chart_shadow); /* JMP 23-02-98 */
+                    (int) tbl->get_text_alignment(), tbl->chart_box, 50 * tbl->chart_shadow);
 
     std::string content;
     for(i = 0; i < T_NL(tbl) && w >= 0; i++) 

@@ -19,7 +19,7 @@ except ImportError:
 from iode.time.sample import Sample
 
 from iode.iode_cython import ComputedTable as CythonComputedTable
-from iode.iode_cython import TableGraphGrid, TableGraphAlign, TableGraphAxis, TableGraphType
+from iode.iode_cython import TableGraphGrid, TableTextAlign, TableGraphAxis, TableGraphType
 
 
 class ComputedTable:
@@ -585,13 +585,13 @@ class ComputedTable:
         return self._cython_instance.get_graph_axis()
 
     @property
-    def graph_alignment(self) -> TableGraphAlign:
+    def graph_alignment(self) -> TableTextAlign:
         r"""
         Graph alignment of the table.
 
         Returns
         -------
-        TableGraphAlign
+        TableTextAlign
 
         Examples
         --------
@@ -603,9 +603,9 @@ class ComputedTable:
         >>> # simple time series (current workspace) - 6 observations
         >>> computed_table = tables["C8_1"].compute("2000:6")
         >>> computed_table.graph_alignment
-        <TableGraphAlign.LEFT: 0>
+        <TableTextAlign.LEFT: 0>
         """
-        return self._cython_instance.get_graph_alignment()
+        return self._cython_instance.get_text_alignment()
 
     @property
     def plot_data(self) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:

@@ -175,9 +175,9 @@ public:
         return ref_table->get_graph_axis();
     }
 
-    TableGraphAlign get_alignement() const
+    TableTextAlign get_alignement() const
     {
-        return ref_table->get_graph_alignment();
+        return ref_table->get_text_alignment();
     }
 
     short get_graph_box() const
