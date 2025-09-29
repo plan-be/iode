@@ -41,7 +41,7 @@
  *    - Identities  K_add(KDB* kdb, char* name, char* lec)
  *    - Lists       K_add(KDB* kdb, char* name, char* list)
  *    - Scalars     K_add(KDB* kdb, char* name, Scalar* scalar)
- *    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
+ *    - Tables      K_add(KDB* kdb, char* name, Table *tbl) 
  *    - Variables   K_add(KDB* kdb, char* name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
  *  
  *  @note: the name of an equation MUST be the name of its endogenous variable
@@ -77,7 +77,7 @@ int K_add(KDB* kdb, char* name, ...)
     char*     txt;
     char*     lec;
     Scalar*   scl;
-    TBL*      tbl;
+    Table*      tbl;
     double*   var;
     int*      lgptr;
 
@@ -111,7 +111,7 @@ int K_add(KDB* kdb, char* name, ...)
           rc = K_spack(&pack, (char*) scl);
           break;            
       case TABLES: 
-          tbl = va_arg(vargs, TBL*);
+          tbl = va_arg(vargs, Table*);
           rc = K_tpack(&pack, (char*) tbl, name);
           break;            
       case VARIABLES: 

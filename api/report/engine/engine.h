@@ -251,7 +251,7 @@ inline int (*B_ScrollVTW0_super)(char *arg) = nullptr;
 inline int (*B_ScrollVTN_super )(char *arg) = nullptr;
 
 inline int (*ODE_scroll_super) (KDB *kdb, char **lst) = nullptr;
-inline int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name) = nullptr;
+inline int (*T_view_tbl_super) (Table *tbl, char *smpl, char* name) = nullptr;
 // inline int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names) = nullptr; // TEMP version for IODE-QT
 
 /* b_rep_super.c - function declarations */
@@ -305,5 +305,5 @@ int B_WindowMinimize(char* unused, int unused2);
 int B_WindowMaximize(char* unused, int unused2);
 
 int ODE_scroll(KDB *kdb, char **lst);
-int T_view_tbl(TBL *tbl, char *smpl, char* name);
+int T_view_tbl(Table *tbl, char *smpl, char* name);
 // int T_view_tbl(char* name, char *smpl, char** vars_names); // Temp version for IODE-QT

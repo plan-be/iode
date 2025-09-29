@@ -30,7 +30,7 @@
  *  
  *  Examples
  *  --------
- *  Various examples can be found here: https://iode.plan.be/doku.php?id=sample_d_impression or in TBL_CALC.md. 
+ *  Various examples can be found here: https://iode.plan.be/doku.php?id=sample_d_impression or in Table_CALC.md. 
  *  
  *  
  *  List of functions 
@@ -230,7 +230,7 @@ static void COL_free_fils(FILS* fils)
  *  @param [in] int     ch      character following # in the cell definition (ex 'y' for "#y")
  *  @param [in] int     n       position of the period to print (#y1 => n=1, #y2 => n=2 )
  *  @param [in] int     nbf     number of compared files in the current GSample
- *  @return     char*           static buffer with the formatting of the TBL text cell
+ *  @return     char*           static buffer with the formatting of the Table text cell
  *  
  */
 
@@ -312,7 +312,7 @@ Num:
 
 /**
  *  The recursive function COL_text() returns an allocated string 
- *  constructed from a TBL text cell containing the '#' character. The result
+ *  constructed from a Table text cell containing the '#' character. The result
  *  depends on the contents of the specific COL (periods and files) passed as argument. 
  *  
  *  

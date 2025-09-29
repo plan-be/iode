@@ -19,26 +19,22 @@ protected:
 };
 
 
-// Test that a TBL* 'tbl' object added to KT_WS using K_add() and a TBL* 'extracted_tbl' object 
+// Test that a Table* 'tbl' object added to KT_WS using K_add() and a Table* 'extracted_tbl' object 
 // extracted using KTVAL() are exactly the same
-TEST_F(TablesTest, AddGetTBL)
+TEST_F(TablesTest, AddGetTable)
 {
     KDBComments kdb_cmt(input_test_dir + "fun.ac");
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
-    // --- create a C struct TBL
+    // --- create a C struct Table
     int nb_columns = 2;
-    char* def = "A title";
-    char* vars = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG";
+    std::string title = "A title";
     std::vector<std::string> v_vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
-    char** lecs = B_ainit_chk(vars, NULL, 0);
-    int mode = 1;
-    int files = 1;
-    int date = 1;
+    bool mode = true;
+    bool files = true;
+    bool date = true;
 
-    TBL* tbl = T_create(nb_columns);
-	T_auto(tbl, def, lecs, mode, files, date);
-	SCR_free_tbl((unsigned char**) lecs);
+    Table* tbl = new Table(nb_columns, title, v_vars, mode, files, date);
 
     // test if the Table object has been correctly initialized
     TableCell* cell;
@@ -54,7 +50,7 @@ TEST_F(TablesTest, AddGetTBL)
     line = &tbl->lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_TITLE);
     cell = &(line->cells[0]);
-    ASSERT_EQ(cell->get_content(), "A title");
+    ASSERT_EQ(cell->get_content(), title);
     // --- separator line ---
     line = &tbl->lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
@@ -110,7 +106,7 @@ TEST_F(TablesTest, AddGetTBL)
 
     // --- extract the table from the Table KDB
     int pos = K_find(KT_WS, name);
-    TBL* extracted_tbl = KTVAL(KT_WS, pos);
+    Table* extracted_tbl = KTVAL(KT_WS, pos);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
@@ -188,8 +184,8 @@ TEST_F(TablesTest, AddGetTBL)
     }
 
     // --- free memory
-    T_free(tbl);
-    T_free(extracted_tbl);
+    delete tbl;
+    delete extracted_tbl;
 }
 
 TEST_F(TablesTest, Equivalence_C_CPP)
@@ -266,11 +262,11 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_FILES);
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
-    K_add(KT_WS, c_name, static_cast<TBL*>(&table));
+    K_add(KT_WS, c_name, static_cast<Table*>(&table));
     int pos = K_find(KT_WS, c_name);
     ASSERT_GT(pos, -1);
 
-    TBL* tbl = KTVAL(KT_WS, pos);
+    Table* tbl = KTVAL(KT_WS, pos);
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);
@@ -322,10 +318,10 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_FILES);
     ASSERT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
-    // test if a Table object can be passed to the hash function for the objects of type TBL.
-    std::hash<TBL> tbl_hasher;
+    // test if a Table object can be passed to the hash function for the objects of type Table.
+    std::hash<Table> tbl_hasher;
     std::size_t c_hash = tbl_hasher(*tbl);
-    std::size_t cpp_hash = tbl_hasher(static_cast<TBL>(table));
+    std::size_t cpp_hash = tbl_hasher(static_cast<Table>(table));
     ASSERT_EQ(c_hash, cpp_hash);
 }
 
@@ -794,7 +790,7 @@ TEST_F(TablesTest, ListVariables)
 
 TEST_F(TablesTest, Hash)
 {
-    std::hash<TBL> table_hasher;
+    std::hash<Table> table_hasher;
     std::size_t hash_original;
     std::size_t hash_before;
     std::size_t hash_after;
@@ -810,7 +806,7 @@ TEST_F(TablesTest, Hash)
 
     // C++ table vs C table
     int pos = K_find(KT_WS, "GFRPC");
-    TBL* c_table = KTVAL(KT_WS, pos);
+    Table* c_table = KTVAL(KT_WS, pos);
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);
 

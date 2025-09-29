@@ -1,5 +1,5 @@
 #pragma once
-#include "cpp_api/objects/table.h"
+#include "api/objs/tables.h"
 #include "cpp_api/computed_table/computed_table.h"
 #include "kdb_template.h"
 
@@ -85,7 +85,7 @@ inline std::size_t hash_value(KDBTables const& cpp_kdb)
     {
         char* o_name = kdb->k_objs[pos].o_name;
         hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
-        hash_combine<TBL>(seed, *KTVAL(kdb, pos));
+        hash_combine<Table>(seed, *KTVAL(kdb, pos));
     }
     return seed;
 }

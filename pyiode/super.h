@@ -43,7 +43,7 @@ int c_IdtExecute_super(char* arg, int unused);
 int c_EqsEstimate_super(char* arg, int unused);
 int c_XodeRuleImport_super(char* arg, int unused);
 
-int c_ViewTable_super(TBL* tbl, char* smpl, char* name);
+int c_ViewTable_super(Table* tbl, char* smpl, char* name);
 
 // ========================================= //
 

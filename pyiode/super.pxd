@@ -1,6 +1,5 @@
 cdef extern from "api/all.h":
     ctypedef struct KDB
-    ctypedef struct TBL
     cdef KDB* KT_WS
 
     cdef int   kmsgbox_continue

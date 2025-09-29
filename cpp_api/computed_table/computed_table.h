@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cpp_api/common.h"
-#include "cpp_api/objects/table.h"
+#include "api/objs/tables.h"
 #include "cpp_api/KDB/kdb_variables.h"
 
 
@@ -12,10 +12,6 @@
 //           to generates output tables and graphs provided in the menu Print/Graph of the GUI.
 //           I would like you to read carefully the code of the ComputedTable class below and makes 
 //           comments/recommandations to get a complete class that does what it is supposed to do.
-
-// TODO ALD: - tranform FIL and COL into C++ classes
-//           - replaced FILS and COLS structures by std::vector
-//           - rewrite T_prep_cls(), T_prep_smpl() and T_find_files() in C++
 
 const static std::string ALLOWED_FORMATS = "HMRCD";
 
@@ -132,7 +128,7 @@ public:
 
     std::string get_title() const
     {
-        return ref_table->get_title(0);
+        return ref_table->get_title();
     }
 
     TableGraphGrid get_grid_xaxis() const

@@ -150,7 +150,7 @@ int B_PrintHtmlTHClass(char *th_class, int unused=-1);
 int B_PrintHtmlTDClass(char *td_class, int unused=-1);
 
 /* b_print.c */
-inline int B_TBL_TITLE;    // Specify how to print a TABLE 
+inline int B_TABLE_TITLE;    // Specify how to print a TABLE 
                            //      0 : print table full definitions
                            //      1 : print only table titles
 inline int B_EQS_INFOS;    // Information detail to print (for equations)
@@ -175,7 +175,7 @@ int B_PrintObjDef_1(char *,int *);
 int B_PrintObjDef(char* arg, int unused=-1);
 int B_PrintObjDefArgs(char* arg, int unused=-1);
 int B_PrintDefTbl(KDB *,int );
-int B_DumpTblDef(TBL *);
+int B_DumpTblDef(Table *);
 int B_CellDef(TableCell *);
 int B_PrintTblCell(TableCell *,int );
 int B_PrintDefCmt(KDB *,int );

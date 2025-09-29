@@ -33,7 +33,7 @@
     - [k\_objvers.c](#T27)
     - [k\_pack.c](#T28)
       - [Packing functions](#T29)
-      - [Unpacking functions (for TBL and EQ only ?)](#T30)
+      - [Unpacking functions (for Table and EQ only ?)](#T30)
       - [Allocation functions (Scalar & VAR only)](#T31)
     - [k\_val.c](#T32)
     - [k\_eqs.c](#T33)
@@ -346,7 +346,7 @@ Functions acting on workspaces of variables.
 - k\_val.c: functions to retrieve object data based on their position or name in the kdb.
 - k\_eqs.c: functions to manipulate equation expressions and objects.
 - k\_lst.c: functions to manipulate and create lists.
-- k\_tbl.c: functions to manage TBL objects.
+- k\_tbl.c: functions to manage Table objects.
 - k\_cmp.c: function to compare two IODE objects.
 - k\_grep.c: functions to search strings in KDB objects.
 
@@ -367,7 +367,7 @@ How to create IODE objects using K\_add():
 |Identities|K\_add(KDB\* kdb, char\* name, char\* lec)|
 |Lists|K\_add(KDB\* kdb, char\* name, char\* list)|
 |Scalars|K\_add(KDB\* kdb, char\* name, Scalar\* scalar)|
-|Tables|K\_add(KDB\* kdb, char\* name, TBL \*tbl)|
+|Tables|K\_add(KDB\* kdb, char\* name, Table \*tbl)|
 |Variables|K\_add(KDB\* kdb, char\* name, IODE\_REAL\* var, int nb\_obs) \[nb\_obs = kdb Sample size\]|
 
 Note: the name of an equation MUST be the name of its endogenous variable.
@@ -411,15 +411,15 @@ Functions for "packing" and "unpacking" IODE objects.
 |`int K_ipack(char **pack, char *a1)`|Packs an IODE IDT object|
 |`int K_lpack(char** pack, char* a1)`|Packs an IODE LST object|
 |`int K_spack(char **pack, char *a1)`|Packs an IODE Scalar object|
-|`int K_tpack(char** pack, char* a1)`|Packs an IODE TBL object|
+|`int K_tpack(char** pack, char* a1)`|Packs an IODE Table object|
 |`int K_vpack(char **pack, double *a1, int *a2)`|Packs an IODE VAR object.|
 |`int K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
 
-#### Unpacking functions (for TBL and EQ only ?) {#T30}
+#### Unpacking functions (for Table and EQ only ?) {#T30}
 
 |Syntax|Description|
 |:---|:---|
-|`TBL* K_tunpack(char *pack)`|Creates a TBL struct from a packed TBL|
+|`Table* K_tunpack(char *pack)`|Creates a Table struct from a packed Table|
 |`Equation* K_eunpack(char *pack, char *name)`|Creates an EQ struct from a packed EQ|
 |`Identity* K_iunpack(char *pack)`|Creates an IDT struct from a packed IDT|
 
@@ -434,7 +434,7 @@ s
 
 ### k\_val.c {#T32}
 
-Basic functions to retrieve object data based on their position or name in the kdb. If the object is packed (EQ, TBL...) the position (n) of the element in the pack must be given.
+Basic functions to retrieve object data based on their position or name in the kdb. If the object is packed (EQ, Table...) the position (n) of the element in the pack must be given.
 
 List of functions
 
@@ -449,7 +449,7 @@ List of functions
 |`double *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
 |`double *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
 |`Equation* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
-|`TBL* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
+|`Table* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
 |**Equation tests**||
 |`double K_etest(KDB* kdb, char*name, int test_nb)`|Retrieves a statistical test stored the equation whose endo is name.|
 |`double K_e_stdev (KDB* kdb, char*name)`|Returns stdev calculated during the last estimation of equation name|
@@ -488,23 +488,16 @@ Basic functions to manipulate lists and to extract lists of VARs and Scalars fro
 
 |`Syntax`|Description|
 |:---|:---|
-|`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).|
+|`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).|
 |`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.|
 |`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.|
-|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of TBLs and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.|
+|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.|
 |`int KL_lst(char* name, char** lst, int chunck)`|Creates a list from a table of strings. The elements in the new list are separated by semi\-colons.|
 |`unsigned char **KL_expand(char *str)`|Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.|
 
 ### k\_tbl.c {#T35}
 
-Functions to manage TBL objects.
-
-|`Syntax`|Description|
-|:---|:---|
-|`TBL *T_create(int dim)`|Creates a new TBL objects.|
-|`void T_free(TBL* tbl)`|Frees a TBL object|
-|`int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)`|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
-|`void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)`|Fills a TBL with a list of variables and their CMT.|
+Functions to manage Table objects.
 
 ### k\_cmp.c {#T36}
 
@@ -705,7 +698,7 @@ See [SIMUL.md](simul.md).
 
 ## Group "Table Calculation" {#T60}
 
-See [TBL\_CALC.md](tbl_calc.md).
+See [Table\_CALC.md](tbl_calc.md).
 
 ## Group "IODE Printing" {#T61}
 

@@ -120,7 +120,7 @@ int K_cmp_scl(Scalar* scl1, Scalar* scl2)
     return *scl1 == *scl2;
 }
 
-int K_cmp_tbl(TBL* tbl1, TBL* tbl2)
+int K_cmp_tbl(Table* tbl1, Table* tbl2)
 {
     int rc;
     char* p1 = NULL; 

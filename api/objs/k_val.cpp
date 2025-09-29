@@ -2,7 +2,7 @@
  *  @header4iode
  *
  *  Basic functions to retrieve object data based on their position or name in the kdb.
- *  If the object is packed (EQ, TBL...) the position (n) of the element in the pack must be given.
+ *  If the object is packed (EQ, Table...) the position (n) of the element in the pack must be given.
  *  
  *  List of functions 
  *  -----------------
@@ -15,7 +15,7 @@
  *    double *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
  *    double *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
  *    Equation* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
- *    TBL* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
+ *    Table* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
  *  
  *    double K_etest(KDB* kdb, char*name, int test_nb)  Retrieves a statistical test stored the equation whose endo is name.
  *    double K_e_stdev (KDB* kdb, char*name)            Returns stdev calculated during the last estimation of equation name
@@ -199,14 +199,14 @@ Equation* K_eptr(KDB* kdb, char* name)
 }
 
 /**
- *  Retrieves a TBL in a kdb based on its name. Allocates a new TBL with its content.  
+ *  Retrieves a Table in a kdb based on its name. Allocates a new Table with its content.  
  *  
  *  @param [in] kdb     KDB*    KDB of tables
  *  @param [in] name    int     table object name
- *  @return             Equation*     pointer to an allocated TBL ~ kdb[name]
+ *  @return             Equation*     pointer to an allocated Table ~ kdb[name]
  *  
  */
-TBL* K_tptr(KDB* kdb, char* name)
+Table* K_tptr(KDB* kdb, char* name)
 {
     int pos;
     

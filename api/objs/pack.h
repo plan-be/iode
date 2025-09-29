@@ -30,7 +30,7 @@ int K_cpack(char **,char *);
 int K_lpack(char **,char *);
 int K_opack(char **,char *,int *);
 //void K_vunpack(void);
-TBL *K_tunpack(char*, char* name = NULL);
+Table *K_tunpack(char*, char* name = NULL);
 Identity* K_iunpack(char *);
 //void K_sunpack(void);
 //void K_cunpack(void);

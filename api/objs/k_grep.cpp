@@ -45,8 +45,8 @@ extern "C" int SCR_ADD_PTR_CHUNCK;
  *  @param [in] pattern  char*     string to search
  *  @param [in] ecase    int       1 if case sensitive, 0 otherwise
  *  @param [in] names    int       1 to search also in object names
- *  @param [in] forms    int       1 to search also in LEC expressions (for EQ, IDT, TBL LEC cells)
- *  @param [in] texts    int       1 to search also in texts (for CMT, LST, EQS comments, TBL text cells)
+ *  @param [in] forms    int       1 to search also in LEC expressions (for EQ, IDT, Table LEC cells)
+ *  @param [in] texts    int       1 to search also in texts (for CMT, LST, EQS comments, Table text cells)
  *  @param [in] all      int       character indicating "any sequence" (normally '*')
  *                       
  *  @return              char**    NULL terminated list of object names where the string has been found 
@@ -57,7 +57,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 {
     int     i, j, k, n = 0, found;
     char    **lst = NULL;
-    TBL     *tbl;
+    Table     *tbl;
     TableLine   *tline;
     int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
     std::string lec;
@@ -139,7 +139,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                                 break;
                         }
                     }
-                    T_free(tbl);
+                    delete tbl;
                     break;
             }
         }

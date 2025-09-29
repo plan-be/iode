@@ -9,7 +9,7 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
-from pyiode.iode_database.cpp_api_database cimport B_TBL_TITLE, B_PrintObjTblTitle
+from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblTitle
 
 
 cdef class Tables(CythonIodeDatabase):
@@ -21,7 +21,7 @@ cdef class Tables(CythonIodeDatabase):
         self.ptr_owner = False
         self.database_ptr = &cpp_global_tables
         self.abstract_db_ptr = &cpp_global_tables
-        self.print_as = B_TBL_TITLE
+        self.print_as = B_TABLE_TITLE
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -40,7 +40,7 @@ cdef class Tables(CythonIodeDatabase):
             wrapper.ptr_owner = False
             wrapper.database_ptr = &cpp_global_tables
             wrapper.abstract_db_ptr = &cpp_global_tables
-        wrapper.print_as = B_TBL_TITLE
+        wrapper.print_as = B_TABLE_TITLE
         return wrapper
 
     def _load(self, filepath: str):

@@ -1,7 +1,7 @@
 /**
  *  @header4iode
  *  
- *  Calculation of TBL cells on a GSample
+ *  Calculation of Table cells on a GSample
  *  --------------------------------------
  *  
  *  This module calculates the values of table cells based on:
@@ -17,16 +17,16 @@
  *  
  *  How to use these functions to print a table ?
  *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
- *      2. call COL_resize() to extend COLS according to the number of columns in the TBL 
- *      3. for each TBL line, call: 
+ *      2. call COL_resize() to extend COLS according to the number of columns in the Table 
+ *      3. for each Table line, call: 
  *          COL_clear(cls) to reset the COLS values 
  *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
  *          COL_text() to generate the value of the TABLE_CELL_STRING cells
  *  
  *  List of functions 
  *  -----------------
- *      int COL_exec(TBL* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one TBL line for all columns of a GSample.
- *      int COL_resize(TBL* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a TBL definition
+ *      int COL_exec(Table* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one Table line for all columns of a GSample.
+ *      int COL_resize(Table* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a Table definition
  *      void COL_clear(COLS* cls)                   Resets the values in a COLS structure. 
  */
 #include <math.h>
@@ -253,18 +253,18 @@ err:
 
 /**
  *  After the compilation of a GSample into a COLS structure, multiply the resulting number of COL's 
- *  by the number of columns in the TBL definition (usually 2).
+ *  by the number of columns in the Table definition (usually 2).
  *  
  *  For example, if the GSample is "2020/2019:5" and the table consists of 2 columns, the 
  *  resulting COLS* will contain 5 x 2 COL's.
  *    
- *  @param [in]         TBL*    tbl     TBL to be calculated
+ *  @param [in]         Table*    tbl     Table to be calculated
  *  @param [in, out]    COLS*   cls     compiled GSample (via COL_cc())
  *  @return             int             new number of columns in cls
  *  
  */
  
-int COL_resize(TBL* tbl, COLS* cls)
+int COL_resize(Table* tbl, COLS* cls)
 {
     COL     *old, *ptr;
     int     i,j, old_nb, new_nb, dim;
@@ -305,19 +305,19 @@ void COL_clear(COLS* cls)
 
 
 /**
- *  Calculates the values of all LEC formulas in one TBL line for all columns 
+ *  Calculates the values of all LEC formulas in one Table line for all columns 
  *  of a GSample (precompiled into a COLS structure).
  *  
  *  Stores each column calculated values in cls[i]->cl_res.
  *      
- *  @param [in]      TBL*    tbl     TBL to be calculated
+ *  @param [in]      Table*    tbl     Table to be calculated
  *  @param [in]      int     i       line position to be calculated
  *  @param [in, out] COLS*   cls     compiled GSample (group of COL structures)
  *  @return          int             0 on success, -1 on failure   
  *  
  */
  
-int COL_exec(TBL* tbl, int i, COLS* cls)
+int COL_exec(Table* tbl, int i, COLS* cls)
 {
     int lg = cls->cl_nb / T_NC(tbl);
 

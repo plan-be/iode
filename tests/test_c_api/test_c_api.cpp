@@ -776,48 +776,52 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
+TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
 {
-    TBL*     tbl;
-    TBL*     extracted_tbl;
+    Table*       tbl;
+    Table*       extracted_tbl;
     TableLine*   line;
     TableLine*   line_original;
     TableLine*   line_restored;
     std::vector<TableCell> cells;
     std::vector<TableCell> cells_original;
     std::vector<TableCell> cells_restored;
+    int pos;
 
-    int     nb_columns = 2;
-    char    *def = "A title";
-    char    *vars = "GOSG,YDTG,DTH,DTF,IT,YSSG+COTRES,RIDG,OCUG"; // Note that semi-colon are not accepted by B_ainit_chk() (see b_args.c)
+    int nb_columns = 2;
+    std::string title = "A title";
     std::vector<std::string> v_lecs = {"GOSG", "YDTG", "DTH", "DTF", "IT", 
                                        "YSSG+COTRES", "RIDG", "OCUG"};
-    
-    char    **lecs;
-    char    *name;
-    int     mode = 1;
-    int     files = 1;
-    int     date = 1;
-    int     pos;
+    bool mode = true;
+    bool files = true;
+    bool date = true;
 
-    U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
+    U_test_print_title("Tests Table: Table(...) constructor vs KTVAL()");
 
-    // --- create a C struct TBL via T_auto()
-    lecs = B_ainit_chk(vars, NULL, 0);
-    tbl = T_create(nb_columns);
-	T_auto(tbl, def, lecs, mode, files, date);
-	SCR_free_tbl((unsigned char**) lecs);
+    // --- create an instance of Table;
+    tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
 
     EXPECT_TRUE(tbl != nullptr);
     EXPECT_EQ(tbl->nb_columns, nb_columns);
-    // title + sep + line #S + sep + 8 cells + sep + mode + files + date
+    // divider line
+    EXPECT_EQ(tbl->divider_line.get_type(), TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->divider_line.get_graph_type(), 0);
+    EXPECT_EQ(tbl->divider_line.right_axis, false);
+    cells = tbl->divider_line.cells;
+    EXPECT_EQ(cells.size(), nb_columns);
+    EXPECT_EQ(cells[0].get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(cells[0].get_content(), "1");
+    EXPECT_EQ(cells[1].get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(cells[1].get_content(), "");
+    cells.clear();
+    // title + sep + line #S + sep + 8 lines with cells + sep + mode + files + date
     EXPECT_EQ(tbl->lines.size(), 16);
     // title line
     line = &tbl->lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     cells = line->cells;
     EXPECT_EQ(cells.size(), 1);
-    EXPECT_EQ(cells[0].get_content(), std::string(def));
+    EXPECT_EQ(cells[0].get_content(), title);
     cells.clear();
     // sep line
     EXPECT_EQ(tbl->lines[1].get_type(), TABLE_LINE_SEP);
@@ -859,7 +863,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
-    name = "c_table";
+    char* name = "c_table";
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
@@ -935,8 +939,8 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     }
 
     // --- free memory
-    T_free(tbl);
-    T_free(extracted_tbl);
+    delete tbl;
+    delete extracted_tbl;
 }
 
 
@@ -1152,18 +1156,18 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     char    **varlist;
     Sample  *smpl;
     KDB     *kdbv, *kdbt;
-    TBL     *tbl;
+    Table     *tbl;
     int     rc;
 
     U_test_suppress_a2m_msgs();
 
-    U_test_print_title("Tests Print TBL as Tables and Graphs");
+    U_test_print_title("Tests Print Table as Tables and Graphs");
 
     // Load the VAR workspace
     K_RWS[VARIABLES][0] = K_WS[VARIABLES] = kdbv  = U_test_K_interpret(VARIABLES, "fun.av");
     EXPECT_NE(kdbv, nullptr);
 
-    // Load the TBL workspace
+    // Load the Table workspace
     K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.at");
     EXPECT_NE(kdbt, nullptr);
 
@@ -1190,8 +1194,8 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     rc = T_graph_tbl_1(tbl, "2000/1999:15[1;2]", 1);
     EXPECT_EQ(rc, 0);
 
-    // Frees tbl
-    T_free(tbl);
+    // deletes tbl
+    delete tbl;
 
     // Print vars as graphs
     varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
@@ -1302,13 +1306,12 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 
 TEST_F(IodeCAPITest, Tests_ALIGN)
 {
-    TBL* p_tbl = T_create(2);
-    int  offset;
-
     U_test_print_title("Tests ALIGN");
-
-    offset = (int) ((char*)(p_tbl + 1) - (char*)p_tbl);
-    printf("sizeof(TBL)    = %d -- Offset = %d\n", (int)sizeof(TBL), offset);
+    
+    Table* p_tbl = new Table(2);
+    int offset = (int) ((char*)(p_tbl + 1) - (char*)p_tbl);
+    printf("sizeof(Table)    = %d -- Offset = %d\n", (int)sizeof(Table), offset);
+    delete p_tbl;
 }
 
 
@@ -2736,7 +2739,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     U_test_reset_kmsg_msgs();
 }
 
-TEST_F(IodeCAPITest, Tests_B_PRINT_TBL_DEF)
+TEST_F(IodeCAPITest, Tests_B_PRINT_Table_DEF)
 {
     char in_filename[256];
     sprintf(in_filename,  "%s%s", input_test_dir, "fun");
@@ -2754,14 +2757,14 @@ TEST_F(IodeCAPITest, Tests_B_PRINT_TBL_DEF)
     kmsg_toggle(1);
     char output_filename[256];
 
-    B_TBL_TITLE = 1;
+    B_TABLE_TITLE = 1;
     sprintf(output_filename, "%s%s", output_test_dir, "tables_titles.csv");
     W_dest(output_filename, A2M_DESTCSV);
     B_PrintObjDef("ANAKNFF ANAPRIX", TABLES);
     W_close();
     compare_files(output_test_dir, "tables_titles.csv", output_test_dir, "tables_titles.ref.csv");
 
-    B_TBL_TITLE = 0;
+    B_TABLE_TITLE = 0;
     sprintf(output_filename, "%s%s", output_test_dir, "tables_full_defs.csv");
     W_dest(output_filename, A2M_DESTCSV);
     B_PrintObjDef("ANAKNFF ANAPRIX", TABLES);

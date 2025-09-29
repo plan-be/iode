@@ -836,7 +836,7 @@ done:
 
 
 /**
- *  Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or TBL).
+ *  Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).
  *  
  *  Syntax
  *  ------
@@ -857,7 +857,7 @@ int B_DataScan(char* arg, int type)
     int     rc = -1;
 
     if(type != IDENTITIES && type != EQUATIONS && type != TABLES) {
-        error_manager.append_error("DataScan : only IDT, EQ and TBL are supported");
+        error_manager.append_error("DataScan : only IDT, EQ and Table are supported");
         return(-1);
     }
 

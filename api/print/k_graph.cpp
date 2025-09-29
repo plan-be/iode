@@ -3,7 +3,7 @@
  *  
  *  Functions to generate IODE graphs in A2M format.
  *  The graphs are based on 
- *      - TBL structures and a GSample definition, or
+ *      - Table structures and a GSample definition, or
  *      - VAR list(s) or combination(s) or VARS. 
  *  
  *  Includes some A2M helper functions. 
@@ -11,15 +11,15 @@
  *  List of functions 
  *  -----------------
  *      int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)    Initialises a graph by sending a2m commands to W_printf().
- *      int T_GraphTest(TBL *tbl)                                               Displays the table tbl as a graph (in level) on the full sample of the current WS.
+ *      int T_GraphTest(Table *tbl)                                               Displays the table tbl as a graph (in level) on the full sample of the current WS.
  *      int T_GraphEnd()                                                        Ends a A2M graph definition by sending the a2m command ".ge" to W_printf().
- *      int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a TBL struct and a GSample.
+ *      int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a Table struct and a GSample.
  *      int T_GraphTitle(char *txt)                                             Defines the graph title by sending a2m command ".gtitle" to W_printf().
  *      int T_GraphLegend(int axis, int type, char *txt, char *fileop)          Adds (in A2M) graph *time* axis (.gty or .gtz, see a2m language) with its position, type and title.
  *      int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)        Adds (in A2M) graph *xy* axis with its position, type and title.
  *      int T_GraphTimeData(Sample *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
  *      int T_GraphXYData(int nb, double *x, double *y)                   Adds numerical data on a *xy* graph line or bar.
- *      int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSample. 
+ *      int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSample. 
  *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
  *      int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)                   Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.
  *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
@@ -37,10 +37,10 @@
 /**
  *  Displays the table tbl as a graph (in level) on the full sample of the current WS.
  *  
- *  @param [in] TBL*    tbl table to print
+ *  @param [in] Table*    tbl table to print
  *  @return     int         0 on success, -1 on error 
  */
-int T_GraphTest(TBL *tbl)
+int T_GraphTest(Table *tbl)
 {
     char    gsmpl[20];
     Sample  *smpl = (Sample *) KDATA(KV_WS);
@@ -112,14 +112,14 @@ int T_GraphEnd()
 
 
 /**
- *  Generates one graph in A2M format from a TBL struct and a GSample.
+ *  Generates one graph in A2M format from a Table struct and a GSample.
  *  
- *  @param [in] TBL*    tbl     source TBL
+ *  @param [in] Table*    tbl     source Table
  *  @param [in] char*   gsmpl   GSample definition
  *  @param [in] int     mode    0 for view mode, not null for print mode (generates A2M RTF topic)
  *  @return     int             0 on success, -1 on error (more than 2 cols in tbl or one of the ref files is not in K_RWS)
  */
-int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
+int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
 {
     int     i, dim, begin = 1, w;
     char    **files;
@@ -245,7 +245,7 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
 /**
  *  Adds (in A2M) the graph *time* axis corresponding to a TableLine and a specific COL.
  *  
- *  @param [in] TableLine* line     pointer to a TBL line
+ *  @param [in] TableLine* line     pointer to a Table line
  *  @param [in] COLS*  fcls     compiled GSample (combination of files, op on files, periods, op on periods)
  *  @param [in] int    i        nb of the GSample column to use for generating the legend
  *  @return 
@@ -340,7 +340,7 @@ int T_GraphXYData(int nb, double *x, double *y)
  *      2000Y1:20[1;2;1%2]
  *  3 curves will be generated: [1],[2] and [1%2].
  *  
- *  @param [in]  TBL*        tbl    Source table
+ *  @param [in]  Table*        tbl    Source table
  *  @param [in]  int         i      line number
  *  @param [in]  COLS*       cls    compiled GSample containing the calculated values 
  *                                  for each operation on files and periods
@@ -351,7 +351,7 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  @return 
  *  
  */
-int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
+int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TableLine   *line = &tbl->lines[i];
@@ -617,7 +617,7 @@ APICHRT** API_CHARTS = NULL;
 int       API_NBCHARTS = 0;
 
 // Functions declarations 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
@@ -632,10 +632,10 @@ int APIChartType(int hdl, int i);
 int APIChartAxis(int hdl, int i);
 char *APIChartTitle(int hdl, int i);
 double *APIChartData(int hdl, int i);
-int APIPrepareChart(TBL *tbl, char *gsmpl);
+int APIPrepareChart(Table *tbl, char *gsmpl);
 
 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TableLine   *line = &tbl->lines[i];
@@ -871,7 +871,7 @@ double  *APIChartData(int hdl, int i)
 }
 
 
-int APIPrepareChart(TBL *tbl, char *gsmpl)
+int APIPrepareChart(Table *tbl, char *gsmpl)
 {
     int     i, dim, begin = 1, w, hdl;
     char    **files;

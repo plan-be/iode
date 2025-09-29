@@ -21,31 +21,25 @@ from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
 
 cdef class TableCell:
     cdef CTableCell* c_cell
-    cdef int nb_columns
     cdef object py_parent_table
 
     def __cinit__(self):
         self.c_cell = NULL
-        self.nb_columns = 0
         self.py_parent_table = None
 
     def __dealloc__(self):
         pass
 
     @staticmethod
-    cdef TableCell from_ptr(CTableCell* c_cell_ptr, int nb_columns, py_parent_table):
+    cdef TableCell from_ptr(CTableCell* c_cell_ptr, py_parent_table):
         """
         Factory function to create TableCell objects from given CTableCell pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef TableCell wrapper = TableCell.__new__(TableCell)
         wrapper.c_cell = c_cell_ptr
-        wrapper.nb_columns = nb_columns
         wrapper.py_parent_table = py_parent_table
         return wrapper
-
-    def get_nb_columns(self) -> int:
-        return self.nb_columns
 
     def get_cell_type(self) -> str:
         return TableCellType(<int>(self.c_cell.get_type())).name if self.c_cell is not NULL else None
@@ -171,7 +165,6 @@ cdef class TableLine:
         c_cell = &(self.c_line.cells[col])
 
         cell.c_cell = c_cell
-        cell.nb_columns = self.nb_columns
         cell.py_parent_table = self.py_parent_table
         return cell
 
@@ -286,16 +279,18 @@ cdef class Table:
 
     def get_nb_lines(self) -> int:
         self.extract_tbl_from_database()
-        return <int>(self.c_table.lines.size())
+        return <int>(self.c_table.lines.size()) if self.c_table is not NULL else 0
 
     def get_nb_columns(self) -> int:
         self.extract_tbl_from_database()
-        return <int>(self.c_table.nb_columns)
+        return <int>(self.c_table.nb_columns) if self.c_table is not NULL else 0
 
     def get_title(self) -> str:
         cdef string c_title
         cdef CTableLine* c_line
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
 
         for i in range(self.c_table.lines.size()):
             c_line = &(self.c_table.lines[i])
@@ -309,6 +304,9 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef string c_title
 
+        if self.c_table is NULL:
+            return
+
         for i in range(self.c_table.lines.size()):
             c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
@@ -319,9 +317,13 @@ cdef class Table:
 
     def get_language(self) -> str:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         return self.c_table.get_language_as_string().decode().upper()
 
     def set_language(self, value: Union[TableLang, str]):
+        if self.c_table is NULL:
+            return
         if isinstance(value, str):
             upper_str = value.upper()
             if upper_str not in TableLang.__members__:
@@ -334,9 +336,13 @@ cdef class Table:
 
     def get_gridx(self) -> str:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         return TableGraphGrid(<int>(self.c_table.get_gridx())).name
 
     def set_gridx(self, value: Union[TableGraphGrid, str]):
+        if self.c_table is NULL:
+            return
         if isinstance(value, str):
             value = value.upper()
             value = TableGraphGrid[value]
@@ -346,9 +352,13 @@ cdef class Table:
 
     def get_gridy(self) -> str:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         return TableGraphGrid(<int>(self.c_table.get_gridy())).name
 
     def set_gridy(self, value: Union[TableGraphGrid, str]):
+        if self.c_table is NULL:
+            return
         if isinstance(value, str):
             value = value.upper()
             value = TableGraphGrid[value]
@@ -358,9 +368,13 @@ cdef class Table:
 
     def get_graph_axis(self) -> str:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         return TableGraphAxis(self.c_table.get_graph_axis()).name
 
     def set_graph_axis(self, value: Union[TableGraphAxis, str]):
+        if self.c_table is NULL:
+            return
         if isinstance(value, str):
             value = value.upper()
             value = TableGraphAxis[value]
@@ -370,9 +384,13 @@ cdef class Table:
 
     def get_text_alignment(self) -> str:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         return TableTextAlign(<int>(self.c_table.get_text_alignment())).name
 
     def set_text_alignment(self, value: Union[TableTextAlign, str]):
+        if self.c_table is NULL:
+            return
         if isinstance(value, str):
             value = value.upper()
             value = TableTextAlign[value]
@@ -441,8 +459,10 @@ cdef class Table:
 
     def get_divider(self, divider: TableLine) -> TableLine:
         cdef CTableLine* c_line
-
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
+        
         c_line = &(self.c_table.divider_line)
 
         divider.c_line = c_line
@@ -452,7 +472,9 @@ cdef class Table:
 
     def set_divider(self, value: Union[List[str], Tuple[str]]):
         cdef CTableLine* c_line
-        cdef CTableCell* c_cell
+        cdef CTableCell* c_cell 
+        if self.c_table is NULL:
+            return 
         
         c_line = &(self.c_table.divider_line)
         if c_line is NULL:
@@ -479,12 +501,15 @@ cdef class Table:
     def index(self, key: str) -> int:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
+        if self.c_table is NULL:
+            return -1
 
         if not isinstance(key, str):
             raise TypeError(f"Expected value of type str. Got value of type {type(key).__name__} instead.")
         key = key.replace('"', '').strip()
 
         self.extract_tbl_from_database()
+        
         nb_columns = self.c_table.nb_columns
         for i in range(self.c_table.lines.size()):
             c_line = &(self.c_table.lines[i])
@@ -506,6 +531,8 @@ cdef class Table:
 
     def insert(self, row: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType]):
         cdef CTableLine* c_line
+        if self.c_table is NULL:
+            return 
 
         if isinstance(value, TableLineType):
             if value == TableLineType.FILES:
@@ -547,13 +574,18 @@ cdef class Table:
 
     def compute(self, generalized_sample: str, nb_decimals: int=2) -> ComputedTable:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         if not generalized_sample:
             raise ValueError("'generalized_sample' must not be empty")
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def _getitem_(self, row: int, line: TableLine) -> TableLine:
-        cdef CTableLine* c_line = &(self.c_table.lines[row])
+        cdef CTableLine* c_line
+        if self.c_table is NULL:
+            return None
 
+        c_line = &(self.c_table.lines[row])
         line.c_line = c_line
         line.nb_columns = <int>(self.c_table.nb_columns)
         line.py_parent_table = self
@@ -561,8 +593,11 @@ cdef class Table:
 
     def _setitem_(self, row: int, value: Union[str, List[str], Tuple[str]]):
         cdef CTableCell* c_cell
-        cdef CTableLine* c_line = &(self.c_table.lines[row])
-        
+        cdef CTableLine* c_line
+        if self.c_table is NULL:
+            return
+
+        c_line = &(self.c_table.lines[row])
         line_type = <int>(c_line.get_type())
         nb_columns = self.c_table.nb_columns
         if line_type == TableLineType.TITLE:
@@ -589,11 +624,15 @@ cdef class Table:
         self.update_owner_database()
 
     def _delitem_(self, row: int):
+        if self.c_table is NULL:
+            return 
         self.c_table.remove_line(row)
         self.update_owner_database()
 
     def _iadd_(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
         cdef CTableLine* c_line
+        if self.c_table is NULL:
+            return None
 
         if isinstance(value, TableLineType):
             if value == TableLineType.FILES:
@@ -633,6 +672,8 @@ cdef class Table:
 
     def _copy_(self, table: Table) -> Table:
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
         del table.c_table
         table.c_table = new CTable(dereference(self.c_table))
         table.ptr_owner = <bint>True
@@ -644,6 +685,8 @@ cdef class Table:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
         self.extract_tbl_from_database()
+        if self.c_table is NULL:
+            return None
 
         nb_cols = self.c_table.nb_columns
         max_title_length = 0
@@ -712,4 +755,4 @@ cdef class Table:
         return s
 
     def __hash__(self) -> int:
-        return <int>hash_value_tbl(dereference(self.c_table))
+        return <int>hash_value_tbl(dereference(self.c_table)) if self.c_table is not NULL else 0

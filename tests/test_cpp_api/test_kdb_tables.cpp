@@ -24,8 +24,8 @@ TEST_F(KDBTablesTest, Subset)
     std::string pattern = "C*";
     std::string title = Tables.get_title("C8_1");
     std::string new_title = "modified title";
-    Table table = Tables.get("C8_1");
-    table.set_title(0, new_title);
+    Table* table = Tables.get("C8_1");
+    table->set_title(0, new_title);
 
     // GLOBAL KDB
     KDBTables kdb_global;
@@ -61,21 +61,24 @@ TEST_F(KDBTablesTest, Save)
 
 TEST_F(KDBTablesTest, Get)
 {
+    Table* table;
     int pos = K_find(K_WS[TABLES], const_cast<char*>("GFRPC"));
 
     // by position
-    Table table = Tables.get(pos);
-    EXPECT_EQ(table.get_title(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table.lines.size(), 31);
-    EXPECT_EQ(table.nb_columns, 2);
-    EXPECT_EQ(table.lines[0].get_type(), TABLE_LINE_TITLE);
+    table = Tables.get(pos);
+    EXPECT_EQ(table->get_title(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table->lines.size(), 31);
+    EXPECT_EQ(table->nb_columns, 2);
+    EXPECT_EQ(table->lines[0].get_type(), TABLE_LINE_TITLE);
+    delete table;
 
     // by name
-    Table table2 = Tables.get("GFRPC");
-    EXPECT_EQ(table2.get_title(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table2.lines.size(), 31);
-    EXPECT_EQ(table2.nb_columns, 2);
-    EXPECT_EQ(table2.lines[0].get_type(), TABLE_LINE_TITLE);
+    table = Tables.get("GFRPC");
+    EXPECT_EQ(table->get_title(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table->lines.size(), 31);
+    EXPECT_EQ(table->nb_columns, 2);
+    EXPECT_EQ(table->lines[0].get_type(), TABLE_LINE_TITLE);
+    delete table;
 }
 
 TEST_F(KDBTablesTest, GetNames)
@@ -110,9 +113,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     KDBVariables kdb_var(input_test_dir + "fun.av");
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
-    std::string list_name = "$ENVI";
     std::vector<std::string> vars_envi_list = {"EX", "PWMAB", "PWMS", "PWXAB", "PWXS", 
-        "QWXAB", "QWXS", "POIL", "NATY", "TFPFHP_"};
+                                               "QWXAB", "QWXS", "POIL", "NATY", "TFPFHP_"};
 
     // add empty table with 2 columns
     name = "TABLE1";
@@ -121,8 +123,9 @@ TEST_F(KDBTablesTest, CreateRemove)
     int nb_lines_header = 0;
     int nb_lines_footnotes = 0;
     int nb_lines_vars = 0;
-    Table table1 = Tables.get(name);
-    EXPECT_EQ(table1.lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    Table* table = Tables.get(name);
+    EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    delete table;
 
     // remove table
     Tables.remove(name);
@@ -130,7 +133,9 @@ TEST_F(KDBTablesTest, CreateRemove)
     // add tables and initialize it (variables as list)
     name = "TABLE2";
     std::string def = "A title";
-    std::vector<std::string> vars = {"GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", list_name};
+    std::string list_name = "$ENVI";
+    std::vector<std::string> vars = {"GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", 
+                                     "RIDG", "OCUG", list_name};
     bool mode = true;
     bool files = true;
     bool date = true;
@@ -140,49 +145,50 @@ TEST_F(KDBTablesTest, CreateRemove)
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     nb_lines_vars = vars.size() + vars_envi_list.size() - 1;    // -1 for list_name which is expanded
-    Table table2 = Tables.get(name);
-    EXPECT_EQ(table2.lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    table = Tables.get(name);
+    EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // check lines
     std::vector<std::string> expanded_vars = vars;
     expanded_vars.pop_back();                                                                   // remove list_name
     expanded_vars.insert(expanded_vars.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
     
-    line = &table2.lines[0];
+    line = &table->lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = &table2.lines[1];
+    line = &table->lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = &table2.lines[2];
+    line = &table->lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = &table2.lines[3];
+    line = &table->lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = &table2.lines[i + nb_lines_header];
+        line = &table->lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), expanded_vars[i]);
         EXPECT_EQ(line->cells[1].get_content(false), expanded_vars[i]);
     }
     i += nb_lines_header;
-    line = &table2.lines[i++];
+    line = &table->lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = &table2.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = &table2.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = &table2.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
+    delete table;
 
     // remove table
     Tables.remove(name);
@@ -195,44 +201,45 @@ TEST_F(KDBTablesTest, CreateRemove)
 
     // check lines
     nb_lines_vars = (int) lecs.size();
-    Table table3 = Tables.get(name);
-    EXPECT_EQ(table3.lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    table = Tables.get(name);
+    EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
-    line = &table3.lines[0];
+    line = &table->lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = &table3.lines[1];
+    line = &table->lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = &table3.lines[2];
+    line = &table->lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = &table3.lines[3];
+    line = &table->lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = &table3.lines[i + nb_lines_header];
+        line = &table->lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), titles[i]);
         EXPECT_EQ(line->cells[1].get_content(false), lecs[i]);
     }
     i += nb_lines_header;
-    line = &table3.lines[i++];
+    line = &table->lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = &table3.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = &table3.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = &table3.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
+    delete table;
 
     // remove table
     Tables.remove(name);
@@ -247,47 +254,48 @@ TEST_F(KDBTablesTest, CreateRemove)
 
     // check lines
     nb_lines_vars = lecs.size() + vars_envi_list.size();
-    Table table4 = Tables.get(name);
-    EXPECT_EQ(table4.lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    table = Tables.get(name);
+    EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     std::vector<std::string> expanded_lecs = lecs;
     expanded_lecs.insert(expanded_lecs.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
 
-    line = &table4.lines[0];
+    line = &table->lines[0];
     EXPECT_EQ(line->get_type(), TABLE_LINE_TITLE);
     EXPECT_EQ(line->cells[0].get_content(false), def);
-    line = &table4.lines[1];
+    line = &table->lines[1];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
-    line = &table4.lines[2];
+    line = &table->lines[2];
     EXPECT_EQ(line->get_type(), TABLE_LINE_CELL);
     EXPECT_EQ(line->cells[0].get_content(false), "");
     EXPECT_EQ(line->cells[1].get_content(false), "#S");
-    line = &table4.lines[3];
+    line = &table->lines[3];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     for(i=0; i < nb_lines_vars; i++)
     {
-        line = &table4.lines[i + nb_lines_header];
+        line = &table->lines[i + nb_lines_header];
         EXPECT_EQ(line->cells[0].get_content(false), expanded_lecs[i]);
         EXPECT_EQ(line->cells[1].get_content(false), expanded_lecs[i]);
     }
     i += nb_lines_header;
-    line = &table4.lines[i++];
+    line = &table->lines[i++];
     EXPECT_EQ(line->get_type(), TABLE_LINE_SEP);
     if(mode)
     {
-        line = &table4.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_MODE);
     }
     if(files)
     {
-        line = &table4.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_FILES);
     }
     if(date)
     {
-        line = &table4.lines[i++];
+        line = &table->lines[i++];
         EXPECT_EQ(line->get_type(), TABLE_LINE_DATE);
     }
+    delete table;
 
     // remove table
     Tables.remove(name);
@@ -295,13 +303,16 @@ TEST_F(KDBTablesTest, CreateRemove)
 
 TEST_F(KDBTablesTest, Copy)
 {
-    Table original_table = Tables.get("GFRPC");
+    Table* original_table = Tables.get("GFRPC");
 
-    Table copy_table = Tables.copy("GFRPC");
-    EXPECT_EQ(copy_table, original_table);
+    Table* copy_table = Tables.copy("GFRPC");
+    EXPECT_EQ(*copy_table, *original_table);
 
     // add copy
-    Tables.add("DUP_GFRPC", copy_table);
+    Tables.add("DUP_GFRPC", *copy_table);
+
+    delete original_table;
+    delete copy_table;
 }
 
 TEST_F(KDBTablesTest, Filter)
@@ -489,27 +500,27 @@ TEST_F(KDBTablesTest, Merge)
     bool files = true;
     bool date = true;
     kdb_to_merge->add(new_name, 2, def, vars, mode, files, date);
-    Table new_table = kdb_to_merge->get(new_name);
+    Table* new_table = kdb_to_merge->get(new_name);
 
     // modify an existing element of the KDB to be merge
     std::string name = "ANAPRIX";
-    Table unmodified_table = kdb_to_merge->get(name);
-    Table modified_table = kdb_to_merge->copy(name);
-    modified_table.set_title(0, "New Title");
+    Table* unmodified_table = kdb_to_merge->get(name);
+    Table* modified_table = kdb_to_merge->copy(name);
+    modified_table->set_title(0, "New Title");
     kdb_to_merge->update(name, modified_table);
 
     // merge (overwrite)
     kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
-    EXPECT_EQ(kdb0->get(new_name), new_table);
+    EXPECT_EQ(*kdb0->get(new_name), *new_table);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0->get(name), modified_table); 
+    EXPECT_EQ(*kdb0->get(name), *modified_table); 
 
     // merge (NOT overwrite)
     kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1->get(name), unmodified_table);
+    EXPECT_EQ(*kdb1->get(name), *unmodified_table);
 }
 
 TEST_F(KDBTablesTest, Search)
@@ -657,7 +668,7 @@ TEST_F(KDBTablesTest, PrintToFile)
 TEST_F(KDBTablesTest, Hash)
 {
     std::size_t hash_val = hash_value(Tables);
-    std::hash<TBL> table_hasher;
+    std::hash<Table> table_hasher;
 
     // change a name
     Tables.rename("GFRPC", "NEW_NAME");
@@ -669,13 +680,13 @@ TEST_F(KDBTablesTest, Hash)
     EXPECT_EQ(hash_val, hash_val_restored);
 
     // remove an entry
-    Table table = Tables.get("GFRPC");
+    Table* table = Tables.get("GFRPC");
     Tables.remove("GFRPC");
     hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    Tables.add("GFRPC", table);
-    std::size_t hash_original = table_hasher(table);
+    Tables.add("GFRPC", *table);
+    std::size_t hash_original = table_hasher(*table);
     std::size_t hash_restored = table_hasher(*Tables.get("GFRPC"));
     EXPECT_EQ(hash_original, hash_restored);
     hash_val_restored = hash_value(Tables);

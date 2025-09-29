@@ -20,7 +20,7 @@
  *    int B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
  *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
  *    int B_PrintDefTbl(KDB* kdb, int pos)                             | Print the table in position pos in kdb.  
- *    int B_DumpTblDef(TBL* tbl)                                       | Print a table definition.
+ *    int B_DumpTblDef(Table* tbl)                                       | Print a table definition.
  *    int B_CellDef(TableCell* cell)                                       | Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells).
  *    int B_PrintTblCell(TableCell* cell, int straddle)                    | Print a TABLE cell optionally on several columns.
  *    int B_PrintDefCmt(KDB* kdb, int pos)                             | Print a comment.
@@ -230,7 +230,7 @@ int B_PrintObjTblTitle(char* arg, int unused)
 
     rc  = B_ScrollSet(arg, &l, 0, 2);
     if(rc) return(rc);
-    B_TBL_TITLE = l;
+    B_TABLE_TITLE = l;
     return(0);
 }
 
@@ -397,14 +397,14 @@ int B_PrintObjDefArgs(char* arg, int type)
 }
 
 
-/*============================= TBL ===============================*/
+/*============================= Table ===============================*/
 
 /**
  *  Print the table in position pos in kdb.  
  *  
- *  If B_TBL_TITLE != 0, print the table title.
- *  If B_TBL_TITLE == 1, print the table name and its title.
- *  If B_TBL_TITLE == 0, print the table definition.
+ *  If B_TABLE_TITLE != 0, print the table title.
+ *  If B_TABLE_TITLE == 1, print the table name and its title.
+ *  If B_TABLE_TITLE == 0, print the table definition.
  *  
  *  @param [in] kdb KDB*        KDB of tables
  *  @param [in] pos int         position of the table in kdb
@@ -412,18 +412,18 @@ int B_PrintObjDefArgs(char* arg, int type)
  */
 int B_PrintDefTbl(KDB* kdb, int pos)
 {
-    TBL *tbl = NULL;
+    Table *tbl = NULL;
 
     if((tbl = KTVAL(kdb, pos)) == NULL) 
         return(-1);
     
-    if(B_TBL_TITLE) 
+    if(B_TABLE_TITLE) 
     {
-        if(B_TBL_TITLE == 1) 
+        if(B_TABLE_TITLE == 1) 
             W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl, false));
         else 
             W_printf("\n%s\n", T_get_title(tbl, false));
-        T_free(tbl);
+        delete tbl;
         return(0);
     }
     B_PrintRtfTopic((char*) T_get_title(tbl, false));
@@ -432,13 +432,13 @@ int B_PrintDefTbl(KDB* kdb, int pos)
     W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
     B_DumpTblDef(tbl);
     W_printf(".te\n");
-    T_free(tbl);
+    delete tbl;
     return(0);
 }
 
 
 // Print a table definition.
-int B_DumpTblDef(TBL* tbl)
+int B_DumpTblDef(Table* tbl)
 {
     W_printf("\n.tl\n");
 

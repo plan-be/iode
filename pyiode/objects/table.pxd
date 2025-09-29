@@ -7,7 +7,7 @@ from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellF
                             TableTextAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
 
-cdef extern from "cpp_api/objects/table.h":
+cdef extern from "api/objs/tables.h":
 
     # declare C++ TableCell class
     cdef cppclass CTableCell "TableCell":
@@ -72,7 +72,6 @@ cdef extern from "cpp_api/objects/table.h":
     cdef cppclass CTable "Table":
         short repeat_columns
         short nb_columns
-        short nb_lines
         CTableLine divider_line
         vector[CTableLine] lines
         float z_min
@@ -90,8 +89,8 @@ cdef extern from "cpp_api/objects/table.h":
         # Copy constructor
         CTable(const CTable& table) except +
 
-        TableLang get_language() 
-        string get_language_as_string()
+        TableLang get_language() except +
+        string get_language_as_string() except +
         void set_language(TableLang lang) except +
 
         TableGraphGrid get_gridx()

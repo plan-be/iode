@@ -1,9 +1,11 @@
 #pragma once
 
 #include "api/constants.h"
+#include "api/b_args.h"
 #include "api/k_super.h"
 #include "api/objs/kdb.h"           // KDB
 #include "api/objs/identities.h"    // Identity
+#include "api/objs/grep.h"
 
 #include <string>
 #include <vector>
@@ -508,50 +510,43 @@ struct std::hash<TableLine>
 std::size_t hash_value(const TableLine& cell);
 
 
-class TBL 
+class Table 
 {
-    short   language;           // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
-    char    chart_gridx;        // 0 = major grids, 1 = no grids, 2 = minor + major grids
-    char    chart_gridy;        // idem
-    char    chart_axis_type;    // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
-    char    text_alignment;     // Text alignment: 0=left, 1=centered, 2=right
+    short   language = TABLE_ENGLISH;               // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
+    char    chart_gridx = TABLE_GRAPH_MAJOR;        // 0 = major grids, 1 = no grids, 2 = minor + major grids
+    char    chart_gridy = TABLE_GRAPH_MAJOR;        // idem
+    char    chart_axis_type = TABLE_GRAPH_VALUES;   // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
+    char    text_alignment = TABLE_TEXT_LEFT;       // Text alignment: 0=left, 1=centered, 2=right
 
 public:
-    short   repeat_columns;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
-    short   nb_columns;         // Number of columns (of text and lec, not calculated values)
-    TableLine divider_line;     // nb_columns TableCell's, each TableCell contains a divider
-    std::vector<TableLine> lines;   
-    float   z_min;              // Min on the right axis
-    float   z_max;              // Max on the right axis
-    float   y_min;              // Min on left axis
-    float   y_max;              // Max on left axis
-    char    attribute;          // Combination (logical &) of attributes: TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_CENTER,
-                                // TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
-    char    chart_box;          // 1 to surround the chart by a box
-    char    chart_shadow;       // 1 to place a shadow behind the chart
+    short   nb_columns;                         // Number of columns (of text and lec, not calculated values)
+    short   repeat_columns = 0;                 // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
+    TableLine divider_line{TABLE_LINE_CELL};    // nb_columns TableCell's, each TableCell contains a divider
+    std::vector<TableLine> lines;
+    float   z_min = (float) IODE_NAN;           // Min on the right axis
+    float   z_max = (float) IODE_NAN;           // Max on the right axis
+    float   y_min = (float) IODE_NAN;           // Min on left axis
+    float   y_max = (float) IODE_NAN;           // Max on left axis
+    char    attribute = TABLE_CELL_NORMAL;      // Combination (logical &) of attributes: TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_CENTER,
+                                                // TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
+    char    chart_box = 0;                      // 1 to surround the chart by a box
+    char    chart_shadow = 0;                   // 1 to place a shadow behind the chart
 
 public:
-    TBL(const int dim): nb_columns(dim), divider_line(TABLE_LINE_CELL)
-    {        
-        this->language = TABLE_ENGLISH;
-        this->repeat_columns = 0;
+    Table(const int nb_columns);
 
-        this->z_min = (float) IODE_NAN;
-        this->z_max = (float) IODE_NAN;
-        this->y_min = (float) IODE_NAN;
-        this->y_max = (float) IODE_NAN;
-        this->attribute = TABLE_CELL_NORMAL;
-        this->text_alignment = TABLE_TEXT_LEFT;
-        this->chart_box = 0;
-        this->chart_shadow = 0;
-        this->chart_gridx = TABLE_GRAPH_MAJOR;
-        this->chart_gridy = TABLE_GRAPH_MAJOR;
-        this->chart_axis_type = TABLE_GRAPH_VALUES;
+    Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
+		  bool mode = false, bool files = false, bool date = false);
 
-        this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1", 0));
-        for(int j = 1; j < dim; j++) 
-            this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
-    }
+    Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
+		  const std::vector<std::string>& lecs, bool mode = false, bool files = false, bool date = false);
+
+    Table(const int nb_columns, const std::string& def, const std::string& lecs, 
+		  bool mode = false, bool files = false, bool date = false);
+
+	Table(const Table& table);
+
+    ~Table();
 
     // -------- GETTERS AND SETTERS --------
 
@@ -645,6 +640,14 @@ public:
         return line.cells[0].get_content(false);
     }
 
+    std::string get_title()
+    {
+        for(TableLine& line : lines)
+            if(line.get_type() == TableLineType::TABLE_LINE_TITLE)
+                return line.cells[0].get_content(false);
+        return "";
+    }
+
     // we assume that title string is written in UTF8 format
     void set_title(const int row, const std::string title)
     {
@@ -718,7 +721,7 @@ public:
 
     // -------- EQUAL --------
 
-    bool operator==(const TBL& other) const
+    bool operator==(const Table& other) const
     {
         if(this->get_language() != other.get_language()) return false;
         if(this->repeat_columns != other.repeat_columns) return false;
@@ -787,25 +790,19 @@ public:
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
-struct std::hash<TBL>
+struct std::hash<Table>
 {
-    std::size_t operator()(const TBL& table) const noexcept
+    std::size_t operator()(const Table& table) const noexcept
     {
 		return table.hash();
     }
 };
 
-std::size_t hash_value(const TBL& table);
+std::size_t hash_value(const Table& table);
 
 /*----------------------- FUNCS ----------------------------*/
 
-TBL* K_tptr(KDB* kdb, char* name);
-
-/* k_tbl.c */
-TBL *T_create(int );
-void T_free(TBL *);
-int T_default(TBL *,char *,char **,char **,int ,int ,int );
-void T_auto(TBL *,char *,char **,int ,int ,int );
+Table* K_tptr(KDB* kdb, char* name);
 
 /*----------------------- MACROS ----------------------------*/
 
@@ -816,4 +813,4 @@ void T_auto(TBL *,char *,char **,int ,int ,int );
 #define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
 
 #define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val), KONAME(kdb, pos)) )
-#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated TBL
+#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated Table
