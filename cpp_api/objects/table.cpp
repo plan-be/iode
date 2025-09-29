@@ -175,15 +175,6 @@ void Table::set_graph_alignment(const TableGraphAlign align)
 
 // -------- LINES --------
 
-TableLine* Table::get_line(const int row)
-{
-	if (row < 0 || row >= this->lines.size())
-		throw std::invalid_argument("Cannot get table line at index " + std::to_string(row) + ".\n" + 
-			"Line index must be in range [0, " + std::to_string(this->lines.size()) + "]");
-
-	return static_cast<TableLine*>(&this->lines[row]);
-}
-
 TableLine* Table::append_line(const TableLineType line_type)
 {
 	int new_pos = T_append_line(this, line_type);
@@ -208,13 +199,6 @@ TableLine* Table::insert_line(const int pos, const TableLineType line_type, cons
 	return static_cast<TableLine*>(&this->lines[new_pos]);
 }
 
-// -------- DIVIDER --------
-
-TableLine* Table::get_divider_line()
-{
-	return static_cast<TableLine*>(&this->divider_line);
-}
-
 // -------- TITLE --------
 
 // we assume that title string is written in UTF8 format
@@ -234,23 +218,23 @@ TableLine* Table::add_title(const std::string& title)
 
 std::string Table::get_title(const int row)
 {
-	TableLine* line = get_line(row);
-	if(line->get_type() != TableLineType::TABLE_LINE_TITLE) 
+	TableLine& line = lines[row];
+	if(line.get_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
-			get_line_type_as_string(line->get_type()) + ".");
-	return line->cells[0].get_content(false);
+			get_line_type_as_string(line.get_type()) + ".");
+	return line.cells[0].get_content(false);
 }
 
 // we assume that title string is written in UTF8 format
 void Table::set_title(const int row, const std::string title)
 {
-	TableLine* line = get_line(row);
-	if(line->get_type() != TableLineType::TABLE_LINE_TITLE) 
+	TableLine& line = lines[row];
+	if(line.get_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot set table title at index " + std::to_string(row) + ".\n" + 
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
-			get_line_type_as_string(line->get_type()) + ".");
-	line->cells[0].set_text(title);
+			get_line_type_as_string(line.get_type()) + ".");
+	line.cells[0].set_text(title);
 }
 
 // -------- CELLS --------
