@@ -553,6 +553,8 @@ public:
             this->divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
     }
 
+    // -------- GETTERS AND SETTERS --------
+
     TableLang get_language() const
     {
         return (TableLang) language;
@@ -608,6 +610,18 @@ public:
         text_alignment = (char) align;
     }
 
+	// -------- LINES --------
+
+	TableLine* append_line(const TableLineType line_type);
+
+	TableLine* insert_line(const int pos, const TableLineType line_type, const bool after = true);
+
+	// -------- REMOVE --------
+
+	void remove_line(const int row);
+
+    // -------- EQUAL --------
+
     bool operator==(const TBL& other) const
     {
         if(this->get_language() != other.get_language()) return false;
@@ -644,6 +658,8 @@ public:
 
         return true;
     }
+
+    // ------- HASH --------
 
     std::size_t hash() const
     {
@@ -693,8 +709,6 @@ TBL* K_tptr(KDB* kdb, char* name);
 TBL *T_create(int );
 void T_free(TBL *);
 char *T_div_cont_tbl(TBL *, int, int );
-int T_append_line(TBL*, int);
-int T_insert_line(TBL*, int, int, int);
 int T_set_lec_cell_tbl(TBL *, int, int, unsigned char *);
 void T_set_string_cell_tbl(TBL *, int, int, unsigned char *);
 int T_default(TBL *,char *,char **,char **,int ,int ,int );

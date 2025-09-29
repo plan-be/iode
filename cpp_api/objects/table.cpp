@@ -83,34 +83,6 @@ Table::Table(const TBL* c_table): TBL(*c_table) {}
 
 Table::Table(const Table& table): TBL((TBL&) table) {}
 
-// ================ TABLE ================
-
-// -------- LINES --------
-
-TableLine* Table::append_line(const TableLineType line_type)
-{
-	int new_pos = T_append_line(this, line_type);
-	if (new_pos < 0) 
-		throw std::runtime_error("Cannot append a new line to the table");
-
-	return static_cast<TableLine*>(&this->lines.back());
-}
-
-TableLine* Table::insert_line(const int pos, const TableLineType line_type, const bool after)
-{
-	if (pos < 0 || pos >= this->lines.size())
-		throw std::invalid_argument("Cannot insert table line at index " + std::to_string(pos) + ".\n" +  
-			"New line index must be in range [0, " + std::to_string(this->lines.size() - 1) + "]");
-
-	int where_ = after ? 1 : 0;
-	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TableCell::type of cells is undefined!
-	int new_pos = T_insert_line(this, pos, line_type, where_);
-	if (new_pos < 0) 
-		throw std::runtime_error("Cannot insert table line at position " + std::to_string(pos));
-
-	return static_cast<TableLine*>(&this->lines[new_pos]);
-}
-
 // -------- TITLE --------
 
 // we assume that title string is written in UTF8 format
