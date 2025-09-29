@@ -92,5 +92,5 @@ int B_ScrollVTW0(char* arg, int unused) {if(B_ScrollVTW0_super       ) return(*B
 int B_ScrollVTN (char* arg, int unused) {if(B_ScrollVTN_super        ) return(*B_ScrollVTN_super       )(arg); else return(0);}
 
 int ODE_scroll  (KDB *kdb, char **lst)             {if(ODE_scroll_super         ) return(*ODE_scroll_super        )(kdb, lst);         else return(0);}
-int T_view_tbl  (TBL *tbl, char *smpl, char* name) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(tbl, smpl, name);  else return(0);}
+int T_view_tbl  (Table *tbl, char *smpl, char* name) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(tbl, smpl, name);  else return(0);}
 // int T_view_tbl  (char* name, char *smpl, char** vars_names) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(name, smpl, vars_names);  else return(0);} // TEMP version for IODE-QT

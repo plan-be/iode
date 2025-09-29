@@ -24,7 +24,7 @@ cdef extern from "api/all.h":
     ctypedef char ONAME[21]
 
     int K_NBDEC
-    int B_TBL_TITLE
+    int B_TABLE_TITLE
     int B_EQS_INFOS
     int B_EQS_LEC
     double K_CMP_EPS

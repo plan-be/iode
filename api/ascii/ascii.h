@@ -116,7 +116,7 @@ inline std::array<std::unique_ptr<AbstractAscii>, 7> ascii_handlers = {
 #define SMPL     1
 
 /**
- * Table of keywords recognized by YY in the context of a TBLs ascii file (.at).
+ * Table of keywords recognized by YY in the context of a Tables ascii file (.at).
  * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
  */
 static YYKEYS TABLE[] = {

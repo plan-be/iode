@@ -1,6 +1,5 @@
 from libc.string cimport strlen
 
-from pyiode.super cimport TBL
 from pyiode.super cimport KT_WS
 from pyiode.super cimport K_end_ws
 from pyiode.super cimport K_find
@@ -8,6 +7,7 @@ from pyiode.super cimport K_add
 from pyiode.super cimport K_del
 from pyiode.super cimport kmsgbox_continue
 from pyiode.super cimport kpause_continue
+from pyiode.objects.table cimport CTable
 
 
 cdef extern from "super.h":
@@ -53,7 +53,7 @@ cdef extern from "super.h":
     cdef int c_EqsEstimate_super(char* arg, int unused) except? -1
     cdef int c_XodeRuleImport_super(char* arg, int unused) except? -1
 
-    cdef int c_ViewTable_super(TBL* tbl, char* smpl, char* name) except? -1
+    cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* name) except? -1
 
 
 # Create an empty dictionary to serve as the registry
@@ -214,7 +214,7 @@ cdef int c_EqsEstimate_super(char* arg, int unused):
 cdef int c_XodeRuleImport_super(char* arg, int unused):
     return __registry_super_functions['XodeRuleImport']()
 
-cdef int c_ViewTable_super(TBL* tbl, char* smpl, char* name):
+cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* name):
     cdef int success = 0
     cdef int pos = K_find(KT_WS, name)
     cdef bytes b_table_name = name

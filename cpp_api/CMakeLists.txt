@@ -10,10 +10,6 @@ set(CPP_REPORT
     report/rep_list.h   report/rep_list.cpp
 )
 
-set(CPP_OBJS
-    objects/table.h         objects/table.cpp
-    )
-
 set(CPP_KDB 
     KDB/kdb_global.h        KDB/kdb_global.cpp
     KDB/kdb_reference.h     KDB/kdb_reference.cpp
@@ -49,7 +45,6 @@ add_library(iode_cpp_api STATIC
             common.h
             ${CPP_UTILS}
             ${CPP_REPORT}
-            ${CPP_OBJS}
             ${CPP_KDB}
             ${CPP_COMPUTE}
             ${CPP_LEC}

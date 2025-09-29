@@ -361,7 +361,7 @@ static void K_xdrCLEC(CLEC* expr, int mode)
 }
 
 
-//// TBL transformation ////
+//// Table transformation ////
 
 /**
  *  Translates a table CELL from little-endian to big-endian or the other way round.
@@ -397,16 +397,16 @@ static void K_xdrCELL(unsigned char* ptr, char type, int mode)
  *  
  */
 
-static void K_xdrTBL(unsigned char* pack, int mode)
+static void K_xdrTable(unsigned char* pack, int mode)
 {
     int             i, j, p, len;
     short           nc, nl;
     unsigned char   *pdiv;
-    TBL             *tbl;
+    Table             *tbl;
     TableCell           *cell, *pcell;
     TableLine           *line, *pline;
 
-    /* TBL:0 */
+    /* Table:0 */
     tbl = P_get_ptr(pack, 0);
     nc = T_NC(tbl);
     nl = T_NL(tbl);
@@ -630,7 +630,7 @@ static int K_sxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 
 
 /**
- *  Translates a little-endian packed TBL into a big-endian packed TBL or the opposite.
+ *  Translates a little-endian packed Table into a big-endian packed Table or the opposite.
  *  Same behaviour as K_cxdr().
  */
  
@@ -641,7 +641,7 @@ static int K_txdr(unsigned char* ptr, unsigned char** xdr_ptr)
     if(xdr_ptr == NULL) {
         /* intel read */
         K_xdrPACK(ptr, 0);
-        K_xdrTBL(ptr, 0);
+        K_xdrTable(ptr, 0);
     }
     else {
         /* intel write */
@@ -649,7 +649,7 @@ static int K_txdr(unsigned char* ptr, unsigned char** xdr_ptr)
         *xdr_ptr = SW_nalloc(len);
         memcpy(*xdr_ptr, ptr, len);
 
-        K_xdrTBL(*xdr_ptr, 1);
+        K_xdrTable(*xdr_ptr, 1);
         K_xdrPACK(*xdr_ptr, 1);
     }
 }

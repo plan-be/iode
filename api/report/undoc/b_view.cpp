@@ -4,7 +4,7 @@
  *  Functions to display or print calculated tables and tables of variables. The same functions are used
  *  to print and to display tables as graphs or as text.
  *  
- *  The functions generate IODE tables in A2M format based on TBL structures and GSample definition.
+ *  The functions generate IODE tables in A2M format based on Table structures and GSample definition.
  *  
  *  List of functions 
  *  -----------------
@@ -17,8 +17,8 @@
  *      int B_ViewGr(char* arg, int unused)                             | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
  *      int B_PrintGr(char* arg, int unused)                            | $PrintGr gsample table1 [table2...]
  *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSample.
- *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on TBL definition(s).
- *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).
+ *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on Table definition(s).
+ *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE Tables either in the form of graphs or in the form of text (SCROLLs).
  *      int B_ViewTblFile(char* arg, int unused)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
@@ -35,6 +35,8 @@
 
 #include "api/report/engine/engine.h"
 #include "api/report/undoc/undoc.h"
+
+#include <algorithm>    // for std::min
 
 
 int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table
@@ -66,63 +68,67 @@ int B_PrintVar(char* arg, int unused)
  */
 int B_ViewPrintVar(char* arg, int mode)
 {
-    int     rc = 0, nb, i;
-    char    *smpl, *ptr;
-    U_ch    **args;
-    TBL     *tbl;
-    char    *oldseps = A_SEPS, *lst;  /* JMP 14-07-96 */
-
-    if(arg == 0 || arg[0] == 0) {
+    if(arg == NULL) 
+    {
         error_manager.append_error("Invalid argument");
-        return(-1);
+        return -1;
     }
-    args = SCR_vtom((unsigned char*) arg, (int) ' ');
-    if(args == NULL) {
+
+    std::string arg_str(arg);
+    arg_str = trim(arg_str);
+    if(arg_str.empty()) 
+    {
         error_manager.append_error("Invalid argument");
-        return(-1);
+        return -1;
     }
 
-    smpl = (char*) SCR_stracpy(args[0]);
-    SCR_free_tbl(args);
-
-    A_SEPS = ";\t\n"; /* JMP 24-12-98 */
-    lst = K_expand(VARIABLES, NULL, arg + strlen(smpl) + 1, '*');
-    args = (unsigned char**) B_ainit_chk(lst, NULL, 0);
-    SCR_free(lst);
-    A_SEPS = oldseps;    /* JMP 14-07-96 */
-    if(args == 0 || args[0] == 0) {
+    size_t pos = arg_str.find(' ');
+    if(pos == std::string::npos) 
+    {
         error_manager.append_error("Invalid argument");
-        rc = -1;
-        goto fin;
+        return -1;
     }
-    nb = SCR_tbl_size(args);
-    for(i = 0 ; i < nb ; i += 50) {
-        if(i + 50 < nb) {
-            ptr = (char*) args[i + 50];
-            args[i + 50] = 0;
-        }
-        tbl = T_create(2);
-        if(mode == 0) {
-            T_default(tbl, 0L, ((char**) args) + i, ((char**) args) + i, 0, 0, 0);
-            rc = T_view_tbl(tbl, smpl, "TABLE_OF_VARIABLES");
-        }
-        else {
-            T_default(tbl, 0L, ((char**) args) + i, ((char**) args) + i, 1, 1, 1);
-            rc = T_print_tbl(tbl, smpl);
-        }
-        T_free(tbl);
-        if(i + 50 < nb) args[i + 50] = (unsigned char*) ptr;
-        if(rc) break;
+    std::string sample = arg_str.substr(0, pos);
+    std::string vars_str = arg_str.substr(pos + 1);
+    vars_str = trim(vars_str);
+
+    char* OLD_SEPS = A_SEPS;
+    A_SEPS = (char*) ";\t\n";
+    std::vector<std::string> vars = split_multi(vars_str, std::string(A_SEPS));
+    A_SEPS = OLD_SEPS;
+    if(vars.size() == 0) 
+    {
+        error_manager.append_error("Invalid argument");
+        W_flush();
+        B_ViewTblEnd();
+        return -1;
     }
 
-fin:
-    SCR_free(smpl);
-    SCR_free_tbl(args);
+    int rc;
+    int chunk_size = 50;
+    for (size_t start = 0; start < vars.size(); start += chunk_size) 
+    {
+        auto end = std::min(start + chunk_size, vars.size());
+        std::vector<std::string> chunks(vars.begin() + start, vars.begin() + end);
+        if(mode == 0)
+        {
+            Table tbl(2, "", chunks, chunks, false, false, false);
+            rc = T_view_tbl(&tbl, (char*) sample.c_str(), "TABLE_OF_VARIABLES");
+        }
+        else 
+        {
+            Table tbl(2, "", chunks, chunks, true, true, true);
+            rc = T_print_tbl(&tbl, (char*) sample.c_str());
+        }
 
-    /*    W_close(); */
+        // something went wrong -> exit loop
+        if(rc != 0) 
+            break;
+    }
+
     W_flush();
     B_ViewTblEnd();
-    return(rc);
+    return rc;
 }
 
 
@@ -172,7 +178,7 @@ int B_PrintGr(char* arg, int unused)
 int B_ViewPrintTbl_1(char* name, char* smpl)
 {
     int rc, pos;
-    TBL *tbl;
+    Table *tbl;
 
     pos = K_find(K_WS[TABLES], name);
     if(pos < 0) {
@@ -189,14 +195,14 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
     if(rc < 0) 
         error_manager.append_error("Table '" + std::string(name) + "' not printed");
 
-    T_free(tbl);
+    delete tbl;
     return(rc);
 }
 
 
 /**
  *  Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, 
- *  based on TBL definition(s).
+ *  based on Table definition(s).
  *  
  *  @param [in] names   char*  list of table names
  *  @param [in] smpl    char*  GSample
@@ -205,7 +211,7 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
     int     rc = 0, pos, hg, ng, i, view = !B_viewmode;
-    TBL     *tbl;
+    Table     *tbl;
     char    **tbls;
 
     tbls = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
@@ -230,7 +236,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
 
         if(view) W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
 
-        T_free(tbl);
+        delete tbl;
         if(hg < 0) {
             rc = -1;
             break;
@@ -254,7 +260,7 @@ int wrapper_B_ViewPrintTbl_1(char* names, void* gsmpl)
 
 
 /**
- *  Calculate, then print or display (according to the mode parameter) IODE TBLs either 
+ *  Calculate, then print or display (according to the mode parameter) IODE Tables either 
  *  in the form of graphs or in the form of text (SCROLLs).
  *  
  *  @param [in] char* arg   sample + list of tables to print  

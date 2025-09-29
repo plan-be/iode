@@ -472,33 +472,29 @@ char T_SEPS[] = ";\n\t";
  */
 int K_upd_tbl(char* name, char* arg)
 {
-    TBL     *tbl;
-    char    **lecs, *lst;
-    int     rc;
-    char    *oldseps = A_SEPS;
+    Table* tbl = nullptr;
 
-    tbl = T_create(2);
-    if(tbl == NULL) {
-        error_manager.append_error("Memory error");
-        return(-1);
+    if(arg == NULL)
+        tbl = new Table(2);
+    else
+    {
+        char* OLD_SEPS = A_SEPS;
+        A_SEPS = T_SEPS;
+        std::vector<std::string> v_args = split_multi(std::string(arg), std::string(A_SEPS));
+        A_SEPS = OLD_SEPS;
+
+        if(v_args.size() == 0)
+            tbl = new Table(2);
+        else
+        {
+            std::string title = v_args.front();
+            v_args.erase(v_args.begin());
+            tbl = new Table(2, title, v_args, false, false, false);
+        }
     }
-    A_SEPS = T_SEPS;
 
-    lst = K_expand(VARIABLES, NULL, arg, '*');
-    lecs = B_ainit_chk(lst, NULL, 0);
-    SCR_free(lst);
-    /*    lecs = B_ainit_chk(arg, 0L, 0);  */
-    if(lecs == 0) goto add;
-    A_SEPS = oldseps;
-    T_auto(tbl, lecs[0], lecs + 1, 1, 1, 0);
-    SCR_free_tbl((unsigned char**) lecs);
+    int pos = K_add(K_WS[TABLES], name, tbl);
+    delete tbl;
 
-add:
-    rc = K_add(K_WS[TABLES], name, tbl);
-
-    if(rc >= 0) rc = 0;
-    if(rc < 0) rc = -1; // Pour ‚viter return dans les rapports si rc = -2
-
-    T_free(tbl);
-    return(rc);
+    return (pos >= 0) ? 0 : -1;
 }

@@ -6,7 +6,6 @@
 #include "utils/super.h"
 #include "report/report.h"
 #include "report/rep_list.h"
-#include "cpp_api/objects/table.h"
 #include "cpp_api/KDB/kdb_global.h"
 #include "cpp_api/KDB/kdb_reference.h"
 #include "cpp_api/KDB/kdb_comments.h"

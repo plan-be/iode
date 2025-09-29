@@ -91,7 +91,7 @@ struct TableLine32
     char    pad[1];
 };
 
-struct TBL32 
+struct Table32 
 {
     short   language;
     short   repeat_columns;     /* = 0, first column is frozen */

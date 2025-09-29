@@ -124,7 +124,7 @@ cdef extern from "api/all.h":
 cdef extern from "api/objs/equations.h":
     cdef vector[string] v_eq_methods
 
-cdef extern from "cpp_api/objects/table.h":
+cdef extern from "api/objs/tables.h":
     cdef enum TableCellType:
         TABLE_CELL_LEC,
         TABLE_CELL_STRING

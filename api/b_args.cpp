@@ -35,7 +35,7 @@
  *  $LST1 and @otherfile will be recursively replaced up to 10 levels of depth.
  *  
  *  The string resulting from the expansion is then split on the separators defined in 
- *      A_SEPS, by default " ,;\n\t\r".
+ *      A_SEPS, by default " ,\n\t\r".
  *  
  *  
  *  Info : when A_NO_EXPANDSTAR_DFT is null, which is never the case in IODE, 

@@ -160,10 +160,10 @@ COLS *COL_add_col(COLS *);
 int COL_find_mode(COLS *,int *,int );
 
 /* c_calc.c */
-int COL_resize(TBL *,COLS *);
+int COL_resize(Table *,COLS *);
 void COL_clear(COLS *);
 //CLEC *COL_cp_clec(CLEC *);
-int COL_exec(TBL *,int ,COLS *);
+int COL_exec(Table *,int ,COLS *);
 //int COL_calc(COL *,CLEC *,CLEC *);
 // int COL_link(int ,CLEC *);
 

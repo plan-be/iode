@@ -111,7 +111,7 @@ int P_free(char *ptr)
  *  Appends to the pack pointed to by vptr1 the content pointed to by vptr2 which has a length of lg bytes. 
  *  The result is a pointer to the new pack. 
  *  
- *  Uses void* instead of char* because packs can point to any object (Equation*, TBL*...). 
+ *  Uses void* instead of char* because packs can point to any object (Equation*, Table*...). 
  *  
  *  @param [in] void* vptr1    pointer to a pack
  *  @param [in] void* vptr2    pointer to a buffer to add to the pack vptr1

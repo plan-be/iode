@@ -1,15 +1,7 @@
 /**
  *  @header4iode
  *
- *  Functions to manage TBL objects.
- *  
- *  List of functions 
- *  -----------------
- *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
- *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
- *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
- *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
- *  
+ *  Functions to manage Table objects.*  
  */
 #include "scr4/s_prost.h"
 
@@ -137,48 +129,6 @@ std::size_t hash_value(const TableLine& line)
 
 // ========================= Table methods ========================= //
 
-/**
- *  Creates a new TBL object.
- *  
- *  @param [in]  dim    int     Number of expression columns
- *  @return             TBL*    pointer to a new allocated TBL
- */
-TBL *T_create(int dim)
-{
-    if(dim < 1) 
-    {
-        kwarning("Table: could not create new table -> number of columns < 1");
-        return NULL;
-    }
-
-    TBL* tbl = new TBL(dim);
-    return tbl;
-}
-
-
-/**
- *  Frees a TBL object.
- *  
- *  @param [in] tbl     TBL*    pointer to the TBL
- *  
- */
-void T_free(TBL* tbl)
-{
-    if(tbl == NULL) 
-        return;
-    
-    tbl->divider_line.cells.clear();
-    if(tbl->lines.size() > 0)
-    {
-        for(int i = 0; i < tbl->lines.size(); i++)
-            tbl->lines[i].cells.clear();
-        tbl->lines.clear();
-    }
-
-    delete tbl;
-}
-
-
 static bool T_initialize_line(TableLine& line, const int nb_columns)
 {
     bool success = true;
@@ -207,9 +157,282 @@ static bool T_initialize_line(TableLine& line, const int nb_columns)
     return success;
 }
 
+static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
+{
+    divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1", 0));
+    for(int j = 1; j < nb_columns; j++) 
+        divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
+}
+
+static void T_initialize_title(TableLine& title_line, const std::string& def)
+{
+    int pos = K_find(K_WS[COMMENTS], (char*) def.c_str());
+    std::string title = (pos < 0) ? def : std::string(KCVAL(K_WS[COMMENTS], pos));
+    title = trim(title);
+    title_line.cells[0].set_text(title);
+}
+
+static void T_initialize_col_names(TableLine& line, const int nb_columns)
+{
+    TableCell* cell = &(line.cells[0]);
+    cell->set_lec("");
+    for(int j = 1; j < nb_columns; j++) 
+    {
+        cell = &(line.cells[j]);
+        cell->set_text("\"#S");
+        cell->set_align(TABLE_CELL_CENTER);
+    }
+}
+
+static std::vector<std::string> expand_lecs(const std::string& lecs)
+{
+    std::vector<std::string> v_lecs;
+	if(!lecs.empty())
+	{
+		char* pattern = to_char_array(lecs);
+		// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
+		char* lst = K_expand(VARIABLES, NULL, pattern, '*');
+		// Parses a string and replaces @filename and $listname by their contents
+        char* OLD_SEPS = A_SEPS;
+        A_SEPS = (char*) ";\t\n";
+		char** c_lecs = B_ainit_chk(lst, NULL, 0);
+        A_SEPS = OLD_SEPS;
+        for(int i = 0; i < SCR_tbl_size((unsigned char**) c_lecs); i++)
+            v_lecs.push_back(std::string(c_lecs[i]));
+		SCR_free(lst);
+        SCR_free_tbl((unsigned char**) c_lecs);
+	}
+    return v_lecs;
+}
+
+static std::vector<std::string> expand_lecs(const std::vector<std::string>& lecs)
+{
+    std::string lecs_str = join(lecs, ";");
+    return expand_lecs(lecs_str);
+}
+
+
+Table::Table(const int nb_columns): nb_columns(nb_columns)
+{        
+    T_initialize_divider(this->divider_line, nb_columns);
+}
+
+Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
+	bool mode, bool files, bool date): nb_columns(nb_columns)
+{
+    int pos;
+    std::string comment;
+
+    T_initialize_divider(this->divider_line, nb_columns);
+
+    append_line(TABLE_LINE_TITLE);
+    T_initialize_title(this->lines.back(), def);
+    append_line(TABLE_LINE_SEP);
+
+    append_line(TABLE_LINE_CELL);
+    T_initialize_col_names(this->lines.back(), nb_columns);
+    append_line(TABLE_LINE_SEP);
+
+    std::string lec;
+    std::string line_name;
+    std::vector<std::string> v_vars = expand_lecs(vars);
+    for(const std::string& var: v_vars) 
+    {
+        append_line(TABLE_LINE_CELL);
+        TableLine& line = lines.back();
+
+        // ---- line name (left column) ----
+        pos = K_find(K_WS[COMMENTS], (char*) var.c_str());
+        if(pos < 0)
+            line_name = var;
+        else
+        {
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = oem_to_utf8(comment);
+            line_name = trim(comment);
+        }
+
+        line.cells[0].set_text(line_name);
+
+        // ---- LEC expression (right column) ----
+        lec = var;
+        for(int j = 1; j < nb_columns; j++)
+            line.cells[j].set_lec(lec);
+    }
+    
+    if(mode || files || date)
+        append_line(TABLE_LINE_SEP);
+    
+    if(mode)  
+        append_line(TABLE_LINE_MODE);
+    
+    if(files) 
+        append_line(TABLE_LINE_FILES);
+    
+    if(date)  
+        append_line(TABLE_LINE_DATE);
+}
+
+Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
+	const std::vector<std::string>& lecs, bool mode, bool files, bool date)
+    : nb_columns(nb_columns)
+{
+    int pos;
+    std::string comment;
+
+    T_initialize_divider(this->divider_line, nb_columns);
+
+    append_line(TABLE_LINE_TITLE);
+    T_initialize_title(this->lines.back(), def);
+    append_line(TABLE_LINE_SEP);
+
+    append_line(TABLE_LINE_CELL);
+    T_initialize_col_names(this->lines.back(), nb_columns);
+    append_line(TABLE_LINE_SEP);
+
+    std::string lec;
+    std::string line_name;
+    std::vector<std::string> v_lecs = expand_lecs(lecs);
+    if(v_lecs.size() != titles.size())
+    {
+        std::string error_msg = "Table constructor: titles and lecs must have the same size ";
+        error_msg += "after expansion of possible lists";
+        throw std::invalid_argument(error_msg);
+    }
+
+    for(int i = 0; i < (int) titles.size(); i++)
+    {
+        append_line(TABLE_LINE_CELL);
+        TableLine& line = lines.back();
+
+        // ---- line name (left column) ----
+        line_name = titles[i];
+        pos = K_find(K_WS[COMMENTS], (char*) line_name.c_str());
+        if(pos > 0)
+        {
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = oem_to_utf8(comment);
+            line_name = trim(comment);
+        }
+
+        line.cells[0].set_text(line_name);
+
+        // ---- LEC expression (right column) ----
+        lec = v_lecs[i];
+        for(int j = 1; j < nb_columns; j++)
+            line.cells[j].set_lec(lec);
+    }
+    
+    if(mode || files || date)
+        append_line(TABLE_LINE_SEP);
+    
+    if(mode)  
+        append_line(TABLE_LINE_MODE);
+    
+    if(files) 
+        append_line(TABLE_LINE_FILES);
+    
+    if(date)  
+        append_line(TABLE_LINE_DATE);
+}
+
+Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
+	bool mode, bool files, bool date): nb_columns(nb_columns)
+{
+    int pos;
+    std::string comment;
+
+    T_initialize_divider(this->divider_line, nb_columns);
+
+    append_line(TABLE_LINE_TITLE);
+    T_initialize_title(this->lines.back(), def);
+    append_line(TABLE_LINE_SEP);
+
+    append_line(TABLE_LINE_CELL);
+    T_initialize_col_names(this->lines.back(), nb_columns);
+    append_line(TABLE_LINE_SEP);
+
+    std::string line_name;
+    std::vector<std::string> v_lecs = expand_lecs(lecs);
+    for(const std::string& lec: v_lecs) 
+    {
+        append_line(TABLE_LINE_CELL);
+        TableLine& line = lines.back();
+
+        // ---- line name (left column) ----
+        pos = K_find(K_WS[COMMENTS], (char*) lec.c_str());
+        if(pos < 0)
+            line_name = lec;
+        else
+        {
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = oem_to_utf8(comment);
+            line_name = trim(comment);
+        }
+
+        line.cells[0].set_text(line_name);
+
+        // ---- LEC expression (right column) ----
+        for(int j = 1; j < nb_columns; j++)
+            line.cells[j].set_lec(lec);
+    }
+    
+    if(mode || files || date)
+        append_line(TABLE_LINE_SEP);
+    
+    if(mode)  
+        append_line(TABLE_LINE_MODE);
+    
+    if(files) 
+        append_line(TABLE_LINE_FILES);
+    
+    if(date)  
+        append_line(TABLE_LINE_DATE);
+}
+
+Table::Table(const Table& table): nb_columns(table.nb_columns)
+{
+    this->set_language(table.get_language());
+    this->set_gridx(table.get_gridx());
+    this->set_gridy(table.get_gridy());
+    this->set_graph_axis(table.get_graph_axis());
+    this->set_text_alignment(table.get_text_alignment());
+    repeat_columns = table.repeat_columns;
+    
+    divider_line.set_graph_type(table.divider_line.get_graph_type());
+    divider_line.right_axis = table.divider_line.right_axis;
+    divider_line.cells.clear();
+    for(const TableCell& cell : table.divider_line.cells)
+        divider_line.cells.push_back(cell);
+
+    lines.clear();
+    for(const TableLine& line : table.lines)
+        lines.push_back(line);
+    
+    z_min = table.z_min;
+    z_max = table.z_max;
+    y_min = table.y_min;
+    y_max = table.y_max;
+    attribute = table.attribute;
+    chart_box = table.chart_box;
+    chart_shadow = table.chart_shadow;
+}
+
+Table::~Table()
+{
+    divider_line.cells.clear();
+    
+    if(lines.size() > 0)
+    {
+        for(int i = 0; i < lines.size(); i++)
+            lines[i].cells.clear();
+        lines.clear();
+    }
+}
+
 // -------- LINES --------
 
-TableLine* TBL::append_line(const TableLineType line_type)
+TableLine* Table::append_line(const TableLineType line_type)
 {
     TableLine line((TableLineType) line_type);
     bool success = T_initialize_line(line, nb_columns);
@@ -220,7 +443,7 @@ TableLine* TBL::append_line(const TableLineType line_type)
 	return &this->lines.back();
 }
 
-TableLine* TBL::insert_line(const int pos, const TableLineType line_type, const bool after)
+TableLine* Table::insert_line(const int pos, const TableLineType line_type, const bool after)
 {
     if(pos < 0 || pos >= this->lines.size())
     {
@@ -247,7 +470,7 @@ TableLine* TBL::insert_line(const int pos, const TableLineType line_type, const 
 
 // -------- REMOVE --------
 
-void TBL::remove_line(const int row)
+void Table::remove_line(const int row)
 {
     if(row < 0 || row >= lines.size())
         throw std::out_of_range("Table line index " + std::to_string(row) + " is out of range [0, " + 
@@ -256,142 +479,8 @@ void TBL::remove_line(const int row)
 }
 
 
-/**
- *  Fills a TBL with some basic data: a title, line titles and LEC expressions.
- *  The TBL must exist and is normally empty.
- *  
- *  @param [in, out] tbl   TBL*     Table to modify
- *  @param [in]      titg  char*    Title of the table (in UTF-8)
- *  @param [in]      titls char**   Titles of the lines (in UTF-8)
- *  @param [in]      lecs  char**   LEC formulas of the lines (// titls)
- *  @param [in]      mode  int      if 1, includes a special TABLE_LINE_MODE line
- *  @param [in]      files int      if 1, includes a special TABLE_LINE_FILES line
- *  @param [in]      date  int      if 1, includes a special TABLE_LINE_DATE line
- *  @return                int      0
- *  
- */
-int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int files, int date)
+std::size_t hash_value(const Table& table)
 {
-    TableCell* cell;
-
-    if(titg) 
-    {
-        tbl->append_line(TABLE_LINE_TITLE);
-        std::string title = std::string(titg);
-        title = trim(title);
-        if(!title.empty())
-        {
-            cell = &(tbl->lines.back().cells[0]);
-            cell->set_text(title);
-        }
-        tbl->append_line(TABLE_LINE_SEP);
-    }
-
-    tbl->append_line(TABLE_LINE_CELL);
-    cell = &(tbl->lines.back().cells[0]);
-    cell->set_lec("");
-    for(int j = 1 ; j < T_NC(tbl) ; j++) 
-    {
-        cell = &(tbl->lines.back().cells[j]);
-        cell->set_text("\"#S");
-        cell->set_align(TABLE_CELL_CENTER);
-    }
-
-    tbl->append_line(TABLE_LINE_SEP);
-
-    if(lecs && titls) 
-    {
-        for(int i = 0 ; lecs[i] && titls[i]; i++) 
-        {
-            tbl->append_line(TABLE_LINE_CELL);
-            TableLine& line = tbl->lines.back();
-            // left column: line title
-            std::string label = std::string(titls[i]);
-            line.cells[0].set_text(label);
-            // other columns: LEC expression
-            std::string lec = std::string(lecs[i]);
-            for(int j = 1 ; j < T_NC(tbl) ; j++)
-                line.cells[j].set_lec(lec);
-        }
-    }
-    else 
-        tbl->append_line(TABLE_LINE_CELL);
-    
-    if(mode || files || date)
-        tbl->append_line(TABLE_LINE_SEP);
-    
-    if(mode)  
-        tbl->append_line(TABLE_LINE_MODE);
-    
-    if(files) 
-        tbl->append_line(TABLE_LINE_FILES);
-    
-    if(date)  
-        tbl->append_line(TABLE_LINE_DATE);
-
-    return(0);
-}
-
-
-/**
- *  Fills a TBL with a list of variables and their CMT. 
- *  The TBL must exist and is normally empty.
- *  
- *    - def can be either a CMT name or a free text. If it's a CMT name, the contents of the CMT becomes the table title.
- *    - vars is a list of VAR names. If a CMT with the same name exists, the CMT become the line title and the variable the LEC expression.
- *  
- *  @param [in, out] tbl   TBL*     Table to modify
- *  @param [in]      def   char*    Table title or name of the CMT that must become the table title
- *  @param [in]      vars  char**   NULL terminated list of variable names
- *  @param [in]      mode  int      if 1, includes a special TABLE_LINE_MODE line
- *  @param [in]      files int      if 1, includes a special TABLE_LINE_FILES line
- *  @param [in]      date  int      if 1, includes a special TABLE_LINE_DATE line
- *  @return                int      0
- *  
- */
-void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)
-{
-    int     i, pos,
-            nb = SCR_tbl_size((unsigned char**) vars),
-            nbt = 0, nbl = 0;
-    KDB     *kdb = K_WS[COMMENTS];
-    char    *titg, **titls = NULL, **lecs = NULL;
-    std::string comment;
-
-    pos = K_find(kdb, def);
-    
-    if(pos < 0) 
-        titg = (char*) SCR_stracpy((unsigned char*) def);
-    else 
-        titg = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, pos));
-    
-    for(i = 0; i < nb; i++) 
-    {
-        pos = K_find(kdb, vars[i]);
-        if(pos < 0)
-            SCR_add_ptr((unsigned char***) &titls, &nbt, (unsigned char*) vars[i]);
-        else
-        {
-            comment = std::string((char*) KCVAL(kdb, pos));
-            comment = oem_to_utf8(comment);
-            SCR_add_ptr((unsigned char***) &titls, &nbt, (unsigned char*) comment.c_str());
-        }
-
-        SCR_add_ptr((unsigned char***) &lecs, &nbl, (unsigned char*) vars[i]);
-    }
-
-    SCR_add_ptr((unsigned char***) &titls, &nbt, NULL);
-    SCR_add_ptr((unsigned char***) &lecs, &nbl, NULL);
-
-    T_default(tbl, titg, titls, lecs, mode, files, date);
-
-    SCR_free(titg);
-    SCR_free_tbl((unsigned char**) titls);
-    SCR_free_tbl((unsigned char**) lecs);
-}
-
-std::size_t hash_value(const TBL& table)
-{
-    std::hash<TBL> tbl_hash;
+    std::hash<Table> tbl_hash;
     return tbl_hash(table);
 }

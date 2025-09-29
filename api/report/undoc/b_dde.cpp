@@ -317,7 +317,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                           nf = 0, nm = 0;
     char    gsmpl[128], **l = NULL, *buf, *res = NULL; /* JMP 30-04-98 */
 
-    TBL     *tbl = KTVAL(K_WS[TABLES], objnb);
+    Table     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
     Sample  *smpl = (Sample *) KDATA(KV_WS);
 
@@ -586,7 +586,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, COMMENTS));
     if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, LISTS));
     if(strcmp(szTopic, "XIDT") == 0) return(IodeDdeGetXObj(szItem, IDENTITIES));
-    if(strcmp(szTopic, "XTBL") == 0) return(IodeDdeGetXObj(szItem, TABLES));
+    if(strcmp(szTopic, "XTable") == 0) return(IodeDdeGetXObj(szItem, TABLES));
     if(strcmp(szTopic, "XREP") == 0) return(IodeDdeGetReportRC(szItem));
 
     type = IodeDdeType(szTopic);

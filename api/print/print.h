@@ -51,7 +51,7 @@ enum IodeGraphColor
     G_BROWN,
     G_LIGHTGRAY,
     G_DARKGRAY,
-    G_LIGHTBLUE,
+    G_LIGHTableUE,
     G_LIGHTGREEN,
     G_LIGHTCYAN,
     G_LIGHTRED,
@@ -166,31 +166,31 @@ int APIChartNl(int hdl);
 char *APIChartTitle(int hdl, int i);
 int APIChartType(int hdl, int i);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
 int APIGraphTimeData(int hdl, Sample *smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
-int APIPrepareChart(TBL *tbl, char *gsmpl);
+int APIPrepareChart(Table *tbl, char *gsmpl);
 int T_GraphEnd();
 int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphLine(TBL *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
 // int T_GraphLineData(int nb, double *x, double *y);
 // int T_GraphLineTitle(TableLine *line, COLS *fcls, int i);
-int T_GraphTest(TBL *tbl);
+int T_GraphTest(Table *tbl);
 int T_GraphTimeData(Sample *smpl, double *y);
 int T_GraphTitle(char *txt);
 int T_GraphXYData(int nb, double *x, double *y);
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 int T_find_opf(COLS *fcls, COL *cl);
-int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
+int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode);
 int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl);
 int V_graph(int ,int ,int ,int ,int ,int ,double ,double ,Sample *,char **);
 
 /* int.c */
-int T_prep_cls(TBL *,char *,COLS **);
-int T_print_tbl(TBL *,char *);
-int T_print_line(TBL *,int ,COLS *);
+int T_prep_cls(Table *,char *,COLS **);
+int T_print_tbl(Table *,char *);
+int T_print_line(Table *,int ,COLS *);
 void T_print_cell(TableCell *,COL *,int );
 void T_fmt_val(char *,double ,int ,int );
 void T_print_val(double );
@@ -204,4 +204,4 @@ void T_print_mode(COLS *,int );
 void T_print_date(int );
 int T_begin_tbl(int ,COLS *);
 void T_end_tbl(void);
-unsigned char *T_get_title(TBL*, const bool to_utf8 = true);
+unsigned char *T_get_title(Table*, const bool to_utf8 = true);

@@ -705,7 +705,7 @@ U_ch *RPF_srelax(U_ch** args)
 U_ch *RPF_ttitle(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
-    TBL     *tbl;
+    Table     *tbl;
     int     pos, i;
 
     for(i = 0 ; args[i] ; i++) {
@@ -717,7 +717,7 @@ U_ch *RPF_ttitle(U_ch** args)
         }
         else {
             res = SCR_strafcat(res, T_get_title(tbl, false));
-            T_free(tbl);
+            delete tbl;
         }
     }
     return(res);

@@ -24,13 +24,13 @@
  *      int K_ipack(char **pack, char *a1)                  Packs an IODE IDT object 
  *      int K_lpack(char** pack, char* a1)                  Packs an IODE LST object 
  *      int K_spack(char **pack, char *a1)                  Packs an IODE Scalar object 
- *      int K_tpack(char** pack, char* a1)                  Packs an IODE TBL object 
+ *      int K_tpack(char** pack, char* a1)                  Packs an IODE Table object 
  *      int K_vpack(char **pack, double *a1, int *a2)    Packs an IODE VAR object. 
  *      int K_opack(char** pack, char* a1, int* a2)         Reserved for future new objects
  * 
  * Unpacking functions
  * -------------------- 
- *      TBL* K_tunpack(char *pack)                   Creates a TBL struct from a packed TBL 
+ *      Table* K_tunpack(char *pack)                   Creates a Table struct from a packed Table 
  *      Equation*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
  *      Identity* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
  * 
@@ -91,12 +91,12 @@ int K_vpack(char **pack, double *a1, int *a2)
 }
 
 /*
- * Function to pack TBL (in 32 and 64 bits)
+ * Function to pack Table (in 32 and 64 bits)
  * -------------------------------------------
 */
 
 /**
- *   Function to pack a TBL cell (in 32 and 64 bits)
+ *   Function to pack a Table cell (in 32 and 64 bits)
  *  
  *  @param [in, out]    pack pointer to the pack before adding the cell (can be NULL)
  *  @param [in]         cell 
@@ -181,16 +181,16 @@ static void K_tline64_32(TableLine* tl64, TableLine32* tl32)
 }
 
 /**
- *  Convert a TBL64 into TBL32 struct.
+ *  Convert a Table64 into Table32 struct.
  *  
- *  @param [in] tbl64 TBL in 64 bits arch
- *  @param [in] tbl32 TBL in 32 bit arch
+ *  @param [in] tbl64 Table in 64 bits arch
+ *  @param [in] tbl32 Table in 32 bit arch
  *  @return void
  *  
  *  @details See K_tcell64_32()
  */
 
-static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
+static void K_tbl64_32(Table* tbl64, Table32* tbl32)
 {
     tbl32->language = (short) tbl64->get_language();
     tbl32->repeat_columns = tbl64->repeat_columns;
@@ -215,10 +215,10 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 
 
 /**
- *  Packs a 64 bits TBL struct by first converting the TBL64, TableLine64 and TableCell64 into 32 bits struct.
+ *  Packs a 64 bits Table struct by first converting the Table64, TableLine64 and TableCell64 into 32 bits struct.
  *  
  *  @param [in] pack pointer to the packed table placeholder
- *  @param [in] a1   pointer to the 64 bits TBL
+ *  @param [in] a1   pointer to the 64 bits Table
  *  @return     -1 if error (lack of memory), 0 if ok
  *  
  *  @details Sub function of K_tpack(). 
@@ -226,8 +226,8 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 
 static int K_tpack64(char **pack, char *a1)
 {
-    TBL*      tbl = (TBL*) a1;
-    TBL32     tbl32;
+    Table*      tbl = (Table*) a1;
+    Table32     tbl32;
     TableLine*    lines;
     TableLine32*  lines32;
     TableCell*    cell;
@@ -242,9 +242,9 @@ static int K_tpack64(char **pack, char *a1)
 
     /* tbl */
     K_tbl64_32(tbl, &tbl32);
-    *pack = (char*) P_add(*pack, (char*) &tbl32, sizeof(TBL32));
+    *pack = (char*) P_add(*pack, (char*) &tbl32, sizeof(Table32));
     p++;
-    debug_packing("TBL      ", "", p);
+    debug_packing("Table      ", "", p);
 
     /* div */
     /* 1. : [nc x TableCell32] */
@@ -340,10 +340,10 @@ static int K_tpack64(char **pack, char *a1)
 }
 
 /**
- * Packs a TBL object whether in 32 or 64 bits architecture. 
+ * Packs a Table object whether in 32 or 64 bits architecture. 
  *
- * @param [out] pack    (char **)       placeholder for the pointer to the packed TBL
- * @param [in]  a1      (char *)        pointer to the TBL (cast to char *)
+ * @param [out] pack    (char **)       placeholder for the pointer to the packed Table
+ * @param [in]  a1      (char *)        pointer to the Table (cast to char *)
  *
  * @return int 0 
 */
@@ -353,7 +353,6 @@ int K_tpack(char** pack, char* a1, char* name)
     if(name != NULL)
         debug_packing("table " + std::string(name), "--------------------------------", -1);
     return(K_tpack64(pack, a1));
-    return 0;
 }
 
 
@@ -534,11 +533,11 @@ int K_opack(char** pack, char* a1, int* a2)
 /* 
  * UNPACK functions
  * ----------------
- * From a packed object (architecture insensitive, see above), creates an IODE object (VAR, EQ, TBL, ...) 
+ * From a packed object (architecture insensitive, see above), creates an IODE object (VAR, EQ, Table, ...) 
  * in the current archicture (32|64).
  */
 
-// see T_create() for the initialization of the special 'div' line
+// see the constructor Table(nb_columns) for the initialization of the special 'div' line
 static void K_tcell_div_sanitize(TableCell* cell, int j)
 {
     if(cell->get_type() == TABLE_CELL_STRING)
@@ -590,16 +589,16 @@ static void K_tline32_64(TableLine32* tl32, TableLine* tl64)
 }
 
 /**
- *  Converts a 32 bits table (TBL32) to a 64 bits TBL. 
+ *  Converts a 32 bits table (Table32) to a 64 bits Table. 
  *  
- *  @param [in]         tc32 TBL32 * pointer to the TBL32 
- *  @param [in, out]    tc64 TBL *   pointer to the resulting TBL (64 bits)
+ *  @param [in]         tc32 Table32 * pointer to the Table32 
+ *  @param [in, out]    tc64 Table *   pointer to the resulting Table (64 bits)
  *  @return void
  *  
  *  @note Only used in 64 bit architecture.
  *  
  */
-static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
+static void K_tbl32_64(Table32* tbl32, Table* tbl64)
 {
     tbl64->set_language((TableLang) tbl32->language);
     tbl64->repeat_columns = tbl32->repeat_columns;
@@ -621,7 +620,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
 }
 
 /**
- *   Function to unpack a TBL cell
+ *   Function to unpack a Table cell
  */
 static int K_tcell_unpack(char *pack, int& p, TableCell *cell, int i, int j)
 {
@@ -648,22 +647,22 @@ static int K_tcell_unpack(char *pack, int& p, TableCell *cell, int i, int j)
 }
 
 /**
- * Unpacks a packed TBL into a TBL structure in the 64 bits architecture.
+ * Unpacks a packed Table into a Table structure in the 64 bits architecture.
  * @note Only used in 64 bit architecture.
  * 
- * @param [in]      pack char * packed TBL
+ * @param [in]      pack char * packed Table
  *
- * @return TBL *    allocated TBL (64 bits)
+ * @return Table *    allocated Table (64 bits)
 */
 
-static TBL* K_tunpack64(char *pack)
+static Table* K_tunpack64(char *pack)
 {
     // 64 bits structs
-    TBL*     tbl;
+    Table*     tbl;
     TableLine*   line;
     TableCell*   cell;
     // 32 bits struct (iode std)
-    TBL32*   tbl32;
+    Table32*   tbl32;
     TableLine32* line32;
     TableLine32* lines32;
     TableCell32* cell32;
@@ -671,17 +670,17 @@ static TBL* K_tunpack64(char *pack)
     int      p=0;
 
     /* tbl */
-    tbl32 = (TBL32*) P_get_ptr(pack, 0);
-    tbl = new TBL(tbl32->nb_columns);
+    tbl32 = (Table32*) P_get_ptr(pack, 0);
+    tbl = new Table(tbl32->nb_columns);
     K_tbl32_64(tbl32, tbl);
-    debug_unpacking("TBL      ", "", 0);
+    debug_unpacking("Table      ", "", 0);
 
     /* div (TableLine) */
     cells32 = (TableCell32*) P_get_ptr(pack, 1);
     debug_unpacking("line", "DIV  ", 1);
 
     p = 2;
-    // NOTE: new TBL(tbl32->nb_columns) above creates a table with a 'divider' line 
+    // NOTE: new Table(tbl32->nb_columns) above creates a table with a 'divider' line 
     //       with nb_columns cells of type TABLE_CELL_LEC and content = ""
     for(int j = 0; j < T_NC(tbl); j++) 
     {
@@ -779,14 +778,14 @@ static TBL* K_tunpack64(char *pack)
 
 
 /**
- * Unpacks a packed TBL into a TBL structure in the current (32|64 bits) architecture.
+ * Unpacks a packed Table into a Table structure in the current (32|64 bits) architecture.
  * 
- * @param [in]      pack char * packed TBL
+ * @param [in]      pack char * packed Table
  *
- * @return TBL *    allocated TBL (32|64 bits according to the current architecture)
+ * @return Table *    allocated Table (32|64 bits according to the current architecture)
 */
 
-TBL* K_tunpack(char *pack, char* name)
+Table* K_tunpack(char *pack, char* name)
 {
     if(name != NULL)
         debug_unpacking("table " + std::string(name), "--------------------------------", -1);

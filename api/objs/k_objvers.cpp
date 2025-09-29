@@ -126,9 +126,9 @@ static char *Pack16To32(char* opack)
 
 /**
  *  Transforms a TableCell from 16 bits integers to 32 bits integers and appends the result
- *  to a pack which accumulates the TableCells of a TBL (see K_repack_tbl()).
+ *  to a pack which accumulates the TableCells of a Table (see K_repack_tbl()).
  *  
- *  @param [in]    pack    char*    NULL or pointer to a partial packed TBL 
+ *  @param [in]    pack    char*    NULL or pointer to a partial packed Table 
  *  @param [in]    cell    TableCell*   16 bits integer packed object
  *  @return                char*    pointer to pack with the cell appended
  *  
@@ -164,22 +164,22 @@ static char *T_cell_repack(char* pack, TableCell* cell)
 
 
 /**
- *  Packs a TBL in IODE objects version 1 or 2 to a pack with long integer i.e. in the 
+ *  Packs a Table in IODE objects version 1 or 2 to a pack with long integer i.e. in the 
  *  current IODE objects version (version 0 = version 3).
  *  
- *  @param [in] tbl     TBL*    pointer to a TBL in IODE objects version 1 or 2
- *  @return             char*   packed TBL in version 0 
+ *  @param [in] tbl     Table*    pointer to a Table in IODE objects version 1 or 2
+ *  @return             char*   packed Table in version 0 
  *  
  */
 
-static char *K_repack_tbl(TBL *tbl)
+static char *K_repack_tbl(Table *tbl)
 {
     char* pack = (char*) P_create();
     if(tbl == NULL) 
         return(NULL);
 
     /* tbl */
-    pack = (char*) P_add(pack, (char *) tbl, sizeof(TBL));
+    pack = (char*) P_add(pack, (char *) tbl, sizeof(Table));
 
     /* div */
     TableCell* cells = tbl->divider_line.cells.data();
@@ -233,7 +233,7 @@ void K_setvers(KDB* kdb, int i, int vers)
     char      buf[512];
     //unsigned char *dptr;
     Equation* eq;
-    TBL*      tbl;
+    Table*      tbl;
 
     if(vers == 0 || vers == 3) return;
     K_repack(kdb, i);
@@ -315,7 +315,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             tbl = K_tunpack(optr, KONAME(kdb, i));
             SW_free(opos);
             pack = K_repack_tbl(tbl);
-            T_free(tbl);
+            delete tbl;
             lg = P_get_len(pack, -1);
             pos = SW_alloc(lg);
             memcpy(SW_getptr(pos), pack, lg);

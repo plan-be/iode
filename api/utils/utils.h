@@ -206,6 +206,34 @@ inline std::vector<std::string> split(const std::string& str, char delimiter)
     return result;
 }
 
+inline std::vector<std::string> split_multi(const std::string& str, const std::string& delimiters)
+{
+    std::vector<std::string> result;
+    size_t start = 0;
+    while (true) 
+    {
+        size_t pos = str.find_first_of(delimiters, start);
+        if (pos == std::string::npos) 
+        {
+            result.push_back(str.substr(start));
+            break;
+        }
+        result.push_back(str.substr(start, pos - start));
+        start = pos + 1;
+    }
+    return result;
+}
+
+inline std::vector<std::string> split_whitespace(const std::string& str) 
+{
+    std::istringstream iss(str);
+    std::vector<std::string> result;
+    std::string token;
+    while(iss >> token)
+        result.push_back(token);
+    return result;
+}
+
 /**
  * @brief trim leading and trailing whitespace of a string
  * 

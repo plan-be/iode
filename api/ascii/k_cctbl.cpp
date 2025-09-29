@@ -1,7 +1,7 @@
 /**
  * @header4iode
  * 
- * Functions to load and save ascii definitions of IODE TBL objects.
+ * Functions to load and save ascii definitions of IODE Table objects.
  *
  *      KDB *load_asc(char* filename)
  *      int save_asc(KDB* kdb, char* filename)
@@ -107,7 +107,7 @@ ret :
 }
 
 /**
- *  Reads the TBL divisors on a YY stream. Each column of a table has its own divisor.
+ *  Reads the Table divisors on a YY stream. Each column of a table has its own divisor.
  *  
  *  Syntax of the section DIV
  *  -------------------------
@@ -118,12 +118,12 @@ ret :
  *  -----------------------------
  *  DIV LEC "1" LEC "PIB[2010]"
  *    
- *  @param [in, out] TBL*       tbl    TBL whose divisors (one by column) is to be read
+ *  @param [in, out] Table*       tbl    Table whose divisors (one by column) is to be read
  *  @param [in, out] YYFILE*    yy     stream 
  *  @return          void
  *  
  */
-static void read_div(TBL* tbl, YYFILE* yy)
+static void read_div(Table* tbl, YYFILE* yy)
 {
     TableCell* cell;
     for(int i = 0; i < tbl->nb_columns; i++)
@@ -134,7 +134,7 @@ static void read_div(TBL* tbl, YYFILE* yy)
 }
 
 /**
- *  Reads a TBL line on a YY stream. Each line has as many Cells as the number 
+ *  Reads a Table line on a YY stream. Each line has as many Cells as the number 
  *  of columns in the table.
  *  
  *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
@@ -159,13 +159,13 @@ static void read_div(TBL* tbl, YYFILE* yy)
  *  - "line B" LEFT LEC "B" DECIMAL  LAXIS GRLINE
  *  
  *    
- *  @param [in, out] TBL*       tbl    TBL where a new line will be added 
+ *  @param [in, out] Table*       tbl    Table where a new line will be added 
  *  @param [in, out] YYFILE*    yy     stream 
  *  @return          int                0 if success
- *                                      -1 if the TBL cannot be created
+ *                                      -1 if the Table cannot be created
  *  
  */
-static int read_line(TBL* tbl, YYFILE* yy)
+static int read_line(Table* tbl, YYFILE* yy)
 {
     int     keyw;
     TableCell*  cell = nullptr;
@@ -267,18 +267,18 @@ static int read_line(TBL* tbl, YYFILE* yy)
 }
 
 /**
- *  Reads on the stream yy the full definition of a TBL.
+ *  Reads on the stream yy the full definition of a Table.
  *  
  *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
  *  
  *  @param [in]     yy  YYFILE*     stream to be read
- *  @return             TBL*        new allocated table
+ *  @return             Table*        new allocated table
  *  
  */
-static TBL* read_tbl(YYFILE* yy)
+static Table* read_tbl(YYFILE* yy)
 {
     int     keyw, dim = 2;
-    TBL     *tbl = NULL;
+    Table     *tbl = NULL;
 
     keyw = YY_lex(yy);
     if(keyw != TABLE_ASCII_OPEN) 
@@ -298,9 +298,9 @@ static TBL* read_tbl(YYFILE* yy)
             dim = yy->yy_long;
     }
 
-    tbl = T_create(dim);
-    if(tbl == NULL) 
-        return(NULL);
+    tbl = new Table(dim);
+    if(!tbl) 
+        return nullptr;
 
     while(1) 
     {
@@ -325,7 +325,7 @@ static TBL* read_tbl(YYFILE* yy)
                 read_div(tbl, yy);
                 break;
             case TABLE_ASCII_BOX     :
-                tbl->chart_box = (char)K_read_long(yy);
+                tbl->chart_box = (char) K_read_long(yy);
                 break;
             case TABLE_ASCII_AXIS     :
                 tbl->set_graph_axis((TableGraphAxis) K_read_long(yy));
@@ -337,24 +337,24 @@ static TBL* read_tbl(YYFILE* yy)
                 tbl->set_gridy((TableGraphGrid) K_read_long(yy));
                 break;
             case TABLE_ASCII_YMIN     :
-                tbl->y_min  = (float)K_read_real(yy);
+                tbl->y_min  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_YMAX     :
-                tbl->y_max  = (float)K_read_real(yy);
+                tbl->y_max  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMIN     :
-                tbl->z_min  = (float)K_read_real(yy);
+                tbl->z_min  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMAX     :
-                tbl->z_max  = (float)K_read_real(yy);
+                tbl->z_max  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ALIGN:
                 tbl->set_text_alignment((TableTextAlign) K_read_align(yy));
                 break;
             case TABLE_ASCII_BREAK   :
-                if(read_line(tbl, yy)< 0) 
+                if(read_line(tbl, yy) < 0) 
                 {
-                    T_free(tbl);
+                    delete tbl;
                     return(NULL);
                 }
                 break;
@@ -364,23 +364,23 @@ static TBL* read_tbl(YYFILE* yy)
         }
     }
 
-    T_free(tbl);
+    delete tbl;
     return(NULL);
 }
 
 /**
- *  Loads TBLs definition from an ASCII file into a new KDB of TBLs.
+ *  Loads Tables definition from an ASCII file into a new KDB of Tables.
  *  
  *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
  *  
  *  Errors are displayed by a call to the function kerror().
- *  For each read TBL, kmsg() is called to send a message to the user. 
+ *  For each read Table, kmsg() is called to send a message to the user. 
  *  
  *  The implementations of kerror() and kmsg() depend on the context.
  *  
  *  @param [in] filename    char*   ascii file to be read or
- *                                  string containing the definition of the TBLs
- *  @return                 KDB*    NULL or allocated KDB of TBLs
+ *                                  string containing the definition of the Tables
+ *  @return                 KDB*    NULL or allocated KDB of Tables
  *  
  */
 KDB* AsciiTables::load_asc(char* filename)
@@ -389,7 +389,7 @@ KDB* AsciiTables::load_asc(char* filename)
 
     int     cmpt = 0;
     KDB     *kdb = 0;
-    TBL     *tbl = NULL;
+    Table     *tbl = NULL;
     YYFILE  *yy;
     ONAME   name;
 
@@ -440,7 +440,7 @@ KDB* AsciiTables::load_asc(char* filename)
                 if(K_add(kdb, name, tbl) < 0)  
                     goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
-                T_free(tbl);
+                delete tbl;
                 break;
 
             default :
@@ -458,7 +458,7 @@ err:
 /*------- SAVE IN ASCII -------------------*/
 
 /**
- *  Prints the alignment value of the TBL.
+ *  Prints the alignment value of the Table.
  *  
  *  @param [in] fd      FILE*     output stream
  *  @param [in] align   int       alignment keyword value
@@ -483,7 +483,7 @@ static void print_align(FILE* fd, int align)
 }
 
 /**
- *  Prints the axis position (left or right) and type (BAR or LINE) of a TBL line.
+ *  Prints the axis position (left or right) and type (BAR or LINE) of a Table line.
  *  
  *  @param [in] fd      FILE*     output stream
  *  @param [in] axis    int       0 for left axis, right axis otherwise
@@ -501,7 +501,7 @@ static void print_graph_info(FILE *fd, int axis, int type)
 }
 
 /**
- *  Prints the axis (min or max, left or right) of the TBL.
+ *  Prints the axis (min or max, left or right) of the Table.
  *  
  *  @param [in] fd      FILE*     output stream
  *  @param [in] align   int       alignment keyword value
@@ -582,14 +582,14 @@ static void print_cell(FILE *fd, const TableCell* cell)
 }
 
 /**
- *  Prints a TBL definition.
+ *  Prints a Table definition.
  *  
  *  @param [in] fd      FILE*     output stream
- *  @param [in] tbl     TBL*      table to print
+ *  @param [in] tbl     Table*      table to print
  *  @return             void
  *  
  */
-static void print_tbl(FILE* fd, TBL* tbl)
+static void print_tbl(FILE* fd, Table* tbl)
 {
     /* tbl */
     fprintf(fd, "\nDIM %d\n", T_NC(tbl));
@@ -643,11 +643,11 @@ static void print_tbl(FILE* fd, TBL* tbl)
 }
 
 /**
- *  Saves a KDB of TBLs into an ascii file (.at) or to the stdout.
+ *  Saves a KDB of Tables into an ascii file (.at) or to the stdout.
  *  
  *  @see load_asc() for the syntax of the ascii tables. 
  *  
- *  @param [in] kdb         KDB*    KDB of TBLs
+ *  @param [in] kdb         KDB*    KDB of Tables
  *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
@@ -655,7 +655,7 @@ static void print_tbl(FILE* fd, TBL* tbl)
 int AsciiTables::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    TBL     *tbl;
+    Table     *tbl;
     int     i;
 
     if(filename[0] == '-') fd = stdout;
@@ -675,7 +675,7 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
         tbl = KTVAL(kdb, i);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");
-        T_free(tbl);
+        delete tbl;
     }
 
     if(filename[0] != '-') fclose(fd);
@@ -683,7 +683,7 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
 }
 
 /* 
- * Save a KDB of TBLs in a .csv file.
+ * Save a KDB of Tables in a .csv file.
  * NOT IMPLEMENTED.
  */
 int AsciiTables::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)

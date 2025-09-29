@@ -7,8 +7,8 @@ void ComputedTable::initialize()
 
     /* ---- see c_calc.c ----
      *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
-     *      2. call COL_resize() to extend COLS according to the number of columns in the TBL 
-     *      3. for each TBL line, call: 
+     *      2. call COL_resize() to extend COLS according to the number of columns in the Table 
+     *      3. for each Table line, call: 
      *          COL_clear(cls) to reset the COLS values 
      *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
      *          COL_text() to generate the value of the TABLE_CELL_STRING cells
