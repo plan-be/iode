@@ -82,5 +82,8 @@ public:
 
 	// -------- EQUAL --------
 
-	bool operator==(const Table& other) const;
+	bool operator==(const Table& other) const
+	{
+		return TBL::operator==((TBL&) other);
+	}
 };
