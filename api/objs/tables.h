@@ -616,9 +616,105 @@ public:
 
 	TableLine* insert_line(const int pos, const TableLineType line_type, const bool after = true);
 
-	// -------- REMOVE --------
-
 	void remove_line(const int row);
+
+    // -------- TITLE --------
+
+    // we assume that title string is written in UTF8 format
+    TableLine* insert_title(const int pos, const std::string& title, const bool after)
+    {
+        TableLine* title_line = insert_line(pos, TABLE_LINE_TITLE, after);
+        title_line->cells[0].set_text(title);
+        return title_line;
+    }
+
+    TableLine* add_title(const std::string& title)
+    {
+        TableLine* title_line = append_line(TABLE_LINE_TITLE);
+        title_line->cells[0].set_text(title);
+        return title_line;
+    }
+
+    std::string get_title(const int row)
+    {
+        TableLine& line = lines[row];
+        if(line.get_type() != TableLineType::TABLE_LINE_TITLE) 
+            throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
+                "Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
+                get_line_type_as_string(line.get_type()) + ".");
+        return line.cells[0].get_content(false);
+    }
+
+    // we assume that title string is written in UTF8 format
+    void set_title(const int row, const std::string title)
+    {
+        TableLine& line = lines[row];
+        if(line.get_type() != TableLineType::TABLE_LINE_TITLE) 
+            throw std::invalid_argument("Cannot set table title at index " + std::to_string(row) + ".\n" + 
+                "Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
+                get_line_type_as_string(line.get_type()) + ".");
+        line.cells[0].set_text(title);
+    }
+
+    // -------- CELLS --------
+
+    TableLine* insert_line_with_cells(const int pos, const bool after)
+    {
+        return insert_line(pos, TABLE_LINE_CELL, after);
+    }
+
+    TableLine* add_line_with_cells()
+    {
+        return append_line(TABLE_LINE_CELL);
+    }
+
+    // -------- SEPARATOR --------
+
+    TableLine* insert_line_separator(const int pos, const bool after)
+    {
+        return insert_line(pos, TABLE_LINE_SEP, after);
+    }
+
+    TableLine* add_line_separator()
+    {
+        return append_line(TABLE_LINE_SEP);
+    }
+
+    // -------- MODE --------
+
+    TableLine* insert_line_mode(const int pos, const bool after)
+    {
+        return insert_line(pos, TABLE_LINE_MODE, after);
+    }
+
+    TableLine* add_line_mode()
+    {
+        return append_line(TABLE_LINE_MODE);
+    }
+
+    // -------- FILES --------
+
+    TableLine* insert_line_files(const int pos, const bool after)
+    {
+        return insert_line(pos, TABLE_LINE_FILES, after);
+    }
+
+    TableLine* add_line_files()
+    {
+        return append_line(TABLE_LINE_FILES);
+    }
+
+    // -------- DATE --------
+
+    TableLine* insert_line_date(const int pos, const bool after)
+    {
+        return insert_line(pos, TABLE_LINE_DATE, after);
+    }
+
+    TableLine* add_line_date()
+    {
+        return append_line(TABLE_LINE_DATE);
+    }
 
     // -------- EQUAL --------
 
@@ -708,9 +804,6 @@ TBL* K_tptr(KDB* kdb, char* name);
 /* k_tbl.c */
 TBL *T_create(int );
 void T_free(TBL *);
-char *T_div_cont_tbl(TBL *, int, int );
-int T_set_lec_cell_tbl(TBL *, int, int, unsigned char *);
-void T_set_string_cell_tbl(TBL *, int, int, unsigned char *);
 int T_default(TBL *,char *,char **,char **,int ,int ,int );
 void T_auto(TBL *,char *,char **,int ,int ,int );
 

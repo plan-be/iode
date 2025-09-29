@@ -7,9 +7,6 @@
  *  -----------------
  *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
- *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
- *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TableCell. Checks the syntax.
- *      void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)                 | Assigns a TEXT to a TableCell.
  *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
  *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
  *  
@@ -182,26 +179,6 @@ void T_free(TBL* tbl)
 }
 
 
-/**
- *  Returns the formated contents of a TBL divisor.
- *
- *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
- *
- *  @param [in] tbl     TBL*    pointer to the table
- *  @param [in] col     int     position of the cell in the divisor
- *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
- *                              0 if not
- *  @return             char*   pointer to BUF_DATA (big buffer - see buf.c) -- Do NOT free!
- */
-
-char* T_div_cont_tbl(TBL* tbl, int col, int mode)
-{
-    bool quotes = (mode == 1);
-    std::string content = tbl->divider_line.cells[col].get_content(quotes);
-    return (char*) content.c_str();
-}
-
-
 static bool T_initialize_line(TableLine& line, const int nb_columns)
 {
     bool success = true;
@@ -276,45 +253,6 @@ void TBL::remove_line(const int row)
         throw std::out_of_range("Table line index " + std::to_string(row) + " is out of range [0, " + 
             std::to_string(lines.size()) + ").");
     lines.erase(lines.begin() + row);
-}
-
-
-/**
- *  Assigns a LEC expression to a TableCell. Checks the syntax.
- *
- *  @param [in] tbl     TBL*              pointer to the table
- *  @param [in] row     int               position of the line
- *  @param [in] col     int               position of the cell
- *  @param [in] lec     unsigned char*    LEC expression
- *  @return             int               0 if ok, -1 if syntax error in LEC
- *
- *  In case of LEC error, kerror() is called and L_errno is set.
- */
-int T_set_lec_cel_tbl(TBL* tbl, int row, int col, unsigned char* lec)
-{
-    std::string s_lec = std::string((char*) lec);
-    tbl->lines[row].cells[col].set_lec(s_lec);
-    return 0;
-}
-
-
-/**
- *  Assigns a TEXT to a TableCell. The alignment attributes are set to:
- *      - TABLE_CELL_LEFT if previously TABLE_CELL_DECIMAL
- *      - TABLE_CELL_CENTER if the txt contains the char '#' indicating a time period (col title).
- *
- *  @param [in] tbl     TBL*              pointer to the table
- *  @param [in] row     int               position of the line
- *  @param [in] col     int               position of the cell
- *  @param [in] lec     unsigned char*    Any text
- *  @return             void
- *
- *  In case of LEC error, kerror() is called and L_errno is set.
- */
-void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)
-{
-    std::string s_txt = std::string((char*) txt);
-    tbl->lines[row].cells[col].set_text(s_txt);
 }
 
 
