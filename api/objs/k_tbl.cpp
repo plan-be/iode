@@ -8,8 +8,6 @@
  *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
  *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
- *      int T_append_line(TBL* tbl, int type)                                                      | Appends a TableLine to a TBL.
- *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TableLine in a TBL.
  *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TableCell. Checks the syntax.
  *      void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)                 | Assigns a TEXT to a TableCell.
  *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
@@ -232,54 +230,52 @@ static bool T_initialize_line(TableLine& line, const int nb_columns)
     return success;
 }
 
+// -------- LINES --------
 
-/**
- *  Inserts a TableLine in a TBL.
- *  
- *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
- *  @param [in]      type    int     TableLine type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
- *  @return                  int     position of the new line in TBL
- *  **TODO: Check where definition 
- */
-int T_append_line(TBL* tbl, int type)
+TableLine* TBL::append_line(const TableLineType line_type)
 {
-    TableLine line((TableLineType) type);
-    bool success = T_initialize_line(line, tbl->nb_columns);
-    if(!success) 
-        return -1;
+    TableLine line((TableLineType) line_type);
+    bool success = T_initialize_line(line, nb_columns);
+	if(!success) 
+	    throw std::runtime_error("Cannot append a new line to the table");
 
-    tbl->lines.push_back(line);
-    return tbl->lines.size() - 1;
+    lines.push_back(line);
+	return &this->lines.back();
 }
 
-/**
- *  Inserts a TableLine in a TBL.
- *  
- *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
- *  @param [in]      nbr     int     reference position of the new line in TBL (see param where below)
- *  @param [in]      type    int     TableLine type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
- *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
- *  @return                  int     position of the new line in TBL
- *  **TODO: Check where definition 
- */
-int T_insert_line(TBL* tbl, int nbr, int type, int where)
+TableLine* TBL::insert_line(const int pos, const TableLineType line_type, const bool after)
 {
-    if(nbr < 0 || nbr > tbl->lines.size())
+    if(pos < 0 || pos >= this->lines.size())
     {
         std::string error_msg = "Table: failed to insert a line in the table at position " 
-                                + std::to_string(nbr) + ": position out of range [0," 
-                                + std::to_string(tbl->lines.size() - 1) + "]";
+                                + std::to_string(pos) + ": position out of range [0," 
+                                + std::to_string(lines.size() - 1) + "]";
         kerror(0, (char*) error_msg.c_str());
     }
 
-    TableLine line((TableLineType) type);
-    bool success = T_initialize_line(line, tbl->nb_columns);
-    if(!success) 
-        return -1;
+    TableLine line((TableLineType) line_type);
+    bool success = T_initialize_line(line, nb_columns);
+    if(!success)
+    {
+        std::string error_msg = "Table: cannot insert a new line in the table at position " 
+                                + std::to_string(pos);
+        kerror(0, (char*) error_msg.c_str());
+    }
 
-    int insert_pos = (where == 0) ? nbr : nbr + 1;
-    tbl->lines.insert(tbl->lines.begin() + insert_pos, line);
-    return insert_pos;
+    int insert_pos = after ? pos + 1 : pos;
+    lines.insert(lines.begin() + insert_pos, line);
+
+	return &this->lines[insert_pos];
+}
+
+// -------- REMOVE --------
+
+void TBL::remove_line(const int row)
+{
+    if(row < 0 || row >= lines.size())
+        throw std::out_of_range("Table line index " + std::to_string(row) + " is out of range [0, " + 
+            std::to_string(lines.size()) + ").");
+    lines.erase(lines.begin() + row);
 }
 
 
@@ -342,7 +338,7 @@ int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int fil
 
     if(titg) 
     {
-        T_append_line(tbl, TABLE_LINE_TITLE);
+        tbl->append_line(TABLE_LINE_TITLE);
         std::string title = std::string(titg);
         title = trim(title);
         if(!title.empty())
@@ -350,10 +346,10 @@ int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int fil
             cell = &(tbl->lines.back().cells[0]);
             cell->set_text(title);
         }
-        T_append_line(tbl, TABLE_LINE_SEP);
+        tbl->append_line(TABLE_LINE_SEP);
     }
 
-    T_append_line(tbl,  TABLE_LINE_CELL);
+    tbl->append_line(TABLE_LINE_CELL);
     cell = &(tbl->lines.back().cells[0]);
     cell->set_lec("");
     for(int j = 1 ; j < T_NC(tbl) ; j++) 
@@ -363,13 +359,13 @@ int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int fil
         cell->set_align(TABLE_CELL_CENTER);
     }
 
-    T_append_line(tbl, TABLE_LINE_SEP);
+    tbl->append_line(TABLE_LINE_SEP);
 
     if(lecs && titls) 
     {
         for(int i = 0 ; lecs[i] && titls[i]; i++) 
         {
-            T_append_line(tbl, TABLE_LINE_CELL);
+            tbl->append_line(TABLE_LINE_CELL);
             TableLine& line = tbl->lines.back();
             // left column: line title
             std::string label = std::string(titls[i]);
@@ -381,19 +377,19 @@ int T_default(TBL* tbl, char* titg, char** titls, char** lecs, int mode, int fil
         }
     }
     else 
-        T_append_line(tbl, TABLE_LINE_CELL);
+        tbl->append_line(TABLE_LINE_CELL);
     
     if(mode || files || date)
-        T_append_line(tbl,  TABLE_LINE_SEP);
+        tbl->append_line(TABLE_LINE_SEP);
     
     if(mode)  
-        T_append_line(tbl,  TABLE_LINE_MODE);
+        tbl->append_line(TABLE_LINE_MODE);
     
     if(files) 
-        T_append_line(tbl,  TABLE_LINE_FILES);
+        tbl->append_line(TABLE_LINE_FILES);
     
     if(date)  
-        T_append_line(tbl,  TABLE_LINE_DATE);
+        tbl->append_line(TABLE_LINE_DATE);
 
     return(0);
 }
