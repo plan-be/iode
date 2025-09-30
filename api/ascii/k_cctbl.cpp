@@ -349,7 +349,7 @@ static TBL* read_tbl(YYFILE* yy)
                 tbl->z_max  = (float)K_read_real(yy);
                 break;
             case TABLE_ASCII_ALIGN:
-                tbl->set_text_alignment((TableTextAlign) K_read_long(yy));
+                tbl->set_text_alignment((TableTextAlign) K_read_align(yy));
                 break;
             case TABLE_ASCII_BREAK   :
                 if(read_line(tbl, yy)< 0) 
