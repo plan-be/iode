@@ -1,6 +1,5 @@
 #include "api/all.h"
 
-int c_kerror_super(const int level, const char* msg);
 void c_kwarning_super(const char* msg);
 void c_kmsg_super(const char* msg);
 int c_kconfirm_super(const char* msg);
@@ -48,6 +47,4 @@ int c_ViewTable_super(Table* tbl, char* smpl, char* name);
 // ========================================= //
 
 int error_as_cpp_exception(const int level, const char* msg);
-
-void _c_api_error_as_exception(const bool value);
 void python_assign_super();

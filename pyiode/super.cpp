@@ -15,14 +15,6 @@ int error_as_cpp_exception(const int level, const char* msg)
 		throw std::runtime_error(msg);
 }
 
-void _c_api_error_as_exception(const bool value)
-{
-	if (value)
-		kerror_super = error_as_cpp_exception;
-	else
-		kerror_super = c_kerror_super;
-}
-
 void python_assign_super()
 {
 	kerror_super   = error_as_cpp_exception;
