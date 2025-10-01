@@ -98,13 +98,7 @@ class EditTableModel(QAbstractTableModel):
 
         if role == Qt.ItemDataRole.BackgroundRole:
             if line_type == TableLineType.SEP:
-                color = QColor("black")
-            elif line_type == TableLineType.CELL:
-                color = QColor("white")
-            else:
-                color = QColor("lightGray")
-                color.setAlphaF(0.4)
-            return color
+                return QColor("black")
 
         if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
