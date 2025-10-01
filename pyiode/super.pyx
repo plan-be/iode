@@ -11,9 +11,6 @@ from pyiode.objects.table cimport CTable
 
 
 cdef extern from "super.h":
-    cdef void _c_api_error_as_exception(const bint value)
-
-    cdef int c_kerror_super(const int level, const char* msg) except? -1
     cdef void c_kwarning_super(const char* msg) noexcept
     cdef void c_kmsg_super(const char* msg) noexcept
     cdef int c_kconfirm_super(const char* msg) noexcept
@@ -78,12 +75,7 @@ def register_super_function(name):
     def decorator(func):
         __registry_super_functions[name] = func
         return func
-    return decorator
-
-cdef int c_kerror_super(const int level, const char* msg):
-    cdef size_t length = strlen(msg)
-    cdef bytes b_msg = bytes(msg[:length])
-    return __registry_super_functions['error'](level, b_msg.decode('utf-8'))   
+    return decorator  
 
 cdef void c_kwarning_super(const char* msg) noexcept:
     cdef size_t length = strlen(msg)
@@ -114,9 +106,6 @@ cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg,
     cdef bytes b_title = bytes(title[:length_title])
     cdef bytes b_msg = bytes(msg[:length_msg])
     return __registry_super_functions['msgbox'](b_title.decode('utf-8'), b_msg.decode('utf-8'))
-
-def c_api_error_as_exception(value: bool):
-    _c_api_error_as_exception(<bint>value)
 
 def skip_pause(value: bool):
     kpause_continue = <bint>value
