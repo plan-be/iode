@@ -1,7 +1,7 @@
 import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
-from iode.util import register_super_function, c_api_error_as_exception
+from iode.util import register_super_function
 from iode.super import skip_pause, skip_msg_box
 
 from PySide6.QtWidgets import QMainWindow, QMessageBox
@@ -19,13 +19,10 @@ main_window: MainWindow = None
 
 def gui_assign_super(arg_main_window: MainWindow):
 	global main_window
-
 	if not isinstance(arg_main_window, MainWindow):
 		QMessageBox.critical(None, "ERROR", "The main window is not initialized yet.")
 		return
-	
 	main_window = arg_main_window
-	c_api_error_as_exception(True)
 
 @register_super_function('error')
 def error_super_GUI(level: int, msg: str) -> int:
