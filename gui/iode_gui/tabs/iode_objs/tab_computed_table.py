@@ -23,8 +23,6 @@ class ComputedTableDialog(QDialog, NumericalWidget):
         self.table_view.setModel(self.table_model)
         self.set_model_and_view(self.table_model, self.table_view)
         self.table_view.horizontalHeader().setStretchLastSection(False)
-        stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }"
-        self.table_view.setStyleSheet(stylesheet)
         self.vertical_layout.addWidget(self.table_view)
 
         horizontalSpacer = QSpacerItem(800, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)

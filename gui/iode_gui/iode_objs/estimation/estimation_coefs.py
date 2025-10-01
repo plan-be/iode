@@ -2,6 +2,8 @@ from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QDialog
 from PySide6.QtGui import QKeySequence, QShortcut
 
+from iode_gui.color_theme import ColorTheme
+from iode_gui.settings import get_color_theme
 from .ui_estimation_coefs import Ui_EstimationCoefsDialog
 from iode_gui.iode_objs.models.table_model import ScalarsModel
 from iode.compute.estimation import EditAndEstimateEquations
@@ -27,8 +29,7 @@ class EstimationCoefsDialog(QDialog):
         self.ui.setupUi(self)
 
         # Set up the table view
-        stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }"
-        self.ui.tableView_coefs.setStyleSheet(stylesheet)
+        self.update_colors()
 
         # Create a copy of the estimation scalars database
         scalars_db = edit_est_eqs.scalars_db.copy()
@@ -40,6 +41,17 @@ class EstimationCoefsDialog(QDialog):
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.full_screen_shortcut.activated.connect(self.toggle_maximize)
+
+    def update_colors(self):
+        """
+        Set the highlighting colors according to the current color theme.
+        """
+        color_theme: ColorTheme = get_color_theme()
+        background_color = color_theme.header_background.name()
+        text_color = color_theme.header_text_color.name()
+        stylesheet = f"QHeaderView::section {{ background-color: {background_color}; color: {text_color}, "\
+                     "font: bold; border: 0.5px solid }"
+        self.ui.tableView_coefs.setStyleSheet(stylesheet)
 
     @Slot()
     def toggle_maximize(self):
