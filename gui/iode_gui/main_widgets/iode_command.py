@@ -126,7 +126,9 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
 
         settings.beginGroup(self.settings_group_name)
 
-        commands_to_load = settings.value("LAST_EXECUTED_COMMANDS", [])
+        commands_to_load = settings.value("LAST_EXECUTED_COMMANDS")
+        if not commands_to_load:
+            commands_to_load = []
         if isinstance(commands_to_load, str):
             commands_to_load = [commands_to_load]
         self.executed_commands_list = commands_to_load
