@@ -71,7 +71,7 @@ void ComputedTable::initialize()
             kdb = K_RWS[VARIABLES][ref - 1];
             if(kdb == NULL) 
                 throw std::invalid_argument("file[" + std::to_string(ref) + "] is not present");
-            files.push_back(std::string(kdb->k_nameptr));
+            files.push_back(kdb->filepath);
         }
     }
 

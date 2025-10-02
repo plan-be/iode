@@ -107,12 +107,13 @@ KDB* AsciiComments::load_asc(char* filename)
     /* READ FILE */
     kdb = K_create(COMMENTS, ASIS_CASE);
     
-    //DebugForce("filename: %s", kdb->k_nameptr);
-    
-    while(1) {
-        switch(YY_lex(yy)) {
+    while(1) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
-                if(cmpt) {
+                if(cmpt) 
+                {
                     char    asc_filename[1024];
                     K_set_ext_asc(asc_filename, filename, COMMENTS);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022

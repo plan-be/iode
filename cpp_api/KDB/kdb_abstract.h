@@ -63,9 +63,9 @@ public:
     std::string get_filename() const 
     {
         KDB* kdb = get_database();
-        if(kdb != NULL && kdb->k_nameptr != NULL) 
+        if(kdb != NULL && !kdb->filepath.empty()) 
         {
-            std::string filename_oem = std::string(kdb->k_nameptr); 
+            std::string filename_oem = kdb->filepath; 
             std::string filename = oem_to_utf8(filename_oem);
             return filename;
         }

@@ -192,7 +192,7 @@ KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask)
 
 /**
  *  Loads variables from an ASCII file into a new KDB. On success, adds extension to ".av" to 
- *  filename in kd->k_nameptr.
+ *  filename in kd->filepath.
  *  
  *  @param [in] filename    char* ascii file to read
  *  @return                 KDB*  NULL or new KDB of variables

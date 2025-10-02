@@ -64,16 +64,16 @@ cdef extern from "api/all.h":
         ONAME o_name
 
     ctypedef struct KDB:
-        KOBJ *k_objs
-        long k_nb
-        short k_type
-        short k_mode
-        char k_arch[32]
-        char k_desc[64]
-        char k_data[64]
-        char k_compressed
-        char k_db_type
-        char *k_nameptr
+        KOBJ*   k_objs
+        long    k_nb
+        short   k_type
+        short   k_mode
+        char    k_arch[32]
+        char    k_desc[64]
+        char    k_data[64]
+        char    k_compressed
+        char    k_db_type
+        string  filepath
 
 
     # k_kdb.c

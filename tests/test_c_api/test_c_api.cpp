@@ -441,16 +441,15 @@ public:
 	    return rc == 0 && std::string(KDESC(K_WS[type])) == descr;
 	}
 
-	bool U_test_B_WsName(char* name, int type)
+	bool U_test_B_WsName(char* c_name, int type)
 	{
 	    int     rc;
-	    char    *nameptr;
 	
-	    rc = B_WsName(name, type);
+	    rc = B_WsName(c_name, type);
         EXPECT_EQ(rc, 0);
-	    nameptr = K_get_kdb_nameptr(K_WS[type]);
-	    EXPECT_EQ(std::string(nameptr), std::string(name));
-	    return rc == 0 && std::string(nameptr) == std::string(name);
+	    std::string name = K_WS[type]->filepath;
+	    EXPECT_EQ(name, std::string(c_name));
+	    return rc == 0 && name == std::string(c_name);
 	}
 
 	bool U_test_B_WsCopyVar()
@@ -2448,9 +2447,6 @@ TEST_F(IodeCAPITest, Tests_B_WsName)
     B_WsLoad(fullfilename, TABLES);
     B_WsLoad(fullfilename, VARIABLES);
 
-    // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
-    // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes)
-    // Should be reviewed for C++ w/o /Zp1
     U_test_print_title("B_WsName()");
     U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", EQUATIONS);

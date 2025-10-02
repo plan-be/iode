@@ -9,16 +9,9 @@ bool is_global_database_loaded(const IodeType iodeType)
     return true; 
 }
 
-// Replaced by K_get_kdb_nameptr()
-// 
-// std::string get_kdb_filename(KDB* kdb)
-// {
-//     return std::string(kdb->k_nameptr);
-// }
-
 void set_kdb_filename(KDB* kdb, const std::string& filename)
 {
-    K_set_kdb_name(kdb, (unsigned char*) filename.c_str());
+    kdb->filepath = filename;
 }
 
 std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iode_type, const std::string& pattern)

@@ -45,7 +45,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
     k_compressed = source_kdb->k_compressed;                            // char
     k_db_type = source_kdb->k_db_type;                                  // char
-    k_nameptr = copy_char_array(source_kdb->k_nameptr);                 // char*
+    filepath = source_kdb->filepath;                                  // std::string
 
     std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeType) k_type, pattern);
 
@@ -69,10 +69,9 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
                     if(k_objs[i].o_val != 0) SW_free(k_objs[i].o_val);
 
                 SW_nfree(k_objs);
-                k_objs = NULL;
+                k_objs = NULL; 
 
-                SCR_free(k_nameptr);
-                k_nameptr = NULL; 
+                filepath.clear();
 
                 error_msg += "Cannot to copy " + v_iode_types[k_type] + " named '" + name + "' in the subset.\n";
                 if (pos == -1) 
@@ -100,8 +99,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
                 SW_nfree(k_objs);
                 k_objs = NULL;
 
-                SCR_free(k_nameptr);
-                k_nameptr = NULL; 
+                filepath.clear();
 
                 error_msg += "Object with name '" + names[i] + "' does not exist in the " + v_iode_types[k_type] + " database.";
                 throw std::runtime_error(error_msg);
@@ -129,8 +127,7 @@ KDBAbstract::~KDBAbstract()
     SW_nfree(k_objs);
     k_objs = NULL;
 
-    SCR_free(k_nameptr);
-    k_nameptr = NULL; 
+    filepath.clear();
 }
 
 // object name

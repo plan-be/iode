@@ -165,7 +165,7 @@ char *IodeDdeGetWS(char *szItem)
     {
         if(kdb == 0) 
             return((char*) 0);
-        res = (char*) SCR_stracpy((unsigned char*) KNAMEPTR(kdb)); /* JMP 03-06-2015 */
+        res = (char*) kdb->filepath.c_str();
         return(res);
     }
     else if(strcmp(szItem + 1, "DESCR") == 0) 

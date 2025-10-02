@@ -15,8 +15,6 @@
  * of the operation.
  * 
  *      KDB *K_init_kdb(int type, char* filename);           // allocates and initialises a KDB struct
- *      char *K_get_kdb_nameptr(KDB *kdb)                    // gets the KDB filename pointer stored in kdb->k_nameptr. 
- *      void K_set_kdb_name(KDB* kdb, U_ch* filename);       // changes the filename in a KDB
  *      KDB *K_create(int type, int mode)                    // allocates and initialises a KDB object.    
  *      int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
  *      int K_free(KDB* kdb)                                 // frees a KDB and its contents.
@@ -109,47 +107,13 @@ KDB *K_init_kdb(int type, char* filename)
             break;
     }
     kdb = K_create(type, mode);
-    if(kdb == NULL) return(kdb);
-    //strcpy(KNAME(kdb), filename);
-    K_set_kdb_name(kdb, (unsigned char*) filename); // JMP 3/6/2015
+    if(kdb == NULL) 
+        return(kdb);
+    
+    kdb->filepath = filename;
     return(kdb);
 }
 
-
-/**
- *  Gets the KDB filename pointer stored in kdb->k_nameptr. 
- *  
- *  Because the k_nameptr is aligned on 4 bytes in the KDB structs,
- *  this function must be compiled with an alignment parameter on 4 bytes max (for ex. /Zp1 in VS).
- *  
- *  @param [in]    kdb      KDB*   input KDB 
- *  @return                 char*  value of k_nameptr of NULL if kdb is NULL
- */
-char *K_get_kdb_nameptr(KDB *kdb)
-{
-    if(kdb) return(KNAMEPTR(kdb));
-    else    return(NULL);
-}
-
-
-
-/**
- *  Sets the KDB filename. 
- *  
- *  The current filename stored in the KDB is freed and space for the new filename is allocated in the KDB.
- *  
- *  @param [in, out]    kdb      KDB*   KDB whose name will be changed
- *  @param [in]         filename char*  new filename
- *  
- *  @details More details   
- */
-void K_set_kdb_name(KDB *kdb, U_ch *filename) 
-{
-    if(kdb) {
-        SCR_free(KNAMEPTR(kdb));
-        KNAMEPTR(kdb) = (char*) SCR_stracpy(filename);
-    }
-}
 
 /**
  *  Sets the KDB full path name. 
@@ -166,8 +130,9 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
     char    *ptr, fullpath[1024];
     
     ptr = SCR_fullpath((char*) filename, fullpath);
-    if(ptr == 0) ptr = (char*) filename;
-    K_set_kdb_name(kdb, (unsigned char*) ptr);  
+    if(ptr == 0) 
+        ptr = (char*) filename;
+    kdb->filepath = std::string((char*) ptr);  
 }
 
 
@@ -191,7 +156,7 @@ KDB *K_create(int type, int mode)
     strcpy(KARCH(kdb), ARCH);
     KMODE(kdb) = mode;
     KTYPE(kdb) = type;
-    KNAMEPTR(kdb) = (char*) SCR_stracpy((unsigned char*) I_DEFAULT_FILENAME); // JMP 29/9/2015
+    kdb->filepath = I_DEFAULT_FILENAME;
     return(kdb);
 }
 
@@ -204,8 +169,6 @@ KDB *K_create(int type, int mode)
  *  
  *  @param [in, out] kdb    KDB* kdb to be deleted.
  *  @return                 int  0
- *  
- *  TODO: free KNAMEPTR ?
  */
 
 int K_free_kdb(KDB* kdb)
@@ -231,9 +194,7 @@ int K_free(KDB* kdb)
     if(kdb == NULL) return(0);
     for(i = 0; i < KNB(kdb); i++)
         if(KOBJS(kdb)[i].o_val != 0) SW_free(KOBJS(kdb)[i].o_val);
-
-    SCR_free(KNAMEPTR(kdb)); 
-    KNAMEPTR(kdb) = 0;       
+      
     K_free_kdb(kdb);
     return(0);
 }
@@ -255,10 +216,8 @@ int K_clear(KDB* kdb)
     SW_nfree(KOBJS(kdb));
     KOBJS(kdb) = NULL;
     KNB(kdb) = 0;
-    SCR_free(KNAMEPTR(kdb)); // JMP 3/6/2015
-    KNAMEPTR(kdb) = 0;              // JMP 3/6/2015
-    memset(KSMPL(kdb), 0, sizeof(Sample)); /* JMP 28-03-92 */
-    KNAMEPTR(kdb) = (char*) SCR_stracpy((unsigned char*) I_DEFAULT_FILENAME); // JMP 29/9/2015
+    memset(KSMPL(kdb), 0, sizeof(Sample));
+    kdb->filepath = I_DEFAULT_FILENAME;
     return(0);
 }
 
