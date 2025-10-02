@@ -277,7 +277,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
                 kdb->k_mode = kdb32.k_mode;
                 kdb->k_compressed = kdb32.k_compressed;
                 memcpy(kdb->k_arch, kdb32.k_arch, LMAGIC);
-                memcpy(kdb->k_magic, kdb32.k_magic, LMAGIC);
                 memcpy(kdb->k_oname, kdb32.k_oname, OK_MAX_FILE); // JMP 03-06-2015 
                 memcpy(kdb->k_desc, kdb32.k_desc, K_MAX_DESC);
                 memcpy(kdb->k_data, kdb32.k_data, K_MAX_DESC);
@@ -301,7 +300,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
         kdb->k_type    = okdb643->k_type  ;
         kdb->k_mode    = okdb643->k_mode  ;
         memcpy(kdb->k_arch,  okdb643->k_arch, LMAGIC);
-        memcpy(kdb->k_magic, okdb643->k_magic, LMAGIC);
         memcpy(kdb->k_oname,  okdb643->k_name, OK_MAX_FILE); // JMP 03-06-2015 
         memcpy(kdb->k_desc,  okdb643->k_desc, K_MAX_DESC);
         memcpy(kdb->k_data,  okdb643->k_data, K_MAX_DESC);
@@ -1048,7 +1046,6 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         kdb32.k_mode = xdr_kdb->k_mode;
         kdb32.k_compressed = xdr_kdb->k_compressed;
         memcpy(kdb32.k_arch, xdr_kdb->k_arch, LMAGIC);
-        memcpy(kdb32.k_magic, xdr_kdb->k_magic, LMAGIC);
         memcpy(kdb32.k_oname, xdr_kdb->k_oname, OK_MAX_FILE); // JMP 03-06-2015 
         memcpy(kdb32.k_desc, xdr_kdb->k_desc, K_MAX_DESC);
         memcpy(kdb32.k_data, xdr_kdb->k_data, K_MAX_DESC);
