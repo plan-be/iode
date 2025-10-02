@@ -27,7 +27,6 @@ struct KDB
     short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
     short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     char        k_arch[LMAGIC];         // processor architecture on which the file has been created/saved/loaded
-    OFNAME      k_oname;                // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)
     char        k_desc[K_MAX_DESC];     // short file content description
     char        k_data[K_MAX_DESC];     // Sample if Variables database
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
