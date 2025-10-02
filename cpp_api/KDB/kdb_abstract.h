@@ -22,16 +22,6 @@ using List = std::string;
 using Variable = std::vector<double>;
 
 
-const static char DB_GLOBAL       = (char) 0;       //< K_WS[iode_type]
-const static char DB_DEEP_COPY    = (char) 1;       //< deep copy of a global KDB (useful when working with estimation of block of eqs in the GUI)
-const static char DB_SHALLOW_COPY = (char) 2;       //< shallow copy (useful when working on subset in the GUI)
-
-
-/**
- * @note We use k_reserve[0] to store if the current database refers to a global database or 
- *       if it is a deep or a shallow copy of a global database  
- * 
- */
 class KDBAbstract: public KDB
 {
 protected:
@@ -47,11 +37,11 @@ public:
 
     int get_iode_type() const { return k_type; }
 
-    bool is_global_database() const { return k_reserved[0] == DB_GLOBAL; }
+    bool is_global_database() const { return k_db_type == DB_GLOBAL; }
 
-    bool is_local_database() const { return k_reserved[0] == DB_DEEP_COPY; }
+    bool is_local_database() const { return k_db_type == DB_DEEP_COPY; }
 
-    bool is_shallow_copy_database() const { return k_reserved[0] == DB_SHALLOW_COPY; }
+    bool is_shallow_copy_database() const { return k_db_type == DB_SHALLOW_COPY; }
 
     KDB* get_database() const
     {

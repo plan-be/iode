@@ -27,7 +27,7 @@ KDBAbstract::KDBAbstract(const IodeType iode_type, const std::string& filepath)
                                     "' database from the file '" + filepath + "'\nReason: unknown");  
     }
     
-    k_reserved[0] = DB_GLOBAL;
+    k_db_type = DB_GLOBAL;
 }
 
 KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern)
@@ -46,7 +46,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     strncpy(k_desc, source_kdb->k_desc, K_MAX_DESC);                    // char[K_MAX_DESC]
     memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
     k_compressed = source_kdb->k_compressed;                            // char
-    memcpy(k_reserved, source_kdb->k_reserved, sizeof(char) * 59);      // char[59]
+    k_db_type = source_kdb->k_db_type;                                  // char
     k_nameptr = copy_char_array(source_kdb->k_nameptr);                 // char*
 
     std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeType) k_type, pattern);
@@ -57,7 +57,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // ---- deep copy of objects ---- 
     if(deep_copy)
     {
-        k_reserved[0] = DB_DEEP_COPY;
+        k_db_type = DB_DEEP_COPY;
         k_nb = 0;
 
         char* c_name;
@@ -89,7 +89,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // -> same as K_quick_refer() function <-
     else
     {
-        k_reserved[0] = DB_SHALLOW_COPY;
+        k_db_type = DB_SHALLOW_COPY;
 
         k_nb = (long) names.size();
         k_objs = (KOBJ*) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + k_nb / K_CHUNCK));
@@ -209,7 +209,7 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
     
     int pos;
     KDB* kdb = get_database();
-    switch (k_reserved[0])
+    switch (k_db_type)
     {
     case 0:
         pos = K_ren(K_WS[k_type], c_old_name, c_new_name);
@@ -260,7 +260,7 @@ void KDBAbstract::remove(const std::string& name)
         return;
 
     KDB* kdb = get_database();
-    switch(k_reserved[0])
+    switch(k_db_type)
     {
     case 0:
         K_del(K_WS[k_type], pos);

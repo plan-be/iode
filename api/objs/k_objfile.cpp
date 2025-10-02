@@ -299,13 +299,14 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
         memcpy(kdb->k_desc,  okdb643->k_desc, K_MAX_DESC);
         memcpy(kdb->k_data,  okdb643->k_data, K_MAX_DESC);
 
-        if(vers == 2 || vers == 3) {
+        if(vers == 2 || vers == 3) 
+        {
             kdb->k_compressed = okdb643->k_compressed;
-            memset(kdb->k_reserved, 0, sizeof(kdb->k_reserved));
+            kdb->k_db_type = DB_GLOBAL; 
         }
     }
 
-    memset(kdb->k_reserved, 0, sizeof(kdb->k_reserved));
+    kdb->k_db_type = DB_GLOBAL; 
     KNAMEPTR(kdb) = 0;
     K_xdrKDB(kdb, NULL);
     return(0);

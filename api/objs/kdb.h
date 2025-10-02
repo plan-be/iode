@@ -1,8 +1,16 @@
 #pragma once
 
 #include "scr4/s_swap.h"        // SWHDL
-
 #include "api/constants.h"
+
+
+enum IodeDatabaseType
+{
+    DB_GLOBAL,          //< K_WS[iode_type]
+    DB_DEEP_COPY,       //< deep copy of a global KDB (useful when working with estimation of block of eqs in the GUI)
+    DB_SHALLOW_COPY     //< shallow copy (useful when working on subset in the GUI)
+};
+
 
 /*----------------------- STRUCTS ----------------------------*/
 
@@ -10,23 +18,22 @@ struct  KOBJ
 {
     SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
     ONAME       o_name;         // name of the object
-    char        o_pad[3];
 };
 
 struct KDB 
 {
-    KOBJ        *k_objs;                // map <position in the memory, object name>
+    KOBJ*       k_objs;                 // map <position in the memory, object name>
 	long        k_nb;                   // number of objects in the database
     short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
     short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     char        k_arch[LMAGIC];         // not used
     char        k_magic[LMAGIC];        // not used
-    OFNAME       k_oname;               // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)
+    OFNAME      k_oname;                // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)
     char        k_desc[K_MAX_DESC];     // short file content description
     char        k_data[K_MAX_DESC];     // Sample if Variables database
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
-    char        k_reserved[59];         // not used (NOTE: decreased by 4 bytes in version 6.44 for k_nameptr)
-    char        *k_nameptr;             // filepath to the database file
+    char        k_db_type;              // type of database: DB_NORMAL (default), DB_DEEP_COPY, DB_SHALLOW_COPY
+    char*       k_nameptr;              // filepath to the database file
 };
 
 /*----------------------- GLOBALS ----------------------------*/
