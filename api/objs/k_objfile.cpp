@@ -261,7 +261,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
 {
     OKDB643     *okdb643, kdb643;
     KDB32       kdb32;
-    int         posnb, posname;
 
     okdb643 = &kdb643;
     memset((char *)&kdb643, 0, sizeof(kdb643)); // JMP 28/10/2016 correction plantage fichier 2000 de PV
@@ -269,12 +268,19 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
     switch(vers) {
         case 0 :
             // Current version
-            if(X64) {
+            if(X64) 
+            {
                 kread((char *) &kdb32, sizeof(KDB32), 1, fd);
                 memset(kdb, 0, sizeof(KDB));
-                posnb   = (int)((char *)&kdb->k_nb      - (char *)kdb);
-                posname = (int)((char *)&kdb->k_nameptr - (char *)kdb);
-                memcpy(&(kdb->k_nb), &(kdb32.k_nb), posname - posnb); // JMP 7/2/2022
+                kdb->k_nb = kdb32.k_nb;
+                kdb->k_type = kdb32.k_type;
+                kdb->k_mode = kdb32.k_mode;
+                kdb->k_compressed = kdb32.k_compressed;
+                memcpy(kdb->k_arch, kdb32.k_arch, LMAGIC);
+                memcpy(kdb->k_magic, kdb32.k_magic, LMAGIC);
+                memcpy(kdb->k_oname, kdb32.k_oname, OK_MAX_FILE); // JMP 03-06-2015 
+                memcpy(kdb->k_desc, kdb32.k_desc, K_MAX_DESC);
+                memcpy(kdb->k_data, kdb32.k_data, K_MAX_DESC);
             }
             else
                 kread((char *) kdb, sizeof(KDB), 1, fd);
@@ -289,7 +295,8 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
             break;
     }
 
-    if(vers != 0) {
+    if(vers != 0) 
+    {
         kdb->k_nb      = okdb643->k_nb  ;
         kdb->k_type    = okdb643->k_type  ;
         kdb->k_mode    = okdb643->k_mode  ;
@@ -1001,7 +1008,7 @@ error :
 
 static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
 {
-    int     i, len, posnb, posname;
+    int     i, len;
     char    *ptr, *xdr_ptr = NULL;
     //KOBJ    *kobj;
     KDB     *xdr_kdb = NULL;
@@ -1032,17 +1039,24 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     K_xdrKDB(kdb, &xdr_kdb);
 
     // Dump KDB struct
-    if(X64) {
+    if(X64) 
+    {
         /* convert to x64 if needed */
         memset(&kdb32, 0, sizeof(KDB32)); // JMP 7/2/2022
-        posnb   = (int)((char *)&xdr_kdb->k_nb      - (char *)xdr_kdb);
-        posname = (int)((char *)&xdr_kdb->k_nameptr - (char *)xdr_kdb);
-        memcpy(&(kdb32.k_nb), &(xdr_kdb->k_nb), posname - posnb);   // JMP 7/2/2022
+        kdb32.k_nb = xdr_kdb->k_nb;
+        kdb32.k_type = xdr_kdb->k_type;
+        kdb32.k_mode = xdr_kdb->k_mode;
+        kdb32.k_compressed = xdr_kdb->k_compressed;
+        memcpy(kdb32.k_arch, xdr_kdb->k_arch, LMAGIC);
+        memcpy(kdb32.k_magic, xdr_kdb->k_magic, LMAGIC);
+        memcpy(kdb32.k_oname, xdr_kdb->k_oname, OK_MAX_FILE); // JMP 03-06-2015 
+        memcpy(kdb32.k_desc, xdr_kdb->k_desc, K_MAX_DESC);
+        memcpy(kdb32.k_data, xdr_kdb->k_data, K_MAX_DESC);
+
         kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
     }
-    else  {
+    else
         kwrite(xdr_kdb, sizeof(KDB), 1, fd);
-    }
 
     SW_nfree(xdr_kdb);
 
