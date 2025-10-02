@@ -40,12 +40,12 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     k_mode = source_kdb->k_mode;                                        // short
     k_type = source_kdb->k_type;                                        // short
     k_objs = NULL;
-    strncpy(k_arch, ARCH, LMAGIC);                                      // char[LMAGIC]   
+    k_arch = ARCH;                                                      // std::string   
     strncpy(k_desc, source_kdb->k_desc, K_MAX_DESC);                    // char[K_MAX_DESC]
     memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
     k_compressed = source_kdb->k_compressed;                            // char
     k_db_type = source_kdb->k_db_type;                                  // char
-    filepath = source_kdb->filepath;                                  // std::string
+    filepath = source_kdb->filepath;                                    // std::string
 
     std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeType) k_type, pattern);
 
