@@ -69,7 +69,6 @@ cdef extern from "api/all.h":
         short k_type
         short k_mode
         char k_arch[32]
-        OFNAME k_oname
         char k_desc[64]
         char k_data[64]
         char k_compressed

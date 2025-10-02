@@ -40,8 +40,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     k_mode = source_kdb->k_mode;                                        // short
     k_type = source_kdb->k_type;                                        // short
     k_objs = NULL;
-    strncpy(k_arch, ARCH, LMAGIC);                                      // char[LMAGIC]
-    strncpy(k_oname, source_kdb->k_oname, sizeof(OFNAME));              // OFNAME     
+    strncpy(k_arch, ARCH, LMAGIC);                                      // char[LMAGIC]   
     strncpy(k_desc, source_kdb->k_desc, K_MAX_DESC);                    // char[K_MAX_DESC]
     memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
     k_compressed = source_kdb->k_compressed;                            // char
