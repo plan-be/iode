@@ -3,6 +3,8 @@
 #include "scr4/s_swap.h"        // SWHDL
 #include "api/constants.h"
 
+#include <string>
+
 
 enum IodeDatabaseType
 {
@@ -31,7 +33,7 @@ struct KDB
     char        k_data[K_MAX_DESC];     // Sample if Variables database
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
     char        k_db_type;              // type of database: DB_NORMAL (default), DB_DEEP_COPY, DB_SHALLOW_COPY
-    char*       k_nameptr;              // filepath to the database file
+    std::string filepath;               // filepath to the database file
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -108,7 +110,6 @@ inline char k_ext[][4] =
 #define KARCH(kdb)   ((kdb)->k_arch)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-#define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
 #define KNB(kdb)     ((kdb)->k_nb)
@@ -125,8 +126,6 @@ inline char k_ext[][4] =
 /* k_kdb.c */
 void K_sort(KDB* kdb);
 KDB *K_init_kdb(int ,char *);
-char *K_get_kdb_nameptr(KDB *kdb);
-void K_set_kdb_name(KDB *kdb, U_ch *filename);
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 KDB *K_create(int ,int );
 int K_free(KDB *);

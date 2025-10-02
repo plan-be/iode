@@ -57,7 +57,7 @@ void K_init_ws(int ws)
  *  
  *  If ws is not null, saves first the KDBs in 7 files ws.cmt, ws.eqs...ws.var before cleaning up.
  *  
- *  @param [in] ws int  if 1, saves the KDB on disk in the file defined in KNAMEPTR(kdb).
+ *  @param [in] ws int  if 1, saves the KDB on disk in the file defined in kdb->filepath.
  *  
  */
 void K_end_ws(int ws)

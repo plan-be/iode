@@ -19,7 +19,7 @@
  *      int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
  *      int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
  *      int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
- *      int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
+ *      int K_setname(char* from, char* to)                                             replaces kdb->filepath in an IODE object file.
  */
 #ifndef UNIX
 #include <io.h>
@@ -310,7 +310,7 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
     }
 
     kdb->k_db_type = DB_GLOBAL; 
-    KNAMEPTR(kdb) = 0;
+    kdb->filepath = "";
     K_xdrKDB(kdb, NULL);
     return(0);
 error :
@@ -389,12 +389,12 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
         goto error;
     }
 
-    // Set filename in kdb->k_nameptr
+    // Set filename in kdb->filepath
     if(strncmp(file, "ws.", 3)) {
         ptr = SCR_fullpath(file, fullpath);
-        if(ptr == 0) ptr = file;
-        //strcpy(kdb->k_name, ptr);
-        K_set_kdb_name(kdb, (unsigned char*) ptr);  // JMP 3/6/2015
+        if(ptr == 0) 
+            ptr = file;
+        kdb->filepath = std::string(ptr);
     }
 
     // Load object table (32 bits == 64 bits)
@@ -866,19 +866,22 @@ fin:
  
 int K_cat(KDB* ikdb, char* filename)
 {
-    KDB     *kdb;
-    //int     ftype;
+    KDB* kdb;
 
     kdb = K_interpret(KTYPE(ikdb), filename);
-    if(kdb == NULL) return(-1);
+    if(kdb == NULL) 
+        return(-1);
 
-    if(KNB(ikdb) == 0) {
+    if(KNB(ikdb) == 0) 
+    {
         memcpy(KDESC(ikdb), KDESC(kdb), K_MAX_DESC);
-        //strcpy(KNAME(ikdb), KNAME(kdb));
-        K_set_kdb_name(ikdb, (unsigned char*) KNAMEPTR(kdb)); // JMP 3/6/2015
+        ikdb->filepath = kdb->filepath;
     }
-    if(KTYPE(ikdb) == VARIABLES) KV_merge_del(ikdb, kdb, 1);
-    else K_merge_del(ikdb, kdb, 1);
+
+    if(KTYPE(ikdb) == VARIABLES) 
+        KV_merge_del(ikdb, kdb, 1);
+    else 
+        K_merge_del(ikdb, kdb, 1);
 
     return(0);
 }
@@ -992,7 +995,7 @@ error :
  *    
  *  @param [in, out]    kdb     KDB*    KDB to save 
  *  @param [in]         fname   FNAME   filename. 
- *  @param [in]         mode    int     1 to replace KNAMEPTR(kdb) by filename before saving
+ *  @param [in]         mode    int     1 to replace kdb->filepath by filename before saving
  *  @return                     int     -1 on error (kdb null, cannot create file)
  *                                      0 on success
  *  
@@ -1023,10 +1026,8 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     setvbuf(fd, NULL, 0, 8192);
     //kmsg("Saving %s", file); // JMP 11/01/2023 (msg already in calling function B_WsDump)
 
-    if(mode) {
-        K_set_kdb_name(kdb, (unsigned char*) file); // JMP 3/6/2015
-        //strcpy(KNAME(kdb), file);
-    }
+    if(mode) 
+        kdb->filepath = std::string(file);
 
     kwrite(K_LABEL, strlen(K_LABEL), 1, fd); /* JMP 23-05-00 */
 
@@ -1115,9 +1116,9 @@ int K_save_ws(KDB* kdb)
 
 
 /**
- *  Replaces KNAMEPTR(kdb) in an IODE object file.
+ *  Replaces kdb->filepath in an IODE object file.
  *  
- *  Opens the object file "from", replaces KNAMEPTR(kdb) by "to" (i.e. the name of the file in the struct) and resaves the KDB struct.
+ *  Opens the object file "from", replaces kdb->filepath by "to" (i.e. the name of the file in the struct) and resaves the KDB struct.
  *  
  *  Only used when renaming or copying a file.
  *  
@@ -1147,8 +1148,7 @@ int K_setname(char* from, char* to)
     }
 
     kread((char *) &kdb, sizeof(KDB), 1, fd);
-    // strcpy(kdb.k_name, to);
-    K_set_kdb_name(&kdb, (unsigned char*) to); // JMP 3/6/2015
+    kdb.filepath = std::string(to);
     kseek(fd, (long) -1L * sizeof(KDB), 1);
     kwrite((char *) &kdb, sizeof(KDB), 1, fd);
 

@@ -278,7 +278,7 @@ char **T_find_files(COLS* cls)
             SCR_free_tbl((unsigned char**) names);
             return(NULL);
         }
-        sprintf(buf, "[%d] %s", i, KNAMEPTR(kdb));
+        sprintf(buf, "[%d] %s", i, (char*) kdb->filepath.c_str());
         SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "/");
         //B_path_change(buf);
         SCR_add_ptr((unsigned char***) &names, &nf, (unsigned char*) buf);

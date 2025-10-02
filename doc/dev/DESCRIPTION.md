@@ -291,8 +291,6 @@ Function to manage KDB, i.e. IODE object groups.
 |Syntax|Description|
 |:---|:---|
 |`KDB *K_init_kdb(int ,char *)`|allocates and initialises a KDB struct|
-|`*char *K_get_kdb_nameptr(KDB *kdb)`|gets the KDB filename pointer stored in kdb\->k\_nameptr|
-|`void K_set_kdb_name(KDB *kdb, U_ch *filename);`|changes the filename in a KDB|
 |`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
 |`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
 |`int K_free(KDB* kdb)`|frees a KDB and its contents.|
@@ -540,7 +538,6 @@ Functions to manipulate IODE object files.
 |`int K_backup(char* filename)`|takes a backup of a file by renaming the file: filename.xxx => filename.xx$.|
 |`int K_save(KDB* kdb, FNAME fname)`|saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).|
 |`int K_save_ws(KDB* kdb)`|saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).|
-|`int K_setname(char* from, char* to)`|replaces KNAMEPTR(kdb) in an IODE object file.|
 
 ## Group "IODE big\- and little\-endian conversion" {#T40}
 

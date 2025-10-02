@@ -511,11 +511,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
  */
 static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 {
-    //char    filename[K_MAX_FILE + 1];
-    int     j, pos, nb_found = 0;
-
-    //strcpy(filename, KNAMEPTR(dbs_tmp));      /* JMP 29-09-2015 */
-    //SCR_replace(filename, "\\", "\\\\");
+    int j, pos, nb_found = 0;
 
     if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     for(j = 0 ; j < KNB(dbs); j++) {

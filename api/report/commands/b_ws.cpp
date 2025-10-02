@@ -342,15 +342,8 @@ int B_WsDescr(char* arg, int type)
 
 int B_WsName(char* arg, int type)
 {
-    //char	dir[K_MAX_FILE], file[K_MAX_FILE];				// JMP 3/6/2015
-
-    // Save filename only (not path) in KDB
-    //SCR_split_name(arg, dir, file)						// JMP 3/6/2015
-    //SCR_strlcpy(KNAME(K_WS[type]), file, K_MAX_FILE - 1);	// JMP 3/6/2015
-
-    // Save full name in K_WSNAME
-    K_set_kdb_name(K_WS[type], (unsigned char*) arg);  // JMP 3/6/2015
-    return(0);
+    K_WS[type]->filepath = std::string(arg);
+    return 0;
 }
 
 
