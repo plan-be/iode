@@ -65,6 +65,7 @@ struct ImportVarFromFile {
     YYKEYS  *imp_keys = NULL;                                                       // Table of keywords (see YY group of functions in scr4 libs)
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
     bool read_variable_implemented;
+    virtual ~ImportVarFromFile() = default;
     virtual int read_header(YYFILE*, Sample*) { return 0; }                         // method to open the input file and to read its header
     virtual int read_variable(YYFILE*, char*, int, double*) { return 0; }           // method to read full variable (i.e. a name + a series of values)
     virtual int read_numerical_value(YYFILE*, char*, int*, double*) { return 0; }   // method to read a single numerical value (a double)
@@ -223,7 +224,8 @@ struct ImportCmtFromFile
 {
     YYKEYS  *imp_keys = NULL;                                                       // Table of keywords (see YY group of functions in scr4 libs)
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
-    virtual int read_header(ImportCmtFromFile*, char*, int) { return 0; }       // method to open the input file and to read its header
+    virtual ~ImportCmtFromFile() = default;
+    virtual int read_header(ImportCmtFromFile*, char*, int) { return 0; }           // method to open the input file and to read its header
     virtual int read_comment(char*, char**) { return 0; }                           // method to read full comment
     virtual int close(void) { return 0; }                                           // method to close the input file
 };
