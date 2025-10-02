@@ -152,12 +152,14 @@ KDB *K_create(int type, int mode)
     KDB   *kdb;
 
     kdb = (KDB *) SW_nalloc(sizeof(KDB));
-    if(kdb == NULL) return(NULL);
-    strcpy(KARCH(kdb), ARCH);
+    if(kdb == NULL) 
+        return(NULL);
+    
+    kdb->k_arch = std::string(ARCH);
     KMODE(kdb) = mode;
     KTYPE(kdb) = type;
     kdb->filepath = I_DEFAULT_FILENAME;
-    return(kdb);
+    return kdb;
 }
 
 
