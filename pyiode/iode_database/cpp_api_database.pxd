@@ -62,7 +62,6 @@ cdef extern from "api/all.h":
     ctypedef struct KOBJ:
         SWHDL o_val
         ONAME o_name
-        char o_pad[3]
 
     ctypedef struct KDB:
         KOBJ *k_objs
@@ -75,7 +74,7 @@ cdef extern from "api/all.h":
         char k_desc[64]
         char k_data[64]
         char k_compressed
-        char k_reserved[59]
+        char k_db_type
         char *k_nameptr
 
 
