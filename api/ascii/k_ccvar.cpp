@@ -40,7 +40,7 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
     double    *vec;
     Sample  *smpl;
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
     vec = (double *) SW_nalloc(smpl->nb_periods * sizeof(double));
 
     /* READ AT MOST nobs OBSERVATIONS */
@@ -109,7 +109,7 @@ static KDB* load_yy(YYFILE* yy, int ask)
     else smpl = K_read_smpl(yy);
 
     if(smpl == NULL) goto err;
-    memcpy((Sample *) KDATA(kdb), smpl, sizeof(Sample));
+    memcpy((Sample *) kdb->k_data, smpl, sizeof(Sample));
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
@@ -256,7 +256,7 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
@@ -322,7 +322,7 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
 
     // sample : if CSV_Sample == NULL => tout le sample
     if(smpl == 0)
-        smpl = (Sample *) KDATA(kdb);
+        smpl = (Sample *) kdb->k_data;
 
     // Liste
     lst = varlist;

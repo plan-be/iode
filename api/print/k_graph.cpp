@@ -43,7 +43,7 @@
 int T_GraphTest(Table *tbl)
 {
     char    gsmpl[20];
-    Sample  *smpl = (Sample *) KDATA(KV_WS);
+    Sample  *smpl = (Sample *) KV_WS->k_data;
 
     W_InitDisplay();
     std::string str_period = smpl->start_period.to_string();

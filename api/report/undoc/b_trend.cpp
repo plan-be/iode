@@ -84,7 +84,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     to = K_create(VARIABLES, UPPER_CASE);
     nb = t_smpl->nb_periods;
-    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 

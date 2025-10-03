@@ -357,8 +357,8 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 {
     int     j, pos, nb_found = 0, start, start_tmp;
 
-    Sample* vsmpl = (Sample *) KDATA(dbv);
-    Sample* tsmpl = (Sample *) KDATA(dbv_tmp);
+    Sample* vsmpl = (Sample *) dbv->k_data;
+    Sample* tsmpl = (Sample *) dbv_tmp->k_data;
     Sample smpl = vsmpl->intersection(*tsmpl);
     if(smpl.nb_periods > 0) 
     {
@@ -735,9 +735,9 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
 
     dbv_i = KI_series_list(dbi);
     if(KSMPL(KV_WS)->nb_periods == 0) 
-        memcpy(KDATA(dbv_i), smpl, sizeof(Sample));
+        memcpy(dbv_i->k_data, smpl, sizeof(Sample));
     else  
-        memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(Sample));
+        memcpy(dbv_i->k_data, KSMPL(KV_WS), sizeof(Sample));
 
     if(KEXEC_TRACE) {
         W_printf("\n.par1 tit_0\nExecution of identities\n");
