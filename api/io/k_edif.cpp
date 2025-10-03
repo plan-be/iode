@@ -64,7 +64,7 @@
 
 int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
-    int dim = KSMPL(dbv)->nb_periods;
+    int dim = dbv->sample->nb_periods;
     int nb  = KNB(dbv);
 
     expdef->file_descriptor.open(outfile);
@@ -75,7 +75,7 @@ int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
 
     for(int i = 0; i < dim; i++) 
     {
-        Period per = KSMPL(dbv)->start_period.shift(i);
+        Period per = dbv->sample->start_period.shift(i);
         expdef->file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
     return(0);

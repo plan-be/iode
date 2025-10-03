@@ -512,9 +512,11 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     E_LECS = lecs;
     E_INSTRS = instrs;
 
-    if(E_SMPL == NULL)
+    if(E_DBV->sample == NULL || E_DBV->sample->nb_periods == 0)
+        throw std::runtime_error("Variables database has no sample defined");
+    if(!E_SMPL)
         throw std::runtime_error("Estimation sample has not been set for estimation");
-    E_FROM = E_SMPL->start_period.difference(KSMPL(E_DBV)->start_period);
+    E_FROM = E_SMPL->start_period.difference(E_DBV->sample->start_period);
     E_T    = E_SMPL->nb_periods;
 
     rc_prep = E_prep(lecs, instrs);

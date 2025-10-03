@@ -66,6 +66,8 @@ public:
 		sample_from_periods(*start_period, *end_period);
 		delete start_period;
 		delete end_period;
+		start_period = nullptr;
+		end_period = nullptr;
 	}
 
 	int get_period_position(const Period& period) const

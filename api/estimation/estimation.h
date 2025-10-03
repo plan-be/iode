@@ -176,6 +176,7 @@ public:
         initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
         if(smpl) 
             delete smpl;
+        smpl = nullptr;
     }
 
     Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, Sample* smpl = NULL,
@@ -227,7 +228,10 @@ public:
         rc = KE_est_s(smpl);                // Perform the estimation
 
         if(free_smpl)
-            delete smpl;
+        {
+            if(smpl) delete smpl;
+            smpl = nullptr;
+        }
 
         if(rc != 0)
         {
@@ -302,9 +306,9 @@ private:
         else
         {
             // If no sample is provided, we will use the one from the global variables database
-            if(KSMPL(KV_WS) == NULL)
+            if(!KV_WS->sample)
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            est_smpl = *KSMPL(KV_WS);
+            est_smpl = *KV_WS->sample;
         }
     }
 

@@ -73,72 +73,90 @@ static int compare(const void *a, const void *b)
  */
 KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
-    KDB     *kdb = 0;
     int     i, nb, size, pos, shift = 0, cmpt = 0, rc;
     char    iname[256];
     ONAME   oname;
-    double    *vector = NULL, value;
+    double  *vector = NULL, value;
     YYFILE  *yy;
+    KDB*    kdb = nullptr;
 
-    if(smpl == NULL || IMP_readrule(rulefile) < 0) return(kdb);
+    if(!smpl)
+        return nullptr;
+
+    if(IMP_readrule(rulefile) < 0) 
+        return nullptr;
 
     YY_CASE_SENSITIVE = 1;
-    if(impdef->imp_keys != NULL) {
+    if(impdef->imp_keys != NULL) 
+    {
         size = impdef->imp_dim;
         qsort(impdef->imp_keys, size, sizeof(YYKEYS), compare);
     }
-    else size = 0;
+    else 
+        size = 0;
 
     SCR_strip((unsigned char*) vecfile);
     yy = YY_open(vecfile, impdef->imp_keys, size, YY_FILE);
-    if(yy == 0) {
+    if(yy == 0) 
+    {
         kerror(0,"Cannot open '%s'", vecfile);
-        return(kdb);
+        return nullptr;
     }
 
     rc = impdef->read_header(yy, smpl);
     if(rc < 0) 
         goto err;
 
-    kdb = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) kdb->k_data, smpl, sizeof(Sample));
+    kdb = new KDB(VARIABLES, DB_STANDALONE);
+    kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
-    if(impdef->read_variable_implemented) {
+    if(impdef->read_variable_implemented) 
+    {
         vector = (double *) SW_nalloc(nb * sizeof(double));
         if(vector == NULL) goto err;
 
-        while(1) {
-            for(i = 0; i < nb; i++) vector[i] = IODE_NAN;
+        while(1) 
+        {
+            for(i = 0; i < nb; i++) 
+                vector[i] = IODE_NAN;
 
             rc = impdef->read_variable(yy, iname, nb, vector);
             if(rc < 0) 
                 break;
 
-            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
+            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
+                continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
             if(K_add(kdb, oname, vector, &nb) < 0)
                 kerror(0, "Unable to create '%s'", oname);
         }
     }
-    else {
-        while(1) {
+    else 
+    {
+        while(1) 
+        {
             rc = impdef->read_numerical_value(yy, iname, &shift, &value);
             if(rc < 0) 
                 break;
 
-            if(shift < 0 || shift > nb) continue;
+            if(shift < 0 || shift > nb)     
+                continue;
 
-            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
+            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0)     
+                continue;
 
             pos = K_find(kdb, oname);
 
-            if(SW_BLKS[7].blk_space > 100000L) Debug("%s\n", oname);
+            if(SW_BLKS[7].blk_space > 100000L) 
+                Debug("%s\n", oname);
 
-            if(pos < 0) {
+            if(pos < 0) 
+            {
                 kmsg("Reading object %d : %s", ++cmpt, oname);
                 pos = K_add(kdb, oname, NULL, &nb);
-                if(pos < 0) {
+                if(pos < 0) 
+                {
                     kerror(0, "Unable to create '%s'", oname);
                     goto err;
                 }
@@ -154,15 +172,15 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
 
     YY_close(yy);
     SW_nfree(vector);
-    return(kdb);
+    return kdb;
 
 err:
-    K_free(kdb);
-    kdb = NULL;
+    delete kdb;
+    kdb = nullptr;
     kerror(0, "%s : incorrect filter (%s : offending entry)", YY_error(yy), yy->yy_text);
     YY_close(yy);
     SW_nfree(vector);
-    return(kdb);
+    return nullptr;
 }
 
 
@@ -198,9 +216,10 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
     if(rc < 0) 
         goto err;
 
-    kdb = K_create(COMMENTS, ASIS_CASE);
+    kdb = new KDB(COMMENTS, DB_STANDALONE);
 
-    while(1) {
+    while(1) 
+    {
         rc = impdef->read_comment(iname, &cmt);
         if(rc < 0) 
             break;
@@ -225,9 +244,8 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
     return(kdb);
 
 err:
-    K_free(kdb);
-    kdb = NULL;
-    return(kdb);
+    delete kdb;
+    return nullptr;
 }
 
 /**
@@ -268,12 +286,13 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
         kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb != NULL) {
             rc = K_save(kdb, ode);
-            K_free(kdb);
+            delete kdb;
+            kdb = nullptr;
         }
     }
 
     if(IMP_trace) W_close();
-    return(rc);
+    return rc;
 }
 
 
@@ -331,7 +350,8 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb != NULL) {
         rc = K_save(kdb, ode);
-        K_free(kdb);
+        delete kdb;
+        kdb = nullptr;
     }
 
     if(IMP_trace) 

@@ -370,7 +370,7 @@ L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
     if(lec == 0 || lec[0] == 0) return(vec);
     clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) {
-        nb = KSMPL(dbv)->nb_periods;
+        nb = dbv->sample->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
         for(t = 0 ; t < nb ; t++) {
             vec[t] = L_exec(dbv, dbs, clec, t);

@@ -214,10 +214,12 @@ int B_DataRasVar(char* arg, int unused)
         rc = RasExecute(args[0], args[1], args[2], rper, cper, maxit, eps);
         delete rper;
         delete cper;
+        rper = nullptr;
+        cper = nullptr;
     }
 
     SCR_free_tbl((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -246,20 +248,24 @@ int B_DataCalcVar(char* arg, int unused)
     lec = arg + lg + 1;
     SCR_strip((unsigned char*) lec);
 
-    nb = KSMPL(kdb)->nb_periods;
+    nb = kdb->sample->nb_periods;
     if((pos = K_find(kdb, name)) < 0) pos = K_add(kdb, name, NULL, &nb);
     if(pos < 0) return(-1);
 
-    if(lec[0]) {
+    if(lec[0]) 
+    {
         clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, K_WS[SCALARS], clec)) {
-            for(t = 0 ; t < KSMPL(kdb)->nb_periods ; t++) {
+        if(clec != 0 && !L_link(kdb, K_WS[SCALARS], clec)) 
+        {
+            for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
+            {
                 d = L_exec(kdb, K_WS[SCALARS], clec, t);
                 *(KVVAL(kdb, pos, t)) = d;
             }
             SW_nfree(clec);
         }
-        else {
+        else 
+        {
             std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
             error_manager.append_error(error_msg);
             SW_nfree(clec);
@@ -295,7 +301,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             else return(0);
 
         case VARIABLES :
-            nb_per = KSMPL(kdb)->nb_periods;
+            nb_per = kdb->sample->nb_periods;
             if(K_add(kdb, arg, NULL, &nb_per) < 0) return(-1);
             else return(0);
 
@@ -577,8 +583,8 @@ int B_DataUpdate(char* arg, int type)
                 rc = -1;
                 break;
             }
-            nb_upd = std::min(nb_upd, (KSMPL(kdb)->end_period.difference(*per) + 1));
-            shift = per->difference(KSMPL(kdb)->start_period);
+            nb_upd = std::min(nb_upd, (kdb->sample->end_period.difference(*per) + 1));
+            shift = per->difference(kdb->sample->start_period);
             if(per == NULL || shift < 0)
                 rc = -1;
             else 
@@ -602,6 +608,7 @@ int B_DataUpdate(char* arg, int type)
 
     A_free((unsigned char**) args);
     delete per;
+    per = nullptr;
 
     if(rc >= 0) 
         rc = 0;
@@ -856,31 +863,37 @@ int B_DataScan(char* arg, int type)
     char    **objs;
     int     rc = -1;
 
-    if(type != IDENTITIES && type != EQUATIONS && type != TABLES) {
+    if(type != IDENTITIES && type != EQUATIONS && type != TABLES) 
+    {
         error_manager.append_error("DataScan : only IDT, EQ and Table are supported");
         return(-1);
     }
 
-    if(arg == NULL || arg[0] == 0) {
+    if(arg == NULL || arg[0] == 0) 
+    {
         /* Exo whole WS */
         return(K_scan(K_WS[type], "_EXO", "_SCAL"));
     }
-    else {
+    else 
+    {
         objs = B_ainit_chk(arg, NULL, 0);
         if(objs == NULL || SCR_tbl_size((unsigned char**) objs) == 0)
             return(K_scan(K_WS[type], "_EXO", "_SCAL"));
-        else {
+        else 
+        {
             tkdb = K_refer(K_WS[type], SCR_tbl_size((unsigned char**) objs), objs);
             if(tkdb == 0 || KNB(tkdb) == 0)            /* JMP 12-05-11 */
                 rc = -1;                                /* JMP 12-05-11 */
             else                                        /* JMP 12-05-11 */
                 rc = K_scan(tkdb, "_EXO", "_SCAL");     /* JMP 12-05-11 */
 
-            K_free_kdb(tkdb);
+            delete tkdb;
+            tkdb = nullptr;
             SCR_free_tbl((unsigned char**) objs);
         }
     }
-    return(rc);
+
+    return rc;
 }
 
 
@@ -984,29 +997,36 @@ int B_DataList(char* arg, int type)
     int     rc = 0;
     char    **args = NULL, **lst,
             *name, *pattern, *file;
-    KDB     *kdb = K_WS[type];
+    KDB*    kdb = new KDB(*K_WS[type]);
 
-    if((args = B_vtom_chk(arg, 3)) == NULL) {
-        if((args = B_vtom_chk(arg, 2)) == NULL) return(-1);
-        else {
+    if((args = B_vtom_chk(arg, 3)) == NULL) 
+    {
+        if((args = B_vtom_chk(arg, 2)) == NULL) 
+            return(-1);
+        else 
+        {
             name    = args[0];
             pattern = args[1];
             file    = NULL;
         }
     }
-    else {
+    else 
+    {
         name    = args[0];
         pattern = args[1];
         file    = args[2];
     }
 
-    if(file == NULL) lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
-    else {
-        kdb = K_interpret(type, file);
-        if(kdb == NULL) return(-1);
-
+    if(file == NULL) 
         lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
-        K_free(kdb);
+    else 
+    {
+        kdb = K_interpret(type, file, 0);
+        if(!kdb) 
+            return(-1);
+        lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
+        delete kdb;
+        kdb = nullptr;
     }
 
     rc = KL_lst(name, lst, 200);
@@ -1198,21 +1218,26 @@ int B_DataCompare(char* arg, int type)
     int     i, rc = 0,
                n1 = 0, n2 = 0, n3 = 0, n4 = 0;
     char    **args = NULL, *name,
-              **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
-                *file, *one, *two, *three, *fr;
-    KDB     *kdb1 = K_WS[type], *kdb2;
+            **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
+            *file, *one, *two, *three, *fr;
+    KDB*    kdb1 = K_WS[type];
+    KDB*    kdb2 = new KDB((IodeType) type, DB_STANDALONE);
 
-    if((args = B_vtom_chk(arg, 5)) == NULL) return(-1);
+    if((args = B_vtom_chk(arg, 5)) == NULL) 
+        return(-1);
+    
     file  = args[0];
     one   = args[1];
     two   = args[2];
     three = args[3];
-    fr   = args[4];
+    fr    = args[4];
 
-    kdb2 = K_interpret(type, file);
-    if(kdb2 == NULL) return(-1);
+    kdb2 = K_interpret(type, file, 0);
+    if(!kdb2) 
+        return(-1);
 
-    for(i = 0; i < KNB(kdb1); i++) {
+    for(i = 0; i < KNB(kdb1); i++) 
+    {
         name = KONAME(kdb1, i);
         rc = K_cmp(name, kdb1, kdb2);
         switch(rc) {
@@ -1229,7 +1254,9 @@ int B_DataCompare(char* arg, int type)
             SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) name);
             break;
         }
-        if(rc > 2) K_del(kdb2, K_find(kdb2, name)) ;
+
+        if(rc > 2) 
+            K_del(kdb2, K_find(kdb2, name)) ;
     }
 
     for(i = 0; i < KNB(kdb2); i++) 
@@ -1257,9 +1284,13 @@ int B_DataCompare(char* arg, int type)
     SCR_free_tbl((unsigned char**) l4);
 
     A_free((unsigned char**) args);
-    K_free(kdb2);
+    if(kdb2)
+    {
+        delete kdb2;
+        kdb2 = nullptr;
+    }
 
-    return(rc);
+    return rc;
 }
 
 
@@ -1309,12 +1340,13 @@ static int B_DataEditGraph(int view, char* arg)
     }
 
     rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
-		    smpl, args + 9);
+		         smpl, args + 9);
 
 fin:
     A_free((unsigned char**) args);
     if(smpl) delete smpl;
-    return(rc);
+    smpl = nullptr;
+    return rc;
 }
 
 

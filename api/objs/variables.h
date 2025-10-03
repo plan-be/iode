@@ -78,6 +78,5 @@ int KV_set_at_aper(char*varname, char* aper, double val);
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KSMPL(kdb)          ((Sample *) (kdb)->k_data)
 #define KVVAL(kdb, pos, t)  K_vval(kdb, pos, t)
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)

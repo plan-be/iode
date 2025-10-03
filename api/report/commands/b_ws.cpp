@@ -61,21 +61,32 @@
  
 int B_WsLoad(char* arg, int type)
 {
-    KDB     *kdb = NULL;
-    int     pos = K_PWS[type];
-    char    buf[K_MAX_FILE + 1];
+    int  pos = K_PWS[type];
+    char buf[K_MAX_FILE + 1];
 
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
-    K_strip(buf);   /* JMP 19-04-98 */
-    if(buf[0] == 0) return(0);
+    K_strip(buf);
+    if(buf[0] == 0) 
+        return 0;
 
-    kdb = K_interpret(type, buf);
-    if(kdb == NULL) return(-1);
+    KDB* kdb = K_interpret(type, buf, 1);
+    if(!kdb) 
+        return -1;
 
-    K_free(K_RWS[type][pos]);
-    K_WS[type] = K_RWS[type][pos] = kdb;
+    if(K_WS[type])
+        delete K_WS[type];
+    K_WS[type] = kdb;
 
-    return(0);
+    // get the list of all object names in 'kdb'
+    char* c_lst = K_expand_kdb(kdb, (int) type, "*", '*');
+    char** c_names = B_ainit_chk(c_lst, NULL, 0);
+
+    if(K_RWS[type][pos])
+        delete K_RWS[type][pos];
+    K_RWS[type][pos] = K_quick_refer(kdb, c_names);
+
+    SCR_free_tbl((unsigned char**) c_names);
+    return 0;
 }
 
 
@@ -277,13 +288,15 @@ int B_WsSample(char* arg, int unused)
     } 
 
     delete new_smpl;
+    new_smpl = nullptr;
     A_free((unsigned char**) args);
-    return(0);
+    return 0;
 
 err:
     if(new_smpl) delete new_smpl;
+    new_smpl = nullptr;
     A_free((unsigned char **) args);
-    return(-1);
+    return -1;
 }
 
 
@@ -300,7 +313,8 @@ int B_WsClear(char* arg, int type)
 {
     B_WsDescr("", type);
     B_WsName("", type);
-    return(K_clear(K_WS[type]));
+    K_WS[type]->clear();
+    return 0;
 }
 
 
@@ -389,7 +403,7 @@ int B_WsCopy(char* arg, int type)
 
     if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
     {
-        // check if from to passed as arguments
+        // check if 'from' and 'to' passed as arguments
         if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0]))
         {
             try
@@ -423,7 +437,9 @@ int B_WsCopy(char* arg, int type)
     }
     SCR_free_tbl((unsigned char**) data0);
     SCR_free_tbl((unsigned char**) files);
-    delete smpl;
+    if(smpl)
+        delete smpl;
+    smpl = nullptr;
 
     if(rc < 0) 
         return(-1);
@@ -509,8 +525,9 @@ int B_WsExtrapolate(char* arg, int unused)
 
 done:
     if(smpl) delete smpl;
+    smpl = nullptr;
     SCR_free_tbl((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -742,6 +759,7 @@ int B_CsvSave(char* arg, int type)
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;
+    smpl = nullptr;
 
     if(rc < 0) 
         return(rc);

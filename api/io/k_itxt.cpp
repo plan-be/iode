@@ -68,6 +68,7 @@ int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
     Period* per = new Period(std::string(buf));
     *shift = per->difference(TXT_smpl.start_period);
     delete per;
+    per = nullptr;
 
     pos = U_pos(',', (unsigned char*) tval);
     if(pos>=0) tval[pos] = '.';

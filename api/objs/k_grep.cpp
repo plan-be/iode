@@ -140,6 +140,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                         }
                     }
                     delete tbl;
+                    tbl = nullptr;
                     break;
             }
         }
@@ -159,7 +160,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
  *  Retrieves all object names matching one or more patterns in a workspace or an object file.
  *  
  *  @param [in] type    int     Object type (COMMENTS -> VARIABLES)
- *  @param [in] file    char*   filename to search into or null to look in the workpace 
+ *  @param [in] file    char*   filename to search into or null to look in the workspace 
  *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
  *  
@@ -174,35 +175,46 @@ char *K_expand(int type, char* file, char* pattern, int all)
     char    **ptbl, **tbl, *lst = NULL;
     KDB     *kdb;
 
-    if(pattern == 0 || pattern[0] == 0 ||
-            type < COMMENTS || type > VARIABLES) return(NULL);
+    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) 
+        return(NULL);
 
-    if(file == NULL) kdb = K_WS[type];
-    else {
-        kdb = K_interpret(type, file);
-        if(kdb == NULL) return(lst);  /* JMP 05-01-99 */
+    if(file == NULL) 
+        kdb = K_WS[type];
+    else 
+    {
+        kdb = K_interpret(type, file, 0);
+        if(!kdb) 
+            return(lst);
     }
 
     ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */
     np = SCR_tbl_size((unsigned char**) ptbl);
-    for(i = 0; i < np; i++) {
-        if(ptbl[i][0] != '"' &&
-                (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) {
+    for(i = 0; i < np; i++) 
+    {
+        if(ptbl[i][0] != '"' && (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) 
+        {
             tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
             SCR_free(ptbl[i]);
-            if(tbl != NULL) {
+            if(tbl != NULL) 
+            {
                 ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
                 SCR_free_tbl((unsigned char**) tbl);
             }
-            else ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
+            else 
+                ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
         }
     }
 
     lst = (char*) SCR_mtov((unsigned char**) ptbl, ';');
     SCR_free_tbl((unsigned char**) ptbl);
 
-    if(file != NULL) K_free(kdb);
-    return(lst);
+    if(file != NULL)
+    {
+        delete kdb;
+        kdb = nullptr;
+    }
+    
+    return lst;
 }
 
 /**

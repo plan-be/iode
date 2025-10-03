@@ -32,12 +32,13 @@ int B_WsSeasonAdj(char *arg, int unused)
 int B_season(char* arg)
 {
     int     nb, lg, rc = -1,
-                    i, j, shift, beg, dim, nbper;
+            i, j, shift, beg, dim, nbper;
     char    name[K_MAX_FILE + 1], **data = NULL;
-    double    *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
-                  eps, scale, season[12];
-    KDB     *from = NULL, *to = NULL;
-    Sample  *t_smpl = NULL;
+    double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
+            eps, scale, season[12];
+    KDB*    to = nullptr;
+    Sample* t_smpl = nullptr;
+    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
     lg = B_get_arg0(name, arg, 80);
     data = B_ainit_chk(arg + lg, NULL, 0);
@@ -47,29 +48,34 @@ int B_season(char* arg)
     eps = atof(data[nb - 1]);
     if(IODE_IS_0(eps)) 
         SEASON_EPS = 5.0;
-    else {
+    else 
+    {
         SEASON_EPS = eps;
         nb --;
     }
 
-    from = K_load(VARIABLES, name, nb, data);
-    if(from == NULL || nb != KNB(from)) {
+    from = K_load(VARIABLES, name, nb, data, 0);
+    if(from == nullptr || nb != KNB(from)) 
+    {
         error_manager.append_error("Empty data set or inexistent variable");
         goto done;
     }
 
-    nbper = DS_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift);
-    if(nbper < 0) goto done;
-
-    to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
+    nbper = DS_smpl(from->sample, KV_WS->sample, &t_smpl, &shift);
+    if(nbper < 0 || t_smpl == nullptr) 
+        goto done;
+    
+    to = new KDB(VARIABLES, DB_STANDALONE);
+    to->sample = new Sample(*t_smpl);
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));
     i_vec = (double *) SW_nalloc(nb * sizeof(double));
-    for(i = 0; i < nb; i++) c_vec[i] = i_vec[i] = IODE_NAN;
+    for(i = 0; i < nb; i++) 
+        c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(i = 0; i < KNB(from); i++) {
+    for(i = 0; i < KNB(from); i++) 
+    {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */
         for(j = 0; j < nb; j++) c_vec[j] = i_vec[j] = IODE_NAN;
@@ -101,17 +107,25 @@ int B_season(char* arg)
     rc = 0;
 
 done:
-    K_free(to);
-    K_free(from);
-    SCR_free_tbl((unsigned char**) data);
+    if(to)
+        delete to;
+    to = nullptr;
+    if(from)
+        delete from;
+    from = nullptr;
+    if(t_smpl)
+        delete t_smpl;
+    t_smpl = nullptr;
 
-    SW_nfree(t_smpl);
+    SCR_free_tbl((unsigned char**) data);
     SW_nfree(t_vec);
     SW_nfree(c_vec);
     SW_nfree(i_vec);
 
-    if(rc < 0) return(-1);
-    else return(0);
+    if(rc < 0) 
+        return(-1);
+    else 
+        return(0);
 }
 
 
@@ -416,8 +430,13 @@ int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbpe
 
 int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
 {
-    int nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
+    if(!f_smpl)
+        return -1;
 
+    if(!ws_smpl)
+        return -1;
+    
+    int nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
     if(nbper <= 0) 
     {
         error_manager.append_error("Set periodicity first");

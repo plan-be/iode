@@ -29,7 +29,7 @@
  *     int khitkey()                                            Checks whether the keyboard buffer is not empty (GUI only).
  *     int kgetkey()                                            Reads the next character in the keyboard buffer (GUI only).
  *     void kbeep()                                             Plays a sound (GUI only).
- *     Sample *kasksmpl()                                       Asks the user to give a Sample (GUI only).
+ *     Sample *kas)                                       Asks the user to give a Sample (GUI only->sample.
  *     int kexecsystem()                                        Calls the fonction system().
  *     int kshellexec()                                         Call the Win32 function ShellExecuteEx().
  *
@@ -477,13 +477,13 @@ void kbeep()
 
 Sample* kasksmpl()
 {
-    Sample  *smpl = KSMPL(K_WS[VARIABLES]);
+    Sample  *smpl = K_WS[VARIABLES]->sample;
 
     if(kasksmpl_super) 
         return((*kasksmpl_super)());
     
     if(KV_WS != 0)
-        return(KSMPL(KV_WS));
+        return(KV_WS)->sample;
     else 
         return(NULL);
 }

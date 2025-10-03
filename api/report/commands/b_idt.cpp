@@ -19,14 +19,6 @@
 #include "api/report/commands/commands.h"
 
 
-// List of functions
-int B_IdtExecute(char* arg, int unused);
-int B_IdtExecuteIdts(Sample* smpl, char** idts);
-int B_IdtExecuteVarFiles(char* arg, int unused);
-int B_IdtExecuteSclFiles(char* arg, int unused);
-int B_IdtExecuteTrace(char* arg, int unused);
-
-
 /**
  *  Report function to execute identities. Used in conjunction with report functions
  *      B_IdtExecuteVarFiles(char* arg, int unused)
@@ -71,7 +63,8 @@ int B_IdtExecute(char* arg, int unused)
 
     SCR_free_tbl((unsigned char**) idts);
     delete smpl;
-    return(rc);
+    smpl = nullptr;
+    return rc;
 }
 
 /**
@@ -105,7 +98,8 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
                        KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                        KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                        smpl);
-        K_free_kdb(tdbi);
+        delete tdbi;
+        tdbi = nullptr;
     }
 
     SCR_free_tbl((unsigned char**) KEXEC_VFILES);
@@ -113,13 +107,17 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
     SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = NULL;
 
-    if(tkdb == NULL) return(-1);
+    if(!tkdb) 
+        return -1;
+    
     KV_sample(tkdb, smpl);
 
-    if(KV_WS != NULL) KV_merge_del(KV_WS, tkdb, 1);
-    else KV_WS = tkdb;
+    if(KV_WS) 
+        KV_merge_del(KV_WS, tkdb, 1);
+    else 
+        KV_WS = tkdb;
 
-    return(0);
+    return 0;
 }
 
 

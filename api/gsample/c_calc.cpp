@@ -130,7 +130,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 vy[1] = vy[0];
                 break;
             }
-            t[j]  = cl->cl_per[j].difference(KSMPL(kdb)->start_period);
+            t[j]  = cl->cl_per[j].difference(kdb->sample->start_period);
             vy[j] = L_exec(kdb, KS_WS, clec, t[j]);
             if(!IODE_IS_A_NUMBER(vy[j])) 
                 goto err; /* JMP 16-12-93 */

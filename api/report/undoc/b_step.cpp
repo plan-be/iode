@@ -53,17 +53,20 @@ static int check_scl_var(char *eqs)
                 B_DataUpdate(buf, SCALARS);
             }
         }
-        else {
+        else 
+        {
             if(K_find(K_WS[VARIABLES],cl->lnames[j].name)== -1) 
             {
                 kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
                 delete eq;
+                eq = nullptr;
                 return -1;
             }
         }
     }
     
     delete eq;
+    eq = nullptr;
     return 1;
 }
 
@@ -138,6 +141,7 @@ int B_EqsStepWise(char* arg, int unused)
     estimate_step_wise(smpl, eqs, cond, test);                  /*Effectue les estimations*/
     
     delete smpl;
+    smpl = nullptr;
     SCR_free_tbl((unsigned char**) args);
-    return(0);
+    return 0;
 }

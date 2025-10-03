@@ -154,30 +154,24 @@ public:
 	{
 	    char*       lst;
 	    Sample*     smpl;
-	    double   A[64], B[64];
+	    double      A[64], B[64];
 	    int         nb, i, pos;
 	    static int  done = 0;
 	
-	    //if(done) return;
-	    //done = 1;
-	
-	    //U_test_print_title("Tests OBJECTS");
-	
 	    // Create lists
 	    pos = K_add(KL_WS, "LST1", "A,B");
-	    //S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
 	    K_add(KL_WS, "LST2", "A,B,A");
 	    lst = KLPTR("LST1");
-	    //S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 	
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
 	    KV_sample(KV_WS, smpl);
-	    //SW_nfree(smpl);
+	    EXPECT_TRUE(KV_WS->sample != nullptr);
 	
 	    // Creates new vars
 	    nb = smpl->nb_periods;
-	    for(i = 0; i < smpl->nb_periods; i++) {
+	    for(i = 0; i < smpl->nb_periods; i++) 
+        {
 	       A[i] = i;
 	       B[i] = i*2;
 	    }
@@ -202,7 +196,7 @@ public:
 	    double  calc_val;
 	    int     rc;
 	
-	    Period per = KSMPL(KV_WS)->start_period.shift(t);
+	    Period per = KV_WS->sample->start_period.shift(t);
 	
 	    clec = L_cc(lec);
 	    //S4ASSERT ("L_cc", clec != 0);
@@ -228,15 +222,14 @@ public:
 	    return(res);
 	}
 
-	KDB* U_test_K_interpret(int type, char* filename)
+	void U_test_K_interpret(int type, char* filename)
 	{
-	    char    fullfilename[256];
-	    KDB     *kdb;
-	
+	    char fullfilename[256];
+
 	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
-	    kdb = K_interpret(type, fullfilename);
-	    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
-	    return(kdb);
+
+        delete K_WS[type];
+	    K_WS[type] = K_interpret(type, fullfilename, 1);
 	}
 
 	void U_test_load_fun_esv(char* filename)
@@ -245,19 +238,14 @@ public:
         char filename_scl[256];
         char filename_var[256];
 
-	    // Frees 3 WS
-	    K_free(KE_WS);
-	    K_free(KS_WS);
-	    K_free(KV_WS);
-
         sprintf(filename_eqs, "%s.ae", filename);
         sprintf(filename_scl, "%s.as", filename);
         sprintf(filename_var, "%s.av", filename);
 	
 	    // Loads 3 WS and check ok
-	    KE_RWS = KE_WS = U_test_K_interpret(EQUATIONS, filename_eqs);
-	    KS_RWS = KS_WS = U_test_K_interpret(SCALARS, filename_scl);
-	    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, filename_var);
+	    U_test_K_interpret(EQUATIONS, filename_eqs);
+	    U_test_K_interpret(SCALARS, filename_scl);
+	    U_test_K_interpret(VARIABLES, filename_var);
 	}
 
 	void U_test_W_printf_cmds()
@@ -372,16 +360,19 @@ public:
 	bool U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
 	{
 	    char    fullfilename[256];
+	    char    out_fullfilename[256];
 	    int     rc;
 	
+	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
+	    sprintf(out_fullfilename, "%s%s", output_test_dir, out_file);
+
 	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s%s", input_test_dir, source_file);
 	    rc = B_WsLoad(fullfilename, type);
 	    EXPECT_EQ(rc, 0);
-	    rc = B_WsSaveCmp(out_file, type);
+	    rc = B_WsSaveCmp(out_fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    B_WsClear("", type);
-	    rc = B_WsLoad(out_file, type);
+	    rc = B_WsLoad(out_fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
 	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
@@ -458,10 +449,16 @@ public:
 	    int     rc, nb, pos;
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
-	    // 1. Copy full VAR file (Att: * required)
 	    B_WsClearAll("");
+        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 0);
+        EXPECT_TRUE(K_WS[VARIABLES]->sample == nullptr);
+
+	    // 1. Copy full VAR file (Warning: * required)
 	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
+        EXPECT_EQ(rc, 0);
+        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 394);
+        EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
@@ -607,7 +604,7 @@ public:
 	    if(KV_WS == NULL) 
             return false;
         
-	    nb = KSMPL(KV_WS)->nb_periods;
+	    nb = KV_WS->sample->nb_periods;
 	    A = L_cc_link_exec(lec, KV_WS, KS_WS);
 	    K_add(KV_WS, name, A, &nb);
 	    SCR_free(A);
@@ -722,8 +719,11 @@ public:
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
 	
-	    B_WsLoad("fun", VARIABLES);
-	    sprintf(arg, "%s\\funcsv.csv A* *G", output_test_dir);
+        sprintf(arg, "%sfun", input_test_dir);
+	    B_WsLoad(arg, VARIABLES);
+        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 394);
+        EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
+	    sprintf(arg, "%sfuncsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
 	    compare_files(output_test_dir, "funcsv.csv", output_test_dir, "funcsv.ref.csv");
@@ -768,9 +768,9 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     EXPECT_TRUE(K_find(KV_WS, "AAA") >= 0);
 
     // Test KV_sample()
-    std::string asmpl1 = KSMPL(KV_WS)->to_string();
+    std::string asmpl1 = KV_WS->sample->to_string();
     KV_sample(KV_WS, NULL);
-    std::string asmpl2 = KSMPL(KV_WS)->to_string();
+    std::string asmpl2 = KV_WS->sample->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
 
@@ -1028,7 +1028,6 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 {
     char    in_filename[256];
     char    out_filename[256];
-    KDB     *kdb_var;
     int     rc;
 
     U_test_print_title("Tests K_OBJFILE");
@@ -1036,13 +1035,39 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.av", input_test_dir);
     sprintf(out_filename, "%sfun_copy.av", output_test_dir);
 
-    kdb_var = K_interpret(VARIABLES, in_filename);
+    KDB* kdb_var = K_interpret(VARIABLES, in_filename, 0);
     EXPECT_NE(kdb_var, nullptr);
-    if(kdb_var) {
+    if(kdb_var) 
+    {
         EXPECT_EQ(KNB(kdb_var), 394);
         rc = K_save(kdb_var, out_filename);
         EXPECT_EQ(rc, 0);
     }
+    delete kdb_var;
+    kdb_var = nullptr;
+
+    // K_load (binary files)
+    // load all objects
+    kdb_var = K_load(VARIABLES, in_filename, 0, NULL, 0);
+    EXPECT_NE(kdb_var, nullptr);
+    EXPECT_NE(kdb_var->sample, nullptr);
+    EXPECT_EQ(KNB(kdb_var), 394);
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    delete kdb_var;
+    kdb_var = nullptr;
+
+    // load only 2 objects
+    char** objs = B_ainit_chk("ACAF ACAG", NULL, 0);
+    kdb_var = K_load(VARIABLES, in_filename, 1, objs, 0);
+    EXPECT_NE(kdb_var, nullptr);
+    EXPECT_NE(kdb_var->sample, nullptr);
+    EXPECT_EQ(KNB(kdb_var), 2);
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    delete kdb_var;
+    kdb_var = nullptr;
+    SCR_free_tbl((unsigned char**) objs);
 }
 
 
@@ -1155,7 +1180,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     char    **varlist;
     Sample  *smpl;
     KDB     *kdbv, *kdbt;
-    Table     *tbl;
+    Table   *tbl;
     int     rc;
 
     U_test_suppress_a2m_msgs();
@@ -1163,18 +1188,21 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     U_test_print_title("Tests Print Table as Tables and Graphs");
 
     // Load the VAR workspace
-    K_RWS[VARIABLES][0] = K_WS[VARIABLES] = kdbv  = U_test_K_interpret(VARIABLES, "fun.av");
+    U_test_K_interpret(VARIABLES, "fun.av");
+    kdbv = K_WS[VARIABLES];
+    K_RWS[VARIABLES][0] = new KDB(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
-    K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.at");
+    U_test_K_interpret(TABLES, "fun.at");
+    kdbt = K_WS[TABLES];
+    K_RWS[TABLES][0] = new KDB(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
     sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
-
 
     // Select a table
     tbl = KTPTR("C8_1");
@@ -1368,21 +1396,29 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 {
     char        *lst, buf[512];
     int         rc, i;
-    double   *A1, val;
+    double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
 
     U_test_print_title("Tests B_DATA");
+
+    KDB* kdb_cmt = KC_WS;
+    KDB* kdb_eqs = KE_WS;
+    KDB* kdb_idt = KI_WS;
+    KDB* kdb_lst = KL_WS;
+    KDB* kdb_scl = KS_WS;
+    KDB* kdb_tbl = KT_WS;
+    KDB* kdb_var = KV_WS;
 
     // Clear WS, then loads 3 WS and check ok
     //K_end_ws(0);
     U_test_load_fun_esv(filename);
 
     // (re-)creates vars AA...
-    K_clear(KC_WS);
-    K_clear(KI_WS);
-    K_clear(KL_WS);
-    K_clear(KT_WS);
+    KC_WS->clear();
+    KI_WS->clear();
+    KL_WS->clear();
+    KT_WS->clear();
     U_test_CreateObjects();
 
     // B_DataPattern()
@@ -1402,12 +1438,14 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataDuplicate(char* arg, int type)
     // B_DataRename(char* arg, int type)
     // B_DataDelete(char* arg, int type)
-    for(i = 0; i < 7 ; i++) {
+    for(i = 0; i < 7 ; i++) 
+    {
         rc = B_DataCreate("XXX", i);
         EXPECT_EQ(rc, 0);
         EXPECT_TRUE(K_find(K_WS[i], "XXX") >= 0);
 
-        if(i != EQUATIONS) { // Equations cannot be renamed or duplicated
+        if(i != EQUATIONS) 
+        { // Equations cannot be renamed or duplicated
             rc = B_DataDuplicate("XXX YYY", i);
             EXPECT_EQ(rc, 0);
             EXPECT_TRUE(K_find(K_WS[i], "YYY") >= 0);
@@ -1458,7 +1496,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
-    smpl = KSMPL(KV_WS);
+    smpl = KV_WS->sample;
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , VARIABLES);
     EXPECT_EQ(rc, 0);
 
@@ -1524,13 +1562,13 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     //printf("%s\n", KLPTR("WS_ONLY"));
 
     // B_DataPrintGraph()
-    //smpl = KSMPL(KV_WS);
+    //smpl = KV_WS->sample;
     //printf("%d\n", smpl->start_period);
-    rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");
+    rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
 
     // B_DataDisplayGraph()
-    rc = B_DataDisplayGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");
+    rc = B_DataDisplayGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
 }
 
 
@@ -1712,19 +1750,16 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
 
 TEST_F(IodeCAPITest, Tests_B_IDT)
 {
-    char        filename[256];
-    char        idtexec[] = "2002Y1 2007Y1 C D";
-    char        idtexec2[] = "2002Y1 2007Y1 C D";
-    int         rc;
-    double      *C, *D;
+    char filename[256];
+    int  rc;
 
     U_test_print_title("Tests B_IDT");
 
-    // Init=> clear ws
-    K_clear(KC_WS);
-    K_clear(KI_WS);
-    K_clear(KL_WS);
-    K_clear(KT_WS);
+    // Init -> clear ws
+    KC_WS->clear();
+    KI_WS->clear();
+    KL_WS->clear();
+    KT_WS->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
     K_add(KI_WS, "C", "D*2+ACAF");
@@ -1740,11 +1775,12 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
+    char idtexec[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec);
     EXPECT_NE(rc, 0);
 
     // Second trial with WS in filenames
-    K_clear(KV_WS);
+    KV_WS->clear();
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
 
     sprintf(filename,  "WS %sfun", input_test_dir);
@@ -1752,12 +1788,13 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
+    char idtexec2[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec2);
     EXPECT_EQ(rc, 0);
 
     // Check the values
-    C = (double*)KVPTR("C");
-    D = (double*)KVPTR("D");
+    double* C = (double*) KVPTR("C");
+    double* D = (double*) KVPTR("D");
 
     EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
     EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
@@ -1774,14 +1811,9 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
 
     U_test_print_title("Tests B_IDT_EXECUTE");
 
-    K_free(KV_WS);
-    K_free(KI_WS);
-    //K_free(KS_WS);
-
     // Loads 3 WS and check ok
-    KI_RWS = KI_WS = U_test_K_interpret(IDENTITIES, "fun");
-    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, "fun");
-    //KS_RWS = KS_WS = U_test_K_interpret(SCALARS, "fun");
+    U_test_K_interpret(IDENTITIES, "fun");
+    U_test_K_interpret(VARIABLES, "fun");
 
     //iode.ws_load_idt(f"{input_test_dir}fun")
     //iode.ws_load_var(f"{input_test_dir}fun")
@@ -1857,10 +1889,12 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(outfile, "%sfun_xode.var", output_test_dir);
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
+    EXPECT_TRUE(KV_WS != nullptr);
+    EXPECT_TRUE(KV_RWS != nullptr);
 
-    KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);
+    delete KV_WS;
+    KV_WS = K_interpret(VARIABLES, outfile, 1);
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
-
 
     U_test_print_title("Tests IMP CMT: Import Ascii Comments");
 
@@ -1871,8 +1905,12 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KC_RWS = KC_WS = K_interpret(COMMENTS, outfile);
-        EXPECT_TRUE(KC_WS != NULL);
+        EXPECT_TRUE(KC_WS != nullptr);
+        EXPECT_TRUE(KC_RWS != nullptr);
+
+        delete KC_WS;
+        KC_WS = K_interpret(COMMENTS, outfile, 1);
+        EXPECT_TRUE(KC_WS != nullptr);
         EXPECT_EQ(std::string(KCPTR("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
@@ -1899,8 +1937,11 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
 
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
+    EXPECT_TRUE(KV_WS != nullptr);
+    EXPECT_TRUE(KV_RWS != nullptr);
 
-    KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);
+    delete KV_WS;
+    KV_WS = K_interpret(VARIABLES, outfile, 1);
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
 
     U_test_reset_kmsg_msgs();
@@ -1919,7 +1960,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
-    K_clear(KV_WS);
+    KV_WS->clear();
     smpl = new Sample("2010Q1", "2020Q4");
     KV_sample(KV_WS, smpl);
     delete smpl;
@@ -1981,7 +2022,7 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
     U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
-    K_clear(KV_WS);
+    KV_WS->clear();
     smpl = new Sample("2000Y1", "2020Y1");
     KV_sample(KV_WS, smpl);
     delete smpl;
@@ -2073,6 +2114,14 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     // Reloads 3 WS
     U_test_load_fun_esv(filename);
 
+    // Check
+    kdbv = KV_WS;
+    EXPECT_NE(kdbv, nullptr);
+    kdbs = KS_WS;
+    EXPECT_NE(kdbs, nullptr);
+    kdbe = KE_WS;
+    EXPECT_NE(kdbe, nullptr);
+
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
     KV_set_at_aper("UY", "2001Y1", 670.0);
@@ -2109,6 +2158,14 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 
     //  2. ReLoads 3 WS to reset EXO XNATY to its original value
     U_test_load_fun_esv(filename);
+
+    // Check
+    kdbv = KV_WS;
+    EXPECT_NE(kdbv, nullptr);
+    kdbs = KS_WS;
+    EXPECT_NE(kdbs, nullptr);
+    kdbe = KE_WS;
+    EXPECT_NE(kdbe, nullptr);
 
     //  3. Simulate & compare
     rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
@@ -2354,7 +2411,7 @@ TEST_F(IodeCAPITest, Tests_B_WsSample)
     rc = B_WsSample("1965Y1 2020Y1");
     smpl = new Sample("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(*KSMPL(KV_WS), *smpl);
+    EXPECT_EQ(*KV_WS->sample, *smpl);
     delete smpl;
 
     U_test_reset_kmsg_msgs();
@@ -2646,7 +2703,7 @@ TEST_F(IodeCAPITest, Tests_B_Csv)
     // int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
     // int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
     // int B_CsvDec(char *dec, int unused)                           $CsvDec char
-    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
+    // int B_CsvSave(char* arg, int type)                            $CsvSave<type> file name1 name2 ...
     U_test_print_title("B_Csv*");
     U_test_B_Csv();
 

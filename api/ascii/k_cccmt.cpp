@@ -3,7 +3,7 @@
  * 
  * Functions to load and save ascii definitions of IODE CMT objects.
  *
- *    KDB *load_asc(char* filename)
+ *    KDB *load_asc(char* filename, int db_global)
  *    int save_asc(KDB* kdb, char* filename)
  *    int save_csv(KDB *kdb, char *filename)
  */
@@ -79,19 +79,20 @@ static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
  *  
  *  The implementations of kerror() and kmsg() depend on the context.
  *  
- *  @param [in] filename    char*   name of the ascii file to be read or 
- *                                  string containing the definition of the comment
- *  @return                 KDB*    new KDB of CMT or NULL on error
+ *  @param [in] filename     char*   name of the ascii file to be read or 
+ *                                   string containing the definition of the comment
+ *  @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
+ *  @return                  KDB*    new KDB of CMT or NULL on error
  *  
  *  TODO: what if read_cmt returns an error code ?
  *  
  */
-KDB* AsciiComments::load_asc(char* filename)
+KDB* AsciiComments::load_asc(char* filename, int db_global)
 {
-    KDB     *kdb = 0;
     int     cmpt = 0, rc;
     YYFILE  *yy;
     ONAME   name;
+    KDB*    kdb = new KDB(COMMENTS, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
@@ -99,14 +100,13 @@ KDB* AsciiComments::load_asc(char* filename)
     SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, NULL, 0, (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
 
-    if(yy   == 0) {
+    if(yy == 0) 
+    {
         kerror(0,"Cannot open '%s'", filename);
-        return(kdb);
+        return nullptr;
     }
 
-    /* READ FILE */
-    kdb = K_create(COMMENTS, ASIS_CASE);
-    
+    /* READ FILE */    
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -119,7 +119,7 @@ KDB* AsciiComments::load_asc(char* filename)
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
-                return(kdb);
+                return kdb;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
@@ -136,8 +136,7 @@ KDB* AsciiComments::load_asc(char* filename)
     }
 
     YY_close(yy);
-    K_free(kdb);
-    return((KDB *)0);
+    return nullptr;
 }
 
 /**

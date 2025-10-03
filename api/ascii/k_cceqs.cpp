@@ -3,7 +3,7 @@
  * 
  * Functions to load and save ascii definitions of IODE EQ objects.
  *
- *     KDB *load_asc(char* filename)
+ *     KDB *load_asc(char* filename, int db_global)
  *     int save_asc(KDB* kdb, char* filename)
  *     int save_csv(KDB *kdb, char *filename) : not implemented
  *
@@ -270,18 +270,19 @@ static Equation* read_eq(YYFILE* yy, char* name)
  *  
  *  The implementations of kerror() and kmsg() depend on the context.
  *  
- *  @param [in] filename    char*   ascii file to be read or
- *                                  string containing the definition of the EQ 
- *  @return                 KDB*    NULL or allocated KDB of EQs
+ *  @param [in] filename     char*   ascii file to be read or
+ *                                   string containing the definition of the EQ 
+*   @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
+ *  @return                  KDB*    NULL or allocated KDB of EQs
  *  
  */
-KDB* AsciiEquations::load_asc(char* filename)
+KDB* AsciiEquations::load_asc(char* filename, int db_global)
 {
-    KDB*       kdb = NULL;
     Equation*  eq = NULL;
     YYFILE*    yy;
     char       name[K_MAX_NAME + 1];
     int        cmpt = 0, pos;
+    KDB*       kdb = new KDB(EQUATIONS, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
@@ -289,14 +290,13 @@ KDB* AsciiEquations::load_asc(char* filename)
     SCR_strip((unsigned char *) filename);
     yy = YY_open(filename, KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS),
                  (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
-    if(yy == 0) {
+    if(yy == 0) 
+    {
         kerror(0, "Cannot open '%s'", filename);
-        return(kdb);
+        return nullptr;
     }
 
     /* READ FILE */
-    kdb = K_create(EQUATIONS, UPPER_CASE);
-        
     while(1) {
         switch(YY_read(yy)) {
             case YY_COMMENT :
@@ -308,7 +308,7 @@ KDB* AsciiEquations::load_asc(char* filename)
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
-                return(kdb);
+                return kdb;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
@@ -333,6 +333,7 @@ KDB* AsciiEquations::load_asc(char* filename)
                 
                 kmsg("Reading object %d : %s", cmpt, name);
                 delete eq;
+                eq = nullptr;
                 break;
 
             default :
@@ -342,9 +343,8 @@ KDB* AsciiEquations::load_asc(char* filename)
     }
 
 err:
-    K_free(kdb);
     YY_close(yy);
-    return((KDB *) 0);
+    return nullptr;
 }
 
 /**
@@ -387,7 +387,7 @@ static void print_eq(FILE* fd, Equation* eq, char* name)
     }
 
     // Estimated equation => Sample not null 30/10/2023
-    if((eq->sample).nb_periods != 0) 
+    if(eq->sample.nb_periods != 0) 
     {
         switch(eq->method) {
             case 0 :
@@ -470,6 +470,7 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
         eq = KEVAL(kdb, i);
         print_eq(fd, eq, KONAME(kdb, i));
         delete eq;
+        eq = nullptr;
     }
 
     if(filename[0] != '-') 

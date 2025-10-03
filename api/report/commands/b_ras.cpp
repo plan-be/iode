@@ -166,8 +166,8 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
 
     if(rper != NULL && cper != NULL) 
     {
-        rt = rper->difference(KSMPL(kdb)->start_period);
-        ct = cper->difference(KSMPL(kdb)->start_period);
+        rt = rper->difference(kdb->sample->start_period);
+        ct = cper->difference(kdb->sample->start_period);
         if(rt < 0 || ct < 0) 
             goto cleanup;
 

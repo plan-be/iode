@@ -64,30 +64,32 @@ bool debug_unpack = false;
  * 
  * If a1 is defined, packs a1.
  * 
- * @param [out] pack    (char **)       placeholder for the pointer to the packed object 
- * @param [in]  a1      (double*)    pointer to the first VAR element 
- * @param [in]  a2      (int *)         pointer to the number of elements in the VAR
+ * @param [out] pack    (char **) placeholder for the pointer to the packed object 
+ * @param [in]  a1      (double*) pointer to the first VAR element 
+ * @param [in]  a2      (int *)   pointer to the number of elements in the VAR
  * 
  * @return int -1 if the variable is empty, 0 if ok
 */
 int K_vpack(char **pack, double *a1, int *a2)
 {
-    int     i;
     double* ptr;
-
-    if(*a2 == 0) 
-        return(-1);
+    
+    if(*a2 == NULL) 
+        return -1;
+    
+    int nb_periods = *a2;
     *pack = (char*) P_create();
     if(a1 == NULL) 
     {
-        *pack = (char*) P_add(*pack, NULL, sizeof(double) * *a2);
-        ptr = (double*)P_get_ptr(*pack, 0);
-        for(i = 0; i < *a2; i++) 
+        *pack = (char*) P_add(*pack, NULL, sizeof(double) * nb_periods);
+        ptr = (double*) P_get_ptr(*pack, 0);
+        for(int i = 0; i < nb_periods; i++) 
             ptr[i] = IODE_NAN;
     }
     else 
-        *pack = (char*) P_add(*pack, (char*)a1, sizeof(double) * *a2);
-    return(0);
+        *pack = (char*) P_add(*pack, (char*) a1, sizeof(double) * nb_periods);
+    
+    return 0;
 }
 
 /*
@@ -841,10 +843,21 @@ Equation* K_eunpack(char *pack, char *name)
     std::string instruments(c_instr);
     SW_nfree(c_instr); 
 
-    Sample* smpl = (Sample*) SW_nalloc(sizeof(Sample));
-    memcpy(smpl, P_get_ptr(pack, 4), sizeof(Sample));
-    Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
-    Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
+    Sample* smpl = nullptr;
+    char* c_smpl = (char*) P_get_ptr(pack, 4);
+    if(c_smpl != NULL && strlen(c_smpl) > 0)
+    {
+        smpl = new Sample();
+        memcpy(smpl, c_smpl, sizeof(Sample));
+    }
+
+    Period from_period = (smpl != nullptr) ? smpl->start_period : Period();
+    Period to_period = (smpl != nullptr) ? smpl->end_period : Period();
+    if(smpl != nullptr)
+    {
+        delete smpl;
+        smpl = nullptr;
+    }
 
     Equation* eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
                                 comment, instruments, block, false);

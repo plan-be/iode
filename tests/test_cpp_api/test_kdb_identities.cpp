@@ -391,8 +391,11 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     EXPECT_DOUBLE_EQ(computed_gap2[9], expected_gap2[9]);
     EXPECT_DOUBLE_EQ(computed_gap_[9], expected_gap_[9]);
 
-    // Error
+    // Error -> empty Variables KDB
     Variables.clear();
+    EXPECT_TRUE(Variables.sample == nullptr);
+    EXPECT_EQ(Variables.count(), 0);
+    EXPECT_EQ(Variables.filepath, std::string(I_DEFAULT_FILENAME));
     EXPECT_THROW(Identities.execute_identities(std::to_string(y_from)+"Y1", std::to_string(y_to)+"Y1", 
                  identities_list), std::runtime_error);
 }

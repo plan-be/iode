@@ -251,34 +251,42 @@ error:
  *  Warning: IODE objects versions 1 and 2 are not implemented in 64 bits !
  *  TODO: implement version 1 and 2 in 64 bits.
  *  
- *  @param [out] kdb    KBD*    modified KDB struct 
  *  @param [in] fd      FILE*   IO stream
  *  @param [in] vers    int     version of IODE objects (0-2 ?)
+ *  @param [out] kdb    KBD*    modified KDB struct 
  *  @return             int     0 success, -1 on I/O error
  *  
  */
 static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
 {
-    OKDB643     *okdb643, kdb643;
-    KDB32       kdb32;
+    OKDB643 *okdb643, kdb643;
+    KDB32   kdb32;
+    Sample* smpl;
 
     okdb643 = &kdb643;
-    memset((char *)&kdb643, 0, sizeof(kdb643)); // JMP 28/10/2016 correction plantage fichier 2000 de PV
+    memset((char*) &kdb643, 0, sizeof(kdb643)); // JMP 28/10/2016 correction plantage fichier 2000 de PV
 
-    switch(vers) {
+    switch(vers) 
+    {
         case 0 :
             // Current version
             if(X64) 
             {
                 kread((char *) &kdb32, sizeof(KDB32), 1, fd);
-                memset(kdb, 0, sizeof(KDB));
+                kdb->k_type = kdb32.k_type;
                 kdb->k_nb = kdb32.k_nb;
                 kdb->k_type = kdb32.k_type;
                 kdb->k_mode = kdb32.k_mode;
                 kdb->k_compressed = kdb32.k_compressed;
                 kdb->k_arch = std::string(kdb32.k_arch);
                 kdb->description = std::string(kdb32.k_desc);
-                memcpy(kdb->k_data, kdb32.k_data, K_MAX_DESC);
+                if(kdb32.k_data != NULL && kdb32.k_data[0] != 0)
+                {
+                    smpl = (Sample*) kdb32.k_data;
+                    kdb->sample = new Sample(*smpl);
+                }
+                else
+                    kdb->sample = nullptr;
             }
             else
                 kread((char *) kdb, sizeof(KDB), 1, fd);
@@ -295,25 +303,27 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
 
     if(vers != 0) 
     {
-        kdb->k_nb   = okdb643->k_nb;
+        kdb->k_nb = okdb643->k_nb;
         kdb->k_type = okdb643->k_type;
         kdb->k_mode = okdb643->k_mode;
         kdb->k_arch = std::string(okdb643->k_arch);
         kdb->description = std::string(okdb643->k_desc);
-        memcpy(kdb->k_data, okdb643->k_data, K_MAX_DESC);
+        if(okdb643->k_data != NULL && okdb643->k_data[0] != 0)
+        {
+            smpl = (Sample*) okdb643->k_data;
+            kdb->sample = new Sample(*smpl);
+        }
+        else
+            kdb->sample = nullptr;
 
         if(vers == 2 || vers == 3) 
-        {
             kdb->k_compressed = okdb643->k_compressed;
-            kdb->k_db_type = DB_GLOBAL; 
-        }
     }
 
-    kdb->k_db_type = DB_GLOBAL; 
-    kdb->filepath = "";
     K_xdrKDB(kdb, NULL);
     return(0);
 error :
+    delete kdb;
     return(-1);
 }
 
@@ -332,8 +342,9 @@ error :
  * @param [in]   fname      FNAME   filename
  * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
  * @param [in]   objs       char**  null or list of objects to load
+ * @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
  * @return                  KDB*    KDB with the content of filename restricted to objs if objs is not null
- *                               NULL on error
+ *                                  NULL on error
  *  
  * @note Messages are sent to the user via calls to 2 functions which must be defined 
  *       according to the context (console app, window app, Qt app...) : 
@@ -341,44 +352,41 @@ error :
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)
  *                                   
  */
-KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
+KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
 {
-    int     i, j, lpos, pos, nf, vers;
+    int     i, pos, nf, vers;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
     OSIZE   len, clen;
-    KDB     *kdb = NULL, *tkdb = NULL;
-    //OKDB643 *okdb643;
-    //KOBJ    *kobj;
+    KDB     *tkdb = nullptr;
     FNAME   file;
     FILE    *fd;
 
     // Next line is deleted because K_load_odbc() was implemented for a specific project
     // if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
 
-    // avoid runtime error 'i is not set' in line 'if(i == 0) K_free(kdb);' below
+    // avoid runtime error 'i is not set' in line 'if(i == 0) delete kdb;' below
     i = 0;
+
+    KDB* kdb = new KDB((IodeType) ftype, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     K_set_ext(file, fname, ftype);
     fd = fopen(file, "rb");
 
-    if(fd == NULL) {
+    if(fd == NULL) 
+    {
         kmsg("File %s does not exist", file);
-        return(NULL);
+        return nullptr;
     }
-    //    setvbuf(fd, NULL, 0, 8192); 
 
     // CHECK OBJS LABEL 
     kread(label, strlen(K_LABEL), 1, fd);
     vers = K_calcvers(label);
-    if(vers < 0 || vers > 2) { // JMP 3/6/2015
+    if(vers < 0 || vers > 2) 
+    { // JMP 3/6/2015
         kmsg("%s : invalid iode file", file);
         fclose(fd);
-        return(NULL);
+        return nullptr;
     }
-
-    // Allocate empty kdb
-    kdb = K_create(0, 0);
-    if(kdb == NULL) return(NULL);
 
     // Read kdb struct from open file (fd) and transpose into kdb 64 if X64
     K_read_kdb(kdb, fd, vers);
@@ -391,7 +399,8 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
     }
 
     // Set filename in kdb->filepath
-    if(strncmp(file, "ws.", 3)) {
+    if(strncmp(file, "ws.", 3)) 
+    {
         ptr = SCR_fullpath(file, fullpath);
         if(ptr == 0) 
             ptr = file;
@@ -402,25 +411,36 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
     // TODO: faire une sous-fonction K_read_objtable
     i = (KNB(kdb) / K_CHUNCK + 1) * K_CHUNCK;
     KOBJS(kdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * i);
-    if(KOBJS(kdb) == NULL) goto error;
+    if(KOBJS(kdb) == NULL) 
+        goto error;
+    for(int j = 0; j < i; j++) 
+    {
+        KOBJS(kdb)[j].o_val = 0;
+        memset(KOBJS(kdb)[j].o_name, 0, sizeof(ONAME));
+    }
 
-    // CHECK VERSION KOBJ and load object tables
-    if(vers == 1 || vers == 2) { // short names
+    // CHECK VERSION KOBJ and load object tables (not the objects themselves)
+    if(vers == 1 || vers == 2) 
+    { // short names
         OKOBJ   *okobj;
 
         okobj = (OKOBJ *) SW_nalloc(sizeof(OKOBJ) * KNB(kdb));
         kread((char *) okobj, sizeof(OKOBJ), KNB(kdb), fd);
-        for(j = 0 ; j < KNB(kdb) ; j++)
+        for(int j = 0 ; j < KNB(kdb) ; j++)
             strcpy(KONAME(kdb, j), okobj[j].o_name);
         SW_nfree(okobj);
     }
-    else {
-        if(kdb->k_compressed == 0) {
+    else 
+    {
+        if(kdb->k_compressed == 0) 
+        {
             // Normal case : no compression / long names
             kread((char *) KOBJS(kdb), sizeof(KOBJ), (int) KNB(kdb), fd);
         }
-        else {
-            if(K_read_len(fd, vers, &len)) goto error;
+        else 
+        {
+            if(K_read_len(fd, vers, &len)) 
+                goto error;
             clen = len = -len;
             cptr = SW_nalloc(clen);
             kread(&len, sizeof(OSIZE), 1, fd);
@@ -433,12 +453,16 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
         }
     }
 
-    // Si aucun nom n'est donné, on charge tout
-    if(load_all == 0) {
-        for(i = 0; i < KNB(kdb); i++) {
-            if(K_read_len(fd, vers, &len)) goto error;
+    // Load objects
+    if(load_all == 0) 
+    {
+        for(i = 0; i < KNB(kdb); i++) 
+        {
+            if(K_read_len(fd, vers, &len)) 
+                goto error;
 
-            if(len < 0) {
+            if(len < 0) 
+            {
                 // Si len < 0 => version zippée
                 clen = len = -len;
                 cptr = SW_nalloc(clen);
@@ -452,11 +476,13 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
                 SW_nfree(cptr);
                 SCR_free(aptr);
             }
-            else {
+            else 
+            {
                 // Si len >= 0 => version non zippée (dft)
                 KOBJS(kdb)[i].o_val = SW_alloc(len);
                 ptr = SW_getptr(KOBJS(kdb)[i].o_val);
-                if(ptr == 0) {
+                if(ptr == 0) 
+                {
                     kerror(0, "Memory full ? %s[%d]", __FILE__, __LINE__); // JMP 15/7/2013
                     kerror(0, "o_val = %d, block : %d", KOBJS(kdb)[i].o_val, SW_get_blk(KOBJS(kdb)[i].o_val));
 
@@ -467,93 +493,127 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
             K_setvers(kdb, i, vers);
         }
     }
-    // Sinon on charge la liste demandée
-    else  {
-        // get data of specified objects 
-        tkdb = K_create(KTYPE(kdb), KMODE(kdb));
-        if(tkdb == NULL) goto error;
-
-        memcpy(tkdb, kdb, sizeof(KDB));
-        KNB(tkdb) = 0;
-        KOBJS(tkdb) = NULL;
-
+    // load only the objects in the list objs
+    else  
+    {
         nf = SCR_tbl_size((unsigned char**) objs);
-        for(i = 0; i < nf; i++) K_add_entry(tkdb, objs[i]);
 
-        lpos = 0;
-
-        if(KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS) {
-            if(K_read_len(fd, vers, &len)) goto error;
+        // check names in the objs list exist in the binary file
+        std::vector<int> v_pos(nf, -1);
+        for(i = 0; i < nf; i++) 
+        {
+            pos = K_find(kdb, objs[i]);
+            if(pos >= 0) 
+                v_pos[i] = pos;
         }
 
-        for(i = 0; i < KNB(tkdb); i) {
-            pos = K_find(kdb, KONAME(tkdb, i));
-            if(pos < 0) {
-                K_del_entry(tkdb, i);
+        // clear the KOBJS table
+        SW_nfree(kdb->k_objs);
+        kdb->k_objs = NULL;
+        kdb->k_nb = 0;
+        
+        // ???
+        if(KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS) 
+            if(K_read_len(fd, vers, &len)) 
+                goto error;
+        
+        // read the objects one by one
+        int j;
+        int lpos = 0;
+        char* c_name;
+        for(int n = 0; n < nf; n++) 
+        {
+            c_name = objs[n];
+            pos = v_pos[n];
+            if(pos < 0) 
                 continue;
-            }
 
-            // skip this pos - lpos entries 
-            if(kdb->k_compressed == 0 && (KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS)) {
+            // skip the pos - lpos entries in the binary file 
+            if(kdb->k_compressed == 0 && (KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS)) 
+            {
                 if(pos - lpos > 0)
-                    kseek(fd, (long) len * (pos -lpos), 1);
+                    kseek(fd, (long) len * (pos - lpos), 1);
             }
-            else {
-                for(j = 0; j < pos - lpos; j++) {
-                    if(K_read_len(fd, vers, &len)) goto error;
-                    if(len < 0) len = -len + sizeof(OSIZE);
+            else 
+            {
+                for(j = 0; j < pos - lpos; j++) 
+                {
+                    if(K_read_len(fd, vers, &len)) 
+                        goto error;
+                    if(len < 0) 
+                        len = -len + sizeof(OSIZE);
                     kseek(fd, (long)len, 1);
                 }
             }
 
-            if(K_read_len(fd, vers, &len)) goto error;
+            // read next object
+            if(K_read_len(fd, vers, &len)) 
+                goto error;
+            
+            j = K_add_entry(kdb, c_name);
+            KOBJS(kdb)[j].o_val = SW_alloc(len);
+            ptr = SW_getptr(KOBJS(kdb)[j].o_val);
+            if(ptr == 0) 
+            {
+                kerror(0, "Memory full ? %s[%d]", __FILE__, __LINE__); // JMP 15/7/2013
+                kerror(0, "o_val = %d, block : %d", KOBJS(kdb)[i].o_val, SW_get_blk(KOBJS(kdb)[i].o_val));
 
-            if(len < 0) {
+            }
+            if(len < 0) 
+            {
                 clen = len = -len;
                 cptr = SW_nalloc(clen);
                 kread(&len, sizeof(OSIZE), 1, fd);
                 kread(cptr, clen, 1, fd);
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
-                KOBJS(tkdb)[i].o_val = SW_alloc(len);
-                ptr = SW_getptr(KOBJS(tkdb)[i].o_val);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
                 SCR_free(aptr);
             }
-            else {
-                KOBJS(tkdb)[i].o_val = SW_alloc(len);
-                ptr = SW_getptr(KOBJS(tkdb)[i].o_val);
+            else 
                 kread(ptr, len, 1, fd);
-            }
 
-            K_xdrobj[KTYPE(tkdb)]((unsigned char*) ptr, NULL);
-            K_setvers(tkdb, i, vers); // JMP 10-04-98 
+            K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, NULL);
+            K_setvers(kdb, i, vers);
             lpos = pos + 1;
-            i++;
         }
-
-        K_free_kdb(kdb); // no data in kdb 
-        kdb = tkdb;
     }
 
     fclose(fd);
-    return(kdb);
+    return kdb;
 
 error:
     fclose(fd);
-    if(load_all == 0) {
-        if(i == 0) K_free(kdb);
-        else { // JMP 31-01-00 
+    if(load_all == 0) 
+    {
+        if(i == 0)
+        {
+            if(kdb)
+            {
+                kdb->k_nb = 0;  // to avoid problems in the KDB destructor
+                delete kdb;
+                kdb = nullptr;
+            } 
+        } 
+        else 
             KNB(kdb) = i;
-            return(kdb);
+    }
+    else 
+    {
+        if(tkdb)
+        {
+            delete tkdb;
+            tkdb = nullptr;
+        } 
+        if(kdb)
+        {
+            delete kdb;
+            kdb = nullptr;
         }
     }
-    else {
-        K_free(tkdb);
-        K_free_kdb(kdb);
-    }
-    return(NULL);
+
+    return kdb;
 }
 
 
@@ -578,45 +638,62 @@ error:
  */
 int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
 {
-    FILE* fd;
+    FILE*   fd;
     int     vers;
-    KDB     kdb;
     FNAME   file;
     char    label[80];
 
     if (descr) descr[0] = 0;
     if (nobjs) *nobjs = 0;
-    if (smpl)  memset(smpl, 0, sizeof(Sample));
-    if (filename == 0 ||
-        filename[0] == 0 || filename[0] == '-') return(-1);
+    if (smpl) memset(smpl, 0, sizeof(Sample));
+    if (filename == 0 || filename[0] == 0 || filename[0] == '-') 
+        return(-1);
 
     strcpy(file, filename);
     K_strip(file); // JMP 19-04-98 
-#ifdef DOS
     fd = fopen(file, "rb");
-#else
-    fd = fopen(file, "rb");
-#endif
-    if (fd == 0) return(-2); // file cannot be opened
+    if (fd == 0) 
+        return(-2); // file cannot be opened
 
     fread(label, strlen(K_LABEL), 1, fd);
     vers = K_calcvers(label);
-    if (vers < 0 || vers > 3) {
+    if (vers < 0 || vers > 3) 
+    {
         fclose(fd);
         return(-1);
     }
 
-    K_read_kdb(&kdb, fd, vers);
+    KDB* kdb = new KDB(COMMENTS, DB_STANDALONE);
+    K_read_kdb(kdb, fd, vers);
     fclose(fd);
 
-    if(descr) 
-        strcpy(descr, (char*) kdb.description.c_str());
-    if(nobjs) 
-        *nobjs = KNB(&kdb);
-    if(smpl && kdb.k_type == VARIABLES)
-        memcpy(smpl, KSMPL(&kdb), sizeof(Sample));
+    if(!kdb)
+    {
+        kwarning("K_filetype: Could not read kdb from %s", file);
+        return -2;
+    }
 
-    return(kdb.k_type);
+    kdb->k_nb = 0;  // to avoid problems in the KDB destructor
+
+    if(descr) 
+        strcpy(descr, (char*) kdb->description.c_str());
+    if(nobjs) 
+        *nobjs = kdb->k_nb;
+    if(smpl != NULL && kdb->k_type == VARIABLES)
+    {
+        if(kdb->sample)
+            smpl = new Sample(*kdb->sample);
+        else
+        {
+            delete smpl;
+            smpl = nullptr;
+        }
+    }
+
+    int type = kdb->k_type;
+    delete kdb;
+    kdb = nullptr;
+    return type;
 }
 
 
@@ -643,24 +720,26 @@ static int K_findtype(char* filename, int type)
 
     ftype = K_filetype(filename, 0L, 0L, 0L); // Open the file to retrieve its content type
     
-    if(type == VARIABLES && U_is_in('!', filename)) return(type); /* Give ODBC a try */
+    if(type == VARIABLES && U_is_in('!', filename)) 
+        return(type); /* Give ODBC a try */
 
-    if(ftype != -2) return(ftype); // -2 => file cannot be opened
+    if(ftype != -2) 
+        return(ftype); // -2 => file cannot be opened
     
     // Try the filename + std extension (e.g.: .var) 
-    if(0) { // old version before 6.64: replacement extension even if an extension is present
-        strcpy(buf, filename);
-        K_add_ext(buf, k_ext[type]);
-        return(K_filetype(buf, 0L, 0L, 0L));
-    }
-    else { // Change JMP 30/11/2022: try to add extension **only** if there is no extension in filename
-        if(K_has_ext(filename)) return(-2); // file with extension (and not found)
-        // file w/o extension => try a standard IODE extension
-        strcpy(buf, filename);
-        K_add_ext(buf, k_ext[type]);
-        return(K_filetype(buf, 0L, 0L, 0L));
-    }
     
+    // old version before 6.64: replacement extension even if an extension is present
+    // strcpy(buf, filename);
+    // K_add_ext(buf, k_ext[type]);
+    // return(K_filetype(buf, 0L, 0L, 0L));
+    
+    // Change JMP 30/11/2022: try to add extension **only** if there is no extension in filename
+    if(K_has_ext(filename)) 
+        return(-2); // file with extension (and not found)
+    // file w/o extension => try a standard IODE extension
+    strcpy(buf, filename);
+    K_add_ext(buf, k_ext[type]);
+    return(K_filetype(buf, 0L, 0L, 0L));
 }
 
 
@@ -673,6 +752,7 @@ static int K_findtype(char* filename, int type)
  *
  *  @param [in]   type       int     file type (FILE_COMMENTS,...ASCII_COMMENTS,..., FILE_CSV)
  *  @param [in]   filename   char*   file to load
+ *  @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
  *  @return                  KDB*    KDB with the content of filename on success
  *                                   NULL on error
  *   
@@ -682,33 +762,32 @@ static int K_findtype(char* filename, int type)
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)
  *                                   
  */
-KDB *K_interpret(int type, char* filename)
+KDB* K_interpret(int type, char* filename, int db_global)
 {
-    KDB     *kdb = NULL;
-    int     ftype;
-    char    ext[10];
+    int   ftype;
+    char  ext[10];
+    KDB*  kdb = nullptr;
 
     kmsg("Loading %s", filename);
     ftype = K_findtype(filename, type);
-//    printf("type=%d, ftype=%d\n", type, ftype);
-    if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
+    if(ftype == -1) 
+    { // file exists but when opened, type not recognized => test ascii contents
         if(type >= FILE_COMMENTS && type <= FILE_VARIABLES && 
-            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) {
-                kdb = ascii_handlers[type]->load_asc(filename);
-        }
+            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) 
+                kdb = ascii_handlers[type]->load_asc(filename, db_global);
     }
     
-    if(kdb == NULL && type == ftype) 
-        kdb = K_load(type, filename, 0, NULL); /* GB 23/01/98*/
+    if(type == ftype) 
+        kdb = K_load(type, filename, 0, NULL, db_global);
 
-    if(kdb == NULL) {
+    if(!kdb) 
+    {
         kerror(0, "%s not found or incompatible type", filename);
-        return(NULL);
+        return nullptr;
     }
 
-    if(kdb != NULL) kmsg("%d objects loaded", (int) KNB(kdb));
-
-    return(kdb);
+    kmsg("%d objects loaded", (int) KNB(kdb));
+    return kdb;
 }
 
 
@@ -735,42 +814,51 @@ KDB *K_interpret(int type, char* filename)
 static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample* smpl)
 {
     int     i, pf, pt, rc = 0, nb_found = 0;
-    KDB     *from;
     char    *ptr, *pack;
     Sample  csmpl;
 
-    from = K_load(KTYPE(to), file, no, objs);
-    if(from == NULL) return(-1);
+    KDB* from = K_load(KTYPE(to), file, no, objs, 0);
+    if(!from) 
+        return(-1);
 
-    if(KTYPE(to) == VARIABLES) {
+    if(KTYPE(to) == VARIABLES) 
+    {
         if(smpl == NULL) 
-            csmpl = *KSMPL(from);
+            csmpl = *from->sample;
         else
-            csmpl = smpl->intersection(*KSMPL(from)); 
+            csmpl = smpl->intersection(*from->sample);
 
-        if(rc < 0) {
+        if(rc < 0) 
+        {
             error_manager.append_error("File sample and copy sample do not overlap");
             goto the_end;
         }
         /* delete already found variables */
-        for(i = 0 ; i < no; i++) {
+        for(i = 0 ; i < no; i++) 
+        {
             pf = K_find(from, objs[i]);
-            if(pf < 0) continue;
-
-            if(found[i]) K_del(from, pf);
+            if(pf < 0) 
+                continue;
+            if(found[i]) 
+                K_del(from, pf);
             found[i] = 1;
         }
 
         rc = KV_sample(from, &csmpl);
-        if(rc < 0) goto the_end;
+        if(rc < 0) 
+            goto the_end;
         nb_found = KNB(from);
         rc = KV_merge(to, from, 1);
     }
-    else {
-        for(i = 0 ; i < no; i++) {
-            if(found[i]) continue;
+    else 
+    {
+        for(i = 0 ; i < no; i++) 
+        {
+            if(found[i]) 
+                continue;
             pf = K_find(from, objs[i]);
-            if(pf < 0) continue;
+            if(pf < 0) 
+                continue;
 
             found[i] = 1;
 
@@ -779,10 +867,10 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
             memcpy(pack, ptr, P_len(ptr));
 
             pt = K_find(to, objs[i]);
-            if(pt >= 0) { /* series already there, replace */
+            if(pt >= 0)
                 SW_free(KSOVAL(to, pt));
-            }
-            else pt = K_add_entry(to, objs[i]);
+            else 
+                pt = K_add_entry(to, objs[i]);
 
             KSOVAL(to, pt) = SW_alloc(P_len(pack));
             memcpy(KGOVAL(to, pt), pack, P_len(pack));
@@ -792,9 +880,13 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     }
 
 the_end:
-    K_free(from);
-    if(rc < 0) return(0);
-    else return(nb_found);
+    delete from;
+    from = nullptr;
+    
+    if(rc < 0) 
+        return(0);
+    else 
+        return nb_found;
 }
 
 
@@ -820,15 +912,20 @@ int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)
 {
     int     i, j, nb, nb_found = 0, *found = NULL;
 
-    if(kdb == NULL) return(-1);
-    if(objs == NULL || no == 0) return(0);
+    if(kdb == NULL) 
+        return(-1);
+    if(objs == NULL || no == 0) 
+        return(0);
 
-    found = (int *)SW_nalloc(no * sizeof(int));
-    if(files == NULL || nf == 0) goto fin;
+    found = (int*) SW_nalloc(no * sizeof(int));
+    if(files == NULL || nf == 0) 
+        goto fin;
 
-    for(i = 0; i < nf && nb_found < no; i++) {
+    for(i = 0; i < nf && nb_found < no; i++) 
+    {
         nb = K_copy_1(kdb, files[i], no, objs, found, smpl);
-        if(nb < 0) {
+        if(nb < 0) 
+        {
             SW_nfree(found);
             return(-1);
         }
@@ -836,8 +933,10 @@ int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)
     }
 
 fin:
-    if(nb_found < no) {
-        for(i = 0, j = 0 ; i < no && j < 10; i++) {
+    if(nb_found < no) 
+    {
+        for(i = 0, j = 0 ; i < no && j < 10; i++) 
+        {
             if(found[i] == 0)
                 error_manager.append_error(std::string("Var ") + std::string(objs[i]) + 
                                            " not found");
@@ -869,11 +968,9 @@ fin:
  
 int K_cat(KDB* ikdb, char* filename)
 {
-    KDB* kdb;
-
-    kdb = K_interpret(KTYPE(ikdb), filename);
-    if(kdb == NULL) 
-        return(-1);
+    KDB* kdb = K_interpret(KTYPE(ikdb), filename, 0);
+    if(!kdb)
+        return -1;
 
     if(KNB(ikdb) == 0) 
     {
@@ -1051,14 +1148,19 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         std::strncpy(kdb32.k_arch, xdr_kdb->k_arch.c_str(), xdr_kdb->k_arch.size());
         memset(kdb32.k_desc, 0, K_MAX_DESC);
         std::strncpy(kdb32.k_desc, (char*) xdr_kdb->description.c_str(), xdr_kdb->description.size());
-        memcpy(kdb32.k_data, xdr_kdb->k_data, K_MAX_DESC);
+        if(xdr_kdb->sample)
+        {
+            char* c_smpl = (char*) xdr_kdb->sample; 
+            memcpy(kdb32.k_data, c_smpl, sizeof(Sample));
+        }
 
         kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
     }
     else
         kwrite(xdr_kdb, sizeof(KDB), 1, fd);
 
-    SW_nfree(xdr_kdb);
+    delete xdr_kdb;
+    xdr_kdb = nullptr;
 
     // Dump KOBJ table
     if(K_cwrite(kdb->k_compressed, (char*)KOBJS(kdb), sizeof(KOBJ), KNB(kdb), fd, -1) < 0) goto error;
@@ -1137,25 +1239,26 @@ int K_save_ws(KDB* kdb)
  
 int K_setname(char* from, char* to)
 {
-    char    label[512];
-    KDB     kdb;
-    FILE    *fd;
+    char  label[512];
+    FILE* fd;
+    KDB*  kdb = nullptr;
 
     fd = fopen(from, "rb+");
-    if(fd == NULL)  return(-1);
+    if(fd == NULL)  
+        return(-1);
 
     kread(label, strlen(K_LABEL), 1, fd);
-    /*    if(memcmp(label, K_LABEL, strlen(K_LABEL))) {     /* JMP 09-04-98 */
-    if(K_calcvers(label) < 0) {                         /* JMP 09-04-98 */
+    if(K_calcvers(label) < 0) 
+    {
         kmsg("%s : unvalid iode file", from);
         fclose(fd);
         return(-1);
     }
 
-    kread((char *) &kdb, sizeof(KDB), 1, fd);
-    kdb.filepath = std::string(to);
+    kread((char *) kdb, sizeof(KDB), 1, fd);
+    kdb->filepath = std::string(to);
     kseek(fd, (long) -1L * sizeof(KDB), 1);
-    kwrite((char *) &kdb, sizeof(KDB), 1, fd);
+    kwrite((char *) kdb, sizeof(KDB), 1, fd);
 
     fclose(fd);
     return(0);

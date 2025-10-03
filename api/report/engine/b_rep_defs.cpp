@@ -13,10 +13,10 @@
  *      int RP_macro_createdb()                     Creates the KDB RP_MACRO if it does not exist.
  *      int RP_macro_deletedb()                     Deletes the KDB RP_MACRO and its content.
  *      int RP_define_1(char *name, char *macro)    Adds or replaces a macro to RP_MACRO.
- *      int RP_define(char* arg, int unused)                    Report function to define a new macro.
+ *      int RP_define(char* arg, int unused)        Report function to define a new macro.
  *      char* RP_get_macro_ptr(char* macro_name)    Returns the pointer to a macro (aka define) value.    
  *      int RP_undef_1(char *name)                  Deletes one macro.
- *      int RP_undef(char *arg, int unused)                     Report function to delete macros.
+ *      int RP_undef(char *arg, int unused)         Report function to delete macros.
  *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
  *      int RP_define_save(char *name)              Saves (pushes) a macro under the name "name#<depth+1>".
  *      int RP_define_restore(char *name)           Deletes the macro "name" and restores (pops) the macro "name#<depth>" under the name "name".
@@ -38,13 +38,17 @@
  */
 int RP_macro_createdb()
 {
-    if(RP_MACRO) return(0);
-    RP_MACRO = K_create(K_OBJ, ASIS_CASE);
-    if(RP_MACRO == NULL) {
+    if(RP_MACRO) 
+        return(0);
+
+    RP_MACRO = new KDB(OBJECTS, DB_STANDALONE);
+    if(!RP_MACRO) 
+    {
         error_manager.append_error("Report : Memory Full");
-        return(-3);
+        return -3;
     }
-    return(0);
+    
+    return 0;
 }
 
 
@@ -55,10 +59,12 @@ int RP_macro_createdb()
  */
 int RP_macro_deletedb()
 {
-    if(RP_MACRO) return(0);
-    K_free(RP_MACRO);
-    RP_MACRO = 0;
-    return(0);
+    if(!RP_MACRO) 
+        return 0;
+    
+    delete RP_MACRO;
+    RP_MACRO = nullptr;
+    return 0;
 }
 
 
@@ -73,19 +79,23 @@ int RP_macro_deletedb()
  */
 int RP_define_1(char *name, char *macro)
 {
-    int     rc, lg;
+    int rc, lg;
 
     rc = RP_macro_createdb();
-    if(rc) return(rc);
+    if(rc) 
+        return(rc);
 
-    if(macro == 0) macro = "";
-    lg = (int)strlen(macro) + 1;
-    if(K_add(RP_MACRO, name, macro, &lg) < 0) {
+    if(macro == 0) 
+        macro = "";
+    lg = (int) strlen(macro) + 1;
+    if(K_add(RP_MACRO, name, macro, &lg) < 0) 
+    {
         std::string error_msg = "Report: Define of " + std::string(name);
         error_msg += " (" + std::string(macro) + ") not possible";
         error_manager.append_error(error_msg);
         return(-1);
     }
+
     return(0);
 }
 
@@ -124,7 +134,8 @@ char* RP_get_macro_ptr(char* macro_name)
     int     pos;
     
     pos = K_find(RP_MACRO, macro_name);
-    if(pos < 0) return(NULL);
+    if(pos < 0) 
+        return(NULL);
    
     return(KOVAL(RP_MACRO, pos));
 }
@@ -137,7 +148,9 @@ char* RP_get_macro_ptr(char* macro_name)
  */
 int RP_undef_1(char *name)
 {
-    if(RP_MACRO == 0) return(0);
+    if(!RP_MACRO) 
+        return(0);
+    
     K_del(RP_MACRO, K_find(RP_MACRO, name));
     return(0);
 }
@@ -199,11 +212,14 @@ int RP_define_calcdepth(char *name)
     sprintf(buf, "%s%c", name, K_SECRETSEP);
     lg = (int)strlen(buf);
 
-    for(i = 0; i < KNB(RP_MACRO); i++) {
-        if(strncmp(buf, KONAME(RP_MACRO, i), lg) == 0) {
+    for(i = 0; i < KNB(RP_MACRO); i++) 
+    {
+        if(strncmp(buf, KONAME(RP_MACRO, i), lg) == 0) 
+        {
             objpos = i;
             depth = atoi(KONAME(RP_MACRO, i) + lg);
-            if(depth > maxdepth) maxdepth = depth; // cas avec depth > 9
+            if(depth > maxdepth) 
+                maxdepth = depth; // cas avec depth > 9
         }
     }
 
@@ -226,11 +242,13 @@ int RP_define_save(char *name)
 
     // Create the macro KDB if needed
     rc = RP_macro_createdb();
-    if(rc) return(rc);
+    if(rc) 
+        return(rc);
 
     // if the macro "name" does not yet exist, no need to push its definition
     pos = K_find(RP_MACRO, name);
-    if(pos < 0) return(0);
+    if(pos < 0) 
+        return(0);
 
     // Try to find object name#*
     maxdepth = RP_define_calcdepth(name);
