@@ -29,7 +29,7 @@ struct KDB
     short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
     short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     std::string k_arch;                 // processor architecture on which the file has been created/saved/loaded
-    char        k_desc[K_MAX_DESC];     // short file content description
+    std::string description;            // short description of the content of the database
     char        k_data[K_MAX_DESC];     // Sample if Variables database
     char        k_compressed;           // are the objects compressed in the file ? (LZH method, slow)
     char        k_db_type;              // type of database: DB_NORMAL (default), DB_DEEP_COPY, DB_SHALLOW_COPY
@@ -109,7 +109,6 @@ inline char k_ext[][4] =
 
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-#define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
 #define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)

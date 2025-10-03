@@ -437,8 +437,8 @@ public:
 	
 	    rc = B_WsDescr(descr, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KDESC(K_WS[type])), descr);
-	    return rc == 0 && std::string(KDESC(K_WS[type])) == descr;
+	    EXPECT_EQ(K_WS[type]->description, descr);
+	    return rc == 0 && K_WS[type]->description == descr;
 	}
 
 	bool U_test_B_WsName(char* c_name, int type)

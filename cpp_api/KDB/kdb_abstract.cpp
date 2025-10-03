@@ -41,7 +41,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     k_type = source_kdb->k_type;                                        // short
     k_objs = NULL;
     k_arch = ARCH;                                                      // std::string   
-    strncpy(k_desc, source_kdb->k_desc, K_MAX_DESC);                    // char[K_MAX_DESC]
+    description = source_kdb->description;                                        // std::string
     memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
     k_compressed = source_kdb->k_compressed;                            // char
     k_db_type = source_kdb->k_db_type;                                  // char

@@ -329,8 +329,8 @@ int B_WsClearAll(char* arg, int unused)
  
 int B_WsDescr(char* arg, int type)
 {
-    SCR_strlcpy((unsigned char*) KDESC(K_WS[type]), (unsigned char*) arg, 50);
-    return(0);
+    K_WS[type]->description = std::string(arg);
+    return 0;
 }
 
 

@@ -65,8 +65,7 @@ public:
         KDB* kdb = get_database();
         if(kdb != NULL && !kdb->filepath.empty()) 
         {
-            std::string filename_oem = kdb->filepath; 
-            std::string filename = oem_to_utf8(filename_oem);
+            std::string filename = oem_to_utf8(kdb->filepath);
             return filename;
         }
         else
@@ -86,10 +85,9 @@ public:
     std::string get_description() const 
     { 
         KDB* kdb = get_database();
-        if(kdb != NULL && kdb->k_desc != NULL)
+        if(kdb != NULL && !kdb->description.empty())
         {
-            std::string desc_oem = std::string(kdb->k_desc); 
-            std::string desc = oem_to_utf8(desc_oem);
+            std::string desc = oem_to_utf8(kdb->description);
             return desc;
         }
         else 
@@ -109,12 +107,7 @@ public:
         KDB* kdb = get_database();
         if (kdb == NULL) 
             return ;
-
-        std::string desc_oem = utf8_to_oem(description);
-        size_t size = desc_oem.size() + 1;
-        if(size > K_MAX_DESC) 
-            size = (size_t) K_MAX_DESC;
-        strncpy(kdb->k_desc, desc_oem.c_str(), size);
+        kdb->description = utf8_to_oem(description);
     }
 
     int get_position(const std::string& name) const
