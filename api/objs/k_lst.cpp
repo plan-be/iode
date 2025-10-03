@@ -39,7 +39,8 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
     char    **lst;
     KDB     *exo = NULL, *scal = NULL;
 
-    if(kdb == NULL || KNB(kdb) == 0) {
+    if(kdb == nullptr || KNB(kdb) == 0) 
+    {
         std::string error_msg = "scan : '";
         error_msg += v_iode_types[kdb->k_type];
         error_msg += "' database is empty";
@@ -47,16 +48,19 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         return(-1);
     }
 
-    exo = K_create(K_OBJ, UPPER_CASE);
-    scal = K_create(K_OBJ, LOWER_CASE);
+    exo = new KDB(VARIABLES, DB_STANDALONE);
+    scal = new KDB(SCALARS, DB_STANDALONE);
 
-    if(exo == NULL || scal == NULL) {
+    if(exo == nullptr || scal == nullptr) 
+    {
         rc = -1;
         goto done;
     }
 
-    for(i = 0; i < KNB(kdb); i++) {
-        switch(KTYPE(kdb)) {
+    for(i = 0; i < KNB(kdb); i++) 
+    {
+        switch(KTYPE(kdb)) 
+        {
             case IDENTITIES :
                 KI_scan(kdb, i, exo, scal);
                 break;
@@ -79,9 +83,9 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
     SCR_free_tbl((unsigned char**) lst);
 
 done:
-    K_free(scal);
-    K_free(exo);
-    return(rc);
+    delete scal;
+    delete exo;
+    return rc;
 }
 
 
@@ -119,12 +123,12 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
 
 /**
  *  Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
- *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
+ *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbe    KDB of equations
  *  @param [in]      int  i      position of the equation in the dbe
- *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbe[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbe[i]
+ *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbe[i]
+ *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbe[i]
  *  @return          void
  *  
  */
@@ -134,18 +138,19 @@ void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
     delete eq;
+    eq = nullptr;
 }
 
 
 /**
  *  Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
  *  
- *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
+ *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbi    KDB of identities
  *  @param [in]      int  i      position of the identity in the dbi
- *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbi[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbi[i]
+ *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbi[i]
+ *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbi[i]
  *  @return          void
  *  
  */
@@ -166,12 +171,12 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
 /**
  *  Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.
  *  
- *  The result is added to 2 KDB of type K_OBJ (i.e.: no type), no type meaning that only the object names are relevant.
+ *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
  *  
  *  @param [in]      KDB* dbt    KDB of tables
  *  @param [in]      int  i      position of the table in the dbt
- *  @param [in, out] KDB* exo    KDB (of type K_OBJ == no type) containing all VAR names found in dbt[i]
- *  @param [in, out] KDB* scal   KDB (of type K_OBJ == no type) containing all Scalar names found in dbt[i]
+ *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbt[i]
+ *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbt[i]
  *  @return          void
  *  
  */
@@ -197,6 +202,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
     }
 
     delete tbl;
+    tbl = nullptr;
 }
 
 

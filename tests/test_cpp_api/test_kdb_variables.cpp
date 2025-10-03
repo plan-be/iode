@@ -134,8 +134,8 @@ TEST_F(KDBVariablesTest, GetSetVar)
 TEST_F(KDBVariablesEmptyTest, Sample)
 {
     Sample* sample_undef = Variables.get_sample();
-    EXPECT_EQ(sample_undef->nb_periods, 0);
-    EXPECT_EQ(sample_undef->to_string(), ":");
+    EXPECT_TRUE(sample_undef == nullptr);
+    EXPECT_EQ(Variables.get_nb_periods(), 0);
 
     EXPECT_THROW(Variables.set_sample("", "2015Y1"), std::invalid_argument);
     EXPECT_THROW(Variables.set_sample("1960Y1", ""), std::invalid_argument);

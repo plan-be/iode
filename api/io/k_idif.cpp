@@ -156,6 +156,7 @@ int ImportObjsDIF::read_header(YYFILE* yy, Sample* smpl)
             per2 = *per;
 
         delete per;
+        per = nullptr;
     }
 
     try

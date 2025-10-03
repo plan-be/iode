@@ -110,28 +110,37 @@ int K_key(char* name, int mode)
  *                                      -2 if name2 cannot be added to the kdb2 (memory...)
  */
 
-int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2)
+int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
 {
     int     pos1, pos2, lg;
     char    *pack, *ptr;
 
-    if(kdb1 == kdb2 && strcmp(name1, name2) == 0) return(-2);   // ALD 19/09/2022
+    if(kdb1 == kdb2 && strcmp(name1, name2) == 0) 
+        return(-2);   // ALD 19/09/2022
 
-    pos1 = K_find(kdb1, name1);
-    if(pos1 < 0) return(-1);
+    pos1 = K_find((KDB*) kdb1, name1);
+    if(pos1 < 0) 
+        return(-1);
 
     pos2 = K_find(kdb2, name2);
-    if(pos2 >= 0) {
-        if(KSOVAL(kdb2, pos2) != 0) SW_free(KSOVAL(kdb2, pos2));
+    if(pos2 >= 0) 
+    {
+        if(KSOVAL(kdb2, pos2) != 0) 
+            SW_free(KSOVAL(kdb2, pos2));
     }
-    else {
+    else 
+    {
         pos2 = K_add_entry(kdb2, name2);
-        pos1 = K_find(kdb1, name1);
+        pos1 = K_find((KDB*) kdb1, name1);
     }
 
-    if(pos2 < 0) return(-2);
+    if(pos2 < 0) 
+        return(-2);
 
     pack = KGOVAL(kdb1, pos1);
+    if(pack == NULL)
+        return(-2);
+    
     lg = * (OSIZE *) pack;
     ptr = SW_nalloc(lg);
     memcpy(ptr, pack, lg);
@@ -434,7 +443,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         if(!block.empty())
             eq->block = block;
         // modify only if not null
-        if(smpl != NULL) 
+        if(smpl) 
             eq->sample = *smpl;
     }
 
@@ -446,6 +455,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
 
     rc = K_add(K_WS[EQUATIONS], name, eq, name);
     delete eq;
+    eq = nullptr;
     if(rc < 0) 
     {
         error_manager.append_error(std::string(L_error()));
@@ -495,6 +505,7 @@ int K_upd_tbl(char* name, char* arg)
 
     int pos = K_add(K_WS[TABLES], name, tbl);
     delete tbl;
+    tbl = nullptr;
 
     return (pos >= 0) ? 0 : -1;
 }

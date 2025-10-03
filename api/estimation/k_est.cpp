@@ -164,7 +164,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     else
     {
         eq = KEVAL(E_DBE, pos);
-        eq->sample = *smpl;
+        eq->sample = (smpl != nullptr) ? *smpl : Sample();
         eq->set_lec(lec);
         eq->set_method(method);
         eq->update_date();
@@ -174,6 +174,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 
     rc = K_add(E_DBE, name, eq, name);
     delete eq;
+    eq = nullptr;
     if(rc < 0) 
     {
         error_manager.append_error(std::string(L_error()));
@@ -202,7 +203,7 @@ int Estimation::KE_est_s(Sample* smpl)
 {
     static char met[6] = {"LZIGM"};
     int        i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
-    Sample     eq_smpl;
+    Sample*    eq_smpl;
     U_ch**     endos = 0;
     U_ch**     blk = 0;
     U_ch**     lecs = 0;
@@ -233,11 +234,10 @@ int Estimation::KE_est_s(Sample* smpl)
         else 
             E_MET = est_method;
 
-        if(smpl == NULL) 
+        if(!smpl) 
         {
-            Sample _sample = KESMPL(E_DBE, pos);
-            memcpy(&eq_smpl, &_sample, sizeof(Sample));
-            E_SMPL = &eq_smpl;
+            eq_smpl = new Sample(KESMPL(E_DBE, pos));
+            E_SMPL = eq_smpl;
         }
         else
             E_SMPL = smpl;

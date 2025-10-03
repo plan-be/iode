@@ -43,20 +43,23 @@
 int T_GraphTest(Table *tbl)
 {
     char    gsmpl[20];
-    Sample  *smpl = (Sample *) KV_WS->k_data;
+    Sample  *smpl = KV_WS->sample;
+    if(!smpl) 
+        return -1;
 
     W_InitDisplay();
     std::string str_period = smpl->start_period.to_string();
     sprintf(gsmpl, "%s:%d", (char*) str_period.c_str(), smpl->nb_periods); /* JMP 28-11-93 */
     //KT_nb = 1; // JMP 11/05/2022
-    if(T_graph_tbl_1(tbl, gsmpl, 1)) { // JMP 11-05-2022 : mode = 1 => display 
+    if(T_graph_tbl_1(tbl, gsmpl, 1)) 
+    { // JMP 11-05-2022 : mode = 1 => display 
         std::string err_msg = "Testing failed ...";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     W_EndDisplay((char*) T_get_title(tbl), -1, -1, -1, -1);
-    return(0);
+    return 0;
 }
 
 static char *T_GRIDS[] = {"MM", "NN", "mm"}; // Grids (Horiz/Vert) M=Major, m = minor, N = no grid 
@@ -535,28 +538,56 @@ fin:
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, KDB* kdb, char** names, int mode)
 {
-    int     i, dt, nt, ng;
+    int i, ng;
 
     ng = SCR_tbl_size((unsigned char**) names);
-    if(ng == 0) {
+    if(ng == 0) 
+    {
         std::string err_msg = "DataDisplayGraph : empty variable list";
         error_manager.append_error(err_msg);
         return(-1);
     }
 
-    nt = smpl->nb_periods;
-    dt = smpl->start_period.difference(KSMPL(kdb)->start_period);
-    if(dt < 0 || dt + nt > KSMPL(kdb)->nb_periods) {
-        std::string err_msg = "DataDisplayGraph : Sample out of the Variables sample boundaries";
+    if(!smpl) 
+    {
+        std::string err_msg = "DataDisplayGraph : No graph sample defined";
         error_manager.append_error(err_msg);
         return(-1);
     }
 
-    for(i = 0; i < ng; i++) {
+    Sample* smpl_kdb = kdb->sample;
+    if(!smpl_kdb) 
+    {
+        std::string err_msg = "DataDisplayGraph : Variables workspace has no sample defined";
+        error_manager.append_error(err_msg);
+        return -1;
+    }
+
+    int nt = smpl->nb_periods;
+    int dt = smpl->start_period.difference(smpl_kdb->start_period);
+    if(dt < 0) 
+    {
+        std::string err_msg = "DataDisplayGraph : Graph sample '" + smpl->to_string() + "' ";
+        err_msg += "starts before the Variables workspace sample '" + smpl_kdb->to_string() + "'";
+        error_manager.append_error(err_msg);
+        return(-1);
+    }
+
+    if(smpl->end_period.difference(smpl_kdb->end_period) > 0) 
+    {
+        std::string err_msg = "DataDisplayGraph : Graph sample '" + smpl->to_string() + "' ";
+        err_msg += "ends after the Variables workspace sample '" + smpl_kdb->to_string() + "'";
+        error_manager.append_error(err_msg);
+        return(-1);
+    }
+
+    for(i = 0; i < ng; i++) 
+    {
         if(view) W_InitDisplay();
         V_graph_vars_1(i, type, xgrid, ygrid, axis, ymin, ymax, smpl, dt, nt, kdb, names[i], mode);
         if(view) W_EndDisplay(names[i], -ng, -i, -1, -1);
     }
+
     W_close();
     return(0); /* JMP38 01-10-92 */
 }

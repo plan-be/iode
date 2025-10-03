@@ -28,49 +28,49 @@ inline int ascii_eqs_compare(const void* a, const void* b)
 
 struct AbstractAscii
 {
-    virtual KDB* load_asc(char* filename) = 0;
+    virtual KDB* load_asc(char* filename, int db_global) = 0;
     virtual int save_asc(KDB* kdb, char* filename) = 0;
     virtual int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) = 0;
 };
 
 struct AsciiComments : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiEquations : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiIdentities : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiLists : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiScalars : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
 
 struct AsciiTables : public AbstractAscii
 {
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 };
@@ -93,12 +93,12 @@ struct AsciiVariables : public AbstractAscii
     static char* CSV_AXES;
     static int   CSV_NBDEC;
 
-    KDB* load_asc(char* filename) override;
+    KDB* load_asc(char* filename, int db_global) override;
     int save_asc(KDB* kdb, char* filename) override;
     int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
 
 private:
-    KDB* load_asc_type_ask(char *file_or_string, int type, int ask);
+    KDB* load_asc_type_ask(char *file_or_string, int type, int ask, int db_global);
 };
 
 /*---------------- GLOBALS ------------------ */

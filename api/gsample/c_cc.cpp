@@ -444,7 +444,7 @@ static void COL_apply_fil(COL* cl, FIL* fl)
  
 static void COL_calc_now(Period *per)
 {
-    memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
+    memcpy(per, &(KV_WS->sample->start_period), sizeof(Period));
     per->year = SCR_current_date() / 10000L;
     switch(per->periodicity) {
         case 'M' :
@@ -489,7 +489,7 @@ static int COL_read_long_per(YYFILE *yy)
     if(keyw == YY_LONG)         
         return(yy->yy_long);
     else if(keyw == COL_PER)    
-        return(get_nb_periods_per_year(KSMPL(KV_WS)->start_period.periodicity));
+        return(get_nb_periods_per_year(KV_WS->sample->start_period.periodicity));
     else if(keyw == COL_SUBPER) 
         return(COL_calc_subper());
     else                        
@@ -534,20 +534,20 @@ static int COL_read_per(YYFILE* yy, Period* per)
             break;
 
         case COL_EOS :
-            memcpy(per, &(KSMPL(KV_WS)->end_period), sizeof(Period));
+            memcpy(per, &(KV_WS->sample->end_period), sizeof(Period));
             break;
 
         case COL_EOS1 :
-            memcpy(per, &(KSMPL(KV_WS)->end_period), sizeof(Period));
+            memcpy(per, &(KV_WS->sample->end_period), sizeof(Period));
             per->step = 1;
             break;
 
         case COL_BOS :
-            memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
+            memcpy(per, &(KV_WS->sample->start_period), sizeof(Period));
             break;
 
         case COL_BOS1 :
-            memcpy(per, &(KSMPL(KV_WS)->start_period), sizeof(Period));
+            memcpy(per, &(KV_WS->sample->start_period), sizeof(Period));
             per->step = 1;
             break;
 
@@ -671,7 +671,7 @@ static int COL_calc_subper()
     Period  *per;
     int     p;
 
-    per = &(KSMPL(KV_WS)->start_period);
+    per = &(KV_WS->sample->start_period);
 
     switch(per->periodicity) {
         case 'M' :

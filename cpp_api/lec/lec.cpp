@@ -44,7 +44,10 @@ double execute_lec(const std::string& lec, const int t)
 
 double execute_lec(const std::string& lec, const std::string& period)
 {
-    int t = Variables.get_sample()->get_period_position(period);
+    if(!Variables.check_sample())
+        return IODE_NAN;
+    Sample* sample = Variables.get_sample();
+    int t = sample->get_period_position(period);
     return execute_lec(lec, t);
 }
 

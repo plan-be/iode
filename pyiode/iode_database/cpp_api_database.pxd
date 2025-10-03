@@ -64,23 +64,23 @@ cdef extern from "api/all.h":
         ONAME o_name
 
     ctypedef struct KDB:
-        KOBJ*   k_objs
-        long    k_nb
-        short   k_type
-        short   k_mode
-        string  k_arch
-        string  description
-        char    k_data[64]
-        char    k_compressed
-        char    k_db_type
-        string  filepath
+        KOBJ*     k_objs
+        long      k_nb
+        short     k_type
+        short     k_mode
+        string    k_arch
+        string    description
+        CSample*  sample
+        char      k_compressed
+        char      k_db_type
+        string    filepath
 
 
     # k_kdb.c
     int K_free(KDB*)
 
     # k_objfile.c
-    KDB* K_interpret(int iode_type, char* filename)
+    KDB* K_interpret(int iode_type, char* filename, int db_global)
 
     # k_objs.c
     int K_find(KDB*, char*)
@@ -111,6 +111,7 @@ cdef extern from "api/all.h":
 #            https://stackoverflow.com/a/23455514
 
 cdef extern from "cpp_api/KDB/kdb_global.h":
+    void load_global_database(const IodeType iode_type, const string& filename) except +
     void low_to_high(IodeLowToHigh type_, char method, string& filepath, string& var_list) except +
     void high_to_low(IodeHighToLow type_, string& filepath, string& var_list) except +
 
@@ -162,8 +163,6 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         bool is_local_database() const
         bool is_shallow_copy_database() const
         int count() const
-
-        KDB* get_database() except +
 
         int get_position(string& name)
 

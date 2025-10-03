@@ -212,7 +212,7 @@ cdef class Variables(CythonIodeDatabase):
             b_name = name.encode()
             c_name = b_name
             c_nb_periods = self.get_sample().get_nb_periods()
-            c_db_ptr = self.database_ptr.get_database()
+            c_db_ptr = self.database_ptr
             var_pos = K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
             if var_pos < 0:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
@@ -242,7 +242,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef double* var_ptr = NULL
         cdef double[::1] numpy_data_memview 
 
-        c_db_ptr = self.database_ptr.get_database()
+        c_db_ptr = self.database_ptr
 
         if pos < 0 or pos >= self.count():
             raise IndexError(f"Cannot update variable '{name}': variable not found in the Variables database")
@@ -359,7 +359,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int i, j, t
         cdef int mode = <int>self.mode_
         cdef int nb_periods
-        cdef KDB* db_ptr = self.database_ptr.get_database()
+        cdef KDB* db_ptr = self.database_ptr
         
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace has not been initialized")
@@ -418,7 +418,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t_first_period
         cdef int t_last_period
         cdef int nb_periods
-        cdef KDB* db_ptr = self.database_ptr.get_database()
+        cdef KDB* db_ptr = self.database_ptr
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace is empty")
 

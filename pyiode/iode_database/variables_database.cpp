@@ -9,11 +9,8 @@
 static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
                              KDBVariables* source, const int source_t_first, const int source_t_last)
 {
-    if(source == nullptr)
+    if(!source)
         throw std::invalid_argument("C API: Variables Source database is empty");
-
-    if(source->get_database() == NULL)
-       throw std::invalid_argument("C API: Source Variables database is empty");
 
     if(source->count() == 0)
        throw std::invalid_argument("C API: Source Variables database is empty");
@@ -21,7 +18,7 @@ static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const i
     if(dest == nullptr)
         throw std::invalid_argument("C API: Destination Variables database is empty");
 
-    if(dest->get_database() == NULL)
+    if(!dest)
       throw std::invalid_argument("C API: Destination Variables database is empty");
 
     if(dest->count() == 0)
@@ -61,6 +58,9 @@ void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVaria
 {
     if(name.empty())
         throw std::invalid_argument("C API: Name of the new variable is empty");
+    
+    if(!dest)
+        throw std::invalid_argument("C API: Destination Variables database is empty");
 
     // sanity checks
     int nb_periods = dest->get_nb_periods();
@@ -78,9 +78,8 @@ void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVaria
     }
 
     // add the variable to the destination database
-    KDB* kdb = dest->get_database();
     source_var_ptr += source_t_first;
-    K_add(kdb, const_cast<char*>(name.c_str()), source_var_ptr, &nb_periods);
+    K_add(dest, const_cast<char*>(name.c_str()), source_var_ptr, &nb_periods);
 }
 
 void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
@@ -131,7 +130,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     double* var_ptr;
 
     // sanity checks
-    if(database == NULL)
+    if(!database)
         throw std::invalid_argument("C API: database is NULL");
     if(t_first < 0 || t_last < 0)
         throw std::invalid_argument("C API: time range must be non-negative");
@@ -192,12 +191,11 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
 
 void _c_operation_one_period(const int op, KDBVariables* database, const int t, const double* values, const int nb_values)
 {
-    KDB* db = NULL;
     int nb_names;
     double value;
 
     // sanity checks
-    if(database == NULL)
+    if(!database)
         throw std::invalid_argument("C API: database is NULL");
     if(values == NULL)
         throw std::invalid_argument("C API: values is NULL");
@@ -210,23 +208,19 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
 
     nb_names = database->count();
 
-    db = database->get_database();
-    if(db == NULL)
-        throw std::invalid_argument("C API: database is NULL");
-
     switch(op)
     {
     case OP_ADD:
         for(int i = 0; i < nb_names; i++)
-            *KVVAL(db, i, t) += values[i];
+            *KVVAL(database, i, t) += values[i];
         break;
     case OP_SUB: 
         for(int i = 0; i < nb_names; i++) 
-            *KVVAL(db, i, t) -= values[i];
+            *KVVAL(database, i, t) -= values[i];
         break;
     case OP_MUL: 
         for(int i = 0; i < nb_names; i++) 
-            *KVVAL(db, i, t) *= values[i];
+            *KVVAL(database, i, t) *= values[i];
         break;
     case OP_DIV:
         for(int i = 0; i < nb_names; i++)
@@ -234,12 +228,12 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
             value = values[i];
             if(value == 0)
                 throw std::invalid_argument("C API: Division by zero");
-            *KVVAL(db, i, t) /= value;
+            *KVVAL(database, i, t) /= value;
         }
         break;
     case OP_POW: 
         for(int i = 0; i < nb_names; i++)
-            *KVVAL(db, i, t) = pow(*KVVAL(db, i, t), values[i]);
+            *KVVAL(database, i, t) = pow(*KVVAL(database, i, t), values[i]);
         break;
     }
 }
@@ -249,7 +243,7 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     double value;
 
     // sanity checks
-    if(database == NULL)
+    if(!database)
         throw std::invalid_argument("C API: database is NULL");
     if(values == NULL)
         throw std::invalid_argument("C API: values is NULL");

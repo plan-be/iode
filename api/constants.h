@@ -147,14 +147,14 @@ enum IodeType
     LISTS,
     SCALARS,
     TABLES,
-    VARIABLES
+    VARIABLES,
+    OBJECTS
 };
 
-#define IODE_NB_TYPES   7
-#define K_OBJ           7
+#define IODE_NB_TYPES  7
 
 const static std::vector<std::string> v_iode_types = 
-{ "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
+{ "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", "Object" };
 
 
 enum IodeFileType

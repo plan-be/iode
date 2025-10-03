@@ -103,10 +103,10 @@ void K_xdrPLONG(unsigned char* a)
  */
 void K_xdrKDB(KDB* ikdb, KDB** okdb)
 {
-    if(okdb == NULL) return;
-
-    *okdb = (KDB *)SW_nalloc(sizeof(KDB));
-    memcpy(*okdb, ikdb, sizeof(KDB));
+    if(okdb == NULL) 
+        return;
+    
+    *okdb = new KDB(*ikdb);
 }
 
 
@@ -728,20 +728,19 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
 {
     short   type;
     KDB     *xdr_kdb;
-    Sample  *smpl;
 
     type = ikdb->k_type;
 
-    if(okdb == NULL) {
+    if(okdb == NULL) 
+    {
         /* intel read */
         xdr_kdb = ikdb;
         K_xdrSHORT(&type);
     }
-    else {
+    else 
+    {
         /* intel write */
-        xdr_kdb = (KDB*) SW_nalloc(sizeof(KDB));
-        memcpy(xdr_kdb, ikdb, sizeof(KDB));
-
+        xdr_kdb = new KDB(*ikdb);
         *okdb = xdr_kdb;
     }
 
@@ -749,9 +748,10 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
     XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
     XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
 
-    if(type == VARIABLES) {
-        smpl = (Sample *) xdr_kdb->k_data;
-        K_xdrSMPL(smpl);
+    if(type == VARIABLES) 
+    {
+        if(xdr_kdb->sample)
+            K_xdrSMPL((unsigned char*) xdr_kdb->sample);
     }
 }
 

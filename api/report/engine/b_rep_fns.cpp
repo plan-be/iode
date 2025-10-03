@@ -708,19 +708,24 @@ U_ch *RPF_ttitle(U_ch** args)
     Table     *tbl;
     int     pos, i;
 
-    for(i = 0 ; args[i] ; i++) {
+    for(i = 0 ; args[i] ; i++) 
+    {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) "\n");
         pos = K_find(K_WS[TABLES], (char*) args[i]);
-        if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0) {
+        if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0) 
+        {
             sprintf((char*) buf, "Table %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
-        else {
+        else 
+        {
             res = SCR_strafcat(res, T_get_title(tbl, false));
             delete tbl;
+            tbl = nullptr;
         }
     }
-    return(res);
+
+    return res;
 }
 
 
@@ -771,24 +776,30 @@ U_ch *RPF_cvalue(U_ch** args)
 U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
-    double    *val;
-    Sample  *smpl;
+    double  *val;
     KDB     *kdb = K_WS[VARIABLES];
     int     pos, i, j;
 
-    if(kdb == NULL) return(res);
+    if(!kdb) 
+        return(res);
 
-    for(i = 0 ; args[i] ; i++) {
+    if(kdb->sample == nullptr || kdb->sample->nb_periods == 0) 
+        return (U_ch*) "";
+
+    for(i = 0 ; args[i] ; i++) 
+    {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
         pos = K_find(kdb, (char*) args[i]);
-        if(pos < 0) {
+        if(pos < 0) 
+        {
             sprintf((char*) buf, "VAR %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
-        else {
-            smpl = (Sample *) kdb->k_data;
+        else 
+        {
             val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->nb_periods; j++, val++) {
+            for(j = 0 ; j < kdb->sample->nb_periods; j++, val++) 
+            {
                 IodeFmtVal((char*) buf, *val);
                 res = SCR_strafcat(res, buf);
                 res = SCR_strafcat(res, (unsigned char*) " ");
@@ -1119,7 +1130,9 @@ U_ch *RPF_sample(U_ch** args)
     KDB     *kdb = K_WS[VARIABLES];
     char     what = 'F';
 
-    smpl = (Sample *) kdb->k_data;
+    smpl = kdb->sample;
+    if(!smpl || smpl->nb_periods == 0) 
+        return(res);
 
     if(args[0]) 
         what = args[0][0];
@@ -1193,13 +1206,14 @@ U_ch *RPF_vsliste(U_ch** args, int type)
         eq = KEVAL(K_WS[EQUATIONS], pos);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         if(eq) delete eq;
+        eq = nullptr;
     }
 
     SCR_add_ptr(&tbl, &nb, 0L);
 
     res = SCR_mtov(tbl, ';');
     SCR_free_tbl(tbl);
-    return(res);
+    return res;
 }
 
 
@@ -1421,11 +1435,11 @@ int RPF_CalcPeriod(U_ch** args)
         return(-1); // Error
 
     // Calc diff bw per and WS sample
-    int t = per.difference(KSMPL(KV_WS)->start_period);
+    int t = per.difference(KV_WS->sample->start_period);
     if(t < 0)  
         return(-1);
 
-    int at = per.difference(KSMPL(KV_WS)->end_period);
+    int at = per.difference(KV_WS->sample->end_period);
     if(at > 0)
         return(-1);
 

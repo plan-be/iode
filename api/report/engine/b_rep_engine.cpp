@@ -605,13 +605,16 @@ char *RP_gmacro(char* str)
             res = (char*) SCR_stracpy((unsigned char*) RP_ARGV[pos - 1]);
         }
     }
-    else {
+    else 
+    {
         if(tmp[0] == '*') 
             res = (char*) SCR_mtov(((unsigned char**) RP_ARGV) + RP_ARG0, ';');
 
-        else {
+        else 
+        {
             pos = K_find(RP_MACRO, tmp);
-            if(pos < 0) {
+            if(pos < 0) 
+            {
                 error_manager.append_error("Report: Macro '" + std::string(tmp) + "' is not defined");
                 SCR_free(tmp); // JMP&GB 26/1/09
                 return(NULL);
@@ -669,7 +672,7 @@ int RP_evaltime()
 {
     RP_T = 0;
     if(RP_PER.year == 0) return(0);
-    RP_T = RP_PER.difference(KSMPL(KV_WS)->start_period);
+    RP_T = RP_PER.difference(KV_WS->sample->start_period);
     if(RP_T < 0) return(-3);
     return(0);
 }
@@ -738,7 +741,7 @@ int RP_fmt(char* buf, char* format, double value)
     if(format[0] == 'T') 
     {
         t = (int) value; /* JMP 24-05-00 */
-        Period per = KSMPL(KV_WS)->start_period.shift(t);
+        Period per = KV_WS->sample->start_period.shift(t);
         strcpy(buf, (char*) per.to_string().c_str());
         return(0);
     }
@@ -1420,11 +1423,13 @@ done:
     RP_ARG0 = o_arg0;
     
     // When exiting the top level report, all $defines are deleted
-    if(RP_DEPTH == 0) {
-        K_free(RP_MACRO);
-        RP_MACRO = NULL;
+    if(RP_DEPTH == 0) 
+    {
+        delete RP_MACRO;
+        RP_MACRO = nullptr;
         W_close(); // TODO: check this !!
     }
+
     return(rc);
 }
 
@@ -1492,9 +1497,11 @@ done:
     RP_ARG0 = o_arg0;
 
     // Si fin des rapports vide les macros
-    if(RP_DEPTH == 0 && cleanup) {
-        K_free(RP_MACRO); // Macros ($define) are saved in the KDB RP_MACROS
-        RP_MACRO = NULL;
+    if(RP_DEPTH == 0 && cleanup) 
+    {
+        delete RP_MACRO; // Macros ($define) are saved in the KDB RP_MACROS
+        RP_MACRO = nullptr;
     }
+
     return(rc);
 }

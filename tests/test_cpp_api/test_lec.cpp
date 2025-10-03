@@ -31,6 +31,9 @@ TEST_F(LecTest, LEC)
 {
     Variable var_A = Variables.get("A");
 
+    Sample* sample = Variables.get_sample();
+    EXPECT_TRUE(sample != nullptr);
+
     int t = 10;
     double value = execute_lec("A + 1", t);
     EXPECT_DOUBLE_EQ(var_A[t] + 1, value);

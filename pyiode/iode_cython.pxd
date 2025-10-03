@@ -22,8 +22,6 @@ cdef extern from "api/all.h":
     cdef int    IodeInit()
     cdef int    IodeEnd()
     
-    # KDB functions
-    cdef void   *K_create(int filetype, int mode)
 
     # SCR4 functions
     cdef int    SCR_free(void *ptr)

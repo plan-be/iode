@@ -45,8 +45,10 @@ void K_init_ws(int ws)
     int     i;
 
     memset(K_RWS, 0, sizeof(K_RWS));
-    for(i = 0 ; i < 7 ; i++) {
-        K_WS[i] = K_RWS[i][0] = K_init_kdb(i, I_DEFAULT_FILENAME);
+    for(i = 0 ; i < 7 ; i++) 
+    {
+        K_WS[i] = new KDB((IodeType) i, DB_GLOBAL);
+        K_RWS[i][0] = new KDB((IodeType) i, DB_STANDALONE);
         if(ws) K_cat(K_WS[i], I_DEFAULT_FILENAME);
     }
 }
@@ -64,13 +66,22 @@ void K_end_ws(int ws)
 {
     int i, j;
 
-    for(i = 0; i < 7; i++) {
+    for(i = 0; i < 7; i++) 
+    {
         if(ws) K_save_ws(K_WS[i]);
-        for(j = 0; K_RWS[i][j]; j ++) {
-            K_free(K_RWS[i][j]);
-            K_RWS[i][j] = 0; // JMP 9/11/2012
+
+        if(K_WS[i]) 
+        {
+            delete K_WS[i];
+            K_WS[i] = nullptr;
         }
-        // K_WS[i] = NULL;  // TODO: check this: in the previous version, K_WS[] remained untouched, is it normal ?
+        
+        for(j = 0; K_RWS[i][j]; j ++) 
+        {
+            if(K_RWS[i][j])
+                delete K_RWS[i][j];
+            K_RWS[i][j] = nullptr;
+        }
     }
 }
 
@@ -95,25 +106,30 @@ void K_end_ws(int ws)
  
 int K_load_RWS(int ref, char *filename)
 {
-    KDB     *kdb = NULL;
+    KDB* kdb = nullptr;
 
-    if(ref < 2 || ref > 5) {
+    if(ref < 2 || ref > 5) 
+    {
         error_manager.append_error(std::string("Invalid Reference number. Must be between 2 and 5. Got") +
                                    std::to_string(ref));
         return(-1);
     }
     
-    if(filename == NULL) {
-        K_free(K_RWS[VARIABLES][ref - 1]);
-        K_RWS[VARIABLES][ref - 1] = NULL;
-        return(0);
+    if(filename == NULL) 
+    {
+        if(K_RWS[VARIABLES][ref - 1])
+            delete K_RWS[VARIABLES][ref - 1];
+        K_RWS[VARIABLES][ref - 1] = nullptr;
+        return 0;
     }
 
-    kdb = K_interpret(VARIABLES, filename);
-    if(kdb == NULL) return(-1);
+    kdb = K_interpret(VARIABLES, filename, 0);
+    if(!kdb) 
+        return -1;
 
-    K_free(K_RWS[VARIABLES][ref - 1]);
+    if(K_RWS[VARIABLES][ref - 1])
+        delete K_RWS[VARIABLES][ref - 1];
     K_RWS[VARIABLES][ref - 1] = kdb;
 
-    return(0);
+    return 0;
 }

@@ -2,19 +2,9 @@
 #include "kdb_abstract.h"
 #include "cpp_api/utils/super.h"
 
-
 KDBAbstract::KDBAbstract(const IodeType iode_type, const std::string& filepath)
+    : KDB(iode_type, DB_GLOBAL) 
 {
-    cpp_assign_super_API();
-
-	if(K_WS[iode_type] == NULL)
-    {
-        memset(K_RWS[iode_type], 0, sizeof(K_RWS[iode_type]));
-        K_WS[iode_type] = K_RWS[iode_type][0] = K_init_kdb(iode_type, I_DEFAULT_FILENAME);
-    }
-
-    k_type = (short) iode_type;
-
     if(!filepath.empty())
     {
         // throw an error if the passed filepath is not valid
@@ -26,28 +16,32 @@ KDBAbstract::KDBAbstract(const IodeType iode_type, const std::string& filepath)
             throw std::runtime_error("Cannot load objects for the '" + v_iode_types[iode_type] + 
                                     "' database from the file '" + filepath + "'\nReason: unknown");  
     }
-    
-    k_db_type = DB_GLOBAL;
 }
 
 KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern)
+    : KDB((IodeType) kdb->k_type, deep_copy ? DB_STANDALONE : DB_SHALLOW_COPY)
 {
-    KDB* source_kdb = kdb->get_database(); 
-    if(source_kdb == NULL || source_kdb == nullptr)
+    if(!kdb)
+        throw std::runtime_error("Cannot create a deep copy of the database.\nThe input database is empty");
+
+    KDB* c_kdb = kdb->get_database();
+    if(!c_kdb)
         throw std::runtime_error("Cannot create a deep copy of the database.\nThe input database is empty");
 
     // ---- prepare the subset database ----
-    k_mode = source_kdb->k_mode;                                        // short
-    k_type = source_kdb->k_type;                                        // short
+    k_mode = c_kdb->k_mode;                                       // short
+    k_nb = 0;                                                   // long
     k_objs = NULL;
-    k_arch = ARCH;                                                      // std::string   
-    description = source_kdb->description;                                        // std::string
-    memcpy(k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);      // char[K_MAX_DESC]
-    k_compressed = source_kdb->k_compressed;                            // char
-    k_db_type = source_kdb->k_db_type;                                  // char
-    filepath = source_kdb->filepath;                                    // std::string
+    k_arch = ARCH;                                              // std::string   
+    description = c_kdb->description;                             // std::string
+    if(c_kdb->sample)                                             // Sample*
+        sample = new Sample(*c_kdb->sample);
+    else
+        sample = nullptr;
+    k_compressed = c_kdb->k_compressed;                           // char
+    filepath = c_kdb->filepath;                                   // std::string
 
-    std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeType) k_type, pattern);
+    std::vector<std::string> names = filter_names_from_database(c_kdb, (IodeType) k_type, pattern);
 
     std::string error_msg = "Cannot extract a subset of the database of " + v_iode_types[k_type] + ".\n";
     int pos;
@@ -55,14 +49,11 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // ---- deep copy of objects ---- 
     if(deep_copy)
     {
-        k_db_type = DB_DEEP_COPY;
-        k_nb = 0;
-
         char* c_name;
         for(const std::string& name: names)
         {
             c_name = to_char_array(name);
-            pos = K_dup(const_cast<KDB*>(source_kdb), c_name, this, c_name);
+            pos = duplicate(*c_kdb, c_name);
             if(pos < 0)
             {
                 for(int i = 0; i < k_nb; i++)
@@ -73,7 +64,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
 
                 filepath.clear();
 
-                error_msg += "Cannot to copy " + v_iode_types[k_type] + " named '" + name + "' in the subset.\n";
+                error_msg += "Cannot copy " + v_iode_types[k_type] + " named '" + name + "' in the subset.\n";
                 if (pos == -1) 
                     error_msg += "Object with name '" + name + "' does not exist in the " + v_iode_types[k_type] + " database.";
                 else 
@@ -86,14 +77,17 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // -> same as K_quick_refer() function <-
     else
     {
-        k_db_type = DB_SHALLOW_COPY;
-
         k_nb = (long) names.size();
         k_objs = (KOBJ*) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + k_nb / K_CHUNCK));
+        for(int j = 0; j < k_nb; j++) 
+        {
+            k_objs[j].o_val = 0;
+            memset(k_objs[j].o_name, 0, sizeof(ONAME));
+        }
 
         for(int i = 0 ; i < k_nb; i++) 
         {
-            pos = K_find(const_cast<KDB*>(source_kdb), to_char_array(names[i]));
+            pos = K_find(c_kdb, to_char_array(names[i]));
             if(pos < 0) 
             {
                 SW_nfree(k_objs);
@@ -104,30 +98,12 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
                 error_msg += "Object with name '" + names[i] + "' does not exist in the " + v_iode_types[k_type] + " database.";
                 throw std::runtime_error(error_msg);
             }
-            memcpy(k_objs + i, source_kdb->k_objs + pos, sizeof(KOBJ));
+            memcpy(k_objs + i, c_kdb->k_objs + pos, sizeof(KOBJ));
         }
 
         // Sort entries
         K_sort(this);
     }
-}
-
-KDBAbstract::~KDBAbstract()
-{
-    if(is_global_database())
-        return;
-
-    // see K_free() from k_kdb.c
-    if(is_local_database())
-    {
-        for(int i = 0; i < k_nb; i++)
-            if(k_objs[i].o_val != 0) SW_free(k_objs[i].o_val);
-    }
-
-    SW_nfree(k_objs);
-    k_objs = NULL;
-
-    filepath.clear();
 }
 
 // object name
@@ -316,7 +292,6 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
                                  "Reason: unknown");
 }
 
-// TODO JMP: please provide input values to test B_WsCopy()
 void KDBAbstract::copy_from(const std::string& input_file, const std::string objects_names)
 {
     std::string buf = input_file + " " + objects_names;
@@ -412,14 +387,5 @@ void KDBAbstract::save(const std::string& filepath, const bool compress)
 void KDBAbstract::clear()
 {
     KDB* kdb = get_database();
-    if(kdb == NULL) 
-        return;
-
-    int res;
-    res = B_WsDescr("", k_type);
-    res += B_WsName("", k_type);
-
-    res += K_clear(kdb);
-    if (res != EXIT_SUCCESS) 
-        throw std::runtime_error("Cannot clear the '" + v_iode_types[k_type] + "' database.\nReason: unknown");
+    kdb->clear();
 }

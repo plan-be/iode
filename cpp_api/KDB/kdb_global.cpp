@@ -139,7 +139,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
         error_msg += "Comments file " + cmt_file_;
-        dbc = K_interpret(COMMENTS, to_char_array(cmt_file));
+        dbc = K_interpret(COMMENTS, to_char_array(cmt_file), 0);
         if(dbc == NULL)
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
@@ -150,7 +150,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         std::string var_file_ = check_file_exists(var_file, caller_name);
         if (dbc != NULL) error_msg += "and";
         error_msg += "Variables file " + var_file_;
-        dbv = K_interpret(VARIABLES, to_char_array(var_file));
+        dbv = K_interpret(VARIABLES, to_char_array(var_file), 0);
         if(dbv == NULL)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
@@ -185,8 +185,8 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
                          to_char_array(nan), to_char_array(separator));
 
 
-    if(dbv != NULL) K_free(dbv);
-    if(dbc != NULL) K_free(dbc);
+    if(dbv) delete dbv;
+    if(dbc) delete dbc;
 
     K_WARN_DUP = 0;
 

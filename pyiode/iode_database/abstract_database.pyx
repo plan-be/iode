@@ -79,7 +79,7 @@ cdef class CythonIodeDatabase:
         if filepath is not None:
             c_list = K_expand(i_iode_type, filepath.encode(), pattern.encode(), _all)
         else:
-            kdb_ptr = self.abstract_db_ptr.get_database()
+            kdb_ptr = self.abstract_db_ptr
             if kdb_ptr is not NULL:
                 c_list = K_expand_kdb(kdb_ptr, i_iode_type, pattern.encode(), _all)  
         

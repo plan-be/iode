@@ -50,13 +50,15 @@ static int B_ModelSimulateEqs(Sample* smpl, char** eqs)
 
     if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
         rc = simu.K_simul(K_WS[EQUATIONS], K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, NULL);
-    else {
+    else 
+    {
         tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
         rc = simu.K_simul(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, eqs);
-        K_free_kdb(tdbe);
+        delete tdbe;
+        tdbe = nullptr;
     }
 
-    return(rc);
+    return rc;
 }
 
 
@@ -97,9 +99,10 @@ int B_ModelSimulate(char *const_arg, int unused)
 
 err:
     if(smpl) delete smpl;
+    smpl = nullptr;
     SCR_free_tbl((unsigned char**) eqs);
     SCR_free(arg);
-    return(rc);
+    return rc;
 }
 
 
@@ -199,6 +202,7 @@ int KE_compile(KDB* dbe)
         eq = KEVAL(dbe, i);
         K_upd_eqs(KONAME(dbe, i), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         delete eq;
+        eq = nullptr;
     }
     
     return 0;
@@ -216,22 +220,27 @@ int B_ModelCompile(char* arg, int unused)
     KDB     *tdbe = NULL;
     int     rc;
 
-    if(arg == NULL || arg[0] == 0) {
+    if(arg == NULL || arg[0] == 0) 
+    {
         /* EndoExo whole WS */
         return(KE_compile(K_WS[EQUATIONS]));
     }
-    else {
+    else 
+    {
         eqs = B_ainit_chk(arg, NULL, 0);
         if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
             return(KE_compile(K_WS[EQUATIONS]));
-        else {
+        else 
+        {
             tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
             rc = KE_compile(tdbe);
-            K_free_kdb(tdbe);
+            delete tdbe;
+            tdbe = nullptr;
             SCR_free_tbl((unsigned char**) eqs);
         }
     }
-    return(rc);
+
+    return rc;
 }
 
 
@@ -271,11 +280,16 @@ int B_ModelCalcSCC(char *const_arg, int unused)
 
     rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
-    if(SCR_tbl_size((unsigned char**) eqs) != 0) K_free_kdb(tdbe);
+    if(SCR_tbl_size((unsigned char**) eqs) != 0)
+    {
+        delete tdbe;
+        tdbe = nullptr;
+    }
+
 err:
     SCR_free_tbl((unsigned char**) eqs);
     SCR_free(arg);
-    return(rc);
+    return rc;
 }
 
 
@@ -349,15 +363,17 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     rc = simu.K_simul_SCC(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, pre, inter, post);
 
     // Cleanup
-    K_free_kdb(tdbe);
+    delete tdbe;
+    tdbe = nullptr;
     SCR_free_tbl((unsigned char**) pre);
     SCR_free_tbl((unsigned char**) inter);
     SCR_free_tbl((unsigned char**) post);
 
 err:
     if(smpl) delete smpl;
+    smpl = nullptr;
     SCR_free(arg);
-    return(rc);
+    return rc;
 }
 
 
@@ -422,8 +438,9 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
     if(x == 0) return(-1);
 
     // Copy values
-    if(vec) {
-        for(t = 0; t < KSMPL(dbv)->nb_periods; t++)
+    if(vec) 
+    {
+        for(t = 0; t < dbv->sample->nb_periods; t++)
             x[t] = vec[t];
     }
     return(0);
@@ -445,7 +462,8 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     // Create var and get Ptr
     B_CreateEmptyVar(name);
     x = B_GetVarPtr(name);
-    if(x == 0) {
+    if(x == 0) 
+    {
         std::string error_msg = "B_CreateVarFromVecOfInts: failed to create the variable '";
         error_msg += std::string(name) + "'";
         error_manager.append_error(error_msg);
@@ -453,8 +471,9 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     }
 
     // Copy values
-    if(vec) {
-        for(t = 0; t < KSMPL(dbv)->nb_periods; t++)
+    if(vec) 
+    {
+        for(t = 0; t < dbv->sample->nb_periods; t++)
             x[t] = vec[t];
     }
     return(0);

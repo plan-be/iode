@@ -58,7 +58,7 @@ double L_getscl(KDB* kdb, int pos)
  */
 Sample *L_getsmpl(KDB* kdb)
 {
-    return((Sample *) kdb->k_data);
+    return(kdb->sample);
 }
 
 

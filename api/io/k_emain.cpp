@@ -220,7 +220,7 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
     if(rc < 0)
         goto err;
 
-    dim = KSMPL(dbv)->nb_periods;
+    dim = dbv->sample->nb_periods;
     for(i = 0; i < KNB(dbv); i++) {
         strcpy(iname, KONAME(dbv, i));
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
@@ -275,7 +275,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
     if(rc < 0) 
         goto err;
 
-    nl = KSMPL(dbv)->nb_periods;
+    nl = dbv->sample->nb_periods;
     nc = KNB(dbv);
 
     expdef->write_variable_and_comment(expdef, EXP_SEP, 0, 0);
@@ -293,7 +293,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
     for(j = 0; j < nl; j++) 
     {
-        Period per = KSMPL(dbv)->start_period.shift(j);
+        Period per = dbv->sample->start_period.shift(j);
         sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(expdef, oname, 0, 0);
 
@@ -338,10 +338,12 @@ err:
  */
 int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
 {
-    KDB     *dbv = NULL, *dbc = NULL;
-    Sample  *smpl;
-    ExportToFile  *expdef;
-    int     rc = 0;
+    int rc = 0;
+    KDB* dbv = nullptr;
+    KDB* dbc = nullptr;
+
+    ExportToFile *expdef;
+    Sample *smpl = nullptr;
 
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
@@ -351,9 +353,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
 
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
-    if(from[0] == 0 || to[0] == 0) 
-        smpl = nullptr;
-    else
+    if(from[0] != 0 && to[0] != 0)
     {
         try
         {
@@ -366,12 +366,14 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         }
     }
 
-    if(trace[0] != 0) {
+    if(trace[0] != 0) 
+    {
         IMP_trace = 1;
         K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
-    else {
+    else 
+    {
         IMP_trace = 0;
         K_WARN_DUP = 1;
     }
@@ -384,26 +386,35 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
 
     if(vfile && vfile[0] != 0) 
     {
-        dbv = K_interpret(VARIABLES, vfile);
-        if(dbv == 0) 
+        dbv = K_interpret(VARIABLES, vfile, 0);
+        if(!dbv) 
             return(-1); // JMP 29-05-2012
         if(smpl) 
             KV_sample(dbv, smpl);
     }
 
     if(cfile && cfile[0] != 0)
-        dbc = K_interpret(COMMENTS, cfile); 
-       
+        dbc = K_interpret(COMMENTS, cfile, 0); 
+    
     if(fmt < 4)
         rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */
     else
         rc = EXP_Rev_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */
 
-
-    K_free(dbv);
-    K_free(dbc);
+    if(dbv)
+    {
+        delete dbv;
+        dbv = nullptr;
+    }
+    if(dbc)
+    {
+        delete dbc;
+        dbc = nullptr;
+    }
+    
     K_WARN_DUP = 0;
     if(rc)
         error_manager.display_last_error(); 
+    
     return(rc);
 }

@@ -76,22 +76,27 @@ int B_EqsEstimateEqs(Sample* smpl, char** eqs)
     KDB* dbe;
     int  rc;
 
-    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) {
+    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) 
+    {
         error_manager.append_error("EqsEstimate: empty equations list");
         return(-1);
     }
-    else {
+    else 
+    {
         dbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
         if(dbe == 0 || KNB(dbe) == 0)                                       
             rc = -1;                                                          
-        else{
+        else
+        {
             Estimation est(eqs, dbe, KV_WS, KS_WS, smpl);
             rc = est.estimate();
         }
-        K_free_kdb(dbe);
+
+        delete dbe;
+        dbe = nullptr;
     }
 
-    return(rc);
+    return rc;
 }
 
 /**

@@ -258,7 +258,7 @@ int B_DSImportDb_1(char *arg, Sample *smpl)
 
 int wrapper_B_DSImportDb_1(char *arg, void *smpl)
 {
-    return B_DSImportDb_1(arg, (Sample *) smpl);
+    return B_DSImportDb_1(arg, (Sample*) smpl);
 }
 
 int B_DSImportDb(char *arg, int unused)
@@ -266,10 +266,11 @@ int B_DSImportDb(char *arg, int unused)
 #ifdef WIN32
     Sample  *smpl;
 
-    if(KSMPL(K_WS[VARIABLES])->nb_periods == 0) return(-1);
+    if(K_WS[VARIABLES]->sample->nb_periods == 0) 
+        return(-1);
 
     WscrDdeSetTimeOut(10000, 3);
-    smpl = KSMPL(K_WS[VARIABLES]);
+    smpl = K_WS[VARIABLES]->sample;
     return(B_ainit_loop(arg, wrapper_B_DSImportDb_1, (char *) smpl));
 #else
     return(-1);

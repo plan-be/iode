@@ -290,11 +290,6 @@ Function to manage KDB, i.e. IODE object groups.
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *K_init_kdb(int ,char *)`|allocates and initialises a KDB struct|
-|`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
-|`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
-|`int K_free(KDB* kdb)`|frees a KDB and its contents.|
-|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the Sample and replaces the filename by I\_DEFAULT\_FILENAME (default "ws").|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
@@ -528,9 +523,9 @@ Functions to manipulate IODE object files.
 |`char *K_set_ext(char* res, char* fname, int type)`|deletes left and right spaces in a filename and changes its extension according to the given type.|
 |`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type).|
 |`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
-|`KDB *K_load(int ftype, FNAME fname, int no, char** objs)`|loads a IODE object file.|
+|`KDB *K_load(int ftype, FNAME fname, int no, char** objs, int db_global)`|loads a IODE object file.|
 |`int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)`|retrieves infos on an IODE file: type, number of objects, Sample|
-|`KDB *K_interpret(int type, char* filename): generalisation of K_load()`|interprets the content of a file, ascii files includes, and try to load ist content into a KDB.|
+|`KDB *K_interpret(int type, char* filename, int db_global): generalisation of K_load()`|interprets the content of a file, ascii files includes, and try to load ist content into a KDB.|
 |`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
 |\`cint K\_cat(KDB\* ikdb, char\* filename)|concatenates the content of a file to an existing kdb.|
 |\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
@@ -586,7 +581,7 @@ Loading and saving IODE ascii comment files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KC_load_asc(char* filename)`||
+|`KDB *KC_load_asc(char* filename, int db_global)`||
 |`int KC_save_asc(KDB* kdb, char* filename)`||
 |`int KC_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
@@ -596,7 +591,7 @@ Loading and saving IODE ascii equation files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KE_load_asc(char* filename)`||
+|`KDB *KE_load_asc(char* filename, int db_global)`||
 |`int KE_save_asc(KDB* kdb, char* filename)`||
 |`int KE_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
@@ -606,7 +601,7 @@ Loading and saving IODE ascii identity files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KI_load_asc(char* filename)`||
+|`KDB *KI_load_asc(char* filename, int db_global)`||
 |`int KI_save_asc(KDB* kdb, char* filename)`||
 |`int KI_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
@@ -616,7 +611,7 @@ Loading and saving IODE ascii list files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KL_load_asc(char* filename)`||
+|`KDB *KL_load_asc(char* filename, int db_global)`||
 |`int KL_save_asc(KDB* kdb, char* filename)`||
 |`int KL_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
@@ -626,7 +621,7 @@ Loading and saving IODE ascii scalar files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KS_load_asc(char* filename)`||
+|`KDB *KS_load_asc(char* filename, int db_global)`||
 |`int KS_save_asc(KDB* kdb, char* filename)`||
 |`int KS_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
@@ -636,7 +631,7 @@ Loading and saving IODE ascii table files.
 
 |Syntax|Remark|
 |:---|:---|
-|`KDB *KT_load_asc(char* filename)`||
+|`KDB *KT_load_asc(char* filename, int db_global)`||
 |`int KT_save_asc(KDB* kdb, char* filename)`||
 |`int KT_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
