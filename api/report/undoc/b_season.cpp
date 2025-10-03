@@ -62,7 +62,7 @@ int B_season(char* arg)
     if(nbper < 0) goto done;
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));

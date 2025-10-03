@@ -352,7 +352,7 @@ static int B_ltoh(int type, char* arg)
     }
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + KSMPL(from)->nb_periods) * sizeof(double));
 

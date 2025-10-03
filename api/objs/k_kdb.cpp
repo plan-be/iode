@@ -246,7 +246,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
     if(kdb == NULL) return(NULL);
     tkdb = K_create(KTYPE(kdb), KMODE(kdb));
-    memcpy(KDATA(tkdb), KDATA(kdb), K_MAX_DESC);
+    memcpy(tkdb->k_data, kdb->k_data, K_MAX_DESC);
 
     for(i = 0 ; i < nb && names[i]; i++) {
         pos2 = K_find(kdb, names[i]);
@@ -302,7 +302,7 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
 
     // Crée la nouvelle kdb avec le nombre exact d'entrées
     tkdb = K_create(KTYPE(kdb), KMODE(kdb));
-    memcpy(KDATA(tkdb), KDATA(kdb), K_MAX_DESC);
+    memcpy(tkdb->k_data, kdb->k_data, K_MAX_DESC);
     KOBJS(tkdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
     KNB(tkdb) = nb;
 

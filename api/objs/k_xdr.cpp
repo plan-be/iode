@@ -750,7 +750,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
     XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
 
     if(type == VARIABLES) {
-        smpl = (Sample *) KDATA(xdr_kdb);
+        smpl = (Sample *) xdr_kdb->k_data;
         K_xdrSMPL(smpl);
     }
 }

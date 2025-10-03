@@ -786,7 +786,7 @@ U_ch *RPF_vvalue(U_ch** args)
             res = SCR_strafcat(res, buf);
         }
         else {
-            smpl = (Sample *) KDATA(kdb);
+            smpl = (Sample *) kdb->k_data;
             val = KVVAL(kdb, pos, 0);
             for(j = 0 ; j < smpl->nb_periods; j++, val++) {
                 IodeFmtVal((char*) buf, *val);
@@ -1119,7 +1119,7 @@ U_ch *RPF_sample(U_ch** args)
     KDB     *kdb = K_WS[VARIABLES];
     char     what = 'F';
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
 
     if(args[0]) 
         what = args[0][0];

@@ -48,7 +48,7 @@ int KV_sample(KDB *kdb, Sample *nsmpl)
     if(nsmpl == NULL || nsmpl->nb_periods == 0) 
         return(0);
     
-    ksmpl = (Sample *) KDATA(kdb);
+    ksmpl = (Sample *) kdb->k_data;
 
     if(ksmpl->nb_periods != 0) {
         smpl = ksmpl->intersection(*nsmpl);
@@ -94,22 +94,27 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
     Sample  *k1smpl, *k2smpl, smpl;
 
     if(kdb2 == NULL) return(0);  // JMP 30/09/2022
-    k1smpl = (Sample *) KDATA(kdb1);
-    k2smpl = (Sample *) KDATA(kdb2);
+    k1smpl = (Sample *) kdb1->k_data;
+    k2smpl = (Sample *) kdb2->k_data;
 
-    if(k1smpl->nb_periods == 0) memcpy(k1smpl, k2smpl, sizeof(Sample));
+    if(k1smpl->nb_periods == 0) 
+        memcpy(k1smpl, k2smpl, sizeof(Sample));
 
     smpl = k1smpl->intersection(*k2smpl);
-    if(smpl.nb_periods > 0) {
+    if(smpl.nb_periods > 0) 
+    {
         start1 = smpl.start_period.difference(k1smpl->start_period); /* always >= 0 */
         start2 = smpl.start_period.difference(k2smpl->start_period); /* always >= 0 */
     }
 
     nb1 = k1smpl->nb_periods;
-    for(i = 0; i < KNB(kdb2); i++) {
+    for(i = 0; i < KNB(kdb2); i++) 
+    {
         pos = K_find(kdb1, KONAME(kdb2, i));
-        if(pos < 0) pos = K_add(kdb1, KONAME(kdb2, i), NULL, &nb1);
-        else if(!replace) continue;
+        if(pos < 0) 
+            pos = K_add(kdb1, KONAME(kdb2, i), NULL, &nb1);
+        else if(!replace) 
+            continue;
 
         if(pos >= 0 && KSOVAL(kdb2, i) != 0)
             memcpy((double *) KVVAL(kdb1, pos, start1),
@@ -138,12 +143,16 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 {
     Sample  *k1smpl, *k2smpl;
 
-    if(kdb2 == NULL) return;  // JMP 30/09/2022
-    k1smpl = (Sample *) KDATA(kdb1);
-    k2smpl = (Sample *) KDATA(kdb2);
+    if(kdb2 == NULL) 
+        return;
+    k1smpl = (Sample *) kdb1->k_data;
+    k2smpl = (Sample *) kdb2->k_data;
 
-    if(KNB(kdb2) == 0) return;
-    if(KNB(kdb1) == 0) {
+    if(KNB(kdb2) == 0) 
+        return;
+    
+    if(KNB(kdb1) == 0) 
+    {
         if(k1smpl->nb_periods != 0)
             KV_sample(kdb2, k1smpl);
         else
@@ -217,7 +226,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
     double    *vt;
     Sample  *smpl;
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
     pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
     switch(mode) {
@@ -280,7 +289,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double value)
     double    *var;
     Sample  *smpl;
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
     pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
     var = KVVAL(kdb, pos, 0);
@@ -450,12 +459,16 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = K_create(VARIABLES, UPPER_CASE);
-    if(ndbv == NULL) goto done;
-    else memcpy(KDATA(ndbv), KSMPL(edbv), sizeof(Sample));
+    if(ndbv == NULL) 
+        goto done;
+    else 
+        memcpy(ndbv->k_data, KSMPL(edbv), sizeof(Sample));
 
-    for(epos = 0; epos < KNB(edbv); epos++) {
+    for(epos = 0; epos < KNB(edbv); epos++) 
+    {
         strcpy(ename, KONAME(edbv, epos));
-        if(K_aggr(pattern, ename, nname) < 0) continue;
+        if(K_aggr(pattern, ename, nname) < 0) 
+            continue;
 
         added = 1;
         npos = K_find(ndbv, nname);

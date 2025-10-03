@@ -101,7 +101,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
         goto err;
 
     kdb = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) KDATA(kdb), smpl, sizeof(Sample));
+    memcpy((Sample *) kdb->k_data, smpl, sizeof(Sample));
     nb = smpl->nb_periods;
 
     if(impdef->read_variable_implemented) {

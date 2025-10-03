@@ -319,7 +319,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
     Table     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
-    Sample  *smpl = (Sample *) KDATA(KV_WS);
+    Sample  *smpl = (Sample *) KV_WS->k_data;
 
     /* date */
     char    date[11];

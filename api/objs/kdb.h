@@ -109,7 +109,6 @@ inline char k_ext[][4] =
 
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-#define KDATA(kdb)   ((kdb)->k_data)
 #define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)
 

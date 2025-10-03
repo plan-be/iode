@@ -324,7 +324,7 @@ int B_PrintObjDef_1(char* arg, int* type)
                     W_flush();
                 }
 
-                Sample* smpl = (Sample *) KDATA(kdb);
+                Sample* smpl = (Sample *) kdb->k_data;
                 Period start_period = smpl->start_period;
                 W_printfRepl(".tb %d\n.sep &\n", smpl->nb_periods + 1);
                 W_printfRepl(".tl\n&1LName");
@@ -772,7 +772,7 @@ int B_PrintDefVar(KDB* kdb, int pos)
     Sample  *smpl;
     int     j;
 
-    smpl = (Sample *) KDATA(kdb);
+    smpl = (Sample *) kdb->k_data;
 
     if((val = KVVAL(kdb, pos, 0)) == NULL) return (-1);
     W_printfRepl("&1L%s ", KONAME(kdb, pos));

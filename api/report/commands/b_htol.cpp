@@ -121,39 +121,46 @@ static int B_htol(int method, char* arg)
     if(nb == 0) goto done;
 
     from = K_load(VARIABLES, file, nb, data);
-    if(from == NULL) {
+    if(from == NULL) 
+    {
         rc = -1;
         goto done;
     }
 
-    if(HTOL_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &skip, &shift) < 0) {
+    if(HTOL_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &skip, &shift) < 0) 
+    {
         rc = -1;
         goto done;
     }
 
     to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) KDATA(to), t_smpl, sizeof(Sample));
+    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + KSMPL(from)->nb_periods) * sizeof(double));
 
-    for(i = 0; i < KNB(from); i++) {
+    for(i = 0; i < KNB(from); i++) 
+    {
         memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->nb_periods * sizeof(double));
         memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
 
-        for(f = 0, t = 0; f < skip; f++) {
-            if(f != 0 && f % shift == 0) {
+        for(f = 0, t = 0; f < skip; f++) 
+        {
+            if(f != 0 && f % shift == 0) 
+            {
                 t_vec[t] = IODE_NAN;
                 t++;
             }
         }
 
-        for(; f + shift <= KSMPL(from)->nb_periods; t++, f += shift) { /* JMP_M 4.20 21-07-95 */
+        for(; f + shift <= KSMPL(from)->nb_periods; t++, f += shift) 
+        { /* JMP_M 4.20 21-07-95 */
             if(method == HTOL_LAST)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
                 for(j = 0; j < shift; j++) {
                     if(IODE_IS_A_NUMBER(f_vec[f + j])) t_vec[t] += f_vec[f + j];
-                    else {
+                    else 
+                    {
                         t_vec[t] = IODE_NAN;
                         break;
                     }
@@ -199,7 +206,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
     }
 
     kdb_to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) KDATA(kdb_to), t_smpl, sizeof(Sample));
+    memcpy((Sample *) kdb_to->k_data, t_smpl, sizeof(Sample));
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + KSMPL(kdb_from)->nb_periods) * sizeof(double));
 
