@@ -318,13 +318,22 @@ int B_PrintObjDef_1(char* arg, int* type)
             W_flush();
             break;
         case VARIABLES :
-            if(BEG % 47 == 0) {
-                if(BEG > 0) {
+            if(BEG % 47 == 0) 
+            {
+                if(BEG > 0) 
+                {
                     W_printf(".tl\n.te\n\n");  /* JMP 19-12-97 */
                     W_flush();
                 }
 
-                Sample* smpl = (Sample *) kdb->k_data;
+                Sample* smpl = kdb->sample;
+                if(!smpl || smpl->nb_periods == 0) 
+                {
+                    std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";
+                    msg += "the variable database has no sample defined";
+                    kwarning((char*) msg.c_str());
+                    return -1;
+                }
                 Period start_period = smpl->start_period;
                 W_printfRepl(".tb %d\n.sep &\n", smpl->nb_periods + 1);
                 W_printfRepl(".tl\n&1LName");
@@ -423,8 +432,10 @@ int B_PrintDefTbl(KDB* kdb, int pos)
             W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl, false));
         else 
             W_printf("\n%s\n", T_get_title(tbl, false));
+        
         delete tbl;
-        return(0);
+        tbl = nullptr;
+        return 0;
     }
     B_PrintRtfTopic((char*) T_get_title(tbl, false));
     W_printf(".tb %d\n", T_NC(tbl));
@@ -432,8 +443,10 @@ int B_PrintDefTbl(KDB* kdb, int pos)
     W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
     B_DumpTblDef(tbl);
     W_printf(".te\n");
+
     delete tbl;
-    return(0);
+    tbl = nullptr;
+    return 0;
 }
 
 
@@ -595,6 +608,7 @@ int B_PrintDefEqs(KDB* kdb, int pos)
     
     B_PrintEqs(KONAME(kdb, pos), eq);
     delete eq;
+    eq = nullptr;
     return 0;
 }
 
@@ -682,7 +696,8 @@ int B_PrintEqs(char* name, Equation* eq)
         B_dump_str((unsigned char*) buf, (unsigned char*) eq->comment.c_str());
     }    
 
-    if(B_EQS_INFOS < 2) return(0);
+    if(B_EQS_INFOS < 2) 
+        return(0);
     if(eq->method >= 0 && eq->method < 4 && (eq->sample).nb_periods != 0 && eq->tests[3]) 
     {
         std::string from = eq->sample.start_period.to_string();
@@ -772,11 +787,20 @@ int B_PrintDefVar(KDB* kdb, int pos)
     Sample  *smpl;
     int     j;
 
-    smpl = (Sample *) kdb->k_data;
+    smpl = kdb->sample;
+    if(!smpl || smpl->nb_periods == 0) 
+    {
+        std::string msg = "Cannot print the variable '" + std::string(KONAME(kdb, pos)) + "' because ";
+        msg += "the variable database has no sample defined";
+        kwarning((char*) msg.c_str());
+        return -1;
+    }
 
-    if((val = KVVAL(kdb, pos, 0)) == NULL) return (-1);
+    if((val = KVVAL(kdb, pos, 0)) == NULL) 
+        return (-1);
     W_printfRepl("&1L%s ", KONAME(kdb, pos));
-    for(j = 0 ; j < smpl->nb_periods; j++, val++) {
+    for(j = 0 ; j < smpl->nb_periods; j++, val++) 
+    {
         W_printfRepl("&1D");
         B_PrintVal(*val);
     }

@@ -5,8 +5,10 @@
 Variable KDBVariables::get_unchecked(const int pos) const
 {
 	Variable vars;
-	int nb_obs = get_nb_periods();
+	if(!check_sample())
+		return vars;
 
+	int nb_obs = get_nb_periods();
 	KDB* kdb = get_database();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
@@ -23,13 +25,21 @@ double KDBVariables::get_var(const int pos, const int t, const IodeVarMode mode)
 
 double KDBVariables::get_var(const int pos, const std::string& period, const IodeVarMode mode) const
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
 double KDBVariables::get_var(const int pos, const Period& period, const IodeVarMode mode) const
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
@@ -53,13 +63,21 @@ double KDBVariables::get_var(const std::string& name, const int t, const IodeVar
 
 double KDBVariables::get_var(const std::string& name, const std::string& period, const IodeVarMode mode) const
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
 double KDBVariables::get_var(const std::string& name, const Period& period, const IodeVarMode mode) const
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
@@ -79,13 +97,21 @@ void KDBVariables::set_var(const int pos, const int t, const double value, const
 
 void KDBVariables::set_var(const int pos, const std::string& period, const double value, const IodeVarMode mode)
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
 void KDBVariables::set_var(const int pos, const Period& period, const double value, const IodeVarMode mode)
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
@@ -98,19 +124,29 @@ void KDBVariables::set_var(const std::string& name, const int t, const double va
 
 void KDBVariables::set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode)
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	set_var(name, t, value, mode);
 }
 
 void KDBVariables::set_var(const std::string& name, const Period& period, const double value, const IodeVarMode mode)
 {
-	int t = get_sample()->get_period_position(period);
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
 	set_var(name, t, value, mode);
 }
 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int t_first, const int t_last)
 {
 	std::string prefix = "Cannot calculate variable values: ";
+	if(!check_sample())
+		return Variable();
 
 	int total_nb_periods = get_nb_periods();
 	if (total_nb_periods == 0) 
@@ -162,10 +198,10 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
+	if(!check_sample())
+		return Variable();
+	
 	Sample* sample = get_sample();
-	if (sample->nb_periods == 0) 
-		throw std::runtime_error("The Variables sample has not been yet defined");
-
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
@@ -174,7 +210,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std:
 
 int KDBVariables::add(const std::string& name, const Variable& variable)
 {
-	if(get_nb_periods() == 0)
+	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
 
 	check_var_size("add", name, variable);
@@ -185,10 +221,10 @@ int KDBVariables::add(const std::string& name, const Variable& variable)
 
 int KDBVariables::add(const std::string& name, const std::string& lec)
 {
-	int total_nb_periods = get_nb_periods();
-	if(total_nb_periods == 0)
+	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
-
+	
+	int total_nb_periods = get_nb_periods();
 	Variable var = calculate_var_from_lec(lec, 0, total_nb_periods - 1);
 	return add(name, var);
 }
@@ -221,10 +257,10 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 {
 	std::string prefix = "Cannot update variable '" + name + "' values: ";
 
-	int total_nb_periods = get_nb_periods();
-	if (total_nb_periods == 0) 
-		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
+	if(!check_sample())
+			throw std::runtime_error(prefix + "Sample is empty");
 
+	int total_nb_periods = get_nb_periods();
 	std::string error_msg = "period position must be in the range [0, " + 
 	                        std::to_string(total_nb_periods - 1) + "]. Got value ";
 	if(t_first < 0 || t_first >= total_nb_periods)
@@ -259,10 +295,10 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 
 void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
 {
+	if(!check_sample())
+		return;
+	
 	Sample* sample = get_sample();
-	if (sample->nb_periods == 0) 
-		throw std::runtime_error("The Variables sample has not been yet defined");
-
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
@@ -277,10 +313,10 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 
 void KDBVariables::update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
-	Sample* sample = get_sample();
-	if (sample->nb_periods == 0) 
-		throw std::runtime_error("The Variables sample has not been yet defined");
+	if(!check_sample())
+		return;
 	
+	Sample* sample = get_sample();
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
@@ -290,7 +326,7 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 // WARNING: the returned Sample pointer must not be deleted
 Sample* KDBVariables::get_sample() const
 {
-	return static_cast<Sample*>(KSMPL(get_database()));
+	return get_database()->sample;
 }
 
 void KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -299,7 +335,7 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 		return;
 	
 	Sample* sample = get_sample();
-    if (sample->nb_periods == 0 && (from.empty() || to.empty()))
+    if ((sample == nullptr || sample->nb_periods == 0) && (from.empty() || to.empty()))
 	{
         throw std::invalid_argument(std::string("Current sample is empty.\n") + 
 			"Please provide a value for both 'from' and 'to' arguments"); 
@@ -315,8 +351,9 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 
 void KDBVariables::set_sample(const Period& from, const Period& to)
 {
-	Sample sample(from, to);
-	if(sample == *get_sample())
+	Sample* sample = get_sample();
+	Sample new_sample(from, to);
+	if(sample != nullptr && new_sample == *sample)
 		return;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
@@ -332,7 +369,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	if(this->is_shallow_copy_database())
 		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
 
-	int res = KV_sample(get_database(), &sample);
+	int res = KV_sample(get_database(), &new_sample);
 	if (res < 0) 
 	{
 		std::string error_msg = "Cannot set sample -> invalid \"from_period\" or \"to_period\" argument\n";
@@ -344,23 +381,37 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 
 int KDBVariables::get_nb_periods() const
 {
-    return get_sample()->nb_periods;
+	Sample* sample = get_sample();
+	if(!sample)
+		return 0;
+    return sample->nb_periods;
 }
 
 std::string KDBVariables::get_period(const int t) const
 {
-    Period period = KSMPL(get_database())->start_period;
+	if(!check_sample())
+		return "";
+	
+	Sample* sample = get_sample();
+    Period period = sample->start_period;
     return Period(period).shift(t).to_string();
 }
 
 float KDBVariables::get_period_as_float(const int t) const
 {
-    Period period = KSMPL(get_database())->start_period;
+	if(!check_sample())
+		return 0;
+	
+	Sample* sample = get_sample();
+    Period period = sample->start_period;
     return Period(period).shift(t).to_float();
 }
 
 std::vector<std::string> KDBVariables::get_list_periods(const std::string& from, const std::string& to) const
 {
+	if(!check_sample())
+		return std::vector<std::string>();
+	
 	Sample* sample = get_sample();
 	if(from.empty() && to.empty())
 		return sample->get_list_periods();
@@ -374,6 +425,9 @@ std::vector<std::string> KDBVariables::get_list_periods(const std::string& from,
 
 std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& from, const std::string& to) const
 {
+	if(!check_sample())
+		return std::vector<float>();
+	
 	Sample* sample = get_sample();
 	if(from.empty() && to.empty())
 		return sample->get_list_periods_as_float();

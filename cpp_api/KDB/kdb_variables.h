@@ -102,8 +102,18 @@ public:
 
     void update(const std::string& name, const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
-    // WARNING: the returned Sample pointer must not be deleted
     Sample* get_sample() const;
+
+    bool check_sample() const
+    {
+        Sample* sample = get_sample();
+        if(sample == nullptr || sample->nb_periods == 0)
+        {
+            kwarning("The Variables sample has not been yet defined");
+            return false;
+        } 
+        return true;
+    }
 
     void set_sample(const std::string& from, const std::string& to);
 
@@ -193,7 +203,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
-	Sample* smpl = KSMPL(kdb);
+	Sample* smpl = kdb->sample;
 
     std::size_t seed = 0;
     for(int pos=0; pos < kdb->k_nb; pos++)

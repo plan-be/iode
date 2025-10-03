@@ -527,10 +527,12 @@ int B_PrintGBand(char* arg, int unused)
         per = new Period(std::string(args[0]));
         startvalue = PER_per2real(per, 0);
         delete per;
+        per = nullptr;
 
         per = new Period(std::string(args[1]));
         endvalue = PER_per2real(per, 0);
         delete per;
+        per = nullptr;
     }
 
     ChrtColorBand(startvalue, endvalue);

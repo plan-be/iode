@@ -151,10 +151,14 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
         cscl = cscl * 2;               // 0001 -> 0010 -> 0100 -> 1000
     }
 
-    if(nscl > 1) {                   /* Effectue l'estimation si plus d'un relax est != 0 */
+    /* Effectue l'estimation si plus d'un relax est != 0 */
+    if(nscl > 1) 
+    {                   
         est = new Estimation(eqs, KE_WS, KV_WS, KS_WS, smpl);
         est->estimate();
-        delete est;                 // Free the Estimation object
+        delete est;
+        est = nullptr;
+
         etest[0]=0;
         strcat(etest, "e0_");
         strcat(etest, test);
@@ -166,7 +170,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
     else 
         res = 0.0;
     
-    return(res);
+    return res;
 }
 
 
@@ -244,16 +248,23 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     eq = KEVAL(K_WS[EQUATIONS], pos);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
-    if(eq) delete eq;
+    if(eq)
+    {
+        delete eq;
+        eq = nullptr;
+    } 
 
     // Effectue les estimations pour toutes les combi
     nbcom = (int) pow(2.0, nbscl);
     lnumtest = -999999999999.0;
     lasti = 0;
-    for(i = 1; i < nbcom; i++) {                                                
+    for(i = 1; i < nbcom; i++) 
+    {                                                
         numtest = estimate_step_wise_1(i, nbscl, scl, smpl, eqs, test);
         /*print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);*/   /*Aide pour la programmation*/
-        if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) {          /*Sauve la combi qui a le meilleur fstat*/
+        /*Sauve la combi qui a le meilleur fstat*/
+        if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) 
+        {          
             lasti = i;
             lnumtest = numtest;
         }
@@ -263,5 +274,5 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     numtest = estimate_step_wise_1(lasti, nbscl, scl, smpl, eqs,test);    
     SCR_free_tbl((unsigned char**) eqs);
     SCR_free_tbl((unsigned char**) scl);
-    return(numtest);
+    return numtest;
 }

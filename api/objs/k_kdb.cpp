@@ -14,11 +14,6 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  * 
- *      KDB *K_init_kdb(int type, char* filename);           // allocates and initialises a KDB struct
- *      KDB *K_create(int type, int mode)                    // allocates and initialises a KDB object.    
- *      int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
- *      int K_free(KDB* kdb)                                 // frees a KDB and its contents.
- *      int K_clear(KDB* kdb)                                // deletes all objects in a KDB, reset the Sample and replaces the filename by I_DEFAULT_FILENAME. 
  *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
  *      KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
@@ -76,42 +71,10 @@ void K_sort(KDB* kdb)
 // ---
 
 
-/**
- *  @brief Allocates and initialise a KDB struct.
- *  
- *  Object "mode" (UPPER_CASE, LOWER_CASE or ASIS_CASE) is assigned according to object type. 
- *  
- *  @param [in] type        int     KDB object type (COMMENTS...VARIABLES).
- *  @param [in] filename    char*   file where the KDB will be saved (can be changed before saving the KDB).
- *  @return                 KDB*    allocated KDB. 
- *  
- */
-KDB *K_init_kdb(int type, char* filename)
+int KDB::duplicate(const KDB& other, char* name)
 {
-    int     mode;
-    KDB     *kdb;
-
-    switch(type) {
-        case COMMENTS :
-            mode = ASIS_CASE;
-            break;
-        case EQUATIONS :
-        case IDENTITIES :
-        case LISTS :
-        case TABLES :
-        case VARIABLES :
-            mode = UPPER_CASE;
-            break;
-        case SCALARS :
-            mode = LOWER_CASE;
-            break;
-    }
-    kdb = K_create(type, mode);
-    if(kdb == NULL) 
-        return(kdb);
-    
-    kdb->filepath = filename;
-    return(kdb);
+    int pos = K_dup(&other, name, this, name);
+    return pos;
 }
 
 
@@ -137,94 +100,6 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
 
 
 /**
- *  Allocates and initialises a KDB object.
- *  
- *  Depending on value of the mode parameter, the object names will be automatically translated to lower or upper case or let unmodified.
- *    
- *  @param [in] type    int     type of object the KDB will contain
- *  @param [in] mode    int     case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
- *  @return             KDB*    new allocated KDB
- *  
- */
-
-KDB *K_create(int type, int mode)
-{
-    KDB   *kdb;
-
-    kdb = (KDB *) SW_nalloc(sizeof(KDB));
-    if(kdb == NULL) 
-        return(NULL);
-    
-    kdb->k_arch = std::string(ARCH);
-    KMODE(kdb) = mode;
-    KTYPE(kdb) = type;
-    kdb->filepath = I_DEFAULT_FILENAME;
-    return kdb;
-}
-
-
-/**
- *  Frees a KDB but leaves its contents untouched. 
- *  
- *  Usage: in the function K_refer() for example, object handles are copied (shallow copy) into a (temporary) new allocated KDB. 
- *  When this temporary KDB in not needed anymore, the struct is deleted (freed), but not the objects.
- *  
- *  @param [in, out] kdb    KDB* kdb to be deleted.
- *  @return                 int  0
- */
-
-int K_free_kdb(KDB* kdb)
-{
-    if(kdb == NULL) return(0); // JMP 28/09/2022
-    SW_nfree(KOBJS(kdb));
-    SW_nfree(kdb);
-    return(0);
-}
-
-
-/**
- *  Frees a KDB and its contents.  But does not free the KDB struct.
- *  
- *  @param [in, out] kdb    KDB* kdb to be deleted
- *  @return                 int  0
- */
-
-int K_free(KDB* kdb)
-{
-    int i;
-
-    if(kdb == NULL) return(0);
-    for(i = 0; i < KNB(kdb); i++)
-        if(KOBJS(kdb)[i].o_val != 0) SW_free(KOBJS(kdb)[i].o_val);
-      
-    K_free_kdb(kdb);
-    return(0);
-}
-
-
-/**
- *  Deletes all objects in a KDB, reset the Sample and replaces the filename by I_DEFAULT_FILENAME. 
- *  But does not free the KDB struct.
- *  
- *  @param [in, out] kdb    KDB* kdb to be cleared
- *  @return                 int  0
- */
-
-int K_clear(KDB* kdb)
-{
-    int i;
-
-    for(i = 0; i < KNB(kdb); i++) SW_free(KOBJS(kdb)[i].o_val);
-    SW_nfree(KOBJS(kdb));
-    KOBJS(kdb) = NULL;
-    KNB(kdb) = 0;
-    memset(KSMPL(kdb), 0, sizeof(Sample));
-    kdb->filepath = I_DEFAULT_FILENAME;
-    return(0);
-}
-
-
-/**
  *  Creates a new kdb containing the handles of the objects listed in names. 
  *  
  *  The data is **not** duplicated ("shallow copy") .
@@ -241,38 +116,46 @@ int K_clear(KDB* kdb)
  */
 KDB *K_refer(KDB* kdb, int nb, char* names[])
 {
-    int     i, pos1, pos2, err = 0;
+    int     pos1, pos2, err = 0;
     KDB     *tkdb;
 
-    if(kdb == NULL) return(NULL);
-    tkdb = K_create(KTYPE(kdb), KMODE(kdb));
-    memcpy(tkdb->k_data, kdb->k_data, K_MAX_DESC);
+    if(kdb == NULL) 
+        return(NULL);
+    
+    tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
+    if(kdb->sample)
+        tkdb->sample = new Sample(*kdb->sample);
+    tkdb->description = kdb->description;
+    tkdb->k_compressed = kdb->k_compressed;
+    tkdb->filepath = kdb->filepath;
 
-    for(i = 0 ; i < nb && names[i]; i++) {
+    for(int i = 0 ; i < nb && names[i]; i++) 
+    {
         pos2 = K_find(kdb, names[i]);
-        if(pos2 < 0)  {
-            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + 
-                                       " not found: ");
+        if(pos2 < 0)  
+        {
+            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found: ");
             err = 1;
             continue;
         }
 
         pos1 = K_add_entry(tkdb, names[i]);
-        if(pos1 < 0) {
-            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + 
-                                       " skipped: (low memory)");
-            K_free_kdb(tkdb);
-            tkdb = NULL;
+        if(pos1 < 0) 
+        {
+            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " skipped: (low memory)");
+            delete tkdb;
+            tkdb = nullptr;
             err = 1;
             break;
         }
+
         KSOVAL(tkdb, pos1) = KSOVAL(kdb, pos2);
     }
 
     if(err) 
         error_manager.display_last_error();
 
-    return(tkdb);
+    return tkdb;
 }
 
 
@@ -289,7 +172,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
  *                              NULL if kdb is null or one of the names cannot be found
  *  
  *  @note Quicker version of K_refer() (JMP 16/3/2012) by allocating KOBJS in one call instead
- *          of calling K_add_entry for each name.
+ *        of calling K_add_entry for each name.
  *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
  */
 
@@ -298,20 +181,33 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     int     i, pos, nb = SCR_tbl_size((unsigned char**) names);
     KDB     *tkdb;
 
-    if(kdb == NULL) return(NULL);
+    if(!kdb) 
+        return nullptr;
 
     // Crée la nouvelle kdb avec le nombre exact d'entrées
-    tkdb = K_create(KTYPE(kdb), KMODE(kdb));
-    memcpy(tkdb->k_data, kdb->k_data, K_MAX_DESC);
+    tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
+    if(kdb->sample)
+        tkdb->sample = new Sample(*kdb->sample);
+    tkdb->description = kdb->description;
+    tkdb->k_compressed = kdb->k_compressed;
+    tkdb->filepath = kdb->filepath;
+
     KOBJS(tkdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
     KNB(tkdb) = nb;
+    for(int j = 0; j < nb; j++) 
+    {
+        KOBJS(tkdb)[j].o_val = 0;
+        memset(KOBJS(tkdb)[j].o_name, 0, sizeof(ONAME));
+    }
 
     // Copie les entrées dans tkdb
-    for(i = 0 ; i < nb; i++) {
+    for(i = 0 ; i < nb; i++) 
+    {
         pos = K_find(kdb, names[i]);
-        if(pos < 0) {
-            K_free_kdb(tkdb);
-            return(NULL);
+        if(pos < 0) 
+        {
+            delete tkdb;
+            return nullptr;
         }
         memcpy(KOBJS(tkdb) + i, KOBJS(kdb) + pos, sizeof(KOBJ));
     }
@@ -319,7 +215,7 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     // Sort tkdb
     K_sort(tkdb);
 
-    return(tkdb);
+    return tkdb;
 }
 
 
@@ -378,18 +274,25 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
 {
 
-    if(kdb1 == NULL || kdb2 == NULL) return(-1);
-    if(KNB(kdb2) == 0) return(-1);
-    if(KNB(kdb1) == 0) {
+    if(kdb1 == NULL || kdb2 == NULL) 
+        return(-1);
+    
+    if(KNB(kdb2) == 0) 
+        return(-1);
+    
+    if(KNB(kdb1) == 0) 
+    {
         KNB(kdb1) = KNB(kdb2);
         KOBJS(kdb1) = KOBJS(kdb2);
         KNB(kdb2) = 0;
         KOBJS(kdb2) = 0;
-        K_free(kdb2);
-        return(0);
+        delete kdb2;
+        kdb2 = nullptr;
+        return 0;
     }
 
     K_merge(kdb1, kdb2, replace);
-    K_free(kdb2);
-    return(0);
+    delete kdb2;
+    kdb2 = nullptr;
+    return 0;
 }

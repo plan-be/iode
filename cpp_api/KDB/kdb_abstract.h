@@ -33,13 +33,11 @@ public:
     // No copy constructor --> replaced by subset() method in derived classes
     KDBAbstract(const KDBAbstract&) = delete;
 
-    ~KDBAbstract();
-
     int get_iode_type() const { return k_type; }
 
     bool is_global_database() const { return k_db_type == DB_GLOBAL; }
 
-    bool is_local_database() const { return k_db_type == DB_DEEP_COPY; }
+    bool is_local_database() const { return k_db_type == DB_STANDALONE; }
 
     bool is_shallow_copy_database() const { return k_db_type == DB_SHALLOW_COPY; }
 

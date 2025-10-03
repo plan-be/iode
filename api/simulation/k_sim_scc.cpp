@@ -116,8 +116,8 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     KSIM_DBS = dbs;
 
     // Check Sample dans les bornes du WS
-    t = smpl->start_period.difference(KSMPL(dbv)->start_period);
-    at = KSMPL(dbv)->end_period.difference(smpl->end_period);
+    t = smpl->start_period.difference(dbv->sample->start_period);
+    at = dbv->sample->end_period.difference(smpl->end_period);
     if(t < 0 || at < 0) 
     {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
@@ -133,9 +133,9 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->nb_periods);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->nb_periods);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->nb_periods);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->sample->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->sample->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->sample->nb_periods);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
@@ -198,7 +198,7 @@ int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** 
     for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = K_find(dbe, post[i]);
 
     // Simulation
-    t = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    t = smpl->start_period.difference(dbv->sample->start_period);
 
     for(i = 0; i < smpl->nb_periods; i++, t++) {
         if(rc = K_simul_1(t)) goto fin;

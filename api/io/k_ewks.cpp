@@ -29,7 +29,7 @@ int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*
     int dim, nb, i;
 
     WKS_COL = 1, WKS_ROW = 1;
-    dim = KSMPL(dbv)->nb_periods;
+    dim = dbv->sample->nb_periods;
     nb = KNB(dbv);
 
     wks_init(outfile, dim + 2, nb + 1);
@@ -38,7 +38,7 @@ int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*
     std::string period_str;
     for(i = 0, WKS_COL = 3; i < dim; i++, WKS_COL++)
     {
-        Period period = KSMPL(dbv)->start_period.shift(i);
+        Period period = dbv->sample->start_period.shift(i);
         period_str = period.to_string();
         wks_string((char*) period_str.c_str(), WKS_COL, WKS_ROW);
     }

@@ -37,7 +37,7 @@ static int E_GetSmpl(Sample *smpl, char *name)
 {
     int     pos, t;
     double    *val;
-    Sample  *wsmpl = KSMPL(K_WS[VARIABLES]);
+    Sample  *wsmpl = K_WS[VARIABLES]->sample;
 
     pos = K_find(K_WS[VARIABLES], name);
     if(pos < 0) return(-1);
@@ -136,14 +136,20 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     Sample   smpl;
     double   *res = NULL, *vec;
 
-
     // Computes the lec formula and stores the result in the VAR _DF
     vec = L_cc_link_exec(lec, KV_WS, KS_WS);
     if(vec == NULL) return(NULL);
     strcpy(varname, "_DF");
-    K_add(KV_WS, varname, vec, &(KSMPL(KV_WS)->nb_periods));
+    Sample* var_sample = KV_WS->sample;
+    if(!var_sample) 
+    {
+        kwarning("No sample defined for the Variables workspace");
+        return NULL;
+    }
+    int nb_periods = var_sample->nb_periods;
+    K_add(KV_WS, varname, vec, &nb_periods);
     SW_nfree(vec);
-        
+    
     // Checks that the sample is large enough for the estimation 
     E_GetSmpl(&smpl, varname);
     smpl.start_period = smpl.start_period.shift(1);

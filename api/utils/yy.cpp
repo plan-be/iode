@@ -177,16 +177,14 @@ Sample  *K_read_smpl(YYFILE* yy)
     nb = two->difference(*one);
     if(one == 0 || two == 0 || nb < 0)
         kerror(0, "%s incorrect period", YY_error(yy));
-    else {
-        smpl = (Sample *) SW_nalloc(sizeof(Sample));
-        memcpy(&(smpl->start_period), one, sizeof(Period));
-        memcpy(&(smpl->end_period), two, sizeof(Period));
-        smpl->nb_periods = nb + 1;
-    }
+    else 
+        smpl = new Sample(*one, *two);
 
-    SW_nfree(one);
-    SW_nfree(two);
-    return(smpl);
+    delete one;
+    one = nullptr;
+    delete two;
+    two = nullptr;
+    return smpl;
 }
 
 

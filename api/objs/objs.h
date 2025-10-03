@@ -16,7 +16,7 @@ inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Ver
 
 /* k_objs.c */
 int K_key(char *,int );
-int K_dup(KDB *,char *,KDB *,char *);
+int K_dup(const KDB *,char *,KDB *,char *);
 int K_ren(KDB *,char *,char *);
 int K_add_entry(KDB *,char *);
 int K_find(KDB *,char *);
@@ -42,8 +42,8 @@ char *K_set_ext_asc(char *,char *,int );
 void K_strip(char *);
 int K_merge(KDB *,KDB *,int );
 int K_merge_del(KDB *,KDB *,int );
-KDB *K_load(int ,char *,int ,char **);
-KDB *K_interpret(int ,char *);
+KDB* K_load(int, char *, int, char **, int);
+KDB* K_interpret(int, char *, int);
 int K_copy(KDB *,int ,char **,int ,char **,Sample *);
 int K_cat(KDB *,char *);
 int K_set_backup_on_save(int take_backup);

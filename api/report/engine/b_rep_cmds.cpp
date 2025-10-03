@@ -552,7 +552,8 @@ int RP_settime(char* arg, int unused)
 
     RP_PER = *rp_per;
     delete rp_per;
-    return(0);
+    rp_per = nullptr;
+    return 0;
 }
 
 // $incrtime [n]

@@ -37,25 +37,35 @@ int   AsciiVariables::CSV_NBDEC = 15;
 static int read_vec(KDB* kdb, YYFILE* yy, char* name)
 {
     int     i, keyw, pos, nb;
-    double    *vec;
+    double  *vec;
     Sample  *smpl;
 
-    smpl = (Sample *) kdb->k_data;
+    smpl = kdb->sample;
+    if(!smpl) 
+    {
+        kerror(0, "%s : undefined sample", YY_error(yy));
+        return(-1);
+    }
+
     vec = (double *) SW_nalloc(smpl->nb_periods * sizeof(double));
 
     /* READ AT MOST nobs OBSERVATIONS */
-    for(i = 0; i < smpl->nb_periods; i++)  vec[i] = K_read_real(yy);
+    for(i = 0; i < smpl->nb_periods; i++)  
+        vec[i] = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
-        if((keyw == YY_WORD && strcmp((char*) yy->yy_text, "na")) || keyw == YY_EOF) break;
+        if((keyw == YY_WORD && strcmp((char*) yy->yy_text, "na")) || keyw == YY_EOF) 
+            break;
     }
     YY_unread(yy);
 
     nb = smpl->nb_periods;
     pos = K_add(kdb, name, vec, &nb);
-    if(pos < 0) {
+    if(pos < 0) 
+    {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(vec);
         return(-1);
@@ -74,54 +84,58 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
  *  
  *  @see http://www.xon.be/scr4/libs1/libs157.htm for more information on YY.
  *    
- *  @param [in, out]    yy      YY*     YY stream to read data from
- *  @param [in]         ask     int     see load_asc_type_ask() 
- *  @return                     KDB*    a new KDB of IODE vars or NULL on error
+ *  @param [in, out]    yy         YY*     YY stream to read data from
+ *  @param [in]         ask        int     see load_asc_type_ask() 
+ *  @param [in]         db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
+ *  @return                        KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-static KDB* load_yy(YYFILE* yy, int ask)
+static KDB* load_yy(YYFILE* yy, int ask, int db_global)
 {
-    KDB     *kdb = 0;
     int     cmpt = 0;
     ONAME   name;
-    //Period  one, two;
-    Sample  *smpl, *kasksmpl();
-
-    // Create and empty KDB for vars
-    kdb = K_create(VARIABLES, UPPER_CASE);
+    Sample* smpl;
+    KDB*    kdb = new KDB(VARIABLES, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     // The keyword sample must be the first on the YY stream */
     // if not:
-    //    - if ask == 1: the user must provide the sample via a call to kasksmpl()
+    //    - if ask == 1: the user must provide the sample via a call to kas->sample
     //    - else:        the function returns NULL
-    //
-    if(YY_lex(yy) != SMPL) {
-        if(!ask) {
+    if(YY_lex(yy) != SMPL) 
+    {
+        if(!ask) 
+        {
             kerror(0,"%s Expected sample definition", YY_error(yy));
             goto err;
         }
-        else {
+        else 
+        {
             YY_unread(yy);
-            //smpl = K_ask_smpl();
             smpl = kasksmpl();
         }
     }
-    else smpl = K_read_smpl(yy);
+    else 
+        smpl = K_read_smpl(yy);
 
-    if(smpl == NULL) goto err;
-    memcpy((Sample *) kdb->k_data, smpl, sizeof(Sample));
+    if(!smpl) 
+        goto err;
+    
+    kdb->sample = new Sample(*smpl);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
     */
-    while(1) {
-        switch(YY_lex(yy)) {
+    while(1) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
-                SW_nfree(smpl);
-                return(kdb);
+                delete smpl;
+                return kdb;
 
             case YY_WORD :
-                if(smpl->nb_periods == 0) {
+                if(smpl->nb_periods == 0) 
+                {
                     kerror(0, "%s : undefined sample", YY_error(yy));
                     goto err;
                 }
@@ -138,56 +152,60 @@ static KDB* load_yy(YYFILE* yy, int ask)
     }
 
 err:
-    SW_nfree(smpl);
-    K_free(kdb);
-    return((KDB *)0);
+    if(smpl) delete smpl;
+    if(kdb) delete kdb;
+    return nullptr;
 }
 
 /**
  *  Loads variables from an ASCII file or from a string.
  *  
- *  @param [in] file_or_string    char* file_or_string or string to interpret
- *  @param [in] type        int   1 => file_or_string is a string containing the var definitions, 
- *                                0 => file_or_string is a file name 
- *  @param [in] ask         int   1 => if and the sample definition is not present on the YY stream, calls kasksmpl() to get the sample from the user.
- *                                0 => if and the sample definition is not present on the YY stream, quit the function and returns NULL
- *  @return                 KDB*  NULL or new KDB of variables
+ *  @param [in] file_or_string char*  file_or_string or string to interpret
+ *  @param [in] type        int    1 => file_or_string is a string containing the var definitions, 
+ *                                 0 => file_or_string is a file name 
+ *  @param [in] ask         int    1 => if and the sample definition is not present on the YY stream, calls kas->sample to get the sample from the user.
+ *                                 0 => if and the sample definition is not present on the YY stream, quit the function and returns NULL
+ *  @param [in] db_global    int   1 for DB_GLOBAL, 0 for DB_STANDALONE
+ *  @return                  KDB*  NULL or new KDB of variables
  *  
  */
-KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask)
+KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask, int db_global)
 {
     static  int sorted;
-    KDB     *kdb = 0;
     YYFILE  *yy;
     int		yytype;
 
-    if(type == 0) {
+    if(type == 0) 
+    {
         SCR_strip((unsigned char *) file_or_string);
         yytype = (!K_ISFILE(file_or_string)) ? YY_STDIN : YY_FILE;
     }
-    else {
+    else
         yytype = YY_MEM;
-    }
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    if(sorted == 0) {
+    if(sorted == 0) 
+    {
         qsort(TABLE, sizeof(TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), ascii_compare);
         sorted = 1;
     }
 
     yy = YY_open(file_or_string, TABLE, sizeof(TABLE) / sizeof(YYKEYS), yytype);
 
-    if(yy == 0) {
-        if(!type) kerror(0,"Cannot open '%s'", file_or_string);
-        else      kerror(0,"Cannot open string");
-        return(kdb);
+    if(yy == 0) 
+    {
+        if(!type) 
+            kerror(0,"Cannot open '%s'", file_or_string);
+        else      
+            kerror(0,"Cannot open string");
+        return nullptr;
     }
 
-    kdb = load_yy(yy, ask);
+    KDB* kdb = load_yy(yy, ask, db_global);
     YY_close(yy);
-    return(kdb);
+    return kdb;
 }
 
 /**
@@ -195,21 +213,21 @@ KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask)
  *  filename in kd->filepath.
  *  
  *  @param [in] filename    char* ascii file to read
+ *  @param [in] db_global   int   1 for DB_GLOBAL, 0 for DB_STANDALONE
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-KDB* AsciiVariables::load_asc(char *filename)
-{
-    KDB     *kdb;
+KDB* AsciiVariables::load_asc(char *filename, int db_global)
+{   
+    KDB* kdb = load_asc_type_ask(filename, 0, 0, db_global);
+    if(kdb == nullptr || kdb->k_nb == 0)
+        return nullptr;
     
-    kdb = load_asc_type_ask(filename, 0, 0);
-    if(kdb && KNB(kdb) > 0) {
-        char    asc_filename[1024];
-        K_set_ext_asc(asc_filename, filename, VARIABLES);
-        K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
-    }
+    char asc_filename[1024];
+    K_set_ext_asc(asc_filename, filename, VARIABLES);
+    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
    
-    return(kdb);
+    return kdb;
 }
 
 /**
@@ -244,30 +262,42 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i, j;
-    double    *val;
+    double  *val;
     Sample  *smpl;
 
     if(filename[0] == '-') fd = stdout;
-    else {
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    smpl = (Sample *) kdb->k_data;
+    smpl = kdb->sample;
+    if(!smpl) 
+    {
+        kwarning("Cannot save the Variables to an ascii file -> sample is empty");
+        if(filename[0] != '-') fclose(fd);
+        return -1;
+    }
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(i = 0 ; i < KNB(kdb); i++) {
+    for(i = 0 ; i < KNB(kdb); i++) 
+    {
         fprintf(fd, "%s ", KONAME(kdb, i));
         val = KVVAL(kdb, i, 0);
-        for(j = 0 ; j < smpl->nb_periods; j++, val++) print_val(fd, *val);
+        for(j = 0 ; j < smpl->nb_periods; j++, val++) 
+            print_val(fd, *val);
         fprintf(fd, "\n");
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
+    
     return(0);
 }
 
@@ -321,12 +351,19 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     if(axes == 0 || axes[0] == 0) axes = "var";
 
     // sample : if CSV_Sample == NULL => tout le sample
-    if(smpl == 0)
-        smpl = (Sample *) kdb->k_data;
+    if(!smpl)
+        smpl = kdb->sample;
+    
+    if(!smpl) 
+    {
+        kwarning("Cannot save the Variables to a CSV file -> sample is empty");
+        return -1;
+    }
 
     // Liste
     lst = varlist;
-    if(varlist == 0) {
+    if(varlist == 0) 
+    {
         lst = 0;
         nb = 0;
         for(i = 0; i < KNB(kdb); i++)
@@ -336,9 +373,11 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
 
     // Open file
     if(filename[0] == '-') fd = stdout;
-    else {
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
@@ -350,7 +389,8 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     {
         if(smpl->start_period.periodicity == 'Y')
             fprintf(fd, "%s%d", sep, smpl->start_period.year + i);
-        else {
+        else 
+        {
             Period period = smpl->start_period.shift(i);
             fprintf(fd, "%s%s", sep, (char*) period.to_string().c_str());
         }
@@ -358,26 +398,32 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     fprintf(fd, "\n");
 
     // Lignes suivantes
-    for(i = 0 ; lst[i] ; i++) {
+    for(i = 0 ; lst[i] ; i++) 
+    {
         SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
         pos = K_find(kdb, lst[i]);
-        if(pos >= 0) {
+        if(pos >= 0) 
+        {
             val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->nb_periods; j++, val++) {
-                if(IODE_IS_A_NUMBER(*val)) {
+            for(j = 0 ; j < smpl->nb_periods; j++, val++) 
+            {
+                if(IODE_IS_A_NUMBER(*val)) 
+                {
                     sprintf(buf, fmt, (double)(*val));
                     if(dec[0] != '.') SCR_replace((unsigned char *) buf, (unsigned char *) ".", (unsigned char *) dec);
                 }
-                else {
+                else 
                     strcpy(buf, nan);
-                }
                 fprintf(fd, "%s%s", sep, buf);
             }
         }
         fprintf(fd, "\n");
     }
-    if(varlist == 0) SCR_free_tbl((unsigned char **) lst);
-    if(filename[0] != '-') fclose(fd);
-    return(0);
+    if(varlist == 0) 
+        SCR_free_tbl((unsigned char **) lst);
+    if(filename[0] != '-') 
+        fclose(fd);
+    
+    return 0;
 }

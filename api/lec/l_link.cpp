@@ -70,9 +70,19 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
     Period  per;
 
     smpl = L_getsmpl(dbv);
-    for(j = 0 ; j < lg ;) {
+    if(!smpl)
+    {
+        std::string msg = "L_link_sample_expr(): Cannot link a LEC sub-expression ";
+        msg += "because the sample of the passed Variables database is empty";
+        kwarning(msg.c_str());
+        return;
+    }
+
+    for(j = 0 ; j < lg ;) 
+    {
         keyw = expr[j++];
-        switch(keyw) {
+        switch(keyw) 
+        {
             case L_VAR   :
                 memcpy(&cvar, expr + j, sizeof(CVAR));
                 cvar.ref = cvar.lag;
@@ -97,13 +107,14 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
                 j += s_short + sizeof(Period);
                 break;
             default :
-                if(is_fn(keyw)) {
+                if(is_fn(keyw)) 
+                {
                     j++;
                     break;
                 }
-                if(is_tfn(keyw)) {
+                if(is_tfn(keyw)) 
+                {
                     memcpy(&len, expr + j + 1, sizeof(short));
-                    /*                    len = *(short *)(expr + j + 1); */
                     L_link_sample_expr(dbv, expr + j + 1 + s_short, len);
                     j += 1 + s_short + len;
                     break;

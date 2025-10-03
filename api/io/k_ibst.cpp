@@ -81,6 +81,7 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     Period* per = new Period(std::string(buf));
     *shift = per->difference(BST_smpl.start_period);
     delete per;
+    per = nullptr;
 
     if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
     if(dif_read_cell(yy, NULL, &status) < 0) return(-1);
@@ -162,7 +163,7 @@ int ImportCommentsBST::sub_read_header(int lang)
     if(dif_skip_to(FYY, DIF_BOT) < 0) return(-1);
     if(dif_skip_to(RYY, DIF_BOT) < 0) return(-1);
 
-    C_kdb = K_create(COMMENTS, ASIS_CASE);
+    C_kdb = new KDB(COMMENTS, DB_GLOBAL);
 
     while(1) {
         if(DIF_long(RYY, &dummy) < 0) break;  /* tbl */
@@ -331,7 +332,7 @@ int ImportCommentsBST::get_niv(char* name)
 
 int ImportCommentsBST::close()
 {
-    K_free(C_kdb);
+    delete C_kdb;
     YY_close(SYY);
     YY_close(FYY);
     return(0);

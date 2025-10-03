@@ -196,7 +196,8 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
         error_manager.append_error("Table '" + std::string(name) + "' not printed");
 
     delete tbl;
-    return(rc);
+    tbl = nullptr;
+    return rc;
 }
 
 
@@ -237,7 +238,9 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         if(view) W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
 
         delete tbl;
-        if(hg < 0) {
+        tbl = nullptr;
+        if(hg < 0) 
+        {
             rc = -1;
             break;
         }
@@ -321,16 +324,18 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 int B_ViewTblFile(char* arg, int unused)
 {
     int     ref, rc = 0;
-    KDB     *kdb = NULL;
     U_ch    **args = NULL;
 
-    if(arg == 0 || arg[0] == 0) {
+    if(arg == 0 || arg[0] == 0) 
+    {
         error_manager.append_error("Invalid argument");
         return(-1);
     }
-    else {
+    else 
+    {
         args = SCR_vtom((unsigned char*) arg, ' ');
-        if(args == NULL)  {
+        if(args == NULL)  
+        {
             error_manager.append_error("Invalid argument");
             rc = -1;
             goto err;
@@ -339,19 +344,22 @@ int B_ViewTblFile(char* arg, int unused)
         if(SCR_tbl_size(args) < 2) goto err;
 
         ref = atoi((char*) args[0]);
-        if(ref < 2 || ref > 5) {
+        if(ref < 2 || ref > 5) 
+        {
             error_manager.append_error("Invalid Reference number");
             rc = -1;
             goto err;
         }
 
-        kdb = K_interpret(VARIABLES, (char*) args[1]);
-        if(kdb == NULL) {
+        KDB* kdb = K_interpret(VARIABLES, (char*) args[1], 0);
+        if(!kdb) 
+        {
             rc = -1;
             goto err;
         }
 
-        K_free(K_RWS[VARIABLES][ref - 1]);
+        if(K_RWS[VARIABLES][ref - 1])
+            delete K_RWS[VARIABLES][ref - 1];
         K_RWS[VARIABLES][ref - 1] = kdb;
     }
 
@@ -364,12 +372,13 @@ err:
 // Close a Print tables or Print variables session.
 int B_ViewTblEnd()
 {
-    int     i;
-
-    for(i = 1; i < 5; i++) {
-        K_free(K_RWS[VARIABLES][i]);
-        K_RWS[VARIABLES][i] = NULL;
+    for(int i = 1; i < 5; i++) 
+    {
+        if(K_RWS[VARIABLES][i])
+            delete K_RWS[VARIABLES][i];
+        K_RWS[VARIABLES][i] = nullptr;
     }
+    
     ODE_VIEW = 0;
     ODE_SMPL[0] = '\0';
     return(0);

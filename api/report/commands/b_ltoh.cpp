@@ -326,10 +326,10 @@ static int B_ltoh(int type, char* arg)
     int     lg, nb, rc = 0,
                     i, shift, skip;
     char    method[81], file[K_MAX_FILE + 1], **data = NULL;
-    double    *t_vec = NULL, *f_vec = NULL;
-    KDB     *from = NULL, *to = NULL;
-    Sample  *t_smpl = NULL;
-
+    double  *t_vec = NULL, *f_vec = NULL;
+    KDB*    to = nullptr;
+    Sample* t_smpl = nullptr;
+    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
     lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
@@ -340,35 +340,45 @@ static int B_ltoh(int type, char* arg)
     nb = SCR_tbl_size((unsigned char**) data);
     if(nb == 0) goto done;
 
-    from = K_load(VARIABLES, file, nb, data);
-    if(from == NULL) {
+    from = K_load(VARIABLES, file, nb, data, 0);
+    if(!from) 
+    {
         rc = -1;
         goto done;
     }
 
-    if(LTOH_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &skip, &shift) < 0) {
+    if(LTOH_smpl(from->sample, KV_WS->sample, &t_smpl, &skip, &shift) < 0) 
+    {
         rc = -1;
         goto done;
     }
 
-    to = K_create(VARIABLES, UPPER_CASE);
-    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
+    if(!t_smpl) 
+    {
+        rc = -1;
+        goto done;
+    }
+
+    to = new KDB(VARIABLES, DB_STANDALONE);
+    to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->nb_periods) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
 
-    for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->nb_periods * sizeof(double));
-        switch(method[0]) {
+    for(i = 0; i < KNB(from); i++) 
+    {
+        memcpy(f_vec, KVVAL(from, i, 0), from->sample->nb_periods * sizeof(double));
+        switch(method[0]) 
+        {
             case LTOH_CS :
                 LTOH_cs(type,
-                        f_vec, (int) KSMPL(from)->nb_periods,
+                        f_vec, (int) from->sample->nb_periods,
                         t_vec, (int) t_smpl->nb_periods,
                         shift);
                 break;
 
             case LTOH_STEP:
                 LTOH_step(type,
-                          f_vec, (int) KSMPL(from)->nb_periods,
+                          f_vec, (int) from->sample->nb_periods,
                           t_vec, (int) t_smpl->nb_periods,
                           shift);
                 break;
@@ -376,7 +386,7 @@ static int B_ltoh(int type, char* arg)
             default       :
             case LTOH_LIN :
                 LTOH_lin(type,
-                         f_vec, (int) KSMPL(from)->nb_periods,
+                         f_vec, (int) from->sample->nb_periods,
                          t_vec, (int) t_smpl->nb_periods,
                          shift);
                 break;
@@ -387,18 +397,25 @@ static int B_ltoh(int type, char* arg)
     KV_merge(KV_WS, to, 1);
 
 done:
-    K_free(to);
-    K_free(from);
-    SCR_free_tbl((unsigned char**) data);
+    if(to)
+        delete to;
+    to = nullptr;
+    if(from)
+        delete from;
+    from = nullptr;
+    if(t_smpl)
+        delete t_smpl;
+    t_smpl = nullptr;
 
-    SW_nfree(t_smpl);
+    SCR_free_tbl((unsigned char**) data);
     SW_nfree(t_vec);
     SW_nfree(f_vec);
 
-    if(rc < 0) return(-1);
-    else return(0);
+    if(rc < 0) 
+        return(-1);
+    else 
+        return(0);
 }
-
 
 
 /**

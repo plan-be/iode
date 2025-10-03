@@ -119,7 +119,7 @@ int K_add(KDB* kdb, char* name, ...)
           lgptr = va_arg(vargs, int*);
           rc = K_vpack(&pack, var, lgptr);
           break;            
-      case K_OBJ: 
+      case OBJECTS: 
           txt = va_arg(vargs, char*);     
           lgptr = va_arg(vargs, int*);
           rc = K_opack(&pack, txt, lgptr);

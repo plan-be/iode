@@ -95,7 +95,7 @@ static int KI_read_scls_file(KDB* dbs, char* file);
 static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[]);
 static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl);
 static int KI_quick_extract(KDB* dbv, KDB* dbi);
-KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* smpl);
+
 
 /**
  *  Helper function used to compare 2 strings in KI_series_list().
@@ -157,8 +157,9 @@ static KDB *KI_series_list(KDB* dbi)
     qsort(tbl, ntbl - 1, sizeof(char *), wrapper_KI_strcmp);
 
     // Create a new KDB of vars with all the names in tbl
-    dbv = K_create(VARIABLES, UPPER_CASE);
-    for(i = 1; i < ntbl; i++) {
+    dbv = new KDB(VARIABLES, DB_STANDALONE);
+    for(i = 1; i < ntbl; i++) 
+    {
         if(tbl[i] == 0 || strcmp(tbl[i], tbl[i -1]))
             K_add_entry(dbv, tbl[i - 1]);
     }
@@ -166,7 +167,7 @@ static KDB *KI_series_list(KDB* dbi)
     SCR_free_tbl((unsigned char **) tbl);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    return(dbv);
+    return dbv;
 }
 
 
@@ -183,20 +184,24 @@ static KDB *KI_scalar_list(KDB* dbi)
     LNAME   *lname;
     CLEC    *clec, *tclec;
 
-    dbs = K_create(SCALARS, LOWER_CASE);
-    for(i = 0; i < KNB(dbi); i++) {
+    dbs = new KDB(SCALARS, DB_STANDALONE);
+    for(i = 0; i < KNB(dbi); i++) 
+    {
         clec = KICLEC(dbi, i);
-        tclec = (CLEC *)SW_nalloc(clec->tot_lg);
+        tclec = (CLEC*) SW_nalloc(clec->tot_lg);
         memcpy(tclec, clec, clec->tot_lg);
         lname    = &(tclec->lnames[0]);
         nb_names = tclec->nb_names;
-        for(j = 0 ; j < nb_names ; j++) {
-            if(!L_ISCOEF(lname[j].name)) continue;
+        for(j = 0 ; j < nb_names ; j++) 
+        {
+            if(!L_ISCOEF(lname[j].name)) 
+                continue;
             K_add_entry(dbs, lname[j].name);
         }
         SW_nfree(tclec); // JMP 26/8/2012
     }
-    return(dbs);
+
+    return dbs;
 }
 
 
@@ -355,10 +360,47 @@ static int *KI_reorder(KDB* dbi)
  */
 static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 {
-    int     j, pos, nb_found = 0, start, start_tmp;
+    int j, pos, nb_found = 0, start, start_tmp;
 
-    Sample* vsmpl = (Sample *) dbv->k_data;
-    Sample* tsmpl = (Sample *) dbv_tmp->k_data;
+    if(!dbv)
+    {
+        error_manager.append_error("Function KI_read_vars_db: input Variables database is null");
+        return -3;
+    }
+
+    int nb_vars_to_read = 0;
+    for(j = 0 ; j < dbv->k_nb; j++) 
+    {
+        if(KSOVAL(dbv, j) != 0) 
+            continue;  /* series already present */
+        pos = K_find(dbv_tmp, KONAME(dbv, j));
+        if(pos >= 0) 
+            nb_vars_to_read++;
+    }
+
+    // No variables to be read
+    if(nb_vars_to_read == 0) 
+        return 0;
+
+    Sample* vsmpl = dbv->sample;
+    Sample* tsmpl = dbv_tmp->sample;
+    if(!tsmpl)
+    {
+        if(std::string(source_name) == "WS")
+            error_manager.append_error("Function KI_read_vars_db: the sample of the current Variables workspace is empty");
+        else
+            error_manager.append_error("Function KI_read_vars_db: the sample of the Variables database read from the file '" 
+                                       + std::string(source_name) + "' is empty");
+        return -3;
+    }
+
+    // The sample of the KDB of the variables to read is empty 
+    if(!vsmpl) 
+    {
+        dbv->sample = new Sample(*tsmpl);
+        vsmpl = dbv->sample;
+    }
+    
     Sample smpl = vsmpl->intersection(*tsmpl);
     if(smpl.nb_periods > 0) 
     {
@@ -366,18 +408,23 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
         start_tmp = smpl.start_period.difference(tsmpl->start_period);  /* always >= 0 */
     }
     else 
-        return(-3);
+        return -3;
 
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
-    for(j = 0 ; j < KNB(dbv); j++) 
+    for(j = 0; j < dbv->k_nb; j++) 
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
-
         pos = K_find(dbv_tmp, KONAME(dbv, j));
-        if(pos < 0) continue;
+        if(pos < 0) 
+            continue;
+        if(KSOVAL(dbv_tmp, pos) == 0 || KGOVAL(dbv_tmp, pos) == 0)
+        {
+            kerror(0, "VAR %s could not be found in the workspace %s", KONAME(dbv, j));
+            return -1;
+        }
         KSOVAL(dbv, j) = KV_alloc_var(vsmpl->nb_periods);
         memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp), 
                sizeof(double) * smpl.nb_periods);
@@ -405,28 +452,52 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
  */
 static int KI_read_vars_file(KDB* dbv, char* file)
 {
-    KDB     *kdb;
     char    **vars = NULL;
     int     j, nbv = 0, nbf,
-               o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
+            o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
 
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < KNB(dbv); j++) {
-        if(KSOVAL(dbv, j) != 0) continue;
+    for(j = 0 ; j < KNB(dbv); j++) 
+    {
+        if(KSOVAL(dbv, j) != 0) 
+            continue;
         SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) KONAME(dbv, j));
     }
     SCR_add_ptr((unsigned char***) &vars, &nbv, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    kdb = K_load(VARIABLES, file, nbv, vars);
-    if(kdb == 0) {
-        error_manager.append_error("VarFile '" + std::string(file) + "' not found");
+    // No variables to be read
+    if(SCR_tbl_size((unsigned char**) vars) == 0)
+    {
+        SCR_free_tbl((unsigned char **) vars);
+        return(0);
+    }
+
+    if(SCR_tbl_size((unsigned char**) vars) > 0 && std::string(file).empty())
+    {
+        error_manager.append_error("The path of file to read the Variables is empty");
+        SCR_free_tbl((unsigned char **) vars);
+        return(-1);
+    }
+
+    KDB* kdb = K_load(VARIABLES, file, nbv, vars, 0);
+    if(!kdb) 
+    {
+        error_manager.append_error("Variables file '" + std::string(file) + "' not found");
+        return(-1);
+    }
+    if(kdb->k_nb == 0) 
+    {
+        delete kdb;
+        kdb = nullptr;
+        error_manager.append_error("The Variables file '" + std::string(file) + "' contains no variable");
         return(-1);
     }
 
     nbf = KI_read_vars_db(dbv, kdb, file);
     SCR_free_tbl((unsigned char **) vars);
-    K_free(kdb);
+    delete kdb;
+    kdb = nullptr;
 
     return(nbf);
 }
@@ -450,15 +521,18 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 {
     int     i, j, dim, nbf, nb_found = 0;
 
-    if(nb == 0) {
+    if(nb == 0) 
+    {
         // No filename given => read in dbv_ws (normally KV_WS)
         nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
         if(nbf < 0) return(-1);
         nb_found += nbf;
     }
-    else {
+    else 
+    {
         // Files given, search in files in the same order as they are listed
-        for(i = 0;  i < nb && nb_found < KNB(dbv); i++) {
+        for(i = 0;  i < nb && nb_found < KNB(dbv); i++) 
+        {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
                 nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
@@ -466,17 +540,23 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
                 // Regular VAR file
                 nbf = KI_read_vars_file(dbv, files[i]);
 
-            if(nbf < 0) return(-1);
+            if(nbf < 0) 
+                return(-1);
             nb_found += nbf;
         }
     }
 
     // If all target VARs are not found, creates them with NaN values
-    if(nb_found < KNB(dbv)) {
-        dim = KSMPL(dbv)->nb_periods;
-        for(i = 0, j = 0 ; i < KNB(dbv) && j < 10; i++) {
+    if(nb_found < KNB(dbv)) 
+    {
+        dim = dbv->sample->nb_periods;
+        for(i = 0, j = 0 ; i < KNB(dbv) && j < 10; i++) 
+        {
             if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
-            if(K_find(dbi, KONAME(dbv, i)) >= 0) {          // series = identity ("endogenous") => creates an IODE_NAN VA
+
+            // series = identity ("endogenous") => creates an IODE_NAN VA
+            if(K_find(dbi, KONAME(dbv, i)) >= 0) 
+            {          
                 K_add(dbv, KONAME(dbv, i), NULL, &dim);      
                 continue;
             }
@@ -542,28 +622,31 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
  */
 static int KI_read_scls_file(KDB* dbs, char* file)
 {
-    KDB     *kdb;
     char    **scls = NULL;
     int     j, nbs = 0, nbf,
-               o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
+            o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
 
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < KNB(dbs); j++) {
-        if(KSOVAL(dbs, j) != 0) continue;
+    for(j = 0 ; j < KNB(dbs); j++) 
+    {
+        if(KSOVAL(dbs, j) != 0) 
+            continue;
         SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) KONAME(dbs, j));
     }
     SCR_add_ptr((unsigned char***) &scls, &nbs, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    kdb = K_load(SCALARS, file, nbs, scls);
-    if(kdb == 0) {
+    KDB* kdb = K_load(SCALARS, file, nbs, scls, 0);
+    if(!kdb) 
+    {
         error_manager.append_error("VarFile '" + std::string(file) + "' not found");
         return(-1);
     }
 
     nbf = KI_read_scls_db(dbs, kdb, file);
     SCR_free_tbl((unsigned char**) scls);
-    K_free(kdb);
+    delete kdb;
+    kdb = nullptr;
 
     return(nbf);
 }
@@ -630,7 +713,7 @@ KDB     *dbv,  *dbi;
 {
     int     i, nb, pos;
 
-    nb = KSMPL(dbv)->nb_periods;
+    nb = dbv->sample->nb_periods;
     for(i = 0; i < KNB(dbi); i++)  {
 	if(K_find(dbv, KONAME(dbi, i)) < 0) {
 	    K_add(dbv, KONAME(dbi, i), NULL, &nb);
@@ -661,7 +744,7 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
     char    *tmp;
     double  d;
 
-    start = smpl->start_period.difference(KSMPL(dbv)->start_period);
+    start = smpl->start_period.difference(dbv->sample->start_period);
     if(start < 0) 
         start = 0;
 
@@ -694,82 +777,112 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
  *  @param [in] KDB*    dbs         Input Scalar KDB
  *  @param [in] int     ns          number of input Scalar files
  *  @param [in] char*   sfiles[]    Input Scalar files
- *  @param [in] Sample* smpl        execution Sample or NULL to select the current VAR KDB sample
+ *  @param [in] Sample* in_smpl     execution Sample or NULL to select the current VAR KDB sample
  *  @return     KDB*                NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
 KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* in_smpl)
 {
     KDB     *dbv_i, *dbs_i;
-    Sample  *smpl;
     int     *order;
 
-    smpl = KSMPL(KV_WS);
-    if(in_smpl != 0) smpl = in_smpl;
+    Sample* var_sample = KV_WS->sample;
+    Sample* exec_sample = nullptr; 
+    if(in_smpl)
+        exec_sample = new Sample(*in_smpl);
+    else if(var_sample)
+        exec_sample = new Sample(*var_sample);
     
-    if(smpl->nb_periods == 0) 
+    if(!exec_sample) 
     {
         error_manager.append_error("Empty execution sample");
-        return((KDB *)0);
+        return nullptr;
     }
-    
-    if(KSMPL(KV_WS)->nb_periods != 0 &&
-       (KSMPL(KV_WS)->end_period.difference(smpl->end_period)) < 0 || 
-       (smpl->start_period.difference(KSMPL(KV_WS)->start_period)) < 0) 
+
+    if(var_sample)
     {
-        error_manager.append_error("Empty execution sample");
-        return((KDB *)0);
+        // execution sample ends after the end of the current Variables workspace sample 
+        if(var_sample->end_period.difference(exec_sample->end_period) < 0) 
+        {
+            std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
+            msg += "ends after the current Variables workspace sample '" + var_sample->to_string() + "'";
+            error_manager.append_error(msg);
+            delete exec_sample;
+            return nullptr;
+        }
+
+        // execution sample starts before the start of the current Variables workspace sample 
+        if(exec_sample->start_period.difference(var_sample->start_period) < 0) 
+        {
+            std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
+            msg += "starts before the current Variables workspace sample '" + var_sample->to_string() + "'";
+            error_manager.append_error(msg);
+            delete exec_sample;
+            return nullptr;
+        }
     }
     
     if(KNB(dbi) == 0) 
     {
         error_manager.append_error("Empty set of identities");
-        return((KDB *)0);
+        delete exec_sample;
+        return nullptr;
     }
 
     order = KI_reorder(dbi);
-    if(order == 0) {
+    if(order == 0) 
+    {
         error_manager.append_error("Circular identity definition");
-        return((KDB *)0);
+        delete exec_sample;
+        return nullptr;
     }
 
     dbv_i = KI_series_list(dbi);
-    if(KSMPL(KV_WS)->nb_periods == 0) 
-        memcpy(dbv_i->k_data, smpl, sizeof(Sample));
+    if(var_sample) 
+        dbv_i->sample = new Sample(*var_sample);
     else  
-        memcpy(dbv_i->k_data, KSMPL(KV_WS), sizeof(Sample));
+        dbv_i->sample = new Sample(*exec_sample);
 
-    if(KEXEC_TRACE) {
+    if(KEXEC_TRACE) 
+    {
         W_printf("\n.par1 tit_0\nExecution of identities\n");
         W_printf(".par1 tit_1\nParameters\n");
-        W_printf(".par1 par_1\nExecution sample : %s\n", (char*) smpl->to_string().c_str());
+        std::string str_exec_sample = exec_sample->to_string();
+        W_printf(".par1 par_1\nExecution sample : %s\n", (char*) str_exec_sample.c_str());
         W_printf(".par1 tit_1\nVariables loaded\n");
     }
     
     if(KI_read_vars(dbi, dbv_i, dbv, nv, vfiles)) 
     {
         SW_nfree(order);
-        K_free(dbv_i);
-        return((KDB *)0);
+        delete dbv_i;
+        dbv_i = nullptr;
+        delete exec_sample;
+        return nullptr;
     }
 
     dbs_i = KI_scalar_list(dbi);
     if(KEXEC_TRACE) W_printf(".par1 tit_1\nScalars loaded\n");
-    if(KI_read_scls(dbs_i, dbs, ns, sfiles)) {
+    if(KI_read_scls(dbs_i, dbs, ns, sfiles)) 
+    {
         SW_nfree(order);
-        K_free(dbv_i);
-        K_free(dbs_i);
-        return((KDB *)0);
+        delete dbv_i;
+        dbv_i = nullptr;
+        delete dbs_i;
+        dbs_i = nullptr;
+        delete exec_sample;
+        return nullptr;
     }
     /*    if(KEXEC_TRACE) W_close();*/
     if(KEXEC_TRACE) W_flush();
 
-
     /*    KI_dbi_to_dbv(dbv_i, dbi); */
-    KI_execute(dbv_i, dbs_i, dbi, order, smpl);
+    KI_execute(dbv_i, dbs_i, dbi, order, exec_sample);
     //KI_extract(dbv_i, dbi);
     KI_quick_extract(dbv_i, dbi); // JMP 19/11/2012
     SW_nfree(order);
-    K_free(dbs_i);
-    return(dbv_i);
+    delete dbs_i;
+    dbs_i = nullptr;
+    delete exec_sample;
+    return dbv_i;
 }

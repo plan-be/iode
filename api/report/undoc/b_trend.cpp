@@ -51,20 +51,21 @@ static int HP_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
     }
 
 err:
-    if(*t_smpl) delete *t_smpl;
+    if(*t_smpl) 
+        delete *t_smpl;
     t_smpl = nullptr;
-    return(-1);
+    return -1;
 }
 
 
 static int B_WsTrendAll(char* arg, int std)
 {
-    int         lg, nb, rc = 0, i, shift = 0, /* lambda,*/ beg, dim = 0;
-    char        file[K_MAX_FILE + 1], **data = NULL;
-    double   *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
-    KDB         *from = NULL, *to = NULL;
-    Sample      *t_smpl = NULL;
-
+    int     lg, nb, rc = 0, i, shift = 0, /* lambda,*/ beg, dim = 0;
+    char    file[K_MAX_FILE + 1], **data = NULL;
+    double  *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
+    KDB*    to = nullptr;
+    Sample* t_smpl = nullptr;
+    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
     lg = B_get_arg0(file, arg, 80);
 
@@ -72,26 +73,34 @@ static int B_WsTrendAll(char* arg, int std)
     // lambda = atoi(data[0]); // JMP  22/1/2019
     lambda = atof(data[0]); // JMP  22/1/2019
     nb = SCR_tbl_size((unsigned char**) data + 1);
-    if(nb == 0) goto done;
+    if(nb == 0) 
+        goto done;
 
-    from = K_load(VARIABLES, file, nb, data + 1);
-    if(from == NULL) {
+    from = K_load(VARIABLES, file, nb, data + 1, 0);
+    if(!from) 
+    {
         rc = -1;
         goto done;
     }
 
-    if(HP_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift) < 0) goto done;
+    if(HP_smpl(from->sample, KV_WS->sample, &t_smpl, &shift) < 0) 
+        goto done;
 
-    to = K_create(VARIABLES, UPPER_CASE);
+    if(!t_smpl) 
+    {
+        rc = -1;
+        goto done;
+    }
+
+    to = new KDB(VARIABLES, DB_STANDALONE);
     nb = t_smpl->nb_periods;
-    memcpy((Sample *) to->k_data, t_smpl, sizeof(Sample));
+    to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
-    for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec,
-               KVVAL(from, i, 0) + shift, nb * sizeof(double));
-
+    for(i = 0; i < KNB(from); i++) 
+    {
+        memcpy(f_vec, KVVAL(from, i, 0) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019
         K_add(to, KONAME(from, i), t_vec, &(nb));
@@ -100,11 +109,17 @@ static int B_WsTrendAll(char* arg, int std)
     KV_merge(KV_WS, to, 1);
 
 done:
-    K_free(to);
-    K_free(from);
+    if(to)
+        delete to;
+    to = nullptr;
+    if(from)
+        delete from;
+    from = nullptr;
+    if(t_smpl)
+        delete t_smpl;
+    t_smpl = nullptr;
+    
     SCR_free_tbl((unsigned char**) data);
-
-    SW_nfree(t_smpl);
     SW_nfree(t_vec);
     SW_nfree(f_vec);
 

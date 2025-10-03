@@ -440,24 +440,28 @@ int CSimulation::K_simul_1(int t)
     if(K_prolog(t)) return(-1);
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
-    while(conv == 0 && it++ < KSIM_MAXIT) {
+    while(conv == 0 && it++ < KSIM_MAXIT) 
+    {
         ms_iter = WscrGetMS();
         rc = K_interdep(t);
         KSIM_NITERS[t]++; 			
         KSIM_NORMS[t] = KSIM_NORM;	
-        if(rc) {
+        if(rc) 
+        {
             ktermvkey(ovtime);  // Resets the interval between 2 keyboard readings
             return(-1);
         }
-        Period period = KSMPL(KSIM_DBV)->start_period.shift(t);
+        Period period = KSIM_DBV->sample->start_period.shift(t);
         sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
                       (char*) period.to_string().c_str(), it, KSIM_NORM, 
                       WscrGetMS() - ms_iter);
         kmsg("%.80s", msg);
         conv = (KSIM_NORM <= KSIM_EPS) ? 1 : 0;
-        if(khitkey() != 0) {                    // Checks the keyboard for a buffered key 
+        if(khitkey() != 0) 
+        {   // Checks the keyboard for a buffered key 
             kgetkey();                          // Reads the keyboard buffer
-            if(!kconfirm("Stop Simulation")) {  
+            if(!kconfirm("Stop Simulation")) 
+            {  
                 K_restore_XK(t);
                 ktermvkey(ovtime); 
                 return(-1);
@@ -542,8 +546,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
 
     // Find in the KSIM_DBV sample the position t of the first period to simulate
     // and check that the simulation sample is included in KSIM_DBV sample
-    at = smpl->start_period.difference(KSMPL(dbv)->start_period);
-    bt = KSMPL(dbv)->end_period.difference(smpl->end_period);
+    at = smpl->start_period.difference(dbv->sample->start_period);
+    bt = dbv->sample->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
@@ -563,9 +567,9 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->nb_periods);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->nb_periods);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->nb_periods);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->sample->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->sample->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->sample->nb_periods);
 
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
@@ -642,18 +646,22 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
     KSIM_XK1 = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
 
-    for(i = 0; i < smpl->nb_periods; i++, t++) {
+    for(i = 0; i < smpl->nb_periods; i++, t++) 
+    {
         cpu_iter = WscrGetMS();
         if(rc = K_simul_1(t)) goto fin;
         KSIM_CPUS[t] = WscrGetMS() - cpu_iter;
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
-        if(endo_exo != NULL) {
-            for(k = 0; k < endo_exonb; k ++) {
+        if(endo_exo != NULL) 
+        {
+            for(k = 0; k < endo_exonb; k ++) 
+            {
                 var = (char**) SCR_vtom((unsigned char*) endo_exo[k], '-');
                 posexo = K_find(KSIM_DBV, var[1]);
 
                 x = KVVAL(KSIM_DBV, posexo, 0);
-                for(j = t + 1; j < KSMPL(dbv)->nb_periods; j++)  x[j] = x[t];
+                for(j = t + 1; j < dbv->sample->nb_periods; j++)  
+                    x[j] = x[t];
 
                 SCR_free_tbl((unsigned char**) var);
                 var = NULL;
@@ -704,7 +712,7 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
     if(!IODE_IS_A_NUMBER(x) && msg)
     {
-        Period period = KSMPL(KSIM_DBV)->start_period.shift(t);
+        Period period = KSIM_DBV->sample->start_period.shift(t);
         kerror(0, "%s : becomes unavailable at %s%s",
                KONAME(KSIM_DBV, varnb), /* JMP 16-06-99 a la place de eqvarnb */
                (char*) period.to_string().c_str(),

@@ -281,7 +281,7 @@ public:
          
         if(from.empty() || to.empty())
         {
-            Sample* c_vars_sample = KSMPL(KV_WS);
+            Sample* c_vars_sample = KV_WS->sample;
             if(c_vars_sample == NULL || c_vars_sample->nb_periods == 0)
             {
                 this->sample.nb_periods = 0;
@@ -305,7 +305,9 @@ public:
         }
 
         Sample new_sample(from, to);
-        memcpy(&(this->sample), &new_sample, sizeof(Sample));
+        this->sample.start_period = new_sample.start_period;
+        this->sample.end_period = new_sample.end_period;
+        this->sample.nb_periods = new_sample.nb_periods;
     }
 
     // -- comment --
@@ -429,7 +431,7 @@ public:
         // create variables not yet present in the Variables Database
         if(create_if_not_exit)
         {
-            Sample* sample = KSMPL(K_WS[VARIABLES]);
+            Sample* sample = K_WS[VARIABLES]->sample;
             if(sample == NULL || sample->nb_periods == 0)
                 throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
