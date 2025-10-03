@@ -68,8 +68,8 @@ cdef extern from "api/all.h":
         long    k_nb
         short   k_type
         short   k_mode
-        char    k_arch[32]
-        char    k_desc[64]
+        string  k_arch
+        string  description
         char    k_data[64]
         char    k_compressed
         char    k_db_type

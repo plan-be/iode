@@ -172,7 +172,7 @@ char *IodeDdeGetWS(char *szItem)
     {
         if(kdb == 0) 
             return((char*) 0);
-        res = (char*) SCR_stracpy((unsigned char*) KDESC(kdb));
+        res = (char*) kdb->description.c_str();
         return(res);
     }
     else if(strcmp(szItem + 1, "NB") == 0) 

@@ -277,7 +277,7 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
                 kdb->k_mode = kdb32.k_mode;
                 kdb->k_compressed = kdb32.k_compressed;
                 kdb->k_arch = std::string(kdb32.k_arch);
-                memcpy(kdb->k_desc, kdb32.k_desc, K_MAX_DESC);
+                kdb->description = std::string(kdb32.k_desc);
                 memcpy(kdb->k_data, kdb32.k_data, K_MAX_DESC);
             }
             else
@@ -299,7 +299,7 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
         kdb->k_type = okdb643->k_type;
         kdb->k_mode = okdb643->k_mode;
         kdb->k_arch = std::string(okdb643->k_arch);
-        memcpy(kdb->k_desc, okdb643->k_desc, K_MAX_DESC);
+        kdb->description = std::string(okdb643->k_desc);
         memcpy(kdb->k_data, okdb643->k_data, K_MAX_DESC);
 
         if(vers == 2 || vers == 3) 
@@ -609,9 +609,11 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
     K_read_kdb(&kdb, fd, vers);
     fclose(fd);
 
-    if (descr) strcpy(descr, kdb.k_desc);
-    if (nobjs) *nobjs = KNB(&kdb);
-    if (smpl && kdb.k_type == VARIABLES)
+    if(descr) 
+        strcpy(descr, (char*) kdb.description.c_str());
+    if(nobjs) 
+        *nobjs = KNB(&kdb);
+    if(smpl && kdb.k_type == VARIABLES)
         memcpy(smpl, KSMPL(&kdb), sizeof(Sample));
 
     return(kdb.k_type);
@@ -875,7 +877,7 @@ int K_cat(KDB* ikdb, char* filename)
 
     if(KNB(ikdb) == 0) 
     {
-        memcpy(KDESC(ikdb), KDESC(kdb), K_MAX_DESC);
+        ikdb->description = kdb->description;
         ikdb->filepath = kdb->filepath;
     }
 
@@ -1047,7 +1049,8 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         kdb32.k_compressed = xdr_kdb->k_compressed;
         memset(kdb32.k_arch, 0, LMAGIC);
         std::strncpy(kdb32.k_arch, xdr_kdb->k_arch.c_str(), xdr_kdb->k_arch.size());
-        memcpy(kdb32.k_desc, xdr_kdb->k_desc, K_MAX_DESC);
+        memset(kdb32.k_desc, 0, K_MAX_DESC);
+        std::strncpy(kdb32.k_desc, (char*) xdr_kdb->description.c_str(), xdr_kdb->description.size());
         memcpy(kdb32.k_data, xdr_kdb->k_data, K_MAX_DESC);
 
         kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
