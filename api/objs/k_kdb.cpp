@@ -64,7 +64,7 @@ static int K_objnamecmp(const void *p1, const void *p2)
  
 void K_sort(KDB* kdb)
 {
-    qsort(KOBJS(kdb), (int) kdb->k_nb, sizeof(KOBJ), K_objnamecmp);
+    qsort(kdb->k_objs, (int) kdb->k_nb, sizeof(KOBJ), K_objnamecmp);
 }
 
 // API 
@@ -192,12 +192,12 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     tkdb->k_compressed = kdb->k_compressed;
     tkdb->filepath = kdb->filepath;
 
-    KOBJS(tkdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
+    tkdb->k_objs = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
     tkdb->k_nb = nb;
     for(int j = 0; j < nb; j++) 
     {
-        KOBJS(tkdb)[j].o_val = 0;
-        memset(KOBJS(tkdb)[j].o_name, 0, sizeof(ONAME));
+        tkdb->k_objs[j].o_val = 0;
+        memset(tkdb->k_objs[j].o_name, 0, sizeof(ONAME));
     }
 
     // Copie les entrées dans tkdb
@@ -209,7 +209,7 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
             delete tkdb;
             return nullptr;
         }
-        memcpy(KOBJS(tkdb) + i, KOBJS(kdb) + pos, sizeof(KOBJ));
+        memcpy(tkdb->k_objs + i, kdb->k_objs + pos, sizeof(KOBJ));
     }
 
     // Sort tkdb
@@ -283,9 +283,9 @@ int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
     if(kdb1->k_nb == 0) 
     {
         kdb1->k_nb = kdb2->k_nb;
-        KOBJS(kdb1) = KOBJS(kdb2);
+        kdb1->k_objs = kdb2->k_objs;
         kdb2->k_nb = 0;
-        KOBJS(kdb2) = 0;
+        kdb2->k_objs = 0;
         delete kdb2;
         kdb2 = nullptr;
         return 0;

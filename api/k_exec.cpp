@@ -257,7 +257,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
     newobjs = (KOBJ *) SW_nalloc((unsigned int)(sizeof(KOBJ) * K_CHUNCK * (1 + (nbres - 1) / K_CHUNCK)));
     for(i = j = 0 ; i < dbv->k_nb; i++) {
         if(objsnb[i]) {
-            memcpy(newobjs + j, KOBJS(dbv) + i, sizeof(KOBJ));
+            memcpy(newobjs + j, dbv->k_objs + i, sizeof(KOBJ));
             j++;
         }
         else {
@@ -265,8 +265,8 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
         }
     }
 
-    SW_nfree(KOBJS(dbv));
-    KOBJS(dbv) = newobjs;
+    SW_nfree(dbv->k_objs);
+    dbv->k_objs = newobjs;
     dbv->k_nb = nbres;
     SW_nfree(objsnb);
     return(0);
