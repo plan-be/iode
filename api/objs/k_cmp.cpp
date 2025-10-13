@@ -231,7 +231,7 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 {
     int     p1, p2, res=0;
 
-    if(KTYPE(kdb1) != KTYPE(kdb2)) return(-1);
+    if(kdb1->k_type != kdb2->k_type) return(-1);
 
     p1 = K_find(kdb1, name);
     p2 = K_find(kdb2, name);
@@ -243,7 +243,7 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 
     if(p2 < 0) return(1);      /* 1, not 2 */
 
-    switch(KTYPE(kdb1))
+    switch(kdb1->k_type)
     {
     case COMMENTS:
         res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);

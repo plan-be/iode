@@ -391,10 +391,10 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     // Read kdb struct from open file (fd) and transpose into kdb 64 if X64
     K_read_kdb(kdb, fd, vers);
 
-    if(ftype != KTYPE(kdb) || kdb->k_arch != ARCH) 
+    if(ftype != kdb->k_type || kdb->k_arch != ARCH) 
     {
         kmsg("%s : unvalid type(%s) or wrong architecture(%s)",
-             file, k_ext[KTYPE(kdb)], (char*) kdb->k_arch.c_str());
+             file, k_ext[kdb->k_type], (char*) kdb->k_arch.c_str());
         goto error;
     }
 
@@ -489,7 +489,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 }
                 kread(ptr, len, 1, fd);
             }
-            K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, NULL);
+            K_xdrobj[kdb->k_type]((unsigned char*) ptr, NULL);
             K_setvers(kdb, i, vers);
         }
     }
@@ -513,7 +513,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         kdb->k_nb = 0;
         
         // ???
-        if(KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS) 
+        if(kdb->k_type == VARIABLES || kdb->k_type == SCALARS) 
             if(K_read_len(fd, vers, &len)) 
                 goto error;
         
@@ -529,7 +529,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 continue;
 
             // skip the pos - lpos entries in the binary file 
-            if(kdb->k_compressed == 0 && (KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS)) 
+            if(kdb->k_compressed == 0 && (kdb->k_type == VARIABLES || kdb->k_type == SCALARS)) 
             {
                 if(pos - lpos > 0)
                     kseek(fd, (long) len * (pos - lpos), 1);
@@ -574,7 +574,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             else 
                 kread(ptr, len, 1, fd);
 
-            K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, NULL);
+            K_xdrobj[kdb->k_type]((unsigned char*) ptr, NULL);
             K_setvers(kdb, i, vers);
             lpos = pos + 1;
         }
@@ -817,11 +817,11 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     char    *ptr, *pack;
     Sample  csmpl;
 
-    KDB* from = K_load(KTYPE(to), file, no, objs, 0);
+    KDB* from = K_load(to->k_type, file, no, objs, 0);
     if(!from) 
         return(-1);
 
-    if(KTYPE(to) == VARIABLES) 
+    if(to->k_type == VARIABLES) 
     {
         if(smpl == NULL) 
             csmpl = *from->sample;
@@ -968,7 +968,7 @@ fin:
  
 int K_cat(KDB* ikdb, char* filename)
 {
-    KDB* kdb = K_interpret(KTYPE(ikdb), filename, 0);
+    KDB* kdb = K_interpret(ikdb->k_type, filename, 0);
     if(!kdb)
         return -1;
 
@@ -978,7 +978,7 @@ int K_cat(KDB* ikdb, char* filename)
         ikdb->filepath = kdb->filepath;
     }
 
-    if(KTYPE(ikdb) == VARIABLES) 
+    if(ikdb->k_type == VARIABLES) 
         KV_merge_del(ikdb, kdb, 1);
     else 
         K_merge_del(ikdb, kdb, 1);
@@ -1119,7 +1119,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
 
     strcpy(file, fname);
     K_strip(file); /* JMP 21-04-98 */
-    K_add_ext(file, k_ext[KTYPE(kdb)]);
+    K_add_ext(file, k_ext[kdb->k_type]);
     if(K_get_backup_on_save()) K_backup(file);     /* JMP 02-12-2022 */
     fd = fopen(file, "wb+");
     if(fd == NULL) return(-1);
@@ -1170,7 +1170,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         /* XDR  OBJ */
         ptr = SW_getptr(KOBJS(kdb)[i].o_val);
         len = P_len(ptr);
-        K_xdrobj[KTYPE(kdb)]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
+        K_xdrobj[kdb->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
         if(K_cwrite(kdb->k_compressed, xdr_ptr, len, 1, fd, 20) < 0) goto error;
         SW_nfree(xdr_ptr);
     }

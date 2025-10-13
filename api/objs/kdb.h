@@ -235,7 +235,6 @@ inline char k_ext[][4] =
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
 #define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)
