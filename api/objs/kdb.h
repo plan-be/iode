@@ -116,9 +116,9 @@ public:
 
     ~KDB()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->k_nb > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
         {
-            for(int i = 0; i < this->k_nb; i++)
+            for(int i = 0; i < this->size(); i++)
                 if(this->k_objs[i].o_val != 0) 
                     SW_free(this->k_objs[i].o_val);
         }
@@ -133,9 +133,9 @@ public:
 
     void clear_objs()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->k_nb > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
         {
-            for(int i = 0; i < this->k_nb; i++)
+            for(int i = 0; i < this->size(); i++)
                 if(this->k_objs[i].o_val != 0) 
                     SW_free(this->k_objs[i].o_val);
         }
@@ -159,6 +159,11 @@ public:
         this->description.clear();
         this->k_compressed = 0;
         this->filepath = I_DEFAULT_FILENAME;
+    }
+
+    int size() const 
+    { 
+        return this->k_nb;
     }
 
     int duplicate(const KDB& other, char* name);

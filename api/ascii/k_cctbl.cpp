@@ -669,7 +669,7 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
     }
 
     char* name;
-    for(i = 0 ; i < kdb->k_nb; i++) 
+    for(i = 0 ; i < kdb->size(); i++) 
     {
         name = KONAME(kdb, i);
         fprintf(fd, "%s {", name);

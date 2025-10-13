@@ -532,7 +532,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     char    **var = NULL;
     double    *x;
 
-    if(dbe->k_nb == 0) {
+    if(dbe->size() == 0) {
         std::string err_msg = "Empty set of equations";
         error_manager.append_error(err_msg);
         return(rc);
@@ -541,7 +541,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     // Assign static global variables to avoid passing to many parameters to sub functions
     KSIM_DBV = dbv;
     KSIM_DBE = dbe;
-    KSIM_MAXDEPTH = dbe->k_nb;
+    KSIM_MAXDEPTH = dbe->size();
     KSIM_DBS = dbs;
 
     // Find in the KSIM_DBV sample the position t of the first period to simulate
@@ -557,9 +557,9 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
 
     // KSIM_POSXK[i] = pos in KSIM_DBV of the endo of equation i (endo var = eq name)
     // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
-    KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->k_nb));
-    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbv->k_nb));
-    for(i = 0 ; i < dbv->k_nb; i++) {
+    KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
+    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbv->size()));
+    for(i = 0 ; i < dbv->size(); i++) {
         KSIM_POSXK_REV[i] = -1;  
     }
 
@@ -574,7 +574,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
     
-    for(i = 0 ; i < dbe->k_nb; i++) {        
+    for(i = 0 ; i < dbe->size(); i++) {        
         posvar = K_find(dbv, KONAME(dbe,i));
         KSIM_POSXK[i] = posvar;
         if(posvar < 0) {

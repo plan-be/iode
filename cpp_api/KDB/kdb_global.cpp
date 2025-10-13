@@ -5,7 +5,7 @@
 bool is_global_database_loaded(const IodeType iodeType) 
 { 
     if (K_WS[iodeType] == NULL) return false;
-    if (K_WS[iodeType]->k_nb == 0) return false;
+    if (K_WS[iodeType]->size() == 0) return false;
     return true; 
 }
 

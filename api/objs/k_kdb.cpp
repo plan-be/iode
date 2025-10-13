@@ -64,7 +64,7 @@ static int K_objnamecmp(const void *p1, const void *p2)
  
 void K_sort(KDB* kdb)
 {
-    qsort(kdb->k_objs, (int) kdb->k_nb, sizeof(KOBJ), K_objnamecmp);
+    qsort(kdb->k_objs, (int) kdb->size(), sizeof(KOBJ), K_objnamecmp);
 }
 
 // API 
@@ -239,7 +239,7 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
     char    *ptr;
 
     if(kdb1 == NULL || kdb2 == NULL) return(-1);
-    for(i = 0; i < kdb2->k_nb; i++) {
+    for(i = 0; i < kdb2->size(); i++) {
         pos = K_find(kdb1, KONAME(kdb2, i));
         if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
         else {
@@ -277,10 +277,10 @@ int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
     if(kdb1 == NULL || kdb2 == NULL) 
         return(-1);
     
-    if(kdb2->k_nb == 0) 
+    if(kdb2->size() == 0) 
         return(-1);
     
-    if(kdb1->k_nb == 0) 
+    if(kdb1->size() == 0) 
     {
         kdb1->k_nb = kdb2->k_nb;
         kdb1->k_objs = kdb2->k_objs;

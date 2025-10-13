@@ -151,10 +151,10 @@ char *IodeDdeGetWS(char *szItem)
     }
     else if(strcmp(szItem + 1, "LIST") == 0) 
     {
-        if(kdb == 0 || kdb->k_nb == 0) 
+        if(kdb == 0 || kdb->size() == 0) 
             return((char *)0);
-        res = SCR_malloc((sizeof(ONAME) + 1) * (1 + kdb->k_nb)); /* IODE64K */
-        for(i = 0 ; i < kdb->k_nb ; i++) 
+        res = SCR_malloc((sizeof(ONAME) + 1) * (1 + kdb->size())); /* IODE64K */
+        for(i = 0 ; i < kdb->size() ; i++) 
         {
             strcat(res, KONAME(kdb, i));
             strcat(res, "\t");
@@ -180,7 +180,7 @@ char *IodeDdeGetWS(char *szItem)
         if(kdb == 0) 
             return((char*) 0);
         res = SCR_malloc(20);
-        sprintf(res, "%d", kdb->k_nb);
+        sprintf(res, "%d", kdb->size());
         return(res);
     }
     return((char*) 0);
@@ -515,7 +515,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
             }
 
             if(SCR_tbl_size(lst) == 0) {
-                for(i = 0 ; i < kdb->k_nb ; i++) {
+                for(i = 0 ; i < kdb->size() ; i++) {
                     res = IodeDdeCreateSeries(i, 0);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + kdb->sample->nb_periods, 1), 
                                    (unsigned char*) res);
@@ -546,7 +546,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
 
         default :
             if(SCR_tbl_size(lst) == 0) {
-                for(i = 0 ; i < kdb->k_nb ; i++) {
+                for(i = 0 ; i < kdb->size() ; i++) {
                     res = IodeDdeCreateObj(i, type, &l, &h);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                    (unsigned char*) res);

@@ -38,7 +38,7 @@ TEST_F(IdentityTest, GetCoefficients)
     EXPECT_EQ(coefs_list, expected_coefs_list);
 
     // check that coeffs have been created
-    EXPECT_EQ(Scalars.count(), coefs_list.size());
+    EXPECT_EQ(Scalars.size(), coefs_list.size());
     EXPECT_TRUE(Scalars.contains("gamma2"));
     EXPECT_TRUE(Scalars.contains("gamma3"));
     EXPECT_TRUE(Scalars.contains("gamma4"));
@@ -60,7 +60,7 @@ TEST_F(IdentityTest, GetVariables)
     EXPECT_EQ(vars_list, expected_vars_list);
 
     // check that variables have been created
-    EXPECT_EQ(Variables.count(), vars_list.size());
+    EXPECT_EQ(Variables.size(), vars_list.size());
     EXPECT_TRUE(Variables.contains("PM"));
     EXPECT_TRUE(Variables.contains("QL"));
     EXPECT_TRUE(Variables.contains("VAFF"));

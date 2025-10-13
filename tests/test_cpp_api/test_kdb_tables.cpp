@@ -16,7 +16,7 @@ protected:
 TEST_F(KDBTablesTest, Load)
 {
     KDBTables kdb(input_test_dir + prefix_filename + "fun.tbl");
-    EXPECT_EQ(kdb.count(), 46);
+    EXPECT_EQ(kdb.size(), 46);
 }
 
 TEST_F(KDBTablesTest, Subset)
@@ -29,13 +29,13 @@ TEST_F(KDBTablesTest, Subset)
 
     // GLOBAL KDB
     KDBTables kdb_global;
-    EXPECT_EQ(kdb_global.count(), 46);
+    EXPECT_EQ(kdb_global.size(), 46);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBTables* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("C8_1", table);
     EXPECT_EQ(kdb_global.get_title("C8_1"), title);
@@ -43,7 +43,7 @@ TEST_F(KDBTablesTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBTables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("C8_1", table);
     EXPECT_EQ(kdb_global.get_title("C8_1"), new_title);
@@ -84,7 +84,7 @@ TEST_F(KDBTablesTest, Get)
 TEST_F(KDBTablesTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Tables.count(); i++) expected_names.push_back(Tables.get_name(i));
+    for (int i=0; i < Tables.size(); i++) expected_names.push_back(Tables.get_name(i));
     std::vector<std::string> names = Tables.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -325,9 +325,9 @@ TEST_F(KDBTablesTest, Filter)
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
+    for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_tables = Tables.count();
+    int nb_total_tables = Tables.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -342,7 +342,7 @@ TEST_F(KDBTablesTest, Filter)
 
     // create local kdb
     kdb_subset = Tables.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // add an element to the local KDB and check if it has also 
@@ -383,7 +383,7 @@ TEST_F(KDBTablesTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Tables.count(), nb_total_tables);
+    EXPECT_EQ(Tables.size(), nb_total_tables);
 
     // wrong pattern
     pattern = "anjfks";
@@ -400,9 +400,9 @@ TEST_F(KDBTablesTest, DeepCopy)
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
+    for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_tables = Tables.count();
+    int nb_total_tables = Tables.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -417,7 +417,7 @@ TEST_F(KDBTablesTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Tables.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // add an element to the local KDB and check if it has not 
@@ -456,7 +456,7 @@ TEST_F(KDBTablesTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Tables.count(), nb_total_tables);
+    EXPECT_EQ(Tables.size(), nb_total_tables);
 
     // wrong pattern
     pattern = "anjfks";
@@ -467,19 +467,19 @@ TEST_F(KDBTablesTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.tbl";
-    int expected_nb_comments = Tables.count();
+    int expected_nb_comments = Tables.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Tables.clear();
     Tables.copy_from(filename, "*");
-    EXPECT_EQ(Tables.count(), expected_nb_comments); 
+    EXPECT_EQ(Tables.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Tables.get_names(pattern);
     Tables.clear();
     Tables.copy_from(filename, pattern);
-    EXPECT_EQ(Tables.count(), v_expected_names.size());  
+    EXPECT_EQ(Tables.size(), v_expected_names.size());  
     EXPECT_EQ(Tables.get_names(), v_expected_names);  
 }
 

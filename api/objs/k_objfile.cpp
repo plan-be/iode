@@ -409,7 +409,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
 
     // Load object table (32 bits == 64 bits)
     // TODO: faire une sous-fonction K_read_objtable
-    i = (kdb->k_nb / K_CHUNCK + 1) * K_CHUNCK;
+    i = (kdb->size() / K_CHUNCK + 1) * K_CHUNCK;
     kdb->k_objs = (KOBJ *) SW_nalloc(sizeof(KOBJ) * i);
     if(kdb->k_objs == NULL) 
         goto error;
@@ -424,9 +424,9 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     { // short names
         OKOBJ   *okobj;
 
-        okobj = (OKOBJ *) SW_nalloc(sizeof(OKOBJ) * kdb->k_nb);
-        kread((char *) okobj, sizeof(OKOBJ), kdb->k_nb, fd);
-        for(int j = 0 ; j < kdb->k_nb ; j++)
+        okobj = (OKOBJ *) SW_nalloc(sizeof(OKOBJ) * kdb->size());
+        kread((char *) okobj, sizeof(OKOBJ), kdb->size(), fd);
+        for(int j = 0 ; j < kdb->size() ; j++)
             strcpy(KONAME(kdb, j), okobj[j].o_name);
         SW_nfree(okobj);
     }
@@ -435,7 +435,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         if(kdb->k_compressed == 0) 
         {
             // Normal case : no compression / long names
-            kread((char *) kdb->k_objs, sizeof(KOBJ), (int) kdb->k_nb, fd);
+            kread((char *) kdb->k_objs, sizeof(KOBJ), (int) kdb->size(), fd);
         }
         else 
         {
@@ -456,7 +456,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     // Load objects
     if(load_all == 0) 
     {
-        for(i = 0; i < kdb->k_nb; i++) 
+        for(i = 0; i < kdb->size(); i++) 
         {
             if(K_read_len(fd, vers, &len)) 
                 goto error;
@@ -678,7 +678,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
     if(descr) 
         strcpy(descr, (char*) kdb->description.c_str());
     if(nobjs) 
-        *nobjs = kdb->k_nb;
+        *nobjs = kdb->size();
     if(smpl != NULL && kdb->k_type == VARIABLES)
     {
         if(kdb->sample)
@@ -786,7 +786,7 @@ KDB* K_interpret(int type, char* filename, int db_global)
         return nullptr;
     }
 
-    kmsg("%d objects loaded", (int) kdb->k_nb);
+    kmsg("%d objects loaded", (int) kdb->size());
     return kdb;
 }
 
@@ -847,7 +847,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
         rc = KV_sample(from, &csmpl);
         if(rc < 0) 
             goto the_end;
-        nb_found = from->k_nb;
+        nb_found = from->size();
         rc = KV_merge(to, from, 1);
     }
     else 
@@ -972,7 +972,7 @@ int K_cat(KDB* ikdb, char* filename)
     if(!kdb)
         return -1;
 
-    if(ikdb->k_nb == 0) 
+    if(ikdb->size() == 0) 
     {
         ikdb->description = kdb->description;
         ikdb->filepath = kdb->filepath;
@@ -1140,7 +1140,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     {
         /* convert to x64 if needed */
         memset(&kdb32, 0, sizeof(KDB32)); // JMP 7/2/2022
-        kdb32.k_nb = xdr_kdb->k_nb;
+        kdb32.k_nb = xdr_kdb->size();
         kdb32.k_type = xdr_kdb->k_type;
         kdb32.k_mode = xdr_kdb->k_mode;
         kdb32.k_compressed = xdr_kdb->k_compressed;
@@ -1163,10 +1163,10 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     xdr_kdb = nullptr;
 
     // Dump KOBJ table
-    if(K_cwrite(kdb->k_compressed, (char*)kdb->k_objs, sizeof(KOBJ), kdb->k_nb, fd, -1) < 0) goto error;
+    if(K_cwrite(kdb->k_compressed, (char*)kdb->k_objs, sizeof(KOBJ), kdb->size(), fd, -1) < 0) goto error;
 
     // Dump objects
-    for(i = 0; i < kdb->k_nb; i++) {
+    for(i = 0; i < kdb->size(); i++) {
         /* XDR  OBJ */
         ptr = SW_getptr(kdb->k_objs[i].o_val);
         len = P_len(ptr);
@@ -1175,7 +1175,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
         SW_nfree(xdr_ptr);
     }
 
-    kmsg("%d objects saved", (int) kdb->k_nb);
+    kmsg("%d objects saved", (int) kdb->size());
     fclose(fd);
     return(0);
 

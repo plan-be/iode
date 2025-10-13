@@ -218,56 +218,67 @@ int K_add_entry(KDB* kdb, char* newname)
     KOBJ    *ktmp;
     ONAME   name;
 
-    if(kdb == NULL) return(-1);
-    SCR_strlcpy((unsigned char*) name, (unsigned char*) newname, K_MAX_NAME);  /* JMP 13-02-2013 */
-    if(K_key(name, kdb->k_mode) < 0) return(-1);
+    if(kdb == NULL) 
+        return(-1);
+    
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) newname, K_MAX_NAME);
+    if(K_key(name, kdb->k_mode) < 0) 
+        return(-1);
+    
     pos = K_find(kdb, name);
-    if(pos >= 0) {
+    if(pos >= 0) 
+    {
         if(K_WARN_DUP)
             kerror(0, "%s defined more than once", name);
         return(pos);
     }
 
-    if((kdb->k_nb) % K_CHUNCK == 0)
+    if((kdb->size()) % K_CHUNCK == 0)
         //kdb->k_objs = (char *) SW_nrealloc(kdb->k_objs,
         kdb->k_objs = (KOBJ*) SW_nrealloc(kdb->k_objs,
-                                         (unsigned int)(sizeof(KOBJ) * kdb->k_nb),
-                                         (unsigned int)(sizeof(KOBJ) * (kdb->k_nb + K_CHUNCK)));
-    if(kdb->k_objs == 0) return(-1);
+                                         (unsigned int)(sizeof(KOBJ) * kdb->size()),
+                                         (unsigned int)(sizeof(KOBJ) * (kdb->size() + K_CHUNCK)));
+    if(kdb->k_objs == 0) 
+        return(-1);
 
-
-    if(kdb->k_nb == 0) { /* JMP 09-06-00 */
+    if(kdb->size() == 0) 
+    {
         maxpos = 0;
         goto done;
     }
 
-    if(K_find_strcmp(name, kdb->k_objs + kdb->k_nb - 1) > 0) {
-        maxpos = kdb->k_nb;
+    if(K_find_strcmp(name, kdb->k_objs + kdb->size() - 1) > 0) 
+    {
+        maxpos = kdb->size();
         goto done;
     }
 
-    if(K_find_strcmp(name, kdb->k_objs) < 0) {
+    if(K_find_strcmp(name, kdb->k_objs) < 0) 
+    {
         /* add before */
         maxpos = 0;
         goto done;
     }
 
     /* insert */
-    maxpos = kdb->k_nb;
+    maxpos = kdb->size();
     minpos = 0;
-    while(maxpos - minpos > 1) {
+    while(maxpos - minpos > 1) 
+    {
         pos = minpos + (maxpos - minpos)/2;
-        if(K_find_strcmp(name, kdb->k_objs + pos) < 0) maxpos = pos;
-        else minpos = pos;
+        if(K_find_strcmp(name, kdb->k_objs + pos) < 0) 
+            maxpos = pos;
+        else 
+            minpos = pos;
     }
 
 done :
-   nbobjs =  kdb->k_nb - maxpos;
-    if(nbobjs != 0) {
+   nbobjs =  kdb->size() - maxpos;
+    if(nbobjs != 0) 
+    {
         ktmp = (KOBJ *) BUF_alloc(nbobjs * sizeof(KOBJ));
         memcpy((char *)ktmp, (char *)(kdb->k_objs + maxpos), nbobjs * sizeof(KOBJ));
         memcpy((char *)(kdb->k_objs + maxpos + 1), (char *)ktmp, nbobjs * sizeof(KOBJ));
-        //SCR_free(ktmp);
     }
 
     lg = std::min((int) strlen(name), K_MAX_NAME);
@@ -294,12 +305,12 @@ int K_find(KDB* kdb, char* name)
     char    *res;
     ONAME   oname;
 
-    if(kdb == NULL || kdb->k_nb == 0) return(-1);
+    if(kdb == NULL || kdb->size() == 0) return(-1);
 
     SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
     if(K_key(oname, kdb->k_mode) < 0) return(-1);
 
-    res = (char *) bsearch(oname, kdb->k_objs, (int) kdb->k_nb,
+    res = (char *) bsearch(oname, kdb->k_objs, (int) kdb->size(),
                            sizeof(KOBJ), K_find_strcmp);
     if(res != 0) return((int)((res - (char *) kdb->k_objs) / sizeof(KOBJ)));
     else return(-1);
@@ -319,16 +330,18 @@ int K_find(KDB* kdb, char* name)
 int K_del_entry(KDB* kdb, int pos)
 {
     memcpy(kdb->k_objs + pos, kdb->k_objs + (pos + 1),
-           (int)(kdb->k_nb - pos - 1) * sizeof(KOBJ));
+           (int)(kdb->size() - pos - 1) * sizeof(KOBJ));
     kdb->k_nb--;
-    if(kdb->k_nb > 0) {
-        memset(kdb->k_objs + (int) kdb->k_nb, 0, sizeof(KOBJ));
-        if(kdb->k_nb % K_CHUNCK == 0)
+    if(kdb->size() > 0) 
+    {
+        memset(kdb->k_objs + (int) kdb->size(), 0, sizeof(KOBJ));
+        if(kdb->size() % K_CHUNCK == 0)
             kdb->k_objs = (KOBJ *) SW_nrealloc((char *)kdb->k_objs,
-                                              (unsigned int)(sizeof(KOBJ) * (kdb->k_nb + K_CHUNCK)),
-                                              (unsigned int)(sizeof(KOBJ) * kdb->k_nb));
+                                              (unsigned int)(sizeof(KOBJ) * (kdb->size() + K_CHUNCK)),
+                                              (unsigned int)(sizeof(KOBJ) * kdb->size()));
     }
-    else {
+    else 
+    {
         SW_nfree(kdb->k_objs);
         kdb->k_objs = NULL;
     }
@@ -349,7 +362,7 @@ int K_del_entry(KDB* kdb, int pos)
 int K_del(KDB* kdb, int pos)
 {
     if(kdb == NULL) return(-1);
-    if(pos < 0 || pos >= kdb->k_nb) return(-1);
+    if(pos < 0 || pos >= kdb->size()) return(-1);
     SW_free(KSOVAL(kdb, pos));
     K_del_entry(kdb, pos);
     return(0);

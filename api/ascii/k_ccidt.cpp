@@ -127,7 +127,7 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->k_nb ; i++) 
+    for(i = 0 ; i < kdb->size() ; i++) 
     {
         fprintf(fd, "%s ", KONAME(kdb, i));
         fprintf(fd, "\"%s\"\n", KILEC(kdb, i));

@@ -206,7 +206,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
 	Sample* smpl = kdb->sample;
 
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->k_nb; pos++)
+    for(int pos=0; pos < kdb->size(); pos++)
     {
         char* o_name = kdb->k_objs[pos].o_name;
         hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));

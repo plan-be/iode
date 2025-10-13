@@ -746,7 +746,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
 
     XDR_rev(&(xdr_kdb->k_type), 1, sizeof(short));
     XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
-    XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
+    XDR_rev(&(xdr_kdb->size()), 1, sizeof(long));
 
     if(type == VARIABLES) 
     {

@@ -49,11 +49,11 @@ public:
         return kdb;
     } 
 
-    int count() const 
+    int size() const 
     { 
         KDB* kdb = get_database();
         if(kdb)
-            return kdb->k_nb;
+            return kdb->size();
         else
             return 0;
     }
@@ -130,9 +130,9 @@ public:
         KDB* kdb = get_database();
         if(kdb == NULL) 
             return "";
-        if(pos < 0 || pos >= kdb->k_nb) 
+        if(pos < 0 || pos >= kdb->size()) 
             throw std::invalid_argument("Cannot get the name of the object at position " + std::to_string(pos) + ".\n" +  
-                                        "The position must be in the range [0, " + std::to_string(kdb->k_nb - 1) + "].");
+                                        "The position must be in the range [0, " + std::to_string(kdb->size() - 1) + "].");
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
         std::string name = oem_to_utf8(name_oem);
         return name;

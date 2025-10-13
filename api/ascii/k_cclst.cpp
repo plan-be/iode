@@ -170,7 +170,7 @@ int AsciiLists::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->k_nb; i++) {
+    for(i = 0 ; i < kdb->size(); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         lst = KLVAL(kdb, i);
         SCR_fprintf_esc(fd, lst, 1);

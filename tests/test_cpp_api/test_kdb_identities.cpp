@@ -16,7 +16,7 @@ protected:
 TEST_F(KDBIdentitiesTest, Load)
 {
     KDBIdentities kdb(input_test_dir + prefix_filename + "fun.idt");
-    EXPECT_EQ(kdb.count(), 48);
+    EXPECT_EQ(kdb.size(), 48);
 }
 
 TEST_F(KDBIdentitiesTest, Subset)
@@ -27,13 +27,13 @@ TEST_F(KDBIdentitiesTest, Subset)
 
     // GLOBAL KDB
     KDBIdentities kdb_global;
-    EXPECT_EQ(kdb_global.count(), 48);
+    EXPECT_EQ(kdb_global.size(), 48);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBIdentities* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
     EXPECT_EQ(kdb_global.get_lec("AOUC"), lec);
@@ -41,7 +41,7 @@ TEST_F(KDBIdentitiesTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBIdentities* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("AOUC", new_lec);
     EXPECT_EQ(kdb_global.get_lec("AOUC"), new_lec);
@@ -136,7 +136,7 @@ TEST_F(KDBIdentitiesTest, Get)
 TEST_F(KDBIdentitiesTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Identities.count(); i++) expected_names.push_back(Identities.get_name(i));
+    for (int i=0; i < Identities.size(); i++) expected_names.push_back(Identities.get_name(i));
     std::vector<std::string> names = Identities.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -200,9 +200,9 @@ TEST_F(KDBIdentitiesTest, Filter)
     KDBIdentities* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
+    for (int p = 0; p < Identities.size(); p++) all_names.push_back(Identities.get_name(p));
 
-    int nb_total_identities = Identities.count();
+    int nb_total_identities = Identities.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -217,7 +217,7 @@ TEST_F(KDBIdentitiesTest, Filter)
 
     // create local kdb
     kdb_subset = Identities.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -256,7 +256,7 @@ TEST_F(KDBIdentitiesTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Identities.count(), nb_total_identities);
+    EXPECT_EQ(Identities.size(), nb_total_identities);
     EXPECT_EQ(Identities.get_lec(name), modified_lec);
 
     // wrong pattern
@@ -271,9 +271,9 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
     KDBIdentities* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
+    for (int p = 0; p < Identities.size(); p++) all_names.push_back(Identities.get_name(p));
 
-    int nb_total_identities = Identities.count();
+    int nb_total_identities = Identities.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -288,7 +288,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Identities.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -326,7 +326,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Identities.count(), nb_total_identities);
+    EXPECT_EQ(Identities.size(), nb_total_identities);
 
     // wrong pattern
     pattern = "anjfks";
@@ -394,7 +394,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     // Error -> empty Variables KDB
     Variables.clear();
     EXPECT_TRUE(Variables.sample == nullptr);
-    EXPECT_EQ(Variables.count(), 0);
+    EXPECT_EQ(Variables.size(), 0);
     EXPECT_EQ(Variables.filepath, std::string(I_DEFAULT_FILENAME));
     EXPECT_THROW(Identities.execute_identities(std::to_string(y_from)+"Y1", std::to_string(y_to)+"Y1", 
                  identities_list), std::runtime_error);
@@ -404,19 +404,19 @@ TEST_F(KDBIdentitiesTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.idt";
-    int expected_nb_comments = Identities.count();
+    int expected_nb_comments = Identities.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Identities.clear();
     Identities.copy_from(filename, "*");
-    EXPECT_EQ(Identities.count(), expected_nb_comments); 
+    EXPECT_EQ(Identities.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Identities.get_names(pattern);
     Identities.clear();
     Identities.copy_from(filename, pattern);
-    EXPECT_EQ(Identities.count(), v_expected_names.size());  
+    EXPECT_EQ(Identities.size(), v_expected_names.size());  
     EXPECT_EQ(Identities.get_names(), v_expected_names);  
 }
 

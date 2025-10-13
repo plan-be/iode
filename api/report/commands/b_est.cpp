@@ -84,7 +84,7 @@ int B_EqsEstimateEqs(Sample* smpl, char** eqs)
     else 
     {
         dbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
-        if(dbe == 0 || dbe->k_nb == 0)                                       
+        if(dbe == 0 || dbe->size() == 0)                                       
             rc = -1;                                                          
         else
         {
