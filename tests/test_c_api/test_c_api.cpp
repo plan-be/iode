@@ -1039,7 +1039,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     if(kdb_var) 
     {
-        EXPECT_EQ(KNB(kdb_var), 394);
+        EXPECT_EQ(kdb_var->k_nb, 394);
         rc = K_save(kdb_var, out_filename);
         EXPECT_EQ(rc, 0);
     }
@@ -1051,7 +1051,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     kdb_var = K_load(VARIABLES, in_filename, 0, NULL, 0);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
-    EXPECT_EQ(KNB(kdb_var), 394);
+    EXPECT_EQ(kdb_var->k_nb, 394);
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
@@ -1062,7 +1062,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     kdb_var = K_load(VARIABLES, in_filename, 1, objs, 0);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
-    EXPECT_EQ(KNB(kdb_var), 2);
+    EXPECT_EQ(kdb_var->k_nb, 2);
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
@@ -2216,7 +2216,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(int i = 0; i < KNB(KE_WS); i++)
+    for(int i = 0; i < KE_WS->k_nb; i++)
         ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
 
     U_test_reset_kmsg_msgs();
@@ -2442,13 +2442,13 @@ TEST_F(IodeCAPITest, Tests_B_WsClearAll)
     U_test_print_title("B_WsClearAll()");
     rc = B_WsClearAll("");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KNB(KC_WS), 0);
-    EXPECT_EQ(KNB(KE_WS), 0);
-    EXPECT_EQ(KNB(KI_WS), 0);
-    EXPECT_EQ(KNB(KL_WS), 0);
-    EXPECT_EQ(KNB(KS_WS), 0);
-    EXPECT_EQ(KNB(KT_WS), 0);
-    EXPECT_EQ(KNB(KV_WS), 0);
+    EXPECT_EQ(KC_WS->k_nb, 0);
+    EXPECT_EQ(KE_WS->k_nb, 0);
+    EXPECT_EQ(KI_WS->k_nb, 0);
+    EXPECT_EQ(KL_WS->k_nb, 0);
+    EXPECT_EQ(KS_WS->k_nb, 0);
+    EXPECT_EQ(KT_WS->k_nb, 0);
+    EXPECT_EQ(KV_WS->k_nb, 0);
 
     U_test_reset_kmsg_msgs();
 }

@@ -882,7 +882,7 @@ int B_DataScan(char* arg, int type)
         else 
         {
             tkdb = K_refer(K_WS[type], SCR_tbl_size((unsigned char**) objs), objs);
-            if(tkdb == 0 || KNB(tkdb) == 0)            /* JMP 12-05-11 */
+            if(tkdb == 0 || tkdb->k_nb == 0)            /* JMP 12-05-11 */
                 rc = -1;                                /* JMP 12-05-11 */
             else                                        /* JMP 12-05-11 */
                 rc = K_scan(tkdb, "_EXO", "_SCAL");     /* JMP 12-05-11 */
@@ -1236,7 +1236,7 @@ int B_DataCompare(char* arg, int type)
     if(!kdb2) 
         return(-1);
 
-    for(i = 0; i < KNB(kdb1); i++) 
+    for(i = 0; i < kdb1->k_nb; i++) 
     {
         name = KONAME(kdb1, i);
         rc = K_cmp(name, kdb1, kdb2);
@@ -1259,7 +1259,7 @@ int B_DataCompare(char* arg, int type)
             K_del(kdb2, K_find(kdb2, name)) ;
     }
 
-    for(i = 0; i < KNB(kdb2); i++) 
+    for(i = 0; i < kdb2->k_nb; i++) 
         SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) KONAME(kdb2, i));
 
     SCR_add_ptr((unsigned char***) &l1, &n1, NULL);

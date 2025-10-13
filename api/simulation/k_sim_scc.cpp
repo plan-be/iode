@@ -43,7 +43,7 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
         opasses = KSIM_PASSES,
         osort = KSIM_SORT;
 
-    if(KNB(dbe) == 0) {
+    if(dbe->k_nb == 0) {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
         return(-1);
@@ -51,7 +51,7 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
 
     KSIM_DBE = dbe;
     KSIM_DBV = dbe; // Pour reconstruire les listes dans K_lstorder via KSIM_NAME
-    KSIM_MAXDEPTH = KNB(dbe);
+    KSIM_MAXDEPTH = dbe->k_nb;
     KSIM_PASSES = tris;
 
     if(tris > 0) KSIM_SORT = SORT_BOTH;
@@ -59,15 +59,15 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
 
     // KSIM_POSXK[i] = num dans dbv de la var endogène de l'équation i
     // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
-    KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbe)));
-    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbe)));
-    for(i = 0 ; i < KNB(dbe); i++) {
+    KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->k_nb));
+    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbe->k_nb));
+    for(i = 0 ; i < dbe->k_nb; i++) {
         KSIM_POSXK_REV[i] = -1;  
     }
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     kmsg("Pseudo-linking equations ....");
-    for(i = 0 ; i < KNB(dbe); i++) {
+    for(i = 0 ; i < dbe->k_nb; i++) {
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
         L_link_endos(dbe, KECLEC(dbe, i));
@@ -104,7 +104,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
-    if(KNB(dbe) == 0) {
+    if(dbe->k_nb == 0) {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
         return(-1);
@@ -112,7 +112,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
 
     KSIM_DBV = dbv;
     KSIM_DBE = dbe;
-    KSIM_MAXDEPTH = KNB(dbe);
+    KSIM_MAXDEPTH = dbe->k_nb;
     KSIM_DBS = dbs;
 
     // Check Sample dans les bornes du WS
@@ -126,7 +126,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     }
 
     // KSIM_POSXK[i] = num dans dbv de la var endogène de l'équation i
-    KSIM_POSXK = (int *) SW_nalloc(sizeof(int) * KNB(dbe));
+    KSIM_POSXK = (int *) SW_nalloc(sizeof(int) * dbe->k_nb);
 
     // Initialise les nouvelles vars pour conserver les résultats de sim
     // NE PAS FREEER KSIM_NORMS ni KSIM_NITERS CAR UTILISES POUR LE REPORTING A POSTERIORI !!
@@ -139,7 +139,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
-    for(i = 0 ; i < KNB(dbe); i++) {
+    for(i = 0 ; i < dbe->k_nb; i++) {
         KSIM_POSXK[i] = K_find(dbv, KONAME(dbe,i));
         if(KSIM_POSXK[i] < 0) {
             std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot find variable";

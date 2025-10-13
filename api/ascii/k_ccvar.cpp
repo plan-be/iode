@@ -286,7 +286,7 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(i = 0 ; i < KNB(kdb); i++) 
+    for(i = 0 ; i < kdb->k_nb; i++) 
     {
         fprintf(fd, "%s ", KONAME(kdb, i));
         val = KVVAL(kdb, i, 0);
@@ -366,7 +366,7 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     {
         lst = 0;
         nb = 0;
-        for(i = 0; i < KNB(kdb); i++)
+        for(i = 0; i < kdb->k_nb; i++)
             SCR_add_ptr((unsigned char ***) &lst, &nb, (unsigned char*) KONAME(kdb, i));
         SCR_add_ptr((unsigned char ***) &lst, &nb, 0L);
     }

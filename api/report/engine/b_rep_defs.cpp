@@ -212,7 +212,7 @@ int RP_define_calcdepth(char *name)
     sprintf(buf, "%s%c", name, K_SECRETSEP);
     lg = (int)strlen(buf);
 
-    for(i = 0; i < KNB(RP_MACRO); i++) 
+    for(i = 0; i < RP_MACRO->k_nb; i++) 
     {
         if(strncmp(buf, KONAME(RP_MACRO, i), lg) == 0) 
         {

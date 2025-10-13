@@ -39,7 +39,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
     char    **lst;
     KDB     *exo = NULL, *scal = NULL;
 
-    if(kdb == nullptr || KNB(kdb) == 0) 
+    if(kdb == nullptr || kdb->k_nb == 0) 
     {
         std::string error_msg = "scan : '";
         error_msg += v_iode_types[kdb->k_type];
@@ -57,7 +57,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         goto done;
     }
 
-    for(i = 0; i < KNB(kdb); i++) 
+    for(i = 0; i < kdb->k_nb; i++) 
     {
         switch(kdb->k_type) 
         {
