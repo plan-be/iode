@@ -88,7 +88,8 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) 
         macro = "";
     lg = (int) strlen(macro) + 1;
-    if(K_add(RP_MACRO, name, macro, &lg) < 0) 
+    bool success = K_add(RP_MACRO, name, macro, &lg);
+    if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);
         error_msg += " (" + std::string(macro) + ") not possible";
@@ -151,8 +152,8 @@ int RP_undef_1(char *name)
     if(!RP_MACRO) 
         return(0);
     
-    K_del(RP_MACRO, RP_MACRO->index_of(name));
-    return(0);
+    bool success = RP_MACRO->remove(name);
+    return (int) success;
 }
 
 int wrapper_RP_undef_1(char *name, void* unused)

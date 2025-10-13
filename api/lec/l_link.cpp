@@ -33,13 +33,16 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
 {
     int     i;
 
-    for (i = 0; i < cl->nb_names; i++) {
+    for (i = 0; i < cl->nb_names; i++) 
+    {
         if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = L_findscl(dbs, cl->lnames[i].name);
         else
             cl->lnames[i].pos = L_findvar(dbv, cl->lnames[i].name);
-        if (cl->lnames[i].pos < 0) {
-            error_manager.append_error(std::string(cl->lnames[i].name) + " : not found");
+        if(cl->lnames[i].pos < 0) 
+        {
+            std::string msg = "linking LEC failed: '" + std::string(cl->lnames[i].name) + "' not found";
+            error_manager.append_error(msg);
             return(L_errno = L_NOT_FOUND_ERR);
         }
     }
@@ -72,8 +75,8 @@ static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
     smpl = L_getsmpl(dbv);
     if(!smpl)
     {
-        std::string msg = "L_link_sample_expr(): Cannot link a LEC sub-expression ";
-        msg += "because the sample of the passed Variables database is empty";
+        std::string msg = "Cannot link a LEC sub-expression because the sample ";
+        msg += "of the passed Variables database is empty";
         kwarning(msg.c_str());
         return;
     }

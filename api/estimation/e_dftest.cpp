@@ -62,9 +62,9 @@ static int E_GetSmpl(Sample *smpl, char *name)
 /**
  *  Retrieves the name of the first variable in a lec expression, "_DF" excluded.
  *  
- *  @param [in] char*   lec  LEC expression
- *  @param [in] char*   name buffer where to put the result
- *  @return     int          0 on success, -1 if the lec expression cannot be compiled       
+ *  @param [in] char*   lec   LEC expression
+ *  @param [in] char*   name  buffer where to put the result
+ *  @return     int           0 on success, -1 if the lec expression cannot be compiled       
  */
 int E_GetLecName(char* lec, char* name)
 {
@@ -74,19 +74,27 @@ int E_GetLecName(char* lec, char* name)
     name[0] = 0;
     clec = L_cc(lec);
     if(clec == 0) 
-        return(-1);
+        return -1;
     
+    std::string obj_name;
     for(j = 0 ; j < clec->nb_names ; j++) 
     {
-        strcpy(name, clec->lnames[j].name);
-        if(strcmp(name, "_DF") == 0) 
+        obj_name = std::string(clec->lnames[j].name);
+        
+        // skip "_DF" 
+        if(obj_name == "_DF")
             continue;
-        if(!is_coefficient(name)) 
+        
+        // if variable -> set name and exit loop
+        if(!is_coefficient(obj_name))
+        {
+            strcpy(name, obj_name.c_str());
             break;
+        } 
     }
 
     SW_nfree(clec);
-    return(0);
+    return 0;
 }
 
 
@@ -112,7 +120,7 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     Estimation est(eqs, KE_WS, KV_WS, KS_WS, smpl);
     rc = est.estimate();
 
-    K_del_by_name(KE_WS, "_DF");
+    KE_WS->remove("_DF");
     SCR_free_tbl((unsigned char**) eqs);
     return(rc);
 }
@@ -144,9 +152,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
 
     // Computes the lec formula and stores the result in the VAR _DF
     vec = L_cc_link_exec(lec, KV_WS, KS_WS);
-    if(vec == NULL) 
-        return(NULL);
-    
+    if(vec == NULL) return(NULL);
     strcpy(varname, "_DF");
     Sample* var_sample = KV_WS->sample;
     if(!var_sample) 
@@ -176,34 +182,30 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     if(drift) 
     {
         sprintf(buf + strlen(buf), "+ df_d");
-        //B_DataCreate("df_d", SCALARS);
         K_add(KS_WS, "df_d", NULL);
     }
 
     if(trend) 
     {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        //B_DataCreate("df_t", SCALARS);
         K_add(KS_WS, "df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
         sprintf(scl, "df%d", i);
-        //B_DataCreate(scl, SCALARS);
         K_add(KS_WS, scl, NULL);
     }
 
     if(order) 
     {
-        for(i = 1;  i <= order ; i++) 
+        for(i = 1;  i <= order ; i++)
             sprintf(buf + strlen(buf), " + df%d*d(%s[-%d])", i, varname, i);
     }
 
     smpl.start_period = smpl.start_period.shift(order);
     smpl.nb_periods -= order;
     rc = E_UnitRoot_1(&smpl, buf);
-
 
     if(rc == 0)
         res = (double *) SCR_malloc((drift + trend + order + 1)* 3 * sizeof(double));
@@ -213,20 +215,20 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     pos = 0;
     if(res) E_SclToReal("df_", res + pos);
     pos += 3;
-    K_del_by_name(KS_WS, "df_");
+    KS_WS->remove("df_");
 
     if(drift) 
     {
         if(res) E_SclToReal("df_d", res + pos);
         pos += 3;
-        K_del_by_name(KS_WS, "df_d");
+        KS_WS->remove("df_d");
     }
 
     if(trend) 
     {
         if(res) E_SclToReal("df_t", res + pos);
         pos += 3;
-        K_del_by_name(KS_WS, "df_t");
+        KS_WS->remove("df_t");
     }
 
     for(i = 1 ; i <= order ; i++) 
@@ -234,13 +236,12 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         sprintf(buf, "df%d", i);
         if(res) E_SclToReal(buf, res + pos);
         pos += 3;
-        K_del_by_name(KS_WS, buf);
+        KS_WS->remove(buf);
     }
 
 cleanup:
     // Deletes the tmp var _DF
-    K_del_by_name(KV_WS, "_DF");
-        
+    KV_WS->remove("_DF");
     return(res);
 }
 

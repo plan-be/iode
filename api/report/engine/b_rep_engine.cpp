@@ -1239,7 +1239,8 @@ int RP_ReportExec_tbl(REPFILE *rf)
     oldrf = CUR_REPFILE;    // Save the current report context
     CUR_REPFILE = rf;       // change locally the current report context
 
-    while(1) {
+    while(1) 
+    {
         // Execute one line
         SW_nfree(line);
         line = 0;
@@ -1248,11 +1249,13 @@ int RP_ReportExec_tbl(REPFILE *rf)
         rc = RP_readline(rf, &line, 1);
         
         // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
-        if(RP_DEBUG || RP_STDOUT) {
+        if(RP_DEBUG || RP_STDOUT) 
+        {
             SCR_strlcpy((unsigned char*) filename, (unsigned char*) rf->filename, 255);
             SCR_strlcpy((unsigned char*) debug_line, (unsigned char*) line, 1023);
             SCR_strip((unsigned char*) debug_line);
-            if(debug_line[0]) {
+            if(debug_line[0]) 
+            {
                 if(RP_DEBUG)
                     kmsg("%s[%d] - %s", filename, rf->curline, debug_line); // JMP 14/2/2013
                 else if(RP_STDOUT)
@@ -1261,7 +1264,8 @@ int RP_ReportExec_tbl(REPFILE *rf)
         }
 
         // EOF or readline has failed => goto done
-        switch(rc) {
+        switch(rc) 
+        {
             case -2  : // expand of macro failed, or LEC returns a NAN
                 rt = -3;
                 goto done;
@@ -1271,31 +1275,40 @@ int RP_ReportExec_tbl(REPFILE *rf)
 
         // Readline Ok: executes the $command or print the result if no $command found
         // $$ or ## are considered as simple txt
-        if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) { 
-            if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;
+        if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) 
+        { 
+            if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) 
+                continue;
             
             // $command, #command, $-command or #-command
             ignore = RP_chk_ignore(line);     // Ignore the errors if $-command or #-command
             rt = RP_splitline(line + 1 + ignore, name, &arg, 30);
             
             // Executes the command
-            if(rt == 0) {
-                if(name[0]) rt = RP_exec_fn(name, arg, line[0]);
-                if(RP_DEBUG > 1) RP_debug(line); // GB MEM
+            if(rt == 0) 
+            {
+                if(name[0]) 
+                    rt = RP_exec_fn(name, arg, line[0]);
+                if(RP_DEBUG > 1) 
+                    RP_debug(line); // GB MEM
             }
 
             CUR_REPFILE = rf; // restore the current REPFILE after RP_exec_fn() (recursivity)
             
             // Manage return codes from RP_exec_fn()
-            switch(rt)   {
+            switch(rt)   
+            {
                 case -1:                // error
-                    if(ignore) {        // $-command => rt = 0
+                    if(ignore)          // $-command => rt = 0
+                    {        
                         rt = 0;
                         break;
                     }
-                    if(RP_PRINT) RP_err_dump(name, arg);
+                    if(RP_PRINT) 
+                        RP_err_dump(name, arg);
                     rt = RP_RT;         // replaces the error code by the value of RP_RT (defined by OnError)
-                    switch(rt)  {
+                    switch(rt)  
+                    {
                         case  0:        // OnError ignore => rt = 0
                             break;     
                         case -2:        // OnError return => rt = 0 (and continue the report execution)
@@ -1319,7 +1332,8 @@ int RP_ReportExec_tbl(REPFILE *rf)
                     break;     // no error
             }
         }
-        else {
+        else 
+        {
             W_printf("%s\n", line);
             continue;
         }

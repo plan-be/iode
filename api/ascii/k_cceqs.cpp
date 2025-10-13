@@ -278,10 +278,11 @@ static Equation* read_eq(YYFILE* yy, char* name)
  */
 KDB* AsciiEquations::load_asc(char* filename, int db_global)
 {
+    bool       success;
     Equation*  eq = NULL;
     YYFILE*    yy;
     char       name[K_MAX_NAME + 1];
-    int        cmpt = 0, pos;
+    int        cmpt = 0;
     KDB*       kdb = new KDB(EQUATIONS, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     /* INIT YY READ */
@@ -297,12 +298,15 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
     }
 
     /* READ FILE */
-    while(1) {
-        switch(YY_read(yy)) {
+    while(1) 
+    {
+        switch(YY_read(yy)) 
+        {
             case YY_COMMENT :
                 break;
             case YY_EOF :
-                if(cmpt) {
+                if(cmpt) 
+                {
                     char    asc_filename[1024];
                     K_set_ext_asc(asc_filename, filename, EQUATIONS);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
@@ -314,7 +318,8 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
                 eq = read_eq(yy, name);
-                if(eq == nullptr) {
+                if(eq == nullptr) 
+                {
                     kerror(0, "%s : equation not defined", YY_error(yy));
                     goto err;
                 }
@@ -322,14 +327,14 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
 
-                pos = K_add(kdb, name, eq, name);
-                if(pos < 0)  {
+                success = K_add(kdb, name, eq, name);
+                if(!success)  
+                {
                     kerror(0, "%s : %s", name, L_error());
-                    if(pos == -1) goto err;
+                    goto err;
                 }
-                else {
+                else
                     cmpt++;
-                }
                 
                 kmsg("Reading object %d : %s", cmpt, name);
                 delete eq;
@@ -464,11 +469,13 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
     }
 
     Equation* eq;
+    char* c_name;
     for(int i = 0 ; i < kdb->size(); i++) 
     {
-        fprintf(fd, "%s ", kdb->get_name(i).c_str());
+        c_name = (char*) kdb->get_name(i).c_str();
+        fprintf(fd, "%s ", c_name);
         eq = KEVAL(kdb, i);
-        print_eq(fd, eq, (char*) kdb->get_name(i).c_str());
+        print_eq(fd, eq, c_name);
         delete eq;
         eq = nullptr;
     }

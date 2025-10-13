@@ -208,7 +208,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std:
 	return calculate_var_from_lec(lec, t_first, t_last);
 }
 
-int KDBVariables::add(const std::string& name, const Variable& variable)
+bool KDBVariables::add(const std::string& name, const Variable& variable)
 {
 	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
@@ -219,7 +219,7 @@ int KDBVariables::add(const std::string& name, const Variable& variable)
 	return KDBTemplate::add(name, variable.data(), &var_size);
 }
 
-int KDBVariables::add(const std::string& name, const std::string& lec)
+bool KDBVariables::add(const std::string& name, const std::string& lec)
 {
 	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");

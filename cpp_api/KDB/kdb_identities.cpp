@@ -31,13 +31,13 @@ std::string KDBIdentities::get_lec(const std::string& name) const
     return get_lec(pos);
 }
 
-int KDBIdentities::add(const std::string& name, const std::string& lec)
+bool KDBIdentities::add(const std::string& name, const std::string& lec)
 {
     char* c_lec = to_char_array(lec);
     return KDBTemplate::add(name, c_lec);
 }
 
-int KDBIdentities::add(const std::string& name, const Identity& obj)
+bool KDBIdentities::add(const std::string& name, const Identity& obj)
 {
     return KDBTemplate::add(name, (char*) obj.lec.c_str());
 }
@@ -54,7 +54,7 @@ void KDBIdentities::update(const int pos, const std::string& lec)
     KDBTemplate::update(pos, c_lec);
 }
 
-void KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
+bool KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
         const std::string& var_files, const std::string& scalar_files, const bool trace)
 {
     B_IdtExecuteVarFiles(to_char_array(var_files));
@@ -67,15 +67,21 @@ void KDBIdentities::execute_identities(const Period& from, const Period& to, con
 
     int rc = B_IdtExecuteIdts(&sample, idts);
     SCR_free_tbl((unsigned char**) idts);
-    if (rc != 0)
+    if(rc != 0)
     {
         std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
-            throw std::runtime_error("Cannot execute identities '" + identities_list + "'\n" + last_error);
+        {
+            error_manager.append_error("Cannot execute identities '" + identities_list + "':\n" + last_error);
+            error_manager.display_last_error();
+        }
+        return false;
     }
+    
+    return true;
 }
 
-void KDBIdentities::execute_identities(const std::string& from, const std::string& to, const std::string& identities_list, 
+bool KDBIdentities::execute_identities(const std::string& from, const std::string& to, const std::string& identities_list, 
         const std::string& var_files, const std::string& scalar_files, const bool trace)
 {
     std::string error_msg;
@@ -88,5 +94,5 @@ void KDBIdentities::execute_identities(const std::string& from, const std::strin
 
     Period period_from(from);
     Period period_to(to);
-    execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
+    return execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
 }

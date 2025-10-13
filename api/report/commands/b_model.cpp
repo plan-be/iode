@@ -200,8 +200,7 @@ int KE_compile(KDB* dbe)
     for(int i = 0; i < dbe->size(); i++) 
     {
         eq = KEVAL(dbe, i);
-        K_upd_eqs((char*) dbe->get_name(i).c_str(), (char*) eq->lec.c_str(), NULL, 0, 
-                  NULL, NULL, NULL, NULL, 0);
+        K_upd_eqs((char*) dbe->get_name(i).c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         delete eq;
         eq = nullptr;
     }

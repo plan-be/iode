@@ -14,13 +14,13 @@ Scalar* KDBScalars::get_unchecked(const int pos) const
     return static_cast<Scalar*>(KSVAL(kdb, pos));
 }
 
-int KDBScalars::add(const std::string& name, const Scalar& obj)
+bool KDBScalars::add(const std::string& name, const Scalar& obj)
 {
 	Scalar scalar(obj);
 	return KDBTemplate::add(name, &scalar);
 }
 
-int KDBScalars::add(const std::string& name, const double value, const double relax, const double std)
+bool KDBScalars::add(const std::string& name, const double value, const double relax, const double std)
 {
 	Scalar scalar(value, relax, std);
 	return KDBTemplate::add(name, &scalar);

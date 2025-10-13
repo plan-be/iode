@@ -106,15 +106,22 @@ done:
  */
 static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
 {
-    int j, rc = 0;
-
-    if(cl == 0) return;
-    for(j = 0 ; j < cl->nb_names ; j++) {
-        if(is_coefficient(cl->lnames[j].name))
-            K_add(scal, cl->lnames[j].name, NULL, &rc);
-        else {
-            if(dbe != NULL
-                    && dbe->index_of(cl->lnames[j].name) >= 0) continue;
+    if(cl == NULL) 
+        return;
+    
+    int rc = 0;
+    char* c_name;
+    std::string name;
+    for(int j = 0 ; j < cl->nb_names ; j++) 
+    {
+        c_name = cl->lnames[j].name;
+        if(is_coefficient(c_name))
+            K_add(scal, c_name, NULL, &rc);
+        else 
+        {
+            name = std::string(c_name);
+            if(dbe != nullptr && dbe->contains(name)) 
+                continue;
             K_add(exo, cl->lnames[j].name, NULL, &rc);
         }
     }
@@ -231,20 +238,26 @@ int KL_lst(char* name, char** lst, int chunck)
     char    *str, *ptr, buf[30];
 
     nb = SCR_tbl_size((unsigned char**) lst);
-    if(nb == 0) {
-        if(K_add(K_WS[LISTS], name, "") < 0)  rc = -1;
+    if(nb == 0) 
+    {
+        if(!K_add(K_WS[LISTS], name, ""))    
+            rc = -1;
         goto done;
     }
 
-    if(nb < chunck || chunck < 0) { /* GB 16/10/2007 */
+    if(nb < chunck || chunck < 0) 
+    {
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(K_add(K_WS[LISTS], name, str) < 0)  rc = -1;
+        if(!K_add(K_WS[LISTS], name, str))  
+            rc = -1;
         SCR_free(str);
         return(rc);
     }
 
-    for(i = 0, j = 0; i < nb && !rc; i+= chunck, j++) {
-        if(i + chunck < nb) {
+    for(i = 0, j = 0; i < nb && !rc; i+= chunck, j++) 
+    {
+        if(i + chunck < nb) 
+        {
             ptr = lst[i + chunck];
             lst[i + chunck] = NULL;
         }
@@ -252,21 +265,26 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(K_add(K_WS[LISTS], buf, str) < 0)  rc = -1;
+        if(!K_add(K_WS[LISTS], buf, str))  
+            rc = -1;
         SCR_free(str);
 
-        if(i + chunck < nb)  lst[i + chunck] = ptr;
+        if(i + chunck < nb)  
+            lst[i + chunck] = ptr;
     }
-    if(rc < 0) goto done;
+    if(rc < 0) 
+        goto done;
 
     str = (char *) SW_nalloc(j * (K_MAX_NAME + 2));
     str[0] = 0;
-    for(i = 0; i < j; i++) {
+    for(i = 0; i < j; i++) 
+    {
         sprintf(buf, "$%s%d;", name, i); /* GB 23/01/98 */
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(K_add(K_WS[LISTS], name, str) < 0) rc = -1;
+    if(!K_add(K_WS[LISTS], name, str)) 
+        rc = -1;
     SW_nfree(str);
 
 done:

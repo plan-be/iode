@@ -32,26 +32,26 @@ std::string KDBTables::get_title(const std::string& name) const
     return get_title(pos);
 }
 
-int KDBTables::add(const std::string& name, const Table& obj)
+bool KDBTables::add(const std::string& name, const Table& obj)
 {
 	Table table(obj);
 	return KDBTemplate::add(name, static_cast<Table*>(&table));
 }
 
-int KDBTables::add(const std::string& name, const int nbColumns)
+bool KDBTables::add(const std::string& name, const int nbColumns)
 {
 	Table table(nbColumns);
 	return KDBTemplate::add(name, static_cast<Table*>(&table));
 }
 
-int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, vars, mode, files, date);
 	return KDBTemplate::add(name, static_cast<Table*>(&table));
 }
 
-int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::vector<std::string>& titles, const std::vector<std::string>& lecs, 
 	bool mode, bool files, bool date)
 {
@@ -59,7 +59,7 @@ int KDBTables::add(const std::string& name, const int nbColumns, const std::stri
 	return KDBTemplate::add(name, static_cast<Table*>(&table));
 }
 
-int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::string& lecs, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, lecs, mode, files, date);

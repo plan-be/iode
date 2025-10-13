@@ -30,27 +30,32 @@
  */
 static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     keyw, pos;
+    int     keyw;
     char    *cmt;
+    bool    success;
 
     /* READ A STRING */
     keyw = YY_lex(yy);
-    if(keyw == YY_STRING) cmt = K_wrap((char*) yy->yy_text, 60);
-    else {
+    if(keyw == YY_STRING)   
+        cmt = K_wrap((char*) yy->yy_text, 60);
+    else 
+    {
         cmt = SW_nalloc(1);
         cmt[0] = '\0';
         YY_unread(yy);
     }
 
     /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
         if(keyw == YY_WORD || keyw == YY_EOF) break;
     }
     YY_unread(yy);
 
-    pos = K_add(kdb, name, cmt);
-    if(pos < 0) {
+    success = K_add(kdb, name, cmt);
+    if(!success) 
+    {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(cmt);
         return(-1);
@@ -153,19 +158,22 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
-    //CMT     *cmt;
-    CMT     cmt; // JMP 30/9/2021
+    CMT     cmt;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) {
+    for(i = 0 ; i < kdb->size(); i++) 
+    {
         fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
         cmt = KCVAL(kdb, i);
         SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
@@ -173,7 +181,8 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
         fprintf(fd, "\n");
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
     return(0);
 }
 

@@ -370,7 +370,7 @@ class IodeDatabase:
     def _set_print_nb_decimals(self, value: int):
         self._cython_instance._set_print_nb_decimals(value)
 
-    def index_of(self, name: str) -> int:
+    def index(self, name: str) -> int:
         r"""
         Return the position of the IODE object with name `name` in the database.
 
@@ -390,12 +390,12 @@ class IodeDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
-        >>> comments.index_of("ACAF")
+        >>> comments.index("ACAF")
         0
         """
         if name not in self:
             raise KeyError(f"'{name}' is not in the database.")
-        return self._cython_instance.index_of(name)
+        return self._cython_instance.index(name)
 
     def get_name(self, pos: int) -> str:
         r"""
@@ -619,7 +619,7 @@ class IodeDatabase:
         """
         return self._cython_instance.property_names()
 
-    def rename(self, old_name: str, new_name: str):
+    def rename(self, old_name: str, new_name: str, overwrite: bool=True):
         r"""
         Rename an object of the database.
 
@@ -629,6 +629,9 @@ class IodeDatabase:
             current name in the database
         new_name: str
             new name in the database
+        overwrite: bool, optional
+            whether or not to overwrite an existing object with name `new_name`.
+            Defaults to True.
 
         Warning
         -------
@@ -654,8 +657,8 @@ class IodeDatabase:
         if self.iode_type == IodeType.EQUATIONS:
             warnings.warn("Renaming an Equation is not allowed")
         else:
-            new_pos = self._cython_instance.rename(old_name, new_name)
-            if new_pos < 0:
+            success = self._cython_instance.rename(old_name, new_name, overwrite)
+            if not success:
                 raise RuntimeError(f"Could not rename item '{old_name}' as '{new_name}'")
 
     def remove(self, names: Union[str, List[str]]):
@@ -1447,7 +1450,7 @@ class IodeDatabase:
         self._cython_instance.remove_objects(names)
         for subsets in self.list_subsets:
             names_subset = [name for name in names if name in subsets]
-            subsets._cython_instance.remove_entries(names_subset)
+            subsets._cython_instance.remove_objects(names_subset)
 
     def _str_header(self) -> str:
         type_name = self.__class__.__name__

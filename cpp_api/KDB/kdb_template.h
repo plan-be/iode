@@ -4,13 +4,6 @@
 
 template<class T> class KDBTemplate: public KDBAbstract
 {
-private:
-    bool check_object_already_exists(KDB* kdb, const std::string& name)
-    {
-        char* c_name = to_char_array(name);
-        return kdb->index_of(c_name) >= 0;
-    }
-
 protected:
     virtual T copy_obj(const T original) const = 0;
 
@@ -19,17 +12,18 @@ protected:
     KDBTemplate(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern) :
         KDBAbstract(kdb, deep_copy, pattern) {}
 
-    template<class... Args> int add_or_update(KDB* kdb, const std::string& name, Args... args)
+    template<class... Args> bool add_or_update(KDB* kdb, const std::string& name, Args... args)
     {
+        bool success;
         char* c_name = to_char_array(name);
-        int pos = K_add(kdb, c_name, args...);
-        if (pos == -1) 
+        if (!kdb) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + ".'\n" +  
                                      "Iode has not been initialized.");
-        if (pos < -1) 
+        success = K_add(kdb, c_name, args...);
+        if(!success) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + "'.\n" + 
                                      "Reason: unknown");
-        return pos;
+        return success;
     }
 
 public:
@@ -44,9 +38,9 @@ public:
     // https://stackoverflow.com/questions/23412703/visual-studio-static-libraries-and-variadic-template-classes#comment35876150_23412703
     // https://stackoverflow.com/a/47890906
 
-    template<class... Args> int add(const std::string& name, Args... args)
+    template<class... Args> bool add(const std::string& name, Args... args)
     {
-        int pos;
+        bool success;
         std::string error_msg = "Cannot add " + v_iode_types[k_type] + " with name '" + name + "'.\n";
         error_msg += "The " + v_iode_types[k_type] + " with name '" + name + "' already exists in the database.\n";
         error_msg += "Use the update() method instead.";
@@ -56,24 +50,25 @@ public:
         KDB* kdb = get_database();
         if(!is_shallow_copy_database())
         {
-            if(check_object_already_exists(kdb, name))
+            if(kdb->contains(name))
                 throw std::invalid_argument(error_msg);
-            pos = add_or_update(kdb, name, args...);
+            success = add_or_update(kdb, name, args...);
+            return success;
         }
         else
         {
             KDB* global_kdb = K_WS[k_type];
-            if(check_object_already_exists(global_kdb, name))
+            if(global_kdb->contains(name))
                 throw std::invalid_argument(error_msg);
             // add new obj to the global KDB
-            int pos_global = add_or_update(global_kdb, name, args...);
+            success = add_or_update(global_kdb, name, args...);
+            if(!success)
+                return false;
             // add a new entry and copy the pointer
-            char* c_name = to_char_array(name);
-            pos = K_add_entry(kdb, c_name);
-            kdb->k_objs[pos].o_val = global_kdb->get_handle(pos_global);
+            K_add_entry(kdb, name);
+            kdb->k_objs[name] = global_kdb->get_handle(name);
+            return true;
         }
-
-        return pos;
     }
 
     template<class... Args> void update(const int pos, Args... args)
@@ -95,7 +90,7 @@ public:
         error_msg += "Name '" + name + "' not found in the database.\nUse the add() method instead.";
 
         KDB* kdb = get_database();
-        if(!check_object_already_exists(kdb, name))
+        if(!kdb->contains(name))
             throw std::invalid_argument(error_msg);
         
         // NOTE: In the case of a shallow copy, only pointers to objects 

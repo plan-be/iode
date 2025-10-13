@@ -344,12 +344,14 @@ int L_get_token()
     int     keyw;
     int     ch;
 
-    while(1) {
+    while(1) 
+    {
         ch = L_getc();
         if(!SCR_is_space(ch)) break; /* JMP 20-10-11 */
     }
 
-    switch(ch) {
+    switch(ch) 
+    {
         case '$' :
             if(L_macro()) return(L_errno);
             break;

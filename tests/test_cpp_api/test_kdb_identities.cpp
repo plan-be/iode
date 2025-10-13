@@ -59,19 +59,21 @@ TEST_F(KDBIdentitiesTest, Save)
 
 TEST_F(KDBIdentitiesTest, Rename)
 {
-    int new_pos;
+    bool success;
     std::string old_name;
     std::string new_name;
 
     // rename
     old_name = Identities.get_name(0);
     EXPECT_EQ(old_name, "AOUC");
-    new_pos = Identities.rename(old_name, "NEW_NAME");
-    EXPECT_EQ(Identities.get_name(new_pos), "NEW_NAME");
+    success = Identities.rename(old_name, "NEW_NAME");
+    EXPECT_TRUE(success);
+    EXPECT_TRUE(Identities.contains("NEW_NAME"));
 
     // set by position
-    new_pos = Identities.set_name(1, "NEW_POS");
-    EXPECT_EQ(Identities.get_name(new_pos), "NEW_POS");
+    success = Identities.set_name(1, "NEW_POS");
+    EXPECT_TRUE(success);
+    EXPECT_TRUE(Identities.contains("NEW_POS"));
 }
 
 TEST_F(KDBIdentitiesTest, GetLec)
@@ -336,6 +338,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
 // QUESTION FOR JMP: How to test with variables file, scalars file and trace ?
 TEST_F(KDBIdentitiesTest, ExecuteIdentities)
 {
+    bool success;
     int y_from = 1991;
     int y_to = 2000;
     // GAP2 "100*(QAFF_/(Q_F+Q_I))"
@@ -369,7 +372,9 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     }
 
     // compute GAP2 and GAP_
-    Identities.execute_identities(std::to_string(y_from)+"Y1", std::to_string(y_to)+"Y1", identities_list);
+    success = Identities.execute_identities(std::to_string(y_from)+"Y1", 
+                         std::to_string(y_to)+"Y1", identities_list);
+    EXPECT_TRUE(success);
 
     Variable computed_gap2;
     Variable computed_gap_;
@@ -396,8 +401,9 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     EXPECT_TRUE(Variables.sample == nullptr);
     EXPECT_EQ(Variables.size(), 0);
     EXPECT_EQ(Variables.filepath, std::string(I_DEFAULT_FILENAME));
-    EXPECT_THROW(Identities.execute_identities(std::to_string(y_from)+"Y1", std::to_string(y_to)+"Y1", 
-                 identities_list), std::runtime_error);
+    success = Identities.execute_identities(std::to_string(y_from) + "Y1", 
+                         std::to_string(y_to) + "Y1", identities_list);
+    EXPECT_FALSE(success);
 }
 
 TEST_F(KDBIdentitiesTest, CopyFrom)

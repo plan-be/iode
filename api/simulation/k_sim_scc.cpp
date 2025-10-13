@@ -104,7 +104,8 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
-    if(dbe->size() == 0) {
+    if(dbe->size() == 0) 
+    {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
         return(-1);
@@ -138,19 +139,25 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->sample->nb_periods);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
+    std::string eq_name;
     kmsg("Linking equations ....");
-    for(i = 0 ; i < dbe->size(); i++) {
-        KSIM_POSXK[i] = dbv->index_of(dbe->get_name(i));
-        if(KSIM_POSXK[i] < 0) {
-            std::string error_msg = "'" + std::string(dbe->get_name(i)) + "': cannot find variable";
+    for(i = 0 ; i < dbe->size(); i++) 
+    {
+        eq_name = dbe->get_name(i);
+
+        KSIM_POSXK[i] = dbv->index_of(eq_name);
+        if(KSIM_POSXK[i] < 0) 
+        {
+            std::string error_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(error_msg);
             rc = -1;
             goto fin;
         }
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
-        if(rc) {
-            std::string error_msg = "'" + std::string(dbe->get_name(i)) + "': cannot link equation";
+        if(rc) 
+        {
+            std::string error_msg = "'" + eq_name + "': cannot link equation";
             error_manager.append_error(error_msg);
             rc = -1;
             goto fin;
@@ -193,9 +200,9 @@ int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** 
 
     // Fixe l'ordre d'exécution dans KSIM_ORDER
     KSIM_ORDER = (int *)  SW_nalloc(sizeof(int) * (KSIM_PRE + KSIM_INTER + KSIM_POST));
-    for(i = j = 0; i < KSIM_PRE; i++)   KSIM_ORDER[j++] = dbe->index_of(pre[i]);
-    for(i = 0;     i < KSIM_INTER; i++) KSIM_ORDER[j++] = dbe->index_of(inter[i]);
-    for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = dbe->index_of(post[i]);
+    for(i = j = 0; i < KSIM_PRE; i++)   KSIM_ORDER[j++] = dbe->index_of(std::string(pre[i]));
+    for(i = 0;     i < KSIM_INTER; i++) KSIM_ORDER[j++] = dbe->index_of(std::string(inter[i]));
+    for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = dbe->index_of(std::string(post[i]));
 
     // Simulation
     t = smpl->start_period.difference(dbv->sample->start_period);

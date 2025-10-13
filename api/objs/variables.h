@@ -58,6 +58,16 @@ enum IodeLowToHigh
 double *K_vval(KDB *, int, int);
 double *K_vptr(KDB *, char*, int);
 
+inline double* KVVAL(KDB* kdb, int pos, int t)
+{
+    return K_vval(kdb, pos, t);
+}  
+
+inline double* KVPTR(KDB* kdb, char* name)
+{
+    return K_vptr(kdb, name, 0);
+}
+
 /* k_wsvar.c */
 int KV_sample(KDB *,Sample *);
 int KV_merge(KDB *,KDB *,int );
@@ -75,14 +85,4 @@ double KV_get_at_aper(char*varname, char* aper);
 int KV_set_at_t(char*varname, int t, double val);
 int KV_set_at_per(char*varname, Period* per, double val);
 int KV_set_at_aper(char*varname, char* aper, double val);
-
-
-inline double* KVVAL(KDB* kdb, const int pos, const int t) 
-{
-    return K_vval(kdb, pos, t);
-}
-
-inline double* KVPTR(const char* name) 
-{
-    return K_vptr(KV_WS, (char*) name, 0);
-}
+        

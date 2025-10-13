@@ -3,7 +3,7 @@
  *
  * Add an object to a KDB of any type
  * ----------------------------------
- *     int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9):
+ *     bool K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9):
  *                      Adds an object to a KDB. The number of arguments depends on object type.
  *
  */
@@ -32,7 +32,7 @@
  *  The handle of the allocated swap memory is stored in the kdb.
  *
  *  If name exists in kdb, the existing object is deleted and replaced by the new one.
- *  It returns the position of the object in the DB.
+ *  It returns true on success, false on error.
  *  
  *  How to create IODE objects with K_add()
  *  ---------------------------------------
@@ -51,7 +51,7 @@
  *      Equation*     eq;
  *      char*   name;
  *      ...
- *      rc = K_add(K_WS[EQUATIONS], name, eq, name);
+ *      success = K_add(K_WS[EQUATIONS], name, eq, name);
  *  
  *  
  *  @param [in, out]    kdb     KDB*    kdb to which the object is added
@@ -67,24 +67,30 @@
 // NEW VERSION: K_add() prototype is correct and corresponds to the implementation
 // -------------------------------------------------------------------------------
 
-int K_add(KDB* kdb, char* name, ...)
+bool K_add(KDB* kdb, char* c_name, ...)
 {
     va_list   vargs;
     char*     pack = NULL;
-    int       pos = -1, lg, rc;
+    int       rc;
+    bool      success;
     Equation* eq;
     char*     endo;
     char*     txt;
     char*     lec;
     Scalar*   scl;
-    Table*      tbl;
+    Table*    tbl;
     double*   var;
     int*      lgptr;
+    int       lg;
+    SWHDL     handle;
+    char*     ptr_swap;
+    std::string name;
 
-    va_start(vargs, name);
+    va_start(vargs, c_name);
 
-    if(kdb == NULL) {
-        pos = -1;
+    if(kdb == NULL) 
+    {
+        success = false;
         goto einde;
     }    
 
@@ -112,7 +118,7 @@ int K_add(KDB* kdb, char* name, ...)
           break;            
       case TABLES: 
           tbl = va_arg(vargs, Table*);
-          rc = K_tpack(&pack, (char*) tbl, name);
+          rc = K_tpack(&pack, (char*) tbl, c_name);
           break;            
       case VARIABLES: 
           var = va_arg(vargs, double*);  
@@ -124,31 +130,56 @@ int K_add(KDB* kdb, char* name, ...)
           lgptr = va_arg(vargs, int*);
           rc = K_opack(&pack, txt, lgptr);
           break;
-    } 
+    }
+    
     if(rc < 0) 
     {
-        pos = -2;
+        success = false;
         goto einde;
-    }    
+    }
+    
+    name = std::string(c_name);
 
-    // Add entry (name) into kdb
-    pos = K_add_entry(kdb, name);
-    if(pos < 0) {
-        error_manager.append_error(v_iode_types[kdb->k_type] + " " + std::string(name) + 
+    // Add an entry (name) if not present yet
+    success = K_add_entry(kdb, name);
+    if(!success) 
+    {
+        error_manager.append_error(v_iode_types[kdb->k_type] + " " + name + 
                                    " cannot be created (syntax ?)");
         goto einde;
     }
+    
+    // frees existing object but keeps the entry in kdb
+    handle = kdb->get_handle(name);
+    if(handle > 0) 
+        SW_free(handle);
 
-    // Copy allocated pack into kdb entry pos (SWAP memory)
+    // allocate space in SCR SWAP memory 
+    // NOTE: if handle > 0 (object previously present in the KDB), 
+    //       SW_alloc() will return the same handle as SW_alloc()
+    //       first searches for handle associated with freed item 
+    //       and reallocates it
     lg = * (OSIZE *) pack;
-    if(kdb->get_handle(pos) != 0) SW_free(kdb->get_handle(pos));
-    kdb->k_objs[pos].o_val = SW_alloc(lg);
-    memcpy(kdb->get_ptr_obj(pos), pack, lg);
+    handle = SW_alloc(lg);
+    if(handle == 0) 
+    {
+        error_manager.append_error("Low memory: cannot allocate " + std::to_string(lg) + 
+                                   " bytes for " + v_iode_types[kdb->k_type] + " " + std::string(name));
+        success = false;
+        goto einde;
+    }
+    kdb->k_objs[name] = handle;
+
+    // Copy allocated pack into the SCR SWAP memory
+    ptr_swap = SW_getptr(handle);
+    memcpy(ptr_swap, pack, lg);
+
+    success = true;
     
 einde:
     // Frees the allocated pack in regular MEM
     SW_nfree(pack);
     va_end(vargs);
     
-    return(pos);
+    return success;
 }

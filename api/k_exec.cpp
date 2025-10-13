@@ -79,7 +79,11 @@
 #include "api/objs/identities.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
+#include "api/utils/utils.h"
 #include "api/k_exec.h"
+
+#include <string>
+#include <vector>
 
 
 // Function declarations
@@ -128,44 +132,41 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  */
 static KDB *KI_series_list(KDB* dbi)
 {
-    int     i, j, nb_names, ntbl;
+    int     i, j, nb_names;
     KDB     *dbv;
     LNAME   *lname;
     CLEC    *clec;
-    char    **tbl;
-    int     o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
 
-    SCR_ADD_PTR_CHUNCK = 1000;
-    tbl = 0;
-    ntbl = 0;
+    // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons 
+    // (will eliminated by the call to K_add_entry() below).
+    std::string idt_name;  
+    std::string var_name;  
+    std::vector<std::string> vars_to_compute;
+    for(i = 0; i < dbi->size(); i++) 
+    {
+        idt_name = dbi->get_name(i);
+        vars_to_compute.push_back(idt_name);
 
-    // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
-    for(i = 0; i < dbi->size(); i++) {
-        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) dbi->get_name(i).c_str());
         clec = KICLEC(dbi, i);
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
 
-        for(j = 0; j < nb_names; j++) {
-            if(is_coefficient(lname[j].name)) continue;
-            SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) lname[j].name);
+        for(j = 0; j < nb_names; j++) 
+        {
+            if(is_coefficient(lname[j].name)) 
+                continue;
+            var_name = std::string(lname[j].name);
+            vars_to_compute.push_back(var_name);
         }
     }
-    SCR_add_ptr((unsigned char***) &tbl, &ntbl, 0);
 
-    // Sort the names (is it really required?)
-    qsort(tbl, ntbl - 1, sizeof(char *), wrapper_KI_strcmp);
+    // remove duplicates
+    sort_and_remove_duplicates(vars_to_compute);
 
     // Create a new KDB of vars with all the names in tbl
     dbv = new KDB(VARIABLES, DB_STANDALONE);
-    for(i = 1; i < ntbl; i++) 
-    {
-        if(tbl[i] == 0 || strcmp(tbl[i], tbl[i -1]))
-            K_add_entry(dbv, tbl[i - 1]);
-    }
-
-    SCR_free_tbl((unsigned char **) tbl);
-    SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
+    for(const std::string& name : vars_to_compute)
+        K_add_entry(dbv, name);
 
     return dbv;
 }
@@ -205,29 +206,6 @@ static KDB *KI_scalar_list(KDB* dbi)
 }
 
 
-// /*********************************************************************
-// Delete from dbv the variables not existing in dbi. The result is thus
-// a KDB dbv containing the vars computed from the  identities in dbi.
-// (identities have the name of the output var).
-// => Old version replaced by KI_quick_extract() (see below)
-// **********************************************************************/
-// int KI_extract(KDB* dbv, KDB* dbi)
-// {
-//     int     i, pos;
-// 
-//     //for(i = dbv->size() - 1; i >= 0 ; i--) {
-//     for(i = 0 ; i < dbv->size() ; i++) {
-//         pos = dbi->index_of(dbv->get_name(i));
-//         if(pos < 0) {
-//             K_del(dbv, i);
-//             i--;
-//         }
-//     }
-//     return(0);
-// }
-// 
-
-
 /**
  *  Reconstructs dbv with the variables whose names are found in dbi. The result is 
  *  a KDB (dbv modified) containing the vars computed from the identities in dbi
@@ -239,36 +217,19 @@ static KDB *KI_scalar_list(KDB* dbi)
  */
 static int KI_quick_extract(KDB* dbv, KDB* dbi) 
 {
-    int     i, j, pos, *objsnb, nbres;
-    KOBJ    *newobjs;
+    // get list of VARs names
+    std::vector<std::string> names;
+    names.reserve(dbv->size());
+    for(auto& [name, handle] : dbv->k_objs)
+        names.push_back(name);
 
-    // Computes in objsnb the nb of VARs that have the same name as an IDT in dbi and that already exist in dbv.
-    nbres = 0;
-    objsnb = (int *) SW_nalloc(sizeof(long) * dbv->size());
-    for(i = 0 ; i < dbv->size(); i++) {
-        pos = dbi->index_of(dbv->get_name(i));
-        if(pos >= 0) {
-            objsnb[i] = 1; 
-            nbres++;
-        }
+    // keep only VARs that have the same name as an IDT in dbi
+    for(const std::string& name : names)
+    {
+        if(!dbi->contains(name))
+            dbv->remove(name);
     }
 
-    // Copy left objs in a new tmp table of KOBJ and delete the others
-    newobjs = (KOBJ *) SW_nalloc((unsigned int)(sizeof(KOBJ) * K_CHUNCK * (1 + (nbres - 1) / K_CHUNCK)));
-    for(i = j = 0 ; i < dbv->size(); i++) {
-        if(objsnb[i]) {
-            memcpy(newobjs + j, dbv->k_objs + i, sizeof(KOBJ));
-            j++;
-        }
-        else {
-            SW_free(dbv->get_handle(i));
-        }
-    }
-
-    SW_nfree(dbv->k_objs);
-    dbv->k_objs = newobjs;
-    dbv->k_nb = nbres;
-    SW_nfree(objsnb);
     return(0);
 }
 
@@ -319,8 +280,10 @@ static int *KI_reorder(KDB* dbi)
                 if(strcmp(dbi->get_name(i).c_str(), lname[j].name) == 0) 
                     continue;
                 pos = dbi->index_of(lname[j].name);
-                if(pos < 0) continue;
-                if(mark[pos]) continue;
+                if(pos < 0) 
+                    continue;
+                if(mark[pos]) 
+                    continue;
                 break;
             }
 
@@ -355,7 +318,7 @@ static int *KI_reorder(KDB* dbi)
 
 
 /**
- *  Copies from the KDB dbv_tmp the unallocated VARs of dbv (i.e. the vars with no associated object).
+ *  Copies VARS from the KDB dbv_tmp the KDB dbv.
  *  The output sample is dbv's.
  *  
  *  @param [in] KDB*    dbv         KDB of vars to read
@@ -367,7 +330,7 @@ static int *KI_reorder(KDB* dbi)
  */
 static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 {
-    int j, pos, nb_found = 0, start, start_tmp;
+    int start, start_tmp;
 
     if(!dbv)
     {
@@ -375,29 +338,32 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
         return -3;
     }
 
-    int nb_vars_to_read = 0;
-    for(j = 0 ; j < dbv->size(); j++) 
+    // get list of VARs to be read (from dbv_tmp)
+    std::vector<std::string> vars_to_read;
+    for(auto& [name, handle] : dbv->k_objs)
     {
-        if(dbv->get_handle(j) != 0) 
-            continue;  /* series already present */
-        pos = dbv_tmp->index_of(dbv->get_name(j));
-        if(pos >= 0) 
-            nb_vars_to_read++;
+        // series already present
+        if(handle > 0)
+            continue;
+        if(dbv_tmp->contains(name)) 
+            vars_to_read.push_back(name);
     }
 
-    // No variables to be read
-    if(nb_vars_to_read == 0) 
+    // no VARs to be read
+    if(vars_to_read.size() == 0)
         return 0;
 
     Sample* vsmpl = dbv->sample;
     Sample* tsmpl = dbv_tmp->sample;
     if(!tsmpl)
     {
+        std::string msg = "Function KI_read_vars_db: the sample of the ";
         if(std::string(source_name) == "WS")
-            error_manager.append_error("Function KI_read_vars_db: the sample of the current Variables workspace is empty");
+            msg += "current Variables workspace";
         else
-            error_manager.append_error("Function KI_read_vars_db: the sample of the Variables database read from the file '" 
-                                       + std::string(source_name) + "' is empty");
+            msg += "database read from the file '" + std::string(source_name) + "'";
+        msg += " is empty";
+        error_manager.append_error(msg);
         return -3;
     }
 
@@ -420,23 +386,29 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
-    for(j = 0; j < dbv->size(); j++) 
+    int pos;
+    int pos_tmp;
+    SWHDL handle;
+    int nb_found = 0;
+    for(const std::string& name : vars_to_read)
     {
-        if(dbv->get_handle(j) != 0) 
-            continue;  /* series already present */
-        pos = dbv_tmp->index_of(dbv->get_name(j));
-        if(pos < 0) 
+        // series already present (in dbv)
+        handle = dbv->get_handle(name);
+        if(handle > 0) 
             continue;
-        if(dbv_tmp->get_handle(pos) == 0 || dbv_tmp->get_ptr_obj(pos) == NULL)
-        {
-            kerror(0, "VAR %s could not be found in the workspace %s", dbv->get_name(j));
-            return -1;
-        }
-        dbv->k_objs[j].o_val = KV_alloc_var(vsmpl->nb_periods);
-        memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp), 
+
+        // allocate the VAR in dbv
+        handle = (SWHDL) KV_alloc_var(vsmpl->nb_periods);
+        dbv->k_objs[name] = handle;
+
+        // copy the VAR from dbv_tmp to dbv
+        pos = dbv->index_of(name);
+        pos_tmp = dbv_tmp->index_of(name);
+        memcpy(KVVAL(dbv, pos, start), KVVAL(dbv_tmp, pos_tmp, start_tmp), 
                sizeof(double) * smpl.nb_periods);
+        
         if(KEXEC_TRACE)
-            W_printf("%s ", dbv->get_name(j));
+            W_printf("%s ", name.c_str());
         nb_found++;
     }
 
@@ -448,7 +420,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 
 
 /**
- *  Tries to read in file the unallocated VARs of dbv (i.e. the vars with no associated object).
+ *  Tries to read in file the VARs of dbv (i.e. the vars with no associated object).
  *  
  *  @param [in] KDB*    dbv     KDB of all needed VARs for calculating the identities
  *  @param [in] char*   file    name of a VAR file
@@ -460,53 +432,55 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 static int KI_read_vars_file(KDB* dbv, char* file)
 {
     char    **vars = NULL;
-    int     j, nbv = 0, nbf,
-            o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
+    int     nbv = 0, nbf;
 
-    SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < dbv->size(); j++) 
+    std::vector<std::string> vars_to_read;
+    for(auto& [name, handle] : dbv->k_objs) 
     {
-        if(dbv->get_handle(j) != 0) 
+        // series already loaded in dbv
+        if(handle > 0) 
             continue;
-        SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) dbv->get_name(j).c_str());
-    }
-    SCR_add_ptr((unsigned char***) &vars, &nbv, NULL);
-    SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
-
-    // No variables to be read
-    if(SCR_tbl_size((unsigned char**) vars) == 0)
-    {
-        SCR_free_tbl((unsigned char **) vars);
-        return(0);
+        vars_to_read.push_back(name);
     }
 
-    if(SCR_tbl_size((unsigned char**) vars) > 0 && std::string(file).empty())
+    // no variables to be read
+    if(vars_to_read.size() == 0)
+        return 0;
+
+    if(vars_to_read.size() > 0 && std::string(file).empty())
     {
         error_manager.append_error("The path of file to read the Variables is empty");
-        SCR_free_tbl((unsigned char **) vars);
-        return(-1);
+        return -1;
     }
 
-    KDB* kdb = K_load(VARIABLES, file, nbv, vars, 0);
+    char** vars_array = new char*[vars_to_read.size()];
+    for(size_t i = 0; i < vars_to_read.size(); i++)
+        vars_array[i] = (char*) vars_to_read[i].c_str();
+    
+    KDB* kdb = K_load(VARIABLES, file, nbv, vars_array, 0);
+
+    delete[] vars_array;
     if(!kdb) 
     {
-        error_manager.append_error("Variables file '" + std::string(file) + "' not found");
-        return(-1);
+        std::string msg = "Variables file '" + std::string(file) + "' not found";
+        error_manager.append_error(msg);
+        return -1;
     }
+
     if(kdb->size() == 0) 
     {
         delete kdb;
         kdb = nullptr;
-        error_manager.append_error("The Variables file '" + std::string(file) + "' contains no variable");
-        return(-1);
+        std::string msg = "Variables file '" + std::string(file) + "' contains no variable";
+        error_manager.append_error(msg);
+        return -1;
     }
 
     nbf = KI_read_vars_db(dbv, kdb, file);
-    SCR_free_tbl((unsigned char **) vars);
     delete kdb;
     kdb = nullptr;
 
-    return(nbf);
+    return nbf;
 }
 
 
@@ -526,13 +500,14 @@ static int KI_read_vars_file(KDB* dbv, char* file)
  */
 static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 {
-    int     i, j, dim, nbf, nb_found = 0;
+    int i, j, dim, nbf, nb_found = 0;
 
     if(nb == 0) 
     {
         // No filename given => read in dbv_ws (normally KV_WS)
         nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
-        if(nbf < 0) return(-1);
+        if(nbf < 0)
+            return -1;
         nb_found += nbf;
     }
     else 
@@ -546,9 +521,9 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
             else
                 // Regular VAR file
                 nbf = KI_read_vars_file(dbv, files[i]);
-
-            if(nbf < 0) 
-                return(-1);
+            
+            if(nbf < 0)
+                return -1;
             nb_found += nbf;
         }
     }
@@ -557,25 +532,36 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
     if(nb_found < dbv->size()) 
     {
         dim = dbv->sample->nb_periods;
-        for(i = 0, j = 0 ; i < dbv->size() && j < 10; i++) 
+        j = 0;
+        // WARNING: we create a copy of the map dbv->k_objs since K_add may modify dbv->k_objs.
+        //          It is not safe to use for(auto& [key, value] : map) when the keys or values 
+        //          can be modify inside the loop.
+        std::map<std::string, SWHDL> k_objs_copy = dbv->k_objs;
+        for(const auto& [name, handle] : k_objs_copy) 
         {
+            // more than 10 exogenous vars not found => stop listing
+            if(j > 10)
+                break;
+
             // series already present in dbv
-            if(dbv->get_handle(i) != 0) 
+            if(handle > 0) 
                 continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN VA
-            if(dbi->index_of(dbv->get_name(i)) >= 0) 
+            if(dbi->contains(name)) 
             {          
-                K_add(dbv, (char*) dbv->get_name(i).c_str(), NULL, &dim);      
+                K_add(dbv, (char*) name.c_str(), NULL, &dim);      
                 continue;
             }
+
             j++;
 
             // Exogenous series not found => error
-            error_manager.append_error("Variable '" + std::string(dbv->get_name(i)) + "' not found");
+            std::string msg = "Exogenous variable '" + name + "' not found";
+            error_manager.append_error(msg);
         }
 
-        // all VARs found
+        // all VARs found or created with NaN values
         if(j == 0) 
             return(0);
         
@@ -600,23 +586,39 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
  */
 static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 {
-    int j, pos, nb_found = 0;
+    if(KEXEC_TRACE) 
+        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
+    
+    int pos;
+    int pos_tmp;
+    int nb_found = 0;
+    for(auto& [name, handle] : dbs->k_objs) 
+    {
+        // scalar already loaded in dbs
+        if(handle > 0) 
+            continue;
 
-    if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
-    for(j = 0 ; j < dbs->size(); j++) {
-        if(dbs->get_handle(j) != 0) continue;
+        // scalar not present in dbs_tmp
+        if(!dbs_tmp->contains(name)) 
+            continue;
 
-        pos = dbs_tmp->index_of(dbs->get_name(j));
-        if(pos < 0) continue;
+        // allocate the Scalar in dbs
+        handle = (SWHDL) KS_alloc_scl();
+        dbs->k_objs[name] = handle;
+        
+        // copy the scalar from dbs_tmp to dbs
+        pos = dbs->index_of(name);
+        pos_tmp = dbs_tmp->index_of(name);
+        memcpy(KSVAL(dbs, pos), KSVAL(dbs_tmp, pos_tmp), sizeof(Scalar));
 
-        dbs->k_objs[j].o_val = KS_alloc_scl();
-        memcpy(KSVAL(dbs, j), KSVAL(dbs_tmp, pos), sizeof(Scalar));
-        if(KEXEC_TRACE) W_printf("%s ", dbs->get_name(j));
+        if(KEXEC_TRACE) 
+            W_printf("%s ", name.c_str());
         nb_found++;
     }
 
-    if(KEXEC_TRACE) W_printf("\n");
-    return(nb_found);
+    if(KEXEC_TRACE) 
+        W_printf("\n");
+    return nb_found;
 }
 
 
@@ -632,32 +634,40 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 static int KI_read_scls_file(KDB* dbs, char* file)
 {
     char    **scls = NULL;
-    int     j, nbs = 0, nbf,
-            o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
+    int     nbs = 0, nbf;
 
-    SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < dbs->size(); j++) 
+    std::vector<std::string> scls_to_read;
+    for(auto& [name, handle] : dbs->k_objs) 
     {
-        if(dbs->get_handle(j) != 0) 
+        // scalar already present
+        if(handle > 0) 
             continue;
-        SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) dbs->get_name(j).c_str());
+        scls_to_read.push_back(name);
     }
-    SCR_add_ptr((unsigned char***) &scls, &nbs, NULL);
-    SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    KDB* kdb = K_load(SCALARS, file, nbs, scls, 0);
+    // no Scalars to be read
+    if(scls_to_read.size() == 0)
+        return 0;
+
+    char** scls_array = new char*[scls_to_read.size()];
+    for(size_t i = 0; i < scls_to_read.size(); i++)
+        scls_array[i] = (char*) scls_to_read[i].c_str();
+
+    KDB* kdb = K_load(SCALARS, file, nbs, scls_array, 0);
+
+    delete[] scls_array;
     if(!kdb) 
     {
-        error_manager.append_error("VarFile '" + std::string(file) + "' not found");
-        return(-1);
+        std::string msg = "Scalar file '" + std::string(file) + "' not found";
+        error_manager.append_error(msg);
+        return -1;
     }
 
     nbf = KI_read_scls_db(dbs, kdb, file);
-    SCR_free_tbl((unsigned char**) scls);
     delete kdb;
     kdb = nullptr;
 
-    return(nbf);
+    return nbf;
 }
 
 
@@ -677,47 +687,52 @@ static int KI_read_scls_file(KDB* dbs, char* file)
 
 static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
 {
-    int     i, j, nbf, nb_found = 0;
-
+    int nbf;
+    int nb_found = 0;
     if(nb == 0) 
     {
         nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
         if(nbf < 0) 
-            return(-1);
+            return -1;
         nb_found += nbf;
     }
     else 
     {
-        for(i = 0;  i < nb && nb_found < dbs->size(); i++) 
+        for(int i = 0;  i < nb && nb_found < dbs->size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
             else
                 nbf = KI_read_scls_file(dbs, files[i]);
 
-            if(nbf < 0) return(-1);
+            if(nbf < 0) 
+                return -1;
             nb_found += nbf;
         }
     }
 
+    int j = 0;
     if(nb_found < dbs->size()) 
     {
-        for(i = 0, j = 0 ; i < dbs->size() && j < 10; i++) 
+        for(auto& [name, handle] : dbs->k_objs) 
         {
-            // series already present
-            if(dbs->get_handle(i) != 0) 
+            if(j > 10)
+                break;
+            if(handle > 0) 
                 continue;
             j++;
-
-            error_manager.append_error("Scalar '" + std::string(dbs->get_name(i)) + "' not found");
+            
+            std::string msg = "Scalar '" + name + "' not found";
+            error_manager.append_error(msg);
         }
 
         if(j == 10) 
             error_manager.append_error("... others skipped");
         
-        return(-2);
+        return -2;
     }
-    return(0);
+
+    return 0;
 }
 
 
@@ -752,6 +767,7 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
         memcpy(tmp, KICLEC(dbi, order[i]), tot_lg);
         if(L_link(dbv, dbs, (CLEC *)tmp)) 
             return(-1);
+        
         pos = dbv->index_of(dbi->get_name(order[i]));
         for(t = start ; t < start + smpl->nb_periods ; t++) 
         {
@@ -777,13 +793,15 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
  *  @param [in] int     ns          number of input Scalar files
  *  @param [in] char*   sfiles[]    Input Scalar files
  *  @param [in] Sample* in_smpl     execution Sample or NULL to select the current VAR KDB sample
- *  @return     KDB*                NULL on error (illegal Sample, empty dbi, vars or scls not found...).
+ *  @return     KDB*                Variables KDB containing the variables calculated using the identities
+ *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
 KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* in_smpl)
 {
     KDB     *dbv_i, *dbs_i;
     int     *order;
+    int     res;
 
     Sample* var_sample = KV_WS->sample;
     Sample* exec_sample = nullptr; 
@@ -792,7 +810,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     else if(var_sample)
         exec_sample = new Sample(*var_sample);
     
-    if(!exec_sample) 
+    if(!exec_sample)
     {
         error_manager.append_error("Empty execution sample");
         return nullptr;
@@ -803,36 +821,36 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
         // execution sample ends after the end of the current Variables workspace sample 
         if(var_sample->end_period.difference(exec_sample->end_period) < 0) 
         {
+            delete exec_sample;
             std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
             msg += "ends after the current Variables workspace sample '" + var_sample->to_string() + "'";
             error_manager.append_error(msg);
-            delete exec_sample;
             return nullptr;
         }
 
         // execution sample starts before the start of the current Variables workspace sample 
         if(exec_sample->start_period.difference(var_sample->start_period) < 0) 
         {
+            delete exec_sample;
             std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
             msg += "starts before the current Variables workspace sample '" + var_sample->to_string() + "'";
             error_manager.append_error(msg);
-            delete exec_sample;
             return nullptr;
         }
     }
     
     if(dbi->size() == 0) 
     {
-        error_manager.append_error("Empty set of identities");
         delete exec_sample;
+        error_manager.append_error("Empty set of identities");
         return nullptr;
     }
 
     order = KI_reorder(dbi);
     if(order == 0) 
     {
-        error_manager.append_error("Circular identity definition");
         delete exec_sample;
+        error_manager.append_error("Circular identity definition");
         return nullptr;
     }
 
@@ -851,7 +869,8 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
         W_printf(".par1 tit_1\nVariables loaded\n");
     }
     
-    if(KI_read_vars(dbi, dbv_i, dbv, nv, vfiles)) 
+    res = KI_read_vars(dbi, dbv_i, dbv, nv, vfiles);
+    if(res != 0) 
     {
         SW_nfree(order);
         delete dbv_i;
@@ -861,8 +880,10 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     }
 
     dbs_i = KI_scalar_list(dbi);
-    if(KEXEC_TRACE) W_printf(".par1 tit_1\nScalars loaded\n");
-    if(KI_read_scls(dbs_i, dbs, ns, sfiles)) 
+    if(KEXEC_TRACE) 
+        W_printf(".par1 tit_1\nScalars loaded\n");
+    res = KI_read_scls(dbs_i, dbs, ns, sfiles);
+    if(res != 0) 
     {
         SW_nfree(order);
         delete dbv_i;
@@ -872,13 +893,12 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
         delete exec_sample;
         return nullptr;
     }
-    /*    if(KEXEC_TRACE) W_close();*/
-    if(KEXEC_TRACE) W_flush();
 
-    /*    KI_dbi_to_dbv(dbv_i, dbi); */
+    if(KEXEC_TRACE) 
+        W_flush();
+
     KI_execute(dbv_i, dbs_i, dbi, order, exec_sample);
-    //KI_extract(dbv_i, dbi);
-    KI_quick_extract(dbv_i, dbi); // JMP 19/11/2012
+    KI_quick_extract(dbv_i, dbi);
     SW_nfree(order);
     delete dbs_i;
     dbs_i = nullptr;

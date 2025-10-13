@@ -61,7 +61,15 @@
  */
 char *K_oval(KDB* kdb, int pos, int n)
 {
-    return((char*) P_get_ptr(SW_getptr(kdb->k_objs[pos].o_val), n));
+    std::string name = kdb->get_name(pos);
+    if(name.empty())
+        return NULL;
+    
+    SWHDL handle = kdb->get_handle(name);
+    if(handle == 0) 
+        return NULL;
+    
+    return (char*) P_get_ptr(SW_getptr(handle), n);
 }
 
 
@@ -74,13 +82,13 @@ char *K_oval(KDB* kdb, int pos, int n)
  *  @return             char*   pointer to the nth element or NULL if not found
  *  
  */
-char* K_optr(KDB *kdb, char* name, int n)
-{
-    int pos;
-    
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);       // name not found
-    return(K_oval(kdb, pos, n));
+char* K_optr(KDB *kdb, char* c_name, int n)
+{    
+    SWHDL handle = kdb->get_handle(std::string(c_name));
+    if(handle == 0) 
+        return NULL;
+
+    return (char*) P_get_ptr(SW_getptr(handle), n);
 }    
 
 /**
@@ -93,7 +101,7 @@ char* K_optr(KDB *kdb, char* name, int n)
  */
 char *K_oval0(KDB* kdb, int pos)
 {
-    return(K_oval(kdb, pos, 0));
+    return K_oval(kdb, pos, 0);
 }
 
 
@@ -107,11 +115,7 @@ char *K_oval0(KDB* kdb, int pos)
  */
 char* K_optr0(KDB *kdb, char* name)
 {
-    int pos;
-    
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);       // name not found
-    return(K_oval0(kdb, pos));
+    return K_optr(kdb, name, 0);
 }    
 
 
@@ -125,7 +129,7 @@ char* K_optr0(KDB *kdb, char* name)
  */
 char *K_oval1(KDB* kdb, int pos)
 {
-    return(K_oval(kdb, pos, 1));
+    return K_oval(kdb, pos, 1);
 }
 
 
@@ -139,11 +143,7 @@ char *K_oval1(KDB* kdb, int pos)
  */
 char* K_optr1(KDB *kdb, char* name)
 {
-    int pos;
-    
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);       // name not found
-    return(K_oval1(kdb, pos));
+    return K_optr(kdb, name, 0);
 }    
 
 
@@ -158,7 +158,10 @@ char* K_optr1(KDB *kdb, char* name)
  */
 double *K_vval(KDB* kdb, int pos, int t)
 {
-    return(((double *)K_oval(kdb, pos, 0)) + t);
+    double* var = (double*) K_oval(kdb, pos, 0);
+    if(var == NULL)
+        return NULL;
+    return var + t;
 }
 
 
@@ -173,11 +176,7 @@ double *K_vval(KDB* kdb, int pos, int t)
  */
 double *K_vptr(KDB* kdb, char* name, int t)
 {
-    int pos;
-    
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);         // name not found
-    return(K_vval(kdb, pos, t));
+    return ((double*) K_optr(kdb, name, 0)) + t;
 }
 
 
@@ -193,8 +192,9 @@ Equation* K_eptr(KDB* kdb, char* name)
 {
     int pos;
     
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);         // name not found
+    pos = kdb->index_of(std::string(name));
+    if(pos < 0) 
+        return(NULL);         // name not found
     return KEVAL(kdb, pos);
 }
 
@@ -207,12 +207,9 @@ Equation* K_eptr(KDB* kdb, char* name)
  *  
  */
 Table* K_tptr(KDB* kdb, char* name)
-{
-    int pos;
-    
-    pos = kdb->index_of(name);
-    if(pos < 0) return(NULL);         // name not found
-    return(K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)));
+{        
+    char* ptr = kdb->get_ptr_obj(std::string(name));
+    return K_tunpack(ptr, name);
 }
 
 /**
@@ -226,7 +223,7 @@ Table* K_tptr(KDB* kdb, char* name)
  */
 double K_etest(KDB* kdb, char*name, int test_nb)
 {   
-    int pos = kdb->index_of(name);
+    int pos = kdb->index_of(std::string(name));
     if(pos < 0) return(IODE_NAN);         // name not found
     
     std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, pos);
@@ -261,7 +258,7 @@ double K_s_get_info(KDB* kdb, char*name, int info_nb)
     Scalar     *scl;
     double  val = IODE_NAN;
     
-    pos = kdb->index_of(name);
+    pos = kdb->index_of(std::string(name));
     if(pos < 0) return(IODE_NAN);         // name not found
     
     scl = KSVAL(kdb, pos);
@@ -300,7 +297,7 @@ int K_s_set_info(KDB* kdb, char*name, int info_nb, double value)
     int     pos;
     Scalar     *scl;
     
-    pos = kdb->index_of(name);
+    pos = kdb->index_of(std::string(name));
     if(pos < 0) return(-1);         // name not found
     
     scl = KSVAL(kdb, pos);

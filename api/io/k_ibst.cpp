@@ -210,7 +210,8 @@ int ImportCommentsBST::sub_read_header(int lang)
 
         if(ftr) cmt = add_ftr(cmt, rub, lang);
 
-        if(cmt && K_add(C_kdb, name, cmt) < 0) return(-1);
+        if(cmt && !K_add(C_kdb, name, cmt)) 
+            return(-1);
 
         SW_nfree(fc);
         SW_nfree(nc);
@@ -273,7 +274,6 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         SW_nfree(str);
         dif_skip_to(SYY, DIF_BOT);
     }
-
     as1 --;
 
     niv = get_niv((char*) C_kdb->get_name(as1).c_str());
@@ -291,7 +291,6 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
 
             niv --;
         }
-
         as1 --;
     }
 

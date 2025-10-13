@@ -74,7 +74,8 @@ static int L_add_new_series(char* name)
     for(i = 0 ; i < L_NB_NAMES ; i++)
         if(strcmp(name, L_NAMES[i]) == 0) return(i);
 
-    if(L_NB_NAMES >= L_NB_ANAMES) {
+    if(L_NB_NAMES >= L_NB_ANAMES) 
+    {
         L_NAMES = (char **) SCR_realloc(L_NAMES, sizeof(char *),
                                         L_NB_ANAMES, L_NB_ANAMES + 10);
         for(j = 0 ; j < 10 ; j++)
@@ -105,19 +106,20 @@ static int L_save_var()
     L_alloc_expr(L_NB_EXPR + 1);
     al = L_EXPR + L_NB_EXPR;
     al->al_type = L_TOKEN.tk_def;
-    switch(L_TOKEN.tk_def) {
-        case L_Period :
+    switch(L_TOKEN.tk_def) 
+    {
+        case L_Period :     // Period
             al->al_val.v_per.year = L_TOKEN.tk_period.year;
             al->al_val.v_per.periodicity = L_TOKEN.tk_period.periodicity;
             al->al_val.v_per.step = L_TOKEN.tk_period.step;
             break;
-        case L_DCONST:
+        case L_DCONST:      // double constant
             al->al_val.v_real = L_TOKEN.tk_real;
             break;
-        case L_LCONST:
+        case L_LCONST:      // long constant
             al->al_val.v_long = L_TOKEN.tk_long;
             break;
-        default :
+        default :           // Variable or Scalar
             if(is_val(L_TOKEN.tk_def)) break;
             al->al_val.v_var.pos = L_add_new_series(L_TOKEN.tk_name);
             al->al_val.v_var.lag  = 0;
@@ -411,24 +413,28 @@ int L_cc1(int nb_names)
     L_alloc_expr(1);
 
     /* LOOP ON TOKEN */
-    while(1) {
+    while(1) 
+    {
         keyw = L_get_token(); // Group of operators, not the operator itself
         if(L_errno) goto ended;
 again:
-        switch(keyw) {
-            case L_Period:
-            case L_LCONST :
-            case L_DCONST :
-            case L_VAR :
-            case L_VAL :
-            case L_COEF :
+        switch(keyw) 
+        {
+            case L_Period:      // Period
+            case L_LCONST :     // Long constant
+            case L_DCONST :     // Double constant
+            case L_VAR :        // Variable
+            case L_VAL :        // ??
+            case L_COEF :       // Coefficient (scalar)
                 if(beg == 0) goto err;
                 if(L_save_var()) goto ended;
                 beg = 0;
                 break;
-            case L_OP :
-                if(beg != 0) {
-                    switch(L_TOKEN.tk_def) {
+            case L_OP :         // Operator
+                if(beg != 0) 
+                {
+                    switch(L_TOKEN.tk_def) 
+                    {
                         case L_MINUS :
                             L_TOKEN.tk_def = L_UMINUS;
                             break;
@@ -444,30 +450,31 @@ again:
                 beg = 1;
                 if(L_add_stack(keyw)) goto ended;
                 break;
-            case L_FN :
-            case L_TFN:
-            case L_MTFN:
-            case L_OPENP :
+            case L_FN :         // Function
+            case L_TFN:         // Time function
+            case L_MTFN:        // ?? function
+            case L_OPENP :      // Open parenthesis
                 if(beg == 0) goto err;
                 if(L_add_stack(keyw)) goto ended;
                 break;
-            case L_OCPAR :
+            case L_OCPAR :      // ??
                 if(beg == 0) goto err;
                 if(L_add_stack(keyw)) goto ended;
                 beg = 0;
                 break;
-            case L_CLOSEP :
+            case L_CLOSEP :     // Close parenthesis
                 if(beg == 1) goto err;
                 if(L_add_stack(keyw)) goto ended;
                 break;
-            case L_COMMA :
+            case L_COMMA :      // Comma
                 if(beg == 1) goto err;
                 if(L_add_stack(keyw)) goto ended;
                 beg = 1;
                 break;
             case YY_EOF:
-            case L_EOE :
-                if(start) {
+            case L_EOE :        // End of expression
+                if(start) 
+                {
                     L_alloc_expr(1);
                     L_EXPR[0].al_type = L_EOE;
                     L_NB_EXPR++;

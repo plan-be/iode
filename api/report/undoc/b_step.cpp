@@ -43,21 +43,26 @@ static int check_scl_var(char *eqs)
 
     CLEC* cl = eq->clec;
 
+    char* c_name;
+    std::string name;
     for(int j = 0 ; j < cl->nb_names ; j++) 
     {
-        if(is_coefficient(cl->lnames[j].name)) 
+        c_name = cl->lnames[j].name;
+        name = std::string(c_name);
+        if(is_coefficient(c_name)) 
         {
-            if(K_WS[SCALARS]->index_of(cl->lnames[j].name) == -1) 
+            // create scalar with default value 0.9 if not existing
+            if(!K_WS[SCALARS]->contains(name))
             {
-                sprintf(buf, "%s 0.9 1", cl->lnames[j].name);
+                sprintf(buf, "%s 0.9 1", c_name);
                 B_DataUpdate(buf, SCALARS);
             }
         }
         else 
         {
-            if(K_WS[VARIABLES]->index_of(cl->lnames[j].name) == -1) 
+            if(!K_WS[VARIABLES]->contains(name))
             {
-                kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
+                kerror(0,"Var %s from %s not found", c_name, eqs);
                 delete eq;
                 eq = nullptr;
                 return -1;
@@ -82,7 +87,7 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg, int unused)                                                 
 {
-    char    *eqs, *cond, *test, *tmp;
+    char    *c_eq_name, *cond, *test, *tmp;
     char**  args;
     Sample  *smpl;
 
@@ -105,11 +110,11 @@ int B_EqsStepWise(char* arg, int unused)
         return(1);
     }
 
-    eqs = args[2];                       
-    /*Gère les erreurs d'équation*/                        
-    if(K_WS[EQUATIONS]->index_of(eqs)== -1) 
+    c_eq_name = args[2];
+    std::string eq_name = std::string(c_eq_name);                                               
+    if(!K_WS[EQUATIONS]->contains(eq_name)) 
     {                            
-        kerror(0,"Eqs %s not found",eqs);
+        kerror(0,"Eqs %s not found", c_eq_name);
         SCR_free_tbl((unsigned char**) args);
         return(1);
     }
@@ -132,13 +137,13 @@ int B_EqsStepWise(char* arg, int unused)
         return(1);
     }
 
-    if(check_scl_var(eqs) == -1)                                /*Gère les erreurs de présence des scalaires et variables de l'équation*/
+    if(check_scl_var(c_eq_name) == -1)                                /*Gère les erreurs de présence des scalaires et variables de l'équation*/
     {
         SCR_free_tbl((unsigned char**) args);
         return(1);                      
     }
 
-    estimate_step_wise(smpl, eqs, cond, test);                  /*Effectue les estimations*/
+    estimate_step_wise(smpl, c_eq_name, cond, test);                  /*Effectue les estimations*/
     
     delete smpl;
     smpl = nullptr;

@@ -6,6 +6,9 @@
 #include "api/time/sample.h"    // Period, Sample
 
 #include <string>
+#include <map>
+#include <memory>               // std::shared_ptr
+#include <vector>
 
 
 enum IodeDatabaseType
@@ -18,24 +21,21 @@ enum IodeDatabaseType
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct  KOBJ 
-{
-    SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
-};
-
 struct KDB 
 {
-    KOBJ*       k_objs = NULL;          // map <position in the memory, object name>
-	long        k_nb = 0;               // number of objects in the database
-    short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
-    short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
-    std::string k_arch;                 // processor architecture on which the file has been created/saved/loaded
-    std::string description = "";       // short description of the content of the database
-    Sample*     sample = nullptr;       // Sample if Variables database
-    char        k_compressed = 0;       // are the objects compressed in the file ? (LZH method, slow)
-    char        k_db_type;              // type of database: DB_NORMAL (default), DB_STANDALONE, DB_SHALLOW_COPY
-    std::string filepath;               // filepath to the database file
+    std::map<std::string, SWHDL> k_objs;            // map <object name, position in the SCR memory>
+    short       k_type;                             // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
+    short       k_mode;                             // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
+    std::string k_arch;                             // processor architecture on which the file has been created/saved/loaded
+    std::string description = "";                   // short description of the content of the database
+    Sample*     sample = nullptr;                   // Sample if Variables database
+    char        k_compressed = 0;                   // are the objects compressed in the file ? (LZH method, slow)
+    char        k_db_type;                          // type of database: DB_NORMAL (default), DB_STANDALONE, DB_SHALLOW_COPY
+    std::string filepath;                           // filepath to the database file
+    std::shared_ptr<KDB*> parent = nullptr;         // parent KDB: if an IODE object is added/removed/updated 
+                                                    //             from the current KDB, it must done also in the parent KDB
+    std::vector<std::shared_ptr<KDB*>> children;    // children KDBs: if the current KDB is modified, all children KDBs must 
+                                                    //                be updated too
 
 public:
     KDB(IodeType type, IodeDatabaseType db_type, std::string filename="")
@@ -80,51 +80,41 @@ public:
             this->sample = nullptr;
 
         // copy all objects from other to this
-        int pos;
-        char* name;
-        this->k_nb = 0;
-        this->k_objs = NULL;
-        if(other.k_nb > 0 && other.k_objs != NULL)
+        bool success;
+        if(other.size() > 0)
         {
-            for(int i = 0; i < other.k_nb; i++)
+            for(auto& [name, handle] : other.k_objs) 
             {
-                name = other.k_objs[i].o_name;
-                pos = duplicate(other, name);
-                if(pos < 0)
+                success = duplicate(other, name);
+                if(!success)
                 {
-                    for(int i = 0; i < k_nb; i++)
-                        if(k_objs[i].o_val != 0) 
-                            SW_free(k_objs[i].o_val);
-    
-                    SW_nfree(k_objs);
-                    k_objs = NULL; 
+                    if(this->size() > 0)
+                    {
+                        for(auto& [this_name, this_handle] : this->k_objs) 
+                            SW_free(this_handle);
+                        this->k_objs.clear();
+                    }
     
                     filepath = std::string(I_DEFAULT_FILENAME);
     
-                    std::string error_msg = "Cannot create a copy of the database of type '" + v_iode_types[k_type] + "':\n";
-                    error_msg += "Cannot copy " + v_iode_types[k_type] + " named '" + name + "'";
+                    std::string error_msg = "Failed to create a copy of the ";
+                    error_msg += v_iode_types[k_type]; 
+                    error_msg += " database.";
                     kerror(0, error_msg.c_str());
                 }
             }
-        }
-        else
-        {
-            this->k_objs = NULL;
-            this->k_nb = 0;
         }
     }
 
     ~KDB()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
         {
-            for(int i = 0; i < this->size(); i++)
-                if(this->k_objs[i].o_val != 0) 
-                    SW_free(this->k_objs[i].o_val);
+            for(auto& [name, handle] : this->k_objs) 
+                SW_free(handle);
         }
-        if(this->k_objs != NULL)
-            SW_nfree(this->k_objs);
-        this->k_nb = 0;
+        if(this->k_objs.size() > 0)
+            this->k_objs.clear();
 
         if(this->sample)
             delete this->sample;
@@ -133,18 +123,13 @@ public:
 
     void clear_objs()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
         {
-            for(int i = 0; i < this->size(); i++)
-                if(this->k_objs[i].o_val != 0) 
-                    SW_free(this->k_objs[i].o_val);
+            for(auto& [name, handle] : this->k_objs) 
+                SW_free(handle);
         }
-        if(this->k_objs != NULL)
-        {
-            SW_nfree(this->k_objs);
-            this->k_objs = NULL;
-        }
-        this->k_nb = 0;
+        if(this->k_objs.size() > 0)
+            this->k_objs.clear();
     }
 
     void clear(bool delete_objs = true)
@@ -163,7 +148,7 @@ public:
 
     int size() const 
     { 
-        return this->k_nb;
+        return (int) this->k_objs.size();
     }
 
     // strip the name and set it to upper/lower/asis according to k_mode
@@ -181,34 +166,132 @@ public:
         }
     }
 
-    int index_of(const std::string& name) const;
-
-    const std::string get_name(const int index) const
+    bool contains(const std::string& name) const
     {
-        if(index < 0 || index >= this->size())
-            return "";
-
-        return std::string(this->k_objs[index].o_name);
+        std::string key = to_key(name);
+        return this->k_objs.contains(key);
     }
 
-    SWHDL get_handle(const int index) const
+    int index_of(const std::string& name) const
     {
+        std::string key = to_key(name);
+        auto it = this->k_objs.find(key);
+        if (it != this->k_objs.end()) 
+            return (int) std::distance(this->k_objs.begin(), it);
+        else
+            return -1;
+    }
+
+    // NOTE: repeated calls to this function can be inefficient (O(n) each)
+    //       To iterate over all names, prefer the C++17 loop syntax:
+    //       for(const auto& [name, _] : kdb.k_objs) { ... } 
+    const std::string& get_name(const int index) const
+    {
+        static const std::string empty_string = "";
         if(index < 0 || index >= this->size())
+            return empty_string;
+
+        auto it = this->k_objs.begin();
+        std::advance(it, index);
+        return const_cast<std::string&>(it->first);
+    }
+
+    std::vector<std::string> get_names() const
+    {
+        std::vector<std::string> names;
+        names.reserve(this->size());
+        for(const auto& [name, _] : this->k_objs) 
+            names.push_back(name);
+        return names;
+    }
+
+    std::string get_names_as_string() const
+    {
+        std::string names;
+        for(const auto& [name, _] : this->k_objs) 
+            names += name + ";";
+
+        // remove last ;
+        if(!names.empty() && names.back() == ';')
+            names.pop_back();
+
+        return names;
+    }
+
+    SWHDL get_handle(const std::string& name) const
+    {
+        std::string key = to_key(name);
+        auto it = this->k_objs.find(key);
+        if (it != this->k_objs.end()) 
+            return it->second;
+        else
             return 0;
-
-        return this->k_objs[index].o_val;
     }
 
-    char* get_ptr_obj(const int index) const
+    char* get_ptr_obj(const std::string& name) const
     {
-        if(index < 0 || index >= this->size())
+        std::string key = to_key(name);
+        auto it = this->k_objs.find(key);
+        if (it != this->k_objs.end()) 
+            return SW_getptr(it->second);
+        else
             return NULL;
-
-        SWHDL handle = this->k_objs[index].o_val;
-        return SW_getptr(handle);
     }
 
-    int duplicate(const KDB& other, char* name);
+    bool rename(const std::string& old_name, const std::string& new_name, const bool overwrite = false)
+    {
+        std::string old_key = to_key(old_name);
+        std::string new_key = to_key(new_name);
+
+        // renaming equations is not allowed (made on purpose)
+        if(this->k_type == EQUATIONS)
+            throw std::invalid_argument("Renaming equations in the database is not allowed");
+
+        if(this->k_objs.size() == 0)
+            return false;
+
+        check_name(new_key, k_type);
+
+        auto it = this->k_objs.find(old_key);
+        if (it == this->k_objs.end())
+        {
+            std::string msg = "Cannot rename object: there is no object previously named '" + old_key + 
+                              "' found in the database.";
+            throw std::invalid_argument(msg);
+        }
+
+        if(!overwrite)
+        {
+            auto it_new = this->k_objs.find(new_key);
+            if (it_new != this->k_objs.end())
+            {
+                std::string msg = "Cannot rename object: an object named '" + new_key + 
+                                  "' already exists in the database.";
+                throw std::invalid_argument(msg);
+            }
+        }
+
+        SWHDL handle = it->second;
+        this->k_objs.erase(it);
+        this->k_objs[new_key] = handle;
+        return true;
+    }
+
+    bool duplicate(const KDB& other, const std::string& name);
+
+    bool remove(const std::string& name)
+    {
+        std::string key = to_key(name);
+        auto it = this->k_objs.find(key);
+        if (it == this->k_objs.end())
+            return false;
+
+        if(k_db_type != DB_SHALLOW_COPY)
+            SW_free(it->second);
+
+        this->k_objs.erase(it);
+        return true;
+    }
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -287,9 +370,6 @@ inline char k_ext[][4] =
 /*----------------------- FUNCS ----------------------------*/
 
 /* k_kdb.c */
-int K_key(char*, int);
-void K_sort(KDB* kdb);
-int K_find_strcmp(const void *name, const void *kobjs);
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 int K_merge(KDB* kdb1, KDB* kdb2, int replace);
 KDB* K_refer(KDB* kdb, int nb, char** names);

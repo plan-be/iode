@@ -78,10 +78,11 @@ int B_WsLoad(char* arg, int type)
     K_WS[type] = kdb;
 
     // get the list of all object names in 'kdb'
+    int i = 0;
     int nb_names = (int) kdb->size();
     char** all_names = new char*[nb_names];
-    for (int i = 0; i < nb_names; i++)
-        all_names[i] = (char*) SCR_stracpy((unsigned char*) kdb->k_objs[i].o_name);
+    for (const auto& [name, _] : kdb->k_objs)
+        all_names[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
 
     if(K_RWS[type][pos])
         delete K_RWS[type][pos];
@@ -654,9 +655,12 @@ double *B_StatUnitRoot_1(char* arg, int print)
     if(df) 
     {
         E_GetLecName(arg + lg + 1, name);
-        std::string str_name = to_lower(std::string(name));
-        sprintf(name, "%s", str_name.c_str());
+        // set variable name to lower case
+        for (int i = 0; i < 80 && name[i]; i++)
+            name[i] = tolower((unsigned char) name[i]);
+        // generate scalar name as df_<var_name_lower_case>
         sprintf(buf, "df_%s %lf", name, df[2]);
+        // create scalar in the scalar WS if not existing
         B_DataUpdate(buf, SCALARS);
     }
     return(df);
