@@ -220,7 +220,7 @@ int K_add_entry(KDB* kdb, char* newname)
 
     if(kdb == NULL) return(-1);
     SCR_strlcpy((unsigned char*) name, (unsigned char*) newname, K_MAX_NAME);  /* JMP 13-02-2013 */
-    if(K_key(name, KMODE(kdb)) < 0) return(-1);
+    if(K_key(name, kdb->k_mode) < 0) return(-1);
     pos = K_find(kdb, name);
     if(pos >= 0) {
         if(K_WARN_DUP)
@@ -297,7 +297,7 @@ int K_find(KDB* kdb, char* name)
     if(kdb == NULL || KNB(kdb) == 0) return(-1);
 
     SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
-    if(K_key(oname, KMODE(kdb)) < 0) return(-1);
+    if(K_key(oname, kdb->k_mode) < 0) return(-1);
 
     res = (char *) bsearch(oname, KOBJS(kdb), (int) KNB(kdb),
                            sizeof(KOBJ), K_find_strcmp);
