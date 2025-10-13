@@ -416,7 +416,7 @@ public:
                 c_name = const_cast<char*>(coeff_name.data());
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
                 // see K_add() and K_spack()
-                if (K_find(KS_WS, c_name) < 0) 
+                if (KS_WS->find(c_name) < 0) 
                     K_add(KS_WS, c_name, NULL);
             }
         }
@@ -442,7 +442,7 @@ public:
                 c_name = const_cast<char*>(var_name.data());
                 // adds a new variable with nb_obs IODE_NAN values to the Variables Database
                 // see K_add() and K_vpack()
-                if (K_find(KV_WS, c_name) < 0) 
+                if (KV_WS->find(c_name) < 0) 
                     K_add(KV_WS, c_name, NULL, &nb_obs);
             }
         }

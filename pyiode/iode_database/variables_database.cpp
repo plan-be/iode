@@ -99,14 +99,14 @@ void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const
     // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
     // TODO: find a way to delete also the variable from the shallow copies
-    int dest_var_pos = dest->get_position(dest_name);
+    int dest_var_pos = dest->find(dest_name);
     double* dest_var_ptr = dest->get_var_ptr(dest_name);
     if(dest_var_ptr == NULL)
         throw std::invalid_argument("C API: Variable named '" + dest_name + "' seems to not exist in the destination database");
     dest_var_ptr += dest_t_first;
 
     // check that the source variable exists in the source database
-    int source_var_pos = source->get_position(source_name);
+    int source_var_pos = source->find(source_name);
     double* source_var_ptr = source->get_var_ptr(source_var_pos);
     if(source_var_ptr == NULL)
         throw std::invalid_argument("C API: Variable named '" + source_name + "' seems to not exist in the source database");
@@ -264,7 +264,7 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     if(t_last >= database->get_nb_periods())
         throw std::invalid_argument("C API: time index 't_last' must be less than the number of time steps");
 
-    int pos = database->get_position(name);
+    int pos = database->find(name);
     double* var_ptr = database->get_var_ptr(pos);
     
     switch(op)
@@ -313,7 +313,7 @@ void _c_operation_between_two_vars(const int op, KDBVariables* database, const s
     // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
     // TODO: find a way to delete also the variable from the shallow copies
-    int other_var_pos = other->get_position(other_name);
+    int other_var_pos = other->find(other_name);
     double* other_var_ptr = other->get_var_ptr(other_var_pos);
     if(other_var_ptr == NULL)
     throw std::invalid_argument("C API: Variable named '" + other_name + "' seems to not exist in the source database");

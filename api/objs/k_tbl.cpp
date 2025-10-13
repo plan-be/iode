@@ -166,7 +166,7 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
-    int pos = K_find(K_WS[COMMENTS], (char*) def.c_str());
+    int pos = K_WS[COMMENTS]->find((char*) def.c_str());
     std::string title = (pos < 0) ? def : std::string(KCVAL(K_WS[COMMENTS], pos));
     title = trim(title);
     title_line.cells[0].set_text(title);
@@ -242,7 +242,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        pos = K_find(K_WS[COMMENTS], (char*) var.c_str());
+        pos = K_WS[COMMENTS]->find((char*) var.c_str());
         if(pos < 0)
             line_name = var;
         else
@@ -307,7 +307,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 
         // ---- line name (left column) ----
         line_name = titles[i];
-        pos = K_find(K_WS[COMMENTS], (char*) line_name.c_str());
+        pos = K_WS[COMMENTS]->find((char*) line_name.c_str());
         if(pos > 0)
         {
             comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
@@ -360,7 +360,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        pos = K_find(K_WS[COMMENTS], (char*) lec.c_str());
+        pos = K_WS[COMMENTS]->find((char*) lec.c_str());
         if(pos < 0)
             line_name = lec;
         else

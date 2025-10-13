@@ -24,7 +24,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
     // test if a Scalar object can be added to the Scalars KDB via K_add()
     Scalar scalar(val, relax, std);
     K_add(KS_WS, name, static_cast<Scalar*>(&scalar));
-    int pos = K_find(KS_WS, name);
+    int pos = KS_WS->find(name);
     ASSERT_GT(pos, -1);
 
     Scalar* scl = KSVAL(KS_WS, pos);

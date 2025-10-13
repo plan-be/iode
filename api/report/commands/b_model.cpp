@@ -336,9 +336,9 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         goto err;
     }
 
-    prepos   = K_find(K_WS[LISTS], lsts[0]); 
-    interpos = K_find(K_WS[LISTS], lsts[1]);
-    postpos  = K_find(K_WS[LISTS], lsts[2]);
+    prepos   = K_WS[LISTS]->find(lsts[0]); 
+    interpos = K_WS[LISTS]->find(lsts[1]);
+    postpos  = K_WS[LISTS]->find(lsts[2]);
     SCR_free_tbl((unsigned char**) lsts);
 
     if(prepos < 0 || interpos < 0 || postpos < 0) 
@@ -411,7 +411,7 @@ static double *B_GetVarPtr(char *name)
     // get var position in KDB
     strcpy(uname, name);
     SCR_sqz(SCR_upper((unsigned char*) uname));
-    pos = K_find(dbv, uname);
+    pos = dbv->find(uname);
     if(pos < 0)
         return(NULL);
     else

@@ -105,7 +105,7 @@ TEST_F(TablesTest, AddGetTable)
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
-    int pos = K_find(KT_WS, name);
+    int pos = KT_WS->find(name);
     Table* extracted_tbl = KTVAL(KT_WS, pos);
 
     // --- check that both table are exactly the same
@@ -263,7 +263,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
     K_add(KT_WS, c_name, static_cast<Table*>(&table));
-    int pos = K_find(KT_WS, c_name);
+    int pos = KT_WS->find(c_name);
     ASSERT_GT(pos, -1);
 
     Table* tbl = KTVAL(KT_WS, pos);
@@ -805,7 +805,7 @@ TEST_F(TablesTest, Hash)
     EXPECT_EQ(hash_before, hash_after);
 
     // C++ table vs C table
-    int pos = K_find(KT_WS, "GFRPC");
+    int pos = KT_WS->find("GFRPC");
     Table* c_table = KTVAL(KT_WS, pos);
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);

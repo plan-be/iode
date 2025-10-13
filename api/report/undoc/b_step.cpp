@@ -33,7 +33,7 @@ static int check_scl_var(char *eqs)
 {
     char  buf[1024];
 
-    int pos = K_find(K_WS[EQUATIONS], eqs);
+    int pos = K_WS[EQUATIONS]->find(eqs);
     if(pos < 0) 
         return(-1);             // JMP 04/07/2022
     
@@ -47,7 +47,7 @@ static int check_scl_var(char *eqs)
     {
         if(L_ISCOEF(cl->lnames[j].name)) 
         {
-            if(K_find(K_WS[SCALARS],cl->lnames[j].name)== -1) 
+            if(K_WS[SCALARS]->find(cl->lnames[j].name) == -1) 
             {
                 sprintf(buf, "%s 0.9 1", cl->lnames[j].name);
                 B_DataUpdate(buf, SCALARS);
@@ -55,7 +55,7 @@ static int check_scl_var(char *eqs)
         }
         else 
         {
-            if(K_find(K_WS[VARIABLES],cl->lnames[j].name)== -1) 
+            if(K_WS[VARIABLES]->find(cl->lnames[j].name) == -1) 
             {
                 kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
                 delete eq;
@@ -107,7 +107,7 @@ int B_EqsStepWise(char* arg, int unused)
 
     eqs = args[2];                       
     /*Gère les erreurs d'équation*/                        
-    if(K_find(K_WS[EQUATIONS], eqs)== -1) 
+    if(K_WS[EQUATIONS]->find(eqs)== -1) 
     {                            
         kerror(0,"Eqs %s not found",eqs);
         SCR_free_tbl((unsigned char**) args);

@@ -57,7 +57,7 @@ double* KDBVariables::get_var_ptr(const int pos)
 double KDBVariables::get_var(const std::string& name, const int t, const IodeVarMode mode) const
 {
 	// throw exception if object with passed name does not exist
-    int pos = get_position(name);
+    int pos = find(name);
     return get_var(pos, t, mode);
 }
 
@@ -84,7 +84,7 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 double* KDBVariables::get_var_ptr(const std::string& name)
 {
 	// throw exception if object with passed name does not exist
-	int pos = get_position(name);
+	int pos = find(name);
 	return get_var_ptr(pos);
 }
 
@@ -118,7 +118,7 @@ void KDBVariables::set_var(const int pos, const Period& period, const double val
 void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)
 {
 	// throw exception if object with passed name does not exist
-	int pos = get_position(name);
+	int pos = find(name);
 	set_var(pos, t, value, mode);
 }
 

@@ -15,11 +15,9 @@ inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
 /* k_objs.c */
-int K_key(char *,int );
 int K_dup(const KDB *,char *,KDB *,char *);
 int K_ren(KDB *,char *,char *);
 int K_add_entry(KDB *,char *);
-int K_find(KDB *,char *);
 int K_del(KDB *,int );
 int K_del_entry(KDB *,int );
 int K_del_by_name(KDB* kdb, char* name);

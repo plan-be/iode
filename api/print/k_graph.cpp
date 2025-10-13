@@ -499,7 +499,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     SCR_free(buf);
 
     for(i = 0 ; i < ng ; i++) {
-        var_nb = K_find(kdb, vars[i]);
+        var_nb = kdb->find(vars[i]);
         if(var_nb < 0) {
             std::string err_msg = "DataDisplayGraph : '";
             err_msg += std::string(vars[i]);

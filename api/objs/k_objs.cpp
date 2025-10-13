@@ -4,11 +4,9 @@
  * IODE object management 
  * ----------------------
  *
- *     int K_key(char* name, int mode):                             Checks the validity of an object name and modify its "case" according to the value of mode.
  *     int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):   Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.
  *     int K_ren(KDB* kdb, char* name1, char* name2):               Renames the object name1 in kdb into name2.
  *     int K_add_entry(KDB* kdb, char* name):                       Adds the entry name in kdb and returns its position in the kdb. 
- *     int K_find(KDB* kdb, char* name):                            Searches the position of an object name in a KDB.
  *     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB **without** deleting the referenced object. 
  *     int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
  *     int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. 
@@ -32,69 +30,8 @@
 #include <algorithm>    // for std::min, std::max
 
 
-// Utilities 
-// ---------
-
-/**
- *  Compares a name with the name of an object (kobjs->o_name).
- *  
- *  @param [in] name    const void*     name to compare
- *  @param [in] kobjs   const KOBJ*     pointer to a general object (KOBJ)
- *  @return             int             0 if name of p1 = name of p2 (the names ares equal)
- *                                      -1 if p1 is < p2 or p1 is null
- *                                      1 if p1 is > p2 or p2 is null and is not null
- *  @return 
- *  
- *  @details 
- */
-
-static int K_find_strcmp(const void *name, const void *kobjs)
-{
-    KOBJ    *ko2 = (KOBJ *)kobjs;
-    return(strcmp((char *)name, ko2->o_name));
-}
-
 // API
 // ---
-
-
-/**
- *  Checks the validity of an object name and modify its "case" according to the value of mode.
- *  The name is truncated if it exceeds K_MAX_NAME characters.
- *  
- *  
- *  
- *  @param [in, out] name    char*   name to check
- *  @param [in]      mode    int     UPPER_CASE, LOWER_CASE of ASIS_CASE 
- *  @return                  int     0 if the name is valid
- *                                   -1 otherwise (illegal character)
- *  
- *  @details 
- */
- 
-int K_key(char* name, int mode)
-{
-    int     i;
-
-    SCR_sqz((unsigned char*) name);
-    if(!SCR_is_alpha(name[0]) && name[0] != '_') return(-1);
-    if(strlen(name) > K_MAX_NAME) name[K_MAX_NAME] = 0;
-    for(i = 1 ; name[i] ; i++)
-        if(!SCR_is_anum(name[i]) && name[i] != '_' && name[i] != K_SECRETSEP) return(-1); // JMP 14/2/2013 pour les macros pushed A#n
-
-    switch(mode) {
-        case UPPER_CASE :
-            SCR_upper((unsigned char*) name);
-            break;
-        case LOWER_CASE :
-            SCR_lower((unsigned char*) name);
-            break;
-        case ASIS_CASE  :
-            break;
-    }
-
-    return(0);
-}
 
 
 /**
@@ -118,11 +55,11 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     if(kdb1 == kdb2 && strcmp(name1, name2) == 0) 
         return(-2);   // ALD 19/09/2022
 
-    pos1 = K_find((KDB*) kdb1, name1);
+    pos1 = kdb1->find(name1);
     if(pos1 < 0) 
         return(-1);
 
-    pos2 = K_find(kdb2, name2);
+    pos2 = kdb2->find(name2);
     if(pos2 >= 0) 
     {
         if(KSOVAL(kdb2, pos2) != 0) 
@@ -131,7 +68,7 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     else 
     {
         pos2 = K_add_entry(kdb2, name2);
-        pos1 = K_find((KDB*) kdb1, name1);
+        pos1 = kdb1->find(name1);
     }
 
     if(pos2 < 0) 
@@ -172,20 +109,20 @@ int K_ren(KDB* kdb, char* name1, char* name2)
     int     pos1, pos2;
 
     if(kdb == NULL) return(-1);
-    pos1 = K_find(kdb, name1);
+    pos1 = kdb->find(name1);
     if(pos1 < 0) return(-1);
 
-    pos2 = K_find(kdb, name2);
+    pos2 = kdb->find(name2);
     if(pos2 >= 0) return(-2);
 
     pos2 = K_add_entry(kdb, name2);
     if(pos2 < 0) return(-3);
-    pos1 = K_find(kdb, name1); /* object name1 may have changed after add name2 */
+    pos1 = kdb->find(name1); /* object name1 may have changed after add name2 */
 
     KSOVAL(kdb, pos2) = KSOVAL(kdb, pos1);
     K_del_entry(kdb, pos1);
     
-    pos2 = K_find(kdb, name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
+    pos2 = kdb->find(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
     
     return(pos2);
 }
@@ -225,7 +162,7 @@ int K_add_entry(KDB* kdb, char* newname)
     if(K_key(name, kdb->k_mode) < 0) 
         return(-1);
     
-    pos = K_find(kdb, name);
+    pos = kdb->find(name);
     if(pos >= 0) 
     {
         if(K_WARN_DUP)
@@ -288,32 +225,6 @@ done :
     kdb->k_nb++;
 
     return(maxpos);
-}
-
-
-/**
- *  Searches the position of an object in a KDB by its name.
- *  
- *  @param [in] kdb     KDB*    where to search for name
- *  @param [in] name    char*   name to be searched
- *  @return             int     position of the name in kdb
- *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
- */
- 
-int K_find(KDB* kdb, char* name)
-{
-    char    *res;
-    ONAME   oname;
-
-    if(kdb == NULL || kdb->size() == 0) return(-1);
-
-    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
-    if(K_key(oname, kdb->k_mode) < 0) return(-1);
-
-    res = (char *) bsearch(oname, kdb->k_objs, (int) kdb->size(),
-                           sizeof(KOBJ), K_find_strcmp);
-    if(res != 0) return((int)((res - (char *) kdb->k_objs) / sizeof(KOBJ)));
-    else return(-1);
 }
 
 
@@ -382,7 +293,7 @@ int K_del(KDB* kdb, int pos)
  
 int K_del_by_name(KDB* kdb, char* name)
 {
-    return(K_del(kdb, K_find(kdb, name))); 
+    return(K_del(kdb, kdb->find(name))); 
 }
 
 
@@ -429,7 +340,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    pos = K_find(KE_WS, name);
+    pos = KE_WS->find(name);
     if(pos < 0)
     {
         Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();

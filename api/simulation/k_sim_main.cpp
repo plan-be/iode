@@ -373,7 +373,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 
     // Delete lst 
     //if(B_DataExist(lst, LISTS) >= 0) B_DataDelete(lst, LISTS);
-    pos = K_find(KL_WS, lst);
+    pos = KL_WS->find(lst);
     if(pos >= 0) K_del(KL_WS, pos);
     
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
@@ -575,7 +575,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     kmsg("Linking equations ....");
     
     for(i = 0 ; i < dbe->size(); i++) {        
-        posvar = K_find(dbv, KONAME(dbe,i));
+        posvar = dbv->find(KONAME(dbe,i));
         KSIM_POSXK[i] = posvar;
         if(posvar < 0) {
             std::string err_msg = std::string("'") + std::string(KONAME(dbe, i)) + "': cannot find variable";
@@ -608,7 +608,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
                 goto fin;
             }
 
-            posendo = K_find(KSIM_DBV, var[0]); // Position of the endogenous var in dbv
+            posendo = KSIM_DBV->find(var[0]); // Position of the endogenous var in dbv
             if(posendo < 0) {
                 std::string err_msg = "Goal Seeking: '";
                 err_msg += std::string(var[0]);
@@ -617,7 +617,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
                 rc = -1;
                 goto fin;
             }
-            posexo = K_find(KSIM_DBV, var[1]);  // Position of the exogenous var in dbv
+            posexo = KSIM_DBV->find(var[1]);  // Position of the exogenous var in dbv
             if(posexo < 0) {
                 std::string err_msg = std::string("'") + std::string(var[1]) + "': cannot find variable";
                 error_manager.append_error(err_msg);
@@ -657,7 +657,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
             for(k = 0; k < endo_exonb; k ++) 
             {
                 var = (char**) SCR_vtom((unsigned char*) endo_exo[k], '-');
-                posexo = K_find(KSIM_DBV, var[1]);
+                posexo = KSIM_DBV->find(var[1]);
 
                 x = KVVAL(KSIM_DBV, posexo, 0);
                 for(j = t + 1; j < dbv->sample->nb_periods; j++)  
@@ -705,7 +705,7 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     lg = KECLEC(KSIM_DBE, eqnb)->tot_lg;
     clec = (CLEC*) SW_nalloc(lg);
     memcpy(clec, KECLEC(KSIM_DBE, eqnb), lg);
-    eqvarnb = K_find(KSIM_DBV, KONAME(KSIM_DBE, eqnb));
+    eqvarnb = KSIM_DBV->find(KONAME(KSIM_DBE, eqnb));
     if(clec->dupendo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
     else

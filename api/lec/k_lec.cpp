@@ -72,7 +72,7 @@ Sample *L_getsmpl(KDB* kdb)
  */
 int L_findscl(KDB* kdb, char *name)
 {
-    return(K_find(kdb, name));
+    return(kdb->find(name));
 }
 
 
@@ -86,7 +86,7 @@ int L_findscl(KDB* kdb, char *name)
  */
 int L_findvar(KDB* kdb, char* name)
 {
-    return(K_find(kdb, name));
+    return(kdb->find(name));
 }
 
 /**
@@ -104,7 +104,7 @@ char* L_expand(char* list_name)
     else {
         int     pos;
 
-        pos = K_find(KL_WS, list_name);
+        pos = KL_WS->find(list_name);
         //printf("pos=%d\n");
         if (pos < 0) return(NULL);
         return((char *)KLVAL(KL_WS, pos));

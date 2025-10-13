@@ -14,6 +14,7 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  * 
+ *      int K_key(char* name, int mode):                     // Checks the validity of an object name and modify its "case" according to the value of mode.
  *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
  *      KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
@@ -67,8 +68,99 @@ void K_sort(KDB* kdb)
     qsort(kdb->k_objs, (int) kdb->size(), sizeof(KOBJ), K_objnamecmp);
 }
 
+/**
+ *  Compares a name with the name of an object (kobjs->o_name).
+ *  
+ *  @param [in] name    const void*     name to compare
+ *  @param [in] kobjs   const KOBJ*     pointer to a general object (KOBJ)
+ *  @return             int             0 if name of p1 = name of p2 (the names ares equal)
+ *                                      -1 if p1 is < p2 or p1 is null
+ *                                      1 if p1 is > p2 or p2 is null and is not null
+ *  @return 
+ *  
+ *  @details 
+ */
+
+int K_find_strcmp(const void *name, const void *kobjs)
+{
+    KOBJ    *ko2 = (KOBJ *)kobjs;
+    return(strcmp((char *)name, ko2->o_name));
+}
+
+/**
+ *  Checks the validity of an object name and modify its "case" according to the value of mode.
+ *  The name is truncated if it exceeds K_MAX_NAME characters.
+ *  
+ *  
+ *  
+ *  @param [in, out] name    char*   name to check
+ *  @param [in]      mode    int     UPPER_CASE, LOWER_CASE of ASIS_CASE 
+ *  @return                  int     0 if the name is valid
+ *                                   -1 otherwise (illegal character)
+ *  
+ *  @details 
+ */
+ 
+int K_key(char* name, int mode)
+{
+    int     i;
+
+    SCR_sqz((unsigned char*) name);
+    if(!SCR_is_alpha(name[0]) && name[0] != '_') 
+        return(-1);
+    
+    if(strlen(name) > K_MAX_NAME) 
+        name[K_MAX_NAME] = 0;
+    for(i = 1 ; name[i] ; i++)
+        if(!SCR_is_anum(name[i]) && name[i] != '_' && name[i] != K_SECRETSEP) 
+            return(-1); // JMP 14/2/2013 pour les macros pushed A#n
+
+    switch(mode) 
+    {
+        case UPPER_CASE :
+            SCR_upper((unsigned char*) name);
+            break;
+        case LOWER_CASE :
+            SCR_lower((unsigned char*) name);
+            break;
+        case ASIS_CASE  :
+            break;
+    }
+
+    return(0);
+}
+
 // API 
 // ---
+
+/**
+ *  Searches the position of an object in a KDB by its name.
+ *  
+ *  @param [in] kdb     KDB*    where to search for name
+ *  @param [in] name    char*   name to be searched
+ *  @return             int     position of the name in kdb
+ *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
+ */
+ 
+int KDB::find(const char* name) const
+{
+    char    *res;
+    ONAME   oname;
+
+    if(this->size() == 0) 
+        return(-1);
+
+    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
+    if(K_key(oname, this->k_mode) < 0) 
+        return(-1);
+
+    res = (char *) bsearch(oname, this->k_objs, (int) this->size(),
+                           sizeof(KOBJ), K_find_strcmp);
+    if(res != 0) 
+        return((int)((res - (char *) this->k_objs) / sizeof(KOBJ)));
+    else 
+        return(-1);
+}
 
 
 int KDB::duplicate(const KDB& other, char* name)
@@ -131,7 +223,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
     for(int i = 0 ; i < nb && names[i]; i++) 
     {
-        pos2 = K_find(kdb, names[i]);
+        pos2 = kdb->find(names[i]);
         if(pos2 < 0)  
         {
             error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found: ");
@@ -203,7 +295,7 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     // Copie les entrées dans tkdb
     for(i = 0 ; i < nb; i++) 
     {
-        pos = K_find(kdb, names[i]);
+        pos = kdb->find(names[i]);
         if(pos < 0) 
         {
             delete tkdb;
@@ -240,7 +332,7 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 
     if(kdb1 == NULL || kdb2 == NULL) return(-1);
     for(i = 0; i < kdb2->size(); i++) {
-        pos = K_find(kdb1, KONAME(kdb2, i));
+        pos = kdb1->find(KONAME(kdb2, i));
         if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
         else {
             if(!replace) continue;
