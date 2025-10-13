@@ -265,15 +265,17 @@ void CSimulation::KE_order(KDB* dbe, char** eqs)
     nb = dbe->size();
     
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
-    if(KSIM_SORT == SORT_NONE) {
+    if(KSIM_SORT == SORT_NONE) 
+    {
         KSIM_PRE = KSIM_POST = 0;
         KSIM_INTER = nb;
-        KSIM_ORDER = (int *)  SW_nalloc(sizeof(int) * nb);
+        KSIM_ORDER = (int *) SW_nalloc(sizeof(int) * nb);
         if(eqs == 0)
-            for(i = 0; i < KSIM_INTER; i++) KSIM_ORDER[i] = i;
+            for(i = 0; i < KSIM_INTER; i++) 
+                KSIM_ORDER[i] = i;
         else
-            for(i = 0; i < KSIM_INTER; i++) KSIM_ORDER[i] = dbe->index_of(eqs[i]); /* JMP 02-02-2004 */
-
+            for(i = 0; i < KSIM_INTER; i++) 
+                KSIM_ORDER[i] = dbe->index_of(std::string(eqs[i]));
         return;
     }
 
@@ -290,7 +292,8 @@ void CSimulation::KE_order(KDB* dbe, char** eqs)
     KSIM_POST = KE_pre(dbe, successors, KSIM_PRE);
     
     /* REVERSE FOR EXECUTION PURPOSE */
-    for(i = 0; i < KSIM_POST / 2; i++) {
+    for(i = 0; i < KSIM_POST / 2; i++) 
+    {
         k = KSIM_ORDER[KSIM_PRE + i];
         KSIM_ORDER[KSIM_PRE + i] = KSIM_ORDER[KSIM_PRE + (KSIM_POST - 1) - i];
         KSIM_ORDER[KSIM_PRE + (KSIM_POST - 1) - i] = k;
@@ -311,7 +314,8 @@ void CSimulation::KE_order(KDB* dbe, char** eqs)
     memcpy(KSIM_ORDER + KSIM_PRE + KSIM_INTER, tmp2, KSIM_POST * sizeof(int));
     SW_nfree(tmp2);
 
-    if(KSIM_SORT == SORT_BOTH) {
+    if(KSIM_SORT == SORT_BOTH) 
+    {
         kmsg("Reordering interdependent block...");
         KE_tri(dbe, predecessors, KSIM_PASSES);
         kmsg("Reordering interdependent block... %ld ms", KSIM_CPU_SORT);

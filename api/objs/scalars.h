@@ -71,9 +71,12 @@ struct std::hash<Scalar>
 
 std::size_t hash_value(const Scalar& scalar);
 
-/*----------------------- MACROS ----------------------------*/
-
-inline Scalar* KSVAL(KDB* kdb, const int pos) 
+inline Scalar* KSVAL(KDB* kdb, int pos)
 {
     return (Scalar*) K_oval0(kdb, pos);
+}
+
+inline Scalar* KSPTR(KDB* kdb, char* name) 
+{         
+    return (Scalar*) K_optr0(kdb, name);
 }

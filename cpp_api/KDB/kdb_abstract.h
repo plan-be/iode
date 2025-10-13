@@ -110,12 +110,13 @@ public:
 
     int index_of(const std::string& name) const
     {
+        KDB* kdb = get_database();
+        if(!kdb)
+            return -1;
+
         check_name(name, k_type);
 
-        KDB* kdb = get_database();
-        int pos = -1;
-        if(kdb != NULL) 
-            pos = kdb->index_of(to_char_array(name));
+        int pos = kdb->index_of(to_char_array(name));
         if(pos < 0) 
             throw std::invalid_argument("Cannot get the position of the object named '" + name + 
                                         "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
@@ -128,29 +129,27 @@ public:
     std::string get_name(const int pos) const 
     {
         KDB* kdb = get_database();
-        if(kdb == NULL) 
+        if(!kdb) 
             return "";
         if(pos < 0 || pos >= kdb->size()) 
             throw std::invalid_argument("Cannot get the name of the object at position " + std::to_string(pos) + ".\n" +  
                                         "The position must be in the range [0, " + std::to_string(kdb->size() - 1) + "].");
-        std::string name_oem = std::string(kdb->k_objs[pos].o_name);
-        std::string name = oem_to_utf8(name_oem);
-        return name;
+        return kdb->get_name(pos);
     }
 
     std::vector<std::string> get_names(const std::string& pattern = "", const bool must_exist = true) const;
 
     std::string get_names_as_string(const std::string& pattern = "", const bool must_exist = true) const;
 
-    int set_name(const int pos, const std::string& new_name);
+    bool set_name(const int pos, const std::string& new_name);
 
-    int rename(const std::string& old_name, const std::string& new_name);
+    bool rename(const std::string& old_name, const std::string& new_name, const bool overwrite = false);
 
     bool contains(const std::string& name) const
     { 
         KDB* kdb = get_database();
-        if(kdb != NULL)
-            return kdb->index_of(to_char_array(name)) >= 0; 
+        if(kdb)
+            return kdb->contains(name); 
         else
             return false;
     }
@@ -160,10 +159,6 @@ public:
     void remove(const int pos);
 
     void remove(const std::string& name);
-
-    void remove_entry(const int pos);
-
-    void remove_entry(const std::string& name);
 
     // Other methods
 

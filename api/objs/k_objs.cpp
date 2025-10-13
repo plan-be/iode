@@ -1,18 +1,3 @@
-/**
- * @header4iode
- *
- * IODE object management 
- * ----------------------
- *
- *     int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):   Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.
- *     int K_ren(KDB* kdb, char* name1, char* name2):               Renames the object name1 in kdb into name2.
- *     int K_add_entry(KDB* kdb, char* name):                       Adds the entry name in kdb and returns its position in the kdb. 
- *     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB **without** deleting the referenced object. 
- *     int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
- *     int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. 
- *     int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)  Updates equation field(s). Creates the equation if it doesn't exist).
- *     int K_upd_tbl(char* name, char* arg)                         Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi-colons.
- */
 #include "scr4/s_args.h"
 #include "scr4/s_prodt.h"
 
@@ -27,7 +12,7 @@
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/objs/tables.h"
-#include <algorithm>    // for std::min, std::max
+#include <algorithm>                // for std::min, std::max
 
 
 // API
@@ -35,106 +20,86 @@
 
 
 /**
- *  Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.
- *  If name2 exists in kdb2, it is replaced by the value of name1.
+ *  Duplicates an IODE object. Copies name1 of kdb_source to name2 in kdb_dest.
+ *  If name2 exists in kdb_dest, it is replaced by the value of name1.
  *  
- *  @param [in]         kdb1    KDB*    KDB source    
- *  @param [in]         name1   char*   object name of the source in kdb1
- *  @param [in, out]    kdb2    KDB*    KDB target
- *  @param [in]         name2   char*   name of the new object
- *  @return                     int     position of name2 in kdb2 in case of success
- *                                      -1 if name1 does not exist in kdb1
- *                                      -2 if name2 cannot be added to the kdb2 (memory...)
+ *  @param [in]         kdb_source    KDB*    KDB source    
+ *  @param [in]         name1         char*   object name of the source in kdb_source
+ *  @param [in, out]    kdb_dest      KDB*    KDB target
+ *  @param [in]         name2         char*   name of the new object
+ *  @return                           bool    true in case of success, false otherwise
  */
-
-int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
+int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const std::string& name2)
 {
-    int     pos1, pos2, lg;
-    char    *pack, *ptr;
-
-    if(kdb1 == kdb2 && strcmp(name1, name2) == 0) 
-        return(-2);   // ALD 19/09/2022
-
-    pos1 = kdb1->index_of(name1);
-    if(pos1 < 0) 
-        return(-1);
-
-    pos2 = kdb2->index_of(name2);
-    if(pos2 >= 0) 
+    std::string error_msg = "Cannot duplicate object '" + name1 + "' as '" + name2 + "': ";
+    if(kdb_source == kdb_dest && name1 == name2)
     {
-        if(kdb2->get_handle(pos2) != 0) 
-            SW_free(kdb2->get_handle(pos2));
-    }
-    else 
+        error_msg += "source and destination are identical.";
+        kwarning(error_msg.c_str());
+        return false;
+    } 
+
+    if(!kdb_source->contains(std::string(name1)))
     {
-        pos2 = K_add_entry(kdb2, name2);
-        pos1 = kdb1->index_of(name1);
+        error_msg += "object does not exist in the source database";
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    if(pos2 < 0) 
-        return(-2);
-
-    pack = kdb1->get_ptr_obj(pos1);
-    if(pack == NULL)
-        return(-2);
+    bool success;
+    SWHDL handle_dest = kdb_dest->get_handle(name2);
+    if(handle_dest > 0) 
+        SW_free(handle_dest);
+    else
+        success = K_add_entry(kdb_dest, name2);
+        if(!success)
+        {
+            error_msg += "cannot add new entry to destination database.";
+            kwarning(error_msg.c_str());
+            return false;
+        }
     
-    lg = * (OSIZE *) pack;
-    ptr = SW_nalloc(lg);
-    memcpy(ptr, pack, lg);
+    SWHDL handle_source = kdb_source->get_handle(name1);
+    if(handle_source == 0)
+    {
+        error_msg += "could not retrieve the object in the source database.";
+        kwarning(error_msg.c_str());
+        return false;
+    } 
+    char* ptr_source = SW_getptr(handle_source);
+    int lg = * (OSIZE *) ptr_source;
 
-    kdb2->k_objs[pos2].o_val = SW_alloc(lg);
-    memcpy(kdb2->get_ptr_obj(pos2), ptr, lg);
+    // WARNING: (ALD) I have no idea why calling SW_nalloc() first and 
+    //          using an intermediate pointer ptr is neccessary, but otherwise
+    //          the copy does not work properly and results in corrupted data.
+    char* ptr = SW_nalloc(lg);
+    memcpy(ptr, ptr_source, lg);
+
+    handle_dest = SW_alloc(lg);
+    if(handle_dest == 0)
+    {
+        SW_nfree(ptr);
+        error_msg += "failed to allocate memory for the duplicated object.";
+        kwarning(error_msg.c_str());
+        return false;
+    }
+    kdb_dest->k_objs[name2] = handle_dest;
+    
+    char* ptr_dest = SW_getptr(handle_dest);
+    memcpy(ptr_dest, ptr, lg);
 
     SW_nfree(ptr);
-    return(pos2);
+    return true;
 }
 
 
 /**
- *  Renames in kdb the object name1 into name2.
- *  If name2 exists, returns -1.
- *  
- *  @param [in, out]    kdb     KDB*    KDB source and target
- *  @param [in]         name1   char*   original object name 
- *  @param [in]         name2   char*   new object name
- *  @return                     int     position of name2 in kdb
- *                                      -1 if name1 does not exist in kdb
- *                                      -2 if name2 exists in kdb
- *                                      -3 if name2 cannot be created in kdb
- *  TODO: Reject equations (cannot be renamed)
- */
- 
-int K_ren(KDB* kdb, char* name1, char* name2)
-{
-    int     pos1, pos2;
-
-    if(kdb == NULL) return(-1);
-    pos1 = kdb->index_of(name1);
-    if(pos1 < 0) return(-1);
-
-    pos2 = kdb->index_of(name2);
-    if(pos2 >= 0) return(-2);
-
-    pos2 = K_add_entry(kdb, name2);
-    if(pos2 < 0) return(-3);
-    pos1 = kdb->index_of(name1); /* object name1 may have changed after add name2 */
-
-    kdb->k_objs[pos2].o_val = kdb->get_handle(pos1);
-    K_del_entry(kdb, pos1);
-    
-    pos2 = kdb->index_of(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
-    
-    return(pos2);
-}
-
-
-/**
- *  Adds the new entry newname in kdb and returns its position in the kdb. 
- *  If newname exists, returns its position in kdb and if K_WARN_UP is not null, displays an error message.
+ *  Adds the new entry newname in kdb and returns true if successful. 
+ *  If newname exists, returns true and if K_WARN_UP is not null, displays an error message.
  *
  *  The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
  *  
- *  @detail  The object names are stored in the table kdb->k_objs. To avoid a reallocation on each new insertion, K_CHUNCK elements 
+ *  @detail The object names are stored in the table kdb->k_objs. To avoid a reallocation on each new insertion, K_CHUNCK elements 
  *          are added to kdb->k_objs each time that more place is needed to store object names.
  *
  *          Names in KOBJS are stored in alphabetic order to speed up the retrieval of an object by its name. 
@@ -144,94 +109,36 @@ int K_ren(KDB* kdb, char* name1, char* name2)
  * 
  *  @param [in, out]    kdb     KDB*    KDB source and target
  *  @param [in]         newname char*   new object name 
- *  @return                     int     position of name in kdb on success
- *                                      -1 if name does not comply to the name syntax in the kdb 
+ *  @return                     bool    true in case of success, false if kdb is NULL
  */
  
-int K_add_entry(KDB* kdb, char* newname)
+bool K_add_entry(KDB* kdb, const std::string& name)
 {
-
-    int     lg, pos, maxpos, minpos, nbobjs;
-    KOBJ    *ktmp;
-    ONAME   name;
-
-    if(kdb == NULL) 
-        return(-1);
+    if(!kdb) 
+        return false;
     
-    SCR_strlcpy((unsigned char*) name, (unsigned char*) newname, K_MAX_NAME);
-    if(K_key(name, kdb->k_mode) < 0) 
-        return(-1);
+    check_name(std::string(name), kdb->k_type);
     
-    pos = kdb->index_of(name);
-    if(pos >= 0) 
+    bool found = kdb->contains(name);
+    if(found) 
     {
         if(K_WARN_DUP)
-            kerror(0, "%s defined more than once", name);
-        return(pos);
+        {
+            kerror(0, "%s already defined", (char*) name.c_str());
+            return false;
+        }
     }
+    else
+        kdb->k_objs[name] = 0;
 
-    if((kdb->size()) % K_CHUNCK == 0)
-        //kdb->k_objs = (char *) SW_nrealloc(kdb->k_objs,
-        kdb->k_objs = (KOBJ*) SW_nrealloc(kdb->k_objs,
-                                         (unsigned int)(sizeof(KOBJ) * kdb->size()),
-                                         (unsigned int)(sizeof(KOBJ) * (kdb->size() + K_CHUNCK)));
-    if(kdb->k_objs == 0) 
-        return(-1);
-
-    if(kdb->size() == 0) 
-    {
-        maxpos = 0;
-        goto done;
-    }
-
-    if(K_find_strcmp(name, kdb->k_objs + kdb->size() - 1) > 0) 
-    {
-        maxpos = kdb->size();
-        goto done;
-    }
-
-    if(K_find_strcmp(name, kdb->k_objs) < 0) 
-    {
-        /* add before */
-        maxpos = 0;
-        goto done;
-    }
-
-    /* insert */
-    maxpos = kdb->size();
-    minpos = 0;
-    while(maxpos - minpos > 1) 
-    {
-        pos = minpos + (maxpos - minpos)/2;
-        if(K_find_strcmp(name, kdb->k_objs + pos) < 0) 
-            maxpos = pos;
-        else 
-            minpos = pos;
-    }
-
-done :
-   nbobjs =  kdb->size() - maxpos;
-    if(nbobjs != 0) 
-    {
-        ktmp = (KOBJ *) BUF_alloc(nbobjs * sizeof(KOBJ));
-        memcpy((char *)ktmp, (char *)(kdb->k_objs + maxpos), nbobjs * sizeof(KOBJ));
-        memcpy((char *)(kdb->k_objs + maxpos + 1), (char *)ktmp, nbobjs * sizeof(KOBJ));
-    }
-
-    lg = std::min((int) strlen(name), K_MAX_NAME);
-    memcpy(kdb->k_objs[maxpos].o_name, name, lg + 1);
-    kdb->k_objs[maxpos].o_val = 0;
-
-    kdb->k_nb++;
-
-    return(maxpos);
+    return true;
 }
 
 
 /**
  *  Deletes an entry in a KDB __without__ deleting the referenced object. 
  *
- *  Warning : for interal use (no check is made on pos).
+ *  Warning : for internal use (no check is made on pos).
  *  
  *  @param [in, out]    kdb     KDB*    KDB source and target
  *  @param [in]         pos     int     object position in kdb
@@ -240,60 +147,15 @@ done :
 
 int K_del_entry(KDB* kdb, int pos)
 {
-    memcpy(kdb->k_objs + pos, kdb->k_objs + (pos + 1),
-           (int)(kdb->size() - pos - 1) * sizeof(KOBJ));
-    kdb->k_nb--;
-    if(kdb->size() > 0) 
-    {
-        memset(kdb->k_objs + (int) kdb->size(), 0, sizeof(KOBJ));
-        if(kdb->size() % K_CHUNCK == 0)
-            kdb->k_objs = (KOBJ *) SW_nrealloc((char *)kdb->k_objs,
-                                              (unsigned int)(sizeof(KOBJ) * (kdb->size() + K_CHUNCK)),
-                                              (unsigned int)(sizeof(KOBJ) * kdb->size()));
-    }
-    else 
-    {
-        SW_nfree(kdb->k_objs);
-        kdb->k_objs = NULL;
-    }
-    return(0);
-}
+    if(!kdb) 
+        return -1;
 
-
-/**
- *  Deletes an object identified by its position from a KDB. 
- *  The object content is also deleted.
- *
- *  @param [in, out] kdb    KDB*    source and target KDB
- *  @param [in]      pos    int     object position in kdb
- *  @return                 int     0 or 
- *                                  -1 if pos does not exist in kdb
- */
- 
-int K_del(KDB* kdb, int pos)
-{
-    if(kdb == NULL) return(-1);
-    if(pos < 0 || pos >= kdb->size()) return(-1);
-    SW_free(kdb->get_handle(pos));
-    K_del_entry(kdb, pos);
-    return(0);
-}
-
-
-/**
- *  Deletes an object identified by its name from a KDB. 
- *  The object content is also deleted. 
- *  
- *  @param [in] kdb     KDB*    where to search for name
- *  @param [in] name    char*   object name
- *  @return             int     0 or 
- *                              -1 if pos does not exist in kdb
- * 
- */
- 
-int K_del_by_name(KDB* kdb, char* name)
-{
-    return(K_del(kdb, kdb->index_of(name))); 
+    std::string name = kdb->get_name(pos);
+    if(name.empty()) 
+        return -1;
+    
+    kdb->k_objs.erase(name);
+    return 0;
 }
 
 
@@ -315,7 +177,7 @@ int K_del_by_name(KDB* kdb, char* name)
  */
 int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, char* instr, char* blk, float* tests, int i_date)
 {
-    int pos, rc;
+    bool success;
 
     std::string endo(name);
     std::string lec;
@@ -340,7 +202,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    pos = KE_WS->index_of(name);
+    int pos = KE_WS->index_of(name);
     if(pos < 0)
     {
         Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
@@ -377,10 +239,10 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     if(i_date > 0)
         eq->update_date();
 
-    rc = K_add(K_WS[EQUATIONS], name, eq, name);
+    success = K_add(K_WS[EQUATIONS], name, eq, name);
     delete eq;
     eq = nullptr;
-    if(rc < 0) 
+    if(!success) 
     {
         error_manager.append_error(std::string(L_error()));
         return -1;
@@ -427,9 +289,9 @@ int K_upd_tbl(char* name, char* arg)
         }
     }
 
-    int pos = K_add(K_WS[TABLES], name, tbl);
+    bool success = K_add(K_WS[TABLES], name, tbl);
     delete tbl;
     tbl = nullptr;
 
-    return (pos >= 0) ? 0 : -1;
+    return success ? 0 : -1;
 }

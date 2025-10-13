@@ -123,8 +123,10 @@ done:
     SW_nfree(t_vec);
     SW_nfree(f_vec);
 
-    if(rc < 0) return(-1);
-    else return(0);
+    if(rc < 0) 
+        return(-1);
+    else 
+        return(0);
 }
 
 

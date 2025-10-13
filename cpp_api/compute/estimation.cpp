@@ -25,8 +25,14 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
     int res = E_DynamicAdjustment(method, &c_eqs, to_char_array(c1), to_char_array(c2));
     std::string adjusted_eqs(c_eqs);
     delete[] c_eqs;
-    if(res < 0) 
-        throw std::runtime_error("Failed to proceed dynamic adjustment of equation \"" + eqs + "\"");
+    if(res < 0)
+    {
+        std::string error_msg = "Error during dynamic adjustment of equation \"" + eqs + "\"";
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
+            error_msg += "\n" + last_error;
+        throw std::runtime_error(error_msg);
+    }
     return adjusted_eqs;
 }
 
@@ -51,6 +57,9 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
         error_msg += "Drift: " + is_drift + "\n";
         error_msg += "Trend: " + is_trend + "\n";
         error_msg += "Order: " + std::to_string(order);
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
+            error_msg += "\n" + last_error;
         throw std::runtime_error(error_msg);
     }
 

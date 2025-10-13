@@ -36,7 +36,8 @@ int   AsciiVariables::CSV_NBDEC = 15;
  */
 static int read_vec(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     i, keyw, pos, nb;
+    bool    success;
+    int     i, keyw, nb;
     double  *vec;
     Sample  *smpl;
 
@@ -63,8 +64,8 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
     YY_unread(yy);
 
     nb = smpl->nb_periods;
-    pos = K_add(kdb, name, vec, &nb);
-    if(pos < 0) 
+    success = K_add(kdb, name, vec, &nb);
+    if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(vec);
@@ -160,7 +161,7 @@ err:
 /**
  *  Loads variables from an ASCII file or from a string.
  *  
- *  @param [in] file_or_string char*  file_or_string or string to interpret
+ *  @param [in] file_or_string char*  file or string to interpret
  *  @param [in] type        int    1 => file_or_string is a string containing the var definitions, 
  *                                 0 => file_or_string is a file name 
  *  @param [in] ask         int    1 => if and the sample definition is not present on the YY stream, calls kas->sample to get the sample from the user.
@@ -397,16 +398,18 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     }
     fprintf(fd, "\n");
 
-    // Lignes suivantes
-    for(i = 0 ; lst[i] ; i++) 
+    // next lines
+    std::string var_name;
+    for(i = 0; lst[i]; i++) 
     {
         SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
-        pos = kdb->index_of(lst[i]);
+        var_name = std::string(lst[i]);
+        pos = kdb->index_of(var_name);
         if(pos >= 0) 
         {
             val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->nb_periods; j++, val++) 
+            for(j = 0; j < smpl->nb_periods; j++, val++) 
             {
                 if(IODE_IS_A_NUMBER(*val)) 
                 {

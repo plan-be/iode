@@ -8,14 +8,15 @@
 // CMT = Comment (string)
 using CMT = char*;
 
-/*----------------------- FUNCS ----------------------------*/
+/*----------------------- MACROS ----------------------------*/
 
-inline CMT KCPTR(const char* name) 
+// Returns a pointer to the CMT in swap (not allocated -> do not free)
+inline CMT KCPTR(KDB* kdb, char* name)
 {
-    return K_optr0(KC_WS, (char*) name);
+    return K_optr0(kdb, name);            
 }
 
-inline CMT KCVAL(KDB* kdb, int pos) 
+inline CMT KCVAL(KDB* kdb, int pos)
 {
-    return (CMT)K_oval0(kdb, pos);
-}
+    return (CMT ) K_oval0(kdb, pos);
+}  

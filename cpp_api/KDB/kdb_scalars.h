@@ -34,9 +34,9 @@ public:
         return new KDBScalars(this, deep_copy, pattern);
     }
 
-    int add(const std::string& name, const Scalar& obj);
+    bool add(const std::string& name, const Scalar& obj);
 
-    int add(const std::string& name, const double value, const double relax, const double std=IODE_NAN);
+    bool add(const std::string& name, const double value, const double relax, const double std=IODE_NAN);
 
     void update(const std::string& name, const Scalar& obj);
 
@@ -51,12 +51,14 @@ inline std::size_t hash_value(KDBScalars const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
+    Scalar* scalar;
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->size(); pos++)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
-        char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
-        hash_combine<Scalar>(seed, *KSVAL(kdb, pos));
+        hash_combine<std::string>(seed, name); 
+
+        scalar = (Scalar*) P_get_ptr(SW_getptr(handle), 0);
+        hash_combine<Scalar>(seed, *scalar);
     }
     return seed;
 }

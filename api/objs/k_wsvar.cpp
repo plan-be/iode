@@ -61,21 +61,22 @@ int KV_sample(KDB *kdb, Sample *new_sample)
         delete kdb->sample;
     kdb->sample = new Sample(*new_sample);
 
+    int i = 0;
     char* ptr;
-    int new_val;
-    for(int i = 0 ; i < kdb->size(); i++) 
+    SWHDL new_handle;
+    for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++, i++)   
     {
-        new_val = KV_alloc_var(kdb->sample->nb_periods);
-        ptr = SW_getptr(new_val);
-        if(kdb->get_handle(i) != 0) 
+        new_handle = (SWHDL) KV_alloc_var(kdb->sample->nb_periods);
+        ptr = SW_getptr(new_handle);
+        if(it->second != 0) 
         {
             if(smpl.nb_periods > 0)
                 memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
                        KVVAL(kdb, i, start1),
                        sizeof(double) * smpl.nb_periods);
-            SW_free(kdb->get_handle(i));
+            SW_free(it->second);
         }
-        kdb->k_objs[i].o_val = new_val;
+        it->second = new_handle;
     }
 
     return 0;
@@ -92,14 +93,35 @@ int KV_sample(KDB *kdb, Sample *new_sample)
  *  @param [in]          kdb2         KDB *   source KDB.
  *  @param [in]          replace      int     if not null, kdb2 vars replace kdb1 homonyms.
  *  @return                           int     -1 if there is no intersection between the 2 samples
- *  TODO: what if kdb1 == NULL ?                                             0 if ok.
+ *                                            0 if ok.
  */
 int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 {
-    int i, start1, start2, pos, nb1;
+    int start1, start2, nb1;
 
-    if(kdb2 == NULL) 
-        return(0);
+    if(!kdb1)
+    {
+        kwarning("Cannot merge into a NULL database");
+        return -1;
+    }
+
+    if(!kdb2)
+    {
+        kwarning("Cannot merge from a NULL database");
+        return -1;
+    }
+
+    if(kdb1->k_type != kdb2->k_type)
+    {
+        kwarning("Cannot merge 2 KDB of different types");
+        return -1;
+    }
+
+    if(kdb1->k_type != VARIABLES) 
+    {
+        kwarning("KV_merge is only implemented for databases of type VARIABLES");
+        return -1;
+    }
 
     if(!kdb1->sample)
     {
@@ -119,19 +141,33 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         start2 = smpl.start_period.difference(kdb2->sample->start_period); /* always >= 0 */
     }
 
+    int pos_2 = 0;
+    int pos = -1;
+    bool found;
     nb1 = kdb1->sample->nb_periods;
-    for(i = 0; i < kdb2->size(); i++) 
+    size_t size = sizeof(double) * smpl.nb_periods;
+    for(auto& [name, handle_2] : kdb2->k_objs) 
     {
-        pos = kdb1->index_of(kdb2->get_name(i));
-        if(pos < 0) 
-            pos = K_add(kdb1, (char*) kdb2->get_name(i).c_str(), NULL, &nb1);
-        else if(!replace) 
-            continue;
+        found = kdb1->contains(name);
 
-        if(pos >= 0 && kdb2->get_handle(i) != 0)
+        // replace == 0 means do not replace existing variables
+        if(found && replace == 0)
+            continue;
+        
+        if(!found)
+            K_add(kdb1, (char*) name.c_str(), NULL, &nb1);
+        
+        pos = kdb1->index_of(name);
+        if(pos < 0)
+        {
+            kerror(0, "Cannot merge variable %s from the second database into the first one", name.c_str());
+            return -1;
+        }
+
+        if(handle_2 > 0)
             memcpy((double *) KVVAL(kdb1, pos, start1),
-                   (double *) KVVAL(kdb2, i, start2),
-                   sizeof(double) * smpl.nb_periods);
+                   (double *) KVVAL(kdb2, pos_2, start2), size);
+        pos_2++;
     }
 
     return 0;
@@ -139,7 +175,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 
 
 /**
- *  Merges 2 KDB of variables, then deletes the second one.
+ *  Merges 2 KDB of variables, then deletes the second one (but not the IODE objects in memory).
  * 
  *  The resulting sample is kdb1 sample if it is defined. 
  *  If not, the sample of kdb2 is used.
@@ -148,35 +184,48 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
  *  @param [in, out] kdb2       KDB*   ws to copy into kdb1
  *  @param [in]      replace    int    indicates if kdb2 homonyms must replace kdb1
  * 
- *  TODO: what if kdb1 == NULL ?
  */
 
 void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 {
-
-    if(kdb2 == NULL) 
+    if(!kdb1)
+    {
+        kwarning("Cannot merge into a NULL database");
         return;
+    }
+
+    if(!kdb2)
+    {
+        kwarning("Cannot merge from a NULL database");
+        return;
+    }
+
+    if(kdb1->k_type != kdb2->k_type) 
+    {
+        kwarning("Cannot merge 2 KDB of different types");
+        return;
+    }
 
     if(kdb2->size() == 0) 
         return;
     
     if(kdb1->size() == 0) 
     {
-        if(kdb1->sample)
-            KV_sample(kdb2, kdb1->sample);
-        else if(kdb2->sample)
-            kdb1->sample = new Sample(*kdb2->sample);
-        kdb1->k_nb = kdb2->k_nb;
+        if(kdb1->k_type == VARIABLES)
+        {
+            if(kdb1->sample)
+                KV_sample(kdb2, kdb1->sample);
+            else if(kdb2->sample)
+                kdb1->sample = new Sample(*kdb2->sample);
+        }
         kdb1->k_objs = kdb2->k_objs;
-        kdb2->k_nb = 0;
-        kdb2->k_objs = NULL;
-        delete kdb2;
+        kdb2->clear(false);
         kdb2 = nullptr;
         return;
     }
 
     KV_merge(kdb1, kdb2, replace);
-    delete kdb2;
+    kdb2->clear(false);
     kdb2 = nullptr;
 }
 
@@ -191,30 +240,41 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
  */
 int KV_add(KDB* kdb, char* varname)
 {
-    int      pos, t, nobs;
+    int      t, nobs;
     double   *vptr;
 
-    if(kdb->k_type != VARIABLES) 
-        return(-1);
+    if(!kdb)
+    {
+        kwarning("Cannot add a variable to a NULL database");
+        return -1;
+    }
+
+    if(kdb->k_type != VARIABLES)
+    {
+        kwarning("KV_add is only implemented for databases of type VARIABLES");
+        return -1;
+    } 
     
     // Create varname with NaN 
-    pos = kdb->index_of(varname);
-    if(pos < 0) 
+    bool found = kdb->contains(varname);
+    if(!found) 
     {
         nobs = kdb->sample->nb_periods;
-        pos = K_add(kdb, varname, NULL, &nobs); // Set IODE_NAN if the new var
+        K_add(kdb, varname, NULL, &nobs);   // Set IODE_NAN if the new var
     }
     else 
     { 
         // Replaces all values by IODE_NAN 
         vptr = K_vptr(kdb, varname, 0);
         if(vptr == NULL) 
-            return(-1);
+            return -1;
+        
         for(t = 0; t < kdb->sample->nb_periods; t++)
             vptr[t] = IODE_NAN;
     }
-        
-    return(pos);
+    
+    int pos = kdb->index_of(varname);
+    return pos;
 }
 
 /**
@@ -507,7 +567,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     ndbv->sample = new Sample(*edbv->sample);
     for(epos = 0; epos < edbv->size(); epos++) 
     {
-        strcpy(ename, edbv->get_name(epos).c_str());
+        strcpy(ename, (char*) edbv->get_name(epos).c_str());
         if(K_aggr(pattern, ename, nname) < 0) 
             continue;
 
@@ -515,7 +575,8 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            npos = K_add(ndbv, nname, NULL, &nb_per);
+            K_add(ndbv, nname, NULL, &nb_per);
+            npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {
                 times = (int *) SCR_realloc((char *) times, sizeof(int), nbtimes, nbtimes + 500);
@@ -647,8 +708,9 @@ double KV_get_at_t(char*varname, int t)
 {
     double  *var_ptr;
     
-    var_ptr = KVPTR(varname);
-    if(var_ptr == NULL) return(IODE_NAN);
+    var_ptr = KVPTR(KV_WS, varname);
+    if(var_ptr == NULL) 
+        return(IODE_NAN);
     
     if(t < 0 || KV_WS->sample->nb_periods < t) 
         return IODE_NAN;
@@ -718,8 +780,9 @@ int KV_set_at_t(char*varname, int t, double val)
 {
     double  *var_ptr;
     
-    var_ptr = KVPTR(varname);
-    if(var_ptr == NULL) return(-1);
+    var_ptr = KVPTR(KV_WS, varname);
+    if(var_ptr == NULL) 
+        return(-1);
 
     if(t < 0 || KV_WS->sample->nb_periods < t) 
         return(-1);

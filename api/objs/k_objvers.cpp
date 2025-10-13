@@ -60,37 +60,36 @@
  *  The object content is replaced by a new allocated one in the swap memory.
  *  
  *  @param [in, out]    kdb     KDB*    KDB containing object to modify
- *  @param [in]         objnb   int     position of the object to modify in kdb
+ *  @param [in]         index   int     position of the object to modify in kdb
  *  @return                     void
  *  
  *  @details Called by K_setvers() only for IODE object version 1 and 2.
  */
 
-static void K_repack(KDB* kdb, int objnb)
+static void K_repack(KDB* kdb, int index)
 {
-    SWHDL   opos, pos;
-    OSIZE   *ptr;
-    U_sh    *optr;
-    int     nlg, add, lendata, i;
+    U_sh*  old_ptr;
+    int    nlg, add, lendata, i;
 
-    opos = kdb->k_objs[objnb].o_val;
-    optr = (U_sh *) SW_getptr(opos);
-    add = (optr[1] + 2 + optr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
-    nlg = optr[0] + add;
-    pos = SW_alloc(nlg);
-    optr = (U_sh *) SW_getptr(opos);
-    ptr = (OSIZE *) SW_getptr(pos);
+    std::string name = kdb->get_name(index);
+    SWHDL old_handle = kdb->get_handle(name);
+    old_ptr = (U_sh *) SW_getptr(old_handle);
+    add = (old_ptr[1] + 2 + old_ptr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
+    nlg = old_ptr[0] + add;
+    SWHDL handle = SW_alloc(nlg);
+    old_ptr = (U_sh *) SW_getptr(old_handle);
+    OSIZE* ptr = (OSIZE *) SW_getptr(handle);
     ptr[0] = nlg;
-    ptr[1] = optr[1];
-    for(i = 2 ; i < optr[1] + 2 ; i++)
-        ptr[i] = optr[i] + add;
+    ptr[1] = old_ptr[1];
+    for(i = 2 ; i < old_ptr[1] + 2 ; i++)
+        ptr[i] = old_ptr[i] + add;
 
-    lendata = nlg - (ptr[1] + 2 + optr[1] % 2) * sizeof(OSIZE);
+    lendata = nlg - (ptr[1] + 2 + old_ptr[1] % 2) * sizeof(OSIZE);
     memcpy(((char *) ptr) + (ptr[1]  + 2 + ptr[1] % 2) * sizeof(OSIZE),
-           ((char *)optr) + (optr[1] + 2 + optr[1] % 2) * sizeof(U_sh),
+           ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(U_sh),
            lendata);
-    SW_free(opos);
-    kdb->k_objs[objnb].o_val = pos;
+    SW_free(old_handle);
+    kdb->k_objs[name] = handle;
 }
 
 /**
@@ -105,20 +104,20 @@ static void K_repack(KDB* kdb, int objnb)
 static char *Pack16To32(char* opack)
 {
     OSIZE   *ptr;
-    U_sh    *optr = (U_sh *)opack;
+    U_sh    *old_ptr = (U_sh *)opack;
     int     nlg, add, lendata, i;
 
-    add = (optr[1] + 2 + optr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
-    nlg = optr[0] + add;
+    add = (old_ptr[1] + 2 + old_ptr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
+    nlg = old_ptr[0] + add;
     ptr = (OSIZE *)SW_nalloc(nlg);
     ptr[0] = nlg;
-    ptr[1] = optr[1];
-    for(i = 2 ; i < optr[1] + 2 ; i++)
-        ptr[i] = optr[i] + add;
+    ptr[1] = old_ptr[1];
+    for(i = 2 ; i < old_ptr[1] + 2 ; i++)
+        ptr[i] = old_ptr[i] + add;
 
-    lendata = nlg - (ptr[1] + 2 + optr[1] % 2) * sizeof(OSIZE);
+    lendata = nlg - (ptr[1] + 2 + old_ptr[1] % 2) * sizeof(OSIZE);
     memcpy(((char *) ptr) + (ptr[1]  + 2 + ptr[1] % 2) * sizeof(OSIZE),
-           ((char *)optr) + (optr[1] + 2 + optr[1] % 2) * sizeof(U_sh),
+           ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(U_sh),
            lendata);
     return((char *)ptr);
 }
@@ -228,101 +227,109 @@ void K_setvers(KDB* kdb, int i, int vers)
     float*    f;
     double*   d;
     int       j, nb, lg;
-    char      *ptr, *optr, *pack;
-    SWHDL     pos, opos;
+    char      *ptr, *old_ptr, *pack;
+    SWHDL     handle, old_handle;
     char      buf[512];
-    //unsigned char *dptr;
     Equation* eq;
-    Table*      tbl;
-
-    if(vers == 0 || vers == 3) return;
+    Table*    tbl;
+    
+    if(vers == 0 || vers == 3) 
+    return;
+    
+    std::string name = kdb->get_name(i);
     K_repack(kdb, i);
-    switch(kdb->k_type) {
+    switch(kdb->k_type) 
+    {
         case VARIABLES :
-            if(vers == 2) return;
-            opos = kdb->k_objs[i].o_val;
+            if(vers == 2) 
+                return;
+            old_handle = kdb->get_handle(name);
             nb = kdb->sample->nb_periods;
-            pos = KV_alloc_var(nb);
-            ptr = SW_getptr(pos);
+            handle = KV_alloc_var(nb);
+            ptr = SW_getptr(handle);
             d = (double *)P_get_ptr(ptr, 0);
-            optr = SW_getptr(opos);
-            f = (float *)P_get_ptr(optr, 0);
-            for(j = 0 ; j < nb ; j++) {
+            old_ptr = SW_getptr(old_handle);
+            f = (float *)P_get_ptr(old_ptr, 0);
+            for(j = 0 ; j < nb ; j++) 
+            {
                 sprintf(buf, "%.8g", f[j]);
                 d[j] = atof(buf);
-                if(IODE_IS_0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
-                /*d[j] = (double)f[j]; */
+                if(IODE_IS_0(d[j])) 
+                    d[j] = 0.0;
             }
-            SW_free(opos);
-            kdb->k_objs[i].o_val = pos;
+            SW_free(old_handle);
+            kdb->k_objs[name] = handle;
             break;
 
         case SCALARS :
-            if(vers == 2) return;
+            if(vers == 2) 
+                return;
             nb = 3;
             /* Do New allocation & get dbl ptr*/
-            pos = KS_alloc_scl();
-            ptr = SW_getptr(pos);
+            handle = KS_alloc_scl();
+            ptr = SW_getptr(handle);
             d = (double *)P_get_ptr(ptr, 0);
 
             /* Get old allocation and get float ptr */
-            opos = kdb->k_objs[i].o_val;
-            optr = SW_getptr(opos);
-            f = (float *)P_get_ptr(optr, 0);
+            old_handle = kdb->get_handle(name);
+            old_ptr = SW_getptr(old_handle);
+            f = (float *)P_get_ptr(old_ptr, 0);
 
             /* Convert */
-            for(j = 0 ; j < 3 ; j++) {
+            for(j = 0 ; j < 3 ; j++) 
+            {
                 d[j] = (double)f[j];
                 //Debug("%.8lg", d[j]);
                 sprintf(buf, "%.8lg", d[j]);
                 d[j] = atof(buf);
-                if(IODE_IS_0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
+                if(IODE_IS_0(d[j])) 
+                    d[j] = 0.0; /* JMP 30-10-98 */
             }
 
-            SW_free(opos);
-            kdb->k_objs[i].o_val = pos;
+            SW_free(old_handle);
+            kdb->k_objs[name] = handle;
             break;
 
         case IDENTITIES :
-            opos = kdb->k_objs[i].o_val;
-            optr = SW_getptr(opos);
-            K_ipack(&pack, (char*) P_get_ptr(optr, 0));
-            SW_free(opos);
+            old_handle = kdb->get_handle(name);
+            old_ptr = SW_getptr(old_handle);
+            K_ipack(&pack, (char*) P_get_ptr(old_ptr, 0));
+            SW_free(old_handle);
             lg = P_get_len(pack, -1);
-            pos = SW_alloc(lg);
-            memcpy(SW_getptr(pos), pack, lg);
+            handle = SW_alloc(lg);
+            memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[i].o_val = pos;
+            kdb->k_objs[name] = handle;
             break;
 
         case EQUATIONS :
-            opos = kdb->k_objs[i].o_val;
-            optr = SW_getptr(opos);
-            eq = K_eunpack(optr, (char*) kdb->get_name(i).c_str());
-            SW_free(opos);
-            K_epack(&pack, (char*) eq, kdb->k_objs[i].o_name);
+            old_handle = kdb->get_handle(name);
+            old_ptr = SW_getptr(old_handle);
+            eq = K_eunpack(old_ptr, (char*) name.c_str());
+            SW_free(old_handle);
+            K_epack(&pack, (char*) eq, (char*) name.c_str());
             delete eq;
             eq = nullptr;
             lg = P_get_len(pack, -1);
-            pos = SW_alloc(lg);
-            memcpy(SW_getptr(pos), pack, lg);
+            handle = SW_alloc(lg);
+            memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[i].o_val = pos;
+            kdb->k_objs[name] = handle;
             break;
 
         case TABLES :
-            opos = kdb->k_objs[i].o_val;
-            optr = SW_getptr(opos);
-            tbl = K_tunpack(optr, (char*) kdb->get_name(i).c_str());
-            SW_free(opos);
+            old_handle = kdb->get_handle(name);
+            old_ptr = SW_getptr(old_handle);
+            tbl = K_tunpack(old_ptr, (char*) name.c_str());
+            SW_free(old_handle);
             pack = K_repack_tbl(tbl);
             delete tbl;
             tbl = nullptr;
             lg = P_get_len(pack, -1);
-            pos = SW_alloc(lg);
-            memcpy(SW_getptr(pos), pack, lg);
+            handle = SW_alloc(lg);
+            memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[i].o_val = pos;
+            kdb->k_objs[name] = handle;
             break;
 
         default :

@@ -35,27 +35,33 @@
  */
 static int read_lst(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     keyw, pos;
+    bool    success;
+    int     keyw;
     char    *lst;
 
     /* READ A STRING */
     keyw = YY_lex(yy);
-    if(keyw == YY_STRING)  lst = K_wrap((char*) yy->yy_text, 60);
-    else {
+    if(keyw == YY_STRING)  
+        lst = K_wrap((char*) yy->yy_text, 60);
+    else 
+    {
         lst = SW_nalloc(1);
         lst[0] = '\0';
         YY_unread(yy);
     }
 
     /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
-        if(keyw == YY_WORD || keyw == YY_EOF) break;
+        if(keyw == YY_WORD || keyw == YY_EOF) 
+            break;
     }
     YY_unread(yy);
 
-    pos = K_add(kdb, name, lst);
-    if(pos < 0) {
+    success = K_add(kdb, name, lst);
+    if(!success) 
+    {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(lst);
         return(-1);
@@ -158,26 +164,30 @@ int AsciiLists::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
-    // LIS     *lst;
-    LIS     lst;        // JMP 30/9/2021
+    LIS     lst;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) {
-        fprintf(fd, "%s ", kdb->get_name(i).c_str());
+    for(i = 0 ; i < kdb->size(); i++) 
+    {
+        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
         lst = KLVAL(kdb, i);
         SCR_fprintf_esc(fd, lst, 1);
         fprintf(fd, "\n");
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
     return(0);
 }
 

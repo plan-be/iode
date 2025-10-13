@@ -192,7 +192,7 @@ cdef class Variables(CythonIodeDatabase):
         _c_add_var_from_other(c_name, self.database_ptr, value.database_ptr, t_first, t_last)
 
     def _add(self, name: str, values: Union[str, float, np.ndarray, Iterable[float], Variables]):
-        cdef int var_pos
+        cdef bint success
         cdef vector[double] cpp_values
         cdef int c_nb_periods
         cdef char* c_name
@@ -213,8 +213,8 @@ cdef class Variables(CythonIodeDatabase):
             c_name = b_name
             c_nb_periods = self.get_sample().get_nb_periods()
             c_db_ptr = self.database_ptr.get_database()
-            var_pos = K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
-            if var_pos < 0:
+            success = K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
+            if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
         # NOTE: 'values' can contains more than one variable as long as the variable named 'name' is present
@@ -603,7 +603,7 @@ cdef class Variables(CythonIodeDatabase):
 
     def _str_table(self, names: List[str], periods: List[str]) -> Dict[str, List[float]]:
         cdef t
-        names_pos: List[int] = [self.index_of(name) for name in names] 
+        names_pos: List[int] = [self.index(name) for name in names] 
         columns = {"name": names}
         for str_period in periods:
             period = Period(str_period)

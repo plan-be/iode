@@ -117,8 +117,9 @@ void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
     
     // Create varname with NaN 
     KV_add(KV_WS, varname);
-    var = KVPTR(varname);
-    if(var == NULL) return;
+    var = KVPTR(KV_WS, varname);
+    if(var == NULL) 
+        return;
     
     // Copy mat to name from E_FROM to E_FROM + E_T
     for(t = E_FROM; t < E_FROM + E_T; t++) {
@@ -137,12 +138,10 @@ void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
  *  @param [in] Sample* smpl    estimation sample or NULL. If NULL, the estimation 
  *                              sample is read from the equation itself
  *  @param [in] float*  tests   list of tests (see KE_est_s() for the complete list)
- *  @return     int     0 on success, -1 on error
+ *  @return     int             0 on success, -1 on error
  */
 int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, float* tests)
 {
-    int     pos, rc;
-
     std::string endo(name);
     std::string lec(c_lec);
     IodeEquationMethod method = EQ_LSQ;
@@ -150,7 +149,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    pos = E_DBE->index_of(name);
+    int pos = E_DBE->index_of(name);
     if(pos < 0) 
     {
         std::string comment = "";
@@ -172,10 +171,10 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
 
-    rc = K_add(E_DBE, name, eq, name);
+    bool success = K_add(E_DBE, name, eq, name);
     delete eq;
     eq = nullptr;
-    if(rc < 0) 
+    if(!success) 
     {
         error_manager.append_error(std::string(L_error()));
         return -1;
@@ -208,7 +207,7 @@ int Estimation::KE_est_s(Sample* smpl)
     U_ch**     blk = 0;
     U_ch**     lecs = 0;
     U_ch**     instrs = 0;
-    float      tests[EQS_NBTESTS]; /* FLOAT 12-04-98 */
+    float      tests[EQS_NBTESTS];
     Equation*  eq;
     
     nb = SCR_tbl_size((unsigned char**) est_endos);
@@ -222,8 +221,9 @@ int Estimation::KE_est_s(Sample* smpl)
         if(estimated_eqs.contains(endo))
             continue;
 
-        pos = E_DBE->index_of((char*) endo.c_str());
-        if(pos < 0) {
+        pos = E_DBE->index_of(endo);
+        if(pos < 0) 
+        {
             std::string error_msg  = "Equation '" + endo + "' not found";
             error_manager.append_error(error_msg);
             goto err;
@@ -299,9 +299,10 @@ int Estimation::KE_est_s(Sample* smpl)
 
         if(error == 0) 
         {
-            E_print_results(1, 1, 1, 1, 1);  /* JMP 23-03-98 */
+            E_print_results(1, 1, 1, 1, 1);
 
-            for(j = 0; j < nbe - 1; j++) {
+            for(j = 0; j < nbe - 1; j++) 
+            {
                 tests[EQ_CORR]    = (float)MATE(E_MCORRU,      0, j);
                 tests[EQ_STDEV]   = (float)MATE(E_STDEV,       0, j);
                 tests[EQ_MEANY]   = (float)MATE(E_MEAN_Y,      0, j);
@@ -315,10 +316,10 @@ int Estimation::KE_est_s(Sample* smpl)
                 tests[EQ_LOGLIK]  = (float)MATE(E_LOGLIK,      0, j);
 
                 KE_update((char*) endos[j], (char*) lecs[j], E_MET, E_SMPL, tests);
-                pos = E_DBE->index_of((char*) endos[j]);   /* JMP 24-06-98 */
-                eq = KEVAL(E_DBE, pos);          /* JMP 24-06-98 */
                 // create the Scalars containing the results of an estimated equation
-                E_tests2scl(eq, j, E_T, E_NCE);  /* JMP 27-09-96 */
+                pos = E_DBE->index_of((char*) endos[j]);   /* JMP 24-06-98 */
+                eq = KEVAL(E_DBE, pos);
+                E_tests2scl(eq, j, E_T, E_NCE);
                 if(eq) delete eq;
                 eq = nullptr;
                 // create the Variables containing the fitted, observed and residual values

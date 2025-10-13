@@ -215,7 +215,7 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
 
     if(dbv == NULL && dbc == NULL) 
         goto err;
-    
+
     if(IMP_readrule(rulefile) < 0) 
         goto err;
 
@@ -226,7 +226,7 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
     dim = dbv->sample->nb_periods;
     for(i = 0; i < dbv->size(); i++) 
     {
-        strcpy(iname, dbv->get_name(i).c_str());
+        strcpy(iname, (char*) dbv->get_name(i).c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
             continue;
 
@@ -290,7 +290,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
     for(i = 0; i < nc; i++) 
     {
-        strcpy(iname, dbv->get_name(i).c_str());
+        strcpy(iname, (char*) dbv->get_name(i).c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
             continue;
         expdef->write_object_name(oname, &code);
@@ -309,7 +309,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
         for(i = 0; i < nc; i++) 
         {
-            strcpy(iname, dbv->get_name(i).c_str());
+            strcpy(iname, (char*) dbv->get_name(i).c_str());
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
             expdef->get_variable_value(dbv, i, j, &code);

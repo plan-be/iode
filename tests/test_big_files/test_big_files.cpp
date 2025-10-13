@@ -123,8 +123,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         all_nb_names = kdb_var->size();
         char** all_objs = new char*[all_nb_names];
         int i = 0;
-        for(int i=0; i < all_nb_names; i++)
-            all_objs[i] = (char*) SCR_stracpy((unsigned char*) kdb_var->k_objs[i].o_name);
+        for(const auto& [name, _] : kdb_var->k_objs)
+            all_objs[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(BUILD VECTOR ALL NAMES) built a char** table of " << std::to_string(all_nb_names) 

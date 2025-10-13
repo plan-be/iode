@@ -14,7 +14,6 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  * 
- *      int K_key(char* name, int mode):                     // Checks the validity of an object name and modify its "case" according to the value of mode.
  *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
  *      KDB *K_quick_refer(KDB *kdb, int nb char *names[])   // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
@@ -31,142 +30,14 @@
 #include "api/objs/variables.h"
 
 
-// Utilities 
-// ---------
-
-/**
- *  Compares the names of 2 KOBJs. Used by K_sort().
- *  
- *  @param [in] p1  void*   pointer to the first KOBJ 
- *  @param [in] p2  void*   pointer to the 2d KOBJ 
- *  @return         int     0 if name of p1 = name of p2 (the names ares equal)
- *                          -1 if p1 is < p2 or p1 is null
- *                          1 if p1 is > p2 or p2 is null and is not null
- *  
- *  @details Calls strcmp() for string comparison (case sensitive)
- */
-
-static int K_objnamecmp(const void *p1, const void *p2)
-{
-    KOBJ    *ko1 = (KOBJ *)p1, *ko2 = (KOBJ *)p2;
-
-    if(ko1 == 0) return(-1);
-    if(ko2 == 0) return(1);
-    return(strcmp(ko1->o_name, ko2->o_name));
-}
-
-
-/**
- *  Sorts a KDB by object names. Names are case sensitive.
- *  
- *  @param [in, out] kdb     KDB*    kdb to be sorted
- *  
- */
- 
-void K_sort(KDB* kdb)
-{
-    qsort(kdb->k_objs, (int) kdb->size(), sizeof(KOBJ), K_objnamecmp);
-}
-
-/**
- *  Compares a name with the name of an object (kobjs->o_name).
- *  
- *  @param [in] name    const void*     name to compare
- *  @param [in] kobjs   const KOBJ*     pointer to a general object (KOBJ)
- *  @return             int             0 if name of p1 = name of p2 (the names ares equal)
- *                                      -1 if p1 is < p2 or p1 is null
- *                                      1 if p1 is > p2 or p2 is null and is not null
- *  @return 
- *  
- *  @details 
- */
-
-int K_find_strcmp(const void *name, const void *kobjs)
-{
-    KOBJ    *ko2 = (KOBJ *)kobjs;
-    return(strcmp((char *)name, ko2->o_name));
-}
-
-/**
- *  Checks the validity of an object name and modify its "case" according to the value of mode.
- *  The name is truncated if it exceeds K_MAX_NAME characters.
- *  
- *  
- *  
- *  @param [in, out] name    char*   name to check
- *  @param [in]      mode    int     UPPER_CASE, LOWER_CASE of ASIS_CASE 
- *  @return                  int     0 if the name is valid
- *                                   -1 otherwise (illegal character)
- *  
- *  @details 
- */
- 
-int K_key(char* name, int mode)
-{
-    int     i;
-
-    SCR_sqz((unsigned char*) name);
-    if(!SCR_is_alpha(name[0]) && name[0] != '_') 
-        return(-1);
-    
-    if(strlen(name) > K_MAX_NAME) 
-        name[K_MAX_NAME] = 0;
-    for(i = 1 ; name[i] ; i++)
-        if(!SCR_is_anum(name[i]) && name[i] != '_' && name[i] != K_SECRETSEP) 
-            return(-1); // JMP 14/2/2013 pour les macros pushed A#n
-
-    switch(mode) 
-    {
-        case UPPER_CASE :
-            SCR_upper((unsigned char*) name);
-            break;
-        case LOWER_CASE :
-            SCR_lower((unsigned char*) name);
-            break;
-        case ASIS_CASE  :
-            break;
-    }
-
-    return(0);
-}
-
 // API 
 // ---
 
-/**
- *  Searches the position of an object in a KDB by its name.
- *  
- *  @param [in] kdb     KDB*    where to search for name
- *  @param [in] name    char*   name to be searched
- *  @return             int     position of the name in kdb
- *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
- */
- 
-int KDB::index_of(const std::string& name) const
+
+bool KDB::duplicate(const KDB& other, const std::string& name)
 {
-    char    *res;
-    ONAME   oname;
-
-    if(this->size() == 0) 
-        return(-1);
-
-    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name.c_str(), K_MAX_NAME);  
-    if(K_key(oname, this->k_mode) < 0) 
-        return(-1);
-
-    res = (char *) bsearch(oname, this->k_objs, (int) this->size(),
-                           sizeof(KOBJ), K_find_strcmp);
-    if(res != 0) 
-        return((int)((res - (char *) this->k_objs) / sizeof(KOBJ)));
-    else 
-        return(-1);
-}
-
-
-int KDB::duplicate(const KDB& other, char* name)
-{
-    int pos = K_dup(&other, name, this, name);
-    return pos;
+    bool success = K_dup(&other, name, this, name);
+    return success;
 }
 
 
@@ -208,8 +79,10 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
  */
 KDB *K_refer(KDB* kdb, int nb, char* names[])
 {
-    int     pos1, pos2, err = 0;
-    KDB     *tkdb;
+    bool  err = false;
+    SWHDL handle;
+    KDB   *tkdb;
+    std::string name;
 
     if(kdb == NULL) 
         return(NULL);
@@ -223,29 +96,23 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
     for(int i = 0; i < nb && names[i]; i++) 
     {
-        pos2 = kdb->index_of(names[i]);
-        if(pos2 < 0)  
+        name = std::string(names[i]);
+        handle = kdb->get_handle(name);
+        if(handle == 0)  
         {
-            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found: ");
-            err = 1;
+            error_manager.append_error(v_iode_types[kdb->k_type] + name + " not found: ");
+            err = true;
             continue;
         }
-
-        pos1 = K_add_entry(tkdb, names[i]);
-        if(pos1 < 0) 
-        {
-            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " skipped: (low memory)");
-            delete tkdb;
-            tkdb = nullptr;
-            err = 1;
-            break;
-        }
-
-        tkdb->k_objs[pos1].o_val = kdb->get_handle(pos2);
+        tkdb->k_objs[name] = handle;
     }
 
-    if(err) 
+    if(err)
+    {
+        delete tkdb;
+        tkdb = nullptr;
         error_manager.display_last_error();
+    }
 
     return tkdb;
 }
@@ -271,51 +138,42 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
 KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
 {
-    bool    err = false;
-    int     pos;
-    KDB     *tkdb;
-
+    bool  err = false;
+    bool  found;
+    KDB   *tkdb;
+    std::string name;
+    
     if(!kdb) 
-        return nullptr;
-
+    return nullptr;
+    
     // Crée la nouvelle kdb avec le nombre exact d'entrées
     tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
     if(kdb->sample)
         tkdb->sample = new Sample(*kdb->sample);
     tkdb->description = kdb->description;
     tkdb->k_compressed = kdb->k_compressed;
-    tkdb->filepath = kdb->filepath;
-
-    tkdb->k_objs = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
-    tkdb->k_nb = nb;
-    for(int j = 0; j < nb; j++) 
+    tkdb->filepath = kdb->filepath;;
+    
+    // copy the pointers to IODE objects from kdb to tkdb
+    for(int i = 0; i < nb; i++) 
     {
-        tkdb->k_objs[j].o_val = 0;
-        memset(tkdb->k_objs[j].o_name, 0, sizeof(ONAME));
-    }
-
-    // Copie les entrées dans tkdb
-    for(int i = 0; i < nb && names[i]; i++)  
-    {
-        pos = kdb->index_of(names[i]);
-        if(pos < 0) 
+        name = std::string(names[i]);
+        found = kdb->contains(name);
+        if(!found) 
         {
             error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found");
-            delete tkdb;
             err = true;
             break;
         }
-        memcpy(tkdb->k_objs + i, kdb->k_objs + pos, sizeof(KOBJ));
+        tkdb->k_objs[name] = kdb->k_objs[name];
     }
 
-    if(err) 
+    if(err)
     {
+        delete tkdb;
+        tkdb = nullptr;
         error_manager.display_last_error();
-        return nullptr;
     }
-
-    // Sort tkdb
-    K_sort(tkdb);
 
     return tkdb;
 }
@@ -337,34 +195,62 @@ KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
 
 int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 {
-    int     i, pos;
-    char    *ptr;
+    bool  found;
+    char  *ptr_1, *ptr_2;
+    SWHDL handle_1;
 
-    if(kdb1 == NULL || kdb2 == NULL) return(-1);
-    for(i = 0; i < kdb2->size(); i++) {
-        pos = kdb1->index_of(kdb2->get_name(i));
-        if(pos < 0) pos = K_add_entry(kdb1, (char*) kdb2->get_name(i).c_str());
-        else {
-            if(!replace) continue;
-            SW_free(kdb1->get_handle(pos));
-        }
-
-        if(pos < 0) return(-1);
-        ptr = kdb2->get_ptr_obj(i);
-        kdb1->k_objs[pos].o_val = SW_alloc(P_len(ptr));
-
-        ptr = kdb2->get_ptr_obj(i); /* GB 26/01/98 */
-        memcpy(kdb1->get_ptr_obj(pos), ptr, P_len(ptr));
+    if(!kdb1)
+    {
+        kwarning("Cannot merge into a NULL database");
+        return -1;
     }
-    return(0);
+
+    if(!kdb2)
+    {
+        kwarning("Cannot merge from a NULL database");
+        return -1;
+    }
+    
+    for(auto& [name, handle_2] : kdb2->k_objs) 
+    {
+        if(handle_2 == 0) 
+            continue;
+
+        found = kdb1->contains(name);
+        if(found)
+        {
+            // do not replace existing object in kdb1 if replace == 0
+            if(replace == 0) 
+                continue;
+            // delete object in kdb1 if replace == 1
+            handle_1 = kdb1->get_handle(name);
+            if(handle_1 > 0)
+                SW_free(handle_1);
+        }
+        
+        ptr_2 = SW_getptr(handle_2);
+
+        // allocate new object in kdb1 on the SCR swap
+        handle_1 = SW_alloc(P_len(ptr_2));
+        if(handle_1 == 0) 
+            return -1;
+        kdb1->k_objs[name] = handle_1;
+
+        // pointer behind handle_2 may have changed after allocation of handle_1
+        ptr_2 = SW_getptr(handle_2);
+        
+        ptr_1 = SW_getptr(handle_1);
+        memcpy(ptr_1, ptr_2, P_len(ptr_2));
+    }
+
+    return 0;
 }
 
 
 /**
- *  Merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+ *  Merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2 (but not the IODE objects in memory). 
  *   If replace == 0, existing elements in kdb1 are not overwritten.
  *   If replace == 1, the values of existing elements are replaced.
- *
  *  
  *  @param [in, out]    kdb1    KDB*      source and target KDB
  *  @param [in, out     kdb2    KDB*      source KDB. Delete at the end of the function
@@ -376,25 +262,31 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
 {
 
-    if(kdb1 == NULL || kdb2 == NULL) 
-        return(-1);
+    if(!kdb1)
+    {
+        kwarning("Cannot merge into a NULL database");
+        return -1;
+    }
+
+    if(!kdb2)
+    {
+        kwarning("Cannot merge from a NULL database");
+        return -1;
+    }
     
     if(kdb2->size() == 0) 
-        return(-1);
+        return -1;
     
     if(kdb1->size() == 0) 
     {
-        kdb1->k_nb = kdb2->k_nb;
         kdb1->k_objs = kdb2->k_objs;
-        kdb2->k_nb = 0;
-        kdb2->k_objs = 0;
-        delete kdb2;
+        kdb2->clear(false);
         kdb2 = nullptr;
         return 0;
     }
 
     K_merge(kdb1, kdb2, replace);
-    delete kdb2;
+    kdb2->clear(false);
     kdb2 = nullptr;
     return 0;
 }

@@ -101,7 +101,7 @@ TEST_F(TablesTest, AddGetTable)
     ASSERT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
-    char* name = "c_table";
+    char* name = "C_TABLE";
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
@@ -195,7 +195,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
-    char* c_name = "cpp_table";
+    char* c_name = "CPP_TABLE";
     int nb_columns = 2;
     std::string def = "A title";
     std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};

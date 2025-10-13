@@ -32,25 +32,30 @@
  */
 static int read_scl(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     keyw, pos;
-    Scalar     scl;
+    bool     success;
+    int      keyw;
+    Scalar   scl;
 
     /* READ AT MOST 3 REALS */
     scl.value = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl.value)) scl.value = 0.9;
+    if(!IODE_IS_A_NUMBER(scl.value)) 
+        scl.value = 0.9;
     scl.relax = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl.relax)) scl.relax = 1.0;
+    if(!IODE_IS_A_NUMBER(scl.relax)) 
+        scl.relax = 1.0;
     scl.std = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
+    while(1) 
+    {
         keyw = YY_lex(yy);
         if(keyw == YY_WORD || keyw == YY_EOF) break;
     }
     YY_unread(yy);
 
-    pos = K_add(kdb, name, &scl);
-    if(pos < 0) {
+    success = K_add(kdb, name, &scl);
+    if(!success) 
+    {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         return(-1);
     }
@@ -167,27 +172,32 @@ static void print_scl(FILE* fd, Scalar* scl)
  */
 int AsciiScalars::save_asc(KDB* kdb, char* filename)
 {
-    FILE    *fd;
-    int     i;
-    Scalar     *scl;
+    FILE*    fd;
+    int      i;
+    Scalar*  scl;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) {
-        fprintf(fd, "%s ", kdb->get_name(i).c_str());
+    for(i = 0 ; i < kdb->size(); i++) 
+    {
+        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
         scl = KSVAL(kdb, i);
         print_scl(fd, scl);
         fprintf(fd, "\n");
     }
 
-    if(filename[0] != '-') fclose(fd);
+    if(filename[0] != '-') 
+        fclose(fd);
     return(0);
 }
 

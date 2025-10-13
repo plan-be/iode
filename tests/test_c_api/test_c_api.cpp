@@ -156,42 +156,74 @@ public:
 
 	void U_test_CreateObjects()
 	{
+        bool        success;
 	    char*       lst;
+        double*     values;
 	    Sample*     smpl;
-	    double      A[64], B[64];
-	    int         nb, i, pos;
+        KDB*        kdb_lst = KL_WS;
+        KDB*        kdb_var = KV_WS;
+	    int         pos;
 	    static int  done = 0;
 	
 	    // Create lists
-	    pos = K_add(KL_WS, "LST1", "A,B");
-	    K_add(KL_WS, "LST2", "A,B,A");
-	    lst = KLPTR("LST1");
-	
+	    success = K_add(kdb_lst, "LST1", "A,B");
+        EXPECT_TRUE(success);
+	    lst = KLPTR(kdb_lst, "LST1");
+        EXPECT_NE(lst, nullptr);
+        EXPECT_STREQ(lst, "A,B");
+	    success = K_add(kdb_lst, "LST2", "A,B,A");
+        EXPECT_TRUE(success);
+        lst = KLPTR(kdb_lst, "LST2");
+        EXPECT_NE(lst, nullptr);
+        EXPECT_STREQ(lst, "A,B,A");
+
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
-	    KV_sample(KV_WS, smpl);
-	    EXPECT_TRUE(KV_WS->sample != nullptr);
+	    KV_sample(kdb_var, smpl);
+	    EXPECT_TRUE(kdb_var->sample != nullptr);
 	
 	    // Creates new vars
-	    nb = smpl->nb_periods;
-	    for(i = 0; i < smpl->nb_periods; i++) 
+	    int nb = smpl->nb_periods;
+        double* A = new double[nb];
+        double* B = new double[nb];
+	    for(int i = 0; i < nb; i++) 
         {
 	       A[i] = i;
 	       B[i] = i*2;
 	    }
 	
-	    pos = K_add(KV_WS, "A", A, &nb);
-	    //S4ASSERT(KV_WS->index_of("A") >= 0,  "K_add() + find()");
-	    pos = K_add(KV_WS, "B", B, &nb);
-	
+	    success = K_add(kdb_var, "A", A, &nb);
+        EXPECT_TRUE(success);
+        pos = kdb_var->index_of("A");
+        values = KVVAL(kdb_var, pos, 0);
+        EXPECT_NE(values, nullptr);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, 0), A[0]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, nb-1), A[nb-1]);
+	    
+        success = K_add(kdb_var, "B", B, &nb);
+        EXPECT_TRUE(success);
+        pos = kdb_var->index_of("B");
+        values = KVVAL(kdb_var, pos, 0);
+        EXPECT_NE(values, nullptr);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, 0), B[0]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, nb-1), B[nb-1]);
+
+        delete[] A;
+        delete[] B;
+
 	    // For B_DataPattern()
-	    pos = K_add(KL_WS, "AB", "A,B");
-	    pos = K_add(KL_WS, "BC", "B,C");
-	
-	    pos = K_add(KV_WS, "AB", B, &nb);
-	    pos = K_add(KV_WS, "AC", B, &nb);
-	    pos = K_add(KV_WS, "BB", B, &nb);
-	    pos = K_add(KV_WS, "BC", B, &nb);
+	    success = K_add(kdb_lst, "AB", "A,B");
+        EXPECT_TRUE(success);
+	    success = K_add(kdb_lst, "BC", "B,C");
+        EXPECT_TRUE(success);
+	    success = K_add(kdb_var, "AB", B, &nb);
+        EXPECT_TRUE(success);
+	    success = K_add(kdb_var, "AC", B, &nb);
+	    EXPECT_TRUE(success);
+        success = K_add(kdb_var, "BB", B, &nb);
+        EXPECT_TRUE(success);
+        success = K_add(kdb_var, "BC", B, &nb);
+        EXPECT_TRUE(success);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
@@ -203,13 +235,11 @@ public:
 	    Period per = KV_WS->sample->start_period.shift(t);
 	
 	    clec = L_cc(lec);
-	    //S4ASSERT ("L_cc", clec != 0);
-	    //S4ASSERT ("L_link", 0 == L_link(KV_WS, KS_WS, clec));
+        EXPECT_TRUE(clec != NULL);
 	    rc = L_link(KV_WS, KS_WS, clec);
 	    EXPECT_EQ(rc, 0);
 	    calc_val = L_exec(KV_WS, KS_WS, clec, t);
 	    SCR_free(clec);
-	    //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
@@ -449,8 +479,9 @@ public:
 
 	bool U_test_B_WsCopyVar()
 	{
+        bool    success;
 	    char    arg[256];
-	    int     rc, nb, pos;
+	    int     rc, nb;
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    B_WsClearAll("");
@@ -476,7 +507,8 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
-	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+        EXPECT_TRUE(success);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
 	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", input_test_dir);
@@ -526,9 +558,11 @@ public:
 
 	bool U_test_B_WsMergeVar()
 	{
-	    int         rc, nb, pos;
-	    char        arg[256];
+        bool     success;
+	    int      rc, nb;
+	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
+        KDB*     kdb_var = KV_WS;
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
@@ -546,7 +580,8 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 21;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
-	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+        EXPECT_TRUE(success);
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
@@ -578,9 +613,10 @@ public:
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
 	{
-	    double   *ACAF, ACAF2002;
-	    char        arg[512];
-	    int         pos, rc, nb;
+        bool      success;
+	    double    *ACAF, ACAF2002;
+	    char      arg[512];
+	    int       rc, nb;
 	
 	    B_WsClearAll("");
 	    B_WsSample("1995Y1 2020Y1");
@@ -589,7 +625,8 @@ public:
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
 	    ACAF[7] = IODE_NAN;
-	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+        EXPECT_TRUE(success);
 	
 	    // $WsExtrapolate [method] from to [variable list]
 	    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
@@ -675,21 +712,18 @@ public:
 	{
 	    int     rc;
 	    double  df;
-	    char    arg[256], scalar[30];
-	
-	    // Load needed data
-	    //B_WsLoad(fullfilename, SCALARS);
-	    //B_WsLoad(fullfilename, VARIABLES);
+	    char    arg[256], scalar[30], lowercase_var_name[27];
 	
 	    // Dickey-Fuller test (E_UnitRoot)
-	    // $StatUnitRoot drift trend order expression
 	    sprintf(arg, "%d %d %d %s", drift, trend, order, varname);
 	    rc = B_StatUnitRoot(arg);
-        EXPECT_EQ(rc, 0);
-
-        std::string str_scalar = "df_" + to_lower(std::string(varname));
-	    sprintf(scalar, "%s", str_scalar.c_str());
+        // set varname to lower case
+        memset(lowercase_var_name, 0, sizeof(lowercase_var_name));
+        for (int i = 0; i < strlen(varname); i++)
+            lowercase_var_name[i] = tolower((unsigned char) varname[i]);
+	    sprintf(scalar, "df_%s", lowercase_var_name);
 	    df = U_test_calc_lec(scalar, 0);
+        EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(df, expected_df);
 	    return true;
 	}
@@ -753,25 +787,26 @@ TEST_F(IodeCAPITest, Tests_BUF)
 
 TEST_F(IodeCAPITest, Tests_OBJECTS)
 {
+    bool        found;
     char*       lst;
-    int         pos;
     static int  done = 0;
 
     U_test_print_title("Tests OBJECTS");
     U_test_CreateObjects();
 
     // Create lists
-    pos = KL_WS->index_of("LST1");
-    EXPECT_TRUE(pos >= 0);
-    lst = KLPTR("LST1");
+    found = KL_WS->contains("LST1");
+    EXPECT_TRUE(found);
+    lst = KLPTR(KL_WS, "LST1");
     EXPECT_EQ(strcmp(lst, "A,B"), 0);
 
+    found = KV_WS->contains("A");
+    EXPECT_TRUE(found);
 
-    pos = KV_WS->index_of("A");
-    EXPECT_TRUE(KV_WS->index_of("A") >= 0);
-
-    pos = K_ren(KV_WS, "A", "AAA");
-    EXPECT_TRUE(KV_WS->index_of("AAA") >= 0);
+    bool success = KV_WS->rename("A", "AAA");
+    EXPECT_TRUE(success);
+    found = KV_WS->contains("AAA");
+    EXPECT_TRUE(found);
 
     // Test KV_sample()
     std::string asmpl1 = KV_WS->sample->to_string();
@@ -868,7 +903,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     EXPECT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
-    char* name = "c_table";
+    char* name = "TABLE";
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
@@ -958,20 +993,39 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_test_CreateObjects();
 
-    A = (double*)KVPTR("A");
-    B = (double*)KVPTR("B");
+    A = (double*) KVPTR(KV_WS, "A");
+    B = (double*) KVPTR(KV_WS, "B");
+
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    //S4ASSERT(0, "Generated error");
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
+    char* lst = KLPTR(KL_WS, "LST1");
+    EXPECT_STREQ(lst, "A,B");
+    lst = KLPTR(KL_WS, "LST2");
+    EXPECT_STREQ(lst, "A,B,A");
+
     // Using macros in LEC
+    CLEC* clec = L_cc("1 + vmax($LST1)");
+    EXPECT_TRUE(clec != NULL);
+    EXPECT_EQ(clec->nb_names, 2);
+    EXPECT_STREQ(clec->lnames[0].name, "A");
+    EXPECT_STREQ(clec->lnames[1].name, "B");
+    SCR_free(clec);
+
+    clec = L_cc("1 + vmax($LST2)");
+    EXPECT_TRUE(clec != NULL);
+    EXPECT_EQ(clec->nb_names, 2);
+    EXPECT_STREQ(clec->lnames[0].name, "A");
+    EXPECT_STREQ(clec->lnames[1].name, "B");
+    SCR_free(clec);
+
     U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
     U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);
 }
@@ -1105,7 +1159,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(kdbe, nullptr);
 
     // Check list is empty
-    lst = KLPTR("_DIVER");
+    lst = KLPTR(KL_WS, "_DIVER");
     EXPECT_TRUE(lst == NULL);
 
     // Simulation instance
@@ -1130,13 +1184,13 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
-    lst = KLPTR("_PRE");
+    lst = KLPTR(KL_WS, "_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Check _DIVER list
-    lst = KLPTR("_DIVER");
+    lst = KLPTR(KL_WS, "_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
@@ -1211,7 +1265,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = KTPTR("C8_1");
+    tbl = KTPTR(KT_WS, "C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
@@ -1400,6 +1454,8 @@ TEST_F(IodeCAPITest, Tests_SWAP)
 
 TEST_F(IodeCAPITest, Tests_B_DATA)
 {
+    bool        success;
+    bool        found;
     char        *lst, buf[512];
     int         rc, i;
     double      *A1, val;
@@ -1430,47 +1486,78 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = KLPTR("RC");
+    lst = KLPTR(KL_WS, "RC");
     EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
-    A1 = KVPTR("A1");
+    A1 = KVPTR(KV_WS, "A1");
     EXPECT_EQ(rc, 0);
-    EXPECT_TRUE(KV_WS->index_of("A1") >= 0);
+    found = KV_WS->contains("A1");
+    EXPECT_TRUE(found);
     EXPECT_EQ(A1[1], 4);
 
     // B_DataCreate(char* arg, int type)
     // B_DataDuplicate(char* arg, int type)
     // B_DataRename(char* arg, int type)
     // B_DataDelete(char* arg, int type)
+    KDB* kdb;
+    int pos;
+    SWHDL handle;
+    char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
-        rc = B_DataCreate("XXX", i);
+        kdb = K_WS[i];
+        char* x_name = (i == SCALARS) ? "xxx" : "XXX";
+        rc = B_DataCreate(x_name, i);
         EXPECT_EQ(rc, 0);
-        EXPECT_TRUE(K_WS[i]->index_of("XXX") >= 0);
+        found = kdb->contains(x_name);
+        EXPECT_TRUE(found);
+        pos = kdb->index_of(x_name);
+        EXPECT_TRUE(pos >= 0);
+        handle = kdb->get_handle(x_name);
+        EXPECT_TRUE(handle > 0);
+        ptr_obj = kdb->get_ptr_obj(x_name);
+        EXPECT_STRNE(ptr_obj, "");
 
+        // Equations cannot be renamed or duplicated
         if(i != EQUATIONS) 
-        { // Equations cannot be renamed or duplicated
-            rc = B_DataDuplicate("XXX YYY", i);
+        {   
+            char* y_name = (i == SCALARS) ? "yyy" : "YYY"; 
+            char* dup_names = (i == SCALARS) ? "xxx yyy" : "XXX YYY";
+            rc = B_DataDuplicate(dup_names, i);
             EXPECT_EQ(rc, 0);
-            EXPECT_TRUE(K_WS[i]->index_of("YYY") >= 0);
+            found = kdb->contains(y_name);
+            EXPECT_TRUE(found);
+            pos = kdb->index_of(y_name);
+            EXPECT_TRUE(pos >= 0);
+            handle = kdb->get_handle(y_name);
+            EXPECT_TRUE(handle > 0);
+            ptr_obj = kdb->get_ptr_obj(y_name);
+            EXPECT_STRNE(ptr_obj, "");
 
-            rc = B_DataRename("YYY ZZZ", i);
+            char* z_name = (i == SCALARS) ? "zzz" : "ZZZ";
+            char* ren_name = (i == SCALARS) ? "yyy zzz" : "YYY ZZZ";
+            rc = B_DataRename(ren_name, i);
             EXPECT_EQ(rc, 0);
-            EXPECT_TRUE(K_WS[i]->index_of("ZZZ") >= 0);
+            found = kdb->contains(z_name);
+            EXPECT_TRUE(found);
         }
 
-        rc = B_DataDelete("XXX", i);
+        rc = B_DataDelete(x_name, i);
         EXPECT_EQ(rc, 0);
-        EXPECT_TRUE(K_WS[i]->index_of("XXX") < 0);
+        found = kdb->contains(x_name);
+        EXPECT_TRUE(!found);
     }
 
     // B_DataListSort()
-    rc = K_add(KL_WS, "LIST1", "A;C;B");
-    EXPECT_TRUE(KL_WS->index_of("LIST1") >= 0);
+    success = K_add(KL_WS, "LIST1", "A;C;B");
+    EXPECT_TRUE(success);
+    found = KL_WS->contains("LIST1");
+    EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
-    lst = KLPTR("LIST2");
+    EXPECT_EQ(rc, 0);
+    lst = KLPTR(KL_WS, "LIST2");
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
@@ -1478,30 +1565,33 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     K_add(KL_WS, "L2", "X Z Y");
     K_add(KL_WS, "L3", "A B D");
     rc = B_DataListSort("L1 RES");
-    lst = KLPTR("RES");
+    EXPECT_EQ(rc, 0);
+    lst = KLPTR(KL_WS, "RES");
     EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCPTR("U")), "Comment of U");
+    EXPECT_EQ(std::string(KCPTR(KC_WS, "U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
+    EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KIPTR("U")), "2 * A");
+    EXPECT_EQ(std::string(KIPTR(KI_WS, "U")), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("U")), "A,B,C");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "U")), "A,B,C");
 
-    rc = B_DataUpdate("U  1.2 1"             , SCALARS);
-    val = K_s_get_value (KS_WS, "U");
+    rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
+    val = K_s_get_value (KS_WS, "u");
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
+    EXPECT_EQ(rc, 0);
     smpl = KV_WS->sample;
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , VARIABLES);
     EXPECT_EQ(rc, 0);
@@ -1509,12 +1599,12 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("NEWLIST")), "U");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "NEWLIST")), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_SCAL")), "c1;c2");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_SCAL")), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1523,17 +1613,17 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_SCAL")), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCPTR("U")), "Comment of U - More comment on U");
+    EXPECT_EQ(std::string(KCPTR(KC_WS, "U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", KLPTR("LC"));
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "LC")), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", KLPTR(KL_WS, "LC"));
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1541,40 +1631,39 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_RES")), "A;B;C;D;E");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_RES")), "C");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_RES")), "A;B");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
-    sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", input_test_dir);
+    sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_EQ BOTH_DIFF", input_test_dir);
     rc = B_DataCompare(buf, LISTS);
-    //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
-    //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
-    //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
-    //printf("    BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
-
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR("WS_ONLY")), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
-    //printf("%s\n", KLPTR("WS_ONLY"));
+    // names only in current WS
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "WS_ONLY")), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
+    // names only in file
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "FILE_ONLY")), "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;TOTAL1;XENVI;XSCENARIO;_SEARCH");
+    // names in both current WS and file and IODE obj in WS == IODE obj in file
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "BOTH_EQ")), "");
+    // names in both current WS and file but IODE obj in WS != IODE obj in file
+    EXPECT_EQ(std::string(KLPTR(KL_WS, "BOTH_DIFF")), "_SCAL");
 
-    // B_DataPrintGraph()
-    //smpl = KV_WS->sample;
-    //printf("%d\n", smpl->start_period);
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
 
     // B_DataDisplayGraph()
     rc = B_DataDisplayGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
+    EXPECT_EQ(rc, 0);
 }
 
 
@@ -1583,6 +1672,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     int     rc, pos;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
+    KDB*    kdb_eqs = KE_WS;
 
     U_test_print_title("Tests B_EQS");
     U_test_suppress_kmsg_msgs();
@@ -1603,12 +1693,6 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     Sample smpl = KESMPL(KE_WS, pos);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
-
-    // TODO: implement next utests with the same canevas
-        //B_EqsSetMethod(char* arg, int unused)
-        //B_EqsSetBloc(char* arg, int unused)
-        //B_EqsSetCmt(char* arg, int unused)
-        //B_EqsSetInstrs(char* arg, int unused)
 
     U_test_reset_kmsg_msgs();
 }
@@ -1781,26 +1865,32 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
+    // C = "D*2+ACAF"
+    // D = "A+B"
     char idtexec[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec);
     EXPECT_NE(rc, 0);
 
     // Second trial with WS in filenames
     KV_WS->clear();
-    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
+    // Create vars on 2000Y1:2020Y1 
+    //  => A = [0, 1...], B = [0, 2, 4...], AB = AC = BB = BC = B
+    U_test_CreateObjects();
 
     sprintf(filename,  "WS %sfun", input_test_dir);
     rc = B_IdtExecuteVarFiles(filename);
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
+    // C = "D*2+ACAF"
+    // D = "A+B"
     char idtexec2[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec2);
     EXPECT_EQ(rc, 0);
 
     // Check the values
-    double* C = (double*) KVPTR("C");
-    double* D = (double*) KVPTR("D");
+    double* C = (double*) KVPTR(KV_WS, "C");
+    double* D = (double*) KVPTR(KV_WS, "D");
 
     EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
     EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
@@ -1821,29 +1911,14 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     U_test_K_interpret(IDENTITIES, "fun");
     U_test_K_interpret(VARIABLES, "fun");
 
-    //iode.ws_load_idt(f"{input_test_dir}fun")
-    //iode.ws_load_var(f"{input_test_dir}fun")
-    //iode.ws_load_scl(f"{input_test_dir}fun")
-
-    AOUC = KVPTR("AOUC");
+    AOUC = KVPTR(KV_WS, "AOUC");
     AOUC[1] = 0.1;
-    //iode.set_var("AOUC", AOUC)
-
-    //rc = iode.idt_execute("1961:2015", "AOUC")
-    //print(f"rc={rc}")
 
     // Sample (null => full sample, see K_exec())
     smpl = new Sample("1961Y1", "2015Y1");   
     idts = (char**) SCR_vtoms((U_ch*) "AOUC", (U_ch*) " ,;\t");
     rc = B_IdtExecuteIdts(smpl, idts);
     printf("rc=%d\n", rc);
-
-    //AOUC = iode.get_var("AOUC")
-    //test_eq(f"AOUC[1961Y1]", 0.24783192, AOUC[1])
-
-    //varname = "AOUC"
-    //res = iode.exec_lec(f"{varname}[1961Y1]", 0)
-    //test_eq(f"{varname}[1961Y1]", 0.24783192, res)
     EXPECT_DOUBLE_EQ(round(AOUC[1] * 1e8) / 1e8, 0.24783192);
 }
 
@@ -1917,7 +1992,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
         delete KC_WS;
         KC_WS = K_interpret(COMMENTS, outfile, 1);
         EXPECT_TRUE(KC_WS != nullptr);
-        EXPECT_EQ(std::string(KCPTR("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(std::string(KCPTR(KC_WS, "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2154,7 +2229,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     // B_ModelCalcSCC(char *arg) $ModelCalcSCC nbtris prename intername postname [eqs]
     rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    rc = strcmp(KLPTR("_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
+    rc = strcmp(KLPTR(KL_WS, "_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
     EXPECT_EQ(rc, 0);
 
     // int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
@@ -2756,11 +2831,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     U_test_print_title("Tests B_ReportExec(\"rep_expand.rep\")");
     U_test_suppress_kmsg_msgs();
 
-    // Calls to B_ReportExec(reportfile)
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
-
+    RP_STDOUT = 1;      // Enable report to stdout for this test
     sprintf(cmd,  "%srep_expand.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
-    rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
+    rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "rep_expand.a2m", output_test_dir, "rep_expand.ref.a2m");
 
@@ -2777,6 +2851,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
     sprintf(cmd,  "%srep_fns.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
@@ -2795,6 +2870,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
     sprintf(cmd,  "%srep_proc.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
@@ -2927,10 +3003,10 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     K_add(KL_WS, "X", "R1,R2,R3,R4,RT");
     K_add(KL_WS, "Y", "C1,C2,C3,C4,CT");
 
-    pos = KL_WS->index_of("X");
-    EXPECT_NE(pos, -1);
-    pos = KL_WS->index_of("Y");
-    EXPECT_NE(pos, -1);
+    bool found = KL_WS->contains("X");
+    EXPECT_TRUE(found);
+    found = KL_WS->contains("Y");
+    EXPECT_TRUE(found);
 
     // Note: ref_period and sum_period are freed in RasExecute()
     res = RasExecute(pattern, xdim, ydim, ref_period, sum_period, maxit, eps);

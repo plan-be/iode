@@ -40,18 +40,18 @@ public:
 
     std::string get_lec(const std::string& name) const;
 
-    int add(const std::string& name, const std::string& lec);
+    bool add(const std::string& name, const std::string& lec);
 
-    int add(const std::string& name, const Identity& obj);
+    bool add(const std::string& name, const Identity& obj);
 
     void update(const std::string& name, const std::string& lec);
 
     void update(const int pos, const std::string& lec);
 
-    void execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
+    bool execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
 
-    void execute_identities(const std::string& from, const std::string& to, const std::string& identities_list = "", 
+    bool execute_identities(const std::string& from, const std::string& to, const std::string& identities_list = "", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
 };
 
@@ -61,15 +61,16 @@ inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
+    char* lec;
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->size(); pos++)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
-        char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
+        hash_combine<std::string>(seed, name);  
         // need to wrap with std::string() because hash_value() and
         // hash_combine() only compare pointer addresses when applied 
         // on char* arrays
-        hash_combine<std::string>(seed, std::string(KILEC(kdb, pos)));
+        lec = (char*) P_get_ptr(SW_getptr(handle), 0);
+        hash_combine<std::string>(seed, std::string(lec));
     }
     return seed;
 }

@@ -410,14 +410,12 @@ public:
         // create scalars not yet present in the Scalars Database
         if(create_if_not_exit)
         {
-            char* c_name;
             for(const std::string& coeff_name: coeffs)
             {
-                c_name = const_cast<char*>(coeff_name.data());
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
                 // see K_add() and K_spack()
-                if (KS_WS->index_of(c_name) < 0) 
-                    K_add(KS_WS, c_name, NULL);
+                if (!KS_WS->contains(coeff_name)) 
+                    K_add(KS_WS, (char*) coeff_name.c_str(), NULL);
             }
         }
 
@@ -435,15 +433,13 @@ public:
             if(sample == NULL || sample->nb_periods == 0)
                 throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
-            char* c_name;
             int nb_obs = sample->nb_periods;
             for(const std::string& var_name: vars)
             {
-                c_name = const_cast<char*>(var_name.data());
                 // adds a new variable with nb_obs IODE_NAN values to the Variables Database
                 // see K_add() and K_vpack()
-                if (KV_WS->index_of(c_name) < 0) 
-                    K_add(KV_WS, c_name, NULL, &nb_obs);
+                if (!KV_WS->contains(var_name)) 
+                    K_add(KV_WS, (char*) var_name.c_str(), NULL, &nb_obs);
             }
         }
 
@@ -598,16 +594,18 @@ inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, int pos)
     return tests;
 }
 
+// returns an allocated EQ
 inline Equation* KEVAL(KDB* kdb, int pos) 
 {   
-    char* ptr = kdb->get_ptr_obj(pos);
-    if(!ptr) 
+    std::string name = kdb->get_name(pos);
+    if(name.empty())
         return nullptr;
-    std::string name = kdb->get_name(pos);  
+    char* ptr = kdb->get_ptr_obj(name);
     return K_eunpack(ptr, (char*) name.c_str());
 }
 
-inline Equation* KEPTR(char* name) 
+// returns an allocated EQ
+inline Equation* KEPTR(KDB* kdb, char* name) 
 {         
-    return K_eptr(KE_WS, name);      // returns an allocated EQ
+    return K_eptr(kdb, name);
 }

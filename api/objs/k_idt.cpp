@@ -10,14 +10,12 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
     // create scalars not yet present in the Scalars Database
     if(create_if_not_exit)
     {
-        char* c_name;
         for(const std::string& coeff_name: coeffs)
         {
-            c_name = const_cast<char*>(coeff_name.data());
             // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
             // see K_add() and K_spack()
-            if (K_WS[SCALARS]->index_of(c_name) < 0) 
-                K_add(K_WS[SCALARS], c_name, NULL);
+            if (!K_WS[SCALARS]->contains(coeff_name)) 
+                K_add(K_WS[SCALARS], (char*) coeff_name.c_str(), NULL);
         }
     }
 
@@ -39,15 +37,13 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
             throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
                                     std::string(this->lec) +"\nThe global sample is not yet defined");
 
-        char* c_name;
         int nb_obs = sample->nb_periods;
         for(const std::string& var_name: vars)
         {
-            c_name = const_cast<char*>(var_name.data());
             // adds a new variable with nb_obs IODE_NAN values to the Variables Database
             // see K_add() and K_vpack()
-            if (K_WS[VARIABLES]->index_of(c_name) < 0) 
-                K_add(K_WS[VARIABLES], c_name, NULL, &nb_obs);
+            if (!K_WS[VARIABLES]->contains(var_name))
+                K_add(K_WS[VARIABLES], (char*) var_name.c_str(), NULL, &nb_obs);
         }
     }
 

@@ -7,7 +7,7 @@ List KDBLists::get_unchecked(const int pos) const
 	return std::string(KLVAL(get_database(), pos));
 }
 
-int KDBLists::add(const std::string& name, const List& list)
+bool KDBLists::add(const std::string& name, const List& list)
 {
 	char* c_list = to_char_array(list);
 	return KDBTemplate::add(name, c_list);

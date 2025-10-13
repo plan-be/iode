@@ -588,7 +588,7 @@ class Variables(IodeDatabase):
         if name not in self:
             raise KeyError(f"Variable '{name}' not found in the Variables database")
 
-        pos = self.index_of(key_name) if isinstance(key_name, str) else key_name
+        pos = self.index(key_name) if isinstance(key_name, str) else key_name
 
         # key_periods represents all periods (of the current subset) -> return a Variables object
         if key_periods is None:
@@ -1052,7 +1052,7 @@ class Variables(IodeDatabase):
         
         # update a Variable
         else:
-            pos = self.index_of(key_name) if isinstance(key_name, str) else key_name
+            pos = self.index(key_name) if isinstance(key_name, str) else key_name
             name = self.get_name(pos) if isinstance(key_name, int) else key_name
             # update values for the whole (subset) sample
             if key_periods is None:
@@ -2014,7 +2014,7 @@ class Variables(IodeDatabase):
         self._cython_instance.remove_objects(names)
         for subsets in self.list_subsets:
             names_subset = [name for name in names if name in subsets]
-            subsets._cython_instance.remove_entries(names_subset)
+            subsets._cython_instance.remove_objects(names_subset)
 
     def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Self], 
                       op: BinaryOperation, copy_self: bool) -> Self:
@@ -5706,7 +5706,7 @@ class Variables(IodeDatabase):
         data = self.to_numpy()
         if data.ndim == 1:
             data = data.reshape(1, len(data))
-        
+
         df = pd.DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name

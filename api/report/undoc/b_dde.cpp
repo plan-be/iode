@@ -457,7 +457,6 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
         strcpy(res, kdb->get_name(objnb).c_str());
         strcat(res, "\t");
         strcat(res, obj);
-        /* strcat(res, "\t");*/
     }
     else
         res = IodeDdeCreateTbl(objnb, NULL, nc, nl, -1);
@@ -488,6 +487,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
     KDB     *kdb;
     int     objnb, i, l, h;
     HCONV   hConv;
+    std::string name;
 
     kdb = K_WS[type];
     tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
@@ -524,16 +524,20 @@ char *IodeDdeGetXObj(char *szItem, int type)
             }
 
             else {
-                for(i = 0 ; lst[i] ; i++) {
+                for(i = 0 ; lst[i] ; i++) 
+                {
+                    name = std::string((char*) lst[i]);
                     if(strcmp((char*) lst[i], "t") == 0) {
                         res = IodeDdeCreatePer(0);
                         WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + kdb->sample->nb_periods, 1), 
                                        (unsigned char*) res);
                         SCR_free(res);
                     }
-                    else {
-                        objnb = kdb->index_of((char*) lst[i]);
-                        if(objnb < 0) continue;
+                    else 
+                    {
+                        objnb = kdb->index_of(name);
+                        if(objnb < 0) 
+                            continue;
 
                         res = IodeDdeCreateSeries(objnb, 0);
                         WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + kdb->sample->nb_periods, 1), 
@@ -553,11 +557,15 @@ char *IodeDdeGetXObj(char *szItem, int type)
                     SCR_free(res);
                 }
             }
-
-            else {
-                for(i = 0 ; lst[i] ; i++) {
+            else 
+            {
+                for(i = 0 ; lst[i] ; i++) 
+                {
+                    name = std::string((char*) lst[i]);
                     objnb = kdb->index_of((char*) lst[i]);
-                    if(objnb < 0) continue;
+                    if(objnb < 0) 
+                        continue;
+                    
                     res = IodeDdeCreateObj(objnb, type, &l, &h);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                    (unsigned char*) res);
@@ -579,7 +587,8 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     KDB     *kdb;
     double  x;
     char    buf[80], *res;
-    Scalar     *scl;
+    Scalar  *scl;
+    std::string name;
 
     SCR_vtime = 1;
     SCR_upper((unsigned char*) szTopic);
@@ -594,13 +603,20 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(strcmp(szTopic, "XREP") == 0) return(IodeDdeGetReportRC(szItem));
 
     type = IodeDdeType(szTopic);
-    if(type < 0 || type > 6) return((char*) SCR_stracpy((unsigned char*) "Error"));
+    if(type < 0 || type > 6) 
+        return((char*) SCR_stracpy((unsigned char*) "Error"));
+    
     kdb = K_WS[type];
-    if(type == SCALARS) SCR_lower((unsigned char*) szItem);
-    objnb = kdb->index_of(szItem);
-    if(objnb < 0) return((char *)0);
+    if(type == SCALARS) 
+        SCR_lower((unsigned char*) szItem);
+    
+    name = std::string((char*) szItem);
+    objnb = kdb->index_of(name);
+    if(objnb < 0) 
+        return((char *)0);
 
-    switch(type) {
+    switch(type) 
+    {
         case EQUATIONS :
         case IDENTITIES :
         case TABLES :
@@ -990,16 +1006,20 @@ int B_ExcelSet(char *arg, int type)
     char        **args = NULL,
                 *ptr = NULL,
                 *item, *smpl;
+    std::string name;
     std::string lec;
 
     args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
     nb_args = SCR_tbl_size((unsigned char**) args);
 
-    pos = kdb->index_of(args[0]);
-    if(pos < 0) goto the_end;
+    name = std::string((char*) args[0]);
+    pos = kdb->index_of(name);
+    if(pos < 0) 
+        goto the_end;
 
     item = args[nb_args - 1];
-    switch(type) {
+    switch(type) 
+    {
         case COMMENTS :
             ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, pos));
             break;

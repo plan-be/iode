@@ -55,11 +55,11 @@ extern "C" int SCR_ADD_PTR_CHUNCK;
  */
 char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)
 {
-    int     i, j, k, n = 0, found;
-    char    **lst = NULL;
-    Table     *tbl;
+    int         i, j, k, n = 0, found;
+    char        **lst = NULL;
+    Table       *tbl;
     TableLine   *tline;
-    int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
+    int         old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
     std::string lec;
     std::string cmt;
     std::string text;
@@ -68,22 +68,25 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     {
         n = kdb->size();
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
-        for(i = 0; i < n ; i++) 
-            lst[i] = (char*) SCR_stracpy((unsigned char*) kdb->get_name(i).c_str());
-        return(lst);
+        i = 0;
+        for(const auto& [name, _] : kdb->k_objs)
+            lst[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
+        return lst;
     }
 
     TableCell* cell;
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(i = 0; i < kdb->size(); i++) 
+    i = 0;
+    for(const auto& [name, _] : kdb->k_objs)
     {
         found = 0;
         if(names) 
-            found = !SCR_grep_gnl(pattern, (char*) kdb->get_name(i).c_str(), ecase, all);
+            found = !SCR_grep_gnl(pattern, (char*) name.c_str(), ecase, all);
 
         if(!found) 
         {
-            switch(kdb->k_type) {
+            switch(kdb->k_type) 
+            {
                 case COMMENTS :
                     if(texts) 
                         found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
@@ -104,7 +107,6 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                     if(!found && texts)
                         found = !SCR_grep_gnl(pattern, (char*) cmt.c_str(), ecase, all);
                     break;
-
                 case TABLES:
                     tbl = KTVAL(kdb, i);
                     for(k = 0; k < T_NL(tbl) && !found; k++) 
@@ -146,14 +148,15 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
         }
 
         if(found) 
-            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) kdb->get_name(i).c_str());
+            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) name.c_str());
+        i++;
     }
 
     if(lst != NULL) 
         SCR_add_ptr((unsigned char***) &lst, &n, NULL);
     
-    SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;    // JMP 19/01/2023
-    return(lst);
+    SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;
+    return lst;
 }
 
 /**
@@ -231,26 +234,30 @@ char *K_expand(int type, char* file, char* pattern, int all)
  */
 char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
 {
-
     int     i, np;
     char    **ptbl, **tbl, *lst = NULL;
 
-    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) return(NULL);
+    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) 
+        return(NULL);
 
-    if(kdb == NULL) kdb = K_WS[type];
+    if(kdb == NULL) 
+        kdb = K_WS[type];
 
-    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */
+    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS);
     np = SCR_tbl_size((unsigned char**) ptbl);
-    for(i = 0; i < np; i++) {
-        if(ptbl[i][0] != '"' &&
-                (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) {
+    for(i = 0; i < np; i++) 
+    {
+        if(ptbl[i][0] != '"' && (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) 
+        {
             tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
             SCR_free(ptbl[i]);
-            if(tbl != NULL) {
+            if(tbl != NULL) 
+            {
                 ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
                 SCR_free_tbl((unsigned char**) tbl);
             }
-            else ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
+            else 
+                ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
         }
     }
 

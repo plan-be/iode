@@ -98,18 +98,21 @@ void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const
     // check that the destination variable exists in the destination database
     // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
-    // TODO: find a way to delete also the variable from the shallow copies
-    int dest_var_pos = dest->index_of(dest_name);
+    bool found = dest->contains(dest_name);
+    if(!found)
+        throw std::invalid_argument("C API: Variable named '" + dest_name + "' seems to not exist in the destination database");
     double* dest_var_ptr = dest->get_var_ptr(dest_name);
     if(dest_var_ptr == NULL)
-        throw std::invalid_argument("C API: Variable named '" + dest_name + "' seems to not exist in the destination database");
+        throw std::runtime_error("C API: Could not get the values of the Variable named '" + dest_name + "'");
     dest_var_ptr += dest_t_first;
 
     // check that the source variable exists in the source database
-    int source_var_pos = source->index_of(source_name);
-    double* source_var_ptr = source->get_var_ptr(source_var_pos);
-    if(source_var_ptr == NULL)
+    found = source->contains(source_name);
+    if(!found)
         throw std::invalid_argument("C API: Variable named '" + source_name + "' seems to not exist in the source database");
+    double* source_var_ptr = source->get_var_ptr(source_name);
+    if(source_var_ptr == NULL)
+        throw std::runtime_error("C API: Could not get the values of the Variable named '" + source_name + "'");
     source_var_ptr += source_t_first;
 
     // copy the data
@@ -264,8 +267,10 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     if(t_last >= database->get_nb_periods())
         throw std::invalid_argument("C API: time index 't_last' must be less than the number of time steps");
 
-    int pos = database->index_of(name);
-    double* var_ptr = database->get_var_ptr(pos);
+    bool found = database->contains(name);
+    if(!found)
+        throw std::invalid_argument("C API: Variable named '" + name + "' seems to not exist in the database");
+    double* var_ptr = database->get_var_ptr(name);
     
     switch(op)
     {
@@ -312,11 +317,12 @@ void _c_operation_between_two_vars(const int op, KDBVariables* database, const s
     // check that the destination variable exists in the destination database
     // NOTE: this can happen if the destination or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
-    // TODO: find a way to delete also the variable from the shallow copies
-    int other_var_pos = other->index_of(other_name);
-    double* other_var_ptr = other->get_var_ptr(other_var_pos);
+    bool found = other->contains(other_name);
+    if(!found)
+        throw std::invalid_argument("C API: Variable named '" + other_name + "' seems to not exist in the source database");
+    double* other_var_ptr = other->get_var_ptr(other_name);
     if(other_var_ptr == NULL)
-    throw std::invalid_argument("C API: Variable named '" + other_name + "' seems to not exist in the source database");
+        throw std::runtime_error("C API: Could not get the values of the Variable named '" + other_name + "'");
     other_var_ptr += other_t_first;
 
     _c_operation_one_var(op, database, name, t_first, t_last, other_var_ptr);

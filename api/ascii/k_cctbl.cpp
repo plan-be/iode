@@ -438,7 +438,7 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(K_add(kdb, name, tbl) < 0)  
+                if(!K_add(kdb, name, tbl))  
                     goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 delete tbl;
@@ -672,7 +672,7 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < kdb->size(); i++) 
     {
         name = kdb->get_name(i);
-        fprintf(fd, "%s {", name.c_str());
+        fprintf(fd, "%s {", (char*) name.c_str());
         tbl = KTVAL(kdb, i);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");

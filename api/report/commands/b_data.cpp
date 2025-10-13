@@ -249,12 +249,14 @@ int B_DataCalcVar(char* arg, int unused)
     SCR_strip((unsigned char*) lec);
 
     nb = kdb->sample->nb_periods;
-    pos = kdb->index_of(name);
-    if(pos < 0) 
-        pos = K_add(kdb, name, NULL, &nb);
-    if(pos < 0) 
-        return(-1);
+    if(!kdb->contains(std::string(name)))
+    {
+        bool success = K_add(kdb, name, NULL, &nb);
+        if(!success) 
+            return(-1);
+    }
 
+    pos = kdb->index_of(std::string(name));
     if(lec[0]) 
     {
         clec = L_cc(lec);
@@ -294,19 +296,26 @@ int B_DataCreate_1(char* arg, int* ptype)
     char    deflt[41];
     KDB     *kdb = K_WS[*ptype];
 
-    if(kdb->index_of(arg) >= 0) return(-1);
+    std::string name = std::string(arg);
+    if(kdb->contains(name)) 
+        return -1;
 
-    switch(*ptype) {
+    switch(*ptype) 
+    {
         case COMMENTS :
         case LISTS :
         case SCALARS :
-            if(K_add(kdb, arg, NULL) < 0) return(-1);
-            else return(0);
+            if(!K_add(kdb, arg, NULL)) 
+                return(-1);
+            else 
+                return(0);
 
         case VARIABLES :
             nb_per = kdb->sample->nb_periods;
-            if(K_add(kdb, arg, NULL, &nb_per) < 0) return(-1);
-            else return(0);
+            if(!K_add(kdb, arg, NULL, &nb_per)) 
+                return(-1);
+            else 
+                return(0);
 
         case EQUATIONS :
             sprintf(deflt, "%s := %s", arg, arg);
@@ -314,8 +323,11 @@ int B_DataCreate_1(char* arg, int* ptype)
 
         case IDENTITIES :
             sprintf(deflt, "%s", arg);
-            if(K_add(kdb, arg, deflt) < 0) return(-1);
-            else return(0);
+            if(!K_add(kdb, arg, deflt)) 
+                return(-1);
+            else 
+                return(0);
+        
         case TABLES :
             return(K_upd_tbl(arg, "TITLE;LEC"));
     }
@@ -356,15 +368,20 @@ int B_DataCreate(char* arg, int type)
  */
 int B_DataDelete_1(char* arg, int* ptype)
 {
-    int     pos;
-    KDB     *kdb = K_WS[*ptype];
+    std::string name = std::string(arg);
+    KDB* kdb = K_WS[*ptype];
 
-    pos = kdb->index_of(arg);
-    if(pos < 0 || K_del(kdb, pos) < 0) {
-        error_manager.append_error("Failed to delete '" + std::string(arg) + "'");
-        return(-1);
+    if(!kdb->contains(name)) 
+        return -1;
+    
+    bool success = kdb->remove(name);
+    if(!success) 
+    {
+        error_manager.append_error("Failed to delete '" + name + "'");
+        return -1;
     }
-    return(0);
+
+    return 0;
 }
 
 int wrapper_B_DataDelete_1(char* arg, void* ptype)
@@ -412,12 +429,16 @@ int B_DataRename(char* arg, int type)
     int     rc = 0;
     char    **args;
 
-    if(type == EQUATIONS) return(-1); /* Rename of EQS has no sense */
+    if(type == EQUATIONS) 
+        return(-1); /* Rename of EQS has no sense */
 
     args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) return(-1);
+    if(args == NULL) 
+        return(-1);
 
-    if(K_ren(K_WS[type], args[0], args[1]) < 0) {
+    bool success = K_WS[type]->rename(std::string(args[0]), std::string(args[1]));
+    if(!success) 
+    {
         std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
         error_msg += std::string(args[1]) + "' failed";
         error_manager.append_error(error_msg);
@@ -443,7 +464,7 @@ int B_DataRename(char* arg, int type)
  */
  int B_DataDuplicate(char* arg, int type)
 {
-    int     rc = 0;
+    int     pos = 0;
     char    **args;
     KDB     *kdb = K_WS[type];
 
@@ -455,15 +476,17 @@ int B_DataRename(char* arg, int type)
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) return(-1);
 
-    if(K_dup(kdb, args[0], kdb, args[1]) < 0) {
+    pos = K_dup(kdb, args[0], kdb, args[1]);
+    if(pos < 0) 
+    {
         std::string error_msg = "DataDuplicate '" + std::string(args[0]) + "' as '";
         error_msg += std::string(args[1]) + " failed";
         error_manager.append_error(error_msg);
-        rc = -1;
     }
 
     A_free((unsigned char**) args);
-    return(rc);
+
+    return (pos < 0) ? -1 : 0;
 }
 
 
@@ -493,36 +516,40 @@ int B_DataRename(char* arg, int type)
 
 int B_DataUpdate(char* arg, int type)
 {
-    int     pos, shift, lg, rc = 0,
-                            nb_args, nb_upd, nb_p,
-                            i, mode;
+    bool    success;
+    int     shift, lg, rc,
+            nb_args, nb_upd, nb_p,
+            i, mode;
     double  var;
     KDB     *kdb = K_WS[type];
-    Scalar     scl;
+    Scalar  scl;
     Period  *per = NULL;
     char    name[K_MAX_NAME + 1], **args = NULL;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    pos = kdb->index_of(name);
-    if(pos < 0) {
+    if(!kdb->contains(std::string(name))) 
+    {
         if(B_DataCreate(name, type)) 
-            return(-1);
-        pos = kdb->index_of(name);
+            return -1;
     }
 
-    switch(type) {
+    int pos;
+    switch(type) 
+    {
     case COMMENTS : /* Name Val */
     case IDENTITIES :
     case LISTS :
-        rc = K_add(kdb, name, arg + lg + 1, name);
+        success = K_add(kdb, name, arg + lg + 1, name);
         break;
 
     case EQUATIONS :
         rc = K_upd_eqs(name, arg + lg + 1, NULL, -1, NULL, NULL, NULL, NULL, 0);
+        success = (rc == 0);
         break;
 
     case TABLES :
         rc = K_upd_tbl(name, arg + lg + 1);
+        success = (rc == 0);
         break;
 
     case SCALARS : /* Name Val [Relax] */
@@ -532,30 +559,34 @@ int B_DataUpdate(char* arg, int type)
         scl.relax = 1.0;
         scl.std = IODE_NAN;
 
-        switch(nb_args) {
+        success = true;
+        switch(nb_args) 
+        {
         case 2:
             scl.value = (double) atof(args[1]);
             break;
-
         case 3:
             scl.value = (double) atof(args[1]);
             scl.relax = (double) atof(args[2]);
             break;
         default :
             error_manager.append_error("DataUpdateScl : Invalid Argument");
-            rc = -1;
+            success = false;
             break;
         }
-        if(rc == 0) 
-            rc = K_add(kdb, args[0], &scl);
+
+        if(success) 
+            success = K_add(kdb, args[0], &scl);
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
         args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
         nb_args = SCR_tbl_size((unsigned char**) args);
-        if(nb_args > 1) {
+        if(nb_args > 1) 
+        {
             nb_p = 1;
-            switch(args[1][0]) {
+            switch(args[1][0]) 
+            {
             case 'd' :
             case 'D' :
                 nb_p = 2;
@@ -581,30 +612,34 @@ int B_DataUpdate(char* arg, int type)
             nb_upd = nb_args - nb_p - 1;
 
             per = new Period(std::string(args[nb_p]));
-            if(per == 0) {
+            if(per == 0) 
+            {
                 error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
-                rc = -1;
+                success = false;
                 break;
             }
             nb_upd = std::min(nb_upd, (kdb->sample->end_period.difference(*per) + 1));
             shift = per->difference(kdb->sample->start_period);
             if(per == NULL || shift < 0)
-                rc = -1;
+                success = false;
             else 
             {
-                nb_p ++;
-                for(i = 0; i < nb_upd; i++) {
+                nb_p++;
+                pos = kdb->index_of(std::string(name));
+                for(i = 0; i < nb_upd; i++) 
+                {
                     var = (double) atof(args[i + nb_p]);
                     if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                         var = IODE_NAN; /* JMP 06-09-2004 */
                     KV_set(kdb, pos, shift + i, mode, var);
                 }
+                success = true;
             }
         }
         else 
-            rc = -1;
+            success = false;
 
-        if(rc < 0) 
+        if(!success) 
             error_manager.append_error("DataUpdateVar : '" + std::string(arg) + "' Invalid Argument");
         break;
     }
@@ -613,13 +648,7 @@ int B_DataUpdate(char* arg, int type)
     delete per;
     per = nullptr;
 
-    if(rc >= 0) 
-        rc = 0;
-
-    if(rc < 0) 
-        rc = -1; // Pour éviter return dans les rapports si rc = -2
-
-    return(rc);
+    return success ? 0 : -1;
 }
 
 
@@ -695,21 +724,6 @@ int B_DataSearch(char* arg, int type)
     forms = atoi(args[4]);
     texts = atoi(args[5]);
 
-/*
-    SCR_strlcpy(buf + 1, args[0], 76);
-    if(word == 1) {
-        strcpy(buf, "*!");
-        SCR_strlcpy(buf + 2, args[0], 76);
-        strcat(buf, "!*");
-    }
-    else {
-        buf[0] = '*';
-        SCR_strlcpy(buf + 1, args[0], 78);
-        strcat(buf, "*");
-    }
-
-    lst = K_grep(kdb, buf, ecase, names, forms, texts, '*');
-*/
     lst = B_DataSearchParms(args[0], word, ecase, names, forms, texts, type);
   
     rc = KL_lst(args[6], lst, 200);
@@ -789,29 +803,34 @@ static int my_strcmp(const void *pa, const void *pb)
 
 int B_DataListSort(char* arg, int unused)
 {
-    int     rc = 0, p;
+    int     rc = 0, pos;
     char    *in, *out, *lst,
             **args = NULL, **lsti = NULL,
             *old_A_SEPS;
 
-    args = B_vtom_chk(arg, 2); /* in out */
-    //if(args == NULL) in = out = arg;
-    if(args == NULL) return(-1);
-    else {
+    args = B_vtom_chk(arg, 2);
+    if(args == NULL) 
+        return(-1);
+    else 
+    {
         in = args[0];
         out = args[1];
     }
 
-    p = KL_WS->index_of(in);
+    pos = KL_WS->index_of(in);
 
-    if(p < 0) {
+    if(pos < 0) 
+    {
         error_manager.append_error("List '" + std::string(args[0]) + 
                                    "' not found in the Lists workspace");
         rc = -1;
         goto done;
     }
-    else lst = KLVAL(KL_WS, p);
-    if(lst == NULL) {
+    else 
+        lst = KLVAL(KL_WS, pos);
+    
+    if(lst == NULL) 
+    {
         error_manager.append_error("List '" + std::string(args[0]) + 
                                    "' not found in the Lists workspace");
         rc = -1;
@@ -823,7 +842,8 @@ int B_DataListSort(char* arg, int unused)
     A_SEPS = " \t\n\r;, ";  
     lsti = B_ainit_chk(lst, NULL, 0);
     A_SEPS = old_A_SEPS;
-    if(lsti == NULL) {
+    if(lsti == NULL) 
+    {
         rc = -1;
         goto done;
     }
@@ -831,7 +851,8 @@ int B_DataListSort(char* arg, int unused)
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
-    if(K_add(K_WS[LISTS], out, lst) < 0) {
+    if(!K_add(K_WS[LISTS], out, lst)) 
+    {
         error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
     }
@@ -916,9 +937,8 @@ int B_DataScan(char* arg, int type)
  */
 int B_DataExist(char* arg, int type)
 {
-    KDB     *kdb = K_WS[type];
-
-    return(kdb->index_of(arg));
+    KDB* kdb = K_WS[type];
+    return kdb->contains(std::string(arg));
 }
 
 
@@ -938,11 +958,13 @@ int B_DataExist(char* arg, int type)
  */
 int B_DataAppend(char* arg, int type)
 {
-    int     pos, lg;
+    bool    success;
+    int     lg;
     KDB     *kdb = K_WS[type];
     char    name[K_MAX_NAME + 1], *ptr, *nptr, *text;
 
-    switch(type) {
+    switch(type) 
+    {
     case COMMENTS :
     case LISTS :
         break;
@@ -958,13 +980,16 @@ int B_DataAppend(char* arg, int type)
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     text = arg + lg + 1;
-    pos = kdb->index_of(name);
 
-    if(pos < 0)
+    bool found = kdb->contains(std::string(name));
+    if(!found)
         nptr = text;
-    else {
-        if(strlen(text) == 0) return(0); /* empty append */
+    else 
+    {
+        if(strlen(text) == 0) 
+            return(0);
 
+        int pos = kdb->index_of(name);
         ptr = KOVAL(kdb, pos);
         nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
         if(type == COMMENTS)
@@ -973,11 +998,11 @@ int B_DataAppend(char* arg, int type)
             sprintf(nptr, "%s,%s", ptr, text);
     }
 
-    pos = K_add(kdb, name, nptr);
-    if(nptr != text) SW_nfree(nptr);
+    success = K_add(kdb, name, nptr);
+    if(nptr != text) 
+        SW_nfree(nptr);
 
-    if(pos < 0) return(-1);
-    else return(0);
+    return success ? 0 : -1;
 }
 
 
@@ -1112,7 +1137,8 @@ int B_DataCalcLst(char* arg, int unused)
 
     p1 = K_WS[LISTS]->index_of((char*) list1);
     p2 = K_WS[LISTS]->index_of((char*) list2);
-    if(p1 < 0 || p2 < 0) {
+    if(p1 < 0 || p2 < 0) 
+    {
         std::string error_msg = "List '";
         error_msg += (p1 < 0) ? std::string((char*) list1) : std::string((char*) list2);
         error_msg += "' not found in the Lists workspace";
@@ -1123,7 +1149,8 @@ int B_DataCalcLst(char* arg, int unused)
 
     l1 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p1), NULL, 0);
     l2 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p2), NULL, 0);
-    switch(op[0]) {
+    switch(op[0]) 
+    {
     case '+' :
         lst = SCR_union(l1, l2);
         break;
@@ -1140,8 +1167,8 @@ int B_DataCalcLst(char* arg, int unused)
         rc = -1;
         goto done;
     }
+    
     rc = KL_lst((char*) res, (char**) lst, -1); 
-
 
 done :
     A_free((unsigned char**) args);
@@ -1154,24 +1181,22 @@ done :
 /**
  *  Returns the number of elements in a list.
  *  
- *  @param [in] char*   arg     list_name
+ *  @param [in] char*   name    list_name
  *  @return     int             nb of elements in the list or -1 if the list does not exist
  */
-int B_DataListCount(char* arg, int unused)
+int B_DataListCount(char* name, int unused)
 {
-    int     nb = 0;
-    char    *lst,
-            **lsti = NULL;
+    int pos = KL_WS->index_of(name);
+    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, pos));
+    if(lst == NULL) 
+        return(-1);
 
-    lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, KL_WS->index_of(arg)));
-    if(lst == NULL) return(-1);
-
-    lsti = B_ainit_chk(lst, NULL, 0);
-    nb = SCR_tbl_size((unsigned char**) lsti);
+    char** lsti = B_ainit_chk(lst, NULL, 0);
+    int nb = SCR_tbl_size((unsigned char**) lsti);
     SCR_free_tbl((unsigned char**) lsti);
     SCR_free(lst);
 
-    return(nb);
+    return nb;
 }
 
 
@@ -1220,14 +1245,15 @@ int B_DataCompare(char* arg, int type)
 {
     int     i, rc = 0,
                n1 = 0, n2 = 0, n3 = 0, n4 = 0;
-    char    **args = NULL, 
+    char    **args = NULL, *c_name,
             **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
             *file, *one, *two, *three, *fr;
     KDB*    kdb1 = K_WS[type];
     KDB*    kdb2 = new KDB((IodeType) type, DB_STANDALONE);
 
-    if((args = B_vtom_chk(arg, 5)) == NULL) 
-        return(-1);
+    args = B_vtom_chk(arg, 5);
+    if(args == NULL) 
+        return -1;
     
     file  = args[0];
     one   = args[1];
@@ -1236,32 +1262,49 @@ int B_DataCompare(char* arg, int type)
     fr    = args[4];
 
     kdb2 = K_interpret(type, file, 0);
-    if(!kdb2) 
-        return(-1);
+    if(!kdb2)
+    {
+        A_free((unsigned char**) args);
+        std::string msg = "DataCompare: failed to load the file '" + std::string(file) + "'";
+        kwarning(msg.c_str());
+        return -1;
+    }
 
-    std::string name;
+    // K_cmp() return codes:
+    //      0 -> if name neither in K_WS[type] nor in file
+    //      1 -> if name in K_WS[type] but not in file
+    //      2 -> if name not in K_WS[type] but in file
+    //      3 -> if name in both K_WS[type] and file, IODE object in K_WS[type] == IODE object in file
+    //      4 -> if name in both K_WS[type] and file, IODE object in K_WS[type] != IODE object in file
     for(i = 0; i < kdb1->size(); i++) 
     {
-        name = kdb1->get_name(i);
-        rc = K_cmp((char*) name.c_str(), kdb1, kdb2);
+        c_name = (char*) kdb1->get_name(i).c_str();
+        rc = K_cmp(c_name, kdb1, kdb2);
         switch(rc) 
         {
+        // name neither in K_WS[type] nor in file
+        case 0 :
+            break;
+        // name in K_WS[type] but not in file
         case 1 :
-            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) name.c_str());
+            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) c_name);
             break;
+        // if name not in K_WS[type] but in file
         case 2 :
-            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) name.c_str());
-            break; /* never reached */
-        case 3 :
-            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) name.c_str());
+            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
             break;
+        // name in both K_WS[type] and file, IODE object in K_WS[type] == IODE object in file
+        case 3 :
+            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) c_name);
+            break;
+        // name in both K_WS[type] and file, IODE object in K_WS[type] != IODE object in file
         case 4 :
-            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) name.c_str());
+            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) c_name);
             break;
         }
 
         if(rc > 2) 
-            K_del(kdb2, kdb2->index_of(name));
+            kdb2->remove(c_name);
     }
 
     for(i = 0; i < kdb2->size(); i++) 

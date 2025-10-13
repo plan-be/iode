@@ -92,7 +92,7 @@ void Estimation::E_print_coefs()
         scl = KSVAL(E_DBS, E_C_NBS[i]);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
-                 E_DBS->get_name(E_C_NBS[i]).c_str(),
+                 E_DBS->get_name(E_C_NBS[i]),
                  (double) scl->value,
                  (double) scl->std,
                  (double) E_div_0(scl->value, scl->std),
@@ -114,19 +114,14 @@ void Estimation::E_print_mcorr()
 
     W_printfRepl("&1C ");
     for(i = 0 ; i < E_NC ; i++)
-        if(MATE(E_SMO, i, 0)) 
-            W_printfRepl("&1C%s", E_DBS->get_name(E_C_NBS[i]).c_str());
+        if(MATE(E_SMO, i, 0)) W_printfRepl("&1C%s", E_DBS->get_name(E_C_NBS[i]));
 
     W_printf("\n.tl\n");
-    for(i = 0, ic = 0 ; i < E_NC ; i++) 
-    {
-        if(MATE(E_SMO, i, 0) == 0) 
-            continue;
-        W_printfRepl("&1L%s", E_DBS->get_name(E_C_NBS[i]).c_str());
-        for(j = 0, jc = 0 ; j < E_NC ; j++) 
-        {
-            if(MATE(E_SMO, j, 0) == 0) 
-                continue;
+    for(i = 0, ic = 0 ; i < E_NC ; i++) {
+        if(MATE(E_SMO, i, 0) == 0) continue;
+        W_printfRepl("&1L%s", E_DBS->get_name(E_C_NBS[i]));
+        for(j = 0, jc = 0 ; j < E_NC ; j++) {
+            if(MATE(E_SMO, j, 0) == 0) continue;
             W_printfRepl("&1D%lf", (double) MATE(E_MCORR, ic, jc));
             jc++;
         }

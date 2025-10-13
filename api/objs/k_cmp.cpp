@@ -205,14 +205,6 @@ static int K_cmpvar(char* p1, char* p2, char* name)
     return(0);
 }
 
-/*
-    compares object name from 2 different kdb's
-    returns 0 : if name not in 1, not in 2
-	    1 ; if name in 1, not in 2
-	    2 ; if name not in 1, in 2
-	    3 ; if name in 1, in 2 and 1 = 2
-	    4 ; if name in 1, in 2 and 1 != 2
-*/
 
 /**
  *  Compares IODE objects having the same name in two KDB. 
@@ -223,53 +215,65 @@ static int K_cmpvar(char* p1, char* p2, char* name)
  *  @param [in] name    char*       object name
  *  @param [in] kdb1    KDB*        first KDB
  *  @param [in] kdb2    KDB*        second KDB
- *  @return             int         0 if objects are equal, 1 if not.
- *  
+ *  @return             int         0 -> if name neither in kdb1 nor in kdb2
+ *                                  1 -> if name in kdb1 but not in kdb2
+ *                                  2 -> if name not in kdb1 but in kdb2
+ *                                  3 -> if name in both kdb1 and kdb2, IODE object in kdb1 == IODE object in kdb2
+ *                                  4 -> if name in both kdb1 and kdb2, IODE object in kdb1 != IODE object in kdb2
  */
 
 int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 {
-    int     p1, p2, res=0;
+    int res=0;
 
-    if(kdb1->k_type != kdb2->k_type) return(-1);
+    if(kdb1->k_type != kdb2->k_type) 
+        return(-1);
 
-    p1 = kdb1->index_of(name);
-    p2 = kdb2->index_of(name);
+    SWHDL handle_1 = kdb1->get_handle(name);
+    SWHDL handle_2 = kdb2->get_handle(name);
 
-    if(p1 < 0) {
-        if(p2 < 0) return(0);   /* not 1, not 2 */
-        else return(2);         /* not 1, 2 */
+    if(handle_1 == 0) 
+    {
+        if(handle_2 == 0) 
+            return(0);          /* not kdb1 and not kdb2 */
+        else 
+            return(2);          /* not kdb1 but in kdb2 */
     }
 
-    if(p2 < 0) return(1);      /* 1, not 2 */
+    if(handle_2 == 0) 
+        return(1);              /* in kdb1 but not in kdb2 */
 
+    // ---- name in both kdb1 and kdb2 ----
+    // res = 0 -> IODE object in kdb1 == IODE object in kdb2
+    // res = 1 -> IODE object in kdb1 != IODE object in kdb2
     switch(kdb1->k_type)
     {
     case COMMENTS:
-        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmplg(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case EQUATIONS:
-        res = K_cmpeqs(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmpeqs(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case IDENTITIES:
-        res = K_cmpidt(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmpidt(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case LISTS:
-        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmplg(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case SCALARS:
-        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmplg(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case TABLES:
-        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmplg(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     case VARIABLES:
-        res = K_cmpvar(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
+        res = K_cmpvar(SW_getptr(handle_1), SW_getptr(handle_2), name);
         break;
     default:
         break;
     }
 
-    /* 1, 2 */
-    return(3 + res);
+    // 3 -> if name in both kdb1 and kdb2, IODE object in kdb1 == IODE object in kdb2
+    // 4 -> if name in both kdb1 and kdb2, IODE object in kdb1 != IODE object in kdb2
+    return 3 + res;
 }

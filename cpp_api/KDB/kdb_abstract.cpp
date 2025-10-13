@@ -29,47 +29,38 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
         throw std::runtime_error("Cannot create a deep copy of the database.\nThe input database is empty");
 
     // ---- prepare the subset database ----
-    k_mode = c_kdb->k_mode;                                       // short
-    k_nb = 0;                                                   // long
-    k_objs = NULL;
-    k_arch = ARCH;                                              // std::string   
-    description = c_kdb->description;                             // std::string
-    if(c_kdb->sample)                                             // Sample*
+    k_mode = c_kdb->k_mode;                                         // short
+    k_arch = ARCH;                                                  // std::string   
+    description = c_kdb->description;                               // std::string
+    if(c_kdb->sample)                                               // Sample*
         sample = new Sample(*c_kdb->sample);
     else
         sample = nullptr;
-    k_compressed = c_kdb->k_compressed;                           // char
-    filepath = c_kdb->filepath;                                   // std::string
+    k_compressed = c_kdb->k_compressed;                             // char
+    filepath = c_kdb->filepath;                                     // std::string
 
     std::vector<std::string> names = filter_names_from_database(c_kdb, (IodeType) k_type, pattern);
 
     std::string error_msg = "Cannot extract a subset of the database of " + v_iode_types[k_type] + ".\n";
-    int pos;
-
+    
     // ---- deep copy of objects ---- 
     if(deep_copy)
     {
-        char* c_name;
+        bool success;
         for(const std::string& name: names)
         {
-            c_name = to_char_array(name);
-            pos = duplicate(*c_kdb, c_name);
-            if(pos < 0)
+            success = duplicate(*c_kdb, name);
+            if(!success)
             {
-                for(int i = 0; i < k_nb; i++)
-                    if(k_objs[i].o_val != 0) SW_free(k_objs[i].o_val);
-
-                SW_nfree(k_objs);
-                k_objs = NULL; 
+                for(auto& [name, handle] : k_objs)
+                    if(handle > 0) 
+                        SW_free(handle);
+                k_objs.clear(); 
 
                 filepath.clear();
 
-                error_msg += "Cannot copy " + v_iode_types[k_type] + " named '" + name + "' in the subset.\n";
-                if (pos == -1) 
-                    error_msg += "Object with name '" + name + "' does not exist in the " + v_iode_types[k_type] + " database.";
-                else 
-                    error_msg += "Reason: unknown";
-                throw std::runtime_error(error_msg);
+                throw std::runtime_error("Failed to create a deep copy of the " + v_iode_types[k_type] + 
+                                         " database.");
             }
         }
     }
@@ -77,32 +68,24 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // -> same as K_quick_refer() function <-
     else
     {
-        k_nb = (long) names.size();
-        k_objs = (KOBJ*) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + k_nb / K_CHUNCK));
-        for(int j = 0; j < k_nb; j++) 
+        SWHDL handle;
+        for(const std::string& name: names) 
         {
-            k_objs[j].o_val = 0;
-            memset(k_objs[j].o_name, 0, sizeof(ONAME));
-        }
-
-        for(int i = 0 ; i < k_nb; i++) 
-        {
-            pos = c_kdb->index_of(to_char_array(names[i]));
-            if(pos < 0) 
+            handle = c_kdb->get_handle(name);
+            if(handle == 0) 
             {
-                SW_nfree(k_objs);
-                k_objs = NULL;
+                for(auto& [_, _handle_] : k_objs)
+                    if(_handle_ > 0) 
+                        SW_free(handle);
+                k_objs.clear();
 
                 filepath.clear();
 
-                error_msg += "Object with name '" + names[i] + "' does not exist in the " + v_iode_types[k_type] + " database.";
-                throw std::runtime_error(error_msg);
+                throw std::runtime_error("Failed to create a deep copy of the " + v_iode_types[k_type] + 
+                                         " database.");
             }
-            memcpy(k_objs + i, c_kdb->k_objs + pos, sizeof(KOBJ));
+            k_objs[name] = handle;
         }
-
-        // Sort entries
-        K_sort(this);
     }
 }
 
@@ -110,26 +93,21 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
 
 std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, const bool must_exist) const
 {
-    std::vector<std::string> v_names;
+    KDB* kdb = get_database();
+    
     if(pattern.empty())
+        return kdb->get_names();
+    
+    std::vector<std::string> v_names_ = filter_names_from_database(kdb, (IodeType) k_type, pattern);
+    if(v_names_.size() == 0)
+    return v_names_;
+    
+    std::vector<std::string> v_names;
+    for(const std::string& name: v_names_)
     {
-        for (int i=0; i < size(); i++) 
-            v_names.push_back(get_name(i));
-        return v_names;
-    }
-    else
-    {
-        KDB* kdb = get_database();
-        std::vector<std::string> v_names_ = filter_names_from_database(kdb, (IodeType) k_type, pattern);
-        if(v_names_.size() == 0)
-            return v_names_;
-
-        for(const std::string& name: v_names_)
-        {
-            if(must_exist && !contains(name))
-                continue;
-            v_names.push_back(name);
-        }
+        if(must_exist && !contains(name))
+            continue;
+        v_names.push_back(name);
     }
 
     return v_names;
@@ -137,81 +115,55 @@ std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, cons
 
 std::string KDBAbstract::get_names_as_string(const std::string& pattern, const bool must_exist) const
 {
-    std::string names;
+    KDB* kdb = get_database();
+    
     if(pattern.empty())
-    {
-        for(int i=0; i < size(); i++) 
-            names += get_name(i) + ";";
-    }
-    else
-    {
-        std::vector<std::string> v_names = get_names(pattern, must_exist);
-        for(const std::string& name: v_names)
-            names += std::string(name) + ";";
-    }
+        return kdb->get_names_as_string();
+    
+    std::string names;
+    std::vector<std::string> v_names = get_names(pattern, must_exist);
+    for(const std::string& name: v_names)
+        names += std::string(name) + ";";
 
     // remove last ;
-    if(!names.empty()) 
+    if(!names.empty() && names.back() == ';')
         names.pop_back();
 
     return names;
 }
 
-int KDBAbstract::set_name(const int pos, const std::string& new_name)
+bool KDBAbstract::set_name(const int pos, const std::string& new_name)
 {
     std::string old_name = get_name(pos);
-    int new_pos = rename(old_name, new_name);
-    return new_pos;
+    bool success = rename(old_name, new_name);
+    return success;
 }
 
-int KDBAbstract::rename(const std::string& old_name, const std::string& new_name)
+bool KDBAbstract::rename(const std::string& old_name, const std::string& new_name, const bool overwrite)
 {
-    if (k_type == EQUATIONS) 
-        throw std::runtime_error(std::string("Cannot rename an equation.\n") + 
-                                 "The name of an equation is always its endogenous variable");
-
-    if(size() == 0) 
-        return -1;
-
-    check_name(new_name, k_type);
-
-    char* c_old_name = to_char_array(old_name);
-    char* c_new_name = to_char_array(new_name);
-    
-    int pos;
+    bool success;
     KDB* kdb = get_database();
     switch (k_db_type)
     {
-    case 0:
-        pos = K_ren(K_WS[k_type], c_old_name, c_new_name);
+    case DB_GLOBAL:
+        success = K_WS[k_type]->rename(old_name, new_name, overwrite);
         break;
-    case 1:
-        pos = K_ren(kdb, c_old_name, c_new_name);
+    case DB_STANDALONE:
+        success = kdb->rename(old_name, new_name, overwrite);
         break;
     case 2:
         // first rename in global KDB
-        pos = K_ren(K_WS[k_type], c_old_name, c_new_name);
-        if (pos < 0) break;
+        success = K_WS[k_type]->rename(old_name, new_name, overwrite);
+        if (!success) 
+            break;
         // then rename in local KDB
-        pos = K_ren(kdb, c_old_name, c_new_name);
+        success = kdb->rename(old_name, new_name, overwrite);
         break;
     default:
         break;
     }
 
-    // see K_ren documentation
-    if(pos < 0)
-    {
-        std::string error_msg = "Cannot rename '" + old_name + "' as '" + new_name + "'.\n";
-        if(pos == -1) 
-            throw std::invalid_argument(error_msg + "There is no object named '" + old_name + "' in the database.");
-        else if(pos == -2) 
-            throw std::invalid_argument(error_msg + "An object named '" + new_name + "' already exists in the database.");
-        else 
-            throw std::runtime_error(error_msg + "Reason: unknown");
-    }
-
-    return pos;
+    return success;
 }
 
 // delete
@@ -225,54 +177,26 @@ void KDBAbstract::remove(const int pos)
 
 void KDBAbstract::remove(const std::string& name)
 {
-    // throw exception if object with passed name does not exist
-    int pos = index_of(name);
-    if(pos < 0) 
-        return;
-
     KDB* kdb = get_database();
     switch(k_db_type)
     {
-    case 0:
-        K_del(K_WS[k_type], pos);
+    case DB_GLOBAL:
+        K_WS[k_type]->remove(name);
         break;
-    case 1:
-        K_del(kdb, pos);
+    case DB_STANDALONE:
+        kdb->remove(name);
         break;
-    case 2: 
-        char* c_name;
+    case DB_SHALLOW_COPY:
         // first delete in shallow copy KDB
-        K_del_entry(kdb, pos);
+        kdb->remove(name);
         // then delete in global KDB
-        c_name = to_char_array(name);
-        pos = K_WS[k_type]->index_of(c_name);
-        K_del(K_WS[k_type], pos);
+        K_WS[k_type]->remove(name);
         break;
     default:
         throw std::invalid_argument("Cannot remove object named '" + name + "'\n."
                                     "Something went wrong.");
         break;
     }
-}
-
-// remove only the entry (= handle) at the given position, not the object in memory
-void KDBAbstract::remove_entry(const int pos)
-{
-    // throw exception if object with passed position is not valid
-    std::string name = get_name(pos);
-    remove_entry(name);
-}
-
-// remove only the entry (= handle) at the given position, not the object in memory
-void KDBAbstract::remove_entry(const std::string& name)
-{
-    // throw exception if object with passed name does not exist
-    int pos = index_of(name);
-    if(pos < 0) 
-        return;
-
-    KDB* kdb = get_database();
-    K_del_entry(kdb, pos);
 }
 
 // Other methods

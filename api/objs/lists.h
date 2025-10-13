@@ -8,19 +8,17 @@
 // LIS = List (string)
 using LIS = char*; 
 
-/*----------------------- INLINE FUNCS ----------------------------*/
+/*----------------------- FUNCS ----------------------------*/
 
-inline LIS KLPTR(const char* name) 
+inline LIS KLPTR(KDB* kdb, char* name)
 {
-    return (LIS) K_optr0(KL_WS, (char*) name);
-}
+    return K_optr0(kdb, name);
+}         
 
-inline LIS KLVAL(KDB* kdb, int pos) 
+inline LIS KLVAL(KDB* kdb, int pos)
 {
     return (LIS) K_oval0(kdb, pos);
-}
-
-/*----------------------- FUNCS ----------------------------*/
+}    
 
 /* k_lst.c */
 int K_scan(KDB *,char *,char *);

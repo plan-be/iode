@@ -367,16 +367,16 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 {
     //char        buf[81];
     char        *diverg = NULL;
-    int         i, j, pos;
+    int         i, j;
     double      x;
     double      d, pd;
 
     // Delete lst 
-    //if(B_DataExist(lst, LISTS) >= 0) B_DataDelete(lst, LISTS);
-    pos = KL_WS->index_of(lst);
-    if(pos >= 0) K_del(KL_WS, pos);
+    std::string name = std::string(lst);
+    KL_WS->remove(name);
     
-    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
+    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
+    {
         /* save XK first */
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
@@ -396,15 +396,17 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
             else pd = fabs(d);
 
             pd *= KSIM_RELAX;
-            if(pd > eps) 
+            if(pd > eps)  
             {
                 if(diverg) 
                     diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
-                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) KSIM_NAME(KSIM_ORDER[i]));
+                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) KSIM_NAME(KSIM_ORDER[i]).c_str());
             }
         }
     }
-    if(diverg) K_add(KL_WS, lst, diverg);
+    
+    if(diverg) 
+        K_add(KL_WS, lst, diverg);
     return(0);
 }
 
@@ -531,8 +533,10 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
             cpu_iter;
     char    **var = NULL;
     double    *x;
+    std::string var_name;
 
-    if(dbe->size() == 0) {
+    if(dbe->size() == 0) 
+    {
         std::string err_msg = "Empty set of equations";
         error_manager.append_error(err_msg);
         return(rc);
@@ -548,7 +552,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     // and check that the simulation sample is included in KSIM_DBV sample
     at = smpl->start_period.difference(dbv->sample->start_period);
     bt = dbv->sample->end_period.difference(smpl->end_period);
-    if(bt < 0 || at < 0) {
+    if(bt < 0 || at < 0) 
+    {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
         return(rc);
@@ -559,9 +564,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
     KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
     KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbv->size()));
-    for(i = 0 ; i < dbv->size(); i++) {
-        KSIM_POSXK_REV[i] = -1;  
-    }
+    for(i = 0 ; i < dbv->size(); i++) 
+        KSIM_POSXK_REV[i] = -1;
 
     // Initialize KSIM_NORMS and KSIM_NITERS (see definitions above) 
     SCR_free(KSIM_NORMS);
@@ -574,11 +578,15 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
     
-    for(i = 0 ; i < dbe->size(); i++) {        
-        posvar = dbv->index_of(dbe->get_name(i));
+    std::string eq_name;
+    for(i = 0 ; i < dbe->size(); i++) 
+    {
+        eq_name = dbe->get_name(i);   
+        posvar = dbv->index_of(eq_name);
         KSIM_POSXK[i] = posvar;
-        if(posvar < 0) {
-            std::string err_msg = std::string("'") + std::string(dbe->get_name(i)) + "': cannot find variable";
+        if(posvar < 0) 
+        {
+            std::string err_msg = std::string("'") + eq_name + "': cannot find variable";
             error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
@@ -586,8 +594,9 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
         KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
-        if(rc) {
-            std::string err_msg = std::string("'") + std::string(dbe->get_name(i)) + "': cannot link equation";
+        if(rc) 
+        {
+            std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
             error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
@@ -596,51 +605,58 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
 
     // Optional goal seeking = exchange exo and endo roles in equations
     // Each couple endo-exo
-    if(endo_exo != NULL) {
+    if(endo_exo != NULL) 
+    {
         endo_exonb = SCR_tbl_size((unsigned char**) endo_exo);
         KSIM_PATH = SW_nalloc(KSIM_MAXDEPTH);
-        for(i = 0; i < endo_exonb; i ++) {
+        for(i = 0; i < endo_exonb; i ++) 
+        {
             var = (char**) SCR_vtom((unsigned char*) endo_exo[i], (int) '-');
-            if(var == NULL || SCR_tbl_size((unsigned char**) var) != 2) {
+            if(var == NULL || SCR_tbl_size((unsigned char**) var) != 2) 
+            {
                 std::string err_msg = std::string(endo_exo[i]) + ": syntax error in goal seeking parameter";
                 error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }
 
-            posendo = KSIM_DBV->index_of(var[0]); // Position of the endogenous var in dbv
-            if(posendo < 0) {
+            var_name = std::string(var[0]);
+            posendo = KSIM_DBV->index_of(var_name);   // Position of the endogenous var in dbv
+            if(posendo < 0) 
+            {
                 std::string err_msg = "Goal Seeking: '";
-                err_msg += std::string(var[0]);
+                err_msg += var_name;
                 err_msg += "': no such equation in the Equations workspace";
                 error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }
-            posexo = KSIM_DBV->index_of(var[1]);  // Position of the exogenous var in dbv
-            if(posexo < 0) {
-                std::string err_msg = std::string("'") + std::string(var[1]) + "': cannot find variable";
+
+            var_name = std::string(var[1]);
+            posexo = KSIM_DBV->index_of(var_name);  // Position of the exogenous var in dbv
+            if(posexo < 0) 
+            {
+                std::string err_msg = std::string("'") + var_name + "': cannot find variable";
                 error_manager.append_error(err_msg);
                 rc = -1;
                 goto fin;
             }
             
-            //         fprintf(stdout, "\n====Exchanging %s %s\n====", var[0], var[1]);
-            if(KE_exo2endo(posendo, posexo) < 0) {
+            if(KE_exo2endo(posendo, posexo) < 0) 
+            {
                 rc = -1;
                 goto fin;
             }
 
-            //          fprintf(stdout, "\nDone");
             SCR_free_tbl((unsigned char**) var);
             var = NULL;
         }
-
     }
 
     // ORDERING EQUATIONS 
     KE_order(dbe, eqs);
-    if(KSIM_DEBUG) K_lstorder("_PRE", "_INTER", "_POST");
+    if(KSIM_DEBUG) 
+        K_lstorder("_PRE", "_INTER", "_POST");
 
     // SIMULATE 
     KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
@@ -657,7 +673,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
             for(k = 0; k < endo_exonb; k ++) 
             {
                 var = (char**) SCR_vtom((unsigned char*) endo_exo[k], '-');
-                posexo = KSIM_DBV->index_of(var[1]);
+                var_name = std::string(var[1]);
+                posexo = KSIM_DBV->index_of(var_name);  // Position of the exogenous var in dbv
 
                 x = KVVAL(KSIM_DBV, posexo, 0);
                 for(j = t + 1; j < dbv->sample->nb_periods; j++)  
@@ -701,11 +718,11 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     CLEC    *clec;
     double  x;
 
-//Debug("Eq %s\n", KSIM_DBE->get_name(eqnb));
     lg = KECLEC(KSIM_DBE, eqnb)->tot_lg;
     clec = (CLEC*) SW_nalloc(lg);
     memcpy(clec, KECLEC(KSIM_DBE, eqnb), lg);
-    eqvarnb = KSIM_DBV->index_of(KSIM_DBE->get_name(eqnb));
+    std::string eq_name = KSIM_DBE->get_name(eqnb);
+    eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->dupendo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
     else
@@ -749,17 +766,18 @@ void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
     sprintf((char*) buf, "%s*", lstname);
     //B_DataDelete(buf, LISTS); // Old version usign B_*() fns
     lst_todel = (unsigned char*) K_expand(LISTS, NULL, (char*) buf, '*');
-    if(lst_todel) {
+    if(lst_todel) 
+    {
         tbl_todel = SCR_vtom(lst_todel, ';');
         for(i = 0; tbl_todel[i] ; i++)
-            K_del_by_name(KL_WS, (char*) tbl_todel[i]);
+            KL_WS->remove(std::string((char*) tbl_todel[i]));
     }
     SCR_free(lst_todel);
     SCR_free_tbl(tbl_todel);
     
     // Creates a table of strings containing all the name to set in the list
     for(i = 0; i < nb; i++)
-        SCR_add_ptr(&lst, &nlst, (unsigned char*) KSIM_NAME(KSIM_ORDER[i + eq1]));
+        SCR_add_ptr(&lst, &nlst, (unsigned char*) KSIM_NAME(KSIM_ORDER[i + eq1]).c_str());
 
     SCR_add_ptr(&lst, &nlst, 0); 
 

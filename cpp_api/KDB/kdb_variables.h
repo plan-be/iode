@@ -82,9 +82,9 @@ public:
 
     void set_var(const std::string& name, const Period& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    int add(const std::string& name, const Variable& variable);
+    bool add(const std::string& name, const Variable& variable);
 
-    int add(const std::string& name, const std::string& lec);
+    bool add(const std::string& name, const std::string& lec);
 
     void update(const int pos, const Variable& values, const int t_first, const int t_last);
 
@@ -201,21 +201,29 @@ public:
 inline std::size_t hash_value(KDBVariables const& cpp_kdb)
 {
     KDB* kdb = cpp_kdb.get_database();
-    if(kdb == NULL) return 0;
+    if(!kdb) 
+        return 0;
 
 	Sample* smpl = kdb->sample;
+    if(!smpl)
+        return 0;
+    
+    int nb_periods = smpl->nb_periods;
+    if(nb_periods == 0)
+        return 0;
 
+    double* var;
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->size(); pos++)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
-        char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
+        hash_combine<std::string>(seed, name); 
         // KVVAL(kdb, pos, t) return a pointer to pointer to kdb[pos][t]. 
         // We need to compute the hash with the values of kdb[pos], not the pointers. 
         // Otherwise, hash_value() and hash_combine() will only compare pointer 
         // addresses and not the values.
-		for(int t=0; t < smpl->nb_periods; t++)
-        	hash_combine<double>(seed, *KVVAL(kdb, pos, t));
+        var = (double*) P_get_ptr(SW_getptr(handle), 0);
+		for(int t=0; t < nb_periods; t++)
+        	hash_combine<double>(seed, var[t]);
     }
     return seed;
 }
