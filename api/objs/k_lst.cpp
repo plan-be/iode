@@ -59,7 +59,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
 
     for(i = 0; i < KNB(kdb); i++) 
     {
-        switch(KTYPE(kdb)) 
+        switch(kdb->k_type) 
         {
             case IDENTITIES :
                 KI_scan(kdb, i, exo, scal);

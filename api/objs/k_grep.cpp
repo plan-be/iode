@@ -83,7 +83,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
         if(!found) 
         {
-            switch(KTYPE(kdb)) {
+            switch(kdb->k_type) {
                 case COMMENTS :
                     if(texts) 
                         found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);

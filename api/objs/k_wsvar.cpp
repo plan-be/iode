@@ -194,7 +194,7 @@ int KV_add(KDB* kdb, char* varname)
     int      pos, t, nobs;
     double   *vptr;
 
-    if(KTYPE(kdb) != VARIABLES) 
+    if(kdb->k_type != VARIABLES) 
         return(-1);
     
     // Create varname with NaN 

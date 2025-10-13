@@ -88,7 +88,7 @@ int K_add(KDB* kdb, char* name, ...)
         goto einde;
     }    
 
-    switch(KTYPE(kdb)) {
+    switch(kdb->k_type) {
       case COMMENTS: 
           txt = va_arg(vargs, char*);
           rc = K_cpack(&pack, txt);
@@ -134,7 +134,7 @@ int K_add(KDB* kdb, char* name, ...)
     // Add entry (name) into kdb
     pos = K_add_entry(kdb, name);
     if(pos < 0) {
-        error_manager.append_error(v_iode_types[KTYPE(kdb)] + " " + std::string(name) + 
+        error_manager.append_error(v_iode_types[kdb->k_type] + " " + std::string(name) + 
                                    " cannot be created (syntax ?)");
         goto einde;
     }

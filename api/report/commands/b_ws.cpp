@@ -152,7 +152,7 @@ int X_findtype(char* filename)
  */
 int B_WsDump(KDB* kdb, char* filename)
 {
-    int     rc = -1, ftype, type = KTYPE(kdb);
+    int     rc = -1, ftype, type = kdb->k_type;
 
     kmsg("Saving %s", filename); 
     ftype = X_findtype(filename);

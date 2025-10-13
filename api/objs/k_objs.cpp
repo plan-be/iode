@@ -286,7 +286,7 @@ done :
  *  @param [in] kdb     KDB*    where to search for name
  *  @param [in] name    char*   name to be searched
  *  @return             int     position of the name in kdb
- *                              -1 if not found or if the name does not comply to the rules of KTYPE(kdb).
+ *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
  */
  
 int K_find(KDB* kdb, char* name)
