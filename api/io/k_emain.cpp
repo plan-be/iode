@@ -221,7 +221,7 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
         goto err;
 
     dim = dbv->sample->nb_periods;
-    for(i = 0; i < KNB(dbv); i++) {
+    for(i = 0; i < dbv->k_nb; i++) {
         strcpy(iname, KONAME(dbv, i));
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
 
@@ -276,7 +276,7 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
         goto err;
 
     nl = dbv->sample->nb_periods;
-    nc = KNB(dbv);
+    nc = dbv->k_nb;
 
     expdef->write_variable_and_comment(expdef, EXP_SEP, 0, 0);
 

@@ -63,7 +63,7 @@ int KV_sample(KDB *kdb, Sample *new_sample)
 
     char* ptr;
     int new_val;
-    for(int i = 0 ; i < KNB(kdb); i++) 
+    for(int i = 0 ; i < kdb->k_nb; i++) 
     {
         new_val = KV_alloc_var(kdb->sample->nb_periods);
         ptr = SW_getptr(new_val);
@@ -120,7 +120,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
     }
 
     nb1 = kdb1->sample->nb_periods;
-    for(i = 0; i < KNB(kdb2); i++) 
+    for(i = 0; i < kdb2->k_nb; i++) 
     {
         pos = K_find(kdb1, KONAME(kdb2, i));
         if(pos < 0) 
@@ -157,18 +157,18 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
     if(kdb2 == NULL) 
         return;
 
-    if(KNB(kdb2) == 0) 
+    if(kdb2->k_nb == 0) 
         return;
     
-    if(KNB(kdb1) == 0) 
+    if(kdb1->k_nb == 0) 
     {
         if(kdb1->sample)
             KV_sample(kdb2, kdb1->sample);
         else if(kdb2->sample)
             kdb1->sample = new Sample(*kdb2->sample);
-        KNB(kdb1)   = KNB(kdb2);
+        kdb1->k_nb   = kdb2->k_nb;
         KOBJS(kdb1) = KOBJS(kdb2);
-        KNB(kdb2)   = 0;
+        kdb2->k_nb   = 0;
         KOBJS(kdb2) = NULL;
         delete kdb2;
         kdb2 = nullptr;
@@ -240,7 +240,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
     Sample  *smpl;
 
     smpl = kdb->sample;
-    if(!smpl || pos < 0 || pos >= KNB(kdb) || t < 0 || t >= smpl->nb_periods)
+    if(!smpl || pos < 0 || pos >= kdb->k_nb || t < 0 || t >= smpl->nb_periods)
     {
         kwarning("Cannot get the value of the variable in position %d at index %d", pos, t);
         return IODE_NAN;
@@ -310,7 +310,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double value)
     Sample  *smpl;
 
     smpl = kdb->sample;
-    if(!smpl || pos < 0 || pos >= KNB(kdb) || t < 0 || t >= smpl->nb_periods)
+    if(!smpl || pos < 0 || pos >= kdb->k_nb || t < 0 || t >= smpl->nb_periods)
     {
         kwarning("Cannot set the value of the variable in position %d at index %d", pos, t);
         return;
@@ -439,10 +439,10 @@ int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)
     else 
         edbv = K_refer(dbv, SCR_tbl_size((unsigned char**) vars), vars);
     // if(edbv == NULL) goto done; /* JMP 12-05-11 */
-    if(edbv == NULL || KNB(edbv) == 0) 
+    if(edbv == NULL || edbv->k_nb == 0) 
         goto done; /* JMP 12-05-11 */
 
-    for(v = 0; v < KNB(edbv); v++) 
+    for(v = 0; v < edbv->k_nb; v++) 
     {
         val = KVVAL(edbv, v, 0);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
@@ -505,7 +505,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         goto done;
     
     ndbv->sample = new Sample(*edbv->sample);
-    for(epos = 0; epos < KNB(edbv); epos++) 
+    for(epos = 0; epos < edbv->k_nb; epos++) 
     {
         strcpy(ename, KONAME(edbv, epos));
         if(K_aggr(pattern, ename, nname) < 0) 
@@ -562,7 +562,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 
     if(method == 2) 
     {
-        for(npos = 0; npos < KNB(ndbv); npos++) 
+        for(npos = 0; npos < ndbv->k_nb; npos++) 
         {
             nval = KVVAL(ndbv, npos, 0);
             for(t = 0; t < smpl->nb_periods; t++)

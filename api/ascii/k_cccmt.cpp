@@ -165,7 +165,7 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < KNB(kdb); i++) {
+    for(i = 0 ; i < kdb->k_nb; i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         cmt = KCVAL(kdb, i);
         SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */

@@ -65,7 +65,7 @@
 int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim = dbv->sample->nb_periods;
-    int nb  = KNB(dbv);
+    int nb  = dbv->k_nb;
 
     expdef->file_descriptor.open(outfile);
 

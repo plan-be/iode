@@ -94,7 +94,7 @@ int CSimulation::KE_pre(KDB* dbe, int** predecessors, int from)
     // ajoutée et qui donc fait aussi partie du groupe
     while(c == 1) {
         c = 0;
-        for(i = 0; i < KNB(dbe); i ++) {
+        for(i = 0; i < dbe->k_nb; i ++) {
             if(KSIM_ORDERED[i] == 1) continue; // Equation déjà classée (i.e. dans le bloc PRE)
             if(predecessors[i]) {
                 for(j = 0; j < predecessors[i][0]; j++) {  	// predecessors[i][0] = nb vars de l'éq i
@@ -133,7 +133,7 @@ int CSimulation::KE_interdep(KDB* dbe, int** predecessors)
 {
     int     i, nb = 0;
 
-    for(i = 0; i < KNB(dbe); i++) {
+    for(i = 0; i < dbe->k_nb; i++) {
         if(KSIM_ORDERED[i]) continue;
         KSIM_ORDER[KSIM_PRE + KSIM_POST + nb] = i;
         nb ++;
@@ -153,7 +153,7 @@ int CSimulation::KE_postorder(KDB* dbe, int** predecessors, int** successors)
 {
     int     i;
 
-    for(i = 0; i < KNB(dbe); i ++)  {
+    for(i = 0; i < dbe->k_nb; i ++)  {
         SW_nfree(predecessors[i]);
         SW_nfree(successors[i]);
     }
@@ -194,7 +194,7 @@ int CSimulation::KE_preorder(KDB* dbe, int** predecessors, int** successors)
     int     i, j, pos, posj, nb;
     CLEC    *clec;
 
-    nb = KNB(dbe);
+    nb = dbe->k_nb;
     KSIM_ORDER    = (int *)  SW_nalloc(sizeof(int) * nb);
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
@@ -262,7 +262,7 @@ void CSimulation::KE_order(KDB* dbe, char** eqs)
     KSIM_CPU_SORT = 0;
     KSIM_CPU_SCC = 0;
     
-    nb = KNB(dbe);
+    nb = dbe->k_nb;
     
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
     if(KSIM_SORT == SORT_NONE) {
@@ -356,7 +356,7 @@ int CSimulation::KE_tri_begin(KDB* dbe)
 {
     int     i, nb;
 
-    nb = KNB(dbe);
+    nb = dbe->k_nb;
     KSIM_PERM = (int *) SW_nalloc(sizeof(int) * nb);
     for(i = 0 ; i < nb ; i++) KSIM_PERM[i] = -1;
     for(i = 0 ; i < KSIM_INTER ; i++)
@@ -378,7 +378,7 @@ int CSimulation::KE_tri_end(KDB* dbe)
 {
     int     i;
 
-    for(i = 0 ; i < KNB(dbe) ; i++)
+    for(i = 0 ; i < dbe->k_nb ; i++)
         if(KSIM_PERM[i] >= 0)
             KSIM_ORDER[KSIM_PRE + KSIM_PERM[i]] = i;
 
@@ -404,7 +404,7 @@ int CSimulation::KE_tri_end(KDB* dbe)
  */
 void CSimulation::KE_tri_perm1(KDB* dbe, int i, int* vars)
 {
-    int     j, m = -1, posj, nbe = KNB(dbe), ksim_permi = KSIM_PERM[i];
+    int     j, m = -1, posj, nbe = dbe->k_nb, ksim_permi = KSIM_PERM[i];
 
     // calcul de l'eq jm dont le numéro d'ordre de calcul est le plus grand
     for(j = 1 ; j <= vars[0] ; j++) {

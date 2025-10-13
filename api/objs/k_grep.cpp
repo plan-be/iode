@@ -66,7 +66,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     
     if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) 
     {
-        n = KNB(kdb);
+        n = kdb->k_nb;
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
         for(i = 0; i < n ; i++) 
             lst[i] = (char*) SCR_stracpy((unsigned char*) KONAME(kdb, i));
@@ -75,7 +75,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
     TableCell* cell;
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(i = 0; i < KNB(kdb); i++) 
+    for(i = 0; i < kdb->k_nb; i++) 
     {
         found = 0;
         if(names) 

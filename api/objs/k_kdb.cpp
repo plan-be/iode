@@ -64,7 +64,7 @@ static int K_objnamecmp(const void *p1, const void *p2)
  
 void K_sort(KDB* kdb)
 {
-    qsort(KOBJS(kdb), (int) KNB(kdb), sizeof(KOBJ), K_objnamecmp);
+    qsort(KOBJS(kdb), (int) kdb->k_nb, sizeof(KOBJ), K_objnamecmp);
 }
 
 // API 
@@ -193,7 +193,7 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     tkdb->filepath = kdb->filepath;
 
     KOBJS(tkdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
-    KNB(tkdb) = nb;
+    tkdb->k_nb = nb;
     for(int j = 0; j < nb; j++) 
     {
         KOBJS(tkdb)[j].o_val = 0;
@@ -239,7 +239,7 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
     char    *ptr;
 
     if(kdb1 == NULL || kdb2 == NULL) return(-1);
-    for(i = 0; i < KNB(kdb2); i++) {
+    for(i = 0; i < kdb2->k_nb; i++) {
         pos = K_find(kdb1, KONAME(kdb2, i));
         if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
         else {
@@ -277,14 +277,14 @@ int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
     if(kdb1 == NULL || kdb2 == NULL) 
         return(-1);
     
-    if(KNB(kdb2) == 0) 
+    if(kdb2->k_nb == 0) 
         return(-1);
     
-    if(KNB(kdb1) == 0) 
+    if(kdb1->k_nb == 0) 
     {
-        KNB(kdb1) = KNB(kdb2);
+        kdb1->k_nb = kdb2->k_nb;
         KOBJS(kdb1) = KOBJS(kdb2);
-        KNB(kdb2) = 0;
+        kdb2->k_nb = 0;
         KOBJS(kdb2) = 0;
         delete kdb2;
         kdb2 = nullptr;

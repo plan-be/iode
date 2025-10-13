@@ -235,7 +235,6 @@ inline char k_ext[][4] =
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)
 
 #define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)                 // name of the object
