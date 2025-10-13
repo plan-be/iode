@@ -612,7 +612,7 @@ char *RP_gmacro(char* str)
 
         else 
         {
-            pos = K_find(RP_MACRO, tmp);
+            pos = RP_MACRO->find(tmp);
             if(pos < 0) 
             {
                 error_manager.append_error("Report: Macro '" + std::string(tmp) + "' is not defined");

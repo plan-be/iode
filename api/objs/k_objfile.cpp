@@ -502,7 +502,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         std::vector<int> v_pos(nf, -1);
         for(i = 0; i < nf; i++) 
         {
-            pos = K_find(kdb, objs[i]);
+            pos = kdb->find(objs[i]);
             if(pos >= 0) 
                 v_pos[i] = pos;
         }
@@ -836,7 +836,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
         /* delete already found variables */
         for(i = 0 ; i < no; i++) 
         {
-            pf = K_find(from, objs[i]);
+            pf = from->find(objs[i]);
             if(pf < 0) 
                 continue;
             if(found[i]) 
@@ -856,7 +856,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
         {
             if(found[i]) 
                 continue;
-            pf = K_find(from, objs[i]);
+            pf = from->find(objs[i]);
             if(pf < 0) 
                 continue;
 
@@ -866,7 +866,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
             pack = SW_nalloc(P_len(ptr));
             memcpy(pack, ptr, P_len(ptr));
 
-            pt = K_find(to, objs[i]);
+            pt = to->find(objs[i]);
             if(pt >= 0)
                 SW_free(KSOVAL(to, pt));
             else 

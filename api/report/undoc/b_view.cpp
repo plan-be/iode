@@ -180,7 +180,7 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
     int rc, pos;
     Table *tbl;
 
-    pos = K_find(K_WS[TABLES], name);
+    pos = K_WS[TABLES]->find(name);
     if(pos < 0) {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
         return(-1);
@@ -225,7 +225,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     for(i = 0; i < ng; i ++) {
         if(view) W_InitDisplay();
 
-        pos = K_find(K_WS[TABLES], tbls[i]);
+        pos = K_WS[TABLES]->find(tbls[i]);
         if(pos < 0) {
             error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");
             rc = -1;

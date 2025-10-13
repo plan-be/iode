@@ -166,6 +166,8 @@ public:
         return this->k_nb;
     }
 
+    int find(const char* name) const;
+
     int duplicate(const KDB& other, char* name);
 };
 
@@ -249,7 +251,9 @@ inline char k_ext[][4] =
 /*----------------------- FUNCS ----------------------------*/
 
 /* k_kdb.c */
+int K_key(char*, int);
 void K_sort(KDB* kdb);
+int K_find_strcmp(const void *name, const void *kobjs);
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 int K_merge(KDB* kdb1, KDB* kdb2, int replace);
 KDB* K_refer(KDB* kdb, int nb, char** names);

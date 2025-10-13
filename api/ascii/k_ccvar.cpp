@@ -402,7 +402,7 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     {
         SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
-        pos = K_find(kdb, lst[i]);
+        pos = kdb->find(lst[i]);
         if(pos >= 0) 
         {
             val = KVVAL(kdb, pos, 0);

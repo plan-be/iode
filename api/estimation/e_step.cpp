@@ -43,11 +43,14 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
  */
 static int E_GetScls(CLEC* clec, char*** scl)                                            
 {
-    int     j, nbscl = 0;
-    if(clec != 0) {
-        for(j = 0 ; j < clec->nb_names ; j++) {
-            if(L_ISCOEF(clec->lnames[j].name) && KSVAL(K_WS[SCALARS], 
-               K_find(K_WS[SCALARS],clec->lnames[j].name))->relax !=0)
+    int j, pos, nbscl = 0;
+
+    if(clec != 0) 
+    {
+        for(j = 0 ; j < clec->nb_names ; j++) 
+        {
+            pos = K_WS[SCALARS]->find(clec->lnames[j].name);
+            if(L_ISCOEF(clec->lnames[j].name) && KSVAL(K_WS[SCALARS], pos)->relax != 0)
                     SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) clec->lnames[j].name);
         }
     }
@@ -240,7 +243,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     if(eqs == NULL) 
         return(0.0);
     
-    pos = K_find(K_WS[EQUATIONS], eqs[0]);
+    pos = K_WS[EQUATIONS]->find(eqs[0]);
     if(pos < 0) 
         return(0.0);
 

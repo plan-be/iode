@@ -2,7 +2,6 @@ from libc.string cimport strlen
 
 from pyiode.super cimport KT_WS
 from pyiode.super cimport K_end_ws
-from pyiode.super cimport K_find
 from pyiode.super cimport K_add
 from pyiode.super cimport K_del
 from pyiode.super cimport kmsgbox_continue
@@ -205,7 +204,7 @@ cdef int c_XodeRuleImport_super(char* arg, int unused):
 
 cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* name):
     cdef int success = 0
-    cdef int pos = K_find(KT_WS, name)
+    cdef int pos = KT_WS.find(name)
     cdef bytes b_table_name = name
     cdef bytes b_generalized_sample = smpl
     

@@ -394,7 +394,7 @@ cdef class Variables(CythonIodeDatabase):
                 #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
                 b_name = name.encode()
                 c_name = b_name
-                var_pos = K_find(db_ptr, c_name)
+                var_pos = self.database_ptr.find(c_name)
                 if var_pos < 0:
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 var_ptr = KVVAL(db_ptr, var_pos, t_first_period)
@@ -403,7 +403,7 @@ cdef class Variables(CythonIodeDatabase):
             for i, name in enumerate(vars_names):
                 b_name = name.encode()
                 c_name = b_name
-                var_pos = K_find(db_ptr, c_name)
+                var_pos = self.database_ptr.find(c_name)
                 if var_pos < 0:
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 for j, t in enumerate(range(t_first_period, t_last_period + 1)):
@@ -603,7 +603,7 @@ cdef class Variables(CythonIodeDatabase):
 
     def _str_table(self, names: List[str], periods: List[str]) -> Dict[str, List[float]]:
         cdef t
-        names_pos: List[int] = [self.get_position(name) for name in names] 
+        names_pos: List[int] = [self.find(name) for name in names] 
         columns = {"name": names}
         for str_period in periods:
             period = Period(str_period)

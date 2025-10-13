@@ -140,7 +140,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
     for(i = 0 ; i < dbe->size(); i++) {
-        KSIM_POSXK[i] = K_find(dbv, KONAME(dbe,i));
+        KSIM_POSXK[i] = dbv->find(KONAME(dbe,i));
         if(KSIM_POSXK[i] < 0) {
             std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot find variable";
             error_manager.append_error(error_msg);
@@ -193,9 +193,9 @@ int CSimulation::K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** 
 
     // Fixe l'ordre d'exécution dans KSIM_ORDER
     KSIM_ORDER = (int *)  SW_nalloc(sizeof(int) * (KSIM_PRE + KSIM_INTER + KSIM_POST));
-    for(i = j = 0; i < KSIM_PRE; i++)   KSIM_ORDER[j++] = K_find(dbe, pre[i]);
-    for(i = 0;     i < KSIM_INTER; i++) KSIM_ORDER[j++] = K_find(dbe, inter[i]);
-    for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = K_find(dbe, post[i]);
+    for(i = j = 0; i < KSIM_PRE; i++)   KSIM_ORDER[j++] = dbe->find(pre[i]);
+    for(i = 0;     i < KSIM_INTER; i++) KSIM_ORDER[j++] = dbe->find(inter[i]);
+    for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = dbe->find(post[i]);
 
     // Simulation
     t = smpl->start_period.difference(dbv->sample->start_period);

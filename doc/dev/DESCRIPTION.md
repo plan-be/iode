@@ -290,6 +290,7 @@ Function to manage KDB, i.e. IODE object groups.
 
 |Syntax|Description|
 |:---|:---|
+|`int K_key(char* name, int mode):`|Checks the validity of an object name and modify its "case" according to the value of mode.|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
@@ -371,11 +372,9 @@ Functions to manipulate IODE objects.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_key(char* name, int mode):`|Checks the validity of an object name and modify its "case" according to the value of mode.|
 |`int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):`|Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.|
 |`int K_ren(KDB* kdb, char* name1, char* name2):`|Renames the object name1 in kdb into name2.|
 |`int K_add_entry(KDB* kdb, char* name):`|Adds the entry name in kdb and returns its position in the kdb.|
-|`int K_find(KDB* kdb, char* name):`|Searches the position of an object name in a KDB.|
 |`int K_del_entry(KDB* kdb, int pos):`|Deletes an entry in a KDB \_\_without\_\_ deleting the referenced object.|
 |`int K_del(KDB* kdb, int pos):`|Deletes an object (and its data) from a KDB.|
 |`int K_del_by_name(KDB* kdb, char* name):`|Deletes an object identified by its name from a KDB.|

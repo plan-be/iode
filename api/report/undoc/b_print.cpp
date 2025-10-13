@@ -285,7 +285,7 @@ int B_PrintObjDef_1(char* arg, int* type)
     int     pos, rc = 0;
 
     kdb = K_WS[*type];
-    if((pos = K_find(kdb, arg)) == -1) 
+    if((pos = kdb->find(arg)) == -1) 
         goto err;
 
     kmsg("Printing %s ...", arg);
@@ -644,7 +644,7 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
         sname = clec->lnames[j].name;
         buf[0] = 0;
         if(coefs && L_ISCOEF(sname)) {
-            pos = K_find(KS_WS, sname);
+            pos = KS_WS->find(sname);
             if(pos >= 0) {
                 scl = KSVAL(KS_WS, pos);
                 // T_fmt_val(tcoef, scl->value, 9, -1); /* JMP 27-10-08 */
@@ -727,7 +727,7 @@ int B_PrintEqs(char* name, Equation* eq)
         for(j = 0 ; j < clec->nb_names ; j++) {
             sname = clec->lnames[j].name;
             if(L_ISCOEF(sname)) {
-                pos = K_find(KS_WS, sname);
+                pos = KS_WS->find(sname);
                 if(pos < 0)
                     B_PrintDefSclPtr(0L, sname, 3);
                 else

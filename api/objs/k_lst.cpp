@@ -114,7 +114,7 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
             K_add(scal, cl->lnames[j].name, NULL, &rc);
         else {
             if(dbe != NULL
-                    && K_find(dbe, cl->lnames[j].name) >= 0) continue;
+                    && dbe->find(cl->lnames[j].name) >= 0) continue;
             K_add(exo, cl->lnames[j].name, NULL, &rc);
         }
     }
@@ -302,7 +302,7 @@ unsigned char **KL_expand(char *str)
     if(SCR_tbl_size(tbl) == 0) return(tbl);
     for(i = 0 ; tbl[i] ; i++) {
         if(tbl[i][0] == '$') {
-            pos = K_find(K_WS[LISTS], (char*) tbl[i] + 1);
+            pos = K_WS[LISTS]->find((char*) tbl[i] + 1);
             if(pos >= 0) {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
                 tbl2 = KL_expand(KLVAL(K_WS[LISTS], pos));

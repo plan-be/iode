@@ -63,8 +63,8 @@ cdef class CythonIodeDatabase:
         cdef char* c_value = b_value
         B_PrintNbDec(c_value)
 
-    def get_position(self, name: str) -> int:
-        return self.abstract_db_ptr.get_position(name.encode())
+    def find(self, name: str) -> int:
+        return self.abstract_db_ptr.find(name.encode())
 
     def get_name(self, pos: int) -> str:
         return self.abstract_db_ptr.get_name(pos).decode()

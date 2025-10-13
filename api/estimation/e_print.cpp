@@ -256,7 +256,7 @@ static int E_graph_calc_lhs(char* name, char* res, char* rhs)
     memset(res, 0, 71);
     memset(rhs, 0, 71);
 
-    pos = K_find(K_WS[EQUATIONS], name);
+    pos = K_WS[EQUATIONS]->find(name);
     if(pos < 0) 
         return(-1);
     

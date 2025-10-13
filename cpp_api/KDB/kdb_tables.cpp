@@ -28,7 +28,7 @@ std::string KDBTables::get_title(const int pos) const
 std::string KDBTables::get_title(const std::string& name) const
 {
 	// throw exception if table with passed name does not exist
-    int pos = get_position(name);
+    int pos = find(name);
     return get_title(pos);
 }
 

@@ -150,7 +150,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    pos = K_find(E_DBE, name);
+    pos = E_DBE->find(name);
     if(pos < 0) 
     {
         std::string comment = "";
@@ -222,7 +222,7 @@ int Estimation::KE_est_s(Sample* smpl)
         if(estimated_eqs.contains(endo))
             continue;
 
-        pos = K_find(E_DBE, (char*) endo.c_str());
+        pos = E_DBE->find((char*) endo.c_str());
         if(pos < 0) {
             std::string error_msg  = "Equation '" + endo + "' not found";
             error_manager.append_error(error_msg);
@@ -272,7 +272,7 @@ int Estimation::KE_est_s(Sample* smpl)
             for(j = 0; j < nblk; j++) 
             {
                 SCR_sqz(blk[j]);
-                pos = K_find(KE_WS, (char*) blk[j]);
+                pos = KE_WS->find((char*) blk[j]);
                 if(pos < 0) 
                 {
                     std::string error_msg = "Equation '";
@@ -315,7 +315,7 @@ int Estimation::KE_est_s(Sample* smpl)
                 tests[EQ_LOGLIK]  = (float)MATE(E_LOGLIK,      0, j);
 
                 KE_update((char*) endos[j], (char*) lecs[j], E_MET, E_SMPL, tests);
-                pos = K_find(E_DBE, (char*) endos[j]);   /* JMP 24-06-98 */
+                pos = E_DBE->find((char*) endos[j]);   /* JMP 24-06-98 */
                 eq = KEVAL(E_DBE, pos);          /* JMP 24-06-98 */
                 // create the Scalars containing the results of an estimated equation
                 E_tests2scl(eq, j, E_T, E_NCE);  /* JMP 27-09-96 */

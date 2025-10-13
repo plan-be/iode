@@ -567,7 +567,7 @@ char* A_expand_super_API(char* name)
 {
     int     pos;
 
-    pos = K_find(KL_WS, const_cast<char*>(name));
+    pos = KL_WS->find(const_cast<char*>(name));
     if (pos < 0) return(NULL);
     return((char *)KLVAL(KL_WS, pos));
 }

@@ -233,8 +233,8 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 
     if(kdb1->k_type != kdb2->k_type) return(-1);
 
-    p1 = K_find(kdb1, name);
-    p2 = K_find(kdb2, name);
+    p1 = kdb1->find(name);
+    p2 = kdb2->find(name);
 
     if(p1 < 0) {
         if(p2 < 0) return(0);   /* not 1, not 2 */

@@ -146,7 +146,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0)     
                 continue;
 
-            pos = K_find(kdb, oname);
+            pos = kdb->find(oname);
 
             if(SW_BLKS[7].blk_space > 100000L) 
                 Debug("%s\n", oname);

@@ -39,7 +39,7 @@ static int E_GetSmpl(Sample *smpl, char *name)
     double    *val;
     Sample  *wsmpl = K_WS[VARIABLES]->sample;
 
-    pos = K_find(K_WS[VARIABLES], name);
+    pos = K_WS[VARIABLES]->find(name);
     if(pos < 0) return(-1);
     val = KVVAL(K_WS[VARIABLES], pos, 0);
 
@@ -247,7 +247,7 @@ void E_SclToReal(char* name, double* res)
     int pos;
     Scalar *scl;
 
-    pos = K_find(KS_WS, name);
+    pos = KS_WS->find(name);
     if(pos < 0) return;
 
     scl = KSVAL(KS_WS, pos);

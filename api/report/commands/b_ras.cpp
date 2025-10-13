@@ -26,7 +26,7 @@ static int RasSetVar(char  *name, int t, double var)
     int     pos;
     KDB     *kdb = K_WS[VARIABLES];
 
-    pos = K_find(kdb, name);
+    pos = kdb->find(name);
     if(pos < 0) {
         std::string error_msg = "RAS: Variable '" + std::string(name) + "' not found";
         error_manager.append_error(error_msg);
@@ -44,7 +44,7 @@ static double RasGetVar(char  *name, int t)
     double  var;
     KDB     *kdb = K_WS[VARIABLES];
 
-    pos = K_find(kdb, name);
+    pos = kdb->find(name);
     if(pos < 0) {
         std::string error_msg = "RAS: Variable '" + std::string(name) + "' not found";
         error_manager.append_error(error_msg);
