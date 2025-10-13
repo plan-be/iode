@@ -174,7 +174,7 @@ TEST_F(UtilsTest, removeDuplicates)
 	EXPECT_EQ(v_names, v_expected_duplicate);
 
 	// (char**) After removing duplicates
-	c_names = remove_duplicates(c_names);
+	c_names = sort_and_remove_duplicates(c_names);
 	nb_names = SCR_tbl_size((unsigned char**) c_names);
 	v_names.clear();
 	for (int i=0; i < nb_names; i++) v_names.push_back(std::string(c_names[i]));
@@ -183,7 +183,7 @@ TEST_F(UtilsTest, removeDuplicates)
 	
 	// (vector<string>) After removing duplicates
 	v_names = v_expected_duplicate;
-	remove_duplicates(v_names);
+	sort_and_remove_duplicates(v_names);
 	nb_names = (int) v_names.size();
 	EXPECT_EQ(nb_names, nb_names_unique);
 	EXPECT_EQ(v_names, v_expected_unique);

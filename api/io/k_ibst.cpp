@@ -210,7 +210,8 @@ int ImportCommentsBST::sub_read_header(int lang)
 
         if(ftr) cmt = add_ftr(cmt, rub, lang);
 
-        if(cmt && K_add(C_kdb, name, cmt) < 0) return(-1);
+        if(cmt && !K_add(C_kdb, name, cmt)) 
+            return(-1);
 
         SW_nfree(fc);
         SW_nfree(nc);
@@ -262,7 +263,8 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
     }
 
     name[0] = '0';
-    while(name[0] == '0') {
+    while(name[0] == '0') 
+    {
         if(DIF_long(SYY, &dom) < 0) return(-1);
         if(DIF_long(SYY, &tbl) < 0) return(-1);
         if(DIF_long(SYY, &as1) < 0) return(-1);
@@ -273,42 +275,46 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         SW_nfree(str);
         dif_skip_to(SYY, DIF_BOT);
     }
-
     as1 --;
 
-    niv = get_niv(KONAME(C_kdb, as1));
-    if(niv < 1 || niv > 9) return(-1);
+    niv = get_niv((char*) C_kdb->get_name(as1).c_str());
+    if(niv < 1 || niv > 9) 
+        return(-1);
 
     shift = niv;
-    while(niv > 0 && as1 >= 0) {
-        r_niv = get_niv(KONAME(C_kdb, as1));
-        if(niv == r_niv) {
+    while(niv > 0 && as1 >= 0) 
+    {
+        r_niv = get_niv((char*) C_kdb->get_name(as1).c_str());
+        if(niv == r_niv) 
+        {
             str = KOVAL(C_kdb, as1);
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
             niv --;
         }
-
         as1 --;
     }
 
-    if(as2 > 0) {
-        niv = get_niv(KONAME(C_kdb, as2));
-        while(niv > 0 && as2 >= 0 && niv + shift < 10) {
-            r_niv = get_niv(KONAME(C_kdb, as2));
-            if(niv == r_niv) {
+    if(as2 > 0) 
+    {
+        niv = get_niv((char*) C_kdb->get_name(as2).c_str());
+        while(niv > 0 && as2 >= 0 && niv + shift < 10) 
+        {
+            r_niv = get_niv((char*) C_kdb->get_name(as2).c_str());
+            if(niv == r_niv) 
+            {
                 str = KOVAL(C_kdb, as2);
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;
             }
-
             as2 --;
         }
     }
 
     *cmt = (char*) SCR_mtov((unsigned char**) p_cmt, (int) ' ');
 
-    for(i = 0; i < 10 && p_cmt[i]; i++) {
+    for(i = 0; i < 10 && p_cmt[i]; i++) 
+    {
         SCR_free(p_cmt[i]);
         p_cmt[i] = NULL;
     }

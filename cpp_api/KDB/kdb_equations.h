@@ -38,9 +38,9 @@ public:
 
     std::string get_lec(const std::string& name) const;
 
-    int add(const std::string& name, const Equation& obj);
+    bool add(const std::string& name, const Equation& obj);
 
-    int add(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
+    bool add(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
         const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
 
     void update(const int pos, const Equation& obj);
@@ -60,12 +60,16 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
+    char* ptr;
+    Equation* eq;
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->size(); pos++)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
-        char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
-        hash_combine<Equation>(seed, *KEVAL(kdb, pos));
+        hash_combine<std::string>(seed, name);
+         
+        ptr = SW_getptr(handle);
+        eq = K_eunpack(ptr, (char*) name.c_str());
+        hash_combine<Equation>(seed, *eq);
     }
     return seed;
 }

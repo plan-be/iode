@@ -220,7 +220,7 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
     int    j;
 
     for(j = 0 ; j < clec->nb_names ; j++)
-        if(L_ISCOEF(clec->lnames[j].name) &&
+        if(is_coefficient(clec->lnames[j].name) &&
                 E_C_NBS[coef_nb] == clec->lnames[j].pos) return(1);
 
     return(0);

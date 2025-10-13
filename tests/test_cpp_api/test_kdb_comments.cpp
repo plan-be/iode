@@ -88,7 +88,7 @@ TEST_F(KDBCommentsTest, GetName)
 
 TEST_F(KDBCommentsTest, Rename)
 {
-    int new_pos;
+    bool success;
     std::string old_name;
     std::string new_name;
     std::string error_msg;
@@ -96,8 +96,9 @@ TEST_F(KDBCommentsTest, Rename)
     // rename
     old_name = Comments.get_name(0);
     EXPECT_EQ(old_name, "ACAF");
-    new_pos = Comments.rename(old_name, "NEW_NAME");
-    EXPECT_EQ(Comments.get_name(new_pos), "NEW_NAME");
+    success = Comments.rename(old_name, "NEW_NAME");
+    EXPECT_TRUE(success);
+    EXPECT_TRUE(Comments.contains("NEW_NAME"));
 
     // expect errors 
     old_name = Comments.get_name(2);
@@ -125,8 +126,9 @@ TEST_F(KDBCommentsTest, Rename)
     EXPECT_THROW(Comments.rename(old_name, new_name), std::invalid_argument);
     
     // set by position
-    new_pos = Comments.set_name(1, "NEW_POS");
-    EXPECT_EQ(Comments.get_name(new_pos), "NEW_POS");
+    success = Comments.set_name(1, "NEW_POS");
+    EXPECT_TRUE(success);
+    EXPECT_TRUE(Comments.contains("NEW_POS"));
 }
 
 TEST_F(KDBCommentsTest, Contains)

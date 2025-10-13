@@ -290,7 +290,6 @@ Function to manage KDB, i.e. IODE object groups.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_key(char* name, int mode):`|Checks the validity of an object name and modify its "case" according to the value of mode.|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, int nb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
@@ -350,7 +349,7 @@ Function to create an IODE object and to record it in a KDB.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)`|adds an object to a KDB. The number of arguments depends on object type.|
+|`bool K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)`|adds an object to a KDB. The number of arguments depends on object type.|
 
 How to create IODE objects using K\_add():
 
@@ -373,11 +372,8 @@ Functions to manipulate IODE objects.
 |Syntax|Description|
 |:---|:---|
 |`int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):`|Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.|
-|`int K_ren(KDB* kdb, char* name1, char* name2):`|Renames the object name1 in kdb into name2.|
-|`int K_add_entry(KDB* kdb, char* name):`|Adds the entry name in kdb and returns its position in the kdb.|
+|`bool K_add_entry(KDB* kdb, char* name):`|Adds the entry name in kdb.|
 |`int K_del_entry(KDB* kdb, int pos):`|Deletes an entry in a KDB \_\_without\_\_ deleting the referenced object.|
-|`int K_del(KDB* kdb, int pos):`|Deletes an object (and its data) from a KDB.|
-|`int K_del_by_name(KDB* kdb, char* name):`|Deletes an object identified by its name from a KDB.|
 |`int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
 |`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
 

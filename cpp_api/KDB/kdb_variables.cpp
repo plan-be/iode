@@ -57,7 +57,7 @@ double* KDBVariables::get_var_ptr(const int pos)
 double KDBVariables::get_var(const std::string& name, const int t, const IodeVarMode mode) const
 {
 	// throw exception if object with passed name does not exist
-    int pos = find(name);
+    int pos = index_of(name);
     return get_var(pos, t, mode);
 }
 
@@ -84,7 +84,7 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 double* KDBVariables::get_var_ptr(const std::string& name)
 {
 	// throw exception if object with passed name does not exist
-	int pos = find(name);
+	int pos = index_of(name);
 	return get_var_ptr(pos);
 }
 
@@ -118,7 +118,7 @@ void KDBVariables::set_var(const int pos, const Period& period, const double val
 void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)
 {
 	// throw exception if object with passed name does not exist
-	int pos = find(name);
+	int pos = index_of(name);
 	set_var(pos, t, value, mode);
 }
 
@@ -208,7 +208,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std:
 	return calculate_var_from_lec(lec, t_first, t_last);
 }
 
-int KDBVariables::add(const std::string& name, const Variable& variable)
+bool KDBVariables::add(const std::string& name, const Variable& variable)
 {
 	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
@@ -219,7 +219,7 @@ int KDBVariables::add(const std::string& name, const Variable& variable)
 	return KDBTemplate::add(name, variable.data(), &var_size);
 }
 
-int KDBVariables::add(const std::string& name, const std::string& lec)
+bool KDBVariables::add(const std::string& name, const std::string& lec)
 {
 	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");

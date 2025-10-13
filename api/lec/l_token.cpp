@@ -378,7 +378,7 @@ int L_get_token()
             keyw = YY_EOF;
             break;
         case YY_WORD    :
-            if(L_ISCOEF(LYYTEXT)) keyw = L_COEF;
+            if(is_coefficient((char*) LYYTEXT)) keyw = L_COEF;
             else keyw = L_VAR;
             break;
         case YY_LONG    :

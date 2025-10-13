@@ -8,7 +8,7 @@ Comment KDBComments::get_unchecked(const int pos) const
     return oem_to_utf8(comment);
 }
 
-int KDBComments::add(const std::string& name, const Comment& comment)
+bool KDBComments::add(const std::string& name, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
     return KDBTemplate::add(name, to_char_array(oem_comment));

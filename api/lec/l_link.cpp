@@ -33,13 +33,16 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
 {
     int     i;
 
-    for (i = 0; i < cl->nb_names; i++) {
-        if (L_ISCOEF(cl->lnames[i].name))
+    for (i = 0; i < cl->nb_names; i++) 
+    {
+        if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = L_findscl(dbs, cl->lnames[i].name);
         else
             cl->lnames[i].pos = L_findvar(dbv, cl->lnames[i].name);
-        if (cl->lnames[i].pos < 0) {
-            error_manager.append_error(std::string(cl->lnames[i].name) + " : not found");
+        if(cl->lnames[i].pos < 0) 
+        {
+            std::string msg = "linking LEC failed: '" + std::string(cl->lnames[i].name) + "' not found";
+            error_manager.append_error(msg);
             return(L_errno = L_NOT_FOUND_ERR);
         }
     }
@@ -177,10 +180,10 @@ static void L_link1_endos(KDB* dbe, CLEC* cl)
     int     i;
 
     for (i = 0; i < cl->nb_names; i++) {
-        if (L_ISCOEF(cl->lnames[i].name))
+        if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
-            cl->lnames[i].pos = dbe->find(cl->lnames[i].name);
+            cl->lnames[i].pos = dbe->index_of(cl->lnames[i].name);
 
         if (cl->lnames[i].pos < 0)  // Not found => exogenous var
             cl->lnames[i].pos = -1; // For the SCC construction, we do not need the exogenous vars positions 

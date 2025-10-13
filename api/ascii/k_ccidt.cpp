@@ -78,12 +78,13 @@ KDB* AsciiIdentities::load_asc(char* filename, int db_global)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(YY_lex(yy) != YY_STRING) {
+                if(YY_lex(yy) != YY_STRING) 
+                {
                     kerror(0, "%s : identity not defined", YY_error(yy));
                     break;
                 }
                 lec = K_wrap((char*) yy->yy_text, 60);
-                if(K_add(kdb, name, lec) < 0)
+                if(!K_add(kdb, name, lec))
                     kerror(0, "%s (%s : %s).", YY_error(yy), name, L_error());
                 else 
                     cmpt++;
@@ -129,7 +130,7 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
 
     for(i = 0 ; i < kdb->size() ; i++) 
     {
-        fprintf(fd, "%s ", KONAME(kdb, i));
+        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
         fprintf(fd, "\"%s\"\n", KILEC(kdb, i));
     }
 

@@ -62,7 +62,7 @@ TEST_F(KDBTablesTest, Save)
 TEST_F(KDBTablesTest, Get)
 {
     Table* table;
-    int pos = K_WS[TABLES]->find(const_cast<char*>("GFRPC"));
+    int pos = K_WS[TABLES]->index_of(const_cast<char*>("GFRPC"));
 
     // by position
     table = Tables.get(pos);

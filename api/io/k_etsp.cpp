@@ -93,7 +93,7 @@ char* ExportObjsTSP::extract_comment(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
-    pos = dbc->find(name);
+    pos = dbc->index_of(name);
     if(pos >= 0)  
         *cmt = (char*) SCR_stracpy((unsigned char*) KCVAL(dbc, pos));
     else 

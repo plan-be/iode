@@ -15,17 +15,14 @@ inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
 /* k_objs.c */
-int K_dup(const KDB *,char *,KDB *,char *);
-int K_ren(KDB *,char *,char *);
-int K_add_entry(KDB *,char *);
-int K_del(KDB *,int );
-int K_del_entry(KDB *,int );
-int K_del_by_name(KDB* kdb, char* name);
+int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const std::string& name2);
+bool K_add_entry(KDB* kdb, const std::string& name);
+int K_del_entry(KDB* kdb, int pos);
 int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date);
 int K_upd_tbl(char* name, char* arg);
 
 /* k_objsv.c */
-int K_add(KDB *kdb, char* name,...);
+bool K_add(KDB *kdb, char* name,...);
 
 /* k_objvers.c */
 int K_calcvers(char *);

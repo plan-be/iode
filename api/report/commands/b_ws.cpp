@@ -78,10 +78,11 @@ int B_WsLoad(char* arg, int type)
     K_WS[type] = kdb;
 
     // get the list of all object names in 'kdb'
+    int i = 0;
     int nb_names = (int) kdb->size();
     char** all_names = new char*[nb_names];
-    for (int i = 0; i < nb_names; i++)
-        all_names[i] = (char*) SCR_stracpy((unsigned char*) kdb->k_objs[i].o_name);
+    for (const auto& [name, _] : kdb->k_objs)
+        all_names[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
 
     if(K_RWS[type][pos])
         delete K_RWS[type][pos];
@@ -647,20 +648,19 @@ double *B_StatUnitRoot_1(char* arg, int print)
     lg = B_get_arg0(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
     order = atoi(name);
 
-//    sprintf(buf, "_DF %s", arg + lg + 1);
-//    rc = B_DataCalcVar(buf);
-//    if(rc) return(NULL);
-
-//    df = E_UnitRoot("_DF", drift, trend, order);
     df = E_UnitRoot(arg + lg + 1, drift, trend, order);
     if(print && df != NULL) 
         E_PrintDF(arg + lg + 1, df, drift, trend, order);
 
-//    B_DataDelete("_DF", VARIABLES);
-
-    if(df) {
+    if(df) 
+    {
         E_GetLecName(arg + lg + 1, name);
+        // set variable name to lower case
+        for (int i = 0; i < 80 && name[i]; i++)
+            name[i] = tolower((unsigned char) name[i]);
+        // generate scalar name as df_<var_name_lower_case>
         sprintf(buf, "df_%s %lf", name, df[2]);
+        // create scalar in the scalar WS if not existing
         B_DataUpdate(buf, SCALARS);
     }
     return(df);

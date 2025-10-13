@@ -7,5 +7,4 @@ cdef extern from "api/all.h":
     cdef int   kpause_continue
 
     cdef void K_end_ws(int)
-    cdef int K_add(KDB* kdb, char* name, ...)
-    cdef int K_del(KDB* kdb, int pos)
+    cdef bint K_add(KDB* kdb, char* name, ...)
