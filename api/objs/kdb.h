@@ -235,8 +235,6 @@ inline char k_ext[][4] =
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KOBJS(kdb)   ((kdb)->k_objs)
-
 #define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)                 // name of the object
 #define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)                  // handle of the object in the scr4/swap memory
 #define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)

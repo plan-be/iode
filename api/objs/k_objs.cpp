@@ -197,8 +197,8 @@ int K_ren(KDB* kdb, char* name1, char* name2)
  *
  *  The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
  *  
- *  @detail  The object names are stored in the table KOBJS(kdb). To avoid a reallocation on each new insertion, K_CHUNCK elements 
- *          are added to KOBJS(kdb) each time that more place is needed to store object names.
+ *  @detail  The object names are stored in the table kdb->k_objs. To avoid a reallocation on each new insertion, K_CHUNCK elements 
+ *          are added to kdb->k_objs each time that more place is needed to store object names.
  *
  *          Names in KOBJS are stored in alphabetic order to speed up the retrieval of an object by its name. 
  *          Consequently, K_add_entry has to calculate the place where the name must be inserted. For (even) more speed when 
@@ -229,11 +229,11 @@ int K_add_entry(KDB* kdb, char* newname)
     }
 
     if((kdb->k_nb) % K_CHUNCK == 0)
-        //KOBJS(kdb) = (char *) SW_nrealloc(KOBJS(kdb),
-        KOBJS(kdb) = (KOBJ*) SW_nrealloc(KOBJS(kdb),
+        //kdb->k_objs = (char *) SW_nrealloc(kdb->k_objs,
+        kdb->k_objs = (KOBJ*) SW_nrealloc(kdb->k_objs,
                                          (unsigned int)(sizeof(KOBJ) * kdb->k_nb),
                                          (unsigned int)(sizeof(KOBJ) * (kdb->k_nb + K_CHUNCK)));
-    if(KOBJS(kdb) == 0) return(-1);
+    if(kdb->k_objs == 0) return(-1);
 
 
     if(kdb->k_nb == 0) { /* JMP 09-06-00 */
@@ -241,12 +241,12 @@ int K_add_entry(KDB* kdb, char* newname)
         goto done;
     }
 
-    if(K_find_strcmp(name, KOBJS(kdb) + kdb->k_nb - 1) > 0) {
+    if(K_find_strcmp(name, kdb->k_objs + kdb->k_nb - 1) > 0) {
         maxpos = kdb->k_nb;
         goto done;
     }
 
-    if(K_find_strcmp(name, KOBJS(kdb)) < 0) {
+    if(K_find_strcmp(name, kdb->k_objs) < 0) {
         /* add before */
         maxpos = 0;
         goto done;
@@ -257,7 +257,7 @@ int K_add_entry(KDB* kdb, char* newname)
     minpos = 0;
     while(maxpos - minpos > 1) {
         pos = minpos + (maxpos - minpos)/2;
-        if(K_find_strcmp(name, KOBJS(kdb) + pos) < 0) maxpos = pos;
+        if(K_find_strcmp(name, kdb->k_objs + pos) < 0) maxpos = pos;
         else minpos = pos;
     }
 
@@ -265,8 +265,8 @@ done :
    nbobjs =  kdb->k_nb - maxpos;
     if(nbobjs != 0) {
         ktmp = (KOBJ *) BUF_alloc(nbobjs * sizeof(KOBJ));
-        memcpy((char *)ktmp, (char *)(KOBJS(kdb) + maxpos), nbobjs * sizeof(KOBJ));
-        memcpy((char *)(KOBJS(kdb) + maxpos + 1), (char *)ktmp, nbobjs * sizeof(KOBJ));
+        memcpy((char *)ktmp, (char *)(kdb->k_objs + maxpos), nbobjs * sizeof(KOBJ));
+        memcpy((char *)(kdb->k_objs + maxpos + 1), (char *)ktmp, nbobjs * sizeof(KOBJ));
         //SCR_free(ktmp);
     }
 
@@ -299,9 +299,9 @@ int K_find(KDB* kdb, char* name)
     SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
     if(K_key(oname, kdb->k_mode) < 0) return(-1);
 
-    res = (char *) bsearch(oname, KOBJS(kdb), (int) kdb->k_nb,
+    res = (char *) bsearch(oname, kdb->k_objs, (int) kdb->k_nb,
                            sizeof(KOBJ), K_find_strcmp);
-    if(res != 0) return((int)((res - (char *) KOBJS(kdb)) / sizeof(KOBJ)));
+    if(res != 0) return((int)((res - (char *) kdb->k_objs) / sizeof(KOBJ)));
     else return(-1);
 }
 
@@ -318,19 +318,19 @@ int K_find(KDB* kdb, char* name)
 
 int K_del_entry(KDB* kdb, int pos)
 {
-    memcpy(KOBJS(kdb) + pos, KOBJS(kdb) + (pos + 1),
+    memcpy(kdb->k_objs + pos, kdb->k_objs + (pos + 1),
            (int)(kdb->k_nb - pos - 1) * sizeof(KOBJ));
     kdb->k_nb--;
     if(kdb->k_nb > 0) {
-        memset(KOBJS(kdb) + (int) kdb->k_nb, 0, sizeof(KOBJ));
+        memset(kdb->k_objs + (int) kdb->k_nb, 0, sizeof(KOBJ));
         if(kdb->k_nb % K_CHUNCK == 0)
-            KOBJS(kdb) = (KOBJ *) SW_nrealloc((char *)KOBJS(kdb),
+            kdb->k_objs = (KOBJ *) SW_nrealloc((char *)kdb->k_objs,
                                               (unsigned int)(sizeof(KOBJ) * (kdb->k_nb + K_CHUNCK)),
                                               (unsigned int)(sizeof(KOBJ) * kdb->k_nb));
     }
     else {
-        SW_nfree(KOBJS(kdb));
-        KOBJS(kdb) = NULL;
+        SW_nfree(kdb->k_objs);
+        kdb->k_objs = NULL;
     }
     return(0);
 }

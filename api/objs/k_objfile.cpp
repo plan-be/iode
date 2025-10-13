@@ -410,13 +410,13 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     // Load object table (32 bits == 64 bits)
     // TODO: faire une sous-fonction K_read_objtable
     i = (kdb->k_nb / K_CHUNCK + 1) * K_CHUNCK;
-    KOBJS(kdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * i);
-    if(KOBJS(kdb) == NULL) 
+    kdb->k_objs = (KOBJ *) SW_nalloc(sizeof(KOBJ) * i);
+    if(kdb->k_objs == NULL) 
         goto error;
     for(int j = 0; j < i; j++) 
     {
-        KOBJS(kdb)[j].o_val = 0;
-        memset(KOBJS(kdb)[j].o_name, 0, sizeof(ONAME));
+        kdb->k_objs[j].o_val = 0;
+        memset(kdb->k_objs[j].o_name, 0, sizeof(ONAME));
     }
 
     // CHECK VERSION KOBJ and load object tables (not the objects themselves)
@@ -435,7 +435,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         if(kdb->k_compressed == 0) 
         {
             // Normal case : no compression / long names
-            kread((char *) KOBJS(kdb), sizeof(KOBJ), (int) kdb->k_nb, fd);
+            kread((char *) kdb->k_objs, sizeof(KOBJ), (int) kdb->k_nb, fd);
         }
         else 
         {
@@ -447,7 +447,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             kread(cptr, clen, 1, fd);
             //LzhDecodeStr(cptr, clen, &aptr, &len);
             GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
-            memcpy((char *)KOBJS(kdb), aptr, len);
+            memcpy((char *)kdb->k_objs, aptr, len);
             SW_nfree(cptr);
             SCR_free(aptr);
         }
@@ -470,8 +470,8 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 kread(cptr, clen, 1, fd);
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
-                KOBJS(kdb)[i].o_val = SW_alloc(len);
-                ptr = SW_getptr(KOBJS(kdb)[i].o_val);
+                kdb->k_objs[i].o_val = SW_alloc(len);
+                ptr = SW_getptr(kdb->k_objs[i].o_val);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
                 SCR_free(aptr);
@@ -479,12 +479,12 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             else 
             {
                 // Si len >= 0 => version non zippée (dft)
-                KOBJS(kdb)[i].o_val = SW_alloc(len);
-                ptr = SW_getptr(KOBJS(kdb)[i].o_val);
+                kdb->k_objs[i].o_val = SW_alloc(len);
+                ptr = SW_getptr(kdb->k_objs[i].o_val);
                 if(ptr == 0) 
                 {
                     kerror(0, "Memory full ? %s[%d]", __FILE__, __LINE__); // JMP 15/7/2013
-                    kerror(0, "o_val = %d, block : %d", KOBJS(kdb)[i].o_val, SW_get_blk(KOBJS(kdb)[i].o_val));
+                    kerror(0, "o_val = %d, block : %d", kdb->k_objs[i].o_val, SW_get_blk(kdb->k_objs[i].o_val));
 
                 }
                 kread(ptr, len, 1, fd);
@@ -551,12 +551,12 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 goto error;
             
             j = K_add_entry(kdb, c_name);
-            KOBJS(kdb)[j].o_val = SW_alloc(len);
-            ptr = SW_getptr(KOBJS(kdb)[j].o_val);
+            kdb->k_objs[j].o_val = SW_alloc(len);
+            ptr = SW_getptr(kdb->k_objs[j].o_val);
             if(ptr == 0) 
             {
                 kerror(0, "Memory full ? %s[%d]", __FILE__, __LINE__); // JMP 15/7/2013
-                kerror(0, "o_val = %d, block : %d", KOBJS(kdb)[i].o_val, SW_get_blk(KOBJS(kdb)[i].o_val));
+                kerror(0, "o_val = %d, block : %d", kdb->k_objs[i].o_val, SW_get_blk(kdb->k_objs[i].o_val));
 
             }
             if(len < 0) 
@@ -1091,7 +1091,7 @@ error :
  *  
  *  If the running architecture is X64, the KDB is translated into 32 bits (KDB32) before writing.
  *  
- *  if K_XDR is not null, the table of objects (KOBJS(kdb)) and the objects are individually compressed before being saved.
+ *  if K_XDR is not null, the table of objects (kdb->k_objs) and the objects are individually compressed before being saved.
  *    
  *  @param [in, out]    kdb     KDB*    KDB to save 
  *  @param [in]         fname   FNAME   filename. 
@@ -1163,12 +1163,12 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     xdr_kdb = nullptr;
 
     // Dump KOBJ table
-    if(K_cwrite(kdb->k_compressed, (char*)KOBJS(kdb), sizeof(KOBJ), kdb->k_nb, fd, -1) < 0) goto error;
+    if(K_cwrite(kdb->k_compressed, (char*)kdb->k_objs, sizeof(KOBJ), kdb->k_nb, fd, -1) < 0) goto error;
 
     // Dump objects
     for(i = 0; i < kdb->k_nb; i++) {
         /* XDR  OBJ */
-        ptr = SW_getptr(KOBJS(kdb)[i].o_val);
+        ptr = SW_getptr(kdb->k_objs[i].o_val);
         len = P_len(ptr);
         K_xdrobj[kdb->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
         if(K_cwrite(kdb->k_compressed, xdr_ptr, len, 1, fd, 20) < 0) goto error;

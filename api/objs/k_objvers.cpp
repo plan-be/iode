@@ -73,7 +73,7 @@ static void K_repack(KDB* kdb, int objnb)
     U_sh    *optr;
     int     nlg, add, lendata, i;
 
-    opos = KOBJS(kdb)[objnb].o_val;
+    opos = kdb->k_objs[objnb].o_val;
     optr = (U_sh *) SW_getptr(opos);
     add = (optr[1] + 2 + optr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
     nlg = optr[0] + add;
@@ -90,7 +90,7 @@ static void K_repack(KDB* kdb, int objnb)
            ((char *)optr) + (optr[1] + 2 + optr[1] % 2) * sizeof(U_sh),
            lendata);
     SW_free(opos);
-    KOBJS(kdb)[objnb].o_val = pos;
+    kdb->k_objs[objnb].o_val = pos;
 }
 
 /**
@@ -240,7 +240,7 @@ void K_setvers(KDB* kdb, int i, int vers)
     switch(kdb->k_type) {
         case VARIABLES :
             if(vers == 2) return;
-            opos = KOBJS(kdb)[i].o_val;
+            opos = kdb->k_objs[i].o_val;
             nb = kdb->sample->nb_periods;
             pos = KV_alloc_var(nb);
             ptr = SW_getptr(pos);
@@ -254,7 +254,7 @@ void K_setvers(KDB* kdb, int i, int vers)
                 /*d[j] = (double)f[j]; */
             }
             SW_free(opos);
-            KOBJS(kdb)[i].o_val = pos;
+            kdb->k_objs[i].o_val = pos;
             break;
 
         case SCALARS :
@@ -266,7 +266,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             d = (double *)P_get_ptr(ptr, 0);
 
             /* Get old allocation and get float ptr */
-            opos = KOBJS(kdb)[i].o_val;
+            opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
             f = (float *)P_get_ptr(optr, 0);
 
@@ -280,11 +280,11 @@ void K_setvers(KDB* kdb, int i, int vers)
             }
 
             SW_free(opos);
-            KOBJS(kdb)[i].o_val = pos;
+            kdb->k_objs[i].o_val = pos;
             break;
 
         case IDENTITIES :
-            opos = KOBJS(kdb)[i].o_val;
+            opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
             K_ipack(&pack, (char*) P_get_ptr(optr, 0));
             SW_free(opos);
@@ -292,26 +292,26 @@ void K_setvers(KDB* kdb, int i, int vers)
             pos = SW_alloc(lg);
             memcpy(SW_getptr(pos), pack, lg);
             SW_nfree(pack);
-            KOBJS(kdb)[i].o_val = pos;
+            kdb->k_objs[i].o_val = pos;
             break;
 
         case EQUATIONS :
-            opos = KOBJS(kdb)[i].o_val;
+            opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
             eq = K_eunpack(optr, KONAME(kdb, i));
             SW_free(opos);
-            K_epack(&pack, (char*) eq, KOBJS(kdb)[i].o_name);
+            K_epack(&pack, (char*) eq, kdb->k_objs[i].o_name);
             delete eq;
             eq = nullptr;
             lg = P_get_len(pack, -1);
             pos = SW_alloc(lg);
             memcpy(SW_getptr(pos), pack, lg);
             SW_nfree(pack);
-            KOBJS(kdb)[i].o_val = pos;
+            kdb->k_objs[i].o_val = pos;
             break;
 
         case TABLES :
-            opos = KOBJS(kdb)[i].o_val;
+            opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
             tbl = K_tunpack(optr, KONAME(kdb, i));
             SW_free(opos);
@@ -322,7 +322,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             pos = SW_alloc(lg);
             memcpy(SW_getptr(pos), pack, lg);
             SW_nfree(pack);
-            KOBJS(kdb)[i].o_val = pos;
+            kdb->k_objs[i].o_val = pos;
             break;
 
         default :
