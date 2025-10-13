@@ -15,7 +15,7 @@ static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const i
     if(source->get_database() == NULL)
        throw std::invalid_argument("C API: Source Variables database is empty");
 
-    if(source->count() == 0)
+    if(source->size() == 0)
        throw std::invalid_argument("C API: Source Variables database is empty");
 
     if(dest == nullptr)
@@ -24,7 +24,7 @@ static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const i
     if(dest->get_database() == NULL)
       throw std::invalid_argument("C API: Destination Variables database is empty");
 
-    if(dest->count() == 0)
+    if(dest->size() == 0)
       throw std::invalid_argument("C API: Destination Variables database is empty");
 
     if(dest_t_first < 0 || dest_t_last < 0 || source_t_first < 0 || source_t_last < 0)
@@ -146,7 +146,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     switch(op)
     {
     case OP_ADD:
-        for(int i=0; i < database->count(); i++)
+        for(int i=0; i < database->size(); i++)
         {
             var_ptr = database->get_var_ptr(i);
             for(int t = t_first; t <= t_last; t++)
@@ -154,7 +154,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_SUB:  
-        for(int i=0; i < database->count(); i++)
+        for(int i=0; i < database->size(); i++)
         {
             var_ptr = database->get_var_ptr(i);
             for(int t = t_first; t <= t_last; t++)
@@ -162,7 +162,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_MUL: 
-        for(int i=0; i < database->count(); i++)
+        for(int i=0; i < database->size(); i++)
         {
             var_ptr = database->get_var_ptr(i);
             for(int t = t_first; t <= t_last; t++)
@@ -172,7 +172,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     case OP_DIV:
         if(value == 0)
             throw std::invalid_argument("C API: Division by zero");
-        for(int i=0; i < database->count(); i++)
+        for(int i=0; i < database->size(); i++)
         {
             var_ptr = database->get_var_ptr(i);
             for(int t = t_first; t <= t_last; t++)
@@ -180,7 +180,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_POW: 
-        for(int i=0; i < database->count(); i++)
+        for(int i=0; i < database->size(); i++)
         {
             var_ptr = database->get_var_ptr(i);
             for(int t = t_first; t <= t_last; t++)
@@ -205,10 +205,10 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
         throw std::invalid_argument("C API: time index 't' must be non-negative");
     if(t >= database->get_nb_periods())
         throw std::invalid_argument("C API: time index 't' exceeds the number of periods in the database");
-    if(nb_values != database->count())
+    if(nb_values != database->size())
         throw std::invalid_argument("C API: number of values must match the number of variables in the database");
 
-    nb_names = database->count();
+    nb_names = database->size();
 
     db = database->get_database();
     if(db == NULL)

@@ -113,7 +113,7 @@ std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, cons
     std::vector<std::string> v_names;
     if(pattern.empty())
     {
-        for (int i=0; i < count(); i++) 
+        for (int i=0; i < size(); i++) 
             v_names.push_back(get_name(i));
         return v_names;
     }
@@ -140,7 +140,7 @@ std::string KDBAbstract::get_names_as_string(const std::string& pattern, const b
     std::string names;
     if(pattern.empty())
     {
-        for(int i=0; i < count(); i++) 
+        for(int i=0; i < size(); i++) 
             names += get_name(i) + ";";
     }
     else
@@ -170,7 +170,7 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
         throw std::runtime_error(std::string("Cannot rename an equation.\n") + 
                                  "The name of an equation is always its endogenous variable");
 
-    if(count() == 0) 
+    if(size() == 0) 
         return -1;
 
     check_name(new_name, k_type);
@@ -361,7 +361,7 @@ void KDBAbstract::save(const std::string& filepath, const bool compress)
     if(kdb == NULL) 
         return;
 
-    if(kdb->k_nb == 0) 
+    if(kdb->size() == 0) 
         return;
 
     // throw an error if the filepath is not valid

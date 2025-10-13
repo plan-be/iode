@@ -163,7 +163,7 @@ TEST_F(EquationTest, GetCoefficients)
 
     // check that coeffs have been created
     KDBScalars kdb_scl;
-    EXPECT_EQ(kdb_scl.count(), coefs_list.size());
+    EXPECT_EQ(kdb_scl.size(), coefs_list.size());
     EXPECT_TRUE(kdb_scl.contains("acaf1"));
     EXPECT_TRUE(kdb_scl.contains("acaf2"));
     EXPECT_TRUE(kdb_scl.contains("acaf4"));
@@ -180,7 +180,7 @@ TEST_F(EquationTest, GetVariables)
     EXPECT_EQ(vars_list, expected_vars_list);
 
     // check that variables have been created
-    EXPECT_EQ(kdb_var.count(), vars_list.size());
+    EXPECT_EQ(kdb_var.size(), vars_list.size());
     EXPECT_TRUE(kdb_var.contains(name));
     EXPECT_TRUE(kdb_var.contains("GOSF"));
     EXPECT_TRUE(kdb_var.contains("TIME"));

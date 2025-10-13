@@ -161,7 +161,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         bool is_global_database() const
         bool is_local_database() const
         bool is_shallow_copy_database() const
-        int count() const
+        int size() const
 
         KDB* get_database() except +
 

@@ -16,7 +16,7 @@ protected:
 TEST_F(KDBScalarsTest, Load)
 {
     KDBScalars kdb(input_test_dir + prefix_filename + "fun.scl");
-    EXPECT_EQ(kdb.count(), 161);
+    EXPECT_EQ(kdb.size(), 161);
 }
 
 TEST_F(KDBScalarsTest, Subset)
@@ -30,13 +30,13 @@ TEST_F(KDBScalarsTest, Subset)
 
     // GLOBAL KDB
     KDBScalars kdb_global;
-    EXPECT_EQ(kdb_global.count(), 161);
+    EXPECT_EQ(kdb_global.size(), 161);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBScalars* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("acaf1", value, relax, std);
     EXPECT_EQ(*kdb_global.get("acaf1"), *scalar);
@@ -44,7 +44,7 @@ TEST_F(KDBScalarsTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBScalars* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("acaf1", value, relax, std);
     EXPECT_EQ(*kdb_global.get("acaf1"), *new_scalar);
@@ -84,7 +84,7 @@ TEST_F(KDBScalarsTest, Get)
 TEST_F(KDBScalarsTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Scalars.count(); i++) expected_names.push_back(Scalars.get_name(i));
+    for (int i=0; i < Scalars.size(); i++) expected_names.push_back(Scalars.get_name(i));
     std::vector<std::string> names = Scalars.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -137,9 +137,9 @@ TEST_F(KDBScalarsTest, Filter)
     KDBScalars* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
+    for (int p = 0; p < Scalars.size(); p++) all_names.push_back(Scalars.get_name(p));
 
-    int nb_total_scalars = Scalars.count();
+    int nb_total_scalars = Scalars.size();
     // a*
     for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
     // *_
@@ -154,7 +154,7 @@ TEST_F(KDBScalarsTest, Filter)
 
     // create local kdb
     kdb_subset = Scalars.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -207,7 +207,7 @@ TEST_F(KDBScalarsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Scalars.count(), nb_total_scalars);
+    EXPECT_EQ(Scalars.size(), nb_total_scalars);
     updated_scalar_global = Scalars.get(name);
     EXPECT_EQ(*updated_scalar_global, *expected_updated_scalar);
     delete expected_updated_scalar;
@@ -224,9 +224,9 @@ TEST_F(KDBScalarsTest, DeepCopy)
     KDBScalars* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
+    for (int p = 0; p < Scalars.size(); p++) all_names.push_back(Scalars.get_name(p));
 
-    int nb_total_scalars = Scalars.count();
+    int nb_total_scalars = Scalars.size();
     // a*
     for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
     // *_
@@ -241,7 +241,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Scalars.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -298,7 +298,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Scalars.count(), nb_total_scalars);
+    EXPECT_EQ(Scalars.size(), nb_total_scalars);
 
     // wrong pattern
     pattern = "anjfks";
@@ -309,19 +309,19 @@ TEST_F(KDBScalarsTest, CopyFrom)
 {
     std::string pattern = "a* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.scl";
-    int expected_nb_comments = Scalars.count();
+    int expected_nb_comments = Scalars.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Scalars.clear();
     Scalars.copy_from(filename, "*");
-    EXPECT_EQ(Scalars.count(), expected_nb_comments); 
+    EXPECT_EQ(Scalars.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Scalars.get_names(pattern);
     Scalars.clear();
     Scalars.copy_from(filename, pattern);
-    EXPECT_EQ(Scalars.count(), v_expected_names.size());  
+    EXPECT_EQ(Scalars.size(), v_expected_names.size());  
     EXPECT_EQ(Scalars.get_names(), v_expected_names);  
 }
 

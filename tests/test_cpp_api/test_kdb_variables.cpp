@@ -25,7 +25,7 @@ class KDBVariablesEmptyTest : public KDBTest, public ::testing::Test
 TEST_F(KDBVariablesTest, Load)
 {
     KDBVariables kdb(input_test_dir + prefix_filename + "fun.var");
-    EXPECT_EQ(kdb.count(), 394);
+    EXPECT_EQ(kdb.size(), 394);
 }
 
 TEST_F(KDBVariablesTest, Subset)
@@ -39,13 +39,13 @@ TEST_F(KDBVariablesTest, Subset)
 
     // GLOBAL KDB
     KDBVariables kdb_global;
-    EXPECT_EQ(kdb_global.count(), 394);
+    EXPECT_EQ(kdb_global.size(), 394);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBVariables* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", lec);
     EXPECT_EQ(kdb_global.get("ACAF"), var);
@@ -53,7 +53,7 @@ TEST_F(KDBVariablesTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBVariables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", lec);
     EXPECT_EQ(kdb_global.get("ACAF"), new_var);
@@ -254,7 +254,7 @@ TEST_F(KDBVariablesTest, Get)
 TEST_F(KDBVariablesTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Variables.count(); i++) expected_names.push_back(Variables.get_name(i));
+    for (int i=0; i < Variables.size(); i++) expected_names.push_back(Variables.get_name(i));
     std::vector<std::string> names = Variables.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -453,9 +453,9 @@ TEST_F(KDBVariablesTest, Filter)
     KDBVariables* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Variables.count(); p++) all_names.push_back(Variables.get_name(p));
+    for (int p = 0; p < Variables.size(); p++) all_names.push_back(Variables.get_name(p));
 
-    int nb_total_variables = Variables.count();
+    int nb_total_variables = Variables.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -470,7 +470,7 @@ TEST_F(KDBVariablesTest, Filter)
 
     // create local kdb
     kdb_subset = Variables.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -515,7 +515,7 @@ TEST_F(KDBVariablesTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Variables.count(), nb_total_variables);
+    EXPECT_EQ(Variables.size(), nb_total_variables);
     EXPECT_EQ(Variables.get(name), updated_var);
 
     // wrong pattern
@@ -530,9 +530,9 @@ TEST_F(KDBVariablesTest, DeepCopy)
     KDBVariables* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Variables.count(); p++) all_names.push_back(Variables.get_name(p));
+    for (int p = 0; p < Variables.size(); p++) all_names.push_back(Variables.get_name(p));
 
-    int nb_total_variables = Variables.count();
+    int nb_total_variables = Variables.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -547,7 +547,7 @@ TEST_F(KDBVariablesTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Variables.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -591,7 +591,7 @@ TEST_F(KDBVariablesTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Variables.count(), nb_total_variables);
+    EXPECT_EQ(Variables.size(), nb_total_variables);
 
     // wrong pattern
     pattern = "anjfks";
@@ -601,13 +601,13 @@ TEST_F(KDBVariablesTest, DeepCopy)
 TEST_F(KDBVariablesTest, CopyFrom)
 {
     std::string filename = input_test_dir + prefix_filename + "fun.var";
-    int expected_nb_comments = Variables.count();
+    int expected_nb_comments = Variables.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Variables.clear();
     Variables.copy_from(filename, "", "", "*");
-    EXPECT_EQ(Variables.count(), expected_nb_comments); 
+    EXPECT_EQ(Variables.size(), expected_nb_comments); 
     EXPECT_NEAR(Variables.get_var("ACAF", "1992Y1"), 30.159, 1e-3);
     EXPECT_NEAR(Variables.get_var("ACAG", "1992Y1"), -40.286, 1e-3);
 

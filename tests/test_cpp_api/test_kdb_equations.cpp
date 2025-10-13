@@ -19,7 +19,7 @@ protected:
 TEST_F(KDBEquationsTest, Load)
 {
     KDBEquations kdb(input_test_dir + prefix_filename + "fun.eqs");
-    EXPECT_EQ(kdb.count(), 274);
+    EXPECT_EQ(kdb.size(), 274);
 }
 
 TEST_F(KDBEquationsTest, Subset)
@@ -30,13 +30,13 @@ TEST_F(KDBEquationsTest, Subset)
 
     // GLOBAL KDB
     KDBEquations kdb_global;
-    EXPECT_EQ(kdb_global.count(), 274);
+    EXPECT_EQ(kdb_global.size(), 274);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBEquations* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
     EXPECT_EQ(kdb_global.get_lec("ACAF"), lec);
@@ -44,7 +44,7 @@ TEST_F(KDBEquationsTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBEquations* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", new_lec);
     EXPECT_EQ(kdb_global.get_lec("ACAF"), new_lec);
@@ -132,7 +132,7 @@ TEST_F(KDBEquationsTest, Get)
 TEST_F(KDBEquationsTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Equations.count(); i++) expected_names.push_back(Equations.get_name(i));
+    for (int i=0; i < Equations.size(); i++) expected_names.push_back(Equations.get_name(i));
     std::vector<std::string> names = Equations.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -187,9 +187,9 @@ TEST_F(KDBEquationsTest, Filter)
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
+    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
 
-    int nb_total_equations = Equations.count();
+    int nb_total_equations = Equations.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // $ENVI
@@ -207,7 +207,7 @@ TEST_F(KDBEquationsTest, Filter)
 
     // create local kdb
     kdb_subset = Equations.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -244,7 +244,7 @@ TEST_F(KDBEquationsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Equations.count(), nb_total_equations);
+    EXPECT_EQ(Equations.size(), nb_total_equations);
     EXPECT_EQ(Equations.get_lec(name), lec);
 
     // wrong pattern
@@ -261,9 +261,9 @@ TEST_F(KDBEquationsTest, DeepCopy)
     KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
+    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
 
-    int nb_total_equations = Equations.count();
+    int nb_total_equations = Equations.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // $ENVI
@@ -281,7 +281,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Equations.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -302,7 +302,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Equations.count(), nb_total_equations);
+    EXPECT_EQ(Equations.size(), nb_total_equations);
 
     // wrong pattern
     pattern = "anjfks";
@@ -313,19 +313,19 @@ TEST_F(KDBEquationsTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.eqs";
-    int expected_nb_comments = Equations.count();
+    int expected_nb_comments = Equations.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Equations.clear();
     Equations.copy_from(filename, "*");
-    EXPECT_EQ(Equations.count(), expected_nb_comments); 
+    EXPECT_EQ(Equations.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Equations.get_names(pattern);
     Equations.clear();
     Equations.copy_from(filename, pattern);
-    EXPECT_EQ(Equations.count(), v_expected_names.size());  
+    EXPECT_EQ(Equations.size(), v_expected_names.size());  
     EXPECT_EQ(Equations.get_names(), v_expected_names);  
 }
 

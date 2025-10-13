@@ -171,8 +171,8 @@ cdef class CythonIodeDatabase:
     def clear(self):
         self.abstract_db_ptr.clear()
 
-    def count(self) -> int:
-        return self.abstract_db_ptr.count()
+    def size(self) -> int:
+        return self.abstract_db_ptr.size()
 
     def contains(self, item) -> bool:
         return self.abstract_db_ptr.contains(item.encode())

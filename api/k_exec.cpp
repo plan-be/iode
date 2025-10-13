@@ -140,7 +140,7 @@ static KDB *KI_series_list(KDB* dbi)
     ntbl = 0;
 
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
-    for(i = 0; i < dbi->k_nb; i++) {
+    for(i = 0; i < dbi->size(); i++) {
         SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) KONAME(dbi, i));
         clec = KICLEC(dbi, i);
         lname    = &(clec->lnames[0]);
@@ -185,7 +185,7 @@ static KDB *KI_scalar_list(KDB* dbi)
     CLEC    *clec, *tclec;
 
     dbs = new KDB(SCALARS, DB_STANDALONE);
-    for(i = 0; i < dbi->k_nb; i++) 
+    for(i = 0; i < dbi->size(); i++) 
     {
         clec = KICLEC(dbi, i);
         tclec = (CLEC*) SW_nalloc(clec->tot_lg);
@@ -215,8 +215,8 @@ static KDB *KI_scalar_list(KDB* dbi)
 // {
 //     int     i, pos;
 // 
-//     //for(i = dbv->k_nb - 1; i >= 0 ; i--) {
-//     for(i = 0 ; i < dbv->k_nb ; i++) {
+//     //for(i = dbv->size() - 1; i >= 0 ; i--) {
+//     for(i = 0 ; i < dbv->size() ; i++) {
 //         pos = K_find(dbi, KONAME(dbv, i));
 //         if(pos < 0) {
 //             K_del(dbv, i);
@@ -244,8 +244,8 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
 
     // Computes in objsnb the nb of VARs that have the same name as an IDT in dbi and that already exist in dbv.
     nbres = 0;
-    objsnb = (int *) SW_nalloc(sizeof(long) * dbv->k_nb);
-    for(i = 0 ; i < dbv->k_nb; i++) {
+    objsnb = (int *) SW_nalloc(sizeof(long) * dbv->size());
+    for(i = 0 ; i < dbv->size(); i++) {
         pos = K_find(dbi, KONAME(dbv, i));
         if(pos >= 0) {
             objsnb[i] = 1; 
@@ -255,7 +255,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
 
     // Copy left objs in a new tmp table of KOBJ and delete the others
     newobjs = (KOBJ *) SW_nalloc((unsigned int)(sizeof(KOBJ) * K_CHUNCK * (1 + (nbres - 1) / K_CHUNCK)));
-    for(i = j = 0 ; i < dbv->k_nb; i++) {
+    for(i = j = 0 ; i < dbv->size(); i++) {
         if(objsnb[i]) {
             memcpy(newobjs + j, dbv->k_objs + i, sizeof(KOBJ));
             j++;
@@ -271,7 +271,6 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
     SW_nfree(objsnb);
     return(0);
 }
-
 
 
 /**
@@ -301,7 +300,7 @@ static int *KI_reorder(KDB* dbi)
     LNAME   *lname;
     CLEC    *clec;
 
-    nb = dbi->k_nb;
+    nb = dbi->size();
     order = (int *)SW_nalloc(sizeof(int) * nb);
     mark  = SW_nalloc(nb);
 
@@ -369,7 +368,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     }
 
     int nb_vars_to_read = 0;
-    for(j = 0 ; j < dbv->k_nb; j++) 
+    for(j = 0 ; j < dbv->size(); j++) 
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
@@ -413,7 +412,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
-    for(j = 0; j < dbv->k_nb; j++) 
+    for(j = 0; j < dbv->size(); j++) 
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
@@ -457,7 +456,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
             o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
 
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < dbv->k_nb; j++) 
+    for(j = 0 ; j < dbv->size(); j++) 
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;
@@ -486,7 +485,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
         error_manager.append_error("Variables file '" + std::string(file) + "' not found");
         return(-1);
     }
-    if(kdb->k_nb == 0) 
+    if(kdb->size() == 0) 
     {
         delete kdb;
         kdb = nullptr;
@@ -531,7 +530,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
     else 
     {
         // Files given, search in files in the same order as they are listed
-        for(i = 0;  i < nb && nb_found < dbv->k_nb; i++) 
+        for(i = 0;  i < nb && nb_found < dbv->size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
@@ -547,10 +546,10 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
     }
 
     // If all target VARs are not found, creates them with NaN values
-    if(nb_found < dbv->k_nb) 
+    if(nb_found < dbv->size()) 
     {
         dim = dbv->sample->nb_periods;
-        for(i = 0, j = 0 ; i < dbv->k_nb && j < 10; i++) 
+        for(i = 0, j = 0 ; i < dbv->size() && j < 10; i++) 
         {
             if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
 
@@ -594,7 +593,7 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
     int j, pos, nb_found = 0;
 
     if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
-    for(j = 0 ; j < dbs->k_nb; j++) {
+    for(j = 0 ; j < dbs->size(); j++) {
         if(KSOVAL(dbs, j) != 0) continue;
 
         pos = K_find(dbs_tmp, KONAME(dbs, j));
@@ -627,7 +626,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
             o_add_ptr_chunck = SCR_ADD_PTR_CHUNCK;
 
     SCR_ADD_PTR_CHUNCK = 1000;
-    for(j = 0 ; j < dbs->k_nb; j++) 
+    for(j = 0 ; j < dbs->size(); j++) 
     {
         if(KSOVAL(dbs, j) != 0) 
             continue;
@@ -676,7 +675,7 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         nb_found += nbf;
     }
     else {
-        for(i = 0;  i < nb && nb_found < dbs->k_nb; i++) {
+        for(i = 0;  i < nb && nb_found < dbs->size(); i++) {
             if(strcmp(files[i], "WS") == 0)
                 nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
             else
@@ -687,8 +686,8 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         }
     }
 
-    if(nb_found < dbs->k_nb) {
-        for(i = 0, j = 0 ; i < dbs->k_nb && j < 10; i++) {
+    if(nb_found < dbs->size()) {
+        for(i = 0, j = 0 ; i < dbs->size() && j < 10; i++) {
             if(KSOVAL(dbs, i) != 0) continue;  /* series already present */
             j++;
 
@@ -714,7 +713,7 @@ KDB     *dbv,  *dbi;
     int     i, nb, pos;
 
     nb = dbv->sample->nb_periods;
-    for(i = 0; i < dbi->k_nb; i++)  {
+    for(i = 0; i < dbi->size(); i++)  {
 	if(K_find(dbv, KONAME(dbi, i)) < 0) {
 	    K_add(dbv, KONAME(dbi, i), NULL, &nb);
 	    }
@@ -748,7 +747,7 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
     if(start < 0) 
         start = 0;
 
-    for(i = 0; i < dbi->k_nb; i++) 
+    for(i = 0; i < dbi->size(); i++) 
     {
         tot_lg = KICLEC(dbi, order[i])->tot_lg;
         tmp = SW_nalloc(tot_lg);
@@ -822,7 +821,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
         }
     }
     
-    if(dbi->k_nb == 0) 
+    if(dbi->size() == 0) 
     {
         error_manager.append_error("Empty set of identities");
         delete exec_sample;

@@ -55,7 +55,7 @@ int B_season(char* arg)
     }
 
     from = K_load(VARIABLES, name, nb, data, 0);
-    if(from == nullptr || nb != from->k_nb) 
+    if(from == nullptr || nb != from->size()) 
     {
         error_manager.append_error("Empty data set or inexistent variable");
         goto done;
@@ -74,7 +74,7 @@ int B_season(char* arg)
     for(i = 0; i < nb; i++) 
         c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(i = 0; i < from->k_nb; i++) 
+    for(i = 0; i < from->size(); i++) 
     {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */

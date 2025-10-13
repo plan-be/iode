@@ -16,7 +16,7 @@ protected:
 TEST_F(KDBCommentsTest, Load)
 {
     KDBComments kdb(input_test_dir + prefix_filename + "fun.cmt");
-    EXPECT_EQ(kdb.count(), 317);
+    EXPECT_EQ(kdb.size(), 317);
 }
 
 TEST_F(KDBCommentsTest, Subset)
@@ -27,13 +27,13 @@ TEST_F(KDBCommentsTest, Subset)
 
     // GLOBAL KDB
     KDBComments kdb_global;
-    EXPECT_EQ(kdb_global.count(), 317);
+    EXPECT_EQ(kdb_global.size(), 317);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBComments* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", modified);
     EXPECT_EQ(kdb_global.get("ACAF"), comment);
@@ -41,7 +41,7 @@ TEST_F(KDBCommentsTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBComments* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", modified);
     EXPECT_EQ(kdb_global.get("ACAF"), modified);
@@ -158,7 +158,7 @@ TEST_F(KDBCommentsTest, GetNames)
     std::vector<std::string> expected_names;
 
     // no pattern
-    for (int i=0; i < Comments.count(); i++)
+    for (int i=0; i < Comments.size(); i++)
     {
         expected_names.push_back(Comments.get_name(i));
         expected_list_names += expected_names.back() + ";";
@@ -229,7 +229,7 @@ TEST_F(KDBCommentsTest, Update)
     EXPECT_EQ(Comments.get(1), new_comment);
 
     // error: position does not exist
-    int beyond_last_pos = Comments.count() + 10;
+    int beyond_last_pos = Comments.size() + 10;
     EXPECT_THROW(Comments.update(beyond_last_pos, new_comment), std::invalid_argument);
 }
 
@@ -254,7 +254,7 @@ TEST_F(KDBCommentsTest, Copy)
     EXPECT_THROW(Comments.copy("UNKNOWN"), std::invalid_argument);
 
     // error: position does not exist
-    int beyond_last_pos = Comments.count() + 10;
+    int beyond_last_pos = Comments.size() + 10;
     EXPECT_THROW(Comments.copy(beyond_last_pos), std::invalid_argument);
 }
 
@@ -265,9 +265,9 @@ TEST_F(KDBCommentsTest, Filter)
     KDBComments* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Comments.count(); p++) all_names.push_back(Comments.get_name(p));
+    for (int p = 0; p < Comments.size(); p++) all_names.push_back(Comments.get_name(p));
 
-    int nb_total_comments = Comments.count();
+    int nb_total_comments = Comments.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -282,7 +282,7 @@ TEST_F(KDBCommentsTest, Filter)
 
     // create local kdb
     kdb_subset = Comments.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -321,7 +321,7 @@ TEST_F(KDBCommentsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Comments.count(), nb_total_comments);
+    EXPECT_EQ(Comments.size(), nb_total_comments);
     EXPECT_EQ(Comments.get(name), modified_comment);
 
     // wrong pattern
@@ -338,7 +338,7 @@ TEST_F(KDBCommentsTest, Filter)
         if(name.front() == 'B') expected_names_subset_subset.push_back(name);
 
     KDBComments* kdb_subset_subset = kdb_subset->subset(pattern_subset_subset);
-    EXPECT_EQ(kdb_subset_subset->count(), expected_names_subset_subset.size());
+    EXPECT_EQ(kdb_subset_subset->size(), expected_names_subset_subset.size());
     EXPECT_EQ(kdb_subset_subset->get_names(), expected_names_subset_subset);
     delete kdb_subset;
     delete kdb_subset_subset;
@@ -351,9 +351,9 @@ TEST_F(KDBCommentsTest, DeepCopy)
     KDBComments* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Comments.count(); p++) all_names.push_back(Comments.get_name(p));
+    for (int p = 0; p < Comments.size(); p++) all_names.push_back(Comments.get_name(p));
 
-    int nb_total_comments = Comments.count();
+    int nb_total_comments = Comments.size();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -368,7 +368,7 @@ TEST_F(KDBCommentsTest, DeepCopy)
 
     // create local kdb
     kdb_subset = Comments.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
     
     // modify an element of the local KDB and check if the 
@@ -406,7 +406,7 @@ TEST_F(KDBCommentsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Comments.count(), nb_total_comments);
+    EXPECT_EQ(Comments.size(), nb_total_comments);
 
     // wrong pattern
     pattern = "anjfks";
@@ -417,19 +417,19 @@ TEST_F(KDBCommentsTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.cmt";
-    int expected_nb_comments = Comments.count();
+    int expected_nb_comments = Comments.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Comments.clear();
     Comments.copy_from(filename, "*");
-    EXPECT_EQ(Comments.count(), expected_nb_comments); 
+    EXPECT_EQ(Comments.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Comments.get_names(pattern);
     Comments.clear();
     Comments.copy_from(filename, pattern);
-    EXPECT_EQ(Comments.count(), v_expected_names.size());  
+    EXPECT_EQ(Comments.size(), v_expected_names.size());  
     EXPECT_EQ(Comments.get_names(), v_expected_names);  
 }
 

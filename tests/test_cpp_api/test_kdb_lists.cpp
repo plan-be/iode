@@ -16,7 +16,7 @@ protected:
 TEST_F(KDBListsTest, Load)
 {
     KDBLists kdb(input_test_dir + prefix_filename + "fun.lst");
-    EXPECT_EQ(kdb.count(), 17);
+    EXPECT_EQ(kdb.size(), 17);
 }
 
 TEST_F(KDBListsTest, Subset)
@@ -27,13 +27,13 @@ TEST_F(KDBListsTest, Subset)
 
     // GLOBAL KDB
     KDBLists kdb_global;
-    EXPECT_EQ(kdb_global.count(), 17);
+    EXPECT_EQ(kdb_global.size(), 17);
     EXPECT_TRUE(kdb_global.is_global_database());
 
     // DEEP COPY SUBSET
     KDBLists* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
     std::vector<std::string> names = kdb_global.get_names(pattern);
-    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("COPY", new_list);
     EXPECT_EQ(kdb_global.get("COPY"), list);
@@ -41,7 +41,7 @@ TEST_F(KDBListsTest, Subset)
 
     // SHALLOW COPY SUBSET
     KDBLists* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
-    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("COPY", new_list);
     EXPECT_EQ(kdb_global.get("COPY"), new_list);
@@ -76,7 +76,7 @@ TEST_F(KDBListsTest, Get)
 TEST_F(KDBListsTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < Lists.count(); i++) expected_names.push_back(Lists.get_name(i));
+    for (int i=0; i < Lists.size(); i++) expected_names.push_back(Lists.get_name(i));
     std::vector<std::string> names = Lists.get_names();
     EXPECT_EQ(names, expected_names);
 }
@@ -120,10 +120,10 @@ TEST_F(KDBListsTest, Filter)
     KDBLists* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Lists.count(); p++) all_names.push_back(Lists.get_name(p));
+    for (int p = 0; p < Lists.size(); p++) all_names.push_back(Lists.get_name(p));
     for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
 
-    int nb_total_lists = Lists.count();
+    int nb_total_lists = Lists.size();
 
     // remove duplicate entries
     // NOTE: std::unique only removes consecutive duplicated elements, 
@@ -134,7 +134,7 @@ TEST_F(KDBListsTest, Filter)
 
     // create local kdb
     kdb_subset = Lists.subset(pattern);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -173,7 +173,7 @@ TEST_F(KDBListsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Lists.count(), nb_total_lists);
+    EXPECT_EQ(Lists.size(), nb_total_lists);
     EXPECT_EQ(Lists.get(name), expanded_list);
 
     // wrong pattern
@@ -188,7 +188,7 @@ TEST_F(KDBListsTest, DeepCopy)
     KDBLists* kdb_subset;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Lists.count(); p++) all_names.push_back(Lists.get_name(p));
+    for (int p = 0; p < Lists.size(); p++) all_names.push_back(Lists.get_name(p));
     for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
 
     // remove duplicate entries
@@ -198,11 +198,11 @@ TEST_F(KDBListsTest, DeepCopy)
     std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
     expected_names.resize(std::distance(expected_names.begin(), it));
 
-    int nb_total_lists = Lists.count();
+    int nb_total_lists = Lists.size();
 
     // create local kdb
     kdb_subset = Lists.subset(pattern, true);
-    EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
@@ -240,7 +240,7 @@ TEST_F(KDBListsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Lists.count(), nb_total_lists);
+    EXPECT_EQ(Lists.size(), nb_total_lists);
 
     // wrong pattern
     pattern = "anjfks";
@@ -251,19 +251,19 @@ TEST_F(KDBListsTest, CopyFrom)
 {
     std::string pattern = "C* T*";
     std::string filename = input_test_dir + prefix_filename + "fun.lst";
-    int expected_nb_comments = Lists.count();
+    int expected_nb_comments = Lists.size();
     std::vector<std::string> v_expected_names;
 
     // Copy entire file
     Lists.clear();
     Lists.copy_from(filename, "*");
-    EXPECT_EQ(Lists.count(), expected_nb_comments); 
+    EXPECT_EQ(Lists.size(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Lists.get_names(pattern);
     Lists.clear();
     Lists.copy_from(filename, pattern);
-    EXPECT_EQ(Lists.count(), v_expected_names.size());  
+    EXPECT_EQ(Lists.size(), v_expected_names.size());  
     EXPECT_EQ(Lists.get_names(), v_expected_names);  
 }
 

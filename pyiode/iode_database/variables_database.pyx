@@ -244,7 +244,7 @@ cdef class Variables(CythonIodeDatabase):
 
         c_db_ptr = self.database_ptr.get_database()
 
-        if pos < 0 or pos >= self.count():
+        if pos < 0 or pos >= self.size():
             raise IndexError(f"Cannot update variable '{name}': variable not found in the Variables database")
 
         # update the value for only one period 
@@ -280,7 +280,7 @@ cdef class Variables(CythonIodeDatabase):
             # values is of type Variables
             elif isinstance(values, Variables):
                 # NOTE: 'values' can contains more than one variable as long as the variable named 'name' is present
-                source_name = name if values.count() > 1 else values.property_names()[0]
+                source_name = name if values.size() > 1 else values.property_names()[0]
                 self.__copy_var(source_name, name, t_first, t_last, values)
             # values is a numpy array AND the mode is VAR_MODE_LEVEL
             elif isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
@@ -422,7 +422,7 @@ cdef class Variables(CythonIodeDatabase):
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace is empty")
 
-        if not self.count():
+        if not self.size():
             raise RuntimeError("The IODE Variables workspace is empty")
 
         t_first_period, t_last_period = self._get_periods_bounds()
@@ -432,22 +432,22 @@ cdef class Variables(CythonIodeDatabase):
             raise RuntimeError("The sample of the Variables database to export is empty")
 
         # Copy values from the IODE Variables database to a Numpy 2D array
-        data = np.empty((self.count(), nb_periods), dtype=np.float64)
+        data = np.empty((self.size(), nb_periods), dtype=np.float64)
 
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
-            for i in range(self.count()):
+            for i in range(self.size()):
                 var_ptr = KVVAL(db_ptr, i, t_first_period)
                 memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
         else:
-            for i in range(self.count()):
+            for i in range(self.size()):
                 for t in range(t_first_period, t_last_period + 1):
                     value = KV_get(db_ptr, i, t, mode)
                     data_view[i, t - t_first_period] = value
         
-        if self.count() == 1:
+        if self.size() == 1:
             data = data.reshape((nb_periods,))
 
         _NA = 0.9999 * NA

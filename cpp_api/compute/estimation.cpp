@@ -177,7 +177,7 @@ void EditAndEstimateEquations::update_scalars()
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (int i=0; i < kdb_eqs->count(); i++)
+    for (int i=0; i < kdb_eqs->size(); i++)
     {
         eq = kdb_eqs->get(i);
         if(!eq)

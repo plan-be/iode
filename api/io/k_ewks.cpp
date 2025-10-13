@@ -30,7 +30,7 @@ int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*
 
     WKS_COL = 1, WKS_ROW = 1;
     dim = dbv->sample->nb_periods;
-    nb = dbv->k_nb;
+    nb = dbv->size();
 
     wks_init(outfile, dim + 2, nb + 1);
     wks_cwidth(2, 20);

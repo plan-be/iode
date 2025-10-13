@@ -20,7 +20,7 @@ TEST_F(KDBGlobalTest, Filter)
     std::vector<std::string> expected_list_names;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
+    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
 
     // simple patterns
     list_names = Equations.get_names("A*");

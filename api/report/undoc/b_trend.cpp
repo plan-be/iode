@@ -98,7 +98,7 @@ static int B_WsTrendAll(char* arg, int std)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
-    for(i = 0; i < from->k_nb; i++) 
+    for(i = 0; i < from->size(); i++) 
     {
         memcpy(f_vec, KVVAL(from, i, 0) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);

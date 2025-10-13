@@ -335,8 +335,8 @@ public:
 	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
 	    rc = B_WsLoad(fullfilename, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
@@ -353,8 +353,8 @@ public:
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_file, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
@@ -374,8 +374,8 @@ public:
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_fullfilename, type);
 	    EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsExport(char* source_file, char* out_file, int type)
@@ -408,8 +408,8 @@ public:
 	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
 	    rc = B_WsImport(fullfilename, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsClear(int type)
@@ -418,8 +418,8 @@ public:
 	
 	    rc = B_WsClear("", type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, 0);
-	    return K_WS[type]->k_nb == 0;
+	    EXPECT_EQ(K_WS[type]->size(), 0);
+	    return K_WS[type]->size() == 0;
 	}
 
 	bool U_test_B_WsDescr(char* descr, int type)
@@ -450,14 +450,14 @@ public:
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    B_WsClearAll("");
-        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 0);
+        EXPECT_EQ(K_WS[VARIABLES]->size(), 0);
         EXPECT_TRUE(K_WS[VARIABLES]->sample == nullptr);
 
 	    // 1. Copy full VAR file (Warning: * required)
 	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 394);
+        EXPECT_EQ(K_WS[VARIABLES]->size(), 394);
         EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
@@ -516,8 +516,8 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsCopy(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsMergeVar()
@@ -568,8 +568,8 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsMerge(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
-	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
+	    EXPECT_EQ(K_WS[type]->size(), expected_nb_objects);
+	    return rc == 0 && K_WS[type]->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
@@ -721,7 +721,7 @@ public:
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
-        EXPECT_EQ(K_WS[VARIABLES]->k_nb, 394);
+        EXPECT_EQ(K_WS[VARIABLES]->size(), 394);
         EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
 	    sprintf(arg, "%sfuncsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
@@ -1039,7 +1039,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     if(kdb_var) 
     {
-        EXPECT_EQ(kdb_var->k_nb, 394);
+        EXPECT_EQ(kdb_var->size(), 394);
         rc = K_save(kdb_var, out_filename);
         EXPECT_EQ(rc, 0);
     }
@@ -1051,7 +1051,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     kdb_var = K_load(VARIABLES, in_filename, 0, NULL, 0);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
-    EXPECT_EQ(kdb_var->k_nb, 394);
+    EXPECT_EQ(kdb_var->size(), 394);
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
@@ -1062,7 +1062,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     kdb_var = K_load(VARIABLES, in_filename, 1, objs, 0);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
-    EXPECT_EQ(kdb_var->k_nb, 2);
+    EXPECT_EQ(kdb_var->size(), 2);
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
@@ -2216,7 +2216,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(int i = 0; i < KE_WS->k_nb; i++)
+    for(int i = 0; i < KE_WS->size(); i++)
         ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
 
     U_test_reset_kmsg_msgs();
@@ -2442,13 +2442,13 @@ TEST_F(IodeCAPITest, Tests_B_WsClearAll)
     U_test_print_title("B_WsClearAll()");
     rc = B_WsClearAll("");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KC_WS->k_nb, 0);
-    EXPECT_EQ(KE_WS->k_nb, 0);
-    EXPECT_EQ(KI_WS->k_nb, 0);
-    EXPECT_EQ(KL_WS->k_nb, 0);
-    EXPECT_EQ(KS_WS->k_nb, 0);
-    EXPECT_EQ(KT_WS->k_nb, 0);
-    EXPECT_EQ(KV_WS->k_nb, 0);
+    EXPECT_EQ(KC_WS->size(), 0);
+    EXPECT_EQ(KE_WS->size(), 0);
+    EXPECT_EQ(KI_WS->size(), 0);
+    EXPECT_EQ(KL_WS->size(), 0);
+    EXPECT_EQ(KS_WS->size(), 0);
+    EXPECT_EQ(KT_WS->size(), 0);
+    EXPECT_EQ(KV_WS->size(), 0);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2728,7 +2728,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 
     rc = B_ReportLine(cmd, 1);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KV_WS->k_nb, 394);
+    EXPECT_EQ(KV_WS->size(), 394);
 
     rc = B_ReportLine("$settime 2000Y1", 0);
     EXPECT_EQ(rc, 0);

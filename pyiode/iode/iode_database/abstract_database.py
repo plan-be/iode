@@ -1238,7 +1238,7 @@ class IodeDatabase:
         >>> len(comments)
         317
         """
-        return self._cython_instance.count()
+        return self._cython_instance.size()
 
     def __contains__(self, item) -> bool:
         r"""
