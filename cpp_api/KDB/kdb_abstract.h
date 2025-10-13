@@ -108,19 +108,20 @@ public:
         kdb->description = utf8_to_oem(description);
     }
 
-    int find(const std::string& name) const
+    SWHDL find(const std::string& name) const
     {
+        KDB* kdb = get_database();
+        if(!kdb)
+            return -1;
+
         check_name(name, k_type);
 
-        KDB* kdb = get_database();
-        int pos = -1;
-        if(kdb != NULL) 
-            pos = kdb->find(to_char_array(name));
-        if(pos < 0) 
+        SWHDL handle = kdb->contains(to_char_array(name));
+        if(handle < 0) 
             throw std::invalid_argument("Cannot get the position of the object named '" + name + 
                                         "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
                                         "The object with name '" + name + "' does not exist.");
-        return pos;
+        return handle;
     }
 
     // object name
@@ -149,8 +150,8 @@ public:
     bool contains(const std::string& name) const
     { 
         KDB* kdb = get_database();
-        if(kdb != NULL)
-            return kdb->find(to_char_array(name)) >= 0; 
+        if(kdb)
+            return kdb->contains(name); 
         else
             return false;
     }

@@ -397,16 +397,19 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     }
     fprintf(fd, "\n");
 
-    // Lignes suivantes
-    for(i = 0 ; lst[i] ; i++) 
+    // next lines
+    bool found;
+    std::string var_name;
+    for(i = 0; lst[i]; i++) 
     {
         SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
-        pos = kdb->find(lst[i]);
-        if(pos >= 0) 
+        var_name = std::string(lst[i]);
+        found = kdb->contains(var_name);
+        if(found) 
         {
-            val = KVVAL(kdb, pos, 0);
-            for(j = 0 ; j < smpl->nb_periods; j++, val++) 
+            val = KVVAL(kdb, var_name, 0);
+            for(j = 0; j < smpl->nb_periods; j++, val++) 
             {
                 if(IODE_IS_A_NUMBER(*val)) 
                 {

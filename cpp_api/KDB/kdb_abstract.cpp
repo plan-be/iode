@@ -29,17 +29,16 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
         throw std::runtime_error("Cannot create a deep copy of the database.\nThe input database is empty");
 
     // ---- prepare the subset database ----
-    k_mode = c_kdb->k_mode;                                       // short
-    k_nb = 0;                                                   // long
+    k_mode = c_kdb->k_mode;                                         // short
     k_objs = NULL;
-    k_arch = ARCH;                                              // std::string   
-    description = c_kdb->description;                             // std::string
-    if(c_kdb->sample)                                             // Sample*
+    k_arch = ARCH;                                                  // std::string   
+    description = c_kdb->description;                               // std::string
+    if(c_kdb->sample)                                               // Sample*
         sample = new Sample(*c_kdb->sample);
     else
         sample = nullptr;
-    k_compressed = c_kdb->k_compressed;                           // char
-    filepath = c_kdb->filepath;                                   // std::string
+    k_compressed = c_kdb->k_compressed;                             // char
+    filepath = c_kdb->filepath;                                     // std::string
 
     std::vector<std::string> names = filter_names_from_database(c_kdb, (IodeType) k_type, pattern);
 
@@ -56,7 +55,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
             pos = duplicate(*c_kdb, c_name);
             if(pos < 0)
             {
-                for(int i = 0; i < k_nb; i++)
+                for(int i = 0; i < this->size(); i++)
                     if(k_objs[i].o_val != 0) SW_free(k_objs[i].o_val);
 
                 SW_nfree(k_objs);
@@ -77,7 +76,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // -> same as K_quick_refer() function <-
     else
     {
-        k_nb = (long) names.size();
+        int k_nb = (long) names.size();
         k_objs = (KOBJ*) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + k_nb / K_CHUNCK));
         for(int j = 0; j < k_nb; j++) 
         {
@@ -87,7 +86,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
 
         for(int i = 0 ; i < k_nb; i++) 
         {
-            pos = c_kdb->find(to_char_array(names[i]));
+            pos = c_kdb->contains(to_char_array(names[i]));
             if(pos < 0) 
             {
                 SW_nfree(k_objs);
@@ -100,9 +99,6 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
             }
             memcpy(k_objs + i, c_kdb->k_objs + pos, sizeof(KOBJ));
         }
-
-        // Sort entries
-        K_sort(this);
     }
 }
 

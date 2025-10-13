@@ -274,7 +274,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
             {
                 kread((char *) &kdb32, sizeof(KDB32), 1, fd);
                 kdb->k_type = kdb32.k_type;
-                kdb->k_nb = kdb32.k_nb;
                 kdb->k_type = kdb32.k_type;
                 kdb->k_mode = kdb32.k_mode;
                 kdb->k_compressed = kdb32.k_compressed;
@@ -303,7 +302,6 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
 
     if(vers != 0) 
     {
-        kdb->k_nb = okdb643->k_nb;
         kdb->k_type = okdb643->k_type;
         kdb->k_mode = okdb643->k_mode;
         kdb->k_arch = std::string(okdb643->k_arch);
@@ -502,7 +500,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         std::vector<int> v_pos(nf, -1);
         for(i = 0; i < nf; i++) 
         {
-            pos = kdb->find(objs[i]);
+            pos = kdb->contains(objs[i]);
             if(pos >= 0) 
                 v_pos[i] = pos;
         }
@@ -510,7 +508,6 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         // clear the KOBJS table
         SW_nfree(kdb->k_objs);
         kdb->k_objs = NULL;
-        kdb->k_nb = 0;
         
         // ???
         if(kdb->k_type == VARIABLES || kdb->k_type == SCALARS) 
@@ -587,17 +584,11 @@ error:
     fclose(fd);
     if(load_all == 0) 
     {
-        if(i == 0)
+        if(i == 0 && kdb != nullptr)
         {
-            if(kdb)
-            {
-                kdb->k_nb = 0;  // to avoid problems in the KDB destructor
-                delete kdb;
-                kdb = nullptr;
-            } 
-        } 
-        else 
-            kdb->k_nb = i;
+            delete kdb;
+            kdb = nullptr;
+        }
     }
     else 
     {
@@ -672,8 +663,6 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         kwarning("K_filetype: Could not read kdb from %s", file);
         return -2;
     }
-
-    kdb->k_nb = 0;  // to avoid problems in the KDB destructor
 
     if(descr) 
         strcpy(descr, (char*) kdb->description.c_str());

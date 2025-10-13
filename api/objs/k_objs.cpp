@@ -109,20 +109,20 @@ int K_ren(KDB* kdb, char* name1, char* name2)
     int     pos1, pos2;
 
     if(kdb == NULL) return(-1);
-    pos1 = kdb->find(name1);
+    pos1 = kdb->contains(name1);
     if(pos1 < 0) return(-1);
 
-    pos2 = kdb->find(name2);
+    pos2 = kdb->contains(name2);
     if(pos2 >= 0) return(-2);
 
     pos2 = K_add_entry(kdb, name2);
     if(pos2 < 0) return(-3);
-    pos1 = kdb->find(name1); /* object name1 may have changed after add name2 */
+    pos1 = kdb->contains(name1); /* object name1 may have changed after add name2 */
 
     KSOVAL(kdb, pos2) = KSOVAL(kdb, pos1);
     K_del_entry(kdb, pos1);
     
-    pos2 = kdb->find(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
+    pos2 = kdb->contains(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
     
     return(pos2);
 }
@@ -162,7 +162,7 @@ int K_add_entry(KDB* kdb, char* newname)
     if(K_key(name, kdb->k_mode) < 0) 
         return(-1);
     
-    pos = kdb->find(name);
+    pos = kdb->contains(name);
     if(pos >= 0) 
     {
         if(K_WARN_DUP)
@@ -222,8 +222,6 @@ done :
     memcpy(KONAME(kdb, maxpos), name, lg + 1);
     KSOVAL(kdb, maxpos) = 0;
 
-    kdb->k_nb++;
-
     return(maxpos);
 }
 
@@ -242,7 +240,6 @@ int K_del_entry(KDB* kdb, int pos)
 {
     memcpy(kdb->k_objs + pos, kdb->k_objs + (pos + 1),
            (int)(kdb->size() - pos - 1) * sizeof(KOBJ));
-    kdb->k_nb--;
     if(kdb->size() > 0) 
     {
         memset(kdb->k_objs + (int) kdb->size(), 0, sizeof(KOBJ));
@@ -293,7 +290,7 @@ int K_del(KDB* kdb, int pos)
  
 int K_del_by_name(KDB* kdb, char* name)
 {
-    return(K_del(kdb, kdb->find(name))); 
+    return(K_del(kdb, kdb->contains(name))); 
 }
 
 

@@ -749,7 +749,7 @@ U_ch *RPF_cvalue(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
-        pos = kdb->find((char*) args[i]);
+        pos = kdb->contains((char*) args[i]);
         if(pos < 0) {
             sprintf((char*) buf, "Cmt %s not found", args[i]);
             res = SCR_strafcat(res, buf);
@@ -789,7 +789,7 @@ U_ch *RPF_vvalue(U_ch** args)
     for(i = 0 ; args[i] ; i++) 
     {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
-        pos = kdb->find((char*) args[i]);
+        pos = kdb->contains((char*) args[i]);
         if(pos < 0) 
         {
             sprintf((char*) buf, "VAR %s not found", args[i]);
@@ -832,7 +832,7 @@ U_ch *RPF_lvalue(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) ",");
-        pos = kdb->find((char*) args[i]);
+        pos = kdb->contains((char*) args[i]);
         if(pos < 0) {
             sprintf((char*) buf, "List %s not found", args[i]);
             res = SCR_strafcat(res, buf);
@@ -869,7 +869,7 @@ U_ch *RPF_ivalue(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, (unsigned char*) ";");
-        pos = kdb->find((char*) args[i]);
+        pos = kdb->contains((char*) args[i]);
         if(pos < 0) {
             sprintf((char*) buf, "Idt %s not found", args[i]);
             res = SCR_strafcat(res, buf);
@@ -912,7 +912,7 @@ U_ch *RPF_evalue(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
         
-        pos = kdb->find((char*) args[i]);
+        pos = kdb->contains((char*) args[i]);
         if(pos < 0) 
         {
             sprintf((char*) buf, "Eqs %s not found", args[i]);
@@ -951,7 +951,7 @@ U_ch *RPF_eqsample(U_ch** args)
         return(res);                // 1! eq
 
     res = (unsigned char*) SCR_malloc(80);
-    pos = kdb->find((char*) args[0]);
+    pos = kdb->contains((char*) args[0]);
 
     if(pos < 0) 
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
@@ -988,7 +988,7 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
         return(res);            // 1! eq
 
     res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
-    pos = kdb->find((char*) args[0]);
+    pos = kdb->contains((char*) args[0]);
 
     if(pos < 0) 
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
@@ -1054,7 +1054,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
     if(kdb == NULL) return(eq);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(eq); // 1! eq
 
-    pos = kdb->find((char*) args[0]);
+    pos = kdb->contains((char*) args[0]);
 
     if(pos < 0) {
         eq = (unsigned char*) SCR_malloc(80);

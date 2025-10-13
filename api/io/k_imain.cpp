@@ -73,12 +73,14 @@ static int compare(const void *a, const void *b)
  */
 KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
-    int     i, nb, size, pos, shift = 0, cmpt = 0, rc;
+    int     i, nb, size, shift = 0, cmpt = 0, rc;
     char    iname[256];
     ONAME   oname;
+    bool    found, success;
     double  *vector = NULL, value;
     YYFILE  *yy;
     KDB*    kdb = nullptr;
+    std::string var_name;
 
     if(!smpl)
         return nullptr;
@@ -145,25 +147,24 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0)     
                 continue;
-
-            pos = kdb->find(oname);
-
+    
             if(SW_BLKS[7].blk_space > 100000L) 
                 Debug("%s\n", oname);
-
-            if(pos < 0) 
+              
+            var_name = std::string(oname);
+            found = kdb->contains(var_name);
+            if(found) 
             {
                 kmsg("Reading object %d : %s", ++cmpt, oname);
-                pos = K_add(kdb, oname, NULL, &nb);
-                if(pos < 0) 
+                success = K_add(kdb, oname, NULL, &nb);
+                if(!success) 
                 {
                     kerror(0, "Unable to create '%s'", oname);
                     goto err;
                 }
             }
-            KV_set(kdb, pos, shift, VAR_MODE_LEVEL, value);
+            KV_set(kdb, var_name, shift, VAR_MODE_LEVEL, value);
         }
-
     }
 
     rc = impdef->close();

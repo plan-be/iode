@@ -65,7 +65,6 @@ cdef extern from "api/all.h":
 
     ctypedef struct KDB:
         KOBJ*     k_objs
-        long      k_nb
         short     k_type
         short     k_mode
         string    k_arch

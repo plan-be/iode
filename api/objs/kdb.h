@@ -6,6 +6,7 @@
 #include "api/time/sample.h"    // Period, Sample
 
 #include <string>
+#include <map>
 
 
 enum IodeDatabaseType
@@ -18,24 +19,17 @@ enum IodeDatabaseType
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct  KOBJ 
-{
-    SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
-};
-
 struct KDB 
 {
-    KOBJ*       k_objs = NULL;          // map <position in the memory, object name>
-	long        k_nb = 0;               // number of objects in the database
-    short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
-    short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
-    std::string k_arch;                 // processor architecture on which the file has been created/saved/loaded
-    std::string description = "";       // short description of the content of the database
-    Sample*     sample = nullptr;       // Sample if Variables database
-    char        k_compressed = 0;       // are the objects compressed in the file ? (LZH method, slow)
-    char        k_db_type;              // type of database: DB_NORMAL (default), DB_STANDALONE, DB_SHALLOW_COPY
-    std::string filepath;               // filepath to the database file
+    std::map<std::string, SWHDL> k_objs;    // map <object name, position in the SCR memory>
+    short       k_type;                     // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
+    short       k_mode;                     // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
+    std::string k_arch;                     // processor architecture on which the file has been created/saved/loaded
+    std::string description = "";           // short description of the content of the database
+    Sample*     sample = nullptr;           // Sample if Variables database
+    char        k_compressed = 0;           // are the objects compressed in the file ? (LZH method, slow)
+    char        k_db_type;                  // type of database: DB_NORMAL (default), DB_STANDALONE, DB_SHALLOW_COPY
+    std::string filepath;                   // filepath to the database file
 
 public:
     KDB(IodeType type, IodeDatabaseType db_type, std::string filename="")
@@ -82,22 +76,19 @@ public:
         // copy all objects from other to this
         int pos;
         char* name;
-        this->k_nb = 0;
-        this->k_objs = NULL;
-        if(other.k_nb > 0 && other.k_objs != NULL)
+        if(other.size() > 0)
         {
-            for(int i = 0; i < other.k_nb; i++)
+            for(auto& [name, handle] : other.k_objs) 
             {
-                name = other.k_objs[i].o_name;
                 pos = duplicate(other, name);
                 if(pos < 0)
                 {
-                    for(int i = 0; i < k_nb; i++)
-                        if(k_objs[i].o_val != 0) 
-                            SW_free(k_objs[i].o_val);
-    
-                    SW_nfree(k_objs);
-                    k_objs = NULL; 
+                    if(this->size() > 0)
+                    {
+                        for(auto& [this_name, this_handle] : this->k_objs) 
+                            SW_free(this_handle);
+                        this->k_objs.clear();
+                    }
     
                     filepath = std::string(I_DEFAULT_FILENAME);
     
@@ -107,24 +98,17 @@ public:
                 }
             }
         }
-        else
-        {
-            this->k_objs = NULL;
-            this->k_nb = 0;
-        }
     }
 
     ~KDB()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
         {
-            for(int i = 0; i < this->size(); i++)
-                if(this->k_objs[i].o_val != 0) 
-                    SW_free(this->k_objs[i].o_val);
+            for(auto& [name, handle] : this->k_objs) 
+                SW_free(handle);
         }
-        if(this->k_objs != NULL)
-            SW_nfree(this->k_objs);
-        this->k_nb = 0;
+        if(this->k_objs.size() > 0)
+            this->k_objs.clear();
 
         if(this->sample)
             delete this->sample;
@@ -133,18 +117,13 @@ public:
 
     void clear_objs()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->k_objs != NULL && this->size() > 0)
+        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
         {
-            for(int i = 0; i < this->size(); i++)
-                if(this->k_objs[i].o_val != 0) 
-                    SW_free(this->k_objs[i].o_val);
+            for(auto& [name, handle] : this->k_objs) 
+                SW_free(handle);
         }
-        if(this->k_objs != NULL)
-        {
-            SW_nfree(this->k_objs);
-            this->k_objs = NULL;
-        }
-        this->k_nb = 0;
+        if(this->k_objs.size() > 0)
+            this->k_objs.clear();
     }
 
     void clear(bool delete_objs = true)
@@ -163,12 +142,17 @@ public:
 
     int size() const 
     { 
-        return this->k_nb;
+        return this->k_objs.size();
     }
 
-    int find(const char* name) const;
+    bool contains(const std::string& name) const
+    {
+        return this->k_objs.contains(name);
+    }
 
-    int duplicate(const KDB& other, char* name);
+    SWHDL find(const char* name) const;
+
+    int duplicate(const KDB& other, const std::string& name);
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -252,8 +236,6 @@ inline char k_ext[][4] =
 
 /* k_kdb.c */
 int K_key(char*, int);
-void K_sort(KDB* kdb);
-int K_find_strcmp(const void *name, const void *kobjs);
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 int K_merge(KDB* kdb1, KDB* kdb2, int replace);
 KDB* K_refer(KDB* kdb, int nb, char** names);

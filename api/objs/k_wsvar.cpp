@@ -166,9 +166,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
             KV_sample(kdb2, kdb1->sample);
         else if(kdb2->sample)
             kdb1->sample = new Sample(*kdb2->sample);
-        kdb1->k_nb = kdb2->k_nb;
         kdb1->k_objs = kdb2->k_objs;
-        kdb2->k_nb = 0;
         kdb2->k_objs = NULL;
         delete kdb2;
         kdb2 = nullptr;
@@ -198,7 +196,7 @@ int KV_add(KDB* kdb, char* varname)
         return(-1);
     
     // Create varname with NaN 
-    pos = kdb->find(varname);
+    pos = kdb->contains(varname);
     if(pos < 0) 
     {
         nobs = kdb->sample->nb_periods;

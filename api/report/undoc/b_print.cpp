@@ -285,7 +285,7 @@ int B_PrintObjDef_1(char* arg, int* type)
     int     pos, rc = 0;
 
     kdb = K_WS[*type];
-    if((pos = kdb->find(arg)) == -1) 
+    if((pos = kdb->contains(arg)) == -1) 
         goto err;
 
     kmsg("Printing %s ...", arg);

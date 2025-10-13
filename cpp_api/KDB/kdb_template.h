@@ -8,7 +8,7 @@ private:
     bool check_object_already_exists(KDB* kdb, const std::string& name)
     {
         char* c_name = to_char_array(name);
-        return kdb->find(c_name) >= 0;
+        return kdb->contains(c_name) >= 0;
     }
 
 protected:

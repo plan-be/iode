@@ -249,7 +249,7 @@ int B_DataCalcVar(char* arg, int unused)
     SCR_strip((unsigned char*) lec);
 
     nb = kdb->sample->nb_periods;
-    pos = kdb->find(name);
+    pos = kdb->contains(name);
     if(pos < 0) 
         pos = K_add(kdb, name, NULL, &nb);
     if(pos < 0) 
@@ -294,7 +294,7 @@ int B_DataCreate_1(char* arg, int* ptype)
     char    deflt[41];
     KDB     *kdb = K_WS[*ptype];
 
-    if(kdb->find(arg) >= 0) return(-1);
+    if(kdb->contains(arg) >= 0) return(-1);
 
     switch(*ptype) {
         case COMMENTS :
@@ -359,7 +359,7 @@ int B_DataDelete_1(char* arg, int* ptype)
     int     pos;
     KDB     *kdb = K_WS[*ptype];
 
-    pos = kdb->find(arg);
+    pos = kdb->contains(arg);
     if(pos < 0 || K_del(kdb, pos) < 0) {
         error_manager.append_error("Failed to delete '" + std::string(arg) + "'");
         return(-1);
@@ -503,11 +503,11 @@ int B_DataUpdate(char* arg, int type)
     char    name[K_MAX_NAME + 1], **args = NULL;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    pos = kdb->find(name);
+    pos = kdb->contains(name);
     if(pos < 0) {
         if(B_DataCreate(name, type)) 
             return(-1);
-        pos = kdb->find(name);
+        pos = kdb->contains(name);
     }
 
     switch(type) {
@@ -918,7 +918,7 @@ int B_DataExist(char* arg, int type)
 {
     KDB     *kdb = K_WS[type];
 
-    return(kdb->find(arg));
+    return(kdb->contains(arg));
 }
 
 
@@ -958,7 +958,7 @@ int B_DataAppend(char* arg, int type)
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     text = arg + lg + 1;
-    pos = kdb->find(name);
+    pos = kdb->contains(name);
 
     if(pos < 0)
         nptr = text;

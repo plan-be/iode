@@ -267,7 +267,6 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
 
     SW_nfree(dbv->k_objs);
     dbv->k_objs = newobjs;
-    dbv->k_nb = nbres;
     SW_nfree(objsnb);
     return(0);
 }
