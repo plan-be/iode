@@ -18,6 +18,10 @@ Fixed Bugs
   is in dark mode (closes :issue:`1061`)
 - GUI: fixed interface closing after catching an error thrown when executing an 
   IODE report (closes :issue:`1063`)
+- GUI: fixed "File explorer" windows not updating when opening another project 
+  (closes :issue:`1073`)
+- GUI: fixed cascading tabs not working when extracting related IODE objects 
+  (closes :issue:`1074`)
 
 Miscellaneous 
 -------------
