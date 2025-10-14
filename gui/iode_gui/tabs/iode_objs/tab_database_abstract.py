@@ -1,5 +1,5 @@
 from PySide6.QtCore import QDir, Qt, Signal, Slot
-from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter,
+from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter, QDialog, 
                                QPushButton, QSpacerItem, QSizePolicy, QLabel)
 from PySide6.QtGui import QShortcut, QKeySequence
 
@@ -16,6 +16,20 @@ from typing import List
 from iode import (IodeType, IodeFileType, VarsMode, IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPES, 
                   comments, equations, identities, lists, scalars, tables, variables)
 from iode.util import IODE_DEFAULT_DATABASE_FILENAME
+
+
+class MixinShowIodeDatabaseSubset:
+    """Mixin class to indicate that a widget can show the subset of an IODE database."""
+
+    subset_objects_dialog_requested = Signal(QDialog)
+
+    def show_database_subset(iode_type: IodeType, obj_names: List[str] = None):
+        """
+        Show the the subset of an IODE database for a given IODE type.
+
+        :param IodeType iode_type: Type of the IODE database to show.
+        """
+        raise NotImplementedError("Subclasses must implement this method")
 
 
 class AbstractIodeObjectWidget(IodeAbstractWidget):
@@ -157,9 +171,9 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.pushButton_add.clicked.connect(self.database_view.new_obj)
         self.shortcut_add.activated.connect(self.database_view.new_obj)
 
-        if hasattr(parent, 'show_objects_list'):
-            self.database_view.show_objs_request.connect(parent.show_objects_list)
-            self.database_view_2.show_objs_request.connect(parent.show_objects_list)
+        if isinstance(parent, MixinShowIodeDatabaseSubset):
+            self.database_view.show_objs_request.connect(parent.show_database_subset)
+            self.database_view_2.show_objs_request.connect(parent.show_database_subset)
 
         # Update filter pattern when an object is removed
         self.database_model.object_removed.connect(self.database_view.object_removed)

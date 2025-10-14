@@ -1,7 +1,7 @@
 from PySide6.QtCore import (Qt, QDir, QFileInfo, QPoint, QCoreApplication, QFileSystemWatcher, 
-                          QUrl, QProcess, Slot, Signal)
-from PySide6.QtWidgets import (QWidget, QTabWidget, QDialog, QMessageBox, QProgressDialog, 
-                             QTabBar, QGridLayout, QMenu, QApplication)
+                            QUrl, QProcess, Slot, Signal)
+from PySide6.QtWidgets import (QWidget, QTabWidget, QMessageBox, QProgressDialog, QTabBar, 
+                               QMenu, QApplication, QGridLayout)
 from PySide6.QtGui import QAction, QKeySequence, QShortcut, QDesktopServices
 
 import sys
@@ -11,10 +11,12 @@ from typing import List, Union, Optional
 
 from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
+from iode_gui.main_widgets.tab_widget.abstract_tab_widget import AbstractIodeTabWidget
 from iode_gui.tabs.tab_abstract import IodeAbstractWidget
-from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
+from iode_gui.tabs.iode_objs.tab_database_abstract import MixinShowIodeDatabaseSubset, AbstractIodeObjectWidget
 from iode_gui.tabs.iode_objs.tab_database import (CommentsWidget, EquationsWidget, IdentitiesWidget, 
-                                         ListsWidget, ScalarsWidget, TablesWidget, VariablesWidget)
+                                                  ListsWidget, ScalarsWidget, TablesWidget, 
+                                                  VariablesWidget, DialogDatabaseSubset)
 from iode_gui.tabs.tab_text import TextWidget
 from iode_gui.tabs.tab_report import ReportWidget
 from iode_gui.utils import Context, SHOW_IN_TEXT_TAB_EXTENSIONS_LIST
@@ -23,7 +25,7 @@ from iode import IodeType, IodeFileType, IODE_FILE_TYPES, IODE_DATABASE_TYPE_NAM
 from iode.util import get_iode_file_type
 
 
-class IodeTabWidget(QTabWidget):
+class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
     """
     The present class represents the widget displaying tabs.
     Tabs content can represent:
@@ -59,12 +61,11 @@ class IodeTabWidget(QTabWidget):
 
     (*) defined in main_window.ui
     """
-
     file_content_modified = Signal(str, bool)
-    subset_objects_dialog_requested = Signal(QDialog)
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        MixinShowIodeDatabaseSubset.__init__(self)
+        AbstractIodeTabWidget.__init__(self, parent)
 
         self.overwrite_all = False 
         self.discard_all = False 
@@ -348,8 +349,8 @@ class IodeTabWidget(QTabWidget):
         # set save_key_sequence
         self.save_key_sequence = main_window.ui.actionSave.shortcut
 
-        # connects to append_dialog() slot
-        self.subset_objects_dialog_requested.connect(main_window.append_dialog)
+        # connect signal to append dialog to main window
+        self.subset_objects_dialog_requested.connect(self.main_window.append_dialog)
 
         # reset all IODE databases
 
@@ -920,7 +921,7 @@ class IodeTabWidget(QTabWidget):
             QMessageBox.critical(None, "ERROR", str(e))
 
     @Slot(IodeType, list)
-    def show_objects_list(self, iode_type: IodeType, obj_names: List[str] = None):
+    def show_database_subset(self, iode_type: IodeType, obj_names: List[str] = None):
         """
         popup a new dialog box containing the list of objects.
 
@@ -930,7 +931,7 @@ class IodeTabWidget(QTabWidget):
         if obj_names is None or len(obj_names) == 0:
             return
 
-        dialog = QDialog(self)
+        dialog = DialogDatabaseSubset(self, self)
 
         try:
             grid_layout = QGridLayout(dialog)
@@ -979,6 +980,7 @@ class IodeTabWidget(QTabWidget):
         except Exception as e:
             dialog.deleteLater()
             QMessageBox.critical(None, "ERROR", str(e))
+
 
     @Slot()
     @Slot(bool)

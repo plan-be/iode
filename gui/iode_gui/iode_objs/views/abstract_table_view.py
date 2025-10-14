@@ -118,7 +118,7 @@ class IodeAbstractTableView(QTableView):
         self.same_cmt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_cmt_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.COMMENTS))
         
-        self.same_eq_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F2), self)
+        self.same_eq_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F2), self)
         self.same_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_eq_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.EQUATIONS))
         
@@ -134,11 +134,11 @@ class IodeAbstractTableView(QTableView):
         self.same_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.same_tbl_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.TABLES))
 
-        self.scalars_from_CLEC_shortcut  = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F5), self)
+        self.scalars_from_CLEC_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F5), self)
         self.scalars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.scalars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.SCALARS))
         
-        self.vars_from_CLEC_shortcut     = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F7), self)
+        self.vars_from_CLEC_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Modifier.ALT | Qt.Key.Key_F7), self)
         self.vars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.VARIABLES))
         

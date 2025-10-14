@@ -1,12 +1,14 @@
 from PySide6.QtCore import Qt, Slot, QSettings
-from PySide6.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy, QDialog
 from PySide6.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import get_settings
-from iode_gui.tabs.iode_objs.tab_database_abstract import AbstractIodeObjectWidget
+from iode_gui.main_widgets.tab_widget.abstract_tab_widget import AbstractIodeTabWidget
+from iode_gui.tabs.iode_objs.tab_database_abstract import MixinShowIodeDatabaseSubset, AbstractIodeObjectWidget
 from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget
 from iode_gui.iode_objs.models.table_model import  VariablesModel
 
+from typing import List
 from iode import IodeType, VarsMode
 
 
@@ -308,3 +310,17 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         index = self.combo_mode.currentIndex()
         index = self.combo_mode.count() - 1 if index == 0 else index - 1
         self.combo_mode.setCurrentIndex(index)
+
+
+class DialogDatabaseSubset(MixinShowIodeDatabaseSubset, QDialog):
+    def __init__(self, tab_widget: AbstractIodeTabWidget, parent=None):
+        MixinShowIodeDatabaseSubset.__init__(self)
+        QDialog.__init__(self, parent)
+        self.tab_widget = tab_widget
+
+        self.setObjectName("dialog_database_subset")
+        self.setWindowTitle("IODE Database Subset")
+
+    @Slot(IodeType, list)
+    def show_database_subset(self, iode_type: IodeType, obj_names: List[str] = None):
+        self.tab_widget.show_database_subset(iode_type, obj_names)
