@@ -33,6 +33,7 @@ class AbstractAddDialog(QDialog):
                     return
             
             self._database[name] = value
+            self.new_object_inserted.emit(name)
             self.accept()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))

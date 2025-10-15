@@ -81,9 +81,9 @@ class MainWindow(AbstractMainWindow):
 
     - CTRL + ALT + N creates a new project.
     - CTRL + O opens an existing project.
-    - CTRL + ALT + S saves current project to another directory.
     - CTRL + S saves the current tab content.
-    - CTRL + SHIFT + S saves all tabs content.
+    - CTRL + SHIFT + S saves the current tab content as.
+    - CTRL + ALT + S saves all tabs content.
     - CTRL + SHIFT + D clears the whole workspace.
 
     Parameters
@@ -611,6 +611,10 @@ class MainWindow(AbstractMainWindow):
     @Slot()
     def save_current_tab(self):
         self.ui.tabWidget_IODE_objs.save_tab()
+
+    @Slot()
+    def save_as_current_tab(self):
+        self.ui.tabWidget_IODE_objs.save_as_tab()
 
     @Slot()
     def save_all_tabs(self):

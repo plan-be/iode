@@ -1,7 +1,7 @@
-from PySide6.QtCore import (QAbstractTableModel, QModelIndex, Qt, QDir, QFileInfo, QSize, 
-                            Signal, Slot)
-from PySide6.QtWidgets import (QMessageBox, QDialog, QVBoxLayout, QLabel, QFileDialog, 
-                               QDialogButtonBox, QSizePolicy)
+from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt, QDir, Signal, Slot
+from PySide6.QtWidgets import QMessageBox, QFileDialog
+
+from iode_gui.util.filepath import ask_filepath
 
 from typing import List, Union, Tuple, Any
 from pathlib import Path
@@ -312,24 +312,17 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
         iode_type: IodeType = self._database.iode_type
         iode_file_type: IodeFileType = IodeFileType(int(iode_type))
+        file_type: FileType = IODE_FILE_TYPES[int(iode_type)]
+        file_filter = f"{file_type.name} Files ({" ".join(f"*{ext}" for ext in file_type.extensions)})"
 
-        # if not provided as argument, get path to the file associated with KDB of objects of type iode_type
+        # if not provided as argument, get path to the file associated with database 
+        # of objects of type iode_type
         if filepath is None:
             filepath = self._database.filename
 
-        # if KDB not linked to any file, ask the user to give/create a file to save in.
-        # Otherwise, check the filepath
+        # if database not linked to any file, ask the user to give/create a file to save in.
         if not filepath or filepath == IODE_DEFAULT_DATABASE_FILENAME:
-            file_type: FileType = IODE_FILE_TYPES[int(iode_type)]
-            # open a box dialog
-            filepath, _ = QFileDialog.getSaveFileName(None, "Save File", project_dir.path(), 
-                                                      f"{file_type.name} Files (*.{file_type.extensions})")
-            # filepath is empty if the user clicked on the Discard button
-            if not filepath:
-                return None
-
-        # NOTE: check_filepath() converts to absolute path
-        filepath = check_filepath(filepath, iode_file_type, file_must_exist=False)
+            filepath = ask_filepath(iode_file_type, project_dir, file_filter)
 
         try:
             self._database.save(filepath)
@@ -350,17 +343,23 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if not len(self._database):
             return None
 
+        iode_type: IodeType = self._database.iode_type
+        iode_file_type: IodeFileType = IodeFileType(int(iode_type))
+        file_type: FileType = IODE_FILE_TYPES[int(iode_type)]
+        file_filter = f"{file_type.name} Files ({" ".join(f"*{ext}" for ext in file_type.extensions)})"
+
         # Ask the user for a new filepath
-        filepath = self._ask_filepath(project_dir)
+        filepath = ask_filepath(iode_file_type, project_dir, file_filter)
+        if not filepath:
+            return None
 
-        # Call the save method
-        filepath = self.save(project_dir, filepath)
-
-        # Update the IODE database filename
-        if filepath:
+        try:
+            self._database.save(filepath)
             self._database.filename = filepath
-
-        return filepath
+            return filepath
+        except Exception as e:
+            QMessageBox.warning(None, "WARNING", str(e))
+            return None
 
     @Slot()
     @Slot(bool)
@@ -405,77 +404,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
         :return: True if the value was set successfully, False otherwise.
         """
         raise NotImplementedError()
-
-    def _ask_filepath(self, project_dir: QDir) -> str:
-        """
-        This function opens a dialog to ask the user for a filepath.
-
-        :param project_dir: The directory of the project.
-        :return: The filepath provided by the user.
-        """
-        filepath = self._ask_filepath_dialog(project_dir)
-
-        if not filepath:
-            return None
-
-        file_info = QFileInfo(filepath)
-
-        if file_info.exists():
-            answer = QMessageBox.warning(None, "WARNING",
-                                         f"The file {file_info.fileName()} already exists. Override it?",
-                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Discard,
-                                         QMessageBox.StandardButton.Yes)
-
-            if answer == QMessageBox.StandardButton.No:
-                return self._ask_filepath(project_dir)
-
-            if answer == QMessageBox.StandardButton.Discard:
-                filepath = None
-
-        return filepath
-
-    def _ask_filepath_dialog(self, project_dir: QDir) -> str:
-        """
-        This function creates and executes a dialog to ask the user for a filepath.
-
-        :param project_dir: The directory of the project.
-        :return: The filepath provided by the user.
-        """
-        iode_type: IodeType = self._database.iode_type
-        str_iode_type = str[iode_type]
-        file_type: FileType = IODE_FILE_TYPES[iode_type]
-
-        default_filename = IODE_DEFAULT_DATABASE_FILENAME + file_type.extensions[0]
-        default_filepath = project_dir.absoluteFilePath(default_filename)
-
-        dialog = QDialog()
-        dialog.setObjectName("ask_save_to_dialog")
-        dialog.setMinimumWidth(380)
-        dialog.setMinimumHeight(100)
-        dialog.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        dialog.setWindowTitle(f"Where to save {str_iode_type} ?")
-
-        layout = QVBoxLayout(dialog)
-        layout.setObjectName("layout")
-
-        label = QLabel(f"Please provide the path to the file where {str_iode_type} will be stored")
-        layout.addWidget(label, 0, Qt.AlignmentFlag.AlignLeft)
-
-        file_dialog = QFileDialog(dialog, "Select File")
-        file_dialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        file_dialog.setDirectory(project_dir.absolutePath())
-        file_dialog.selectFile(default_filepath)
-        layout.addWidget(file_dialog, 0, Qt.AlignmentFlag.AlignLeft)
-
-        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box, 0, Qt.AlignmentFlag.AlignCenter)
-
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            return file_dialog.selectedFiles()[0]
-
-        return None
 
     @Slot()
     def reset(self):

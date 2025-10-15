@@ -27,7 +27,6 @@ class AbstractTextWidget(IodeAbstractWidget):
         super().__init__(file_type, parent)
         self.main_window = main_window
         self._filepath = filepath
-        self.filter = ""
         self.printer = QPrinter()
         self._editor: QPlainTextEdit = None
         self._editor_2: QPlainTextEdit = None
@@ -116,18 +115,8 @@ class AbstractTextWidget(IodeAbstractWidget):
         """
         if filepath is None:
             filepath = self.filepath
-        self._save(filepath)
-
-    def _save_as(self) -> Optional[str]:
-        """
-        Saves the content to a new file.
-
-        :return: The path of the new file.
-        """
-        new_filepath, _ = QFileDialog.getSaveFileName(self, "Save As", None, self.filter)
-        if not new_filepath:
-            return None
-        return self.save(new_filepath)
+        filepath = self._save(filepath)
+        return filepath
 
     def split(self, orientation: Qt.Orientation):
         """

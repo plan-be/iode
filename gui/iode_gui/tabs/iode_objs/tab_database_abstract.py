@@ -13,8 +13,9 @@ from iode_gui.iode_objs.views.table_view import (CommentsView , EquationsView , 
                                         ListsView , ScalarsView , TablesView , VariablesView)
 
 from typing import List
-from iode import (IodeType, IodeFileType, VarsMode, IODE_DATABASE_TYPE_NAMES, IODE_FILE_TYPES, 
-                  comments, equations, identities, lists, scalars, tables, variables)
+from iode import (IodeType, IodeFileType, FileType, VarsMode, IODE_DATABASE_TYPE_NAMES, 
+                  IODE_FILE_TYPES, comments, equations, identities, lists, scalars, 
+                  tables, variables)
 from iode.util import IODE_DEFAULT_DATABASE_FILENAME
 
 
@@ -46,7 +47,9 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         self.setObjectName(f"widget_{iode_type_name}")
 
         self.iode_type: IodeType = iode_type
-        self.project_dir: str = QDir.homePath()
+
+        file_type: FileType = IODE_FILE_TYPES[int(iode_type)]
+        self.file_filter = f"{file_type.name} Files ({" ".join(f"*{ext}" for ext in file_type.extensions)})"
 
         # layout
         self.vertical_layout = QVBoxLayout(self)

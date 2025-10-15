@@ -1,5 +1,5 @@
+from PySide6.QtCore import Qt, QRect, Slot, Signal, QDir
 from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
-from PySide6.QtCore import Qt, QRect, Slot
 
 from iode_gui.utils import Context
 
@@ -12,6 +12,8 @@ class IodeAbstractWidget(QWidget):
     """
     Abstract base class for IODE widgets.
     """
+
+    maybe_new_file_created = Signal(str)
 
     def __init__(self, file_type: IodeFileType, parent=None):
         """
@@ -28,6 +30,8 @@ class IodeAbstractWidget(QWidget):
         self.saving_file: bool = False
         self.splitted: bool = False
         self.splitter: QSplitter = None
+        self.file_filter: str = ""
+        self.project_dir: QDir = QDir.home()
 
         self.setGeometry(QRect(10, 11, 951, 26))
 
@@ -113,7 +117,7 @@ class IodeAbstractWidget(QWidget):
     def _save_as(self) -> str:
         raise NotImplementedError()
 
-    def save_as(self):
+    def save_as(self) -> str:
         """
         Prompt the user to save the current tab's content to a new file.
 
@@ -126,6 +130,7 @@ class IodeAbstractWidget(QWidget):
             return ""
 
         self.filepath = new_filepath
+        self.maybe_new_file_created.emit(new_filepath)
         return new_filepath
 
     def load_settings(self):
