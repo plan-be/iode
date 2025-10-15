@@ -2,9 +2,11 @@ from PySide6.QtCore import Signal, Slot, QSettings
 from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
 from PySide6.QtPrintSupport import QPrintPreviewDialog
 
+from typing import Optional
 from iode import IodeFileType, TableLang
 
 from iode_gui.utils import IODE_REPORT_EXTENSION
+from iode_gui.util.filepath import ask_filepath
 from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.text_edit.report_editor import IodeReportEditor
@@ -58,7 +60,7 @@ class ReportWidget(AbstractTextWidget):
         self.ui.comboBox_language.addItems(self.v_lang_names)
         self.ui.comboBox_language.setEditable(False)
 
-        self.filter = f"IODE report files (*{IODE_REPORT_EXTENSION})"
+        self.file_filter = f"IODE report files (*{IODE_REPORT_EXTENSION})"
 
         # Connect signals to slots
         self._editor.modificationChanged.connect(self.set_modified)
@@ -75,6 +77,15 @@ class ReportWidget(AbstractTextWidget):
         :return: True if the report was loaded successfully, False otherwise.
         """
         return self._load_(filepath)
+
+    def _save_as(self) -> Optional[str]:
+        """
+        Saves the content to a new file.
+
+        :return: The path of the new file.
+        """
+        new_filepath = ask_filepath(IodeFileType.FILE_REP, self.project_dir, self.file_filter)
+        return self.save(new_filepath)
 
     def load_settings(self):
         """

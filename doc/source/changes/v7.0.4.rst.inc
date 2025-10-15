@@ -10,6 +10,8 @@ New Features
 Improvements 
 ------------
 
+- GUI: added the possibility to *save as* any tab using a "Save As" dialog 
+  (closes :issue:`1076`)
 
 Fixed Bugs 
 ----------

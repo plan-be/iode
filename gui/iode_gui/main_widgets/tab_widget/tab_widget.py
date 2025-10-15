@@ -50,10 +50,11 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
     - Open files with corresponding application (.xlsx with Excel, ...)
     - Reload file content if modified by another program.
     -> CTRL + S on a tab saves its content (*)
+    -> CTRL + SHIFT + S on a tab saves as its content (*)
     -> CTRL + W on a tab closes it if the tab does not represent an IODE database
     -> SHIFT + ALT + C copies the absolute filepath
     -> SHIFT + ALT + R reveals file in OS file explorer
-    -> CTRL + SHIFT + S saves all tabs content (*)
+    -> CTRL + ALT + S saves all tabs content (*)
     -> CTRL + D on a IODE database tab clears the corresponding database
     -> CTRL + SHIFT + D clears the whole workspace (*)
     -> ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab
@@ -120,12 +121,13 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         self.close_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_W), self)
         self.close_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.close_shortcut.activated.connect(self.close_tab)
-        
-        # NOTE: set in the setup() method
-        self.save_key_sequence: QKeySequence = None
 
         # ---- file system watcher ----
         self.file_system_watcher = QFileSystemWatcher(self)
+
+        # ---- QAction  ----
+        self.action_save: QAction = None
+        self.action_save_as: QAction = None
 
         # ---- QAction to be (de)activated ----
         self.action_close: QAction = None
@@ -140,17 +142,13 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
 
         self.file_system_watcher.fileChanged.connect(self.reload_file)
 
-        self.tab_comments.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_equations.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_identities.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_lists.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_scalars.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_tables.tab_database_modified.connect(self.tab_database_modified)
-        self.tab_variables.tab_database_modified.connect(self.tab_database_modified)
-
         self.tabs_database: List[AbstractIodeObjectWidget] = [
             self.tab_comments, self.tab_equations, self.tab_identities, self.tab_lists, 
             self.tab_scalars, self.tab_tables, self.tab_variables]
+
+        for tab in self.tabs_database:
+            tab.tab_database_modified.connect(self.tab_database_modified)
+            tab.maybe_new_file_created.connect(self.maybe_new_file_created)
 
         # rebuild the list of files (tabs) every time a tab is moved
         self.tabBar().tabMoved.connect(self._build_files_list)
@@ -346,8 +344,11 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         # set output
         self.output = main_window.output
 
-        # set save_key_sequence
-        self.save_key_sequence = main_window.ui.actionSave.shortcut
+        # set missing shortcuts
+        save_shortcut = main_window.ui.actionSave.shortcut()
+        save_as_shortcut = main_window.ui.actionSave_As.shortcut()
+        self.action_save.setShortcut(save_shortcut) 
+        self.action_save_as.setShortcut(save_as_shortcut)
 
         # connect signal to append dialog to main window
         self.subset_objects_dialog_requested.connect(self.main_window.append_dialog)
@@ -372,8 +373,10 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
 
         # make sure that all IODE database tabs has a default text and tooltip
         # (usually when starting a new project)
+        project_dir = QDir(main_window.project_path)
         for index in range(self.count()):
             tab_widget: IodeAbstractWidget = self.widget(index)
+            tab_widget.project_dir = project_dir
             self.setTabText(index, tab_widget.tab_text)
             self.setTabToolTip(index, tab_widget.tooltip)
 
@@ -432,15 +435,16 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         # --- directory context menu
         self.context_menu = QMenu(self)
 
-        # NOTE: close tab action MUST BE DISABLE FOR TABS REPRESENTING AN IODE DATABASE
-        self.action_close = self._add_action("Close", "Close the current tab", self.close_tab, 
-                                             self.close_shortcut)
-        self._add_action("Save", "Save the content of the current tab", self.save_tab, 
-                         self.save_key_sequence)
+        self.action_save = self._add_action("Save", "Save the content of the current tab", 
+                                            self.save_tab)
+        self.action_save_as = self._add_action("Save As", "Save the content of the current tab "
+                                               "to another file", self.save_as_tab)
         # NOTE: clear tab (ONLY FOR TABS REPRESENTING AN IODE DATABASE)
         self.action_clear = self._add_action("Clear", "Clear the content of the current tab", 
                                              self.clear_tab, self.clear_shortcut)
-        
+        # NOTE: close tab action MUST BE DISABLE FOR TABS REPRESENTING AN IODE DATABASE
+        self.action_close = self._add_action("Close", "Close the current tab", self.close_tab, 
+                                             self.close_shortcut)
         self.context_menu.addSeparator()
 
         self._add_action("Copy Absolute Path", "Copy the absolute path of the current file", 
@@ -525,7 +529,7 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
 
         return index
 
-    def _save_tab_content(self, index: int) -> bool:
+    def save_tab_content(self, index: int, save_as: bool) -> bool:
         """
         Save the content of the tab at a given index.
         Ask for a filepath if the tab represents an IODE database and 
@@ -539,9 +543,13 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         """
         try:
             tab_widget: IodeAbstractWidget = self.widget(index)
-            filepath = tab_widget.save()
+            if save_as:
+                filepath = tab_widget.save_as()
+            else:
+                filepath = tab_widget.save()
             if not filepath:
                 return False
+
             self.setTabText(index, tab_widget.tab_text)
             self.setTabToolTip(index, tab_widget.tooltip)
             return True
@@ -727,6 +735,12 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
                 # ask OS to open the file with the default application
                 QDesktopServices.openUrl(QUrl.fromLocalFile(str_filepath))
                 index = -1
+
+            if index >= 0:
+                tab_widget = self.widget(index)
+                if isinstance(tab_widget, IodeAbstractWidget):
+                    tab_widget.project_dir = QDir(self.project_dir_path)
+                    tab_widget.maybe_new_file_created.connect(self.maybe_new_file_created)
 
             return index
         except Exception as e:
@@ -997,6 +1011,26 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         for tab_database in self.tabs_database:
             tab_database.compute_hash(before)
 
+    @Slot(str)
+    def maybe_new_file_created(self, filepath: str):
+        """
+        method called when a user creates a new file using the file explorer.
+        add the path of the new file to the system file watcher.
+
+        :param filepath: path to the created file
+        """
+        try:
+            if filepath and Path(filepath).is_file():
+                self.file_system_watcher.addPath(filepath)
+                index = self.index_context_menu if self.index_context_menu > 0 else self.currentIndex()
+                if index:
+                    tab_widget: IodeAbstractWidget = self.widget(index)
+                    self.setTabText(index, tab_widget.tab_text)
+                    self.setTabToolTip(index, tab_widget.tooltip)
+        except Exception as e:
+            QMessageBox.warning(None, "WARNING", f"Could not add the file "
+                                f"'{filepath}' to the file system watcher.\n" + str(e))
+
     @Slot(int)
     def remove_tab(self, index: int):
         """
@@ -1047,20 +1081,6 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         if self.currentIndex() != 0:
             self.setCurrentIndex(self.currentIndex() - 1)
 
-    @Slot(int)
-    def save_tab_content(self, index: int) -> bool:
-        """
-        saves the content of the tab at position index
-        :param index: the index of the tab to save
-        """
-        try:
-            success = self._save_tab_content(index)
-            self.index_context_menu = -1
-            return success
-        except Exception as e:
-            QMessageBox.warning(None, "WARNING", "Could not save tab.\n" + str(e))
-            return False 
-
     @Slot()
     def save_all_tabs(self) -> bool:
         """
@@ -1072,7 +1092,7 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
         """
         success = True
         for index in range(self.count()):
-            if not self._save_tab_content(index):
+            if not self.save_tab_content(index, save_as=False):
                 success = False
         return success
 
@@ -1088,8 +1108,9 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
             self.project_dir_path = project_dir_path
             # associate new project directory to each IODE database tab + clear global IODE databases
             project_dir = QDir(project_dir_path)
-            for tab_database in self.tabs_database:
-                tab_database.project_dir = project_dir
+            for i in range(self.count()):
+                tab_widget: IodeAbstractWidget = self.widget(i)
+                tab_widget.project_dir = project_dir
             self._reset_file_system_watcher()
         except Exception as e:
             QMessageBox.warning(None, "WARNING", f"Could not open the project directory "
@@ -1225,7 +1246,16 @@ class IodeTabWidget(MixinShowIodeDatabaseSubset, AbstractIodeTabWidget):
     def save_tab(self):
         try:
             index = self.index_context_menu if self.index_context_menu > 0 else self.currentIndex()
-            self._save_tab_content(index)
+            self.save_tab_content(index, save_as=False)
+            self.index_context_menu = -1
+        except Exception as e:
+            QMessageBox.warning(None, "WARNING", "Could not save tab.\n" + str(e))
+
+    @Slot()
+    def save_as_tab(self):
+        try:
+            index = self.index_context_menu if self.index_context_menu > 0 else self.currentIndex()
+            self.save_tab_content(index, save_as=True)
             self.index_context_menu = -1
         except Exception as e:
             QMessageBox.warning(None, "WARNING", "Could not save tab.\n" + str(e))
