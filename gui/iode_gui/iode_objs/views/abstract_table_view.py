@@ -520,6 +520,7 @@ class IodeAbstractTableView(QTableView):
             pattern = self.filter_line_edit.text().strip()
             pattern += ";" + name
             self.filter_line_edit.setText(pattern)
+        self.database_modified.emit()
 
     @Slot(str)
     def object_removed(self, name: str):
@@ -527,9 +528,8 @@ class IodeAbstractTableView(QTableView):
         table_model: IodeAbstractTableModel = self.model()
         if table_model.filter_active:
             pattern = self.filter_line_edit.text().strip()
-            name = ";" + name
             if name in pattern:
-                pattern.replace(name, "")
+                pattern = pattern.replace(name, "")
             self.filter_line_edit.setText(pattern)
 
     @Slot()

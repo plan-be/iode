@@ -243,8 +243,8 @@ class IodeAbstractTableModel(QAbstractTableModel):
                 name: str = self.headerData(row, Qt.Orientation.Vertical)
                 del self._displayed_database[name]
                 self.object_removed.emit(name)
-                self.endRemoveRows()
-                return True
+            self.endRemoveRows()
+            return True
         except Exception as e:
             QMessageBox.warning(None, "WARNING", str(e))
             self.endRemoveRows()
