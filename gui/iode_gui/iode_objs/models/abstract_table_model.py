@@ -113,7 +113,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
         """
         Returns whether a filter is currently active.
         """
-        return self._displayed_database.is_global_workspace
+        return not self._displayed_database.is_global_workspace
 
     def reset_model(self):
         """
