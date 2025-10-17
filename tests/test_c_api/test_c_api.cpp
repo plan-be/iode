@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string>
 #include <regex>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 
@@ -2932,4 +2933,104 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     delete sum_period;
 
     EXPECT_EQ(res, 0);
+}
+
+TEST_F(IodeCAPITest, Tests_BIG_WS)
+{
+    int load_all;
+    int db_global;
+    KDB* kdb_var = nullptr;
+    char fullfilename[256];
+    std::chrono::duration<double> elapsed;
+
+    U_test_print_title("Tests BIG_LOAD");
+    sprintf(fullfilename,  "%s%s", input_test_dir, "big.var");
+
+    // WARNING: Do not use a pattern that could lead to duplicated names 
+    //          when expand (e.g. "A*;0*")
+    char* pattern = "A*;Z*";
+   
+   if(std::filesystem::exists(fullfilename))
+   {
+        // ==== Load all variables from big.var in GLOBAL and STANDALONE modes ====
+        load_all = 0;
+
+        // ---- GLOBAL ----
+        db_global = 1;
+        auto start = std::chrono::high_resolution_clock::now();
+        kdb_var = K_load(VARIABLES, fullfilename, load_all, NULL, db_global);
+        EXPECT_TRUE(kdb_var != nullptr);
+        EXPECT_EQ(kdb_var->size(), 175760);
+        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        auto end = std::chrono::high_resolution_clock::now();
+        elapsed = end - start;
+        std::cout << "(GLOBAL - ALL VARS)     loaded " << std::to_string(kdb_var->size()) 
+                << " variables in " << elapsed.count() << " seconds" << std::endl;
+
+        char* OLD_SEPS = A_SEPS;
+        A_SEPS = (char*) ";\t\n";
+        // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+        char* list_names = K_expand_kdb(kdb_var, (int) VARIABLES, pattern, '*');
+        // Parses a string and replaces @filename and $listname by their contents
+        char** objs = B_ainit_chk(list_names, NULL, 0);
+        A_SEPS = OLD_SEPS;
+
+        delete kdb_var; 
+
+        // ---- STANDALONE ----
+        db_global = 0;
+        start = std::chrono::high_resolution_clock::now();
+        kdb_var = K_load(VARIABLES, fullfilename, load_all, NULL, db_global);
+        EXPECT_TRUE(kdb_var != nullptr);
+        EXPECT_EQ(kdb_var->size(), 175760);
+        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        end = std::chrono::high_resolution_clock::now();
+        elapsed = end - start;
+        std::cout << "(STANDALONE - ALL VARS) loaded " << std::to_string(kdb_var->size()) 
+                << " variables in " << elapsed.count() << " seconds" << std::endl; 
+        delete kdb_var;
+
+        // ==== Load list of variables from big.var in GLOBAL and STANDALONE modes ====
+        load_all = 1;
+        
+        std::cout << "Number of variables matching pattern '" << pattern << "': " 
+                << std::to_string(SCR_tbl_size((unsigned char**) objs)) << std::endl;
+
+        // ---- GLOBAL ----
+        db_global = 1;
+        start = std::chrono::high_resolution_clock::now();
+        kdb_var = K_load(VARIABLES, fullfilename, load_all, objs, db_global);
+        EXPECT_TRUE(kdb_var != nullptr);
+        EXPECT_EQ(kdb_var->size(), 13520);
+        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        end = std::chrono::high_resolution_clock::now();
+        elapsed = end - start;
+        std::cout << "(GLOBAL - SOME VARS)     loaded " << std::to_string(kdb_var->size()) 
+                << " variables in " << elapsed.count() << " seconds" << std::endl;  
+        delete kdb_var; 
+
+        // ---- STANDALONE ----
+        db_global = 0;
+        start = std::chrono::high_resolution_clock::now();
+        kdb_var = K_load(VARIABLES, fullfilename, load_all, objs, db_global);
+        EXPECT_TRUE(kdb_var != nullptr);
+        EXPECT_EQ(kdb_var->size(), 13520);
+        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        end = std::chrono::high_resolution_clock::now();
+        elapsed = end - start;
+        std::cout << "(STANDALONE - SOME VARS) loaded " << std::to_string(kdb_var->size()) 
+                << " variables in " << elapsed.count() << " seconds" << std::endl; 
+        delete kdb_var;
+
+        SCR_free_tbl((unsigned char**) objs);
+    }
+    else
+    {
+        std::cout << "File '" << fullfilename << "' not found. Skipping BIG_WS test." << std::endl;
+        std::cout << "To generate the file, run the Python script tests/generate_big_vars_ws.py" << std::endl;
+    }
 }
