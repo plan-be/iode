@@ -16,6 +16,7 @@ try:
 except ImportError:
     la = None
 
+import time
 import logging
 from pathlib import Path
 from datetime import datetime
@@ -856,6 +857,19 @@ def test_variables_from_array():
     assert variables["VLA_00", "1970Y1"] == 10.0
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
+
+def test_variables_big_file():
+    variables.clear()
+
+    filepath = Path(__file__).parent.parent.parent.parent / "tests" / "data" / "big.var"
+    if not filepath.exists():
+        logging.warning(f"{filepath} data file not found.\nSkipping test_variables_big_file.")
+        logging.warning("To run this test, run the script tests/generate_big_vars_ws.py")
+    else:
+        start = time.process_time()     # CPU time
+        variables.load(str(filepath))
+        end = time.process_time()
+        logging.info(f"loaded {len(variables)} variables in {end - start} seconds")
 
 
 # Estimation
