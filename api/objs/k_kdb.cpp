@@ -16,7 +16,7 @@
  * 
  *      int K_key(char* name, int mode):                     // Checks the validity of an object name and modify its "case" according to the value of mode.
  *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
- *      KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
+ *      KDB *K_quick_refer(KDB *kdb, int nb char *names[])   // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
  *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
@@ -221,7 +221,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
     tkdb->k_compressed = kdb->k_compressed;
     tkdb->filepath = kdb->filepath;
 
-    for(int i = 0 ; i < nb && names[i]; i++) 
+    for(int i = 0; i < nb && names[i]; i++) 
     {
         pos2 = kdb->find(names[i]);
         if(pos2 < 0)  
@@ -259,6 +259,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
  *  The data is **not** duplicated ("shallow copy") .
  *  
  *  @param [in] kdb   KDB*      source kdb
+ *  @param [in] nb    int       number of names 
  *  @param [in] names char*[]   null terminated list of names
  *  @return           KDB*      shallow copy of kdb[names]
  *                              NULL if kdb is null or one of the names cannot be found
@@ -268,9 +269,10 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
  *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
  */
 
-KDB *K_quick_refer(KDB *kdb, char *names[])
+KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
 {
-    int     i, pos, nb = SCR_tbl_size((unsigned char**) names);
+    bool    err = false;
+    int     pos;
     KDB     *tkdb;
 
     if(!kdb) 
@@ -293,15 +295,23 @@ KDB *K_quick_refer(KDB *kdb, char *names[])
     }
 
     // Copie les entrées dans tkdb
-    for(i = 0 ; i < nb; i++) 
+    for(int i = 0; i < nb && names[i]; i++)  
     {
         pos = kdb->find(names[i]);
         if(pos < 0) 
         {
+            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found");
             delete tkdb;
-            return nullptr;
+            err = true;
+            break;
         }
         memcpy(tkdb->k_objs + i, kdb->k_objs + pos, sizeof(KOBJ));
+    }
+
+    if(err) 
+    {
+        error_manager.display_last_error();
+        return nullptr;
     }
 
     // Sort tkdb

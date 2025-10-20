@@ -292,7 +292,7 @@ Function to manage KDB, i.e. IODE object groups.
 |:---|:---|
 |`int K_key(char* name, int mode):`|Checks the validity of an object name and modify its "case" according to the value of mode.|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
-|`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
+|`KDB *K_quick_refer(KDB *kdb, int nb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
 |`int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2 then deletes kdb2.|
 
