@@ -22,9 +22,46 @@ if(Python_FOUND)
     message(STATUS "\nSet up target for iode Python package\n")
     cmake_print_variables(CYTHON)
 
+    message(STATUS "\n   Copy documentation files to iode/doc\n")
     file(INSTALL ${CMAKE_SOURCE_DIR}/doc/build/iode.chm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/doc)
     file(INSTALL ${CMAKE_SOURCE_DIR}/doc/build/iode.pdf DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/doc)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)
+
+    set(DATA_DST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/iode/tests")
+    message(STATUS "\n   Copy data files for testing to ${DATA_DST_DIR}\n")
+
+    set(SUPPORTED_EXTENSIONS ac ae ai al as at av cmt eqs idt lst scl tbl var rep txt a2m)
+    message(STATUS "Supported extensions: ${SUPPORTED_EXTENSIONS}")
+    
+    set(TESTS_DATA_SUBDIRS "data" "data/reports")
+    foreach(subdir ${TESTS_DATA_SUBDIRS})
+      # Get all files in the source directory
+      set(DATA_SRC_DIR "${CMAKE_SOURCE_DIR}/tests/${subdir}")
+      file(GLOB DATA_FILES LIST_DIRECTORIES false "${DATA_SRC_DIR}/*")
+      message(STATUS "Get list of files from the source directory ${DATA_SRC_DIR}")
+
+      foreach(f ${DATA_FILES})
+        # only copy files with extensions "ac ae ai al as at av cmt eqs idt lst "
+        # "scl tbl var rep txt a2m" and size less than 2 MB
+        get_filename_component(ext "${f}" EXT)
+        string(TOLOWER "${ext}" ext_lower)
+        # --- remove leading dot from extension
+        string(REGEX REPLACE "^\\." "" ext_lower "${ext_lower}")
+        if(ext_lower IN_LIST SUPPORTED_EXTENSIONS)
+          file(SIZE "${f}" fsize)
+          if(fsize LESS 2097152) # 2 MB in bytes
+            # get_filename_component(fname "${f}" NAME)
+            # message(STATUS "Copy file '${fname}' to the destination directory ${DATA_DST_DIR}")
+            file(INSTALL DESTINATION "${DATA_DST_DIR}/${subdir}" TYPE FILE FILES "${f}")
+          else()
+            message(STATUS "Skip file ${f} (size ${fsize} bytes exceeds 2 MB)")
+          endif()
+        else()
+          message(STATUS "Skip file ${f} (unsupported extension .${ext_lower})")
+        endif()
+      endforeach()
+    
+    endforeach()
+
     # copy all Python files to binary directory to then be able to generate stub files *.pyi
     file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
          FILES_MATCHING PATTERN "*.py")
