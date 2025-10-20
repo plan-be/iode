@@ -78,12 +78,16 @@ int B_WsLoad(char* arg, int type)
     K_WS[type] = kdb;
 
     // get the list of all object names in 'kdb'
+    char* OLD_SEPS = A_SEPS;
+    A_SEPS = (char*) ";\t\n";
     char* c_lst = K_expand_kdb(kdb, (int) type, "*", '*');
     char** c_names = B_ainit_chk(c_lst, NULL, 0);
+    int nb_names = kdb->k_nb;
+    A_SEPS = OLD_SEPS;
 
     if(K_RWS[type][pos])
         delete K_RWS[type][pos];
-    K_RWS[type][pos] = K_quick_refer(kdb, c_names);
+    K_RWS[type][pos] = K_quick_refer(kdb, nb_names, c_names);
 
     SCR_free_tbl((unsigned char**) c_names);
     return 0;

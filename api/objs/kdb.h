@@ -257,7 +257,7 @@ int K_find_strcmp(const void *name, const void *kobjs);
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 int K_merge(KDB* kdb1, KDB* kdb2, int replace);
 KDB* K_refer(KDB* kdb, int nb, char** names);
-KDB *K_quick_refer(KDB *, char **names);
+KDB *K_quick_refer(KDB* kdb, int nb, char **names);
 
 /* k_val.c */
 char *K_oval(KDB *,int ,int );

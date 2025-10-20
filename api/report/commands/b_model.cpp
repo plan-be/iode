@@ -252,6 +252,7 @@ int B_ModelCompile(char* arg, int unused)
 int B_ModelCalcSCC(char *const_arg, int unused)
 {
     char    **eqs, buf[256], pre[64], inter[64], post[64];
+    int     nb_eqs = 0;
     int     rc = -1, lg1, tris;
     KDB		*tdbe = NULL;
     char    *arg;
@@ -273,10 +274,11 @@ int B_ModelCalcSCC(char *const_arg, int unused)
 
     // eqs if given
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
-    if(SCR_tbl_size((unsigned char**) eqs) == 0)
+    nb_eqs = SCR_tbl_size((unsigned char**) eqs);
+    if(nb_eqs == 0)
         tdbe = K_WS[EQUATIONS];
     else
-        tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
+        tdbe = K_quick_refer(K_WS[EQUATIONS], nb_eqs, eqs);
 
     rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
@@ -304,6 +306,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 {
     int     lg1, lg2, rc, prepos, interpos, postpos;
     char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
+    int     nb_eqs = 0;
     Sample  *smpl = nullptr;
     KDB     *tdbe;
     char    *arg;
@@ -356,7 +359,8 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
     eqs = (char**) SCR_union_quick((unsigned char**) eqs1, (unsigned char**) post);  // JMP 29/8/2012
     SCR_free_tbl((unsigned char**) eqs1);                 // JMP 29/8/2012
-    tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
+    nb_eqs = SCR_tbl_size((unsigned char**) eqs);
+    tdbe = K_quick_refer(K_WS[EQUATIONS], nb_eqs, eqs);
     SCR_free_tbl((unsigned char**) eqs);
 
     // Lance la simulation

@@ -3011,7 +3011,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         list_names = K_expand_kdb(kdb_var, (int) VARIABLES, "*", '*');
         // Parses a string and replaces @filename and $listname by their contents
         char** all_objs = B_ainit_chk(list_names, NULL, 0);
-        all_nb_names = SCR_tbl_size((unsigned char**) all_objs);
+        all_nb_names = kdb_var->size();
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(PATTERN MATCHING)       found " << std::to_string(all_nb_names) 
@@ -3074,7 +3074,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(K_WS[VARIABLES], objs);
+        kdb_shallow_copy = K_quick_refer(K_WS[VARIABLES], nb_names, objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -3093,7 +3093,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(K_WS[VARIABLES], all_objs);
+        kdb_shallow_copy = K_quick_refer(K_WS[VARIABLES], all_nb_names, all_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
