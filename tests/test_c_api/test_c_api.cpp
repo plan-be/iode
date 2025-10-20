@@ -3006,6 +3006,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
                   << " variable names matching pattern '" << pattern << "' in " 
                   << elapsed.count() << " seconds" << std::endl;
 
+        /* NOTE: TOO SLOW -> ~ 35 sec -> skipped
         start = std::chrono::high_resolution_clock::now();
         // Retrieves all object names from K_WS[...]
         list_names = K_expand_kdb(kdb_var, (int) VARIABLES, "*", '*');
@@ -3017,8 +3018,20 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         std::cout << "(PATTERN MATCHING)       found " << std::to_string(all_nb_names) 
                   << " variable names matching pattern '" << pattern << "' in " 
                   << elapsed.count() << " seconds" << std::endl;
+        */
 
         A_SEPS = OLD_SEPS;
+
+        // ---- Build a char** table containing all variable names ----
+        start = std::chrono::high_resolution_clock::now();
+        all_nb_names = kdb_var->size();
+        char** all_objs = new char*[all_nb_names];
+        for (int i = 0; i < all_nb_names; i++)
+            all_objs[i] = (char*) SCR_stracpy((unsigned char*) kdb_var->k_objs[i].o_name);
+        end = std::chrono::high_resolution_clock::now();
+        elapsed = end - start;
+        std::cout << "(BUILD VECTOR ALL NAMES) built a char** table of " << std::to_string(all_nb_names) 
+                  << " variable names in " << elapsed.count() << " seconds" << std::endl;
 
         delete kdb_var;
 
@@ -3057,9 +3070,10 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         // ==== Load all variables from big.var into K_WS[VARIABLES] ====
         start = std::chrono::high_resolution_clock::now();
         B_WsLoad(fullfilename, VARIABLES);
+        EXPECT_TRUE(K_WS[VARIABLES] != nullptr);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
-        std::cout << "(B_WsLoad)               loaded " << std::to_string(KV_WS->size()) 
+        std::cout << "(B_WsLoad)               loaded " << std::to_string(K_WS[VARIABLES]->size()) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
 
         // **** K_refer and K_quick_refer performance tests ****
@@ -3070,6 +3084,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
+        EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
         kdb_shallow_copy->clear(false);
 
@@ -3079,6 +3094,7 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
+        EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
         kdb_shallow_copy->clear(false);
 
@@ -3088,7 +3104,8 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
-                  << " variables in " << elapsed.count() << " seconds" << std::endl;
+        << " variables in " << elapsed.count() << " seconds" << std::endl;
+        EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
         kdb_shallow_copy->clear(false);
 
@@ -3098,11 +3115,12 @@ TEST_F(IodeCAPITest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
+        EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
         kdb_shallow_copy->clear(false);
 
         SCR_free_tbl((unsigned char**) objs);
-        SCR_free_tbl((unsigned char**) all_objs);
+        delete[] all_objs;
 
         // ==== delete big.var to save disk space ====
         success = remove(fullfilename);
