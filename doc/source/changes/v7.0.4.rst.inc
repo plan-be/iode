@@ -25,6 +25,9 @@ Fixed Bugs
 - GUI: fixed cascading tabs not working when extracting related IODE objects 
   (closes :issue:`1074`)
 
+- NOTEPAD++: fixed color highlighting not working when opening IODE report files 
+  (except for iode comments) (closes :issue:`521`)
+
 Miscellaneous 
 -------------
 
