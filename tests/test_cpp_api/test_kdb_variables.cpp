@@ -823,75 +823,76 @@ TEST_F(KDBVariablesTest, Hash)
 TEST_F(KDBVariablesTest, Tests_BIG_WS)
 {
     int success;
+    KDB* global_kdb;
     KDBVariables* kdb_var;
     std::chrono::duration<double> elapsed;
 
     std::string filename = input_test_dir + "big.var";
-    if(std::filesystem::exists(filename))
+
+    if(!std::filesystem::exists(filename))
     {
-        Variables.clear();
-
-        auto start = std::chrono::high_resolution_clock::now();
-        kdb_var = new KDBVariables(filename);
-        EXPECT_TRUE(kdb_var != nullptr);
-        KDB* global_kdb = kdb_var->get_database();
-        EXPECT_TRUE(global_kdb != nullptr);
-        EXPECT_EQ(global_kdb->size(), 175760);
-        EXPECT_EQ(global_kdb->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(global_kdb->sample->nb_periods, 71);
-        auto end = std::chrono::high_resolution_clock::now();
-        elapsed = end - start;
-        std::cout << "loaded " << std::to_string(kdb_var->size()) << " variables in " 
-                  << elapsed.count() << " seconds" << std::endl;
-
-        start = std::chrono::high_resolution_clock::now();
-        std::size_t hash_val = hash_value(Variables);
-        end = std::chrono::high_resolution_clock::now();
-        elapsed = end - start;
-        std::cout << "hashed " << std::to_string(kdb_var->size()) << " variables in " 
-                  << elapsed.count() << " seconds" << std::endl;
-        delete kdb_var;
-
-        // ==== delete big.var to save disk space ====
-        success = remove(filename.c_str());
-        if(success == 0)
-            std::cout << "File '" << filename << "' deleted successfully" << std::endl;
+        std::string command = "python " + str_tests_dir + "generate_big_vars_ws.py";
+        std::cout << "Executing command: '" << command << "'" << std::endl;
+        int result = system((char*) command.c_str());
+        if(result == 0)
+            std::cout << "Successfully generated big.var and big.av test files" << std::endl;
         else
-            std::cout << "Error deleting file '" << filename << "'" << std::endl;
-    }
-    else
-    {
-        std::cout << "File '" << filename << "' not found. Skipping BIG_WS test." << std::endl;
-        std::cout << "To generate the file, run the Python script tests/generate_big_vars_ws.py" << std::endl;
+            std::cout << "ERROR: could not generate big.var and big.av test files" << std::endl;
+        EXPECT_EQ(result, 0);
     }
 
+    std::cout << "\n---- Testing performance of loading the binary file 'big.var' ----\n" << std::endl;
+    Variables.clear();
+
+    auto start = std::chrono::high_resolution_clock::now();
+    kdb_var = new KDBVariables(filename);
+    EXPECT_TRUE(kdb_var != nullptr);
+    global_kdb = kdb_var->get_database();
+    EXPECT_TRUE(global_kdb != nullptr);
+    EXPECT_EQ(global_kdb->size(), 175760);
+    EXPECT_EQ(global_kdb->sample->to_string(), "1990Y1:2060Y1");
+    EXPECT_EQ(global_kdb->sample->nb_periods, 71);
+    auto end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "loaded " << std::to_string(kdb_var->size()) << " variables in " 
+                << elapsed.count() << " seconds" << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    std::size_t hash_val = hash_value(Variables);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "hashed " << std::to_string(kdb_var->size()) << " variables in " 
+                << elapsed.count() << " seconds" << std::endl;
+    delete kdb_var;
+
+    // ==== delete big.var to save disk space ====
+    success = remove(filename.c_str());
+    if(success == 0)
+        std::cout << "File '" << filename << "' deleted successfully" << std::endl;
+    else
+        std::cout << "Error deleting file '" << filename << "'" << std::endl;
+
+    std::cout << "\n---- Testing performance of loading the ASCII file 'big.av' ----\n" << std::endl;
     filename = input_test_dir + "big.av";
-    if(std::filesystem::exists(filename))
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-        kdb_var = new KDBVariables(filename);
-        EXPECT_TRUE(kdb_var != nullptr);
-        KDB* global_kdb = kdb_var->get_database();
-        EXPECT_TRUE(global_kdb != nullptr);
-        EXPECT_EQ(global_kdb->size(), 175760);
-        EXPECT_EQ(global_kdb->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(global_kdb->sample->nb_periods, 71);
-        auto end = std::chrono::high_resolution_clock::now();
-        elapsed = end - start;
-        std::cout << "(B_WsLoad) [.av file]      loaded " << std::to_string(K_WS[VARIABLES]->size()) 
-                  << " variables in " << elapsed.count() << " seconds" << std::endl;
-        delete kdb_var;
 
-        // ==== delete big.av to save disk space ====
-        success = remove(filename.c_str());
-        if(success == 0)
-            std::cout << "File '" << filename << "' deleted successfully" << std::endl;
-        else
-            std::cout << "Error deleting file '" << filename << "'" << std::endl;
-    }
+    start = std::chrono::high_resolution_clock::now();
+    kdb_var = new KDBVariables(filename);
+    EXPECT_TRUE(kdb_var != nullptr);
+    global_kdb = kdb_var->get_database();
+    EXPECT_TRUE(global_kdb != nullptr);
+    EXPECT_EQ(global_kdb->size(), 175760);
+    EXPECT_EQ(global_kdb->sample->to_string(), "1990Y1:2060Y1");
+    EXPECT_EQ(global_kdb->sample->nb_periods, 71);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "(B_WsLoad) [.av file]      loaded " << std::to_string(K_WS[VARIABLES]->size()) 
+                << " variables in " << elapsed.count() << " seconds" << std::endl;
+    delete kdb_var;
+
+    // ==== delete big.av to save disk space ====
+    success = remove(filename.c_str());
+    if(success == 0)
+        std::cout << "File '" << filename << "' deleted successfully" << std::endl;
     else
-    {
-        std::cout << "File '" << filename << "' not found. Skipping BIG_WS test." << std::endl;
-        std::cout << "To generate the file, run the Python script tests/generate_big_vars_ws.py" << std::endl;
-    }
+        std::cout << "Error deleting file '" << filename << "'" << std::endl;
 }
