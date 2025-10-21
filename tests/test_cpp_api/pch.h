@@ -8,6 +8,8 @@
 #include "cpp_api/iode_cpp_api.h"
 
 #include <cmath>
+#include <cstdlib>		// for system()
+
 #include <fstream>
 #include <stdexcept>
 #include <filesystem>
@@ -20,6 +22,7 @@ class KDBTest
 {
 protected:
 	std::string prefix_filename;
+	std::string str_tests_dir;
 	std::string input_test_dir;
 	std::string output_test_dir;
 	std::string report_test_dir;
@@ -37,8 +40,8 @@ public:
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::string current_file = __FILE__;
 		std::filesystem::path cwd(current_file);
-		std::filesystem::path tests_dir = cwd.parent_path();
-        std::filesystem::path data_dir = tests_dir.parent_path() / "data";
+		std::filesystem::path tests_dir = cwd.parent_path().parent_path();
+        std::filesystem::path data_dir = tests_dir / "data";
         std::filesystem::path output_dir = data_dir / "output";
         std::filesystem::path report_dir = data_dir / "reports";
 #ifdef __GNUC__
@@ -48,7 +51,8 @@ public:
 		prefix_filename = "";
         std::string separator = "\\";
 #endif
-		input_test_dir = data_dir.string() + separator;
+		str_tests_dir   = tests_dir.string() + separator;
+		input_test_dir  = data_dir.string() + separator;
 		output_test_dir = output_dir.string() + separator;
 		report_test_dir = report_dir.string() + separator;
 	}
