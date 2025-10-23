@@ -228,8 +228,8 @@ file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
 # -- copy syntax files --
 message(STATUS "\n-> files to highlight IODE report commands in Texpad and Notepad++ <-")
-file(INSTALL resources/syntax/ioderep.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
-file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
+file(INSTALL resources/syntax/iode_reports.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
+file(INSTALL resources/syntax/npp_iode_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
 message(STATUS "DONE")
 
 message(STATUS " ")
