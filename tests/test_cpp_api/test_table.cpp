@@ -101,11 +101,11 @@ TEST_F(TablesTest, AddGetTable)
     ASSERT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
-    char* name = "c_table";
+    char* name = "C_TABLE";
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
-    int pos = KT_WS->find(name);
+    int pos = KT_WS->index_of(name);
     Table* extracted_tbl = KTVAL(KT_WS, pos);
 
     // --- check that both table are exactly the same
@@ -195,7 +195,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     KDBVariables kdb_var(input_test_dir + "fun.av");
 
-    char* c_name = "cpp_table";
+    char* c_name = "CPP_TABLE";
     int nb_columns = 2;
     std::string def = "A title";
     std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
@@ -263,7 +263,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
     K_add(KT_WS, c_name, static_cast<Table*>(&table));
-    int pos = KT_WS->find(c_name);
+    int pos = KT_WS->index_of(c_name);
     ASSERT_GT(pos, -1);
 
     Table* tbl = KTVAL(KT_WS, pos);
@@ -805,7 +805,7 @@ TEST_F(TablesTest, Hash)
     EXPECT_EQ(hash_before, hash_after);
 
     // C++ table vs C table
-    int pos = KT_WS->find("GFRPC");
+    int pos = KT_WS->index_of("GFRPC");
     Table* c_table = KTVAL(KT_WS, pos);
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);

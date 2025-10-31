@@ -44,6 +44,8 @@ int B_IdtExecute(char* arg, int unused)
     char    from[16], to[16], **idts;
     Sample  *smpl;
 
+    error_manager.clear();
+
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
     try
@@ -64,6 +66,9 @@ int B_IdtExecute(char* arg, int unused)
     SCR_free_tbl((unsigned char**) idts);
     delete smpl;
     smpl = nullptr;
+
+    if(rc != 0)
+        error_manager.display_last_error();
     return rc;
 }
 
@@ -85,21 +90,27 @@ int B_IdtExecute(char* arg, int unused)
 
 int B_IdtExecuteIdts(Sample* smpl, char** idts)
 {
-    KDB     *tdbi, *tkdb;
+    KDB*  kdb_idt;
+    KDB*  kdb_var;
+
+    error_manager.clear();
 
     if(idts == NULL || SCR_tbl_size((unsigned char**) idts) == 0)
-        tkdb = KI_exec(KI_WS,
-                       KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                       KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
-                       smpl);
-    else {
-        tdbi = K_refer(KI_WS, SCR_tbl_size((unsigned char**) idts), idts);
-        tkdb = KI_exec(tdbi,
-                       KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                       KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
-                       smpl);
-        delete tdbi;
-        tdbi = nullptr;
+    {
+        kdb_var = KI_exec(KI_WS,
+                          KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+                          smpl);
+    }
+    else 
+    {
+        kdb_idt = K_refer(KI_WS, SCR_tbl_size((unsigned char**) idts), idts);
+        kdb_var = KI_exec(kdb_idt,
+                          KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+                          smpl);
+        delete kdb_idt;
+        kdb_idt = nullptr;
     }
 
     SCR_free_tbl((unsigned char**) KEXEC_VFILES);
@@ -107,15 +118,22 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
     SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = NULL;
 
-    if(!tkdb) 
+    std::string last_error = error_manager.get_last_error();
+    if(last_error != "")
+    {
+        error_manager.append_error("Error(s) during identity execution:\n" + last_error);
+        return -1;
+    }
+
+    if(!kdb_var) 
         return -1;
     
-    KV_sample(tkdb, smpl);
+    KV_sample(kdb_var, smpl);
 
     if(KV_WS) 
-        KV_merge_del(KV_WS, tkdb, 1);
+        KV_merge_del(KV_WS, kdb_var, 1);
     else 
-        KV_WS = tkdb;
+        KV_WS = kdb_var;
 
     return 0;
 }

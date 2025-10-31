@@ -65,7 +65,7 @@ char* ExportObjsWKS::extract_comment(KDB* dbc, char* name, char** cmt)
 {
     int pos;
 
-    pos = dbc->find(name);
+    pos = dbc->index_of(name);
     if(pos >= 0)  wks_string(KCVAL(dbc, pos), WKS_COL, WKS_ROW);
     else wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;

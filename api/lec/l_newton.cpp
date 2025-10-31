@@ -174,7 +174,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
     d_ptr = L_getvar(dbv, varnb) + t;
     oldx = x = d_ptr[0];
     if(!IODE_IS_A_NUMBER(x)) {
-        if(CSimulation::KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb));
+        if(CSimulation::KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", dbv->get_name(eqvarnb), dbv->get_name(varnb));
         return((double)IODE_NAN);
     }
 
@@ -192,7 +192,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
     }
 
     if(CSimulation::KSIM_NEWTON_DEBUG)
-        L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
+        L_debug("Eq %s - Endo %s : shift=%lf\n", dbv->get_name(eqvarnb), dbv->get_name(varnb), shift);
 
 
     if(algo && ax > 1.0) eps *= ax; /* GB 20-06-96 */
@@ -206,7 +206,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
 
         if(!IODE_IS_A_NUMBER(fx)) {
             if(CSimulation::KSIM_NEWTON_DEBUG) { // Message iniquement en cas de pb
-                L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
+                L_debug("Eq %s - Endo %s : shift=%lf\n", dbv->get_name(eqvarnb), dbv->get_name(varnb), shift);
                 L_debug("   - f(%lg) = %lg\n", x, fx);
                 L_debug("   -> cannot compute f(%lg)\n", x);
             }

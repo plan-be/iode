@@ -16,7 +16,7 @@ struct OKOBJ
 
 struct OKDB 
 {
-    KOBJ        *k_objs;
+    OKOBJ       *k_objs;
     long        k_nb;
     short       k_type;
     short       k_mode;
@@ -29,7 +29,7 @@ struct OKDB
 
 struct OKDB643 
 {
-    KOBJ        *k_objs;
+    OKOBJ       *k_objs;
     long        k_nb;
     short       k_type;
     short       k_mode;

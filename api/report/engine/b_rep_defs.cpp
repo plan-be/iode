@@ -88,7 +88,8 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) 
         macro = "";
     lg = (int) strlen(macro) + 1;
-    if(K_add(RP_MACRO, name, macro, &lg) < 0) 
+    bool success = K_add(RP_MACRO, name, macro, &lg);
+    if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);
         error_msg += " (" + std::string(macro) + ") not possible";
@@ -133,7 +134,7 @@ char* RP_get_macro_ptr(char* macro_name)
 {
     int     pos;
     
-    pos = RP_MACRO->find(macro_name);
+    pos = RP_MACRO->index_of(macro_name);
     if(pos < 0) 
         return(NULL);
    
@@ -151,8 +152,8 @@ int RP_undef_1(char *name)
     if(!RP_MACRO) 
         return(0);
     
-    K_del(RP_MACRO, RP_MACRO->find(name));
-    return(0);
+    bool success = RP_MACRO->remove(name);
+    return (int) success;
 }
 
 int wrapper_RP_undef_1(char *name, void* unused)
@@ -214,10 +215,10 @@ int RP_define_calcdepth(char *name)
 
     for(i = 0; i < RP_MACRO->size(); i++) 
     {
-        if(strncmp(buf, KONAME(RP_MACRO, i), lg) == 0) 
+        if(strncmp(buf, RP_MACRO->get_name(i).c_str(), lg) == 0) 
         {
             objpos = i;
-            depth = atoi(KONAME(RP_MACRO, i) + lg);
+            depth = atoi(RP_MACRO->get_name(i).c_str() + lg);
             if(depth > maxdepth) 
                 maxdepth = depth; // cas avec depth > 9
         }
@@ -246,7 +247,7 @@ int RP_define_save(char *name)
         return(rc);
 
     // if the macro "name" does not yet exist, no need to push its definition
-    pos = RP_MACRO->find(name);
+    pos = RP_MACRO->index_of(name);
     if(pos < 0) 
         return(0);
 
@@ -289,7 +290,7 @@ int RP_define_restore(char *name)
 
     // Restore the copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
-    pos = RP_MACRO->find(buf);
+    pos = RP_MACRO->index_of(buf);
     rc = RP_define_1(name, KOVAL(RP_MACRO, pos));
 
     // Delete the copy

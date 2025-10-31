@@ -68,9 +68,9 @@ cdef class Identities(CythonIodeDatabase):
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
-    def execute(self, identities: str, from_period: str, to_period: str, var_files: str, scalar_files: str, trace: bool=False):
-        self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
-                                            var_files.encode(), scalar_files.encode(), <bint>trace)
+    def execute(self, identities: str, from_period: str, to_period: str, var_files: str, scalar_files: str, trace: bool=False) -> bool:
+        return self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
+                                                    var_files.encode(), scalar_files.encode(), <bint>trace)
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database_ptr))

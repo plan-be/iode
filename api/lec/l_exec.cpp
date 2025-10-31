@@ -98,6 +98,20 @@ int L_stackna(L_REAL** p_stack, int nargs)
 }
 
 
+static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
+{
+    std::string sub_expression = std::string((char*) expr);
+    std::string error_msg = "Could not execute compiled LEC sub expression ";
+    if(sub_expression.empty())
+        error_msg += "at period position " + std::to_string(t) + ": empty expression";
+    else
+    {
+        error_msg += "'" + sub_expression + "' at period position ";
+        error_msg += std::to_string(t) + ": invalid expression";
+    }
+    return error_msg;
+}
+
 /**
  *  Execution of a CLEC sub expression.
  * 
@@ -136,6 +150,12 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
         {
             memcpy(&cvar, expr + j, sizeof(CVAR));
             d_ptr = L_getvar(L_EXEC_DBV, L_EXEC_NAMES[cvar.pos].pos);
+            if(d_ptr == nullptr) 
+            {
+                std::string error_msg = get_l_exec_sub_error_message(expr, t);
+                kerror(0, (char*) error_msg.c_str());
+                return((double)IODE_NAN);
+            }
             j += sizeof(CVAR);
             len = cvar.ref;
             if(cvar.per.year == 0)  
@@ -239,15 +259,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         break;
                     }
 
-                    std::string sub_expression = std::string((char*) expr);
-                    std::string error_msg = "Could not execute compiled LEC sub expression ";
-                    if(sub_expression.empty())
-                        error_msg += "at period position " + std::to_string(t) + ": empty expression";
-                    else
-                    {
-                        error_msg += "'" + sub_expression + "' at period position ";
-                        error_msg += std::to_string(t) + ": invalid expression";
-                    }
+                    std::string error_msg = get_l_exec_sub_error_message(expr, t);
                     kerror(0, (char*) error_msg.c_str());
                     return((double)IODE_NAN);
             }
@@ -366,15 +378,16 @@ L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
     CLEC     *clec = 0;
     L_REAL   *vec = NULL;
 
+    if(lec == 0 || lec[0] == 0) 
+        return(vec);
     
-    if(lec == 0 || lec[0] == 0) return(vec);
     clec = L_cc(lec);
-    if(clec != 0 && !L_link(dbv, dbs, clec)) {
+    if(clec != 0 && !L_link(dbv, dbs, clec)) 
+    {
         nb = dbv->sample->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
-        for(t = 0 ; t < nb ; t++) {
+        for(t = 0 ; t < nb ; t++)
             vec[t] = L_exec(dbv, dbs, clec, t);
-        }
     }
 
     SW_nfree(clec);

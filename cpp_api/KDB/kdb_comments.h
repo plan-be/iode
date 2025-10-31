@@ -21,7 +21,7 @@ public:
         return new KDBComments(this, deep_copy, pattern);
     }
     
-    int add(const std::string& name, const Comment& comment);
+    bool add(const std::string& name, const Comment& comment);
 
     void update(const std::string& name, const Comment& comment);
 
@@ -35,15 +35,16 @@ inline std::size_t hash_value(KDBComments const& cpp_kdb)
     KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
+    char* cmt;
     std::size_t seed = 0;
-    for(int pos=0; pos < kdb->size(); pos++)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
-        char* o_name = kdb->k_objs[pos].o_name;
-        hash_combine<std::string_view>(seed, std::string_view(o_name, strlen(o_name)));
+        hash_combine<std::string>(seed, name); 
         // need to wrap with std::string() because hash_value() and
         // hash_combine() only compare pointer addresses when applied 
         // on char* arrays
-        hash_combine<std::string>(seed, std::string(KCVAL(kdb, pos)));
+        cmt = (char*) P_get_ptr(SW_getptr(handle), 0);
+        hash_combine<std::string>(seed, std::string(cmt));
     }
     return seed;
 }

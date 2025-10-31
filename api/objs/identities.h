@@ -2,14 +2,26 @@
 
 #include "api/constants.h"
 #include "api/objs/objs.h"
+#include "api/objs/kdb.h"
 #include "api/objs/variables.h"
 #include "api/lec/lec.h"
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KIPTR(name)         K_optr0(KI_WS, name)
-#define KILEC(kdb, pos)     K_oval0(kdb, pos)
-#define KICLEC(kdb, pos)    ((CLEC *) K_oval1(kdb, pos))
+inline char* KIPTR(KDB* kdb, char* name)
+{
+    return K_optr0(kdb, name);
+}    
+
+inline char* KILEC(KDB* kdb, int pos)
+{
+    return K_oval0(kdb, pos);
+}
+
+inline CLEC* KICLEC(KDB* kdb, int pos)
+{
+    return (CLEC*) K_oval1(kdb, pos);
+}     
 
 /*----------------------- STRUCTS ----------------------------*/
 

@@ -63,8 +63,8 @@ cdef class CythonIodeDatabase:
         cdef char* c_value = b_value
         B_PrintNbDec(c_value)
 
-    def find(self, name: str) -> int:
-        return self.abstract_db_ptr.find(name.encode())
+    def index(self, name: str) -> int:
+        return self.abstract_db_ptr.index_of(name.encode())
 
     def get_name(self, pos: int) -> str:
         return self.abstract_db_ptr.get_name(pos).decode()
@@ -100,8 +100,8 @@ cdef class CythonIodeDatabase:
         cdef string s = string(b'')
         return [name.decode() for name in self.abstract_db_ptr.get_names(s, <bint>True)]
 
-    def rename(self, old_name: str, new_name: str) -> int:
-        return self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())
+    def rename(self, old_name: str, new_name: str, overwrite: bool) -> bool:
+        return self.abstract_db_ptr.rename(old_name.encode(), new_name.encode(), <bint>overwrite)
 
     def remove(self, names: List[str]):
         for name in names:
@@ -180,7 +180,3 @@ cdef class CythonIodeDatabase:
     def remove_objects(self, names: List[str]):
         for name in names:
             self.abstract_db_ptr.remove(name.encode())
-
-    def remove_entries(self, names: List[str]):
-        for name in names:
-            self.abstract_db_ptr.remove_entry(name.encode())

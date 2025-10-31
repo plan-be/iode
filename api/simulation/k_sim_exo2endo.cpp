@@ -91,7 +91,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     poseq = KE_poseq(posendo);
     clec = KECLEC(KSIM_DBE, poseq);
     for(j = 0; j < clec->nb_names; j++) {
-        if(L_ISCOEF(clec->lnames[j].name)) continue;
+        if(is_coefficient(clec->lnames[j].name)) continue;
         if((clec->lnames[j]).pos == posexo) {
             KSIM_POSXK[poseq] = posexo;
             KSIM_POSXK_REV[posexo] = poseq;
@@ -105,7 +105,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
         eclec = KECLEC(KSIM_DBE, poseq);            
         clec = (CLEC *)SW_nalloc(eclec->tot_lg);
         memcpy(clec, eclec, eclec->tot_lg);
-        if(L_ISCOEF(clec->lnames[j].name)) continue;
+        if(is_coefficient(clec->lnames[j].name)) continue;
         posseq = KE_poseq((clec->lnames[j]).pos);
 
         /* if same endo, variable exo or endo already exchanged continue */
@@ -170,7 +170,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
     endo = KE_poseq(posendo);
     if(endo < 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posendo));
+        error_msg += std::string(KSIM_DBV->get_name(posendo));
         error_msg += " : no such equation in the Equations workspace";
         error_manager.append_error(error_msg);
         return(-1);
@@ -178,7 +178,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
 
     if(KE_poseq(posexo) >= 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posexo));
+        error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " already endogeneous";
         error_manager.append_error(error_msg);
         return(-1);
@@ -189,8 +189,8 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
     exo = KE_findpath(posendo, posexo, &depth);
     if(exo < 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posendo)) + "-"; 
-        error_msg += std::string(KONAME(KSIM_DBV, posexo));
+        error_msg += std::string(KSIM_DBV->get_name(posendo)) + "-"; 
+        error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " no exchange possible";
         error_manager.append_error(error_msg);
         return(-1);

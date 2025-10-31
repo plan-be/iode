@@ -92,7 +92,7 @@ void Estimation::E_print_coefs()
         scl = KSVAL(E_DBS, E_C_NBS[i]);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
-                 KONAME(E_DBS, E_C_NBS[i]),
+                 E_DBS->get_name(E_C_NBS[i]),
                  (double) scl->value,
                  (double) scl->std,
                  (double) E_div_0(scl->value, scl->std),
@@ -114,12 +114,12 @@ void Estimation::E_print_mcorr()
 
     W_printfRepl("&1C ");
     for(i = 0 ; i < E_NC ; i++)
-        if(MATE(E_SMO, i, 0)) W_printfRepl("&1C%s", KONAME(E_DBS, E_C_NBS[i]));
+        if(MATE(E_SMO, i, 0)) W_printfRepl("&1C%s", E_DBS->get_name(E_C_NBS[i]));
 
     W_printf("\n.tl\n");
     for(i = 0, ic = 0 ; i < E_NC ; i++) {
         if(MATE(E_SMO, i, 0) == 0) continue;
-        W_printfRepl("&1L%s", KONAME(E_DBS, E_C_NBS[i]));
+        W_printfRepl("&1L%s", E_DBS->get_name(E_C_NBS[i]));
         for(j = 0, jc = 0 ; j < E_NC ; j++) {
             if(MATE(E_SMO, j, 0) == 0) continue;
             W_printfRepl("&1D%lf", (double) MATE(E_MCORR, ic, jc));
@@ -256,7 +256,7 @@ static int E_graph_calc_lhs(char* name, char* res, char* rhs)
     memset(res, 0, 71);
     memset(rhs, 0, 71);
 
-    pos = K_WS[EQUATIONS]->find(name);
+    pos = K_WS[EQUATIONS]->index_of(name);
     if(pos < 0) 
         return(-1);
     

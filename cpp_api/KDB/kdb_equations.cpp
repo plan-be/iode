@@ -23,11 +23,11 @@ std::string KDBEquations::get_lec(const int pos) const
 
 std::string KDBEquations::get_lec(const std::string& name) const
 {
-    int pos = find(name);
+    int pos = index_of(name);
     return get_lec(pos);
 }
 
-int KDBEquations::add(const std::string& name, const Equation& obj)
+bool KDBEquations::add(const std::string& name, const Equation& obj)
 {
     char* c_name = to_char_array(name);
 
@@ -37,7 +37,7 @@ int KDBEquations::add(const std::string& name, const Equation& obj)
     return pos;
 }
 
-int KDBEquations::add(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
+bool KDBEquations::add(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
     const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
     char* c_name = to_char_array(name);

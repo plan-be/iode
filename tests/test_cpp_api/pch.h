@@ -113,12 +113,12 @@ protected:
 		{
 			longest_file.open(filepath2);
 			filepath_longest_file = filepath2;
-			std::filesystem::path p(filepath1);
+			std::filesystem::path p(filepath2);
 			filename_longest_file = p.filename().string();
 
 			smallest_file.open(filepath1);
 			filepath_smallest_file = filepath1;
-			std::filesystem::path p2(filepath2);
+			std::filesystem::path p2(filepath1);
 			filename_smallest_file = p2.filename().string();
 		}
 

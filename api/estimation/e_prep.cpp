@@ -188,14 +188,16 @@ int Estimation::E_prep_lecs(char** lecs)
  */
 int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
 {
-    int         j;
-    char        *name;
-
-    for(j = 0 ; j < clec->nb_names ; j++) {
-        name = clec->lnames[j].name;
-        if(L_ISCOEF(name) && dbs->find(name) < 0)
-            K_add(dbs, name, NULL);
+    char* c_name;
+    std::string name;
+    for(int j = 0 ; j < clec->nb_names ; j++) 
+    {
+        c_name = clec->lnames[j].name;
+        name = std::string(c_name);
+        if(is_coefficient(name) && !dbs->contains(name))
+            K_add(dbs, c_name, NULL);
     }
+    
     return(0);
 }
 
@@ -324,7 +326,7 @@ int Estimation::E_prep_coefs()
     for(i = 0 ; i < E_NEQ ; i++) {
         clec = E_CRHS[i]; // linked before
         for(j = 0 ; j < clec->nb_names ; j++) {
-            if(L_ISCOEF(clec->lnames[j].name)) {
+            if(is_coefficient(clec->lnames[j].name)) {
                 pos = clec->lnames[j].pos;
                 for(k = 0 ; k < E_NC ; k++)
                     if(E_C_NBS[k] == pos) 

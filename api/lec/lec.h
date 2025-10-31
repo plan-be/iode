@@ -6,6 +6,7 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
+#include "api/utils/utils.h"
 
 /* ---------------------- DEFINE ---------------------- */
 
@@ -190,11 +191,11 @@ struct ALEC
 {
     int     al_type;        // type : L_VAR, L_COEF, L_CONST ...
     union {
-        LECREAL v_real;         // constant values double
-        long    v_long;         // constant values long int
-        int     v_nb_args;      // nb of args for fn
+        LECREAL v_real;         // constant value (float)
+        long    v_long;         // constant values (integer)
+        int     v_nb_args;      // nb of args for functions
         struct {
-            short   pos;        // coef or series pos in table ??
+            short   pos;        // coef or series pos in ??
             Period  per;        // Period if any
             short   lag;        // lag if any
         } v_var;                // variable
@@ -243,8 +244,6 @@ struct CLEC {
 };
 
 /*---------------- MACROS ------------------------*/
-
-#define L_ISCOEF(x) ((x)[0] >= 'a')
 
 #define s_dbl   sizeof(LECREAL)
 #define s_ptr   sizeof(double *)
@@ -467,7 +466,7 @@ inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
     for(int i = 0; i < clec->nb_names; i++)
     { 
         item_name = clec->lnames[i].name;
-        if(L_ISCOEF(item_name))
+        if(is_coefficient(item_name))
             list.push_back(std::string(item_name));
     }
 
@@ -485,7 +484,7 @@ inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
     for(int i = 0; i < clec->nb_names; i++)
     {
         item_name = clec->lnames[i].name;
-        if(!L_ISCOEF(item_name))
+        if(!is_coefficient(item_name))
             list.push_back(std::string(item_name));
     }
 

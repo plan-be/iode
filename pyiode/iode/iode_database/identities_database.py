@@ -405,7 +405,9 @@ class Identities(IodeDatabase):
         input_files, names = self._copy_from(input_files, names)
         self._cython_instance.copy_from(input_files, names)
 
-    def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, scalar_files: Union[str, List[str]]=None, trace: bool=False):
+    def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, 
+                to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, 
+                scalar_files: Union[str, List[str]]=None, trace: bool=False) -> bool:
         r"""
         Execute the specified identity(ies).
 
@@ -432,7 +434,7 @@ class Identities(IodeDatabase):
 
         Returns
         -------
-        None
+        bool
 
         Examples
         --------
@@ -478,6 +480,7 @@ class Identities(IodeDatabase):
 
         >>> # compute GAP_ and GAP2 (assuming Scalars and Variables are already loaded)
         >>> identities.execute("GAP_;GAP2")
+        True
         >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 1
@@ -505,6 +508,7 @@ class Identities(IodeDatabase):
         >>> variables["GAP_"] = 0.
         >>> variables["GAP2"] = 0.
         >>> identities.execute("GAP_;GAP2", "2000Y1", "2005Y1")
+        True
         >>> variables["GAP_", "2000Y1:2005Y1"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
         nb variables: 1
@@ -536,6 +540,7 @@ class Identities(IodeDatabase):
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
         >>> identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
+        True
         >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
         Workspace: Variables
         nb variables: 1
@@ -633,7 +638,8 @@ class Identities(IodeDatabase):
         else:
             raise TypeError("'scalar_files': Expected value of type str or a list of str. "
                             f"Got value of type {type(scalar_files).__name__}")
-        self._cython_instance.execute(identities, str(from_period), str(to_period), var_files, scalar_files, trace)
+        success = self._cython_instance.execute(identities, str(from_period), str(to_period), var_files, scalar_files, trace)
+        return success
 
     def from_series(self, s: pd.Series):
         r"""
