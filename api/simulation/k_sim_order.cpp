@@ -272,7 +272,7 @@ void CSimulation::KE_order(KDB* dbe, char** eqs)
         if(eqs == 0)
             for(i = 0; i < KSIM_INTER; i++) KSIM_ORDER[i] = i;
         else
-            for(i = 0; i < KSIM_INTER; i++) KSIM_ORDER[i] = dbe->find(eqs[i]); /* JMP 02-02-2004 */
+            for(i = 0; i < KSIM_INTER; i++) KSIM_ORDER[i] = dbe->index_of(eqs[i]); /* JMP 02-02-2004 */
 
         return;
     }

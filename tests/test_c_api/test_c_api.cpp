@@ -181,7 +181,7 @@ public:
 	    }
 	
 	    pos = K_add(KV_WS, "A", A, &nb);
-	    //S4ASSERT(KV_WS->find("A") >= 0,  "K_add() + find()");
+	    //S4ASSERT(KV_WS->index_of("A") >= 0,  "K_add() + find()");
 	    pos = K_add(KV_WS, "B", B, &nb);
 	
 	    // For B_DataPattern()
@@ -761,17 +761,17 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     U_test_CreateObjects();
 
     // Create lists
-    pos = KL_WS->find("LST1");
+    pos = KL_WS->index_of("LST1");
     EXPECT_TRUE(pos >= 0);
     lst = KLPTR("LST1");
     EXPECT_EQ(strcmp(lst, "A,B"), 0);
 
 
-    pos = KV_WS->find("A");
-    EXPECT_TRUE(KV_WS->find("A") >= 0);
+    pos = KV_WS->index_of("A");
+    EXPECT_TRUE(KV_WS->index_of("A") >= 0);
 
     pos = K_ren(KV_WS, "A", "AAA");
-    EXPECT_TRUE(KV_WS->find("AAA") >= 0);
+    EXPECT_TRUE(KV_WS->index_of("AAA") >= 0);
 
     // Test KV_sample()
     std::string asmpl1 = KV_WS->sample->to_string();
@@ -872,7 +872,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
-    pos = KT_WS->find(name);
+    pos = KT_WS->index_of(name);
     extracted_tbl = KTVAL(KT_WS, pos);
 
     // --- check that both table are exactly the same
@@ -1437,7 +1437,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     rc = B_DataCalcVar("A1 2 * B");
     A1 = KVPTR("A1");
     EXPECT_EQ(rc, 0);
-    EXPECT_TRUE(KV_WS->find("A1") >= 0);
+    EXPECT_TRUE(KV_WS->index_of("A1") >= 0);
     EXPECT_EQ(A1[1], 4);
 
     // B_DataCreate(char* arg, int type)
@@ -1448,27 +1448,27 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     {
         rc = B_DataCreate("XXX", i);
         EXPECT_EQ(rc, 0);
-        EXPECT_TRUE(K_WS[i]->find("XXX") >= 0);
+        EXPECT_TRUE(K_WS[i]->index_of("XXX") >= 0);
 
         if(i != EQUATIONS) 
         { // Equations cannot be renamed or duplicated
             rc = B_DataDuplicate("XXX YYY", i);
             EXPECT_EQ(rc, 0);
-            EXPECT_TRUE(K_WS[i]->find("YYY") >= 0);
+            EXPECT_TRUE(K_WS[i]->index_of("YYY") >= 0);
 
             rc = B_DataRename("YYY ZZZ", i);
             EXPECT_EQ(rc, 0);
-            EXPECT_TRUE(K_WS[i]->find("ZZZ") >= 0);
+            EXPECT_TRUE(K_WS[i]->index_of("ZZZ") >= 0);
         }
 
         rc = B_DataDelete("XXX", i);
         EXPECT_EQ(rc, 0);
-        EXPECT_TRUE(K_WS[i]->find("XXX") < 0);
+        EXPECT_TRUE(K_WS[i]->index_of("XXX") < 0);
     }
 
     // B_DataListSort()
     rc = K_add(KL_WS, "LIST1", "A;C;B");
-    EXPECT_TRUE(KL_WS->find("LIST1") >= 0);
+    EXPECT_TRUE(KL_WS->index_of("LIST1") >= 0);
     rc = B_DataListSort("LIST1 LIST2");
     lst = KLPTR("LIST2");
     EXPECT_EQ(std::string(lst), "A;B;C");
@@ -1599,7 +1599,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    pos = KE_WS->find("ACAF");
+    pos = KE_WS->index_of("ACAF");
     Sample smpl = KESMPL(KE_WS, pos);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
@@ -2927,9 +2927,9 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     K_add(KL_WS, "X", "R1,R2,R3,R4,RT");
     K_add(KL_WS, "Y", "C1,C2,C3,C4,CT");
 
-    pos = KL_WS->find("X");
+    pos = KL_WS->index_of("X");
     EXPECT_NE(pos, -1);
-    pos = KL_WS->find("Y");
+    pos = KL_WS->index_of("Y");
     EXPECT_NE(pos, -1);
 
     // Note: ref_period and sum_period are freed in RasExecute()

@@ -87,7 +87,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
 
         for(int i = 0 ; i < k_nb; i++) 
         {
-            pos = c_kdb->find(to_char_array(names[i]));
+            pos = c_kdb->index_of(to_char_array(names[i]));
             if(pos < 0) 
             {
                 SW_nfree(k_objs);
@@ -226,7 +226,7 @@ void KDBAbstract::remove(const int pos)
 void KDBAbstract::remove(const std::string& name)
 {
     // throw exception if object with passed name does not exist
-    int pos = find(name);
+    int pos = index_of(name);
     if(pos < 0) 
         return;
 
@@ -245,7 +245,7 @@ void KDBAbstract::remove(const std::string& name)
         K_del_entry(kdb, pos);
         // then delete in global KDB
         c_name = to_char_array(name);
-        pos = K_WS[k_type]->find(c_name);
+        pos = K_WS[k_type]->index_of(c_name);
         K_del(K_WS[k_type], pos);
         break;
     default:
@@ -267,7 +267,7 @@ void KDBAbstract::remove_entry(const int pos)
 void KDBAbstract::remove_entry(const std::string& name)
 {
     // throw exception if object with passed name does not exist
-    int pos = find(name);
+    int pos = index_of(name);
     if(pos < 0) 
         return;
 

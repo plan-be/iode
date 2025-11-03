@@ -142,7 +142,7 @@ int K_key(char* name, int mode)
  *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
  */
  
-int KDB::find(const char* name) const
+int KDB::index_of(const char* name) const
 {
     char    *res;
     ONAME   oname;
@@ -223,7 +223,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
     for(int i = 0; i < nb && names[i]; i++) 
     {
-        pos2 = kdb->find(names[i]);
+        pos2 = kdb->index_of(names[i]);
         if(pos2 < 0)  
         {
             error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found: ");
@@ -297,7 +297,7 @@ KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
     // Copie les entrées dans tkdb
     for(int i = 0; i < nb && names[i]; i++)  
     {
-        pos = kdb->find(names[i]);
+        pos = kdb->index_of(names[i]);
         if(pos < 0) 
         {
             error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found");
@@ -342,7 +342,7 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 
     if(kdb1 == NULL || kdb2 == NULL) return(-1);
     for(i = 0; i < kdb2->size(); i++) {
-        pos = kdb1->find(KONAME(kdb2, i));
+        pos = kdb1->index_of(KONAME(kdb2, i));
         if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
         else {
             if(!replace) continue;

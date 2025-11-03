@@ -235,7 +235,7 @@ bool ComputedTable::is_editable(const int line, const int col)
     return true;
 }
 
-// TODO : use a KDBVariable object instead of K_find and KV_set.
+// TODO : use a KDBVariable object instead of index_of() and KV_set().
 //        For the moment, there is a memory problem when the function ends and
 //        thus when the KDBVariable object is destroyed. 
 //        -> problem linked to the compiler option /Zp1
@@ -251,7 +251,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     std::string formula = lec + " := " + oss.str() + " * " + div_lec;
     CLEC* clec = L_solve(to_char_array(formula), to_char_array(var_name));
 
-    int var_pos = KV_WS->find(to_char_array(var_name));
+    int var_pos = KV_WS->index_of(to_char_array(var_name));
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used

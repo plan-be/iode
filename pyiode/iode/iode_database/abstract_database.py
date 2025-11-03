@@ -370,7 +370,7 @@ class IodeDatabase:
     def _set_print_nb_decimals(self, value: int):
         self._cython_instance._set_print_nb_decimals(value)
 
-    def find(self, name: str) -> int:
+    def index_of(self, name: str) -> int:
         r"""
         Return the position of the IODE object with name `name` in the database.
 
@@ -390,12 +390,12 @@ class IodeDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.cmt
         317 objects loaded 
-        >>> comments.find("ACAF")
+        >>> comments.index_of("ACAF")
         0
         """
         if name not in self:
             raise KeyError(f"'{name}' is not in the database.")
-        return self._cython_instance.find(name)
+        return self._cython_instance.index_of(name)
 
     def get_name(self, pos: int) -> str:
         r"""

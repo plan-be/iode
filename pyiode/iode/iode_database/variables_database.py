@@ -588,7 +588,7 @@ class Variables(IodeDatabase):
         if name not in self:
             raise KeyError(f"Variable '{name}' not found in the Variables database")
 
-        pos = self.find(key_name) if isinstance(key_name, str) else key_name
+        pos = self.index_of(key_name) if isinstance(key_name, str) else key_name
 
         # key_periods represents all periods (of the current subset) -> return a Variables object
         if key_periods is None:
@@ -1052,7 +1052,7 @@ class Variables(IodeDatabase):
         
         # update a Variable
         else:
-            pos = self.find(key_name) if isinstance(key_name, str) else key_name
+            pos = self.index_of(key_name) if isinstance(key_name, str) else key_name
             name = self.get_name(pos) if isinstance(key_name, int) else key_name
             # update values for the whole (subset) sample
             if key_periods is None:

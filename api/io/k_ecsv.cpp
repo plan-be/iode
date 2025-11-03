@@ -112,7 +112,7 @@ char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
     int     pos;
     U_ch    *ccmt;                     /* JMP 19-09-96 */
 
-    pos = dbc->find(name);
+    pos = dbc->index_of(name);
     if(pos >= 0)  
     {
         ccmt = (unsigned char*) KCVAL(dbc, pos);        /* JMP 19-09-96 */

@@ -23,7 +23,7 @@ std::string KDBEquations::get_lec(const int pos) const
 
 std::string KDBEquations::get_lec(const std::string& name) const
 {
-    int pos = find(name);
+    int pos = index_of(name);
     return get_lec(pos);
 }
 
