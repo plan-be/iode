@@ -9,6 +9,7 @@
 #include <numeric>      // for std::accumulate
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include <stdexcept>
 #include <functional>   // for std::hash
 #include <filesystem>   // requires C++17 
@@ -166,6 +167,22 @@ inline std::string utf8_to_oem(const std::string str_utf8)
     return convert_between_codepages(str_utf8, false);
 }
 
+inline std::string to_lower(const std::string& input) 
+{
+    std::string result = input;
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    return result;
+}
+
+inline std::string to_upper(const std::string& input) 
+{
+    std::string result = input;
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](unsigned char c){ return std::toupper(c); });
+    return result;
+}
+
 /**
  * @brief Joins the elements of a vector of strings into a single string using a specified separator.
  * 
@@ -284,7 +301,7 @@ inline void hash_combine(std::size_t& seed, const T& value)
 inline IodeRegexName get_regex_name(const int type)
 {
     IodeRegexName nre;
-    if (type == COMMENTS)
+    if (type == COMMENTS || type == OBJECTS)
     {
         nre.regex = "A-Za-z";
         nre.type = "capital or lowercase";
@@ -304,6 +321,15 @@ inline IodeRegexName get_regex_name(const int type)
     nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_#]{0," + std::to_string(K_MAX_NAME - 1) + "}";
 
     return nre;
+}
+
+inline bool is_coefficient(const std::string& name)
+{
+    if(name.empty()) 
+        return false;
+
+    IodeRegexName nre = get_regex_name(SCALARS);
+    return regex_match(name, std::regex(nre.regex));
 }
 
 inline void check_name(const std::string name, const int type)
@@ -458,7 +484,10 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
     return p_filepath.string();
 }
 
-inline void remove_duplicates(std::vector<std::string>& v)
+/*
+ * @brief Sort a vector of strings and remove duplicates
+ */
+inline void sort_and_remove_duplicates(std::vector<std::string>& v)
 {
     // NOTE: std::unique only removes consecutive duplicated elements, 
     //       so the vector needst to be sorted first
@@ -467,15 +496,16 @@ inline void remove_duplicates(std::vector<std::string>& v)
     v.resize(std::distance(v.begin(), it));
 }
 
-// QUESTION FOR JMP: is there a function in the C Iode API to remove duplicates 
-//                   from a char** ?
-inline char** remove_duplicates(char** items)
+/*
+ * @brief Sort a char** table and remove duplicates
+ */
+inline char** sort_and_remove_duplicates(char** items)
 {
     int nb_items = SCR_tbl_size((unsigned char**) items);
     std::vector<std::string> v_items;
     v_items.reserve(nb_items);
     for (int i=0; i < nb_items; i++) v_items.push_back(std::string(items[i]));
-    remove_duplicates(v_items);
+    sort_and_remove_duplicates(v_items);
     SCR_free_tbl((unsigned char**) items);
     
     nb_items = (int) v_items.size();

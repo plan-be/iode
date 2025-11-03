@@ -189,7 +189,7 @@ void EditAndEstimateEquations::update_scalars()
     }
 
     // remove duplicated scalars names
-    remove_duplicates(coefficients_list);
+    sort_and_remove_duplicates(coefficients_list);
 
     // for each scalar name
     for(const std::string& name: coefficients_list)

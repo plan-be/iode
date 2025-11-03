@@ -31,7 +31,7 @@ std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iod
     SCR_free_tbl((unsigned char **) c_names);
     
     // remove duplicates
-    remove_duplicates(names);
+    sort_and_remove_duplicates(names);
     
     // return names
     return names; 
