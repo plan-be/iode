@@ -53,22 +53,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      - name: Install Python 3.12
-        if: runner.os == 'Windows'
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12' 
-      # required to run the Python script tests/generate_big_vars_ws.py
-      # called the test functions Tests_BIG_WS
-      - name: Install Python packages numpy, pandas, matplotlib and iode
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install numpy
-          pip install pandas
-          pip install matplotlib
-          pip install iode
       - name: Print preset config
         shell: bash
         run: echo "${{ env.os }}-${{ inputs.build-config }}"
@@ -89,6 +73,32 @@ jobs:
       - name: Test the C and C++ APIs
         if: runner.os == 'Windows'
         uses: ./.github/actions/test_api
+        with:
+          cmake-config: ${{ env.os }}-${{ inputs.build-config }}
+      - name: Install Python 3.12
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12' 
+      # required to run the Python script tests/generate_big_vars_ws.py
+      # called the test functions Tests_BIG_WS
+      - name: Install Python packages numpy, pandas, matplotlib and iode
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy
+          pip install pandas
+          pip install matplotlib
+          pip install iode
+      - name: Generate big.var and big.av test files
+        if: runner.os == 'Windows'
+        shell:  bash
+        run: python tests/test_big_files/generate_big_vars_ws.py
+      # requires Python + numpy, pandas and iode packages installed
+      - name: Test loading and saving a big Variables database
+        if: runner.os == 'Windows'
+        uses: ./.github/actions/test_big_files
         with:
           cmake-config: ${{ env.os }}-${{ inputs.build-config }}
       - run: echo "This job's status is ${{ job.status }}."
@@ -125,22 +135,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      - name: Install Python 3.12
-        if: runner.os == 'Windows'
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12' 
-      # required to run the Python script tests/generate_big_vars_ws.py
-      # called the test functions Tests_BIG_WS
-      - name: Install Python packages numpy, pandas, matplotlib and iode
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install numpy
-          pip install pandas
-          pip install matplotlib
-          pip install iode
       - name: Print preset config
         shell: bash
         run: echo "${{ env.os }}-${{ inputs.build-config }}-sanitize"

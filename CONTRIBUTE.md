@@ -50,7 +50,7 @@ conda install -c larray-project larray
 ```
 For all other Python libraries:
 ```bash
-conda install -c conda-forge <list of libraries>
+conda install <list of libraries>
 ```
 
 **note**: To install `build` and `myst-parser`, you have to use pip:

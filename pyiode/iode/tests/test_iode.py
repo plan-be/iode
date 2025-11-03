@@ -861,7 +861,8 @@ def test_variables_from_array():
 def test_variables_big_file():
     variables.clear()
 
-    filepath = Path(__file__).parent.parent.parent.parent / "tests" / "data" / "big.var"
+    tests_dir = Path(__file__).parent.parent.parent.parent / "tests" 
+    filepath = tests_dir / "test_big_files" / "data" / "big.var"
     if not filepath.exists():
         logging.warning(f"{filepath} data file not found.\nSkipping test_variables_big_file.")
         logging.warning("To run this test, run the script tests/generate_big_vars_ws.py")
