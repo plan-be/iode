@@ -29,7 +29,7 @@ if(Python_FOUND)
     set(DATA_DST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/iode/tests")
     message(STATUS "\n   Copy data files for testing to ${DATA_DST_DIR}\n")
 
-    set(SUPPORTED_EXTENSIONS ac ae ai al as at av cmt eqs idt lst scl tbl var rep txt a2m)
+    set(SUPPORTED_EXTENSIONS ac ae ai al as at av cmt eqs idt lst scl tbl var rep txt a2m ref)
     message(STATUS "Supported extensions: ${SUPPORTED_EXTENSIONS}")
     
     set(TESTS_DATA_SUBDIRS "data" "data/reports")
@@ -41,12 +41,13 @@ if(Python_FOUND)
 
       foreach(f ${DATA_FILES})
         # only copy files with extensions "ac ae ai al as at av cmt eqs idt lst "
-        # "scl tbl var rep txt a2m" and size less than 2 MB
+        # "scl tbl var rep txt a2m ref" and size less than 2 MB
         get_filename_component(ext "${f}" EXT)
         string(TOLOWER "${ext}" ext_lower)
         # --- remove leading dot from extension
         string(REGEX REPLACE "^\\." "" ext_lower "${ext_lower}")
-        if(ext_lower IN_LIST SUPPORTED_EXTENSIONS)
+        # Accept if extension is in SUPPORTED_EXTENSIONS or matches *.ref
+        if(ext_lower IN_LIST SUPPORTED_EXTENSIONS OR ext_lower MATCHES "^.*\\.ref$")
           file(SIZE "${f}" fsize)
           if(fsize LESS 2097152) # 2 MB in bytes
             # get_filename_component(fname "${f}" NAME)
