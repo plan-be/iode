@@ -174,6 +174,16 @@
             "name": "linux-release/tests/test_cpp_api"
         },
         {
+            "inherits": "linux-debug",
+            "displayName": "TEST CPP API LINUX x64 FOR BIG DATABASES",
+            "name": "linux-debug/tests/test_big_files"
+        },
+        {
+            "inherits": "linux-release",
+            "displayName": "TEST CPP API LINUX x64 FOR BIG DATABASES",
+            "name": "linux-release/tests/test_big_files"
+        },
+        {
             "inherits": "linux-debug-sanitize",
             "displayName": "TEST C API LINUX Sanitize",
             "name": "linux-debug-sanitize/tests/test_c_api"
@@ -202,6 +212,16 @@
             "inherits": "windows-release",
             "displayName": "TEST CPP API Windows x64",
             "name": "windows-release/tests/test_cpp_api"
+        },
+        {
+            "inherits": "windows-debug",
+            "displayName": "TEST CPP API Windows x64 FOR BIG DATABASES",
+            "name": "windows-debug/tests/test_big_files"
+        },
+        {
+            "inherits": "windows-release",
+            "displayName": "TEST CPP API Windows x64 FOR BIG DATABASES",
+            "name": "windows-release/tests/test_big_files"
         },
         {
             "inherits": "windows-debug-sanitize",
@@ -271,10 +291,22 @@
             "configurePreset": "linux-debug/tests/test_cpp_api"
         },
         {
+            "name": "cpp-api-linux-debug-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API LINUX x64 FOR BIG DATABASES",
+            "configurePreset": "linux-debug/tests/test_big_files"
+        },
+        {
             "name": "cpp-api-linux-release",
             "inherits": "test-default",
             "displayName": "TEST CPP API LINUX x64",
             "configurePreset": "linux-release/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-linux-release-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API LINUX x64 FOR BIG DATABASES",
+            "configurePreset": "linux-release/tests/test_big_files"
         },
         {
             "name": "c-api-linux-debug-sanitize",
@@ -307,10 +339,22 @@
             "configurePreset": "windows-debug/tests/test_cpp_api"
         },
         {
+            "name": "cpp-api-windows-debug-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows x64 FOR BIG DATABASES",
+            "configurePreset": "windows-debug/tests/test_big_files"
+        },
+        {
             "name": "cpp-api-windows-release",
             "inherits": "test-default",
             "displayName": "TEST CPP API Windows x64",
             "configurePreset": "windows-release/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-windows-release-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows x64 FOR BIG DATABASES",
+            "configurePreset": "windows-release/tests/test_big_files"
         },
         {
             "name": "c-api-windows-debug-sanitize",

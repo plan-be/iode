@@ -22,12 +22,16 @@ def save_big_vars_ws(filepath: str):
 
 if __name__ == "__main__":
     current_dir = Path(__file__).parent.resolve()
-    filepath = current_dir / "data" / "big.var"
 
     populate_big_vars()
 
-    save_big_vars_ws(str(filepath))
+    data_dir = current_dir / "data"
+    data_dir.mkdir(exist_ok=True)
+
+    filepath = data_dir / "big.var"
+    if not filepath.exists():
+        save_big_vars_ws(str(filepath))
 
     filepath = filepath.with_suffix(".av")
-
-    save_big_vars_ws(str(filepath))
+    if not filepath.exists():
+        save_big_vars_ws(str(filepath))
