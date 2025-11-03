@@ -193,7 +193,7 @@ int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
 
     for(j = 0 ; j < clec->nb_names ; j++) {
         name = clec->lnames[j].name;
-        if(L_ISCOEF(name) && dbs->find(name) < 0)
+        if(is_coefficient(name) && dbs->find(name) < 0)
             K_add(dbs, name, NULL);
     }
     return(0);
@@ -324,7 +324,7 @@ int Estimation::E_prep_coefs()
     for(i = 0 ; i < E_NEQ ; i++) {
         clec = E_CRHS[i]; // linked before
         for(j = 0 ; j < clec->nb_names ; j++) {
-            if(L_ISCOEF(clec->lnames[j].name)) {
+            if(is_coefficient(clec->lnames[j].name)) {
                 pos = clec->lnames[j].pos;
                 for(k = 0 ; k < E_NC ; k++)
                     if(E_C_NBS[k] == pos) 

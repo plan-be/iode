@@ -244,8 +244,6 @@ struct CLEC {
 
 /*---------------- MACROS ------------------------*/
 
-#define L_ISCOEF(x) ((x)[0] >= 'a')
-
 #define s_dbl   sizeof(LECREAL)
 #define s_ptr   sizeof(double *)
 #define s_short sizeof(short)
@@ -467,7 +465,7 @@ inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
     for(int i = 0; i < clec->nb_names; i++)
     { 
         item_name = clec->lnames[i].name;
-        if(L_ISCOEF(item_name))
+        if(is_coefficient(item_name))
             list.push_back(std::string(item_name));
     }
 
@@ -485,7 +483,7 @@ inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
     for(int i = 0; i < clec->nb_names; i++)
     {
         item_name = clec->lnames[i].name;
-        if(!L_ISCOEF(item_name))
+        if(!is_coefficient(item_name))
             list.push_back(std::string(item_name));
     }
 

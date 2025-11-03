@@ -205,7 +205,7 @@ int CSimulation::KE_preorder(KDB* dbe, int** predecessors, int** successors)
         /* LOG ALL NB AND POS OF ENDO VARS */
         predecessors[i][0] = clec->nb_names; // Nbre max de noms (on pourrait améliorer en ne prenant que les vars)
         for(j = 0; j < clec->nb_names; j++) {
-            if(L_ISCOEF(clec->lnames[j].name)) continue;
+            if(is_coefficient(clec->lnames[j].name)) continue;
             // Recherche l'eq dont la variable j est endo
             posj = (clec->lnames[j]).pos;
             

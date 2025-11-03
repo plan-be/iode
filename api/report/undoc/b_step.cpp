@@ -45,7 +45,7 @@ static int check_scl_var(char *eqs)
 
     for(int j = 0 ; j < cl->nb_names ; j++) 
     {
-        if(L_ISCOEF(cl->lnames[j].name)) 
+        if(is_coefficient(cl->lnames[j].name)) 
         {
             if(K_WS[SCALARS]->find(cl->lnames[j].name) == -1) 
             {

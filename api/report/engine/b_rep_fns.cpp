@@ -1172,8 +1172,8 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
     int     j, k;
 
     for(j = 0 ; j < cl->nb_names ; j++) {
-        if(L_ISCOEF(cl->lnames[j].name) && type != 'S') continue;
-        if(!L_ISCOEF(cl->lnames[j].name) && type != 'V') continue;
+        if(is_coefficient(cl->lnames[j].name) && type != 'S') continue;
+        if(!is_coefficient(cl->lnames[j].name) && type != 'V') continue;
         for(k = 0 ; k < *nb ; k++)
             if(strcmp(cl->lnames[j].name, (char*) (*tbl)[k]) == 0) break;
         if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, (unsigned char*) cl->lnames[j].name);

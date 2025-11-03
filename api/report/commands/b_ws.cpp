@@ -647,19 +647,15 @@ double *B_StatUnitRoot_1(char* arg, int print)
     lg = B_get_arg0(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
     order = atoi(name);
 
-//    sprintf(buf, "_DF %s", arg + lg + 1);
-//    rc = B_DataCalcVar(buf);
-//    if(rc) return(NULL);
-
-//    df = E_UnitRoot("_DF", drift, trend, order);
     df = E_UnitRoot(arg + lg + 1, drift, trend, order);
     if(print && df != NULL) 
         E_PrintDF(arg + lg + 1, df, drift, trend, order);
 
-//    B_DataDelete("_DF", VARIABLES);
-
-    if(df) {
+    if(df) 
+    {
         E_GetLecName(arg + lg + 1, name);
+        std::string str_name = to_lower(std::string(name));
+        sprintf(name, "%s", str_name.c_str());
         sprintf(buf, "df_%s %lf", name, df[2]);
         B_DataUpdate(buf, SCALARS);
     }
