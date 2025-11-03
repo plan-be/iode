@@ -34,7 +34,7 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
     int     i;
 
     for (i = 0; i < cl->nb_names; i++) {
-        if (L_ISCOEF(cl->lnames[i].name))
+        if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = L_findscl(dbs, cl->lnames[i].name);
         else
             cl->lnames[i].pos = L_findvar(dbv, cl->lnames[i].name);
@@ -177,7 +177,7 @@ static void L_link1_endos(KDB* dbe, CLEC* cl)
     int     i;
 
     for (i = 0; i < cl->nb_names; i++) {
-        if (L_ISCOEF(cl->lnames[i].name))
+        if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
             cl->lnames[i].pos = dbe->find(cl->lnames[i].name);

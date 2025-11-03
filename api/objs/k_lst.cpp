@@ -110,7 +110,7 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
 
     if(cl == 0) return;
     for(j = 0 ; j < cl->nb_names ; j++) {
-        if(L_ISCOEF(cl->lnames[j].name))
+        if(is_coefficient(cl->lnames[j].name))
             K_add(scal, cl->lnames[j].name, NULL, &rc);
         else {
             if(dbe != NULL

@@ -643,7 +643,7 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
     for(j = 0 ; j < clec->nb_names ; j++) {
         sname = clec->lnames[j].name;
         buf[0] = 0;
-        if(coefs && L_ISCOEF(sname)) {
+        if(coefs && is_coefficient(sname)) {
             pos = KS_WS->find(sname);
             if(pos >= 0) {
                 scl = KSVAL(KS_WS, pos);
@@ -726,7 +726,7 @@ int B_PrintEqs(char* name, Equation* eq)
         memcpy(clec, eq->clec, eq->clec->tot_lg);
         for(j = 0 ; j < clec->nb_names ; j++) {
             sname = clec->lnames[j].name;
-            if(L_ISCOEF(sname)) {
+            if(is_coefficient(sname)) {
                 pos = KS_WS->find(sname);
                 if(pos < 0)
                     B_PrintDefSclPtr(0L, sname, 3);

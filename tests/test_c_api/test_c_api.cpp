@@ -682,12 +682,14 @@ public:
 	    //B_WsLoad(fullfilename, VARIABLES);
 	
 	    // Dickey-Fuller test (E_UnitRoot)
-	    // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
+	    // $StatUnitRoot drift trend order expression
 	    sprintf(arg, "%d %d %d %s", drift, trend, order, varname);
 	    rc = B_StatUnitRoot(arg);
-	    sprintf(scalar, "df_%s", varname);
-	    df = U_test_calc_lec(scalar, 0);
         EXPECT_EQ(rc, 0);
+
+        std::string str_scalar = "df_" + to_lower(std::string(varname));
+	    sprintf(scalar, "%s", str_scalar.c_str());
+	    df = U_test_calc_lec(scalar, 0);
 	    EXPECT_DOUBLE_EQ(df, expected_df);
 	    return true;
 	}

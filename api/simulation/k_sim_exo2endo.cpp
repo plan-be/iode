@@ -91,7 +91,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     poseq = KE_poseq(posendo);
     clec = KECLEC(KSIM_DBE, poseq);
     for(j = 0; j < clec->nb_names; j++) {
-        if(L_ISCOEF(clec->lnames[j].name)) continue;
+        if(is_coefficient(clec->lnames[j].name)) continue;
         if((clec->lnames[j]).pos == posexo) {
             KSIM_POSXK[poseq] = posexo;
             KSIM_POSXK_REV[posexo] = poseq;
@@ -105,7 +105,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
         eclec = KECLEC(KSIM_DBE, poseq);            
         clec = (CLEC *)SW_nalloc(eclec->tot_lg);
         memcpy(clec, eclec, eclec->tot_lg);
-        if(L_ISCOEF(clec->lnames[j].name)) continue;
+        if(is_coefficient(clec->lnames[j].name)) continue;
         posseq = KE_poseq((clec->lnames[j]).pos);
 
         /* if same endo, variable exo or endo already exchanged continue */

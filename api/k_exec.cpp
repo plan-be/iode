@@ -147,7 +147,7 @@ static KDB *KI_series_list(KDB* dbi)
         nb_names = clec->nb_names;
 
         for(j = 0; j < nb_names; j++) {
-            if(L_ISCOEF(lname[j].name)) continue;
+            if(is_coefficient(lname[j].name)) continue;
             SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) lname[j].name);
         }
     }
@@ -194,7 +194,7 @@ static KDB *KI_scalar_list(KDB* dbi)
         nb_names = tclec->nb_names;
         for(j = 0 ; j < nb_names ; j++) 
         {
-            if(!L_ISCOEF(lname[j].name)) 
+            if(!is_coefficient(lname[j].name)) 
                 continue;
             K_add_entry(dbs, lname[j].name);
         }
