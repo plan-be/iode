@@ -27,7 +27,7 @@ std::string KDBIdentities::get_lec(const int pos) const
 std::string KDBIdentities::get_lec(const std::string& name) const
 {
     // throw exception if object with passed name does not exist
-    int pos = find(name);
+    int pos = index_of(name);
     return get_lec(pos);
 }
 

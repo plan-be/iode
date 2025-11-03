@@ -193,7 +193,7 @@ int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
 
     for(j = 0 ; j < clec->nb_names ; j++) {
         name = clec->lnames[j].name;
-        if(is_coefficient(name) && dbs->find(name) < 0)
+        if(is_coefficient(name) && dbs->index_of(name) < 0)
             K_add(dbs, name, NULL);
     }
     return(0);

@@ -78,7 +78,7 @@ char* K_optr(KDB *kdb, char* name, int n)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);       // name not found
     return(K_oval(kdb, pos, n));
 }    
@@ -109,7 +109,7 @@ char* K_optr0(KDB *kdb, char* name)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);       // name not found
     return(K_oval0(kdb, pos));
 }    
@@ -141,7 +141,7 @@ char* K_optr1(KDB *kdb, char* name)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);       // name not found
     return(K_oval1(kdb, pos));
 }    
@@ -175,7 +175,7 @@ double *K_vptr(KDB* kdb, char* name, int t)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);         // name not found
     return(K_vval(kdb, pos, t));
 }
@@ -193,7 +193,7 @@ Equation* K_eptr(KDB* kdb, char* name)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);         // name not found
     return KEVAL(kdb, pos);
 }
@@ -210,7 +210,7 @@ Table* K_tptr(KDB* kdb, char* name)
 {
     int pos;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(NULL);         // name not found
     return(K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)));
 }
@@ -226,7 +226,7 @@ Table* K_tptr(KDB* kdb, char* name)
  */
 double K_etest(KDB* kdb, char*name, int test_nb)
 {   
-    int pos = kdb->find(name);
+    int pos = kdb->index_of(name);
     if(pos < 0) return(IODE_NAN);         // name not found
     
     std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, pos);
@@ -261,7 +261,7 @@ double K_s_get_info(KDB* kdb, char*name, int info_nb)
     Scalar     *scl;
     double  val = IODE_NAN;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(IODE_NAN);         // name not found
     
     scl = KSVAL(kdb, pos);
@@ -300,7 +300,7 @@ int K_s_set_info(KDB* kdb, char*name, int info_nb, double value)
     int     pos;
     Scalar     *scl;
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) return(-1);         // name not found
     
     scl = KSVAL(kdb, pos);

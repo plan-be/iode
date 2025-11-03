@@ -49,7 +49,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
     {
         for(j = 0 ; j < clec->nb_names ; j++) 
         {
-            pos = K_WS[SCALARS]->find(clec->lnames[j].name);
+            pos = K_WS[SCALARS]->index_of(clec->lnames[j].name);
             if(is_coefficient(clec->lnames[j].name) && KSVAL(K_WS[SCALARS], pos)->relax != 0)
                     SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) clec->lnames[j].name);
         }
@@ -243,7 +243,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     if(eqs == NULL) 
         return(0.0);
     
-    pos = K_WS[EQUATIONS]->find(eqs[0]);
+    pos = K_WS[EQUATIONS]->index_of(eqs[0]);
     if(pos < 0) 
         return(0.0);
 

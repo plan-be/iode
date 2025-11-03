@@ -249,7 +249,7 @@ int B_DataCalcVar(char* arg, int unused)
     SCR_strip((unsigned char*) lec);
 
     nb = kdb->sample->nb_periods;
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) 
         pos = K_add(kdb, name, NULL, &nb);
     if(pos < 0) 
@@ -294,7 +294,7 @@ int B_DataCreate_1(char* arg, int* ptype)
     char    deflt[41];
     KDB     *kdb = K_WS[*ptype];
 
-    if(kdb->find(arg) >= 0) return(-1);
+    if(kdb->index_of(arg) >= 0) return(-1);
 
     switch(*ptype) {
         case COMMENTS :
@@ -359,7 +359,7 @@ int B_DataDelete_1(char* arg, int* ptype)
     int     pos;
     KDB     *kdb = K_WS[*ptype];
 
-    pos = kdb->find(arg);
+    pos = kdb->index_of(arg);
     if(pos < 0 || K_del(kdb, pos) < 0) {
         error_manager.append_error("Failed to delete '" + std::string(arg) + "'");
         return(-1);
@@ -503,11 +503,11 @@ int B_DataUpdate(char* arg, int type)
     char    name[K_MAX_NAME + 1], **args = NULL;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos < 0) {
         if(B_DataCreate(name, type)) 
             return(-1);
-        pos = kdb->find(name);
+        pos = kdb->index_of(name);
     }
 
     switch(type) {
@@ -802,7 +802,7 @@ int B_DataListSort(char* arg, int unused)
         out = args[1];
     }
 
-    p = KL_WS->find(in);
+    p = KL_WS->index_of(in);
 
     if(p < 0) {
         error_manager.append_error("List '" + std::string(args[0]) + 
@@ -918,7 +918,7 @@ int B_DataExist(char* arg, int type)
 {
     KDB     *kdb = K_WS[type];
 
-    return(kdb->find(arg));
+    return(kdb->index_of(arg));
 }
 
 
@@ -958,7 +958,7 @@ int B_DataAppend(char* arg, int type)
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     text = arg + lg + 1;
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
 
     if(pos < 0)
         nptr = text;
@@ -1110,8 +1110,8 @@ int B_DataCalcLst(char* arg, int unused)
     op   = args[2];
     list2 = args[3];
 
-    p1 = K_WS[LISTS]->find((char*) list1);
-    p2 = K_WS[LISTS]->find((char*) list2);
+    p1 = K_WS[LISTS]->index_of((char*) list1);
+    p2 = K_WS[LISTS]->index_of((char*) list2);
     if(p1 < 0 || p2 < 0) {
         std::string error_msg = "List '";
         error_msg += (p1 < 0) ? std::string((char*) list1) : std::string((char*) list2);
@@ -1163,7 +1163,7 @@ int B_DataListCount(char* arg, int unused)
     char    *lst,
             **lsti = NULL;
 
-    lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, KL_WS->find(arg)));
+    lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, KL_WS->index_of(arg)));
     if(lst == NULL) return(-1);
 
     lsti = B_ainit_chk(lst, NULL, 0);
@@ -1259,7 +1259,7 @@ int B_DataCompare(char* arg, int type)
         }
 
         if(rc > 2) 
-            K_del(kdb2, kdb2->find(name)) ;
+            K_del(kdb2, kdb2->index_of(name)) ;
     }
 
     for(i = 0; i < kdb2->size(); i++) 

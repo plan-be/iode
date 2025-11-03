@@ -55,11 +55,11 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     if(kdb1 == kdb2 && strcmp(name1, name2) == 0) 
         return(-2);   // ALD 19/09/2022
 
-    pos1 = kdb1->find(name1);
+    pos1 = kdb1->index_of(name1);
     if(pos1 < 0) 
         return(-1);
 
-    pos2 = kdb2->find(name2);
+    pos2 = kdb2->index_of(name2);
     if(pos2 >= 0) 
     {
         if(KSOVAL(kdb2, pos2) != 0) 
@@ -68,7 +68,7 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     else 
     {
         pos2 = K_add_entry(kdb2, name2);
-        pos1 = kdb1->find(name1);
+        pos1 = kdb1->index_of(name1);
     }
 
     if(pos2 < 0) 
@@ -109,20 +109,20 @@ int K_ren(KDB* kdb, char* name1, char* name2)
     int     pos1, pos2;
 
     if(kdb == NULL) return(-1);
-    pos1 = kdb->find(name1);
+    pos1 = kdb->index_of(name1);
     if(pos1 < 0) return(-1);
 
-    pos2 = kdb->find(name2);
+    pos2 = kdb->index_of(name2);
     if(pos2 >= 0) return(-2);
 
     pos2 = K_add_entry(kdb, name2);
     if(pos2 < 0) return(-3);
-    pos1 = kdb->find(name1); /* object name1 may have changed after add name2 */
+    pos1 = kdb->index_of(name1); /* object name1 may have changed after add name2 */
 
     KSOVAL(kdb, pos2) = KSOVAL(kdb, pos1);
     K_del_entry(kdb, pos1);
     
-    pos2 = kdb->find(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
+    pos2 = kdb->index_of(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
     
     return(pos2);
 }
@@ -162,7 +162,7 @@ int K_add_entry(KDB* kdb, char* newname)
     if(K_key(name, kdb->k_mode) < 0) 
         return(-1);
     
-    pos = kdb->find(name);
+    pos = kdb->index_of(name);
     if(pos >= 0) 
     {
         if(K_WARN_DUP)
@@ -293,7 +293,7 @@ int K_del(KDB* kdb, int pos)
  
 int K_del_by_name(KDB* kdb, char* name)
 {
-    return(K_del(kdb, kdb->find(name))); 
+    return(K_del(kdb, kdb->index_of(name))); 
 }
 
 
@@ -340,7 +340,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    pos = KE_WS->find(name);
+    pos = KE_WS->index_of(name);
     if(pos < 0)
     {
         Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();

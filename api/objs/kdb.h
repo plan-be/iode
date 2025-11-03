@@ -166,7 +166,7 @@ public:
         return this->k_nb;
     }
 
-    int find(const char* name) const;
+    int index_of(const char* name) const;
 
     int duplicate(const KDB& other, char* name);
 };

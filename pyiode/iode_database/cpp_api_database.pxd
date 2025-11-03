@@ -75,7 +75,7 @@ cdef extern from "api/all.h":
         char      k_db_type
         string    filepath
 
-        int find(char* name)
+        int index_of(char* name)
 
 
     # k_objfile.c
@@ -161,7 +161,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
 
         KDB* get_database() except +
 
-        int find(string& name)
+        int index_of(string& name)
 
         string get_filename() const
         void set_filename(string& filename) except +

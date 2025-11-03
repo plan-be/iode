@@ -97,7 +97,7 @@ char* ExportObjsDIF::extract_comment(KDB* dbc, char* name, char **cmt)
 {
     int pos;
 
-    pos = dbc->find(name);
+    pos = dbc->index_of(name);
     if(pos >= 0)
         return(write_pre_post("1,0\n\"", "\"\n", KCVAL(dbc, pos), cmt));
     else

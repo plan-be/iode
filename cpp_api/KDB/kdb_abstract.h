@@ -108,14 +108,14 @@ public:
         kdb->description = utf8_to_oem(description);
     }
 
-    int find(const std::string& name) const
+    int index_of(const std::string& name) const
     {
         check_name(name, k_type);
 
         KDB* kdb = get_database();
         int pos = -1;
         if(kdb != NULL) 
-            pos = kdb->find(to_char_array(name));
+            pos = kdb->index_of(to_char_array(name));
         if(pos < 0) 
             throw std::invalid_argument("Cannot get the position of the object named '" + name + 
                                         "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
@@ -150,7 +150,7 @@ public:
     { 
         KDB* kdb = get_database();
         if(kdb != NULL)
-            return kdb->find(to_char_array(name)) >= 0; 
+            return kdb->index_of(to_char_array(name)) >= 0; 
         else
             return false;
     }

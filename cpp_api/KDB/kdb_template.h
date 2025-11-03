@@ -8,7 +8,7 @@ private:
     bool check_object_already_exists(KDB* kdb, const std::string& name)
     {
         char* c_name = to_char_array(name);
-        return kdb->find(c_name) >= 0;
+        return kdb->index_of(c_name) >= 0;
     }
 
 protected:
@@ -115,7 +115,7 @@ public:
     T get(const std::string& name) const
     {
         // throw exception if object with passed name does not exist
-        int pos = find(name);
+        int pos = index_of(name);
         return get_unchecked(pos);
     }
 

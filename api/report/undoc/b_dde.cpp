@@ -532,7 +532,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                         SCR_free(res);
                     }
                     else {
-                        objnb = kdb->find((char*) lst[i]);
+                        objnb = kdb->index_of((char*) lst[i]);
                         if(objnb < 0) continue;
 
                         res = IodeDdeCreateSeries(objnb, 0);
@@ -556,7 +556,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
 
             else {
                 for(i = 0 ; lst[i] ; i++) {
-                    objnb = kdb->find((char*) lst[i]);
+                    objnb = kdb->index_of((char*) lst[i]);
                     if(objnb < 0) continue;
                     res = IodeDdeCreateObj(objnb, type, &l, &h);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
@@ -597,7 +597,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(type < 0 || type > 6) return((char*) SCR_stracpy((unsigned char*) "Error"));
     kdb = K_WS[type];
     if(type == SCALARS) SCR_lower((unsigned char*) szItem);
-    objnb = kdb->find(szItem);
+    objnb = kdb->index_of(szItem);
     if(objnb < 0) return((char *)0);
 
     switch(type) {
@@ -995,7 +995,7 @@ int B_ExcelSet(char *arg, int type)
     args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
     nb_args = SCR_tbl_size((unsigned char**) args);
 
-    pos = kdb->find(args[0]);
+    pos = kdb->index_of(args[0]);
     if(pos < 0) goto the_end;
 
     item = args[nb_args - 1];

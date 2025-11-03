@@ -217,7 +217,7 @@ static KDB *KI_scalar_list(KDB* dbi)
 // 
 //     //for(i = dbv->size() - 1; i >= 0 ; i--) {
 //     for(i = 0 ; i < dbv->size() ; i++) {
-//         pos = dbi->find(KONAME(dbv, i));
+//         pos = dbi->index_of(KONAME(dbv, i));
 //         if(pos < 0) {
 //             K_del(dbv, i);
 //             i--;
@@ -246,7 +246,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
     nbres = 0;
     objsnb = (int *) SW_nalloc(sizeof(long) * dbv->size());
     for(i = 0 ; i < dbv->size(); i++) {
-        pos = dbi->find(KONAME(dbv, i));
+        pos = dbi->index_of(KONAME(dbv, i));
         if(pos >= 0) {
             objsnb[i] = 1; 
             nbres++;
@@ -313,7 +313,7 @@ static int *KI_reorder(KDB* dbi)
             nb_names = clec->nb_names;
             for(j = 0 ; j < nb_names ; j++) {
                 if(strcmp(KONAME(dbi, i), lname[j].name) == 0) continue;
-                pos = dbi->find(lname[j].name);
+                pos = dbi->index_of(lname[j].name);
                 if(pos < 0) continue;
                 if(mark[pos]) continue;
                 break;
@@ -372,7 +372,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
-        pos = dbv_tmp->find(KONAME(dbv, j));
+        pos = dbv_tmp->index_of(KONAME(dbv, j));
         if(pos >= 0) 
             nb_vars_to_read++;
     }
@@ -416,7 +416,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
-        pos = dbv_tmp->find(KONAME(dbv, j));
+        pos = dbv_tmp->index_of(KONAME(dbv, j));
         if(pos < 0) 
             continue;
         if(KSOVAL(dbv_tmp, pos) == 0 || KGOVAL(dbv_tmp, pos) == 0)
@@ -554,7 +554,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
             if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
 
             // series = identity ("endogenous") => creates an IODE_NAN VA
-            if(dbi->find(KONAME(dbv, i)) >= 0) 
+            if(dbi->index_of(KONAME(dbv, i)) >= 0) 
             {          
                 K_add(dbv, KONAME(dbv, i), NULL, &dim);      
                 continue;
@@ -596,7 +596,7 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
     for(j = 0 ; j < dbs->size(); j++) {
         if(KSOVAL(dbs, j) != 0) continue;
 
-        pos = dbs_tmp->find(KONAME(dbs, j));
+        pos = dbs_tmp->index_of(KONAME(dbs, j));
         if(pos < 0) continue;
 
         KSOVAL(dbs, j) = KS_alloc_scl();
@@ -714,7 +714,7 @@ KDB     *dbv,  *dbi;
 
     nb = dbv->sample->nb_periods;
     for(i = 0; i < dbi->size(); i++)  {
-	if(dbv->find(KONAME(dbi, i)) < 0) {
+	if(dbv->index_of(KONAME(dbi, i)) < 0) {
 	    K_add(dbv, KONAME(dbi, i), NULL, &nb);
 	    }
     }
@@ -753,7 +753,7 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, KICLEC(dbi, order[i]), tot_lg);
         if(L_link(dbv, dbs, (CLEC *)tmp)) return(-1);
-        pos = dbv->find(KONAME(dbi, order[i]));
+        pos = dbv->index_of(KONAME(dbi, order[i]));
         for(t = start ; t < start + smpl->nb_periods ; t++) {
             d = L_exec(dbv, dbs, (CLEC *)tmp, t);
             *(KVVAL(dbv, pos, t)) = d;

@@ -204,7 +204,7 @@ cdef int c_XodeRuleImport_super(char* arg, int unused):
 
 cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* name):
     cdef int success = 0
-    cdef int pos = KT_WS.find(name)
+    cdef int pos = KT_WS.index_of(name)
     cdef bytes b_table_name = name
     cdef bytes b_generalized_sample = smpl
     
