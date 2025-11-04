@@ -407,11 +407,13 @@ Push the tag to Github: git push origin <tag_name>.
 Build the *iode* (for all supported python versions) and *iode_gui* Python packages:
 ```bash
 root_dir_iode> cd pyiode
+pyiode> del dist\*
 pyiode> conda activate py3xx
 pyiode> python -m build --sdist --wheel
 ```
 ```bash
 root_dir_iode> cd gui
+gui> del dist\*
 gui> python -m build --sdist --wheel
 ```
 
