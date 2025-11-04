@@ -668,11 +668,11 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    char* name;
+    std::string name;
     for(i = 0 ; i < kdb->size(); i++) 
     {
-        name = KONAME(kdb, i);
-        fprintf(fd, "%s {", name);
+        name = kdb->get_name(i);
+        fprintf(fd, "%s {", name.c_str());
         tbl = KTVAL(kdb, i);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");

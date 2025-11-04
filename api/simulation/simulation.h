@@ -277,5 +277,5 @@ private:
 
 /* ---------------------- MACROS ---------------------- */
 
-#define KSIM_VAL(i, t)      *(KVVAL(KSIM_DBV, KSIM_POSXK[i], t))  // Value of endo[i] in period nb t
-#define KSIM_NAME(i)        (KONAME(KSIM_DBV, KSIM_POSXK[i]))     // Name  of the endogenous of equation i (possibly after endo-exo)  
+#define KSIM_VAL(i, t)      *(KVVAL(KSIM_DBV, KSIM_POSXK[i], t))  		// Value of endo[i] in period nb t
+#define KSIM_NAME(i)        (KSIM_DBV->k_objs[KSIM_POSXK[i]].o_name)  	// Name  of the endogenous of equation i (possibly after endo-exo)  

@@ -170,7 +170,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
     endo = KE_poseq(posendo);
     if(endo < 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posendo));
+        error_msg += std::string(KSIM_DBV->get_name(posendo));
         error_msg += " : no such equation in the Equations workspace";
         error_manager.append_error(error_msg);
         return(-1);
@@ -178,7 +178,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
 
     if(KE_poseq(posexo) >= 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posexo));
+        error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " already endogeneous";
         error_manager.append_error(error_msg);
         return(-1);
@@ -189,8 +189,8 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
     exo = KE_findpath(posendo, posexo, &depth);
     if(exo < 0) {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KONAME(KSIM_DBV, posendo)) + "-"; 
-        error_msg += std::string(KONAME(KSIM_DBV, posexo));
+        error_msg += std::string(KSIM_DBV->get_name(posendo)) + "-"; 
+        error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " no exchange possible";
         error_manager.append_error(error_msg);
         return(-1);

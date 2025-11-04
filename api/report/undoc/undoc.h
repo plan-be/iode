@@ -165,7 +165,7 @@ inline int B_EQS_LEC;      // Specify how to print a LEC expression
 int B_PrintVal(double );
 double B_calc_ttest(Scalar *);
 int B_replesc(unsigned char *,unsigned char *);
-int B_PrintDefGnl(char *,char *);
+int B_PrintDefGnl(const std::string&, char *);
 int B_isdef(char* arg);
 int B_dump_str(unsigned char *,unsigned char *);
 int B_PrintObjTblTitle(char* arg, int unused=-1);
@@ -182,9 +182,9 @@ int B_PrintDefCmt(KDB *,int );
 int B_PrintDefLst(KDB *,int );
 int B_PrintDefIdt(KDB *,int );
 int B_PrintDefEqs(KDB *,int );
-int B_PrintLec(char*, char*, CLEC*, int);
-int B_PrintEqs(char*, Equation*);
-int B_PrintDefSclPtr(Scalar *,char *,int );
+int B_PrintLec(std::string&, char*, CLEC*, int);
+int B_PrintEqs(std::string&, Equation*);
+int B_PrintDefSclPtr(Scalar*, std::string&, int);
 int B_PrintDefScl(KDB *,int );
 int B_PrintDefVar(KDB *,int );
 

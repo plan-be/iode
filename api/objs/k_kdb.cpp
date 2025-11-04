@@ -142,7 +142,7 @@ int K_key(char* name, int mode)
  *                              -1 if not found or if the name does not comply to the rules of kdb->k_type.
  */
  
-int KDB::index_of(const char* name) const
+int KDB::index_of(const std::string& name) const
 {
     char    *res;
     ONAME   oname;
@@ -150,7 +150,7 @@ int KDB::index_of(const char* name) const
     if(this->size() == 0) 
         return(-1);
 
-    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name, K_MAX_NAME);  
+    SCR_strlcpy((unsigned char*) oname, (unsigned char*) name.c_str(), K_MAX_NAME);  
     if(K_key(oname, this->k_mode) < 0) 
         return(-1);
 
@@ -342,8 +342,8 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
 
     if(kdb1 == NULL || kdb2 == NULL) return(-1);
     for(i = 0; i < kdb2->size(); i++) {
-        pos = kdb1->index_of(KONAME(kdb2, i));
-        if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
+        pos = kdb1->index_of(kdb2->get_name(i));
+        if(pos < 0) pos = K_add_entry(kdb1, (char*) kdb2->get_name(i).c_str());
         else {
             if(!replace) continue;
             SW_free(KSOVAL(kdb1, pos));

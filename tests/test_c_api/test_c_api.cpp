@@ -2223,7 +2223,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
 
     // check equation->endo == equation name
     for(int i = 0; i < KE_WS->size(); i++)
-        ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KONAME(KE_WS, i)));
+        ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KE_WS->get_name(i)));
 
     U_test_reset_kmsg_msgs();
 }

@@ -69,7 +69,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
         n = kdb->size();
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
         for(i = 0; i < n ; i++) 
-            lst[i] = (char*) SCR_stracpy((unsigned char*) KONAME(kdb, i));
+            lst[i] = (char*) SCR_stracpy((unsigned char*) kdb->get_name(i).c_str());
         return(lst);
     }
 
@@ -79,7 +79,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     {
         found = 0;
         if(names) 
-            found = !SCR_grep_gnl(pattern, KONAME(kdb, i), ecase, all);
+            found = !SCR_grep_gnl(pattern, (char*) kdb->get_name(i).c_str(), ecase, all);
 
         if(!found) 
         {
@@ -146,7 +146,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
         }
 
         if(found) 
-            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) KONAME(kdb, i));
+            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) kdb->get_name(i).c_str());
     }
 
     if(lst != NULL) 

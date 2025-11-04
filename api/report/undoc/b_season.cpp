@@ -86,7 +86,7 @@ int B_season(char* arg)
         if(!DS_test(t_vec, nb, &beg, &dim, nbper, &scale)) {
             memcpy(t_vec,
                    KVVAL(from, i, 0) + shift, nb * sizeof(double));
-            K_add(to, KONAME(from, i), t_vec, &(nb));
+            K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
             continue;
         }
 
@@ -95,12 +95,12 @@ int B_season(char* arg)
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper,
                 season, scale);
 
-        K_add(to, KONAME(from, i), t_vec, &(nb));
+        K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
 
-        sprintf(name, "_C%s", KONAME(from, i));
+        sprintf(name, "_C%s", from->get_name(i).c_str());
         K_add(to, name, c_vec, &(nb));
 
-        sprintf(name, "_I%s", KONAME(from, i));
+        sprintf(name, "_I%s", from->get_name(i).c_str());
         K_add(to, name, i_vec, &(nb));
     }
     KV_merge(KV_WS, to, 1);

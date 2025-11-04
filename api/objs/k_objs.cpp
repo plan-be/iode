@@ -219,7 +219,7 @@ done :
     }
 
     lg = std::min((int) strlen(name), K_MAX_NAME);
-    memcpy(KONAME(kdb, maxpos), name, lg + 1);
+    memcpy(kdb->k_objs[maxpos].o_name, name, lg + 1);
     KSOVAL(kdb, maxpos) = 0;
 
     kdb->k_nb++;

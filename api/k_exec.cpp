@@ -141,7 +141,7 @@ static KDB *KI_series_list(KDB* dbi)
 
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
     for(i = 0; i < dbi->size(); i++) {
-        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) KONAME(dbi, i));
+        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) dbi->get_name(i).c_str());
         clec = KICLEC(dbi, i);
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
@@ -217,7 +217,7 @@ static KDB *KI_scalar_list(KDB* dbi)
 // 
 //     //for(i = dbv->size() - 1; i >= 0 ; i--) {
 //     for(i = 0 ; i < dbv->size() ; i++) {
-//         pos = dbi->index_of(KONAME(dbv, i));
+//         pos = dbi->index_of(dbv->get_name(i));
 //         if(pos < 0) {
 //             K_del(dbv, i);
 //             i--;
@@ -246,7 +246,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
     nbres = 0;
     objsnb = (int *) SW_nalloc(sizeof(long) * dbv->size());
     for(i = 0 ; i < dbv->size(); i++) {
-        pos = dbi->index_of(KONAME(dbv, i));
+        pos = dbi->index_of(dbv->get_name(i));
         if(pos >= 0) {
             objsnb[i] = 1; 
             nbres++;
@@ -304,35 +304,43 @@ static int *KI_reorder(KDB* dbi)
     order = (int *)SW_nalloc(sizeof(int) * nb);
     mark  = SW_nalloc(nb);
 
-    while(nb_order < nb) {
+    while(nb_order < nb) 
+    {
         mod = 0;
-        for(i = 0; i < nb ; i++) {
-            if(mark[i]) continue;
+        for(i = 0; i < nb ; i++) 
+        {
+            if(mark[i]) 
+                continue;
             clec = KICLEC(dbi, i);
             lname    = clec->lnames;
             nb_names = clec->nb_names;
-            for(j = 0 ; j < nb_names ; j++) {
-                if(strcmp(KONAME(dbi, i), lname[j].name) == 0) continue;
+            for(j = 0 ; j < nb_names ; j++) 
+            {
+                if(strcmp(dbi->get_name(i).c_str(), lname[j].name) == 0) 
+                    continue;
                 pos = dbi->index_of(lname[j].name);
                 if(pos < 0) continue;
                 if(mark[pos]) continue;
                 break;
             }
 
-            if(j == nb_names) {
+            if(j == nb_names) 
+            {
                 mark[i] = mod = 1;
                 order[nb_order++] = i;
             }
         }
 
-        if(mod == 0) {
+        if(mod == 0) 
+        {
             /* IDENTITIES LOOP */
             if(KEXEC_TRACE) { /* GB TRACE */
-                for(i = 0; i < nb; i++) {
+                for(i = 0; i < nb; i++) 
+                {
                     if(mark[i])
-                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", KONAME(dbi, i));
+                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi->get_name(i));
                     else
-                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", KONAME(dbi, i));
+                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi->get_name(i));
                 }
             }
             SW_nfree(order);
@@ -372,7 +380,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
-        pos = dbv_tmp->index_of(KONAME(dbv, j));
+        pos = dbv_tmp->index_of(dbv->get_name(j));
         if(pos >= 0) 
             nb_vars_to_read++;
     }
@@ -416,19 +424,19 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;  /* series already present */
-        pos = dbv_tmp->index_of(KONAME(dbv, j));
+        pos = dbv_tmp->index_of(dbv->get_name(j));
         if(pos < 0) 
             continue;
         if(KSOVAL(dbv_tmp, pos) == 0 || KGOVAL(dbv_tmp, pos) == 0)
         {
-            kerror(0, "VAR %s could not be found in the workspace %s", KONAME(dbv, j));
+            kerror(0, "VAR %s could not be found in the workspace %s", dbv->get_name(j));
             return -1;
         }
         KSOVAL(dbv, j) = KV_alloc_var(vsmpl->nb_periods);
         memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp), 
                sizeof(double) * smpl.nb_periods);
         if(KEXEC_TRACE)
-            W_printf("%s ", KONAME(dbv, j));
+            W_printf("%s ", dbv->get_name(j));
         nb_found++;
     }
 
@@ -460,7 +468,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
     {
         if(KSOVAL(dbv, j) != 0) 
             continue;
-        SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) KONAME(dbv, j));
+        SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) dbv->get_name(j).c_str());
     }
     SCR_add_ptr((unsigned char***) &vars, &nbv, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
@@ -551,18 +559,20 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
         dim = dbv->sample->nb_periods;
         for(i = 0, j = 0 ; i < dbv->size() && j < 10; i++) 
         {
-            if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
+            // series already present in dbv
+            if(KSOVAL(dbv, i) != 0) 
+                continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN VA
-            if(dbi->index_of(KONAME(dbv, i)) >= 0) 
+            if(dbi->index_of(dbv->get_name(i)) >= 0) 
             {          
-                K_add(dbv, KONAME(dbv, i), NULL, &dim);      
+                K_add(dbv, (char*) dbv->get_name(i).c_str(), NULL, &dim);      
                 continue;
             }
             j++;
 
             // Exogenous series not found => error
-            error_manager.append_error("Variable '" + std::string(KONAME(dbv, i)) + "' not found");
+            error_manager.append_error("Variable '" + std::string(dbv->get_name(i)) + "' not found");
         }
 
         // all VARs found
@@ -596,12 +606,12 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
     for(j = 0 ; j < dbs->size(); j++) {
         if(KSOVAL(dbs, j) != 0) continue;
 
-        pos = dbs_tmp->index_of(KONAME(dbs, j));
+        pos = dbs_tmp->index_of(dbs->get_name(j));
         if(pos < 0) continue;
 
         KSOVAL(dbs, j) = KS_alloc_scl();
         memcpy(KSVAL(dbs, j), KSVAL(dbs_tmp, pos), sizeof(Scalar));
-        if(KEXEC_TRACE) W_printf("%s ", KONAME(dbs, j));
+        if(KEXEC_TRACE) W_printf("%s ", dbs->get_name(j));
         nb_found++;
     }
 
@@ -630,7 +640,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     {
         if(KSOVAL(dbs, j) != 0) 
             continue;
-        SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) KONAME(dbs, j));
+        SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) dbs->get_name(j).c_str());
     }
     SCR_add_ptr((unsigned char***) &scls, &nbs, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
@@ -669,13 +679,17 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
 {
     int     i, j, nbf, nb_found = 0;
 
-    if(nb == 0) {
+    if(nb == 0) 
+    {
         nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
-        if(nbf < 0) return(-1);
+        if(nbf < 0) 
+            return(-1);
         nb_found += nbf;
     }
-    else {
-        for(i = 0;  i < nb && nb_found < dbs->size(); i++) {
+    else 
+    {
+        for(i = 0;  i < nb && nb_found < dbs->size(); i++) 
+        {
             if(strcmp(files[i], "WS") == 0)
                 nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
             else
@@ -686,12 +700,16 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         }
     }
 
-    if(nb_found < dbs->size()) {
-        for(i = 0, j = 0 ; i < dbs->size() && j < 10; i++) {
-            if(KSOVAL(dbs, i) != 0) continue;  /* series already present */
+    if(nb_found < dbs->size()) 
+    {
+        for(i = 0, j = 0 ; i < dbs->size() && j < 10; i++) 
+        {
+            // series already present
+            if(KSOVAL(dbs, i) != 0) 
+                continue;
             j++;
 
-            error_manager.append_error("Scalar '" + std::string(KONAME(dbs, i)) + "' not found");
+            error_manager.append_error("Scalar '" + std::string(dbs->get_name(i)) + "' not found");
         }
 
         if(j == 10) 
@@ -701,26 +719,6 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
     }
     return(0);
 }
-
-
-/*
-    Adds to dbv series to be calculated (from dbi)
-*/
-/*
-KI_dbi_to_dbv(dbv, dbi)
-KDB     *dbv,  *dbi;
-{
-    int     i, nb, pos;
-
-    nb = dbv->sample->nb_periods;
-    for(i = 0; i < dbi->size(); i++)  {
-	if(dbv->index_of(KONAME(dbi, i)) < 0) {
-	    K_add(dbv, KONAME(dbi, i), NULL, &nb);
-	    }
-    }
-
-}
-*/
 
 
 /**
@@ -752,9 +750,11 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
         tot_lg = KICLEC(dbi, order[i])->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, KICLEC(dbi, order[i]), tot_lg);
-        if(L_link(dbv, dbs, (CLEC *)tmp)) return(-1);
-        pos = dbv->index_of(KONAME(dbi, order[i]));
-        for(t = start ; t < start + smpl->nb_periods ; t++) {
+        if(L_link(dbv, dbs, (CLEC *)tmp)) 
+            return(-1);
+        pos = dbv->index_of(dbi->get_name(order[i]));
+        for(t = start ; t < start + smpl->nb_periods ; t++) 
+        {
             d = L_exec(dbv, dbs, (CLEC *)tmp, t);
             *(KVVAL(dbv, pos, t)) = d;
         }

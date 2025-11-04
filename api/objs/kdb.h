@@ -166,7 +166,30 @@ public:
         return this->k_nb;
     }
 
-    int index_of(const char* name) const;
+    // strip the name and set it to upper/lower/asis according to k_mode
+    std::string to_key(const std::string& name) const
+    {
+        std::string key = trim(name);
+        switch(this->k_mode)
+        {
+            case UPPER_CASE :
+                return to_upper(key);
+            case LOWER_CASE :
+                return to_lower(key);
+            default :
+                return key;
+        }
+    }
+
+    int index_of(const std::string& name) const;
+
+    const std::string get_name(const int index) const
+    {
+        if(index < 0 || index >= this->size())
+            return "";
+
+        return std::string(this->k_objs[index].o_name);
+    }
 
     int duplicate(const KDB& other, char* name);
 };
@@ -242,7 +265,6 @@ inline char k_ext[][4] =
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)                 // name of the object
 #define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)                  // handle of the object in the scr4/swap memory
 #define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)
 

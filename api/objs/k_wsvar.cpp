@@ -122,9 +122,9 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
     nb1 = kdb1->sample->nb_periods;
     for(i = 0; i < kdb2->size(); i++) 
     {
-        pos = kdb1->index_of(KONAME(kdb2, i));
+        pos = kdb1->index_of(kdb2->get_name(i));
         if(pos < 0) 
-            pos = K_add(kdb1, KONAME(kdb2, i), NULL, &nb1);
+            pos = K_add(kdb1, (char*) kdb2->get_name(i).c_str(), NULL, &nb1);
         else if(!replace) 
             continue;
 
@@ -507,7 +507,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     ndbv->sample = new Sample(*edbv->sample);
     for(epos = 0; epos < edbv->size(); epos++) 
     {
-        strcpy(ename, KONAME(edbv, epos));
+        strcpy(ename, edbv->get_name(epos).c_str());
         if(K_aggr(pattern, ename, nname) < 0) 
             continue;
 

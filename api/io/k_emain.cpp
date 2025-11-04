@@ -213,17 +213,22 @@ int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfi
 
     EXP_set(na, sep);
 
-    if(dbv == NULL && dbc == NULL) goto err;
-    if(IMP_readrule(rulefile) < 0) goto err;
+    if(dbv == NULL && dbc == NULL) 
+        goto err;
+    
+    if(IMP_readrule(rulefile) < 0) 
+        goto err;
 
     rc = expdef->write_header(expdef, dbv, dbc, outfile);
     if(rc < 0)
         goto err;
 
     dim = dbv->sample->nb_periods;
-    for(i = 0; i < dbv->size(); i++) {
-        strcpy(iname, KONAME(dbv, i));
-        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
+    for(i = 0; i < dbv->size(); i++) 
+    {
+        strcpy(iname, dbv->get_name(i).c_str());
+        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
+            continue;
 
         expdef->write_object_name(oname, &code);
 
@@ -268,8 +273,11 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
     EXP_set(na, sep);
 
-    if(dbv == NULL && dbc == NULL) goto err;
-    if(IMP_readrule(rulefile) < 0) goto err;
+    if(dbv == NULL && dbc == NULL) 
+        goto err;
+
+    if(IMP_readrule(rulefile) < 0) 
+        goto err;
 
     rc = expdef->write_header(expdef, dbv, dbc, outfile);
     if(rc < 0) 
@@ -280,9 +288,11 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
 
     expdef->write_variable_and_comment(expdef, EXP_SEP, 0, 0);
 
-    for(i = 0; i < nc; i++) {
-        strcpy(iname, KONAME(dbv, i));
-        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
+    for(i = 0; i < nc; i++) 
+    {
+        strcpy(iname, dbv->get_name(i).c_str());
+        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
+            continue;
         expdef->write_object_name(oname, &code);
         expdef->write_variable_and_comment(expdef, code, 0, 0);
         SW_nfree(code);
@@ -297,9 +307,11 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* o
         sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(expdef, oname, 0, 0);
 
-        for(i = 0; i < nc; i++) {
-            strcpy(iname, KONAME(dbv, i));
-            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) continue;
+        for(i = 0; i < nc; i++) 
+        {
+            strcpy(iname, dbv->get_name(i).c_str());
+            if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
+                continue;
             expdef->get_variable_value(dbv, i, j, &code);
             expdef->write_variable_and_comment(expdef, code, 0, 0);
             SW_nfree(code);

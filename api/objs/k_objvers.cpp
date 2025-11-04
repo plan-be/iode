@@ -298,7 +298,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case EQUATIONS :
             opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
-            eq = K_eunpack(optr, KONAME(kdb, i));
+            eq = K_eunpack(optr, (char*) kdb->get_name(i).c_str());
             SW_free(opos);
             K_epack(&pack, (char*) eq, kdb->k_objs[i].o_name);
             delete eq;
@@ -313,7 +313,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case TABLES :
             opos = kdb->k_objs[i].o_val;
             optr = SW_getptr(opos);
-            tbl = K_tunpack(optr, KONAME(kdb, i));
+            tbl = K_tunpack(optr, (char*) kdb->get_name(i).c_str());
             SW_free(opos);
             pack = K_repack_tbl(tbl);
             delete tbl;
