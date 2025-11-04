@@ -5704,7 +5704,9 @@ class Variables(IodeDatabase):
                              f"Expected 'str', 'int' or 'float'.")
 
         data = self.to_numpy()
-
+        if data.ndim == 1:
+            data = data.reshape(1, len(data))
+        
         df = pd.DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name

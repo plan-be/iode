@@ -16,6 +16,10 @@ Improvements
 Fixed Bugs 
 ----------
 
+- PYTHON: fixed exporting a single variable as a pandas DataFrame raising the 
+  error 'ValueError: Shape of passed values is (x, 1), indices imply (1, x)' 
+  (closes :issue:`1089`)
+
 - GUI: fixed cells content not visible when editing an IODE table if Windows OS 
   is in dark mode (closes :issue:`1061`)
 - GUI: fixed interface closing after catching an error thrown when executing an 
