@@ -214,10 +214,10 @@ int RP_define_calcdepth(char *name)
 
     for(i = 0; i < RP_MACRO->size(); i++) 
     {
-        if(strncmp(buf, KONAME(RP_MACRO, i), lg) == 0) 
+        if(strncmp(buf, RP_MACRO->get_name(i).c_str(), lg) == 0) 
         {
             objpos = i;
-            depth = atoi(KONAME(RP_MACRO, i) + lg);
+            depth = atoi(RP_MACRO->get_name(i).c_str() + lg);
             if(depth > maxdepth) 
                 maxdepth = depth; // cas avec depth > 9
         }

@@ -943,7 +943,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_PrintVal(double val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
 |`double B_calc_ttest(Scalar* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
 |`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
-|`int B_PrintDefGnl(char* name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
+|`int B_PrintDefGnl(const std::string& name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
 |`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||
 |`int B_dump_str(unsigned char*head, unsigned char*txt)`|Print a header and a modified text: spaces are added before and after specific characters in the text|||
 |`int B_get1int(char* arg)`|Return the integer value of the beginning of a string.|||
@@ -962,9 +962,9 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_PrintDefLst(KDB* kdb, int pos)`|Print a list.|||
 |`int B_PrintDefIdt(KDB* kdb, int pos)`|Print a identity.|||
 |`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||
-|`int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
-|`int B_PrintEqs(char* name, Equation* eq)`|Print an equation and optionally its statistical tests.|||
-|`int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)`|Print a scalar in an enumeration list.|||
+|`int B_PrintLec(std::string& name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
+|`int B_PrintEqs(std::string& name, Equation* eq)`|Print an equation and optionally its statistical tests.|||
+|`int B_PrintDefSclPtr(Scalar* scl, std::string& name, int enum_)`|Print a scalar in an enumeration list.|||
 |`int B_PrintDefScl(KDB* kdb, int pos)`|Print the scalar kdb\[pos\].|||
 |`int B_PrintDefVar(KDB* kdb, int pos)`|Print the variable kdb\[pos\] in a table. Sub\-function of B\_PrintObjDef\_1().|||
 

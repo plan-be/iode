@@ -466,9 +466,9 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
     Equation* eq;
     for(int i = 0 ; i < kdb->size(); i++) 
     {
-        fprintf(fd, "%s ", KONAME(kdb, i));
+        fprintf(fd, "%s ", kdb->get_name(i).c_str());
         eq = KEVAL(kdb, i);
-        print_eq(fd, eq, KONAME(kdb, i));
+        print_eq(fd, eq, (char*) kdb->get_name(i).c_str());
         delete eq;
         eq = nullptr;
     }

@@ -812,5 +812,5 @@ Table* K_tptr(KDB* kdb, char* name);
 #define T_L(tbl)            (tbl->lines)
 #define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
 
-#define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val), KONAME(kdb, pos)) )
+#define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name))
 #define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated Table

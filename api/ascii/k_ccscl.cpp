@@ -181,7 +181,7 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
     }
 
     for(i = 0 ; i < kdb->size(); i++) {
-        fprintf(fd, "%s ", KONAME(kdb, i));
+        fprintf(fd, "%s ", kdb->get_name(i).c_str());
         scl = KSVAL(kdb, i);
         print_scl(fd, scl);
         fprintf(fd, "\n");

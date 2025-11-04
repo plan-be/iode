@@ -116,12 +116,12 @@ int B_replesc(unsigned char* out, unsigned char* in)
  *  @param [in] text    char*   object title of definition    
  *  @return             int     0
  */
-int B_PrintDefGnl(char* name, char* text)
+int B_PrintDefGnl(const std::string& name, char* text)
 {
     char    buf[80];
 
     //sprintf(buf, ".par1 enum_1\n\\b%s\\B : ", name);
-    sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name, A2M_ESCCH);  // JMP 10/04/2023
+    sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name.c_str(), A2M_ESCCH);  // JMP 10/04/2023
     B_dump_str((unsigned char*) buf, (unsigned char*) text);
     return(0);
 }
@@ -285,7 +285,8 @@ int B_PrintObjDef_1(char* arg, int* type)
     int     pos, rc = 0;
 
     kdb = K_WS[*type];
-    if((pos = kdb->index_of(arg)) == -1) 
+    pos = kdb->index_of(arg);
+    if(pos == -1) 
         goto err;
 
     kmsg("Printing %s ...", arg);
@@ -390,7 +391,7 @@ int B_PrintObjDefArgs(char* arg, int type)
     if(arg == 0 || arg[0] == 0)
         for(i = 0; i < K_WS[type]->size(); i++) 
         {
-            rc = B_PrintObjDef_1(KONAME(K_WS[type], i), &type);
+            rc = B_PrintObjDef_1((char*) K_WS[type]->get_name(i).c_str(), &type);
             if(rc) break;
         }
     else
@@ -422,15 +423,16 @@ int B_PrintObjDefArgs(char* arg, int type)
  */
 int B_PrintDefTbl(KDB* kdb, int pos)
 {
-    Table *tbl = NULL;
+    Table *tbl = KTVAL(kdb, pos);
 
-    if((tbl = KTVAL(kdb, pos)) == NULL) 
-        return(-1);
+    if(!tbl) 
+        return -1;
     
+    std::string name = kdb->get_name(pos);
     if(B_TABLE_TITLE) 
     {
         if(B_TABLE_TITLE == 1) 
-            W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl, false));
+            W_printfReplEsc("\n~b%s~B : %s\n", name.c_str(), T_get_title(tbl, false));
         else 
             W_printf("\n%s\n", T_get_title(tbl, false));
         
@@ -441,7 +443,7 @@ int B_PrintDefTbl(KDB* kdb, int pos)
     B_PrintRtfTopic((char*) T_get_title(tbl, false));
     W_printf(".tb %d\n", T_NC(tbl));
     W_printfRepl(".sep &\n");
-    W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
+    W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, name.c_str(), A2M_ESCCH);
     B_DumpTblDef(tbl);
     W_printf(".te\n");
 
@@ -570,7 +572,7 @@ int B_PrintTblCell(TableCell* cell, int straddle)
 // Print a comment.
 int B_PrintDefCmt(KDB* kdb, int pos)
 {
-    B_PrintDefGnl(KONAME(kdb, pos), KCVAL(kdb, pos));
+    B_PrintDefGnl(kdb->get_name(pos), KCVAL(kdb, pos));
     return(0);
 }
 
@@ -579,7 +581,7 @@ int B_PrintDefCmt(KDB* kdb, int pos)
 // Print a list.
 int B_PrintDefLst(KDB* kdb, int pos)
 {
-    B_PrintDefGnl(KONAME(kdb, pos), KLVAL(kdb, pos));
+    B_PrintDefGnl(kdb->get_name(pos), KLVAL(kdb, pos));
     return(0);
 }
 
@@ -588,10 +590,11 @@ int B_PrintDefLst(KDB* kdb, int pos)
 // Print an identity.
 int B_PrintDefIdt(KDB* kdb, int pos)
 {
-    char    *name = KONAME(kdb, pos), *tmp;
+    std::string name = kdb->get_name(pos);
+    char* tmp;
 
     tmp = SCR_malloc(K_MAX_NAME + 10 + (int)strlen(KILEC(kdb, pos))); /* IODE64K */
-    sprintf(tmp, "%s : %s", name, KILEC(kdb, pos));
+    sprintf(tmp, "%s : %s", name.c_str(), KILEC(kdb, pos));
     W_printf(".par1 enum_1\n");
     B_PrintLec(name, tmp, KICLEC(kdb, pos), B_EQS_LEC);
     SCR_free(tmp);
@@ -607,7 +610,8 @@ int B_PrintDefEqs(KDB* kdb, int pos)
     if(!eq) 
         return -1;
     
-    B_PrintEqs(KONAME(kdb, pos), eq);
+    std::string name = kdb->get_name(pos);
+    B_PrintEqs(name, eq);
     delete eq;
     eq = nullptr;
     return 0;
@@ -624,10 +628,10 @@ int B_PrintDefEqs(KDB* kdb, int pos)
  *  @return            int           0
  *  
  */
-int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
+int B_PrintLec(std::string& name, char* eqlec, CLEC* eqclec, int coefs)
 {
     CLEC    *clec;
-    Scalar     *scl;
+    Scalar  *scl;
     char    *lec, *sname, buf[80], tcoef[128], ttest[128];
     int     j, pos, lg;
 
@@ -638,14 +642,18 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
     clec = (CLEC *) SCR_malloc(eqclec->tot_lg + 1);
     memcpy(clec, eqclec, eqclec->tot_lg);
 
-    sprintf(buf, "%cb%s%cB", A2M_ESCCH, name, A2M_ESCCH);
-    SCR_replace_gnl((unsigned char*) lec, (unsigned char*) name, (unsigned char*) buf, (unsigned char*) "_\\");
-    for(j = 0 ; j < clec->nb_names ; j++) {
+    sprintf(buf, "%cb%s%cB", A2M_ESCCH, name.c_str(), A2M_ESCCH);
+    SCR_replace_gnl((unsigned char*) lec, (unsigned char*) name.c_str(), (unsigned char*) buf, 
+                    (unsigned char*) "_\\");
+    for(j = 0 ; j < clec->nb_names ; j++) 
+    {
         sname = clec->lnames[j].name;
         buf[0] = 0;
-        if(coefs && is_coefficient(sname)) {
+        if(coefs && is_coefficient(sname)) 
+        {
             pos = KS_WS->index_of(sname);
-            if(pos >= 0) {
+            if(pos >= 0) 
+            {
                 scl = KSVAL(KS_WS, pos);
                 // T_fmt_val(tcoef, scl->value, 9, -1); /* JMP 27-10-08 */
                 // T_fmt_val(ttest, B_calc_ttest(scl), 9, -1); /* JMP 27-10-08 */
@@ -655,8 +663,10 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
                 if(coefs == 2) sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef, ttest, A2M_ESCCH);
             }
         }
-        if(buf[0] == 0) sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname, A2M_ESCCH);
-        SCR_replace_gnl((unsigned char*) lec, (unsigned char*) sname, (unsigned char*) buf, (unsigned char*) "_\\");
+        if(buf[0] == 0) 
+            sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname, A2M_ESCCH);
+        SCR_replace_gnl((unsigned char*) lec, (unsigned char*) sname, (unsigned char*) buf, 
+                        (unsigned char*) "_\\");
     }
     B_dump_str((unsigned char*) " ", (unsigned char*) lec);
 
@@ -678,13 +688,14 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
  *  @param [in] eq    Equation*       equation struct 
  *  @return           int       0    
  */
-int B_PrintEqs(char* name, Equation* eq)
+int B_PrintEqs(std::string& name, Equation* eq)
 {
     CLEC    *clec;
-    char    buf[256], *sname;
+    char    buf[256];
     int     j, pos;
 
-    if(B_EQS_INFOS > 1) B_PrintRtfTopic(name);
+    if(B_EQS_INFOS > 1) 
+        B_PrintRtfTopic((char*) name.c_str());
     W_printf(".par1 enum_1\n");
 
     B_PrintLec(name, (char*) eq->lec.c_str(), eq->clec, B_EQS_LEC);
@@ -722,11 +733,15 @@ int B_PrintEqs(char* name, Equation* eq)
         W_printf("Durbin-Watson               : %f\n\n", eq->tests[EQ_DW]);
         W_printf("Log Likelihood              : %f\n\n", eq->tests[EQ_LOGLIK]);
         W_printf(".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
+        
         clec = (CLEC *) SW_nalloc(eq->clec->tot_lg + 1);
         memcpy(clec, eq->clec, eq->clec->tot_lg);
-        for(j = 0 ; j < clec->nb_names ; j++) {
-            sname = clec->lnames[j].name;
-            if(is_coefficient(sname)) {
+        std::string sname;
+        for(j = 0 ; j < clec->nb_names ; j++) 
+        {
+            sname = std::string(clec->lnames[j].name);
+            if(is_coefficient(sname)) 
+            {
                 pos = KS_WS->index_of(sname);
                 if(pos < 0)
                     B_PrintDefSclPtr(0L, sname, 3);
@@ -752,13 +767,14 @@ int B_PrintEqs(char* name, Equation* eq)
  *  @param [in] enum_ int       enum level 
  *  @return           int       -1 is scl is NULL, 0 otherwise
  */
-int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)
+int B_PrintDefSclPtr(Scalar* scl, std::string& name, int enum_)
 {
     double  ttest;
     char    tcoef[128], trelax[128], tstd[128], tttest[128];
 
-    W_printfReplEsc(".par1 enum_%d\n~b%s~B : ", enum_, name);
-    if(scl == NULL) {
+    W_printfReplEsc(".par1 enum_%d\n~b%s~B : ", enum_, name.c_str());
+    if(scl == NULL) 
+    {
         W_printf("?\n");
         return(-1);
     }
@@ -776,7 +792,8 @@ int B_PrintDefSclPtr(Scalar* scl, char*name, int enum_)
 // Print the scalar kdb[pos].
 int B_PrintDefScl(KDB* kdb, int pos)
 {
-    return(B_PrintDefSclPtr(KSVAL(kdb, pos), KONAME(kdb, pos),1));
+    std::string name = kdb->get_name(pos);
+    return(B_PrintDefSclPtr(KSVAL(kdb, pos), name, 1));
 }
 
 /*================================= VAR ================================*/
@@ -791,7 +808,7 @@ int B_PrintDefVar(KDB* kdb, int pos)
     smpl = kdb->sample;
     if(!smpl || smpl->nb_periods == 0) 
     {
-        std::string msg = "Cannot print the variable '" + std::string(KONAME(kdb, pos)) + "' because ";
+        std::string msg = "Cannot print the variable '" + std::string(kdb->get_name(pos)) + "' because ";
         msg += "the variable database has no sample defined";
         kwarning((char*) msg.c_str());
         return -1;
@@ -799,7 +816,7 @@ int B_PrintDefVar(KDB* kdb, int pos)
 
     if((val = KVVAL(kdb, pos, 0)) == NULL) 
         return (-1);
-    W_printfRepl("&1L%s ", KONAME(kdb, pos));
+    W_printfRepl("&1L%s ", kdb->get_name(pos));
     for(j = 0 ; j < smpl->nb_periods; j++, val++) 
     {
         W_printfRepl("&1D");

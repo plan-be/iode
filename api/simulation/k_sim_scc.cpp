@@ -140,9 +140,9 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
     for(i = 0 ; i < dbe->size(); i++) {
-        KSIM_POSXK[i] = dbv->index_of(KONAME(dbe,i));
+        KSIM_POSXK[i] = dbv->index_of(dbe->get_name(i));
         if(KSIM_POSXK[i] < 0) {
-            std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot find variable";
+            std::string error_msg = "'" + std::string(dbe->get_name(i)) + "': cannot find variable";
             error_manager.append_error(error_msg);
             rc = -1;
             goto fin;
@@ -150,7 +150,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
-            std::string error_msg = "'" + std::string(KONAME(dbe, i)) + "': cannot link equation";
+            std::string error_msg = "'" + std::string(dbe->get_name(i)) + "': cannot link equation";
             error_manager.append_error(error_msg);
             rc = -1;
             goto fin;

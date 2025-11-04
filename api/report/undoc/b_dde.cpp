@@ -156,7 +156,7 @@ char *IodeDdeGetWS(char *szItem)
         res = SCR_malloc((sizeof(ONAME) + 1) * (1 + kdb->size())); /* IODE64K */
         for(i = 0 ; i < kdb->size() ; i++) 
         {
-            strcat(res, KONAME(kdb, i));
+            strcat(res, kdb->get_name(i).c_str());
             strcat(res, "\t");
         }
         return(res);
@@ -194,7 +194,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     double  x;
 
     res = SCR_malloc(40 * (1 + kdb->sample->nb_periods - bt)); /* JMP 29-06-00 */
-    strcpy(res, KONAME(kdb, objnb));
+    strcpy(res, kdb->get_name(objnb).c_str());
     strcat(res, "\t");
     for(t = bt ; t < kdb->sample->nb_periods ; t++) 
     {
@@ -454,7 +454,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
 
         if(obj == 0) obj = " ";
         res = SCR_malloc((int)sizeof(ONAME) + 10 + (int)strlen(obj));
-        strcpy(res, KONAME(kdb, objnb));
+        strcpy(res, kdb->get_name(objnb).c_str());
         strcat(res, "\t");
         strcat(res, obj);
         /* strcat(res, "\t");*/

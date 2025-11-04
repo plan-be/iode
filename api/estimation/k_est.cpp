@@ -288,7 +288,7 @@ int Estimation::KE_est_s(Sample* smpl)
 
                 _lec = KELEC(KE_WS, pos);
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
-                SCR_add_ptr(&endos, &nbe, (unsigned char*) KONAME(KE_WS, pos));
+                SCR_add_ptr(&endos, &nbe, (unsigned char*) KE_WS->get_name(pos).c_str());
             }
         }
 

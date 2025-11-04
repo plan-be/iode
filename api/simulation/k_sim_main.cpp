@@ -396,11 +396,11 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
             else pd = fabs(d);
 
             pd *= KSIM_RELAX;
-            if(pd > eps)  {
-                if(diverg) diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
+            if(pd > eps) 
+            {
+                if(diverg) 
+                    diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
                 diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) KSIM_NAME(KSIM_ORDER[i]));
-                //sprintf(buf, "%s %s", lst, KSIM_NAME(KSIM_ORDER[i]));
-                //B_DataAppend(buf, LISTS);
             }
         }
     }
@@ -575,10 +575,10 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     kmsg("Linking equations ....");
     
     for(i = 0 ; i < dbe->size(); i++) {        
-        posvar = dbv->index_of(KONAME(dbe,i));
+        posvar = dbv->index_of(dbe->get_name(i));
         KSIM_POSXK[i] = posvar;
         if(posvar < 0) {
-            std::string err_msg = std::string("'") + std::string(KONAME(dbe, i)) + "': cannot find variable";
+            std::string err_msg = std::string("'") + std::string(dbe->get_name(i)) + "': cannot find variable";
             error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
@@ -587,7 +587,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
         
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
-            std::string err_msg = std::string("'") + std::string(KONAME(dbe, i)) + "': cannot link equation";
+            std::string err_msg = std::string("'") + std::string(dbe->get_name(i)) + "': cannot link equation";
             error_manager.append_error(err_msg);
             rc = -1;
             goto fin;
@@ -701,11 +701,11 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     CLEC    *clec;
     double  x;
 
-//Debug("Eq %s\n", KONAME(KSIM_DBE, eqnb));
+//Debug("Eq %s\n", KSIM_DBE->get_name(eqnb));
     lg = KECLEC(KSIM_DBE, eqnb)->tot_lg;
     clec = (CLEC*) SW_nalloc(lg);
     memcpy(clec, KECLEC(KSIM_DBE, eqnb), lg);
-    eqvarnb = KSIM_DBV->index_of(KONAME(KSIM_DBE, eqnb));
+    eqvarnb = KSIM_DBV->index_of(KSIM_DBE->get_name(eqnb));
     if(clec->dupendo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
     else
@@ -714,7 +714,7 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     {
         Period period = KSIM_DBV->sample->start_period.shift(t);
         kerror(0, "%s : becomes unavailable at %s%s",
-               KONAME(KSIM_DBV, varnb), /* JMP 16-06-99 a la place de eqvarnb */
+               KSIM_DBV->get_name(varnb), /* JMP 16-06-99 a la place de eqvarnb */
                (char*) period.to_string().c_str(),
                ((clec->dupendo || varnb != eqvarnb) ? "(Newton)" : "")
               );

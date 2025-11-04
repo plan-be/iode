@@ -1220,7 +1220,7 @@ int B_DataCompare(char* arg, int type)
 {
     int     i, rc = 0,
                n1 = 0, n2 = 0, n3 = 0, n4 = 0;
-    char    **args = NULL, *name,
+    char    **args = NULL, 
             **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
             *file, *one, *two, *three, *fr;
     KDB*    kdb1 = K_WS[type];
@@ -1239,31 +1239,33 @@ int B_DataCompare(char* arg, int type)
     if(!kdb2) 
         return(-1);
 
+    std::string name;
     for(i = 0; i < kdb1->size(); i++) 
     {
-        name = KONAME(kdb1, i);
-        rc = K_cmp(name, kdb1, kdb2);
-        switch(rc) {
+        name = kdb1->get_name(i);
+        rc = K_cmp((char*) name.c_str(), kdb1, kdb2);
+        switch(rc) 
+        {
         case 1 :
-            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) name);
+            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) name.c_str());
             break;
         case 2 :
-            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) name);
+            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) name.c_str());
             break; /* never reached */
         case 3 :
-            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) name);
+            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) name.c_str());
             break;
         case 4 :
-            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) name);
+            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) name.c_str());
             break;
         }
 
         if(rc > 2) 
-            K_del(kdb2, kdb2->index_of(name)) ;
+            K_del(kdb2, kdb2->index_of(name));
     }
 
     for(i = 0; i < kdb2->size(); i++) 
-        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) KONAME(kdb2, i));
+        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) kdb2->get_name(i).c_str());
 
     SCR_add_ptr((unsigned char***) &l1, &n1, NULL);
     SCR_add_ptr((unsigned char***) &l2, &n2, NULL);

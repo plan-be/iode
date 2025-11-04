@@ -427,7 +427,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         okobj = (OKOBJ *) SW_nalloc(sizeof(OKOBJ) * kdb->size());
         kread((char *) okobj, sizeof(OKOBJ), kdb->size(), fd);
         for(int j = 0 ; j < kdb->size() ; j++)
-            strcpy(KONAME(kdb, j), okobj[j].o_name);
+            strcpy(kdb->k_objs[j].o_name, okobj[j].o_name);
         SW_nfree(okobj);
     }
     else 
