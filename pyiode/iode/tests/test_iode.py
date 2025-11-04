@@ -798,6 +798,11 @@ def test_variables_numpy_1D():
     variables.clear()
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
+    # exporting a subset representing a single variable
+    array = variables["ACAF"].to_numpy()
+    assert array.ndim == 1
+    assert array.shape == (variables.nb_periods,)
+
     # exporting a subset representing a single variable returns 
     # a 1D numpy ndarray
     array = variables["ACAF", "2000Y1:2010Y1"].to_numpy()
@@ -807,6 +812,28 @@ def test_variables_numpy_1D():
     array *= 1.1 
     variables.from_numpy(array, "ACAF", "2000Y1:2010Y1")
     assert all(variables["ACAF", "2000Y1:2010Y1"].to_numpy() == array)
+
+def test_variables_dataframe():
+    variables.clear()
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # select a subset containing a unique Variable
+    vars_subset = variables["ACAF"]
+    df = vars_subset.df
+    assert len(df) == 1
+    assert df.index[0] == "ACAF"
+    expected_columns = [str(p) for p in variables.sample.periods]
+    assert list(df.columns) == expected_columns
+
+    # select a subset containing a unique Variable over 
+    # a specific range of periods
+    periods = "2000Y1:2010Y1"
+    vars_subset = variables["ACAF", periods]
+    df = vars_subset.df
+    assert len(df) == 1
+    assert df.index[0] == "ACAF"
+    expected_columns = [str(p) for p in Sample(periods).periods]
+    assert list(df.columns) == expected_columns
 
 def test_variables_from_frame():
     # check that pandas nan are converted to IODE NA
