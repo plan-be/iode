@@ -802,7 +802,22 @@ std::size_t hash_value(const Table& table);
 
 /*----------------------- FUNCS ----------------------------*/
 
+Table* K_tunpack(char*, char* name = NULL);
 Table* K_tptr(KDB* kdb, char* name);
+
+inline Table* KTVAL(KDB* kdb, const int pos) 
+{
+    char* ptr = kdb->get_ptr_obj(pos);
+    if(!ptr) 
+        return nullptr;
+    std::string name = kdb->get_name(pos); 
+    return (Table*) K_tunpack(ptr, (char*) name.c_str());
+}
+
+inline Table* KTPTR(char* name) 
+{
+    return (Table*) K_tptr(KT_WS, name);
+}
 
 /*----------------------- MACROS ----------------------------*/
 
@@ -811,6 +826,3 @@ Table* K_tptr(KDB* kdb, char* name);
 #define T_LANG(tbl)         (tbl->get_language())
 #define T_L(tbl)            (tbl->lines)
 #define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])
-
-#define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name))
-#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated Table
