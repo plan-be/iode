@@ -5,11 +5,22 @@
 #include "api/objs/variables.h"
 #include "api/lec/lec.h"
 
-/*----------------------- MACROS ----------------------------*/
+/*----------------------- INLINE FUNCTIONS ----------------------------*/
 
-#define KIPTR(name)         K_optr0(KI_WS, name)
-#define KILEC(kdb, pos)     K_oval0(kdb, pos)
-#define KICLEC(kdb, pos)    ((CLEC *) K_oval1(kdb, pos))
+inline char* KIPTR(const char* name) 
+{
+    return K_optr0(KI_WS, (char*) name);
+}
+
+inline char* KILEC(KDB* kdb, const int pos) 
+{
+    return K_oval0(kdb, pos);
+}
+
+inline CLEC* KICLEC(KDB* kdb, const int pos) 
+{
+    return (CLEC*) K_oval1(kdb, pos);
+}
 
 /*----------------------- STRUCTS ----------------------------*/
 
