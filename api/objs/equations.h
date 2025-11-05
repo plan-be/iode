@@ -599,8 +599,12 @@ inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, int pos)
 }
 
 inline Equation* KEVAL(KDB* kdb, int pos) 
-{     
-    return K_eunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name);
+{   
+    char* ptr = kdb->get_ptr_obj(pos);
+    if(!ptr) 
+        return nullptr;
+    std::string name = kdb->get_name(pos);  
+    return K_eunpack(ptr, (char*) name.c_str());
 }
 
 inline Equation* KEPTR(char* name) 
