@@ -143,7 +143,7 @@ int K_add(KDB* kdb, char* name, ...)
     lg = * (OSIZE *) pack;
     if(kdb->get_handle(pos) != 0) SW_free(kdb->get_handle(pos));
     kdb->k_objs[pos].o_val = SW_alloc(lg);
-    memcpy(KGOVAL(kdb, pos), pack, lg);
+    memcpy(kdb->get_ptr_obj(pos), pack, lg);
     
 einde:
     // Frees the allocated pack in regular MEM

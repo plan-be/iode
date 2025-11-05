@@ -74,7 +74,7 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     if(pos2 < 0) 
         return(-2);
 
-    pack = KGOVAL(kdb1, pos1);
+    pack = kdb1->get_ptr_obj(pos1);
     if(pack == NULL)
         return(-2);
     
@@ -83,7 +83,7 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     memcpy(ptr, pack, lg);
 
     kdb2->k_objs[pos2].o_val = SW_alloc(lg);
-    memcpy(KGOVAL(kdb2, pos2), ptr, lg);
+    memcpy(kdb2->get_ptr_obj(pos2), ptr, lg);
 
     SW_nfree(ptr);
     return(pos2);
