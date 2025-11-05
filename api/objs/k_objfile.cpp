@@ -862,7 +862,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
 
             found[i] = 1;
 
-            ptr = KGOVAL(from, pf);
+            ptr = from->get_ptr_obj(pf);
             pack = SW_nalloc(P_len(ptr));
             memcpy(pack, ptr, P_len(ptr));
 
@@ -873,7 +873,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
                 pt = K_add_entry(to, objs[i]);
 
             to->k_objs[pt].o_val = SW_alloc(P_len(pack));
-            memcpy(KGOVAL(to, pt), pack, P_len(pack));
+            memcpy(to->get_ptr_obj(pt), pack, P_len(pack));
             SW_nfree(pack);
             nb_found++;
         }

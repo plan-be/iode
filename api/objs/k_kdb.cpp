@@ -350,11 +350,11 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
         }
 
         if(pos < 0) return(-1);
-        ptr = KGOVAL(kdb2, i);
+        ptr = kdb2->get_ptr_obj(i);
         kdb1->k_objs[pos].o_val = SW_alloc(P_len(ptr));
 
-        ptr = KGOVAL(kdb2, i); /* GB 26/01/98 */
-        memcpy(KGOVAL(kdb1, pos), ptr, P_len(ptr));
+        ptr = kdb2->get_ptr_obj(i); /* GB 26/01/98 */
+        memcpy(kdb1->get_ptr_obj(pos), ptr, P_len(ptr));
     }
     return(0);
 }

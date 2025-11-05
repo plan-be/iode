@@ -199,6 +199,15 @@ public:
         return this->k_objs[index].o_val;
     }
 
+    char* get_ptr_obj(const int index) const
+    {
+        if(index < 0 || index >= this->size())
+            return NULL;
+
+        SWHDL handle = this->k_objs[index].o_val;
+        return SW_getptr(handle);
+    }
+
     int duplicate(const KDB& other, char* name);
 };
 
@@ -272,8 +281,6 @@ inline char k_ext[][4] =
 #define KV_RWS   K_RWS[VARIABLES][K_PWS[VARIABLES]]
 
 /*----------------------- MACROS ----------------------------*/
-
-#define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 

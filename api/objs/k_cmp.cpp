@@ -246,25 +246,25 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
     switch(kdb1->k_type)
     {
     case COMMENTS:
-        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case EQUATIONS:
-        res = K_cmpeqs(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmpeqs(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case IDENTITIES:
-        res = K_cmpidt(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmpidt(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case LISTS:
-        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case SCALARS:
-        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case TABLES:
-        res = K_cmplg(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmplg(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     case VARIABLES:
-        res = K_cmpvar(KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name);
+        res = K_cmpvar(kdb1->get_ptr_obj(p1), kdb2->get_ptr_obj(p2), name);
         break;
     default:
         break;

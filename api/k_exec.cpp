@@ -427,7 +427,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
         pos = dbv_tmp->index_of(dbv->get_name(j));
         if(pos < 0) 
             continue;
-        if(dbv_tmp->get_handle(pos) == 0 || KGOVAL(dbv_tmp, pos) == NULL)
+        if(dbv_tmp->get_handle(pos) == 0 || dbv_tmp->get_ptr_obj(pos) == NULL)
         {
             kerror(0, "VAR %s could not be found in the workspace %s", dbv->get_name(j));
             return -1;
