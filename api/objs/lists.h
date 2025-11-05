@@ -8,10 +8,17 @@
 // LIS = List (string)
 using LIS = char*; 
 
-/*----------------------- MACROS ----------------------------*/
+/*----------------------- INLINE FUNCS ----------------------------*/
 
-#define KLPTR(name)         K_optr0(KL_WS, name)
-#define KLVAL(kdb, pos)     ((LIS )   K_oval0(kdb, pos))
+inline LIS KLPTR(const char* name) 
+{
+    return (LIS) K_optr0(KL_WS, (char*) name);
+}
+
+inline LIS KLVAL(KDB* kdb, int pos) 
+{
+    return (LIS) K_oval0(kdb, pos);
+}
 
 /*----------------------- FUNCS ----------------------------*/
 
