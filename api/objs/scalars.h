@@ -2,6 +2,7 @@
 
 #include "api/constants.h"
 #include "api/utils/utils.h"
+#include "api/objs/kdb.h"
 
 
 /*----------------------- STRUCTS ----------------------------*/
@@ -72,4 +73,7 @@ std::size_t hash_value(const Scalar& scalar);
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KSVAL(kdb, pos)     ((Scalar *)  K_oval0(kdb, pos))
+inline Scalar* KSVAL(KDB* kdb, const int pos) 
+{
+    return (Scalar*) K_oval0(kdb, pos);
+}
