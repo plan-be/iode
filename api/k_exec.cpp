@@ -261,7 +261,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
             j++;
         }
         else {
-            SW_free(KSOVAL(dbv, i));
+            SW_free(dbv->get_handle(i));
         }
     }
 
@@ -378,7 +378,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     int nb_vars_to_read = 0;
     for(j = 0 ; j < dbv->size(); j++) 
     {
-        if(KSOVAL(dbv, j) != 0) 
+        if(dbv->get_handle(j) != 0) 
             continue;  /* series already present */
         pos = dbv_tmp->index_of(dbv->get_name(j));
         if(pos >= 0) 
@@ -422,17 +422,17 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 
     for(j = 0; j < dbv->size(); j++) 
     {
-        if(KSOVAL(dbv, j) != 0) 
+        if(dbv->get_handle(j) != 0) 
             continue;  /* series already present */
         pos = dbv_tmp->index_of(dbv->get_name(j));
         if(pos < 0) 
             continue;
-        if(KSOVAL(dbv_tmp, pos) == 0 || KGOVAL(dbv_tmp, pos) == 0)
+        if(dbv_tmp->get_handle(pos) == 0 || KGOVAL(dbv_tmp, pos) == NULL)
         {
             kerror(0, "VAR %s could not be found in the workspace %s", dbv->get_name(j));
             return -1;
         }
-        KSOVAL(dbv, j) = KV_alloc_var(vsmpl->nb_periods);
+        dbv->k_objs[j].o_val = KV_alloc_var(vsmpl->nb_periods);
         memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp), 
                sizeof(double) * smpl.nb_periods);
         if(KEXEC_TRACE)
@@ -466,7 +466,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
     SCR_ADD_PTR_CHUNCK = 1000;
     for(j = 0 ; j < dbv->size(); j++) 
     {
-        if(KSOVAL(dbv, j) != 0) 
+        if(dbv->get_handle(j) != 0) 
             continue;
         SCR_add_ptr((unsigned char***) &vars, &nbv, (unsigned char*) dbv->get_name(j).c_str());
     }
@@ -560,7 +560,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
         for(i = 0, j = 0 ; i < dbv->size() && j < 10; i++) 
         {
             // series already present in dbv
-            if(KSOVAL(dbv, i) != 0) 
+            if(dbv->get_handle(i) != 0) 
                 continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN VA
@@ -604,12 +604,12 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 
     if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     for(j = 0 ; j < dbs->size(); j++) {
-        if(KSOVAL(dbs, j) != 0) continue;
+        if(dbs->get_handle(j) != 0) continue;
 
         pos = dbs_tmp->index_of(dbs->get_name(j));
         if(pos < 0) continue;
 
-        KSOVAL(dbs, j) = KS_alloc_scl();
+        dbs->k_objs[j].o_val = KS_alloc_scl();
         memcpy(KSVAL(dbs, j), KSVAL(dbs_tmp, pos), sizeof(Scalar));
         if(KEXEC_TRACE) W_printf("%s ", dbs->get_name(j));
         nb_found++;
@@ -638,7 +638,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     SCR_ADD_PTR_CHUNCK = 1000;
     for(j = 0 ; j < dbs->size(); j++) 
     {
-        if(KSOVAL(dbs, j) != 0) 
+        if(dbs->get_handle(j) != 0) 
             continue;
         SCR_add_ptr((unsigned char***) &scls, &nbs, (unsigned char*) dbs->get_name(j).c_str());
     }
@@ -705,7 +705,7 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         for(i = 0, j = 0 ; i < dbs->size() && j < 10; i++) 
         {
             // series already present
-            if(KSOVAL(dbs, i) != 0) 
+            if(dbs->get_handle(i) != 0) 
                 continue;
             j++;
 

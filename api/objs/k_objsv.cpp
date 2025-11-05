@@ -141,8 +141,8 @@ int K_add(KDB* kdb, char* name, ...)
 
     // Copy allocated pack into kdb entry pos (SWAP memory)
     lg = * (OSIZE *) pack;
-    if(KSOVAL(kdb, pos) != 0) SW_free(KSOVAL(kdb, pos));
-    KSOVAL(kdb, pos) = SW_alloc(lg);
+    if(kdb->get_handle(pos) != 0) SW_free(kdb->get_handle(pos));
+    kdb->k_objs[pos].o_val = SW_alloc(lg);
     memcpy(KGOVAL(kdb, pos), pack, lg);
     
 einde:

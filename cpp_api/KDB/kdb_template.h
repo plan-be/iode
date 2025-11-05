@@ -70,7 +70,7 @@ public:
             // add a new entry and copy the pointer
             char* c_name = to_char_array(name);
             pos = K_add_entry(kdb, c_name);
-            KSOVAL(kdb, pos) = KSOVAL(global_kdb, pos_global);
+            kdb->k_objs[pos].o_val = global_kdb->get_handle(pos_global);
         }
 
         return pos;

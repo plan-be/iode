@@ -868,11 +868,11 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
 
             pt = to->index_of(objs[i]);
             if(pt >= 0)
-                SW_free(KSOVAL(to, pt));
+                SW_free(to->get_handle(pt));
             else 
                 pt = K_add_entry(to, objs[i]);
 
-            KSOVAL(to, pt) = SW_alloc(P_len(pack));
+            to->k_objs[pt].o_val = SW_alloc(P_len(pack));
             memcpy(KGOVAL(to, pt), pack, P_len(pack));
             SW_nfree(pack);
             nb_found++;

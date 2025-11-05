@@ -241,7 +241,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
             break;
         }
 
-        KSOVAL(tkdb, pos1) = KSOVAL(kdb, pos2);
+        tkdb->k_objs[pos1].o_val = kdb->get_handle(pos2);
     }
 
     if(err) 
@@ -346,12 +346,12 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
         if(pos < 0) pos = K_add_entry(kdb1, (char*) kdb2->get_name(i).c_str());
         else {
             if(!replace) continue;
-            SW_free(KSOVAL(kdb1, pos));
+            SW_free(kdb1->get_handle(pos));
         }
 
         if(pos < 0) return(-1);
         ptr = KGOVAL(kdb2, i);
-        KSOVAL(kdb1, pos) = SW_alloc(P_len(ptr));
+        kdb1->k_objs[pos].o_val = SW_alloc(P_len(ptr));
 
         ptr = KGOVAL(kdb2, i); /* GB 26/01/98 */
         memcpy(KGOVAL(kdb1, pos), ptr, P_len(ptr));
