@@ -76,7 +76,13 @@ int KV_set_at_t(char*varname, int t, double val);
 int KV_set_at_per(char*varname, Period* per, double val);
 int KV_set_at_aper(char*varname, char* aper, double val);
 
-/*----------------------- MACROS ----------------------------*/
 
-#define KVVAL(kdb, pos, t)  K_vval(kdb, pos, t)
-#define KVPTR(name)         K_vptr(KV_WS, name, 0)
+inline double* KVVAL(KDB* kdb, const int pos, const int t) 
+{
+    return K_vval(kdb, pos, t);
+}
+
+inline double* KVPTR(const char* name) 
+{
+    return K_vptr(KV_WS, (char*) name, 0);
+}
