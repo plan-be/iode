@@ -67,15 +67,15 @@ int KV_sample(KDB *kdb, Sample *new_sample)
     {
         new_val = KV_alloc_var(kdb->sample->nb_periods);
         ptr = SW_getptr(new_val);
-        if(KSOVAL(kdb, i) != 0) 
+        if(kdb->get_handle(i) != 0) 
         {
             if(smpl.nb_periods > 0)
                 memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
                        KVVAL(kdb, i, start1),
                        sizeof(double) * smpl.nb_periods);
-            SW_free(KSOVAL(kdb, i));
+            SW_free(kdb->get_handle(i));
         }
-        KSOVAL(kdb, i) = new_val;
+        kdb->k_objs[i].o_val = new_val;
     }
 
     return 0;
@@ -128,7 +128,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         else if(!replace) 
             continue;
 
-        if(pos >= 0 && KSOVAL(kdb2, i) != 0)
+        if(pos >= 0 && kdb2->get_handle(i) != 0)
             memcpy((double *) KVVAL(kdb1, pos, start1),
                    (double *) KVVAL(kdb2, i, start2),
                    sizeof(double) * smpl.nb_periods);

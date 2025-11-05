@@ -191,6 +191,14 @@ public:
         return std::string(this->k_objs[index].o_name);
     }
 
+    SWHDL get_handle(const int index) const
+    {
+        if(index < 0 || index >= this->size())
+            return 0;
+
+        return this->k_objs[index].o_val;
+    }
+
     int duplicate(const KDB& other, char* name);
 };
 
@@ -265,7 +273,6 @@ inline char k_ext[][4] =
 
 /*----------------------- MACROS ----------------------------*/
 
-#define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)                  // handle of the object in the scr4/swap memory
 #define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)

@@ -62,8 +62,8 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     pos2 = kdb2->index_of(name2);
     if(pos2 >= 0) 
     {
-        if(KSOVAL(kdb2, pos2) != 0) 
-            SW_free(KSOVAL(kdb2, pos2));
+        if(kdb2->get_handle(pos2) != 0) 
+            SW_free(kdb2->get_handle(pos2));
     }
     else 
     {
@@ -82,7 +82,7 @@ int K_dup(const KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     ptr = SW_nalloc(lg);
     memcpy(ptr, pack, lg);
 
-    KSOVAL(kdb2, pos2) = SW_alloc(lg);
+    kdb2->k_objs[pos2].o_val = SW_alloc(lg);
     memcpy(KGOVAL(kdb2, pos2), ptr, lg);
 
     SW_nfree(ptr);
@@ -119,7 +119,7 @@ int K_ren(KDB* kdb, char* name1, char* name2)
     if(pos2 < 0) return(-3);
     pos1 = kdb->index_of(name1); /* object name1 may have changed after add name2 */
 
-    KSOVAL(kdb, pos2) = KSOVAL(kdb, pos1);
+    kdb->k_objs[pos2].o_val = kdb->get_handle(pos1);
     K_del_entry(kdb, pos1);
     
     pos2 = kdb->index_of(name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
@@ -220,7 +220,7 @@ done :
 
     lg = std::min((int) strlen(name), K_MAX_NAME);
     memcpy(kdb->k_objs[maxpos].o_name, name, lg + 1);
-    KSOVAL(kdb, maxpos) = 0;
+    kdb->k_objs[maxpos].o_val = 0;
 
     kdb->k_nb++;
 
@@ -274,7 +274,7 @@ int K_del(KDB* kdb, int pos)
 {
     if(kdb == NULL) return(-1);
     if(pos < 0 || pos >= kdb->size()) return(-1);
-    SW_free(KSOVAL(kdb, pos));
+    SW_free(kdb->get_handle(pos));
     K_del_entry(kdb, pos);
     return(0);
 }
