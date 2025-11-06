@@ -237,9 +237,13 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
         kdb1->k_objs[name] = handle_1;
 
         // pointer behind handle_2 may have changed after allocation of handle_1
-        ptr_2 = SW_getptr(handle_2);
-        
+        // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
+        // of the segments allocated by the SWAP system. If a segment contains enough free space 
+        // but with gaps, the SW_alloc() function compresses the segment to have lg bytes contiguous.
+        // In doing so, it (potentially) shifts the pack within the segment, and therefore 
+        // ptr may change value after an SW_alloc() call.
         ptr_1 = SW_getptr(handle_1);
+        ptr_2 = SW_getptr(handle_2);
         memcpy(ptr_1, ptr_2, P_len(ptr_2));
     }
 
