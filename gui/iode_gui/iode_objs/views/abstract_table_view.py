@@ -15,7 +15,7 @@ from iode_gui.print.print_file_dialog import PrintFileDialog
 
 from typing import Union, Tuple, Dict, Any
 from pathlib import Path
-from iode import IodeType, variables
+from iode import IodeType, variables, split_list
 # TODO : add MAX_LENGTH_NAME (= K_MAX_NAME) to the Python iode package
 MAX_LENGTH_NAME = 20
 
@@ -512,12 +512,20 @@ class IodeAbstractTableView(QTableView):
         """Edits the selected object."""
         self.open_edit_dialog()
 
+    def _cleanup_filter_pattern(self, pattern: str) -> str:
+        # remove empty patterns and leading/trailing spaces
+        pattern = [elem.strip() for elem in split_list(pattern) if elem.strip()]
+        # remove duplicates while preserving order
+        pattern = list(dict.fromkeys(pattern))
+        return ";".join(pattern)
+
     @Slot(str)
     def new_object_inserted(self, name: str):
         """Handles the insertion of a new object."""
         table_model: IodeAbstractTableModel = self.model()
         if table_model.filter_active:
             pattern = self.filter_line_edit.text().strip()
+            pattern = self._cleanup_filter_pattern(pattern)
             pattern += ";" + name
             self.filter_line_edit.setText(pattern)
         self.database_modified.emit()
@@ -530,7 +538,11 @@ class IodeAbstractTableView(QTableView):
             pattern = self.filter_line_edit.text().strip()
             if name in pattern:
                 pattern = pattern.replace(name, "")
+            pattern = self._cleanup_filter_pattern(pattern)
             self.filter_line_edit.setText(pattern)
+        # WARNING: do not emit database_modified signal because it would 
+        #          interfere with the IodeAbstractTableModel.removeRows method
+        # -- self.database_modified.emit() --
 
     @Slot()
     def filter_slot(self):

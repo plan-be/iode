@@ -65,22 +65,11 @@ class EquationsView(IodeAbstractTableView):
         model: IodeAbstractTableModel = self.model()
         self.edit_dialog = EditEquationDialog(obj_name, model.displayed_database, self.main_window, self)
         self.edit_dialog.database_modified.connect(self.database_modified)
-        self.edit_dialog.database_modified.connect(self.update_filter)
         self.edit_dialog.new_object_inserted.connect(self.new_object_inserted)
 
     def _open_add_dialog(self) -> QDialog:
         model: IodeAbstractTableModel = self.model()
-        dialog: EditEquationDialog = EditEquationDialog("", model.displayed_database, self.main_window, self)
-        dialog.new_object_inserted.connect(self.new_object_inserted)
-        dialog.database_modified.connect(self.database_modified)
-        dialog.database_modified.connect(self.update_filter)
-        return dialog
-
-    @Slot()
-    def update_filter(self):
-        model: IodeAbstractTableModel = self.model()
-        if model.filter_active:
-            self.filter()
+        return EditEquationDialog("", model.displayed_database, self.main_window, self)
 
     # override not implemented in abstract view class
     def _print_to_file_kwargs(self, dialog: PrintFileDialog) -> Dict[str, Any]:        
