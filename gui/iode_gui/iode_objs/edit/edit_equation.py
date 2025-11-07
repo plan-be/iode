@@ -100,13 +100,6 @@ class EditEquationDialog(MixinSettingsDialog):
             self.edit_est_eqs = EditAndEstimateEquations()
             QMessageBox.warning(None, "WARNING", str(e))
 
-    # same as ODE_blk_save_cur() from o_est.c from the old GUI
-    def _save_current_equation(self):
-        """Saves the current equation."""
-        lec = self.ui.textEdit_lec.toPlainText()
-        comment = self.ui.lineEdit_comment.text()
-        self.edit_est_eqs.update_current_equation(lec, comment)
-
     # same as ODE_blk_check() from o_est.c from the old GUI
     def _update_list_of_equations_to_estimate(self):
         """Updates the list of equations to estimate."""
@@ -129,6 +122,15 @@ class EditEquationDialog(MixinSettingsDialog):
         # See EditAndEstimateEquations.block
         block = self.edit_est_eqs.block
         self.ui.lineEdit_block.setText(block)
+
+    # same as ODE_blk_save_cur() from o_est.c from the old GUI
+    def _save_current_equation(self):
+        """Saves the current equation."""
+        self._update_list_of_equations_to_estimate()
+        lec = self.ui.textEdit_lec.toPlainText()
+        comment = self.ui.lineEdit_comment.text()
+        self.edit_est_eqs.update_current_equation(lec, comment)
+        self.edit_est_eqs.update_scalars()
 
     def _update_estimation_sample(self):
         """Updates the estimation sample."""
@@ -190,7 +192,6 @@ class EditEquationDialog(MixinSettingsDialog):
         """Edits the equation."""
         try:
             self._save_current_equation()
-            self._update_list_of_equations_to_estimate()
 
             if not self.edit_est_eqs.is_done:
                 self.edit_est_eqs.update_scalars()
@@ -220,10 +221,6 @@ class EditEquationDialog(MixinSettingsDialog):
         """Displays the coefficients."""
         try:
             self._save_current_equation()
-            self._update_list_of_equations_to_estimate()
-
-            self.edit_est_eqs.update_scalars()
-
             dialog = EstimationCoefsDialog(self.edit_est_eqs)
             dialog.exec()
         except Exception as e:
@@ -258,12 +255,6 @@ class EditEquationDialog(MixinSettingsDialog):
             instruments = self.ui.lineEdit_instruments.text()
             self.edit_est_eqs.instruments = instruments
 
-            # update list of equations to estimate
-            self._update_list_of_equations_to_estimate()
-
-            # update list of coefficients
-            self.edit_est_eqs.update_scalars()
-
             # process estimation
             self.edit_est_eqs.estimate()
 
@@ -281,9 +272,6 @@ class EditEquationDialog(MixinSettingsDialog):
         try:
             # Save the current equation
             self._save_current_equation()
-
-            # Update the list of equations to estimate
-            self._update_list_of_equations_to_estimate()
 
             # Get the next equation from our list
             self.eq = self.edit_est_eqs.next_equation
