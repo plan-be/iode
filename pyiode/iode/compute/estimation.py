@@ -754,6 +754,38 @@ class EditAndEstimateEquations:
         Notes
         -----
         Equivalent to the ODE_blk_save_cur() function from o_est.c from the old GUI (developed by Jean-Marc Paul)
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+
+        >>> from iode.compute.estimation import EditAndEstimateEquations
+        >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
+        >>> estimation.block = "ACAF;TEST", "TEST"
+        >>> estimation.block
+        'ACAF;TEST'
+        >>> # ---- current equation ----
+        >>> current_eq = estimation.current_equation
+        >>> current_eq.endogenous
+        'TEST'
+        >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
+        'TEST := 0'
+        >>> # ---- update current equation ----
+        >>> estimation.update_current_equation("TEST := test0 + test1 * ACAF", "This is a test equation.")
+        >>> current_eq = estimation.current_equation
+        >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
+        'TEST := test0 + test1 * ACAF'
+        >>> current_eq.comment
+        'This is a test equation.'
         """
         self._cython_instance.update_current_equation(lec, comment)
 
@@ -1301,6 +1333,111 @@ class EditAndEstimateEquations:
         Notes
         -----
         Equivalent to the ODE_blk_save() function from o_est.c from the old GUI (developed by Jean-Marc Paul).
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+
+        >>> from iode.compute.estimation import EditAndEstimateEquations
+        >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
+        >>> estimation.block = "ACAF;TEST", "DPUH"
+        >>> estimation.block
+        'ACAF;TEST;DPUH'
+        >>> estimation.equations_list
+        ['ACAF', 'TEST', 'DPUH']
+        >>> estimation.current_equation.endogenous
+        'DPUH'
+        >>> estimation.current_equation.lec             # doctest: +NORMALIZE_WHITESPACE
+        'dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC'
+        >>> eq = estimation.next_equation
+        >>> eq.endogenous
+        'ACAF'
+        >>> eq.lec           # doctest: +NORMALIZE_WHITESPACE
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        >>> eq = estimation.next_equation
+        >>> eq.endogenous
+        'TEST'
+        >>> eq.lec
+        'TEST := 0'
+        >>> estimation.update_current_equation("TEST := test0 + test1 * ACAF", "This is a test equation.")
+        >>> estimation.current_equation.lec             # doctest: +NORMALIZE_WHITESPACE
+        'TEST := test0 + test1 * ACAF'
+        >>> 'TEST' in equations
+        False
+        >>> 'test0' in scalars
+        False
+        >>> 'test1' in scalars
+        False
+
+        >>> # save the new equation and scalars into the global databases
+        >>> estimation.update_scalars()
+        >>> new_eqs = estimation.save()
+        >>> new_eqs
+        ['TEST']
+        >>> 'TEST' in equations
+        True
+        >>> equations["TEST"]           # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'TEST',
+                 lec = 'TEST := test0 + test1 * ACAF',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 comment = 'This is a test equation.',
+                 block = 'ACAF;TEST;DPUH')
+        >>> 'test0' in scalars
+        True
+        >>> scalars["test0"]
+        Scalar(0.9, 1, na)
+        >>> 'test1' in scalars
+        True
+        >>> scalars["test1"]
+        Scalar(0.9, 1, na)
+
+        >>> # Now do an estimation
+        >>> equations.clear()
+        >>> scalars.clear()
+
+        >>> equations["ACAF"] = Equation("ACAF", "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> equations["DPUH"] = Equation("DPUH", "dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)")
+
+        >>> from iode.compute.estimation import EditAndEstimateEquations
+        >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
+        >>> estimation.block = "ACAF;DPUH", "ACAF"
+        >>> estimation.block
+        'ACAF;DPUH'
+        >>> estimation.update_scalars()
+
+        >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Estimating : iteration 1 (||eps|| = 2.01246)
+        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        <BLANKLINE>
+        Solution reached after 2 iteration(s). Creating results file ...
+        <BLANKLINE>
+
+        >>> scalars["acaf1"]
+        Scalar(0.9, 1, na)
+        >>> scalars["dpuh_1"]
+        Scalar(0.9, 1, na)
+
+        >>> # save results in the global databases
+        >>> new_eqs = estimation.save()
+        >>> new_eqs
+        []
+
+        >>> scalars["acaf1"]
+        Scalar(0.0157705, 1, 0.00136079)
+        >>> scalars["dpuh_1"]
+        Scalar(0.0109855, 1, 0.00481857)
         """
         if from_period is None:
             from_period = ''
