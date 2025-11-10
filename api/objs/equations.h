@@ -542,70 +542,63 @@ int E_DynamicAdjustment(int ,char **,char *,char *);
 int K_epack(char **,char *,char *);
 Equation* K_eunpack(char *, char *);
 
-inline std::string KELEC(KDB* kdb, int pos) 
+inline std::string KELEC(KDB* kdb, const std::string& name) 
 {                  
-    return std::string(K_oval0(kdb, pos));
+    return std::string(K_optr0(kdb, (char*) name.c_str()));
 }
 
-inline CLEC* KECLEC(KDB* kdb, int pos) 
+inline CLEC* KECLEC(KDB* kdb, const std::string& name) 
 {    
-    return ((CLEC *) K_oval1(kdb, pos));
+    return ((CLEC *) K_optr1(kdb, (char*) name.c_str()));
 }
 
-inline char KESOLV(KDB* kdb, int pos) 
+inline char KESOLV(KDB* kdb, const std::string& name) 
 {    
-    return *((char *) K_oval(kdb, pos, 2));
+    return *((char *) K_optr(kdb, (char*) name.c_str(), 2));
 }
 
-inline char KEMETH(KDB* kdb, int pos) 
+inline char KEMETH(KDB* kdb, const std::string& name) 
 {    
-    return *((char *) K_oval(kdb, pos, 3));
+    return *((char *) K_optr(kdb, (char*) name.c_str(), 3));
 }
 
-inline Sample KESMPL(KDB* kdb, int pos) 
+inline Sample KESMPL(KDB* kdb, const std::string& name) 
 {    
-    return *((Sample *) K_oval(kdb, pos, 4));
+    return *((Sample *) K_optr(kdb, (char*) name.c_str(), 4));
 }
 
-inline std::string KECMT(KDB* kdb, int pos) 
+inline std::string KECMT(KDB* kdb, const std::string& name) 
 {                  
-    return std::string(K_oval(kdb, pos, 5));
+    return std::string(K_optr(kdb, (char*) name.c_str(), 5));
 }
 
-inline std::string KEBLK(KDB* kdb, int pos) 
+inline std::string KEBLK(KDB* kdb, const std::string& name) 
 {                  
-    return std::string(K_oval(kdb, pos, 6));
+    return std::string(K_optr(kdb, (char*) name.c_str(), 6));
 }
 
-inline std::string KEINSTR(KDB* kdb, int pos) 
+inline std::string KEINSTR(KDB* kdb, const std::string& name) 
 {                
-    return std::string(K_oval(kdb, pos, 7));
+    return std::string(K_optr(kdb, (char*) name.c_str(), 7));
 }
 
-inline long KEDATE(KDB* kdb, int pos) 
+inline long KEDATE(KDB* kdb, const std::string& name) 
 {    
-    return *((long *) K_oval(kdb, pos, 8));
+    return *((long *) K_optr(kdb, (char*) name.c_str(), 8));
 }
 
-inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, int pos) 
+inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, const std::string& name) 
 {   
     std::array<float, EQS_NBTESTS> tests;
-    memcpy(tests.data(), K_oval(kdb, pos, 9), EQS_NBTESTS * sizeof(float));
+    memcpy(tests.data(), K_optr(kdb, (char*) name.c_str(), 9), EQS_NBTESTS * sizeof(float));
     return tests;
 }
 
 // returns an allocated EQ
-inline Equation* KEVAL(KDB* kdb, int pos) 
-{   
-    std::string name = kdb->get_name(pos);
-    if(name.empty())
-        return nullptr;
+inline Equation* KEVAL(KDB* kdb, const std::string& name) 
+{    
     char* ptr = kdb->get_ptr_obj(name);
+    if(ptr == nullptr)
+        return nullptr;
     return K_eunpack(ptr, (char*) name.c_str());
-}
-
-// returns an allocated EQ
-inline Equation* KEPTR(KDB* kdb, char* name) 
-{         
-    return K_eptr(kdb, name);
 }

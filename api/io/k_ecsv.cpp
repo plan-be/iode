@@ -109,15 +109,14 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  */
 char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
 {
-    int     pos;
-    U_ch    *ccmt;                     /* JMP 19-09-96 */
+    U_ch* ccmt;
 
-    pos = dbc->index_of(name);
-    if(pos >= 0)  
+    SWHDL handle = dbc->get_handle(name);
+    if(handle > 0)  
     {
-        ccmt = (unsigned char*) KCVAL(dbc, pos);        /* JMP 19-09-96 */
-        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");  /* JMP 19-09-96 */
-        return(write_separator((char*) ccmt, cmt)); /* JMP 19-09-96 */
+        ccmt = (unsigned char*) KCVAL(dbc, handle);
+        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");
+        return(write_separator((char*) ccmt, cmt));
     }
     else 
         return(write_separator("", cmt));
@@ -137,14 +136,16 @@ char* ExportObjsCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    std::string name = dbv->get_name(nb);
+    double* value_ptr = KVVAL(dbv, name, t);
+    write_value(tmp, *value_ptr);
     write_separator(tmp, &buf);
-    lg = (int)strlen(buf) + 1;
+    lg = (int) strlen(buf) + 1;
 
     if(*vec == NULL) 
         olg = 0;
     else 
-        olg = (int)strlen(*vec);
+        olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
@@ -192,12 +193,16 @@ char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
 
 char* ExportObjsRevertCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
-    char    tmp[81], *buf = NULL;
+    char  tmp[81]; 
+    char* buf = NULL;
 
-    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    std::string name = dbv->get_name(nb);
+    double* value_ptr = KVVAL(dbv, name, t);
+    write_value(tmp, *value_ptr);
     write_separator(tmp, &buf);
-    if(vec) *vec = buf;
-    return(buf);
+    if(vec) 
+        *vec = buf;
+    return buf;
 }
 
 int ExportObjsRevertCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)

@@ -45,11 +45,16 @@
 #include "api/constants.h"
 #include "api/lec/lec.h"
 #include "api/objs/pack.h"
+#include "api/objs/structs_32.h"
+
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
+#include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
-#include "api/objs/structs_32.h"
+#include "api/objs/variables.h"
+
 
 #include <string>
 

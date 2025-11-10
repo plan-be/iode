@@ -4,24 +4,8 @@
 #include "api/objs/objs.h"
 #include "api/objs/kdb.h"
 #include "api/objs/variables.h"
-#include "api/lec/lec.h"
+#include "api/lec/lec.h"    
 
-/*----------------------- MACROS ----------------------------*/
-
-inline char* KIPTR(KDB* kdb, char* name)
-{
-    return K_optr0(kdb, name);
-}    
-
-inline char* KILEC(KDB* kdb, int pos)
-{
-    return K_oval0(kdb, pos);
-}
-
-inline CLEC* KICLEC(KDB* kdb, int pos)
-{
-    return (CLEC*) K_oval1(kdb, pos);
-}     
 
 /*----------------------- STRUCTS ----------------------------*/
 
@@ -93,3 +77,28 @@ public:
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true);
     std::vector<std::string> get_variables_list(const bool create_if_not_exit=true);
 };
+
+/*----------------------- FUNCTIONS ----------------------------*/
+
+Identity* K_iunpack(char *);
+   
+
+inline char* KILEC(KDB* kdb, const std::string& name)
+{
+    return K_optr0(kdb, (char*) name.c_str());
+}
+
+inline char* KILEC(KDB* kdb, SWHDL handle)
+{
+    return (char*) P_get_ptr(SW_getptr(handle), 0);            
+}
+
+inline CLEC* KICLEC(KDB* kdb, const std::string& name)
+{
+    return (CLEC*) K_optr1(kdb, (char*) name.c_str());
+} 
+
+inline CLEC* KICLEC(KDB* kdb, SWHDL handle)
+{
+    return (CLEC*) P_get_ptr(SW_getptr(handle), 1);            
+}

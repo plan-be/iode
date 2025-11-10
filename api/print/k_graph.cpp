@@ -477,7 +477,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
            double ymin, double ymax, Sample* smpl, int dt, int nt, KDB* kdb, char* names, int mode)
 {
     char    *buf, **vars;
-    int     i, t, ng, var_nb, rc = 0;
+    int     i, t, ng, rc = 0;
     double  *y;
 
     vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
@@ -502,9 +502,8 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     std::string var_name;
     for(i = 0 ; i < ng ; i++) 
     {
-        var_name = vars[i];
-        var_nb = kdb->index_of(var_name);
-        if(var_nb < 0) 
+        var_name = std::string(vars[i]);
+        if(!kdb->contains(var_name)) 
         {
             std::string err_msg = "DataDisplayGraph : '";
             err_msg += std::string(vars[i]);
@@ -515,7 +514,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         }
 
         for(t = 0; t < nt; t++) 
-            y[t] = (double ) KV_get(kdb, var_nb, dt + t, mode);
+            y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
 
         T_GraphLegend(0, "LLBL"[type], vars[i], NULL);
         T_GraphTimeData(smpl, y);

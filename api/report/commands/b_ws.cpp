@@ -550,13 +550,15 @@ int B_WsAggr(int method, char* arg)
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 1) {
+    if(nb_args < 1) 
+    {
         error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
         goto done;
     }
     pattern = (char*) SCR_stracpy((unsigned char*) args[0]);
     nkdb = KV_aggregate(kdb, method, pattern, args[1]);
-    if(nkdb) {
+    if(nkdb) 
+    {
         KV_merge_del(kdb, nkdb, 1);
         rc = 0;
     }    

@@ -23,7 +23,7 @@ protected:
     // https://www.learncpp.com/cpp-tutorial/type-deduction-with-pointers-references-and-const/?utm_content=cmp-true
     Identity* copy_obj(Identity* const original) const override;
 
-    Identity* get_unchecked(const int pos) const override;
+    Identity* get_unchecked(const std::string& name) const override;
 
     KDBIdentities(KDBIdentities* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -36,8 +36,6 @@ public:
         return new KDBIdentities(this, deep_copy, pattern);
     }
 
-    std::string get_lec(const int pos) const;
-
     std::string get_lec(const std::string& name) const;
 
     bool add(const std::string& name, const std::string& lec);
@@ -45,8 +43,6 @@ public:
     bool add(const std::string& name, const Identity& obj);
 
     void update(const std::string& name, const std::string& lec);
-
-    void update(const int pos, const std::string& lec);
 
     bool execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);

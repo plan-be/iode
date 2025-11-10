@@ -276,17 +276,18 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
     }
     as1 --;
 
-    niv = get_niv((char*) C_kdb->get_name(as1).c_str());
+    char* name1 = (char*) C_kdb->get_name(as1).c_str();
+    niv = get_niv(name1);
     if(niv < 1 || niv > 9) 
         return(-1);
 
     shift = niv;
     while(niv > 0 && as1 >= 0) 
     {
-        r_niv = get_niv((char*) C_kdb->get_name(as1).c_str());
+        r_niv = get_niv(name1);
         if(niv == r_niv) 
         {
-            str = KOVAL(C_kdb, as1);
+            str = K_optr0(C_kdb, name);
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
             niv --;
@@ -296,13 +297,14 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
 
     if(as2 > 0) 
     {
-        niv = get_niv((char*) C_kdb->get_name(as2).c_str());
+        char* name2 = (char*) C_kdb->get_name(as2).c_str();
+        niv = get_niv(name2);
         while(niv > 0 && as2 >= 0 && niv + shift < 10) 
         {
-            r_niv = get_niv((char*) C_kdb->get_name(as2).c_str());
+            r_niv = get_niv(name2);
             if(niv == r_niv) 
             {
-                str = KOVAL(C_kdb, as2);
+                str = K_optr0(C_kdb, name2);
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;
             }

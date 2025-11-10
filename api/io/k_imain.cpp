@@ -114,7 +114,6 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
-    int pos;
     if(impdef->read_variable_implemented) 
     {
         vector = (double *) SW_nalloc(nb * sizeof(double));
@@ -166,8 +165,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
                 }
             }
 
-            pos = kdb->index_of(var_name);
-            KV_set(kdb, pos, shift, VAR_MODE_LEVEL, value);
+            KV_set(kdb, var_name, shift, VAR_MODE_LEVEL, value);
         }
     }
 

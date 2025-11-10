@@ -262,7 +262,7 @@ static void print_val(FILE* fd, double val)
 int AsciiVariables::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i, j;
+    int     j;
     double  *val;
     Sample  *smpl;
 
@@ -287,10 +287,10 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, _] : kdb->k_objs) 
     {
-        fprintf(fd, "%s ", kdb->get_name(i).c_str());
-        val = KVVAL(kdb, i, 0);
+        fprintf(fd, "%s ", name.c_str());
+        val = KVVAL(kdb, name, 0);
         for(j = 0 ; j < smpl->nb_periods; j++, val++) 
             print_val(fd, *val);
         fprintf(fd, "\n");
@@ -326,7 +326,7 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
 int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)
 {
     FILE        *fd;
-    int         i, j, nb, pos;
+    int         i, j, nb;
     char        fmt[80], buf[256], *sep, *dec, *nan, *axes, **lst;
     double      *val;
 
@@ -405,10 +405,9 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
         SCR_upper((unsigned char *) lst[i]);
         fprintf(fd, "%s", lst[i]);
         var_name = std::string(lst[i]);
-        pos = kdb->index_of(var_name);
-        if(pos >= 0) 
+        if(kdb->contains(var_name)) 
         {
-            val = KVVAL(kdb, pos, 0);
+            val = KVVAL(kdb, var_name, 0);
             for(j = 0; j < smpl->nb_periods; j++, val++) 
             {
                 if(IODE_IS_A_NUMBER(*val)) 

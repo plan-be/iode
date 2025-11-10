@@ -21,7 +21,7 @@ protected:
     Scalar* copy_obj(Scalar* const original) const override;
 
     // WARNING: the returned scalar MUST NOT be deleted
-    Scalar* get_unchecked(const int pos) const override;
+    Scalar* get_unchecked(const std::string& name) const override;
 
     KDBScalars(KDBScalars* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -41,8 +41,6 @@ public:
     void update(const std::string& name, const Scalar& obj);
 
     void update(const std::string& name, const double value, const double relax, const double std = IODE_NAN);
-
-    void update(const int pos, const double value, const double relax, const double std = IODE_NAN);
 };
 
 

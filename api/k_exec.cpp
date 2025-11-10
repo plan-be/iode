@@ -132,31 +132,29 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  */
 static KDB *KI_series_list(KDB* dbi)
 {
-    int     i, j, nb_names;
+    int     nb_names;
     KDB     *dbv;
     LNAME   *lname;
     CLEC    *clec;
 
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons 
-    // (will eliminated by the call to K_add_entry() below).
-    std::string idt_name;  
-    std::string var_name;  
+    // (will eliminated by the call to K_add_entry() below). 
+    std::string name;  
     std::vector<std::string> vars_to_compute;
-    for(i = 0; i < dbi->size(); i++) 
+    for(auto& [idt_name, idt_handle] : dbi->k_objs) 
     {
-        idt_name = dbi->get_name(i);
         vars_to_compute.push_back(idt_name);
 
-        clec = KICLEC(dbi, i);
+        clec = KICLEC(dbi, idt_handle);
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
 
-        for(j = 0; j < nb_names; j++) 
+        for(int j = 0; j < nb_names; j++) 
         {
-            if(is_coefficient(lname[j].name)) 
+            name = std::string(lname[j].name);
+            if(is_coefficient(name)) 
                 continue;
-            var_name = std::string(lname[j].name);
-            vars_to_compute.push_back(var_name);
+            vars_to_compute.push_back(name);
         }
     }
 
@@ -180,24 +178,26 @@ static KDB *KI_series_list(KDB* dbi)
  */
 static KDB *KI_scalar_list(KDB* dbi)
 {
-    int     i, j, nb_names;
+    int     nb_names;
     KDB     *dbs;
     LNAME   *lname;
     CLEC    *clec, *tclec;
 
+    std::string name;
     dbs = new KDB(SCALARS, DB_STANDALONE);
-    for(i = 0; i < dbi->size(); i++) 
+    for(auto& [idt_name, idt_handle] : dbi->k_objs) 
     {
-        clec = KICLEC(dbi, i);
+        clec = KICLEC(dbi, idt_handle);
         tclec = (CLEC*) SW_nalloc(clec->tot_lg);
         memcpy(tclec, clec, clec->tot_lg);
         lname    = &(tclec->lnames[0]);
         nb_names = tclec->nb_names;
-        for(j = 0 ; j < nb_names ; j++) 
+        for(int j = 0 ; j < nb_names ; j++) 
         {
-            if(!is_coefficient(lname[j].name)) 
+            name = std::string(lname[j].name);
+            if(!is_coefficient(name)) 
                 continue;
-            K_add_entry(dbs, lname[j].name);
+            K_add_entry(dbs, name);
         }
         SW_nfree(tclec); // JMP 26/8/2012
     }
@@ -254,7 +254,7 @@ static int KI_quick_extract(KDB* dbv, KDB* dbi)
 
 static int *KI_reorder(KDB* dbi)
 {
-    int     i, j, nb, *order,
+    int     nb, *order,
             nb_order = 0,
             nb_names, mod, pos;
     char    *mark;
@@ -265,21 +265,25 @@ static int *KI_reorder(KDB* dbi)
     order = (int *)SW_nalloc(sizeof(int) * nb);
     mark  = SW_nalloc(nb);
 
+    int i, j;
+    std::string name;
     while(nb_order < nb) 
     {
+        i = 0;
         mod = 0;
-        for(i = 0; i < nb ; i++) 
+        for(auto& [idt_name, idt_handle] : dbi->k_objs) 
         {
             if(mark[i]) 
                 continue;
-            clec = KICLEC(dbi, i);
+            clec = KICLEC(dbi, idt_handle);
             lname    = clec->lnames;
             nb_names = clec->nb_names;
             for(j = 0 ; j < nb_names ; j++) 
             {
-                if(strcmp(dbi->get_name(i).c_str(), lname[j].name) == 0) 
+                name = std::string(lname[j].name);
+                if(idt_name == name) 
                     continue;
-                pos = dbi->index_of(lname[j].name);
+                pos = dbi->index_of(name);
                 if(pos < 0) 
                     continue;
                 if(mark[pos]) 
@@ -292,6 +296,8 @@ static int *KI_reorder(KDB* dbi)
                 mark[i] = mod = 1;
                 order[nb_order++] = i;
             }
+
+            i++;
         }
 
         if(mod == 0) 
@@ -386,8 +392,6 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
-    int pos;
-    int pos_tmp;
     SWHDL handle;
     int nb_found = 0;
     for(const std::string& name : vars_to_read)
@@ -402,9 +406,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
         dbv->k_objs[name] = handle;
 
         // copy the VAR from dbv_tmp to dbv
-        pos = dbv->index_of(name);
-        pos_tmp = dbv_tmp->index_of(name);
-        memcpy(KVVAL(dbv, pos, start), KVVAL(dbv_tmp, pos_tmp, start_tmp), 
+        memcpy(KVVAL(dbv, name, start), KVVAL(dbv_tmp, name, start_tmp), 
                sizeof(double) * smpl.nb_periods);
         
         if(KEXEC_TRACE)
@@ -589,8 +591,6 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     
-    int pos;
-    int pos_tmp;
     int nb_found = 0;
     for(auto& [name, handle] : dbs->k_objs) 
     {
@@ -607,9 +607,7 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
         dbs->k_objs[name] = handle;
         
         // copy the scalar from dbs_tmp to dbs
-        pos = dbs->index_of(name);
-        pos_tmp = dbs_tmp->index_of(name);
-        memcpy(KSVAL(dbs, pos), KSVAL(dbs_tmp, pos_tmp), sizeof(Scalar));
+        memcpy(KSVAL(dbs, name), KSVAL(dbs_tmp, name), sizeof(Scalar));
 
         if(KEXEC_TRACE) 
             W_printf("%s ", name.c_str());
@@ -752,7 +750,7 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
  */
 static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
 {
-    int     i, t, pos, tot_lg, start;
+    int     tot_lg, start;
     char    *tmp;
     double  d;
 
@@ -760,19 +758,20 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, Sample* smpl)
     if(start < 0) 
         start = 0;
 
-    for(i = 0; i < dbi->size(); i++) 
+    std::string idt_name;
+    for(int i = 0; i < dbi->size(); i++) 
     {
-        tot_lg = KICLEC(dbi, order[i])->tot_lg;
+        idt_name = dbi->get_name(order[i]);
+        tot_lg = KICLEC(dbi, idt_name)->tot_lg;
         tmp = SW_nalloc(tot_lg);
-        memcpy(tmp, KICLEC(dbi, order[i]), tot_lg);
+        memcpy(tmp, KICLEC(dbi, idt_name), tot_lg);
         if(L_link(dbv, dbs, (CLEC *)tmp)) 
             return(-1);
         
-        pos = dbv->index_of(dbi->get_name(order[i]));
-        for(t = start ; t < start + smpl->nb_periods ; t++) 
+        for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
             d = L_exec(dbv, dbs, (CLEC *)tmp, t);
-            *(KVVAL(dbv, pos, t)) = d;
+            *(KVVAL(dbv, idt_name, t)) = d;
         }
         SW_nfree(tmp);
     }

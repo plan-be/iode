@@ -240,7 +240,6 @@ int B_DataCalcVar(char* arg, int unused)
     int         lg, t, nb;
     KDB         *kdb = K_WS[VARIABLES];
     CLEC        *clec = 0;
-    int         pos;
     double      d;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
@@ -256,7 +255,6 @@ int B_DataCalcVar(char* arg, int unused)
             return(-1);
     }
 
-    pos = kdb->index_of(std::string(name));
     if(lec[0]) 
     {
         clec = L_cc(lec);
@@ -265,7 +263,7 @@ int B_DataCalcVar(char* arg, int unused)
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
                 d = L_exec(kdb, K_WS[SCALARS], clec, t);
-                *(KVVAL(kdb, pos, t)) = d;
+                *(KVVAL(kdb, name, t)) = d;
             }
             SW_nfree(clec);
         }
@@ -517,7 +515,7 @@ int B_DataRename(char* arg, int type)
 int B_DataUpdate(char* arg, int type)
 {
     bool    success;
-    int     shift, lg, rc,
+    int     shift, rc,
             nb_args, nb_upd, nb_p,
             i, mode;
     double  var;
@@ -525,15 +523,15 @@ int B_DataUpdate(char* arg, int type)
     Scalar  scl;
     Period  *per = NULL;
     char    name[K_MAX_NAME + 1], **args = NULL;
+    std::string var_name;
 
-    lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     if(!kdb->contains(std::string(name))) 
     {
         if(B_DataCreate(name, type)) 
             return -1;
     }
 
-    int pos;
     switch(type) 
     {
     case COMMENTS : /* Name Val */
@@ -624,14 +622,14 @@ int B_DataUpdate(char* arg, int type)
                 success = false;
             else 
             {
+                var_name = std::string(name);
                 nb_p++;
-                pos = kdb->index_of(std::string(name));
                 for(i = 0; i < nb_upd; i++) 
                 {
                     var = (double) atof(args[i + nb_p]);
                     if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
-                        var = IODE_NAN; /* JMP 06-09-2004 */
-                    KV_set(kdb, pos, shift + i, mode, var);
+                        var = IODE_NAN;
+                    KV_set(kdb, var_name, shift + i, mode, var);
                 }
                 success = true;
             }
@@ -803,7 +801,7 @@ static int my_strcmp(const void *pa, const void *pb)
 
 int B_DataListSort(char* arg, int unused)
 {
-    int     rc = 0, pos;
+    int     rc = 0;
     char    *in, *out, *lst,
             **args = NULL, **lsti = NULL,
             *old_A_SEPS;
@@ -817,9 +815,7 @@ int B_DataListSort(char* arg, int unused)
         out = args[1];
     }
 
-    pos = KL_WS->index_of(in);
-
-    if(pos < 0) 
+    if(!KL_WS->contains(in)) 
     {
         error_manager.append_error("List '" + std::string(args[0]) + 
                                    "' not found in the Lists workspace");
@@ -827,7 +823,7 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
     else 
-        lst = KLVAL(KL_WS, pos);
+        lst = KLVAL(KL_WS, in);
     
     if(lst == NULL) 
     {
@@ -989,8 +985,7 @@ int B_DataAppend(char* arg, int type)
         if(strlen(text) == 0) 
             return(0);
 
-        int pos = kdb->index_of(name);
-        ptr = KOVAL(kdb, pos);
+        ptr = K_optr0(kdb, name);
         nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
         if(type == COMMENTS)
             sprintf(nptr, "%s %s", ptr, text);
@@ -1124,31 +1119,40 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
  */
 int B_DataCalcLst(char* arg, int unused)
 {
-    int             rc = 0, p1, p2;
-    unsigned char   **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
-                      *res, *list1, *list2, *op;
+    int rc = 0;
+    unsigned char **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
+                  *res, *list1, *list2, *op;
 
     /* arg: res list1 op list2 */
-    if((args = (unsigned char**) B_vtom_chk(arg, 4)) == NULL) return(-1);
-    res  = args[0];
+    args = (unsigned char**) B_vtom_chk(arg, 4);
+    if(args == NULL) 
+        return -1;
+    
+    res   = args[0];
     list1 = args[1];
-    op   = args[2];
+    op    = args[2];
     list2 = args[3];
 
-    p1 = K_WS[LISTS]->index_of((char*) list1);
-    p2 = K_WS[LISTS]->index_of((char*) list2);
-    if(p1 < 0 || p2 < 0) 
+    if(!K_WS[LISTS]->contains((char*) list1))
     {
-        std::string error_msg = "List '";
-        error_msg += (p1 < 0) ? std::string((char*) list1) : std::string((char*) list2);
+        std::string error_msg = "List '" + std::string((char*) list1);
         error_msg += "' not found in the Lists workspace";
-        error_manager.append_error(error_msg); // JMP 4/02/09
+        error_manager.append_error(error_msg);
         rc = -1;
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], p2), NULL, 0);
+    if(!K_WS[LISTS]->contains((char*) list2))
+    {
+        std::string error_msg = "List '" + std::string((char*) list2);
+        error_msg += "' not found in the Lists workspace";
+        error_manager.append_error(error_msg);
+        rc = -1;
+        goto done;
+    }
+
+    l1 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], (char*) list1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], (char*) list2), NULL, 0);
     switch(op[0]) 
     {
     case '+' :
@@ -1186,10 +1190,9 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    int pos = KL_WS->index_of(name);
-    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, pos));
+    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, name));
     if(lst == NULL) 
-        return(-1);
+        return -1;
 
     char** lsti = B_ainit_chk(lst, NULL, 0);
     int nb = SCR_tbl_size((unsigned char**) lsti);

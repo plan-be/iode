@@ -90,18 +90,26 @@ double Estimation::E_sqrt(double val)
  */
 void Estimation::E_deg_freed()
 {
-    int     j, eq, cf, nbr, nbce;
+    int j, eq, cf, nbr, nbce;
 
-    for(cf = 0, j = 0; cf < E_NC; cf++) {
-        if(KSVAL(E_DBS, E_C_NBS[cf])->relax == 0) continue;
+    std::string coef_name;
+    for(cf = 0, j = 0; cf < E_NC; cf++) 
+    {
+        coef_name = E_DBS->get_name(E_C_NBS[cf]);
+        if(KSVAL(E_DBS, coef_name)->relax == 0) 
+            continue;
         nbr = 0;
-        for(eq = 0; eq < E_NEQ; eq++) {
-            if(E_scl_in_eq(cf, eq)) {
+        for(eq = 0; eq < E_NEQ; eq++) 
+        {
+            if(E_scl_in_eq(cf, eq)) 
+            {
                 nbr ++;
-                nbce = (int)MATE(E_NBCE, 0, eq);
+                nbce = (int) MATE(E_NBCE, 0, eq);
             }
-            if(nbr > 1) MATE(E_DF, 0, j) = E_T;
-            else MATE(E_DF, 0, j) = E_T - nbce;
+            if(nbr > 1) 
+                MATE(E_DF, 0, j) = E_T;
+            else 
+                MATE(E_DF, 0, j) = E_T - nbce;
         }
         j++;
     }
@@ -223,12 +231,16 @@ int Estimation::E_c_mcorru()
 int Estimation::E_c_ttests()
 {
     int     i, j;
-    Scalar     *scl;
+    Scalar* scl;
 
-    for(i = 0, j = 0 ; i < E_NC ; i++) {
-        scl = KSVAL(E_DBS, E_C_NBS[i]);
+    std::string coef_name;
+    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    {
+        coef_name = E_DBS->get_name(E_C_NBS[i]);
+        scl = KSVAL(E_DBS, coef_name);
         scl->std = 0.0;
-        if(scl->relax == 0) continue;
+        if(scl->relax == 0) 
+            continue;
         if(E_MET == 4) // ??? Max likelihood ???
             scl->std = E_sqrt(MATE(E_VCC, j, j));
         else

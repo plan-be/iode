@@ -61,19 +61,7 @@ TEST_F(KDBTablesTest, Save)
 
 TEST_F(KDBTablesTest, Get)
 {
-    Table* table;
-    int pos = K_WS[TABLES]->index_of(const_cast<char*>("GFRPC"));
-
-    // by position
-    table = Tables.get(pos);
-    EXPECT_EQ(table->get_title(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table->lines.size(), 31);
-    EXPECT_EQ(table->nb_columns, 2);
-    EXPECT_EQ(table->lines[0].get_type(), TABLE_LINE_TITLE);
-    delete table;
-
-    // by name
-    table = Tables.get("GFRPC");
+    Table* table = Tables.get("GFRPC");
     EXPECT_EQ(table->get_title(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table->lines.size(), 31);
     EXPECT_EQ(table->nb_columns, 2);
@@ -91,17 +79,10 @@ TEST_F(KDBTablesTest, GetNames)
 
 TEST_F(KDBTablesTest, GetTitle)
 {
-    int pos = 0;
     std::string title;
     std::string expected_title = "Déterminants de la croissance de K";
 
-    // by position
-    title = Tables.get_title(pos);
-    EXPECT_EQ(expected_title, title);
-
-    // by name
-    std::string name = Tables.get_name(pos);
-    title = Tables.get_title(name);
+    title = Tables.get_title("ANAKNFF");
     EXPECT_EQ(expected_title, title);
 }
 

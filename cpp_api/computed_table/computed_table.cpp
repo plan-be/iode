@@ -285,7 +285,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         return false;
 
     // update the variable var_name in the database
-    KV_set(KV_WS, var_pos, period_pos, 0, res);
+    KV_set(KV_WS, var_name, period_pos, 0, res);
 
     return true;
 }

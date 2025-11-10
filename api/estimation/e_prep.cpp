@@ -314,8 +314,9 @@ int Estimation::E_prep_coefs()
         E_NC += E_CRHS[i]->nb_names;
     
     // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
-    E_C_NBS = (int *)SW_nalloc(E_NC * sizeof(int));
-    if(E_C_NBS == 0) {
+    E_C_NBS = (int *) SW_nalloc(E_NC * sizeof(int));
+    if(E_C_NBS == 0) 
+    {
         error_manager.append_error("Estimation : Memory Error");
         return(-1);
     }
@@ -323,26 +324,33 @@ int Estimation::E_prep_coefs()
     // Loop on equations and names in each equations (linked before with E_BDS)
     E_NC = 0;
     E_NBCE = M_alloc(1, E_NEQ);
-    for(i = 0 ; i < E_NEQ ; i++) {
-        clec = E_CRHS[i]; // linked before
-        for(j = 0 ; j < clec->nb_names ; j++) {
-            if(is_coefficient(clec->lnames[j].name)) {
+    std::string scl_name;
+    for(i = 0 ; i < E_NEQ ; i++) 
+    {
+        clec = E_CRHS[i];                                   // linked before
+        for(j = 0 ; j < clec->nb_names ; j++) 
+        {
+            if(is_coefficient(clec->lnames[j].name)) 
+            {
                 pos = clec->lnames[j].pos;
                 for(k = 0 ; k < E_NC ; k++)
                     if(E_C_NBS[k] == pos) 
-                        break;    // Coef already found in E_C_NBS
-                if(k == E_NC) {
-                    E_C_NBS[E_NC++] = pos;          // Add a coefficient in E_C_NBS
-                    if(KSVAL(E_DBS, pos)->relax > 0) 
+                        break;                              // Coef already found in E_C_NBS
+                scl_name = E_DBS->get_name(pos);
+                if(k == E_NC) 
+                {
+                    E_C_NBS[E_NC++] = pos;                  // Add a coefficient in E_C_NBS
+                    if(KSVAL(E_DBS, scl_name)->relax > 0) 
                         E_NCE++;
                 }
-                if(KSVAL(E_DBS, pos)->relax > 0) 
-                    MATE(E_NBCE, 0, i)++; // relax > 0 => estimation coef
+                if(KSVAL(E_DBS, scl_name)->relax > 0) 
+                    MATE(E_NBCE, 0, i)++;                   // relax > 0 => estimation coef
             }
         }
     }
 
-    if(E_NCE == 0) { /* GB 26/02/97 */
+    if(E_NCE == 0) 
+    {
         std::string error_msg = "No scalars to estimate in your block of equations";
         error_manager.append_error(error_msg);
         error_manager.append_error("Estimation: No current estimation");
@@ -370,14 +378,16 @@ int Estimation::E_prep_coefs()
  */
 void Estimation::E_get_C()
 {
-    int     i;
-    double    c;
-
-    for(i = 0 ; i < E_NC ; i++) {
-        c = KSVAL(E_DBS, E_C_NBS[i])->value;
-        if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0.0 && fabs(c) < 1e-15) {
+    double c;
+    std::string scl_name;
+    for(int i = 0 ; i < E_NC ; i++) 
+    {
+        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        c = KSVAL(E_DBS, scl_name)->value;
+        if(KSVAL(E_DBS, scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
+        {
             c = 0.1;
-            KSVAL(E_DBS, E_C_NBS[i])->value = c; // GB 24/01/2013
+            KSVAL(E_DBS, scl_name)->value = c; // GB 24/01/2013
         }
         MATE(E_C, i, 0) = c;
     }
@@ -393,10 +403,12 @@ void Estimation::E_get_C()
  */
 void Estimation::E_put_C()
 {
-    int     i;
-
-    for(i = 0 ; i < E_NC ; i++)
-        KSVAL(E_DBS, E_C_NBS[i])->value = MATE(E_C, i, 0);
+    std::string name;
+    for(int i = 0 ; i < E_NC ; i++)
+    {
+        name = E_DBS->get_name(E_C_NBS[i]);
+        KSVAL(E_DBS, name)->value = MATE(E_C, i, 0);
+    }
 }
 
 
@@ -410,10 +422,12 @@ void Estimation::E_put_C()
  */
 void Estimation::E_get_SMO()
 {
-    int     i;
-
-    for(i = 0 ; i < E_NC ; i++)
-        MATE(E_SMO, i, 0) = KSVAL(E_DBS, E_C_NBS[i])->relax;
+    std::string scl_name;
+    for(int i = 0 ; i < E_NC ; i++)
+    {
+        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        MATE(E_SMO, i, 0) = KSVAL(E_DBS, scl_name)->relax;
+    }
 }
 
 

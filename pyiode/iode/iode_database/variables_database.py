@@ -69,34 +69,37 @@ class VarPositionalIndexer:
     def __init__(self, database):
         self.database = database
 
-    def _check_index(self, index: Union[int, Tuple[int, int]]) -> Tuple[int, int]:
+    def _check_index(self, index: Union[int, Tuple[int, int]]) -> Tuple[str, int]:
         if isinstance(index, int):
             pos, t = index, None
         if isinstance(index, tuple):
             pos, t = index
+        
         if pos < 0:
             pos += len(self.database)
         if not (0 <= pos < len(self.database)):
             raise IndexError(f"Index {pos} out of range")
+        name = self.database.get_name(pos)
+
         if t is not None: 
             if t < 0:
                 t += self.database.nb_periods
             if not (0 <= t < self.database.nb_periods):
                 raise IndexError(f"Period index {t} out of range")
-        return pos, t
+        return name, t
 
     def _convert_period(self, t: int) -> Period:
         return self.database.sample.start.shift(t) if t is not None else None
 
     def __getitem__(self, index: Union[int, Tuple[int, int]]):
-        pos, t = self._check_index(index)
+        name, t = self._check_index(index)
         period = self._convert_period(t)
-        return self.database._get_variable(pos, period)
+        return self.database._get_variable(name, period)
 
     def __setitem__(self, index: Union[int, Tuple[int, int]], value):
-        pos, t = self._check_index(index)
+        name, t = self._check_index(index)
         period = self._convert_period(t)
-        self.database._set_variable(pos, value, period)
+        self.database._set_variable(name, value, period)
 
 
 class Variables(IodeDatabase):
@@ -588,14 +591,12 @@ class Variables(IodeDatabase):
         if name not in self:
             raise KeyError(f"Variable '{name}' not found in the Variables database")
 
-        pos = self.index(key_name) if isinstance(key_name, str) else key_name
-
         # key_periods represents all periods (of the current subset) -> return a Variables object
         if key_periods is None:
             db_subset = self._subset(name, copy=False)
         # key_periods represents a unique period -> return a float 
         elif isinstance(key_periods, Period):
-            db_subset = self._cython_instance._get_variable(pos, key_periods._cython_instance)
+            db_subset = self._cython_instance._get_variable(key_name, key_periods._cython_instance)
         # key_periods represents a contiguous range of periods -> return a Variables object
         elif isinstance(key_periods, tuple):
             first_period, last_period = key_periods
@@ -612,7 +613,7 @@ class Variables(IodeDatabase):
             if not all(isinstance(period, Period) for period in key_periods):
                 raise TypeError("Expected a list of periods each of type 'Period'")
             cython_key_periods = [p._cython_instance for p in key_periods]
-            values = self._cython_instance._get_variable(pos, cython_key_periods)
+            values = self._cython_instance._get_variable(key_name, cython_key_periods)
             key_periods = [str(period) for period in key_periods]
             series = pd.Series(values, index=key_periods, dtype=float)
             series.index.name = "time"

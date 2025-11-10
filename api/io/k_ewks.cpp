@@ -63,11 +63,11 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
 
 char* ExportObjsWKS::extract_comment(KDB* dbc, char* name, char** cmt)
 {
-    int pos;
-
-    pos = dbc->index_of(name);
-    if(pos >= 0)  wks_string(KCVAL(dbc, pos), WKS_COL, WKS_ROW);
-    else wks_string(" ", WKS_COL, WKS_ROW);
+    SWHDL handle = dbc->get_handle(name);
+    if(handle > 0)  
+        wks_string(KCVAL(dbc, handle), WKS_COL, WKS_ROW);
+    else 
+        wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;
 
     return(*cmt = NULL);
@@ -75,9 +75,11 @@ char* ExportObjsWKS::extract_comment(KDB* dbc, char* name, char** cmt)
 
 char* ExportObjsWKS::get_variable_value(KDB* dbv, int nb, int t, char** vec)
 {
-    char    *buf = NULL;
+    char* buf = NULL;
 
-    wks_value((double)(*KVVAL(dbv, nb, t)), WKS_COL, WKS_ROW);
+    std::string name = dbv->get_name(nb);
+    double* value_ptr = KVVAL(dbv, name, t);
+    wks_value(*value_ptr, WKS_COL, WKS_ROW);
     WKS_COL ++;
 
     return(*vec = NULL);

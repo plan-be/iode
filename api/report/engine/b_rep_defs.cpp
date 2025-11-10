@@ -132,15 +132,12 @@ int RP_define(char* arg, int unused)
  */
 char* RP_get_macro_ptr(char* macro_name)
 {
-    int     pos;
-    
-    pos = RP_MACRO->index_of(macro_name);
-    if(pos < 0) 
-        return(NULL);
+    if(!RP_MACRO->contains(macro_name)) 
+        return NULL;
    
-    return(KOVAL(RP_MACRO, pos));
+    return(K_optr0(RP_MACRO, macro_name));
 }
-    
+
 /**
  *  Deletes one macro.
  *  
@@ -238,7 +235,7 @@ int RP_define_calcdepth(char *name)
  */
 int RP_define_save(char *name)
 {
-    int     pos, rc, maxdepth;
+    int     rc, maxdepth;
     char    buf[1024];
 
     // Create the macro KDB if needed
@@ -247,16 +244,15 @@ int RP_define_save(char *name)
         return(rc);
 
     // if the macro "name" does not yet exist, no need to push its definition
-    pos = RP_MACRO->index_of(name);
-    if(pos < 0) 
-        return(0);
+    if(!RP_MACRO->contains(name)) 
+        return 0;
 
     // Try to find object name#*
     maxdepth = RP_define_calcdepth(name);
 
     // Create a copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth + 1);
-    rc = RP_define_1(buf, KOVAL(RP_MACRO, pos));
+    rc = RP_define_1(buf, K_optr0(RP_MACRO, name));
 
     return(rc);
 }
@@ -274,7 +270,7 @@ int RP_define_save(char *name)
  */
 int RP_define_restore(char *name)
 {
-    int     pos, rc, maxdepth;
+    int     rc, maxdepth;
     char    buf[1024];
 
     // Create the macro KDB if needed
@@ -286,12 +282,12 @@ int RP_define_restore(char *name)
 
     // Try to find object name#* - Nothing to do if not found
     maxdepth = RP_define_calcdepth(name);
-    if(maxdepth < 0) return(0);
+    if(maxdepth < 0) 
+        return(0);
 
     // Restore the copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
-    pos = RP_MACRO->index_of(buf);
-    rc = RP_define_1(name, KOVAL(RP_MACRO, pos));
+    rc = RP_define_1(name, K_optr0(RP_MACRO, buf));
 
     // Delete the copy
     RP_undef_1(buf);

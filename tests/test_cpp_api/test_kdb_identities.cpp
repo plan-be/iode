@@ -78,44 +78,17 @@ TEST_F(KDBIdentitiesTest, Rename)
 
 TEST_F(KDBIdentitiesTest, GetLec)
 {
-    int pos = 0;
-    std::string name = Identities.get_name(pos);
-    std::string lec;
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
-
-    // by position
-    lec = Identities.get_lec(pos);
-    EXPECT_EQ(lec, expected_lec);
-
-    // by name
-    lec = Identities.get_lec(name);
+    std::string lec = Identities.get_lec("AOUC");
     EXPECT_EQ(lec, expected_lec);
 }
 
 TEST_F(KDBIdentitiesTest, Get)
 {
-    int pos = 0;
-    std::string name = Identities.get_name(pos);
+    std::string name = "AOUC";
     CLEC* clec = NULL;
-    CLEC* expected_clec = KICLEC(K_WS[IDENTITIES], pos);
+    CLEC* expected_clec = KICLEC(K_WS[IDENTITIES], name);
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
-
-    // by position
-    Identity* identity_pos = Identities.get(pos);
-    EXPECT_EQ(identity_pos->lec, expected_lec);
-    clec = identity_pos->get_compiled_lec();
-    EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
-    EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
-    EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
-    EXPECT_EQ(clec->dupendo, expected_clec->dupendo);
-    for(int i = 0; i < expected_clec->nb_names; i++)
-    {
-        EXPECT_EQ(std::string(clec->lnames[i].name), std::string(expected_clec->lnames[i].name));
-        EXPECT_EQ(std::string(clec->lnames[i].pad), std::string(expected_clec->lnames[i].pad));
-        EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
-    }
-    EXPECT_TRUE(clec_equal(clec, expected_clec));
-    delete identity_pos;
 
     // by name
     Identity* identity_name = Identities.get(name);

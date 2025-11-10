@@ -21,7 +21,7 @@ protected:
     // https://www.learncpp.com/cpp-tutorial/type-deduction-with-pointers-references-and-const/?utm_content=cmp-true
     Table* copy_obj(Table* const original) const override;
 
-    Table* get_unchecked(const int pos) const override;
+    Table* get_unchecked(const std::string& name) const override;
 
     KDBTables(KDBTables* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -33,8 +33,6 @@ public:
     {
         return new KDBTables(this, deep_copy, pattern);
     }
-
-    std::string get_title(const int pos) const;
 
     std::string get_title(const std::string& name) const;
 

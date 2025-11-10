@@ -6,7 +6,6 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBIdentities as CKDBIdentities
 from pyiode.iode_database.cpp_api_database cimport Identities as cpp_global_identities
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 import pandas as pd
 

@@ -43,15 +43,16 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
  */
 static int E_GetScls(CLEC* clec, char*** scl)                                            
 {
-    int j, pos, nbscl = 0;
+    int nbscl = 0;
 
+    std::string name;
     if(clec != 0) 
     {
-        for(j = 0 ; j < clec->nb_names ; j++) 
+        for(int j = 0 ; j < clec->nb_names ; j++) 
         {
-            pos = K_WS[SCALARS]->index_of(clec->lnames[j].name);
-            if(is_coefficient(clec->lnames[j].name) && KSVAL(K_WS[SCALARS], pos)->relax != 0)
-                    SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) clec->lnames[j].name);
+            name = std::string(clec->lnames[j].name);
+            if(is_coefficient(name) && KSVAL(K_WS[SCALARS], name)->relax != 0)
+                SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) name.c_str());
         }
     }
     SCR_add_ptr((unsigned char***) scl, &nbscl, NULL);
@@ -232,7 +233,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
 double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
-    int         pos, lasti;
+    int         lasti;
     double      lnumtest, numtest;
     Equation*   eq;
     CLEC*       cl;
@@ -243,12 +244,12 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     if(eqs == NULL) 
         return(0.0);
     
-    pos = K_WS[EQUATIONS]->index_of(eqs[0]);
-    if(pos < 0) 
-        return(0.0);
+    std::string name = std::string(eqs[0]);
+    if(!K_WS[EQUATIONS]->contains(name)) 
+        return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = KEVAL(K_WS[EQUATIONS], pos);               
+    eq = KEVAL(K_WS[EQUATIONS], name);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
     if(eq)

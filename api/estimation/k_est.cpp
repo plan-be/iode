@@ -108,24 +108,19 @@ void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
  */
  void Estimation::E_savevar(char* name, int eqnb, MAT* mat) 
 {
-    int         t;
-    double   *var; 
-    char        varname[80];
+    // varname = name{eqnb}. Ex: _YRES0, _YCALC1...
+    char varname[80];
+    sprintf(varname, "%s%d", name, eqnb);
     
-    // Varname = name{eqnb}. Ex: _YRES0, _YCALC1...
-    sprintf(varname, "%s%d", name, eqnb);              // JMP 1/3/2023
-    
-    // Create varname with NaN 
+    // create varname with NaN 
     KV_add(KV_WS, varname);
-    var = KVPTR(KV_WS, varname);
+    double* var = KVVAL(KV_WS, varname);
     if(var == NULL) 
         return;
     
-    // Copy mat to name from E_FROM to E_FROM + E_T
-    for(t = E_FROM; t < E_FROM + E_T; t++) {
-        // KV_set_at_t(name, t, (double) MATE(mat, eqnb, t));
+    // copy mat to name from E_FROM to E_FROM + E_T
+    for(int t = E_FROM; t < E_FROM + E_T; t++)
         var[t] =  MATE(mat, eqnb, t - E_FROM);
-    }
 }
 
 
@@ -149,8 +144,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    int pos = E_DBE->index_of(name);
-    if(pos < 0) 
+    if(!E_DBE->contains(name)) 
     {
         std::string comment = "";
         std::string instruments = "";
@@ -162,7 +156,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     }
     else
     {
-        eq = KEVAL(E_DBE, pos);
+        eq = KEVAL(E_DBE, name);
         eq->sample = (smpl != nullptr) ? *smpl : Sample();
         eq->set_lec(lec);
         eq->set_method(method);
@@ -201,7 +195,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 int Estimation::KE_est_s(Sample* smpl)
 {
     static char met[6] = {"LZIGM"};
-    int        i, j, pos, nb, error = 0, nbl = 0, nbe = 0, nblk;
+    int        nb, error = 0, nbl = 0, nbe = 0, nblk;
     Sample*    eq_smpl;
     U_ch**     endos = 0;
     U_ch**     blk = 0;
@@ -214,15 +208,14 @@ int Estimation::KE_est_s(Sample* smpl)
     
     std::string endo;
     std::set<std::string> estimated_eqs;
-    for(i = 0; i < nb; i++) 
+    for(int i = 0; i < nb; i++) 
     {    
         // check if the equation has already been estimated (through a block)
         endo = std::string(est_endos[i]);
         if(estimated_eqs.contains(endo))
             continue;
 
-        pos = E_DBE->index_of(endo);
-        if(pos < 0) 
+        if(!E_DBE->contains(endo)) 
         {
             std::string error_msg  = "Equation '" + endo + "' not found";
             error_manager.append_error(error_msg);
@@ -230,13 +223,13 @@ int Estimation::KE_est_s(Sample* smpl)
         }
 
         if(est_method < 0) 
-            E_MET = KEMETH(E_DBE, pos);
+            E_MET = KEMETH(E_DBE, endo);
         else 
             E_MET = est_method;
 
         if(!smpl) 
         {
-            eq_smpl = new Sample(KESMPL(E_DBE, pos));
+            eq_smpl = new Sample(KESMPL(E_DBE, endo));
             E_SMPL = eq_smpl;
         }
         else
@@ -249,35 +242,35 @@ int Estimation::KE_est_s(Sample* smpl)
         }
         E_T = E_SMPL->nb_periods;
 
-        std::string _instruments = KEINSTR(E_DBE, pos);
+        std::string _instruments = KEINSTR(E_DBE, endo);
         if(_instruments.empty()) 
             instrs = NULL;
         else 
             instrs = SCR_vtoms((unsigned char*) _instruments.c_str(), (unsigned char*) ",;");
 
-        std::string _block = KEBLK(E_DBE, pos);
+        std::string _block = KEBLK(E_DBE, endo);
         blk =  SCR_vtoms((unsigned char*) _block.c_str(), (unsigned char*) " ,;");
         nblk = SCR_tbl_size(blk);
 
         std::string _lec;
+        std::string eq_name;
         if(nblk == 0)  
         {
-            _lec = KELEC(E_DBE, pos);
+            _lec = KELEC(E_DBE, endo);
             SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
             SCR_add_ptr(&endos, &nbe, (unsigned char*) endo.c_str());
         }
         else 
         {
             /* add elements of block */
-            for(j = 0; j < nblk; j++) 
+            for(int j = 0; j < nblk; j++) 
             {
                 SCR_sqz(blk[j]);
-                pos = KE_WS->index_of((char*) blk[j]);
-                if(pos < 0) 
+                eq_name = std::string((char*) blk[j]);
+                if(!KE_WS->contains(eq_name)) 
                 {
-                    std::string error_msg = "Equation '";
-                    error_msg += std::string((char*) blk[j]); 
-                    error_msg += "' not found in block of equation";
+                    std::string error_msg = "Equation '" + eq_name + "' "; 
+                    error_msg += "not found in block of equation";
                     error_manager.append_error(error_msg);
                     SCR_free_tbl(lecs);
                     SCR_free_tbl(endos);
@@ -286,9 +279,9 @@ int Estimation::KE_est_s(Sample* smpl)
                     goto err;
                 }
 
-                _lec = KELEC(KE_WS, pos);
+                _lec = KELEC(KE_WS, eq_name);
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
-                SCR_add_ptr(&endos, &nbe, (unsigned char*) KE_WS->get_name(pos).c_str());
+                SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
             }
         }
 
@@ -301,7 +294,7 @@ int Estimation::KE_est_s(Sample* smpl)
         {
             E_print_results(1, 1, 1, 1, 1);
 
-            for(j = 0; j < nbe - 1; j++) 
+            for(int j = 0; j < nbe - 1; j++) 
             {
                 tests[EQ_CORR]    = (float)MATE(E_MCORRU,      0, j);
                 tests[EQ_STDEV]   = (float)MATE(E_STDEV,       0, j);
@@ -315,10 +308,10 @@ int Estimation::KE_est_s(Sample* smpl)
                 tests[EQ_DW]      = (float)MATE(E_DW,          0, j);
                 tests[EQ_LOGLIK]  = (float)MATE(E_LOGLIK,      0, j);
 
-                KE_update((char*) endos[j], (char*) lecs[j], E_MET, E_SMPL, tests);
+                eq_name = std::string((char*) endos[j]);
+                KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
-                pos = E_DBE->index_of((char*) endos[j]);   /* JMP 24-06-98 */
-                eq = KEVAL(E_DBE, pos);
+                eq = KEVAL(E_DBE, eq_name);
                 E_tests2scl(eq, j, E_T, E_NCE);
                 if(eq) delete eq;
                 eq = nullptr;

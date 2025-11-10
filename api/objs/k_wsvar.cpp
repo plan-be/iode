@@ -72,7 +72,7 @@ int KV_sample(KDB *kdb, Sample *new_sample)
         {
             if(smpl.nb_periods > 0)
                 memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
-                       KVVAL(kdb, i, start1),
+                       KVVAL(kdb, it->first, start1),
                        sizeof(double) * smpl.nb_periods);
             SW_free(it->second);
         }
@@ -141,8 +141,6 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         start2 = smpl.start_period.difference(kdb2->sample->start_period); /* always >= 0 */
     }
 
-    int pos_2 = 0;
-    int pos = -1;
     bool found;
     nb1 = kdb1->sample->nb_periods;
     size_t size = sizeof(double) * smpl.nb_periods;
@@ -156,18 +154,16 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         
         if(!found)
             K_add(kdb1, (char*) name.c_str(), NULL, &nb1);
-        
-        pos = kdb1->index_of(name);
-        if(pos < 0)
+
+        if(!kdb1->contains(name))
         {
             kerror(0, "Cannot merge variable %s from the second database into the first one", name.c_str());
             return -1;
         }
 
         if(handle_2 > 0)
-            memcpy((double *) KVVAL(kdb1, pos, start1),
-                   (double *) KVVAL(kdb2, pos_2, start2), size);
-        pos_2++;
+            memcpy((double *) KVVAL(kdb1, name, start1),
+                   (double *) KVVAL(kdb2, name, start2), size);
     }
 
     return 0;
@@ -278,10 +274,10 @@ int KV_add(KDB* kdb, char* varname)
 }
 
 /**
- * Gets VAR[t] where VAR is the series at position pos in kdb. The value can be modified depending on the value of mode.
+ * Gets VAR[t] where VAR is the series named 'name' in kdb. The value can be modified depending on the value of mode.
  *
  * @param [in] kdb       KDB*    KDB of variables
- * @param [in] pos       int     position of the variable in the kdb
+ * @param [in] name      string  name of the variable in the kdb
  * @param [in] t         int     index in the variable (0 = first position in the series...)
  * @param [in] mode      int     transformation of the value, see below. 
  *
@@ -292,53 +288,53 @@ int KV_add(KDB* kdb, char* varname)
  *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
-double KV_get(KDB *kdb, int pos, int t, int mode)
+double KV_get(KDB* kdb, const std::string& name, int t, int mode)
 {
-    int     pernb;
-    double  var;
-    double    *vt;
-    Sample  *smpl;
-
-    smpl = kdb->sample;
-    if(!smpl || pos < 0 || pos >= kdb->size() || t < 0 || t >= smpl->nb_periods)
+    Sample* smpl = kdb->sample;
+    if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
     {
-        kwarning("Cannot get the value of the variable in position %d at index %d", pos, t);
+        kwarning("Cannot get the value of the variable name %s at period position %d", name.c_str(), t);
         return IODE_NAN;
     }
     
-    pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
+    int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
+    double var;
+    double* vt;
     switch(mode) 
     {
         case VAR_MODE_LEVEL :
-            var = *KVVAL(kdb, pos, t);
+            var = *KVVAL(kdb, name, t);
             break;
         case VAR_MODE_DIFF :
             pernb = 1;
         /* NO BREAK */
         case VAR_MODE_Y0Y_DIFF : 
-            if(t < pernb) {
+            if(t < pernb) 
+            {
                 var = IODE_NAN;
                 break;
             }
-            vt = KVVAL(kdb, pos, 0);
+            vt = KVVAL(kdb, name, 0);
             if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]))
                 var = vt[t] - vt[t - pernb];
-            else var = IODE_NAN;
+            else 
+                var = IODE_NAN;
             break;
-
         case VAR_MODE_GROWTH_RATE :
             pernb = 1;
         /* NO BREAK */
         case VAR_MODE_Y0Y_GROWTH_RATE :
-            if(t < pernb) {
+            if(t < pernb) 
+            {
                 var = IODE_NAN;
                 break;
             }
-            vt = KVVAL(kdb, pos, 0);
+            vt = KVVAL(kdb, name, 0);
             if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !IODE_IS_0(vt[t - pernb]))
                 var = (vt[t]/vt[t - pernb] - 1) * 100.0;
-            else var = IODE_NAN;
+            else 
+                var = IODE_NAN;
             break;
     }
 
@@ -351,7 +347,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  * the parameter mode and the value new.
  * 
  * @param [in, out]  kdb       KDB*        KDB of variables
- * @param [in]       pos       int         position of the variable in the kdb
+ * @param [in]       name      string      name of the variable in the kdb
  * @param [in]       t         int         index in the variable (0 = first position in the series...)
  * @param [in]       mode      int         transformation of the value, see below. 
  * @param [in]       value     double      new value of VAR[t] before transformation according to mode, see below. 
@@ -363,46 +359,44 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  *                              
  */
  
-void KV_set(KDB *kdb, int pos, int t, int mode, double value)
+void KV_set(KDB* kdb, const std::string& name, int t, int mode, double value)
 {
-    int     pernb;
-    double    *var;
-    Sample  *smpl;
-
-    smpl = kdb->sample;
-    if(!smpl || pos < 0 || pos >= kdb->size() || t < 0 || t >= smpl->nb_periods)
+    Sample* smpl = kdb->sample;
+    if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
     {
-        kwarning("Cannot set the value of the variable in position %d at index %d", pos, t);
+        kwarning("Cannot set the value of the variable named %s at period position %d", name.c_str(), t);
         return;
     }
     
-    pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
+    int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
-    var = KVVAL(kdb, pos, 0);
-    switch(mode) {
+    double* var = KVVAL(kdb, name, 0);
+    switch(mode) 
+    {
         case VAR_MODE_LEVEL :
             var[t] = value;
             break;
-
         case VAR_MODE_DIFF :
             pernb = 1;
         /* NO BREAK */
         case VAR_MODE_Y0Y_DIFF :
-            if(t < pernb)  break;
-
-            if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(var[t - pernb])) var[t] = var[t - pernb] + value;
-            else var[t] = IODE_NAN;
+            if(t < pernb)  
+                break;
+            if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(var[t - pernb])) 
+                var[t] = var[t - pernb] + value;
+            else 
+                var[t] = IODE_NAN;
             break;
-
         case VAR_MODE_GROWTH_RATE :
             pernb = 1;
         /* NO BREAK */
         case VAR_MODE_Y0Y_GROWTH_RATE :
-            if(t < pernb) break;
-
+            if(t < pernb) 
+                break;
             if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(var[t - pernb]))
                 var[t] = (value/100.0 + 1.0) * var[t - pernb];
-            else var[t] = IODE_NAN;
+            else 
+                var[t] = IODE_NAN;
             break;
     }
 }
@@ -482,7 +476,7 @@ calc2:
  
 int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)
 {
-    int         rc = -1, i, v, bt, t, at;
+    int         rc = -1, bt, t, at;
     double      *val;
     KDB         *edbv = NULL;
 
@@ -498,13 +492,13 @@ int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)
         edbv = dbv;
     else 
         edbv = K_refer(dbv, SCR_tbl_size((unsigned char**) vars), vars);
-    // if(edbv == NULL) goto done; /* JMP 12-05-11 */
-    if(edbv == NULL || edbv->size() == 0) 
-        goto done; /* JMP 12-05-11 */
+    if(!edbv || edbv->size() == 0) 
+        goto done;
 
-    for(v = 0; v < edbv->size(); v++) 
+    int i;
+    for(auto& [name, _] : edbv->k_objs) 
     {
-        val = KVVAL(edbv, v, 0);
+        val = KVVAL(edbv, name, 0);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
@@ -534,12 +528,12 @@ done:
 
 KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 {
-    int     t, nb_per, added, *times, nbtimes = 500,
-                                         epos, npos;
-    ONAME   ename, nname;
+    int     nb_per, res, npos, added, *times, nbtimes = 500;
     double  *eval = NULL, *nval;
     KDB     *edbv = nullptr, *ndbv = nullptr;
     Sample  *smpl;
+    char    c_nname[K_MAX_NAME + 1];
+    std::string nname;
 
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
@@ -561,21 +555,23 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = new KDB(VARIABLES, DB_STANDALONE);
-    if(ndbv == NULL) 
+    if(!ndbv) 
         goto done;
     
     ndbv->sample = new Sample(*edbv->sample);
-    for(epos = 0; epos < edbv->size(); epos++) 
-    {
-        strcpy(ename, (char*) edbv->get_name(epos).c_str());
-        if(K_aggr(pattern, ename, nname) < 0) 
-            continue;
 
+    for(auto& [ename, handle] : edbv->k_objs) 
+    {
+        res = K_aggr(pattern, (char*) ename.c_str(), c_nname);
+        if(res < 0) 
+            continue;
+    
         added = 1;
+        nname = std::string(c_nname);
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            K_add(ndbv, nname, NULL, &nb_per);
+            K_add(ndbv, c_nname, NULL, &nb_per);
             npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {
@@ -594,23 +590,25 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         if(npos < 0) 
             goto done;
 
-        memcpy(eval, KVVAL(edbv, epos, 0), nb_per * sizeof(double));
-        nval = KVVAL(ndbv, npos, 0);
-        for(t = 0; t < smpl->nb_periods; t++) 
+        memcpy(eval, KVVAL(edbv, ename, 0), nb_per * sizeof(double));
+        nval = KVVAL(ndbv, nname, 0);
+        for(int t = 0; t < smpl->nb_periods; t++) 
         {
             if(added) 
                 nval[t] = eval[t];
             else 
             {
+                /* m = 1 PROD */
                 if(method == 1) 
-                { /* m = 1 PROD */
+                {
                     if(IODE_IS_A_NUMBER(eval[t])) 
                         nval[t] *= eval[t];
                     else 
                         nval[t] = IODE_NAN;
                 }
-                else 
-                { /* m != 1 SUM or MEAN */
+                /* m != 1 SUM or MEAN */
+                else
+                {
                     if(IODE_IS_A_NUMBER(eval[t])) 
                         nval[t] += eval[t];
                     else 
@@ -623,10 +621,10 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 
     if(method == 2) 
     {
-        for(npos = 0; npos < ndbv->size(); npos++) 
+        for(auto& [name, handle] : ndbv->k_objs) 
         {
-            nval = KVVAL(ndbv, npos, 0);
-            for(t = 0; t < smpl->nb_periods; t++)
+            nval = KVVAL(ndbv, name, 0);
+            for(int t = 0; t < smpl->nb_periods; t++)
                 if(IODE_IS_A_NUMBER(nval[t])) 
                     nval[t] /= times[npos];
         }
@@ -706,9 +704,7 @@ int KV_aper_pos(char* aper2)
  
 double KV_get_at_t(char*varname, int t)
 {
-    double  *var_ptr;
-    
-    var_ptr = KVPTR(KV_WS, varname);
+    double* var_ptr = KVVAL(KV_WS, varname);
     if(var_ptr == NULL) 
         return(IODE_NAN);
     
@@ -778,9 +774,7 @@ double KV_get_at_aper(char*varname, char* aper)
 
 int KV_set_at_t(char*varname, int t, double val)
 {
-    double  *var_ptr;
-    
-    var_ptr = KVPTR(KV_WS, varname);
+    double* var_ptr = KVVAL(KV_WS, varname);
     if(var_ptr == NULL) 
         return(-1);
 

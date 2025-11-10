@@ -6,7 +6,6 @@ from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBLists as CKDBLists
 from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 
 import pandas as pd
 

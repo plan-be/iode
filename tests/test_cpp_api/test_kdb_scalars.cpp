@@ -64,21 +64,12 @@ TEST_F(KDBScalarsTest, Save)
 
 TEST_F(KDBScalarsTest, Get)
 {
-    int pos = 0;
+    std::string name = "acaf1";
     Scalar expected_scalar(0.015768406912684, 1.0, 0.0013687137980013999);
-
-    // by position
-    Scalar* scalar = Scalars.get(pos);
+    Scalar* scalar = Scalars.get(name);
     EXPECT_DOUBLE_EQ(expected_scalar.value, scalar->value);
     EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar->relax);
     EXPECT_DOUBLE_EQ(expected_scalar.std, scalar->std);
-
-    // by name
-    std::string name = Scalars.get_name(pos);
-    Scalar* scalar2 = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(expected_scalar.value, scalar2->value);
-    EXPECT_DOUBLE_EQ(expected_scalar.relax, scalar2->relax);
-    EXPECT_DOUBLE_EQ(expected_scalar.std, scalar2->std);
 }
 
 TEST_F(KDBScalarsTest, GetNames)

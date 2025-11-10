@@ -8,7 +8,7 @@ protected:
 
     List copy_obj(const List original) const override { return original; }
 
-    List get_unchecked(const int pos) const override;
+    List get_unchecked(const std::string& name) const override;
 
     KDBLists(KDBLists* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -24,8 +24,6 @@ public:
     bool add(const std::string& name, const List& list);
 
     void update(const std::string& name, const List& list);
-
-    void update(const int pos, const List& list);
 };
 
 

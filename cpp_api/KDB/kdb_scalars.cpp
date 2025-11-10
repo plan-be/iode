@@ -7,11 +7,11 @@ Scalar* KDBScalars::copy_obj(Scalar* const original) const
 	return new Scalar(*original);
 }
 
-Scalar* KDBScalars::get_unchecked(const int pos) const
+Scalar* KDBScalars::get_unchecked(const std::string& name) const
 {
 	KDB* kdb = get_database();
     // Note: KSVAL does NOT allocate a new pointer Scalar*
-    return static_cast<Scalar*>(KSVAL(kdb, pos));
+    return static_cast<Scalar*>(KSVAL(kdb, name));
 }
 
 bool KDBScalars::add(const std::string& name, const Scalar& obj)
@@ -36,10 +36,4 @@ void KDBScalars::update(const std::string& name, const double value, const doubl
 {
 	Scalar scalar(value, relax, std);
 	KDBTemplate::update(name, &scalar);
-}
-
-void KDBScalars::update(const int pos, const double value, const double relax, const double std)
-{
-	Scalar scalar(value, relax, std);
-	KDBTemplate::update(pos, &scalar);
 }

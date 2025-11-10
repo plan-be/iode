@@ -655,25 +655,25 @@ static void print_tbl(FILE* fd, Table* tbl)
  */
 int AsciiTables::save_asc(KDB* kdb, char* filename)
 {
-    FILE    *fd;
-    Table     *tbl;
-    int     i;
+    FILE*  fd;
+    Table* tbl;
 
-    if(filename[0] == '-') fd = stdout;
-    else {
+    if(filename[0] == '-') 
+        fd = stdout;
+    else 
+    {
         fd = fopen(filename, "w+");
-        if(fd == 0) {
+        if(fd == 0) 
+        {
             kerror(0, "Cannot create '%s'", filename);
             return(-1);
         }
     }
 
-    std::string name;
-    for(i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, _] : kdb->k_objs) 
     {
-        name = kdb->get_name(i);
         fprintf(fd, "%s {", (char*) name.c_str());
-        tbl = KTVAL(kdb, i);
+        tbl = KTVAL(kdb, name);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");
         delete tbl;

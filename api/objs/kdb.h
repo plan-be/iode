@@ -363,10 +363,6 @@ inline char k_ext[][4] =
 #define KT_RWS   K_RWS[TABLES][K_PWS[TABLES]]
 #define KV_RWS   K_RWS[VARIABLES][K_PWS[VARIABLES]]
 
-/*----------------------- MACROS ----------------------------*/
-
-#define KOVAL(kdb, pos)     K_oval0(kdb, pos)
-
 /*----------------------- FUNCS ----------------------------*/
 
 /* k_kdb.c */

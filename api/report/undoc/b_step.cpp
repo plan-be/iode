@@ -31,20 +31,19 @@
  */
 static int check_scl_var(char *eqs)
 {
-    char  buf[1024];
+    char buf[1024];
+    std::string name = std::string(eqs);
 
-    int pos = K_WS[EQUATIONS]->index_of(eqs);
-    if(pos < 0) 
-        return(-1);             // JMP 04/07/2022
+    if(!K_WS[EQUATIONS]->contains(name)) 
+        return -1;
     
-    Equation* eq = KEVAL(K_WS[EQUATIONS], pos);
+    Equation* eq = KEVAL(K_WS[EQUATIONS], name);
     if(!eq) 
-        return(-1);
+        return -1;
 
     CLEC* cl = eq->clec;
 
     char* c_name;
-    std::string name;
     for(int j = 0 ; j < cl->nb_names ; j++) 
     {
         c_name = cl->lnames[j].name;
@@ -87,6 +86,8 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg, int unused)                                                 
 {
+    int     res;
+    double  value;
     char    *c_eq_name, *cond, *test, *tmp;
     char**  args;
     Sample  *smpl;
@@ -119,8 +120,9 @@ int B_EqsStepWise(char* arg, int unused)
         return(1);
     }
 
-    cond = args[3];                                              
-    if(C_evallec(cond, 0)==-1)                                       /*Gère les erreurs de condition*/
+    cond = args[3]; 
+    value = C_evallec(cond, 0);                                    
+    if(int(value) == -1)                                        /* Gère les erreurs de condition */
     {
         SCR_free_tbl((unsigned char**) args);
         return(1);                          
@@ -130,20 +132,21 @@ int B_EqsStepWise(char* arg, int unused)
     // strcpy-param-overlap error (from SCR_add_ptr())
     tmp = args[4];
     test = (char*) SCR_stracpy(SCR_lower((unsigned char*) tmp));
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /*Gère les erreurs de test*/
+    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /* Gère les erreurs de test */
     {
         kerror(0,"Incorrect test name");
         SCR_free_tbl((unsigned char**) args);
         return(1);
     }
 
-    if(check_scl_var(c_eq_name) == -1)                                /*Gère les erreurs de présence des scalaires et variables de l'équation*/
+    res = check_scl_var(c_eq_name);
+    if(res == -1)                                               /* Gère les erreurs de présence des scalaires et variables de l'équation */
     {
         SCR_free_tbl((unsigned char**) args);
         return(1);                      
     }
 
-    estimate_step_wise(smpl, c_eq_name, cond, test);                  /*Effectue les estimations*/
+    estimate_step_wise(smpl, c_eq_name, cond, test);            /* Effectue les estimations */
     
     delete smpl;
     smpl = nullptr;

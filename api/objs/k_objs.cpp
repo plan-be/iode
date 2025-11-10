@@ -201,8 +201,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    int pos = KE_WS->index_of(name);
-    if(pos < 0)
+    if(!KE_WS->contains(name))
     {
         Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
         Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
@@ -211,7 +210,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     } 
     else
     {
-        eq = KEVAL(KE_WS, pos);
+        eq = KEVAL(KE_WS, name);
         // modify only if not empty
         if(!lec.empty())
             eq->set_lec(lec);

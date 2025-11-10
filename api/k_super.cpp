@@ -565,11 +565,10 @@ int kshellexec(const char *arg)
  */
 char* A_expand_super_API(char* name)
 {
-    int     pos;
-
-    pos = KL_WS->index_of(const_cast<char*>(name));
-    if (pos < 0) return(NULL);
-    return((char *)KLVAL(KL_WS, pos));
+    if(!KL_WS->contains(name)) 
+        return NULL;
+    
+    return KLVAL(KL_WS, name);
 }
 
 

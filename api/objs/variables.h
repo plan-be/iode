@@ -4,6 +4,9 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/pack.h"
+
+#include <string>
 
 /*----------------------- TYPEDEF ----------------------------*/
 
@@ -56,25 +59,27 @@ enum IodeLowToHigh
 /*----------------------- FUNCS ----------------------------*/
 
 double *K_vval(KDB *, int, int);
-double *K_vptr(KDB *, char*, int);
+double *K_vptr(KDB *, char*, int); 
 
-inline double* KVVAL(KDB* kdb, int pos, int t)
-{
-    return K_vval(kdb, pos, t);
-}  
 
-inline double* KVPTR(KDB* kdb, char* name)
+inline double* KVVAL(KDB* kdb, const std::string& name)
 {
-    return K_vptr(kdb, name, 0);
+    return K_vptr(kdb, (char*) name.c_str(), 0);
 }
+
+inline double* KVVAL(KDB* kdb, const std::string& name, const int t)
+{
+    return K_vptr(kdb, (char*) name.c_str(), t);
+}
+
 
 /* k_wsvar.c */
 int KV_sample(KDB *,Sample *);
 int KV_merge(KDB *,KDB *,int );
 void KV_merge_del(KDB *,KDB *,int );
 int KV_add(KDB* kdb, char* varname);
-double KV_get(KDB *,int ,int ,int );
-void KV_set(KDB *,int ,int ,int ,double );
+double KV_get(KDB *, const std::string& ,int ,int );
+void KV_set(KDB *, const std::string& ,int ,int ,double );
 int KV_extrapolate(KDB *,int ,Sample *,char **);
 KDB *KV_aggregate(KDB *,int ,char *,char *);
 void KV_init_values_1(double* val, int t, int method);
