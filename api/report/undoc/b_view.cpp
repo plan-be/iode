@@ -175,25 +175,25 @@ int B_PrintGr(char* arg, int unused)
  *  @param [in] smpl char*  GSample
  *  @return          int    0 on success, -1 on error (table not found, illegal gsample...)
  */
-int B_ViewPrintTbl_1(char* name, char* smpl)
+int B_ViewPrintTbl_1(char* c_name, char* smpl)
 {
-    int rc, pos;
-    Table *tbl;
+    int rc;
 
-    pos = K_WS[TABLES]->index_of(name);
-    if(pos < 0) {
+    std::string name = std::string(c_name);
+    if(!K_WS[TABLES]->contains(name)) 
+    {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
         return(-1);
     }
 
-    tbl = KTVAL(K_WS[TABLES], pos);
+    Table* tbl = KTVAL(K_WS[TABLES], name);
     if(B_viewmode == 0)
-        rc = T_view_tbl(tbl, smpl, name);
+        rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
     else
         rc = T_print_tbl(tbl, smpl);
 
     if(rc < 0) 
-        error_manager.append_error("Table '" + std::string(name) + "' not printed");
+        error_manager.append_error("Table '" + name + "' not printed");
 
     delete tbl;
     tbl = nullptr;
@@ -211,31 +211,37 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
  */
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
-    int     rc = 0, pos, hg, ng, i, view = !B_viewmode;
-    Table     *tbl;
+    int     rc = 0, hg, ng, i, view = !B_viewmode;
+    Table*  tbl;
     char    **tbls;
 
     tbls = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
     ng = SCR_tbl_size((unsigned char**) tbls);
-    if(ng == 0) {
+    if(ng == 0) 
+    {
         error_manager.append_error("No tables defined");
         return(-1);
     }
 
-    for(i = 0; i < ng; i ++) {
-        if(view) W_InitDisplay();
+    std::string name;
+    for(i = 0; i < ng; i ++) 
+    {
+        if(view) 
+            W_InitDisplay();
 
-        pos = K_WS[TABLES]->index_of(tbls[i]);
-        if(pos < 0) {
+        name = std::string(tbls[i]);
+        if(!K_WS[TABLES]->contains(name)) 
+        {
             error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");
             rc = -1;
             break;
         }
-        tbl = KTVAL(K_WS[TABLES], pos);
-        //KT_nb++;
+
+        tbl = KTVAL(K_WS[TABLES], name);
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
-        if(view) W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
+        if(view) 
+            W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
 
         delete tbl;
         tbl = nullptr;

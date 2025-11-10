@@ -25,9 +25,10 @@
  *  @return             IODE_READ   pointer to the first value of the variable
  *  
  */
-double *L_getvar(KDB* kdb, int pos)
+double* L_getvar(KDB* kdb, int pos)
 {
-    return(KVVAL(kdb, pos, 0));
+    std::string name = kdb->get_name(pos);
+    return KVVAL(kdb, name, 0);
 }
 
 
@@ -41,9 +42,8 @@ double *L_getvar(KDB* kdb, int pos)
  */
 double L_getscl(KDB* kdb, int pos)
 {
-    Scalar *scl;
-
-    scl = KSVAL(kdb, pos);
+    std::string name = kdb->get_name(pos);
+    Scalar* scl = KSVAL(kdb, name);
     return(scl->value);
 }
 
@@ -103,9 +103,8 @@ char* L_expand(char* list_name)
         return((*L_expand_super)(list_name));
     else 
     {
-        int pos = KL_WS->index_of(list_name);
-        if (pos < 0) 
-            return(NULL);
-        return ((char *)KLVAL(KL_WS, pos));
+        if(!KL_WS->contains(list_name)) 
+            return NULL;
+        return KLVAL(KL_WS, list_name);
     }    
 }

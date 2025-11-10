@@ -173,7 +173,6 @@ static void print_scl(FILE* fd, Scalar* scl)
 int AsciiScalars::save_asc(KDB* kdb, char* filename)
 {
     FILE*    fd;
-    int      i;
     Scalar*  scl;
 
     if(filename[0] == '-') 
@@ -188,10 +187,10 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, handle] : kdb->k_objs) 
     {
-        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
-        scl = KSVAL(kdb, i);
+        fprintf(fd, "%s ", (char*) name.c_str());
+        scl = KSVAL(kdb, handle);
         print_scl(fd, scl);
         fprintf(fd, "\n");
     }

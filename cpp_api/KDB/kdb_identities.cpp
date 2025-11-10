@@ -9,26 +9,22 @@ Identity* KDBIdentities::copy_obj(Identity* const original) const
     return new Identity(*original);
 }
 
-Identity* KDBIdentities::get_unchecked(const int pos) const
+Identity* KDBIdentities::get_unchecked(const std::string& name) const
 {
 	KDB* kdb = get_database();
-	std::string lec(KILEC(kdb, pos));
+	std::string lec(KILEC(kdb, name));
 	Identity* idt = new Identity(lec);
 	return idt;
 }
 
-std::string KDBIdentities::get_lec(const int pos) const
-{
-    // throw exception if object with passed position is not valid
-    get_name(pos);
-    return std::string(KILEC(get_database(), pos));
-}
-
 std::string KDBIdentities::get_lec(const std::string& name) const
 {
-    // throw exception if object with passed name does not exist
-    int pos = index_of(name);
-    return get_lec(pos);
+    // throw exception if object with passed position is not valid
+    if(!this->contains(name))
+        throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
+                                    "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
+                                    "The identity with name '" + name + "' does not exist.");
+    return std::string(KILEC(get_database(), name));
 }
 
 bool KDBIdentities::add(const std::string& name, const std::string& lec)
@@ -46,12 +42,6 @@ void KDBIdentities::update(const std::string& name, const std::string& lec)
 {
     char* c_lec = to_char_array(lec);
     KDBTemplate::update(name, c_lec);
-}
-
-void KDBIdentities::update(const int pos, const std::string& lec)
-{
-    char* c_lec = to_char_array(lec);
-    KDBTemplate::update(pos, c_lec);
 }
 
 bool KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 

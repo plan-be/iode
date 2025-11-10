@@ -2,6 +2,8 @@
 
 #include "api/constants.h"
 #include "api/objs/kdb.h"       // KDB
+#include "api/objs/pack.h"      // P_get_ptr
+
 
 /*----------------------- TYPEDEF ----------------------------*/
 
@@ -10,15 +12,16 @@ using LIS = char*;
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline LIS KLPTR(KDB* kdb, char* name)
+inline LIS KLVAL(KDB* kdb, const std::string& name)
 {
-    return K_optr0(kdb, name);
-}         
+    return (LIS) K_optr0(kdb, (char*) name.c_str());
+} 
 
-inline LIS KLVAL(KDB* kdb, int pos)
+inline LIS KLVAL(KDB* kdb, SWHDL handle)
 {
-    return (LIS) K_oval0(kdb, pos);
-}    
+    return (LIS) P_get_ptr(SW_getptr(handle), 0);     
+} 
+
 
 /* k_lst.c */
 int K_scan(KDB *,char *,char *);

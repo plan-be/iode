@@ -29,12 +29,11 @@ cdef extern from "api/all.h":
     int B_EQS_LEC
     double K_CMP_EPS
 
-    char*   KCPTR(char* name)
-    char*   KIPTR(char* name)
-    char*   KLPTR(char* name)
-    double* KVPTR(char* name)
-
-    double* KVVAL(KDB* kdb, int pos, int t)
+    char*   KCVAL(KDB* kdb, string name)
+    char*   KIVAL(KDB* kdb, string name)
+    char*   KLVAL(KDB* kdb, string name)
+    double* KVVAL(KDB* kdb, string name)
+    double* KVVAL(KDB* kdb, string name, int t)
 
     int B_PrintNbDec(char* nbdec)
     int B_PrintLang(char* lang)
@@ -89,8 +88,8 @@ cdef extern from "api/all.h":
 
     # k_wsvar.c
     int KV_add(KDB* kdb, char* varname)
-    double KV_get(KDB *kdb, int pos, int t, int mode)
-    void KV_set(KDB *kdb, int pos, int t, int mode, double value)
+    double KV_get(KDB *kdb, string name, int t, int mode)
+    void KV_set(KDB *kdb, string name, int t, int mode, double value)
 
     # k_grep.c
     char** K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int _all)
@@ -335,8 +334,8 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         void update(string& name, string& lec) except +
         void update(string& name, string& lec, int t_first, int t_last) except +
 
-        double* get_var_ptr(int pos) except +
-        double get_var(int pos, int t, IodeVarMode mode) except +
+        double* get_var_ptr(string name) except +
+        double get_var(string name, int t, IodeVarMode mode) except +
 
         CSample* get_sample()
         void set_sample(string& from_period, string& to_period) except +

@@ -60,19 +60,18 @@ err:
 
 static int B_WsTrendAll(char* arg, int std)
 {
-    int     lg, nb, rc = 0, i, shift = 0, /* lambda,*/ beg, dim = 0;
-    char    file[K_MAX_FILE + 1], **data = NULL;
-    double  *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
+    int     res, rc = 0, shift = 0, beg, dim = 0;
+    char    file[K_MAX_FILE + 1];
+    double  *t_vec = NULL, *f_vec = NULL;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
-    lg = B_get_arg0(file, arg, 80);
+    int lg = B_get_arg0(file, arg, 80);
 
-    data = B_ainit_chk(arg + lg, NULL, 0);
-    // lambda = atoi(data[0]); // JMP  22/1/2019
-    lambda = atof(data[0]); // JMP  22/1/2019
-    nb = SCR_tbl_size((unsigned char**) data + 1);
+    char** data = B_ainit_chk(arg + lg, NULL, 0);
+    double lambda = atof(data[0]);
+    int nb = SCR_tbl_size((unsigned char**) data + 1);
     if(nb == 0) 
         goto done;
 
@@ -83,7 +82,8 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    if(HP_smpl(from->sample, KV_WS->sample, &t_smpl, &shift) < 0) 
+    res = HP_smpl(from->sample, KV_WS->sample, &t_smpl, &shift);
+    if(res < 0) 
         goto done;
 
     if(!t_smpl) 
@@ -98,12 +98,12 @@ static int B_WsTrendAll(char* arg, int std)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
-    for(i = 0; i < from->size(); i++) 
+    for(auto& [from_name, _] : from->k_objs) 
     {
-        memcpy(f_vec, KVVAL(from, i, 0) + shift, nb * sizeof(double));
+        memcpy(f_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019
-        K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
+        K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
     }
 
     KV_merge(KV_WS, to, 1);

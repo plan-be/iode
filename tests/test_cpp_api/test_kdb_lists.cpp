@@ -59,17 +59,8 @@ TEST_F(KDBListsTest, Save)
 
 TEST_F(KDBListsTest, Get)
 {
-    int pos = 0;
-    std::string list;
     std::string expected_list = "$COPY0;$COPY1;";
-
-    // by position
-    list = Lists.get(pos);
-    EXPECT_EQ(expected_list, list);
-
-    // by name
-    std::string name = Lists.get_name(pos);
-    list = Lists.get(name);
+    std::string list = Lists.get("COPY");
     EXPECT_EQ(expected_list, list);
 }
 

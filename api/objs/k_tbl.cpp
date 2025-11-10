@@ -166,8 +166,8 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
-    int pos = K_WS[COMMENTS]->index_of((char*) def.c_str());
-    std::string title = (pos < 0) ? def : std::string(KCVAL(K_WS[COMMENTS], pos));
+    SWHDL handle = K_WS[COMMENTS]->get_handle(def);
+    std::string title = (handle > 0) ? std::string(KCVAL(K_WS[COMMENTS], handle)) : def;
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -220,7 +220,6 @@ Table::Table(const int nb_columns): nb_columns(nb_columns)
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
 	bool mode, bool files, bool date): nb_columns(nb_columns)
 {
-    int pos;
     std::string comment;
 
     T_initialize_divider(this->divider_line, nb_columns);
@@ -233,6 +232,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
+    SWHDL handle;
     std::string lec;
     std::string line_name;
     std::vector<std::string> v_vars = expand_lecs(vars);
@@ -242,12 +242,12 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        pos = K_WS[COMMENTS]->index_of((char*) var.c_str());
-        if(pos < 0)
+        handle = K_WS[COMMENTS]->get_handle(var);
+        if(handle == 0)
             line_name = var;
         else
         {
-            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -277,7 +277,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 	const std::vector<std::string>& lecs, bool mode, bool files, bool date)
     : nb_columns(nb_columns)
 {
-    int pos;
     std::string comment;
 
     T_initialize_divider(this->divider_line, nb_columns);
@@ -300,6 +299,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         throw std::invalid_argument(error_msg);
     }
 
+    SWHDL handle;
     for(int i = 0; i < (int) titles.size(); i++)
     {
         append_line(TABLE_LINE_CELL);
@@ -307,10 +307,10 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 
         // ---- line name (left column) ----
         line_name = titles[i];
-        pos = K_WS[COMMENTS]->index_of((char*) line_name.c_str());
-        if(pos > 0)
+        handle = K_WS[COMMENTS]->get_handle(line_name);
+        if(handle > 0)
         {
-            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -339,7 +339,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
 	bool mode, bool files, bool date): nb_columns(nb_columns)
 {
-    int pos;
     std::string comment;
 
     T_initialize_divider(this->divider_line, nb_columns);
@@ -352,6 +351,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
+    SWHDL handle;
     std::string line_name;
     std::vector<std::string> v_lecs = expand_lecs(lecs);
     for(const std::string& lec: v_lecs) 
@@ -360,12 +360,12 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        pos = K_WS[COMMENTS]->index_of((char*) lec.c_str());
-        if(pos < 0)
+        handle = K_WS[COMMENTS]->get_handle(lec);
+        if(handle == 0)
             line_name = lec;
         else
         {
-            comment = std::string((char*) KCVAL(K_WS[COMMENTS], pos));
+            comment = std::string((char*) KCVAL(K_WS[COMMENTS], handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }

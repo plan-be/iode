@@ -21,7 +21,7 @@ protected:
     // https://www.learncpp.com/cpp-tutorial/type-deduction-with-pointers-references-and-const/?utm_content=cmp-true
     Equation* copy_obj(Equation* const original) const override;
 
-    Equation* get_unchecked(const int pos) const override;
+    Equation* get_unchecked(const std::string& name) const override;
 
     KDBEquations(KDBEquations* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -34,8 +34,6 @@ public:
         return new KDBEquations(this, deep_copy, pattern);
     }
 
-    std::string get_lec(const int pos) const;
-
     std::string get_lec(const std::string& name) const;
 
     bool add(const std::string& name, const Equation& obj);
@@ -43,14 +41,9 @@ public:
     bool add(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
         const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
 
-    void update(const int pos, const Equation& obj);
-
     void update(const std::string& name, const Equation& obj);
 
     void update(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
-        const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = false);
-
-    void update(const int pos, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
         const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = false);
 };
 

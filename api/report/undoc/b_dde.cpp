@@ -193,15 +193,17 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     int     t;
     double  x;
 
+    std::string name = kdb->get_name(objnb);
     res = SCR_malloc(40 * (1 + kdb->sample->nb_periods - bt)); /* JMP 29-06-00 */
-    strcpy(res, kdb->get_name(objnb).c_str());
+    strcpy(res, name.c_str());
     strcat(res, "\t");
     for(t = bt ; t < kdb->sample->nb_periods ; t++) 
     {
-        x = *(KVVAL(kdb, objnb, t));
-        if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "#N/A");
-        // else           SCR_fmt_dbl(x, buf, 16, -1); /* JMP 01-02-99 */
-        else           IodeFmtVal(buf, x);             /* JMP 01-02-99 */
+        x = *(KVVAL(kdb, name, t));
+        if(!IODE_IS_A_NUMBER(x)) 
+            strcpy(buf, "#N/A");
+        else 
+            IodeFmtVal(buf, x);
         strcat(res, buf);
         strcat(res, "\t");
     }
@@ -317,10 +319,11 @@ char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     int     dim, i, j, d, rc = 0, nli = 0,
                           nf = 0, nm = 0;
     char    gsmpl[128], **l = NULL, *buf, *res = NULL; /* JMP 30-04-98 */
-
-    Table     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
-    Sample  *smpl = KV_WS->sample;
+
+    std::string name = K_WS[TABLES]->get_name(objnb);
+    Table* tbl = KTVAL(K_WS[TABLES], name);
+    Sample* smpl = KV_WS->sample;
 
     /* date */
     char date[11];
@@ -426,26 +429,32 @@ char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
 char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
 {
-    char        *obj, *res;
-    KDB         *kdb = K_WS[type];
-    std::string lec;
+    KDB* kdb = K_WS[type];
+    if(objnb < 0 || objnb >= kdb->size())
+        return (char*) 0;
 
-    if(type != TABLES) {
+    std::string name = kdb->get_name(objnb);
+    
+    char *obj, *res;
+    std::string lec;
+    if(type != TABLES) 
+    {
         *nc = 2;
         *nl = 1;
-        switch(type) {
+        switch(type) 
+        {
             case COMMENTS :
-                obj = (char*) KCVAL(kdb, objnb);
+                obj = (char*) KCVAL(kdb, name);
                 break;
             case EQUATIONS :
-                lec = KELEC(kdb, objnb);
+                lec = KELEC(kdb, name);
                 obj = (char*) lec.c_str();
                 break;
             case IDENTITIES :
-                obj = (char*) KILEC(kdb, objnb);
+                obj = (char*) KILEC(kdb, name);
                 break;
             case LISTS :
-                obj = (char*) KLVAL(kdb, objnb);
+                obj = (char*) KLVAL(kdb, name);
                 break;
             default    :
                 obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
@@ -454,7 +463,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
 
         if(obj == 0) obj = " ";
         res = SCR_malloc((int)sizeof(ONAME) + 10 + (int)strlen(obj));
-        strcpy(res, kdb->get_name(objnb).c_str());
+        strcpy(res, name.c_str());
         strcat(res, "\t");
         strcat(res, obj);
     }
@@ -583,7 +592,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
 
 char *IodeDdeGetItem(char *szTopic, char *szItem)
 {
-    int     objnb, t, type;
+    int     t, type;
     KDB     *kdb;
     double  x;
     char    buf[80], *res;
@@ -611,8 +620,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         SCR_lower((unsigned char*) szItem);
     
     name = std::string((char*) szItem);
-    objnb = kdb->index_of(name);
-    if(objnb < 0) 
+    if(!kdb->contains(name)) 
         return((char *)0);
 
     switch(type) 
@@ -624,19 +632,20 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case COMMENTS :
         case LISTS :
-            res = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, objnb));
+            res = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
             SCR_replace((unsigned char*) res, (unsigned char*) "\t", (unsigned char*) " ");
             SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
             return(res);
 
         case VARIABLES :
-            res = SCR_malloc(40 * (1 + kdb->sample->nb_periods)); /* JMP 29-06-00 */
+            res = SCR_malloc(40 * (1 + kdb->sample->nb_periods));
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                x = *(KVVAL(kdb, objnb, t));
-                if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "0");
-                //else           SCR_fmt_dbl(x, buf, 16, -1);  /* JMP 01-02-99 */
-                else           IodeFmtVal(buf, x);             /* JMP 01-02-99 */
+                x = *(KVVAL(kdb, name, t));
+                if(!IODE_IS_A_NUMBER(x)) 
+                    strcpy(buf, "0");
+                else 
+                    IodeFmtVal(buf, x);
                 strcat(res, buf);
                 strcat(res, "\t");
             }
@@ -644,7 +653,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case SCALARS :
             res = SCR_malloc(40);
-            scl = KSVAL(kdb, objnb);
+            scl = KSVAL(kdb, name);
             if(!IODE_IS_A_NUMBER(scl->value)) strcpy(res, "0");
             //else                  SCR_fmt_dbl(scl->value, res, 16, -1); /* JMP 01-02-99 */
             else                  IodeFmtVal(res, scl->value);    /* JMP 01-02-99 */
@@ -1013,32 +1022,33 @@ int B_ExcelSet(char *arg, int type)
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     name = std::string((char*) args[0]);
-    pos = kdb->index_of(name);
-    if(pos < 0) 
+    if(name.empty()) 
         goto the_end;
+    
+    pos = kdb->index_of(name);
 
     item = args[nb_args - 1];
     switch(type) 
     {
         case COMMENTS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
             break;
         case IDENTITIES :
-            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(kdb, name));
             break;
         case LISTS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, pos));
+            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, name));
             break;
         case EQUATIONS :
-            lec = KELEC(kdb, pos);
+            lec = KELEC(kdb, name);
             ptr = (char*) SCR_stracpy((unsigned char*) lec.c_str());
             break;
         case SCALARS :
-            scl = KSVAL(kdb, pos); /* JMP 10-08-00 */
-            d = scl->value;          /* JMP 10-08-00 */
-            ptr = SCR_malloc(80);  /* JMP 10-08-00 */
-            IodeFmtVal(ptr, d);    /* JMP 01-02-99 */
-            break;                 /* JMP 10-08-00 */
+            scl = KSVAL(kdb, name);
+            d = scl->value;        
+            ptr = SCR_malloc(80);  
+            IodeFmtVal(ptr, d);    
+            break;                 
 
         case TABLES :
             if(nb_args == 3) smpl = args[1];

@@ -114,8 +114,7 @@ KDB* AsciiIdentities::load_asc(char* filename, int db_global)
  */
 int AsciiIdentities::save_asc(KDB* kdb, char* filename)
 {
-    FILE    *fd;
-    int     i;
+    FILE* fd;
 
     if(filename[0] == '-') 
         fd = stdout;
@@ -128,10 +127,10 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->size() ; i++) 
+    for(auto& [name, handle] : kdb->k_objs) 
     {
-        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
-        fprintf(fd, "\"%s\"\n", KILEC(kdb, i));
+        fprintf(fd, "%s ", (char*) name.c_str());
+        fprintf(fd, "\"%s\"\n", KILEC(kdb, handle));
     }
 
     if(filename[0] != '-') 

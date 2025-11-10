@@ -39,11 +39,11 @@
  */
 int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
 {
-    int i,
-        opasses = KSIM_PASSES,
-        osort = KSIM_SORT;
+    int opasses = KSIM_PASSES;
+    int osort = KSIM_SORT;
 
-    if(dbe->size() == 0) {
+    if(dbe->size() == 0) 
+    {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
         return(-1);
@@ -54,23 +54,29 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
     KSIM_MAXDEPTH = dbe->size();
     KSIM_PASSES = tris;
 
-    if(tris > 0) KSIM_SORT = SORT_BOTH;
-    else         KSIM_SORT = SORT_CONNEX;
+    if(tris > 0) 
+        KSIM_SORT = SORT_BOTH;
+    else         
+        KSIM_SORT = SORT_CONNEX;
 
     // KSIM_POSXK[i] = num dans dbv de la var endogène de l'équation i
     // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
     KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
     KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
-    for(i = 0 ; i < dbe->size(); i++) {
+    for(int i = 0 ; i < dbe->size(); i++) 
+    {
         KSIM_POSXK_REV[i] = -1;  
     }
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
+    std::string eq_name;
     kmsg("Pseudo-linking equations ....");
-    for(i = 0 ; i < dbe->size(); i++) {
+    for(int i = 0 ; i < dbe->size(); i++) 
+    {
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
-        L_link_endos(dbe, KECLEC(dbe, i));
+        eq_name = dbe->get_name(i);
+        L_link_endos(dbe, KECLEC(dbe, eq_name));
     }
 
     /* ORDERING EQUATIONS */
@@ -154,7 +160,7 @@ int CSimulation::K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl)
             goto fin;
         }
         
-        rc = L_link(dbv, dbs, KECLEC(dbe, i));
+        rc = L_link(dbv, dbs, KECLEC(dbe, eq_name));
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";

@@ -191,33 +191,40 @@ int CSimulation::KE_postorder(KDB* dbe, int** predecessors, int** successors)
  */
 int CSimulation::KE_preorder(KDB* dbe, int** predecessors, int** successors)
 {
-    int     i, j, pos, posj, nb;
+    int     pos, posj, nb;
     CLEC    *clec;
 
     nb = dbe->size();
     KSIM_ORDER    = (int *)  SW_nalloc(sizeof(int) * nb);
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
-    for(i = 0; i < nb; i ++) {
-        clec = KECLEC(dbe, i);
+    int i = 0;
+    for(auto& [name, _] : dbe->k_objs) 
+    {
+        clec = KECLEC(dbe, name);
         predecessors[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long
 
         /* LOG ALL NB AND POS OF ENDO VARS */
         predecessors[i][0] = clec->nb_names; // Nbre max de noms (on pourrait améliorer en ne prenant que les vars)
-        for(j = 0; j < clec->nb_names; j++) {
-            if(is_coefficient(clec->lnames[j].name)) continue;
+        for(int j = 0; j < clec->nb_names; j++) 
+        {
+            if(is_coefficient(clec->lnames[j].name)) 
+                continue;
             // Recherche l'eq dont la variable j est endo
             posj = (clec->lnames[j]).pos;
             
             if(KSIM_POSXK[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
                 pos = -1; // Endo de l'eq courante
-            else {
+            else 
+            {
                 pos = KE_poseq(posj);
                 if(pos >= 0 && pos == i) pos = -1; // si var pos est l'endogène => -1
             }
             predecessors[i][j + 1] = pos;
-            if(pos >= 0) KE_add_post(successors, i, pos);
+            if(pos >= 0) 
+                KE_add_post(successors, i, pos);
         }
+        i++;
     }
 
     return(0);

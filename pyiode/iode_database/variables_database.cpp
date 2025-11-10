@@ -56,10 +56,10 @@ static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const i
                                     "and destination (" + std::to_string(dest_nb_periods) + " periods) databases do not match");
 }
 
-void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVariables* source, 
+void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDBVariables* source, 
                            const int source_t_first, const int source_t_last)
 {
-    if(name.empty())
+    if(dest_name.empty())
         throw std::invalid_argument("C API: Name of the new variable is empty");
 
     // sanity checks
@@ -70,17 +70,15 @@ void _c_add_var_from_other(const std::string& name, KDBVariables* dest, KDBVaria
     // NOTE: this can happen if the source or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
     // TODO: find a way to delete also the variable from the shallow copies
-    double* source_var_ptr = source->get_var_ptr(0);
+    std::string source_var_name = source->get_name(0);
+    double* source_var_ptr = source->get_var_ptr(source_var_name);
     if(source_var_ptr == NULL)
-    {
-        std::string source_name = source->get_name(0);
-        throw std::invalid_argument("C API: Variable named '" + source_name + "' seems to not exist in the source database");
-    }
+        throw std::invalid_argument("C API: Variable named '" + source_var_name + "' seems to not exist in the source database");
 
     // add the variable to the destination database
     KDB* kdb = dest->get_database();
     source_var_ptr += source_t_first;
-    K_add(kdb, const_cast<char*>(name.c_str()), source_var_ptr, &nb_periods);
+    K_add(kdb, const_cast<char*>(dest_name.c_str()), source_var_ptr, &nb_periods);
 }
 
 void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
@@ -131,8 +129,6 @@ enum BinaryOperation
 
 void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int t_last, const double value)
 {
-    double* var_ptr;
-
     // sanity checks
     if(database == NULL)
         throw std::invalid_argument("C API: database is NULL");
@@ -146,28 +142,29 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         throw std::invalid_argument("C API: t_last exceeds the number of periods in the database");
 
     // perform the operation
+    double* var_ptr;
     switch(op)
     {
     case OP_ADD:
-        for(int i=0; i < database->size(); i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            var_ptr = database->get_var_ptr(i);
+            var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
                 var_ptr[t] += value;
         }
         break;
     case OP_SUB:  
-        for(int i=0; i < database->size(); i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            var_ptr = database->get_var_ptr(i);
+            var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
                 var_ptr[t] -= value;
         }
         break;
     case OP_MUL: 
-        for(int i=0; i < database->size(); i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            var_ptr = database->get_var_ptr(i);
+            var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
                 var_ptr[t] *= value;
         }
@@ -175,17 +172,17 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     case OP_DIV:
         if(value == 0)
             throw std::invalid_argument("C API: Division by zero");
-        for(int i=0; i < database->size(); i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            var_ptr = database->get_var_ptr(i);
+            var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
                 var_ptr[t] /= value;
         }
         break;
     case OP_POW: 
-        for(int i=0; i < database->size(); i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            var_ptr = database->get_var_ptr(i);
+            var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
                 var_ptr[t] = pow(var_ptr[t], value);
         }
@@ -195,10 +192,6 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
 
 void _c_operation_one_period(const int op, KDBVariables* database, const int t, const double* values, const int nb_values)
 {
-    KDB* db = NULL;
-    int nb_names;
-    double value;
-
     // sanity checks
     if(database == NULL)
         throw std::invalid_argument("C API: database is NULL");
@@ -211,38 +204,38 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     if(nb_values != database->size())
         throw std::invalid_argument("C API: number of values must match the number of variables in the database");
 
-    nb_names = database->size();
-
-    db = database->get_database();
+    KDB* db = database->get_database();
     if(db == NULL)
         throw std::invalid_argument("C API: database is NULL");
 
+    int i = 0;
+    double value;
     switch(op)
     {
     case OP_ADD:
-        for(int i = 0; i < nb_names; i++)
-            *KVVAL(db, i, t) += values[i];
+        for(auto& [name, _] : database->k_objs)
+            *KVVAL(db, name, t) += values[i++];
         break;
     case OP_SUB: 
-        for(int i = 0; i < nb_names; i++) 
-            *KVVAL(db, i, t) -= values[i];
+        for(auto& [name, _] : database->k_objs) 
+            *KVVAL(db, name, t) -= values[i++];
         break;
     case OP_MUL: 
-        for(int i = 0; i < nb_names; i++) 
-            *KVVAL(db, i, t) *= values[i];
+        for(auto& [name, _] : database->k_objs) 
+            *KVVAL(db, name, t) *= values[i++];
         break;
     case OP_DIV:
-        for(int i = 0; i < nb_names; i++)
+        for(auto& [name, _] : database->k_objs)
         {
-            value = values[i];
+            value = values[i++];
             if(value == 0)
                 throw std::invalid_argument("C API: Division by zero");
-            *KVVAL(db, i, t) /= value;
+            *KVVAL(db, name, t) /= value;
         }
         break;
     case OP_POW: 
-        for(int i = 0; i < nb_names; i++)
-            *KVVAL(db, i, t) = pow(*KVVAL(db, i, t), values[i]);
+        for(auto& [name, _] : database->k_objs)
+            *KVVAL(db, name, t) = pow(*KVVAL(db, name, t), values[i++]);
         break;
     }
 }
@@ -270,8 +263,8 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     bool found = database->contains(name);
     if(!found)
         throw std::invalid_argument("C API: Variable named '" + name + "' seems to not exist in the database");
-    double* var_ptr = database->get_var_ptr(name);
     
+    double* var_ptr = database->get_var_ptr(name);
     switch(op)
     {
     case OP_ADD:

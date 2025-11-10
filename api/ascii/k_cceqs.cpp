@@ -469,13 +469,11 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
     }
 
     Equation* eq;
-    char* c_name;
-    for(int i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, _] : kdb->k_objs) 
     {
-        c_name = (char*) kdb->get_name(i).c_str();
-        fprintf(fd, "%s ", c_name);
-        eq = KEVAL(kdb, i);
-        print_eq(fd, eq, c_name);
+        fprintf(fd, "%s ", name.c_str());
+        eq = KEVAL(kdb, name);
+        print_eq(fd, eq, (char*) name.c_str());
         delete eq;
         eq = nullptr;
     }

@@ -82,17 +82,20 @@ void Estimation::E_print_instrs()
  */
 void Estimation::E_print_coefs()
 {
-    int     i;
-    Scalar     *scl;
+    Scalar* scl;
 
     W_print_tb("Coefficients and tests", 5);
     W_printfRepl("&1CName&1CValue&1CStandard Error&1CT-Statistic&1CRelax\n");
     W_printf(".tl\n");
-    for(i = 0 ; i < E_NC ; i++) {
-        scl = KSVAL(E_DBS, E_C_NBS[i]);
+
+    std::string scl_name;
+    for(int i = 0 ; i < E_NC ; i++) 
+    {
+        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl = KSVAL(E_DBS, scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
-                 E_DBS->get_name(E_C_NBS[i]),
+                 scl_name.c_str(),
                  (double) scl->value,
                  (double) scl->std,
                  (double) E_div_0(scl->value, scl->std),
@@ -249,29 +252,27 @@ void Estimation::E_print_eqres(int obs)
  *  @param [out]    char*   rhs     right member (max 70 chars)
  *  @return         int             -1 if no ":=" found in equation, 0 otherwise
  */
-static int E_graph_calc_lhs(char* name, char* res, char* rhs)
+static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
 {
-    int   i, pos;
-
     memset(res, 0, 71);
     memset(rhs, 0, 71);
 
-    pos = K_WS[EQUATIONS]->index_of(name);
-    if(pos < 0) 
-        return(-1);
+    std::string name = std::string(c_name);
+    if(!K_WS[EQUATIONS]->contains(name)) 
+        return -1;
     
-    std::string lec = KELEC(K_WS[EQUATIONS], pos);
+    std::string lec = KELEC(K_WS[EQUATIONS], name);
     char* c_lec = (char*) lec.c_str();
-    i = L_split_eq(c_lec);
+    int i = L_split_eq(c_lec);
     if(i < 0) 
-        return(-1);
+        return -1;
     i = std::min(i, 70);
     memcpy(res, c_lec, i);
 
     SCR_strlcpy((unsigned char*) rhs, ((unsigned char*) c_lec) + i + 2, 70);
-    SCR_replace((unsigned char*) rhs, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 07-10-98 */
-    SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 07-10-98 */
-    return(0);
+    SCR_replace((unsigned char*) rhs, (unsigned char*) "\n", (unsigned char*) " ");
+    SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
+    return 0;
 }
 
 /**

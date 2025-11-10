@@ -84,42 +84,56 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     int         j, poseq, posseq, posvar, rc = -1;
     CLEC        *clec = NULL, *eclec;
 
-    if(posexo < 0 || *depth > KSIM_MAXDEPTH) return(-1);
+    if(posexo < 0 || *depth > KSIM_MAXDEPTH) 
+        return -1;
 
     // Endo and exo are in same equation 
     // => replace the endo var position in KSIM_POSXK by the exo var position 
+    std::string coef_name, eq_name;
     poseq = KE_poseq(posendo);
-    clec = KECLEC(KSIM_DBE, poseq);
-    for(j = 0; j < clec->nb_names; j++) {
-        if(is_coefficient(clec->lnames[j].name)) continue;
-        if((clec->lnames[j]).pos == posexo) {
+    eq_name = KSIM_DBV->get_name(posendo); 
+    clec = KECLEC(KSIM_DBE, eq_name);
+    for(j = 0; j < clec->nb_names; j++) 
+    {
+        coef_name = std::string(clec->lnames[j].name);
+        if(is_coefficient(coef_name)) 
+            continue;
+        if((clec->lnames[j]).pos == posexo) 
+        {
             KSIM_POSXK[poseq] = posexo;
             KSIM_POSXK_REV[posexo] = poseq;
-            return(0);
+            return 0;
         }
     }
 
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
-    for(j = 0; j < clec->nb_names; j++) {
-        eclec = KECLEC(KSIM_DBE, poseq);            
+    for(j = 0; j < clec->nb_names; j++) 
+    {
+        eq_name = KSIM_DBE->get_name(poseq);
+        eclec = KECLEC(KSIM_DBE, eq_name);            
         clec = (CLEC *)SW_nalloc(eclec->tot_lg);
         memcpy(clec, eclec, eclec->tot_lg);
-        if(is_coefficient(clec->lnames[j].name)) continue;
+        coef_name = std::string(clec->lnames[j].name);
+        if(is_coefficient(coef_name)) 
+            continue;
         posseq = KE_poseq((clec->lnames[j]).pos);
 
         /* if same endo, variable exo or endo already exchanged continue */
-        if(poseq == posseq || posseq < 0) continue;
+        if(poseq == posseq || posseq < 0) 
+            continue;
 
         /* if path already examined continue */
-        if(KSIM_PATH[posseq] == 1) continue;
-        else KSIM_PATH[posseq] = 1;
-
+        if(KSIM_PATH[posseq] == 1) 
+            continue;
+        else 
+            KSIM_PATH[posseq] = 1;
 
         (*depth) ++;
         rc = KE_findpath((clec->lnames[j]).pos, posexo, depth);
         // If not found, try the next variable in clec
-        if(rc < 0) {
+        if(rc < 0) 
+        {
             (*depth) --;
             continue;
         }
@@ -164,11 +178,12 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
  */
 int CSimulation::KE_exo2endo(int posendo, int posexo)
 {
-    int         endo, exo;
-    int         depth = 0;
+    int endo, exo;
+    int depth = 0;
 
     endo = KE_poseq(posendo);
-    if(endo < 0) {
+    if(endo < 0) 
+    {
         std::string error_msg = "Goal Seeking: ";
         error_msg += std::string(KSIM_DBV->get_name(posendo));
         error_msg += " : no such equation in the Equations workspace";
@@ -176,7 +191,9 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         return(-1);
     }
 
-    if(KE_poseq(posexo) >= 0) {
+    exo = KE_poseq(posexo);
+    if(exo >= 0) 
+    {
         std::string error_msg = "Goal Seeking: ";
         error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " already endogeneous";
@@ -187,7 +204,8 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
     /* check if exo in equation */
     memset(KSIM_PATH, 0, KSIM_MAXDEPTH);
     exo = KE_findpath(posendo, posexo, &depth);
-    if(exo < 0) {
+    if(exo < 0) 
+    {
         std::string error_msg = "Goal Seeking: ";
         error_msg += std::string(KSIM_DBV->get_name(posendo)) + "-"; 
         error_msg += std::string(KSIM_DBV->get_name(posexo));
@@ -195,5 +213,6 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         error_manager.append_error(error_msg);
         return(-1);
     }
+
     return(0);
 }

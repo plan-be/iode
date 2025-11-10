@@ -34,7 +34,7 @@ from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR, KVVAL
+from pyiode.iode_database.cpp_api_database cimport KVVAL
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport RasExecute
@@ -166,15 +166,16 @@ cdef class Variables(CythonIodeDatabase):
             raise IndexError(f"The period '{period}' is outside the sample '{sample}'")
         return self.c_get_real_period_position(period.c_period)
 
-    def _get_variable(self, name_pos: int, key_periods: Union[Period, List[Period]]) -> Union[float, List[float]]:
+    def _get_variable(self, name: str, key_periods: Union[Period, List[Period]]) -> Union[float, List[float]]:
         cdef int t
+        cdef string c_name = name.encode('utf-8')
         cdef double cpp_value
         cdef vector[double] cpp_values
 
         # key_periods represents a unique period
         if isinstance(key_periods, Period):
             t = self._get_real_period_position(key_periods)
-            cpp_value = self.database_ptr.get_var(<int>name_pos, t, self.mode_)
+            cpp_value = self.database_ptr.get_var(c_name, t, self.mode_)
             return cpp_value if IODE_IS_A_NUMBER(cpp_value) else np.nan
         # key_periods represents a list of non-contiguous periods -> return a pandas Series
         if isinstance(key_periods, list):
@@ -182,7 +183,7 @@ cdef class Variables(CythonIodeDatabase):
                 raise TypeError("key_periods must be a list of Cython Period objects")
             # convert Period objects to their corresponding integer positions
             key_periods: List[int] = [self._get_real_period_position(period) for period in key_periods]
-            values = [self.database_ptr.get_var(<int>name_pos, <int>p, self.mode_) for p in key_periods]
+            values = [self.database_ptr.get_var(c_name, <int>p, self.mode_) for p in key_periods]
             return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
 
     def __add_var(self, name: str, value: Variables):
@@ -195,8 +196,8 @@ cdef class Variables(CythonIodeDatabase):
         cdef bint success
         cdef vector[double] cpp_values
         cdef int c_nb_periods
-        cdef char* c_name
         cdef bytes b_name
+        cdef char* c_name
         cdef double[::1] numpy_data_memview
         cdef KDB* c_db_ptr = NULL
         
@@ -237,6 +238,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t
         cdef int t_first
         cdef int t_last
+        cdef string c_name = name.encode('utf-8')
         cdef KDB* c_db_ptr = NULL
         cdef vector[double] cpp_values
         cdef double* var_ptr = NULL
@@ -244,17 +246,17 @@ cdef class Variables(CythonIodeDatabase):
 
         c_db_ptr = self.database_ptr.get_database()
 
-        if pos < 0 or pos >= self.size():
-            raise IndexError(f"Cannot update variable '{name}': variable not found in the Variables database")
+        if not self.contains(name):
+            raise KeyError(f"Variable '{name}' not found in the IODE Variables database")
 
         # update the value for only one period 
         if isinstance(key_periods, Period):
             t = self._get_real_period_position(key_periods)
             if isinstance(values, float):
-                KV_set(c_db_ptr, pos, t, self.mode_, <double>values)
+                KV_set(c_db_ptr, c_name, t, self.mode_, <double>values)
             # values is a LEC expression
             elif isinstance(values, str):
-                self.database_ptr.update(<string>(name.encode()), <string>values.encode(), t, t) 
+                self.database_ptr.update(c_name, <string>values.encode(), t, t) 
             elif isinstance(values, Variables):
                 self.__copy_var(name, name, t, t, values)
         # update values for a contiguous range of periods
@@ -273,10 +275,10 @@ cdef class Variables(CythonIodeDatabase):
             # set same value for all periods in the range
             if isinstance(values, float):
                 for t in range(t_first, t_last + 1): 
-                    KV_set(c_db_ptr, pos, t, self.mode_, <double>values)  
+                    KV_set(c_db_ptr, c_name, t, self.mode_, <double>values)  
             # values is a LEC expression
             elif isinstance(values, str):
-                self.database_ptr.update(<string>(name.encode()), <string>values.encode(), t_first, t_last) 
+                self.database_ptr.update(c_name, <string>values.encode(), t_first, t_last) 
             # values is of type Variables
             elif isinstance(values, Variables):
                 # NOTE: 'values' can contains more than one variable as long as the variable named 'name' is present
@@ -285,20 +287,20 @@ cdef class Variables(CythonIodeDatabase):
             # values is a numpy array AND the mode is VAR_MODE_LEVEL
             elif isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
                     nb_periods = t_last - t_first + 1
-                    var_ptr = KVVAL(c_db_ptr, pos, t_first)
+                    var_ptr = KVVAL(c_db_ptr, c_name, t_first)
                     numpy_data_memview = values
                     memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
             # assume values is an iterable
             else:
                 for i, t in enumerate(range(t_first, t_last + 1)):
-                    KV_set(c_db_ptr, pos, t, self.mode_, <double>(values[i]))
+                    KV_set(c_db_ptr, c_name, t, self.mode_, <double>(values[i]))
         # update values for a list of periods
         elif isinstance(key_periods, list):
             if not all(isinstance(p, Period) for p in key_periods):
                 raise TypeError("key_periods must be a list of Cython Period objects")             
             for p, v in zip(key_periods, values):
                 t = self._get_real_period_position(p)
-                KV_set(c_db_ptr, pos, t, self.mode_, <double>v)
+                KV_set(c_db_ptr, c_name, t, self.mode_, <double>v)
 
     def binary_op_scalar(self, other: float, op: BinaryOperation, copy_self: bool) -> Variables:
         cdef int i_op = int(op)
@@ -393,22 +395,18 @@ cdef class Variables(CythonIodeDatabase):
                 #       so we need to use the encode() method to convert it to a bytes object first, 
                 #       and then convert the bytes object to a C string using the syntax char_obj = bytes_obj.
                 b_name = name.encode()
-                c_name = b_name
-                var_pos = self.database_ptr.index_of(c_name)
-                if var_pos < 0:
+                if not self.database_ptr.contains(<string>b_name):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
-                var_ptr = KVVAL(db_ptr, var_pos, t_first_period)
+                var_ptr = KVVAL(db_ptr, <string>b_name, t_first_period)
                 memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
         else:
             for i, name in enumerate(vars_names):
                 b_name = name.encode()
-                c_name = b_name
-                var_pos = self.database_ptr.index_of(c_name)
-                if var_pos < 0:
+                if not self.database_ptr.contains(<string>b_name):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 for j, t in enumerate(range(t_first_period, t_last_period + 1)):
                     value = data_view[i, j]
-                    KV_set(db_ptr, var_pos, t, mode, value)
+                    KV_set(db_ptr, <string>b_name, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
         cdef int i, t
@@ -437,14 +435,18 @@ cdef class Variables(CythonIodeDatabase):
         # declaring a C-contiguous array of 2D double
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
+        
+        cdef string c_name
+        cdef string pattern = string(b'')
+        cdef vector[string] cpp_names = self.database_ptr.get_names(pattern, <bint>True)
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
-            for i in range(self.size()):
-                var_ptr = KVVAL(db_ptr, i, t_first_period)
+            for i, c_name in enumerate(cpp_names):
+                var_ptr = KVVAL(db_ptr, c_name, t_first_period)
                 memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
         else:
-            for i in range(self.size()):
+            for i, c_name in enumerate(cpp_names):
                 for t in range(t_first_period, t_last_period + 1):
-                    value = KV_get(db_ptr, i, t, mode)
+                    value = KV_get(db_ptr, c_name, t, mode)
                     data_view[i, t - t_first_period] = value
         
         if self.size() == 1:
@@ -603,12 +605,12 @@ cdef class Variables(CythonIodeDatabase):
 
     def _str_table(self, names: List[str], periods: List[str]) -> Dict[str, List[float]]:
         cdef t
-        names_pos: List[int] = [self.index(name) for name in names] 
         columns = {"name": names}
         for str_period in periods:
             period = Period(str_period)
             t = self._get_real_period_position(period)
-            columns[str_period] = [self.database_ptr.get_var(<int>pos, <int>t, self.mode_) for pos in names_pos]
+            columns[str_period] = [self.database_ptr.get_var(<str>name.encode('utf-8'), <int>t, self.mode_) 
+                                   for name in names]
         return columns
 
     def __hash__(self) -> int:

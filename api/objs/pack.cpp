@@ -71,6 +71,7 @@
  *      void *P_alloc_get_ptr(void *ptr, int p) : Allocates a new buffer and copies the p'th element of pack in the new buffer.
  *      int P_nb(char *ptr) : Retrieves the number of elements in a pack pointed to by ptr.
  */
+#include "scr4/s_swap.h"        // SW_nalloc(), SW_nrealloc(), SW_getptr(), SW_nfree()
 #include "api/constants.h"
 #include "api/utils/buf.h"
 #include "api/objs/pack.h"

@@ -4,6 +4,7 @@
 #include "api/b_args.h"
 #include "api/k_super.h"
 #include "api/objs/kdb.h"           // KDB
+#include "api/objs/pack.h"
 #include "api/objs/identities.h"    // Identity
 #include "api/objs/grep.h"
 
@@ -807,19 +808,12 @@ Table* K_tptr(KDB* kdb, char* name);
 
 
 // returns an allocated Table
-inline Table* KTVAL(KDB* kdb, const int pos) 
+inline Table* KTVAL(KDB* kdb, const std::string& name) 
 {
-    std::string name = kdb->get_name(pos);
-    if(name.empty())
-        return nullptr;
     char* ptr = kdb->get_ptr_obj(name);
+    if(ptr == nullptr)
+        return nullptr;
     return (Table*) K_tunpack(ptr, (char*) name.c_str());
-}
-
-// returns an allocated Table
-inline Table* KTPTR(KDB* kdb, char* name) 
-{
-    return (Table*) K_tptr(kdb, name);
 }
 
 /*----------------------- MACROS ----------------------------*/

@@ -814,8 +814,8 @@ class Equations(IodeDatabase):
         >>> # estimate a block
         >>> # prepare equations (same block and method)
         >>> block = "ACAF;DPUH"
-        >>> for name in block.split(";"):
-        ...     equations[name] = {"block": block, "method": "LSQ"}
+        >>> equations["ACAF"] = {"block": block, "method": "LSQ"}
+        >>> equations["DPUH"] = {"block": block, "method": "LSQ"}
         >>> success = equations.estimate("1980Y1", "2000Y1", block)           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 0.141421)
         <BLANKLINE>

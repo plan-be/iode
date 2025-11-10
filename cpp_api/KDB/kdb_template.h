@@ -7,7 +7,7 @@ template<class T> class KDBTemplate: public KDBAbstract
 protected:
     virtual T copy_obj(const T original) const = 0;
 
-    virtual T get_unchecked(const int pos) const = 0;
+    virtual T get_unchecked(const std::string& name) const = 0;
 
     KDBTemplate(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern) :
         KDBAbstract(kdb, deep_copy, pattern) {}
@@ -71,19 +71,6 @@ public:
         }
     }
 
-    template<class... Args> void update(const int pos, Args... args)
-    {
-        // throw exception if object with passed position is not valid
-        std::string name = get_name(pos);
-        
-        // NOTE: In the case of a shallow copy, only pointers to objects 
-        //       are duplicated, not the objects.
-        //       Modifying an object passing either the shallow copy
-        //       or the global KDB (K_WS[k_type]) modifies the same object.
-        KDB* kdb = get_database();
-        add_or_update(kdb, name, args...);
-    }
-
     template<class... Args> void update(const std::string& name, Args... args)
     {
         std::string error_msg = "Cannot update " + v_iode_types[k_type] + " with name '" + name + "'.\n";
@@ -100,25 +87,13 @@ public:
         add_or_update(kdb, name, args...);
     }
 
-    T get(const int pos) const
-    {
-        // throw exception if object with passed position is not valid
-        get_name(pos);
-        return get_unchecked(pos);
-    }
-
     T get(const std::string& name) const
     {
         // throw exception if object with passed name does not exist
-        int pos = index_of(name);
-        return get_unchecked(pos);
-    }
-
-    T copy(const int pos) const
-    {
-        // throw exception if object with passed position is not valid
-        T obj = get(pos);
-        return copy_obj(obj);
+        if(!this->contains(name))
+            throw std::invalid_argument("Cannot get " + v_iode_types[k_type] + " with name '" + name + "'.\n" +  
+                                        "The object with name '" + name + "' does not exist in the database.");
+        return get_unchecked(name);
     }
 
     T copy(const std::string& name) const

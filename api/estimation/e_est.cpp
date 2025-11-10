@@ -185,20 +185,27 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
  */
 int Estimation::E_jacobian()
 {
-    double  h = 1e-4, oldc;
-    int     i, j;
+    int i, j;
+    double h = 1e-4, oldc;
 
-    for(i = 0, j = 0 ; i < E_NC ; i++) {
-        if(KSVAL(E_DBS, E_C_NBS[i])->relax != 0) {      // Uniquement pour les coef estimés (relax <> 0)
-            oldc = KSVAL(E_DBS, E_C_NBS[i])->value;       // Stocke l'ancienne valeur du coef
-            if(fabs(oldc) < 1e-15) oldc = 0.1;          //   ou 0.1 si coef proche de nul
-            KSVAL(E_DBS, E_C_NBS[i])->value = oldc * (1.0 + h); // coef augmenté de h pourcents
-            if(0 != E_mod_residuals(i, j, oldc * h)) {  /* compute G : (NCE, T*N) */
+    std::string scl_name;
+    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    {
+        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        // Uniquement pour les coef estimés (relax <> 0)
+        if(KSVAL(E_DBS, scl_name)->relax != 0) 
+        {      
+            oldc = KSVAL(E_DBS, scl_name)->value;                   // Stocke l'ancienne valeur du coef
+            if(fabs(oldc) < 1e-15)                                  // ou 0.1 si coef proche de nul
+                oldc = 0.1;                      
+            KSVAL(E_DBS, scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
+            if(0 != E_mod_residuals(i, j, oldc * h)) 
+            {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                KSVAL(E_DBS, E_C_NBS[i])->value = oldc;   // remet l'ancienne valeur du coef
-                return(-1);
+                KSVAL(E_DBS, scl_name)->value = oldc;               /* reset coef */
+                return -1;
             }
-            KSVAL(E_DBS, E_C_NBS[i])->value = oldc;       /* reset coef */
+            KSVAL(E_DBS, scl_name)->value = oldc;                   /* reset coef */
             j++;
         }
     }
@@ -216,12 +223,13 @@ int Estimation::E_jacobian()
  */
 int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
-    CLEC    *clec = E_CRHS[eq_nb];
+    CLEC* clec = E_CRHS[eq_nb];
     int    j;
 
     for(j = 0 ; j < clec->nb_names ; j++)
         if(is_coefficient(clec->lnames[j].name) &&
-                E_C_NBS[coef_nb] == clec->lnames[j].pos) return(1);
+                E_C_NBS[coef_nb] == clec->lnames[j].pos) 
+                    return(1);
 
     return(0);
 }

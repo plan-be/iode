@@ -19,20 +19,21 @@ class PositionalIndexer:
     def __init__(self, database):
         self.database = database
 
-    def _check_index(self, index: int) -> int:
+    def _check_index(self, index: int) -> str:
         if index < 0:
             index += len(self.database)
         if not (0 <= index < len(self.database)):
             raise IndexError(f"Index {index} out of range")
-        return index
+        name = self.database.get_name(index)
+        return name
 
     def __getitem__(self, index: int):
-        index = self._check_index(index)
-        return self.database._get_object(index)
+        name = self._check_index(index)
+        return self.database._get_object(name)
 
     def __setitem__(self, index: int, value):
-        index = self._check_index(index)
-        self.database._set_object(index, value)
+        name = self._check_index(index)
+        self.database._set_object(name, value)
 
 
 class IodeDatabase:

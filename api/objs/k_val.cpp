@@ -187,14 +187,13 @@ double *K_vptr(KDB* kdb, char* name, int t)
  *  @return             Equation*     pointer to an allocated EQ ~ kdb[name]
  *  
  */
-Equation* K_eptr(KDB* kdb, char* name)
+Equation* K_eptr(KDB* kdb, char* c_name)
 {
-    int pos;
+    std::string name = std::string(c_name);
+    if(!kdb->contains(name)) 
+        return nullptr;
     
-    pos = kdb->index_of(std::string(name));
-    if(pos < 0) 
-        return(NULL);         // name not found
-    return KEVAL(kdb, pos);
+    return KEVAL(kdb, name);
 }
 
 /**
@@ -220,12 +219,13 @@ Table* K_tptr(KDB* kdb, char* name)
  *  @return     double           test value or IODE_NAN if equation name not found
  *  
  */
-double K_etest(KDB* kdb, char*name, int test_nb)
+double K_etest(KDB* kdb, char* c_name, int test_nb)
 {   
-    int pos = kdb->index_of(std::string(name));
-    if(pos < 0) return(IODE_NAN);         // name not found
+    std::string name = std::string(c_name);
+    if(!kdb->contains(name)) 
+        return(IODE_NAN);
     
-    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, pos);
+    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, name);
     double value = (double) tests[test_nb];
     return value;
 }
@@ -251,17 +251,17 @@ double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
  *  @return     double           value or IODE_NAN if scalar name not found or t-test undefined
  *  
  */
-double K_s_get_info(KDB* kdb, char*name, int info_nb)
+double K_s_get_info(KDB* kdb, char* c_name, int info_nb)
 {
-    int     pos;
-    Scalar     *scl;
-    double  val = IODE_NAN;
     
-    pos = kdb->index_of(std::string(name));
-    if(pos < 0) return(IODE_NAN);         // name not found
+    std::string name = std::string(c_name);
+    if(!kdb->contains(name)) 
+        return IODE_NAN;
     
-    scl = KSVAL(kdb, pos);
-    switch(info_nb) {
+    double val = IODE_NAN;
+    Scalar* scl = KSVAL(kdb, name);
+    switch(info_nb) 
+    {
         case 1 :  val = scl->relax; break;
         case 2 :  val = scl->std; break;
         case 3 :  
@@ -291,16 +291,15 @@ double K_s_get_ttest (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 3));}
  *  @param [in] double  value    value to set to info_nb
  *  @return     int              -1 if scalar not found, -2 if info_nb illegal, 0 otherwise
  */
-int K_s_set_info(KDB* kdb, char*name, int info_nb, double value)
-{
-    int     pos;
-    Scalar     *scl;
+int K_s_set_info(KDB* kdb, char* c_name, int info_nb, double value)
+{   
+    std::string name = std::string(c_name);
+    if(!kdb->contains(name)) 
+        return(-1);
     
-    pos = kdb->index_of(std::string(name));
-    if(pos < 0) return(-1);         // name not found
-    
-    scl = KSVAL(kdb, pos);
-    switch(info_nb) {
+    Scalar* scl = KSVAL(kdb, name);
+    switch(info_nb) 
+    {
         case 0 :  scl->value = value; break;
         case 1 :  scl->relax = value; break;
         case 2 :  scl->std = value; break;

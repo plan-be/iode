@@ -2,7 +2,7 @@
 #include "kdb_variables.h"
 
 
-Variable KDBVariables::get_unchecked(const int pos) const
+Variable KDBVariables::get_unchecked(const std::string& name) const
 {
 	Variable vars;
 	if(!check_sample())
@@ -12,53 +12,16 @@ Variable KDBVariables::get_unchecked(const int pos) const
 	KDB* kdb = get_database();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
-		vars.push_back(KV_get(kdb, pos, i, 0));
+		vars.push_back(KV_get(kdb, name, i, 0));
 	return vars;
-}
-
-double KDBVariables::get_var(const int pos, const int t, const IodeVarMode mode) const
-{
-	// throw exception if object with passed position is not valid
-	get_name(pos);
-    return KV_get(get_database(), pos, t, mode);
-}
-
-double KDBVariables::get_var(const int pos, const std::string& period, const IodeVarMode mode) const
-{
-	if(!check_sample())
-		return IODE_NAN;
-	
-	Sample* sample = get_sample();
-	int t = sample->get_period_position(period);
-	return get_var(pos, t, mode);
-}
-
-double KDBVariables::get_var(const int pos, const Period& period, const IodeVarMode mode) const
-{
-	if(!check_sample())
-		return IODE_NAN;
-	
-	Sample* sample = get_sample();
-	int t = sample->get_period_position(period);
-	return get_var(pos, t, mode);
-}
-
-double* KDBVariables::get_var_ptr(const int pos)
-{
-	if(get_nb_periods() == 0)
-		return NULL;
-
-	// throw exception if object with passed position is not valid
-	get_name(pos);
-
-	return KVVAL(get_database(), pos, 0);
 }
 
 double KDBVariables::get_var(const std::string& name, const int t, const IodeVarMode mode) const
 {
 	// throw exception if object with passed name does not exist
-    int pos = index_of(name);
-    return get_var(pos, t, mode);
+    if(!this->contains(name))
+		throw std::invalid_argument("Cannot get Variable '" + name + "'.\nThe Variable does not exist in the database.");
+    return KV_get(get_database(), name, t, mode);
 }
 
 double KDBVariables::get_var(const std::string& name, const std::string& period, const IodeVarMode mode) const
@@ -84,42 +47,17 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 double* KDBVariables::get_var_ptr(const std::string& name)
 {
 	// throw exception if object with passed name does not exist
-	int pos = index_of(name);
-	return get_var_ptr(pos);
-}
-
-void KDBVariables::set_var(const int pos, const int t, const double value, const IodeVarMode mode)
-{
-	// throw exception if object with passed position is not valid
-	get_name(pos);
-	KV_set(get_database(), pos, t, mode, value);
-}
-
-void KDBVariables::set_var(const int pos, const std::string& period, const double value, const IodeVarMode mode)
-{
-	if(!check_sample())
-		return;
-	
-	Sample* sample = get_sample();
-	int t = sample->get_period_position(period);
-	set_var(pos, t, value, mode);
-}
-
-void KDBVariables::set_var(const int pos, const Period& period, const double value, const IodeVarMode mode)
-{
-	if(!check_sample())
-		return;
-	
-	Sample* sample = get_sample();
-	int t = sample->get_period_position(period);
-	set_var(pos, t, value, mode);
+    if(!this->contains(name))
+		throw std::invalid_argument("Cannot get Variable '" + name + "'.\nThe Variable does not exist in the database.");
+    return KVVAL(get_database(), name, 0);
 }
 
 void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)
 {
 	// throw exception if object with passed name does not exist
-	int pos = index_of(name);
-	set_var(pos, t, value, mode);
+    if(!this->contains(name))
+		throw std::invalid_argument("Cannot get Variable '" + name + "'.\nThe Variable does not exist in the database.");
+	KV_set(get_database(), name, t, mode, value);
 }
 
 void KDBVariables::set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode)
@@ -227,30 +165,6 @@ bool KDBVariables::add(const std::string& name, const std::string& lec)
 	int total_nb_periods = get_nb_periods();
 	Variable var = calculate_var_from_lec(lec, 0, total_nb_periods - 1);
 	return add(name, var);
-}
-
-void KDBVariables::update(const int pos, const Variable& values, const int t_first, const int t_last)
-{
-	std::string name = get_name(pos);
-	update(name, values, t_first, t_last);
-}
-
-void KDBVariables::update(const int pos, const Variable& values, const std::string& first_period, const std::string& last_period)
-{
-	std::string name = get_name(pos);
-	update(name, values, first_period, last_period);
-}
-
-void KDBVariables::update(const int pos, const std::string& lec, const int t_first, const int t_last)
-{
-	std::string name = get_name(pos);
-	update(name, lec, t_first, t_last);
-}
-
-void KDBVariables::update(const int pos, const std::string& lec, const std::string& first_period, const std::string& last_period)
-{
-	std::string name = get_name(pos);
-	update(name, lec, first_period, last_period);
 }
 
 void KDBVariables::update(const std::string& name, const Variable& values, const int t_first, const int t_last)

@@ -8,7 +8,7 @@ protected:
 
     Comment copy_obj(const Comment original) const override { return original; }
 
-    Comment get_unchecked(const int pos) const override;
+    Comment get_unchecked(const std::string& name) const override;
 
     KDBComments(KDBComments* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {}
@@ -24,9 +24,6 @@ public:
     bool add(const std::string& name, const Comment& comment);
 
     void update(const std::string& name, const Comment& comment);
-
-    void update(const int pos, const Comment& comment);
-    
 };
 
 

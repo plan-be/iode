@@ -62,34 +62,16 @@ TEST_F(KDBEquationsTest, Save)
 
 TEST_F(KDBEquationsTest, GetLec)
 {
-    int pos = 0;
-    std::string name = Equations.get_name(pos);
     std::string expected_lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-
-    // by pos
-    EXPECT_EQ(Equations.get_lec(pos), expected_lec);
-
-    // by name
-    EXPECT_EQ(Equations.get_lec(name), expected_lec);
+    EXPECT_EQ(Equations.get_lec("ACAF"), expected_lec);
 }
 
 TEST_F(KDBEquationsTest, Get)
 {
-    int pos = 0;
     Equation* eq = nullptr;
-    std::string name = Equations.get_name(pos);
     std::string expected_lec;
 
-    // by pos
-    eq = Equations.get(pos);
-    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
-    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
-    EXPECT_EQ(eq->get_method(), "LSQ");
-    delete eq;
-
-    // by name
-    eq = Equations.get(name);
+    eq = Equations.get("ACAF");
     EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
     EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");

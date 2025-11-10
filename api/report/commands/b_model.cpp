@@ -166,7 +166,8 @@ int B_ModelExchange(char* const_arg, int unused)
     // Copy for C++ strings = read only (const)
     arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
-    if(CSimulation::KSIM_EXO) {
+    if(CSimulation::KSIM_EXO) 
+    {
         SCR_free_tbl((unsigned char**) CSimulation::KSIM_EXO);
         CSimulation::KSIM_EXO = NULL;
     }
@@ -197,10 +198,10 @@ int KE_compile(KDB* dbe)
     }
 
     Equation* eq;
-    for(int i = 0; i < dbe->size(); i++) 
+    for(auto& [name, handle] : dbe->k_objs) 
     {
-        eq = KEVAL(dbe, i);
-        K_upd_eqs((char*) dbe->get_name(i).c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
+        eq = KEVAL(dbe, name);
+        K_upd_eqs((char*) name.c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         delete eq;
         eq = nullptr;
     }
@@ -304,7 +305,7 @@ err:
  */
 int B_ModelSimulateSCC(char *const_arg, int unused)
 {
-    int     lg1, lg2, rc, prepos, interpos, postpos;
+    int     lg1, lg2, rc;
     char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
     int     nb_eqs = 0;
     Sample  *smpl = nullptr;
@@ -339,21 +340,18 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         goto err;
     }
 
-    prepos   = K_WS[LISTS]->index_of(lsts[0]); 
-    interpos = K_WS[LISTS]->index_of(lsts[1]);
-    postpos  = K_WS[LISTS]->index_of(lsts[2]);
-    SCR_free_tbl((unsigned char**) lsts);
-
-    if(prepos < 0 || interpos < 0 || postpos < 0) 
+    if(!(K_WS[LISTS]->contains(lsts[0]) && K_WS[LISTS]->contains(lsts[1]) && K_WS[LISTS]->contains(lsts[2]))) 
     {
         rc = -1;
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         goto err;
     }
 
-    pre   = (char**) KL_expand(KLVAL(K_WS[LISTS], prepos));
-    inter = (char**) KL_expand(KLVAL(K_WS[LISTS], interpos));
-    post  = (char**) KL_expand(KLVAL(K_WS[LISTS], postpos));
+    pre   = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[0]));
+    inter = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[1]));
+    post  = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[2]));
+
+    SCR_free_tbl((unsigned char**) lsts);
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
     eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
@@ -406,20 +404,15 @@ static int B_CreateEmptyVar(char *name)
  *  @param [in] char*       name    variable name
  *  @return     double*          pointer to the var "name"
  */
-static double *B_GetVarPtr(char *name)
+static double *B_GetVarPtr(char* c_name)
 {
-    int     pos;
-    KDB     *dbv = K_WS[VARIABLES];
-    char    uname[1024];
-
-    // get var position in KDB
-    strcpy(uname, name);
-    SCR_sqz(SCR_upper((unsigned char*) uname));
-    pos = dbv->index_of(uname);
-    if(pos < 0)
-        return(NULL);
+    std::string name = std::string(c_name);
+    name = trim(name);
+    name = to_upper(name);
+    if(!K_WS[VARIABLES]->contains(name))
+        return NULL;
     else
-        return(KVVAL(dbv, pos, 0));
+        return KVVAL(K_WS[VARIABLES], name, 0);
 }
 
 

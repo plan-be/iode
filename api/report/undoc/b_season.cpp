@@ -31,19 +31,19 @@ int B_WsSeasonAdj(char *arg, int unused)
 
 int B_season(char* arg)
 {
-    int     nb, lg, rc = -1,
-            i, j, shift, beg, dim, nbper;
-    char    name[K_MAX_FILE + 1], **data = NULL;
+    int     res, rc = -1, shift, beg, dim, nbper;
+    char    name[K_MAX_FILE + 1];
     double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
             eps, scale, season[12];
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
-    lg = B_get_arg0(name, arg, 80);
-    data = B_ainit_chk(arg + lg, NULL, 0);
-    nb = SCR_tbl_size((unsigned char**) data);
-    if(nb == 0) goto done;
+    int lg = B_get_arg0(name, arg, 80);
+    char** data = B_ainit_chk(arg + lg, NULL, 0);
+    int nb = SCR_tbl_size((unsigned char**) data);
+    if(nb == 0) 
+        goto done;
 
     eps = atof(data[nb - 1]);
     if(IODE_IS_0(eps)) 
@@ -55,7 +55,7 @@ int B_season(char* arg)
     }
 
     from = K_load(VARIABLES, name, nb, data, 0);
-    if(from == nullptr || nb != from->size()) 
+    if(!from || nb != from->size()) 
     {
         error_manager.append_error("Empty data set or inexistent variable");
         goto done;
@@ -71,35 +71,34 @@ int B_season(char* arg)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));
     i_vec = (double *) SW_nalloc(nb * sizeof(double));
-    for(i = 0; i < nb; i++) 
+    for(int i = 0; i < nb; i++) 
         c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(i = 0; i < from->size(); i++) 
+    for(auto& [from_name, _] : from->k_objs) 
     {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */
-        for(j = 0; j < nb; j++) 
+        for(int j = 0; j < nb; j++) 
             c_vec[j] = i_vec[j] = IODE_NAN;
-        memcpy(t_vec, KVVAL(from, i, 0) + shift, nb * sizeof(double));
+        memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
 
-        if(!DS_test(t_vec, nb, &beg, &dim, nbper, &scale)) 
+        res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
+        if(!res) 
         {
-            memcpy(t_vec, KVVAL(from, i, 0) + shift, nb * sizeof(double));
-            K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
+            memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
+            K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
             continue;
         }
 
-        DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season,
-               dim, nbper, scale);
-        DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper,
-                season, scale);
+        DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
+        DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
+        K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
 
-        sprintf(name, "_C%s", from->get_name(i).c_str());
+        sprintf(name, "_C%s", from_name.c_str());
         K_add(to, name, c_vec, &(nb));
 
-        sprintf(name, "_I%s", from->get_name(i).c_str());
+        sprintf(name, "_I%s", from_name.c_str());
         K_add(to, name, i_vec, &(nb));
     }
     KV_merge(KV_WS, to, 1);

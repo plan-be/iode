@@ -74,59 +74,60 @@ TEST_F(KDBVariablesTest, GetSetVar)
     double value;
     double new_value;
     int nb_periods = Variables.get_nb_periods();
-    std::string name = Variables.get_name(pos + 1);
+    std::string name = Variables.get_name(pos);
+    std::string next_var = Variables.get_name(pos + 1);
     Period start = Variables.get_sample()->start_period;
 
     // period as int
     value = 1.2130001;
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, t), value);
-    new_value = 10.0;
-    Variables.set_var(pos, t, new_value);
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, t), new_value);
-
-    value = -11.028999;
     EXPECT_DOUBLE_EQ(Variables.get_var(name, t), value);
-    new_value = 20.0;
+    new_value = 10.0;
     Variables.set_var(name, t, new_value);
     EXPECT_DOUBLE_EQ(Variables.get_var(name, t), new_value);
+
+    value = -11.028999;
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, t), value);
+    new_value = 20.0;
+    Variables.set_var(next_var, t, new_value);
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, t), new_value);
 
     // period as Period object
     Period period = start.shift(t + 1);
 
     value = 5.2020001;
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, period), value);
-    new_value = 30.0;
-    Variables.set_var(pos, period, new_value);
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, period), new_value);
-
-    value = -15.847;
     EXPECT_DOUBLE_EQ(Variables.get_var(name, period), value);
-    new_value = 40.0;
+    new_value = 30.0;
     Variables.set_var(name, period, new_value);
     EXPECT_DOUBLE_EQ(Variables.get_var(name, period), new_value);
+
+    value = -15.847;
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, period), value);
+    new_value = 40.0;
+    Variables.set_var(next_var, period, new_value);
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, period), new_value);
 
     // period as string
     std::string s_period = start.shift(t + 2).to_string();
 
     value = 9.184;
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, s_period), value);
-    new_value = 50.0;
-    Variables.set_var(pos, s_period, new_value);
-    EXPECT_DOUBLE_EQ(Variables.get_var(pos, s_period), new_value);
-
-    value = -19.288002;
     EXPECT_DOUBLE_EQ(Variables.get_var(name, s_period), value);
-    new_value = 60.0;
+    new_value = 50.0;
     Variables.set_var(name, s_period, new_value);
     EXPECT_DOUBLE_EQ(Variables.get_var(name, s_period), new_value);
 
+    value = -19.288002;
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, s_period), value);
+    new_value = 60.0;
+    Variables.set_var(next_var, s_period, new_value);
+    EXPECT_DOUBLE_EQ(Variables.get_var(next_var, s_period), new_value);
+
     // get pointers to a variable's data
-    double* data = Variables.get_var_ptr(pos);
+    double* data = Variables.get_var_ptr(name);
     EXPECT_TRUE(data != NULL);
-    value = Variables.get_var(pos, 0);
+    value = Variables.get_var(name, 0);
     EXPECT_DOUBLE_EQ(*data, value);
     EXPECT_DOUBLE_EQ(data[0], value);
-    value = Variables.get_var(pos, t);
+    value = Variables.get_var(name, t);
     EXPECT_DOUBLE_EQ(*(data + t), value);
     EXPECT_DOUBLE_EQ(data[t], value);
 }
@@ -234,19 +235,34 @@ TEST_F(KDBVariablesTest, GetPeriodList)
 TEST_F(KDBVariablesTest, Get)
 {
     int nb_periods = Variables.get_nb_periods();
-    std::string name = Variables.get_name(pos);
+    std::string name = "ACAF";
     Variable var;
     Variable expected_var;
+
+    EXPECT_EQ(Variables.get_var(name, "1990Y1", VAR_MODE_LEVEL), 23.771);
+    EXPECT_NEAR(Variables.get_var(name, "1990Y1", VAR_MODE_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, "1990Y1", VAR_MODE_GROWTH_RATE), 38.485, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, "1990Y1", VAR_MODE_Y0Y_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, "1990Y1", VAR_MODE_Y0Y_GROWTH_RATE), 38.485, 1e-3);
     
+    int t_1990 = Variables.get_sample()->get_period_position("1990Y1");
+    EXPECT_EQ(Variables.get_var(name, t_1990, VAR_MODE_LEVEL), 23.771);
+    EXPECT_NEAR(Variables.get_var(name, t_1990, VAR_MODE_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, t_1990, VAR_MODE_GROWTH_RATE), 38.485, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, t_1990, VAR_MODE_Y0Y_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, t_1990, VAR_MODE_Y0Y_GROWTH_RATE), 38.485, 1e-3);
+
+    Period p_1990("1990Y1");
+    EXPECT_EQ(Variables.get_var(name, p_1990, VAR_MODE_LEVEL), 23.771);
+    EXPECT_NEAR(Variables.get_var(name, p_1990, VAR_MODE_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, p_1990, VAR_MODE_GROWTH_RATE), 38.485, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, p_1990, VAR_MODE_Y0Y_DIFF), 6.606, 1e-3);
+    EXPECT_NEAR(Variables.get_var(name, p_1990, VAR_MODE_Y0Y_GROWTH_RATE), 38.485, 1e-3);
+
     expected_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++)
         expected_var.push_back(Variables.get_var(name, p, mode));
 
-    // by position
-    var = Variables.get(pos);
-    EXPECT_EQ(var, expected_var);
-
-    // by name
     var = Variables.get(name);
     EXPECT_EQ(var, expected_var);
 }
@@ -330,53 +346,6 @@ TEST_F(KDBVariablesTest, Update)
     int t_last_wrong = t_last + 1;
     std::string last_period_wrong = "1991Y1";
 
-    // ---- by position ----
-
-    // 1) pass a vector with values
-    for (int p = 0; p < nb_periods; p++) 
-        expected_var.push_back(10.0 + p);
-    Variables.update(pos, expected_var);
-    EXPECT_EQ(Variables.get(pos), expected_var);
-    // -- wrong size of the passed vector of new values
-    expected_var.pop_back();
-    EXPECT_THROW(Variables.update(pos, expected_var), std::range_error);
-
-    // 2) for a given range of periods (as int)
-    expected_var = Variables.get(pos+1);
-    for(int i=0; i < values.size(); i++)
-        expected_var[t_first + i] = values[i];
-    Variables.update(pos+1, values, t_first, t_last);
-    EXPECT_EQ(Variables.get(pos+1), expected_var);
-    // -- wrong last period
-    EXPECT_THROW(Variables.update(pos+1, values, t_first, t_last_wrong), std::range_error);
-
-    // 3) for a given range of periods (as string)
-    expected_var = Variables.get(pos+2);
-    for(int i=0; i < values.size(); i++)
-        expected_var[t_first + i] = values[i];
-    Variables.update(pos+2, values, first_period, last_period);
-    EXPECT_EQ(Variables.get(pos+2), expected_var);
-    // -- wrong last period
-    EXPECT_THROW(Variables.update(pos+2, values, first_period, last_period_wrong), std::range_error);
-
-    // 4) pass a LEC expression
-    expected_var.clear();
-    for(int t=0; t < nb_periods; t++)
-        expected_var.push_back(10.0 + t);
-    lec = "10 + t";
-    Variables.update(pos+3, lec);
-    EXPECT_EQ(Variables.get(pos+3), expected_var);
-
-    // 5) pass a LEC expression for a given range of periods (as int)
-    expected_var = Variables.get(pos+3);
-    for(int i=0; i < values.size(); i++)
-        expected_var[t_first + i] = 20.0 + t_first + i;
-    lec = "20 + t";
-    Variables.update(pos+3, lec, first_period, last_period);
-    EXPECT_EQ(Variables.get(pos+3), expected_var);
-
-    // ---- by name ----
-
     // 1) pass a vector with values
     name = Variables.get_name(pos);
     expected_var.clear();
@@ -418,28 +387,21 @@ TEST_F(KDBVariablesTest, Update)
     EXPECT_EQ(Variables.get(name), expected_var);
 
     // 5) pass a LEC expression for a given range of periods (as int)
-    expected_var = Variables.get(pos+3);
+    expected_var = Variables.get(name);
     for(int i=0; i < values.size(); i++)
         expected_var[t_first + i] = 40.0 + t_first + i;
     lec = "40 + t";
-    Variables.update(pos+3, lec, first_period, last_period);
-    EXPECT_EQ(Variables.get(pos+3), expected_var);
+    Variables.update(name, lec, first_period, last_period);
+    EXPECT_EQ(Variables.get(name), expected_var);
 }
 
 TEST_F(KDBVariablesTest, Copy)
 {
     std::string name = Variables.get_name(pos);
-    Variable var;
-    Variable copy_var;
 
-    // by position
-    var = Variables.get(pos);
-    copy_var = Variables.copy(pos);
-    EXPECT_EQ(copy_var, var);
-
-    // by name
-    var = Variables.get(name);
-    copy_var = Variables.copy(name);
+    // make copy
+    Variable var = Variables.get(name);
+    Variable copy_var = Variables.copy(name);
     EXPECT_EQ(copy_var, var);
 
     // add copy

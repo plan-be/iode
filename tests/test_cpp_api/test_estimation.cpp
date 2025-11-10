@@ -174,9 +174,8 @@ TEST_F(EstimationTest, Estimate)
     Estimation* c_estimation;
     std::string from = "1980Y1";
     std::string to = "1996Y1";
-
-    Equation* eq = Equations.get("ACAF");
-    Equation* eq2 = Equations.get("DPUH");
+    Equation* eq_ACAF;
+    Equation* eq_DPUH;
 
     Scalars.update("acaf1", 0., 1.);
     Scalars.update("acaf2", 0., 1.);
@@ -188,14 +187,50 @@ TEST_F(EstimationTest, Estimate)
     est.set_instruments("");
     est.set_method(EQ_LSQ);
 
-    // Estimates the block ACAF;DPUH
     est.set_block("ACAF;DPUH");
+    std::string block = est.get_block();
+    EXPECT_EQ(block, "ACAF;DPUH");
+
+    KDBEquations* kdb_eqs = est.get_equations();
+    
+    eq_ACAF = kdb_eqs->get("ACAF");
+    EXPECT_EQ(eq_ACAF->block, "ACAF");
+    EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
+    delete eq_ACAF;
+
+    eq_DPUH = kdb_eqs->get("DPUH");
+    EXPECT_EQ(eq_DPUH->block, "DPUH");
+    EXPECT_EQ(eq_DPUH->sample.to_string(), "1972Y1:1996Y1");
+    delete eq_DPUH;
+
+    // Estimates the block ACAF;DPUH
     est.update_scalars();
     est.estimate();
     ASSERT_TRUE(est.is_estimation_done());
 
     est.save();
     c_estimation = est.get_estimation();
+
+    // block updated after calling save()
+    eq_ACAF = kdb_eqs->get("ACAF");
+    EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
+    EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
+    delete eq_ACAF;
+
+    eq_DPUH = kdb_eqs->get("DPUH");
+    EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
+    EXPECT_EQ(eq_DPUH->sample.to_string(), "1980Y1:1996Y1");
+    delete eq_DPUH;
+
+    eq_ACAF = Equations.get("ACAF");
+    EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
+    EXPECT_EQ(eq_ACAF->sample.to_string(), from + ":" + to);
+    delete eq_ACAF;
+
+    eq_DPUH = Equations.get("DPUH");
+    EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
+    EXPECT_EQ(eq_DPUH->sample.to_string(), from + ":" + to);
+    delete eq_DPUH;
 
     // number of coefficients 
     EXPECT_EQ(c_estimation->E_NCE, 5);

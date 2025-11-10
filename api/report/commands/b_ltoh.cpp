@@ -323,22 +323,22 @@ static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip
 
 static int B_ltoh(int type, char* arg)
 {
-    int     lg, nb, rc = 0,
-                    i, shift, skip;
-    char    method[81], file[K_MAX_FILE + 1], **data = NULL;
+    int     res, rc = 0, shift, skip;
+    char    method[81], file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
 
-    lg = B_get_arg0(method, arg, 80);
+    int lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
 
     lg += B_get_arg0(file, arg + lg, K_MAX_FILE);
 
-    data = B_ainit_chk(arg + lg, NULL, 0);
-    nb = SCR_tbl_size((unsigned char**) data);
-    if(nb == 0) goto done;
+    char** data = B_ainit_chk(arg + lg, NULL, 0);
+    int nb = SCR_tbl_size((unsigned char**) data);
+    if(nb == 0) 
+        goto done;
 
     from = K_load(VARIABLES, file, nb, data, 0);
     if(!from) 
@@ -347,7 +347,8 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    if(LTOH_smpl(from->sample, KV_WS->sample, &t_smpl, &skip, &shift) < 0) 
+    res = LTOH_smpl(from->sample, KV_WS->sample, &t_smpl, &skip, &shift);
+    if(res < 0) 
     {
         rc = -1;
         goto done;
@@ -364,9 +365,9 @@ static int B_ltoh(int type, char* arg)
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
 
-    for(i = 0; i < from->size(); i++) 
+    for(auto& [from_name, from_handle] : from->k_objs) 
     {
-        memcpy(f_vec, KVVAL(from, i, 0), from->sample->nb_periods * sizeof(double));
+        memcpy(f_vec, KVVAL(from, from_name, 0), from->sample->nb_periods * sizeof(double));
         switch(method[0]) 
         {
             case LTOH_CS :
@@ -392,7 +393,7 @@ static int B_ltoh(int type, char* arg)
                 break;
         }
         nb = t_smpl->nb_periods;
-        K_add(to, (char*) from->get_name(i).c_str(), t_vec, &(nb));
+        K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
     }
     KV_merge(KV_WS, to, 1);
 

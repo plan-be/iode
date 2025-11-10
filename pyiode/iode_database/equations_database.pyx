@@ -9,7 +9,6 @@ from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInfos
 from pyiode.iode_database.cpp_api_database cimport B_EQS_LEC, B_PrintObjLec
 

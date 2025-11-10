@@ -162,18 +162,17 @@ public:
 	    Sample*     smpl;
         KDB*        kdb_lst = KL_WS;
         KDB*        kdb_var = KV_WS;
-	    int         pos;
 	    static int  done = 0;
 	
 	    // Create lists
 	    success = K_add(kdb_lst, "LST1", "A,B");
         EXPECT_TRUE(success);
-	    lst = KLPTR(kdb_lst, "LST1");
+	    lst = KLVAL(kdb_lst, "LST1");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B");
 	    success = K_add(kdb_lst, "LST2", "A,B,A");
         EXPECT_TRUE(success);
-        lst = KLPTR(kdb_lst, "LST2");
+        lst = KLVAL(kdb_lst, "LST2");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B,A");
 
@@ -194,19 +193,17 @@ public:
 	
 	    success = K_add(kdb_var, "A", A, &nb);
         EXPECT_TRUE(success);
-        pos = kdb_var->index_of("A");
-        values = KVVAL(kdb_var, pos, 0);
+        values = KVVAL(kdb_var, "A", 0);
         EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, 0), A[0]);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, nb-1), A[nb-1]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", 0), A[0]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", nb-1), A[nb-1]);
 	    
         success = K_add(kdb_var, "B", B, &nb);
         EXPECT_TRUE(success);
-        pos = kdb_var->index_of("B");
-        values = KVVAL(kdb_var, pos, 0);
+        values = KVVAL(kdb_var, "B", 0);
         EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, 0), B[0]);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, pos, nb-1), B[nb-1]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "B", 0), B[0]);
+        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "B", nb-1), B[nb-1]);
 
         delete[] A;
         delete[] B;
@@ -797,7 +794,7 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     // Create lists
     found = KL_WS->contains("LST1");
     EXPECT_TRUE(found);
-    lst = KLPTR(KL_WS, "LST1");
+    lst = KLVAL(KL_WS, "LST1");
     EXPECT_EQ(strcmp(lst, "A,B"), 0);
 
     found = KV_WS->contains("A");
@@ -826,7 +823,6 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     std::vector<TableCell> cells;
     std::vector<TableCell> cells_original;
     std::vector<TableCell> cells_restored;
-    int pos;
 
     int nb_columns = 2;
     std::string title = "A title";
@@ -907,8 +903,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     K_add(KT_WS, name, tbl);
 
     // --- extract the table from the Table KDB
-    pos = KT_WS->index_of(name);
-    extracted_tbl = KTVAL(KT_WS, pos);
+    extracted_tbl = KTVAL(KT_WS, name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -993,8 +988,8 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_test_CreateObjects();
 
-    A = (double*) KVPTR(KV_WS, "A");
-    B = (double*) KVPTR(KV_WS, "B");
+    A = (double*) KVVAL(KV_WS, "A");
+    B = (double*) KVVAL(KV_WS, "B");
 
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
@@ -1006,9 +1001,9 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
-    char* lst = KLPTR(KL_WS, "LST1");
+    char* lst = KLVAL(KL_WS, "LST1");
     EXPECT_STREQ(lst, "A,B");
-    lst = KLPTR(KL_WS, "LST2");
+    lst = KLVAL(KL_WS, "LST2");
     EXPECT_STREQ(lst, "A,B,A");
 
     // Using macros in LEC
@@ -1112,8 +1107,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
 
@@ -1123,8 +1118,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 0, 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, 1, 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
     SCR_free_tbl((unsigned char**) objs);
@@ -1159,7 +1154,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(kdbe, nullptr);
 
     // Check list is empty
-    lst = KLPTR(KL_WS, "_DIVER");
+    lst = KLVAL(KL_WS, "_DIVER");
     EXPECT_TRUE(lst == NULL);
 
     // Simulation instance
@@ -1184,13 +1179,13 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
-    lst = KLPTR(KL_WS, "_PRE");
+    lst = KLVAL(KL_WS, "_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Check _DIVER list
-    lst = KLPTR(KL_WS, "_DIVER");
+    lst = KLVAL(KL_WS, "_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
@@ -1265,7 +1260,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = KTPTR(KT_WS, "C8_1");
+    tbl = KTVAL(KT_WS, "C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
@@ -1341,35 +1336,37 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
     delete smpl;
 
+    std::vector<std::string> coef_names = {"acaf1", "acaf2", "acaf3", "acaf4"};
+
     // B_EqsStepWise
-    for(int i = 0; i < 4; i++)
+    for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS, i)->value = 0.9;
-        KSVAL(KS_WS, i)->relax = 1.0;
+        KSVAL(KS_WS, name)->value = 0.9;
+        KSVAL(KS_WS, name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
-    for(int i = 0; i < 4; i++)
+    for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS, i)->value = 0.9;
-        KSVAL(KS_WS, i)->relax = 1.0;
+        KSVAL(KS_WS, name)->value = 0.9;
+        KSVAL(KS_WS, name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
-    for(int i = 0; i < 4; i++)
+    for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS, i)->value = 0.9;
-        KSVAL(KS_WS, i)->relax = 1.0;
+        KSVAL(KS_WS, name)->value = 0.9;
+        KSVAL(KS_WS, name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
-    for(int i = 0; i < 4; i++)
+    for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS, i)->value = 0.9;
-        KSVAL(KS_WS, i)->relax = 1.0;
+        KSVAL(KS_WS, name)->value = 0.9;
+        KSVAL(KS_WS, name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1486,12 +1483,12 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = KLPTR(KL_WS, "RC");
+    lst = KLVAL(KL_WS, "RC");
     EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
-    A1 = KVPTR(KV_WS, "A1");
+    A1 = KVVAL(KV_WS, "A1");
     EXPECT_EQ(rc, 0);
     found = KV_WS->contains("A1");
     EXPECT_TRUE(found);
@@ -1557,7 +1554,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
     EXPECT_EQ(rc, 0);
-    lst = KLPTR(KL_WS, "LIST2");
+    lst = KLVAL(KL_WS, "LIST2");
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
@@ -1566,24 +1563,24 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     K_add(KL_WS, "L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
-    lst = KLPTR(KL_WS, "RES");
+    lst = KLVAL(KL_WS, "RES");
     EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCPTR(KC_WS, "U")), "Comment of U");
+    EXPECT_EQ(std::string(KCVAL(KC_WS, "U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KIPTR(KI_WS, "U")), "2 * A");
+    EXPECT_EQ(std::string(KILEC(KI_WS, "U")), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "U")), "A,B,C");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "U")), "A,B,C");
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
@@ -1599,12 +1596,12 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "NEWLIST")), "U");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "NEWLIST")), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_SCAL")), "c1;c2");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_SCAL")), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1613,17 +1610,17 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_SCAL")), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCPTR(KC_WS, "U")), "Comment of U - More comment on U");
+    EXPECT_EQ(std::string(KCVAL(KC_WS, "U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", KLPTR(KL_WS, "LC"));
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "LC")), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", KLVAL(KL_WS, "LC"));
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1631,32 +1628,38 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "A;B;C;D;E");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_RES")), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "C");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_RES")), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "A;B");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_RES")), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
+    std::string expected_list;
     sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_EQ BOTH_DIFF", input_test_dir);
     rc = B_DataCompare(buf, LISTS);
     EXPECT_EQ(rc, 0);
     // names only in current WS
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "WS_ONLY")), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
+    expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "WS_ONLY")), expected_list);
     // names only in file
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "FILE_ONLY")), "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;TOTAL1;XENVI;XSCENARIO;_SEARCH");
+    expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
+    expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "FILE_ONLY")), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "BOTH_EQ")), "");
+    expected_list = "";
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "BOTH_EQ")), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
-    EXPECT_EQ(std::string(KLPTR(KL_WS, "BOTH_DIFF")), "_SCAL");
+    expected_list = "_SCAL";
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "BOTH_DIFF")), expected_list);
 
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
@@ -1669,7 +1672,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
 TEST_F(IodeCAPITest, Tests_B_EQS)
 {
-    int     rc, pos;
+    int     rc;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
     KDB*    kdb_eqs = KE_WS;
@@ -1689,8 +1692,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    pos = KE_WS->index_of("ACAF");
-    Sample smpl = KESMPL(KE_WS, pos);
+    Sample smpl = KESMPL(KE_WS, "ACAF");
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
 
@@ -1889,8 +1891,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Check the values
-    double* C = (double*) KVPTR(KV_WS, "C");
-    double* D = (double*) KVPTR(KV_WS, "D");
+    double* C = (double*) KVVAL(KV_WS, "C");
+    double* D = (double*) KVVAL(KV_WS, "D");
 
     EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
     EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
@@ -1911,7 +1913,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     U_test_K_interpret(IDENTITIES, "fun");
     U_test_K_interpret(VARIABLES, "fun");
 
-    AOUC = KVPTR(KV_WS, "AOUC");
+    AOUC = KVVAL(KV_WS, "AOUC");
     AOUC[1] = 0.1;
 
     // Sample (null => full sample, see K_exec())
@@ -1992,7 +1994,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
         delete KC_WS;
         KC_WS = K_interpret(COMMENTS, outfile, 1);
         EXPECT_TRUE(KC_WS != nullptr);
-        EXPECT_EQ(std::string(KCPTR(KC_WS, "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(std::string(KCVAL(KC_WS, "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2155,7 +2157,6 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
     U_test_suppress_kmsg_msgs();
 
-
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
 
@@ -2182,7 +2183,6 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     EXPECT_EQ(CSimulation::KSIM_RELAX, 0.7);
     EXPECT_EQ(CSimulation::KSIM_DEBUG, 0);
     EXPECT_EQ(CSimulation::KSIM_PASSES, 5);
-
 
     // B_ModelSimulate()
     rc = B_ModelSimulate("2000Y1 2002Y1");
@@ -2226,13 +2226,15 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     rc = B_ModelCompile("");
     EXPECT_EQ(rc, 0);
 
-    // B_ModelCalcSCC(char *arg) $ModelCalcSCC nbtris prename intername postname [eqs]
+    // B_ModelCalcSCC(char *arg)            $ModelCalcSCC nbtris prename intername postname [eqs]
     rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    rc = strcmp(KLPTR(KL_WS, "_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
-    EXPECT_EQ(rc, 0);
+    std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
+    expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
+    expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    EXPECT_EQ(std::string(KLVAL(KL_WS, "_PRE2")), expected_list);
 
-    // int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
+    // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
     //  1. Annuler Exchange
     rc = B_ModelExchange("");
     EXPECT_EQ(rc, 0);
@@ -2297,8 +2299,8 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(int i = 0; i < KE_WS->size(); i++)
-        ASSERT_EQ(KEVAL(KE_WS, i)->endo, std::string(KE_WS->get_name(i)));
+    for(auto& [name, _] : KE_WS->k_objs)
+        ASSERT_EQ(KEVAL(KE_WS, name)->endo, name);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2925,80 +2927,78 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     int maxit = 100;
     double eps = 0.0001;
 
-    int pos;
     int res;
-
     B_WsClear("Var", VARIABLES);
     B_WsSample("2000Y1 2001Y1");
 
-    pos = KV_add(KV_WS, "R1C1");
-    *KVVAL(KV_WS, pos, 0) = 5.0;
-    pos = KV_add(KV_WS, "R1C2");
-    *KVVAL(KV_WS, pos, 0) = 3.0;
-    pos = KV_add(KV_WS, "R1C3");
-    *KVVAL(KV_WS, pos, 0) = 5.0;
-    pos = KV_add(KV_WS, "R1C4");
-    *KVVAL(KV_WS, pos, 0) = 7.0;
-    *KVVAL(KV_WS, pos, 1) = 5.0;
-    pos = KV_add(KV_WS, "R1CT");
-    *KVVAL(KV_WS, pos, 0) = 20.0;
-    *KVVAL(KV_WS, pos, 1) = 20.0;
+    KV_add(KV_WS, "R1C1");
+    *KVVAL(KV_WS, "R1C1", 0) = 5.0;
+    KV_add(KV_WS, "R1C2");
+    *KVVAL(KV_WS, "R1C2", 0) = 3.0;
+    KV_add(KV_WS, "R1C3");
+    *KVVAL(KV_WS, "R1C3", 0) = 5.0;
+    KV_add(KV_WS, "R1C4");
+    *KVVAL(KV_WS, "R1C4", 0) = 7.0;
+    *KVVAL(KV_WS, "R1C4", 1) = 5.0;
+    KV_add(KV_WS, "R1CT");
+    *KVVAL(KV_WS, "R1CT", 0) = 20.0;
+    *KVVAL(KV_WS, "R1CT", 1) = 20.0;
 
-    pos = KV_add(KV_WS, "R2C1");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    pos = KV_add(KV_WS, "R2C2");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    *KVVAL(KV_WS, pos, 1) = 2.0;
-    pos = KV_add(KV_WS, "R2C3");
-    *KVVAL(KV_WS, pos, 0) = 4.0;
-    pos = KV_add(KV_WS, "R2C4");
-    *KVVAL(KV_WS, pos, 0) = 4.0;
-    pos = KV_add(KV_WS, "R2CT");
-    *KVVAL(KV_WS, pos, 0) = 10.0;
-    *KVVAL(KV_WS, pos, 1) = 10.0;
+    KV_add(KV_WS, "R2C1");
+    *KVVAL(KV_WS, "R2C1", 0) = 1.0;
+    KV_add(KV_WS, "R2C2");
+    *KVVAL(KV_WS, "R2C2", 0) = 1.0;
+    *KVVAL(KV_WS, "R2C2", 1) = 2.0;
+    KV_add(KV_WS, "R2C3");
+    *KVVAL(KV_WS, "R2C3", 0) = 4.0;
+    KV_add(KV_WS, "R2C4");
+    *KVVAL(KV_WS, "R2C4", 0) = 4.0;
+    KV_add(KV_WS, "R2CT");
+    *KVVAL(KV_WS, "R2CT", 0) = 10.0;
+    *KVVAL(KV_WS, "R2CT", 1) = 10.0;
 
-    pos = KV_add(KV_WS, "R3C1");
-    *KVVAL(KV_WS, pos, 0) = 3.0;
-    pos = KV_add(KV_WS, "R3C2");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    pos = KV_add(KV_WS, "R3C3");
-    *KVVAL(KV_WS, pos, 0) = 3.0;
-    *KVVAL(KV_WS, pos, 1) = 2.0;
-    pos = KV_add(KV_WS, "R3C4");
-    *KVVAL(KV_WS, pos, 0) = 3.0;
-    pos = KV_add(KV_WS, "R3CT");
-    *KVVAL(KV_WS, pos, 0) = 10.0;
-    *KVVAL(KV_WS, pos, 1) = 10.0;
+    KV_add(KV_WS, "R3C1");
+    *KVVAL(KV_WS, "R3C1", 0) = 3.0;
+    KV_add(KV_WS, "R3C2");
+    *KVVAL(KV_WS, "R3C2", 0) = 1.0;
+    KV_add(KV_WS, "R3C3");
+    *KVVAL(KV_WS, "R3C3", 0) = 3.0;
+    *KVVAL(KV_WS, "R3C3", 1) = 2.0;
+    KV_add(KV_WS, "R3C4");
+    *KVVAL(KV_WS, "R3C4", 0) = 3.0;
+    KV_add(KV_WS, "R3CT");
+    *KVVAL(KV_WS, "R3CT", 0) = 10.0;
+    *KVVAL(KV_WS, "R3CT", 1) = 10.0;
 
-    pos = KV_add(KV_WS, "R4C1");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    *KVVAL(KV_WS, pos, 1) = 0.0;
-    pos = KV_add(KV_WS, "R4C2");
-    *KVVAL(KV_WS, pos, 0) = 2.0;
-    pos = KV_add(KV_WS, "R4C3");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    pos = KV_add(KV_WS, "R4C4");
-    *KVVAL(KV_WS, pos, 0) = 1.0;
-    pos = KV_add(KV_WS, "R4CT");
-    *KVVAL(KV_WS, pos, 0) = 5.0;
-    *KVVAL(KV_WS, pos, 1) = 5.0;
+    KV_add(KV_WS, "R4C1");
+    *KVVAL(KV_WS, "R4C1", 0) = 1.0;
+    *KVVAL(KV_WS, "R4C1", 1) = 0.0;
+    KV_add(KV_WS, "R4C2");
+    *KVVAL(KV_WS, "R4C2", 0) = 2.0;
+    KV_add(KV_WS, "R4C3");
+    *KVVAL(KV_WS, "R4C3", 0) = 1.0;
+    KV_add(KV_WS, "R4C4");
+    *KVVAL(KV_WS, "R4C4", 0) = 1.0;
+    KV_add(KV_WS, "R4CT");
+    *KVVAL(KV_WS, "R4CT", 0) = 5.0;
+    *KVVAL(KV_WS, "R4CT", 1) = 5.0;
 
-    pos = KV_add(KV_WS, "RTC1");
-    *KVVAL(KV_WS, pos, 0) = 10.0;
-    *KVVAL(KV_WS, pos, 1) = 10.0;
-    pos = KV_add(KV_WS, "RTC2");
-    *KVVAL(KV_WS, pos, 0) = 7.0;
-    *KVVAL(KV_WS, pos, 1) = 7.0;
-    pos = KV_add(KV_WS, "RTC3");
-    *KVVAL(KV_WS, pos, 0) = 13.0;
-    *KVVAL(KV_WS, pos, 1) = 13.0;
-    pos = KV_add(KV_WS, "RTC4");
-    *KVVAL(KV_WS, pos, 0) = 15.0;
-    *KVVAL(KV_WS, pos, 1) = 15.0;
+    KV_add(KV_WS, "RTC1");
+    *KVVAL(KV_WS, "RTC1", 0) = 10.0;
+    *KVVAL(KV_WS, "RTC1", 1) = 10.0;
+    KV_add(KV_WS, "RTC2");
+    *KVVAL(KV_WS, "RTC2", 0) = 7.0;
+    *KVVAL(KV_WS, "RTC2", 1) = 7.0;
+    KV_add(KV_WS, "RTC3");
+    *KVVAL(KV_WS, "RTC3", 0) = 13.0;
+    *KVVAL(KV_WS, "RTC3", 1) = 13.0;
+    KV_add(KV_WS, "RTC4");
+    *KVVAL(KV_WS, "RTC4", 0) = 15.0;
+    *KVVAL(KV_WS, "RTC4", 1) = 15.0;
 
-    pos = KV_add(KV_WS, "RTCT");
-    *KVVAL(KV_WS, pos, 0) = 90.0;
-    *KVVAL(KV_WS, pos, 1) = 90.0;
+    KV_add(KV_WS, "RTCT");
+    *KVVAL(KV_WS, "RTCT", 0) = 90.0;
+    *KVVAL(KV_WS, "RTCT", 1) = 90.0;
 
     K_add(KL_WS, "X", "R1,R2,R3,R4,RT");
     K_add(KL_WS, "Y", "C1,C2,C3,C4,CT");

@@ -33,16 +33,16 @@
  *  @param [in]       char*    name     variable to be analysed (from KV_WS)
  *  @return           int               0 if name is found in KV_WS, -1 otherwise
  */
-static int E_GetSmpl(Sample *smpl, char *name)
+static int E_GetSmpl(Sample* smpl, char* c_name)
 {
-    int     pos, t;
-    double    *val;
-    Sample  *wsmpl = K_WS[VARIABLES]->sample;
+    std::string name = std::string(c_name);
+    if(!K_WS[VARIABLES]->contains(name)) 
+        return -1;
+    
+    double* val = KVVAL(K_WS[VARIABLES], name, 0);
 
-    pos = K_WS[VARIABLES]->index_of(name);
-    if(pos < 0) return(-1);
-    val = KVVAL(K_WS[VARIABLES], pos, 0);
-
+    int t;
+    Sample* wsmpl = K_WS[VARIABLES]->sample;
     for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
 
@@ -55,7 +55,7 @@ static int E_GetSmpl(Sample *smpl, char *name)
 
     smpl->nb_periods = smpl->end_period.difference(smpl->start_period);
     
-    return(0);
+    return 0;
 }
 
 
@@ -255,16 +255,14 @@ cleanup:
  */
 void E_SclToReal(char* name, double* res)
 {
-    int pos;
-    Scalar *scl;
+    if(!KS_WS->contains(name))
+        return;
 
-    pos = KS_WS->index_of(name);
-    if(pos < 0) return;
-
-    scl = KSVAL(KS_WS, pos);
+    Scalar* scl = KSVAL(KS_WS, name);
     res[0] = scl->value;
     res[1] = scl->std;
-    if(!IODE_IS_0(scl->std)) res[2] = scl->value/scl->std;
+    if(!IODE_IS_0(scl->std)) 
+        res[2] = scl->value/scl->std;
 }
 
 

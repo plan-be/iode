@@ -10,7 +10,6 @@ from libc.string cimport strlen
 from libcpp.string cimport string
 from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
-from pyiode.iode_database.cpp_api_database cimport KCPTR, KIPTR, KLPTR, KVPTR
 from pyiode.iode_database.cpp_api_database cimport K_NBDEC
 from pyiode.iode_database.cpp_api_database cimport error_manager
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb

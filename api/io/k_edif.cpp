@@ -95,11 +95,9 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
 
 char* ExportObjsDIF::extract_comment(KDB* dbc, char* name, char **cmt)
 {
-    int pos;
-
-    pos = dbc->index_of(name);
-    if(pos >= 0)
-        return(write_pre_post("1,0\n\"", "\"\n", KCVAL(dbc, pos), cmt));
+    SWHDL handle = dbc->get_handle(name);
+    if(handle > 0)
+        return(write_pre_post("1,0\n\"", "\"\n", KCVAL(dbc, handle), cmt));
     else
         return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
 }
@@ -109,12 +107,14 @@ char* ExportObjsDIF::get_variable_value(KDB* dbv, int nb, int t, char** vec)
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    std::string name = dbv->get_name(nb);
+    double* value_ptr = KVVAL(dbv, name, t);
+    write_value(tmp, *value_ptr);
     write_pre_post("0,", "\nV\n", tmp, &buf);
-    lg = (int)strlen(buf) + 1;
+    lg = (int) strlen(buf) + 1;
 
     if(*vec == NULL) olg = 0;
-    else olg = (int)strlen(*vec);
+    else olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);

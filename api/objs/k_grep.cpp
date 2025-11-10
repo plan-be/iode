@@ -55,7 +55,7 @@ extern "C" int SCR_ADD_PTR_CHUNCK;
  */
 char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)
 {
-    int         i, j, k, n = 0, found;
+    int         j, k, n = 0, found;
     char        **lst = NULL;
     Table       *tbl;
     TableLine   *tline;
@@ -68,7 +68,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     {
         n = kdb->size();
         lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
-        i = 0;
+        int i = 0;
         for(const auto& [name, _] : kdb->k_objs)
             lst[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
         return lst;
@@ -76,8 +76,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
     TableCell* cell;
     SCR_ADD_PTR_CHUNCK = 1000;
-    i = 0;
-    for(const auto& [name, _] : kdb->k_objs)
+    for(const auto& [name, handle] : kdb->k_objs)
     {
         found = 0;
         if(names) 
@@ -89,26 +88,26 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
             {
                 case COMMENTS :
                     if(texts) 
-                        found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
+                        found = !SCR_grep_gnl(pattern, KCVAL(kdb, handle), ecase, all);
                     break;
                 case LISTS :
                     if(texts) 
-                        found = !SCR_grep_gnl(pattern, KLVAL(kdb, i), ecase, all);
+                        found = !SCR_grep_gnl(pattern, KLVAL(kdb, handle), ecase, all);
                     break;
                 case IDENTITIES :
                     if(forms) 
-                        found = !SCR_grep_gnl(pattern, KILEC(kdb, i), ecase, all);
+                        found = !SCR_grep_gnl(pattern, KILEC(kdb, handle), ecase, all);
                     break;
                 case EQUATIONS :
-                    lec = KELEC(kdb, i);
-                    cmt = KECMT(kdb, i);
+                    lec = KELEC(kdb, name);
+                    cmt = KECMT(kdb, name);
                     if(forms) 
                         found = !SCR_grep_gnl(pattern, (char*) lec.c_str(), ecase, all);
                     if(!found && texts)
                         found = !SCR_grep_gnl(pattern, (char*) cmt.c_str(), ecase, all);
                     break;
                 case TABLES:
-                    tbl = KTVAL(kdb, i);
+                    tbl = KTVAL(kdb, name);
                     for(k = 0; k < T_NL(tbl) && !found; k++) 
                     {
                         tline = &tbl->lines[k];
@@ -149,7 +148,6 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
         if(found) 
             SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) name.c_str());
-        i++;
     }
 
     if(lst != NULL) 

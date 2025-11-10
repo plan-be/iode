@@ -29,7 +29,7 @@ protected:
 
     Variable copy_obj(const Variable original) const override { return original; }
 
-    Variable get_unchecked(const int pos) const override;
+    Variable get_unchecked(const std::string& name) const override;
 
     KDBVariables(KDBVariables* kdb, const bool deep_copy, const std::string& pattern) : 
         KDBTemplate(kdb, deep_copy, pattern) {};
@@ -41,20 +41,6 @@ public:
     {
         return new KDBVariables(this, deep_copy, pattern);
     }
-
-    double get_var(const int pos, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
-
-    double get_var(const int pos, const std::string& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
-
-    double get_var(const int pos, const Period& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
-
-    /**
-     *  Returns a pointer to the first value of the Variable. 
-     *  
-     *  @param    pos   int        Variable position in the workspace   
-     *  @return         double*    pointer to the Variable values
-     */
-    double* get_var_ptr(const int pos);
 
     double get_var(const std::string& name, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
@@ -70,12 +56,6 @@ public:
      */
     double* get_var_ptr(const std::string& name);
 
-    void set_var(const int pos, const int t, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
-
-    void set_var(const int pos, const std::string& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
-
-    void set_var(const int pos, const Period& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
-
     void set_var(const std::string& name, const int t, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
     void set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
@@ -85,14 +65,6 @@ public:
     bool add(const std::string& name, const Variable& variable);
 
     bool add(const std::string& name, const std::string& lec);
-
-    void update(const int pos, const Variable& values, const int t_first, const int t_last);
-
-    void update(const int pos, const Variable& values, const std::string& first_period = "", const std::string& last_period = "");
-
-    void update(const int pos, const std::string& lec, const int t_first, const int t_last);
-
-    void update(const int pos, const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
     void update(const std::string& name, const Variable& values, const int t_first, const int t_last);
 

@@ -141,7 +141,8 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
  */
 void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
 {
-    Equation* eq = KEVAL(dbe, i);
+    std::string name = dbe->get_name(i);
+    Equation* eq = KEVAL(dbe, name);
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
     delete eq;
@@ -165,10 +166,11 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
 {
     int     lg;
     CLEC    *cl = NULL;
+    std::string name = dbi->get_name(i);
 
-    lg = KICLEC(dbi, i)->tot_lg;
+    lg = KICLEC(dbi, name)->tot_lg;
     cl = (CLEC *) SW_nalloc(lg);
-    memcpy(cl, KICLEC(dbi, i), lg);
+    memcpy(cl, KICLEC(dbi, name), lg);
 
     K_clecscan(dbi, cl, exo, scal);
     SW_nfree(cl);
@@ -189,10 +191,10 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
  */
 void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
 {
-    Table     *tbl;
-    CLEC    *clec = NULL;
+    std::string name = dbt->get_name(i);
+    Table* tbl = KTVAL(dbt, name);
 
-    tbl = KTVAL(dbt, i);
+    CLEC* clec = NULL;
     for(int k = 0; k < T_NL(tbl); k++)   
     {
         if(tbl->lines[k].get_type() != TABLE_LINE_CELL) 
@@ -313,17 +315,23 @@ unsigned char **KL_expand(char *str)
 {
     unsigned char 	**tbl, **tbl2;
     unsigned char*  seps = (unsigned char*) " ,;\t\n\r\f";
-    int				i, nb, nb2, pos;
+    int				i, nb, nb2;
 
     tbl = SCR_vtoms((unsigned char*) str, seps);
     nb = SCR_tbl_size(tbl);
-    if(SCR_tbl_size(tbl) == 0) return(tbl);
-    for(i = 0 ; tbl[i] ; i++) {
-        if(tbl[i][0] == '$') {
-            pos = K_WS[LISTS]->index_of((char*) tbl[i] + 1);
-            if(pos >= 0) {
+    if(SCR_tbl_size(tbl) == 0) 
+        return(tbl);
+    
+    std::string list_name;
+    for(i = 0 ; tbl[i] ; i++) 
+    {
+        if(tbl[i][0] == '$') 
+        {
+            list_name = std::string((char*) tbl[i] + 1);
+            if(K_WS[LISTS]->contains(list_name))
+            {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                tbl2 = KL_expand(KLVAL(K_WS[LISTS], pos));
+                tbl2 = KL_expand(KLVAL(K_WS[LISTS], list_name));
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);

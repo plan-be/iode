@@ -637,14 +637,13 @@ char *RP_gmacro(char* str)
 
         else 
         {
-            pos = RP_MACRO->index_of(tmp);
-            if(pos < 0) 
+            if(!RP_MACRO->contains(tmp)) 
             {
                 error_manager.append_error("Report: Macro '" + std::string(tmp) + "' is not defined");
-                SCR_free(tmp); // JMP&GB 26/1/09
+                SCR_free(tmp);
                 return(NULL);
             }
-            res = (char*) SCR_stracpy((unsigned char*) KOVAL(RP_MACRO, pos));
+            res = (char*) SCR_stracpy((unsigned char*) K_optr0(RP_MACRO, tmp));
         }
     }
 

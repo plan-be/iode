@@ -142,14 +142,8 @@ TEST_F(KDBCommentsTest, Contains)
 
 TEST_F(KDBCommentsTest, Get)
 {
-    std::string name = Comments.get_name(0);
     Comment expected_comment = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-
-    // get by name
-    EXPECT_EQ(Comments.get(name), expected_comment);
-
-    // get by position
-    EXPECT_EQ(Comments.get(0), expected_comment);
+    EXPECT_EQ(Comments.get("ACAF"), expected_comment);
 }
 
 TEST_F(KDBCommentsTest, GetNames)
@@ -216,7 +210,7 @@ TEST_F(KDBCommentsTest, CreateRemove)
 
 TEST_F(KDBCommentsTest, Update)
 {
-    std::string name = Comments.get_name(0);
+    std::string name = "ACAF";
     Comment new_comment = "New Comment";
 
     // by name
@@ -225,28 +219,15 @@ TEST_F(KDBCommentsTest, Update)
 
     // error: name does not exist
     EXPECT_THROW(Comments.update("UNKNOWN", new_comment), std::invalid_argument);
-
-    // by position
-    Comments.update(1, new_comment);
-    EXPECT_EQ(Comments.get(1), new_comment);
-
-    // error: position does not exist
-    int beyond_last_pos = Comments.size() + 10;
-    EXPECT_THROW(Comments.update(beyond_last_pos, new_comment), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Copy)
 {
-    int pos = 0;
-    std::string name = Comments.get_name(pos);
+    std::string name = "ACAF";
 
-    // by postion
-    Comment comment = Comments.get(pos);
-    Comment copy_comment = Comments.copy(pos);
-    EXPECT_EQ(copy_comment, comment);
-
-    // by name
-    copy_comment = Comments.copy(name);
+    // make copy
+    std::string comment = Comments.get(name);
+    std::string copy_comment = Comments.copy(name);
     EXPECT_EQ(copy_comment, comment);
 
     // add copy
@@ -254,10 +235,6 @@ TEST_F(KDBCommentsTest, Copy)
 
     // error: name does not exist
     EXPECT_THROW(Comments.copy("UNKNOWN"), std::invalid_argument);
-
-    // error: position does not exist
-    int beyond_last_pos = Comments.size() + 10;
-    EXPECT_THROW(Comments.copy(beyond_last_pos), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Filter)

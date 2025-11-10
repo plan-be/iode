@@ -7,29 +7,24 @@ Table* KDBTables::copy_obj(Table* const original) const
 	return new Table(*original);
 }
 
-Table* KDBTables::get_unchecked(const int pos) const
+Table* KDBTables::get_unchecked(const std::string& name) const
 {
 	KDB* kdb = get_database();
 	// Note: - KTVAL allocate a new pointer Table*
 	//       - static_cast<Table*>(Table*) calls the copy constructor Table(const Table* c_table)
-	return static_cast<Table*>(KTVAL(kdb, pos));
-}
-
-std::string KDBTables::get_title(const int pos) const
-{
-	// throw exception if table with passed position is not valid
-	get_name(pos);
-    Table* c_table = KTVAL(get_database(), pos);
-    std::string title = std::string((char*) T_get_title(c_table));
-    delete c_table;
-    return title;
+	return static_cast<Table*>(KTVAL(kdb, name));
 }
 
 std::string KDBTables::get_title(const std::string& name) const
 {
-	// throw exception if table with passed name does not exist
-    int pos = index_of(name);
-    return get_title(pos);
+	// throw exception if table with passed position is not valid
+	if(!this->contains(name))
+		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
+			                    "The table with name '" + name + "' does not exist in the database.");
+    Table* c_table = KTVAL(get_database(), name);
+    std::string title = std::string((char*) T_get_title(c_table));
+    delete c_table;
+    return title;
 }
 
 bool KDBTables::add(const std::string& name, const Table& obj)

@@ -157,7 +157,6 @@ KDB* AsciiComments::load_asc(char* filename, int db_global)
 int AsciiComments::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i;
     CMT     cmt;
 
     if(filename[0] == '-') 
@@ -172,10 +171,10 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, handle] : kdb->k_objs) 
     {
-        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
-        cmt = KCVAL(kdb, i);
+        fprintf(fd, "%s ", (char*) name.c_str());
+        cmt = KCVAL(kdb, handle);
         SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
         SCR_fprintf_esc(fd, cmt, 1);
         fprintf(fd, "\n");

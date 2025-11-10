@@ -135,13 +135,15 @@ int     CSimulation::KSIM_CPU_SORT = 0;
  */
 void CSimulation::K_init_values(int t)
 {
-    int         i;
-    double      *val;
+    if(KSIM_START == VAR_INIT_ASIS) 
+        return;
 
-    if(KSIM_START == VAR_INIT_ASIS) return;
-
-    for(i = 0 ; i < KSIM_PRE + KSIM_INTER + KSIM_POST; i++) {
-        val = KVVAL(KSIM_DBV, KSIM_POSXK[KSIM_ORDER[i]], 0);
+    double* val;
+    std::string name;
+    for(int i = 0 ; i < KSIM_PRE + KSIM_INTER + KSIM_POST; i++) 
+    {
+        name = KSIM_DBV->get_name(KSIM_POSXK[KSIM_ORDER[i]]);
+        val = KVVAL(KSIM_DBV, name, 0);
         KV_init_values_1(val, t, KSIM_START);
     }
 }
@@ -158,10 +160,9 @@ void CSimulation::K_init_values(int t)
  */
 void CSimulation::K_restore_XK(int t)
 {
-    int         i, j;
-
+    int i, j;
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)
-        KSIM_VAL(KSIM_ORDER[i], t) = KSIM_XK[j];
+        KSIM_SET_VAL(KSIM_ORDER[i], t, KSIM_XK[j]);
 }
 
 /**
@@ -174,13 +175,11 @@ void CSimulation::K_restore_XK(int t)
  */
 int CSimulation::K_prolog(int t)
 {
-    int     i;
-    double    x;
-
-    for(i = 0; i < KSIM_PRE; i++)  {
+    double x;
+    for(int i = 0; i < KSIM_PRE; i++)  
+    {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
-        KSIM_VAL(KSIM_ORDER[i], t) = x;
-        // if(!IODE_IS_A_NUMBER(x)) return(-1); /* JMP 13-04-00 */
+        KSIM_SET_VAL(KSIM_ORDER[i], t, x);
     }
     return(0);
 }
@@ -191,7 +190,7 @@ int CSimulation::K_prolog(int t)
  *  
  *  For eq nb i:
  *    - saves the previous iteration value of the endogenous variable in KSIM_XK[i]
- *    - computes the new value of the endo var and saves it into KSIM_DBV (via KSIM_VAL) 
+ *    - computes the new value of the endo var and saves it into KSIM_DBV (via KSIM_SET_VAL) 
  *    - if required, modifies the resulting value by "relaxing" it (multiply by KSIM_RELAX)
  *    - computes the ||f(x)|| = diff between the new endo value and the value of the previous iteration 
  *      and saves that value in KSIM_NORM. 
@@ -210,16 +209,19 @@ int CSimulation::K_interdep_1(int t)
 
 
     KSIM_NORM = 0.0;
-    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
+    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
+    {
         /* save XK first */
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
         /* execute lec */
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!IODE_IS_A_NUMBER(x)) return(-1);
+        if(!IODE_IS_A_NUMBER(x)) 
+            return(-1);
 
         /* Check convergence */
-        if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) 
+        {
             d = (KSIM_XK[j] - x);   // d = diff between 2 iterations
             if(!IODE_IS_0(KSIM_XK[j]))  
                 pd = std::min(fabs(1 - x / KSIM_XK[j]), fabs(d));   // if ||endo|| != 0, norm = relative difference
@@ -230,13 +232,13 @@ int CSimulation::K_interdep_1(int t)
             if(pd > KSIM_NORM) KSIM_NORM = pd;
 
             // Stores the new endo value and "relaxes" it 
-            KSIM_VAL(KSIM_ORDER[i], t) = KSIM_RELAX * (x - KSIM_XK[j]) +
-                                         KSIM_XK[j];
+            KSIM_SET_VAL(KSIM_ORDER[i], t, KSIM_RELAX * (x - KSIM_XK[j]) + KSIM_XK[j]);
         }
-        else {
+        else 
+        {
             // if NaN, set KSIM_NORM to a huge value 
             KSIM_NORM = 10;
-            KSIM_VAL(KSIM_ORDER[i], t) = x;
+            KSIM_SET_VAL(KSIM_ORDER[i], t, x);
         }
     }
 
@@ -263,19 +265,25 @@ int CSimulation::K_interdep_2(int t)
     double  d, pd;
 
     // Stage 1
-    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
+    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
+    {
         /* save XK for further use */
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
         /* execute lec and save in KSIM_XK1 */
         KSIM_XK1[j] = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!IODE_IS_A_NUMBER(KSIM_XK1[j])) return(-1); // NaN value --> stop simulation
+        // NaN value --> stop simulation
+        if(!IODE_IS_A_NUMBER(KSIM_XK1[j])) 
+            return(-1);
     }
 
     // Stage 2
     KSIM_NORM = 0.0;
-    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
-        if(IODE_IS_A_NUMBER(KSIM_XK[j])) { // Valeur précédente définie
+    for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
+    {
+        // Valeur précédente définie
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) 
+        {
             d = KSIM_XK[j] - KSIM_XK1[j]; // Diff between iterations
 
             // Calcule la 'norme' = fabs de la différence relative entre 2 it.
@@ -285,16 +293,19 @@ int CSimulation::K_interdep_2(int t)
             else
                 pd = fabs(d);
 
+            // norme : la plus grande pour le mod.
             pd *= KSIM_RELAX;
-            if(pd > KSIM_NORM) KSIM_NORM = pd; // norme : la plus grande pour le mod.
+            if(pd > KSIM_NORM) 
+                KSIM_NORM = pd;
 
             /* Store new value and relax it */
-            KSIM_VAL(KSIM_ORDER[i], t) =
-                KSIM_RELAX * KSIM_XK1[j] + (1 - KSIM_RELAX) * KSIM_XK[j];
+            KSIM_SET_VAL(KSIM_ORDER[i], t, KSIM_RELAX * KSIM_XK1[j] + (1 - KSIM_RELAX) * KSIM_XK[j]);
         }
-        else { // If previous iteation value is L-NAN, set KSIM_NORM to 10 and assing new calc value to endo
+        // If previous iteation value is L-NAN, set KSIM_NORM to 10 and assing new calc value to endo
+        else 
+        {
             KSIM_NORM = 10;
-            KSIM_VAL(KSIM_ORDER[i], t) = KSIM_XK1[j];
+            KSIM_SET_VAL(KSIM_ORDER[i], t, KSIM_XK1[j]);
         }
     }
 
@@ -338,13 +349,14 @@ int CSimulation::K_interdep(int t)
 int CSimulation::K_epilog(int t)
 {
     int     i, j;
-    double    x;
+    double  x;
 
-    for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  {
+    for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  
+    {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
-        KSIM_VAL(KSIM_ORDER[i], t) = x;
-        // if(!IODE_IS_A_NUMBER(x)) return(-1);  
+        KSIM_SET_VAL(KSIM_ORDER[i], t, x);  
     }
+
     return(0);
 }
 
@@ -527,13 +539,13 @@ int CSimulation::K_simul_1(int t)
  */
 int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs)
 {
-    int     i, t, bt, at, j, k, endo_exonb,
+    int     i, t, bt, at, j, k, res, endo_exonb,
             posendo, posexo, posvar,
             rc = -1,
             cpu_iter;
     char    **var = NULL;
     double    *x;
-    std::string var_name;
+    std::string var_name, var_exo;
 
     if(dbe->size() == 0) 
     {
@@ -593,7 +605,7 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
         }
         KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
         
-        rc = L_link(dbv, dbs, KECLEC(dbe, i));
+        rc = L_link(dbv, dbs, KECLEC(dbe, eq_name));
         if(rc) 
         {
             std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
@@ -642,7 +654,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
                 goto fin;
             }
             
-            if(KE_exo2endo(posendo, posexo) < 0) 
+            res = KE_exo2endo(posendo, posexo);
+            if(res < 0) 
             {
                 rc = -1;
                 goto fin;
@@ -676,7 +689,8 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
                 var_name = std::string(var[1]);
                 posexo = KSIM_DBV->index_of(var_name);  // Position of the exogenous var in dbv
 
-                x = KVVAL(KSIM_DBV, posexo, 0);
+                var_exo = KSIM_DBV->get_name(posexo);
+                x = KVVAL(KSIM_DBV, var_exo, 0);
                 for(j = t + 1; j < dbv->sample->nb_periods; j++)  
                     x[j] = x[t];
 
@@ -714,14 +728,13 @@ fin:
  */
 double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
 {
-    int     lg, eqvarnb = -1;
-    CLEC    *clec;
-    double  x;
+    int eqvarnb = -1;
+    double x;
 
-    lg = KECLEC(KSIM_DBE, eqnb)->tot_lg;
-    clec = (CLEC*) SW_nalloc(lg);
-    memcpy(clec, KECLEC(KSIM_DBE, eqnb), lg);
     std::string eq_name = KSIM_DBE->get_name(eqnb);
+    int lg = KECLEC(KSIM_DBE, eq_name)->tot_lg;
+    CLEC* clec = (CLEC*) SW_nalloc(lg);
+    memcpy(clec, KECLEC(KSIM_DBE, eq_name), lg);
     eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->dupendo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);

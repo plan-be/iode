@@ -3,6 +3,7 @@
 #include "api/constants.h"
 #include "api/utils/utils.h"
 #include "api/objs/kdb.h"
+#include "api/objs/pack.h"
 
 
 /*----------------------- STRUCTS ----------------------------*/
@@ -71,12 +72,13 @@ struct std::hash<Scalar>
 
 std::size_t hash_value(const Scalar& scalar);
 
-inline Scalar* KSVAL(KDB* kdb, int pos)
-{
-    return (Scalar*) K_oval0(kdb, pos);
+
+inline Scalar* KSVAL(KDB* kdb, const std::string& name) 
+{         
+    return (Scalar*) K_optr0(kdb, (char*) name.c_str());
 }
 
-inline Scalar* KSPTR(KDB* kdb, char* name) 
+inline Scalar* KSVAL(KDB* kdb, SWHDL handle) 
 {         
-    return (Scalar*) K_optr0(kdb, name);
+    return (Scalar*) P_get_ptr(SW_getptr(handle), 0); 
 }

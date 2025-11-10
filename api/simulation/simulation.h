@@ -228,6 +228,26 @@ protected:
 	/* k_sim_exo2endo.c */
 	int KE_exo2endo(int ,int );
 
+	///< Name of the endogenous of equation i (possibly after endo-exo)
+	std::string KSIM_NAME(const int i) const
+	{
+		return KSIM_DBV->get_name(KSIM_POSXK[i]);
+	}
+
+	///< get value of endo[i] in period nb t
+	double KSIM_VAL(const int i, const int t) const
+	{
+		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
+		return *KVVAL(KSIM_DBV, name, t);
+	}
+
+	///< set value of endo[i] in period nb t
+	void KSIM_SET_VAL(const int i, const int t, const double value)
+	{
+		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
+		*KVVAL(KSIM_DBV, name, t) = value;
+	}
+
 private:
 	void K_simul_free()
 	{
@@ -274,8 +294,3 @@ private:
 	/* k_sim_scc.c */
 	int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl);
 };
-
-/* ---------------------- MACROS ---------------------- */
-
-#define KSIM_VAL(i, t)      *(KVVAL(KSIM_DBV, KSIM_POSXK[i], t))  	// Value of endo[i] in period nb t
-#define KSIM_NAME(i)        (KSIM_DBV->get_name(KSIM_POSXK[i]))   	// Name of the endogenous of equation i (possibly after endo-exo)  

@@ -163,7 +163,6 @@ KDB* AsciiLists::load_asc(char* filename, int db_global)
 int AsciiLists::save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i;
     LIS     lst;
 
     if(filename[0] == '-') 
@@ -178,10 +177,10 @@ int AsciiLists::save_asc(KDB* kdb, char* filename)
         }
     }
 
-    for(i = 0 ; i < kdb->size(); i++) 
+    for(auto& [name, handle] : kdb->k_objs) 
     {
-        fprintf(fd, "%s ", (char*) kdb->get_name(i).c_str());
-        lst = KLVAL(kdb, i);
+        fprintf(fd, "%s ", (char*) name.c_str());
+        lst = KLVAL(kdb, handle);
         SCR_fprintf_esc(fd, lst, 1);
         fprintf(fd, "\n");
     }

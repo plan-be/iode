@@ -91,11 +91,9 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
 
 char* ExportObjsTSP::extract_comment(KDB* dbc, char* name, char** cmt)
 {
-    int pos;
-
-    pos = dbc->index_of(name);
-    if(pos >= 0)  
-        *cmt = (char*) SCR_stracpy((unsigned char*) KCVAL(dbc, pos));
+    SWHDL handle = dbc->get_handle(name);
+    if(handle > 0)  
+        *cmt = (char*) SCR_stracpy((unsigned char*) KCVAL(dbc, handle));
     else 
         *cmt = (char*) SCR_stracpy((unsigned char*) " ");
     
@@ -107,14 +105,16 @@ char* ExportObjsTSP::get_variable_value(KDB* dbv, int nb, int t, char** vec)
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    write_value(tmp, (double)(*KVVAL(dbv, nb, t)));
+    std::string name = dbv->get_name(nb);
+    double* value_ptr = KVVAL(dbv, name, t);
+    write_value(tmp, *value_ptr);
     write_pre_post("", " ", tmp, &buf);
     lg = (int) strlen(buf) + 1;
 
     if(*vec == NULL) 
         olg = 0;
     else 
-        olg = (int)strlen(*vec);
+        olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
