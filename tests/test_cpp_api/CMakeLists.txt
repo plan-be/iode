@@ -1,4 +1,4 @@
-enable_testing()
+if(BUILD_TESTING)
 
 add_executable(test_cpp_api pch.cpp test_utils.cpp test_lec.cpp 
                test_equation.cpp test_identity.cpp test_scalar.cpp test_table.cpp test_computed_table.cpp 
@@ -11,3 +11,4 @@ target_link_options(test_cpp_api PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPL
 
 include(GoogleTest)
 gtest_discover_tests(test_cpp_api)
+endif()

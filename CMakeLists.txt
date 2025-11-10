@@ -45,9 +45,8 @@ set(CMAKE_INSTALL_MESSAGE ALWAYS)
 # -- resources directory --
 set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
 
-# -- compiler options --
-# SET(CMAKE_CXX_FLAGS_DEBUG "")
-# SET(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /Ot")
+# -- enable C++ testing and testing coverage --
+include(CTest)
 
 # ---- compile options ----
 if(MSVC)
@@ -55,13 +54,6 @@ if(MSVC)
   # to use std::min/max -> prevent windows.h to define min and max as macros
   # see https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max 
   add_compile_options(-DNOMINMAX)
-endif()
-
-# /Zi | g:	Generates complete debugging information
-if(MSVC)
-  set(IODE_DEBUG_INFO_FLAG "-Zi")
-else()
-  set(IODE_DEBUG_INFO_FLAG "-g")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -77,8 +69,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
   add_compile_options("-w") # disable all warning
 endif()
 
+# debug flags
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_compile_options(${IODE_DEBUG_INFO_FLAG})
+  if(MSVC)
+    # /Zi | g:	Generates complete debugging information
+    add_compile_options("-Zi")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    # https://gitlab.kitware.com/cmake/community/-/wikis/doc/ctest/Coverage
+    add_compile_options("-O0")
+    add_compile_options("-Wall")
+    add_compile_options("-W")
+    add_compile_options("--coverage")
+    add_link_options("--coverage")
+  endif()
 endif()
 
 # ---- preprocessor ----
