@@ -57,8 +57,8 @@
  *                  RP_add                  Util : concatenates a string to the current line and reallocates
  *          RP_exec_fn()                    Executes the report command (if any)
  *              RP_find_fn                  Finds the right function
- *              (*B_fns[i].fn)              Executes the no-GUI function
- *              (*B_fns[i].sfn)             Executes the GUI function
+ *              (*B_fns[name].fn)           Executes the no-GUI function
+ *              (*B_fns[name].sfn)          Executes the GUI function
  *              
  *  
  *  Examples of report line parsing
@@ -110,15 +110,15 @@
  *      int RP_readline(REPFILE* rf, char** line, int mode)                 Reads the current line from the REPFILE rf.
  *      int RP_chk_ignore(char* line)                                       Indicates if errors on a report line must be ignored
  *      int RP_splitline(char* text, char* cmd, char** arg, int lg)         Splits a report line into the command and its arguments.
- *      int RP_find_fn(char* name, int* type, int fs)                       Finds the position in B_fns of the command "name" and, if there is a suffix, the corresponding object or file type. 
+ *      BFNS* RP_find_fn(char* name, int* type, int fs)                     Returns the BFNS struct corresponding to the command name.
  *      int RP_exec_fn(char* name, char* arg, int fs)                       Retrieves a report command function pointer and executes the function with its parameters
  *      int RP_err_dump(char* name, char* arg)                              Prints or displays the current report line if an error has occured.
  *      char *RP_extract(char* buf, int* i, int ch)                         Extracts a string terminated by the specific character.
  *      char *RP_gmacro(char* str)                                          Calculates a macro value. The macro may contain expressions between {} or @-functions
  *      char *RP_gcmd(char* str)                                            Calculates the value of an expression between curly brackets.
  *      int RP_evaltime()                                                   Calculates RP_T, the position in the current sample of the current calculation period RP_PER.
- *      double RP_evallec(char* lec)                                     Evaluates a LEC expression in (the period) RP_PER. 
- *      int RP_fmt(char* buf, char* format, double value)                Formats a double. 
+ *      double RP_evallec(char* lec)                                        Evaluates a LEC expression in (the period) RP_PER. 
+ *      int RP_fmt(char* buf, char* format, double value)                   Formats a double. 
  *      int RP_eval(char** res, char* farg)                                 Interprets strings between accolades found in a report line.
  *      int RP_add(char** line, int* lg, int* j, char* res)                 Reallocates the string line (of length *lg) in order to concatanate res from the position *j.
  *      int RP_expand(char** line, char* buf)                               Expands a report line by replacing macros, lec expressions and @-functions par their calculated values
@@ -158,7 +158,7 @@ unsigned char **RP_read_file(char* filename);
 int RP_readline(REPFILE* rf, char** line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, char** arg, int lg);
-int RP_find_fn(char* name, int* type, int fs);
+BFNS* RP_find_fn(char* name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 int RP_err_dump(char* name, char* arg);
 char *RP_extract(char* buf, int* i, int ch);
@@ -432,56 +432,67 @@ done :
 
 
 /**
- *  Finds the position in B_fns of the command "name" and, if there is a suffix, the corresponding object or file type. 
+ *  Returns the BFNS struct corresponding to the command name.
  *  
- *  See in b_rep_syntax.c the definition of the table B_fns[] for more details.
+ *  See in b_rep_syntax.c the definition of the table B_fns for more details.
  *  
- *  @global [in]     BFNS   B_fns[] table of command names and fn pointers
+ *  @global [in]     BFNS   B_fns   table of command names and fn pointers
  *  @param [in, out] char*  name    command name ($name)
  *  @param [out]     int*   type    type of object or file to which the command must be assigned
  *  @param [in]      int    fs      full screen : character preceding the command in the report ('#' or '$').
- *  @return          int            position of the command in B_fns[] or -1 if not found or illegal suffix.   
+ *  @return          BFNS*          BFNS struct corresponding to the command name (nullptr if not found)  
  *  
  */
-int RP_find_fn(char* name, int* type, int fs)
+BFNS* RP_find_fn(char* c_name, int* type, int fs)
 {
-    int     i, lg, j;
+    std::string name = std::string(c_name);
+    name = trim(name);
+    name = to_lower(name);
 
-    SCR_lower((unsigned char*) name);
-    for(i = 0 ; B_fns[i].func_name ; i++) 
+    size_t n;
+    std::string prefix;
+    std::string suffix;
+    std::string extension;
+    for(auto& [func_name, fns]: B_fns) 
     {
         // command without extension 
-        if(B_fns[i].type == 0) 
+        if(fns.type == 0) 
         {
-            if(strcmp(name, B_fns[i].func_name) == 0) 
-                return(i);
+            if(name == func_name) 
+                return &fns;
             continue;
         }
         else 
         {
-            lg = (int)strlen(B_fns[i].func_name);
-            if(strncmp(name, B_fns[i].func_name, lg)) 
+            n = func_name.length();
+            prefix = name.substr(0, n);
+            if(prefix != func_name) 
                 continue;
-            for(j = 0 ; k_ext[j] ; j++) 
+            
+            for(int j = 0; k_ext[j]; j++) 
             {
-                if(j > VARIABLES && B_fns[i].type % 2) 
+                if(j > VARIABLES && fns.type % 2) 
                     break;
-                if(strcmp(k_ext[j], name + lg) == 0) 
+                
+                suffix = name.substr(n);
+                extension = std::string(k_ext[j]);
+                if(suffix == extension) 
                 {
                     *type = j;
-                    return(i);
+                    return &fns;
                 }
             }
             
-            // if(B_fns[i].type > 2 && fs == "#") { => erreur "" => ''
-            if(B_fns[i].type > 2 && fs == '#') 
+            // if(fns.type > 2 && fs == "#") { => erreur "" => ''
+            if(fns.type > 2 && fs == '#') 
             {
                 *type = 0;
-                return(i);
+                return &fns;
             }
         }
     }
-    return(-1);
+
+    return nullptr;
 }
 
 
@@ -496,14 +507,18 @@ int RP_find_fn(char* name, int* type, int fs)
  */
 int RP_exec_fn(char* name, char* arg, int fs)
 {
-    int     i, parm;
+    int parm;
 
-    i = RP_find_fn(name, &parm, fs);
-    if(i < 0) return(-1);
-    if(fs == '#' && B_fns[i].sfn != 0)
-        return((*B_fns[i].sfn)(arg, parm));
-    else if(fs == '$' && B_fns[i].fn != 0)
-        return((*B_fns[i].fn)(arg, parm));
+    BFNS* fns = RP_find_fn(name, &parm, fs);
+    if(!fns) 
+        return(-1);
+    
+    if(fs == '#' && fns->sfn != 0)
+        return((*fns->sfn)(arg, parm));
+    
+    if(fs == '$' && fns->fn != 0)
+        return((*fns->fn)(arg, parm));
+    
     return(-1);
 }
 
@@ -971,30 +986,30 @@ char *RP_extractpar(char* buf, int* i, char* brackets)
  */
 int RP_fneval(char** res, char* str)
 {
-    U_ch    **tbl;
-    int     i, rc = 0;
-
     *res = 0;
-    // tbl = SCR_vtoms3(str, "(,", 1); // Buggé si on a fn("ssdff","sdfsdf")
-    tbl = SCR_vtomsq(str, "(,", '"');  // JMP 20/10/2022
+    // tbl = SCR_vtoms3(str, "(,", 1);  // buggy if fn("ssdff","sdfsdf")
+    U_ch** tbl = SCR_vtomsq(str, "(,", '"');
     
-    // Find the function name (in lowercase)
-    SCR_strip(tbl[0]);
-    SCR_lower(tbl[0]);
-    for(i = 0 ; RP_FNS[i].name ; i++)
-        if(strcmp((char*) RP_FNS[i].name, (char*) tbl[0]) == 0) break;
+    // find the function name (in lowercase)
+    std::string name = std::string((char*) tbl[0]);
+    name = trim(name);
+    name = to_lower(name);
 
-    if(RP_FNS[i].name == 0) { // @function name not found
-        rc = -1;
-        goto fin;
+    int rc = -1;
+    for(auto& [func_name, fns]: RP_FNS)
+    {
+        if(name == func_name)
+        {
+            // execute the @function 
+            *res = (char*) fns.fn((U_ch**) tbl + 1);
+            if(*res == NULL) 
+                rc = -1;
+            rc = 0;
+        }
     }
-    
-    // Execute the @function 
-    *res = (char*) (*RP_FNS[i].fn)((U_ch**) tbl + 1);
-    if(*res == 0) rc = -1;
-fin:
+
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 

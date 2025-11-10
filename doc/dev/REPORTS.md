@@ -228,7 +228,7 @@ Note that this is not the exact result of a report execution: to keep some expre
 |`int RP_readline(REPFILE* rf, char** line, int mode)`|Reads the current line from the REPFILE rf.|
 |`int RP_chk_ignore(char* line)`|Indicates if errors on a report line must be ignored|
 |`int RP_splitline(char* text, char* cmd, char** arg, int lg)`|Splits a report line into the command and its arguments.|
-|`int RP_find_fn(char* name, int* type, int fs)`|Finds the position in B\_fns of the command "name" and, if there is a suffix, the corresponding object or file type.|
+|`BFNS* RP_find_fn(char* name, int* type, int fs)`|Returns the BFNS struct corresponding tp the function named "name"|
 |`int RP_exec_fn(char* name, char* arg, int fs)`|Retrieves a report command function pointer and executes the function with its parameters|
 |`int RP_err_dump(char* name, char* arg)`|Prints or displays the current report line if an error has occured.|
 |`char *RP_extract(char* buf, int* i, int ch)`|Extracts a string terminated by the specific character.|
