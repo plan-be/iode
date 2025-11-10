@@ -22,11 +22,11 @@ struct REPFILE
 
 struct BFNS 
 {
-    char*   keyw;                           // function name to use in reports
-    char*   key_camel;                      // function name in CamelCase
+    char*   func_name;                      // function name to use in reports
+    char*   func_name_camel_case;           // function name in CamelCase
     int     (*fn)(char* arg, int type_);    // function pointer in *non GUI* mode
     int     (*sfn)(char* arg, int type_);   // function pointer in GUI mode
-    int     type;                           // suffix required after keyw (var, idt...) or not:
+    int     type;                           // suffix required after func_name (var, idt...) or not:
 			                                //   0=not required
 						                    //   1=ws type required: cmt, idt, ... see k_ext => not used ?
 						                    //   2=suffix required: file extensions defined in k_ext
@@ -37,7 +37,8 @@ struct BFNS
 
 const static int BFNS_NB_GROUPS = 2;
 
-struct RPFN {
+struct RPFN 
+{
     U_ch*   name;                   // name of the @function (ex "upper")
     U_ch*   (*fn)(U_ch** args);     // Pointer to the corresponding function
 };
