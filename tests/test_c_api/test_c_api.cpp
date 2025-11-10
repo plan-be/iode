@@ -1508,7 +1508,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     for(i = 0; i < 7 ; i++) 
     {
         kdb = K_WS[i];
-        char* x_name = (i == SCALARS) ? "xxx" : "XXX";
+        char* x_name = (i == SCALARS) ? (char*) "xxx" : (char*) "XXX";
         rc = B_DataCreate(x_name, i);
         EXPECT_EQ(rc, 0);
         found = kdb->contains(x_name);
@@ -1523,8 +1523,8 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
         // Equations cannot be renamed or duplicated
         if(i != EQUATIONS) 
         {   
-            char* y_name = (i == SCALARS) ? "yyy" : "YYY"; 
-            char* dup_names = (i == SCALARS) ? "xxx yyy" : "XXX YYY";
+            char* y_name = (i == SCALARS) ? (char*) "yyy" : (char*) "YYY"; 
+            char* dup_names = (i == SCALARS) ? (char*) "xxx yyy" : (char*) "XXX YYY";
             rc = B_DataDuplicate(dup_names, i);
             EXPECT_EQ(rc, 0);
             found = kdb->contains(y_name);
@@ -1536,8 +1536,8 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
             ptr_obj = kdb->get_ptr_obj(y_name);
             EXPECT_STRNE(ptr_obj, "");
 
-            char* z_name = (i == SCALARS) ? "zzz" : "ZZZ";
-            char* ren_name = (i == SCALARS) ? "yyy zzz" : "YYY ZZZ";
+            char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
+            char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
             rc = B_DataRename(ren_name, i);
             EXPECT_EQ(rc, 0);
             found = kdb->contains(z_name);
