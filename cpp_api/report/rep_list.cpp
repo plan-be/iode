@@ -49,9 +49,9 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
     bool test_func;
     bool test_group;
     int i = 0;
-    while(B_fns[i].keyw != 0)
+    while(B_fns[i].func_name != 0)
     {
-        func_name = prefix + std::string(B_fns[i].key_camel);
+        func_name = prefix + std::string(B_fns[i].func_name_camel_case);
         func_group = B_fns[i].group;
 
         test_func = gui ? B_fns[i].sfn != NULL : B_fns[i].fn != NULL;

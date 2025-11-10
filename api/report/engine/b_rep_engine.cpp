@@ -448,24 +448,34 @@ int RP_find_fn(char* name, int* type, int fs)
     int     i, lg, j;
 
     SCR_lower((unsigned char*) name);
-    for(i = 0 ; B_fns[i].keyw ; i++) {
-        if(B_fns[i].type == 0) { // command withour extension 
-            if(strcmp(name, B_fns[i].keyw) == 0) return(i);
+    for(i = 0 ; B_fns[i].func_name ; i++) 
+    {
+        // command without extension 
+        if(B_fns[i].type == 0) 
+        {
+            if(strcmp(name, B_fns[i].func_name) == 0) 
+                return(i);
             continue;
         }
-        else {
-            lg = (int)strlen(B_fns[i].keyw);
-            if(strncmp(name, B_fns[i].keyw, lg)) continue;
-            for(j = 0 ; k_ext[j] ; j++) {
-                if(j > VARIABLES && B_fns[i].type % 2) break;
-                if(strcmp(k_ext[j], name + lg) == 0) {
+        else 
+        {
+            lg = (int)strlen(B_fns[i].func_name);
+            if(strncmp(name, B_fns[i].func_name, lg)) 
+                continue;
+            for(j = 0 ; k_ext[j] ; j++) 
+            {
+                if(j > VARIABLES && B_fns[i].type % 2) 
+                    break;
+                if(strcmp(k_ext[j], name + lg) == 0) 
+                {
                     *type = j;
                     return(i);
                 }
             }
             
             // if(B_fns[i].type > 2 && fs == "#") { => erreur "" => ''
-            if(B_fns[i].type > 2 && fs == '#') { // JMP 29/09/2021 TODO: voir l'effet et documenter !
+            if(B_fns[i].type > 2 && fs == '#') 
+            {
                 *type = 0;
                 return(i);
             }
