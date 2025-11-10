@@ -82,13 +82,13 @@ def build_command_functions_list(group: int, gui: bool=False) -> List[str]:
     --------
     >>> from iode.reports import build_command_functions_list
     >>> build_command_functions_list(0, False)     # doctest: +ELLIPSIS
-    ['$label', '$goto', '$ask', ..., '$next', '$procdef', '$procexec']
+    ['$abort', '$ask', '$beep', ..., '$undef', '$undefine', '$vseps']
     >>> build_command_functions_list(0, True)      # doctest: +ELLIPSIS
-    ['#label', '#goto', '#ask', ..., '#next', '#procdef', '#procexec']
+    ['#abort', '#ask', '#beep', ..., '#undef', '#undefine', '#vseps']
     >>> build_command_functions_list(1, False)     # doctest: +ELLIPSIS
-    ['$FileImportVar', '$FileImportCmt', '$FileDelete', ..., '$CsvDec', '$CsvNaN', '$CsvAxes']
+    ['$A2mToCsv', '$A2mToHtml', '$A2mToMif', ..., '$WsSeasonAdj', '$WsTrend', '$WsTrendStd']
     >>> build_command_functions_list(1, True)      # doctest: +ELLIPSIS
-    ['#FileImportVar', '#FileImportCmt', '#WsSample', ..., '#ReportExec', '#ReportEdit', '#ReportPrompt']
+    ['#DataCalcLst', '#DataCompareCmt', '#DataCompareEqs', ..., '#WsSeasonAdj', '#WsTrend', '#WsTrendStd']
     """
     return cython_build_command_functions_list(group, gui)
 
@@ -109,7 +109,7 @@ def build_report_functions_list() -> List[str]:
     --------
     >>> from iode.reports import build_report_functions_list
     >>> build_report_functions_list()          # doctest: +ELLIPSIS
-    ['@upper', '@date', '@time', '@lower', ..., '@mkdir', '@rmdir', '@void', '@version']
+    ['@ansi', '@cexpand', '@chdir', '@chronoget', ..., '@vliste', '@void', '@vtake', '@vvalue']
     """
     return cython_build_report_functions_list()
 

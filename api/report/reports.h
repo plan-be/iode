@@ -4,6 +4,10 @@
 #include "api/time/period.h"         // Period
 #include "api/time/sample.h"         // Sample
 
+#include <string>
+#include <map>
+
+
 /*------------------------ DEFINE ----------------------- */
 
 #define RP_LINELENGTH 102400
@@ -22,11 +26,10 @@ struct REPFILE
 
 struct BFNS 
 {
-    char*   func_name;                      // function name to use in reports
     char*   func_name_camel_case;           // function name in CamelCase
     int     (*fn)(char* arg, int type_);    // function pointer in *non GUI* mode
     int     (*sfn)(char* arg, int type_);   // function pointer in GUI mode
-    int     type;                           // suffix required after func_name (var, idt...) or not:
+    int     type;                           // suffix required after function name (var, idt...) or not:
 			                                //   0=not required
 						                    //   1=ws type required: cmt, idt, ... see k_ext => not used ?
 						                    //   2=suffix required: file extensions defined in k_ext
@@ -39,14 +42,13 @@ const static int BFNS_NB_GROUPS = 2;
 
 struct RPFN 
 {
-    U_ch*   name;                   // name of the @function (ex "upper")
     U_ch*   (*fn)(U_ch** args);     // Pointer to the corresponding function
 };
 
 /*------------------------ GLOBALS ----------------------- */
 
-extern BFNS     B_fns[];                    // Table of report command names and function pointers
-extern RPFN     RP_FNS[];                   // Table of report @functions names and function pointers
+extern std::map<std::string, BFNS> B_fns;  // Table of report command names and function pointers
+extern std::map<std::string, RPFN> RP_FNS; // Table of report @functions names and function pointers
 
 inline REPFILE* CUR_REPFILE = 0;            // Pointer to the current REPFILE during report execution
 inline char*    RP_RPTSTR = 0;              // Repeat string used by the command $repeat. Default = '_'.

@@ -49,17 +49,17 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
     bool test_func;
     bool test_group;
     int i = 0;
-    while(B_fns[i].func_name != 0)
+    for(auto& [name, fns] : B_fns)
     {
-        func_name = prefix + std::string(B_fns[i].func_name_camel_case);
-        func_group = B_fns[i].group;
+        func_name = prefix + std::string(fns.func_name_camel_case);
+        func_group = fns.group;
 
-        test_func = gui ? B_fns[i].sfn != NULL : B_fns[i].fn != NULL;
+        test_func = gui ? fns.sfn != NULL : fns.fn != NULL;
         test_group = (group < 0) ? true : func_group == group;
         if(test_func && test_group)
         {
             // see documentation of BFNS structure in iode.h
-            switch (B_fns[i].type)
+            switch (fns.type)
             {
             // no suffix required
             case 0:
@@ -108,13 +108,9 @@ std::vector<std::string> build_report_functions_list()
 {
     std::vector<std::string> func_list;
 
-    int i = 0;
-    while(RP_FNS[i].name != 0)
-    {
-        func_list.push_back("@" + std::string((char*) RP_FNS[i].name));
-        i++;
-    } 
-
+    for(auto& [name, fns] : RP_FNS)
+        func_list.push_back("@" + name);
+    
     return func_list;
 }
 

@@ -6,9 +6,9 @@
  *  Functions  related to the control flow of the reports ($msg, $return, $goto...).
  *  They are not directly acting on IODE objects or files. 
  *  
- *  They are grouped in the table B_fns[] and called by RP_exec_fn().
- *  Each element of B_fns[] contains for the command $goto:
- *      - the function name (eg. "goto")
+ *  They are grouped in the table B_fns and called by RP_exec_fn().
+ *  Each element of B_fns contains for the command $goto:
+ *      - the function name in CamelCase (eg. "DataCompare")
  *      - the function pointer in *non GUI* mode (RP_goto)
  *      - the function pointer in *GUI* mode (NULL because if there is no "GUI" version of $goto)
  *      - the suffix allowed or required after the function name

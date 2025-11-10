@@ -33,7 +33,7 @@ char* RP_read_multiline(REPFILE* rf);
 int RP_readline(REPFILE* rf, char** line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, char** arg, int lg);
-int RP_find_fn(char* name, int* type, int fs);
+BFNS* RP_find_fn(char* name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 int RP_err_dump(char* name, char* arg);
 char *RP_extract(char* buf, int* i, int ch);
