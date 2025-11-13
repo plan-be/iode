@@ -143,9 +143,8 @@ char *K_oval1(KDB* kdb, int pos)
  */
 char* K_optr1(KDB *kdb, char* name)
 {
-    return K_optr(kdb, name, 0);
-}    
-
+    return K_optr(kdb, name, 1);
+}
 
 /**
  *  Retrieves the pointer to a variable in a kdb based on its position and then shifts the pointer t elements to the right.
