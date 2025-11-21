@@ -132,7 +132,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
  *                              NULL if kdb is null or one of the names cannot be found
  *  
  *  @note Quicker version of K_refer() (JMP 16/3/2012) by allocating KOBJS in one call instead
- *        of calling K_add_entry for each name.
+ *        of calling add_entry for each name.
  *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
  */
 

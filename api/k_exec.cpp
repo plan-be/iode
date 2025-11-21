@@ -138,7 +138,7 @@ static KDB *KI_series_list(KDB* dbi)
     CLEC    *clec;
 
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons 
-    // (will eliminated by the call to K_add_entry() below). 
+    // (will eliminated by the call to add_entry() below). 
     std::string name;  
     std::vector<std::string> vars_to_compute;
     for(auto& [idt_name, idt_handle] : dbi->k_objs) 
@@ -164,7 +164,7 @@ static KDB *KI_series_list(KDB* dbi)
     // Create a new KDB of vars with all the names in tbl
     dbv = new KDB(VARIABLES, DB_STANDALONE);
     for(const std::string& name : vars_to_compute)
-        K_add_entry(dbv, name);
+        dbv->add_entry(name);
 
     return dbv;
 }
@@ -197,9 +197,9 @@ static KDB *KI_scalar_list(KDB* dbi)
             name = std::string(lname[j].name);
             if(!is_coefficient(name)) 
                 continue;
-            K_add_entry(dbs, name);
+            dbs->add_entry(name);
         }
-        SW_nfree(tclec); // JMP 26/8/2012
+        SW_nfree(tclec);
     }
 
     return dbs;

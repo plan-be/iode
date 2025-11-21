@@ -11,6 +11,11 @@
 #include <vector>
 
 
+inline int K_WARN_DUP = 0;      // If null, adding an existing object name in a KDB  
+                                // does not trigger an error (used in KDB::add_entry())
+inline int K_SECRETSEP = '#';   // pour les macros pushed A#n in reports
+
+
 enum IodeDatabaseType
 {
     DB_GLOBAL,          //< K_WS[iode_type]
@@ -277,6 +282,25 @@ public:
         return true;
     }
 
+    bool add_entry(const std::string& name)
+    {
+        check_name(std::string(name), this->k_type);
+        
+        bool found = this->contains(name);
+        if(found) 
+        {
+            if(K_WARN_DUP)
+            {
+                kerror(0, "%s already defined", (char*) name.c_str());
+                return false;
+            }
+        }
+        else
+            this->k_objs[name] = 0;
+
+        return true;
+    }
+
     bool duplicate(const KDB& other, const std::string& name);
 
     bool remove(const std::string& name)
@@ -299,9 +323,6 @@ public:
 inline KDB*     K_WS[7] = { NULL };             // Current workspaces
 inline KDB*     K_RWS[7][5] = {{ NULL }};       // Currently loaded workspaces (for printing and identity execution)
 inline int      K_PWS[7] = { 0 };               // ??? TODO: check if still in use
-inline int      K_WARN_DUP = 0;                 // If null, adding an existing object name in a KDB does not trigger 
-                                                // an error (used in K_add_entry())
-inline int      K_SECRETSEP = '#';              // pour les macros pushed A#n in reports
 
 /**
  * k_ext[][4] : extensions of IODE filenames.

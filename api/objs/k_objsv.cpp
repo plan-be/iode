@@ -141,7 +141,7 @@ bool K_add(KDB* kdb, char* c_name, ...)
     name = std::string(c_name);
 
     // Add an entry (name) if not present yet
-    success = K_add_entry(kdb, name);
+    success = kdb->add_entry(name);
     if(!success) 
     {
         error_manager.append_error(v_iode_types[kdb->k_type] + " " + name + 
