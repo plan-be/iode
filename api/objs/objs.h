@@ -15,7 +15,6 @@ inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
 /* k_objs.c */
-int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const std::string& name2);
 int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date);
 int K_upd_tbl(char* name, char* arg);
 

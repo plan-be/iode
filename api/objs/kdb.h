@@ -90,7 +90,7 @@ public:
         {
             for(auto& [name, handle] : other.k_objs) 
             {
-                success = duplicate(other, name);
+                success = duplicate(other, name, name);
                 if(!success)
                 {
                     if(this->size() > 0)
@@ -301,7 +301,7 @@ public:
         return true;
     }
 
-    bool duplicate(const KDB& other, const std::string& name);
+    bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name);
 
     bool remove(const std::string& name)
     {

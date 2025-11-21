@@ -49,7 +49,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
         bool success;
         for(const std::string& name: names)
         {
-            success = duplicate(*c_kdb, name);
+            success = duplicate(*c_kdb, name, name);
             if(!success)
             {
                 for(auto& [name, handle] : k_objs)
