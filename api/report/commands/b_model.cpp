@@ -49,11 +49,11 @@ static int B_ModelSimulateEqs(Sample* smpl, char** eqs)
     CSimulation simu;
 
     if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
-        rc = simu.K_simul(K_WS[EQUATIONS], K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, NULL);
+        rc = simu.K_simul(KE_WS, KV_WS, KS_WS, smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
-        rc = simu.K_simul(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, CSimulation::KSIM_EXO, eqs);
+        tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
+        rc = simu.K_simul(tdbe, KV_WS, KS_WS, smpl, CSimulation::KSIM_EXO, eqs);
         delete tdbe;
         tdbe = nullptr;
     }
@@ -224,16 +224,16 @@ int B_ModelCompile(char* arg, int unused)
     if(arg == NULL || arg[0] == 0) 
     {
         /* EndoExo whole WS */
-        return(KE_compile(K_WS[EQUATIONS]));
+        return(KE_compile(KE_WS));
     }
     else 
     {
         eqs = B_ainit_chk(arg, NULL, 0);
         if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
-            return(KE_compile(K_WS[EQUATIONS]));
+            return(KE_compile(KE_WS));
         else 
         {
-            tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) eqs), eqs);
+            tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
             rc = KE_compile(tdbe);
             delete tdbe;
             tdbe = nullptr;
@@ -277,9 +277,9 @@ int B_ModelCalcSCC(char *const_arg, int unused)
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
     nb_eqs = SCR_tbl_size((unsigned char**) eqs);
     if(nb_eqs == 0)
-        tdbe = K_WS[EQUATIONS];
+        tdbe = KE_WS;
     else
-        tdbe = K_quick_refer(K_WS[EQUATIONS], nb_eqs, eqs);
+        tdbe = K_quick_refer(KE_WS, nb_eqs, eqs);
 
     rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
@@ -340,16 +340,16 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         goto err;
     }
 
-    if(!(K_WS[LISTS]->contains(lsts[0]) && K_WS[LISTS]->contains(lsts[1]) && K_WS[LISTS]->contains(lsts[2]))) 
+    if(!(KL_WS->contains(lsts[0]) && KL_WS->contains(lsts[1]) && KL_WS->contains(lsts[2]))) 
     {
         rc = -1;
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         goto err;
     }
 
-    pre   = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[0]));
-    inter = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[1]));
-    post  = (char**) KL_expand(KLVAL(K_WS[LISTS], lsts[2]));
+    pre   = (char**) KL_expand(KLVAL(KL_WS, lsts[0]));
+    inter = (char**) KL_expand(KLVAL(KL_WS, lsts[1]));
+    post  = (char**) KL_expand(KLVAL(KL_WS, lsts[2]));
 
     SCR_free_tbl((unsigned char**) lsts);
 
@@ -358,11 +358,11 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     eqs = (char**) SCR_union_quick((unsigned char**) eqs1, (unsigned char**) post);  // JMP 29/8/2012
     SCR_free_tbl((unsigned char**) eqs1);                 // JMP 29/8/2012
     nb_eqs = SCR_tbl_size((unsigned char**) eqs);
-    tdbe = K_quick_refer(K_WS[EQUATIONS], nb_eqs, eqs);
+    tdbe = K_quick_refer(KE_WS, nb_eqs, eqs);
     SCR_free_tbl((unsigned char**) eqs);
 
     // Lance la simulation
-    rc = simu.K_simul_SCC(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, pre, inter, post);
+    rc = simu.K_simul_SCC(tdbe, KV_WS, KS_WS, smpl, pre, inter, post);
 
     // Cleanup
     delete tdbe;
@@ -409,10 +409,10 @@ static double *B_GetVarPtr(char* c_name)
     std::string name = std::string(c_name);
     name = trim(name);
     name = to_upper(name);
-    if(!K_WS[VARIABLES]->contains(name))
+    if(!KV_WS->contains(name))
         return NULL;
     else
-        return KVVAL(K_WS[VARIABLES], name, 0);
+        return KVVAL(KV_WS, name, 0);
 }
 
 
@@ -425,7 +425,7 @@ static double *B_GetVarPtr(char* c_name)
  */
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
-    KDB         *dbv = K_WS[VARIABLES];
+    KDB         *dbv = KV_WS;
     double      *x;
     int         t;
 
@@ -452,7 +452,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  */
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
-    KDB         *dbv = K_WS[VARIABLES];
+    KDB         *dbv = KV_WS;
     double      *x;
     int         t;
 

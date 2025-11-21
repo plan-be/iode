@@ -146,7 +146,7 @@ char *IodeDdeGetWS(char *szItem)
     kdb = K_WS[type];
     if(strcmp(szItem, "Sample") == 0) 
     {
-        res = (char*) K_WS[VARIABLES]->sample->to_string().c_str();
+        res = (char*) KV_WS->sample->to_string().c_str();
         return(res);
     }
     else if(strcmp(szItem + 1, "LIST") == 0) 
@@ -189,7 +189,7 @@ char *IodeDdeGetWS(char *szItem)
 char *IodeDdeCreateSeries(int objnb, int bt)
 {
     char    *res, buf[128];
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
     int     t;
     double  x;
 
@@ -215,7 +215,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
 char *IodeDdeCreatePer(int bt)
 {
     char    *res;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
     int     t;
 
     res = SCR_malloc(11 * (1 + kdb->sample->nb_periods - bt));
@@ -321,8 +321,8 @@ char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     char    gsmpl[128], **l = NULL, *buf, *res = NULL; /* JMP 30-04-98 */
     COLS    *cls;
 
-    std::string name = K_WS[TABLES]->get_name(objnb);
-    Table* tbl = KTVAL(K_WS[TABLES], name);
+    std::string name = KT_WS->get_name(objnb);
+    Table* tbl = KTVAL(KT_WS, name);
     Sample* smpl = KV_WS->sample;
 
     /* date */

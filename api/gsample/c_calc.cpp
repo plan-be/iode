@@ -89,7 +89,7 @@ static int COL_link(int i, CLEC* clec)
  *  Calculates the value of a table CELL on a specific GSample column (COL).
  *  
  *  First links clec and dclec (divisor) according to the COL definition (which 
- *  includes the files numbers and periods, that both refer to K_WS[VARIABLES]). 
+ *  includes the files numbers and periods, that both refer to KV_WS). 
  *  The linking of scalars is always done with KS_WS, the current Scalar workspace.
  *  
  *  The result is stored in cl->cl_res, which is IODE_NAN on error.

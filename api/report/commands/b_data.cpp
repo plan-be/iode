@@ -238,7 +238,7 @@ int B_DataCalcVar(char* arg, int unused)
 {
     char        name[K_MAX_NAME + 1], *lec;
     int         lg, t, nb;
-    KDB         *kdb = K_WS[VARIABLES];
+    KDB         *kdb = KV_WS;
     CLEC        *clec = 0;
     double      d;
 
@@ -258,11 +258,11 @@ int B_DataCalcVar(char* arg, int unused)
     if(lec[0]) 
     {
         clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, K_WS[SCALARS], clec)) 
+        if(clec != 0 && !L_link(kdb, KS_WS, clec)) 
         {
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                d = L_exec(kdb, K_WS[SCALARS], clec, t);
+                d = L_exec(kdb, KS_WS, clec, t);
                 *(KVVAL(kdb, name, t)) = d;
             }
             SW_nfree(clec);
@@ -850,7 +850,7 @@ int B_DataListSort(char* arg, int unused)
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
-    if(!K_WS[LISTS]->add(out, lst)) 
+    if(!KL_WS->add(out, lst)) 
     {
         error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
@@ -1136,7 +1136,7 @@ int B_DataCalcLst(char* arg, int unused)
     op    = args[2];
     list2 = args[3];
 
-    if(!K_WS[LISTS]->contains((char*) list1))
+    if(!KL_WS->contains((char*) list1))
     {
         std::string error_msg = "List '" + std::string((char*) list1);
         error_msg += "' not found in the Lists workspace";
@@ -1145,7 +1145,7 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    if(!K_WS[LISTS]->contains((char*) list2))
+    if(!KL_WS->contains((char*) list2))
     {
         std::string error_msg = "List '" + std::string((char*) list2);
         error_msg += "' not found in the Lists workspace";
@@ -1154,8 +1154,8 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], (char*) list1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(KLVAL(K_WS[LISTS], (char*) list2), NULL, 0);
+    l1 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS, (char*) list1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS, (char*) list2), NULL, 0);
     switch(op[0]) 
     {
     case '+' :

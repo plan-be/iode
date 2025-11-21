@@ -51,7 +51,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
         for(int j = 0 ; j < clec->nb_names ; j++) 
         {
             name = std::string(clec->lnames[j].name);
-            if(is_coefficient(name) && KSVAL(K_WS[SCALARS], name)->relax != 0)
+            if(is_coefficient(name) && KSVAL(KS_WS, name)->relax != 0)
                 SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) name.c_str());
         }
     }
@@ -104,8 +104,8 @@ double C_evallec(char* lec, int t)
             error_manager.append_error(error_msg);
             return(x);
         }
-        if(clec != 0 && !L_link(K_WS[VARIABLES], K_WS[SCALARS], clec))
-            x = L_exec(K_WS[VARIABLES], K_WS[SCALARS], clec, t);
+        if(clec != 0 && !L_link(KV_WS, KS_WS, clec))
+            x = L_exec(KV_WS, KS_WS, clec, t);
         SW_nfree(clec);
     }
 
@@ -245,11 +245,11 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
         return(0.0);
     
     std::string name = std::string(eqs[0]);
-    if(!K_WS[EQUATIONS]->contains(name)) 
+    if(!KE_WS->contains(name)) 
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = KEVAL(K_WS[EQUATIONS], name);               
+    eq = KEVAL(KE_WS, name);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
     if(eq)

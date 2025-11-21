@@ -477,7 +477,7 @@ void kbeep()
 
 Sample* kasksmpl()
 {
-    Sample  *smpl = K_WS[VARIABLES]->sample;
+    Sample  *smpl = KV_WS->sample;
 
     if(kasksmpl_super) 
         return((*kasksmpl_super)());

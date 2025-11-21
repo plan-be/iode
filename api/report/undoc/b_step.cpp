@@ -34,10 +34,10 @@ static int check_scl_var(char *eqs)
     char buf[1024];
     std::string name = std::string(eqs);
 
-    if(!K_WS[EQUATIONS]->contains(name)) 
+    if(!KE_WS->contains(name)) 
         return -1;
     
-    Equation* eq = KEVAL(K_WS[EQUATIONS], name);
+    Equation* eq = KEVAL(KE_WS, name);
     if(!eq) 
         return -1;
 
@@ -51,7 +51,7 @@ static int check_scl_var(char *eqs)
         if(is_coefficient(c_name)) 
         {
             // create scalar with default value 0.9 if not existing
-            if(!K_WS[SCALARS]->contains(name))
+            if(!KS_WS->contains(name))
             {
                 sprintf(buf, "%s 0.9 1", c_name);
                 B_DataUpdate(buf, SCALARS);
@@ -59,7 +59,7 @@ static int check_scl_var(char *eqs)
         }
         else 
         {
-            if(!K_WS[VARIABLES]->contains(name))
+            if(!KV_WS->contains(name))
             {
                 kerror(0,"Var %s from %s not found", c_name, eqs);
                 delete eq;
@@ -113,7 +113,7 @@ int B_EqsStepWise(char* arg, int unused)
 
     c_eq_name = args[2];
     std::string eq_name = std::string(c_eq_name);                                               
-    if(!K_WS[EQUATIONS]->contains(eq_name)) 
+    if(!KE_WS->contains(eq_name)) 
     {                            
         kerror(0,"Eqs %s not found", c_eq_name);
         SCR_free_tbl((unsigned char**) args);
