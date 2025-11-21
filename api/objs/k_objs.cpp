@@ -51,7 +51,7 @@ int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const 
     if(handle_dest > 0) 
         SW_free(handle_dest);
     else
-        success = K_add_entry(kdb_dest, name2);
+        success = kdb_dest->add_entry(name2);
         if(!success)
         {
             error_msg += "cannot add new entry to destination database.";
@@ -87,48 +87,6 @@ int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const 
     ptr_source = SW_getptr(handle_source);
     ptr_dest = SW_getptr(handle_dest);
     memcpy(ptr_dest, ptr_source, lg);
-
-    return true;
-}
-
-
-/**
- *  Adds the new entry newname in kdb and returns true if successful. 
- *  If newname exists, returns true and if K_WARN_UP is not null, displays an error message.
- *
- *  The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
- *  
- *  @detail The object names are stored in the table kdb->k_objs. To avoid a reallocation on each new insertion, K_CHUNCK elements 
- *          are added to kdb->k_objs each time that more place is needed to store object names.
- *
- *          Names in KOBJS are stored in alphabetic order to speed up the retrieval of an object by its name. 
- *          Consequently, K_add_entry has to calculate the place where the name must be inserted. For (even) more speed when 
- *          elements are added in alphabetic order, the function first checks that the new name must not be placed at the end or the beginning 
- *          of the table in which case, no search is required.
- * 
- *  @param [in, out]    kdb     KDB*    KDB source and target
- *  @param [in]         newname char*   new object name 
- *  @return                     bool    true in case of success, false if kdb is NULL
- */
- 
-bool K_add_entry(KDB* kdb, const std::string& name)
-{
-    if(!kdb) 
-        return false;
-    
-    check_name(std::string(name), kdb->k_type);
-    
-    bool found = kdb->contains(name);
-    if(found) 
-    {
-        if(K_WARN_DUP)
-        {
-            kerror(0, "%s already defined", (char*) name.c_str());
-            return false;
-        }
-    }
-    else
-        kdb->k_objs[name] = 0;
 
     return true;
 }

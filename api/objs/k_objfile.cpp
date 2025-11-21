@@ -901,7 +901,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
                 SW_free(handle_to);
             // if not -> create a new entry
             else 
-                success = K_add_entry(to, objs[i]);
+                success = to->add_entry(objs[i]);
                 if(!success) 
                 {
                     SW_nfree(pack);

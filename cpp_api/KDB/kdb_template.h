@@ -65,7 +65,7 @@ public:
             if(!success)
                 return false;
             // add a new entry and copy the pointer
-            K_add_entry(kdb, name);
+            kdb->add_entry(name);
             kdb->k_objs[name] = global_kdb->get_handle(name);
             return true;
         }
