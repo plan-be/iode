@@ -93,30 +93,6 @@ int K_dup(const KDB* kdb_source, const std::string& name1, KDB* kdb_dest, const 
 
 
 /**
- *  Deletes an entry in a KDB __without__ deleting the referenced object. 
- *
- *  Warning : for internal use (no check is made on pos).
- *  
- *  @param [in, out]    kdb     KDB*    KDB source and target
- *  @param [in]         pos     int     object position in kdb
- *  @return                     int     0 (should be void fn)
- */
-
-int K_del_entry(KDB* kdb, int pos)
-{
-    if(!kdb) 
-        return -1;
-
-    std::string name = kdb->get_name(pos);
-    if(name.empty()) 
-        return -1;
-    
-    kdb->k_objs.erase(name);
-    return 0;
-}
-
-
-/**
  *  Updates equation field(s). Creates the equation if it doesn't exist). All fields do not have to be updated during one call: only the non NULL
  *  parameters are taken into account.
  *  
