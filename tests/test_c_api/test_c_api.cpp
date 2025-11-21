@@ -482,15 +482,15 @@ public:
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    B_WsClearAll("");
-        EXPECT_EQ(K_WS[VARIABLES]->size(), 0);
-        EXPECT_TRUE(K_WS[VARIABLES]->sample == nullptr);
+        EXPECT_EQ(KV_WS->size(), 0);
+        EXPECT_TRUE(KV_WS->sample == nullptr);
 
 	    // 1. Copy full VAR file (Warning: * required)
 	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-        EXPECT_EQ(K_WS[VARIABLES]->size(), 394);
-        EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
+        EXPECT_EQ(KV_WS->size(), 394);
+        EXPECT_TRUE(KV_WS->sample != nullptr);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
@@ -758,8 +758,8 @@ public:
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
-        EXPECT_EQ(K_WS[VARIABLES]->size(), 394);
-        EXPECT_TRUE(K_WS[VARIABLES]->sample != nullptr);
+        EXPECT_EQ(KV_WS->size(), 394);
+        EXPECT_TRUE(KV_WS->sample != nullptr);
 	    sprintf(arg, "%sfuncsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
@@ -1244,13 +1244,13 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 
     // Load the VAR workspace
     U_test_K_interpret(VARIABLES, "fun.av");
-    kdbv = K_WS[VARIABLES];
+    kdbv = KV_WS;
     K_RWS[VARIABLES][0] = new KDB(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_K_interpret(TABLES, "fun.at");
-    kdbt = K_WS[TABLES];
+    kdbt = KT_WS;
     K_RWS[TABLES][0] = new KDB(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 

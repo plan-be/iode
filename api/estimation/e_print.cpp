@@ -258,10 +258,10 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
     memset(rhs, 0, 71);
 
     std::string name = std::string(c_name);
-    if(!K_WS[EQUATIONS]->contains(name)) 
+    if(!KE_WS->contains(name)) 
         return -1;
     
-    std::string lec = KELEC(K_WS[EQUATIONS], name);
+    std::string lec = KELEC(KE_WS, name);
     char* c_lec = (char*) lec.c_str();
     int i = L_split_eq(c_lec);
     if(i < 0) 

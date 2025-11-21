@@ -97,7 +97,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     if(i_date > 0)
         eq->update_date();
 
-    success = K_WS[EQUATIONS]->add(name, (char*) eq);
+    success = KE_WS->add(name, (char*) eq);
     delete eq;
     eq = nullptr;
     if(!success) 
@@ -147,7 +147,7 @@ int K_upd_tbl(char* name, char* arg)
         }
     }
 
-    bool success = K_WS[TABLES]->add(name, (char*) tbl);
+    bool success = KT_WS->add(name, (char*) tbl);
     delete tbl;
     tbl = nullptr;
 

@@ -429,7 +429,7 @@ public:
         // create variables not yet present in the Variables Database
         if(create_if_not_exit)
         {
-            Sample* sample = K_WS[VARIABLES]->sample;
+            Sample* sample = KV_WS->sample;
             if(sample == NULL || sample->nb_periods == 0)
                 throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 

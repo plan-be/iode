@@ -23,7 +23,7 @@
 
 static int RasSetVar(char* c_name, int t, double var)
 {
-    KDB* kdb = K_WS[VARIABLES];
+    KDB* kdb = KV_WS;
     std::string name = std::string(c_name);
 
     if(!kdb->contains(name)) 
@@ -40,7 +40,7 @@ static int RasSetVar(char* c_name, int t, double var)
 static double RasGetVar(char* c_name, int t)
 {
     double  var;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
     std::string name = std::string(c_name);
 
     if(!kdb->contains(name)) 
@@ -162,7 +162,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     double  *row = NULL;
     double  *col = NULL;
     double  var, fvar;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
 
     if(rper != NULL && cper != NULL) 
     {

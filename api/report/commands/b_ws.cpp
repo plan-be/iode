@@ -262,7 +262,7 @@ int B_WsSample(char* arg, int unused)
 {
     char    **args;
     Sample  *new_smpl = NULL;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
 
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) 
@@ -493,7 +493,7 @@ int B_WsExtrapolate(char* arg, int unused)
     int     nb_args, p = 0, method = 0, rc = -1;
     char    **args, **vars;
     Sample  *smpl;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
@@ -546,7 +546,7 @@ int B_WsAggr(int method, char* arg)
 {
     int     nb_args, rc = -1;
     char    **args, *pattern = NULL;
-    KDB     *kdb = K_WS[VARIABLES], *nkdb = NULL;
+    KDB     *kdb = KV_WS, *nkdb = NULL;
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);

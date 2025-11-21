@@ -647,11 +647,11 @@ U_ch *RPF_sstderr(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
-        if(!K_WS[SCALARS]->contains(name))
+        if(!KS_WS->contains(name))
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(K_WS[SCALARS], name);
+            scl = KSVAL(KS_WS, name);
             if(IODE_IS_A_NUMBER(scl->std))
                 sprintf((char*) buf, "%lf", (double) scl->std);
             else
@@ -682,11 +682,11 @@ U_ch *RPF_srelax(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
-        if(!K_WS[SCALARS]->contains(name))
+        if(!KS_WS->contains(name))
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(K_WS[SCALARS], name);
+            scl = KSVAL(KS_WS, name);
             if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf((char*) buf, "%lf", (double) scl->relax);
             else
@@ -719,14 +719,14 @@ U_ch *RPF_ttitle(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) "\n");
         name = std::string((char*) args[i]);
-        if(!K_WS[TABLES]->contains(name)) 
+        if(!KT_WS->contains(name)) 
         {
             sprintf((char*) buf, "Table %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else 
         {
-            tbl = KTVAL(K_WS[TABLES], name);
+            tbl = KTVAL(KT_WS, name);
             res = SCR_strafcat(res, T_get_title(tbl, false));
             delete tbl;
             tbl = nullptr;
@@ -751,7 +751,7 @@ U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     int     i;
-    KDB     *kdb = K_WS[COMMENTS];
+    KDB     *kdb = KC_WS;
 
     if(kdb == NULL) 
         return(res);
@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
 
     if(!kdb) 
         return(res);
@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDB  *kdb = K_WS[LISTS];
+    KDB  *kdb = KL_WS;
 
     if(kdb == NULL) 
         return(res);
@@ -884,7 +884,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDB     *kdb = K_WS[IDENTITIES];
+    KDB     *kdb = KI_WS;
 
     if(kdb == NULL) 
         return(res);
@@ -928,7 +928,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDB     *kdb = K_WS[EQUATIONS];
+    KDB     *kdb = KE_WS;
 
     if(kdb == NULL) 
         return(res);
@@ -969,7 +969,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch    *res = 0;
-    KDB     *kdb = K_WS[EQUATIONS];
+    KDB     *kdb = KE_WS;
 
     // Equation WS  empty
     if(kdb == NULL) 
@@ -1007,7 +1007,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch    *res = 0;
-    KDB     *kdb = K_WS[EQUATIONS];
+    KDB     *kdb = KE_WS;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1079,7 +1079,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch    *eq = 0, *rhs;
     int     poscolon;
-    KDB     *kdb = K_WS[EQUATIONS];
+    KDB     *kdb = KE_WS;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1165,7 +1165,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    KDB     *kdb = K_WS[VARIABLES];
+    KDB     *kdb = KV_WS;
     char     what = 'F';
 
     smpl = kdb->sample;
@@ -1241,9 +1241,9 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     for(i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
-        if(!K_WS[EQUATIONS]->contains(name)) 
+        if(!KE_WS->contains(name)) 
             continue;
-        eq = KEVAL(K_WS[EQUATIONS], name);
+        eq = KEVAL(KE_WS, name);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         if(eq) 
             delete eq;

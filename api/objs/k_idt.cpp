@@ -14,8 +14,8 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
         {
             // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
             // see add() and K_spack()
-            if (!K_WS[SCALARS]->contains(coeff_name)) 
-                K_WS[SCALARS]->add(coeff_name, (char*) NULL);
+            if (!KS_WS->contains(coeff_name)) 
+                KS_WS->add(coeff_name, (char*) NULL);
         }
     }
 
@@ -32,7 +32,7 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
-        Sample* sample = K_WS[VARIABLES]->sample;
+        Sample* sample = KV_WS->sample;
         if(sample == NULL || sample->nb_periods == 0)
             throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
                                     std::string(this->lec) +"\nThe global sample is not yet defined");
@@ -42,8 +42,8 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
         {
             // adds a new variable with nb_obs IODE_NAN values to the Variables Database
             // see add() and K_vpack()
-            if (!K_WS[VARIABLES]->contains(var_name))
-                K_WS[VARIABLES]->add(var_name, (double*) NULL, nb_obs);
+            if (!KV_WS->contains(var_name))
+                KV_WS->add(var_name, (double*) NULL, nb_obs);
         }
     }
 

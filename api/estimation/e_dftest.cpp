@@ -36,13 +36,13 @@
 static int E_GetSmpl(Sample* smpl, char* c_name)
 {
     std::string name = std::string(c_name);
-    if(!K_WS[VARIABLES]->contains(name)) 
+    if(!KV_WS->contains(name)) 
         return -1;
     
-    double* val = KVVAL(K_WS[VARIABLES], name, 0);
+    double* val = KVVAL(KV_WS, name, 0);
 
     int t;
-    Sample* wsmpl = K_WS[VARIABLES]->sample;
+    Sample* wsmpl = KV_WS->sample;
     for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
 

@@ -87,7 +87,7 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     std::string name = "AOUC";
     CLEC* clec = NULL;
-    CLEC* expected_clec = KICLEC(K_WS[IDENTITIES], name);
+    CLEC* expected_clec = KICLEC(KI_WS, name);
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by name
