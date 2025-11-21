@@ -161,7 +161,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         return NULL;
     }
     int nb_periods = var_sample->nb_periods;
-    K_add(KV_WS, varname, vec, &nb_periods);
+    KV_WS->add(varname, vec, nb_periods);
     SW_nfree(vec);
     
     // Checks that the sample is large enough for the estimation 
@@ -177,24 +177,24 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     /* Dickey Fuller */
     // Construction de l'équation à estimer, partie par partie selon les parms
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    K_add(KS_WS, "df_", NULL);
+    KS_WS->add("df_", NULL);
     
     if(drift) 
     {
         sprintf(buf + strlen(buf), "+ df_d");
-        K_add(KS_WS, "df_d", NULL);
+        KS_WS->add("df_d", NULL);
     }
 
     if(trend) 
     {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        K_add(KS_WS, "df_t", NULL);
+        KS_WS->add("df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
         sprintf(scl, "df%d", i);
-        K_add(KS_WS, scl, NULL);
+        KS_WS->add(scl, NULL);
     }
 
     if(order) 

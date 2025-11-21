@@ -17,23 +17,23 @@ Scalar* KDBScalars::get_unchecked(const std::string& name) const
 bool KDBScalars::add(const std::string& name, const Scalar& obj)
 {
 	Scalar scalar(obj);
-	return KDBTemplate::add(name, &scalar);
+	return KDBTemplate::add(name, (char*) &scalar);
 }
 
 bool KDBScalars::add(const std::string& name, const double value, const double relax, const double std)
 {
 	Scalar scalar(value, relax, std);
-	return KDBTemplate::add(name, &scalar);
+	return KDBTemplate::add(name, (char*) &scalar);
 }
 
 void KDBScalars::update(const std::string& name, const Scalar& obj)
 {
 	Scalar scalar(obj);
-	KDBTemplate::update(name, &scalar);
+	KDBTemplate::update(name, (char*) &scalar);
 }
 
 void KDBScalars::update(const std::string& name, const double value, const double relax, const double std)
 {
 	Scalar scalar(value, relax, std);
-	KDBTemplate::update(name, &scalar);
+	KDBTemplate::update(name, (char*) &scalar);
 }

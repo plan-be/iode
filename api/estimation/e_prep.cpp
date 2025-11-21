@@ -183,7 +183,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  
  *  @param [in] CLEC*   clec    Compiled LEC equation
  *  @param [in] KDB*    dbs     KDB of scalar
- *  @return     int             0 (TODO: check the K_add() return value)        
+ *  @return     int             0 (TODO: check the add() return value)        
  *  
  */
 int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
@@ -195,7 +195,7 @@ int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            K_add(dbs, c_name, NULL);
+            dbs->add(name, NULL);
     }
     
     return(0);

@@ -64,7 +64,7 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
     YY_unread(yy);
 
     nb = smpl->nb_periods;
-    success = K_add(kdb, name, vec, &nb);
+    success = kdb->add(name, vec, nb);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);

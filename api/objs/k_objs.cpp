@@ -18,7 +18,6 @@
 // API
 // ---
 
-
 /**
  *  Updates equation field(s). Creates the equation if it doesn't exist). All fields do not have to be updated during one call: only the non NULL
  *  parameters are taken into account.
@@ -98,7 +97,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     if(i_date > 0)
         eq->update_date();
 
-    success = K_add(K_WS[EQUATIONS], name, eq, name);
+    success = K_WS[EQUATIONS]->add(name, (char*) eq);
     delete eq;
     eq = nullptr;
     if(!success) 
@@ -148,7 +147,7 @@ int K_upd_tbl(char* name, char* arg)
         }
     }
 
-    bool success = K_add(K_WS[TABLES], name, tbl);
+    bool success = K_WS[TABLES]->add(name, (char*) tbl);
     delete tbl;
     tbl = nullptr;
 

@@ -37,7 +37,7 @@ TEST_F(KDBTablesTest, Subset)
     std::vector<std::string> names = kdb_global.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
-    kdb_subset_deep_copy->update("C8_1", table);
+    kdb_subset_deep_copy->update("C8_1", *table);
     EXPECT_EQ(kdb_global.get_title("C8_1"), title);
     EXPECT_EQ(kdb_subset_deep_copy->get_title("C8_1"), new_title);
 
@@ -45,7 +45,7 @@ TEST_F(KDBTablesTest, Subset)
     KDBTables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
-    kdb_subset_shallow_copy->update("C8_1", table);
+    kdb_subset_shallow_copy->update("C8_1", *table);
     EXPECT_EQ(kdb_global.get_title("C8_1"), new_title);
     EXPECT_EQ(kdb_subset_shallow_copy->get_title("C8_1"), new_title);
 }
@@ -488,7 +488,7 @@ TEST_F(KDBTablesTest, Merge)
     Table* unmodified_table = kdb_to_merge->get(name);
     Table* modified_table = kdb_to_merge->copy(name);
     modified_table->set_title(0, "New Title");
-    kdb_to_merge->update(name, modified_table);
+    kdb_to_merge->update(name, *modified_table);
 
     // merge (overwrite)
     kdb0->merge(*kdb_to_merge, true);

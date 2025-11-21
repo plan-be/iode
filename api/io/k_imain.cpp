@@ -131,7 +131,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
-            if(!K_add(kdb, oname, vector, &nb))
+            if(!kdb->add(oname, vector, nb))
                 kerror(0, "Unable to create '%s'", oname);
         }
     }
@@ -157,7 +157,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
             if(found) 
             {
                 kmsg("Reading object %d : %s", ++cmpt, oname);
-                success = K_add(kdb, oname, NULL, &nb);
+                success = kdb->add(oname, (double*) NULL, nb);
                 if(!success) 
                 {
                     kerror(0, "Unable to create '%s'", oname);
@@ -235,7 +235,7 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
         if(SW_BLKS[7].blk_space > 100000L) Debug("CMT:%s\n", oname);
         kmsg("Reading object %d : %s", ++cmpt, oname);
         SCR_strip((unsigned char*) cmt);
-        if(!K_add(kdb, oname, cmt))
+        if(!kdb->add(oname, cmt))
             kerror(0, "Unable to create '%s'", oname);
         SW_nfree(cmt);
     }

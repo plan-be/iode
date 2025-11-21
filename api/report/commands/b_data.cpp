@@ -250,7 +250,7 @@ int B_DataCalcVar(char* arg, int unused)
     nb = kdb->sample->nb_periods;
     if(!kdb->contains(std::string(name)))
     {
-        bool success = K_add(kdb, name, NULL, &nb);
+        bool success = kdb->add(name, (double*) NULL, nb);
         if(!success) 
             return(-1);
     }
@@ -303,14 +303,14 @@ int B_DataCreate_1(char* arg, int* ptype)
         case COMMENTS :
         case LISTS :
         case SCALARS :
-            if(!K_add(kdb, arg, NULL)) 
+            if(!kdb->add(arg, NULL)) 
                 return(-1);
             else 
                 return(0);
 
         case VARIABLES :
             nb_per = kdb->sample->nb_periods;
-            if(!K_add(kdb, arg, NULL, &nb_per)) 
+            if(!kdb->add(arg, (double*) NULL, nb_per)) 
                 return(-1);
             else 
                 return(0);
@@ -321,7 +321,7 @@ int B_DataCreate_1(char* arg, int* ptype)
 
         case IDENTITIES :
             sprintf(deflt, "%s", arg);
-            if(!K_add(kdb, arg, deflt)) 
+            if(!kdb->add(arg, deflt)) 
                 return(-1);
             else 
                 return(0);
@@ -540,7 +540,7 @@ int B_DataUpdate(char* arg, int type)
     case COMMENTS : /* Name Val */
     case IDENTITIES :
     case LISTS :
-        success = K_add(kdb, name, arg + lg + 1, name);
+        success = kdb->add(name, arg + lg + 1);
         break;
 
     case EQUATIONS :
@@ -577,7 +577,7 @@ int B_DataUpdate(char* arg, int type)
         }
 
         if(success) 
-            success = K_add(kdb, args[0], &scl);
+            success = kdb->add(std::string(args[0]), (char*) &scl);
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
@@ -850,7 +850,7 @@ int B_DataListSort(char* arg, int unused)
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
-    if(!K_add(K_WS[LISTS], out, lst)) 
+    if(!K_WS[LISTS]->add(out, lst)) 
     {
         error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
@@ -996,7 +996,7 @@ int B_DataAppend(char* arg, int type)
             sprintf(nptr, "%s,%s", ptr, text);
     }
 
-    success = K_add(kdb, name, nptr);
+    success = kdb->add(name, nptr);
     if(nptr != text) 
         SW_nfree(nptr);
 

@@ -42,6 +42,9 @@ struct KDB
     std::vector<std::shared_ptr<KDB*>> children;    // children KDBs: if the current KDB is modified, all children KDBs must 
                                                     //                be updated too
 
+private:
+    bool add_packed_object(const std::string& name, char* pack);
+
 public:
     KDB(IodeType type, IodeDatabaseType db_type, std::string filename="")
         : k_type((short) type), k_db_type((char) db_type), k_arch(std::string(ARCH)) 
@@ -300,6 +303,34 @@ public:
 
         return true;
     }
+
+    /**
+     *  Adds an object to a KDB. The number of arguments depends on object type. 
+     *   
+     *  The object is first packed (see k_pack.c). The resulting pack is then copied in the swap memory. 
+     *  The handle of the allocated swap memory is stored in the kdb.
+     *
+     *  If name exists in kdb, the existing object is deleted and replaced by the new one.
+     *  It returns true on success, false on error.
+     *  
+     *  How to create IODE objects with add()
+     *  -------------------------------------
+     *    - Comments:    add(const std::string& name, char* comment)
+     *    - Equations:   add(const std::string& name, Equation* eq, char* endo) [where endo = name]
+     *    - Identities:  add(const std::string& name, char* lec)
+     *    - Lists:       add(const std::string& name, char* list)
+     *    - Scalars:     add(const std::string& name, Scalar* scalar)
+     *    - Tables:      add(const std::string& name, Table *tbl) 
+     *    - Variables:   add(const std::string& name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
+     *  
+     *  @note: the name of an equation MUST be the name of its endogenous variable
+     */
+    // comments, equations, identities, lists, scalars, tables, objects
+    bool add(const std::string& name, char* value);
+    // variables
+    bool add(const std::string& name, double* var, const int nb_obs);
+    // objects
+    bool add(const std::string& name, char* value, const int length);    
 
     bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name);
 

@@ -44,12 +44,12 @@
  */
 void Estimation::E_savescl(double val, int eqnb, char*txt)  
 {
-    char    buf[40];                        // JMP 25/04/2022 : 20 -> 40 
-    static Scalar  scl = {0.9, 1.0, IODE_NAN}; // Why static ?
+    char buf[40];
+    Scalar scl(0.9, 1.0, IODE_NAN);
 
     scl.value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
-    K_add(KS_WS, buf, &scl);
+    KS_WS->add(buf, (char*) &scl);
 }
 
 /**
@@ -165,7 +165,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
 
-    bool success = K_add(E_DBE, name, eq, name);
+    bool success = E_DBE->add(name, (char*) eq);
     delete eq;
     eq = nullptr;
     if(!success) 

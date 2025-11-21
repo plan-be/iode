@@ -78,7 +78,7 @@ void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDB
     // add the variable to the destination database
     KDB* kdb = dest->get_database();
     source_var_ptr += source_t_first;
-    K_add(kdb, const_cast<char*>(dest_name.c_str()), source_var_ptr, &nb_periods);
+    kdb->add(dest_name, source_var_ptr, nb_periods);
 }
 
 void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 

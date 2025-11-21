@@ -13,9 +13,9 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
         for(const std::string& coeff_name: coeffs)
         {
             // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
-            // see K_add() and K_spack()
+            // see add() and K_spack()
             if (!K_WS[SCALARS]->contains(coeff_name)) 
-                K_add(K_WS[SCALARS], (char*) coeff_name.c_str(), NULL);
+                K_WS[SCALARS]->add(coeff_name, (char*) NULL);
         }
     }
 
@@ -41,9 +41,9 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
         for(const std::string& var_name: vars)
         {
             // adds a new variable with nb_obs IODE_NAN values to the Variables Database
-            // see K_add() and K_vpack()
+            // see add() and K_vpack()
             if (!K_WS[VARIABLES]->contains(var_name))
-                K_add(K_WS[VARIABLES], (char*) var_name.c_str(), NULL, &nb_obs);
+                K_WS[VARIABLES]->add(var_name, (double*) NULL, nb_obs);
         }
     }
 

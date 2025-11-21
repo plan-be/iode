@@ -165,12 +165,12 @@ public:
 	    static int  done = 0;
 	
 	    // Create lists
-	    success = K_add(kdb_lst, "LST1", "A,B");
+	    success = kdb_lst->add("LST1", "A,B");
         EXPECT_TRUE(success);
 	    lst = KLVAL(kdb_lst, "LST1");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B");
-	    success = K_add(kdb_lst, "LST2", "A,B,A");
+	    success = kdb_lst->add("LST2", "A,B,A");
         EXPECT_TRUE(success);
         lst = KLVAL(kdb_lst, "LST2");
         EXPECT_NE(lst, nullptr);
@@ -191,14 +191,14 @@ public:
 	       B[i] = i*2;
 	    }
 	
-	    success = K_add(kdb_var, "A", A, &nb);
+	    success = kdb_var->add("A", A, nb);
         EXPECT_TRUE(success);
         values = KVVAL(kdb_var, "A", 0);
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", 0), A[0]);
         EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", nb-1), A[nb-1]);
 	    
-        success = K_add(kdb_var, "B", B, &nb);
+        success = kdb_var->add("B", B, nb);
         EXPECT_TRUE(success);
         values = KVVAL(kdb_var, "B", 0);
         EXPECT_NE(values, nullptr);
@@ -209,17 +209,17 @@ public:
         delete[] B;
 
 	    // For B_DataPattern()
-	    success = K_add(kdb_lst, "AB", "A,B");
+	    success = kdb_lst->add("AB", "A,B");
         EXPECT_TRUE(success);
-	    success = K_add(kdb_lst, "BC", "B,C");
+	    success = kdb_lst->add("BC", "B,C");
         EXPECT_TRUE(success);
-	    success = K_add(kdb_var, "AB", B, &nb);
+	    success = kdb_var->add("AB", B, nb);
         EXPECT_TRUE(success);
-	    success = K_add(kdb_var, "AC", B, &nb);
+	    success = kdb_var->add("AC", B, nb);
 	    EXPECT_TRUE(success);
-        success = K_add(kdb_var, "BB", B, &nb);
+        success = kdb_var->add("BB", B, nb);
         EXPECT_TRUE(success);
-        success = K_add(kdb_var, "BC", B, &nb);
+        success = kdb_var->add("BC", B, nb);
         EXPECT_TRUE(success);
 	}
 
@@ -504,7 +504,7 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
-	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = KV_WS->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
@@ -577,7 +577,7 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 21;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
-	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = KV_WS->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
@@ -622,7 +622,7 @@ public:
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
 	    ACAF[7] = IODE_NAN;
-	    success = K_add(KV_WS, "ACAF", ACAF, &nb);
+	    success = KV_WS->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	
 	    // $WsExtrapolate [method] from to [variable list]
@@ -644,7 +644,7 @@ public:
         
 	    nb = KV_WS->sample->nb_periods;
 	    A = L_cc_link_exec(lec, KV_WS, KS_WS);
-	    K_add(KV_WS, name, A, &nb);
+	    KV_WS->add(name, A, nb);
 	    SCR_free(A);
 	    return true;
 	}
@@ -900,7 +900,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
 
     // --- add the table to the Tables KDB
     char* name = "TABLE";
-    K_add(KT_WS, name, tbl);
+    KT_WS->add(name, (char*) tbl);
 
     // --- extract the table from the Table KDB
     extracted_tbl = KTVAL(KT_WS, name);
@@ -1548,7 +1548,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     }
 
     // B_DataListSort()
-    success = K_add(KL_WS, "LIST1", "A;C;B");
+    success = KL_WS->add("LIST1", "A;C;B");
     EXPECT_TRUE(success);
     found = KL_WS->contains("LIST1");
     EXPECT_TRUE(found);
@@ -1558,9 +1558,9 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
-    K_add(KL_WS, "L1", "C;B;$L2;$L3");
-    K_add(KL_WS, "L2", "X Z Y");
-    K_add(KL_WS, "L3", "A B D");
+    KL_WS->add("L1", "C;B;$L2;$L3");
+    KL_WS->add("L2", "X Z Y");
+    KL_WS->add("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
     lst = KLVAL(KL_WS, "RES");
@@ -1854,8 +1854,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     KT_WS->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    K_add(KI_WS, "C", "D*2+ACAF");
-    K_add(KI_WS, "D", "A+B");
+    KI_WS->add("C", "D*2+ACAF");
+    KI_WS->add("D", "A+B");
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -3000,8 +3000,8 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     *KVVAL(KV_WS, "RTCT", 0) = 90.0;
     *KVVAL(KV_WS, "RTCT", 1) = 90.0;
 
-    K_add(KL_WS, "X", "R1,R2,R3,R4,RT");
-    K_add(KL_WS, "Y", "C1,C2,C3,C4,CT");
+    KL_WS->add("X", "R1,R2,R3,R4,RT");
+    KL_WS->add("Y", "C1,C2,C3,C4,CT");
 
     bool found = KL_WS->contains("X");
     EXPECT_TRUE(found);

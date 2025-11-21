@@ -535,7 +535,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
     {
         dim = dbv->sample->nb_periods;
         j = 0;
-        // WARNING: we create a copy of the map dbv->k_objs since K_add may modify dbv->k_objs.
+        // WARNING: we create a copy of the map dbv->k_objs since add() may modify dbv->k_objs.
         //          It is not safe to use for(auto& [key, value] : map) when the keys or values 
         //          can be modify inside the loop.
         std::map<std::string, SWHDL> k_objs_copy = dbv->k_objs;
@@ -552,7 +552,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
             // series = identity ("endogenous") => creates an IODE_NAN VA
             if(dbi->contains(name)) 
             {          
-                K_add(dbv, (char*) name.c_str(), NULL, &dim);      
+                dbv->add(name, (double*) NULL, dim);      
                 continue;
             }
 

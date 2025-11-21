@@ -154,7 +154,7 @@ bool KDBVariables::add(const std::string& name, const Variable& variable)
 	check_var_size("add", name, variable);
 
 	int var_size = (int) variable.size();
-	return KDBTemplate::add(name, variable.data(), &var_size);
+	return KDBTemplate::add(name, (double*) variable.data(), var_size);
 }
 
 bool KDBVariables::add(const std::string& name, const std::string& lec)
@@ -204,7 +204,7 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 		variable[t_first + i] = values[i];
 
 	// update the variable
-	KDBTemplate::update(name, variable.data(), &total_nb_periods);
+	KDBTemplate::update(name, (double*) variable.data(), total_nb_periods);
 }
 
 void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)

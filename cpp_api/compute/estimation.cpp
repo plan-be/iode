@@ -39,7 +39,11 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
 // Note: +/- the same as E_SclToReal()
 static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, double* res, const int pos)
 {
-    kdb->add(coeff_name, res[pos], (res[pos+1] < 1.0) ? res[pos+1]: 1.0, (!IODE_IS_0(res[pos+2])) ? res[pos]/res[pos+2] : IODE_NAN);
+    Scalar scl;
+    scl.value = res[pos];
+    scl.relax = (res[pos+1] < 1.0) ? res[pos+1] : 1.0;
+    scl.std   = (!IODE_IS_0(res[pos+2])) ? res[pos] / res[pos+2] : IODE_NAN;
+    kdb->add(coeff_name, scl);
 }
 
 // QUESTION FOR JMP : Why E_UnitRoot does not return a new KDB of scalars ? 
@@ -150,8 +154,8 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
                     kdb_eqs->add(name, *eq);
                     delete eq;
                 }
+                // no -> add a new equation with LEC '<name> := 0' to 'kdb_eqs'
                 else
-                    // no -> add a new equation with LEC '<name> := 0' to 'kdb_eqs'
                     kdb_eqs->add(name, name + " := 0");
             }
 
@@ -213,9 +217,9 @@ void EditAndEstimateEquations::update_scalars()
                 Scalar* scl = Scalars.get(name);
                 kdb_scl->add(name, *scl);
             }
+            // no -> add a new scalar with value = 0.0 and relax = 1.0 to 'kdb_scl'
             else
-                // no -> add a new scalar with value = 0.0 and relax = 1.0 to 'kdb_scl'
-                kdb_scl->add(name, 0.9, 1.0);
+                kdb_scl->add(name, 0.0, 1.0, IODE_NAN);
         }
     }
 

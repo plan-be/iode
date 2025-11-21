@@ -2,6 +2,8 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.map cimport map
+
 from libcpp cimport bool
 
 from pyiode.common cimport (IodeType, IodeFileType, TableLang, IodeEquationMethod, 
@@ -58,33 +60,28 @@ cdef extern from "api/all.h":
                    CPeriod* sum_period, int maxit, double eps)
     int B_DataPattern(char* arg, int iode_type)
 
-    ctypedef struct KOBJ:
-        SWHDL o_val
-        ONAME o_name
-
     ctypedef struct KDB:
-        KOBJ*     k_objs
-        short     k_type
-        short     k_mode
-        string    k_arch
-        string    description
-        CSample*  sample
-        char      k_compressed
-        char      k_db_type
-        string    filepath
+        map[string, SWHDL]  k_objs
+        short               k_type
+        short               k_mode
+        string              k_arch
+        string              description
+        CSample*            sample
+        char                k_compressed
+        char                k_db_type
+        string              filepath
 
         int size()
         int index_of(string& name)
         bool contains(string& name)
         string get_name(int pos)
+        # variables
+        bool add(string& name, double* var, int nb_obs) except +
         bool remove(string& name) except +
 
 
     # k_objfile.c
     KDB* K_interpret(int iode_type, char* filename, int db_global)
-
-    # k_objsv.c
-    bint K_add(KDB *kdb, char* name, ...)
 
     # k_wsvar.c
     int KV_add(KDB* kdb, char* varname)

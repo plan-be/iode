@@ -109,20 +109,19 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
     if(cl == NULL) 
         return;
     
-    int rc = 0;
     char* c_name;
     std::string name;
     for(int j = 0 ; j < cl->nb_names ; j++) 
     {
         c_name = cl->lnames[j].name;
-        if(is_coefficient(c_name))
-            K_add(scal, c_name, NULL, &rc);
+        name = std::string(c_name);
+        if(is_coefficient(name))
+            scal->add(name, (char*) NULL);
         else 
         {
-            name = std::string(c_name);
             if(dbe != nullptr && dbe->contains(name)) 
                 continue;
-            K_add(exo, cl->lnames[j].name, NULL, &rc);
+            exo->add(name, (char*) NULL);
         }
     }
 }
@@ -231,7 +230,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
  *  @param [in] char*   name    name or the resulting list
  *  @param [in] char**  lst     table of strings
  *  @param [in] int     chunck  max number of strings per (sub-)list
- *  @return     int             0 on success, < 0 on, error (rc from K_add())
+ *  @return     int             0 on success, < 0 on, error (rc from add())
  *  
  */
 int KL_lst(char* name, char** lst, int chunck)
@@ -242,7 +241,7 @@ int KL_lst(char* name, char** lst, int chunck)
     nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) 
     {
-        if(!K_add(K_WS[LISTS], name, ""))    
+        if(!K_WS[LISTS]->add(name, ""))    
             rc = -1;
         goto done;
     }
@@ -250,7 +249,7 @@ int KL_lst(char* name, char** lst, int chunck)
     if(nb < chunck || chunck < 0) 
     {
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(!K_add(K_WS[LISTS], name, str))  
+        if(!K_WS[LISTS]->add(name, str))  
             rc = -1;
         SCR_free(str);
         return(rc);
@@ -267,7 +266,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(!K_add(K_WS[LISTS], buf, str))  
+        if(!K_WS[LISTS]->add(buf, str))  
             rc = -1;
         SCR_free(str);
 
@@ -285,7 +284,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(!K_add(K_WS[LISTS], name, str)) 
+    if(!K_WS[LISTS]->add(name, str)) 
         rc = -1;
     SW_nfree(str);
 

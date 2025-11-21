@@ -49,6 +49,8 @@ public:
     bool add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, 
         bool mode = false, bool files = false, bool date = false);
 
+    void update(const std::string& name, const Table& obj);
+
     /**
      * @brief Compute and print a list of tables to a file.
      * Argument `format` must be in the list:

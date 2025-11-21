@@ -22,7 +22,7 @@ from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, 
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
-from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add, K_add
+from pyiode.iode_database.cpp_api_database cimport KV_get, KV_set, KV_add
 from pyiode.iode_database.cpp_api_database cimport _c_add_var_from_other, _c_copy_var_content
 from pyiode.iode_database.cpp_api_database cimport BinaryOperation as CBinaryOperation
 from pyiode.iode_database.cpp_api_database cimport _c_operation_scalar, _c_operation_one_var, _c_operation_one_period
@@ -214,7 +214,7 @@ cdef class Variables(CythonIodeDatabase):
             c_name = b_name
             c_nb_periods = self.get_sample().get_nb_periods()
             c_db_ptr = self.database_ptr.get_database()
-            success = K_add(c_db_ptr, c_name, &numpy_data_memview[0], &c_nb_periods)
+            success = c_db_ptr.add(c_name, &numpy_data_memview[0], c_nb_periods)
             if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
