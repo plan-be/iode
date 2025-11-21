@@ -462,29 +462,32 @@ int B_DataRename(char* arg, int type)
  */
  int B_DataDuplicate(char* arg, int type)
 {
-    int     pos = 0;
     char    **args;
     KDB     *kdb = K_WS[type];
 
-    if(type == EQUATIONS) {
+    if(type == EQUATIONS) 
+    {
         error_manager.append_error("DataDuplicate of Equations has no sense");
-        return(-1); /* Duplicate of EQS has no sense */
+        return -1; /* Duplicate of EQS has no sense */
     }
 
     args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) return(-1);
-
-    pos = K_dup(kdb, args[0], kdb, args[1]);
-    if(pos < 0) 
-    {
-        std::string error_msg = "DataDuplicate '" + std::string(args[0]) + "' as '";
-        error_msg += std::string(args[1]) + " failed";
-        error_manager.append_error(error_msg);
-    }
-
+    if(args == NULL) 
+        return -1;
+    std::string old_name = std::string(args[0]);
+    std::string new_name = std::string(args[1]);
     A_free((unsigned char**) args);
 
-    return (pos < 0) ? -1 : 0;
+    bool success = kdb->duplicate(*kdb, old_name, new_name);
+    if(!success) 
+    {
+        std::string error_msg = "DataDuplicate '" + old_name + "' as '";
+        error_msg += new_name + " failed";
+        error_manager.append_error(error_msg);
+        return -1;
+    }
+
+    return 0;
 }
 
 

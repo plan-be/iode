@@ -33,11 +33,66 @@
 // API 
 // ---
 
-
-bool KDB::duplicate(const KDB& other, const std::string& name)
+bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::string& new_name)
 {
-    bool success = K_dup(&other, name, this, name);
-    return success;
+    std::string error_msg = "Cannot duplicate object '" + old_name + "' as '" + new_name + "': ";
+    if(this == &other && old_name == new_name)
+    {
+        error_msg += "source and destination are identical.";
+        kwarning(error_msg.c_str());
+        return false;
+    } 
+
+    if(!other.contains(old_name))
+    {
+        error_msg += "object '" + old_name + "' does not exist in the source database";
+        kwarning(error_msg.c_str());
+        return false;
+    }
+
+    bool success;
+    SWHDL handle_dest = this->get_handle(new_name);
+    if(handle_dest > 0) 
+        SW_free(handle_dest);
+    else
+        success = this->add_entry(new_name);
+        if(!success)
+        {
+            error_msg += "Failed to add a new entry to destination database.";
+            kwarning(error_msg.c_str());
+            return false;
+        }
+    
+    SWHDL handle_source = other.get_handle(old_name);
+    if(handle_source == 0)
+    {
+        error_msg += "could not retrieve the object in the source database.";
+        kwarning(error_msg.c_str());
+        return false;
+    } 
+
+    char* ptr_source = SW_getptr(handle_source);
+    int lg = * (OSIZE *) ptr_source;
+    handle_dest = SW_alloc(lg);
+    if(handle_dest == 0)
+    {
+        kwarning("failed to allocate memory for the duplicated object.");
+        return false;
+    }
+    this->k_objs[new_name] = handle_dest;
+    
+    // pointer behind handle_2 may have changed after allocation of handle_1
+    // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
+    // of the segments allocated by the SWAP system. If a segment contains enough free space 
+    // but with gaps, the SW_alloc() function compresses the segment to have lg bytes contiguous.
+    // In doing so, it (potentially) shifts the pack within the segment, and therefore 
+    // ptr may change value after an SW_alloc() call.
+    char* ptr_dest;
+    ptr_source = SW_getptr(handle_source);
+    ptr_dest = SW_getptr(handle_dest);
+    memcpy(ptr_dest, ptr_source, lg);
+
+    return true;
 }
 
 
