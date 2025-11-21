@@ -372,7 +372,6 @@ Functions to manipulate IODE objects.
 |Syntax|Description|
 |:---|:---|
 |`int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):`|Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.|
-|`int K_del_entry(KDB* kdb, int pos):`|Deletes an entry in a KDB \_\_without\_\_ deleting the referenced object.|
 |`int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
 |`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
 
