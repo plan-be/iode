@@ -19,7 +19,7 @@ protected:
 };
 
 
-// Test that a Table* 'tbl' object added to KT_WS using K_add() and a Table* 'extracted_tbl' object 
+// Test that a Table* 'tbl' object added to KT_WS using add() and a Table* 'extracted_tbl' object 
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
@@ -102,7 +102,7 @@ TEST_F(TablesTest, AddGetTable)
 
     // --- add the table to the Tables KDB
     char* name = "C_TABLE";
-    K_add(KT_WS, name, tbl);
+    KT_WS->add(name, (char*) tbl);
 
     // --- extract the table from the Table KDB
     Table* extracted_tbl = KTVAL(KT_WS, name);
@@ -202,7 +202,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     bool files = true;
     bool date = true;
 
-    // test if a Table object can be added to the Tables KDB via K_add()
+    // test if a Table object can be added to the Tables KDB via add()
     Table table(nb_columns, def, vars, mode, files, date);
 
     // test if the Table object has been correctly initialized
@@ -261,7 +261,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_FILES);
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
-    K_add(KT_WS, c_name, static_cast<Table*>(&table));
+    KT_WS->add(c_name, (char*) &table);
     bool found = KT_WS->contains(c_name);
     ASSERT_TRUE(found);
 

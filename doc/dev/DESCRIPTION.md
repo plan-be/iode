@@ -343,28 +343,6 @@ Functions acting on workspaces of variables.
 - k\_cmp.c: function to compare two IODE objects.
 - k\_grep.c: functions to search strings in KDB objects.
 
-### k\_objsv.c {#T25}
-
-Function to create an IODE object and to record it in a KDB.
-
-|Syntax|Description|
-|:---|:---|
-|`bool K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)`|adds an object to a KDB. The number of arguments depends on object type.|
-
-How to create IODE objects using K\_add():
-
-|Object type|Syntax|
-|:---|:---|
-|Comments|K\_add(KDB\* kdb, char\* name, CMT cmt)|
-|Equations|K\_add(KDB\* kdb, char\* name, EQ\* eq, char\* endo) \[where endo = name\]|
-|Identities|K\_add(KDB\* kdb, char\* name, char\* lec)|
-|Lists|K\_add(KDB\* kdb, char\* name, char\* list)|
-|Scalars|K\_add(KDB\* kdb, char\* name, Scalar\* scalar)|
-|Tables|K\_add(KDB\* kdb, char\* name, Table \*tbl)|
-|Variables|K\_add(KDB\* kdb, char\* name, IODE\_REAL\* var, int nb\_obs) \[nb\_obs = kdb Sample size\]|
-
-Note: the name of an equation MUST be the name of its endogenous variable.
-
 ### k\_objs.c {#T26}
 
 Functions to manipulate IODE objects.

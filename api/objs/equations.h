@@ -413,9 +413,9 @@ public:
             for(const std::string& coeff_name: coeffs)
             {
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
-                // see K_add() and K_spack()
+                // see add() and K_spack()
                 if (!KS_WS->contains(coeff_name)) 
-                    K_add(KS_WS, (char*) coeff_name.c_str(), NULL);
+                    KS_WS->add(coeff_name, (char*) NULL);
             }
         }
 
@@ -437,9 +437,9 @@ public:
             for(const std::string& var_name: vars)
             {
                 // adds a new variable with nb_obs IODE_NAN values to the Variables Database
-                // see K_add() and K_vpack()
+                // see add() and K_vpack()
                 if (!KV_WS->contains(var_name)) 
-                    K_add(KV_WS, (char*) var_name.c_str(), NULL, &nb_obs);
+                    KV_WS->add(var_name, (double*) NULL, nb_obs);
             }
         }
 

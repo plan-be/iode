@@ -27,11 +27,136 @@
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
 #include "api/objs/variables.h"
 
 
 // API 
 // ---
+
+bool KDB::add_packed_object(const std::string& name, char* pack)
+{
+    if(pack == NULL) 
+    {
+        std::string error_msg = "Failed to add the " + v_iode_types[this->k_type];
+        error_msg += + " object '" + name + "' to the database.";
+        kerror(0, error_msg.c_str());
+        return false;
+    }
+
+    // Add an entry (name) if not present yet
+    bool success = this->add_entry(name);
+    if(!success) 
+    {
+        error_manager.append_error(v_iode_types[this->k_type] + " " + name + 
+                                   " cannot be created (syntax ?)");
+        SW_nfree(pack);
+        return false;
+    }
+    
+    // frees existing object but keeps the entry in kdb
+    SWHDL handle = this->get_handle(name);
+    if(handle > 0) 
+        SW_free(handle);
+
+    // allocate space in SCR SWAP memory 
+    // NOTE: if handle > 0 (object previously present in the KDB), 
+    //       SW_alloc() will return the same handle as SW_alloc()
+    //       first searches for handle associated with freed item 
+    //       and reallocates it
+    int lg = * (OSIZE *) pack;
+    handle = SW_alloc(lg);
+    if(handle == 0) 
+    {
+        error_manager.append_error("Low memory: cannot allocate " + std::to_string(lg) + 
+                                   " bytes for " + v_iode_types[this->k_type] + " " + std::string(name));
+        SW_nfree(pack);
+        return false;
+    }
+    this->k_objs[name] = handle;
+
+    // Copy allocated pack into the SCR SWAP memory
+    char* ptr_swap = SW_getptr(handle);
+    memcpy(ptr_swap, pack, lg);
+
+    SW_nfree(pack);    
+    return true;
+}
+
+// comments, equations, identities, lists, scalars, tables, objects
+bool KDB::add(const std::string& name, char* value)
+{
+    char error[1024];
+    char* pack = NULL;
+    switch(this->k_type)
+    {
+        case COMMENTS :
+            K_cpack(&pack, value);
+            break;
+        case EQUATIONS :
+            // value = equation pointer
+            K_epack(&pack, value, (char*) name.c_str());
+            break;
+        case IDENTITIES :
+            // value = lec expression
+            K_ipack(&pack, value);
+            break; 
+        case LISTS :
+            K_lpack(&pack, value);
+            break;
+        case SCALARS :
+            // value = scalar pointer
+            K_spack(&pack, value);
+            break; 
+        case TABLES :
+            // value = table pointer
+            K_tpack(&pack, value, (char*) name.c_str());
+            break;
+        default :
+            sprintf(error, "Invalid database type for adding a %s object", 
+                           v_iode_types[this->k_type].c_str());
+            kerror(0, error);
+            return false;
+    }
+
+    bool success = add_packed_object(name, pack);
+    return success;
+}
+
+// variables
+bool KDB::add(const std::string& name, double* var, const int nb_obs)       
+{
+    if(this->k_type != VARIABLES)
+    {
+        kerror(0, "Invalid database type for adding a Variable object");
+        return false;
+    }
+
+    char* pack = NULL;
+    K_vpack(&pack, var, (int*) &nb_obs);
+    bool success = add_packed_object(name, pack);
+    return success;
+}
+
+// objects
+bool KDB::add(const std::string& name, char* value, const int length)
+{
+    if(this->k_type != OBJECTS)
+    {
+        kerror(0, "Invalid database type for adding an Object");
+        return false;
+    }
+
+    char* pack = NULL;
+    K_opack(&pack, value, (int*) &length);
+    bool success = add_packed_object(name, pack);
+    return success;
+} 
 
 bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::string& new_name)
 {

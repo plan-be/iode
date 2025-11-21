@@ -86,20 +86,20 @@ int B_season(char* arg)
         if(!res) 
         {
             memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
-            K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
+            to->add(from_name, t_vec, nb);
             continue;
         }
 
         DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        K_add(to, (char*) from_name.c_str(), t_vec, &(nb));
+        to->add(from_name, t_vec, nb);
 
         sprintf(name, "_C%s", from_name.c_str());
-        K_add(to, name, c_vec, &(nb));
+        to->add(name, c_vec, nb);
 
         sprintf(name, "_I%s", from_name.c_str());
-        K_add(to, name, i_vec, &(nb));
+        to->add(name, i_vec, nb);
     }
     KV_merge(KV_WS, to, 1);
     rc = 0;

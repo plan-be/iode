@@ -69,7 +69,7 @@ cdef class Tables(CythonIodeDatabase):
 
         c_table = table.c_table
         if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), dereference(c_table))
+            self.database_ptr.update(<string>name.encode(), dereference(c_table))
         else:
             self.database_ptr.add(<string>(name.encode()), dereference(c_table))
 

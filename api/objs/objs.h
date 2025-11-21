@@ -18,9 +18,6 @@ inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Ver
 int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date);
 int K_upd_tbl(char* name, char* arg);
 
-/* k_objsv.c */
-bool K_add(KDB *kdb, char* name,...);
-
 /* k_objvers.c */
 int K_calcvers(char *);
 void K_setvers(KDB* kdb, int i, int vers);

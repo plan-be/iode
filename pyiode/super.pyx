@@ -1,8 +1,8 @@
 from libc.string cimport strlen
+from libcpp.string cimport string
 
 from pyiode.super cimport KT_WS
 from pyiode.super cimport K_end_ws
-from pyiode.super cimport K_add
 from pyiode.super cimport kmsgbox_continue
 from pyiode.super cimport kpause_continue
 from pyiode.objects.table cimport CTable
@@ -201,24 +201,26 @@ cdef int c_EqsEstimate_super(char* arg, int unused):
 cdef int c_XodeRuleImport_super(char* arg, int unused):
     return __registry_super_functions['XodeRuleImport']()
 
-cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* name):
+cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* c_name):
     cdef int success = 0
-    cdef bint table_found = KT_WS.contains(name)
-    cdef bytes b_table_name = name
+    cdef bytes b_name = c_name
+    cdef string s_name = <string>b_name
     cdef bytes b_generalized_sample = smpl
+    cdef char* tbl_ptr = <char*>(tbl)
     
-    table_name: str = b_table_name.decode()
+    name: str = b_name.decode()
     generalized_sample: str = b_generalized_sample.decode()
     nb_decimals: int = 6
 
+    table_found: bool = KT_WS.contains(name)
     if not table_found:
         # temporary add the passed IODE table to the global database of tables
-        K_add(KT_WS, name, tbl)
+        KT_WS.add(s_name, tbl_ptr)
 	
-    success = __registry_super_functions['ViewTable'](table_name, generalized_sample, nb_decimals)
+    success = __registry_super_functions['ViewTable'](name, generalized_sample, nb_decimals)
 
     if not table_found:
         # remove the temporary added IODE table from the global database
-        KT_WS.remove(name)
+        KT_WS.remove(s_name)
 
     return success

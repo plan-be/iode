@@ -21,9 +21,9 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
     double std = 6.5;
     char* name = "cpp_scalar";
 
-    // test if a Scalar object can be added to the Scalars KDB via K_add()
+    // test if a Scalar object can be added to the Scalars KDB via add()
     Scalar scalar(val, relax, std);
-    K_add(KS_WS, name, static_cast<Scalar*>(&scalar));
+    KS_WS->add(name, (char*) &scalar);
     bool found = KS_WS->contains(name);
     ASSERT_TRUE(found);
 

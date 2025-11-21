@@ -438,7 +438,7 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(!K_add(kdb, name, tbl))  
+                if(!kdb->add(name, (char*) tbl))  
                     goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 delete tbl;

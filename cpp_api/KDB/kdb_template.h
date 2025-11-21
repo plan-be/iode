@@ -14,12 +14,10 @@ protected:
 
     template<class... Args> bool add_or_update(KDB* kdb, const std::string& name, Args... args)
     {
-        bool success;
-        char* c_name = to_char_array(name);
         if (!kdb) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + ".'\n" +  
                                      "Iode has not been initialized.");
-        success = K_add(kdb, c_name, args...);
+        bool success = kdb->add(name, args...);
         if(!success) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + "'.\n" + 
                                      "Reason: unknown");

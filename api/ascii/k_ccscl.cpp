@@ -53,7 +53,7 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = K_add(kdb, name, &scl);
+    success = kdb->add(name, (char*) &scl);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);

@@ -74,7 +74,7 @@ int RP_macro_deletedb()
  *  @param [in] char*   name    macro name
  *  @param [in] char*   macro   macro content
  *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if K_add() fails
+ *                              -1 if add() fails
  *                              0 on success
  */
 int RP_define_1(char *name, char *macro)
@@ -88,7 +88,7 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) 
         macro = "";
     lg = (int) strlen(macro) + 1;
-    bool success = K_add(RP_MACRO, name, macro, &lg);
+    bool success = RP_MACRO->add(name, macro, lg);
     if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);

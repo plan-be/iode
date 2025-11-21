@@ -26,7 +26,7 @@ bool KDBEquations::add(const std::string& name, const Equation& obj)
     char* c_name = to_char_array(name);
 
     Equation eq(obj);
-    int pos = KDBTemplate::add(name, eq, c_name);
+    int pos = KDBTemplate::add(name, (char*) &eq);
 
     return pos;
 }
@@ -37,7 +37,7 @@ bool KDBEquations::add(const std::string& name, const std::string& lec, const st
     char* c_name = to_char_array(name);
 
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-    int pos = KDBTemplate::add(name, eq, c_name);
+    int pos = KDBTemplate::add(name, (char*) &eq);
 
     return pos;
 }
@@ -47,7 +47,7 @@ void KDBEquations::update(const std::string& name, const Equation& obj)
     char* c_name = to_char_array(name);
 
     Equation eq(obj);
-    KDBTemplate::update(name, eq, c_name);
+    KDBTemplate::update(name, (char*) &eq);
 }
 
 void KDBEquations::update(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
@@ -56,5 +56,5 @@ void KDBEquations::update(const std::string& name, const std::string& lec, const
     char* c_name = to_char_array(name);
 
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-    KDBTemplate::update(name, eq, c_name);
+    KDBTemplate::update(name, (char*) &eq);
 }
