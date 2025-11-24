@@ -120,10 +120,10 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	CLEC* clec = L_cc(c_lec);
 	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
 	// The CLEC object is modified (inplace) by L_link()
-	if (clec != NULL && L_link(KV_WS, KS_WS, clec) == 0)
+	if (clec != NULL && L_link(KV_WS.get(), KS_WS.get(), clec) == 0)
 	{
 		for (int t = t_first; t <= t_last; t++) 
-			var.push_back(L_exec(KV_WS, KS_WS, clec, t));
+			var.push_back(L_exec(KV_WS.get(), KS_WS.get(), clec, t));
 		SW_nfree(clec);
 		return var;
 	}
@@ -277,8 +277,8 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	//       1. changes the 'sample' attribute of the passed KDB
 	//       2. reallocates the data for each 'key' (IODE variable) [a bit more more complicated than that but that's not the point]
 	//       Problem: if the 'sample' attribute is changed on the subset (passed KDB), the 'sample' attribute of 
-	//                the global KDB (K_WS) is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
-	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling K_WS[var_name, 2001] is still 
+	//                the global database is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
+	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling KV_WS[var_name, 2001] is still 
 	//                possible but will return garbage.
 	if(this->is_shallow_copy_database())
 		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	

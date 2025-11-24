@@ -622,7 +622,7 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
     //int old_mode = global_VM, rc;
 
     //global_VM = mode;
-    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, KV_WS, names, mode); // JMP 8/8//2022
+    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, KV_WS.get(), names, mode); // JMP 8/8//2022
 
     //global_VM = old_mode;
     return(rc);

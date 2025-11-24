@@ -186,7 +186,7 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
         return(-1);
     }
 
-    Table* tbl = KTVAL(KT_WS, name);
+    Table* tbl = KTVAL(KT_WS.get(), name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
     else
@@ -237,7 +237,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             break;
         }
 
-        tbl = KTVAL(KT_WS, name);
+        tbl = KTVAL(KT_WS.get(), name);
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
         if(view) 
@@ -306,11 +306,13 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
                 rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintGr_1, smpl);
         }
         else {
-            if(type == 0) ODE_VIEW = 1;
-            else ODE_VIEW = 2;
+            if(type == 0) 
+                ODE_VIEW = 1;
+            else 
+                ODE_VIEW = 2;
             //strcpy(ODE_SMPL, smpl);
             SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
-            ODE_scroll(KT_WS, ((char**) args) + 1);
+            ODE_scroll(KT_WS.get(), ((char**) args) + 1);
         }
 
         SCR_free_tbl(args);

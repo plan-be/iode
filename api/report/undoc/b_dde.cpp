@@ -143,7 +143,7 @@ char *IodeDdeGetWS(char *szItem)
     if(type < 0 || type > 6) 
         return((char*) SCR_stracpy((unsigned char*) "Error"));
 
-    kdb = K_WS[type];
+    kdb = get_global_db(type);
     if(strcmp(szItem, "Sample") == 0) 
     {
         res = (char*) KV_WS->sample->to_string().c_str();
@@ -189,7 +189,7 @@ char *IodeDdeGetWS(char *szItem)
 char *IodeDdeCreateSeries(int objnb, int bt)
 {
     char    *res, buf[128];
-    KDB     *kdb = KV_WS;
+    KDB     *kdb = KV_WS.get();
     int     t;
     double  x;
 
@@ -215,7 +215,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
 char *IodeDdeCreatePer(int bt)
 {
     char    *res;
-    KDB     *kdb = KV_WS;
+    KDB     *kdb = KV_WS.get();
     int     t;
 
     res = SCR_malloc(11 * (1 + kdb->sample->nb_periods - bt));
@@ -322,7 +322,7 @@ char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
     COLS    *cls;
 
     std::string name = KT_WS->get_name(objnb);
-    Table* tbl = KTVAL(KT_WS, name);
+    Table* tbl = KTVAL(KT_WS.get(), name);
     Sample* smpl = KV_WS->sample;
 
     /* date */
@@ -429,7 +429,7 @@ char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 
 char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
 {
-    KDB* kdb = K_WS[type];
+    KDB* kdb = get_global_db(type);
     if(objnb < 0 || objnb >= kdb->size())
         return (char*) 0;
 
@@ -498,7 +498,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
     HCONV   hConv;
     std::string name;
 
-    kdb = K_WS[type];
+    kdb = get_global_db(type);
     tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
     if(SCR_tbl_size(tbl) < 1) lst = SCR_vtom((unsigned char*) "", (int) ',');
     else {
@@ -615,7 +615,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(type < 0 || type > 6) 
         return((char*) SCR_stracpy((unsigned char*) "Error"));
     
-    kdb = K_WS[type];
+    kdb = get_global_db(type);
     if(type == SCALARS) 
         SCR_lower((unsigned char*) szItem);
     
@@ -673,7 +673,7 @@ int IodeDdeSetWS(char *szItem, char *szBuffer)
     type = IodeDdeType(szItem);
     if(type < 0 || type > 6) return(-1);
 
-    kdb = K_WS[type];
+    kdb = get_global_db(type);
     if(strcmp(szItem, "Sample") == 0) rc = B_WsSample(szBuffer);
     else if(strcmp(szItem + 1, "NAME") == 0)  rc = B_WsName(szBuffer, type);
     else if(strcmp(szItem + 1, "DESCR") == 0) rc = B_WsDescr(szBuffer, type);
@@ -754,7 +754,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
     type = IodeDdeType(szTopic);
     if(type < 0 || type > 6) return(-1);
 
-    kdb = K_WS[type];
+    kdb = get_global_db(type);
 
     tmp = SCR_malloc((int)strlen(szBuffer) + 30);
     if(type == VARIABLES) 
@@ -1008,7 +1008,7 @@ int B_ExcelSet(char *arg, int type)
 {
     int         pos, shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
-    KDB         *kdb = K_WS[type];
+    KDB         *kdb = get_global_db(type);
     Scalar         *scl;
     Period      *per = NULL;
     double      d;

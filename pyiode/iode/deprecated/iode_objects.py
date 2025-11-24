@@ -161,7 +161,7 @@ def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
         "Please use the new syntax: np.asarray(variables[name])",DeprecationWarning, stacklevel=2)
     return np.asarray(variables[varname])
 
-# Copy a ndarray or a list into KV_WS
+# Copy a ndarray or a list into the global Variables database
 def set_var(varname: str, py_values):
     warnings.warn("set_var() is deprecated. " + 
         "Please use the new syntax: variables[name] = values",DeprecationWarning, stacklevel=2)
@@ -242,7 +242,7 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
             
     var_files: Optional[Union[str, List[str]]] = None
             list of files the needed variables must be read from. "WS" means current current Variable WS.
-            if empty, only the current KV_WS is used
+            if empty, only the current global Variables database is used
             
     scl_files: Optional[Union[str, List[str]]] = None
             list of files the needed scalars must be read from. "WS" means current current WS.

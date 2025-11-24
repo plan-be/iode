@@ -101,7 +101,7 @@ int B_season(char* arg)
         sprintf(name, "_I%s", from_name.c_str());
         to->add(name, i_vec, nb);
     }
-    KV_merge(KV_WS, to, 1);
+    KV_merge(KV_WS.get(), to, 1);
     rc = 0;
 
 done:

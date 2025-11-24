@@ -330,7 +330,7 @@ unsigned char **KL_expand(char *str)
             if(KL_WS->contains(list_name))
             {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                tbl2 = KL_expand(KLVAL(KL_WS, list_name));
+                tbl2 = KL_expand(KLVAL(KL_WS.get(), list_name));
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);

@@ -38,25 +38,24 @@ TEST_F(KDBVariablesTest, Subset)
     for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
 
     // GLOBAL KDB
-    KDBVariables kdb_global;
-    EXPECT_EQ(kdb_global.size(), 394);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Variables.size(), 394);
+    EXPECT_TRUE(Variables.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBVariables* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBVariables* kdb_subset_deep_copy = Variables.subset(pattern, true);
+    std::vector<std::string> names = Variables.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", lec);
-    EXPECT_EQ(kdb_global.get("ACAF"), var);
+    EXPECT_EQ(Variables.get("ACAF"), var);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
 
     // SHALLOW COPY SUBSET
-    KDBVariables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBVariables* kdb_subset_shallow_copy = Variables.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", lec);
-    EXPECT_EQ(kdb_global.get("ACAF"), new_var);
+    EXPECT_EQ(Variables.get("ACAF"), new_var);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), new_var);
 }
 

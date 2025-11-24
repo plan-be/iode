@@ -187,7 +187,7 @@ static int B_htol(int method, char* arg)
         to->add(from_name, t_vec, nb);
     }
 
-    KV_merge(KV_WS, to, 1);
+    KV_merge(KV_WS.get(), to, 1);
 
 done:
     if(to)

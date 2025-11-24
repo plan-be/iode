@@ -162,29 +162,27 @@ TEST_F(EquationTest, GetCoefficients)
     EXPECT_EQ(coefs_list, expected_coefs_list);
 
     // check that coeffs have been created
-    KDBScalars kdb_scl;
-    EXPECT_EQ(kdb_scl.size(), coefs_list.size());
-    EXPECT_TRUE(kdb_scl.contains("acaf1"));
-    EXPECT_TRUE(kdb_scl.contains("acaf2"));
-    EXPECT_TRUE(kdb_scl.contains("acaf4"));
+    EXPECT_EQ(Scalars.size(), coefs_list.size());
+    EXPECT_TRUE(Scalars.contains("acaf1"));
+    EXPECT_TRUE(Scalars.contains("acaf2"));
+    EXPECT_TRUE(Scalars.contains("acaf4"));
 }
 
 TEST_F(EquationTest, GetVariables)
 {
     Sample eq_sample = equation->sample;
-    KDBVariables kdb_var;
-    kdb_var.set_sample(eq_sample.start_period, eq_sample.end_period);
+    Variables.set_sample(eq_sample.start_period, eq_sample.end_period);
 
     std::vector<std::string> expected_vars_list = {name, "VAF", "GOSF", "TIME"};
     std::vector<std::string> vars_list = equation->get_variables_list();
     EXPECT_EQ(vars_list, expected_vars_list);
 
     // check that variables have been created
-    EXPECT_EQ(kdb_var.size(), vars_list.size());
-    EXPECT_TRUE(kdb_var.contains(name));
-    EXPECT_TRUE(kdb_var.contains("GOSF"));
-    EXPECT_TRUE(kdb_var.contains("TIME"));
-    EXPECT_TRUE(kdb_var.contains("VAF"));
+    EXPECT_EQ(Variables.size(), vars_list.size());
+    EXPECT_TRUE(Variables.contains(name));
+    EXPECT_TRUE(Variables.contains("GOSF"));
+    EXPECT_TRUE(Variables.contains("TIME"));
+    EXPECT_TRUE(Variables.contains("VAF"));
 }
 
 TEST_F(EquationTest, Hash)

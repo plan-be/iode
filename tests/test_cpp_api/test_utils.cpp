@@ -163,7 +163,8 @@ TEST_F(UtilsTest, removeDuplicates)
 	int nb_names_unique = (int) v_expected_unique.size();
 
 	// Before removing duplicates
-	// Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+	// Retrieves all object names matching one or more patterns in 
+	// the global database (similar to grep)
 	char* c_lst = K_expand(COMMENTS, NULL, pattern, '*');
 	// Parses a string and replaces @filename and $listname by their contents
 	char** c_names = B_ainit_chk(c_lst, NULL, 0);

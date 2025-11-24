@@ -206,14 +206,17 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
             *cmt = NULL;
     ONAME   oname;
 
-    if(IMP_readrule(rulefile) < 0) return(kdb);
+    if(IMP_readrule(rulefile) < 0) 
+        return(kdb);
 
     YY_CASE_SENSITIVE = 1;
-    if(impdef->imp_keys != NULL) {
+    if(impdef->imp_keys != NULL) 
+    {
         size = impdef->imp_dim;
         qsort(impdef->imp_keys, size, sizeof(YYKEYS), compare);
     }
-    else size = 0;
+    else 
+        size = 0;
 
     rc = impdef->read_header(impdef, cfile, lang);
     if(rc < 0) 
@@ -227,7 +230,8 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
         if(rc < 0) 
             break;
 
-        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) {
+        if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
+        {
             SW_nfree(cmt);
             continue;
         }
@@ -273,21 +277,25 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     SCR_strip((unsigned char*) ode);
     SCR_strip((unsigned char*) asc);
 
-    if(trace[0] != 0) {
+    if(trace[0] != 0) 
+    {
         IMP_trace = 1;
         K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
-    else {
+    else 
+    {
         IMP_trace = 0;
         K_WARN_DUP = 1;
     }
    
     impdef = import_comments[fmt].get();
 
-    if(impdef){
+    if(impdef)
+    {
         kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
-        if(kdb != NULL) {
+        if(kdb) 
+        {
             rc = K_save(kdb, ode);
             delete kdb;
             kdb = nullptr;
@@ -323,12 +331,14 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     SCR_strip((unsigned char*) ode);
     SCR_strip((unsigned char*) asc);
 
-    if(trace[0] != 0) {
+    if(trace[0] != 0) 
+    {
         IMP_trace = 1;
         K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
-    else {
+    else 
+    {
         IMP_trace = 0;
         K_WARN_DUP = 1;
     }
@@ -351,7 +361,8 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     }
     
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
-    if(kdb != NULL) {
+    if(kdb) 
+    {
         rc = K_save(kdb, ode);
         delete kdb;
         kdb = nullptr;
@@ -381,7 +392,8 @@ int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char
 {
     int     rc = -1;
     
-    switch(type) {
+    switch(type) 
+    {
         case COMMENTS   :
             rc = IMP_RuleImportCmt(trace, rule, ode, asc, fmt, lang);
             break;
@@ -393,6 +405,7 @@ int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char
         default :
             break;
     }
+
     K_WARN_DUP = 0;
     return(rc);
 }

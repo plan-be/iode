@@ -264,7 +264,7 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
     KDB   *tkdb;
     std::string name;
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(NULL);
     
     tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);

@@ -238,7 +238,7 @@ int B_DataCalcVar(char* arg, int unused)
 {
     char        name[K_MAX_NAME + 1], *lec;
     int         lg, t, nb;
-    KDB         *kdb = KV_WS;
+    KDB         *kdb = KV_WS.get();
     CLEC        *clec = 0;
     double      d;
 
@@ -258,11 +258,11 @@ int B_DataCalcVar(char* arg, int unused)
     if(lec[0]) 
     {
         clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, KS_WS, clec)) 
+        if(clec != 0 && !L_link(kdb, KS_WS.get(), clec)) 
         {
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                d = L_exec(kdb, KS_WS, clec, t);
+                d = L_exec(kdb, KS_WS.get(), clec, t);
                 *(KVVAL(kdb, name, t)) = d;
             }
             SW_nfree(clec);
@@ -292,7 +292,7 @@ int B_DataCreate_1(char* arg, int* ptype)
 {
     int     nb_per;
     char    deflt[41];
-    KDB     *kdb = K_WS[*ptype];
+    KDB     *kdb = get_global_db(*ptype);
 
     std::string name = std::string(arg);
     if(kdb->contains(name)) 
@@ -367,7 +367,7 @@ int B_DataCreate(char* arg, int type)
 int B_DataDelete_1(char* arg, int* ptype)
 {
     std::string name = std::string(arg);
-    KDB* kdb = K_WS[*ptype];
+    KDB* kdb = get_global_db(*ptype);
 
     if(!kdb->contains(name)) 
         return -1;
@@ -434,7 +434,7 @@ int B_DataRename(char* arg, int type)
     if(args == NULL) 
         return(-1);
 
-    bool success = K_WS[type]->rename(std::string(args[0]), std::string(args[1]));
+    bool success = get_global_db(type)->rename(std::string(args[0]), std::string(args[1]));
     if(!success) 
     {
         std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
@@ -463,7 +463,7 @@ int B_DataRename(char* arg, int type)
  int B_DataDuplicate(char* arg, int type)
 {
     char    **args;
-    KDB     *kdb = K_WS[type];
+    KDB     *kdb = get_global_db(type);
 
     if(type == EQUATIONS) 
     {
@@ -522,7 +522,7 @@ int B_DataUpdate(char* arg, int type)
             nb_args, nb_upd, nb_p,
             i, mode;
     double  var;
-    KDB     *kdb = K_WS[type];
+    KDB     *kdb = get_global_db(type);
     Scalar  scl;
     Period  *per = NULL;
     char    name[K_MAX_NAME + 1], **args = NULL;
@@ -674,7 +674,7 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
 {
     int     rc = 0;
     char    **args = NULL, buf[81];
-    KDB     *kdb = K_WS[type];
+    KDB     *kdb = get_global_db(type);
 
     
     if(word == 1) {
@@ -714,7 +714,7 @@ int B_DataSearch(char* arg, int type)
     int     rc = 0, word, ecase, names, forms, texts;
     char    **args = NULL, **lst;
     char    **K_grep();
-    KDB     *kdb = K_WS[type];
+    KDB     *kdb = get_global_db(type);
 
     args = B_vtom_chk(arg, 7); /* pattern list */
     if(args == NULL) return(-1);
@@ -826,7 +826,7 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
     else 
-        lst = KLVAL(KL_WS, in);
+        lst = KLVAL(KL_WS.get(), in);
     
     if(lst == NULL) 
     {
@@ -895,16 +895,16 @@ int B_DataScan(char* arg, int type)
     if(arg == NULL || arg[0] == 0) 
     {
         /* Exo whole WS */
-        return(K_scan(K_WS[type], "_EXO", "_SCAL"));
+        return(K_scan(get_global_db(type), "_EXO", "_SCAL"));
     }
     else 
     {
         objs = B_ainit_chk(arg, NULL, 0);
         if(objs == NULL || SCR_tbl_size((unsigned char**) objs) == 0)
-            return(K_scan(K_WS[type], "_EXO", "_SCAL"));
+            return(K_scan(get_global_db(type), "_EXO", "_SCAL"));
         else 
         {
-            tkdb = K_refer(K_WS[type], SCR_tbl_size((unsigned char**) objs), objs);
+            tkdb = K_refer(get_global_db(type), SCR_tbl_size((unsigned char**) objs), objs);
             if(tkdb == 0 || tkdb->size() == 0)            /* JMP 12-05-11 */
                 rc = -1;                                /* JMP 12-05-11 */
             else                                        /* JMP 12-05-11 */
@@ -936,7 +936,7 @@ int B_DataScan(char* arg, int type)
  */
 int B_DataExist(char* arg, int type)
 {
-    KDB* kdb = K_WS[type];
+    KDB* kdb = get_global_db(type);
     return kdb->contains(std::string(arg));
 }
 
@@ -959,7 +959,7 @@ int B_DataAppend(char* arg, int type)
 {
     bool    success;
     int     lg;
-    KDB     *kdb = K_WS[type];
+    KDB     *kdb = get_global_db(type);
     char    name[K_MAX_NAME + 1], *ptr, *nptr, *text;
 
     switch(type) 
@@ -1023,7 +1023,7 @@ int B_DataList(char* arg, int type)
     int     rc = 0;
     char    **args = NULL, **lst,
             *name, *pattern, *file;
-    KDB*    kdb = new KDB(*K_WS[type]);
+    KDB*    kdb = new KDB(*get_global_db(type));
 
     if((args = B_vtom_chk(arg, 3)) == NULL) 
     {
@@ -1154,8 +1154,8 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS, (char*) list1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS, (char*) list2), NULL, 0);
+    l1 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS.get(), (char*) list1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS.get(), (char*) list2), NULL, 0);
     switch(op[0]) 
     {
     case '+' :
@@ -1193,7 +1193,7 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS, name));
+    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS.get(), name));
     if(lst == NULL) 
         return -1;
 
@@ -1254,7 +1254,7 @@ int B_DataCompare(char* arg, int type)
     char    **args = NULL, *c_name,
             **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
             *file, *one, *two, *three, *fr;
-    KDB*    kdb1 = K_WS[type];
+    KDB*    kdb1 = get_global_db(type);
     KDB*    kdb2 = new KDB((IodeType) type, DB_STANDALONE);
 
     args = B_vtom_chk(arg, 5);
@@ -1277,33 +1277,33 @@ int B_DataCompare(char* arg, int type)
     }
 
     // K_cmp() return codes:
-    //      0 -> if name neither in K_WS[type] nor in file
-    //      1 -> if name in K_WS[type] but not in file
-    //      2 -> if name not in K_WS[type] but in file
-    //      3 -> if name in both K_WS[type] and file, IODE object in K_WS[type] == IODE object in file
-    //      4 -> if name in both K_WS[type] and file, IODE object in K_WS[type] != IODE object in file
+    //      0 -> if name neither in get_global_db(type) nor in file
+    //      1 -> if name in get_global_db(type) but not in file
+    //      2 -> if name not in get_global_db(type) but in file
+    //      3 -> if name in both get_global_db(type) and file, IODE object in get_global_db(type) == IODE object in file
+    //      4 -> if name in both get_global_db(type) and file, IODE object in get_global_db(type) != IODE object in file
     for(i = 0; i < kdb1->size(); i++) 
     {
         c_name = (char*) kdb1->get_name(i).c_str();
         rc = K_cmp(c_name, kdb1, kdb2);
         switch(rc) 
         {
-        // name neither in K_WS[type] nor in file
+        // name neither in get_global_db(type) nor in file
         case 0 :
             break;
-        // name in K_WS[type] but not in file
+        // name in get_global_db(type) but not in file
         case 1 :
             SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) c_name);
             break;
-        // if name not in K_WS[type] but in file
+        // if name not in get_global_db(type) but in file
         case 2 :
             SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
             break;
-        // name in both K_WS[type] and file, IODE object in K_WS[type] == IODE object in file
+        // name in both get_global_db(type) and file, IODE object in get_global_db(type) == IODE object in file
         case 3 :
             SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) c_name);
             break;
-        // name in both K_WS[type] and file, IODE object in K_WS[type] != IODE object in file
+        // name in both get_global_db(type) and file, IODE object in get_global_db(type) != IODE object in file
         case 4 :
             SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) c_name);
             break;

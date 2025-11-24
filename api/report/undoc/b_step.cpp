@@ -37,7 +37,7 @@ static int check_scl_var(char *eqs)
     if(!KE_WS->contains(name)) 
         return -1;
     
-    Equation* eq = KEVAL(KE_WS, name);
+    Equation* eq = KEVAL(KE_WS.get(), name);
     if(!eq) 
         return -1;
 

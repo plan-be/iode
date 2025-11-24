@@ -695,9 +695,13 @@ char *RP_gcmd(char* str)
 int RP_evaltime()
 {
     RP_T = 0;
-    if(RP_PER.year == 0) return(0);
+    if(RP_PER.year == 0) 
+        return(0);
+    
     RP_T = RP_PER.difference(KV_WS->sample->start_period);
-    if(RP_T < 0) return(-3);
+    if(RP_T < 0) 
+        return(-3);
+    
     return(0);
 }
 
@@ -723,8 +727,8 @@ double RP_evallec(char* lec)
             error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
-        if(clec != 0 && !L_link(KV_WS, KS_WS, clec))
-            x = L_exec(KV_WS, KS_WS, clec, RP_T);
+        if(clec != 0 && !L_link(KV_WS.get(), KS_WS.get(), clec))
+            x = L_exec(KV_WS.get(), KS_WS.get(), clec, RP_T);
         SW_nfree(clec);
     }
 

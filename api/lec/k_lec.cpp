@@ -105,6 +105,6 @@ char* L_expand(char* list_name)
     {
         if(!KL_WS->contains(list_name)) 
             return NULL;
-        return KLVAL(KL_WS, list_name);
+        return KLVAL(KL_WS.get(), list_name);
     }    
 }

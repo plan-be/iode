@@ -146,14 +146,14 @@ bool KDBAbstract::rename(const std::string& old_name, const std::string& new_nam
     switch (k_db_type)
     {
     case DB_GLOBAL:
-        success = K_WS[k_type]->rename(old_name, new_name, overwrite);
+        success = get_global_db(k_type)->rename(old_name, new_name, overwrite);
         break;
     case DB_STANDALONE:
         success = kdb->rename(old_name, new_name, overwrite);
         break;
     case 2:
         // first rename in global KDB
-        success = K_WS[k_type]->rename(old_name, new_name, overwrite);
+        success = get_global_db(k_type)->rename(old_name, new_name, overwrite);
         if (!success) 
             break;
         // then rename in local KDB
@@ -181,7 +181,7 @@ void KDBAbstract::remove(const std::string& name)
     switch(k_db_type)
     {
     case DB_GLOBAL:
-        K_WS[k_type]->remove(name);
+        get_global_db(k_type)->remove(name);
         break;
     case DB_STANDALONE:
         kdb->remove(name);
@@ -190,7 +190,7 @@ void KDBAbstract::remove(const std::string& name)
         // first delete in shallow copy KDB
         kdb->remove(name);
         // then delete in global KDB
-        K_WS[k_type]->remove(name);
+        get_global_db(k_type)->remove(name);
         break;
     default:
         throw std::invalid_argument("Cannot remove object named '" + name + "'\n."
@@ -236,7 +236,7 @@ void KDBAbstract::copy_from(const std::string& input_file, const std::string obj
 void KDBAbstract::merge_from(const std::string& input_file)
 {
     KDB* kdb = get_database();
-    if(kdb == NULL) 
+    if(!kdb) 
         return;
 
     // throw an error if the passed filepath is not valid
@@ -282,7 +282,7 @@ std::vector<std::string> KDBAbstract::search(const std::string& pattern, const b
 void KDBAbstract::save(const std::string& filepath, const bool compress)
 {
     KDB* kdb = get_database();
-    if(kdb == NULL) 
+    if(!kdb) 
         return;
 
     if(kdb->size() == 0) 

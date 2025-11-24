@@ -39,7 +39,7 @@ static int E_GetSmpl(Sample* smpl, char* c_name)
     if(!KV_WS->contains(name)) 
         return -1;
     
-    double* val = KVVAL(KV_WS, name, 0);
+    double* val = KVVAL(KV_WS.get(), name, 0);
 
     int t;
     Sample* wsmpl = KV_WS->sample;
@@ -117,7 +117,7 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     if(rc) 
         return(rc);
     
-    Estimation est(eqs, KE_WS, KV_WS, KS_WS, smpl);
+    Estimation est(eqs, KE_WS.get(), KV_WS.get(), KS_WS.get(), smpl);
     rc = est.estimate();
 
     KE_WS->remove("_DF");
@@ -151,8 +151,9 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     double   *res = NULL, *vec;
 
     // Computes the lec formula and stores the result in the VAR _DF
-    vec = L_cc_link_exec(lec, KV_WS, KS_WS);
-    if(vec == NULL) return(NULL);
+    vec = L_cc_link_exec(lec, KV_WS.get(), KS_WS.get());
+    if(vec == NULL) 
+        return(NULL);
     strcpy(varname, "_DF");
     Sample* var_sample = KV_WS->sample;
     if(!var_sample) 
@@ -258,7 +259,7 @@ void E_SclToReal(char* name, double* res)
     if(!KS_WS->contains(name))
         return;
 
-    Scalar* scl = KSVAL(KS_WS, name);
+    Scalar* scl = KSVAL(KS_WS.get(), name);
     res[0] = scl->value;
     res[1] = scl->std;
     if(!IODE_IS_0(scl->std)) 

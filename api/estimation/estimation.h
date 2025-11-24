@@ -297,9 +297,9 @@ private:
             throw std::invalid_argument("Max iterations must be greater than 0");
         E_MAXIT = maxit;
 
-        E_DBE  = (dbe != NULL) ? dbe : KE_WS;
-        E_DBV  = (dbv != NULL) ? dbv : KV_WS;
-        E_DBS  = (dbs != NULL) ? dbs : KS_WS;
+        E_DBE  = (dbe != NULL) ? dbe : KE_WS.get();
+        E_DBV  = (dbv != NULL) ? dbv : KV_WS.get();
+        E_DBS  = (dbs != NULL) ? dbs : KS_WS.get();
 
         if(smpl != nullptr)
             est_smpl = *smpl;

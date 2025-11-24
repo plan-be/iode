@@ -301,9 +301,9 @@ Variables and functions for initializing and cleaning up the "in memory" workspa
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *K_WS[7]`|Table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)|
-|`void K_init_ws(int ws)`|Initialises the "in mem" KDB structures and optionaly loads the ws.\* files|
-|`void K_end_ws(int ws)`|Deletes the current workspaces defined in K\_WS\[\] and their content after having optionaly saved their content in ws.\* files.|
+|`KDB* get_global_db(const int iode_type)`|returns the global database corresponding to the IODE type i|
+|`void K_init_ws(int ws)`|sets the filename of all global databases to I_DEFAULT_FILENAME|
+|`void K_end_ws(int ws)`|saves content of all global databases|
 |`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSample (print tables and graphs)|
 
 ### k\_wsvar.c {#T23}

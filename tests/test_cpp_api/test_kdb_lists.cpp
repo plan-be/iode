@@ -26,25 +26,24 @@ TEST_F(KDBListsTest, Subset)
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
 
     // GLOBAL KDB
-    KDBLists kdb_global;
-    EXPECT_EQ(kdb_global.size(), 17);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Lists.size(), 17);
+    EXPECT_TRUE(Lists.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBLists* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBLists* kdb_subset_deep_copy = Lists.subset(pattern, true);
+    std::vector<std::string> names = Lists.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("COPY", new_list);
-    EXPECT_EQ(kdb_global.get("COPY"), list);
+    EXPECT_EQ(Lists.get("COPY"), list);
     EXPECT_EQ(kdb_subset_deep_copy->get("COPY"), new_list);
 
     // SHALLOW COPY SUBSET
-    KDBLists* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBLists* kdb_subset_shallow_copy = Lists.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("COPY", new_list);
-    EXPECT_EQ(kdb_global.get("COPY"), new_list);
+    EXPECT_EQ(Lists.get("COPY"), new_list);
     EXPECT_EQ(kdb_subset_shallow_copy->get("COPY"), new_list);
 }
 

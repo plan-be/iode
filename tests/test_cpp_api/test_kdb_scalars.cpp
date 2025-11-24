@@ -29,25 +29,24 @@ TEST_F(KDBScalarsTest, Subset)
     Scalar* new_scalar = new Scalar(value, relax, std);
 
     // GLOBAL KDB
-    KDBScalars kdb_global;
-    EXPECT_EQ(kdb_global.size(), 161);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Scalars.size(), 161);
+    EXPECT_TRUE(Scalars.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBScalars* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBScalars* kdb_subset_deep_copy = Scalars.subset(pattern, true);
+    std::vector<std::string> names = Scalars.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("acaf1", value, relax, std);
-    EXPECT_EQ(*kdb_global.get("acaf1"), *scalar);
+    EXPECT_EQ(*Scalars.get("acaf1"), *scalar);
     EXPECT_EQ(*kdb_subset_deep_copy->get("acaf1"), *new_scalar);
 
     // SHALLOW COPY SUBSET
-    KDBScalars* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBScalars* kdb_subset_shallow_copy = Scalars.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("acaf1", value, relax, std);
-    EXPECT_EQ(*kdb_global.get("acaf1"), *new_scalar);
+    EXPECT_EQ(*Scalars.get("acaf1"), *new_scalar);
     EXPECT_EQ(*kdb_subset_shallow_copy->get("acaf1"), *new_scalar);
 
     delete new_scalar;

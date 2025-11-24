@@ -83,12 +83,12 @@ int B_EqsEstimateEqs(Sample* smpl, char** eqs)
     }
     else 
     {
-        dbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
+        dbe = K_refer(KE_WS.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
         if(dbe == 0 || dbe->size() == 0)                                       
             rc = -1;                                                          
         else
         {
-            Estimation est(eqs, dbe, KV_WS, KS_WS, smpl);
+            Estimation est(eqs, dbe, KV_WS.get(), KS_WS.get(), smpl);
             rc = est.estimate();
         }
 

@@ -97,17 +97,17 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
 
     if(idts == NULL || SCR_tbl_size((unsigned char**) idts) == 0)
     {
-        kdb_var = KI_exec(KI_WS,
-                          KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+        kdb_var = KI_exec(KI_WS.get(),
+                          KV_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          KS_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }
     else 
     {
-        kdb_idt = K_refer(KI_WS, SCR_tbl_size((unsigned char**) idts), idts);
+        kdb_idt = K_refer(KI_WS.get(), SCR_tbl_size((unsigned char**) idts), idts);
         kdb_var = KI_exec(kdb_idt,
-                          KV_WS, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          KS_WS, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+                          KV_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          KS_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
         delete kdb_idt;
         kdb_idt = nullptr;
@@ -130,10 +130,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
     
     KV_sample(kdb_var, smpl);
 
-    if(KV_WS) 
-        KV_merge_del(KV_WS, kdb_var, 1);
-    else 
-        KV_WS = kdb_var;
+    if(KV_WS.get()) 
+        KV_merge_del(KV_WS.get(), kdb_var, 1);
+    else
+        KV_WS.reset(kdb_var);
 
     return 0;
 }

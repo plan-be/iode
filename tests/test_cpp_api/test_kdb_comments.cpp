@@ -26,25 +26,24 @@ TEST_F(KDBCommentsTest, Subset)
     std::string modified = "modified";
 
     // GLOBAL KDB
-    KDBComments kdb_global;
-    EXPECT_EQ(kdb_global.size(), 317);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Comments.size(), 317);
+    EXPECT_TRUE(Comments.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBComments* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBComments* kdb_subset_deep_copy = Comments.subset(pattern, true);
+    std::vector<std::string> names = Comments.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", modified);
-    EXPECT_EQ(kdb_global.get("ACAF"), comment);
+    EXPECT_EQ(Comments.get("ACAF"), comment);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), modified);
 
     // SHALLOW COPY SUBSET
-    KDBComments* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBComments* kdb_subset_shallow_copy = Comments.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", modified);
-    EXPECT_EQ(kdb_global.get("ACAF"), modified);
+    EXPECT_EQ(Comments.get("ACAF"), modified);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), modified);
 }
 

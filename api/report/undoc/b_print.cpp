@@ -284,7 +284,7 @@ int B_PrintObjDef_1(char* arg, int* type)
     KDB     *kdb;
     int     pos, rc = 0;
 
-    kdb = K_WS[*type];
+    kdb = get_global_db(*type);
     std::string name = std::string(arg);
     pos = kdb->index_of(name);
     if(pos < 0) 
@@ -391,7 +391,7 @@ int B_PrintObjDefArgs(char* arg, int type)
 
     kmsg("Printing IODE objects definition to file '%s'...", W_filename);
     if(arg == 0 || arg[0] == 0)
-        for(const auto& [name, _] : K_WS[type]->k_objs) 
+        for(const auto& [name, _] : get_global_db(type)->k_objs) 
         {
             rc = B_PrintObjDef_1((char*) name.c_str(), &type);
             if(rc) break;
@@ -656,7 +656,7 @@ int B_PrintLec(std::string& name, char* eqlec, CLEC* eqclec, int coefs)
         {
             if(KS_WS->contains(sname)) 
             {
-                scl = KSVAL(KS_WS, sname);
+                scl = KSVAL(KS_WS.get(), sname);
                 // T_fmt_val(tcoef, scl->value, 9, -1); /* JMP 27-10-08 */
                 // T_fmt_val(ttest, B_calc_ttest(scl), 9, -1); /* JMP 27-10-08 */
                 T_fmt_val(tcoef, scl->value, 15, K_NBDEC);           // JMP 18-04-2022
@@ -749,7 +749,7 @@ int B_PrintEqs(std::string& name, Equation* eq)
                 if(!KS_WS->contains(sname))
                     B_PrintDefSclPtr(0L, sname, 3);
                 else
-                    B_PrintDefSclPtr(KSVAL(KS_WS, sname), sname,3);
+                    B_PrintDefSclPtr(KSVAL(KS_WS.get(), sname), sname,3);
             }
         }
         SW_nfree(clec);

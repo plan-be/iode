@@ -113,8 +113,8 @@ void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
     sprintf(varname, "%s%d", name, eqnb);
     
     // create varname with NaN 
-    KV_add(KV_WS, varname);
-    double* var = KVVAL(KV_WS, varname);
+    KV_add(KV_WS.get(), varname);
+    double* var = KVVAL(KV_WS.get(), varname);
     if(var == NULL) 
         return;
     
@@ -279,7 +279,7 @@ int Estimation::KE_est_s(Sample* smpl)
                     goto err;
                 }
 
-                _lec = KELEC(KE_WS, eq_name);
+                _lec = KELEC(KE_WS.get(), eq_name);
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
             }

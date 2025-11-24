@@ -5,23 +5,17 @@
  *
  * Globals
  * -------
- *    - K_WS = table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)
- *      - K_WS[0] : C=comments 
- *      - K_WS[1] : E=equations
- *      - ...
- *  
- *    - K_RWS = table of max 5 KDB* per object type, used for ws comparison, for printing...
- *      Only used for Vars at the moment (print vars, print tables with comparison)
- *      - K_RWS[6][0] = first WS of VARS for comparison (ws)  
- *      - K_RWS[6][1] = second WS of VARS for comparison (file 1)
- *      - ...
- *    - K_PWS =  table of "current" K_RWS number. Set to 0 and never used (yet).
+ * K_RWS = table of max 5 KDB* per object type, used for ws comparison, for printing...
+ * Only used for Vars at the moment (print vars, print tables with comparison)
+ *     - K_RWS[6][0] = first WS of VARS for comparison (ws)  
+ *     - K_RWS[6][1] = second WS of VARS for comparison (file 1)
+ *     - ...
  *
  * 
  * Functions
  * ---------
- *      - void K_init_ws(int ws)                    Initialises the "in mem" KDB structures and optionnaly loads the ws.* files
- *      - void K_end_ws(int ws)                     Deletes the current workspaces defined in K_WS[] and their content after having optionnaly 
+ *      - void K_init_ws(int ws)                    Initialises the "in mem" KDB structures and optionally loads the ws.* files
+ *      - void K_end_ws(int ws)                     Deletes the global workspaces and their content after having optionally 
  *                                                  saved their content in ws.* files.
  *      - int K_load_RWS(int ref, char *filename)   Load a VAR file for use in GSample (print tables and graphs)
  */
@@ -31,58 +25,22 @@
 
 
 /**
- *  @brief Initialises the "in mem" KDB structures adn optional loads the ws.* files. 
- *  
- *  If ws is not NULL, the files I_DEFAULT_FILENAME.* (default "ws.*"), 
- *      if they are found in the current dir, are loaded as initial values for the in memory KDBs.
- *  If ws is NULL, the KDB are left empty.
- *  
- *  @param [in] ws  int     indicates if the files ws.ac, ws.ae..., ws.av must be loaded as initial values for the KDB in memory
+ *  @brief If ws is not null, set I_DEFAULT_FILENAME as the filename 
+ *  for each of the global workspaces
  */
- 
 void K_init_ws(int ws)
 {
-    int     i;
-
-    memset(K_RWS, 0, sizeof(K_RWS));
-    for(i = 0 ; i < 7 ; i++) 
-    {
-        K_WS[i] = new KDB((IodeType) i, DB_GLOBAL);
-        K_RWS[i][0] = new KDB((IodeType) i, DB_STANDALONE);
-        if(ws) K_cat(K_WS[i], I_DEFAULT_FILENAME);
-    }
+    for(int i = 0; i < IODE_NB_TYPES; i++) 
+        if(ws) K_cat(get_global_db(i), I_DEFAULT_FILENAME);
 }
 
-
 /**
- *  @brief Deletes the current workspaces defined in K_WS[] and their content after having optionnaly saved their content in ws.* files.
- *  
- *  If ws is not null, saves first the KDBs in 7 files ws.cmt, ws.eqs...ws.var before cleaning up.
- *  
- *  @param [in] ws int  if 1, saves the KDB on disk in the file defined in kdb->filepath.
- *  
+ *  @brief If ws is not null, saves the KDBs in files ws.cmt, ws.eqs...ws.var 
  */
 void K_end_ws(int ws)
 {
-    int i, j;
-
-    for(i = 0; i < 7; i++) 
-    {
-        if(ws) K_save_ws(K_WS[i]);
-
-        if(K_WS[i]) 
-        {
-            delete K_WS[i];
-            K_WS[i] = nullptr;
-        }
-        
-        for(j = 0; K_RWS[i][j]; j ++) 
-        {
-            if(K_RWS[i][j])
-                delete K_RWS[i][j];
-            K_RWS[i][j] = nullptr;
-        }
-    }
+    for(int i = 0; i < IODE_NB_TYPES; i++)
+        if(ws) K_save_ws(get_global_db(i));
 }
 
 
