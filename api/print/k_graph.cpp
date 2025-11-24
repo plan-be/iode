@@ -43,7 +43,7 @@
 int T_GraphTest(Table *tbl)
 {
     char    gsmpl[20];
-    Sample  *smpl = KV_WS->sample;
+    Sample  *smpl = global_ws_var->sample;
     if(!smpl) 
         return -1;
 
@@ -622,7 +622,7 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
     //int old_mode = global_VM, rc;
 
     //global_VM = mode;
-    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, KV_WS.get(), names, mode); // JMP 8/8//2022
+    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var.get(), names, mode); // JMP 8/8//2022
 
     //global_VM = old_mode;
     return(rc);

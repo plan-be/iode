@@ -4,7 +4,7 @@
  *  Estimation functions. 
  *  These functions do not save the results in the equations 
  *  themselves: it is the role of the upper level function KE_est_s() that 
- *  calls E_est() and saves the results in KE_WS and KS_WS.
+ *  calls E_est() and saves the results in global_ws_eqs and global_ws_scl.
  *  
  *  See "Specification, Estimation and Analysis of Macroeconomic Models" [Fair, 1984]
  *  for details on the methods implemented in IODE.

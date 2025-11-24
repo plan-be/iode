@@ -470,7 +470,7 @@ void kbeep()
 /**
  *  Asks the user to give a Sample (GUI only).
  *  
- *  The default behaviour is to return the sample of KV_WS or NULL is KV_WS is NULL
+ *  The default behaviour is to return the sample of global_ws_var or NULL is global_ws_var is NULL
  *  
  *  If the function pointer kasksmpl_super is not null, it is called instead.
  */
@@ -480,8 +480,8 @@ Sample* kasksmpl()
     if(kasksmpl_super) 
         return((*kasksmpl_super)());
     
-    if(KV_WS.get())
-        return KV_WS->sample;
+    if(global_ws_var.get())
+        return global_ws_var->sample;
     else 
         return nullptr;
 }
@@ -563,10 +563,10 @@ int kshellexec(const char *arg)
  */
 char* A_expand_super_API(char* name)
 {
-    if(!KL_WS->contains(name)) 
+    if(!global_ws_lst->contains(name)) 
         return NULL;
     
-    return KLVAL(KL_WS.get(), name);
+    return KLVAL(global_ws_lst.get(), name);
 }
 
 

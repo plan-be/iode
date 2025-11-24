@@ -71,7 +71,7 @@ struct std::hash<Scalar>
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> KS_WS = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_scl = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
 
 /*----------------------- FUNCTIONS ----------------------------*/
 

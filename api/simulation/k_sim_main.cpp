@@ -385,7 +385,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 
     // Delete lst 
     std::string name = std::string(lst);
-    KL_WS->remove(name);
+    global_ws_lst->remove(name);
     
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
     {
@@ -418,7 +418,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
     }
     
     if(diverg) 
-        KL_WS->add(lst, diverg);
+        global_ws_lst->add(lst, diverg);
     return(0);
 }
 
@@ -511,7 +511,7 @@ int CSimulation::K_simul_1(int t)
  *  
  *  The algorithm used to solve the model for one period is Gauss-Seidel or a secant method.
  *  
- *  @param [in] KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
+ *  @param [in] KDB*    dbe         global_ws_eqs or subset of global_ws_eqs containing all the model equations
  *  @param [in] KDB*    dbv         KDB containing the model variables (endo + exo)
  *  @param [in] KDB*    dbs         KDB containing the model scalars
  *  @param [in] Sample* smpl        simulation Sample
@@ -717,7 +717,7 @@ fin:
  *  
  *  If no solution can be found, the function kerror() is called to display an error message
  *  
- *  @param [in] int         eqnb    position of the equation in KSIM_DBE (the model KDB = subset of KE_WS)
+ *  @param [in] int         eqnb    position of the equation in KSIM_DBE (the model KDB = subset of global_ws_eqs)
  *  @param [in] int         t       index of the period to be calculated
  *  @param [in] int         varnb   position of the variable to calculate in the global KV_DB
  *  @param [in] int         msg     indicated if the function kerror() must be called on error (no solution found)
@@ -783,7 +783,7 @@ void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
     {
         tbl_todel = SCR_vtom(lst_todel, ';');
         for(i = 0; tbl_todel[i] ; i++)
-            KL_WS->remove(std::string((char*) tbl_todel[i]));
+            global_ws_lst->remove(std::string((char*) tbl_todel[i]));
     }
     SCR_free(lst_todel);
     SCR_free_tbl(tbl_todel);

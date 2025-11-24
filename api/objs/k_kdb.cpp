@@ -9,7 +9,7 @@
  *
  * For each IODE object type, there is one KDB (also called "workspace") in memory. 
  * 
- * To simplify the use of these structs, some MACRO have been defined for KDB in iode.h: for example "KV_WS" for the KDB of variables...
+ * To simplify the use of these structs, some MACRO have been defined for KDB in iode.h: for example "global_ws_var" for the KDB of variables...
  *
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
@@ -44,19 +44,19 @@ KDB* get_global_db(const int iode_type)
     switch(iode_type)
     {
         case COMMENTS :
-            return KC_WS.get();
+            return global_ws_cmt.get();
         case EQUATIONS :
-            return KE_WS.get();
+            return global_ws_eqs.get();
         case IDENTITIES :
-            return KI_WS.get();
+            return global_ws_idt.get();
         case LISTS :
-            return KL_WS.get();
+            return global_ws_lst.get();
         case SCALARS :
-            return KS_WS.get();
+            return global_ws_scl.get();
         case TABLES :
-            return KT_WS.get();
+            return global_ws_tbl.get();
         case VARIABLES :
-            return KV_WS.get();
+            return global_ws_var.get();
         default :
             return nullptr;
     }

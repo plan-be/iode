@@ -654,9 +654,9 @@ int B_PrintLec(std::string& name, char* eqlec, CLEC* eqclec, int coefs)
         buf[0] = 0;
         if(coefs && is_coefficient(sname)) 
         {
-            if(KS_WS->contains(sname)) 
+            if(global_ws_scl->contains(sname)) 
             {
-                scl = KSVAL(KS_WS.get(), sname);
+                scl = KSVAL(global_ws_scl.get(), sname);
                 // T_fmt_val(tcoef, scl->value, 9, -1); /* JMP 27-10-08 */
                 // T_fmt_val(ttest, B_calc_ttest(scl), 9, -1); /* JMP 27-10-08 */
                 T_fmt_val(tcoef, scl->value, 15, K_NBDEC);           // JMP 18-04-2022
@@ -746,10 +746,10 @@ int B_PrintEqs(std::string& name, Equation* eq)
             sname = std::string(clec->lnames[j].name);
             if(is_coefficient(sname)) 
             {
-                if(!KS_WS->contains(sname))
+                if(!global_ws_scl->contains(sname))
                     B_PrintDefSclPtr(0L, sname, 3);
                 else
-                    B_PrintDefSclPtr(KSVAL(KS_WS.get(), sname), sname,3);
+                    B_PrintDefSclPtr(KSVAL(global_ws_scl.get(), sname), sname,3);
             }
         }
         SW_nfree(clec);

@@ -6,15 +6,15 @@
  *    int KV_sample(KDB *kdb, Sample *new_sample)                                  Changes the Sample of a KDB of variables.
  *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(KDB* kdb, char* varname)                                               Adds a new variable in KV_WS. Fills it with IODE_NAN.
+ *    int KV_add(KDB* kdb, char* varname)                                               Adds a new variable in global_ws_var. Fills it with IODE_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
  *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)     Extrapolates variables on a selected Sample according to one of the available methods.
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(double* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
- *    int KV_per_pos(Period* per2)                                            Retrieves the position of a Period in the current KV_WS sample.
- *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current KV_WS sample.  
+ *    int KV_per_pos(Period* per2)                                            Retrieves the position of a Period in the current global_ws_var sample.
+ *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current global_ws_var sample.  
  *    double KV_get_at_t(char*varname, int t)                                 Retrieves the value of varname[t] 
  *    double KV_get_at_per(char*varname, Period* per)                         Retrieves the value of varname[per] 
  *    double KV_get_at_aper(char*varname, char* aper)                         Retrieves the value of varname[aper]
@@ -227,7 +227,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 
 
 /**
- *  Adds a new variable in KV_WS. Fills it with IODE_NAN.
+ *  Adds a new variable in global_ws_var. Fills it with IODE_NAN.
  *  If the variable already exists, replaces all values by IODE_NAN.
  *  
  *  @param [in] kdb     KDB*        KDB of variables
@@ -643,7 +643,7 @@ done:
 
 
 /**
- *  Retrieves the position of a Period in the current KV_WS sample.
+ *  Retrieves the position of a Period in the current global_ws_var sample.
  *  
  *  @param [in] Period* per2    Period whose position is searched
  *  @return     int             position in the current WS sample (starting at 0)
@@ -652,17 +652,17 @@ done:
  
 int KV_per_pos(Period* per2)
 {   
-    if(!KV_WS.get()) 
+    if(!global_ws_var.get()) 
         return(-1);
     
-    Sample* smpl = KV_WS->sample;
+    Sample* smpl = global_ws_var->sample;
     int diff = per2->difference(smpl->start_period);
     return(diff);
 }
 
 
 /**
- *  Retrieves the position of a period in text format in the current KV_WS sample.
+ *  Retrieves the position of a period in text format in the current global_ws_var sample.
  *  
  *  Example : 
  *      Let the current sample be 2000Y1 2020Y1
@@ -688,7 +688,7 @@ int KV_aper_pos(char* aper2)
 
 
 /**
- *  Retrieves the value of varname[t] in the current KV_WS.
+ *  Retrieves the value of varname[t] in the current global_ws_var.
  *  
  *  Example : 
  *      KV_get_at_t("A", 2) => retrieves A[2]
@@ -703,17 +703,17 @@ int KV_aper_pos(char* aper2)
  
 double KV_get_at_t(char*varname, int t)
 {
-    double* var_ptr = KVVAL(KV_WS.get(), varname);
+    double* var_ptr = KVVAL(global_ws_var.get(), varname);
     if(var_ptr == NULL) 
         return(IODE_NAN);
     
-    if(t < 0 || KV_WS->sample->nb_periods < t) 
+    if(t < 0 || global_ws_var->sample->nb_periods < t) 
         return IODE_NAN;
     return(var_ptr[t]);
 }
 
 /**
- *  Retrieves the value of varname[per] in the current KV_WS.
+ *  Retrieves the value of varname[per] in the current global_ws_var.
  *  
  *  Example : 
  *      KV_get_at_aper("A", "2002Y1")
@@ -736,7 +736,7 @@ double KV_get_at_per(char*varname, Period* per)
 
 
 /**
- *  Retrieves the value of varname[aper] in the current KV_WS.
+ *  Retrieves the value of varname[aper] in the current global_ws_var.
  *  
  *  Example : 
  *      KV_get_at_aper("A", "2002Y1")
@@ -773,11 +773,11 @@ double KV_get_at_aper(char*varname, char* aper)
 
 int KV_set_at_t(char*varname, int t, double val)
 {
-    double* var_ptr = KVVAL(KV_WS.get(), varname);
+    double* var_ptr = KVVAL(global_ws_var.get(), varname);
     if(var_ptr == NULL) 
         return(-1);
 
-    if(t < 0 || KV_WS->sample->nb_periods < t) 
+    if(t < 0 || global_ws_var->sample->nb_periods < t) 
         return(-1);
     
     var_ptr[t] = val;

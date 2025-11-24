@@ -347,7 +347,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    res = LTOH_smpl(from->sample, KV_WS->sample, &t_smpl, &skip, &shift);
+    res = LTOH_smpl(from->sample, global_ws_var->sample, &t_smpl, &skip, &shift);
     if(res < 0) 
     {
         rc = -1;
@@ -395,7 +395,7 @@ static int B_ltoh(int type, char* arg)
         nb = t_smpl->nb_periods;
         to->add(from_name, t_vec, nb);
     }
-    KV_merge(KV_WS.get(), to, 1);
+    KV_merge(global_ws_var.get(), to, 1);
 
 done:
     if(to)

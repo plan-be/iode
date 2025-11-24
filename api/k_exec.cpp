@@ -30,10 +30,10 @@
  *  in a set of external files. 
  *  
  *  In the example above, the variables X, Y and C, and the scalar alpha, are needed to perform the calculation. 
- *  If no information on external files are given, X, Y and C are searched in the current KV_WS and alpha in the KS_WS.
+ *  If no information on external files are given, X, Y and C are searched in the current global_ws_var and alpha in the global_ws_scl.
  *  If one of them cannot be found, the process stops.
  *  
- *  If these objects are not present in KV_WS / KS_WS, the user must thus provide one or more source files. 
+ *  If these objects are not present in global_ws_var / global_ws_scl, the user must thus provide one or more source files. 
  *  Note the order in which these files are specified is important because as soon as an object is found, 
  *  it is not searched in the following files.
  *  
@@ -492,7 +492,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
  *  
  *  @param [in] KDB*    dbi         identities to be calculated
  *  @param [in] KDB*    dbv         list of series needed to calculate the identities in dbi
- *  @param [in] KDB*    dbv_ws      current VAR KDB (KV_WS)
+ *  @param [in] KDB*    dbv_ws      current VAR KDB (global_ws_var)
  *  @param [in] int     nb          Number of VAR input files
  *  @param [in] char*   files[]     list of input VAR files, including "WS" for the current KDB of VARs 
  *                                  if nb == 0, the needed VARs are read from dbv_ws
@@ -506,7 +506,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 
     if(nb == 0) 
     {
-        // No filename given => read in dbv_ws (normally KV_WS)
+        // No filename given => read in dbv_ws (normally global_ws_var)
         nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
         if(nbf < 0)
             return -1;
@@ -674,7 +674,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
  *  For the Scalars to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
  *  
  *  @param [in] KDB*    dbs         Scalars to be read
- *  @param [in] KDB*    dbs_ws      current Scalar KDB (KS_WS)
+ *  @param [in] KDB*    dbs_ws      current Scalar KDB (global_ws_scl)
  *  @param [in] int     nb          Number of Scalar input files
  *  @param [in] char*   files[]     list of input Scalar files, including "WS" for the current KDB of Scalars 
  *                                  if nb == 0, the needed Scalars are read from dbs_ws
@@ -802,7 +802,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     int     *order;
     int     res;
 
-    Sample* var_sample = KV_WS->sample;
+    Sample* var_sample = global_ws_var->sample;
     Sample* exec_sample = nullptr; 
     if(in_smpl)
         exec_sample = new Sample(*in_smpl);

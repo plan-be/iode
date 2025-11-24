@@ -282,7 +282,7 @@ public:
          
         if(from.empty() || to.empty())
         {
-            Sample* c_vars_sample = KV_WS->sample;
+            Sample* c_vars_sample = global_ws_var->sample;
             if(c_vars_sample == NULL || c_vars_sample->nb_periods == 0)
             {
                 this->sample.nb_periods = 0;
@@ -415,8 +415,8 @@ public:
             {
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
                 // see add() and K_spack()
-                if (!KS_WS->contains(coeff_name)) 
-                    KS_WS->add(coeff_name, (char*) NULL);
+                if (!global_ws_scl->contains(coeff_name)) 
+                    global_ws_scl->add(coeff_name, (char*) NULL);
             }
         }
 
@@ -430,7 +430,7 @@ public:
         // create variables not yet present in the Variables Database
         if(create_if_not_exit)
         {
-            Sample* sample = KV_WS->sample;
+            Sample* sample = global_ws_var->sample;
             if(sample == NULL || sample->nb_periods == 0)
                 throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
@@ -439,8 +439,8 @@ public:
             {
                 // adds a new variable with nb_obs IODE_NAN values to the Variables Database
                 // see add() and K_vpack()
-                if (!KV_WS->contains(var_name)) 
-                    KV_WS->add(var_name, (double*) NULL, nb_obs);
+                if (!global_ws_var->contains(var_name)) 
+                    global_ws_var->add(var_name, (double*) NULL, nb_obs);
             }
         }
 
@@ -532,7 +532,7 @@ inline std::size_t hash_value(const Equation& equation)
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> KE_WS = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_eqs = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
 
 /*----------------------- FUNCS ----------------------------*/
 

@@ -238,7 +238,7 @@ int B_DataCalcVar(char* arg, int unused)
 {
     char        name[K_MAX_NAME + 1], *lec;
     int         lg, t, nb;
-    KDB         *kdb = KV_WS.get();
+    KDB         *kdb = global_ws_var.get();
     CLEC        *clec = 0;
     double      d;
 
@@ -258,11 +258,11 @@ int B_DataCalcVar(char* arg, int unused)
     if(lec[0]) 
     {
         clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, KS_WS.get(), clec)) 
+        if(clec != 0 && !L_link(kdb, global_ws_scl.get(), clec)) 
         {
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                d = L_exec(kdb, KS_WS.get(), clec, t);
+                d = L_exec(kdb, global_ws_scl.get(), clec, t);
                 *(KVVAL(kdb, name, t)) = d;
             }
             SW_nfree(clec);
@@ -818,7 +818,7 @@ int B_DataListSort(char* arg, int unused)
         out = args[1];
     }
 
-    if(!KL_WS->contains(in)) 
+    if(!global_ws_lst->contains(in)) 
     {
         error_manager.append_error("List '" + std::string(args[0]) + 
                                    "' not found in the Lists workspace");
@@ -826,7 +826,7 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
     else 
-        lst = KLVAL(KL_WS.get(), in);
+        lst = KLVAL(global_ws_lst.get(), in);
     
     if(lst == NULL) 
     {
@@ -850,7 +850,7 @@ int B_DataListSort(char* arg, int unused)
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
-    if(!KL_WS->add(out, lst)) 
+    if(!global_ws_lst->add(out, lst)) 
     {
         error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
@@ -1136,7 +1136,7 @@ int B_DataCalcLst(char* arg, int unused)
     op    = args[2];
     list2 = args[3];
 
-    if(!KL_WS->contains((char*) list1))
+    if(!global_ws_lst->contains((char*) list1))
     {
         std::string error_msg = "List '" + std::string((char*) list1);
         error_msg += "' not found in the Lists workspace";
@@ -1145,7 +1145,7 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    if(!KL_WS->contains((char*) list2))
+    if(!global_ws_lst->contains((char*) list2))
     {
         std::string error_msg = "List '" + std::string((char*) list2);
         error_msg += "' not found in the Lists workspace";
@@ -1154,8 +1154,8 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS.get(), (char*) list1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(KLVAL(KL_WS.get(), (char*) list2), NULL, 0);
+    l1 = (unsigned char**) B_ainit_chk(KLVAL(global_ws_lst.get(), (char*) list1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(KLVAL(global_ws_lst.get(), (char*) list2), NULL, 0);
     switch(op[0]) 
     {
     case '+' :
@@ -1193,7 +1193,7 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(KL_WS.get(), name));
+    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(global_ws_lst.get(), name));
     if(lst == NULL) 
         return -1;
 

@@ -127,7 +127,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    res = HTOL_smpl(from->sample, KV_WS->sample, &t_smpl, &skip, &shift); 
+    res = HTOL_smpl(from->sample, global_ws_var->sample, &t_smpl, &skip, &shift); 
     if(res < 0) 
     {
         rc = -1;
@@ -187,7 +187,7 @@ static int B_htol(int method, char* arg)
         to->add(from_name, t_vec, nb);
     }
 
-    KV_merge(KV_WS.get(), to, 1);
+    KV_merge(global_ws_var.get(), to, 1);
 
 done:
     if(to)
@@ -211,7 +211,7 @@ done:
 }
 
 
-// Same function but acting on kdb instead of file and KV_WS (for pyiode - larray)
+// Same function but acting on kdb instead of file and global_ws_var (for pyiode - larray)
 // !!! NOT TESTED !!!
 KDB* B_htol_kdb(int method, KDB* kdb_from)
 {

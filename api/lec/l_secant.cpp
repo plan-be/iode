@@ -25,7 +25,7 @@ static KDB     *LN_DBV, *LN_DBS;    // Current KDB of vars and scalars
 /**
  *  Computes the value of f(x) in time t where:
  *      f is a the LEC expression compiled in LN_CLEC
- *      x is a variable (in position LN_VARNB in KV_WS) present in the LEC expression
+ *      x is a variable (in position LN_VARNB in global_ws_var) present in the LEC expression
  *      t is the position of the computation period (0 for the 1st period of the KDB LN_DBV sample)
  *  
  *  @param   [in]   double  x   value for which the expression must be calculated

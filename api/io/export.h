@@ -40,7 +40,7 @@ struct ExportToFile {
         *code = (char*) SCR_stracpy((unsigned char*) oname);
         return *code;
     }
-    virtual char* extract_comment(KDB*, char*, char**) { return 0; }                                // method to create the output object comment (if it exists in KC_WS) + the separator for the output file
+    virtual char* extract_comment(KDB*, char*, char**) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
     virtual char* get_variable_value(KDB*, int, int, char**){ return 0; }                           // method constructing an allocated string of one value + sep
     virtual int   write_variable_and_comment(ExportToFile*, char*, char*, char*) { return 0; }      // method saving the VAR and CMT in the output file
     virtual int   close(ExportToFile*, KDB*, KDB*, char*) { return 0; }                             // method that closes the output file after having written its footer

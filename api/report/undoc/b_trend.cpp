@@ -82,7 +82,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    res = HP_smpl(from->sample, KV_WS->sample, &t_smpl, &shift);
+    res = HP_smpl(from->sample, global_ws_var->sample, &t_smpl, &shift);
     if(res < 0) 
         goto done;
 
@@ -106,7 +106,7 @@ static int B_WsTrendAll(char* arg, int std)
         to->add(from_name, t_vec, nb);
     }
 
-    KV_merge(KV_WS.get(), to, 1);
+    KV_merge(global_ws_var.get(), to, 1);
 
 done:
     if(to)

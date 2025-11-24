@@ -170,7 +170,7 @@ static int K_cmpvar_1(double v1, double v2)
 int K_cmp_var(VAR var1, VAR var2)
 {
     int i;
-    int nb = KV_WS->sample->nb_periods;
+    int nb = global_ws_var->sample->nb_periods;
 
     for(i = 0 ; i < nb ; i++)
         if(K_cmpvar_1(var1[i], var2[i])) 
@@ -194,7 +194,7 @@ int K_cmp_var(VAR var1, VAR var2)
 static int K_cmpvar(char* p1, char* p2, char* name)
 {
     double *r1, *r2;
-    int     i, nb = KV_WS->sample->nb_periods;
+    int     i, nb = global_ws_var->sample->nb_periods;
 
     r1 = (double*) P_get_ptr(p1, 0);
     r2 = (double*) P_get_ptr(p2, 0);

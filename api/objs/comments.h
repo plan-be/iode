@@ -12,7 +12,7 @@ using CMT = char*;
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> KC_WS = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_cmt = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
 
 /*----------------------- MACROS ----------------------------*/
 

@@ -180,13 +180,13 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     int rc;
 
     std::string name = std::string(c_name);
-    if(!KT_WS->contains(name)) 
+    if(!global_ws_tbl->contains(name)) 
     {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
         return(-1);
     }
 
-    Table* tbl = KTVAL(KT_WS.get(), name);
+    Table* tbl = KTVAL(global_ws_tbl.get(), name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
     else
@@ -230,14 +230,14 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             W_InitDisplay();
 
         name = std::string(tbls[i]);
-        if(!KT_WS->contains(name)) 
+        if(!global_ws_tbl->contains(name)) 
         {
             error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");
             rc = -1;
             break;
         }
 
-        tbl = KTVAL(KT_WS.get(), name);
+        tbl = KTVAL(global_ws_tbl.get(), name);
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
         if(view) 
@@ -312,7 +312,7 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
                 ODE_VIEW = 2;
             //strcpy(ODE_SMPL, smpl);
             SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
-            ODE_scroll(KT_WS.get(), ((char**) args) + 1);
+            ODE_scroll(global_ws_tbl.get(), ((char**) args) + 1);
         }
 
         SCR_free_tbl(args);

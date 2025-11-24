@@ -96,7 +96,7 @@ int CSimulation::KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, cha
 /**
  *  Initialize the function K_simul_SCC by allocating the needed global vars and linking the equations.
  *  
- *  @param [in]         KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
+ *  @param [in]         KDB*    dbe         global_ws_eqs or subset of global_ws_eqs containing all the model equations
  *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
  *  @param [in]         KDB*    dbs         KDB containing the model scalars
  *  @param [in]         Sample* smpl        simulation Sample
@@ -184,7 +184,7 @@ fin:
 /**
  *  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *  
- *  @param [in]         KDB*    dbe         KE_WS or subset of KE_WS containing all the model equations
+ *  @param [in]         KDB*    dbe         global_ws_eqs or subset of global_ws_eqs containing all the model equations
  *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
  *  @param [in]         KDB*    dbs         KDB containing the model scalars
  *  @param [in]         Sample* smpl        simulation Sample

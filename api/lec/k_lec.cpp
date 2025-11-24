@@ -103,8 +103,8 @@ char* L_expand(char* list_name)
         return((*L_expand_super)(list_name));
     else 
     {
-        if(!KL_WS->contains(list_name)) 
+        if(!global_ws_lst->contains(list_name)) 
             return NULL;
-        return KLVAL(KL_WS.get(), list_name);
+        return KLVAL(global_ws_lst.get(), list_name);
     }    
 }

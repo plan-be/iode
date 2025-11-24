@@ -224,7 +224,7 @@ int Estimation::E_c_mcorru()
 
 /**
  *  Computes the standard deviation of each estimated coefficient and saves their values 
- *  in KS_WS.
+ *  in global_ws_scl.
  *  
  *  @return int 0 always
  */

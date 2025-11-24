@@ -81,25 +81,25 @@ int B_WsLoad(char* arg, int type)
     switch(type) 
     {
         case COMMENTS :    
-            KC_WS.reset(kdb); 
+            global_ws_cmt.reset(kdb); 
             break;
         case EQUATIONS :   
-            KE_WS.reset(kdb);
+            global_ws_eqs.reset(kdb);
             break;
         case IDENTITIES :  
-            KI_WS.reset(kdb);
+            global_ws_idt.reset(kdb);
             break;
         case LISTS :       
-            KL_WS.reset(kdb);
+            global_ws_lst.reset(kdb);
             break;
         case SCALARS :     
-            KS_WS.reset(kdb);
+            global_ws_scl.reset(kdb);
             break;
         case TABLES :      
-            KT_WS.reset(kdb);
+            global_ws_tbl.reset(kdb);
             break;
         case VARIABLES :   
-            KV_WS.reset(kdb);
+            global_ws_var.reset(kdb);
             break;
         default:
             kerror(0, "B_WsLoad: unknown type %d", type);
@@ -311,7 +311,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    if(KV_sample(KV_WS.get(), new_smpl) < 0)
+    if(KV_sample(global_ws_var.get(), new_smpl) < 0)
     {
         error_manager.append_error("New sample invalid");
         goto err;
@@ -554,7 +554,7 @@ int B_WsExtrapolate(char* arg, int unused)
     }
 
     vars = args + p + 2;
-    rc = KV_extrapolate(KV_WS.get(), method, smpl, vars);
+    rc = KV_extrapolate(global_ws_var.get(), method, smpl, vars);
 
 done:
     if(smpl) delete smpl;
@@ -576,7 +576,7 @@ int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
     char    *pattern = NULL;
-    KDB     *kdb = KV_WS.get(), *nkdb = NULL;
+    KDB     *kdb = global_ws_var.get(), *nkdb = NULL;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);

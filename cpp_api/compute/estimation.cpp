@@ -438,7 +438,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
     std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;
 
-    Estimation estimation(to_char_array(eqs), KE_WS.get(), KV_WS.get(), KS_WS.get(), 
+    Estimation estimation(to_char_array(eqs), global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
                           to_char_array(from_period), to_char_array(to_period), -1, maxit, eps);
     int res = estimation.estimate();
     if(res != 0)
