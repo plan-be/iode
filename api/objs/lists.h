@@ -10,6 +10,11 @@
 // LIS = List (string)
 using LIS = char*; 
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KL_WS = std::make_unique<KDB>(LISTS, DB_GLOBAL);
+
 /*----------------------- FUNCS ----------------------------*/
 
 inline LIS KLVAL(KDB* kdb, const std::string& name)

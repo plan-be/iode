@@ -78,6 +78,11 @@ public:
     std::vector<std::string> get_variables_list(const bool create_if_not_exit=true);
 };
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KI_WS = std::make_unique<KDB>(IDENTITIES, DB_GLOBAL);
+
 /*----------------------- FUNCTIONS ----------------------------*/
 
 Identity* K_iunpack(char *);

@@ -135,6 +135,11 @@ enum TableTextAlign
 
 /*----------------------- GLOBALS ----------------------------*/
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KT_WS = std::make_unique<KDB>(TABLES, DB_GLOBAL);
+
 inline std::string get_line_type_as_string(TableLineType line_type)
 {
 	for(const auto& [key, value]: m_line_type)

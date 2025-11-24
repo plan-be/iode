@@ -9,6 +9,11 @@
 // CMT = Comment (string)
 using CMT = char*;
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KC_WS = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
+
 /*----------------------- MACROS ----------------------------*/
 
 // Returns a pointer to the CMT in swap (not allocated -> do not free)

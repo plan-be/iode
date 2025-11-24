@@ -353,38 +353,7 @@ public:
 
 /*----------------------- GLOBALS ----------------------------*/
 
-// unique_ptr -> automatic memory management
-//            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> KC_WS = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
-inline std::unique_ptr<KDB> KE_WS = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
-inline std::unique_ptr<KDB> KI_WS = std::make_unique<KDB>(IDENTITIES, DB_GLOBAL);
-inline std::unique_ptr<KDB> KL_WS = std::make_unique<KDB>(LISTS, DB_GLOBAL);
-inline std::unique_ptr<KDB> KS_WS = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
-inline std::unique_ptr<KDB> KT_WS = std::make_unique<KDB>(TABLES, DB_GLOBAL);
-inline std::unique_ptr<KDB> KV_WS = std::make_unique<KDB>(VARIABLES, DB_GLOBAL);
-
-inline KDB* get_global_db(const int iode_type)
-{
-    switch(iode_type)
-    {
-        case COMMENTS :
-            return KC_WS.get();
-        case EQUATIONS :
-            return KE_WS.get();
-        case IDENTITIES :
-            return KI_WS.get();
-        case LISTS :
-            return KL_WS.get();
-        case SCALARS :
-            return KS_WS.get();
-        case TABLES :
-            return KT_WS.get();
-        case VARIABLES :
-            return KV_WS.get();
-        default :
-            return nullptr;
-    }
-}
+KDB* get_global_db(const int iode_type);
 
 inline std::array<std::array<KDB*, 5>, IODE_NB_TYPES> K_RWS = {{ nullptr }};
 

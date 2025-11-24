@@ -39,6 +39,29 @@
 // API 
 // ---
 
+KDB* get_global_db(const int iode_type)
+{
+    switch(iode_type)
+    {
+        case COMMENTS :
+            return KC_WS.get();
+        case EQUATIONS :
+            return KE_WS.get();
+        case IDENTITIES :
+            return KI_WS.get();
+        case LISTS :
+            return KL_WS.get();
+        case SCALARS :
+            return KS_WS.get();
+        case TABLES :
+            return KT_WS.get();
+        case VARIABLES :
+            return KV_WS.get();
+        default :
+            return nullptr;
+    }
+}
+
 bool KDB::add_packed_object(const std::string& name, char* pack)
 {
     if(pack == NULL) 
