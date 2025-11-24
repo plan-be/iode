@@ -68,6 +68,11 @@ struct std::hash<Scalar>
     }
 };
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KS_WS = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
+
 /*----------------------- FUNCTIONS ----------------------------*/
 
 std::size_t hash_value(const Scalar& scalar);

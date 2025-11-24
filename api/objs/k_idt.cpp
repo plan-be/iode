@@ -1,4 +1,6 @@
 #include "api/objs/identities.h"
+#include "api/objs/scalars.h"
+
 
 std::vector<std::string> Identity::get_coefficients_list(const bool create_if_not_exit)
 {

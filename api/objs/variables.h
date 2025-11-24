@@ -56,6 +56,11 @@ enum IodeLowToHigh
     LTOH_FLOW
 };
 
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KV_WS = std::make_unique<KDB>(VARIABLES, DB_GLOBAL);
+
 /*----------------------- FUNCS ----------------------------*/
 
 double *K_vval(KDB *, int, int);

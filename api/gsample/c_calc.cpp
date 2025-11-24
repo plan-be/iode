@@ -38,6 +38,7 @@
 #include "api/gsample/gsample.h"
 #include "api/lec/lec.h"
 #include "api/objs/pack.h"
+#include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 
 

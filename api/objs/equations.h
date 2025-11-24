@@ -9,6 +9,7 @@
 #include "api/lec/lec.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
+#include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 
 #include <string>
@@ -527,6 +528,11 @@ inline std::size_t hash_value(const Equation& equation)
     std::hash<Equation> eq_hash;
     return eq_hash(equation);
 }
+
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KE_WS = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
 
 /*----------------------- FUNCS ----------------------------*/
 
