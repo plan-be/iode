@@ -21,7 +21,7 @@
  *      typedef struct _expdef_ { 
  *              int     (*write_header)();     // Pointer to the function that creates the output file and writes the header
  *              char    *(*write_object_name)();  // Pointer to the function to create the output object name (aka code) + the separator
- *              char    *(*extract_comment)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
+ *              char    *(*extract_comment)();   // Pointer to the function to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file 
  *              char    *(*get_variable_value)();  // Pointer to the function constructing an allocated vector of one VAR values
  *              int     (*write_variable_and_comment)();    // Pointer to the function saving the VAR and CMT in the output file
  *              int     (*close)();    // Pointer to the function that closes the output file after having written its footer
@@ -339,8 +339,8 @@ err:
  *  @param [in] char*   trace   if trace[0] != 0, prints a list of the object name modifications
  *  @param [in] char*   rule    rule file
  *  @param [in] char*   out     output file name
- *  @param [in] char*   vfile   input VAR file name. If NULL or empty, KV_WS is used
- *  @param [in] char*   cfile   input CMT file name. If NULL or empty, KC_WS is used
+ *  @param [in] char*   vfile   input VAR file name. If NULL or empty, global_ws_var is used
+ *  @param [in] char*   cfile   input CMT file name. If NULL or empty, global_ws_cmt is used
  *  @param [in] char*   from    first period to export
  *  @param [in] char*   to      last period to export
  *  @param [in] char*   na      string to use for IODE_NAN values

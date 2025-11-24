@@ -81,7 +81,7 @@ static int COL_link(int i, CLEC* clec)
         return(-1);
     }
 
-    int res = L_link(kdb, KS_WS.get(), clec);
+    int res = L_link(kdb, global_ws_scl.get(), clec);
     return res;
 }
 
@@ -90,8 +90,8 @@ static int COL_link(int i, CLEC* clec)
  *  Calculates the value of a table CELL on a specific GSample column (COL).
  *  
  *  First links clec and dclec (divisor) according to the COL definition (which 
- *  includes the files numbers and periods, that both refer to KV_WS). 
- *  The linking of scalars is always done with KS_WS, the current Scalar workspace.
+ *  includes the files numbers and periods, that both refer to global_ws_var). 
+ *  The linking of scalars is always done with global_ws_scl, the current Scalar workspace.
  *  
  *  The result is stored in cl->cl_res, which is IODE_NAN on error.
  *       
@@ -132,12 +132,12 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 break;
             }
             t[j]  = cl->cl_per[j].difference(kdb->sample->start_period);
-            vy[j] = L_exec(kdb, KS_WS.get(), clec, t[j]);
+            vy[j] = L_exec(kdb, global_ws_scl.get(), clec, t[j]);
             if(!IODE_IS_A_NUMBER(vy[j])) 
                 goto err; /* JMP 16-12-93 */
             div = 1.0;
             if(dclec) 
-                div = L_exec(kdb, KS_WS.get(), dclec, t[j]);
+                div = L_exec(kdb, global_ws_scl.get(), dclec, t[j]);
             if(!IODE_IS_A_NUMBER(div) || div == 0) 
                 goto err; /* JMP 16-12-93 */
             vy[j] /= div;
@@ -199,12 +199,12 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 vf[i] = 0.0;
                 for(j = t[0]; j <= t[1] ; j++) 
                 {
-                    vy[0] = L_exec(kdb, KS_WS.get(), clec, j);
+                    vy[0] = L_exec(kdb, global_ws_scl.get(), clec, j);
                     if(!IODE_IS_A_NUMBER(vy[0])) 
                         goto err; /* JMP 16-12-93 */
                     div = 1.0;
                     if(dclec) 
-                        div = L_exec(kdb, KS_WS.get(), dclec, j);
+                        div = L_exec(kdb, global_ws_scl.get(), dclec, j);
                     if(!IODE_IS_A_NUMBER(div) || div == 0) 
                         goto err; /* JMP 16-12-93 */
                     vf[i] += vy[0] / div;

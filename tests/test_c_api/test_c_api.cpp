@@ -160,8 +160,8 @@ public:
 	    char*       lst;
         double*     values;
 	    Sample*     smpl;
-        KDB*        kdb_lst = KL_WS.get();
-        KDB*        kdb_var = KV_WS.get();
+        KDB*        kdb_lst = global_ws_lst.get();
+        KDB*        kdb_var = global_ws_var.get();
 	    static int  done = 0;
 	
 	    // Create lists
@@ -229,13 +229,13 @@ public:
 	    double  calc_val;
 	    int     rc;
 	
-	    Period per = KV_WS->sample->start_period.shift(t);
+	    Period per = global_ws_var->sample->start_period.shift(t);
 	
 	    clec = L_cc(lec);
         EXPECT_TRUE(clec != NULL);
-	    rc = L_link(KV_WS.get(), KS_WS.get(), clec);
+	    rc = L_link(global_ws_var.get(), global_ws_scl.get(), clec);
 	    EXPECT_EQ(rc, 0);
-	    calc_val = L_exec(KV_WS.get(), KS_WS.get(), clec, t);
+	    calc_val = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
 	    SCR_free(clec);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
@@ -247,8 +247,8 @@ public:
 	
 	    clec = L_cc(lec);
 	    if(clec == NULL) return(IODE_NAN);
-	    if(L_link(KV_WS.get(), KS_WS.get(), clec)) return(IODE_NAN);
-	    res = L_exec(KV_WS.get(), KS_WS.get(), clec, t);
+	    if(L_link(global_ws_var.get(), global_ws_scl.get(), clec)) return(IODE_NAN);
+	    res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
 	    SCR_free(clec);
 	    return(res);
 	}
@@ -263,25 +263,25 @@ public:
         switch(type) 
         {
             case COMMENTS :    
-                KC_WS.reset(kdb); 
+                global_ws_cmt.reset(kdb); 
                 break;
             case EQUATIONS :   
-                KE_WS.reset(kdb);
+                global_ws_eqs.reset(kdb);
                 break;
             case IDENTITIES :  
-                KI_WS.reset(kdb);
+                global_ws_idt.reset(kdb);
                 break;
             case LISTS :       
-                KL_WS.reset(kdb);
+                global_ws_lst.reset(kdb);
                 break;
             case SCALARS :     
-                KS_WS.reset(kdb);
+                global_ws_scl.reset(kdb);
                 break;
             case TABLES :      
-                KT_WS.reset(kdb);
+                global_ws_tbl.reset(kdb);
                 break;
             case VARIABLES :   
-                KV_WS.reset(kdb);
+                global_ws_var.reset(kdb);
                 break;
             default:
                 throw std::invalid_argument(std::string("B_WsLoad: unknown type ") + 
@@ -508,15 +508,15 @@ public:
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    B_WsClearAll("");
-        EXPECT_EQ(KV_WS->size(), 0);
-        EXPECT_TRUE(KV_WS->sample == nullptr);
+        EXPECT_EQ(global_ws_var->size(), 0);
+        EXPECT_TRUE(global_ws_var->sample == nullptr);
 
 	    // 1. Copy full VAR file (Warning: * required)
 	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
-        EXPECT_EQ(KV_WS->size(), 394);
-        EXPECT_TRUE(KV_WS->sample != nullptr);
+        EXPECT_EQ(global_ws_var->size(), 394);
+        EXPECT_TRUE(global_ws_var->sample != nullptr);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
@@ -529,8 +529,8 @@ public:
 	    B_WsSample("1990Y1 2000Y1");
 	    // Create ACAF = 0 1 2...
 	    nb = 11;
-	    ACAF = L_cc_link_exec("t", KV_WS.get(), KS_WS.get());
-	    success = KV_WS->add("ACAF", ACAF, nb);
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    success = global_ws_var->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
@@ -585,7 +585,7 @@ public:
 	    int      rc, nb;
 	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
-        KDB*     kdb_var = KV_WS.get();
+        KDB*     kdb_var = global_ws_var.get();
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
@@ -602,8 +602,8 @@ public:
 	    B_WsSample("2000Y1 2020Y1");
 	    // Create ACAF = 0 1 2...
 	    nb = 21;
-	    ACAF = L_cc_link_exec("t", KV_WS.get(), KS_WS.get());
-	    success = KV_WS->add("ACAF", ACAF, nb);
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    success = global_ws_var->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
@@ -646,9 +646,9 @@ public:
 	
 	    // Create ACAF = 0 1 IODE_NAN...
 	    nb = 11;
-	    ACAF = L_cc_link_exec("t", KV_WS.get(), KS_WS.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
 	    ACAF[7] = IODE_NAN;
-	    success = KV_WS->add("ACAF", ACAF, nb);
+	    success = global_ws_var->add("ACAF", ACAF, nb);
         EXPECT_TRUE(success);
 	
 	    // $WsExtrapolate [method] from to [variable list]
@@ -665,12 +665,12 @@ public:
 	    double  *A;
 	    int     nb;
 	
-	    if(!KV_WS.get()) 
+	    if(!global_ws_var.get()) 
             return false;
         
-	    nb = KV_WS->sample->nb_periods;
-	    A = L_cc_link_exec(lec, KV_WS.get(), KS_WS.get());
-	    KV_WS->add(name, A, nb);
+	    nb = global_ws_var->sample->nb_periods;
+	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
+	    global_ws_var->add(name, A, nb);
 	    SCR_free(A);
 	    return true;
 	}
@@ -784,8 +784,8 @@ public:
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
-        EXPECT_EQ(KV_WS->size(), 394);
-        EXPECT_TRUE(KV_WS->sample != nullptr);
+        EXPECT_EQ(global_ws_var->size(), 394);
+        EXPECT_TRUE(global_ws_var->sample != nullptr);
 	    sprintf(arg, "%sfuncsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
@@ -818,23 +818,23 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     U_test_CreateObjects();
 
     // Create lists
-    found = KL_WS->contains("LST1");
+    found = global_ws_lst->contains("LST1");
     EXPECT_TRUE(found);
-    lst = KLVAL(KL_WS.get(), "LST1");
+    lst = KLVAL(global_ws_lst.get(), "LST1");
     EXPECT_EQ(strcmp(lst, "A,B"), 0);
 
-    found = KV_WS->contains("A");
+    found = global_ws_var->contains("A");
     EXPECT_TRUE(found);
 
-    bool success = KV_WS->rename("A", "AAA");
+    bool success = global_ws_var->rename("A", "AAA");
     EXPECT_TRUE(success);
-    found = KV_WS->contains("AAA");
+    found = global_ws_var->contains("AAA");
     EXPECT_TRUE(found);
 
     // Test KV_sample()
-    std::string asmpl1 = KV_WS->sample->to_string();
-    KV_sample(KV_WS.get(), NULL);
-    std::string asmpl2 = KV_WS->sample->to_string();
+    std::string asmpl1 = global_ws_var->sample->to_string();
+    KV_sample(global_ws_var.get(), NULL);
+    std::string asmpl2 = global_ws_var->sample->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
 
@@ -926,10 +926,10 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
 
     // --- add the table to the Tables KDB
     char* name = "TABLE";
-    KT_WS->add(name, (char*) tbl);
+    global_ws_tbl->add(name, (char*) tbl);
 
     // --- extract the table from the Table KDB
-    extracted_tbl = KTVAL(KT_WS.get(), name);
+    extracted_tbl = KTVAL(global_ws_tbl.get(), name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -1014,8 +1014,8 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_test_CreateObjects();
 
-    A = (double*) KVVAL(KV_WS.get(), "A");
-    B = (double*) KVVAL(KV_WS.get(), "B");
+    A = (double*) KVVAL(global_ws_var.get(), "A");
+    B = (double*) KVVAL(global_ws_var.get(), "B");
 
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
@@ -1027,9 +1027,9 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
-    char* lst = KLVAL(KL_WS.get(), "LST1");
+    char* lst = KLVAL(global_ws_lst.get(), "LST1");
     EXPECT_STREQ(lst, "A,B");
-    lst = KLVAL(KL_WS.get(), "LST2");
+    lst = KLVAL(global_ws_lst.get(), "LST2");
     EXPECT_STREQ(lst, "A,B,A");
 
     // Using macros in LEC
@@ -1172,15 +1172,15 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = KV_WS.get();
+    kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = KS_WS.get();
+    kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = KE_WS.get();
+    kdbe = global_ws_eqs.get();
     EXPECT_NE(kdbe, nullptr);
 
     // Check list is empty
-    lst = KLVAL(KL_WS.get(), "_DIVER");
+    lst = KLVAL(global_ws_lst.get(), "_DIVER");
     EXPECT_TRUE(lst == NULL);
 
     // Simulation instance
@@ -1205,13 +1205,13 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
-    lst = KLVAL(KL_WS.get(), "_PRE");
+    lst = KLVAL(global_ws_lst.get(), "_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Check _DIVER list
-    lst = KLVAL(KL_WS.get(), "_DIVER");
+    lst = KLVAL(global_ws_lst.get(), "_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
@@ -1270,13 +1270,13 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 
     // Load the VAR workspace
     U_test_K_interpret(VARIABLES, "fun.av");
-    kdbv = KV_WS.get();
+    kdbv = global_ws_var.get();
     K_RWS[VARIABLES][0] = new KDB(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_K_interpret(TABLES, "fun.at");
-    kdbt = KT_WS.get();
+    kdbt = global_ws_tbl.get();
     K_RWS[TABLES][0] = new KDB(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
@@ -1286,7 +1286,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = KTVAL(KT_WS.get(), "C8_1");
+    tbl = KTVAL(global_ws_tbl.get(), "C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
@@ -1349,7 +1349,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     EXPECT_EQ(rc, 0);
 
     EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-    EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS.get(), "ACAF") * 1e6) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs.get(), "ACAF") * 1e6) / 1e6, 0.821815);
 
     //TODO:add some tests with other estimation methods / on blocks / with instruments
 
@@ -1367,32 +1367,32 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS.get(), name)->value = 0.9;
-        KSVAL(KS_WS.get(), name)->relax = 1.0;
+        KSVAL(global_ws_scl.get(), name)->value = 0.9;
+        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS.get(), name)->value = 0.9;
-        KSVAL(KS_WS.get(), name)->relax = 1.0;
+        KSVAL(global_ws_scl.get(), name)->value = 0.9;
+        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS.get(), name)->value = 0.9;
-        KSVAL(KS_WS.get(), name)->relax = 1.0;
+        KSVAL(global_ws_scl.get(), name)->value = 0.9;
+        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(KS_WS.get(), name)->value = 0.9;
-        KSVAL(KS_WS.get(), name)->relax = 1.0;
+        KSVAL(global_ws_scl.get(), name)->value = 0.9;
+        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1487,36 +1487,36 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     U_test_print_title("Tests B_DATA");
 
-    KDB* kdb_cmt = KC_WS.get();
-    KDB* kdb_eqs = KE_WS.get();
-    KDB* kdb_idt = KI_WS.get();
-    KDB* kdb_lst = KL_WS.get();
-    KDB* kdb_scl = KS_WS.get();
-    KDB* kdb_tbl = KT_WS.get();
-    KDB* kdb_var = KV_WS.get();
+    KDB* kdb_cmt = global_ws_cmt.get();
+    KDB* kdb_eqs = global_ws_eqs.get();
+    KDB* kdb_idt = global_ws_idt.get();
+    KDB* kdb_lst = global_ws_lst.get();
+    KDB* kdb_scl = global_ws_scl.get();
+    KDB* kdb_tbl = global_ws_tbl.get();
+    KDB* kdb_var = global_ws_var.get();
 
     // Clear WS, then loads 3 WS and check ok
     //K_end_ws(0);
     U_test_load_fun_esv(filename);
 
     // (re-)creates vars AA...
-    KC_WS->clear();
-    KI_WS->clear();
-    KL_WS->clear();
-    KT_WS->clear();
+    global_ws_cmt->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_tbl->clear();
     U_test_CreateObjects();
 
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = KLVAL(KL_WS.get(), "RC");
+    lst = KLVAL(global_ws_lst.get(), "RC");
     EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
-    A1 = KVVAL(KV_WS.get(), "A1");
+    A1 = KVVAL(global_ws_var.get(), "A1");
     EXPECT_EQ(rc, 0);
-    found = KV_WS->contains("A1");
+    found = global_ws_var->contains("A1");
     EXPECT_TRUE(found);
     EXPECT_EQ(A1[1], 4);
 
@@ -1574,60 +1574,60 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     }
 
     // B_DataListSort()
-    success = KL_WS->add("LIST1", "A;C;B");
+    success = global_ws_lst->add("LIST1", "A;C;B");
     EXPECT_TRUE(success);
-    found = KL_WS->contains("LIST1");
+    found = global_ws_lst->contains("LIST1");
     EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
     EXPECT_EQ(rc, 0);
-    lst = KLVAL(KL_WS.get(), "LIST2");
+    lst = KLVAL(global_ws_lst.get(), "LIST2");
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
-    KL_WS->add("L1", "C;B;$L2;$L3");
-    KL_WS->add("L2", "X Z Y");
-    KL_WS->add("L3", "A B D");
+    global_ws_lst->add("L1", "C;B;$L2;$L3");
+    global_ws_lst->add("L2", "X Z Y");
+    global_ws_lst->add("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
-    lst = KLVAL(KL_WS.get(), "RES");
+    lst = KLVAL(global_ws_lst.get(), "RES");
     EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(KC_WS.get(), "U")), "Comment of U");
+    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KILEC(KI_WS.get(), "U")), "2 * A");
+    EXPECT_EQ(std::string(KILEC(global_ws_idt.get(), "U")), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "U")), "A,B,C");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "U")), "A,B,C");
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
-    val = K_s_get_value (KS_WS.get(), "u");
+    val = K_s_get_value (global_ws_scl.get(), "u");
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     EXPECT_EQ(rc, 0);
-    smpl = KV_WS->sample;
+    smpl = global_ws_var->sample;
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , VARIABLES);
     EXPECT_EQ(rc, 0);
 
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "NEWLIST")), "U");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "NEWLIST")), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_SCAL")), "c1;c2");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_SCAL")), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1636,17 +1636,17 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_SCAL")), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(KC_WS.get(), "U")), "Comment of U - More comment on U");
+    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", KLVAL(KL_WS.get(), "LC"));
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "LC")), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", KLVAL(global_ws_lst.get(), "LC"));
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1654,19 +1654,19 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_RES")), "A;B;C;D;E");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_RES")), "C");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_RES")), "A;B");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
     std::string expected_list;
@@ -1675,17 +1675,17 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(rc, 0);
     // names only in current WS
     expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "WS_ONLY")), expected_list);
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "WS_ONLY")), expected_list);
     // names only in file
     expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
     expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "FILE_ONLY")), expected_list);
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "FILE_ONLY")), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
     expected_list = "";
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "BOTH_EQ")), expected_list);
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "BOTH_EQ")), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
     expected_list = "_SCAL";
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "BOTH_DIFF")), expected_list);
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "BOTH_DIFF")), expected_list);
 
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
@@ -1701,7 +1701,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     int     rc;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
-    KDB*    kdb_eqs = KE_WS.get();
+    KDB*    kdb_eqs = global_ws_eqs.get();
 
     U_test_print_title("Tests B_EQS");
     U_test_suppress_kmsg_msgs();
@@ -1713,12 +1713,12 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
     rc = B_EqsEstimate(cmd_B_EqsEstimate);
     EXPECT_EQ(rc, 0);
 
-    EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS.get(), "ACAF") * 1e8) / 1e8, 0.82181543);
-    EXPECT_DOUBLE_EQ(round(K_e_fstat(KE_WS.get(), "ACAF") * 1e8) / 1e8, 32.28510666);
+    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs.get(), "ACAF") * 1e8) / 1e8, 0.82181543);
+    EXPECT_DOUBLE_EQ(round(K_e_fstat(global_ws_eqs.get(), "ACAF") * 1e8) / 1e8, 32.28510666);
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    Sample smpl = KESMPL(KE_WS.get(), "ACAF");
+    Sample smpl = KESMPL(global_ws_eqs.get(), "ACAF");
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
 
@@ -1874,14 +1874,14 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     U_test_print_title("Tests B_IDT");
 
     // Init -> clear ws
-    KC_WS->clear();
-    KI_WS->clear();
-    KL_WS->clear();
-    KT_WS->clear();
+    global_ws_cmt->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_tbl->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    KI_WS->add("C", "D*2+ACAF");
-    KI_WS->add("D", "A+B");
+    global_ws_idt->add("C", "D*2+ACAF");
+    global_ws_idt->add("D", "A+B");
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -1900,7 +1900,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_NE(rc, 0);
 
     // Second trial with WS in filenames
-    KV_WS->clear();
+    global_ws_var->clear();
     // Create vars on 2000Y1:2020Y1 
     //  => A = [0, 1...], B = [0, 2, 4...], AB = AC = BB = BC = B
     U_test_CreateObjects();
@@ -1917,8 +1917,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Check the values
-    double* C = (double*) KVVAL(KV_WS.get(), "C");
-    double* D = (double*) KVVAL(KV_WS.get(), "D");
+    double* C = (double*) KVVAL(global_ws_var.get(), "C");
+    double* D = (double*) KVVAL(global_ws_var.get(), "D");
 
     EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
     EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
@@ -1939,7 +1939,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     U_test_K_interpret(IDENTITIES, "fun");
     U_test_K_interpret(VARIABLES, "fun");
 
-    AOUC = KVVAL(KV_WS.get(), "AOUC");
+    AOUC = KVVAL(global_ws_var.get(), "AOUC");
     AOUC[1] = 0.1;
 
     // Sample (null => full sample, see K_exec())
@@ -2000,7 +2000,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     EXPECT_EQ(rc, 0);
 
     KDB* kdb_var = K_interpret(VARIABLES, outfile, 1);
-    KV_WS.reset(kdb_var);
+    global_ws_var.reset(kdb_var);
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
 
     U_test_print_title("Tests IMP CMT: Import Ascii Comments");
@@ -2013,9 +2013,9 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     if(rc == 0) 
     {
         KDB* kdb_cmt = K_interpret(COMMENTS, outfile, 1);
-        KC_WS.reset(kdb_cmt);
-        EXPECT_TRUE(KC_WS != nullptr);
-        EXPECT_EQ(std::string(KCVAL(KC_WS.get(), "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        global_ws_cmt.reset(kdb_cmt);
+        EXPECT_TRUE(global_ws_cmt != nullptr);
+        EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2043,7 +2043,7 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     EXPECT_EQ(rc, 0);
 
     KDB* kdb_var = K_interpret(VARIABLES, outfile, 1);
-    KV_WS.reset(kdb_var);
+    global_ws_var.reset(kdb_var);
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
 
     U_test_reset_kmsg_msgs();
@@ -2062,9 +2062,9 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
-    KV_WS->clear();
+    global_ws_var->clear();
     smpl = new Sample("2010Q1", "2020Q4");
-    KV_sample(KV_WS.get(), smpl);
+    KV_sample(global_ws_var.get(), smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun.av", input_test_dir);
@@ -2124,9 +2124,9 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
     U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
-    KV_WS->clear();
+    global_ws_var->clear();
     smpl = new Sample("2000Y1", "2020Y1");
-    KV_sample(KV_WS.get(), smpl);
+    KV_sample(global_ws_var.get(), smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun_q.var", input_test_dir);
@@ -2180,11 +2180,11 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = KV_WS.get();
+    kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = KS_WS.get();
+    kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = KE_WS.get();
+    kdbe = global_ws_eqs.get();
     EXPECT_NE(kdbe, nullptr);
 
     // B_ModelSimulateParms()
@@ -2215,11 +2215,11 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = KV_WS.get();
+    kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = KS_WS.get();
+    kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = KE_WS.get();
+    kdbe = global_ws_eqs.get();
     EXPECT_NE(kdbe, nullptr);
 
     // Set values of endo UY
@@ -2251,7 +2251,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
     expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
     expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(std::string(KLVAL(KL_WS.get(), "_PRE2")), expected_list);
+    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_PRE2")), expected_list);
 
     // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
     //  1. Annuler Exchange
@@ -2262,11 +2262,11 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = KV_WS.get();
+    kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = KS_WS.get();
+    kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = KE_WS.get();
+    kdbe = global_ws_eqs.get();
     EXPECT_NE(kdbe, nullptr);
 
     //  3. Simulate & compare
@@ -2318,8 +2318,8 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(auto& [name, _] : KE_WS->k_objs)
-        ASSERT_EQ(KEVAL(KE_WS.get(), name)->endo, name);
+    for(auto& [name, _] : global_ws_eqs->k_objs)
+        ASSERT_EQ(KEVAL(global_ws_eqs.get(), name)->endo, name);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2513,7 +2513,7 @@ TEST_F(IodeCAPITest, Tests_B_WsSample)
     rc = B_WsSample("1965Y1 2020Y1");
     smpl = new Sample("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(*KV_WS->sample, *smpl);
+    EXPECT_EQ(*global_ws_var->sample, *smpl);
     delete smpl;
 
     U_test_reset_kmsg_msgs();
@@ -2544,13 +2544,13 @@ TEST_F(IodeCAPITest, Tests_B_WsClearAll)
     U_test_print_title("B_WsClearAll()");
     rc = B_WsClearAll("");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KC_WS->size(), 0);
-    EXPECT_EQ(KE_WS->size(), 0);
-    EXPECT_EQ(KI_WS->size(), 0);
-    EXPECT_EQ(KL_WS->size(), 0);
-    EXPECT_EQ(KS_WS->size(), 0);
-    EXPECT_EQ(KT_WS->size(), 0);
-    EXPECT_EQ(KV_WS->size(), 0);
+    EXPECT_EQ(global_ws_cmt->size(), 0);
+    EXPECT_EQ(global_ws_eqs->size(), 0);
+    EXPECT_EQ(global_ws_idt->size(), 0);
+    EXPECT_EQ(global_ws_lst->size(), 0);
+    EXPECT_EQ(global_ws_scl->size(), 0);
+    EXPECT_EQ(global_ws_tbl->size(), 0);
+    EXPECT_EQ(global_ws_var->size(), 0);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2830,7 +2830,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 
     rc = B_ReportLine(cmd, 1);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KV_WS->size(), 394);
+    EXPECT_EQ(global_ws_var->size(), 394);
 
     rc = B_ReportLine("$settime 2000Y1", 0);
     EXPECT_EQ(rc, 0);
@@ -2950,81 +2950,81 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     B_WsClear("Var", VARIABLES);
     B_WsSample("2000Y1 2001Y1");
 
-    KV_add(KV_WS.get(), "R1C1");
-    *KVVAL(KV_WS.get(), "R1C1", 0) = 5.0;
-    KV_add(KV_WS.get(), "R1C2");
-    *KVVAL(KV_WS.get(), "R1C2", 0) = 3.0;
-    KV_add(KV_WS.get(), "R1C3");
-    *KVVAL(KV_WS.get(), "R1C3", 0) = 5.0;
-    KV_add(KV_WS.get(), "R1C4");
-    *KVVAL(KV_WS.get(), "R1C4", 0) = 7.0;
-    *KVVAL(KV_WS.get(), "R1C4", 1) = 5.0;
-    KV_add(KV_WS.get(), "R1CT");
-    *KVVAL(KV_WS.get(), "R1CT", 0) = 20.0;
-    *KVVAL(KV_WS.get(), "R1CT", 1) = 20.0;
+    KV_add(global_ws_var.get(), "R1C1");
+    *KVVAL(global_ws_var.get(), "R1C1", 0) = 5.0;
+    KV_add(global_ws_var.get(), "R1C2");
+    *KVVAL(global_ws_var.get(), "R1C2", 0) = 3.0;
+    KV_add(global_ws_var.get(), "R1C3");
+    *KVVAL(global_ws_var.get(), "R1C3", 0) = 5.0;
+    KV_add(global_ws_var.get(), "R1C4");
+    *KVVAL(global_ws_var.get(), "R1C4", 0) = 7.0;
+    *KVVAL(global_ws_var.get(), "R1C4", 1) = 5.0;
+    KV_add(global_ws_var.get(), "R1CT");
+    *KVVAL(global_ws_var.get(), "R1CT", 0) = 20.0;
+    *KVVAL(global_ws_var.get(), "R1CT", 1) = 20.0;
 
-    KV_add(KV_WS.get(), "R2C1");
-    *KVVAL(KV_WS.get(), "R2C1", 0) = 1.0;
-    KV_add(KV_WS.get(), "R2C2");
-    *KVVAL(KV_WS.get(), "R2C2", 0) = 1.0;
-    *KVVAL(KV_WS.get(), "R2C2", 1) = 2.0;
-    KV_add(KV_WS.get(), "R2C3");
-    *KVVAL(KV_WS.get(), "R2C3", 0) = 4.0;
-    KV_add(KV_WS.get(), "R2C4");
-    *KVVAL(KV_WS.get(), "R2C4", 0) = 4.0;
-    KV_add(KV_WS.get(), "R2CT");
-    *KVVAL(KV_WS.get(), "R2CT", 0) = 10.0;
-    *KVVAL(KV_WS.get(), "R2CT", 1) = 10.0;
+    KV_add(global_ws_var.get(), "R2C1");
+    *KVVAL(global_ws_var.get(), "R2C1", 0) = 1.0;
+    KV_add(global_ws_var.get(), "R2C2");
+    *KVVAL(global_ws_var.get(), "R2C2", 0) = 1.0;
+    *KVVAL(global_ws_var.get(), "R2C2", 1) = 2.0;
+    KV_add(global_ws_var.get(), "R2C3");
+    *KVVAL(global_ws_var.get(), "R2C3", 0) = 4.0;
+    KV_add(global_ws_var.get(), "R2C4");
+    *KVVAL(global_ws_var.get(), "R2C4", 0) = 4.0;
+    KV_add(global_ws_var.get(), "R2CT");
+    *KVVAL(global_ws_var.get(), "R2CT", 0) = 10.0;
+    *KVVAL(global_ws_var.get(), "R2CT", 1) = 10.0;
 
-    KV_add(KV_WS.get(), "R3C1");
-    *KVVAL(KV_WS.get(), "R3C1", 0) = 3.0;
-    KV_add(KV_WS.get(), "R3C2");
-    *KVVAL(KV_WS.get(), "R3C2", 0) = 1.0;
-    KV_add(KV_WS.get(), "R3C3");
-    *KVVAL(KV_WS.get(), "R3C3", 0) = 3.0;
-    *KVVAL(KV_WS.get(), "R3C3", 1) = 2.0;
-    KV_add(KV_WS.get(), "R3C4");
-    *KVVAL(KV_WS.get(), "R3C4", 0) = 3.0;
-    KV_add(KV_WS.get(), "R3CT");
-    *KVVAL(KV_WS.get(), "R3CT", 0) = 10.0;
-    *KVVAL(KV_WS.get(), "R3CT", 1) = 10.0;
+    KV_add(global_ws_var.get(), "R3C1");
+    *KVVAL(global_ws_var.get(), "R3C1", 0) = 3.0;
+    KV_add(global_ws_var.get(), "R3C2");
+    *KVVAL(global_ws_var.get(), "R3C2", 0) = 1.0;
+    KV_add(global_ws_var.get(), "R3C3");
+    *KVVAL(global_ws_var.get(), "R3C3", 0) = 3.0;
+    *KVVAL(global_ws_var.get(), "R3C3", 1) = 2.0;
+    KV_add(global_ws_var.get(), "R3C4");
+    *KVVAL(global_ws_var.get(), "R3C4", 0) = 3.0;
+    KV_add(global_ws_var.get(), "R3CT");
+    *KVVAL(global_ws_var.get(), "R3CT", 0) = 10.0;
+    *KVVAL(global_ws_var.get(), "R3CT", 1) = 10.0;
 
-    KV_add(KV_WS.get(), "R4C1");
-    *KVVAL(KV_WS.get(), "R4C1", 0) = 1.0;
-    *KVVAL(KV_WS.get(), "R4C1", 1) = 0.0;
-    KV_add(KV_WS.get(), "R4C2");
-    *KVVAL(KV_WS.get(), "R4C2", 0) = 2.0;
-    KV_add(KV_WS.get(), "R4C3");
-    *KVVAL(KV_WS.get(), "R4C3", 0) = 1.0;
-    KV_add(KV_WS.get(), "R4C4");
-    *KVVAL(KV_WS.get(), "R4C4", 0) = 1.0;
-    KV_add(KV_WS.get(), "R4CT");
-    *KVVAL(KV_WS.get(), "R4CT", 0) = 5.0;
-    *KVVAL(KV_WS.get(), "R4CT", 1) = 5.0;
+    KV_add(global_ws_var.get(), "R4C1");
+    *KVVAL(global_ws_var.get(), "R4C1", 0) = 1.0;
+    *KVVAL(global_ws_var.get(), "R4C1", 1) = 0.0;
+    KV_add(global_ws_var.get(), "R4C2");
+    *KVVAL(global_ws_var.get(), "R4C2", 0) = 2.0;
+    KV_add(global_ws_var.get(), "R4C3");
+    *KVVAL(global_ws_var.get(), "R4C3", 0) = 1.0;
+    KV_add(global_ws_var.get(), "R4C4");
+    *KVVAL(global_ws_var.get(), "R4C4", 0) = 1.0;
+    KV_add(global_ws_var.get(), "R4CT");
+    *KVVAL(global_ws_var.get(), "R4CT", 0) = 5.0;
+    *KVVAL(global_ws_var.get(), "R4CT", 1) = 5.0;
 
-    KV_add(KV_WS.get(), "RTC1");
-    *KVVAL(KV_WS.get(), "RTC1", 0) = 10.0;
-    *KVVAL(KV_WS.get(), "RTC1", 1) = 10.0;
-    KV_add(KV_WS.get(), "RTC2");
-    *KVVAL(KV_WS.get(), "RTC2", 0) = 7.0;
-    *KVVAL(KV_WS.get(), "RTC2", 1) = 7.0;
-    KV_add(KV_WS.get(), "RTC3");
-    *KVVAL(KV_WS.get(), "RTC3", 0) = 13.0;
-    *KVVAL(KV_WS.get(), "RTC3", 1) = 13.0;
-    KV_add(KV_WS.get(), "RTC4");
-    *KVVAL(KV_WS.get(), "RTC4", 0) = 15.0;
-    *KVVAL(KV_WS.get(), "RTC4", 1) = 15.0;
+    KV_add(global_ws_var.get(), "RTC1");
+    *KVVAL(global_ws_var.get(), "RTC1", 0) = 10.0;
+    *KVVAL(global_ws_var.get(), "RTC1", 1) = 10.0;
+    KV_add(global_ws_var.get(), "RTC2");
+    *KVVAL(global_ws_var.get(), "RTC2", 0) = 7.0;
+    *KVVAL(global_ws_var.get(), "RTC2", 1) = 7.0;
+    KV_add(global_ws_var.get(), "RTC3");
+    *KVVAL(global_ws_var.get(), "RTC3", 0) = 13.0;
+    *KVVAL(global_ws_var.get(), "RTC3", 1) = 13.0;
+    KV_add(global_ws_var.get(), "RTC4");
+    *KVVAL(global_ws_var.get(), "RTC4", 0) = 15.0;
+    *KVVAL(global_ws_var.get(), "RTC4", 1) = 15.0;
 
-    KV_add(KV_WS.get(), "RTCT");
-    *KVVAL(KV_WS.get(), "RTCT", 0) = 90.0;
-    *KVVAL(KV_WS.get(), "RTCT", 1) = 90.0;
+    KV_add(global_ws_var.get(), "RTCT");
+    *KVVAL(global_ws_var.get(), "RTCT", 0) = 90.0;
+    *KVVAL(global_ws_var.get(), "RTCT", 1) = 90.0;
 
-    KL_WS->add("X", "R1,R2,R3,R4,RT");
-    KL_WS->add("Y", "C1,C2,C3,C4,CT");
+    global_ws_lst->add("X", "R1,R2,R3,R4,RT");
+    global_ws_lst->add("Y", "C1,C2,C3,C4,CT");
 
-    bool found = KL_WS->contains("X");
+    bool found = global_ws_lst->contains("X");
     EXPECT_TRUE(found);
-    found = KL_WS->contains("Y");
+    found = global_ws_lst->contains("Y");
     EXPECT_TRUE(found);
 
     // Note: ref_period and sum_period are freed in RasExecute()

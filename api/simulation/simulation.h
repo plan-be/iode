@@ -67,9 +67,9 @@ public:
 	static int     KSIM_CPU_SORT;  		// Elapsed time to sort interdep block
 
 protected:
-	KDB*    KSIM_DBV;            		// KDB of variables used for the simulation. Normally KV_WS
-	KDB*    KSIM_DBS;            		// KDB of scalars used for the simulation. Normally KS_WS
-	KDB*    KSIM_DBE;            		// KDB of equations defining the model to simulation. Can KE_WS or a subset.
+	KDB*    KSIM_DBV;            		// KDB of variables used for the simulation. Normally global_ws_var
+	KDB*    KSIM_DBS;            		// KDB of scalars used for the simulation. Normally global_ws_scl
+	KDB*    KSIM_DBE;            		// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
 

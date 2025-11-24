@@ -61,21 +61,21 @@ void python_assign_super()
 
 bool contain_table(const std::string& name)
 {
-	if(!KT_WS.get())
+	if(!global_ws_tbl.get())
 		return false;
-	return KT_WS->contains(name);
+	return global_ws_tbl->contains(name);
 }
 
 bool add_table(const std::string& name, char* value)
 {
-	if(!KT_WS.get())
+	if(!global_ws_tbl.get())
 		return false;
-	return KT_WS->add(name, value);
+	return global_ws_tbl->add(name, value);
 }
 
 bool remove_table(const std::string& name)
 {
-	if(!KT_WS.get())
+	if(!global_ws_tbl.get())
 		return false;
-	return KT_WS->remove(name);
+	return global_ws_tbl->remove(name);
 }

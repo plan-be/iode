@@ -80,12 +80,12 @@ int B_IdtExecute(char* arg, int unused)
  *  are specified via the functions B_IdtExecuteVarFiles() and B_IdtExecuteSclFiles().
  *  
  *  At the end of the functions, KEXEC_VFILES and KEXEC_SFILES are reset to NULL.
- *  The resulting variables are copied into KV_WS.
+ *  The resulting variables are copied into global_ws_var.
  *  
  *  @see https://iode.plan.be/doku.php?id=idtexecute
  *  
  *  @param   [in]   Sample* smpl    Sample on which the identities must be calculated.
- *  @param   [in]   char**  idts    list of identity names or NULL to execute all the idts present in KI_WS.
+ *  @param   [in]   char**  idts    list of identity names or NULL to execute all the idts present in global_ws_idt.
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
@@ -98,17 +98,17 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
 
     if(idts == NULL || SCR_tbl_size((unsigned char**) idts) == 0)
     {
-        kdb_var = KI_exec(KI_WS.get(),
-                          KV_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          KS_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+        kdb_var = KI_exec(global_ws_idt.get(),
+                          global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }
     else 
     {
-        kdb_idt = K_refer(KI_WS.get(), SCR_tbl_size((unsigned char**) idts), idts);
+        kdb_idt = K_refer(global_ws_idt.get(), SCR_tbl_size((unsigned char**) idts), idts);
         kdb_var = KI_exec(kdb_idt,
-                          KV_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          KS_WS.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+                          global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
         delete kdb_idt;
         kdb_idt = nullptr;
@@ -131,10 +131,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
     
     KV_sample(kdb_var, smpl);
 
-    if(KV_WS.get()) 
-        KV_merge_del(KV_WS.get(), kdb_var, 1);
+    if(global_ws_var.get()) 
+        KV_merge_del(global_ws_var.get(), kdb_var, 1);
     else
-        KV_WS.reset(kdb_var);
+        global_ws_var.reset(kdb_var);
 
     return 0;
 }

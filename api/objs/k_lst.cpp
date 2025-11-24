@@ -241,7 +241,7 @@ int KL_lst(char* name, char** lst, int chunck)
     nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) 
     {
-        if(!KL_WS->add(name, ""))    
+        if(!global_ws_lst->add(name, ""))    
             rc = -1;
         goto done;
     }
@@ -249,7 +249,7 @@ int KL_lst(char* name, char** lst, int chunck)
     if(nb < chunck || chunck < 0) 
     {
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(!KL_WS->add(name, str))  
+        if(!global_ws_lst->add(name, str))  
             rc = -1;
         SCR_free(str);
         return(rc);
@@ -266,7 +266,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(!KL_WS->add(buf, str))  
+        if(!global_ws_lst->add(buf, str))  
             rc = -1;
         SCR_free(str);
 
@@ -284,7 +284,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(!KL_WS->add(name, str)) 
+    if(!global_ws_lst->add(name, str)) 
         rc = -1;
     SW_nfree(str);
 
@@ -327,10 +327,10 @@ unsigned char **KL_expand(char *str)
         if(tbl[i][0] == '$') 
         {
             list_name = std::string((char*) tbl[i] + 1);
-            if(KL_WS->contains(list_name))
+            if(global_ws_lst->contains(list_name))
             {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                tbl2 = KL_expand(KLVAL(KL_WS.get(), list_name));
+                tbl2 = KL_expand(KLVAL(global_ws_lst.get(), list_name));
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);

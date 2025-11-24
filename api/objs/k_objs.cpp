@@ -61,7 +61,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
         method = (IodeEquationMethod) i_method;
 
     Equation* eq;
-    if(!KE_WS->contains(name))
+    if(!global_ws_eqs->contains(name))
     {
         Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
         Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
@@ -70,7 +70,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     } 
     else
     {
-        eq = KEVAL(KE_WS.get(), name);
+        eq = KEVAL(global_ws_eqs.get(), name);
         // modify only if not empty
         if(!lec.empty())
             eq->set_lec(lec);
@@ -97,7 +97,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     if(i_date > 0)
         eq->update_date();
 
-    success = KE_WS->add(name, (char*) eq);
+    success = global_ws_eqs->add(name, (char*) eq);
     delete eq;
     eq = nullptr;
     if(!success) 
@@ -147,7 +147,7 @@ int K_upd_tbl(char* name, char* arg)
         }
     }
 
-    bool success = KT_WS->add(name, (char*) tbl);
+    bool success = global_ws_tbl->add(name, (char*) tbl);
     delete tbl;
     tbl = nullptr;
 

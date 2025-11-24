@@ -297,18 +297,18 @@ private:
             throw std::invalid_argument("Max iterations must be greater than 0");
         E_MAXIT = maxit;
 
-        E_DBE  = (dbe != NULL) ? dbe : KE_WS.get();
-        E_DBV  = (dbv != NULL) ? dbv : KV_WS.get();
-        E_DBS  = (dbs != NULL) ? dbs : KS_WS.get();
+        E_DBE  = (dbe != NULL) ? dbe : global_ws_eqs.get();
+        E_DBV  = (dbv != NULL) ? dbv : global_ws_var.get();
+        E_DBS  = (dbs != NULL) ? dbs : global_ws_scl.get();
 
         if(smpl != nullptr)
             est_smpl = *smpl;
         else
         {
             // If no sample is provided, we will use the one from the global variables database
-            if(!KV_WS->sample)
+            if(!global_ws_var->sample)
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            est_smpl = *KV_WS->sample;
+            est_smpl = *global_ws_var->sample;
         }
     }
 

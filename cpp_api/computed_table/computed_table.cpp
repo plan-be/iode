@@ -251,7 +251,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     std::string formula = lec + " := " + oss.str() + " * " + div_lec;
     CLEC* clec = L_solve(to_char_array(formula), to_char_array(var_name));
 
-    int var_pos = KV_WS->index_of(var_name);
+    int var_pos = global_ws_var->index_of(var_name);
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used
@@ -268,15 +268,15 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         if(clec == NULL)
             return false;
 
-        L_link(KV_WS.get(), KS_WS.get(), clec);
+        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
         // Newton-Raphson method
-        res = L_zero(KV_WS.get(), KS_WS.get(), clec, period_pos, var_pos, var_pos);
+        res = L_zero(global_ws_var.get(), global_ws_scl.get(), clec, period_pos, var_pos, var_pos);
     }
     else
     {
         // inverse formula
-        L_link(KV_WS.get(), KS_WS.get(), clec);
-        res = L_exec(KV_WS.get(), KS_WS.get(), clec, period_pos);
+        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
+        res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, period_pos);
     }
 
     SW_nfree(clec);
@@ -285,12 +285,12 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         return false;
 
     // update the variable var_name in the database
-    KV_set(KV_WS.get(), var_name, period_pos, 0, res);
+    KV_set(global_ws_var.get(), var_name, period_pos, 0, res);
 
     return true;
 }
 
-// TODO : use a KDBVariable object instead of KSMPL(KV_WS).
+// TODO : use a KDBVariable object instead of KSMPL(global_ws_var).
 //        For the moment, there is a memory problem when the function ends and
 //        thus when the KDBVariable object is destroyed. 
 //        -> problem linked to the compiler option /Zp1
@@ -317,7 +317,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
-    Sample var_sample(*KV_WS->sample);
+    Sample var_sample(*global_ws_var->sample);
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 
     // get lec

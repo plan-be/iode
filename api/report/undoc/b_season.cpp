@@ -61,7 +61,7 @@ int B_season(char* arg)
         goto done;
     }
 
-    nbper = DS_smpl(from->sample, KV_WS->sample, &t_smpl, &shift);
+    nbper = DS_smpl(from->sample, global_ws_var->sample, &t_smpl, &shift);
     if(nbper < 0 || t_smpl == nullptr) 
         goto done;
     
@@ -101,7 +101,7 @@ int B_season(char* arg)
         sprintf(name, "_I%s", from_name.c_str());
         to->add(name, i_vec, nb);
     }
-    KV_merge(KV_WS.get(), to, 1);
+    KV_merge(global_ws_var.get(), to, 1);
     rc = 0;
 
 done:

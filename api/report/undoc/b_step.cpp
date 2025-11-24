@@ -19,13 +19,13 @@
 
 
 /**
- *  Analyses an equation and checks that all variables exist in KV_WS. 
- *  Initializes to 0.9 the scalars that are not yet defined in KS_WS.
+ *  Analyses an equation and checks that all variables exist in global_ws_var. 
+ *  Initializes to 0.9 the scalars that are not yet defined in global_ws_scl.
  *  
  *  Sub-function of B_EqsStepWise().
  *  
  *  @param [in] char*   eqs     equation name
- *  @return     int             1 on success, -1 if some variable present in eqs does not exist in KV_WS
+ *  @return     int             1 on success, -1 if some variable present in eqs does not exist in global_ws_var
  *  
  *  TODO: éliminer les B_DataUpdate et autres fonctions de haut niveau
  */
@@ -34,10 +34,10 @@ static int check_scl_var(char *eqs)
     char buf[1024];
     std::string name = std::string(eqs);
 
-    if(!KE_WS->contains(name)) 
+    if(!global_ws_eqs->contains(name)) 
         return -1;
     
-    Equation* eq = KEVAL(KE_WS.get(), name);
+    Equation* eq = KEVAL(global_ws_eqs.get(), name);
     if(!eq) 
         return -1;
 
@@ -51,7 +51,7 @@ static int check_scl_var(char *eqs)
         if(is_coefficient(c_name)) 
         {
             // create scalar with default value 0.9 if not existing
-            if(!KS_WS->contains(name))
+            if(!global_ws_scl->contains(name))
             {
                 sprintf(buf, "%s 0.9 1", c_name);
                 B_DataUpdate(buf, SCALARS);
@@ -59,7 +59,7 @@ static int check_scl_var(char *eqs)
         }
         else 
         {
-            if(!KV_WS->contains(name))
+            if(!global_ws_var->contains(name))
             {
                 kerror(0,"Var %s from %s not found", c_name, eqs);
                 delete eq;
@@ -113,7 +113,7 @@ int B_EqsStepWise(char* arg, int unused)
 
     c_eq_name = args[2];
     std::string eq_name = std::string(c_eq_name);                                               
-    if(!KE_WS->contains(eq_name)) 
+    if(!global_ws_eqs->contains(eq_name)) 
     {                            
         kerror(0,"Eqs %s not found", c_eq_name);
         SCR_free_tbl((unsigned char**) args);

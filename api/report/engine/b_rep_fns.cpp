@@ -647,11 +647,11 @@ U_ch *RPF_sstderr(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
-        if(!KS_WS->contains(name))
+        if(!global_ws_scl->contains(name))
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(KS_WS.get(), name);
+            scl = KSVAL(global_ws_scl.get(), name);
             if(IODE_IS_A_NUMBER(scl->std))
                 sprintf((char*) buf, "%lf", (double) scl->std);
             else
@@ -682,11 +682,11 @@ U_ch *RPF_srelax(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
-        if(!KS_WS->contains(name))
+        if(!global_ws_scl->contains(name))
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(KS_WS.get(), name);
+            scl = KSVAL(global_ws_scl.get(), name);
             if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf((char*) buf, "%lf", (double) scl->relax);
             else
@@ -719,14 +719,14 @@ U_ch *RPF_ttitle(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) "\n");
         name = std::string((char*) args[i]);
-        if(!KT_WS->contains(name)) 
+        if(!global_ws_tbl->contains(name)) 
         {
             sprintf((char*) buf, "Table %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else 
         {
-            tbl = KTVAL(KT_WS.get(), name);
+            tbl = KTVAL(global_ws_tbl.get(), name);
             res = SCR_strafcat(res, T_get_title(tbl, false));
             delete tbl;
             tbl = nullptr;
@@ -751,7 +751,7 @@ U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
     int  i;
-    KDB  *kdb = KC_WS.get();
+    KDB  *kdb = global_ws_cmt.get();
 
     if(!kdb) 
         return(res);
@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    KDB     *kdb = KV_WS.get();
+    KDB     *kdb = global_ws_var.get();
 
     if(!kdb) 
         return(res);
@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDB  *kdb = KL_WS.get();
+    KDB  *kdb = global_ws_lst.get();
 
     if(!kdb) 
         return(res);
@@ -884,7 +884,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDB     *kdb = KI_WS.get();
+    KDB     *kdb = global_ws_idt.get();
 
     if(!kdb) 
         return(res);
@@ -928,7 +928,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch* res = 0, buf[128];
-    KDB* kdb = KE_WS.get();
+    KDB* kdb = global_ws_eqs.get();
 
     if(!kdb) 
         return(res);
@@ -969,7 +969,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch* res = 0;
-    KDB* kdb = KE_WS.get();
+    KDB* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1007,7 +1007,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch* res = 0;
-    KDB* kdb = KE_WS.get();
+    KDB* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1079,7 +1079,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch* eq = 0, *rhs;
     int poscolon;
-    KDB* kdb = KE_WS.get();
+    KDB* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1165,7 +1165,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    KDB     *kdb = KV_WS.get();
+    KDB     *kdb = global_ws_var.get();
     char     what = 'F';
 
     smpl = kdb->sample;
@@ -1241,9 +1241,9 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     for(i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
-        if(!KE_WS->contains(name)) 
+        if(!global_ws_eqs->contains(name)) 
             continue;
-        eq = KEVAL(KE_WS.get(), name);
+        eq = KEVAL(global_ws_eqs.get(), name);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         if(eq) 
             delete eq;
@@ -1476,11 +1476,11 @@ int RPF_CalcPeriod(U_ch** args)
         return(-1); // Error
 
     // Calc diff bw per and WS sample
-    int t = per.difference(KV_WS->sample->start_period);
+    int t = per.difference(global_ws_var->sample->start_period);
     if(t < 0)  
         return(-1);
 
-    int at = per.difference(KV_WS->sample->end_period);
+    int at = per.difference(global_ws_var->sample->end_period);
     if(at > 0)
         return(-1);
 

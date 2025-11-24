@@ -166,8 +166,8 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
-    SWHDL handle = KC_WS->get_handle(def);
-    std::string title = (handle > 0) ? std::string(KCVAL(KC_WS.get(), handle)) : def;
+    SWHDL handle = global_ws_cmt->get_handle(def);
+    std::string title = (handle > 0) ? std::string(KCVAL(global_ws_cmt.get(), handle)) : def;
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -190,7 +190,7 @@ static std::vector<std::string> expand_lecs(const std::string& lecs)
 	if(!lecs.empty())
 	{
 		char* pattern = to_char_array(lecs);
-		// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
+		// Retrieves all variable names matching one or more patterns in global_ws_var (similar to grep)
 		char* lst = K_expand(VARIABLES, NULL, pattern, '*');
 		// Parses a string and replaces @filename and $listname by their contents
         char* OLD_SEPS = A_SEPS;
@@ -242,12 +242,12 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = KC_WS->get_handle(var);
+        handle = global_ws_cmt->get_handle(var);
         if(handle == 0)
             line_name = var;
         else
         {
-            comment = std::string((char*) KCVAL(KC_WS.get(), handle));
+            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -307,10 +307,10 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 
         // ---- line name (left column) ----
         line_name = titles[i];
-        handle = KC_WS->get_handle(line_name);
+        handle = global_ws_cmt->get_handle(line_name);
         if(handle > 0)
         {
-            comment = std::string((char*) KCVAL(KC_WS.get(), handle));
+            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -360,12 +360,12 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = KC_WS->get_handle(lec);
+        handle = global_ws_cmt->get_handle(lec);
         if(handle == 0)
             line_name = lec;
         else
         {
-            comment = std::string((char*) KCVAL(KC_WS.get(), handle));
+            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }

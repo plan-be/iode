@@ -30,19 +30,19 @@
  *  defined (i.e.: is not NaN).
  *  
  *  @param [in, out]  Sample*  smpl     First sample on which the variable is not IODE_NAN
- *  @param [in]       char*    name     variable to be analysed (from KV_WS)
- *  @return           int               0 if name is found in KV_WS, -1 otherwise
+ *  @param [in]       char*    name     variable to be analysed (from global_ws_var)
+ *  @return           int               0 if name is found in global_ws_var, -1 otherwise
  */
 static int E_GetSmpl(Sample* smpl, char* c_name)
 {
     std::string name = std::string(c_name);
-    if(!KV_WS->contains(name)) 
+    if(!global_ws_var->contains(name)) 
         return -1;
     
-    double* val = KVVAL(KV_WS.get(), name, 0);
+    double* val = KVVAL(global_ws_var.get(), name, 0);
 
     int t;
-    Sample* wsmpl = KV_WS->sample;
+    Sample* wsmpl = global_ws_var->sample;
     for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
 
@@ -117,10 +117,10 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     if(rc) 
         return(rc);
     
-    Estimation est(eqs, KE_WS.get(), KV_WS.get(), KS_WS.get(), smpl);
+    Estimation est(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
     rc = est.estimate();
 
-    KE_WS->remove("_DF");
+    global_ws_eqs->remove("_DF");
     SCR_free_tbl((unsigned char**) eqs);
     return(rc);
 }
@@ -151,18 +151,18 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     double   *res = NULL, *vec;
 
     // Computes the lec formula and stores the result in the VAR _DF
-    vec = L_cc_link_exec(lec, KV_WS.get(), KS_WS.get());
+    vec = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
     if(vec == NULL) 
         return(NULL);
     strcpy(varname, "_DF");
-    Sample* var_sample = KV_WS->sample;
+    Sample* var_sample = global_ws_var->sample;
     if(!var_sample) 
     {
         kwarning("No sample defined for the Variables workspace");
         return NULL;
     }
     int nb_periods = var_sample->nb_periods;
-    KV_WS->add(varname, vec, nb_periods);
+    global_ws_var->add(varname, vec, nb_periods);
     SW_nfree(vec);
     
     // Checks that the sample is large enough for the estimation 
@@ -178,24 +178,24 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     /* Dickey Fuller */
     // Construction de l'équation à estimer, partie par partie selon les parms
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    KS_WS->add("df_", NULL);
+    global_ws_scl->add("df_", NULL);
     
     if(drift) 
     {
         sprintf(buf + strlen(buf), "+ df_d");
-        KS_WS->add("df_d", NULL);
+        global_ws_scl->add("df_d", NULL);
     }
 
     if(trend) 
     {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        KS_WS->add("df_t", NULL);
+        global_ws_scl->add("df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
         sprintf(scl, "df%d", i);
-        KS_WS->add(scl, NULL);
+        global_ws_scl->add(scl, NULL);
     }
 
     if(order) 
@@ -216,20 +216,20 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     pos = 0;
     if(res) E_SclToReal("df_", res + pos);
     pos += 3;
-    KS_WS->remove("df_");
+    global_ws_scl->remove("df_");
 
     if(drift) 
     {
         if(res) E_SclToReal("df_d", res + pos);
         pos += 3;
-        KS_WS->remove("df_d");
+        global_ws_scl->remove("df_d");
     }
 
     if(trend) 
     {
         if(res) E_SclToReal("df_t", res + pos);
         pos += 3;
-        KS_WS->remove("df_t");
+        global_ws_scl->remove("df_t");
     }
 
     for(i = 1 ; i <= order ; i++) 
@@ -237,12 +237,12 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         sprintf(buf, "df%d", i);
         if(res) E_SclToReal(buf, res + pos);
         pos += 3;
-        KS_WS->remove(buf);
+        global_ws_scl->remove(buf);
     }
 
 cleanup:
     // Deletes the tmp var _DF
-    KV_WS->remove("_DF");
+    global_ws_var->remove("_DF");
     return(res);
 }
 
@@ -256,10 +256,10 @@ cleanup:
  */
 void E_SclToReal(char* name, double* res)
 {
-    if(!KS_WS->contains(name))
+    if(!global_ws_scl->contains(name))
         return;
 
-    Scalar* scl = KSVAL(KS_WS.get(), name);
+    Scalar* scl = KSVAL(global_ws_scl.get(), name);
     res[0] = scl->value;
     res[1] = scl->std;
     if(!IODE_IS_0(scl->std)) 
