@@ -58,3 +58,24 @@ void python_assign_super()
 
 	T_view_tbl_super        = c_ViewTable_super;
 }
+
+bool contain_table(const std::string& name)
+{
+	if(!KT_WS.get())
+		return false;
+	return KT_WS->contains(name);
+}
+
+bool add_table(const std::string& name, char* value)
+{
+	if(!KT_WS.get())
+		return false;
+	return KT_WS->add(name, value);
+}
+
+bool remove_table(const std::string& name)
+{
+	if(!KT_WS.get())
+		return false;
+	return KT_WS->remove(name);
+}

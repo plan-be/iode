@@ -35,6 +35,15 @@ public:
 		// suppress messages from kmsg()
 		kmsg_toggle(0);
 
+		// clear global workspaces
+		KDB* kdb;
+		for(int iode_type = 0; iode_type < IODE_NB_TYPES; iode_type++)
+		{
+			kdb = get_global_db(iode_type);
+			if(kdb)
+				kdb->clear();
+		}
+
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)

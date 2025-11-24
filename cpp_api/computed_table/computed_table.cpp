@@ -69,7 +69,7 @@ void ComputedTable::initialize()
         if(files_usage.test(ref))
         {
             kdb = K_RWS[VARIABLES][ref - 1];
-            if(kdb == NULL) 
+            if(!kdb) 
                 throw std::invalid_argument("file[" + std::to_string(ref) + "] is not present");
             files.push_back(kdb->filepath);
         }
@@ -268,15 +268,15 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         if(clec == NULL)
             return false;
 
-        L_link(KV_WS, KS_WS, clec);
+        L_link(KV_WS.get(), KS_WS.get(), clec);
         // Newton-Raphson method
-        res = L_zero(KV_WS, KS_WS, clec, period_pos, var_pos, var_pos);
+        res = L_zero(KV_WS.get(), KS_WS.get(), clec, period_pos, var_pos, var_pos);
     }
     else
     {
         // inverse formula
-        L_link(KV_WS, KS_WS, clec);
-        res = L_exec(KV_WS, KS_WS, clec, period_pos);
+        L_link(KV_WS.get(), KS_WS.get(), clec);
+        res = L_exec(KV_WS.get(), KS_WS.get(), clec, period_pos);
     }
 
     SW_nfree(clec);
@@ -285,7 +285,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         return false;
 
     // update the variable var_name in the database
-    KV_set(KV_WS, var_name, period_pos, 0, res);
+    KV_set(KV_WS.get(), var_name, period_pos, 0, res);
 
     return true;
 }

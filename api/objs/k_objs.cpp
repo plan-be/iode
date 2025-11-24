@@ -70,7 +70,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     } 
     else
     {
-        eq = KEVAL(KE_WS, name);
+        eq = KEVAL(KE_WS.get(), name);
         // modify only if not empty
         if(!lec.empty())
             eq->set_lec(lec);

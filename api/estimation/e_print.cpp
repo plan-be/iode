@@ -261,7 +261,7 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
     if(!KE_WS->contains(name)) 
         return -1;
     
-    std::string lec = KELEC(KE_WS, name);
+    std::string lec = KELEC(KE_WS.get(), name);
     char* c_lec = (char*) lec.c_str();
     int i = L_split_eq(c_lec);
     if(i < 0) 

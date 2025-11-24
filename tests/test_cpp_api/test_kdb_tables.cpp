@@ -28,25 +28,24 @@ TEST_F(KDBTablesTest, Subset)
     table->set_title(0, new_title);
 
     // GLOBAL KDB
-    KDBTables kdb_global;
-    EXPECT_EQ(kdb_global.size(), 46);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Tables.size(), 46);
+    EXPECT_TRUE(Tables.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBTables* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBTables* kdb_subset_deep_copy = Tables.subset(pattern, true);
+    std::vector<std::string> names = Tables.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("C8_1", *table);
-    EXPECT_EQ(kdb_global.get_title("C8_1"), title);
+    EXPECT_EQ(Tables.get_title("C8_1"), title);
     EXPECT_EQ(kdb_subset_deep_copy->get_title("C8_1"), new_title);
 
     // SHALLOW COPY SUBSET
-    KDBTables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBTables* kdb_subset_shallow_copy = Tables.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("C8_1", *table);
-    EXPECT_EQ(kdb_global.get_title("C8_1"), new_title);
+    EXPECT_EQ(Tables.get_title("C8_1"), new_title);
     EXPECT_EQ(kdb_subset_shallow_copy->get_title("C8_1"), new_title);
 }
 

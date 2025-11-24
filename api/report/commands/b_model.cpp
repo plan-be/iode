@@ -49,11 +49,11 @@ static int B_ModelSimulateEqs(Sample* smpl, char** eqs)
     CSimulation simu;
 
     if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
-        rc = simu.K_simul(KE_WS, KV_WS, KS_WS, smpl, CSimulation::KSIM_EXO, NULL);
+        rc = simu.K_simul(KE_WS.get(), KV_WS.get(), KS_WS.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
-        rc = simu.K_simul(tdbe, KV_WS, KS_WS, smpl, CSimulation::KSIM_EXO, eqs);
+        tdbe = K_refer(KE_WS.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
+        rc = simu.K_simul(tdbe, KV_WS.get(), KS_WS.get(), smpl, CSimulation::KSIM_EXO, eqs);
         delete tdbe;
         tdbe = nullptr;
     }
@@ -224,16 +224,16 @@ int B_ModelCompile(char* arg, int unused)
     if(arg == NULL || arg[0] == 0) 
     {
         /* EndoExo whole WS */
-        return(KE_compile(KE_WS));
+        return(KE_compile(KE_WS.get()));
     }
     else 
     {
         eqs = B_ainit_chk(arg, NULL, 0);
         if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
-            return(KE_compile(KE_WS));
+            return(KE_compile(KE_WS.get()));
         else 
         {
-            tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
+            tdbe = K_refer(KE_WS.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
             rc = KE_compile(tdbe);
             delete tdbe;
             tdbe = nullptr;
@@ -277,9 +277,9 @@ int B_ModelCalcSCC(char *const_arg, int unused)
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
     nb_eqs = SCR_tbl_size((unsigned char**) eqs);
     if(nb_eqs == 0)
-        tdbe = KE_WS;
+        tdbe = KE_WS.get();
     else
-        tdbe = K_quick_refer(KE_WS, nb_eqs, eqs);
+        tdbe = K_quick_refer(KE_WS.get(), nb_eqs, eqs);
 
     rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
@@ -347,9 +347,9 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         goto err;
     }
 
-    pre   = (char**) KL_expand(KLVAL(KL_WS, lsts[0]));
-    inter = (char**) KL_expand(KLVAL(KL_WS, lsts[1]));
-    post  = (char**) KL_expand(KLVAL(KL_WS, lsts[2]));
+    pre   = (char**) KL_expand(KLVAL(KL_WS.get(), lsts[0]));
+    inter = (char**) KL_expand(KLVAL(KL_WS.get(), lsts[1]));
+    post  = (char**) KL_expand(KLVAL(KL_WS.get(), lsts[2]));
 
     SCR_free_tbl((unsigned char**) lsts);
 
@@ -358,11 +358,11 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     eqs = (char**) SCR_union_quick((unsigned char**) eqs1, (unsigned char**) post);  // JMP 29/8/2012
     SCR_free_tbl((unsigned char**) eqs1);                 // JMP 29/8/2012
     nb_eqs = SCR_tbl_size((unsigned char**) eqs);
-    tdbe = K_quick_refer(KE_WS, nb_eqs, eqs);
+    tdbe = K_quick_refer(KE_WS.get(), nb_eqs, eqs);
     SCR_free_tbl((unsigned char**) eqs);
 
     // Lance la simulation
-    rc = simu.K_simul_SCC(tdbe, KV_WS, KS_WS, smpl, pre, inter, post);
+    rc = simu.K_simul_SCC(tdbe, KV_WS.get(), KS_WS.get(), smpl, pre, inter, post);
 
     // Cleanup
     delete tdbe;
@@ -412,7 +412,7 @@ static double *B_GetVarPtr(char* c_name)
     if(!KV_WS->contains(name))
         return NULL;
     else
-        return KVVAL(KV_WS, name, 0);
+        return KVVAL(KV_WS.get(), name, 0);
 }
 
 
@@ -425,22 +425,27 @@ static double *B_GetVarPtr(char* c_name)
  */
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
-    KDB         *dbv = KV_WS;
-    double      *x;
-    int         t;
+    if(!KV_WS.get())
+        return -1;
 
     // Create var and get Ptr
     B_CreateEmptyVar(name);
-    x = B_GetVarPtr(name);
-    if(x == 0) return(-1);
+    double* x = B_GetVarPtr(name);
+    if(x == 0) 
+    {
+        std::string error_msg = "B_CreateVarFromVecOfDoubles: failed to create the variable '";
+        error_msg += std::string(name) + "'";
+        error_manager.append_error(error_msg);
+        return -1;
+    }
 
     // Copy values
     if(vec) 
     {
-        for(t = 0; t < dbv->sample->nb_periods; t++)
+        for(int t = 0; t < KV_WS->sample->nb_periods; t++)
             x[t] = vec[t];
     }
-    return(0);
+    return 0;
 }
 
 /**
@@ -452,28 +457,27 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  */
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
-    KDB         *dbv = KV_WS;
-    double      *x;
-    int         t;
+    if(!KV_WS.get())
+        return -1;
 
     // Create var and get Ptr
     B_CreateEmptyVar(name);
-    x = B_GetVarPtr(name);
+    double* x = B_GetVarPtr(name);
     if(x == 0) 
     {
         std::string error_msg = "B_CreateVarFromVecOfInts: failed to create the variable '";
         error_msg += std::string(name) + "'";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     // Copy values
     if(vec) 
     {
-        for(t = 0; t < dbv->sample->nb_periods; t++)
+        for(int t = 0; t < KV_WS->sample->nb_periods; t++)
             x[t] = vec[t];
     }
-    return(0);
+    return 0;
 }
 
 

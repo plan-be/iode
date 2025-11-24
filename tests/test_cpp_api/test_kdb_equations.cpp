@@ -29,25 +29,24 @@ TEST_F(KDBEquationsTest, Subset)
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
 
     // GLOBAL KDB
-    KDBEquations kdb_global;
-    EXPECT_EQ(kdb_global.size(), 274);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Equations.size(), 274);
+    EXPECT_TRUE(Equations.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBEquations* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBEquations* kdb_subset_deep_copy = Equations.subset(pattern, true);
+    std::vector<std::string> names = Equations.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
-    EXPECT_EQ(kdb_global.get_lec("ACAF"), lec);
+    EXPECT_EQ(Equations.get_lec("ACAF"), lec);
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("ACAF"), new_lec);
 
     // SHALLOW COPY SUBSET
-    KDBEquations* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBEquations* kdb_subset_shallow_copy = Equations.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("ACAF", new_lec);
-    EXPECT_EQ(kdb_global.get_lec("ACAF"), new_lec);
+    EXPECT_EQ(Equations.get_lec("ACAF"), new_lec);
     EXPECT_EQ(kdb_subset_shallow_copy->get_lec("ACAF"), new_lec);
 }
 

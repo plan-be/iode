@@ -10,11 +10,11 @@ const std::map<char, std::string> mLowToHigh =
 };
 
 /**
- * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
+ * @brief check if data for IODE objects of type iodeType has been loaded in global database. 
  * 
  * @param iodeType IodeType type of Iode object.
  * 
- * @return bool Wether or not K_WS corresponding to iodeType is empty.
+ * @return bool Wether or not global database corresponding to iodeType is empty.
  */
 bool is_global_database_loaded(const IodeType iodeType);
 

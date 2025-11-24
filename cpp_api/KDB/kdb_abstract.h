@@ -43,8 +43,8 @@ public:
 
     KDB* get_database() const
     {
-        KDB* kdb = is_global_database() ? K_WS[k_type] : const_cast<KDBAbstract*>(this);
-        if(kdb == NULL)
+        KDB* kdb = is_global_database() ? get_global_db(k_type) : const_cast<KDBAbstract*>(this);
+        if(!kdb)
             kwarning(("The current " + v_iode_types[k_type] + " has not been set yet").c_str());
         return kdb;
     } 

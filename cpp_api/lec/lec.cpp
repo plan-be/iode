@@ -19,7 +19,7 @@ static CLEC* link_lec(const std::string& lec)
         return NULL;
     } 
     
-    int res = L_link(KV_WS, KS_WS, clec);
+    int res = L_link(KV_WS.get(), KS_WS.get(), clec);
     if(res != 0)
     {
         SCR_free(clec);
@@ -36,7 +36,7 @@ double execute_lec(const std::string& lec, const int t)
     if(clec == NULL) 
         return IODE_NAN;
 
-    double value = L_exec(KV_WS, KS_WS, clec, t);
+    double value = L_exec(KV_WS.get(), KS_WS.get(), clec, t);
     SCR_free(clec);
 
     return value;
@@ -68,7 +68,7 @@ std::vector<double> execute_lec(const std::string& lec)
 
     res.reserve(nb_per);
     for(int t = 0; t < nb_per; t++) 
-        res.push_back(L_exec(KV_WS, KS_WS, clec, t));
+        res.push_back(L_exec(KV_WS.get(), KS_WS.get(), clec, t));
     SCR_free(clec);
 
     return res;

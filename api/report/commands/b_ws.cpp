@@ -61,7 +61,6 @@
  
 int B_WsLoad(char* arg, int type)
 {
-    int  pos = K_PWS[type];
     char buf[K_MAX_FILE + 1];
 
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
@@ -73,9 +72,33 @@ int B_WsLoad(char* arg, int type)
     if(!kdb) 
         return -1;
 
-    if(K_WS[type])
-        delete K_WS[type];
-    K_WS[type] = kdb;
+    switch(type) 
+    {
+        case COMMENTS :    
+            KC_WS.reset(kdb); 
+            break;
+        case EQUATIONS :   
+            KE_WS.reset(kdb);
+            break;
+        case IDENTITIES :  
+            KI_WS.reset(kdb);
+            break;
+        case LISTS :       
+            KL_WS.reset(kdb);
+            break;
+        case SCALARS :     
+            KS_WS.reset(kdb);
+            break;
+        case TABLES :      
+            KT_WS.reset(kdb);
+            break;
+        case VARIABLES :   
+            KV_WS.reset(kdb);
+            break;
+        default:
+            kerror(0, "B_WsLoad: unknown type %d", type);
+            return -1;
+    }
 
     // get the list of all object names in 'kdb'
     int i = 0;
@@ -84,9 +107,9 @@ int B_WsLoad(char* arg, int type)
     for (const auto& [name, _] : kdb->k_objs)
         all_names[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
 
-    if(K_RWS[type][pos])
-        delete K_RWS[type][pos];
-    K_RWS[type][pos] = K_quick_refer(kdb, nb_names, all_names);
+    if(K_RWS[type][0])
+        delete K_RWS[type][0];
+    K_RWS[type][0] = K_quick_refer(kdb, nb_names, all_names);
 
     delete[] all_names;
     return 0;
@@ -192,7 +215,7 @@ int B_WsSave(char* arg, int type)
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
     SCR_strip((unsigned char*) buf);
     if(buf[0] == 0) return(0);
-    return(B_WsDump(K_WS[type], buf));
+    return(B_WsDump(get_global_db(type), buf));
 }
 
 
@@ -216,7 +239,7 @@ int B_WsSave(char* arg, int type)
     if(buf[0] == 0) return(0);
     klzh = K_LZH;
     K_LZH = 2;
-    rc = B_WsDump(K_WS[type], buf);
+    rc = B_WsDump(get_global_db(type), buf);
     K_LZH = klzh;
     return(rc);
 }
@@ -233,7 +256,7 @@ int B_WsSave(char* arg, int type)
 
 int B_WsExport(char* arg, int type)
 {
-    return ascii_handlers[type]->save_asc(K_WS[type], arg);
+    return ascii_handlers[type]->save_asc(get_global_db(type), arg);
 }
 
 
@@ -260,11 +283,9 @@ int B_WsImport(char* arg, int type)
 
 int B_WsSample(char* arg, int unused)
 {
-    char    **args;
-    Sample  *new_smpl = NULL;
-    KDB     *kdb = KV_WS;
-
-    args = B_ainit_chk(arg, NULL, 2);
+    Sample* new_smpl = nullptr;
+    
+    char** args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) 
         goto err;
 
@@ -284,7 +305,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    if(KV_sample(kdb, new_smpl) < 0)
+    if(KV_sample(KV_WS.get(), new_smpl) < 0)
     {
         error_manager.append_error("New sample invalid");
         goto err;
@@ -316,7 +337,7 @@ int B_WsClear(char* arg, int type)
 {
     B_WsDescr("", type);
     B_WsName("", type);
-    K_WS[type]->clear();
+    get_global_db(type)->clear();
     return 0;
 }
 
@@ -346,7 +367,7 @@ int B_WsClearAll(char* arg, int unused)
  
 int B_WsDescr(char* arg, int type)
 {
-    K_WS[type]->description = std::string(arg);
+    get_global_db(type)->description = std::string(arg);
     return 0;
 }
 
@@ -359,7 +380,7 @@ int B_WsDescr(char* arg, int type)
 
 int B_WsName(char* arg, int type)
 {
-    K_WS[type]->filepath = std::string(arg);
+    get_global_db(type)->filepath = std::string(arg);
     return 0;
 }
 
@@ -432,7 +453,7 @@ int B_WsCopy(char* arg, int type)
     else 
     {
         data = (char**) SCR_inter(((unsigned char**) data0) + shift, ((unsigned char**) data0) + shift);
-        rc = K_copy(K_WS[type],
+        rc = K_copy(get_global_db(type),
                     SCR_tbl_size((unsigned char**) files), files,
                     SCR_tbl_size((unsigned char**) data), data,
                     smpl);
@@ -466,7 +487,7 @@ int B_WsMerge(char* arg, int type)
     char    file[K_MAX_FILE + 1];
 
     lg = B_get_arg0(file, arg, K_MAX_FILE);
-    rc = K_cat(K_WS[type], file);
+    rc = K_cat(get_global_db(type), file);
     return(rc);
 }
 
@@ -490,21 +511,24 @@ int B_WsMerge(char* arg, int type)
  
 int B_WsExtrapolate(char* arg, int unused)
 {
-    int     nb_args, p = 0, method = 0, rc = -1;
-    char    **args, **vars;
-    Sample  *smpl;
-    KDB     *kdb = KV_WS;
+    int     p = 0, method = 0, rc = -1;
+    char    **vars;
+    Sample* smpl = nullptr;
 
-    args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 2) {
+    char** args = B_ainit_chk(arg, NULL, 0);
+    int nb_args = SCR_tbl_size((unsigned char**) args);
+    if(nb_args < 2) 
+    {
         error_manager.append_error("WsExtrapolate: syntax error (method from to vars ...)");
         goto done;
     }
-    else {
+    else 
+    {
         method = atoi(args[0]);
-        if(method < 0 || method > 6) method = 0;
-        else p = 1;
+        if(method < 0 || method > 6) 
+            method = 0;
+        else 
+            p = 1;
     }
 
     try
@@ -524,7 +548,7 @@ int B_WsExtrapolate(char* arg, int unused)
     }
 
     vars = args + p + 2;
-    rc = KV_extrapolate(kdb, method, smpl, vars);
+    rc = KV_extrapolate(KV_WS.get(), method, smpl, vars);
 
 done:
     if(smpl) delete smpl;
@@ -544,12 +568,12 @@ done:
  
 int B_WsAggr(int method, char* arg)
 {
-    int     nb_args, rc = -1;
-    char    **args, *pattern = NULL;
-    KDB     *kdb = KV_WS, *nkdb = NULL;
+    int     rc = -1;
+    char    *pattern = NULL;
+    KDB     *kdb = KV_WS.get(), *nkdb = NULL;
 
-    args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    char** args = B_ainit_chk(arg, NULL, 0);
+    int nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 1) 
     {
         error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
@@ -759,7 +783,7 @@ int B_CsvSave(char* arg, int type)
         }
     }
 
-    rc = ascii_handlers[type]->save_csv(K_WS[type], file_ext, smpl, data0 + shift);
+    rc = ascii_handlers[type]->save_csv(get_global_db(type), file_ext, smpl, data0 + shift);
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;

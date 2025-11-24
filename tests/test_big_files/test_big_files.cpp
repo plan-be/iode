@@ -91,7 +91,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         A_SEPS = (char*) ";\t\n";
 
         start = std::chrono::high_resolution_clock::now();
-        // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+        // Retrieves all object names matching one or more patterns in the 
+        // global database (similar to grep)
         char* list_names = K_expand_kdb(kdb_var, (int) VARIABLES, (char*) pattern, '*');
         // Parses a string and replaces @filename and $listname by their contents
         char** objs = B_ainit_chk(list_names, NULL, 0);
@@ -104,7 +105,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         /* NOTE: TOO SLOW -> ~ 35 sec -> skipped
         start = std::chrono::high_resolution_clock::now();
-        // Retrieves all object names from K_WS[...]
+        // Retrieves all object names from the global database
         list_names = K_expand_kdb(kdb_var, (int) VARIABLES, "*", '*');
         // Parses a string and replaces @filename and $listname by their contents
         char** all_objs = B_ainit_chk(list_names, NULL, 0);
@@ -167,7 +168,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ==== Load all variables from big.var into KV_WS ====
         start = std::chrono::high_resolution_clock::now();
         B_WsLoad(fullfilename, VARIABLES);
-        EXPECT_TRUE(KV_WS != nullptr);
+        EXPECT_TRUE(KV_WS.get() != nullptr);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(B_WsLoad)               loaded " << std::to_string(KV_WS->size()) 
@@ -176,7 +177,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // **** K_refer and K_quick_refer performance tests ****
         // ==== Only names matching a specific pattern ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_refer(KV_WS, nb_names, objs);
+        kdb_shallow_copy = K_refer(KV_WS.get(), nb_names, objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
@@ -186,7 +187,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(KV_WS, nb_names, objs);
+        kdb_shallow_copy = K_quick_refer(KV_WS.get(), nb_names, objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -197,7 +198,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== All names from KV_WS ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_refer(KV_WS, all_nb_names, all_objs);
+        kdb_shallow_copy = K_refer(KV_WS.get(), all_nb_names, all_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
@@ -207,7 +208,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(KV_WS, all_nb_names, all_objs);
+        kdb_shallow_copy = K_quick_refer(KV_WS.get(), all_nb_names, all_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
@@ -245,7 +246,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.var");
         start = std::chrono::high_resolution_clock::now();
-        K_save(KV_WS, out_filename);
+        K_save(KV_WS.get(), out_filename);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.var file]  saved " << std::to_string(KV_WS->size()) 
@@ -293,7 +294,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.av");
         start = std::chrono::high_resolution_clock::now();
-        K_save(KV_WS, out_filename);
+        K_save(KV_WS.get(), out_filename);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.av file]  saved " << std::to_string(KV_WS->size()) 

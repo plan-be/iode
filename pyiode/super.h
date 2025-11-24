@@ -48,3 +48,7 @@ int c_ViewTable_super(Table* tbl, char* smpl, char* name);
 
 int error_as_cpp_exception(const int level, const char* msg);
 void python_assign_super();
+
+bool contain_table(const std::string& name);
+bool add_table(const std::string& name, char* value);
+bool remove_table(const std::string& name);

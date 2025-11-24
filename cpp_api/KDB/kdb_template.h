@@ -55,7 +55,7 @@ public:
         }
         else
         {
-            KDB* global_kdb = K_WS[k_type];
+            KDB* global_kdb = get_global_db(k_type);
             if(global_kdb->contains(name))
                 throw std::invalid_argument(error_msg);
             // add new obj to the global KDB
@@ -81,7 +81,7 @@ public:
         // NOTE: In the case of a shallow copy, only pointers to objects 
         //       are duplicated, not the objects.
         //       Modifying an object passing either the shallow copy
-        //       or the global KDB (K_WS[k_type]) modifies the same object.
+        //       or the global database modifies the same object.
         add_or_update(kdb, name, args...);
     }
 

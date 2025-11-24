@@ -180,7 +180,7 @@ char *K_expand(int type, char* file, char* pattern, int all)
         return(NULL);
 
     if(file == NULL) 
-        kdb = K_WS[type];
+        kdb = get_global_db(type);
     else 
     {
         kdb = K_interpret(type, file, 0);
@@ -238,8 +238,8 @@ char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
     if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) 
         return(NULL);
 
-    if(kdb == NULL) 
-        kdb = K_WS[type];
+    if(!kdb) 
+        kdb = get_global_db(type);
 
     ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS);
     np = SCR_tbl_size((unsigned char**) ptbl);

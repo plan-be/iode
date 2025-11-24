@@ -651,7 +651,7 @@ U_ch *RPF_sstderr(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(KS_WS, name);
+            scl = KSVAL(KS_WS.get(), name);
             if(IODE_IS_A_NUMBER(scl->std))
                 sprintf((char*) buf, "%lf", (double) scl->std);
             else
@@ -686,7 +686,7 @@ U_ch *RPF_srelax(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(KS_WS, name);
+            scl = KSVAL(KS_WS.get(), name);
             if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf((char*) buf, "%lf", (double) scl->relax);
             else
@@ -726,7 +726,7 @@ U_ch *RPF_ttitle(U_ch** args)
         }
         else 
         {
-            tbl = KTVAL(KT_WS, name);
+            tbl = KTVAL(KT_WS.get(), name);
             res = SCR_strafcat(res, T_get_title(tbl, false));
             delete tbl;
             tbl = nullptr;
@@ -749,11 +749,11 @@ U_ch *RPF_ttitle(U_ch** args)
  */
 U_ch *RPF_cvalue(U_ch** args)
 {
-    U_ch    *res = 0, buf[128];
-    int     i;
-    KDB     *kdb = KC_WS;
+    U_ch *res = 0, buf[128];
+    int  i;
+    KDB  *kdb = KC_WS.get();
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(res);
 
     SWHDL handle;
@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    KDB     *kdb = KV_WS;
+    KDB     *kdb = KV_WS.get();
 
     if(!kdb) 
         return(res);
@@ -842,9 +842,9 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDB  *kdb = KL_WS;
+    KDB  *kdb = KL_WS.get();
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(res);
 
     std::string name;
@@ -884,9 +884,9 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDB     *kdb = KI_WS;
+    KDB     *kdb = KI_WS.get();
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(res);
 
     std::string name;
@@ -927,10 +927,10 @@ U_ch *RPF_ivalue(U_ch** args)
  */
 U_ch *RPF_evalue(U_ch** args)                
 {
-    U_ch    *res = 0, buf[128];
-    KDB     *kdb = KE_WS;
+    U_ch* res = 0, buf[128];
+    KDB* kdb = KE_WS.get();
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(res);
 
     std::string name;
@@ -968,11 +968,11 @@ U_ch *RPF_evalue(U_ch** args)
  */
 U_ch *RPF_eqsample(U_ch** args)            
 {
-    U_ch    *res = 0;
-    KDB     *kdb = KE_WS;
+    U_ch* res = 0;
+    KDB* kdb = KE_WS.get();
 
     // Equation WS  empty
-    if(kdb == NULL) 
+    if(!kdb) 
         return(res);
     
     // 1! eq
@@ -1006,8 +1006,8 @@ U_ch *RPF_eqsample(U_ch** args)
  */
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
-    U_ch    *res = 0;
-    KDB     *kdb = KE_WS;
+    U_ch* res = 0;
+    KDB* kdb = KE_WS.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1077,9 +1077,9 @@ U_ch *RPF_eqsampleto(U_ch **args)
  */
 U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs) 
 {
-    U_ch    *eq = 0, *rhs;
-    int     poscolon;
-    KDB     *kdb = KE_WS;
+    U_ch* eq = 0, *rhs;
+    int poscolon;
+    KDB* kdb = KE_WS.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1165,7 +1165,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    KDB     *kdb = KV_WS;
+    KDB     *kdb = KV_WS.get();
     char     what = 'F';
 
     smpl = kdb->sample;
@@ -1243,7 +1243,7 @@ U_ch *RPF_vsliste(U_ch** args, int type)
         name = std::string((char*) args[i]);
         if(!KE_WS->contains(name)) 
             continue;
-        eq = KEVAL(KE_WS, name);
+        eq = KEVAL(KE_WS.get(), name);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         if(eq) 
             delete eq;

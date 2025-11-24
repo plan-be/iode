@@ -23,34 +23,32 @@
 
 static int RasSetVar(char* c_name, int t, double var)
 {
-    KDB* kdb = KV_WS;
     std::string name = std::string(c_name);
 
-    if(!kdb->contains(name)) 
+    if(!KV_WS->contains(name)) 
     {
         std::string error_msg = "RAS: Variable '" + name + "' not found";
         error_manager.append_error(error_msg);
         return(-1);
     }         
     
-    *KVVAL(kdb, name, t) = var;
+    *KVVAL(KV_WS.get(), name, t) = var;
     return(0);
 }
 
 static double RasGetVar(char* c_name, int t)
 {
     double  var;
-    KDB     *kdb = KV_WS;
     std::string name = std::string(c_name);
 
-    if(!kdb->contains(name)) 
+    if(!KV_WS->contains(name)) 
     {
         std::string error_msg = "RAS: Variable '" + name + "' not found";
         error_manager.append_error(error_msg);
         var = IODE_NAN;
     }
     else          
-        var = *KVVAL(kdb, name, t);
+        var = *KVVAL(KV_WS.get(), name, t);
 
     // set to 0 if almost 0
     if(fabs(var) < 1e-10) 
@@ -162,7 +160,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     double  *row = NULL;
     double  *col = NULL;
     double  var, fvar;
-    KDB     *kdb = KV_WS;
+    KDB     *kdb = KV_WS.get();
 
     if(rper != NULL && cper != NULL) 
     {

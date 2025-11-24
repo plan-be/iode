@@ -39,7 +39,8 @@ int B_FileImportCmt(char* arg, int unused)
     empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 5) {
+    if(nb_args < 5) 
+    {
         error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
@@ -51,11 +52,13 @@ int B_FileImportCmt(char* arg, int unused)
     oufile = args[3];
     lang   = B_argpos("EFD", args[4][0]);
 
-    if(nb_args == 6) trace = args[5];
-    else             trace = empty_buf;
+    if(nb_args == 6) 
+        trace = args[5];
+    else             
+        trace = empty_buf;
 
     rc = IMP_RuleImport(COMMENTS, trace, rule, oufile, infile,
-                      empty_buf, empty_buf, format, lang);
+                        empty_buf, empty_buf, format, lang);
 
 fin:
     A_free((unsigned char**) args);
@@ -85,7 +88,8 @@ int B_FileImportVar(char* arg, int unused)
     empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
-    if(nb_args < 6) {
+    if(nb_args < 6) 
+    {
         error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
@@ -98,11 +102,13 @@ int B_FileImportVar(char* arg, int unused)
     from   = args[4];
     to     = args[5];
 
-    if(nb_args == 7) trace = args[6];
-    else             trace = empty_buf;
+    if(nb_args == 7) 
+        trace = args[6];
+    else             
+        trace = empty_buf;
 
     rc = IMP_RuleImport(VARIABLES, trace, rule, oufile, infile,
-                      from, to, format, 0);
+                        from, to, format, 0);
 
 fin:
     A_free((unsigned char**) args);

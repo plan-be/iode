@@ -51,7 +51,7 @@ public:
 inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 {
     KDB* kdb = cpp_kdb.get_database();
-    if(kdb == NULL) return 0;
+    if(!kdb) return 0;
 
     char* ptr;
     Equation* eq;

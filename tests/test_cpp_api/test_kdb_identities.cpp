@@ -26,25 +26,24 @@ TEST_F(KDBIdentitiesTest, Subset)
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
 
     // GLOBAL KDB
-    KDBIdentities kdb_global;
-    EXPECT_EQ(kdb_global.size(), 48);
-    EXPECT_TRUE(kdb_global.is_global_database());
+    EXPECT_EQ(Identities.size(), 48);
+    EXPECT_TRUE(Identities.is_global_database());
 
     // DEEP COPY SUBSET
-    KDBIdentities* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
-    std::vector<std::string> names = kdb_global.get_names(pattern);
+    KDBIdentities* kdb_subset_deep_copy = Identities.subset(pattern, true);
+    std::vector<std::string> names = Identities.get_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
-    EXPECT_EQ(kdb_global.get_lec("AOUC"), lec);
+    EXPECT_EQ(Identities.get_lec("AOUC"), lec);
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("AOUC"), new_lec);
 
     // SHALLOW COPY SUBSET
-    KDBIdentities* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    KDBIdentities* kdb_subset_shallow_copy = Identities.subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("AOUC", new_lec);
-    EXPECT_EQ(kdb_global.get_lec("AOUC"), new_lec);
+    EXPECT_EQ(Identities.get_lec("AOUC"), new_lec);
     EXPECT_EQ(kdb_subset_shallow_copy->get_lec("AOUC"), new_lec);
 }
 
@@ -87,7 +86,7 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     std::string name = "AOUC";
     CLEC* clec = NULL;
-    CLEC* expected_clec = KICLEC(KI_WS, name);
+    CLEC* expected_clec = KICLEC(KI_WS.get(), name);
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by name

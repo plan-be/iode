@@ -27,7 +27,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
     bool found = KS_WS->contains(name);
     ASSERT_TRUE(found);
 
-    Scalar* scl = KSVAL(KS_WS, name);
+    Scalar* scl = KSVAL(KS_WS.get(), name);
     ASSERT_EQ(scl->value, val);
     ASSERT_EQ(scl->relax, relax);
     ASSERT_EQ(scl->std, std);

@@ -9,6 +9,8 @@
 #include <map>
 #include <memory>               // std::shared_ptr
 #include <vector>
+#include <array>
+#include <memory>               // std::unique_ptr, std::shared_ptr
 
 
 inline int K_WARN_DUP = 0;      // If null, adding an existing object name in a KDB  
@@ -18,7 +20,7 @@ inline int K_SECRETSEP = '#';   // pour les macros pushed A#n in reports
 
 enum IodeDatabaseType
 {
-    DB_GLOBAL,          //< K_WS[iode_type]
+    DB_GLOBAL,          //< global database (must be unique)
     DB_STANDALONE,      //< isolated database (useful when working with estimation of block of eqs in the GUI)
     DB_SHALLOW_COPY     //< shallow copy (useful when working on subset in the GUI)
 };
@@ -351,9 +353,40 @@ public:
 
 /*----------------------- GLOBALS ----------------------------*/
 
-inline KDB*     K_WS[7] = { NULL };             // Current workspaces
-inline KDB*     K_RWS[7][5] = {{ NULL }};       // Currently loaded workspaces (for printing and identity execution)
-inline int      K_PWS[7] = { 0 };               // ??? TODO: check if still in use
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<KDB> KC_WS = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
+inline std::unique_ptr<KDB> KE_WS = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
+inline std::unique_ptr<KDB> KI_WS = std::make_unique<KDB>(IDENTITIES, DB_GLOBAL);
+inline std::unique_ptr<KDB> KL_WS = std::make_unique<KDB>(LISTS, DB_GLOBAL);
+inline std::unique_ptr<KDB> KS_WS = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
+inline std::unique_ptr<KDB> KT_WS = std::make_unique<KDB>(TABLES, DB_GLOBAL);
+inline std::unique_ptr<KDB> KV_WS = std::make_unique<KDB>(VARIABLES, DB_GLOBAL);
+
+inline KDB* get_global_db(const int iode_type)
+{
+    switch(iode_type)
+    {
+        case COMMENTS :
+            return KC_WS.get();
+        case EQUATIONS :
+            return KE_WS.get();
+        case IDENTITIES :
+            return KI_WS.get();
+        case LISTS :
+            return KL_WS.get();
+        case SCALARS :
+            return KS_WS.get();
+        case TABLES :
+            return KT_WS.get();
+        case VARIABLES :
+            return KV_WS.get();
+        default :
+            return nullptr;
+    }
+}
+
+inline std::array<std::array<KDB*, 5>, IODE_NB_TYPES> K_RWS = {{ nullptr }};
 
 /**
  * k_ext[][4] : extensions of IODE filenames.
@@ -396,24 +429,6 @@ inline char k_ext[][4] =
 
     "xxx"
 };
-
-/*----------------------- DEFINE ----------------------------*/
-
-#define KC_WS   K_WS[COMMENTS]
-#define KE_WS   K_WS[EQUATIONS]
-#define KI_WS   K_WS[IDENTITIES]
-#define KL_WS   K_WS[LISTS]
-#define KS_WS   K_WS[SCALARS]
-#define KT_WS   K_WS[TABLES]
-#define KV_WS   K_WS[VARIABLES]
-
-#define KC_RWS   K_RWS[COMMENTS][K_PWS[COMMENTS]]
-#define KE_RWS   K_RWS[EQUATIONS][K_PWS[EQUATIONS]]
-#define KI_RWS   K_RWS[IDENTITIES][K_PWS[IDENTITIES]]
-#define KL_RWS   K_RWS[LISTS][K_PWS[LISTS]]
-#define KS_RWS   K_RWS[SCALARS][K_PWS[SCALARS]]
-#define KT_RWS   K_RWS[TABLES][K_PWS[TABLES]]
-#define KV_RWS   K_RWS[VARIABLES][K_PWS[VARIABLES]]
 
 /*----------------------- FUNCS ----------------------------*/
 

@@ -51,7 +51,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
         for(int j = 0 ; j < clec->nb_names ; j++) 
         {
             name = std::string(clec->lnames[j].name);
-            if(is_coefficient(name) && KSVAL(KS_WS, name)->relax != 0)
+            if(is_coefficient(name) && KSVAL(KS_WS.get(), name)->relax != 0)
                 SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) name.c_str());
         }
     }
@@ -70,12 +70,12 @@ static int E_GetScls(CLEC* clec, char*** scl)
 static void E_SetScl(int relax, char* name)                                             
 {
     if(relax == 1) {
-        K_s_set_value(KS_WS, name, 0.9);
-        K_s_set_relax (KS_WS, name, 1.0);
+        K_s_set_value(KS_WS.get(), name, 0.9);
+        K_s_set_relax (KS_WS.get(), name, 1.0);
     }    
     else { 
-        K_s_set_value(KS_WS, name, 0.0);
-        K_s_set_relax (KS_WS, name, 0.0);
+        K_s_set_value(KS_WS.get(), name, 0.0);
+        K_s_set_relax (KS_WS.get(), name, 0.0);
     }
 }
 
@@ -104,8 +104,8 @@ double C_evallec(char* lec, int t)
             error_manager.append_error(error_msg);
             return(x);
         }
-        if(clec != 0 && !L_link(KV_WS, KS_WS, clec))
-            x = L_exec(KV_WS, KS_WS, clec, t);
+        if(clec != 0 && !L_link(KV_WS.get(), KS_WS.get(), clec))
+            x = L_exec(KV_WS.get(), KS_WS.get(), clec, t);
         SW_nfree(clec);
     }
 
@@ -158,7 +158,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
     /* Effectue l'estimation si plus d'un relax est != 0 */
     if(nscl > 1) 
     {                   
-        est = new Estimation(eqs, KE_WS, KV_WS, KS_WS, smpl);
+        est = new Estimation(eqs, KE_WS.get(), KV_WS.get(), KS_WS.get(), smpl);
         est->estimate();
         delete est;
         est = nullptr;
@@ -167,7 +167,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
         strcat(etest, "e0_");
         strcat(etest, test);
         //E_SclToReal(etest, res);
-        res = K_s_get_value(KS_WS, etest); // JMP 09/07/2022
+        res = K_s_get_value(KS_WS.get(), etest); // JMP 09/07/2022
         kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);        // JMP 08/07/2022
         L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);   // JMP 08/07/2022
     }
@@ -249,7 +249,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = KEVAL(KE_WS, name);               
+    eq = KEVAL(KE_WS.get(), name);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
     if(eq)

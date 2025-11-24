@@ -1,7 +1,6 @@
 from libc.string cimport strlen
 from libcpp.string cimport string
 
-from pyiode.super cimport KT_WS
 from pyiode.super cimport K_end_ws
 from pyiode.super cimport kmsgbox_continue
 from pyiode.super cimport kpause_continue
@@ -16,6 +15,9 @@ cdef extern from "super.h":
     cdef void c_kpause_super() noexcept
     cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
                              const unsigned char** buts) noexcept
+    cdef bint contain_table(string& name) except +
+    cdef bint add_table(string& name, char* value) except +
+    cdef bint remove_table(string& name) except +
 
     cdef int c_PrintObjDef_super(char* arg, int unused) except? -1
     cdef int c_ViewPrintGr_super(char* arg, int unused) except? -1
@@ -202,25 +204,28 @@ cdef int c_XodeRuleImport_super(char* arg, int unused):
     return __registry_super_functions['XodeRuleImport']()
 
 cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* c_name):
-    cdef int success = 0
+    cdef bint success = False
+    cdef int i_success = 0
     cdef bytes b_name = c_name
     cdef string s_name = <string>b_name
     cdef bytes b_generalized_sample = smpl
     cdef char* tbl_ptr = <char*>(tbl)
-    
+
     name: str = b_name.decode()
     generalized_sample: str = b_generalized_sample.decode()
     nb_decimals: int = 6
 
-    table_found: bool = KT_WS.contains(name)
+    table_found: bool = contain_table(name)
     if not table_found:
         # temporary add the passed IODE table to the global database of tables
-        KT_WS.add(s_name, tbl_ptr)
+        success = add_table(s_name, tbl_ptr)
+        if not success:
+            return -1
 	
-    success = __registry_super_functions['ViewTable'](name, generalized_sample, nb_decimals)
+    i_success = __registry_super_functions['ViewTable'](name, generalized_sample, nb_decimals)
 
     if not table_found:
         # remove the temporary added IODE table from the global database
-        KT_WS.remove(s_name)
+        remove_table(s_name)
 
-    return success
+    return i_success

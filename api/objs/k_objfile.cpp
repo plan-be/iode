@@ -953,7 +953,7 @@ int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)
 {
     int     i, j, nb, nb_found = 0, *found = NULL;
 
-    if(kdb == NULL) 
+    if(!kdb) 
         return(-1);
     if(objs == NULL || no == 0) 
         return(0);

@@ -105,7 +105,7 @@ TEST_F(TablesTest, AddGetTable)
     KT_WS->add(name, (char*) tbl);
 
     // --- extract the table from the Table KDB
-    Table* extracted_tbl = KTVAL(KT_WS, name);
+    Table* extracted_tbl = KTVAL(KT_WS.get(), name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
@@ -265,7 +265,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     bool found = KT_WS->contains(c_name);
     ASSERT_TRUE(found);
 
-    Table* tbl = KTVAL(KT_WS, std::string(c_name));
+    Table* tbl = KTVAL(KT_WS.get(), std::string(c_name));
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);
@@ -804,7 +804,7 @@ TEST_F(TablesTest, Hash)
     EXPECT_EQ(hash_before, hash_after);
 
     // C++ table vs C table
-    Table* c_table = KTVAL(KT_WS, "GFRPC");
+    Table* c_table = KTVAL(KT_WS.get(), "GFRPC");
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);
 

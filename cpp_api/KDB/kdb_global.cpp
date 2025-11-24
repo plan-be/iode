@@ -4,8 +4,10 @@
 
 bool is_global_database_loaded(const IodeType iodeType) 
 { 
-    if (K_WS[iodeType] == NULL) return false;
-    if (K_WS[iodeType]->size() == 0) return false;
+    if(!get_global_db(iodeType)) 
+        return false;
+    if(get_global_db(iodeType)->size() == 0) 
+        return false;
     return true; 
 }
 
@@ -18,7 +20,8 @@ std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iod
 {
     char* c_pattern = to_char_array(pattern);
     
-    // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+    // Retrieves all object names matching one or more patterns in the 
+    // global database (similar to grep)
     char* c_lst = K_expand_kdb(kdb, (int) iode_type, c_pattern, '*');
     
     // Parses a string and replaces @filename and $listname by their contents

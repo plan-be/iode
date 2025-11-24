@@ -651,13 +651,12 @@ done:
  */
  
 int KV_per_pos(Period* per2)
-{
-    Sample* smpl;
-    int     diff;
+{   
+    if(!KV_WS.get()) 
+        return(-1);
     
-    if(KV_WS == NULL) return(-1);
-    smpl = KV_WS->sample;
-    diff = per2->difference(smpl->start_period);
+    Sample* smpl = KV_WS->sample;
+    int diff = per2->difference(smpl->start_period);
     return(diff);
 }
 
@@ -704,7 +703,7 @@ int KV_aper_pos(char* aper2)
  
 double KV_get_at_t(char*varname, int t)
 {
-    double* var_ptr = KVVAL(KV_WS, varname);
+    double* var_ptr = KVVAL(KV_WS.get(), varname);
     if(var_ptr == NULL) 
         return(IODE_NAN);
     
@@ -774,7 +773,7 @@ double KV_get_at_aper(char*varname, char* aper)
 
 int KV_set_at_t(char*varname, int t, double val)
 {
-    double* var_ptr = KVVAL(KV_WS, varname);
+    double* var_ptr = KVVAL(KV_WS.get(), varname);
     if(var_ptr == NULL) 
         return(-1);
 

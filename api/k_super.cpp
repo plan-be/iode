@@ -477,15 +477,13 @@ void kbeep()
 
 Sample* kasksmpl()
 {
-    Sample  *smpl = KV_WS->sample;
-
     if(kasksmpl_super) 
         return((*kasksmpl_super)());
     
-    if(KV_WS != 0)
-        return(KV_WS)->sample;
+    if(KV_WS.get())
+        return KV_WS->sample;
     else 
-        return(NULL);
+        return nullptr;
 }
 
 
@@ -568,7 +566,7 @@ char* A_expand_super_API(char* name)
     if(!KL_WS->contains(name)) 
         return NULL;
     
-    return KLVAL(KL_WS, name);
+    return KLVAL(KL_WS.get(), name);
 }
 
 
