@@ -281,23 +281,22 @@ static int     BEG = 0;     // Nb of the current printed variable (to limit each
  */
 int B_PrintObjDef_1(char* arg, int* type)
 {
-    KDB     *kdb;
-    int     pos, rc = 0;
+    int rc = 0;
 
-    kdb = get_global_db(*type);
+    KDB* kdb = get_global_db(*type);
     std::string name = std::string(arg);
-    pos = kdb->index_of(name);
+    int pos = kdb->index_of(name);
     if(pos < 0) 
         goto err;
 
     kmsg("Printing %s ...", arg);
     if(khitkey() != 0) 
-        kgetkey();               // JMP 11/12/2021
+        kgetkey();
 
     switch(*type) 
     {
         case COMMENTS :
-            rc = B_PrintDefCmt(kdb, pos);
+            rc = B_PrintDefCmt(static_cast<CKDBComments*>(kdb), pos);
             W_flush();
             break;
         case EQUATIONS :
@@ -571,12 +570,11 @@ int B_PrintTblCell(TableCell* cell, int straddle)
 
 /*================================= CMT ================================*/
 
-// Print a comment.
-int B_PrintDefCmt(KDB* kdb, int pos)
+// Print a comment
+int B_PrintDefCmt(CKDBComments* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
-    SWHDL handle = kdb->k_objs[name];
-    B_PrintDefGnl((char*) name.c_str(), KCVAL(kdb, handle));
+    B_PrintDefGnl((char*) name.c_str(), kdb->get_obj(name));
     return(0);
 }
 

@@ -66,8 +66,10 @@
 #include "api/objs/pack.h"
 #include "api/objs/grep.h"
 #include "api/objs/comments.h"
+#include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 #include "api/print/print.h"
@@ -444,7 +446,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
         switch(type) 
         {
             case COMMENTS :
-                obj = (char*) KCVAL(kdb, name);
+                obj = (char*) static_cast<CKDBComments*>(kdb)->get_obj(name);
                 break;
             case EQUATIONS :
                 lec = KELEC(kdb, name);
@@ -632,7 +634,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case COMMENTS :
         case LISTS :
-            res = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
+            res = (char*) SCR_stracpy((unsigned char*) kdb->get_ptr_obj(name));
             SCR_replace((unsigned char*) res, (unsigned char*) "\t", (unsigned char*) " ");
             SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
             return(res);
@@ -1009,7 +1011,7 @@ int B_ExcelSet(char *arg, int type)
     int         pos, shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
     KDB         *kdb = get_global_db(type);
-    Scalar         *scl;
+    Scalar      *scl;
     Period      *per = NULL;
     double      d;
     char        **args = NULL,
@@ -1031,7 +1033,7 @@ int B_ExcelSet(char *arg, int type)
     switch(type) 
     {
         case COMMENTS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
+            ptr = (char*) SCR_stracpy((unsigned char*) static_cast<CKDBComments*>(kdb)->get_obj(name));
             break;
         case IDENTITIES :
             ptr = (char*) SCR_stracpy((unsigned char*) KILEC(kdb, name));

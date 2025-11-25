@@ -89,11 +89,11 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
     return(write_pre_post("LOAD ", " ;\n", name, code));
 }
 
-char* ExportObjsTSP::extract_comment(KDB* dbc, char* name, char** cmt)
+char* ExportObjsTSP::extract_comment(CKDBComments* dbc, char* name, char** cmt)
 {
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)  
-        *cmt = (char*) SCR_stracpy((unsigned char*) KCVAL(dbc, handle));
+        *cmt = (char*) SCR_stracpy((unsigned char*) dbc->get_obj(handle));
     else 
         *cmt = (char*) SCR_stracpy((unsigned char*) " ");
     

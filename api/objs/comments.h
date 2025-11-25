@@ -9,20 +9,25 @@
 // CMT = Comment (string)
 using CMT = char*;
 
+/*----------------------- STRUCTS ----------------------------*/
+
+struct CKDBComments : public CKDBTemplate<CMT>
+{
+    CKDBComments(const IodeDatabaseType db_type) : CKDBTemplate(COMMENTS, db_type) {}
+
+    CKDBComments(const CKDBComments& other): CKDBTemplate(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    CMT get_obj(const SWHDL handle) const;
+    CMT get_obj(const std::string& name) const;
+
+    void set_obj(const std::string& name, const CMT& value);
+};
+
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_cmt = std::make_unique<KDB>(COMMENTS, DB_GLOBAL);
-
-/*----------------------- MACROS ----------------------------*/
-
-// Returns a pointer to the CMT in swap (not allocated -> do not free)
-inline CMT KCVAL(KDB* kdb, const std::string& name)
-{
-    return K_optr0(kdb, (char*) name.c_str());            
-}
-
-inline CMT KCVAL(KDB* kdb, SWHDL handle)
-{
-    return (CMT) P_get_ptr(SW_getptr(handle), 0);            
-}
+inline std::unique_ptr<CKDBComments> global_ws_cmt = std::make_unique<CKDBComments>(DB_GLOBAL);

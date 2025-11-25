@@ -20,7 +20,9 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 #include "api/objs/grep.h"
 #include "api/report/commands/commands.h"       // K_AggrChar
 
@@ -80,7 +82,7 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
             {
                 case COMMENTS :
                     if(texts) 
-                        found = wrap_grep_gnl(pattern, KCVAL(this, handle), ecase, all);
+                        found = wrap_grep_gnl(pattern, this->get_obj(handle), ecase, all);
                     break;
                 case LISTS :
                     if(texts) 
