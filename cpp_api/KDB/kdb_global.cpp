@@ -16,29 +16,6 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
     kdb->filepath = filename;
 }
 
-std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iode_type, const std::string& pattern)
-{   
-    // Retrieves all object names matching one or more patterns in the 
-    // global database (similar to grep)
-    std::string lst = kdb->expand(pattern, '*');
-    char* c_lst = (char*) lst.c_str();
-    
-    // Parses a string and replaces @filename and $listname by their contents
-    char** c_names = B_ainit_chk(c_lst, NULL, 0);
-    
-    // convert char** -> std::vector<std::string>
-    std::vector<std::string> names;
-    for(int i=0; i < SCR_tbl_size((unsigned char **) c_names); i++)
-        names.push_back(c_names[i]);
-    SCR_free_tbl((unsigned char **) c_names);
-    
-    // remove duplicates
-    sort_and_remove_duplicates(names);
-    
-    // return names
-    return names; 
-}
-
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
                 const TableLang lang, const std::string& debug_file)
 {
@@ -137,7 +114,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    KDB* dbc = new KDB(COMMENTS, DB_STANDALONE);
+    CKDBComments* dbc = new CKDBComments(DB_STANDALONE);
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
@@ -147,17 +124,17 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    KDB* dbv = new KDB(VARIABLES, DB_STANDALONE);
+    KDB* dbv = new KDB(VARIABLES, false);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);
-        if (dbc != NULL) error_msg += "and";
+        if(dbc) error_msg += "and";
         error_msg += "Variables file " + var_file_;
         success = dbv->load(var_file);
         if(!success)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
-        if(smpl != NULL) 
+        if(smpl) 
             KV_sample(dbv, smpl);
     }
 

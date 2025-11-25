@@ -11,7 +11,7 @@ protected:
 
     void SetUp() override
     {
-        KDBVariables kdb_var(input_test_dir + "fun.av");
+        KDBVariables kdb_var(true, input_test_dir + "fun.av");
     }
 
     // void TearDown() override {}
@@ -24,7 +24,7 @@ class KDBVariablesEmptyTest : public KDBTest, public ::testing::Test
 
 TEST_F(KDBVariablesTest, Load)
 {
-    KDBVariables kdb(input_test_dir + prefix_filename + "fun.var");
+    KDBVariables kdb(false, input_test_dir + prefix_filename + "fun.var");
     EXPECT_EQ(kdb.size(), 394);
 }
 
@@ -43,7 +43,7 @@ TEST_F(KDBVariablesTest, Subset)
 
     // DEEP COPY SUBSET
     KDBVariables* kdb_subset_deep_copy = Variables.subset(pattern, true);
-    std::vector<std::string> names = Variables.get_names(pattern);
+    std::vector<std::string> names = Variables.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", lec);
@@ -636,12 +636,12 @@ TEST_F(KDBVariablesTest, Search)
     std::string var_name = "AOUC";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
 
     std::vector<std::string> expected_cmts = { var_name };
     objs_list = Comments.search(var_name);

@@ -44,8 +44,8 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         return -1;
     }
 
-    KDB* exo = new KDB(VARIABLES, DB_STANDALONE);
-    KDB* scal = new KDB(SCALARS, DB_STANDALONE);
+    KDB* exo = new KDB(VARIABLES, false);
+    KDB* scal = new KDB(SCALARS, false);
 
     if(exo == nullptr || scal == nullptr) 
     {

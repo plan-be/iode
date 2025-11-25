@@ -38,7 +38,7 @@ int B_season(char* arg)
     int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
 
     int lg = B_get_arg0(name, arg, 80);
@@ -74,7 +74,7 @@ int B_season(char* arg)
     if(nbper < 0 || t_smpl == nullptr) 
         goto done;
     
-    to = new KDB(VARIABLES, DB_STANDALONE);
+    to = new KDB(VARIABLES, false);
     to->sample = new Sample(*t_smpl);
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));

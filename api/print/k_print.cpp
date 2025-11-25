@@ -109,7 +109,7 @@ void T_print_string(COL* cl, char* string)
     char   *ptr = NULL;
 
     ptr = (char *) COL_text(cl, string, KT_nbnames);
-    if(ptr != NULL) W_printf("%s", ptr);
+    if(ptr != NULL) W_printf((char*) "%s", ptr);
     SW_nfree(ptr);
 }
 
@@ -133,7 +133,7 @@ void T_open_cell(int attr, int straddle, int type)
     if(attr & TABLE_CELL_RIGHT)     align = 'R';
     if(type != TABLE_CELL_STRING && (attr & TABLE_CELL_DECIMAL))   align = 'D'; /* JMP 17-12-93 */
 
-    W_printf("%c%d%c", A2M_SEPCH, straddle, align);
+    W_printf((char*) "%c%d%c", A2M_SEPCH, straddle, align);
 }
 
 
@@ -178,8 +178,8 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
 {
     if(cell == nullptr || cell->is_null()) 
     {
-        //W_printf("%c1R", KT_sep); 
-        W_printf("%c1R", A2M_SEPCH); 
+        //W_printf((char*) "%c1R", KT_sep); 
+        W_printf((char*) "%c1R", A2M_SEPCH); 
         return;                
     }
 
@@ -238,7 +238,7 @@ int T_print_line(Table* tbl, int i, COLS* cls)
             T_print_cell(cell, cl, 1);
         }
     }
-    W_printf("\n");
+    W_printf((char*) "\n");
 
     return(0);
 }
@@ -312,7 +312,7 @@ void T_print_files(COLS* cls, int dim)
 
     for(i = 0; KT_names[i]; i++) {
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
-        W_printf("%s\n", KT_names[i]);
+        W_printf((char*) "%s\n", KT_names[i]);
     }
 }
 
@@ -333,8 +333,8 @@ void T_print_mode(COLS* cls, int dim)
     for(i = 0; i < MAX_MODE; i++) {
         if(KT_mode[i] == 0) continue;
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);  /* JMP 17-12-93 */
-        //W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
-        W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
+        //W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
+        W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
     }
 }
 
@@ -353,7 +353,7 @@ void T_print_date(int dim)
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
     T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
-    W_printf("%s\n", date);
+    W_printf((char*) "%s\n", date);
 }
 
 
@@ -374,11 +374,11 @@ int T_begin_tbl(int dim, COLS* cls)
     if(KT_nbnames == 0) return(-1); /* JMP 11-06-99 */
     COL_find_mode(cls, KT_mode, 2);
 
-    W_printf(".tb %d\n", dim);
-    //if(KT_sep == '\t') W_printf(".sep TAB\n");
-    //else W_printf(".sep %c\n", KT_sep);
-    if(A2M_SEPCH == '\t') W_printf(".sep TAB\n");
-    else W_printf(".sep %c\n", A2M_SEPCH);
+    W_printf((char*) ".tb %d\n", dim);
+    //if(KT_sep == '\t') W_printf((char*) ".sep TAB\n");
+    //else W_printf((char*) ".sep %c\n", KT_sep);
+    if(A2M_SEPCH == '\t') W_printf((char*) ".sep TAB\n");
+    else W_printf((char*) ".sep %c\n", A2M_SEPCH);
     
     return(0);
 }
@@ -390,7 +390,7 @@ int T_begin_tbl(int dim, COLS* cls)
 
 void T_end_tbl()
 {
-    W_printf(".te \n");
+    W_printf((char*) ".te \n");
     SCR_free_tbl((unsigned char**) KT_names);
     KT_names = NULL;
     KT_nbnames = 0;
@@ -452,12 +452,12 @@ int T_print_tbl(Table* tbl, char* smpl)
     // B_PrintRtfTopic(T_get_title(tbl));
     // Nouveau JMP 18/04/2022
     W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(tbl, false));
-    //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
+    //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
     
     if(T_begin_tbl(dim, cls)) 
         return(-1);
     
-    W_printf(".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
+    W_printf((char*) ".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
     
     TableLine* line;
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
@@ -466,7 +466,7 @@ int T_print_tbl(Table* tbl, char* smpl)
         switch(line->get_type()) 
         {
             case TABLE_LINE_SEP   :
-                W_printf(".tl\n");
+                W_printf((char*) ".tl\n");
                 break;
             case TABLE_LINE_TITLE :
                 if(first) {
@@ -474,7 +474,7 @@ int T_print_tbl(Table* tbl, char* smpl)
                     break;
                 }
                 T_print_cell(&(line->cells[0]), NULL, dim);
-                W_printf("\n");
+                W_printf((char*) "\n");
                 break;
             case TABLE_LINE_DATE  :
                 T_print_date(dim);

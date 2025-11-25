@@ -14,16 +14,16 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  * 
- *      KDB *K_refer(KDB* kdb, std::vector<std::string>& names)         // creates a new kdb containing the **handles** of the objects listed in names.
- *      KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)   // same as K_refer() but more efficient for large databases.
  *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)                  // merges two databases : kdb1 <- kdb1 + kdb2. 
  *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)              // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
 #include "scr4/s_dir.h"
 
 #include "api/b_errors.h"
+#include "api/k_lang.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
+#include "api/gsample/gsample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
@@ -34,6 +34,8 @@
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
+#include "api/print/print.h"
+#include "api/report/undoc/undoc.h"
 
 
 // API 
@@ -248,8 +250,6 @@ bool KDB::load_asc(const std::string& filename)
     bool success = false;
     switch(this->k_type)
     {
-        case COMMENTS :
-            success = load_asc_cmt(filename);
             break;
         case EQUATIONS :
             success = load_asc_eqs(filename);
@@ -276,14 +276,16 @@ bool KDB::load_asc(const std::string& filename)
     return success;
 }
 
+void KDB::update_reference_db()
+{
+    K_RWS[this->k_type][0] = new KDB(this, "*");
+}
+
 bool KDB::save_asc(const std::string& filename)
 {
     bool success = false;
     switch(this->k_type)
     {
-        case COMMENTS :
-            success = save_asc_cmt(filename);
-            break;
         case EQUATIONS :
             success = save_asc_eqs(filename);
             break;
@@ -309,6 +311,449 @@ bool KDB::save_asc(const std::string& filename)
     return success;
 }
 
+bool KDB::grep_obj(const std::string& name, const SWHDL handle, 
+    const std::string& pattern, const bool ecase, const bool forms, 
+    const bool texts, const char all) const
+{
+    bool found = false;
+    KDB* _this_ = const_cast<KDB*>(this);
+    switch(this->k_type) 
+    {
+        case LISTS :
+            if(texts) 
+                found = wrap_grep_gnl(pattern, KLVAL(_this_, handle), ecase, all);
+            break;
+        case IDENTITIES :
+            if(forms) 
+                found = wrap_grep_gnl(pattern, KILEC(_this_, handle), ecase, all);
+            break;
+        case EQUATIONS :
+        {
+            std::string lec = KELEC(_this_, name);
+            std::string cmt = KECMT(_this_, name);
+            if(forms) 
+                found = wrap_grep_gnl(pattern, lec, ecase, all);
+            if(!found && texts)
+                found = wrap_grep_gnl(pattern, cmt, ecase, all);
+            break;
+        }
+        case TABLES:
+        {
+            Table* tbl = KTVAL(_this_, name);
+
+            found = false;
+            std::string text;
+            for(const TableLine& tline : tbl->lines) 
+            {
+                if(found) 
+                    break;
+                
+                switch(tline.get_type()) 
+                {
+                    case TABLE_LINE_SEP   :
+                    case TABLE_LINE_MODE  :
+                    case TABLE_LINE_DATE  :
+                    case TABLE_LINE_FILES :
+                        break;
+                    case TABLE_LINE_TITLE :
+                    {
+                        TableCell cell = tline.cells[0];
+                        if(texts)
+                        {
+                            text = cell.get_content(true);
+                            found = wrap_grep_gnl(pattern, text, ecase, all);
+                        } 
+                        break;
+                    }
+                    case TABLE_LINE_CELL :
+                    {
+                        found = false;
+                        for(const TableCell& cell : tline.cells)
+                        {
+                            if(found) 
+                                break;
+                            
+                            if((texts && cell.get_type() == TABLE_CELL_STRING) || 
+                               (forms && cell.get_type() == TABLE_CELL_LEC))
+                               {
+                                    text = cell.get_content(true);
+                                    found = wrap_grep_gnl(pattern, text, ecase, all);
+                               }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            delete tbl;
+            break;
+        }
+    }
+
+    return found;
+}
+
+bool KDB::print_eqs_def(const std::string& name)
+{
+    Equation* eq = KEVAL(this, name);
+    if(!eq) 
+        return false;
+    
+    bool success = eq->print_definition();
+
+    delete eq;
+    eq = nullptr;
+    return success;
+}
+
+bool KDB::print_idt_def(const std::string& name)
+{
+    char* lec = KILEC(this, name);
+    if(lec == NULL) 
+        return false;
+    
+    std::string tmp = name + " : " + std::string(lec);
+    W_printf((char*) ".par1 enum_1\n");
+    CLEC* clec = KICLEC(this, name);
+    print_lec_definition(name, tmp, clec, B_EQS_LEC);
+
+    return true;
+}
+
+bool KDB::print_lst_def(const std::string& name)
+{
+    print_definition_generic(name, KLVAL(this, name));
+    return true;
+}
+
+bool KDB::print_scl_def(const std::string& name)
+{
+    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 1, name.c_str());
+
+    Scalar* scl = KSVAL(this, name);
+    if(!scl) 
+    {
+        W_printf((char*) "?\n");
+        return false;
+    }
+
+    bool success = scl->print_definition();
+    return success;
+}
+
+/**
+ *  Print the table in position pos in kdb.  
+ *  
+ *  If B_TABLE_TITLE != 0, print the table title.
+ *  If B_TABLE_TITLE == 1, print the table name and its title.
+ *  If B_TABLE_TITLE == 0, print the table definition.
+ *  
+ *  @param [in] kdb KDB*        KDB of tables
+ *  @param [in] pos int         position of the table in kdb
+ *  @return         int         -1 if the table cannot be found in kdb
+ */
+bool KDB::print_tbl_def(const std::string& name)
+{
+    Table* tbl = KTVAL(this, name);
+    if(!tbl) 
+        return false;
+    
+    if(B_TABLE_TITLE) 
+    {
+        if(B_TABLE_TITLE == 1) 
+            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), T_get_title(tbl, false));
+        else 
+            W_printf((char*) "\n%s\n", T_get_title(tbl, false));
+        
+        delete tbl;
+        tbl = nullptr;
+        return true;
+    }
+
+    B_PrintRtfTopic((char*) T_get_title(tbl, false));
+    W_printf((char*) ".tb %d\n", T_NC(tbl));
+    W_printfRepl((char*) ".sep &\n");
+    W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, name.c_str(), A2M_ESCCH);
+    bool success = tbl->print_definition();
+    W_printf((char*) ".te\n");
+
+    delete tbl;
+    tbl = nullptr;
+    return success;
+}
+
+bool KDB::print_var_def(const std::string& name)
+{
+    Sample* smpl = this->sample;
+    if(!smpl || smpl->nb_periods == 0) 
+    {
+        std::string msg = "Cannot print the variable '" + name + "' because ";
+        msg += "the variable database has no sample defined";
+        kwarning((char*) msg.c_str());
+        return false;
+    }
+
+    double* val = KVVAL(this, name, 0); 
+    if(val == NULL) 
+        return false;
+    
+    W_printfRepl((char*) "&1L%s ", name.c_str());
+    for(int j = 0 ; j < smpl->nb_periods; j++, val++) 
+    {
+        W_printfRepl((char*) "&1D");
+        B_PrintVal(*val);
+    }
+
+    W_printf((char*) "\n");
+    return true;
+}
+
+bool KDB::print_obj_def(const std::string& name)
+{
+    switch(this->k_type) 
+    {
+        case EQUATIONS :
+            return print_eqs_def(name);
+        case IDENTITIES :
+            return print_idt_def(name);
+        case LISTS :
+            return print_lst_def(name);
+        case SCALARS :
+            return print_scl_def(name);
+        case TABLES :
+            return print_tbl_def(name);
+        case VARIABLES :
+            return print_var_def(name);
+        default :
+            kerror(0, "Invalid database type for printing object definition");
+            return false;
+    }
+
+    return true;
+}
+
+char* KDB::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+{
+    char* obj;
+    switch(this->k_type) 
+    {
+        case EQUATIONS :
+        {
+            std::string lec = KELEC(this, name);
+            obj = (char*) lec.c_str();
+            break;
+        }
+        case IDENTITIES :
+            obj = (char*) KILEC(this, name);
+            break;
+        case LISTS :
+            obj = (char*) KLVAL(this, name);
+            break;
+        default:
+            obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
+            break;
+    }
+
+    return obj;
+}
+
+/**
+ *  Compute a table on the GSample ismpl and return a string containing the result.
+ */
+char* KDB::dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec)
+{
+    int     dim, i, j, d, rc = 0, nli = 0,
+                          nf = 0, nm = 0;
+    char    gsmpl[128], **l = NULL, *buf, *res = NULL;
+    COLS    *cls;
+
+    Table* tbl = KTVAL(global_ws_tbl.get(), name);
+    Sample* smpl = global_ws_var->sample;
+
+    /* date */
+    char date[11];
+
+    if(smpl == nullptr || smpl->nb_periods == 0) 
+        return (char*) "";
+
+    /* mode */
+    if(!ismpl)
+        sprintf(gsmpl, "%s:%d", (char*) smpl->start_period.to_string().c_str(), smpl->nb_periods);
+    else
+        sprintf(gsmpl, "%s", ismpl);
+
+    dim = T_prep_cls(tbl, gsmpl, &cls);
+    if(dim < 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+
+    KT_names = T_find_files(cls);
+    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
+    if(KT_nbnames == 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    COL_find_mode(cls, KT_mode, 2);
+
+    *nc = dim + 1;
+    *nl = 1;
+
+    TableLine* line;
+    buf = SCR_malloc(256 + dim * 128);
+    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    {
+        buf[0] = 0;
+        line = &tbl->lines[i];
+
+        switch(line->get_type()) 
+        {
+            case TABLE_LINE_SEP   :
+                break;
+            case TABLE_LINE_DATE  :
+                strcat(buf, SCR_long_to_fdate(SCR_current_date(), date, (char*) "dd/mm/yy"));
+                break;
+            case TABLE_LINE_MODE  :
+                for(j = 0; j < MAX_MODE; j++) 
+                {
+                    if(KT_mode[j] == 0) 
+                        continue;
+                    sprintf(date, "(%s) ", COL_OPERS[j + 1]);
+                    strcat(buf, date);
+                    strcat(buf, KLG_OPERS_TEXTS[j + 1][K_LANG]);
+                    strcat(buf, "\n");
+                    nm ++;
+                }
+                break;
+            case TABLE_LINE_FILES :
+                for(j = 0; KT_names[j]; j++) 
+                {
+                    strcat(buf, KT_names[j]);
+                    strcat(buf, "\n");
+                    nf ++;
+                }
+                break;
+            case TABLE_LINE_TITLE :
+                strcat(buf, IodeTblCell(&(line->cells[0]), NULL, nbdec));
+                //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
+                break;
+            case TABLE_LINE_CELL  :
+                COL_clear(cls);
+                if(COL_exec(tbl, i, cls) < 0)
+                    strcat(buf, "Error in calc");
+                else
+                    for(j = 0; j < cls->cl_nb; j++) 
+                    {
+                        d = j % T_NC(tbl);
+                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+                            continue;
+                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
+                        strcat(buf, "\t");
+                    }
+                break;
+        }
+
+        if(buf[0]) 
+        {
+            SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
+            (*nl)++;
+        }
+    }
+    
+    SCR_add_ptr((unsigned char***) &l, &nli, NULL);
+    *nl += nf + nm;
+    res = (char*) SCR_mtov((unsigned char**) l, '\n');
+
+    COL_free_cols(cls);
+    SCR_free_tbl((unsigned char**) l);
+    SCR_free(buf);
+
+    SCR_free_tbl((unsigned char**) KT_names);
+    KT_names = NULL;
+    KT_nbnames = 0;
+
+    return(res);
+}
+
+char* KDB::dde_create_obj(int objnb, int *nc, int *nl)
+{
+    if(objnb < 0 || objnb >= this->size())
+        return NULL;
+
+    std::string name = this->get_name(objnb);
+    
+    char *res;
+    if(this->k_type != TABLES) 
+    {
+        *nc = 2;
+        *nl = 1;
+
+        char* obj = dde_create_obj_by_name(name, nc, nl);
+        if(obj == NULL) 
+            obj = (char*) " ";
+        res = SCR_malloc((int)sizeof(ONAME) + 10 + (int)strlen(obj));
+        strcpy(res, name.c_str());
+        strcat(res, "\t");
+        strcat(res, obj);
+    }
+    else
+        res = this->dde_create_table(name, NULL, nc, nl, -1);
+
+    SCR_OemToAnsi((unsigned char*) res, (unsigned char*) res);
+    return(res);
+}
+
+
+/**
+ *  Print a header and a modified text: spaces are added before and after specific characters in the text.
+ *  If the text is NULL, print only a \n.
+ *  
+ *  A space is added before each '+' ':' and ']'.
+ *  A space is added after  each '=', '+', ',', ')' '\n'.
+ *  
+ *  @param [in] head char *     header
+ *  @param [in] txt  char *     text 
+ *  @return          bool       true if success
+ */
+bool dump_string(char* head, char* txt)
+{
+    if(txt) 
+    {
+        W_printf((char*) "\n%s", head);
+
+        char ch;
+        std::string str_txt = std::string(txt);
+        for(int i = 0; i < str_txt.size(); i++) 
+        {
+            ch = txt[i];
+
+            if(ch == '+' || ch == ':' || ch == ']') 
+                W_putc(' ');
+            
+            W_putc(ch);
+
+            if(ch == '=' || ch == '+' || ch == ',' || ch == ')' || ch == '\n') 
+                W_putc(' ');
+        }
+    }
+
+    W_printf((char*) "\n");
+    return true;
+}
+
+
+/**
+ *  Print an object name and its title in an enum_1 paragraph.
+ *          
+ *  @param [in] name    char*   object name
+ *  @param [in] text    char*   object title of definition    
+ *  @return             bool    true if success
+ */
+bool print_definition_generic(const std::string& name, char* text)
+{
+    char buf[80];
+
+    sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name.c_str(), A2M_ESCCH);
+    dump_string(buf, text);
+    return true;
+}
+
 /**
  *  Sets the KDB full path name. 
  *  
@@ -328,120 +773,6 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
         ptr = (char*) filename;
     kdb->filepath = std::string((char*) ptr);  
 }
-
-
-/**
- *  Creates a new kdb containing the handles of the objects listed in names. 
- *  
- *  The data is **not** duplicated ("shallow copy") .
- *  
- *  On error, calls IodeErrorManager::append_error() with the following messages:
- *      - " %.80s : not found" if one of the names is not found
- *      - " %.80s : skipped (low memory)" if an entry cannot be created in the new DB
- *  
- *  @param [in] kdb   KDB*      source kdb
- *  @param [in] nb    int       number of names 
- *  @param [in] names char*[]   null terminated list of names
- *  @return           KDB*      shallow copy of kdb[names] on success
- *                              NULL if kdb is null or one of the names cannot be found
- */
-KDB *K_refer(KDB* kdb, std::vector<std::string>& names)
-{
-    bool  err = false;
-    SWHDL handle;
-    KDB   *tkdb;
-
-    if(!kdb) 
-        return(NULL);
-    
-    tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
-    if(kdb->sample)
-        tkdb->sample = new Sample(*kdb->sample);
-    tkdb->description = kdb->description;
-    tkdb->k_compressed = kdb->k_compressed;
-    tkdb->filepath = kdb->filepath;
-
-    for(const std::string& name : names) 
-    {
-        handle = kdb->get_handle(name);
-        if(handle == 0)  
-        {
-            error_manager.append_error(v_iode_types[kdb->k_type] + " '" + name + "' not found: ");
-            err = true;
-            continue;
-        }
-        tkdb->k_objs[name] = handle;
-    }
-
-    if(err)
-    {
-        delete tkdb;
-        tkdb = nullptr;
-        error_manager.display_last_error();
-    }
-
-    return tkdb;
-}
-
-
-/**
- *  Creates a new kdb containing the handles of the objects listed in names. 
- *  
- *  Same as K_refer() but more efficient for large databases.
- *  
- *  The data is **not** duplicated ("shallow copy") .
- *  
- *  @param [in] kdb   KDB*      source kdb
- *  @param [in] nb    int       number of names 
- *  @param [in] names char*[]   null terminated list of names
- *  @return           KDB*      shallow copy of kdb[names]
- *                              NULL if kdb is null or one of the names cannot be found
- *  
- *  @note Quicker version of K_refer() (JMP 16/3/2012) by allocating KOBJS in one call instead
- *        of calling add_entry for each name.
- *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
- */
-
-KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)
-{
-    bool  err = false;
-    bool  found;
-    KDB   *tkdb;
-    
-    if(!kdb) 
-        return nullptr;
-    
-    // Crée la nouvelle kdb avec le nombre exact d'entrées
-    tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
-    if(kdb->sample)
-        tkdb->sample = new Sample(*kdb->sample);
-    tkdb->description = kdb->description;
-    tkdb->k_compressed = kdb->k_compressed;
-    tkdb->filepath = kdb->filepath;;
-    
-    // copy the pointers to IODE objects from kdb to tkdb
-    for(const std::string& name : names) 
-    {
-        found = kdb->contains(name);
-        if(!found) 
-        {
-            error_manager.append_error(v_iode_types[kdb->k_type] + " '" + name + "' not found");
-            err = true;
-            break;
-        }
-        tkdb->k_objs[name] = kdb->k_objs[name];
-    }
-
-    if(err)
-    {
-        delete tkdb;
-        tkdb = nullptr;
-        error_manager.display_last_error();
-    }
-
-    return tkdb;
-}
-
 
 /**
  *  Merges two databases : kdb1 <- kdb1 + kdb2. 

@@ -168,7 +168,7 @@ int IMP_change(char** rule, char** pat, char* in, char* out)
     out[o] = '\0';
 
     if(IMP_trace)
-        W_printf("%s -> %s\t(Rule %s)\n", in, out, rule[rc]);
+        W_printf((char*) "%s -> %s\t(Rule %s)\n", in, out, rule[rc]);
 
     return(0);
 }

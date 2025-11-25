@@ -11,9 +11,9 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-        KDBScalars kdb_scl(input_test_dir + "fun.as");
-        KDBVariables kdb_var(input_test_dir + "fun.av");
+        KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+        KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+        KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
         from = "2000Y1";
         to = "2002Y1";

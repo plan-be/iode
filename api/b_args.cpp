@@ -17,8 +17,8 @@
 #include "scr4/s_strs.h"
 
 #include "api/constants.h"
-#include "b_args.h"
-#include "b_errors.h"
+#include "api/b_args.h"
+#include "api/b_errors.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
@@ -126,10 +126,15 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 {
     int     i, rc;
 
-    for(i = 0 ; argv[i] ; i++) {
-        if(client == NULL) rc = (*fn)(argv[i], NULL);
-        else rc = (*fn)(argv[i], client);
-        if(rc) return(rc);
+    for(i = 0 ; argv[i] ; i++) 
+    {
+        if(client == NULL) 
+            rc = (*fn)(argv[i], NULL);
+        else 
+            rc = (*fn)(argv[i], client);
+        
+        if(rc) 
+            return(rc);
     }
 
     return(0);

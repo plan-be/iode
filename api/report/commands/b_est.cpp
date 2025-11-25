@@ -14,7 +14,7 @@
  *  
  *  List of functions 
  *  -----------------
- * int B_EqsEstimateEqs(Sample* smpl, char** eqs)   Estimates a bloc of equations on a defined Sample.
+ * int B_EqsEstimateEqs(Sample* smpl, char* pattern)            Estimates a bloc of equations on a defined Sample.
  * int B_EqsEstimate(char* arg, int unused)                     Implementation of the report function $EqsEstimate.
  * int B_EqsSetSample(char* arg, int unused)                    Implementation of the report function $EqsSetSample.
  * int B_EqsSetMethod(char* arg, int unused)                    Implementation of the report function $EqsSetMethod.   
@@ -37,12 +37,12 @@
  *  
  *  @param [in] char*       arg     report line (w/o command)
  *  @param [in] Sample**    psmpl   pointer to the result Sample
- *  @return     char**              table of equations names        
+ *  @return     char*               pattern for equations names        
  */
-static char **B_EqsSplitSmplName(char* arg, Sample **psmpl)
+static std::string B_EqsSplitSmplName(char* arg, Sample **psmpl)
 {
     int     lg1, lg2;
-    char    from[16], to[16], **eqs = 0;
+    char    from[16], to[16];
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
@@ -54,11 +54,11 @@ static char **B_EqsSplitSmplName(char* arg, Sample **psmpl)
     {
         std::string err_msg = "EqsEstimate: invalid sample\n" + std::string(e.what()); 
         error_manager.append_error(err_msg);
-        return(eqs);
+        return NULL;
     }
 
-    eqs = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    return(eqs);
+    char* pattern = (char*) SCR_stracpy(((unsigned char*) arg) + lg1 + lg2);
+    return trim(std::string(pattern));
 }
 
 
@@ -71,29 +71,33 @@ static char **B_EqsSplitSmplName(char* arg, Sample **psmpl)
  *  @return     int             -1 if some eqs are not found
  *                              rc of KE_est_s() otherwise 
  */
-int B_EqsEstimateEqs(Sample* smpl, char** c_eqs)
+int B_EqsEstimateEqs(Sample* smpl, char* pattern)
 {
     int rc = -1;
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    if(c_eqs == NULL || nb_eqs == 0) 
+    if(pattern == NULL) 
         error_manager.append_error("EqsEstimate: empty equations list");
     else 
     {
-        std::vector<std::string> eqs(nb_eqs);
-        for(int i = 0; i < nb_eqs; i++)
-            eqs[i] = std::string(c_eqs[i]);
-
-        KDB* dbe = K_refer(global_ws_eqs.get(), eqs);
-        if(dbe)
+        try
         {
+            KDB* dbe = new KDB(global_ws_eqs.get(), std::string(pattern));
+
             if(dbe->size() > 0)
             {
-                Estimation est(c_eqs, dbe, global_ws_var.get(), global_ws_scl.get(), smpl);
+                std::string from_period = smpl->start_period.to_string();
+                std::string to_period   = smpl->end_period.to_string();
+                Estimation est(pattern, dbe, global_ws_var.get(), global_ws_scl.get(), 
+                               (char*) from_period.c_str(), (char*) to_period.c_str());
                 rc = est.estimate();
             }
             delete dbe;
             dbe = nullptr;
-        }    
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "EqsEstimate: estimation failed\n" + std::string(e.what());
+            error_manager.append_error(error_msg);
+        }
     }
 
     return rc;
@@ -110,13 +114,11 @@ int B_EqsEstimateEqs(Sample* smpl, char** c_eqs)
 int B_EqsEstimate(char* arg, int unused)
 {
     int     rc = -1;
-    char    **eqs;
     Sample  *smpl;
 
-    eqs = B_EqsSplitSmplName(arg, &smpl);
-    if(smpl == 0) return(-1);
-    rc = B_EqsEstimateEqs(smpl, eqs);
-    SCR_free_tbl((unsigned char**) eqs);
+    std::string pattern = B_EqsSplitSmplName(arg, &smpl);
+    if(smpl != NULL) 
+        rc = B_EqsEstimateEqs(smpl, (char*) pattern.c_str());
     SCR_free(smpl);
     return(rc);
 }
@@ -137,21 +139,22 @@ int B_EqsEstimate(char* arg, int unused)
  */
 int B_EqsSetSample(char* arg, int unused)
 {
-    int     rc = 0, i;
-    char    **eqs;
+    int     rc = 0;
     Sample  *smpl;
 
-    eqs = B_EqsSplitSmplName(arg, &smpl);
-    if(smpl == 0) 
-        return(-1);
+    std::string pattern = B_EqsSplitSmplName(arg, &smpl);
+    if(smpl == NULL)
+        return -1;
     
-    for(i = 0 ; eqs[i] ; i++) 
+    char** eqs = B_ainit_chk((char*) pattern.c_str(), NULL, 0);
+    int nb_eqs = SCR_tbl_size((unsigned char**) eqs);
+    for(int i = 0; i < nb_eqs; i++) 
     {
         rc = K_upd_eqs(eqs[i], 0L, 0L, -1, smpl, 0L, 0L, 0L, 0);
         if(rc) break;
     }
 
-    SCR_free_tbl((unsigned char**) eqs);
+    SCR_free((unsigned char**) eqs);
     SCR_free(smpl);
     return(rc);
 }

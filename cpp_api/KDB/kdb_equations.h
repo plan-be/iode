@@ -5,7 +5,7 @@
 #include "kdb_template.h"
 
 
-class KDBEquations : public KDBTemplate<Equation*>
+class KDBEquations : public KDBTemplate<KDB, Equation*>
 {
 protected:
     // WARNING: 1) A top-level const is a const qualifier that applies to an object itself:
@@ -23,15 +23,17 @@ protected:
 
     Equation* get_unchecked(const std::string& name) const override;
 
-    KDBEquations(KDBEquations* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {};
-
 public:
-    KDBEquations(const std::string& filepath="") : KDBTemplate(EQUATIONS, filepath) {}
+    // global or standalone database
+    KDBEquations(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(EQUATIONS, is_global, filepath) {}
 
+    // shallow copy database
+    KDBEquations(KDBEquations* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {};
+    
     KDBEquations* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBEquations(this, deep_copy, pattern);
+        return template_subset<KDB, KDBEquations>(this, pattern, deep_copy);
     }
 
     std::string get_lec(const std::string& name) const;
@@ -67,4 +69,4 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     return seed;
 }
 
-inline KDBEquations Equations;
+inline KDBEquations Equations(true);

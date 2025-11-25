@@ -1112,7 +1112,6 @@ class IodeDatabase:
         filepath = str(filepath.resolve())
 
         names = ';'.join(self.get_names(names))
-
         self._cython_instance.print_to_file(filepath, names, format)
 
     def _load(self, filepath: str):

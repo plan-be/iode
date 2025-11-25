@@ -138,7 +138,7 @@ enum TableTextAlign
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_tbl = std::make_unique<KDB>(TABLES, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_tbl = std::make_unique<KDB>(TABLES, true);;
 
 inline std::string get_line_type_as_string(TableLineType line_type)
 {
@@ -343,6 +343,20 @@ public:
         CLEC* clec = get_compiled_lec();
         return get_scalars_from_clec(clec);
     }
+
+    // Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells)
+    bool check_print_def() const
+    {
+        if(is_null()) 
+            return false;
+    
+        if(get_type() == TABLE_CELL_LEC && get_content() == "1")
+            return false;
+    
+        return true;
+    }
+
+    bool print_definition(int nb_columns) const;
 
 	bool operator==(const TableCell& other) const
     {	
@@ -723,6 +737,67 @@ public:
     TableLine* add_line_date()
     {
         return append_line(TABLE_LINE_DATE);
+    }
+
+    // -------- MISC --------
+
+    bool print_definition() const
+    {
+        W_printf((char*) "\n.tl\n");
+
+        /* lines */
+        for(const TableLine& line : lines) 
+        {
+            switch(line.get_type()) 
+            {
+                case TABLE_LINE_CELL :
+                    for(const TableCell& cell: line.cells)
+                        cell.print_definition(1);
+                    W_printf((char*) "\n");
+                    break;
+    
+                case TABLE_LINE_TITLE :
+                    line.cells[0].print_definition(nb_columns);
+                    W_printf((char*) "\n");
+                    break;
+    
+                case TABLE_LINE_SEP   :
+                case TABLE_ASCII_BOLD_LINE  :
+                    W_printf((char*) ".tl\n");
+                    break;
+                case TABLE_LINE_MODE  :
+                    W_printfRepl((char*) "&%dL[MODE]\n", nb_columns);
+                    break;
+                case TABLE_LINE_DATE  :
+                    W_printfRepl((char*) "&%dL[DATE]\n", nb_columns);
+                    break;
+                case TABLE_LINE_FILES :
+                    W_printfRepl((char*) "&%dL[FILES]\n", nb_columns);
+                    break;
+    
+                default       :
+                    break;
+            }
+        }
+    
+        /* div */
+        bool print_divider = false;
+        for(const TableCell& cell: divider_line.cells)
+            if(cell.check_print_def())
+            {
+                print_divider = true;
+                break;
+            }
+        
+        if(print_divider) 
+        {
+            W_printfRepl((char*) ".tl\n&%dC%cbColumn divisors%cB\n.tl\n", nb_columns, A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
+            for(const TableCell& cell: divider_line.cells)
+                cell.print_definition(1);
+        }
+    
+        W_printf((char*) "\n.tl\n");
+        return true;
     }
 
     // -------- EQUAL --------

@@ -45,12 +45,12 @@
 static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
 {
     int nb_eqs = 0;
-    std::vector<std::string> eqs;
-    if(c_eqs) 
+    std::string eqs;
+    if(c_eqs != NULL) 
     {
         int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
         for(int i = 0; i < nb_eqs; i++) 
-            eqs.push_back(std::string(c_eqs[i]));
+            eqs += std::string(c_eqs[i]) + std::string(";");
     }
 
     int rc = -1;
@@ -59,7 +59,7 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
         rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+        KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
         if(tdbe)
         {
             if(tdbe->size() > 0)
@@ -235,18 +235,12 @@ int B_ModelCompile(char* arg, int unused)
         rc = KE_compile(global_ws_eqs.get());
     else 
     {
-        char** c_eqs = B_ainit_chk(arg, NULL, 0);
-        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-        std::vector<std::string> eqs;
-        for(int i = 0; i < nb_eqs; i++) 
-            eqs.push_back(std::string(c_eqs[i]));
-        SCR_free_tbl((unsigned char**) c_eqs);
-        
-        if(nb_eqs == 0)
+        std::string eqs = std::string(arg);
+        if(eqs.empty())
             rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+            KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
             if(tdbe)
             {
                 if(tdbe->size() > 0)
@@ -288,26 +282,18 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    // eqs if given
-    char** c_eqs = B_ainit_chk(arg + lg1, NULL, 0);
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::vector<std::string> eqs(nb_eqs);
-    for(int i = 0; i < nb_eqs; i++) 
-        eqs[i] = std::string(c_eqs[i]);
-    SCR_free_tbl((unsigned char**) c_eqs);
-
-    SCR_free(arg);
-
     KDB* tdbe = nullptr;
-    if(nb_eqs == 0)
+    std::string list_eqs = std::string(arg + lg1);
+    list_eqs = trim(list_eqs);
+    if(list_eqs.empty())
         tdbe = global_ws_eqs.get();
     else
-        tdbe = K_quick_refer(global_ws_eqs.get(), eqs);
+        tdbe = new KDB(global_ws_eqs.get(), list_eqs);
 
     CSimulation simu;
     int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
-    if(nb_eqs > 0)
+    if(!list_eqs.empty())
     {
         delete tdbe;
         tdbe = nullptr;
@@ -373,14 +359,14 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     // Regroupe les listes dans une seule avant de faire K_quick_refer
     char** c_eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
     char** c_eqs = (char**) SCR_union_quick((unsigned char**) c_eqs1, (unsigned char**) post);  // JMP 29/8/2012
-    SCR_free_tbl((unsigned char**) c_eqs1);                 // JMP 29/8/2012
+    SCR_free_tbl((unsigned char**) c_eqs1);
     int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::vector<std::string> eqs(nb_eqs);
+    std::string eqs;
     for(int i = 0; i < nb_eqs; i++) 
-        eqs[i] = std::string(c_eqs[i]);
+        eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    KDB* tdbe = K_quick_refer(global_ws_eqs.get(), eqs);
+    KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
 
     // Lance la simulation
     CSimulation simu;

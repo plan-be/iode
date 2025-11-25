@@ -290,8 +290,6 @@ Function to manage KDB, i.e. IODE object groups.
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *K_refer(KDB* kdb, std::vector<std::string>& names)`|creates a new kdb containing the references to the objects of the list names.|
-|`KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
 |`int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2 then deletes kdb2.|
 
@@ -318,7 +316,7 @@ Functions acting on workspaces of variables.
 |`int KV_add(KDB* kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
 |`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB *kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
-|`int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)`|Extrapolates variables on a selected Sample according to one of the available methods.|
+|`int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|
 |`KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
 |`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 |`double KV_get_at_t(char*varname, int t)`|Retrieves the value of varname\[t\]|
@@ -704,8 +702,6 @@ Some of IODE report commands line $ExcelGet are implemented here.
 |`char *ToBase26(int num)`||
 |`char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)`||
 |`char *IodeTblCell(TableCell *cell, COL *cl, int nbdec)`||
-|`char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)`||
-|`char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)`||
 |`char *IodeDdeGetReportRC(char *szItem)`||
 |`char *IodeDdeGetXObj(char *szItem, int type)`||
 |`char *IodeDdeGetItem(char *szTopic, char *szItem)`||

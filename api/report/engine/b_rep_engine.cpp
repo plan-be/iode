@@ -534,7 +534,7 @@ int RP_err_dump(char* name, char* arg)
 {
     /* File */
     if(RP_PRINT == 1) {
-        W_printf("Error : %s %s\n", name, arg);
+        W_printf((char*) "Error : %s %s\n", name, arg);
         error_manager.print_last_error();
         return(0);
     }
@@ -1378,7 +1378,7 @@ int RP_ReportExec_tbl(REPFILE *rf)
         }
         else 
         {
-            W_printf("%s\n", line);
+            W_printf((char*) "%s\n", line);
             continue;
         }
     }

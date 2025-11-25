@@ -765,7 +765,7 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
 
 |Syntax|Description|
 |:---|:---|
-|`int B_EqsEstimateEqs(Sample* smpl, char** eqs)`|Estimates a bloc of equations on a defined Sample.|
+|`int B_EqsEstimateEqs(Sample* smpl, char* pattern)`|Estimates a bloc of equations on a defined Sample.|
 |`int B_EqsEstimate(char* arg, int unused)`|Implementation of the report function $EqsEstimate.|
 |`int B_EqsSetSample(char* arg, int unused)`|Implementation of the report function $EqsSetSample.|
 |`int B_EqsSetMethod(char* arg, int unused)`|Implementation of the report function $EqsSetMethod.|
@@ -940,11 +940,9 @@ Functions (and their subfunctions) to print IODE object definitions.
 |Syntax|Description or equivalent in Reports|||
 |:---|:---|:---|:---|
 |`int B_PrintVal(double val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
-|`double B_calc_ttest(Scalar* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
 |`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
-|`int B_PrintDefGnl(const std::string& name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
 |`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||
-|`int B_dump_str(unsigned char*head, unsigned char*txt)`|Print a header and a modified text: spaces are added before and after specific characters in the text|||
+|`int dump_string(unsigned char* head, unsigned char* txt)`|Print a header and a modified text: spaces are added before and after specific characters in the text|||
 |`int B_get1int(char* arg)`|Return the integer value of the beginning of a string.|||
 |`int B_ScrollSet(char* arg, long *plong, int inf, int sup)`|Interprets the first part of a string as a integer and check that the value is between 2 boundaries.|||
 |`int B_PrintObjTblTitle(char* arg, int unused)`|$PrintObjTitle 0 or 1|||
@@ -953,19 +951,6 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_PrintObjDef_1(char* arg, int* type)`|Print the definition of the object named arg of the given type|||
 |`int B_PrintObjDef(char* arg, int type)`|$PrintObjDefXxx object\_list|||
 |`int B_PrintObjDefArgs(char* arg, int type)`|Print a list of objects of a given type.|||
-|`int B_PrintDefTbl(KDB* kdb, int pos)`|Print the table in position pos in kdb.|||
-|`int B_DumpTblDef(Table* tbl)`|Print a table definition.|||
-|`int B_CellDef(TableCell* cell)`|Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells).|||
-|`int B_PrintTblCell(TableCell* cell, int straddle)`|Print a TABLE cell optionally on several columns.|||
-|`int B_PrintDefCmt(KDB* kdb, int pos)`|Print a comment.|||
-|`int B_PrintDefLst(KDB* kdb, int pos)`|Print a list.|||
-|`int B_PrintDefIdt(KDB* kdb, int pos)`|Print a identity.|||
-|`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||
-|`int B_PrintLec(std::string& name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
-|`int B_PrintEqs(std::string& name, Equation* eq)`|Print an equation and optionally its statistical tests.|||
-|`int B_PrintDefSclPtr(Scalar* scl, std::string& name, int enum_)`|Print a scalar in an enumeration list.|||
-|`int B_PrintDefScl(KDB* kdb, int pos)`|Print the scalar kdb\[pos\].|||
-|`int B_PrintDefVar(KDB* kdb, int pos)`|Print the variable kdb\[pos\] in a table. Sub\-function of B\_PrintObjDef\_1().|||
 
 ### b\_view.c {#T66}
 

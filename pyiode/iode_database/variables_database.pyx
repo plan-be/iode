@@ -101,11 +101,11 @@ cdef class Variables(CythonIodeDatabase):
         return t_first_period, t_last_period
 
     def _load(self, filepath: str):
-        cdef CKDBVariables* kdb = new CKDBVariables(filepath.encode())
-        del kdb
-        self.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        self.first_period_subset: Period = None
-        self.last_period_subset: Period = None
+        if self.database_ptr is not NULL:
+            self.database_ptr.load(filepath.encode())
+            self.mode_ = IodeVarMode.VAR_MODE_LEVEL
+            self.first_period_subset: Period = None
+            self.last_period_subset: Period = None
 
     def initialize_subset(self, cython_instance: Variables, pattern: str, copy: bool, 
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
@@ -437,8 +437,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef double[:, ::1] data_view = data
         
         cdef string c_name
-        cdef string pattern = string(b'')
-        cdef vector[string] cpp_names = self.database_ptr.get_names(pattern, <bint>True)
+        cdef vector[string] cpp_names = self.database_ptr.get_names()
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
             for i, c_name in enumerate(cpp_names):
                 var_ptr = KVVAL(db_ptr, c_name, t_first_period)

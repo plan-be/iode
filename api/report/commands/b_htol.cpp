@@ -112,7 +112,7 @@ static int B_htol(int method, char* arg)
     int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
@@ -149,7 +149,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = new KDB(VARIABLES, DB_STANDALONE);
+    to = new KDB(VARIABLES, false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
@@ -242,7 +242,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         goto done;
     }
 
-    kdb_to = new KDB(VARIABLES, DB_STANDALONE);
+    kdb_to = new KDB(VARIABLES, false);
     kdb_to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + kdb_from->sample->nb_periods) * sizeof(double));

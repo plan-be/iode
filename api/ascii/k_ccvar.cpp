@@ -95,7 +95,7 @@ static bool load_yy(KDB* kdb, YYFILE* yy, int ask)
 {
     int     cmpt = 0;
     ONAME   name;
-    Sample* smpl;
+    Sample* smpl = nullptr;
 
     if(!kdb)
         return false;

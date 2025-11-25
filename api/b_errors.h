@@ -68,7 +68,7 @@ public:
             return;
 
         for(const std::string& msg : B_ERROR_MSG) 
-            W_printf("%s\n", msg.c_str());
+            W_printf((char*) "%s\n", msg.c_str());
 
         B_ERROR_MSG.clear();
     }

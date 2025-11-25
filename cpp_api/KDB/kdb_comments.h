@@ -2,23 +2,25 @@
 #include "kdb_template.h"
 
 
-class KDBComments : public KDBTemplate<Comment>
+class KDBComments : public KDBTemplate<CKDBComments, Comment>
 {
 protected:
 
     Comment copy_obj(const Comment original) const override { return original; }
 
     Comment get_unchecked(const std::string& name) const override;
-
-    KDBComments(KDBComments* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {}
-
+    
 public:
-    KDBComments(const std::string& filepath="") : KDBTemplate(COMMENTS, filepath) {}
+    // global or standalone database
+    KDBComments(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(COMMENTS, is_global, filepath) {}
+    
+    // shallow copy database
+    KDBComments(KDBComments* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {}
 
     KDBComments* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBComments(this, deep_copy, pattern);
+        return template_subset<CKDBComments, KDBComments>(this, pattern, deep_copy);
     }
     
     bool add(const std::string& name, const Comment& comment);
@@ -46,4 +48,4 @@ inline std::size_t hash_value(KDBComments const& cpp_kdb)
     return seed;
 }
 
-inline KDBComments Comments;
+inline KDBComments Comments(true);

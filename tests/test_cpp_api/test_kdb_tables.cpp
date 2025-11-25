@@ -6,7 +6,7 @@ class KDBTablesTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBTables kdb_tbl(input_test_dir + "fun.at");
+        KDBTables kdb_tbl(true, input_test_dir + "fun.at");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBTablesTest, Load)
 {
-    KDBTables kdb(input_test_dir + prefix_filename + "fun.tbl");
+    KDBTables kdb(false, input_test_dir + prefix_filename + "fun.tbl");
     EXPECT_EQ(kdb.size(), 46);
 }
 
@@ -33,7 +33,7 @@ TEST_F(KDBTablesTest, Subset)
 
     // DEEP COPY SUBSET
     KDBTables* kdb_subset_deep_copy = Tables.subset(pattern, true);
-    std::vector<std::string> names = Tables.get_names(pattern);
+    std::vector<std::string> names = Tables.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("C8_1", *table);
@@ -90,8 +90,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     int i;
     std::string name;
     TableLine* line;
-    KDBVariables kdb_var(input_test_dir + "fun.av");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
     std::vector<std::string> vars_envi_list = {"EX", "PWMAB", "PWMS", "PWXAB", "PWXS", 
                                                "QWXAB", "QWXS", "POIL", "NATY", "TFPFHP_"};
@@ -124,7 +124,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     // check that list $ENVI has been expanded
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
-    nb_lines_vars = vars.size() + vars_envi_list.size() - 1;    // -1 for list_name which is expanded
+    nb_lines_vars = (int) vars.size() + (int) vars_envi_list.size() - 1;    // -1 for list_name which is expanded
     table = Tables.get(name);
     EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
@@ -233,7 +233,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     Tables.add(name, 2, def, lecs_list, mode, files, date);
 
     // check lines
-    nb_lines_vars = lecs.size() + vars_envi_list.size();
+    nb_lines_vars = (int) lecs.size() + (int) vars_envi_list.size();
     table = Tables.get(name);
     EXPECT_EQ(table->lines.size(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
@@ -301,8 +301,8 @@ TEST_F(KDBTablesTest, Filter)
     std::vector<std::string> expected_names;
     KDBTables* kdb_subset;
 
-    KDBVariables kdb_var(input_test_dir + "fun.av");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
@@ -376,8 +376,8 @@ TEST_F(KDBTablesTest, DeepCopy)
     std::vector<std::string> expected_names;
     KDBTables* kdb_subset;
 
-    KDBVariables kdb_var(input_test_dir + "fun.av");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
@@ -456,7 +456,7 @@ TEST_F(KDBTablesTest, CopyFrom)
     EXPECT_EQ(Tables.size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Tables.get_names(pattern);
+    v_expected_names = Tables.filter_names(pattern);
     Tables.clear();
     Tables.copy_from(filename, pattern);
     EXPECT_EQ(Tables.size(), v_expected_names.size());  
@@ -508,12 +508,12 @@ TEST_F(KDBTablesTest, Search)
     std::string tbl_name = "ENVI";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     objs_list = Comments.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
@@ -551,7 +551,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     // slightly modify variables
     std::string ref_file = input_test_dir + "ref2.av";
     double value;
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
     KDBVariables* kdb_ref = Variables.subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
     for(int t=0; t < kdb_ref->get_nb_periods(); t++)
     {

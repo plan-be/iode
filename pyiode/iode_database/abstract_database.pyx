@@ -87,15 +87,13 @@ cdef class CythonIodeDatabase:
             b_list = c_list[:length]
             SCR_free(c_list)
         else:
-            kdb_ptr = self.abstract_db_ptr.get_database()
-            if kdb_ptr is not NULL:
-                b_list = kdb_ptr.expand(pattern.encode(), _all)  
+            if self.abstract_db_ptr is not NULL:
+                b_list = self.abstract_db_ptr.expand(pattern.encode(), _all)  
 
         return b_list.decode()
 
     def property_names(self) -> List[str]:
-        cdef string s = string(b'')
-        return [name.decode() for name in self.abstract_db_ptr.get_names(s, <bint>True)]
+        return [name.decode() for name in self.abstract_db_ptr.get_names()]
 
     def rename(self, old_name: str, new_name: str, overwrite: bool) -> bool:
         return self.abstract_db_ptr.rename(old_name.encode(), new_name.encode(), <bint>overwrite)

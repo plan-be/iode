@@ -6,8 +6,8 @@ class KDBGlobalTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-        KDBLists kdb_lst(input_test_dir + "fun.al");
+        KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+        KDBLists kdb_lst(true, input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -23,19 +23,19 @@ TEST_F(KDBGlobalTest, Filter)
     for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
 
     // simple patterns
-    list_names = Equations.get_names("A*");
+    list_names = Equations.filter_names("A*");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
-    list_names = Equations.get_names("*_");
+    list_names = Equations.filter_names("*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // list
     std::string list = "$ENVI";
-    list_names = Equations.get_names(list);
+    list_names = Equations.filter_names(list);
     expected_list_names.clear();
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
@@ -45,7 +45,7 @@ TEST_F(KDBGlobalTest, Filter)
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
-    list_names = Equations.get_names("A*;" + list + ";*_");
+    list_names = Equations.filter_names("A*;" + list + ";*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
@@ -56,7 +56,7 @@ TEST_F(KDBGlobalTest, Filter)
 
     // pattern containing a name that does not exist in the global workspace
     // -> name is skipped by default (must_exist = true)
-    list_names = Equations.get_names("A*;DO_NOT_EXIST");
+    list_names = Equations.filter_names("A*;DO_NOT_EXIST");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     // Note: get_names() calls sort_and_remove_duplicates() (which calls sort())
@@ -64,7 +64,7 @@ TEST_F(KDBGlobalTest, Filter)
     EXPECT_EQ(list_names, expected_list_names);
 
     // must_exist = false
-    list_names = Equations.get_names("A*;DO_NOT_EXIST", false);
+    list_names = Equations.filter_names("A*;DO_NOT_EXIST", false);
     expected_list_names.push_back("DO_NOT_EXIST");
     EXPECT_EQ(list_names, expected_list_names);
 }

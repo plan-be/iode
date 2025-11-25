@@ -23,6 +23,7 @@
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
+#include "api/objs/comments.h"
 #include "api/io/dif.h"
 #include "api/io/import.h"
 
@@ -154,18 +155,24 @@ char* ImportCommentsBST::add_ftr(char* cmt, long rubr, int lang)
 
 int ImportCommentsBST::sub_read_header(int lang)
 {
-    char    *fc = NULL, *nc = NULL, *cmt = NULL; /* JMP 04-08-98 */
+    char    *fc = NULL, *nc = NULL, *cmt = NULL;
     long    dummy, rub, niv, ftr;
     char    name[80];
     int     lrub;
 
-    if(dif_skip_to(SYY, DIF_BOT) < 0) return(-1);
-    if(dif_skip_to(FYY, DIF_BOT) < 0) return(-1);
-    if(dif_skip_to(RYY, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(SYY, DIF_BOT) < 0) 
+        return(-1);
 
-    C_kdb = new KDB(COMMENTS, DB_GLOBAL);
+    if(dif_skip_to(FYY, DIF_BOT) < 0) 
+        return(-1);
 
-    while(1) {
+    if(dif_skip_to(RYY, DIF_BOT) < 0) 
+        return(-1);
+
+    CKDBComments* c_kdb = global_ws_cmt.get();
+
+    while(1) 
+    {
         if(DIF_long(RYY, &dummy) < 0) break;  /* tbl */
         if(DIF_long(RYY, &dummy) < 0) break;  /* dom */
         if(DIF_long(RYY, &dummy) < 0) break;  /* as */
@@ -196,26 +203,27 @@ int ImportCommentsBST::sub_read_header(int lang)
                 return(-1);
         }
 
-        switch(lang) {
+        switch(lang) 
+        {
             case 0 :
                 cmt = NULL;
                 break;
             case 1 :
-                cmt = (char*) SCR_stracpy((unsigned char*) fc); /* JMP 04-08-98 */
+                cmt = (char*) SCR_stracpy((unsigned char*) fc);
                 break;
             case 2 :
-                cmt = (char*) SCR_stracpy((unsigned char*) nc); /* JMP 04-08-98 */
+                cmt = (char*) SCR_stracpy((unsigned char*) nc);
                 break;
         }
 
         if(ftr) cmt = add_ftr(cmt, rub, lang);
 
-        if(cmt && !C_kdb->set(name, cmt)) 
+        if(cmt && !c_kdb->set(name, cmt)) 
             return(-1);
 
         SW_nfree(fc);
         SW_nfree(nc);
-        SW_nfree(cmt); /* JMP 04-08-98 */
+        SW_nfree(cmt);
     }
 
     YY_close(RYY);

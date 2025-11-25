@@ -26,7 +26,7 @@
  */
 void W_print_enum(int n)
 {
-    W_printf(".par1 enum_%d\n", n);
+    W_printf((char*) ".par1 enum_%d\n", n);
 }
 
 
@@ -50,9 +50,9 @@ void W_print_cmd(int n)
 {
     /* JMP 13-07-96 */
     if(n >= 0)
-        W_printf(".lf_on\n.bl_on\n.par cmd_%d\n", n);
+        W_printf((char*) ".lf_on\n.bl_on\n.par cmd_%d\n", n);
     else
-        W_printf(".lf_off\n.bl_off\n.par par_1\n");
+        W_printf((char*) ".lf_off\n.bl_off\n.par par_1\n");
 }
 
 
@@ -63,7 +63,7 @@ void W_print_cmd(int n)
  */
 void W_print_par(int n)
 {
-    W_printf(".par1 par_%d\n", n);
+    W_printf((char*) ".par1 par_%d\n", n);
 }
 
 
@@ -74,7 +74,7 @@ void W_print_par(int n)
  */
 void W_print_tit(int n)
 {
-    W_printf(".par1 tit_%d\n", n);
+    W_printf((char*) ".par1 tit_%d\n", n);
 }
 
 /**
@@ -89,7 +89,7 @@ void W_print_pg_header(char* arg)
     SCR_free(A2M_PGHEAD);
     A2M_PGHEAD = SCR_stracpy((unsigned char*) arg);
     SCR_strip(A2M_PGHEAD);
-    W_printf(".pghead %s\n", A2M_PGHEAD);
+    W_printf((char*) ".pghead %s\n", A2M_PGHEAD);
 }
 
 
@@ -106,7 +106,7 @@ void W_print_pg_footer(char* arg)
     A2M_PGFOOT = SCR_stracpy((unsigned char*) arg);
     SCR_strip(A2M_PGFOOT);
     //BGUI_PrintPageFooter();
-    W_printf(".pgfoot %s\n", A2M_PGFOOT); 
+    W_printf((char*) ".pgfoot %s\n", A2M_PGFOOT); 
 }
 
 
@@ -120,8 +120,8 @@ void W_print_pg_footer(char* arg)
 void W_print_rtf_topic(char* arg)
 {
     if(arg) {
-        W_printf(".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, arg);
-        if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);
+        W_printf((char*) ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, arg);
+        if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);
         // if(W_type == A2M_DESTHTML && W_htmlhelp) W_printf( ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg); /* JMP 06-01-02 */
     }
 }
@@ -135,7 +135,7 @@ void W_print_rtf_topic(char* arg)
  */
 void W_print_tb(char* title, int nc)
 {
-    W_printf(".tb %d\n", nc);
-    W_printf(".sep %c\n", A2M_SEPCH);
-    W_printf(".ttitle %s\n", title);
+    W_printf((char*) ".tb %d\n", nc);
+    W_printf((char*) ".sep %c\n", A2M_SEPCH);
+    W_printf((char*) ".ttitle %s\n", title);
 }

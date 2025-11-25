@@ -63,7 +63,7 @@ void ComputedTable::initialize()
         files_usage[column.cl_fnb[1]] = 1;
     }
 
-    KDB* kdb;
+    KDB* kdb = nullptr;
     for(int ref=1; ref < K_MAX_FREF + 1; ref++) 
     {
         if(files_usage.test(ref))

@@ -1104,9 +1104,10 @@ def test_simulation(capsys):
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    with pytest.warns(RuntimeWarning, match=r"Cannot simulate SCC:\nPre-recursive list \"_PRE\" not found!\n" 
-                                            r"Recursive list \"_INTER\" not found!\n"
-                                            r"Post-recursive list \"_POST\" not found!"):
+    with pytest.warns(RuntimeWarning, match=r"Cannot simulate SCC:\n"
+                                            r"\tPre-recursive list '_PRE' not found!\n" 
+                                            r"\tRecursive list '_INTER' not found!\n"
+                                            r"\tPost-recursive list '_POST' not found!"):
         simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     
     simu.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
@@ -1121,10 +1122,13 @@ def test_simulation(capsys):
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    with pytest.warns(RuntimeWarning, match=r"Could not simulate the model for the sample "
-                                            r"2000Y1:2010Y1:\nerrors:\nModel does not converge "
-                                            r"after 2 iterations\n"):
+    with pytest.warns(RuntimeWarning) as record:
         simu.model_simulate("2000Y1", "2010Y1")
+    assert len(record) == 2
+    assert str(record[0].message) == "Cannot remove List: no List named '_DIVER' found in the database"
+    assert str(record[1].message) == "Cannot simulate the model for the sample " \
+                                     "'2000Y1:2010Y1':\nerrors:\nModel does not converge " \
+                                     "after 2 iterations\n"
 
     # ======== test quiet mode ========
     captured = capsys.readouterr()
@@ -1140,6 +1144,7 @@ def test_simulation(capsys):
     simu.model_simulate("2000Y1", "2015Y1", quiet=True)
     captured = capsys.readouterr()
     assert captured.out == ""
+
 
 # WRITE
 # -----

@@ -59,7 +59,7 @@ enum IodeLowToHigh
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_var = std::make_unique<KDB>(VARIABLES, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_var = std::make_unique<KDB>(VARIABLES, true);;
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -85,7 +85,7 @@ void KV_merge_del(KDB *,KDB *,int );
 int KV_add(KDB* kdb, char* varname);
 double KV_get(KDB *, const std::string& ,int ,int );
 void KV_set(KDB *, const std::string& ,int ,int ,double );
-int KV_extrapolate(KDB *,int ,Sample *,char **);
+int KV_extrapolate(KDB*, int, Sample*, char*);
 KDB *KV_aggregate(KDB *,int ,char *,char *);
 void KV_init_values_1(double* val, int t, int method);
 //int KV_GetSmpl(Sample *,char *);

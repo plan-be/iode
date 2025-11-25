@@ -750,8 +750,8 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    int  i;
-    KDB  *kdb = global_ws_cmt.get();
+    int i;
+    CKDBComments* kdb = global_ws_cmt.get();
 
     if(!kdb) 
         return(res);

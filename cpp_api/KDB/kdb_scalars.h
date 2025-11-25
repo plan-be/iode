@@ -3,7 +3,7 @@
 #include "api/objs/scalars.h"
 
 
-class KDBScalars : public KDBTemplate<Scalar*>
+class KDBScalars : public KDBTemplate<KDB, Scalar*>
 {
 protected:
 
@@ -23,15 +23,17 @@ protected:
     // WARNING: the returned scalar MUST NOT be deleted
     Scalar* get_unchecked(const std::string& name) const override;
 
-    KDBScalars(KDBScalars* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {};
-
 public:
-    KDBScalars(const std::string& filepath="") : KDBTemplate(SCALARS, filepath) {}
+    // global or standalone database
+    KDBScalars(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(SCALARS, is_global, filepath) {}
 
+    // shallow copy database
+    KDBScalars(KDBScalars* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {};
+    
     KDBScalars* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBScalars(this, deep_copy, pattern);
+        return template_subset<KDB, KDBScalars>(this, pattern, deep_copy);
     }
 
     bool add(const std::string& name, const Scalar& obj);
@@ -61,4 +63,4 @@ inline std::size_t hash_value(KDBScalars const& cpp_kdb)
     return seed;
 }
 
-inline KDBScalars Scalars;
+inline KDBScalars Scalars(true);

@@ -6,7 +6,7 @@ class KDBIdentitiesTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBIdentities kdb_idt(input_test_dir + "fun.ai");
+        KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBIdentitiesTest, Load)
 {
-    KDBIdentities kdb(input_test_dir + prefix_filename + "fun.idt");
+    KDBIdentities kdb(false, input_test_dir + prefix_filename + "fun.idt");
     EXPECT_EQ(kdb.size(), 48);
 }
 
@@ -31,7 +31,7 @@ TEST_F(KDBIdentitiesTest, Subset)
 
     // DEEP COPY SUBSET
     KDBIdentities* kdb_subset_deep_copy = Identities.subset(pattern, true);
-    std::vector<std::string> names = Identities.get_names(pattern);
+    std::vector<std::string> names = Identities.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
@@ -317,7 +317,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     // GAP_ "100*((QAF_/Q_F)-1)"
     std::string identities_list = "GAP2;GAP_";
 
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     std::string period;
     Variable expected_gap2;
@@ -370,9 +370,9 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
 
     // Error -> empty Variables KDB
     Variables.clear();
-    EXPECT_TRUE(Variables.sample == nullptr);
+    EXPECT_TRUE(Variables.get_sample() == nullptr);
     EXPECT_EQ(Variables.size(), 0);
-    EXPECT_EQ(Variables.filepath, std::string(I_DEFAULT_FILENAME));
+    EXPECT_EQ(Variables.get_filename(), std::string(I_DEFAULT_FILENAME));
     success = Identities.execute_identities(std::to_string(y_from) + "Y1", 
                          std::to_string(y_to) + "Y1", identities_list);
     EXPECT_FALSE(success);
@@ -391,7 +391,7 @@ TEST_F(KDBIdentitiesTest, CopyFrom)
     EXPECT_EQ(Identities.size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Identities.get_names(pattern);
+    v_expected_names = Identities.filter_names(pattern);
     Identities.clear();
     Identities.copy_from(filename, pattern);
     EXPECT_EQ(Identities.size(), v_expected_names.size());  
@@ -437,12 +437,12 @@ TEST_F(KDBIdentitiesTest, Search)
     std::string idt_name = "RENT";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     objs_list = Comments.search(idt_name);
     EXPECT_EQ(objs_list.size(), 0);

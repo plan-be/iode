@@ -12,8 +12,7 @@
  *
  */
 #include "equations.h"
-
-
+#include "api/report/undoc/undoc.h"
 
 /**
  *  Extracts the left and right sides of a lec equation. 
@@ -127,4 +126,104 @@ int E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)
     SCR_free(ae);
 
     return(0);
+}
+
+/**
+ *  Print an equation and optionally its statistical tests.
+ *  
+ *  if B_EQS_INFOS == 0, print only the equation
+ *  if B_EQS_INFOS == 1, print the equation and its (optional) comment
+ *  if B_EQS_INFOS == 2, print the equation, its (optional) comment and the estimation 
+ *                       tests (if the equation was estimated)
+ */
+bool Equation::print_definition() const
+{
+    std::string warn_msg = "Cannot print definition of equation '" + endo + "'";
+
+    if(B_EQS_INFOS > 1) 
+        B_PrintRtfTopic((char*) endo.c_str());
+    W_printf((char*) ".par1 enum_1\n");
+
+    bool success = print_lec_definition(endo, lec, clec, B_EQS_LEC);
+    if(B_EQS_INFOS < 1) 
+        return true;
+    
+    if(!success)
+    {
+        warn_msg += ": failed to print its LEC expression";
+        kwarning(warn_msg.c_str());
+        return false;
+    }
+    
+    char buf[256];
+    if(B_isdef((char*) comment.c_str())) 
+    {
+        sprintf(buf, ".par1 par_1\n%ci ", A2M_ESCCH);
+        dump_string(buf, (char*) comment.c_str());
+    }    
+
+    if(B_EQS_INFOS < 2) 
+        return true;
+    
+    success = true;
+
+    if(method >= 0 && method < 4 && sample.nb_periods != 0 && tests[3]) 
+    {
+        std::string from = sample.start_period.to_string();
+        std::string to = sample.end_period.to_string();
+        W_printf((char*) ".par enum_2\nEstimation : %ci%c%cI on %s-%s\n\n", A2M_ESCCH, "LZIG"[method], A2M_ESCCH, 
+                 (char*) from.c_str(), (char*) to.c_str());
+        if(B_isdef((char*) block.c_str()))   
+            dump_string((char*) "Block : ", (char*) block.c_str());
+        if(B_isdef((char*) instruments.c_str())) 
+            dump_string((char*) "Instruments : ", (char*) instruments.c_str());
+        
+        W_printf((char*) "\nTests :\n");
+        W_printf((char*) ".par enum_3\n");
+        W_printf((char*) "St dev of residuals         : %f\n\n", tests[EQ_STDEV]);
+        W_printf((char*) "Mean of YOBS                : %f\n\n", tests[EQ_MEANY]);
+        W_printf((char*) "Sum of Squares of Residuals : %f\n\n", tests[EQ_SSRES]);
+        W_printf((char*) "Standard error (%%)          : %f (%ci%f%cI)\n\n", tests[EQ_STDERR], A2M_ESCCH, tests[EQ_STDERRP], A2M_ESCCH);
+        W_printf((char*) "F-stat                      : %f\n\n", tests[EQ_FSTAT]);
+        W_printf((char*) "R2 (R2 adjusted)            : %f (%ci%f%cI)\n\n", tests[EQ_R2], A2M_ESCCH, tests[EQ_R2ADJ], A2M_ESCCH);
+        W_printf((char*) "Durbin-Watson               : %f\n\n", tests[EQ_DW]);
+        W_printf((char*) "Log Likelihood              : %f\n\n", tests[EQ_LOGLIK]);
+        W_printf((char*) ".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
+        
+        std::string sname;
+        CLEC* copy_clec = (CLEC *) SW_nalloc(clec->tot_lg + 1);
+        memcpy(copy_clec, clec, clec->tot_lg);
+        for(int j = 0 ; j < copy_clec->nb_names ; j++) 
+        {
+            sname = std::string(copy_clec->lnames[j].name);
+            if(is_coefficient(sname)) 
+            {
+                if(!global_ws_scl->contains(sname))
+                {
+                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
+                    W_printf((char*) "?\n");
+                }
+                else
+                {
+                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
+                    
+                    Scalar* scl = KSVAL(global_ws_scl.get(), sname);
+                    if(!scl) 
+                    {
+                        W_printf((char*) "?\n");
+                        success = false;
+                    }
+                    success = scl->print_definition();
+                }
+            }
+        }
+        SW_nfree(copy_clec);
+    }
+
+    W_printf((char*) "\n");
+
+    if(!success)
+        kwarning(warn_msg.c_str());
+    
+    return success;
 }

@@ -271,7 +271,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 		return;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
-	//       A shallow copy is created by calling the C function K_quick_refer().
+	//       A shallow copy is created by calling the C function new KDB().
 	//       Each 'key' in the shallow copy points to the same data as the original.
 	//       The C function KV_sample(KDB*, Sample*) used below does the following things: 
 	//       1. changes the 'sample' attribute of the passed KDB
@@ -396,11 +396,11 @@ void KDBVariables::extrapolate(const VariablesInitialization method, const std::
 
 	Sample sample(from, to);
 
-	char* c_variables_list = const_cast<char*>(variables_list.c_str());
-	char** vars = (variables_list.empty()) ? NULL : B_ainit_chk(c_variables_list, NULL, 0);
-
-	int res = KV_extrapolate(kdb, (int) method, &sample, vars);
-	SCR_free_tbl((unsigned char**) vars);
+	std::string pattern = variables_list;
+	if(pattern.empty())
+		pattern = "*";
+	
+	int res = KV_extrapolate(kdb, (int) method, &sample, (char*) pattern.c_str());
 
 	if (res < 0)
 	{

@@ -46,13 +46,13 @@
  *  -------
  *      W_dest("", W_GDI);              // Prepares to send output to the default printer (W_GDI)
  *      W_print_tit(1);
- *      W_printf("Title 1\n\n"); 
+ *      W_printf((char*) "Title 1\n\n"); 
  *      ...
  *      W_close();                      // Flushes the memory buffer and sends the output to the printer
  *  
  *      W_dest("test1.htm", W_HTML);    // Creates test.html in HTML format (W_HTML)
- *      W_printf(".par1 tit_1\n");      // Save a2m code in memory
- *      W_printf("Title 1\n\n");        // id.
+ *      W_printf((char*) ".par1 tit_1\n");      // Save a2m code in memory
+ *      W_printf((char*) "Title 1\n\n");        // id.
  *      ...
  *      W_close();                      // Flushes the memory buffer and saves the file test1.htm
  *  
@@ -483,7 +483,7 @@ int W_printfReplEsc(char* fmt, ...)
  */
 int W_putc(int ch)
 {
-    return(W_printf("%c", ch));
+    return(W_printf((char*) "%c", ch));
 }
 
 

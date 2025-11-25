@@ -4,7 +4,7 @@
 #include "kdb_template.h"
 
 
-class KDBTables : public KDBTemplate<Table*>
+class KDBTables : public KDBTemplate<KDB, Table*>
 {
 protected:
 
@@ -22,16 +22,18 @@ protected:
     Table* copy_obj(Table* const original) const override;
 
     Table* get_unchecked(const std::string& name) const override;
-
-    KDBTables(KDBTables* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {};
-
+    
 public:
-    KDBTables(const std::string& filepath="") : KDBTemplate(TABLES, filepath) {}
+    // global or standalone database
+    KDBTables(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(TABLES, is_global, filepath) {}
+    
+    // shallow copy database
+    KDBTables(KDBTables* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {};
 
     KDBTables* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBTables(this, deep_copy, pattern);
+        return template_subset<KDB, KDBTables>(this, pattern, deep_copy);
     }
 
     std::string get_title(const std::string& name) const;
@@ -94,4 +96,4 @@ inline std::size_t hash_value(KDBTables const& cpp_kdb)
     return seed;
 }
 
-inline KDBTables Tables;
+inline KDBTables Tables(true);
