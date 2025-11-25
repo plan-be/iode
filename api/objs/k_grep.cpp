@@ -21,7 +21,9 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 #include "api/objs/grep.h"
 #include "api/report/commands/commands.h"       // K_AggrChar
 
@@ -88,7 +90,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
             {
                 case COMMENTS :
                     if(texts) 
-                        found = !SCR_grep_gnl(pattern, KCVAL(kdb, handle), ecase, all);
+                        found = !SCR_grep_gnl(pattern, static_cast<CKDBComments*>(kdb)->get_obj(handle), ecase, all);
                     break;
                 case LISTS :
                     if(texts) 

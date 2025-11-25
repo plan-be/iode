@@ -107,14 +107,14 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  *  @param [out] char**  code    allocated string with the comment + sep
  *  @return      char*           pointer to *code
  */
-char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
+char* ExportObjsCSV::extract_comment(CKDBComments* dbc, char* name, char**cmt)
 {
     U_ch* ccmt;
 
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)  
     {
-        ccmt = (unsigned char*) KCVAL(dbc, handle);
+        ccmt = (unsigned char*) dbc->get_obj(handle);
         SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");
         return(write_separator((char*) ccmt, cmt));
     }

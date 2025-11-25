@@ -137,13 +137,13 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    KDB* dbc;
+    CKDBComments* dbc;
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
         error_msg += "Comments file " + cmt_file_;
-        dbc = K_interpret(COMMENTS, to_char_array(cmt_file), 0);
-        if(dbc == NULL)
+        dbc = static_cast<CKDBComments*>(K_interpret(COMMENTS, to_char_array(cmt_file), 0));
+        if(!dbc)
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
@@ -151,13 +151,13 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);
-        if (dbc != NULL) error_msg += "and";
+        if(dbc) error_msg += "and";
         error_msg += "Variables file " + var_file_;
         dbv = K_interpret(VARIABLES, to_char_array(var_file), 0);
-        if(dbv == NULL)
+        if(!dbv)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
-        if(smpl != NULL) 
+        if(smpl) 
             KV_sample(dbv, smpl);
     }
 

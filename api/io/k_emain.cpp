@@ -204,7 +204,7 @@ char *write_separator(char* src, char** tg)
  *  @return     int                 0 on success, -1 on error
  *  
  */
-int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)
 {
     int     i, j, dim, rc;
     char    *code = NULL, *cmt = NULL, *vec = NULL;
@@ -264,7 +264,7 @@ err:
  *  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.
  *  
  */
-int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)
 {
     int     i, j, nl, nc, rc;
     char    *code = NULL;
@@ -352,7 +352,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
 {
     int rc = 0;
     KDB* dbv = nullptr;
-    KDB* dbc = nullptr;
+    CKDBComments* dbc = nullptr;
 
     ExportToFile *expdef;
     Sample *smpl = nullptr;
@@ -406,7 +406,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     }
 
     if(cfile && cfile[0] != 0)
-        dbc = K_interpret(COMMENTS, cfile, 0); 
+        dbc = static_cast<CKDBComments*>(K_interpret(COMMENTS, cfile, 0)); 
     
     if(fmt < 4)
         rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */

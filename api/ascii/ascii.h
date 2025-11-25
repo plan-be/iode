@@ -7,7 +7,13 @@
 #include "api/time/sample.h"
 #include "api/utils/yy.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 #include <array>    // for std::array
 #include <memory>   // for std::unique_ptr

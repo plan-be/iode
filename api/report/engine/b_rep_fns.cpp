@@ -750,8 +750,8 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    int  i;
-    KDB  *kdb = global_ws_cmt.get();
+    int i;
+    CKDBComments* kdb = global_ws_cmt.get();
 
     if(!kdb) 
         return(res);
@@ -771,7 +771,7 @@ U_ch *RPF_cvalue(U_ch** args)
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) KCVAL(kdb, handle));
+            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(handle));
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }

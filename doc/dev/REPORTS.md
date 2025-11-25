@@ -958,7 +958,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 |`int B_DumpTblDef(Table* tbl)`|Print a table definition.|||
 |`int B_CellDef(TableCell* cell)`|Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells).|||
 |`int B_PrintTblCell(TableCell* cell, int straddle)`|Print a TABLE cell optionally on several columns.|||
-|`int B_PrintDefCmt(KDB* kdb, int pos)`|Print a comment.|||
+|`int B_PrintDefCmt(CKDBComments* kdb, int pos)`|Print a comment.|||
 |`int B_PrintDefLst(KDB* kdb, int pos)`|Print a list.|||
 |`int B_PrintDefIdt(KDB* kdb, int pos)`|Print a identity.|||
 |`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||

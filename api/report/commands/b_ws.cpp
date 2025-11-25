@@ -78,10 +78,14 @@ int B_WsLoad(char* arg, int type)
     if(!kdb) 
         return -1;
 
+    CKDBComments* kdb_cmt;
     switch(type) 
     {
-        case COMMENTS :    
-            global_ws_cmt.reset(kdb); 
+        case COMMENTS :
+            kdb_cmt = global_ws_cmt.release();
+            delete kdb_cmt;
+            kdb_cmt = static_cast<CKDBComments*>(kdb);
+            global_ws_cmt.reset(kdb_cmt); 
             break;
         case EQUATIONS :   
             global_ws_eqs.reset(kdb);

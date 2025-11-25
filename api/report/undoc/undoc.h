@@ -4,9 +4,13 @@
 #include "api/report/reports.h"
 #include "api/gsample/gsample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 #ifdef __GNUC__
 #    define IODE_CDECL __attribute__((cdecl))
@@ -178,7 +182,7 @@ int B_PrintDefTbl(KDB *,int );
 int B_DumpTblDef(Table *);
 int B_CellDef(TableCell *);
 int B_PrintTblCell(TableCell *,int );
-int B_PrintDefCmt(KDB *,int );
+int B_PrintDefCmt(CKDBComments*, int);
 int B_PrintDefLst(KDB *,int );
 int B_PrintDefIdt(KDB *,int );
 int B_PrintDefEqs(KDB *,int );

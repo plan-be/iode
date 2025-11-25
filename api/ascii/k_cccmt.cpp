@@ -171,10 +171,11 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
         }
     }
 
+    CKDBComments* kdb_cmt = static_cast<CKDBComments*>(kdb);
     for(auto& [name, handle] : kdb->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        cmt = KCVAL(kdb, handle);
+        cmt = kdb_cmt->get_obj(handle);
         SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
         SCR_fprintf_esc(fd, cmt, 1);
         fprintf(fd, "\n");
@@ -189,7 +190,7 @@ int AsciiComments::save_asc(KDB* kdb, char* filename)
  * Save a KDB of CMTs in a .csv file.
  * NOT IMPLEMENTED.
  */
-int AsciiComments::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
+int AsciiComments::save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist)
 {
     return(-1);
 }

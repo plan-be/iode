@@ -263,7 +263,7 @@ public:
         switch(type) 
         {
             case COMMENTS :    
-                global_ws_cmt.reset(kdb); 
+                global_ws_cmt.reset(static_cast<CKDBComments*>(kdb)); 
                 break;
             case EQUATIONS :   
                 global_ws_eqs.reset(kdb);
@@ -1484,10 +1484,30 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
+    SWHDL       handle;
 
     U_test_print_title("Tests B_DATA");
 
-    KDB* kdb_cmt = global_ws_cmt.get();
+    CKDBComments* kdb_cmt = new CKDBComments(COMMENTS, DB_GLOBAL);
+    kdb_cmt->set_obj("AAA", "This is a test comment");
+    handle = kdb_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    char* value = (char*) kdb_cmt->get_obj(handle);
+    EXPECT_EQ(std::string(value), "This is a test comment");
+    delete kdb_cmt;
+    kdb_cmt = nullptr;
+
+    KDB* _kdb_ = K_interpret(COMMENTS, filename, 1);
+    kdb_cmt = static_cast<CKDBComments*>(_kdb_);
+    kdb_cmt->set_obj("AAA", "This is a test comment");
+    handle = kdb_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    value = (char*) kdb_cmt->get_obj(handle);
+    EXPECT_EQ(std::string(value), "This is a test comment");
+    delete kdb_cmt;
+    kdb_cmt = nullptr;
+
+    kdb_cmt = global_ws_cmt.get();
     KDB* kdb_eqs = global_ws_eqs.get();
     KDB* kdb_idt = global_ws_idt.get();
     KDB* kdb_lst = global_ws_lst.get();
@@ -1526,7 +1546,6 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataDelete(char* arg, int type)
     KDB* kdb;
     int pos;
-    SWHDL handle;
     char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
@@ -1573,6 +1592,18 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
         EXPECT_TRUE(!found);
     }
 
+    kdb_cmt->set_obj("AAA", "This is a comment");
+    handle = kdb_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    char* comment = (char*) kdb_cmt->get_obj(handle);
+    EXPECT_EQ(std::string(comment), "This is a comment");
+    kdb_cmt->clear();
+    global_ws_cmt->set_obj("AAA", "This is a comment");
+    handle = global_ws_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    comment = (char*) global_ws_cmt->get_obj(handle);
+    EXPECT_EQ(std::string(comment), "This is a comment");
+
     // B_DataListSort()
     success = global_ws_lst->set("LIST1", "A;C;B");
     EXPECT_TRUE(success);
@@ -1595,7 +1626,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U");
+    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
@@ -1640,7 +1671,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U - More comment on U");
+    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
@@ -2012,10 +2043,10 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDB* kdb_cmt = K_interpret(COMMENTS, outfile, 1);
+        CKDBComments* kdb_cmt = static_cast<CKDBComments*>(K_interpret(COMMENTS, outfile, 1));
         global_ws_cmt.reset(kdb_cmt);
         EXPECT_TRUE(global_ws_cmt != nullptr);
-        EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(std::string(global_ws_cmt->get_obj("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();

@@ -184,7 +184,7 @@ public:
      *      $DataSearch<type> mask word ecase in_name in_formula in_text list_result
      *        (word, ecase, in_name, in_formula, in_text := 0 ou 1)
      *        (mask := suite of chars or ?, *)
-     *        (list_result := name of the resulting list
+     *        (list_result := name of the resulting list)
      *  
      *  @see https://iode.plan.be/doku.php?id=datasearch for details
      */
