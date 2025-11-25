@@ -12,7 +12,7 @@ protected:
     KDBTemplate(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern) :
         KDBAbstract(kdb, deep_copy, pattern) {}
 
-    template<class... Args> bool add_or_update(KDB* kdb, const std::string& name, Args... args)
+    template<class... Args> bool set(KDB* kdb, const std::string& name, Args... args)
     {
         if (!kdb) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + ".'\n" +  
@@ -50,7 +50,7 @@ public:
         {
             if(kdb->contains(name))
                 throw std::invalid_argument(error_msg);
-            success = add_or_update(kdb, name, args...);
+            success = set(kdb, name, args...);
             return success;
         }
         else
@@ -59,7 +59,7 @@ public:
             if(global_kdb->contains(name))
                 throw std::invalid_argument(error_msg);
             // add new obj to the global KDB
-            success = add_or_update(global_kdb, name, args...);
+            success = set(global_kdb, name, args...);
             if(!success)
                 return false;
             // add a new entry and copy the pointer
@@ -82,7 +82,7 @@ public:
         //       are duplicated, not the objects.
         //       Modifying an object passing either the shallow copy
         //       or the global database modifies the same object.
-        add_or_update(kdb, name, args...);
+        set(kdb, name, args...);
     }
 
     T get(const std::string& name) const
