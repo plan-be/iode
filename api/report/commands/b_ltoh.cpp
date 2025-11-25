@@ -393,7 +393,7 @@ static int B_ltoh(int type, char* arg)
                 break;
         }
         nb = t_smpl->nb_periods;
-        to->add(from_name, t_vec, nb);
+        to->set(from_name, t_vec, nb);
     }
     KV_merge(global_ws_var.get(), to, 1);
 

@@ -153,7 +153,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
             continue;
         
         if(!found)
-            kdb1->add(name, (double*) NULL, nb1);
+            kdb1->set(name, (double*) NULL, nb1);
 
         if(!kdb1->contains(name))
         {
@@ -256,7 +256,7 @@ int KV_add(KDB* kdb, char* varname)
     if(!found) 
     {
         nobs = kdb->sample->nb_periods;
-        kdb->add(varname, (double*) NULL, nobs);   // Set IODE_NAN if the new var
+        kdb->set(varname, (double*) NULL, nobs);   // Set IODE_NAN if the new var
     }
     else 
     { 
@@ -571,7 +571,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            ndbv->add(c_nname, (double*) NULL, nb_per);
+            ndbv->set(c_nname, (double*) NULL, nb_per);
             npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {

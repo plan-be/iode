@@ -17,7 +17,7 @@ protected:
         if (!kdb) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + ".'\n" +  
                                      "Iode has not been initialized.");
-        bool success = kdb->add(name, args...);
+        bool success = kdb->set(name, args...);
         if(!success) 
             throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + "'.\n" + 
                                      "Reason: unknown");

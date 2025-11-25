@@ -116,12 +116,12 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
         c_name = cl->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name))
-            scal->add(name, (char*) NULL);
+            scal->set(name, (char*) NULL);
         else 
         {
             if(dbe != nullptr && dbe->contains(name)) 
                 continue;
-            exo->add(name, (char*) NULL);
+            exo->set(name, (char*) NULL);
         }
     }
 }
@@ -241,7 +241,7 @@ int KL_lst(char* name, char** lst, int chunck)
     nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) 
     {
-        if(!global_ws_lst->add(name, ""))    
+        if(!global_ws_lst->set(name, ""))    
             rc = -1;
         goto done;
     }
@@ -249,7 +249,7 @@ int KL_lst(char* name, char** lst, int chunck)
     if(nb < chunck || chunck < 0) 
     {
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(!global_ws_lst->add(name, str))  
+        if(!global_ws_lst->set(name, str))  
             rc = -1;
         SCR_free(str);
         return(rc);
@@ -266,7 +266,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(!global_ws_lst->add(buf, str))  
+        if(!global_ws_lst->set(buf, str))  
             rc = -1;
         SCR_free(str);
 
@@ -284,7 +284,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(!global_ws_lst->add(name, str)) 
+    if(!global_ws_lst->set(name, str)) 
         rc = -1;
     SW_nfree(str);
 

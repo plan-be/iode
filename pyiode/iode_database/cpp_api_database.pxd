@@ -76,7 +76,7 @@ cdef extern from "api/all.h":
         bool contains(string& name)
         string get_name(int pos)
         # variables
-        bool add(string& name, double* var, int nb_obs) except +
+        bool set(string& name, double* var, int nb_obs) except +
         bool remove(string& name) except +
 
 

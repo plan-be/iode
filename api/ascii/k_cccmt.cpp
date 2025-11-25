@@ -53,7 +53,7 @@ static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->add(name, cmt);
+    success = kdb->set(name, cmt);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
