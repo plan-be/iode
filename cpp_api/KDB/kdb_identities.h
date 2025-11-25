@@ -6,7 +6,7 @@
 class KDBIdentities : public KDBTemplate<Identity*>
 {
 private:
-    int add_or_update(const std::string& name, const std::string& lec);
+    int set(const std::string& name, const std::string& lec);
 
 protected:
 
