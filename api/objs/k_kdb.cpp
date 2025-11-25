@@ -62,7 +62,7 @@ KDB* get_global_db(const int iode_type)
     }
 }
 
-bool KDB::add_packed_object(const std::string& name, char* pack)
+bool KDB::set_packed_object(const std::string& name, char* pack)
 {
     if(pack == NULL) 
     {
@@ -112,7 +112,7 @@ bool KDB::add_packed_object(const std::string& name, char* pack)
 }
 
 // comments, equations, identities, lists, scalars, tables, objects
-bool KDB::add(const std::string& name, char* value)
+bool KDB::set(const std::string& name, char* value)
 {
     char error[1024];
     char* pack = NULL;
@@ -147,12 +147,12 @@ bool KDB::add(const std::string& name, char* value)
             return false;
     }
 
-    bool success = add_packed_object(name, pack);
+    bool success = set_packed_object(name, pack);
     return success;
 }
 
 // variables
-bool KDB::add(const std::string& name, double* var, const int nb_obs)       
+bool KDB::set(const std::string& name, double* var, const int nb_obs)       
 {
     if(this->k_type != VARIABLES)
     {
@@ -162,12 +162,12 @@ bool KDB::add(const std::string& name, double* var, const int nb_obs)
 
     char* pack = NULL;
     K_vpack(&pack, var, (int*) &nb_obs);
-    bool success = add_packed_object(name, pack);
+    bool success = set_packed_object(name, pack);
     return success;
 }
 
 // objects
-bool KDB::add(const std::string& name, char* value, const int length)
+bool KDB::set(const std::string& name, char* value, const int length)
 {
     if(this->k_type != OBJECTS)
     {
@@ -177,7 +177,7 @@ bool KDB::add(const std::string& name, char* value, const int length)
 
     char* pack = NULL;
     K_opack(&pack, value, (int*) &length);
-    bool success = add_packed_object(name, pack);
+    bool success = set_packed_object(name, pack);
     return success;
 } 
 

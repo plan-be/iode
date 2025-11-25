@@ -45,10 +45,10 @@ struct KDB
                                                     //                be updated too
 
 private:
-    bool add_packed_object(const std::string& name, char* pack);
+    bool set_packed_object(const std::string& name, char* pack);
 
 public:
-    KDB(IodeType type, IodeDatabaseType db_type, std::string filename="")
+    KDB(const IodeType type, const IodeDatabaseType db_type, const std::string filename="")
         : k_type((short) type), k_db_type((char) db_type), k_arch(std::string(ARCH)) 
     {
         switch(type) 
@@ -74,7 +74,7 @@ public:
         this->filepath = (filename.empty()) ? std::string(I_DEFAULT_FILENAME) : filename;
     }
     
-    KDB(KDB& other)
+    KDB(const KDB& other)
     {
         this->k_db_type = DB_STANDALONE;     // new copy is a deep copy
         this->k_type = other.k_type;
@@ -307,32 +307,32 @@ public:
     }
 
     /**
-     *  Adds an object to a KDB. The number of arguments depends on object type. 
+     *  Adds or updates an IODE object to a KDB. The number of arguments depends on object type. 
      *   
-     *  The object is first packed (see k_pack.c). The resulting pack is then copied in the swap memory. 
-     *  The handle of the allocated swap memory is stored in the kdb.
+     *  The object is first packed (see k_pack.c). The resulting pack is then copied in 
+     *  the swap memory. The handle of the allocated swap memory is stored in the kdb.
      *
      *  If name exists in kdb, the existing object is deleted and replaced by the new one.
      *  It returns true on success, false on error.
      *  
      *  How to create IODE objects with add()
      *  -------------------------------------
-     *    - Comments:    add(const std::string& name, char* comment)
-     *    - Equations:   add(const std::string& name, Equation* eq, char* endo) [where endo = name]
-     *    - Identities:  add(const std::string& name, char* lec)
-     *    - Lists:       add(const std::string& name, char* list)
-     *    - Scalars:     add(const std::string& name, Scalar* scalar)
-     *    - Tables:      add(const std::string& name, Table *tbl) 
-     *    - Variables:   add(const std::string& name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
+     *    - Comments:    set(const std::string& name, char* comment)
+     *    - Equations:   set(const std::string& name, Equation* eq, char* endo) [where endo = name]
+     *    - Identities:  set(const std::string& name, char* lec)
+     *    - Lists:       set(const std::string& name, char* list)
+     *    - Scalars:     set(const std::string& name, Scalar* scalar)
+     *    - Tables:      set(const std::string& name, Table *tbl) 
+     *    - Variables:   set(const std::string& name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
      *  
      *  @note: the name of an equation MUST be the name of its endogenous variable
      */
     // comments, equations, identities, lists, scalars, tables, objects
-    bool add(const std::string& name, char* value);
+    bool set(const std::string& name, char* value);
     // variables
-    bool add(const std::string& name, double* var, const int nb_obs);
+    bool set(const std::string& name, double* var, const int nb_obs);
     // objects
-    bool add(const std::string& name, char* value, const int length);    
+    bool set(const std::string& name, char* value, const int length);    
 
     bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name);
 

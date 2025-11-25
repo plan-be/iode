@@ -88,7 +88,7 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) 
         macro = "";
     lg = (int) strlen(macro) + 1;
-    bool success = RP_MACRO->add(name, macro, lg);
+    bool success = RP_MACRO->set(name, macro, lg);
     if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);

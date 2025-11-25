@@ -102,7 +102,7 @@ TEST_F(TablesTest, AddGetTable)
 
     // --- add the table to the Tables KDB
     char* name = "C_TABLE";
-    global_ws_tbl->add(name, (char*) tbl);
+    global_ws_tbl->set(name, (char*) tbl);
 
     // --- extract the table from the Table KDB
     Table* extracted_tbl = KTVAL(global_ws_tbl.get(), name);
@@ -261,7 +261,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_FILES);
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
-    global_ws_tbl->add(c_name, (char*) &table);
+    global_ws_tbl->set(c_name, (char*) &table);
     bool found = global_ws_tbl->contains(c_name);
     ASSERT_TRUE(found);
 

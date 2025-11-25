@@ -49,7 +49,7 @@ void Estimation::E_savescl(double val, int eqnb, char*txt)
 
     scl.value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
-    global_ws_scl->add(buf, (char*) &scl);
+    global_ws_scl->set(buf, (char*) &scl);
 }
 
 /**
@@ -165,7 +165,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
 
-    bool success = E_DBE->add(name, (char*) eq);
+    bool success = E_DBE->set(name, (char*) eq);
     delete eq;
     eq = nullptr;
     if(!success) 

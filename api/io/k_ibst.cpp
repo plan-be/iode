@@ -210,7 +210,7 @@ int ImportCommentsBST::sub_read_header(int lang)
 
         if(ftr) cmt = add_ftr(cmt, rub, lang);
 
-        if(cmt && !C_kdb->add(name, cmt)) 
+        if(cmt && !C_kdb->set(name, cmt)) 
             return(-1);
 
         SW_nfree(fc);

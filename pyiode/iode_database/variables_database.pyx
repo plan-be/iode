@@ -214,7 +214,7 @@ cdef class Variables(CythonIodeDatabase):
             c_name = b_name
             c_nb_periods = self.get_sample().get_nb_periods()
             c_db_ptr = self.database_ptr.get_database()
-            success = c_db_ptr.add(c_name, &numpy_data_memview[0], c_nb_periods)
+            success = c_db_ptr.set(c_name, &numpy_data_memview[0], c_nb_periods)
             if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object

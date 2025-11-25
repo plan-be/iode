@@ -418,7 +418,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
     }
     
     if(diverg) 
-        global_ws_lst->add(lst, diverg);
+        global_ws_lst->set(lst, diverg);
     return(0);
 }
 

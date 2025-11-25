@@ -184,7 +184,7 @@ static int B_htol(int method, char* arg)
         for(; t < nb; t++) 
             t_vec[t] = IODE_NAN;
 
-        to->add(from_name, t_vec, nb);
+        to->set(from_name, t_vec, nb);
     }
 
     KV_merge(global_ws_var.get(), to, 1);
@@ -277,7 +277,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         for(; t < nb; t++) 
             t_vec[t] = IODE_NAN;
 
-        kdb_to->add(from_name, t_vec, nb);
+        kdb_to->set(from_name, t_vec, nb);
     }
 
 done:

@@ -59,7 +59,7 @@ static int read_lst(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->add(name, lst);
+    success = kdb->set(name, lst);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);

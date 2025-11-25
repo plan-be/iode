@@ -84,7 +84,7 @@ KDB* AsciiIdentities::load_asc(char* filename, int db_global)
                     break;
                 }
                 lec = K_wrap((char*) yy->yy_text, 60);
-                if(!kdb->add(name, lec))
+                if(!kdb->set(name, lec))
                     kerror(0, "%s (%s : %s).", YY_error(yy), name, L_error());
                 else 
                     cmpt++;

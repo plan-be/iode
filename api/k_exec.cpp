@@ -552,7 +552,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
             // series = identity ("endogenous") => creates an IODE_NAN VA
             if(dbi->contains(name)) 
             {          
-                dbv->add(name, (double*) NULL, dim);      
+                dbv->set(name, (double*) NULL, dim);      
                 continue;
             }
 

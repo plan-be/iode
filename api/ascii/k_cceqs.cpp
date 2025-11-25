@@ -327,7 +327,7 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
 
-                success = kdb->add(name, (char*) eq);
+                success = kdb->set(name, (char*) eq);
                 if(!success)  
                 {
                     kerror(0, "%s : %s", name, L_error());

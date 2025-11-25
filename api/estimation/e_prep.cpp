@@ -195,7 +195,7 @@ int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            dbs->add(name, NULL);
+            dbs->set(name, NULL);
     }
     
     return(0);

@@ -70,7 +70,7 @@ bool add_table(const std::string& name, char* value)
 {
 	if(!global_ws_tbl.get())
 		return false;
-	return global_ws_tbl->add(name, value);
+	return global_ws_tbl->set(name, value);
 }
 
 bool remove_table(const std::string& name)
