@@ -286,26 +286,33 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     U_ch    **args;
 
     B_viewmode = mode;
-    if(arg == 0 || arg[0] == 0) {
-        error_manager.append_error("Invalid argument");
+        
+    if(arg == NULL || arg[0] == 0) 
+    {
+        kwarning("No argument passed");
         return(-1);
     }
-    else {
+    else 
+    {
         args = SCR_vtom((unsigned char*) arg, ' ');
-        if(args == NULL || args[0] == NULL) {
-            error_manager.append_error("Invalid argument");
+        if(args == NULL || args[0] == NULL) 
+        {
+            std::string error_msg = "Invalid argument '" + std::string(arg) + "'";
+            kwarning(error_msg.c_str());
             return(-1);
         }
 
         smpl = (char*) SCR_stracpy(args[0]);
 
-        if(mode == 1 || SCR_tbl_size(args) < 3) {
+        if(mode == 1 || SCR_tbl_size(args) < 3) 
+        {
             if(type == 0)
                 rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintTbl_1, smpl);
             else
                 rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintGr_1, smpl);
         }
-        else {
+        else 
+        {
             if(type == 0) 
                 ODE_VIEW = 1;
             else 
@@ -323,6 +330,14 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     /*    W_close();*/
     W_flush();
     B_ViewTblEnd();
+
+    if(rc < 0)
+    {
+        std::string error_msg = error_manager.get_last_error();
+        if(!error_msg.empty())
+            kwarning(error_msg.c_str());
+    }
+
     return(rc);
 }
 
@@ -360,18 +375,20 @@ int B_ViewTblFile(char* arg, int unused)
             goto err;
         }
 
-        KDB* kdb = new KDB(VARIABLES, DB_STANDALONE);
-        success = kdb->load(std::string((char*) args[1]));
+        if(K_RWS[VARIABLES][ref - 1])
+            delete K_RWS[VARIABLES][ref - 1];
+        K_RWS[VARIABLES][ref - 1] = new KDB(VARIABLES, false);
+        success = K_RWS[VARIABLES][ref - 1]->load(std::string((char*) args[1]));
         if(!success) 
         {
-            delete kdb;
+            delete K_RWS[VARIABLES][ref - 1];
+            K_RWS[VARIABLES][ref - 1] = nullptr;
+            std::string msg = "Error loading the variables file '";
+            msg += std::string((char*) args[1]) + "'";
+            kwarning(msg.c_str());
             rc = -1;
             goto err;
         }
-
-        if(K_RWS[VARIABLES][ref - 1])
-            delete K_RWS[VARIABLES][ref - 1];
-        K_RWS[VARIABLES][ref - 1] = kdb;
     }
 
 err:

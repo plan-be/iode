@@ -21,16 +21,6 @@ bool is_global_database_loaded(const IodeType iodeType);
 void set_kdb_filename(KDB* kdb, const std::string& filename);
 
 /**
- * @brief Create a list of object names given a pattern.
- * 
- * @param kdb 
- * @param iode_type
- * @param pattern 
- * @return std::vector<std::string>
- */
-std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iode_type, const std::string& pattern);
-
-/**
  * @brief import comments from file.
  * 
  *  Syntax: $FileImportCmt rule infile outfile language [trace]

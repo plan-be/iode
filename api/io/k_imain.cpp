@@ -50,6 +50,7 @@
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
+#include "api/objs/comments.h"
 #include "api/objs/variables.h"
 #include "api/write/write.h"
 #include "api/io/import.h"
@@ -110,7 +111,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
     if(rc < 0) 
         goto err;
 
-    kdb = new KDB(VARIABLES, DB_STANDALONE);
+    kdb = new KDB(VARIABLES, false);
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
@@ -200,14 +201,13 @@ err:
  */
 KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
 {
-    KDB     *kdb = NULL;
-    int     size, cmpt = 0, rc;
-    char    iname[256],
-            *cmt = NULL;
-    ONAME   oname;
+    CKDBComments *kdb = nullptr;
+    int          size, cmpt = 0, rc;
+    char         iname[256], *cmt = NULL;
+    ONAME        oname;
 
     if(IMP_readrule(rulefile) < 0) 
-        return(kdb);
+        return nullptr;
 
     YY_CASE_SENSITIVE = 1;
     if(impdef->imp_keys != NULL) 
@@ -222,7 +222,7 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
     if(rc < 0) 
         goto err;
 
-    kdb = new KDB(COMMENTS, DB_STANDALONE);
+    kdb = new CKDBComments(false);
 
     while(1) 
     {
@@ -236,7 +236,8 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
             continue;
         }
 
-        if(SW_BLKS[7].blk_space > 100000L) Debug("CMT:%s\n", oname);
+        if(SW_BLKS[7].blk_space > 100000L) 
+            Debug((char*) "CMT:%s\n", oname);
         kmsg("Reading object %d : %s", ++cmpt, oname);
         SCR_strip((unsigned char*) cmt);
         if(!kdb->set(oname, cmt))

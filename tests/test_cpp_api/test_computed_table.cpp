@@ -4,24 +4,22 @@
 class ComputedTableTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBTables*    kdb_tbl;
-    KDBVariables* kdb_var;
     std::string var_file;
     std::string ref_file;
 
     void SetUp() override
     {
-        kdb_tbl = new KDBTables(input_test_dir + "fun.at");
+        Tables.load(input_test_dir + "fun.at");
 
         var_file = input_test_dir + "fun.av";
         // C: -> c:
         var_file[0] = tolower(var_file[0]);
-        kdb_var = new KDBVariables(var_file);
+        Variables.load(var_file);
 
         ref_file = input_test_dir + "ref2.av";
         // slightly modify variables
         double value;
-        KDBVariables* kdb_ref = kdb_var->subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
+        KDBVariables* kdb_ref = Variables.subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
         for(int t=0; t < kdb_ref->get_nb_periods(); t++)
         {
             for(const std::string& name: kdb_ref->get_names())
@@ -37,11 +35,7 @@ protected:
         load_reference_kdb(2, VARIABLES, ref_file);
     }
 
-    void TearDown() override 
-    {
-        delete kdb_tbl;
-        delete kdb_var;
-    }
+    // void TearDown() override {}
 };
 
 
@@ -53,8 +47,8 @@ TEST_F(ComputedTableTest, BuildFromTable)
     int nb_lines = 4;
     std::string sample;
     std::vector<double> values;
-
-    Table* ref_table = kdb_tbl->get(table_name);
+    
+    Table* ref_table = Tables.get(table_name);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -398,10 +392,10 @@ TEST_F(ComputedTableTest, EditTable)
     // -> simple time series (current workspace) - 10 observations
     //    gsample = "2000:10";
     //    sample = "2000Y1:2009Y1";
-    double Q_F = kdb_var->get_var("Q_F", "2005Y1");
-    double Q_I = kdb_var->get_var("Q_I", "2005Y1");
-    double KNFF = kdb_var->get_var("KNFF", "2005Y1");
-    double KNFF_1 = kdb_var->get_var("KNFF", "2004Y1");
+    double Q_F = Variables.get_var("Q_F", "2005Y1");
+    double Q_I = Variables.get_var("Q_I", "2005Y1");
+    double KNFF = Variables.get_var("KNFF", "2005Y1");
+    double KNFF_1 = Variables.get_var("KNFF", "2004Y1");
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
     EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
@@ -419,7 +413,7 @@ TEST_F(ComputedTableTest, EditTable)
 
     // propagate
     Q_F *= 0.9;
-    value = round(kdb_var->get_var("Q_F", "2005Y1") * 1e4) / 1e4;
+    value = round(Variables.get_var("Q_F", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(Q_F * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
@@ -436,7 +430,7 @@ TEST_F(ComputedTableTest, EditTable)
 
     // propagate
     KNFF *= 0.9;
-    value = round(kdb_var->get_var("KNFF", "2005Y1") * 1e4) / 1e4;
+    value = round(Variables.get_var("KNFF", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(KNFF * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
@@ -531,7 +525,7 @@ TEST_F(ComputedTableTest, PrintToFile)
                                           "Productivité totale des facteurs" };
     std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
 
-    Table* ref_table = kdb_tbl->get(table_name); 
+    Table* ref_table = Tables.get(table_name); 
 
     int i = 0;
     TableLine* line;
@@ -666,8 +660,8 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // ---- binary table files ----
 
-    KDBTables* bin_kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
-    Table* bin_ref_table = bin_kdb_tbl->get(table_name);
+    KDBTables* bin_kdb_tables = new KDBTables(false, input_test_dir + "fun.tbl");
+    Table* bin_ref_table = bin_kdb_tables->get(table_name);
 
     TableCell* bin_cell;
     
@@ -748,5 +742,5 @@ TEST_F(ComputedTableTest, PrintToFile)
     compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
 
     delete bin_ref_table;
-    delete bin_kdb_tbl;
+    delete bin_kdb_tables;
 }

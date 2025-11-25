@@ -8,6 +8,8 @@
 #include "api/objs/kdb.h"
 #include "api/utils/utils.h"
 
+#include <algorithm>            // for std::min, std::max
+
 /* ---------------------- DEFINE ---------------------- */
 
 #ifndef M_E
@@ -676,6 +678,8 @@ Sample *L_getsmpl(KDB *);
 int L_findscl(KDB *,char *);
 int L_findvar(KDB *,char *);
 char* L_expand(char* list_name);
+bool print_lec_definition(const std::string& name, const std::string& eqlec, 
+                          CLEC* eqclec, int coefs);
 
 // l_exec_val.c
 inline L_REAL(*L_VAL_FN[])(int t) = 

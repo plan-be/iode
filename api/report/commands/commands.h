@@ -38,9 +38,8 @@ int B_DataDisplayGraph(char* arg, int unused=-1);
 int B_DataPrintGraph(char* arg, int unused=-1);
 
 /* b_est.c */
-//char **B_EqsSplitSmplName(char *,Sample **);
 int B_EqsEstimate(char* arg, int unused=-1);
-int B_EqsEstimateEqs(Sample *,char **);
+int B_EqsEstimateEqs(Sample* smpl, char* pattern);
 int B_EqsSetSample(char* arg, int unused=-1);
 int B_EqsSetMethod(char* arg, int unused=-1);
 int B_EqsSetBloc(char* arg, int unused=-1);

@@ -61,7 +61,7 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
     return(*code);
 }
 
-char* ExportObjsWKS::extract_comment(KDB* dbc, char* name, char** cmt)
+char* ExportObjsWKS::extract_comment(CKDBComments* dbc, char* name, char** cmt)
 {
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)  

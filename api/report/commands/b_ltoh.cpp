@@ -329,7 +329,7 @@ static int B_ltoh(int type, char* arg)
     int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
 
     int lg = B_get_arg0(method, arg, 80);
@@ -369,7 +369,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    to = new KDB(VARIABLES, DB_STANDALONE);
+    to = new KDB(VARIABLES, false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));

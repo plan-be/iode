@@ -9,7 +9,7 @@ const static std::vector<std::string> v_var_modes = { "Level", "Differences", "G
 
 
 // TODO: wrapp functions from k_wsvar.c in KDBVariables
-class KDBVariables : public KDBTemplate<Variable>
+class KDBVariables : public KDBTemplate<KDB, Variable>
 {
 private:
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
@@ -31,15 +31,17 @@ protected:
 
     Variable get_unchecked(const std::string& name) const override;
 
-    KDBVariables(KDBVariables* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {};
-
 public:
-    KDBVariables(const std::string& filepath="") : KDBTemplate(VARIABLES, filepath) {}
+    // global or standalone database
+    KDBVariables(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(VARIABLES, is_global, filepath) {}
+    
+    // shallow copy database
+    KDBVariables(KDBVariables* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {};
 
     KDBVariables* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBVariables(this, deep_copy, pattern);
+        return template_subset<KDB, KDBVariables>(this, pattern, deep_copy);
     }
 
     double get_var(const std::string& name, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
@@ -200,4 +202,4 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     return seed;
 }
 
-inline KDBVariables Variables;
+inline KDBVariables Variables(true);

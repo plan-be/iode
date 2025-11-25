@@ -281,35 +281,35 @@ void E_PrintDF(char* lec, double* res, int drift, int trend, int order)
     int     i, pos = 0;
 
     W_print_tit(2);
-    W_printf("Augmented Dickey Fuller Test\n");
+    W_printf((char*) "Augmented Dickey Fuller Test\n");
     W_print_enum(1);
-    W_printf("ADF(%s, drift = %d, trend = %d, order = %d) = %lf\n",
+    W_printf((char*) "ADF(%s, drift = %d, trend = %d, order = %d) = %lf\n",
              lec, drift, trend, order, res[2]);
 
     W_print_tb("Coefficients and tests", 4);
-    W_printfRepl("&1C &1CValue&1CStandard Error&1CT-Statistic\n");
-    W_printf(".tl\n");
+    W_printfRepl((char*) "&1C &1CValue&1CStandard Error&1CT-Statistic\n");
+    W_printf((char*) ".tl\n");
 
-    W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
+    W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf\n",
              "ADF", res[pos], res[pos + 1], res[pos + 2]);
     pos += 3;
 
     if(drift) {
-        W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf\n",
                  "Drift", res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
 
     if(trend) {
-        W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf\n",
                  "Trend", res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
 
     for(i = 1 ; i <= order ; i++) {
-        W_printfRepl("&1LOrder %d&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl((char*) "&1LOrder %d&1D%lf&1D%lf&1D%lf\n",
                  i, res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
-    W_printf(".te\n");
+    W_printf((char*) ".te\n");
 }

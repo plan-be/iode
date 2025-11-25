@@ -3,7 +3,7 @@
 #include "api/objs/identities.h"
 
 
-class KDBIdentities : public KDBTemplate<Identity*>
+class KDBIdentities : public KDBTemplate<KDB, Identity*>
 {
 private:
     int set(const std::string& name, const std::string& lec);
@@ -25,15 +25,17 @@ protected:
 
     Identity* get_unchecked(const std::string& name) const override;
 
-    KDBIdentities(KDBIdentities* kdb, const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(kdb, deep_copy, pattern) {};
-
 public:
-    KDBIdentities(const std::string& filepath="") : KDBTemplate(IDENTITIES, filepath) {}
+    // global or standalone database
+    KDBIdentities(const bool is_global, const std::string& filepath="") 
+        : KDBTemplate(IDENTITIES, is_global, filepath) {}
+    
+    // shallow copy database
+    KDBIdentities(KDBIdentities* kdb, const std::string& pattern) : KDBTemplate(kdb, pattern) {};
 
     KDBIdentities* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBIdentities(this, deep_copy, pattern);
+        return template_subset<KDB, KDBIdentities>(this, pattern, deep_copy);
     }
 
     std::string get_lec(const std::string& name) const;
@@ -71,4 +73,4 @@ inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
     return seed;
 }
 
-inline KDBIdentities Identities;
+inline KDBIdentities Identities(true);

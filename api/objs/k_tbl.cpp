@@ -13,6 +13,7 @@
 #include "api/objs/pack.h"
 #include "api/objs/comments.h"
 #include "api/objs/tables.h"
+#include "api/print/print.h"
 #include "api/utils/buf.h"
 
 
@@ -113,6 +114,43 @@ void TableCell::set_content(const std::string& content, const bool to_oem)
         set_lec(content);
 }
 
+// -------- PRINT DEF --------
+
+/**
+ *  Print a TABLE cell optionally on several columns.
+ *  
+ *  @param [in] nb_columns int   number of columns occupied by the cell
+ *  @return                bool  true if successful, false otherwise
+ */
+bool TableCell::print_definition(int nb_columns) const
+{
+    if(!check_print_def()) 
+    {
+        W_printfRepl((char*) "&%dL ", nb_columns);
+        return true;
+    }
+
+    int attribute = (int) get_attribute();
+    std::string content = get_content(false, false);
+    switch(get_type()) 
+    {
+        case TABLE_CELL_STRING :
+            T_open_cell(attribute, nb_columns, TABLE_CELL_STRING);
+            T_open_attr(attribute);
+            W_printf((char*) "\"%s\"", (char*) content.c_str());
+            break;
+
+        case TABLE_CELL_LEC :
+            W_printfRepl((char*) "&%dL", nb_columns);
+            T_open_attr(attribute);
+            W_printf((char*) "%s", (char*) content.c_str());
+            break;
+    }
+    
+    T_close_attr(attribute);
+    return true;
+}
+
 std::size_t hash_value(const TableCell& cell)
 {
     std::hash<TableCell> cell_hash;
@@ -166,8 +204,12 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
+    std::string title;
     SWHDL handle = global_ws_cmt->get_handle(def);
-    std::string title = (handle > 0) ? std::string(KCVAL(global_ws_cmt.get(), handle)) : def;
+    if(handle == 0)
+        title = def;
+    else
+        title = std::string(KCVAL(global_ws_cmt.get(), handle));
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -247,7 +289,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
             line_name = var;
         else
         {
-            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -310,7 +352,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         handle = global_ws_cmt->get_handle(line_name);
         if(handle > 0)
         {
-            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -365,7 +407,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
             line_name = lec;
         else
         {
-            comment = std::string((char*) KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }

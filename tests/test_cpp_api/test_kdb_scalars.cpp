@@ -6,7 +6,7 @@ class KDBScalarsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBScalars kdb_scl(input_test_dir + "fun.as");
+        KDBScalars kdb_scl(true, input_test_dir + "fun.as");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBScalarsTest, Load)
 {
-    KDBScalars kdb(input_test_dir + prefix_filename + "fun.scl");
+    KDBScalars kdb(false, input_test_dir + prefix_filename + "fun.scl");
     EXPECT_EQ(kdb.size(), 161);
 }
 
@@ -34,7 +34,7 @@ TEST_F(KDBScalarsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBScalars* kdb_subset_deep_copy = Scalars.subset(pattern, true);
-    std::vector<std::string> names = Scalars.get_names(pattern);
+    std::vector<std::string> names = Scalars.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("acaf1", value, relax, std);
@@ -308,7 +308,7 @@ TEST_F(KDBScalarsTest, CopyFrom)
     EXPECT_EQ(Scalars.size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Scalars.get_names(pattern);
+    v_expected_names = Scalars.filter_names(pattern);
     Scalars.clear();
     Scalars.copy_from(filename, pattern);
     EXPECT_EQ(Scalars.size(), v_expected_names.size());  
@@ -363,12 +363,12 @@ TEST_F(KDBScalarsTest, Search)
     std::string scl_name = "gamma_";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     objs_list = Comments.search(scl_name);
     EXPECT_EQ(objs_list.size(), 0);

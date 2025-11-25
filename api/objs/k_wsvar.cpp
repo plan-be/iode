@@ -3,24 +3,24 @@
  *
  * Functions acting on workspaces of variables.
  *
- *    int KV_sample(KDB *kdb, Sample *new_sample)                                  Changes the Sample of a KDB of variables.
- *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
- *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(KDB* kdb, char* varname)                                               Adds a new variable in global_ws_var. Fills it with IODE_NAN.
- *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)     Extrapolates variables on a selected Sample according to one of the available methods.
- *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
- *    void KV_init_values_1(double* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
+ *    int KV_sample(KDB *kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
+ *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
+ *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
+ *    int KV_add(KDB* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
+ *    double KV_get(KDB *kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
+ *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
+ *    int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
+ *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
+ *    void KV_init_values_1(double* val, int t, int method)                     Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
- *    int KV_per_pos(Period* per2)                                            Retrieves the position of a Period in the current global_ws_var sample.
- *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current global_ws_var sample.  
- *    double KV_get_at_t(char*varname, int t)                                 Retrieves the value of varname[t] 
- *    double KV_get_at_per(char*varname, Period* per)                         Retrieves the value of varname[per] 
- *    double KV_get_at_aper(char*varname, char* aper)                         Retrieves the value of varname[aper]
- *    int KV_set_at_t(char*varname, int t, double val)                        Replaces the value of varname[t] by val.
- *    int KV_set_at_per(char*varname, Period* per, double val)                Replaces the value of varname[per] by val.
- *    int KV_set_at_aper(char*varname, char* aper, double val)                Replaces the value of varname[aper] by val.
+ *    int KV_per_pos(Period* per2)                                              Retrieves the position of a Period in the current global_ws_var sample.
+ *    int KV_aper_pos(char* aper2)                                              Retrieves the position of a period in text format in the current global_ws_var sample.  
+ *    double KV_get_at_t(char*varname, int t)                                   Retrieves the value of varname[t] 
+ *    double KV_get_at_per(char*varname, Period* per)                           Retrieves the value of varname[per] 
+ *    double KV_get_at_aper(char*varname, char* aper)                           Retrieves the value of varname[aper]
+ *    int KV_set_at_t(char*varname, int t, double val)                          Replaces the value of varname[t] by val.
+ *    int KV_set_at_per(char*varname, Period* per, double val)                  Replaces the value of varname[per] by val.
+ *    int KV_set_at_aper(char*varname, char* aper, double val)                  Replaces the value of varname[aper] by val.
  */
 #include "api/b_errors.h"
 #include "api/objs/kdb.h"
@@ -463,18 +463,17 @@ calc2:
  *  Extrapolates variables on a selected Sample according to one of the available methods. These extrapolation methods are
  *  described in the function KV_init_values(). 
  *  
- *  @param [in, out]    dbv    KDB*     KDB of variables on which the operation will be applied
- *  @param [in]         method int      identification of the extrapolation method (see K_init_values())
- *  @param [in]         smpl   Sample*  Sample on which the operation is to be carried out
- *  @param [in]         vars   char**   if not NULL, restricted list of variables to extrapolate
- *                                      if NULL, all variables in KDB will be modified
- *  @return                             0 on success,
- *                                      -1 if the Sample is invalid or the KDB is empty or dbv does not contain any variable 
- *                                          from the list vars
- *  @details 
+ *  @param [in, out]    dbv      KDB*     KDB of variables on which the operation will be applied
+ *  @param [in]         method   int      identification of the extrapolation method (see K_init_values())
+ *  @param [in]         smpl     Sample*  Sample on which the operation is to be carried out
+ *  @param [in]         pattern  char*    if not NULL, restricted list of variables to extrapolate
+ *                                        if NULL, all variables in KDB will be modified
+ *  @return                               0 on success,
+ *                                        -1 if the Sample is invalid or the KDB is empty or dbv does not contain any variable 
+ *                                        from the list vars
  */
  
-int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char** c_vars)
+int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char* pattern)
 {
     int bt = smpl->start_period.difference(dbv->sample->start_period);
     int at = dbv->sample->end_period.difference(smpl->end_period);
@@ -484,35 +483,25 @@ int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char** c_vars)
         return -1;
     }
 
-    int nb_vars = 0;
-    std::vector<std::string> vars;
-    if(c_vars != NULL) 
-    {
-        nb_vars = SCR_tbl_size((unsigned char**) c_vars);
-        for(int i = 0; i < nb_vars; i++) 
-            vars.push_back(std::string(c_vars[i]));
-    }
+    if(!dbv)
+        return -1;
 
-    KDB* edbv = nullptr; 
-    if(nb_vars == 0) 
-        edbv = dbv;
-    else 
-        edbv = K_refer(dbv, vars);
-    
-    if(!edbv)
-        return -1;
-    if(edbv->size() == 0)
+    if(dbv->size() == 0) 
     {
-        if(edbv != dbv)
-            delete edbv;
+        error_manager.append_error("WsExtrapolate : database is empty");
         return -1;
-    } 
+    }
     
+    std::string pattern_str = (pattern != NULL) ? std::string(pattern) : std::string("*");
+    if(pattern_str.empty())
+        pattern_str = "*";
+    std::vector<std::string> var_list = dbv->filter_names(pattern);
+
     int i, t;
     double* val;
-    for(auto& [name, _] : edbv->k_objs) 
+    for(const std::string& name : var_list) 
     {
-        val = KVVAL(edbv, name, 0);
+        val = KVVAL(dbv, name, 0);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
@@ -546,7 +535,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         edbv = dbv;
     else
     {
-        edbv = new KDB(VARIABLES, DB_STANDALONE);
+        edbv = new KDB(VARIABLES, false);
         bool success = edbv->load(std::string(filename));
         if(!success)
             goto done;
@@ -566,7 +555,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
-    ndbv = new KDB(VARIABLES, DB_STANDALONE);
+    ndbv = new KDB(VARIABLES, false);
     if(!ndbv) 
         goto done;
     

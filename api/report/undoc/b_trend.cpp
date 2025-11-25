@@ -66,7 +66,7 @@ static int B_WsTrendAll(char* arg, int std)
     int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
 
     int lg = B_get_arg0(file, arg, 80);
@@ -101,7 +101,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    to = new KDB(VARIABLES, DB_STANDALONE);
+    to = new KDB(VARIABLES, false);
     nb = t_smpl->nb_periods;
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));

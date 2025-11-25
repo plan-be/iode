@@ -258,37 +258,8 @@ public:
 	    char fullfilename[256];
 	    sprintf(fullfilename, "%s%s", input_test_dir, filename);
 
-        KDB* kdb = new KDB((IodeType) type, DB_GLOBAL);
-	    bool success = kdb->load(std::string(fullfilename));
-        EXPECT_TRUE(success);
-
-        switch(type) 
-        {
-            case COMMENTS :    
-                global_ws_cmt.reset(kdb); 
-                break;
-            case EQUATIONS :   
-                global_ws_eqs.reset(kdb);
-                break;
-            case IDENTITIES :  
-                global_ws_idt.reset(kdb);
-                break;
-            case LISTS :       
-                global_ws_lst.reset(kdb);
-                break;
-            case SCALARS :     
-                global_ws_scl.reset(kdb);
-                break;
-            case TABLES :      
-                global_ws_tbl.reset(kdb);
-                break;
-            case VARIABLES :   
-                global_ws_var.reset(kdb);
-                break;
-            default:
-                throw std::invalid_argument(std::string("B_WsLoad: unknown type ") + 
-                                                        std::to_string(type));
-        }
+        int rc = B_WsLoad(fullfilename, type);
+        EXPECT_EQ(rc, 0);
 	}
 
 	void U_test_load_fun_esv(char* filename)
@@ -1117,7 +1088,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    KDB* kdb_var = new KDB(VARIABLES, DB_STANDALONE);
+    KDB* kdb_var = new KDB(VARIABLES, false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1488,10 +1459,20 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
+    SWHDL       handle;
 
     U_test_print_title("Tests B_DATA");
 
-    KDB* kdb_cmt = global_ws_cmt.get();
+    CKDBComments* kdb_cmt = new CKDBComments(DB_GLOBAL);
+    kdb_cmt->set_obj("AAA", "This is a test comment");
+    handle = kdb_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    char* value = (char*) KCVAL(kdb_cmt, handle);
+    EXPECT_EQ(std::string(value), "This is a test comment");
+    delete kdb_cmt;
+    kdb_cmt = nullptr;
+
+    kdb_cmt = global_ws_cmt.get();
     KDB* kdb_eqs = global_ws_eqs.get();
     KDB* kdb_idt = global_ws_idt.get();
     KDB* kdb_lst = global_ws_lst.get();
@@ -1530,7 +1511,6 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataDelete(char* arg, int type)
     KDB* kdb;
     int pos;
-    SWHDL handle;
     char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
@@ -1577,6 +1557,18 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
         EXPECT_TRUE(!found);
     }
 
+    kdb_cmt->set_obj("AAA", "This is a comment");
+    handle = kdb_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    char* comment = (char*) KCVAL(kdb_cmt, handle);
+    EXPECT_EQ(std::string(comment), "This is a comment");
+    kdb_cmt->clear();
+    global_ws_cmt->set_obj("AAA", "This is a comment");
+    handle = global_ws_cmt->get_handle("AAA");
+    EXPECT_TRUE(handle > 0);
+    comment = (char*) KCVAL(global_ws_cmt.get(), handle);
+    EXPECT_EQ(std::string(comment), "This is a comment");
+
     // B_DataListSort()
     success = global_ws_lst->set("LIST1", "A;C;B");
     EXPECT_TRUE(success);
@@ -1599,7 +1591,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U");
+    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
@@ -1644,7 +1636,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "U")), "Comment of U - More comment on U");
+    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
@@ -2019,12 +2011,12 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDB* kdb_cmt = new KDB(COMMENTS, DB_GLOBAL);
+        CKDBComments* kdb_cmt = new CKDBComments(DB_GLOBAL);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
         EXPECT_TRUE(global_ws_cmt != nullptr);
-        EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(std::string(global_ws_cmt->get_obj("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2256,7 +2248,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     rc = B_ModelCompile("");
     EXPECT_EQ(rc, 0);
 
-    // B_ModelCalcSCC(char *arg)            $ModelCalcSCC nbtris prename intername postname [eqs]
+    // $ModelCalcSCC nbtris prename intername postname [eqs]
     rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
     std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";

@@ -39,8 +39,8 @@ cdef class Identities(CythonIodeDatabase):
         return wrapper
 
     def _load(self, filepath: str):
-        cdef CKDBIdentities* kdb = new CKDBIdentities(filepath.encode())
-        del kdb
+        if self.database_ptr is not NULL:
+            self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, cython_instance: Identities, pattern: str, copy: bool) -> Identities:
         cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)

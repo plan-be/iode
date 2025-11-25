@@ -21,6 +21,15 @@
 
 #define EQS_NBTESTS     20
 
+inline int B_EQS_INFOS;    // Information detail to print (for equations)
+                           //    0: equation only 
+                           //    1: equation + comment
+                           //    2: equation + comment + estimation results
+inline int B_EQS_LEC;      // Specify how to print a LEC expression 
+                           //    0 : print the LEC form as is
+                           //    1 : replace all scalars by their values
+                           //    2 : replaced all scalars by their values + t-tests
+
 /*----------------------- ENUMS ----------------------------*/
 
 enum IodeEquationMethod
@@ -473,6 +482,8 @@ public:
         return lrhs;
     }
 
+    bool print_definition() const;
+
     // -- operators --
 
     bool operator==(const Equation& other) const
@@ -532,7 +543,7 @@ inline std::size_t hash_value(const Equation& equation)
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_eqs = std::make_unique<KDB>(EQUATIONS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_eqs = std::make_unique<KDB>(EQUATIONS, true);;
 
 /*----------------------- FUNCS ----------------------------*/
 

@@ -40,8 +40,8 @@ cdef class Comments(CythonIodeDatabase):
         return wrapper
 
     def _load(self, filepath: str):
-        cdef CKDBComments* kdb = new CKDBComments(filepath.encode())
-        del kdb
+        if self.database_ptr is not NULL:
+            self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, cython_instance: Comments, pattern: str, copy: bool) -> Comments:
         cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)

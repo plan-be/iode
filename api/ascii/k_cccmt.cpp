@@ -89,9 +89,8 @@ static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
  *  @return                  KDB*    new KDB of CMT or NULL on error
  *  
  *  TODO: what if read_cmt returns an error code ?
- *  
  */
-bool KDB::load_asc_cmt(const std::string& filename)
+bool CKDBComments::load_asc(const std::string& filename)
 {
     int     cmpt = 0, rc;
     YYFILE  *yy;
@@ -157,7 +156,7 @@ bool KDB::load_asc_cmt(const std::string& filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_cmt(const std::string& filename)
+bool CKDBComments::save_asc(const std::string& filename)
 {
     FILE    *fd;
     CMT     cmt;
@@ -177,7 +176,7 @@ bool KDB::save_asc_cmt(const std::string& filename)
         }
     }
 
-    for(auto& [name, handle] : this->k_objs)
+    for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
         cmt = KCVAL(this, handle);

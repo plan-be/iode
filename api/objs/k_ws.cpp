@@ -22,6 +22,13 @@
 #include "api/b_errors.h" 
 #include "api/objs/kdb.h" 
 #include "api/objs/objs.h" 
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 
 /**
@@ -76,17 +83,25 @@ int K_load_RWS(int ref, char *filename)
         if(K_RWS[VARIABLES][ref - 1])
             delete K_RWS[VARIABLES][ref - 1];
         K_RWS[VARIABLES][ref - 1] = nullptr;
+        std::string msg = "Filepath for the Variables 'reference file' number " + 
+                          std::to_string(ref) + " is empty";
+        kwarning(msg.c_str());
         return 0;
     }
 
-    KDB* kdb = new KDB(VARIABLES, DB_STANDALONE);
-    bool success = kdb->load(std::string(filename));
-    if(!success) 
-        return -1;
-
     if(K_RWS[VARIABLES][ref - 1])
         delete K_RWS[VARIABLES][ref - 1];
-    K_RWS[VARIABLES][ref - 1] = kdb;
+    K_RWS[VARIABLES][ref - 1] = new KDB(VARIABLES, false);
+    bool success = K_RWS[VARIABLES][ref - 1]->load(std::string(filename));
+    if(!success)
+    {
+        delete K_RWS[VARIABLES][ref - 1];
+        K_RWS[VARIABLES][ref - 1] = nullptr;
+        std::string msg = "Error loading the variables file '";
+        msg += std::string(filename) + "' required to compute the table";
+        kwarning(msg.c_str());
+        return -1;
+    }
 
     return 0;
 }

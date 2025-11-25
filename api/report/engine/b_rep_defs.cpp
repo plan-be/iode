@@ -41,7 +41,7 @@ int RP_macro_createdb()
     if(RP_MACRO) 
         return(0);
 
-    RP_MACRO = new KDB(OBJECTS, DB_STANDALONE);
+    RP_MACRO = new KDB();
     if(!RP_MACRO) 
     {
         error_manager.append_error("Report : Memory Full");

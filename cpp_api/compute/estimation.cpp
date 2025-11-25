@@ -124,7 +124,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 
         // generate a list of equations names from the passed argument 'block'
         // If an equation name specified in the block is not found in the global workspace, add it anyway
-        std::vector<std::string> v_equations_ = Equations.get_names(block, false);
+        std::vector<std::string> v_equations_ = Equations.filter_names(block, false);
 
         // if current equation name is not empty
         if(!current_eq_name.empty())
@@ -188,11 +188,13 @@ void EditAndEstimateEquations::update_scalars()
     Equation* eq;
     std::vector<std::string> coefficients_list;
 
+    KDB* c_kdb_eqs = kdb_eqs->get_database();
+
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (auto& [name, _] : kdb_eqs->k_objs)
+    for (auto& [name, handle] : c_kdb_eqs->k_objs)
     {
-        eq = kdb_eqs->get(name);
+        eq = KEVAL(c_kdb_eqs, name);
         if(!eq)
             throw std::runtime_error("Estimation: Cannot get equation at position " 
                                      + name + " from the local Equations database.");
@@ -224,7 +226,7 @@ void EditAndEstimateEquations::update_scalars()
     }
 
     // remove the scalars associated with equations which are not in the present block to estimate
-    for(const std::string& eq_name: kdb_eqs->get_names())
+    for(const std::string& eq_name: kdb_eqs->filter_names("*"))
     {
         // if eq_name is not contained in v_equations
         if(find(v_equations.begin(), v_equations.end(), eq_name) == v_equations.end())
@@ -336,7 +338,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     if(res == 0)
     {
         estimation_done = true;
-        std::vector<std::string> v_coeffs = kdb_scl->get_names();
+        std::vector<std::string> v_coeffs = kdb_scl->filter_names("*");
 
         if(m_corr) delete m_corr;
         m_corr = new CorrelationMatrix(v_coeffs, estimation->get_MCORR()); 

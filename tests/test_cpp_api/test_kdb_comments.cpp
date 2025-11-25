@@ -6,7 +6,7 @@ class KDBCommentsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override 
     {
-        KDBComments kdb_cmt(input_test_dir + "fun.ac");
+        KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBCommentsTest, Load)
 {
-    KDBComments kdb(input_test_dir + prefix_filename + "fun.cmt");
+    KDBComments kdb(false, input_test_dir + prefix_filename + "fun.cmt");
     EXPECT_EQ(kdb.size(), 317);
 }
 
@@ -31,7 +31,7 @@ TEST_F(KDBCommentsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBComments* kdb_subset_deep_copy = Comments.subset(pattern, true);
-    std::vector<std::string> names = Comments.get_names(pattern);
+    std::vector<std::string> names = Comments.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", modified);
@@ -82,7 +82,7 @@ TEST_F(KDBCommentsTest, GetName)
     name = Comments.get_name(0);
     EXPECT_EQ(name, "ACAF");
     
-    EXPECT_THROW(Comments.get_name(400), std::invalid_argument);
+    EXPECT_THROW(Comments.get_name(400), std::out_of_range);
 }
 
 TEST_F(KDBCommentsTest, Rename)
@@ -177,10 +177,8 @@ TEST_F(KDBCommentsTest, GetNames)
         }
     expected_list_names.pop_back();     // remove trailing ';'
 
-    names = Comments.get_names(pattern);
+    names = Comments.filter_names(pattern);
     EXPECT_EQ(names, expected_names);
-    list_names = Comments.get_names_as_string(pattern);
-    EXPECT_EQ(list_names, expected_list_names);
 }
 
 TEST_F(KDBCommentsTest, CreateRemove)
@@ -404,7 +402,7 @@ TEST_F(KDBCommentsTest, CopyFrom)
     EXPECT_EQ(Comments.size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Comments.get_names(pattern);
+    v_expected_names = Comments.filter_names(pattern);
     Comments.clear();
     Comments.copy_from(filename, pattern);
     EXPECT_EQ(Comments.size(), v_expected_names.size());  
@@ -450,12 +448,12 @@ TEST_F(KDBCommentsTest, Search)
     std::string cmt_name = "ACAF";
     std::vector<std::string> objs_list;
 
-    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
-    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     std::vector<std::string> expected_cmts = { cmt_name };
     objs_list = Comments.search(cmt_name);

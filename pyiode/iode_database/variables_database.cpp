@@ -143,10 +143,11 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
 
     // perform the operation
     double* var_ptr;
+    KDB* c_database = database->get_database();
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -154,7 +155,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_SUB:  
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -162,7 +163,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_MUL: 
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -172,7 +173,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     case OP_DIV:
         if(value == 0)
             throw std::invalid_argument("C API: Division by zero");
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -180,7 +181,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_POW: 
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -210,22 +211,23 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
 
     int i = 0;
     double value;
+    KDB* c_database = database->get_database();
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
             *KVVAL(db, name, t) += values[i++];
         break;
     case OP_SUB: 
-        for(auto& [name, _] : database->k_objs) 
+        for(auto& [name, _] : c_database->k_objs) 
             *KVVAL(db, name, t) -= values[i++];
         break;
     case OP_MUL: 
-        for(auto& [name, _] : database->k_objs) 
+        for(auto& [name, _] : c_database->k_objs) 
             *KVVAL(db, name, t) *= values[i++];
         break;
     case OP_DIV:
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
         {
             value = values[i++];
             if(value == 0)
@@ -234,7 +236,7 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
         }
         break;
     case OP_POW: 
-        for(auto& [name, _] : database->k_objs)
+        for(auto& [name, _] : c_database->k_objs)
             *KVVAL(db, name, t) = pow(*KVVAL(db, name, t), values[i++]);
         break;
     }

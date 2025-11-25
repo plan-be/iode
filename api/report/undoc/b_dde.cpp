@@ -17,8 +17,6 @@
  *      char *ToBase26(int num)
  *      char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
  *      char *IodeTblCell(TableCell *cell, COL *cl, int nbdec)
- *      char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
- *      char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
  *      char *IodeDdeGetReportRC(char *szItem)
  *      char *IodeDdeGetXObj(char *szItem, int type)
  *      char *IodeDdeGetItem(char *szTopic, char *szItem)
@@ -66,8 +64,10 @@
 #include "api/objs/pack.h"
 #include "api/objs/grep.h"
 #include "api/objs/comments.h"
+#include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 #include "api/print/print.h"
@@ -310,170 +310,6 @@ char* IodeTblCell(TableCell *cell, COL *cl, int nbdec)
 }
 
 
-/**
- *  Compute the table objnb on the GSample ismpl and return a string containing the result.
- */
-
-char* IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
-{
-    int     dim, i, j, d, rc = 0, nli = 0,
-                          nf = 0, nm = 0;
-    char    gsmpl[128], **l = NULL, *buf, *res = NULL; /* JMP 30-04-98 */
-    COLS    *cls;
-
-    std::string name = global_ws_tbl->get_name(objnb);
-    Table* tbl = KTVAL(global_ws_tbl.get(), name);
-    Sample* smpl = global_ws_var->sample;
-
-    /* date */
-    char date[11];
-
-    if(smpl == nullptr || smpl->nb_periods == 0) 
-        return (char*) "";
-
-    /* mode */
-    if(!ismpl)
-        sprintf(gsmpl, "%s:%d", (char*) smpl->start_period.to_string().c_str(), smpl->nb_periods);
-    else
-        sprintf(gsmpl, "%s", ismpl);
-
-    dim = T_prep_cls(tbl, gsmpl, &cls);
-    if(dim < 0) 
-        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-
-    KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) 
-        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-    COL_find_mode(cls, KT_mode, 2);
-
-    *nc = dim + 1;
-    *nl = 1;
-
-    TableLine* line;
-    buf = SCR_malloc(256 + dim * 128);
-    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
-    {
-        buf[0] = 0;
-        line = &tbl->lines[i];
-
-        switch(line->get_type()) 
-        {
-            case TABLE_LINE_SEP   :
-                break;
-            case TABLE_LINE_DATE  :
-                strcat(buf, SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy"));
-                break;
-            case TABLE_LINE_MODE  :
-                for(j = 0; j < MAX_MODE; j++) 
-                {
-                    if(KT_mode[j] == 0) 
-                        continue;
-                    sprintf(date, "(%s) ", COL_OPERS[j + 1]);
-                    strcat(buf, date);
-                    //strcat(buf, KLG_OPERS_TEXTS[j + 1][B_LANG]);
-                    strcat(buf, KLG_OPERS_TEXTS[j + 1][K_LANG]); // JMP 18-04-2022
-                    strcat(buf, "\n");
-                    nm ++;
-                }
-                break;
-            case TABLE_LINE_FILES :
-                for(j = 0; KT_names[j]; j++) 
-                {
-                    strcat(buf, KT_names[j]);
-                    strcat(buf, "\n");
-                    nf ++;
-                }
-                break;
-            case TABLE_LINE_TITLE :
-                strcat(buf, IodeTblCell(&(line->cells[0]), NULL, nbdec));
-                //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
-                break;
-            case TABLE_LINE_CELL  :
-                COL_clear(cls);
-                if(COL_exec(tbl, i, cls) < 0)
-                    strcat(buf, "Error in calc");
-                else
-                    for(j = 0; j < cls->cl_nb; j++) 
-                    {
-                        d = j % T_NC(tbl);
-                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
-                            continue;
-                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
-                        strcat(buf, "\t");
-                    }
-                break;
-        }
-
-        if(buf[0]) 
-        {
-            SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
-            (*nl)++;
-        }
-    }
-    
-    SCR_add_ptr((unsigned char***) &l, &nli, NULL);
-    *nl += nf + nm;
-    res = (char*) SCR_mtov((unsigned char**) l, '\n');
-
-    COL_free_cols(cls);
-    SCR_free_tbl((unsigned char**) l);
-    SCR_free(buf);
-
-    SCR_free_tbl((unsigned char**) KT_names);
-    KT_names = NULL;
-    KT_nbnames = 0;
-
-    return(res);
-}
-
-char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
-{
-    KDB* kdb = get_global_db(type);
-    if(objnb < 0 || objnb >= kdb->size())
-        return (char*) 0;
-
-    std::string name = kdb->get_name(objnb);
-    
-    char *obj, *res;
-    std::string lec;
-    if(type != TABLES) 
-    {
-        *nc = 2;
-        *nl = 1;
-        switch(type) 
-        {
-            case COMMENTS :
-                obj = (char*) KCVAL(kdb, name);
-                break;
-            case EQUATIONS :
-                lec = KELEC(kdb, name);
-                obj = (char*) lec.c_str();
-                break;
-            case IDENTITIES :
-                obj = (char*) KILEC(kdb, name);
-                break;
-            case LISTS :
-                obj = (char*) KLVAL(kdb, name);
-                break;
-            default    :
-                obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
-                break;
-        }
-
-        if(obj == 0) obj = " ";
-        res = SCR_malloc((int)sizeof(ONAME) + 10 + (int)strlen(obj));
-        strcpy(res, name.c_str());
-        strcat(res, "\t");
-        strcat(res, obj);
-    }
-    else
-        res = IodeDdeCreateTbl(objnb, NULL, nc, nl, -1);
-
-    SCR_OemToAnsi((unsigned char*) res, (unsigned char*) res);
-    return(res);
-}
-
 char *IodeDdeGetReportRC(char *szItem)
 {
     char    *res;
@@ -558,9 +394,11 @@ char *IodeDdeGetXObj(char *szItem, int type)
             break;
 
         default :
-            if(SCR_tbl_size(lst) == 0) {
-                for(i = 0 ; i < kdb->size() ; i++) {
-                    res = IodeDdeCreateObj(i, type, &l, &h);
+            if(SCR_tbl_size(lst) == 0) 
+            {
+                for(i = 0 ; i < kdb->size() ; i++) 
+                {
+                    res = kdb->dde_create_obj(i, &l, &h);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                    (unsigned char*) res);
                     SCR_free(res);
@@ -575,7 +413,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                     if(objnb < 0) 
                         continue;
                     
-                    res = IodeDdeCreateObj(objnb, type, &l, &h);
+                    res = kdb->dde_create_obj(objnb, &l, &h);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                    (unsigned char*) res);
                     SCR_free(res);
@@ -632,7 +470,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case COMMENTS :
         case LISTS :
-            res = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
+            res = (char*) SCR_stracpy((unsigned char*) kdb->get_ptr_obj(name));
             SCR_replace((unsigned char*) res, (unsigned char*) "\t", (unsigned char*) " ");
             SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
             return(res);
@@ -924,12 +762,12 @@ int B_ExcelCurrency(char *arg, int unused)
 
             case 'e': /* EUR */
             case 'E':
-                SCR_sCURRENCY = '€';
+                SCR_sCURRENCY = (char) '€';
                 break;
 
             case 'p': /* Pound */
             case 'P':
-                SCR_sCURRENCY = '£';
+                SCR_sCURRENCY = (char) '£';
                 break;
 
             default:
@@ -1006,15 +844,15 @@ the_end:
 
 int B_ExcelSet(char *arg, int type)
 {
-    int         pos, shift, rc = -1, 
+    int         shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
-    KDB         *kdb = get_global_db(type);
-    Scalar         *scl;
+    Scalar      *scl;
     Period      *per = NULL;
     double      d;
     char        **args = NULL,
                 *ptr = NULL,
                 *item, *smpl;
+    bool        found = false;
     std::string name;
     std::string lec;
 
@@ -1025,49 +863,92 @@ int B_ExcelSet(char *arg, int type)
     if(name.empty()) 
         goto the_end;
     
-    pos = kdb->index_of(name);
-
     item = args[nb_args - 1];
     switch(type) 
     {
         case COMMENTS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(kdb, name));
+        {
+            found = global_ws_cmt->contains(name);
+            if(!found)
+                goto the_end;
+
+            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(global_ws_cmt.get(), name));
             break;
+        }
         case IDENTITIES :
-            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(kdb, name));
+        {
+            found = global_ws_idt->contains(name);
+            if(!found)
+                goto the_end;
+
+            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(global_ws_idt.get(), name));
             break;
+        }
         case LISTS :
-            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(kdb, name));
+        {
+            found = global_ws_lst->contains(name);
+            if(!found)
+                goto the_end;
+
+            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(global_ws_lst.get(), name));
             break;
+        }
         case EQUATIONS :
-            lec = KELEC(kdb, name);
+        {
+            found = global_ws_eqs->contains(name);
+            if(!found)
+                goto the_end;
+
+            lec = KELEC(global_ws_eqs.get(), name);
             ptr = (char*) SCR_stracpy((unsigned char*) lec.c_str());
             break;
+        }
         case SCALARS :
-            scl = KSVAL(kdb, name);
+        {
+            found = global_ws_scl->contains(name);
+            if(!found)
+                goto the_end;
+
+            scl = KSVAL(global_ws_scl.get(), name);
             d = scl->value;        
             ptr = SCR_malloc(80);  
             IodeFmtVal(ptr, d);    
             break;                 
-
+        }
         case TABLES :
-            if(nb_args == 3) smpl = args[1];
-            else smpl = NULL;
+        {
+            found = global_ws_tbl->contains(name);
+            if(!found)
+                goto the_end;
 
-            ptr = IodeDdeCreateTbl(pos, smpl, &nc, &nl, -1);
+            if(nb_args == 3) 
+                smpl = args[1];
+            else 
+                smpl = NULL;
+
+            ptr = global_ws_tbl->dde_create_table(name, smpl, &nc, &nl, -1);
             break;
+        }
 
-        case VARIABLES : /* Name Period nVal */
+        case VARIABLES : 
+        {
+            found = global_ws_var->contains(name);
+            if(!found)
+                goto the_end;
+
+            /* Name Period nVal */
             per = new Period(std::string(args[1]));
-            shift = per->difference(kdb->sample->start_period);
+            shift = per->difference(global_ws_var->sample->start_period);
             if(per == NULL || shift< 0) 
                 shift = 0;
             else 
                 item = args[2];
-
+    
+            int pos = global_ws_var->index_of(name);
             ptr = IodeDdeCreateSeries(pos, shift);
-            nc = 1 + kdb->sample->nb_periods - shift; /* JMP 04-10-99 */
+            nc = 1 + global_ws_var->sample->nb_periods - shift;
             break;
+        } 
     }
 
     SCR_OemToAnsi((unsigned char*) ptr, (unsigned char*) ptr);
@@ -1075,8 +956,8 @@ int B_ExcelSet(char *arg, int type)
     rc = B_ExcelSetItem(item, ptr, nc, nl);
 
 the_end:
-    if(pos < 0)
-        error_manager.append_error(std::string(args[0]) + " : not found");  /* JMP 10-08-00 */
+    if(!found)
+        error_manager.append_error(name + " : not found");
 
     SCR_free_tbl((unsigned char**) args);
     delete per;

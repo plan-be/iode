@@ -826,7 +826,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         return(-1);
     }
 
-    KDB* kdb = new KDB(OBJECTS, DB_STANDALONE);
+    KDB* kdb = new KDB();
     nb_objs = kdb->preload(fd, std::string(file), vers);
     fclose(fd);
 
@@ -920,10 +920,17 @@ bool KDB::load(const std::string& filename)
 {
     int   ftype;
     char  ext[10];
-    KDB*  kdb = nullptr;
     bool  success = false;
 
+    if(this->k_db_type == DB_SHALLOW_COPY)
+    {
+        kwarning("Cannot load file into a shallow copy of a database");
+        return false;
+    }
+
     kmsg("Loading %s", filename.c_str());
+
+    this->clear();
 
     ftype = K_findtype((char*) filename.c_str(), this->k_type);
     if(ftype == -1) 
@@ -942,7 +949,17 @@ bool KDB::load(const std::string& filename)
         success = this->load_binary(this->k_type, filename);
 
     if(success)
+    {
+        if(this->k_db_type == DB_GLOBAL)
+        {
+            IodeType iode_type = (IodeType) this->k_type;
+            if(K_RWS[iode_type][0])
+                delete K_RWS[iode_type][0];
+            // K_RWS[iode_type][0] = new <sub_class>(this, "*");      
+            this->update_reference_db();
+        }
         kmsg("%d objects loaded", (int) this->size());
+    }
     
     return success;
 }
@@ -1056,7 +1073,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     Sample  csmpl;
     std::string name;
 
-    KDB* from = new KDB((IodeType) to->k_type, DB_STANDALONE);
+    KDB* from = new KDB((IodeType) to->k_type, false);
     if(!from) 
         return(-1);
     
@@ -1230,7 +1247,7 @@ fin:
  
 int K_cat(KDB* ikdb, char* filename)
 {
-    KDB* kdb = new KDB((IodeType) ikdb->k_type, DB_STANDALONE);
+    KDB* kdb = new KDB((IodeType) ikdb->k_type, false);
     bool success = kdb->load(std::string(filename));
     if(!success)
     {

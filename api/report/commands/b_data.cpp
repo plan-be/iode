@@ -896,18 +896,12 @@ int B_DataScan(char* arg, int type)
         rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
     else 
     {
-        char** c_objs = B_ainit_chk(arg, NULL, 0);
-        int nb_objs = SCR_tbl_size((unsigned char**) c_objs);
-        std::vector<std::string> objs(nb_objs);
-        for(int i = 0; i < nb_objs; i++)
-            objs[i] = std::string(c_objs[i]);
-        SCR_free_tbl((unsigned char**) c_objs);
-
-        if(nb_objs == 0)
+        std::string objs = std::string(arg);
+        if(objs.empty())
             rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
         else 
         {
-            KDB* tkdb = K_refer(get_global_db(type), objs);
+            KDB* tkdb = new KDB(get_global_db(type), objs);
             if(tkdb)
             {
                 if(tkdb->size() > 0)
@@ -1270,7 +1264,6 @@ int B_DataCompare(char* arg, int type)
             **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
             *file, *one, *two, *three, *fr;
     KDB*    kdb1 = get_global_db(type);
-    KDB*    kdb2 = new KDB((IodeType) type, DB_STANDALONE);
 
     args = B_vtom_chk(arg, 5);
     if(args == NULL) 
@@ -1282,6 +1275,7 @@ int B_DataCompare(char* arg, int type)
     three = args[3];
     fr    = args[4];
 
+    KDB* kdb2 = new KDB((IodeType) type, false);
     bool success = kdb2->load(std::string(file));
     if(!success)
     {

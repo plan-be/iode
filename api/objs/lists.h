@@ -13,7 +13,7 @@ using LIS = char*;
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_lst = std::make_unique<KDB>(LISTS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_lst = std::make_unique<KDB>(LISTS, true);;
 
 /*----------------------- FUNCS ----------------------------*/
 

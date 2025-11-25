@@ -105,11 +105,11 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     }
     else 
     {
-        std::vector<std::string> idts(nb_idts);
+        std::string idts;
         for(int i = 0; i < nb_idts; i++)
-            idts[i] = std::string(c_idts[i]);
+            idts += std::string(c_idts[i]) + ";";
 
-        KDB* kdb_idt = K_refer(global_ws_idt.get(), idts);
+        KDB* kdb_idt = new KDB(global_ws_idt.get(), idts);
         kdb_var = KI_exec(kdb_idt,
                           global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,

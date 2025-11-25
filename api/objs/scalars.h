@@ -42,6 +42,16 @@ public:
         return *this;
     }
 
+    // Return the t-test of a scalar or IODE_NAN if it cannot be determined
+    double calculate_t_test() const
+    {
+        if(IODE_IS_A_NUMBER(value) && IODE_IS_A_NUMBER(std) && !IODE_IS_0(std))
+            return value / std;
+        return IODE_NAN;
+    }
+
+    bool print_definition() const;
+
     bool operator==(const Scalar& other) const
     {
         bool eq = this->value == other.value;
@@ -71,7 +81,7 @@ struct std::hash<Scalar>
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_scl = std::make_unique<KDB>(SCALARS, DB_GLOBAL);
+inline std::unique_ptr<KDB> global_ws_scl = std::make_unique<KDB>(SCALARS, true);;
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
@@ -79,11 +89,21 @@ std::size_t hash_value(const Scalar& scalar);
 
 
 inline Scalar* KSVAL(KDB* kdb, const std::string& name) 
-{         
-    return (Scalar*) K_optr0(kdb, (char*) name.c_str());
+{  
+    if(!kdb) 
+        return nullptr;
+
+    char* ptr = kdb->get_ptr_obj(name);
+    if(ptr == nullptr)
+        return nullptr;
+    
+    return (Scalar*) P_get_ptr(ptr, 0);
 }
 
 inline Scalar* KSVAL(KDB* kdb, SWHDL handle) 
-{         
+{
+    if(!kdb) 
+        return nullptr;
+
     return (Scalar*) P_get_ptr(SW_getptr(handle), 0); 
 }

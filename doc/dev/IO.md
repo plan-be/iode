@@ -164,8 +164,8 @@ A set of rules can be defined to select and/or determine the name each object is
 |`void write_value(char* tmp, double val)`|Formats a double value on 20 positions in general format.|
 |`char *write_pre_post(char* pre, char* post, char* src, char** tg)`|Creates an allocated string formatted as \{pre\}\{src\}\{post\}.|
 |`char *write_separator(char* src, char** tg)`|Creates an allocated string formatted as \{src\}\{EXP\_SEP\}.|
-|`int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile|
-|`int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
+|`int EXP_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile|
+|`int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
 |`int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)`|Exports VAR files into an external format.|
 
 ### k\_ecsv.c {#T15}

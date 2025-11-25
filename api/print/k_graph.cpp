@@ -85,17 +85,17 @@ int T_GraphInit(double w, double h,
             double ymin, double ymax, double zmin, 
             double zmax, int align, int box, int brush)
 {
-    W_printf(".gb %.2lf %.2lf\n", w, h);
-    W_printf(".ggrid %c%s\n", "TNt"[xgrid], T_GRIDS[ygrid]); /* JMP 26-11-2003 */
+    W_printf((char*) ".gb %.2lf %.2lf\n", w, h);
+    W_printf((char*) ".ggrid %c%s\n", "TNt"[xgrid], T_GRIDS[ygrid]); /* JMP 26-11-2003 */
 
-    W_printf(".galign %c\n", "LMR"[align]);
-    W_printf(".gbox %d %c %d\n", box, A2M_BACKCOLOR, brush);
+    W_printf((char*) ".galign %c\n", "LMR"[align]);
+    W_printf((char*) ".gbox %d %c %d\n", box, A2M_BACKCOLOR, brush);
 
 
-    if(IODE_IS_A_NUMBER(ymin)) W_printf(".gyMin %lg\n", ymin);
-    if(IODE_IS_A_NUMBER(ymax)) W_printf(".gyMax %lg\n", ymax);
-    if(IODE_IS_A_NUMBER(zmin)) W_printf(".gzMin %lg\n", zmin);
-    if(IODE_IS_A_NUMBER(zmax)) W_printf(".gzMax %lg\n", zmax);
+    if(IODE_IS_A_NUMBER(ymin)) W_printf((char*) ".gyMin %lg\n", ymin);
+    if(IODE_IS_A_NUMBER(ymax)) W_printf((char*) ".gyMax %lg\n", ymax);
+    if(IODE_IS_A_NUMBER(zmin)) W_printf((char*) ".gzMin %lg\n", zmin);
+    if(IODE_IS_A_NUMBER(zmax)) W_printf((char*) ".gzMax %lg\n", zmax);
     return(0);
 }
 
@@ -107,7 +107,7 @@ int T_GraphInit(double w, double h,
  */
 int T_GraphEnd()
 {
-    W_printf(".ge\n");
+    W_printf((char*) ".ge\n");
     W_flush();
 
     return(0);
@@ -217,7 +217,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
  */
 int T_GraphTitle(char *txt)
 {
-    W_printf(".gtitle %s\n", txt);
+    W_printf((char*) ".gtitle %s\n", txt);
     return(0);
 }
 
@@ -235,12 +235,12 @@ int T_GraphTitle(char *txt)
  
 int T_GraphLegend(int axis, int type, char *txt, char *fileop)
 {
-    if(axis == 0) W_printf(".gty %c \"%s", type, txt);
-    else W_printf(".gtz %c \"%s", type, txt);
+    if(axis == 0) W_printf((char*) ".gty %c \"%s", type, txt);
+    else W_printf((char*) ".gtz %c \"%s", type, txt);
 
-    if(fileop != NULL && fileop[0] != 0) W_printf(" %s", fileop);
+    if(fileop != NULL && fileop[0] != 0) W_printf((char*) " %s", fileop);
 
-    W_printf("\" "); /* GB 25/11/98 */
+    W_printf((char*) "\" "); /* GB 25/11/98 */
     return(0);
 }
 
@@ -279,12 +279,12 @@ static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i)
  */
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
 {
-    if(axis == 0) W_printf(".gxy %c \"%s", type, txt);
-    else W_printf(".gxz %c \"%s", type, txt);
+    if(axis == 0) W_printf((char*) ".gxy %c \"%s", type, txt);
+    else W_printf((char*) ".gxz %c \"%s", type, txt);
 
-    if(fileop != NULL && fileop[0] != 0) W_printf(" %s", fileop);
+    if(fileop != NULL && fileop[0] != 0) W_printf((char*) " %s", fileop);
 
-    W_printf("\" ");
+    W_printf((char*) "\" ");
     return(0);
 }
 
@@ -302,13 +302,13 @@ int T_GraphTimeData(Sample *smpl, double *y)
     char    buf[21];
 
     std::string str_period = smpl->start_period.to_string();
-    W_printf("%s ", (char*) str_period.c_str());
+    W_printf((char*) "%s ", (char*) str_period.c_str());
 
     for(int i = 0; i < smpl->nb_periods; i++) {
         T_fmt_val(buf, y[i], 16, -1);
-        W_printf(" %s ", buf);
+        W_printf((char*) " %s ", buf);
     }
-    W_printf("\n");
+    W_printf((char*) "\n");
     return(0);
 }
 
@@ -329,9 +329,9 @@ int T_GraphXYData(int nb, double *x, double *y)
     for(i = 0; i < nb; i++) {
         T_fmt_val(bufx, x[i], 16, -1);
         T_fmt_val(bufy, y[i], 16, -1);
-        W_printf(" %s %s ", bufx, bufy);
+        W_printf((char*) " %s %s ", bufx, bufy);
     }
-    W_printf("\n");
+    W_printf((char*) "\n");
     return(0);
 }
 
@@ -935,7 +935,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     for(i = 1; i < smpl.nb_periods; i++) 
         x[i] = x[i - 1] + step;
     y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
-    hdl = APIChartAlloc(T_NL(tbl));
+    hdl = APIChartAlloc((int) T_NL(tbl));
     w = 1;
 
     std::string content;

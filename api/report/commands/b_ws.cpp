@@ -53,6 +53,39 @@
 #include "api/report/commands/commands.h"
 
 
+template<typename T>
+static bool load_global_database(std::unique_ptr<T>& global_ptr, 
+        const std::string& filepath)
+{
+    T* kdb = new T(true);
+    bool success = kdb->load(filepath);
+    if(!success)
+    {
+        delete kdb;
+        return false;
+    }
+
+    global_ptr.reset(kdb); 
+    return true;
+}
+
+template<typename T>
+static bool load_global_KDB(const IodeType iode_type, 
+    std::unique_ptr<T>& global_ptr, const std::string& filepath)
+{
+    T* kdb = new T(iode_type, true);
+    bool success = kdb->load(filepath);
+    if(!success)
+    {
+        delete kdb;
+        return false;
+    }
+
+    global_ptr.reset(kdb); 
+    return true;
+}
+
+
 /**
  *  Syntax: $WsLoad<type> filename
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
@@ -72,50 +105,38 @@ int B_WsLoad(char* arg, int type)
     K_strip(buf);
     if(buf[0] == 0) 
         return 0;
+    std::string filepath = std::string(buf);
 
-    KDB* kdb = new KDB((IodeType) type, DB_GLOBAL);
-    bool success = kdb->load(std::string(buf));
-    if(!success)
-    {
-        delete kdb;
-        return -1;
-    }
-
+    bool success;
     switch(type) 
     {
-        case COMMENTS :    
-            global_ws_cmt.reset(kdb); 
+        case COMMENTS: 
+            success = load_global_database<CKDBComments>(global_ws_cmt, filepath);
             break;
-        case EQUATIONS :   
-            global_ws_eqs.reset(kdb);
+        case EQUATIONS: 
+            success = load_global_KDB<KDB>(EQUATIONS, global_ws_eqs, filepath);
             break;
-        case IDENTITIES :  
-            global_ws_idt.reset(kdb);
+        case IDENTITIES: 
+            success = load_global_KDB<KDB>(IDENTITIES, global_ws_idt, filepath);
             break;
-        case LISTS :       
-            global_ws_lst.reset(kdb);
+        case LISTS: 
+            success = load_global_KDB<KDB>(LISTS, global_ws_lst, filepath);
             break;
-        case SCALARS :     
-            global_ws_scl.reset(kdb);
+        case SCALARS: 
+            success = load_global_KDB<KDB>(SCALARS, global_ws_scl, filepath);
             break;
-        case TABLES :      
-            global_ws_tbl.reset(kdb);
+        case TABLES: 
+            success = load_global_KDB<KDB>(TABLES, global_ws_tbl, filepath);
             break;
-        case VARIABLES :   
-            global_ws_var.reset(kdb);
+        case VARIABLES: 
+            success = load_global_KDB<KDB>(VARIABLES, global_ws_var, filepath);
             break;
         default:
             kerror(0, "B_WsLoad: unknown type %d", type);
             return -1;
     }
 
-    if(K_RWS[type][0])
-        delete K_RWS[type][0];
-
-    std::vector<std::string> all_names = kdb->get_names();
-    K_RWS[type][0] = K_quick_refer(kdb, all_names);
-
-    return 0;
+    return success ? 0 : -1;
 }
 
 
@@ -453,9 +474,10 @@ int B_WsMerge(char* arg, int type)
  
 int B_WsExtrapolate(char* arg, int unused)
 {
-    int     p = 0, method = 0, rc = -1;
-    char    **vars;
+    int     p = 0, method = 0, nb_vars = 0, rc = -1;
+    char**  vars = NULL;
     Sample* smpl = nullptr;
+    std::string pattern;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);
@@ -490,12 +512,27 @@ int B_WsExtrapolate(char* arg, int unused)
     }
 
     vars = args + p + 2;
-    rc = KV_extrapolate(global_ws_var.get(), method, smpl, vars);
+    nb_vars = SCR_tbl_size((unsigned char**) vars);
+    if(nb_vars == 0) 
+        pattern = "*";
+    else 
+    {
+        for(int i = 0; i < nb_vars; i++) 
+        {
+            pattern += vars[i];
+            if(i < nb_vars - 1) 
+                pattern += ",";
+        }
+    }
+    SCR_free_tbl((unsigned char**) args);
+
+    rc = KV_extrapolate(global_ws_var.get(), method, smpl, (char*) pattern.c_str());
 
 done:
-    if(smpl) delete smpl;
+    if(smpl) 
+        delete smpl;
     smpl = nullptr;
-    SCR_free_tbl((unsigned char**) args);
+
     return rc;
 }
 

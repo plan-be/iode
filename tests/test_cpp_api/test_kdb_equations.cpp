@@ -9,7 +9,7 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+        KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
     }
 
     // void TearDown() override {}
@@ -18,7 +18,7 @@ protected:
 
 TEST_F(KDBEquationsTest, Load)
 {
-    KDBEquations kdb(input_test_dir + prefix_filename + "fun.eqs");
+    KDBEquations kdb(false, input_test_dir + prefix_filename + "fun.eqs");
     EXPECT_EQ(kdb.size(), 274);
 }
 
@@ -34,7 +34,7 @@ TEST_F(KDBEquationsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBEquations* kdb_subset_deep_copy = Equations.subset(pattern, true);
-    std::vector<std::string> names = Equations.get_names(pattern);
+    std::vector<std::string> names = Equations.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
@@ -165,7 +165,7 @@ TEST_F(KDBEquationsTest, Filter)
     std::vector<std::string> expected_names;
     KDBEquations* kdb_subset;
 
-    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
@@ -239,7 +239,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
     std::vector<std::string> expected_names;
     KDBEquations* kdb_subset;
 
-    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
@@ -303,7 +303,7 @@ TEST_F(KDBEquationsTest, CopyFrom)
     EXPECT_EQ(Equations.size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Equations.get_names(pattern);
+    v_expected_names = Equations.filter_names(pattern);
     Equations.clear();
     Equations.copy_from(filename, pattern);
     EXPECT_EQ(Equations.size(), v_expected_names.size());  
@@ -356,12 +356,12 @@ TEST_F(KDBEquationsTest, Search)
     std::string eqs_name = "ACAG";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
-    KDBLists kdb_lst(input_test_dir + "fun.al");
-    KDBScalars kdb_scl(input_test_dir + "fun.as");
-    KDBTables kdb_tbl(input_test_dir + "fun.at");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
+    KDBLists kdb_lst(true, input_test_dir + "fun.al");
+    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     std::vector<std::string> expected_cmts = { eqs_name };
     objs_list = Comments.search(eqs_name);

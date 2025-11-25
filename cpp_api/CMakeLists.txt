@@ -13,7 +13,6 @@ set(CPP_REPORT
 set(CPP_KDB 
     KDB/kdb_global.h        KDB/kdb_global.cpp
     KDB/kdb_reference.h     KDB/kdb_reference.cpp
-    KDB/kdb_abstract.h      KDB/kdb_abstract.cpp
     KDB/kdb_template.h
     KDB/kdb_comments.h      KDB/kdb_comments.cpp
     KDB/kdb_equations.h     KDB/kdb_equations.cpp

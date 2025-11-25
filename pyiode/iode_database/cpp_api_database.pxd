@@ -60,7 +60,7 @@ cdef extern from "api/all.h":
                    CPeriod* sum_period, int maxit, double eps)
     int B_DataPattern(char* arg, int iode_type)
 
-    ctypedef struct KDB:
+    cdef cppclass KDB:
         map[string, SWHDL]  k_objs
         short               k_type
         short               k_mode
@@ -79,6 +79,11 @@ cdef extern from "api/all.h":
         # variables
         bool set(string& name, double* var, int nb_obs) except +
         bool remove(string& name) except +
+
+    cdef cppclass CKDBComments(KDB):
+        char* get_obj(SWHDL handle) except +
+        char* get_obj(string name) except +
+        void set_obj(string name, char* value) except +
 
     # k_wsvar.c
     int KV_add(KDB* kdb, char* varname)
@@ -142,51 +147,58 @@ cdef extern from "api/b_errors.h":
         void clear()
 
     # Define the global IodeErrorManager instance
-    cdef IodeErrorManager error_manager
+    cdef IodeErrorManager error_manager  
 
-cdef extern from "cpp_api/KDB/kdb_abstract.h":
-    cdef cppclass KDBAbstract:    
-        # Public methods
-        int get_iode_type() const
-        bool is_global_database() const
-        bool is_local_database() const
-        bool is_shallow_copy_database() const
-        int size() const
-
-        KDB* get_database() except +
-
-        int index_of(string& name)
-        bool contains(string& name)
-        string get_name(int pos)
-        vector[string] get_names(string& pattern, bool must_exist) except +
-        bool rename(string& old_name, string& new_name, bool overwrite) except +
-        bool remove(string& name) except +
-
-        string get_filename() const
-        void set_filename(string& filename) except +
-
-        string get_description() const
-        void set_description(string& description) except +
-
-        void merge(KDBAbstract& other, bool overwrite) except +
-        void copy_from(string& input_file, string& objects_names) except +
-        void merge_from(string& input_file) except +
-
-        vector[string] search(string& pattern, bint word, bint case_sensitive, bint in_name, 
-                              bint in_formula, bint in_text, string& list_result) except +
-        string expand(string pattern, char ch_all) except +
-
-        void save(string& filepath, bool compress) except +
-        void clear() except +
 
 cdef extern from "cpp_api/KDB/kdb_template.h":
-    cdef cppclass KDBTemplate[T](KDBAbstract):        
-        pass
+    cdef cppclass KDBAbstract:   
+        # Constructor     
+        KDBAbstract(IodeType iode_type)
+
+        # ==== methods ====
+
+        int size() except +
+        int get_iode_type() except +
+        string get_iode_type_str() except +
+        bool is_global_database() except +
+        bool is_local_database() except +
+        bool is_shallow_copy_database() except +
+        string get_filename() except +
+        void set_filename(const string& filename) except +
+        string get_description() except +
+        void set_description(const string& description) except +
+        int index_of(const string& name) except +
+        bool contains(const string& name) except +
+
+        # object names
+        string get_name(const int pos) except +
+        bool set_name(const int pos, const string& new_name) except +
+        bool rename(const string& old_name, const string& new_name, const bool overwrite) except +
+        string expand(const string& pattern, const char ch_all) except +
+        vector[string] filter_names(const string& pattern, const bool must_exist) except +
+        vector[string] get_names() except +
+        string get_names_as_string() except +
+
+        # delete
+        void remove(const string& name) except +
+
+        # Other methods
+        void merge(const KDBAbstract& other, const bool overwrite) except +
+        void copy_from(const string& input_file, const string objects_names) except +
+        void merge_from(const string& input_file) except +
+        vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
+            const bool in_name, const bool in_formula, const bool in_text, const string& list_result) except +
+
+        # load - save - clear
+        bool load(const string& filepath) except +
+        bool save(const string& filepath, const bool compress) except +
+        void clear() except +
+
 
 cdef extern from "cpp_api/KDB/kdb_comments.h":
-    cdef cppclass KDBComments(KDBTemplate[string]):
+    cdef cppclass KDBComments(KDBAbstract):
         # Constructor
-        KDBComments(string& filepath) except +
+        KDBComments(bool is_global, string& filepath) except +
 
         # Public methods
         KDBComments* subset(string& pattern, bool deep_copy) except +
@@ -202,9 +214,9 @@ cdef extern from "cpp_api/KDB/kdb_comments.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_equations.h":
-    cdef cppclass KDBEquations(KDBTemplate[string]):
+    cdef cppclass KDBEquations(KDBAbstract):
         # Constructor
-        KDBEquations(string& filepath) except +
+        KDBEquations(bool is_global, string& filepath) except +
 
         # Public methods
         KDBEquations* subset(string& pattern, bool deep_copy) except +
@@ -225,9 +237,9 @@ cdef extern from "cpp_api/KDB/kdb_equations.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_identities.h":
-    cdef cppclass KDBIdentities(KDBTemplate[string]):
+    cdef cppclass KDBIdentities(KDBAbstract):
         # Constructor
-        KDBIdentities(string& filepath) except +
+        KDBIdentities(bool is_global, string& filepath) except +
 
         # Public methods
         KDBIdentities* subset(string& pattern, bool deep_copy) except +
@@ -246,9 +258,9 @@ cdef extern from "cpp_api/KDB/kdb_identities.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_lists.h":
-    cdef cppclass KDBLists(KDBTemplate[string]):
+    cdef cppclass KDBLists(KDBAbstract):
         # Constructor
-        KDBLists(string& filepath) except +
+        KDBLists(bool is_global, string& filepath) except +
 
         # Public methods
         KDBLists* subset(string& pattern, bool deep_copy) except +
@@ -264,9 +276,9 @@ cdef extern from "cpp_api/KDB/kdb_lists.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_scalars.h":
-    cdef cppclass KDBScalars(KDBTemplate[string]):
+    cdef cppclass KDBScalars(KDBAbstract):
         # Constructor
-        KDBScalars(string& filepath) except +
+        KDBScalars(bool is_global, string& filepath) except +
 
         # Public methods
         KDBScalars* subset(string& pattern, bool deep_copy) except +
@@ -284,9 +296,9 @@ cdef extern from "cpp_api/KDB/kdb_scalars.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_tables.h":
-    cdef cppclass KDBTables(KDBTemplate[string]):
+    cdef cppclass KDBTables(KDBAbstract):
         # Constructor
-        KDBTables(string& filepath) except +
+        KDBTables(bool is_global, string& filepath) except +
 
         # Public methods
         KDBTables* subset(string& pattern, bool deep_copy) except +
@@ -312,12 +324,14 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
 
 
 cdef extern from "cpp_api/KDB/kdb_variables.h":
-    cdef cppclass KDBVariables(KDBTemplate[vector[double]]):
+    cdef cppclass KDBVariables(KDBAbstract):
         # Constructor
-        KDBVariables(string& filepath) except +
+        KDBVariables(bool is_global, string& filepath) except +
 
         # Public methods
         KDBVariables* subset(string& pattern, bool deep_copy) except +
+        KDB* get_database() except +
+
         vector[double] get(string& name) except +
         vector[double] copy(string& name) except +
         bool add(string& name, vector[double]& values) except +

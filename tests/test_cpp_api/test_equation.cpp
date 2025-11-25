@@ -5,19 +5,17 @@ class EquationTest : public KDBTest, public ::testing::Test
 {
 protected:
     Equation* equation;
-    KDBEquations* kdb_eqs;
     std::string name = "ACAF";
 
     void SetUp() override
     {
-        kdb_eqs = new KDBEquations(input_test_dir + "fun.ae");
-        equation = kdb_eqs->get(name);
+        KDBEquations(true, input_test_dir + "fun.ae");
+        equation = Equations.get(name);
     }
 
     void TearDown() override
     {
         delete equation;
-        delete kdb_eqs;
     }
 };
 

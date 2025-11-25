@@ -22,7 +22,7 @@ std::string KDBIdentities::get_lec(const std::string& name) const
     // throw exception if object with passed position is not valid
     if(!this->contains(name))
         throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
-                                    "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
+                                    "' in the database of '" + get_iode_type_str() + "'.\n" +  
                                     "The identity with name '" + name + "' does not exist.");
     return std::string(KILEC(get_database(), name));
 }

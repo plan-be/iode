@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        KDBTables kdb_tbl(input_test_dir + "fun.at");
+        KDBTables kdb_tbl(true, input_test_dir + "fun.at");
         table = Tables.get("GFRPC");
     }
 
@@ -23,8 +23,8 @@ protected:
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
-    KDBComments kdb_cmt(input_test_dir + "fun.ac");
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     // --- create a C struct Table
     int nb_columns = 2;
@@ -192,7 +192,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     TableLine* line;
     TableCell* cell;
 
-    KDBVariables kdb_var(input_test_dir + "fun.av");
+    KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
     char* c_name = "CPP_TABLE";
     int nb_columns = 2;
@@ -327,7 +327,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 TEST_F(TablesTest, CopyConstructor)
 {
     int nb_columns = table->nb_columns;
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBVariables kdb_var(true, input_test_dir + "fun.var");
 
     Table copied_table(*table);
     ASSERT_EQ(*table, copied_table);
@@ -469,11 +469,11 @@ TEST_F(TablesTest, LineTitle)
     EXPECT_EQ(title, new_title);
 
     // add
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     new_title = "New title";
     TableLine* new_line_title = table->add_title(new_title);
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     title = table->get_title(new_pos);
     EXPECT_EQ(title, new_title);
 
@@ -618,9 +618,9 @@ TEST_F(TablesTest, LineCells)
     std::string second_cell_content = third_line.cells[1].get_content(false);     // LEC cell
 
     // ---- add line
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     TableLine* new_line = table->add_line_with_cells();
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
 
     first_cell = &new_line->cells[0];
@@ -668,9 +668,9 @@ TEST_F(TablesTest, LineSeparator)
         EXPECT_EQ(table->lines[row].get_type(), TABLE_LINE_SEP);
 
     // add
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     TableLine* new_line = table->add_line_separator();
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_SEP);
 
@@ -692,9 +692,9 @@ TEST_F(TablesTest, LineMode)
     EXPECT_EQ(table->lines[27].get_type(), TABLE_LINE_MODE);
 
     // add
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     TableLine* new_line = table->add_line_mode();
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_MODE);
 
@@ -716,9 +716,9 @@ TEST_F(TablesTest, LineFiles)
     EXPECT_EQ(table->lines[28].get_type(), TABLE_LINE_FILES);
 
     // add
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     TableLine* new_line = table->add_line_files();
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_FILES);
 
@@ -740,9 +740,9 @@ TEST_F(TablesTest, LineDate)
     EXPECT_EQ(table->lines[29].get_type(), TABLE_LINE_DATE);
 
     // add
-    int nb_lines = table->lines.size();
+    int nb_lines = (int) table->lines.size();
     TableLine* new_line = table->add_line_date();
-    new_pos = table->lines.size() - 1;
+    new_pos = (int) table->lines.size() - 1;
     EXPECT_EQ(table->lines.size(), nb_lines + 1);
     EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_DATE);
 

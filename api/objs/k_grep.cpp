@@ -20,20 +20,12 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 #include "api/objs/grep.h"
 #include "api/report/commands/commands.h"       // K_AggrChar
 
-
-extern "C" int SCR_ADD_PTR_CHUNCK;
-
-
-static bool wrap_grep_gnl(const std::string& pattern, const std::string& text, 
-    const bool ecase, const char all)
-{
-    return SCR_grep_gnl((char*) pattern.c_str(), (char*) text.c_str(), 
-                        (int) ecase, (int) all) == 0;
-}
 
 /**
  *  Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...
@@ -60,7 +52,7 @@ static bool wrap_grep_gnl(const std::string& pattern, const std::string& text,
  *                                      empty if none were found 
  */
 std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase, const bool names, 
-    const bool forms, const bool texts, const char all)
+    const bool forms, const bool texts, const char all) const
 {
     bool pattern_is_all = pattern.size() == 1 && pattern[0] == all;
     if(names && !texts && !forms && pattern_is_all) 
@@ -75,84 +67,7 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
             found = wrap_grep_gnl(pattern, name, ecase, all);
 
         if(!found) 
-        {
-            switch(this->k_type) 
-            {
-                case COMMENTS :
-                    if(texts) 
-                        found = wrap_grep_gnl(pattern, KCVAL(this, handle), ecase, all);
-                    break;
-                case LISTS :
-                    if(texts) 
-                        found = wrap_grep_gnl(pattern, KLVAL(this, handle), ecase, all);
-                    break;
-                case IDENTITIES :
-                    if(forms) 
-                        found = wrap_grep_gnl(pattern, KILEC(this, handle), ecase, all);
-                    break;
-                case EQUATIONS :
-                {
-                    std::string lec = KELEC(this, name);
-                    std::string cmt = KECMT(this, name);
-                    if(forms) 
-                        found = wrap_grep_gnl(pattern, lec, ecase, all);
-                    if(!found && texts)
-                        found = wrap_grep_gnl(pattern, cmt, ecase, all);
-                    break;
-                }
-                case TABLES:
-                {
-                    Table* tbl = KTVAL(this, name);
-
-                    found = false;
-                    std::string text;
-                    for(const TableLine& tline : tbl->lines) 
-                    {
-                        if(found) 
-                            break;
-                        
-                        switch(tline.get_type()) 
-                        {
-                            case TABLE_LINE_SEP   :
-                            case TABLE_LINE_MODE  :
-                            case TABLE_LINE_DATE  :
-                            case TABLE_LINE_FILES :
-                                break;
-                            case TABLE_LINE_TITLE :
-                            {
-                                TableCell cell = tline.cells[0];
-                                if(texts)
-                                {
-                                    text = cell.get_content(true);
-                                    found = wrap_grep_gnl(pattern, text, ecase, all);
-                                } 
-                                break;
-                            }
-                            case TABLE_LINE_CELL :
-                            {
-                                found = false;
-                                for(const TableCell& cell : tline.cells)
-                                {
-                                    if(found) 
-                                        break;
-                                    
-                                    if((texts && cell.get_type() == TABLE_CELL_STRING) || 
-                                       (forms && cell.get_type() == TABLE_CELL_LEC))
-                                       {
-                                            text = cell.get_content(true);
-                                            found = wrap_grep_gnl(pattern, text, ecase, all);
-                                       }
-                                }
-                                break;
-                            }
-                        }
-                    }
-
-                    delete tbl;
-                    break;
-                }
-            }
-        }
+            found = this->grep_obj(name, handle, pattern, ecase, forms, texts, all);
 
         if(found) 
             lst.push_back(name);
@@ -179,7 +94,7 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
         kdb = get_global_db(type);
     else 
     {
-        kdb = new KDB((IodeType) type, DB_STANDALONE);
+        kdb = new KDB((IodeType) type, false);
         bool success = kdb->load(std::string(file));
         if(!success) 
             return NULL;
@@ -201,7 +116,7 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
 /**
  *  Retrieves all object names matching one or more patterns in a KDB.
  *  
- *  @param [in] kdb     KDB*    KDB to search into or null to look in the workpace 
+ *  @param [in] kdb     KDB*    KDB to search into or null to look in the workspace 
  *  @param [in] type    int     Object type (COMMENTS -> VARIABLES)
  *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
@@ -209,7 +124,7 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
  *  @return             char*   allocated semi-colon separated string with all matching names
  *                              if no name found return allocated string of length 0 ("").
  */
-std::string KDB::expand(const std::string& pattern, const char all)
+std::string KDB::expand(const std::string& pattern, const char all) const
 {
     if(pattern.empty()) 
         return "";

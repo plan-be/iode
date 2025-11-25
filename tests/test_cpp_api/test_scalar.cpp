@@ -7,7 +7,7 @@ protected:
 
 	void SetUp() override 
     {
-        KDBScalars kdb_scl(input_test_dir + "fun.as");
+        KDBScalars kdb_scl(true, input_test_dir + "fun.as");
     }
 
 	// void TearDown() override {}

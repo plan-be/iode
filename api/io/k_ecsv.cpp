@@ -107,7 +107,7 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  *  @param [out] char**  code    allocated string with the comment + sep
  *  @return      char*           pointer to *code
  */
-char* ExportObjsCSV::extract_comment(KDB* dbc, char* name, char**cmt)
+char* ExportObjsCSV::extract_comment(CKDBComments* dbc, char* name, char**cmt)
 {
     U_ch* ccmt;
 

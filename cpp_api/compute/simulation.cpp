@@ -45,55 +45,47 @@ bool Simulation::model_compile(const std::string& list_eqs)
 
     int rc = -1;
 
+    std::string error_msg = "Could not compile the model";
+    if(!list_eqs.empty()) 
+        error_msg += " for the equations list '" + list_eqs + "'";
+    error_msg += ":\n";
+
     // EndoExo whole WS
     if(list_eqs.empty()) 
         rc = KE_compile(global_ws_eqs.get());
     else 
-    {
-        char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-        if(c_eqs == NULL && !list_eqs.empty()) 
-        {
-            std::string error_msg = "Cannot compile the model:\n";
-            error_msg += "Invalid list of equations: " + list_eqs;
-            kwarning(error_msg.c_str());
-            return false;
-        }
-
-        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-        std::vector<std::string> eqs;
-        for(int i=0; i < nb_eqs; i++)
-            eqs.push_back(std::string(c_eqs[i]));
-        SCR_free_tbl((unsigned char**) c_eqs);
-        
+    {        
         // EndoExo whole WS
         if(list_eqs.empty()) 
             rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
-            if(tdbe) 
+            try
             {
+                KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
                 if(tdbe->size() > 0)
                     rc = KE_compile(tdbe);
                 delete tdbe;
+            }
+            catch(const std::exception& e)
+            {
+                error_msg += "\t" + std::string(e.what());
+                kwarning(error_msg.c_str());
+                return false;
             }
 
             if(rc < 0)
             {
                 std::string last_error = error_manager.get_last_error();
                 if(!last_error.empty()) 
-                {
-                    std::string error_msg = "Could not compile the model";
-                    if(!list_eqs.empty()) 
-                        error_msg += " for the equations list " + list_eqs;
-                    error_msg += ":\n" + last_error;
-                    kwarning(error_msg.c_str());
-                }
+                    error_msg += "\t" + last_error;
+                kwarning(error_msg.c_str());
+                return false;
             }
         }
     }
 
-    return rc == 0;
+    return true;
 }
 
 
@@ -106,6 +98,8 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     // clear C API errors stack
     error_manager.clear();
 
+    std::string error_msg = "Cannot simulate the model";
+
     Sample* sample = nullptr;
     try
     {
@@ -114,24 +108,16 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     }
     catch(const std::exception& e)
     {
-        std::string error_msg = "Cannot simulate the model:\n" + std::string(e.what());
+        error_msg += ":\n" + std::string(e.what());
         kwarning(error_msg.c_str());
         return false;
     }
 
-    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-    if(c_eqs == NULL && !list_eqs.empty())
-    {
-        std::string error_msg = "Cannot simulate the model:\nInvalid list of equations: " + list_eqs;
-        kwarning(error_msg.c_str());
-        delete sample;
-        return false;
-    }
-
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::vector<std::string> eqs;
-    for(int i=0; i < nb_eqs; i++)
-        eqs.push_back(std::string(c_eqs[i]));
+    error_msg += " for the sample ";
+    error_msg += "'" + from + ":" + to + "'";
+    if(!list_eqs.empty()) 
+        error_msg += " and for the equations list '" + list_eqs + "'";
+    error_msg += ":\n";
 
     int rc = -1;
     if(list_eqs.empty())
@@ -139,34 +125,40 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
                      sample, KSIM_EXO, NULL);
     else 
     {
-        KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
-        if(tdbe)
+        try
         {
+            KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
             if(tdbe->size() > 0)
+            {
+                char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
                 rc = K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
-                             KSIM_EXO, c_eqs);
+                                KSIM_EXO, c_eqs);
+                SCR_free_tbl((unsigned char**) c_eqs);
+            }
             delete tdbe;
         }
+        catch(const std::exception& e)
+        {
+            error_msg += "\t" + std::string(e.what());
+            kwarning(error_msg.c_str());
+            if(sample) delete sample;
+            return false;
+        }
+        
     }
 
     delete sample;
-    SCR_free_tbl((unsigned char**) c_eqs);
 
     if(rc < 0)
     {
         std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
-        {
-            std::string error_msg = "Could not simulate the model for the sample ";
-            error_msg += from + ":" + to;
-            if(!list_eqs.empty()) 
-                error_msg += " and for the equations list " + list_eqs;
-            error_msg += ":\n" + last_error;
-            kwarning(error_msg.c_str());
-        }
+            error_msg += last_error;
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    return rc == 0;
+    return true;
 }
 
 /**
@@ -175,21 +167,33 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
 bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, 
     const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
 {
-    std::string error_msg;
+    std::string error_msg = "Cannot simulate SCC";
+    if(!list_eqs.empty()) 
+        error_msg += " for the equations list '" + list_eqs + "'";
+    error_msg += ":\n";
 
     // clear C API errors stack
     error_manager.clear();
 
     // result list names
-    if(pre_name.empty())   
-        error_msg += "Pre-recursive list name is empty\n";
-    if(inter_name.empty()) 
-        error_msg += "Recursive list name is empty\n";
-    if(post_name.empty())  
-        error_msg += "Post-recursive list name is empty\n";
-    if(!error_msg.empty())
+    bool lists_ok = true;
+    if(pre_name.empty())
     {
-        error_msg = "Cannot simulate SCC:\n" + error_msg;
+        lists_ok = false;
+        error_msg += "\tPre-recursive list name is empty\n";
+    }
+    if(inter_name.empty())
+    {
+        lists_ok = false;
+        error_msg += "\tRecursive list name is empty\n";
+    }
+    if(post_name.empty())
+    {
+        lists_ok = false;
+        error_msg += "\tPost-recursive list name is empty\n";
+    }
+    if(!lists_ok)
+    {
         kwarning(error_msg.c_str());
         return false;
     }
@@ -197,21 +201,6 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     char* c_pre = to_char_array(pre_name);
     char* c_inter = to_char_array(inter_name);
     char* c_post = to_char_array(post_name);
-
-    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-    if(c_eqs == NULL && !list_eqs.empty())
-    {
-        std::string error_msg = "Cannot calculate SCC:\n";
-        error_msg += "Invalid list of equations: " + list_eqs;
-        kwarning(error_msg.c_str());
-        return false;
-    }
-
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::vector<std::string> eqs;
-    for(int i=0; i < nb_eqs; i++)
-        eqs.push_back(std::string(c_eqs[i]));
-    SCR_free_tbl((unsigned char**) c_eqs);
 
     int rc = -1;
     KDB* tdbe = nullptr;
@@ -222,12 +211,18 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     }
     else
     {
-        tdbe = K_refer(global_ws_eqs.get(), eqs);
-        if(tdbe)
+        try
         {
+            tdbe = new KDB(global_ws_eqs.get(), list_eqs);
             if(tdbe->size() > 0)
                 rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
             delete tdbe;
+        }
+        catch(const std::exception& e)
+        {
+            error_msg += "\t" + std::string(e.what());
+            kwarning(error_msg.c_str());
+            return false;
         }
     }
     
@@ -235,16 +230,12 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     {
         std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
-        {
-            std::string error_msg = "Could not not calculate SCC";
-            if(!list_eqs.empty()) 
-                error_msg += " for the equations list " + list_eqs;
-            error_msg += ":\n" + last_error;
-            kwarning(error_msg.c_str());
-        }
+            error_msg += "\t" + last_error;
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    return rc == 0;
+    return true;
 }
 
 /**
@@ -260,6 +251,8 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     // clear C API errors stack
     error_manager.clear();
 
+    std::string error_msg = "Cannot simulate SCC:\n";
+
     Sample* sample = nullptr;
     try
     {
@@ -268,24 +261,32 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     }
     catch(const std::exception& e)
     {
-        std::string error_msg = "Cannot simulate SCC:\n" + std::string(e.what());
+        error_msg += "\t" + std::string(e.what());
         kwarning(error_msg.c_str());
         return false;
     }
 
     // result list names
-    std::string error_msg;
-    if(!Lists.contains(pre_name))   
-        error_msg += "Pre-recursive list \"" + pre_name + "\" not found!\n";
-    if(!Lists.contains(inter_name)) 
-        error_msg += "Recursive list \"" + inter_name + "\" not found!\n";
-    if(!Lists.contains(post_name))  
-        error_msg += "Post-recursive list \"" + post_name + "\" not found!\n";
-    if(!error_msg.empty())
+    bool lists_ok = true;
+    if(!Lists.contains(pre_name))
     {
-        if (sample) delete sample;
-        error_msg = "Cannot simulate SCC:\n" + error_msg;
+        lists_ok = false;
+        error_msg += "\tPre-recursive list '" + pre_name + "' not found!\n";
+    }  
+    if(!Lists.contains(inter_name))
+    {
+        lists_ok = false;
+        error_msg += "\tRecursive list '" + inter_name + "' not found!\n";
+    }
+    if(!Lists.contains(post_name))
+    {
+        lists_ok = false;
+        error_msg += "\tPost-recursive list '" + post_name + "' not found!\n";
+    }
+    if(!lists_ok)
+    {
         kwarning(error_msg.c_str());
+        if (sample) delete sample;
         return false;
     }
 
@@ -302,30 +303,29 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     if(!(list_inter.back() == ';')) list_inter += ";";
     std::string list_eqs = list_pre + list_inter + list_post;
 
-    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-    if(c_eqs == NULL && !list_eqs.empty())
+    if(list_eqs.empty())
     {
-        std::string error_msg = "Cannot simulate SCC:\n";
-        error_msg += "Invalid list of equations: " + list_eqs;
+        error_msg += "\tEmpty list of equations";
         kwarning(error_msg.c_str());
-        delete sample;
+        if (sample) delete sample;
         return false;
     }
 
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::vector<std::string> eqs;
-    for(int i=0; i < nb_eqs; i++)
-        eqs.push_back(std::string(c_eqs[i]));
-    SCR_free_tbl((unsigned char**) c_eqs);
-
     int rc = -1;
-    KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
-    if(tdbe)
+    try
     {
+        KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
         if(tdbe->size() > 0)
             rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
                              c_pre, c_inter, c_post);
         delete tdbe;
+    }
+    catch(const std::exception& e)
+    {
+        error_msg += "\t" + std::string(e.what());
+        kwarning(error_msg.c_str());
+        if(sample) delete sample;
+        return false;
     }
 
     SCR_free_tbl((unsigned char**) c_pre);
@@ -338,12 +338,10 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     {
         std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
-        {
-            std::string error_msg = "Could not simulate SCC:\n"; 
-            error_msg += last_error;
-            kwarning(error_msg.c_str());
-        }
+            error_msg += "\t" + last_error;
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    return rc == 0;
+    return true;
 }

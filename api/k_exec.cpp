@@ -162,7 +162,7 @@ static KDB *KI_series_list(KDB* dbi)
     sort_and_remove_duplicates(vars_to_compute);
 
     // Create a new KDB of vars with all the names in tbl
-    dbv = new KDB(VARIABLES, DB_STANDALONE);
+    dbv = new KDB(VARIABLES, false);
     for(const std::string& name : vars_to_compute)
         dbv->add_entry(name);
 
@@ -184,7 +184,7 @@ static KDB *KI_scalar_list(KDB* dbi)
     CLEC    *clec, *tclec;
 
     std::string name;
-    dbs = new KDB(SCALARS, DB_STANDALONE);
+    dbs = new KDB(SCALARS, false);
     for(auto& [idt_name, idt_handle] : dbi->k_objs) 
     {
         clec = KICLEC(dbi, idt_handle);
@@ -410,12 +410,12 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
                sizeof(double) * smpl.nb_periods);
         
         if(KEXEC_TRACE)
-            W_printf("%s ", name.c_str());
+            W_printf((char*) "%s ", name.c_str());
         nb_found++;
     }
 
     if(KEXEC_TRACE) 
-        W_printf("\n");
+        W_printf((char*) "\n");
     
     return(nb_found);
 }
@@ -455,7 +455,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
         return -1;
     }
     
-    KDB* kdb = new KDB(VARIABLES, DB_STANDALONE);
+    KDB* kdb = new KDB(VARIABLES, false);
     bool success = kdb->load(std::string(file));
     if(!success) 
     {
@@ -605,12 +605,12 @@ static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
         memcpy(KSVAL(dbs, name), KSVAL(dbs_tmp, name), sizeof(Scalar));
 
         if(KEXEC_TRACE) 
-            W_printf("%s ", name.c_str());
+            W_printf((char*) "%s ", name.c_str());
         nb_found++;
     }
 
     if(KEXEC_TRACE) 
-        W_printf("\n");
+        W_printf((char*) "\n");
     return nb_found;
 }
 
@@ -642,7 +642,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     if(scls_to_read.size() == 0)
         return 0;
 
-    KDB* kdb = new KDB(SCALARS, DB_STANDALONE);
+    KDB* kdb = new KDB(SCALARS, false);
     bool success = kdb->load(std::string(file));
     if(!success) 
     {
@@ -851,11 +851,11 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
 
     if(KEXEC_TRACE) 
     {
-        W_printf("\n.par1 tit_0\nExecution of identities\n");
-        W_printf(".par1 tit_1\nParameters\n");
+        W_printf((char*) "\n.par1 tit_0\nExecution of identities\n");
+        W_printf((char*) ".par1 tit_1\nParameters\n");
         std::string str_exec_sample = exec_sample->to_string();
-        W_printf(".par1 par_1\nExecution sample : %s\n", (char*) str_exec_sample.c_str());
-        W_printf(".par1 tit_1\nVariables loaded\n");
+        W_printf((char*) ".par1 par_1\nExecution sample : %s\n", (char*) str_exec_sample.c_str());
+        W_printf((char*) ".par1 tit_1\nVariables loaded\n");
     }
     
     res = KI_read_vars(dbi, dbv_i, dbv, nv, vfiles);
@@ -870,7 +870,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
 
     dbs_i = KI_scalar_list(dbi);
     if(KEXEC_TRACE) 
-        W_printf(".par1 tit_1\nScalars loaded\n");
+        W_printf((char*) ".par1 tit_1\nScalars loaded\n");
     res = KI_read_scls(dbs_i, dbs, ns, sfiles);
     if(res != 0) 
     {

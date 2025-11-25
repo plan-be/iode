@@ -4,9 +4,13 @@
 #include "api/report/reports.h"
 #include "api/gsample/gsample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 #ifdef __GNUC__
 #    define IODE_CDECL __attribute__((cdecl))
@@ -32,8 +36,6 @@ char *IodeDdeCreatePer(int bt);
 char *ToBase26(int num);
 char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg);
 char *IodeTblCell(TableCell *cell, COL *cl, int nbdec);
-char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec);
-char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl);
 char *IodeDdeGetReportRC(char *szItem);
 char *IodeDdeGetXObj(char *szItem, int type);
 char *IodeDdeGetItem(char *szTopic, char *szItem);
@@ -150,43 +152,15 @@ int B_PrintHtmlTHClass(char *th_class, int unused=-1);
 int B_PrintHtmlTDClass(char *td_class, int unused=-1);
 
 /* b_print.c */
-inline int B_TABLE_TITLE;    // Specify how to print a TABLE 
-                           //      0 : print table full definitions
-                           //      1 : print only table titles
-inline int B_EQS_INFOS;    // Information detail to print (for equations)
-                           //    0: equation only 
-                           //    1: equation + comment
-                           //    2: equation + comment + estimation results
-inline int B_EQS_LEC;      // Specify how to print a LEC expression 
-                           //    0 : print the LEC form as is
-                           //    1 : replace all scalars by their values
-                           //    2 : replaced all scalars by their values + t-tests
-
 int B_PrintVal(double );
-double B_calc_ttest(Scalar *);
 int B_replesc(unsigned char *,unsigned char *);
-int B_PrintDefGnl(const std::string&, char *);
 int B_isdef(char* arg);
-int B_dump_str(unsigned char *,unsigned char *);
 int B_PrintObjTblTitle(char* arg, int unused=-1);
 int B_PrintObjLec(char* arg, int unused=-1);
 int B_PrintObjEqsInfos(char* arg, int unused=-1);
 int B_PrintObjDef_1(char *,int *);
 int B_PrintObjDef(char* arg, int unused=-1);
 int B_PrintObjDefArgs(char* arg, int unused=-1);
-int B_PrintDefTbl(KDB *,int );
-int B_DumpTblDef(Table *);
-int B_CellDef(TableCell *);
-int B_PrintTblCell(TableCell *,int );
-int B_PrintDefCmt(KDB *,int );
-int B_PrintDefLst(KDB *,int );
-int B_PrintDefIdt(KDB *,int );
-int B_PrintDefEqs(KDB *,int );
-int B_PrintLec(std::string&, char*, CLEC*, int);
-int B_PrintEqs(std::string&, Equation*);
-int B_PrintDefSclPtr(Scalar*, std::string&, int);
-int B_PrintDefScl(KDB *,int );
-int B_PrintDefVar(KDB *,int );
 
 /* b_season.c */
 int B_WsSeasonAdj(char* arg, int unused=-1);

@@ -8,6 +8,7 @@
 #include "report/rep_list.h"
 #include "cpp_api/KDB/kdb_global.h"
 #include "cpp_api/KDB/kdb_reference.h"
+#include "cpp_api/KDB/kdb_template.h"
 #include "cpp_api/KDB/kdb_comments.h"
 #include "cpp_api/KDB/kdb_equations.h"
 #include "cpp_api/KDB/kdb_identities.h"
