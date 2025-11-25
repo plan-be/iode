@@ -411,6 +411,23 @@ public:
     bool save(const std::string& filename);
 };
 
+
+template<class T> struct CKDBTemplate: public KDB
+{
+    CKDBTemplate(const IodeType type, const IodeDatabaseType db_type) : KDB(type, db_type) {}
+
+    CKDBTemplate(const CKDBTemplate& other): KDB(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    virtual T get_obj(const SWHDL handle) const = 0;
+    virtual T get_obj(const std::string& name) const = 0;
+
+    virtual void set_obj(const std::string& name, const T& value) = 0;
+};
+
 /*----------------------- GLOBALS ----------------------------*/
 
 KDB* get_global_db(const int iode_type);
