@@ -183,9 +183,10 @@ char *K_expand(int type, char* file, char* pattern, int all)
         kdb = get_global_db(type);
     else 
     {
-        kdb = K_interpret(type, file, 0);
-        if(!kdb) 
-            return(lst);
+        kdb = new KDB((IodeType) type, DB_STANDALONE);
+        bool success = kdb->load(std::string(file));
+        if(!success) 
+            return lst;
     }
 
     ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */

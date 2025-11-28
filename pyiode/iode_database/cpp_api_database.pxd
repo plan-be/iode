@@ -79,10 +79,6 @@ cdef extern from "api/all.h":
         bool set(string& name, double* var, int nb_obs) except +
         bool remove(string& name) except +
 
-
-    # k_objfile.c
-    KDB* K_interpret(int iode_type, char* filename, int db_global)
-
     # k_wsvar.c
     int KV_add(KDB* kdb, char* varname)
     double KV_get(KDB *kdb, string name, int t, int mode)

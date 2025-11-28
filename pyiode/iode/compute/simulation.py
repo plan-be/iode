@@ -824,7 +824,8 @@ class Simulation:
         """
         success = self._cython_instance.save_nb_iterations(var_name)
         if not success:
-            raise RuntimeError(f"Could not save the number of iterations for each period as a new variable '{var_name}'")
+            warnings.warn(f"Could not save the number of iterations for each period "
+                          f"as a new variable '{var_name}'")
 
     def norm(self, period: Union[str, Period]) -> float:
         r"""
@@ -946,9 +947,10 @@ class Simulation:
         """
         success = self._cython_instance.save_norms(var_name)
         if not success:
-            raise RuntimeError(f"Could not save the lowest norm value for each period as a new variable '{var_name}'")
+            warnings.warn(f"Could not save the lowest norm value for each period as "
+                          f"a new variable '{var_name}'")
 
-    def model_exchange(self, list_exo: Union[str, List[str]]=None):
+    def model_exchange(self, list_exo: Union[str, List[str]]=None) -> bool:
         r"""
         Set a list of endogenous-exogenous pairs for ``goal seeking``. 
         For each pair, the status of the variables is exchanged: endogenous becomes exogenous and vice versa. 
@@ -1054,8 +1056,10 @@ class Simulation:
         <BLANKLINE>
 
         >>> # exchange UY and XNATY
-        >>> simu.model_exchange("UY-XNATY")
-        
+        >>> success = simu.model_exchange("UY-XNATY")
+        >>> success
+        True
+
         >>> # update endogenous variable (now UY)
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
@@ -1098,7 +1102,8 @@ class Simulation:
             raise TypeError("'list_exo': Expected None or value of type str or list of str. "
                             f"Got value of type {type(list_exo)} instead.")
         
-        self._cython_instance.model_exchange(list_exo)
+        success = self._cython_instance.model_exchange(list_exo)
+        return success
 
     def model_compile(self, list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
@@ -1142,8 +1147,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            self._cython_instance.model_compile(list_eqs)
-            success = True
+            success = self._cython_instance.model_compile(list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1284,8 +1288,7 @@ class Simulation:
             suppress_msgs()
 
         try: 
-            self._cython_instance.model_simulate(from_period, to_period, list_eqs)
-            success = True
+            success = self._cython_instance.model_simulate(from_period, to_period, list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1391,8 +1394,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            self._cython_instance.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
-            success = True
+            success = self._cython_instance.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1552,8 +1554,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            self._cython_instance.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
-            success = True
+            success = self._cython_instance.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False

@@ -14,10 +14,10 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  * 
- *      KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
- *      KDB *K_quick_refer(KDB *kdb, int nb char *names[])   // same as K_refer() but more efficient for large databases.
- *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
- *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+ *      KDB *K_refer(KDB* kdb, std::vector<std::string>& names)         // creates a new kdb containing the **handles** of the objects listed in names.
+ *      KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)   // same as K_refer() but more efficient for large databases.
+ *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)                  // merges two databases : kdb1 <- kdb1 + kdb2. 
+ *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)              // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
 #include "scr4/s_dir.h"
 
@@ -243,6 +243,71 @@ bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::st
     return true;
 }
 
+bool KDB::load_asc(const std::string& filename)
+{
+    bool success = false;
+    switch(this->k_type)
+    {
+        case COMMENTS :
+            success = load_asc_cmt(filename);
+            break;
+        case EQUATIONS :
+            success = load_asc_eqs(filename);
+            break;
+        case IDENTITIES :
+            success = load_asc_idt(filename);
+            break; 
+        case LISTS :
+            success = load_asc_lst(filename);
+            break;
+        case SCALARS :
+            success = load_asc_scl(filename);
+            break; 
+        case TABLES :
+            success = load_asc_tbl(filename);
+            break;
+        case VARIABLES :
+            success = load_asc_var(filename);
+            break;
+        default :
+            break;
+    }
+
+    return success;
+}
+
+bool KDB::save_asc(const std::string& filename)
+{
+    bool success = false;
+    switch(this->k_type)
+    {
+        case COMMENTS :
+            success = save_asc_cmt(filename);
+            break;
+        case EQUATIONS :
+            success = save_asc_eqs(filename);
+            break;
+        case IDENTITIES :
+            success = save_asc_idt(filename);
+            break; 
+        case LISTS :
+            success = save_asc_lst(filename);
+            break;
+        case SCALARS :
+            success = save_asc_scl(filename);
+            break; 
+        case TABLES :
+            success = save_asc_tbl(filename);
+            break;
+        case VARIABLES :
+            success = save_asc_var(filename);
+            break;
+        default :
+            break;
+    }
+
+    return success;
+}
 
 /**
  *  Sets the KDB full path name. 
@@ -280,12 +345,11 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
  *  @return           KDB*      shallow copy of kdb[names] on success
  *                              NULL if kdb is null or one of the names cannot be found
  */
-KDB *K_refer(KDB* kdb, int nb, char* names[])
+KDB *K_refer(KDB* kdb, std::vector<std::string>& names)
 {
     bool  err = false;
     SWHDL handle;
     KDB   *tkdb;
-    std::string name;
 
     if(!kdb) 
         return(NULL);
@@ -297,13 +361,12 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
     tkdb->k_compressed = kdb->k_compressed;
     tkdb->filepath = kdb->filepath;
 
-    for(int i = 0; i < nb && names[i]; i++) 
+    for(const std::string& name : names) 
     {
-        name = std::string(names[i]);
         handle = kdb->get_handle(name);
         if(handle == 0)  
         {
-            error_manager.append_error(v_iode_types[kdb->k_type] + name + " not found: ");
+            error_manager.append_error(v_iode_types[kdb->k_type] + " '" + name + "' not found: ");
             err = true;
             continue;
         }
@@ -339,15 +402,14 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
  *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
  */
 
-KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
+KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)
 {
     bool  err = false;
     bool  found;
     KDB   *tkdb;
-    std::string name;
     
     if(!kdb) 
-    return nullptr;
+        return nullptr;
     
     // Crée la nouvelle kdb avec le nombre exact d'entrées
     tkdb = new KDB((IodeType) kdb->k_type, DB_SHALLOW_COPY);
@@ -358,13 +420,12 @@ KDB *K_quick_refer(KDB *kdb, int nb, char *names[])
     tkdb->filepath = kdb->filepath;;
     
     // copy the pointers to IODE objects from kdb to tkdb
-    for(int i = 0; i < nb; i++) 
+    for(const std::string& name : names) 
     {
-        name = std::string(names[i]);
         found = kdb->contains(name);
         if(!found) 
         {
-            error_manager.append_error(v_iode_types[kdb->k_type] + std::string(names[i]) + " not found");
+            error_manager.append_error(v_iode_types[kdb->k_type] + " '" + name + "' not found");
             err = true;
             break;
         }

@@ -698,11 +698,27 @@ int RP_evaltime()
     if(RP_PER.year == 0) 
         return(0);
     
-    RP_T = RP_PER.difference(global_ws_var->sample->start_period);
-    if(RP_T < 0) 
-        return(-3);
+    KDB* kdb_var = global_ws_var.get();
+    if(!kdb_var)
+        return 0;
+    Sample* sample = kdb_var->sample;
+    if(!sample)
+        return 0;
+    Period start_period = sample->start_period;
+    if(start_period.year == 0)
+        return 0;
+
+    RP_T = RP_PER.difference(start_period);
+    if(RP_T < 0)
+    {
+        std::string msg = "The current report period " + RP_PER.to_string();
+        msg += " is before the sample period " + start_period.to_string() + ".\n";
+        msg += "Cannot evaluate LEC expressions in reports.";
+        kwarning(msg.c_str());
+        return -3;
+    }
     
-    return(0);
+    return 0;
 }
 
 
@@ -710,7 +726,7 @@ int RP_evaltime()
  *  Evaluates a LEC expression in (the period) RP_PER. 
  *  
  *  @param [in, out]    char*       lec     LEC expression or empty string (the expression is first stripped, hence the [out]).
- *  @return             double           IODE_NAN on error or if RP_PER is before the current WS sample
+ *  @return             double              IODE_NAN on error or if RP_PER is before the current WS sample
  *                                          calculated LEC value on success
  */
 double RP_evallec(char* lec)
@@ -1285,7 +1301,7 @@ int RP_ReportExec_tbl(REPFILE *rf)
             if(debug_line[0]) 
             {
                 if(RP_DEBUG)
-                    kmsg("%s[%d] - %s", filename, rf->curline, debug_line); // JMP 14/2/2013
+                    kmsg("[%d] - %s", rf->curline, debug_line);
                 else if(RP_STDOUT)
                     kmsg("iode> %s", debug_line);
             }

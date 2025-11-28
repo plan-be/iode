@@ -3,10 +3,8 @@
  
  * Functions to load and save ascii definitions of IODE IDT objects.
  * 
- *     KDB *load_asc(char* filename, int db_global)
- *     int save_asc(KDB* kdb, char* filename)
- *     int save_csv(KDB *kdb, char *filename)
- *  
+ *     bool load_asc(const std::string& filename)
+ *     bool save_asc(const std::string& filename)
  */
 #include "api/b_errors.h"
 #include "api/k_super.h"
@@ -43,49 +41,56 @@
  *  TODO: what if KC_read_cmt returns an error code ?
  *  
  */
-KDB* AsciiIdentities::load_asc(char* filename, int db_global)
+bool KDB::load_asc_idt(const std::string& filename)
 {
     char    *lec = NULL;
     int     cmpt = 0;
     YYFILE  *yy;
     ONAME   name;
-    KDB*    kdb = new KDB(IDENTITIES, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
-    SCR_strip((unsigned char *) filename);
-    yy = YY_open(filename, 0L, 0,
-                 (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
-    if(yy == 0) 
+
+    std::string trim_filename = trim(filename);
+    char* c_filename = (char*) trim_filename.c_str();
+    yy = YY_open(c_filename, 0L, 0,
+                 (!K_ISFILE(c_filename)) ? YY_STDIN : YY_FILE);
+    if(yy == 0)
     {
-        kerror(0, "Cannot open '%s'", filename);
-        return nullptr;
+        std::string error_msg = "Cannot open file '" + trim_filename + "'";
+        kwarning(error_msg.c_str());
+        return false;
     }
 
+    clear();  /* clear current KDB */
+
     /* READ FILE */
-    K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 28/11/2022
-    while(1) {
-        switch(YY_lex(yy)) {
+    K_set_kdb_fullpath(this, (U_ch*) c_filename); // JMP 28/11/2022
+    while(1) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
-                if(cmpt) {
-                    char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, IDENTITIES);
-                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                if(cmpt) 
+                {
+                    char asc_filename[1024];
+                    K_set_ext_asc(asc_filename, c_filename, IDENTITIES);
+                    K_set_kdb_fullpath(this, (U_ch*) asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
-                return kdb;
+                return true;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
                 if(YY_lex(yy) != YY_STRING) 
                 {
-                    kerror(0, "%s : identity not defined", YY_error(yy));
+                    kwarning("%s : identity not defined", YY_error(yy));
                     break;
                 }
                 lec = K_wrap((char*) yy->yy_text, 60);
-                if(!kdb->set(name, lec))
-                    kerror(0, "%s (%s : %s).", YY_error(yy), name, L_error());
+                if(!this->set(name, lec))
+                    kwarning("%s (%s : %s).", YY_error(yy), name, L_error());
                 else 
                     cmpt++;
                 SW_nfree(lec);
@@ -93,13 +98,13 @@ KDB* AsciiIdentities::load_asc(char* filename, int db_global)
                 break;
 
             default :
-                kerror(0, "Incorrect entry : %s", YY_error(yy));
+                kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
         }
     }
 
     YY_close(yy);
-    return nullptr;
+    return false;
 }
 
 /**
@@ -112,7 +117,7 @@ KDB* AsciiIdentities::load_asc(char* filename, int db_global)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int AsciiIdentities::save_asc(KDB* kdb, char* filename)
+bool KDB::save_asc_idt(const std::string& filename)
 {
     FILE* fd;
 
@@ -120,29 +125,25 @@ int AsciiIdentities::save_asc(KDB* kdb, char* filename)
         fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
-        if(fd == 0) {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
+        if(fd == 0)
+        {
+            std::string error_msg = "Cannot create '" + trim_filename + "'";
+            kwarning(error_msg.c_str());
+            return false;
         }
     }
 
-    for(auto& [name, handle] : kdb->k_objs) 
+    for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        fprintf(fd, "\"%s\"\n", KILEC(kdb, handle));
+        fprintf(fd, "\"%s\"\n", KILEC(this, handle));
     }
 
     if(filename[0] != '-') 
         fclose(fd);
-    return(0);
-}
 
-/* 
- * Save a KDB of IDTs in a .csv file.
- * NOT IMPLEMENTED.
- */
-int AsciiIdentities::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
-{
-    return(-1);
+    return true;
 }

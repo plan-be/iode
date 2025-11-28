@@ -351,8 +351,7 @@ err:
 int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
 {
     int rc = 0;
-    KDB* dbv = nullptr;
-    KDB* dbc = nullptr;
+    bool success = false;
 
     ExportToFile *expdef;
     Sample *smpl = nullptr;
@@ -396,17 +395,19 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     // Get the ExportToFile handler for the requested format
     expdef = export_handlers[fmt].get();
 
+    KDB* dbv = new KDB(VARIABLES, DB_STANDALONE);
     if(vfile && vfile[0] != 0) 
     {
-        dbv = K_interpret(VARIABLES, vfile, 0);
-        if(!dbv) 
-            return(-1); // JMP 29-05-2012
+        success = dbv->load(std::string(vfile));
+        if(!success) 
+            return -1;
         if(smpl) 
             KV_sample(dbv, smpl);
     }
 
+    KDB* dbc = new KDB(COMMENTS, DB_STANDALONE);
     if(cfile && cfile[0] != 0)
-        dbc = K_interpret(COMMENTS, cfile, 0); 
+        success = dbc->load(std::string(cfile)); 
     
     if(fmt < 4)
         rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */

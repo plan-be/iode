@@ -539,7 +539,10 @@ class Identities(IodeDatabase):
         []
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
-        >>> identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> success = identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading ...fun.var
+        394 objects loaded
+        >>> success
         True
         >>> variables["GAP_"]                   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
         Workspace: Variables

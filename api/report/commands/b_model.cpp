@@ -42,20 +42,31 @@
  *  @param [in] char**  eqs     NULL or list of equations defining the model 
  *  @return     int             0 on success, return code of K_simul() on error.    
  */
-static int B_ModelSimulateEqs(Sample* smpl, char** eqs)
+static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
 {
-    KDB     *tdbe;
-    int     rc;
-    CSimulation simu;
+    int nb_eqs = 0;
+    std::vector<std::string> eqs;
+    if(c_eqs) 
+    {
+        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+        for(int i = 0; i < nb_eqs; i++) 
+            eqs.push_back(std::string(c_eqs[i]));
+    }
 
-    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
+    int rc = -1;
+    CSimulation simu;
+    if(nb_eqs == 0)
         rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        tdbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
-        rc = simu.K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, eqs);
-        delete tdbe;
-        tdbe = nullptr;
+        KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+        if(tdbe)
+        {
+            if(tdbe->size() > 0)
+                rc = simu.K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
+                                  CSimulation::KSIM_EXO, c_eqs);
+            delete tdbe;
+        }
     }
 
     return rc;
@@ -217,27 +228,31 @@ int KE_compile(KDB* dbe)
  */
 int B_ModelCompile(char* arg, int unused)
 {
-    char    **eqs = NULL;
-    KDB     *tdbe = NULL;
-    int     rc;
+    int rc = -1;
 
+    /* EndoExo whole WS */
     if(arg == NULL || arg[0] == 0) 
-    {
-        /* EndoExo whole WS */
-        return(KE_compile(global_ws_eqs.get()));
-    }
+        rc = KE_compile(global_ws_eqs.get());
     else 
     {
-        eqs = B_ainit_chk(arg, NULL, 0);
-        if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0)
-            return(KE_compile(global_ws_eqs.get()));
+        char** c_eqs = B_ainit_chk(arg, NULL, 0);
+        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+        std::vector<std::string> eqs;
+        for(int i = 0; i < nb_eqs; i++) 
+            eqs.push_back(std::string(c_eqs[i]));
+        SCR_free_tbl((unsigned char**) c_eqs);
+        
+        if(nb_eqs == 0)
+            rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            tdbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
-            rc = KE_compile(tdbe);
-            delete tdbe;
-            tdbe = nullptr;
-            SCR_free_tbl((unsigned char**) eqs);
+            KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+            if(tdbe)
+            {
+                if(tdbe->size() > 0)
+                    rc = KE_compile(tdbe);
+                delete tdbe;
+            }
         }
     }
 
@@ -252,46 +267,52 @@ int B_ModelCompile(char* arg, int unused)
  */
 int B_ModelCalcSCC(char *const_arg, int unused)
 {
-    char    **eqs, buf[256], pre[64], inter[64], post[64];
-    int     nb_eqs = 0;
-    int     rc = -1, lg1, tris;
-    KDB		*tdbe = NULL;
-    char    *arg;
-    CSimulation simu;
-
     // Copy for C++ strings = read only (const)
-    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
+    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
     // Tri
-    lg1 = B_get_arg0(buf, arg, 15);
-    tris = atoi(buf); 
-    if(tris < 0) tris = 0;
+    char buf[256];
+    int lg1 = B_get_arg0(buf, arg, 15);
+    int tris = atoi(buf); 
+    if(tris < 0) 
+        tris = 0;
 
     // result list names
+    char pre[64], inter[64], post[64];
     lg1 += B_get_arg0(pre,   arg + lg1, 20);
     lg1 += B_get_arg0(inter, arg + lg1, 20);
     lg1 += B_get_arg0(post,  arg + lg1, 20);
-    if(strlen(pre) == 0 || strlen(inter) == 0 || strlen(post) == 0) goto err;
+    if(strlen(pre) == 0 || strlen(inter) == 0 || strlen(post) == 0)
+    {
+        SCR_free(arg);
+        return -1;
+    } 
 
     // eqs if given
-    eqs = B_ainit_chk(arg + lg1, NULL, 0);
-    nb_eqs = SCR_tbl_size((unsigned char**) eqs);
+    char** c_eqs = B_ainit_chk(arg + lg1, NULL, 0);
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    std::vector<std::string> eqs(nb_eqs);
+    for(int i = 0; i < nb_eqs; i++) 
+        eqs[i] = std::string(c_eqs[i]);
+    SCR_free_tbl((unsigned char**) c_eqs);
+
+    SCR_free(arg);
+
+    KDB* tdbe = nullptr;
     if(nb_eqs == 0)
         tdbe = global_ws_eqs.get();
     else
-        tdbe = K_quick_refer(global_ws_eqs.get(), nb_eqs, eqs);
+        tdbe = K_quick_refer(global_ws_eqs.get(), eqs);
 
-    rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
+    CSimulation simu;
+    int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
-    if(SCR_tbl_size((unsigned char**) eqs) != 0)
+    if(nb_eqs > 0)
     {
         delete tdbe;
         tdbe = nullptr;
     }
 
-err:
-    SCR_free_tbl((unsigned char**) eqs);
-    SCR_free(arg);
     return rc;
 }
 
@@ -305,64 +326,65 @@ err:
  */
 int B_ModelSimulateSCC(char *const_arg, int unused)
 {
-    int     lg1, lg2, rc;
-    char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
-    int     nb_eqs = 0;
-    Sample  *smpl = nullptr;
-    KDB     *tdbe;
-    char    *arg;
-    CSimulation simu;
-
     // Copy for C++ strings = read only (const)
-    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
+    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
 
-    lg1 = B_get_arg0(from, arg, 15);
-    lg2 = B_get_arg0(to, arg + lg1, 15);
+    Sample* smpl = nullptr;
+    char from[16], to[16];
+    int lg1 = B_get_arg0(from, arg, 15);
+    int lg2 = B_get_arg0(to, arg + lg1, 15);
     try
     {
         smpl = new Sample(std::string((char*) from), std::string((char*) to));
     }
     catch(const std::exception& e)
     {
-        SCR_free(arg);
         std::string error_msg = "ModelSimulateSCC: invalid sample\n" + std::string(e.what());
         error_manager.append_error(error_msg);
-        return(-1);
+        SCR_free(arg);
+        return -1;
     }
 
     // Extrait les listes restantes
-    lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
+    char** lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
     if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) 
     {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");
+        SCR_free(arg);
         SCR_free_tbl((unsigned char**) lsts);
-        rc = -1;
-        goto err;
+        if(smpl) delete smpl;
+        return -1;
     }
 
     if(!(global_ws_lst->contains(lsts[0]) && global_ws_lst->contains(lsts[1]) && global_ws_lst->contains(lsts[2]))) 
     {
-        rc = -1;
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
-        goto err;
+        SCR_free(arg);
+        SCR_free_tbl((unsigned char**) lsts);
+        if(smpl) delete smpl;
+        return -1;
     }
 
-    pre   = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[0]));
-    inter = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[1]));
-    post  = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[2]));
-
+    char** pre   = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[0]));
+    char** inter = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[1]));
+    char** post  = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[2]));
     SCR_free_tbl((unsigned char**) lsts);
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
-    eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
-    eqs = (char**) SCR_union_quick((unsigned char**) eqs1, (unsigned char**) post);  // JMP 29/8/2012
-    SCR_free_tbl((unsigned char**) eqs1);                 // JMP 29/8/2012
-    nb_eqs = SCR_tbl_size((unsigned char**) eqs);
-    tdbe = K_quick_refer(global_ws_eqs.get(), nb_eqs, eqs);
-    SCR_free_tbl((unsigned char**) eqs);
+    char** c_eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
+    char** c_eqs = (char**) SCR_union_quick((unsigned char**) c_eqs1, (unsigned char**) post);  // JMP 29/8/2012
+    SCR_free_tbl((unsigned char**) c_eqs1);                 // JMP 29/8/2012
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    std::vector<std::string> eqs(nb_eqs);
+    for(int i = 0; i < nb_eqs; i++) 
+        eqs[i] = std::string(c_eqs[i]);
+    SCR_free_tbl((unsigned char**) c_eqs);
+
+    KDB* tdbe = K_quick_refer(global_ws_eqs.get(), eqs);
 
     // Lance la simulation
-    rc = simu.K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
+    CSimulation simu;
+    int rc = simu.K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
 
     // Cleanup
     delete tdbe;
@@ -371,10 +393,6 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     SCR_free_tbl((unsigned char**) inter);
     SCR_free_tbl((unsigned char**) post);
 
-err:
-    if(smpl) delete smpl;
-    smpl = nullptr;
-    SCR_free(arg);
     return rc;
 }
 

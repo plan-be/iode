@@ -35,17 +35,23 @@ protected:
 
 TEST_F(SimulationTest, ModelExchange)
 {
-    sim.model_exchange(endo_exo);
+    bool success;
+
+    success = sim.model_exchange(endo_exo);
+    EXPECT_TRUE(success);
     EXPECT_EQ(SCR_tbl_size((unsigned char**) CSimulation::KSIM_EXO), 1);
     EXPECT_EQ(std::string(CSimulation::KSIM_EXO[0]), "UY-XNATY");
 
     // reset KSIM_EXO
-    sim.model_exchange();
+    success = sim.model_exchange();
+    EXPECT_FALSE(success);
     EXPECT_TRUE(CSimulation::KSIM_EXO == NULL);
 }
 
 TEST_F(SimulationTest, Simulation)
 {
+    bool success;
+
     sim.set_sort(SimuSortAlgorithm::SORT_NONE);
     sim.set_sort(SimuSortAlgorithm::SORT_CONNEX);
     sim.set_sort(SimuSortAlgorithm::SORT_BOTH);
@@ -60,13 +66,16 @@ TEST_F(SimulationTest, Simulation)
 
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate("2000U1", to), std::runtime_error);
+    success = sim.model_simulate("2000U1", to);
+    EXPECT_FALSE(success);
     // invalid list of equations
-    EXPECT_THROW(sim.model_simulate(from, to, "$UNKNOWN_LIST"), std::invalid_argument);
+    success = sim.model_simulate(from, to, "$UNKNOWN_LIST");
+    EXPECT_FALSE(success);
 
     // Test simulation: divergence
     CSimulation::KSIM_MAXIT = 2;
-    EXPECT_THROW(sim.model_simulate(from, to), std::runtime_error);
+    success = sim.model_simulate(from, to);
+    EXPECT_FALSE(success);
 
     // Check _PRE list after simulation (prolog)
     std::string lst_pre = Lists.get("_PRE");
@@ -80,7 +89,8 @@ TEST_F(SimulationTest, Simulation)
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;
-    sim.model_simulate(from, to);
+    success = sim.model_simulate(from, to);
+    EXPECT_TRUE(success);
 
     // Check result
     // exo
@@ -94,8 +104,10 @@ TEST_F(SimulationTest, Simulation)
     Variables.set_var("UY", "2001Y1", 670.0);
     Variables.set_var("UY", "2002Y1", 680.0);
 
-    sim.model_exchange(endo_exo);
-    sim.model_simulate(from, to);
+    success = sim.model_exchange(endo_exo);
+    EXPECT_TRUE(success);
+    success = sim.model_simulate(from, to);
+    EXPECT_TRUE(success);
 
     // Check result
     EXPECT_DOUBLE_EQ(Variables.get_var("UY", "2000Y1"), 650.0);
@@ -106,14 +118,19 @@ TEST_F(SimulationTest, Simulation)
 
 TEST_F(SimulationTest, CalculateSCC)
 {
+    bool success;
+
     // Invalid arguments
     // PRE list name empty
-    EXPECT_THROW(sim.model_calculate_SCC(10, ""), std::invalid_argument);
+    success = sim.model_calculate_SCC(10, "");
+    EXPECT_FALSE(success);
     // invalid list of equations
-    EXPECT_THROW(sim.model_calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST"), std::invalid_argument);
+    success = sim.model_calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST");
+    EXPECT_FALSE(success);
 
     // SCC decomposition
-    sim.model_calculate_SCC(10);
+    success = sim.model_calculate_SCC(10);
+    EXPECT_TRUE(success);
 
     std::string list_pre = Lists.get("_PRE");
     std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;";
@@ -144,18 +161,24 @@ TEST_F(SimulationTest, CalculateSCC)
 
 TEST_F(SimulationTest, SimulateSCC)
 {
+    bool success;
+
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate_SCC("2000U1", to), std::runtime_error);
+    success = sim.model_simulate_SCC("2000U1", to);
+    EXPECT_FALSE(success);
     // invalid pre-recursive list
-    EXPECT_THROW(sim.model_simulate_SCC(from, to, "UNKNOWN_LIST"), std::invalid_argument);
+    success = sim.model_simulate_SCC(from, to, "UNKNOWN_LIST");
+    EXPECT_FALSE(success);
 
     // SCC decomposition
-    sim.model_calculate_SCC(10);
+    success = sim.model_calculate_SCC(10);
+    EXPECT_TRUE(success);
 
     // SCC simulation
     CSimulation::KSIM_MAXIT = 100;
-    sim.model_simulate_SCC(from, to);
+    success = sim.model_simulate_SCC(from, to);
+    EXPECT_TRUE(success);
 
     // Check result
     // exo
@@ -169,8 +192,10 @@ TEST_F(SimulationTest, SimulateSCC)
     Variables.set_var("UY", "2001Y1", 670.0);
     Variables.set_var("UY", "2002Y1", 680.0);
 
-    sim.model_exchange(endo_exo);
-    sim.model_simulate_SCC(from, to);
+    success = sim.model_exchange(endo_exo);
+    EXPECT_TRUE(success);
+    success = sim.model_simulate_SCC(from, to);
+    EXPECT_TRUE(success);
 
     // Check result
     EXPECT_DOUBLE_EQ(round(Variables.get_var("UY", "2000Y1") * 10e5) / 10e5, 624.179951);

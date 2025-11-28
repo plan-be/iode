@@ -123,6 +123,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 			   const IodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
 			   const std::string& nan, const std::string& separator, const std::string& debug_file)
 {
+    bool success = false;
     std::string caller_name = "export_as";
     std::string error_msg = "Cannot export ";
         
@@ -137,24 +138,24 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    KDB* dbc;
+    KDB* dbc = new KDB(COMMENTS, DB_STANDALONE);
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
         error_msg += "Comments file " + cmt_file_;
-        dbc = K_interpret(COMMENTS, to_char_array(cmt_file), 0);
-        if(dbc == NULL)
+        success = dbc->load(cmt_file_);
+        if(!success)
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    KDB* dbv;
+    KDB* dbv = new KDB(VARIABLES, DB_STANDALONE);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);
         if (dbc != NULL) error_msg += "and";
         error_msg += "Variables file " + var_file_;
-        dbv = K_interpret(VARIABLES, to_char_array(var_file), 0);
-        if(dbv == NULL)
+        success = dbv->load(var_file);
+        if(!success)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
         if(smpl != NULL) 

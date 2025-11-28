@@ -109,9 +109,11 @@ static int B_htol(int method, char* arg)
     int     res, rc = 0, f, t, shift, skip;
     char    file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
+    int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    std::vector<std::string> v_data;
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
@@ -120,7 +122,14 @@ static int B_htol(int method, char* arg)
     if(nb == 0) 
         goto done;
 
-    from = K_load(VARIABLES, file, nb, data, 0);
+    for(int i = 0; i < nb; i++) 
+        v_data.push_back(std::string(data[i]));
+        
+    file_type = K_findtype(file, VARIABLES);
+    if(file_type < 0) 
+        from->load_asc(file);
+    else
+        from->load_binary(file_type, file, v_data);
     if(!from) 
     {
         rc = -1;

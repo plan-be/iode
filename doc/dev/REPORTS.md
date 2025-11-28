@@ -809,7 +809,6 @@ Functions related to WS management (clear, load, save, sample, import...).
 |Syntax|Equivalent in Reports|
 |:---|:---|
 |`int B_WsLoad(char* arg, int type)`|$WsLoad<type> filename|
-|`int X_findtype(char* filename)`|Returns the type of content of filename according to its extension|
 |`int B_WsDump(KDB* kdb, char* filename)`|Dumps the content of KDB in a file|
 |`int B_WsSave(char* arg, int type)`|$WsSave<type> filename|
 |`int B_WsSaveCmp(char* arg, int type)`|$WsSaveCmp<type> filename|

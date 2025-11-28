@@ -103,20 +103,21 @@ cdef class Simulation:
         res: int = B_ModelSimulateSaveNorms(c_var_name)
         return res == 0
 
-    def model_exchange(self, list_exo: str):
-        self.c_simulation.model_exchange(list_exo.encode())
+    def model_exchange(self, list_exo: str) -> bool:
+        return self.c_simulation.model_exchange(list_exo.encode())
 
-    def model_compile(self, list_eqs: str):
-        self.c_simulation.model_compile(list_eqs.encode())
+    def model_compile(self, list_eqs: str) -> bool:
+        return self.c_simulation.model_compile(list_eqs.encode())
 
-    def model_simulate(self, from_period: str, to_period: str, list_eqs: str):
-        self.c_simulation.model_simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
+    def model_simulate(self, from_period: str, to_period: str, list_eqs: str) -> bool:
+        return self.c_simulation.model_simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str, inter_name: str, 
-                            post_name: str, list_eqs: str):
-        self.c_simulation.model_calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
-                                              post_name.encode(), list_eqs.encode())
+                            post_name: str, list_eqs: str) -> bool:
+        return self.c_simulation.model_calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
+                                                     post_name.encode(), list_eqs.encode())
 
-    def model_simulate_SCC(self, from_period: str, to_period: str, pre_name: str, inter_name: str, post_name: str):
-        self.c_simulation.model_simulate_SCC(from_period.encode(), to_period.encode(), pre_name.encode(), 
-                                             inter_name.encode(), post_name.encode())
+    def model_simulate_SCC(self, from_period: str, to_period: str, pre_name: str, 
+                           inter_name: str, post_name: str) -> bool:
+        return self.c_simulation.model_simulate_SCC(from_period.encode(), to_period.encode(), pre_name.encode(), 
+                                                    inter_name.encode(), post_name.encode())
