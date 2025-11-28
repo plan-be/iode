@@ -474,44 +474,50 @@ calc2:
  *  @details 
  */
  
-int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char **vars)
+int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char** c_vars)
 {
-    int         rc = -1, bt, t, at;
-    double      *val;
-    KDB         *edbv = NULL;
-
-    bt = smpl->start_period.difference(dbv->sample->start_period);
-    at = dbv->sample->end_period.difference(smpl->end_period);
+    int bt = smpl->start_period.difference(dbv->sample->start_period);
+    int at = dbv->sample->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         error_manager.append_error("WsExtrapolate : sample definition error");
-        goto done;
+        return -1;
     }
 
-    if(vars == NULL || SCR_tbl_size((unsigned char**) vars) == 0) 
+    int nb_vars = 0;
+    std::vector<std::string> vars;
+    if(c_vars != NULL) 
+    {
+        nb_vars = SCR_tbl_size((unsigned char**) c_vars);
+        for(int i = 0; i < nb_vars; i++) 
+            vars.push_back(std::string(c_vars[i]));
+    }
+
+    KDB* edbv = nullptr; 
+    if(nb_vars == 0) 
         edbv = dbv;
     else 
-        edbv = K_refer(dbv, SCR_tbl_size((unsigned char**) vars), vars);
-    if(!edbv || edbv->size() == 0) 
-        goto done;
-
-    int i;
+        edbv = K_refer(dbv, vars);
+    
+    if(!edbv)
+        return -1;
+    if(edbv->size() == 0)
+    {
+        if(edbv != dbv)
+            delete edbv;
+        return -1;
+    } 
+    
+    int i, t;
+    double* val;
     for(auto& [name, _] : edbv->k_objs) 
     {
         val = KVVAL(edbv, name, 0);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
-    rc = 0;
-
-done:
-    if(edbv != dbv)
-    {
-        delete edbv;
-        edbv = nullptr;
-    }
     
-    return rc;
+    return 0;
 }
 
 
@@ -529,16 +535,22 @@ done:
 KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
-    double  *eval = NULL, *nval;
-    KDB     *edbv = nullptr, *ndbv = nullptr;
-    Sample  *smpl;
+    double* eval = NULL, *nval;
+    Sample* smpl;
+    KDB*    ndbv = nullptr;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
 
+    KDB* edbv = nullptr;
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
     else
-        edbv = K_interpret(VARIABLES, filename, 0);
+    {
+        edbv = new KDB(VARIABLES, DB_STANDALONE);
+        bool success = edbv->load(std::string(filename));
+        if(!success)
+            goto done;
+    }
     
     if(!edbv) 
         goto done;

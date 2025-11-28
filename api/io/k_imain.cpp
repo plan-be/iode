@@ -264,13 +264,12 @@ err:
  *  @param [in] char*   asc     input filename
  *  @param [in] int     fmt     input format: 0=ASCII_CMT (=default), 1=-, 2=-, 3=Bistel_CMT 4=-, 5=-, 6=PRN_CMT, 7=TXT_CMT
  *  @param [in] int     lang    0=English, 1=French , 2=Dutch 
- *  @return     int             0 on success, -1 on error (IMP_InterpretCmt() ==  NULL or K_save() return code)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretCmt() ==  NULL or save() return code)
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
-    int     rc = -1;
-    KDB     *kdb;
-    ImportCmtFromFile  *impdef;
+    KDB* kdb;
+    ImportCmtFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
@@ -291,18 +290,25 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
    
     impdef = import_comments[fmt].get();
 
+    int rc = 0;
     if(impdef)
     {
         kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb) 
         {
-            rc = K_save(kdb, ode);
+            kdb->save_binary(ode);
             delete kdb;
             kdb = nullptr;
         }
+        else
+            rc = -1;
     }
+    else
+        rc = -1;
 
-    if(IMP_trace) W_close();
+    if(IMP_trace) 
+        W_close();
+    
     return rc;
 }
 
@@ -317,14 +323,13 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
  *  @param [in] char*   from    starting period of the sample to be read
  *  @param [in] char*   to      ending period of the sample
  *  @param [in] int     fmt     input format: 0=ASCII, 1=ROT_ASCII, 2=DIF, 3=Bistel, 4=NIS, 5=GEM, 6=PRN, 7=TXT
- *  @return     int             0 on success, -1 on error (IMP_InterpretVar() ==  NULL or K_save() return code)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretVar() ==  NULL or save() return code)
  */
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
-    int     rc = -1;
-    Sample  *smpl;
-    KDB     *kdb;
-    ImportVarFromFile  *impdef;
+    Sample* smpl;
+    KDB* kdb;
+    ImportVarFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
@@ -348,7 +353,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
     if(from[0] == 0 || to[0] == 0)
-        return(-1);
+        return -1;
     try
     {
         smpl = new Sample(std::string(from), std::string(to));
@@ -357,21 +362,24 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     {
         std::string error_msg = "Cannot imports variables:\n" + std::string(e.what());
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
     
+    int rc = 0;
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb) 
     {
-        rc = K_save(kdb, ode);
+        kdb->save_binary(ode);
         delete kdb;
         kdb = nullptr;
     }
+    else 
+        rc = -1;
 
     if(IMP_trace) 
         W_close();
     
-    return(rc);
+    return rc;
 }
 
 /**

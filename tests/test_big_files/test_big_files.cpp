@@ -9,8 +9,6 @@
 
 TEST(BigFilesTest, Tests_BIG_WS)
 {
-    int load_all;
-    int db_global;
     int nb_names;
     int all_nb_names;
     KDB* global_kdb;
@@ -52,16 +50,16 @@ TEST(BigFilesTest, Tests_BIG_WS)
     {
         std::cout << "File big.var found" << std::endl;
 
-        // **** K_load() performance tests ****
+        // **** load() performance tests ****
+        
         std::cout << "\n---- Testing performance of loading the binary file 'big.var' ----\n" << std::endl;
 
         // ==== Load all variables from big.var in GLOBAL and STANDALONE modes ====
-        load_all = 0;
 
         // ---- GLOBAL ----
-        db_global = 1;
+        kdb_var = new KDB(VARIABLES, DB_GLOBAL);
         auto start = std::chrono::high_resolution_clock::now();
-        kdb_var = K_load(VARIABLES, fullfilename, load_all, NULL, db_global);
+        kdb_var->load_binary(VARIABLES, fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -70,13 +68,13 @@ TEST(BigFilesTest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(GLOBAL - ALL VARS)      loaded " << std::to_string(kdb_var->size()) 
                     << " variables in " << elapsed.count() << " seconds" << std::endl;
-
-        delete kdb_var; 
+        delete kdb_var;
+        kdb_var = nullptr;
 
         // ---- STANDALONE ----
-        db_global = 0;
+        kdb_var = new KDB(VARIABLES, DB_STANDALONE);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var = K_load(VARIABLES, fullfilename, load_all, NULL, db_global);
+        kdb_var->load_binary(VARIABLES, fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -95,13 +93,19 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // global database (similar to grep)
         char* list_names = K_expand_kdb(kdb_var, (int) VARIABLES, (char*) pattern, '*');
         // Parses a string and replaces @filename and $listname by their contents
-        char** objs = B_ainit_chk(list_names, NULL, 0);
-        nb_names = SCR_tbl_size((unsigned char**) objs);
+        char** c_objs = B_ainit_chk(list_names, NULL, 0);
+        nb_names = SCR_tbl_size((unsigned char**) c_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(PATTERN MATCHING)       found " << std::to_string(nb_names) 
                     << " variable names matching pattern '" << pattern << "' in " 
                     << elapsed.count() << " seconds" << std::endl;
+
+        std::vector<std::string> objs;
+        for(int i = 0; i < nb_names; i++)
+            objs.push_back(std::string(c_objs[i]));
+
+        SCR_free_tbl((unsigned char**) c_objs);
 
         /* NOTE: TOO SLOW -> ~ 35 sec -> skipped
         start = std::chrono::high_resolution_clock::now();
@@ -122,24 +126,20 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ---- Build a char** table containing all variable names ----
         start = std::chrono::high_resolution_clock::now();
         all_nb_names = kdb_var->size();
-        char** all_objs = new char*[all_nb_names];
-        int i = 0;
-        for(const auto& [name, _] : kdb_var->k_objs)
-            all_objs[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
+        std::vector<std::string> all_objs = kdb_var->get_names();
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(BUILD VECTOR ALL NAMES) built a char** table of " << std::to_string(all_nb_names) 
                     << " variable names in " << elapsed.count() << " seconds" << std::endl;
-
         delete kdb_var;
+        kdb_var = nullptr;
 
         // ==== Load list of variables from big.var in GLOBAL and STANDALONE modes ====
-        load_all = 1;
 
         // ---- GLOBAL ----
-        db_global = 1;
+        kdb_var = new KDB(VARIABLES, DB_GLOBAL);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var = K_load(VARIABLES, fullfilename, load_all, objs, db_global);
+        kdb_var->load_binary(VARIABLES, fullfilename, objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -149,11 +149,12 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::cout << "(GLOBAL - SOME VARS)     loaded " << std::to_string(nb_names) 
                     << " variables in " << elapsed.count() << " seconds" << std::endl;  
         delete kdb_var; 
+        kdb_var = nullptr;
 
         // ---- STANDALONE ----
-        db_global = 0;
+        kdb_var = new KDB(VARIABLES, DB_STANDALONE);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var = K_load(VARIABLES, fullfilename, load_all, objs, db_global);
+        kdb_var->load_binary(VARIABLES, fullfilename, objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -163,8 +164,10 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::cout << "(STANDALONE - SOME VARS) loaded " << std::to_string(nb_names) 
                     << " variables in " << elapsed.count() << " seconds" << std::endl; 
         delete kdb_var;
+        kdb_var = nullptr;
 
         // **** B_WsLoad() performance test ****
+
         // ==== Load all variables from big.var into global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
         B_WsLoad(fullfilename, VARIABLES);
@@ -175,9 +178,10 @@ TEST(BigFilesTest, Tests_BIG_WS)
                     << " variables in " << elapsed.count() << " seconds" << std::endl;
 
         // **** K_refer and K_quick_refer performance tests ****
+
         // ==== Only names matching a specific pattern ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_refer(global_ws_var.get(), nb_names, objs);
+        kdb_shallow_copy = K_refer(global_ws_var.get(), objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
@@ -187,7 +191,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(global_ws_var.get(), nb_names, objs);
+        kdb_shallow_copy = K_quick_refer(global_ws_var.get(), objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -198,7 +202,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== All names from global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_refer(global_ws_var.get(), all_nb_names, all_objs);
+        kdb_shallow_copy = K_refer(global_ws_var.get(), all_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
@@ -208,7 +212,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear(false);
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = K_quick_refer(global_ws_var.get(), all_nb_names, all_objs);
+        kdb_shallow_copy = K_quick_refer(global_ws_var.get(), all_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
@@ -217,10 +221,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
         kdb_shallow_copy->clear(false);
 
-        SCR_free_tbl((unsigned char**) objs);
-        delete[] all_objs;
-
         // **** KDBVariables(filepath) performance tests ****
+
         start = std::chrono::high_resolution_clock::now();
         cpp_kdb_var = new KDBVariables(std::string(fullfilename));
         EXPECT_TRUE(cpp_kdb_var != nullptr);
@@ -242,11 +244,12 @@ TEST(BigFilesTest, Tests_BIG_WS)
                     << elapsed.count() << " seconds" << std::endl;
         delete cpp_kdb_var;
 
-        // **** K_save() performance tests ****
+        // **** save() performance tests ****
+
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.var");
         start = std::chrono::high_resolution_clock::now();
-        K_save(global_ws_var.get(), out_filename);
+        global_ws_var->save_binary(out_filename);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.var file]  saved " << std::to_string(global_ws_var->size()) 
@@ -265,6 +268,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
     if(std::filesystem::exists(fullfilename))
     {
         // **** B_WsLoad() performance test ****
+
         // ==== Load all variables from big.av into global_ws_var ====
         std::cout << "\n---- Testing performance of loading the ASCII file 'big.av' ----\n" << std::endl;
 
@@ -276,6 +280,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
                 << " variables in " << elapsed.count() << " seconds" << std::endl;
 
         // **** KDBVariables(filepath) performance tests ****
+
         start = std::chrono::high_resolution_clock::now();
         cpp_kdb_var = new KDBVariables(std::string(fullfilename));
         EXPECT_TRUE(cpp_kdb_var != nullptr);
@@ -290,11 +295,12 @@ TEST(BigFilesTest, Tests_BIG_WS)
                     << " variables in " << elapsed.count() << " seconds" << std::endl;
         delete cpp_kdb_var;
 
-        // **** K_save() performance tests ****
+        // **** save() performance tests ****
+
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.av");
         start = std::chrono::high_resolution_clock::now();
-        K_save(global_ws_var.get(), out_filename);
+        global_ws_var->save_asc(out_filename);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.av file]  saved " << std::to_string(global_ws_var->size()) 

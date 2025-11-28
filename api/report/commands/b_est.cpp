@@ -71,29 +71,29 @@ static char **B_EqsSplitSmplName(char* arg, Sample **psmpl)
  *  @return     int             -1 if some eqs are not found
  *                              rc of KE_est_s() otherwise 
  */
-int B_EqsEstimateEqs(Sample* smpl, char** eqs)
+int B_EqsEstimateEqs(Sample* smpl, char** c_eqs)
 {
-    KDB* dbe;
-    int  rc;
-
-    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) 
-    {
+    int rc = -1;
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    if(c_eqs == NULL || nb_eqs == 0) 
         error_manager.append_error("EqsEstimate: empty equations list");
-        return(-1);
-    }
     else 
     {
-        dbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) eqs), eqs);
-        if(dbe == 0 || dbe->size() == 0)                                       
-            rc = -1;                                                          
-        else
-        {
-            Estimation est(eqs, dbe, global_ws_var.get(), global_ws_scl.get(), smpl);
-            rc = est.estimate();
-        }
+        std::vector<std::string> eqs(nb_eqs);
+        for(int i = 0; i < nb_eqs; i++)
+            eqs[i] = std::string(c_eqs[i]);
 
-        delete dbe;
-        dbe = nullptr;
+        KDB* dbe = K_refer(global_ws_eqs.get(), eqs);
+        if(dbe)
+        {
+            if(dbe->size() > 0)
+            {
+                Estimation est(c_eqs, dbe, global_ws_var.get(), global_ws_scl.get(), smpl);
+                rc = est.estimate();
+            }
+            delete dbe;
+            dbe = nullptr;
+        }    
     }
 
     return rc;

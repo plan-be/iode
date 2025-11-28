@@ -253,13 +253,15 @@ public:
 	    return(res);
 	}
 
-	void U_test_K_interpret(int type, char* filename)
+	void U_test_load(int type, char* filename)
 	{
 	    char fullfilename[256];
+	    sprintf(fullfilename, "%s%s", input_test_dir, filename);
 
-	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
+        KDB* kdb = new KDB((IodeType) type, DB_GLOBAL);
+	    bool success = kdb->load(std::string(fullfilename));
+        EXPECT_TRUE(success);
 
-	    KDB* kdb = K_interpret(type, fullfilename, 1);
         switch(type) 
         {
             case COMMENTS :    
@@ -300,9 +302,9 @@ public:
         sprintf(filename_var, "%s.av", filename);
 	
 	    // Loads 3 WS and check ok
-	    U_test_K_interpret(EQUATIONS, filename_eqs);
-	    U_test_K_interpret(SCALARS, filename_scl);
-	    U_test_K_interpret(VARIABLES, filename_var);
+	    U_test_load(EQUATIONS, filename_eqs);
+	    U_test_load(SCALARS, filename_scl);
+	    U_test_load(VARIABLES, filename_var);
 	}
 
 	void U_test_W_printf_cmds()
@@ -764,23 +766,23 @@ public:
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(AsciiVariables::CSV_NBDEC, 7);
+	    EXPECT_EQ(KDB::CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(AsciiVariables::CSV_SEP[0], ';');
+	    EXPECT_EQ(KDB::CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_NAN), "--");
+	    EXPECT_EQ(std::string(KDB::CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_AXES), "Name");
+	    EXPECT_EQ(std::string(KDB::CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
+	    EXPECT_EQ(std::string(KDB::CSV_DEC), ".");
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
@@ -1107,29 +1109,26 @@ TEST_F(IodeCAPITest, Tests_ERRMSGS)
 
 TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 {
-    char    in_filename[256];
-    char    out_filename[256];
-    int     rc;
+    char in_filename[256];
+    char out_filename[256];
 
     U_test_print_title("Tests K_OBJFILE");
 
-    sprintf(in_filename,  "%sfun.av", input_test_dir);
-    sprintf(out_filename, "%sfun_copy.av", output_test_dir);
+    sprintf(in_filename,  "%sfun.var", input_test_dir);
+    sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    KDB* kdb_var = K_interpret(VARIABLES, in_filename, 0);
-    EXPECT_NE(kdb_var, nullptr);
-    if(kdb_var) 
-    {
-        EXPECT_EQ(kdb_var->size(), 394);
-        rc = K_save(kdb_var, out_filename);
-        EXPECT_EQ(rc, 0);
-    }
+    KDB* kdb_var = new KDB(VARIABLES, DB_STANDALONE);
+    bool success = kdb_var->load(std::string(in_filename));
+    EXPECT_TRUE(success);
+    EXPECT_EQ(kdb_var->size(), 394);
+    kdb_var->save_binary(out_filename);
     delete kdb_var;
     kdb_var = nullptr;
 
-    // K_load (binary files)
+    // load (binary files)
     // load all objects
-    kdb_var = K_load(VARIABLES, in_filename, 0, NULL, 0);
+    kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1140,7 +1139,13 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     // load only 2 objects
     char** objs = B_ainit_chk("ACAF ACAG", NULL, 0);
-    kdb_var = K_load(VARIABLES, in_filename, 1, objs, 0);
+    std::vector<std::string> v_objs;
+    for(int i = 0; objs[i] != NULL; i++)
+        v_objs.push_back(std::string(objs[i]));
+    SCR_free_tbl((unsigned char**) objs);
+
+    kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
@@ -1148,7 +1153,6 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
-    SCR_free_tbl((unsigned char**) objs);
 }
 
 
@@ -1269,13 +1273,13 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     U_test_print_title("Tests Print Table as Tables and Graphs");
 
     // Load the VAR workspace
-    U_test_K_interpret(VARIABLES, "fun.av");
+    U_test_load(VARIABLES, "fun.av");
     kdbv = global_ws_var.get();
     K_RWS[VARIABLES][0] = new KDB(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
-    U_test_K_interpret(TABLES, "fun.at");
+    U_test_load(TABLES, "fun.at");
     kdbt = global_ws_tbl.get();
     K_RWS[TABLES][0] = new KDB(*kdbt);
     EXPECT_NE(kdbt, nullptr);
@@ -1936,8 +1940,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     U_test_print_title("Tests B_IDT_EXECUTE");
 
     // Loads 3 WS and check ok
-    U_test_K_interpret(IDENTITIES, "fun");
-    U_test_K_interpret(VARIABLES, "fun");
+    U_test_load(IDENTITIES, "fun");
+    U_test_load(VARIABLES, "fun");
 
     AOUC = KVVAL(global_ws_var.get(), "AOUC");
     AOUC[1] = 0.1;
@@ -1960,6 +1964,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     char    rulefile[256];
     char    trace[] = " ";
     int     rc;
+    bool    success;
 
     U_test_print_title("Tests EXP: Export CSV and rcsv");
 
@@ -1999,7 +2004,9 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    KDB* kdb_var = K_interpret(VARIABLES, outfile, 1);
+    KDB* kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    success = kdb_var->load(std::string(outfile));
+    EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
 
@@ -2012,7 +2019,9 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDB* kdb_cmt = K_interpret(COMMENTS, outfile, 1);
+        KDB* kdb_cmt = new KDB(COMMENTS, DB_GLOBAL);
+        success = kdb_cmt->load(std::string(outfile));
+        EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
         EXPECT_TRUE(global_ws_cmt != nullptr);
         EXPECT_EQ(std::string(KCVAL(global_ws_cmt.get(), "KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
@@ -2042,7 +2051,9 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    KDB* kdb_var = K_interpret(VARIABLES, outfile, 1);
+    KDB* kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    bool success = kdb_var->load(std::string(outfile));
+    EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
 
@@ -2818,9 +2829,8 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
     int     rc;
     char    fullfilename[256], cmd[1024];
 
-
     U_test_print_title("Tests B_ReportLine()");
-    U_test_suppress_kmsg_msgs();
+    kmsg_toggle(1);
 
     // Simple test of a call to B_ReportLine(). More elaborate commands are tested with B_ReportExec()
     sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
@@ -2839,8 +2849,6 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
     rc = B_ReportLine("$incrtime 2", 0);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(RP_PER.to_string(), "2002Y1");
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2850,7 +2858,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_expand.rep\")");
-    U_test_suppress_kmsg_msgs();
+    kmsg_toggle(1);
 
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -2858,8 +2866,6 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "rep_expand.a2m", output_test_dir, "rep_expand.ref.a2m");
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2869,7 +2875,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_fns.rep\")");
-    U_test_suppress_kmsg_msgs();
+    kmsg_toggle(1);
 
     // Execution of the report rep_fns.rep
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -2877,8 +2883,6 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "rep_fns.a2m", output_test_dir, "rep_fns.ref.a2m");
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2888,7 +2892,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_proc.rep\")");
-    U_test_suppress_kmsg_msgs();
+    kmsg_toggle(1);
 
     // Execution of the report rep_fns.rep
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -2896,8 +2900,6 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     rc = B_ReportExec(cmd);
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "rep_proc.a2m", output_test_dir, "rep_proc.ref.a2m");
-
-    U_test_reset_kmsg_msgs();
 }
 
 TEST_F(IodeCAPITest, Tests_B_PRINT_Table_DEF)

@@ -35,15 +35,20 @@ int B_season(char* arg)
     char    name[K_MAX_FILE + 1];
     double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
             eps, scale, season[12];
+    int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    std::vector<std::string> v_data;
 
     int lg = B_get_arg0(name, arg, 80);
     char** data = B_ainit_chk(arg + lg, NULL, 0);
     int nb = SCR_tbl_size((unsigned char**) data);
     if(nb == 0) 
         goto done;
+
+    for(int i = 0; i < nb; i++) 
+        v_data.push_back(std::string(data[i]));
 
     eps = atof(data[nb - 1]);
     if(IODE_IS_0(eps)) 
@@ -54,7 +59,11 @@ int B_season(char* arg)
         nb --;
     }
 
-    from = K_load(VARIABLES, name, nb, data, 0);
+    file_type = K_findtype(name, VARIABLES);
+    if(file_type < 0) 
+        from->load_asc(name);
+    else
+        from->load_binary(file_type, name, v_data);
     if(!from || nb != from->size()) 
     {
         error_manager.append_error("Empty data set or inexistent variable");

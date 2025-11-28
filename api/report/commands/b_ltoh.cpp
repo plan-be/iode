@@ -326,9 +326,11 @@ static int B_ltoh(int type, char* arg)
     int     res, rc = 0, shift, skip;
     char    method[81], file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
+    int     file_type;
     KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
     KDB*    from = new KDB(VARIABLES, DB_STANDALONE);
+    std::vector<std::string> v_data;
 
     int lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
@@ -340,7 +342,14 @@ static int B_ltoh(int type, char* arg)
     if(nb == 0) 
         goto done;
 
-    from = K_load(VARIABLES, file, nb, data, 0);
+    for(int i = 0; i < nb; i++)
+        v_data.push_back(std::string(data[i]));
+
+    file_type = K_findtype(file, VARIABLES);
+    if(file_type < 0) 
+        from->load_asc(file);
+    else
+        from->load_binary(file_type, file, v_data);
     if(!from) 
     {
         rc = -1;

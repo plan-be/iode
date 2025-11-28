@@ -106,7 +106,6 @@ int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper
 
 /* b_ws.c */
 int B_WsLoad(char* arg, int type);
-int X_findtype(char* arg);
 int B_WsDump(KDB *,char *);
 int B_WsSave(char* arg, int type);
 int B_WsSaveCmp(char* arg, int type);

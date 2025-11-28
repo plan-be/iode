@@ -6,17 +6,29 @@
  * 
  * This "exchange" bw endos and exos variables allows to solve the model with respect to an alternate set of variables (some endos being replaced by exos).
  */
-void Simulation::model_exchange(const std::string& list_exo)
+bool Simulation::model_exchange(const std::string& list_endo_exo)
 {
-    if (KSIM_EXO) 
+    if(KSIM_EXO) 
     {
         SCR_free_tbl((unsigned char**) KSIM_EXO);
         KSIM_EXO = NULL;
     }
 
-    if (list_exo.empty()) return;
-    char* c_list_exo = to_char_array(list_exo);
-    KSIM_EXO = B_ainit_chk(c_list_exo, NULL, 0);
+    if(list_endo_exo.empty())
+        return false;
+    
+    char* c_list_endo_exo = to_char_array(list_endo_exo);
+    char** c_exo = B_ainit_chk(c_list_endo_exo, NULL, 0);
+    if(c_exo == NULL && !list_endo_exo.empty()) 
+    {
+        std::string error_msg = "Cannot exchange the model variables:\n";
+        error_msg += "Invalid list of endogenous-exogenous pairs: " + list_endo_exo;
+        kwarning(error_msg.c_str());
+        return false;
+    }
+
+    KSIM_EXO = c_exo;
+    return true;
 }
 
 /**
@@ -26,26 +38,47 @@ void Simulation::model_exchange(const std::string& list_exo)
  * 
  * Note: rarely, if ever, used.
  */
-void Simulation::model_compile(const std::string& list_eqs)
+bool Simulation::model_compile(const std::string& list_eqs)
 {
     // clear C API errors stack
     error_manager.clear();
 
-    if (list_eqs.empty()) 
-        KE_compile(global_ws_eqs.get());            // EndoExo whole WS
+    int rc = -1;
+
+    // EndoExo whole WS
+    if(list_eqs.empty()) 
+        rc = KE_compile(global_ws_eqs.get());
     else 
     {
-        char* c_list_eqs = to_char_array(list_eqs);
-        char** eqs = B_ainit_chk(c_list_eqs, NULL, 0);
-        int nb_eqs = SCR_tbl_size((unsigned char**) eqs);
-        if (eqs == NULL || nb_eqs == 0) KE_compile(global_ws_eqs.get());   // EndoExo whole WS
+        char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+        if(c_eqs == NULL && !list_eqs.empty()) 
+        {
+            std::string error_msg = "Cannot compile the model:\n";
+            error_msg += "Invalid list of equations: " + list_eqs;
+            kwarning(error_msg.c_str());
+            return false;
+        }
+
+        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+        std::vector<std::string> eqs;
+        for(int i=0; i < nb_eqs; i++)
+            eqs.push_back(std::string(c_eqs[i]));
+        SCR_free_tbl((unsigned char**) c_eqs);
+        
+        // EndoExo whole WS
+        if(list_eqs.empty()) 
+            rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            KDB* tdbe = K_refer(global_ws_eqs.get(), nb_eqs, eqs);
-            int rc = KE_compile(tdbe);
-            delete tdbe;
-            SCR_free_tbl((unsigned char**) eqs);
-            if (rc < 0)
+            KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+            if(tdbe) 
+            {
+                if(tdbe->size() > 0)
+                    rc = KE_compile(tdbe);
+                delete tdbe;
+            }
+
+            if(rc < 0)
             {
                 std::string last_error = error_manager.get_last_error();
                 if(!last_error.empty()) 
@@ -54,18 +87,21 @@ void Simulation::model_compile(const std::string& list_eqs)
                     if(!list_eqs.empty()) 
                         error_msg += " for the equations list " + list_eqs;
                     error_msg += ":\n" + last_error;
-                    throw std::runtime_error(error_msg);
+                    kwarning(error_msg.c_str());
                 }
             }
         }
     }
+
+    return rc == 0;
 }
 
 
 /**
  * Same as B_ModelSimulate()
  */
-void Simulation::model_simulate(const std::string& from, const std::string& to, const std::string& list_eqs)
+bool Simulation::model_simulate(const std::string& from, const std::string& to, 
+    const std::string& list_eqs)
 {
     // clear C API errors stack
     error_manager.clear();
@@ -78,50 +114,66 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
     }
     catch(const std::exception& e)
     {
-         throw std::runtime_error("Cannot simulate the model:\n" + std::string(e.what()));
+        std::string error_msg = "Cannot simulate the model:\n" + std::string(e.what());
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
-    if (!list_eqs.empty() && c_eqs == NULL) 
+    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+    if(c_eqs == NULL && !list_eqs.empty())
     {
-        if (sample) delete sample;
-        if (SCR_tbl_size((unsigned char**)c_eqs) > 0) SCR_free_tbl((unsigned char**) c_eqs);
-        throw std::invalid_argument("Cannot simulate the model:\nthe equations list is empty or null");
+        std::string error_msg = "Cannot simulate the model:\nInvalid list of equations: " + list_eqs;
+        kwarning(error_msg.c_str());
+        delete sample;
+        return false;
     }
 
-    int rc;
-    if (SCR_tbl_size((unsigned char**) c_eqs) == 0)
-        rc = K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), sample, KSIM_EXO, NULL);
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    std::vector<std::string> eqs;
+    for(int i=0; i < nb_eqs; i++)
+        eqs.push_back(std::string(c_eqs[i]));
+
+    int rc = -1;
+    if(list_eqs.empty())
+        rc = K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
+                     sample, KSIM_EXO, NULL);
     else 
     {
-        KDB* tdbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
-        rc = K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, KSIM_EXO, c_eqs);
-        delete tdbe;
-        SCR_free_tbl((unsigned char**) c_eqs);
+        KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+        if(tdbe)
+        {
+            if(tdbe->size() > 0)
+                rc = K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+                             KSIM_EXO, c_eqs);
+            delete tdbe;
+        }
     }
 
-    if (rc < 0)
+    delete sample;
+    SCR_free_tbl((unsigned char**) c_eqs);
+
+    if(rc < 0)
     {
-        std::string c_api_error = error_manager.get_last_error();
-        if(!c_api_error.empty())
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
         {
             std::string error_msg = "Could not simulate the model for the sample ";
             error_msg += from + ":" + to;
             if(!list_eqs.empty()) 
                 error_msg += " and for the equations list " + list_eqs;
-            error_msg += ":\n" + c_api_error;
-            delete sample;
-            throw std::runtime_error(error_msg);
+            error_msg += ":\n" + last_error;
+            kwarning(error_msg.c_str());
         }
     }
 
-    delete sample;
+    return rc == 0;
 }
 
 /**
  * Same as IodeModelCalcSCC() (defined in b_api.c from iode_dos repository).
  */
-void Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
+bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, 
+    const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
 {
     std::string error_msg;
 
@@ -129,54 +181,70 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     error_manager.clear();
 
     // result list names
-    if (pre_name.empty())   
+    if(pre_name.empty())   
         error_msg += "Pre-recursive list name is empty\n";
-    if (inter_name.empty()) 
+    if(inter_name.empty()) 
         error_msg += "Recursive list name is empty\n";
-    if (post_name.empty())  
+    if(post_name.empty())  
         error_msg += "Post-recursive list name is empty\n";
+    if(!error_msg.empty())
+    {
+        error_msg = "Cannot simulate SCC:\n" + error_msg;
+        kwarning(error_msg.c_str());
+        return false;
+    }
 
     char* c_pre = to_char_array(pre_name);
     char* c_inter = to_char_array(inter_name);
     char* c_post = to_char_array(post_name);
 
-    char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
-    if (!list_eqs.empty() && c_eqs == NULL) 
-        error_msg += "Equations list is empty or null\n";
-
-    if(!error_msg.empty())
+    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+    if(c_eqs == NULL && !list_eqs.empty())
     {
-        if (SCR_tbl_size((unsigned char**)c_eqs) > 0) SCR_free_tbl((unsigned char**)c_eqs);
-        throw std::invalid_argument("Cannot calculate SCC:\n" + error_msg);
+        std::string error_msg = "Cannot calculate SCC:\n";
+        error_msg += "Invalid list of equations: " + list_eqs;
+        kwarning(error_msg.c_str());
+        return false;
     }
 
-    int rc;
-    KDB* tdbe;
-    if (SCR_tbl_size((unsigned char**) c_eqs) == 0)
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    std::vector<std::string> eqs;
+    for(int i=0; i < nb_eqs; i++)
+        eqs.push_back(std::string(c_eqs[i]));
+    SCR_free_tbl((unsigned char**) c_eqs);
+
+    int rc = -1;
+    KDB* tdbe = nullptr;
+    if(list_eqs.empty())
     {
         tdbe = global_ws_eqs.get();
         rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
     }
     else
     {
-        tdbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
-        rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
-        delete tdbe;
-        SCR_free_tbl((unsigned char**) c_eqs);
+        tdbe = K_refer(global_ws_eqs.get(), eqs);
+        if(tdbe)
+        {
+            if(tdbe->size() > 0)
+                rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
+            delete tdbe;
+        }
     }
     
-    if (rc < 0)
+    if(rc < 0)
     {
-        std::string c_api_error = error_manager.get_last_error();
-        if(!c_api_error.empty())
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
         {
             std::string error_msg = "Could not not calculate SCC";
             if(!list_eqs.empty()) 
                 error_msg += " for the equations list " + list_eqs;
-            error_msg += ":\n" + c_api_error;
-            throw std::runtime_error(error_msg);
+            error_msg += ":\n" + last_error;
+            kwarning(error_msg.c_str());
         }
     }
+
+    return rc == 0;
 }
 
 /**
@@ -186,7 +254,8 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
  * 
  * TODO: add these parameters as optional arguments
  */
-void Simulation::model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
+bool Simulation::model_simulate_SCC(const std::string& from, const std::string& to, 
+    const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
 {
     // clear C API errors stack
     error_manager.clear();
@@ -199,7 +268,9 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     }
     catch(const std::exception& e)
     {
-        throw std::runtime_error("Cannot simulate SCC" + std::string(e.what()));
+        std::string error_msg = "Cannot simulate SCC:\n" + std::string(e.what());
+        kwarning(error_msg.c_str());
+        return false;
     }
 
     // result list names
@@ -213,39 +284,66 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     if(!error_msg.empty())
     {
         if (sample) delete sample;
-        throw std::invalid_argument("Cannot simulate SCC:\n" + error_msg);
+        error_msg = "Cannot simulate SCC:\n" + error_msg;
+        kwarning(error_msg.c_str());
+        return false;
     }
 
     std::string list_pre = Lists.get(pre_name);
     char** c_pre = (char**) KL_expand(to_char_array(list_pre));
-    if (!(list_pre.back() == ';')) list_pre += ";";
+    
     std::string list_inter = Lists.get(inter_name);
     char** c_inter = (char**) KL_expand(to_char_array(list_inter));
-    if (!(list_inter.back() == ';')) list_inter += ";";
+    
     std::string list_post = Lists.get(post_name);
     char** c_post = (char**) KL_expand(to_char_array(list_post));
+    
+    if(!(list_pre.back() == ';')) list_pre += ";";
+    if(!(list_inter.back() == ';')) list_inter += ";";
     std::string list_eqs = list_pre + list_inter + list_post;
-    char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
 
-    KDB* tdbe = K_refer(global_ws_eqs.get(), SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
-    int rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, c_pre, c_inter, c_post);
+    char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+    if(c_eqs == NULL && !list_eqs.empty())
+    {
+        std::string error_msg = "Cannot simulate SCC:\n";
+        error_msg += "Invalid list of equations: " + list_eqs;
+        kwarning(error_msg.c_str());
+        delete sample;
+        return false;
+    }
 
-    delete tdbe;
+    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
+    std::vector<std::string> eqs;
+    for(int i=0; i < nb_eqs; i++)
+        eqs.push_back(std::string(c_eqs[i]));
     SCR_free_tbl((unsigned char**) c_eqs);
+
+    int rc = -1;
+    KDB* tdbe = K_refer(global_ws_eqs.get(), eqs);
+    if(tdbe)
+    {
+        if(tdbe->size() > 0)
+            rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+                             c_pre, c_inter, c_post);
+        delete tdbe;
+    }
+
     SCR_free_tbl((unsigned char**) c_pre);
     SCR_free_tbl((unsigned char**) c_inter);
     SCR_free_tbl((unsigned char**) c_post);
 
-    if (rc < 0)
+    delete sample;
+
+    if(rc < 0)
     {
-        std::string c_api_error = error_manager.get_last_error();
-        if(!c_api_error.empty())
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
         {
             std::string error_msg = "Could not simulate SCC:\n"; 
-            error_msg += c_api_error;
-            delete sample;
-            throw std::runtime_error(error_msg);
+            error_msg += last_error;
+            kwarning(error_msg.c_str());
         }
     }
-    delete sample;
+
+    return rc == 0;
 }

@@ -882,37 +882,36 @@ done:
 
 int B_DataScan(char* arg, int type)
 {
-    KDB     *tkdb = NULL;
-    char    **objs;
-    int     rc = -1;
-
     if(type != IDENTITIES && type != EQUATIONS && type != TABLES) 
     {
         error_manager.append_error("DataScan : only IDT, EQ and Table are supported");
-        return(-1);
+        return -1;
     }
 
+    int rc = -1;
+    /* Exo whole WS */
     if(arg == NULL || arg[0] == 0) 
-    {
-        /* Exo whole WS */
-        return(K_scan(get_global_db(type), "_EXO", "_SCAL"));
-    }
+        rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
     else 
     {
-        objs = B_ainit_chk(arg, NULL, 0);
-        if(objs == NULL || SCR_tbl_size((unsigned char**) objs) == 0)
-            return(K_scan(get_global_db(type), "_EXO", "_SCAL"));
+        char** c_objs = B_ainit_chk(arg, NULL, 0);
+        int nb_objs = SCR_tbl_size((unsigned char**) c_objs);
+        std::vector<std::string> objs(nb_objs);
+        for(int i = 0; i < nb_objs; i++)
+            objs[i] = std::string(c_objs[i]);
+        SCR_free_tbl((unsigned char**) c_objs);
+
+        if(nb_objs == 0)
+            rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
         else 
         {
-            tkdb = K_refer(get_global_db(type), SCR_tbl_size((unsigned char**) objs), objs);
-            if(tkdb == 0 || tkdb->size() == 0)            /* JMP 12-05-11 */
-                rc = -1;                                /* JMP 12-05-11 */
-            else                                        /* JMP 12-05-11 */
-                rc = K_scan(tkdb, "_EXO", "_SCAL");     /* JMP 12-05-11 */
-
-            delete tkdb;
-            tkdb = nullptr;
-            SCR_free_tbl((unsigned char**) objs);
+            KDB* tkdb = K_refer(get_global_db(type), objs);
+            if(tkdb)
+            {
+                if(tkdb->size() > 0)
+                    rc = K_scan(tkdb, "_EXO", "_SCAL");
+                delete tkdb;
+            } 
         }
     }
 
@@ -1047,19 +1046,22 @@ int B_DataList(char* arg, int type)
         lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
     else 
     {
-        kdb = K_interpret(type, file, 0);
-        if(!kdb) 
-            return(-1);
+        bool success = kdb->load(std::string(file));
+        if(!success)
+        {
+            delete kdb;
+            return -1;
+        }
+
         lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
         delete kdb;
-        kdb = nullptr;
     }
 
     rc = KL_lst(name, lst, 200);
     SCR_free_tbl((unsigned char**) lst);
     A_free((unsigned char**) args);
 
-    return(rc);
+    return rc;
 }
 
 
@@ -1267,8 +1269,8 @@ int B_DataCompare(char* arg, int type)
     three = args[3];
     fr    = args[4];
 
-    kdb2 = K_interpret(type, file, 0);
-    if(!kdb2)
+    bool success = kdb2->load(std::string(file));
+    if(!success)
     {
         A_free((unsigned char**) args);
         std::string msg = "DataCompare: failed to load the file '" + std::string(file) + "'";

@@ -44,11 +44,47 @@ struct KDB
     std::vector<std::shared_ptr<KDB*>> children;    // children KDBs: if the current KDB is modified, all children KDBs must 
                                                     //                be updated too
 
+    /** 
+     *  ---- ONLY FOR VARIABLES DATABASE TYPE ----
+     *  Parameters specific to csv output files. 
+     *  These parameters can be modified via report commands: 
+     *    - $csvdigits
+     *    - $csvsep
+     *    - $csvdec
+     *    - $csvnan
+     *    - $csvaxes
+     *  
+     */
+    static char* CSV_SEP;
+    static char* CSV_DEC;
+    static char* CSV_NAN;
+    static char* CSV_AXES;
+    static int   CSV_NBDEC;
+
 private:
     bool set_packed_object(const std::string& name, char* pack);
 
+    bool load_asc_cmt(const std::string& filename);
+    bool load_asc_eqs(const std::string& filename);
+    bool load_asc_idt(const std::string& filename);
+    bool load_asc_lst(const std::string& filename);
+    bool load_asc_scl(const std::string& filename);
+    bool load_asc_tbl(const std::string& filename);
+    bool load_asc_var(const std::string& filename);
+
+    // only for Variables database
+    bool load_asc_type_ask(const std::string& file_or_string, int type, int ask);
+
+    bool save_asc_cmt(const std::string& filename);
+    bool save_asc_eqs(const std::string& filename);
+    bool save_asc_idt(const std::string& filename);
+    bool save_asc_lst(const std::string& filename);
+    bool save_asc_scl(const std::string& filename);
+    bool save_asc_tbl(const std::string& filename);
+    bool save_asc_var(const std::string& filename);
+
 public:
-    KDB(const IodeType type, const IodeDatabaseType db_type, const std::string filename="")
+    KDB(const IodeType type, const IodeDatabaseType db_type)
         : k_type((short) type), k_db_type((char) db_type), k_arch(std::string(ARCH)) 
     {
         switch(type) 
@@ -71,7 +107,7 @@ public:
                 break;
         }
 
-        this->filepath = (filename.empty()) ? std::string(I_DEFAULT_FILENAME) : filename;
+        this->filepath = std::string(I_DEFAULT_FILENAME);
     }
     
     KDB(const KDB& other)
@@ -349,6 +385,23 @@ public:
         this->k_objs.erase(it);
         return true;
     }
+
+    // load
+
+    bool load_asc(const std::string& filename);
+    int preload(FILE *fd, const std::string& filepath, const int vers);
+    bool load_binary(const int file_type, const std::string& filename, 
+                     const std::vector<std::string>& objs=std::vector<std::string>());
+    bool load(const std::string& filename);
+
+    // save
+
+    bool save_asc(const std::string& filename);
+    bool save_vars_csv(const std::string& filename, const std::vector<std::string>& varlist
+                       =std::vector<std::string>(), Sample* sample=nullptr);
+    bool save_binary(const std::string& filename, const bool override_filepath = true);
+
+    bool save(const std::string& filename);
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -404,8 +457,8 @@ inline char k_ext[][4] =
 /* k_kdb.c */
 void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 int K_merge(KDB* kdb1, KDB* kdb2, int replace);
-KDB* K_refer(KDB* kdb, int nb, char** names);
-KDB *K_quick_refer(KDB* kdb, int nb, char **names);
+KDB* K_refer(KDB* kdb, std::vector<std::string>& names);
+KDB *K_quick_refer(KDB* kdb, std::vector<std::string>& names);
 
 /* k_val.c */
 char *K_oval(KDB *,int ,int );

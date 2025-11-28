@@ -331,8 +331,9 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 //      $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
 int B_ViewTblFile(char* arg, int unused)
 {
-    int     ref, rc = 0;
-    U_ch    **args = NULL;
+    bool   success;
+    int    ref, rc = 0;
+    U_ch   **args = NULL;
 
     if(arg == 0 || arg[0] == 0) 
     {
@@ -359,9 +360,11 @@ int B_ViewTblFile(char* arg, int unused)
             goto err;
         }
 
-        KDB* kdb = K_interpret(VARIABLES, (char*) args[1], 0);
-        if(!kdb) 
+        KDB* kdb = new KDB(VARIABLES, DB_STANDALONE);
+        success = kdb->load(std::string((char*) args[1]));
+        if(!success) 
         {
+            delete kdb;
             rc = -1;
             goto err;
         }

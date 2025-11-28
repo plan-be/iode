@@ -40,7 +40,7 @@ void K_init_ws(int ws)
 void K_end_ws(int ws)
 {
     for(int i = 0; i < IODE_NB_TYPES; i++)
-        if(ws) K_save_ws(get_global_db(i));
+        if(ws) get_global_db(i)->save_binary(I_DEFAULT_FILENAME, false);
 }
 
 
@@ -64,8 +64,6 @@ void K_end_ws(int ws)
  
 int K_load_RWS(int ref, char *filename)
 {
-    KDB* kdb = nullptr;
-
     if(ref < 2 || ref > 5) 
     {
         error_manager.append_error(std::string("Invalid Reference number. Must be between 2 and 5. Got") +
@@ -81,8 +79,9 @@ int K_load_RWS(int ref, char *filename)
         return 0;
     }
 
-    kdb = K_interpret(VARIABLES, filename, 0);
-    if(!kdb) 
+    KDB* kdb = new KDB(VARIABLES, DB_STANDALONE);
+    bool success = kdb->load(std::string(filename));
+    if(!success) 
         return -1;
 
     if(K_RWS[VARIABLES][ref - 1])

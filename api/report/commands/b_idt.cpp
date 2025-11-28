@@ -89,14 +89,14 @@ int B_IdtExecute(char* arg, int unused)
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
-int B_IdtExecuteIdts(Sample* smpl, char** idts)
+int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 {
-    KDB*  kdb_idt;
-    KDB*  kdb_var;
-
     error_manager.clear();
 
-    if(idts == NULL || SCR_tbl_size((unsigned char**) idts) == 0)
+    int nb_idts = SCR_tbl_size((unsigned char**) c_idts);
+
+    KDB* kdb_var = nullptr;
+    if(c_idts == NULL || nb_idts == 0)
     {
         kdb_var = KI_exec(global_ws_idt.get(),
                           global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
@@ -105,7 +105,11 @@ int B_IdtExecuteIdts(Sample* smpl, char** idts)
     }
     else 
     {
-        kdb_idt = K_refer(global_ws_idt.get(), SCR_tbl_size((unsigned char**) idts), idts);
+        std::vector<std::string> idts(nb_idts);
+        for(int i = 0; i < nb_idts; i++)
+            idts[i] = std::string(c_idts[i]);
+
+        KDB* kdb_idt = K_refer(global_ws_idt.get(), idts);
         kdb_var = KI_exec(kdb_idt,
                           global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,

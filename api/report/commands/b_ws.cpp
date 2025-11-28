@@ -9,7 +9,6 @@
  *  -----------------
  *  
  * int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
- * int X_findtype(char* filename)                    Returns the type of content of filename according to its extension
  * int B_WsDump(KDB* kdb, char* filename)            Dumps the content of KDB in a file
  * int B_WsSave(char* arg, int type)                 $WsSave<type> filename
  * int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
@@ -74,9 +73,13 @@ int B_WsLoad(char* arg, int type)
     if(buf[0] == 0) 
         return 0;
 
-    KDB* kdb = K_interpret(type, buf, 1);
-    if(!kdb) 
+    KDB* kdb = new KDB((IodeType) type, DB_GLOBAL);
+    bool success = kdb->load(std::string(buf));
+    if(!success)
+    {
+        delete kdb;
         return -1;
+    }
 
     switch(type) 
     {
@@ -106,70 +109,13 @@ int B_WsLoad(char* arg, int type)
             return -1;
     }
 
-    // get the list of all object names in 'kdb'
-    int i = 0;
-    int nb_names = (int) kdb->size();
-    char** all_names = new char*[nb_names];
-    for (const auto& [name, _] : kdb->k_objs)
-        all_names[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
-
     if(K_RWS[type][0])
         delete K_RWS[type][0];
-    K_RWS[type][0] = K_quick_refer(kdb, nb_names, all_names);
 
-    delete[] all_names;
+    std::vector<std::string> all_names = kdb->get_names();
+    K_RWS[type][0] = K_quick_refer(kdb, all_names);
+
     return 0;
-}
-
-
-/**
- *  Returns the type of content of filename according to its extension:
- *    - 0 -> 6 = .cmt, ..., .var (binary format)
- *    - 10 -> 16 = ac, ... av
- *    - 26 = csv
- *    - 22 = rep (TODO: check this)
- *    - autres formats (rep, a2m, ..., csv)
- *    - -1 -> undefined
- *  
- *  @global     char**  k_ext       recognized extensions
- *  @param [in] char*   filename    file to analyse
- *  @return     int                 file type (see above)
- */
-int X_findtype(char* filename)
-{
-    int         i, lg = (int)strlen(filename);
-    char        buf[5];
-
-    // Check std extensions .cmt => .var
-    if(lg > 4) {
-        for(i = 0 ; i < 7 ; i++) {
-            if(filename[lg - 4] == '.' &&
-                    SCR_cstrcmp((unsigned char*) k_ext[i], ((unsigned char*) filename) + lg - 3) == 0) return(i);
-        }
-    }
-
-    // Check ascii extensions .ac => .av
-    if(lg > 3) {
-        strcpy(buf, ".ac");
-        for(i = 0 ; i < 7 ; i++) {
-            buf[2] = k_ext[i][0];
-            if(SCR_cstrcmp(((unsigned char*) filename) + lg - 3, (unsigned char*) buf) == 0) return(10 + i);
-        }
-    }
-
-    // Other extensions
-    //
-    //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019
-    //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019
-    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
-    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".rep") == 0) return(22); // ??? pas trés cohérent...
-
-    // Sais plus a quoi ca peut servir... => a supprimer
-    for(i = 16 ; strcmp(k_ext[i], "xxx") !=0 ; i++) {
-        if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3
-    }
-
-    return(-1);
 }
 
 
@@ -179,24 +125,13 @@ int X_findtype(char* filename)
  *  
  *  @param [in] KDB*    kdb         KDB to dump
  *  @param [in] char*   filename    filename with extension
- *  @return     int                 return code of the K_save_*() function called according to filename extension and KDB type.
+ *  @return     int                 return 0 if success, -1 on error
  *  
  */
 int B_WsDump(KDB* kdb, char* filename)
 {
-    int     rc = -1, ftype, type = kdb->k_type;
-
-    kmsg("Saving %s", filename); 
-    ftype = X_findtype(filename);
-
-    if(ftype >= 10 && ftype <= 17)
-        rc = ascii_handlers[type]->save_asc(kdb, filename);
-    else if(ftype <= 6)
-        rc = K_save(kdb, filename);
-    else if(ftype == FILE_CSV)
-        rc = ascii_handlers[type]->save_csv(kdb, filename, NULL, NULL);
-
-    return(rc);
+    bool success = kdb->save(std::string(filename));
+    return (success) ? 0 : -1;
 }
 
 
@@ -262,7 +197,8 @@ int B_WsSave(char* arg, int type)
 
 int B_WsExport(char* arg, int type)
 {
-    return ascii_handlers[type]->save_asc(get_global_db(type), arg);
+    get_global_db(type)->save_asc(arg);
+    return 0;
 }
 
 
@@ -745,6 +681,9 @@ int B_CsvSave(char* arg, int type)
     Sample  *smpl = nullptr;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
+    if(type != VARIABLES)
+        return -1;
+
     // filename
     lg = B_get_arg0(file, arg, K_MAX_FILE);
     K_set_ext(file_ext, file, FILE_CSV);
@@ -789,16 +728,20 @@ int B_CsvSave(char* arg, int type)
         }
     }
 
-    rc = ascii_handlers[type]->save_csv(get_global_db(type), file_ext, smpl, data0 + shift);
+    std::vector<std::string> vars;
+    if(data0 + shift != NULL) 
+    {
+        for(int i = 0; data0[shift + i] != NULL; i++) 
+            vars.push_back(std::string(data0[shift + i]));
+    }
+
+    get_global_db(type)->save_vars_csv(file_ext, vars, smpl);
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;
     smpl = nullptr;
 
-    if(rc < 0) 
-        return(rc);
-    else 
-        return(0);
+    return 0;
 }
 
 
@@ -810,10 +753,10 @@ int B_CsvSave(char* arg, int type)
 
 int B_CsvNbDec(char *nbdec, int unused)
 {
-    AsciiVariables::CSV_NBDEC = atoi(nbdec);
-    if(AsciiVariables::CSV_NBDEC > 99 || (AsciiVariables::CSV_NBDEC < 0 && AsciiVariables::CSV_NBDEC != -1)) {
+    KDB::CSV_NBDEC = atoi(nbdec);
+    if(KDB::CSV_NBDEC > 99 || (KDB::CSV_NBDEC < 0 && KDB::CSV_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
-        AsciiVariables::CSV_NBDEC = 10;
+        KDB::CSV_NBDEC = 10;
         return(-1);
     }
     return(0);
@@ -828,8 +771,8 @@ int B_CsvNbDec(char *nbdec, int unused)
 
 int B_CsvSep(char *sep, int unused)
 {
-    SCR_free(AsciiVariables::CSV_SEP);
-    AsciiVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
+    SCR_free(KDB::CSV_SEP);
+    KDB::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
     return(0);
 }
 
@@ -842,8 +785,8 @@ int B_CsvSep(char *sep, int unused)
 
 int B_CsvNaN(char *nan, int unused)
 {
-    SCR_free(AsciiVariables::CSV_NAN);
-    AsciiVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
+    SCR_free(KDB::CSV_NAN);
+    KDB::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
     return(0);
 }
 
@@ -857,8 +800,8 @@ int B_CsvNaN(char *nan, int unused)
 
 int B_CsvAxes(char *var, int unused)
 {
-    SCR_free(AsciiVariables::CSV_AXES);
-    AsciiVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
+    SCR_free(KDB::CSV_AXES);
+    KDB::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
     return(0);
 }
 
@@ -872,8 +815,8 @@ int B_CsvAxes(char *var, int unused)
 
 int B_CsvDec(char *dec, int unused)
 {
-    SCR_free(AsciiVariables::CSV_DEC);
-    AsciiVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
+    SCR_free(KDB::CSV_DEC);
+    KDB::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
     return(0);
 }
 

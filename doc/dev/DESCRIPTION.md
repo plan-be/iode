@@ -290,8 +290,8 @@ Function to manage KDB, i.e. IODE object groups.
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
-|`KDB *K_quick_refer(KDB *kdb, int nb, char *names[])`|same as K\_refer() but more efficient for large databases.|
+|`KDB *K_refer(KDB* kdb, std::vector<std::string>& names)`|creates a new kdb containing the references to the objects of the list names.|
+|`KDB *K_quick_refer(KDB *kdb, std::vector<std::string>& names)`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
 |`int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2 then deletes kdb2.|
 
@@ -491,18 +491,15 @@ Functions to manipulate IODE object files.
 |`int K_get_ext(char* filename, char* ext, int max_ext_len)`|gets a filename extension.|
 |`int K_has_ext(char* filename)`|indicates if a filename contains an extension.|
 |`char *K_set_ext(char* res, char* fname, int type)`|deletes left and right spaces in a filename and changes its extension according to the given type.|
-|`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type).|
+|`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type.|
 |`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
-|`KDB *K_load(int ftype, FNAME fname, int no, char** objs, int db_global)`|loads a IODE object file.|
 |`int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)`|retrieves infos on an IODE file: type, number of objects, Sample|
-|`KDB *K_interpret(int type, char* filename, int db_global): generalisation of K_load()`|interprets the content of a file, ascii files includes, and try to load ist content into a KDB.|
+|`int X_findtype(char* filename)`|Returns the type of content of filename according to its extension|
 |`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
 |\`cint K\_cat(KDB\* ikdb, char\* filename)|concatenates the content of a file to an existing kdb.|
 |\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
 |\`cint K\_get\_backup\_on\_save()|indicates if a backup must be taken before saving a kdb.|
 |`int K_backup(char* filename)`|takes a backup of a file by renaming the file: filename.xxx => filename.xx$.|
-|`int K_save(KDB* kdb, FNAME fname)`|saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).|
-|`int K_save_ws(KDB* kdb)`|saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).|
 
 ## Group "IODE big\- and little\-endian conversion" {#T40}
 
