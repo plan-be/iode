@@ -764,23 +764,23 @@ public:
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(AsciiVariables::CSV_NBDEC, 7);
+	    EXPECT_EQ(KDB::CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(AsciiVariables::CSV_SEP[0], ';');
+	    EXPECT_EQ(KDB::CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_NAN), "--");
+	    EXPECT_EQ(std::string(KDB::CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_AXES), "Name");
+	    EXPECT_EQ(std::string(KDB::CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(AsciiVariables::CSV_DEC), ".");
+	    EXPECT_EQ(std::string(KDB::CSV_DEC), ".");
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
@@ -1113,23 +1113,22 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     U_test_print_title("Tests K_OBJFILE");
 
-    sprintf(in_filename,  "%sfun.av", input_test_dir);
-    sprintf(out_filename, "%sfun_copy.av", output_test_dir);
+    sprintf(in_filename,  "%sfun.var", input_test_dir);
+    sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
     KDB* kdb_var = K_interpret(VARIABLES, in_filename, 0);
     EXPECT_NE(kdb_var, nullptr);
     if(kdb_var) 
     {
         EXPECT_EQ(kdb_var->size(), 394);
-        rc = K_save(kdb_var, out_filename);
-        EXPECT_EQ(rc, 0);
+        kdb_var->save_binary(out_filename);
     }
     delete kdb_var;
     kdb_var = nullptr;
 
-    // K_load (binary files)
+    // load (binary files)
     // load all objects
-    kdb_var = K_load(VARIABLES, in_filename, 0, NULL, 0);
+    kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1140,7 +1139,12 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     // load only 2 objects
     char** objs = B_ainit_chk("ACAF ACAG", NULL, 0);
-    kdb_var = K_load(VARIABLES, in_filename, 1, objs, 0);
+    std::vector<std::string> v_objs;
+    for(int i = 0; objs[i] != NULL; i++)
+        v_objs.push_back(std::string(objs[i]));
+    SCR_free_tbl((unsigned char**) objs);
+
+    kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
@@ -1148,7 +1152,6 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
-    SCR_free_tbl((unsigned char**) objs);
 }
 
 

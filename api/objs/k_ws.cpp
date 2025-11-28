@@ -40,7 +40,7 @@ void K_init_ws(int ws)
 void K_end_ws(int ws)
 {
     for(int i = 0; i < IODE_NB_TYPES; i++)
-        if(ws) K_save_ws(get_global_db(i));
+        if(ws) get_global_db(i)->save_binary(I_DEFAULT_FILENAME, false);
 }
 
 

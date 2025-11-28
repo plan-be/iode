@@ -243,6 +243,65 @@ bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::st
     return true;
 }
 
+void KDB::load_asc(const std::string& filename)
+{
+    switch(this->k_type)
+    {
+        case COMMENTS :
+            load_asc_cmt(filename);
+            break;
+        case EQUATIONS :
+            load_asc_eqs(filename);
+            break;
+        case IDENTITIES :
+            load_asc_idt(filename);
+            break; 
+        case LISTS :
+            load_asc_lst(filename);
+            break;
+        case SCALARS :
+            load_asc_scl(filename);
+            break; 
+        case TABLES :
+            load_asc_tbl(filename);
+            break;
+        case VARIABLES :
+            load_asc_var(filename);
+            break;
+        default :
+            break;
+    }
+}
+
+void KDB::save_asc(const std::string& filename)
+{
+    switch(this->k_type)
+    {
+        case COMMENTS :
+            save_asc_cmt(filename);
+            break;
+        case EQUATIONS :
+            save_asc_eqs(filename);
+            break;
+        case IDENTITIES :
+            save_asc_idt(filename);
+            break; 
+        case LISTS :
+            save_asc_lst(filename);
+            break;
+        case SCALARS :
+            save_asc_scl(filename);
+            break; 
+        case TABLES :
+            save_asc_tbl(filename);
+            break;
+        case VARIABLES :
+            save_asc_var(filename);
+            break;
+        default :
+            break;
+    }
+}
 
 /**
  *  Sets the KDB full path name. 

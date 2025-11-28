@@ -184,17 +184,16 @@ int X_findtype(char* filename)
  */
 int B_WsDump(KDB* kdb, char* filename)
 {
-    int     rc = -1, ftype, type = kdb->k_type;
-
     kmsg("Saving %s", filename); 
-    ftype = X_findtype(filename);
-
+    int ftype = X_findtype(filename);
+    
+    int rc = 0;
     if(ftype >= 10 && ftype <= 17)
-        rc = ascii_handlers[type]->save_asc(kdb, filename);
+        kdb->save_asc(filename);
     else if(ftype <= 6)
-        rc = K_save(kdb, filename);
+        kdb->save_binary(filename);
     else if(ftype == FILE_CSV)
-        rc = ascii_handlers[type]->save_csv(kdb, filename, NULL, NULL);
+        kdb->save_vars_csv(filename);
 
     return(rc);
 }
@@ -262,7 +261,8 @@ int B_WsSave(char* arg, int type)
 
 int B_WsExport(char* arg, int type)
 {
-    return ascii_handlers[type]->save_asc(get_global_db(type), arg);
+    get_global_db(type)->save_asc(arg);
+    return 0;
 }
 
 
@@ -745,6 +745,9 @@ int B_CsvSave(char* arg, int type)
     Sample  *smpl = nullptr;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
+    if(type != VARIABLES)
+        return -1;
+
     // filename
     lg = B_get_arg0(file, arg, K_MAX_FILE);
     K_set_ext(file_ext, file, FILE_CSV);
@@ -789,16 +792,20 @@ int B_CsvSave(char* arg, int type)
         }
     }
 
-    rc = ascii_handlers[type]->save_csv(get_global_db(type), file_ext, smpl, data0 + shift);
+    std::vector<std::string> vars;
+    if(data0 + shift != NULL) 
+    {
+        for(int i = 0; data0[shift + i] != NULL; i++) 
+            vars.push_back(std::string(data0[shift + i]));
+    }
+
+    get_global_db(type)->save_vars_csv(file_ext, vars, smpl);
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;
     smpl = nullptr;
 
-    if(rc < 0) 
-        return(rc);
-    else 
-        return(0);
+    return 0;
 }
 
 
@@ -810,10 +817,10 @@ int B_CsvSave(char* arg, int type)
 
 int B_CsvNbDec(char *nbdec, int unused)
 {
-    AsciiVariables::CSV_NBDEC = atoi(nbdec);
-    if(AsciiVariables::CSV_NBDEC > 99 || (AsciiVariables::CSV_NBDEC < 0 && AsciiVariables::CSV_NBDEC != -1)) {
+    KDB::CSV_NBDEC = atoi(nbdec);
+    if(KDB::CSV_NBDEC > 99 || (KDB::CSV_NBDEC < 0 && KDB::CSV_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
-        AsciiVariables::CSV_NBDEC = 10;
+        KDB::CSV_NBDEC = 10;
         return(-1);
     }
     return(0);
@@ -828,8 +835,8 @@ int B_CsvNbDec(char *nbdec, int unused)
 
 int B_CsvSep(char *sep, int unused)
 {
-    SCR_free(AsciiVariables::CSV_SEP);
-    AsciiVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
+    SCR_free(KDB::CSV_SEP);
+    KDB::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
     return(0);
 }
 
@@ -842,8 +849,8 @@ int B_CsvSep(char *sep, int unused)
 
 int B_CsvNaN(char *nan, int unused)
 {
-    SCR_free(AsciiVariables::CSV_NAN);
-    AsciiVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
+    SCR_free(KDB::CSV_NAN);
+    KDB::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
     return(0);
 }
 
@@ -857,8 +864,8 @@ int B_CsvNaN(char *nan, int unused)
 
 int B_CsvAxes(char *var, int unused)
 {
-    SCR_free(AsciiVariables::CSV_AXES);
-    AsciiVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
+    SCR_free(KDB::CSV_AXES);
+    KDB::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
     return(0);
 }
 
@@ -872,8 +879,8 @@ int B_CsvAxes(char *var, int unused)
 
 int B_CsvDec(char *dec, int unused)
 {
-    SCR_free(AsciiVariables::CSV_DEC);
-    AsciiVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
+    SCR_free(KDB::CSV_DEC);
+    KDB::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
     return(0);
 }
 

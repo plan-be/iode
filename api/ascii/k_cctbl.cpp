@@ -386,7 +386,7 @@ static Table* read_tbl(YYFILE* yy)
  *  @return                  KDB*    NULL or allocated KDB of Tables
  *  
  */
-KDB* AsciiTables::load_asc(char* filename, int db_global)
+void KDB::load_asc_tbl(const std::string& filename)
 {
     static  int sorted;
 
@@ -394,7 +394,8 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
     Table   *tbl = NULL;
     YYFILE  *yy;
     ONAME   name;
-    KDB*    kdb = new KDB(TABLES, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
+
+    clear();  /* clear current KDB */
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
@@ -405,17 +406,18 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
         sorted = 1;
     }
 
-    SCR_strip((unsigned char*) filename);
-    yy = YY_open(filename, TABLE, sizeof(TABLE) / sizeof(YYKEYS),
-                 (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
+    std::string trim_filename = trim(filename);
+    char* c_filename = (char*) trim_filename.c_str();
+    yy = YY_open(c_filename, TABLE, sizeof(TABLE) / sizeof(YYKEYS),
+                 (!K_ISFILE(c_filename)) ? YY_STDIN : YY_FILE);
     if(yy == 0) 
     {
         kerror(0, "Cannot open '%s'", filename);
-        return nullptr;
+        return;
     }
 
     /* READ FILE */
-    K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 30/11/2022
+    K_set_kdb_fullpath(this, (U_ch*) c_filename);
     char asc_filename[1024];
     while(1) 
     {
@@ -424,11 +426,11 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    K_set_ext_asc(asc_filename, filename, TABLES);
-                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                    K_set_ext_asc(asc_filename, c_filename, TABLES);
+                    K_set_kdb_fullpath(this, (U_ch*) asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
-                return kdb;
+                return;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
@@ -438,7 +440,7 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
                     kerror(0, "%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(!kdb->set(name, (char*) tbl))  
+                if(!this->set(name, (char*) tbl))  
                     goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 delete tbl;
@@ -453,7 +455,6 @@ KDB* AsciiTables::load_asc(char* filename, int db_global)
 
 err:
     YY_close(yy);
-    return nullptr;
 }
 
 /*------- SAVE IN ASCII -------------------*/
@@ -653,7 +654,7 @@ static void print_tbl(FILE* fd, Table* tbl)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int AsciiTables::save_asc(KDB* kdb, char* filename)
+void KDB::save_asc_tbl(const std::string& filename)
 {
     FILE*  fd;
     Table* tbl;
@@ -662,18 +663,20 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
         fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
-        if(fd == 0) 
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
+        if(fd == 0)
         {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
+            kerror(0, "Cannot create '%s'", c_filename);
+            return;
         }
     }
 
-    for(auto& [name, _] : kdb->k_objs) 
+    for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s {", (char*) name.c_str());
-        tbl = KTVAL(kdb, name);
+        tbl = KTVAL(this, name);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");
         delete tbl;
@@ -682,14 +685,4 @@ int AsciiTables::save_asc(KDB* kdb, char* filename)
 
     if(filename[0] != '-') 
         fclose(fd);
-    return 0;
-}
-
-/* 
- * Save a KDB of Tables in a .csv file.
- * NOT IMPLEMENTED.
- */
-int AsciiTables::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
-{
-    return(-1);
 }

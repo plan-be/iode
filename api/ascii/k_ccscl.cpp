@@ -49,7 +49,8 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
     while(1) 
     {
         keyw = YY_lex(yy);
-        if(keyw == YY_WORD || keyw == YY_EOF) break;
+        if(keyw == YY_WORD || keyw == YY_EOF) 
+            break;
     }
     YY_unread(yy);
 
@@ -92,42 +93,48 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
  *  TODO: what if read_cmt returns an error code ?
  *  
  */
-KDB* AsciiScalars::load_asc(char* filename, int db_global)
+void KDB::load_asc_scl(const std::string& filename)
 {
     int     cmpt = 0;
     YYFILE  *yy;
     ONAME   name;
-    KDB*    kdb = new KDB(SCALARS, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
+
+    clear();  /* clear current KDB */
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
 
-    SCR_strip((unsigned char *) filename);
-    yy = YY_open(filename, NULL, 0, (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
+    std::string trim_filename = trim(filename);
+    char* c_filename = (char*) trim_filename.c_str();
+    yy = YY_open(c_filename, NULL, 0, (!K_ISFILE(c_filename)) ? YY_STDIN : YY_FILE);
 
-    if(yy   == 0) 
+    if(yy == 0) 
     {
-        kerror(0,"Cannot open '%s'", filename);
-        return nullptr;
+        kerror(0, "Cannot open '%s'", c_filename);
+        return;
     }
 
     /* READ FILE */ 
-    K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 30/11/2022
-    while(1) {
-        switch(YY_lex(yy)) {
+    K_set_kdb_fullpath(this, (U_ch*) c_filename);
+    while(1) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
-                if(cmpt) {
-                    char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, SCALARS);
-                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                if(cmpt) 
+                {
+                    char asc_filename[1024];
+                    K_set_ext_asc(asc_filename, c_filename, SCALARS);
+                    K_set_kdb_fullpath(this, (U_ch*) asc_filename);
                 }            
                 YY_close(yy);
-                return kdb;
+                return;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(read_scl(kdb, yy, name) == 0) cmpt++;
+                if(read_scl(this, yy, name) == 0) 
+                    cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
@@ -138,7 +145,6 @@ KDB* AsciiScalars::load_asc(char* filename, int db_global)
     }
 
     YY_close(yy);
-    return nullptr;
 }
 
 /**
@@ -170,7 +176,7 @@ static void print_scl(FILE* fd, Scalar* scl)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int AsciiScalars::save_asc(KDB* kdb, char* filename)
+void KDB::save_asc_scl(const std::string& filename)
 {
     FILE*    fd;
     Scalar*  scl;
@@ -179,32 +185,24 @@ int AsciiScalars::save_asc(KDB* kdb, char* filename)
         fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
-        if(fd == 0) 
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
+        if(fd == 0)
         {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
-        }
+            kerror(0, "Cannot create '%s'", c_filename);
+            return;
+        } 
     }
 
-    for(auto& [name, handle] : kdb->k_objs) 
+    for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        scl = KSVAL(kdb, handle);
+        scl = KSVAL(this, handle);
         print_scl(fd, scl);
         fprintf(fd, "\n");
     }
 
     if(filename[0] != '-') 
         fclose(fd);
-    return(0);
-}
-
-/* 
- * Save a KDB of Scalar in a .csv file.
- * NOT IMPLEMENTED.
- */
-int AsciiScalars::save_csv(KDB *kdb, char *filename, Sample* sample, char** varlist)
-{
-    return(-1);
 }

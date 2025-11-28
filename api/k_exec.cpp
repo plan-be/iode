@@ -454,14 +454,8 @@ static int KI_read_vars_file(KDB* dbv, char* file)
         error_manager.append_error("The path of file to read the Variables is empty");
         return -1;
     }
-
-    char** vars_array = new char*[vars_to_read.size()];
-    for(size_t i = 0; i < vars_to_read.size(); i++)
-        vars_array[i] = (char*) vars_to_read[i].c_str();
     
-    KDB* kdb = K_load(VARIABLES, file, nbv, vars_array, 0);
-
-    delete[] vars_array;
+    KDB* kdb = K_interpret(VARIABLES, file, 0);
     if(!kdb) 
     {
         std::string msg = "Variables file '" + std::string(file) + "' not found";
@@ -647,13 +641,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     if(scls_to_read.size() == 0)
         return 0;
 
-    char** scls_array = new char*[scls_to_read.size()];
-    for(size_t i = 0; i < scls_to_read.size(); i++)
-        scls_array[i] = (char*) scls_to_read[i].c_str();
-
-    KDB* kdb = K_load(SCALARS, file, nbs, scls_array, 0);
-
-    delete[] scls_array;
+    KDB* kdb = K_interpret(SCALARS, file, 0);
     if(!kdb) 
     {
         std::string msg = "Scalar file '" + std::string(file) + "' not found";

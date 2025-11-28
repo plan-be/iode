@@ -264,7 +264,7 @@ err:
  *  @param [in] char*   asc     input filename
  *  @param [in] int     fmt     input format: 0=ASCII_CMT (=default), 1=-, 2=-, 3=Bistel_CMT 4=-, 5=-, 6=PRN_CMT, 7=TXT_CMT
  *  @param [in] int     lang    0=English, 1=French , 2=Dutch 
- *  @return     int             0 on success, -1 on error (IMP_InterpretCmt() ==  NULL or K_save() return code)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretCmt() ==  NULL or save() return code)
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
@@ -296,7 +296,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
         kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb) 
         {
-            rc = K_save(kdb, ode);
+            kdb->save_binary(ode);
             delete kdb;
             kdb = nullptr;
         }
@@ -317,7 +317,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
  *  @param [in] char*   from    starting period of the sample to be read
  *  @param [in] char*   to      ending period of the sample
  *  @param [in] int     fmt     input format: 0=ASCII, 1=ROT_ASCII, 2=DIF, 3=Bistel, 4=NIS, 5=GEM, 6=PRN, 7=TXT
- *  @return     int             0 on success, -1 on error (IMP_InterpretVar() ==  NULL or K_save() return code)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretVar() ==  NULL or save() return code)
  */
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
@@ -363,7 +363,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb) 
     {
-        rc = K_save(kdb, ode);
+        kdb->save_binary(ode);
         delete kdb;
         kdb = nullptr;
     }

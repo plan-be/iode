@@ -9,16 +9,13 @@
  *      char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
  *      char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
  *      void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
- *      KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
  *      int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)           retrieves infos on an IODE file: type, number of objects, Sample
- *      KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
+ *      KDB *K_interpret(int type, char* filename): generalisation of load()            interprets the content of a file, ascii files included, and try to load ist content into a KDB.
  *      int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
  *      int K_cat(KDB* ikdb, char* filename)                                            concatenates the content of a file to an existing kdb.
  *      int K_set_backup_on_save(int take_backup)                                       sets the backup choice before saving a kdb. 
  *      int K_get_backup_on_save()                                                      indicates if a backup must be taken before saving a kdb. 
  *      int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
- *      int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
- *      int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
  *      int K_setname(char* from, char* to)                                             replaces kdb->filepath in an IODE object file.
  */
 #ifndef UNIX
@@ -370,7 +367,8 @@ static int index_of_name(const std::vector<std::string>& vec, const std::string&
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)
  *                                   
  */
-KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
+void KDB::load_binary(const int file_type, const std::string& filename, 
+                      const std::vector<std::string>& objs)
 {
     int     i, pos, nf, vers;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
@@ -385,50 +383,47 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     std::string name;
     std::vector<std::string> v_names;
 
-    // Next line is deleted because K_load_odbc() was implemented for a specific project
-    // if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
-
     // avoid runtime error 'i is not set' in line 'if(i == 0) delete kdb;' below
     i = 0;
 
-    KDB* kdb = new KDB((IodeType) ftype, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
-
-    K_set_ext(file, fname, ftype);
+    std::string filename_trim = trim(filename);
+    char* fname = const_cast<char*>(filename_trim.c_str());
+    K_set_ext(file, fname, file_type);
     fd = fopen(file, "rb");
 
     if(fd == NULL) 
     {
-        kmsg("File %s does not exist", file);
-        return nullptr;
+        kwarning("File %s does not exist", file);
+        return;
     }
 
     // CHECK OBJS LABEL 
     kread(label, strlen(K_LABEL), 1, fd);
     vers = K_calcvers(label);
     if(vers < 0 || vers > 2) 
-    { // JMP 3/6/2015
-        kmsg("%s : invalid iode file", file);
+    {
+        kwarning("%s : invalid iode file", file);
         fclose(fd);
-        return nullptr;
+        return;
     }
 
     // Read kdb struct from open file (fd) and transpose into kdb 64 if X64
-    K_read_kdb(kdb, &nb_objs, fd, vers);
+    K_read_kdb(this, &nb_objs, fd, vers);
 
-    if(ftype != kdb->k_type || kdb->k_arch != ARCH) 
+    if(file_type != this->k_type || this->k_arch != ARCH) 
     {
         kmsg("%s : unvalid type(%s) or wrong architecture(%s)",
-             file, k_ext[kdb->k_type], (char*) kdb->k_arch.c_str());
+             file, k_ext[this->k_type], (char*) this->k_arch.c_str());
         goto error;
     }
 
-    // Set filename in kdb->filepath
+    // Set filename in this->filepath
     if(strncmp(file, "ws.", 3)) 
     {
         ptr = SCR_fullpath(file, fullpath);
         if(ptr == 0) 
             ptr = file;
-        kdb->filepath = std::string(ptr);
+        this->filepath = std::string(ptr);
     }
 
     // ======== Load objects ========
@@ -453,7 +448,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             goto error;
 
         // no compression
-        if(kdb->k_compressed == 0) 
+        if(this->k_compressed == 0) 
         {
             // load names
             kread((char *) k_objs, sizeof(KOBJ), (int) nb_objs, fd);
@@ -482,7 +477,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
     }
 
     // -------- load values --------
-    if(load_all == 0) 
+    if(objs.size() == 0)
     {
         for(i = 0; i < nb_objs; i++) 
         {
@@ -500,7 +495,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
                 handle = SW_alloc(len);
-                kdb->k_objs[name] = handle;
+                this->k_objs[name] = handle;
                 ptr = SW_getptr(handle);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
@@ -510,7 +505,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             {
                 // Si len >= 0 => version non zippée (dft)
                 handle = SW_alloc(len);
-                kdb->k_objs[name] = handle;
+                this->k_objs[name] = handle;
                 ptr = SW_getptr(handle);
                 if(ptr == 0) 
                 {
@@ -520,27 +515,26 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
                 }
                 kread(ptr, len, 1, fd);
             }
-            K_xdrobj[kdb->k_type]((unsigned char*) ptr, NULL);
-            K_setvers(kdb, i, vers);
+            K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
+            K_setvers(this, i, vers);
         }
     }
     // load only the objects in the list objs
     else  
     {
-        nf = SCR_tbl_size((unsigned char**) objs);
+        nf = objs.size();
 
         // check names in the objs list exist in the binary file
         std::vector<int> v_pos(nf, -1);
         for(i = 0; i < nf; i++) 
         {
-            name = std::string(objs[i]);
-            pos = index_of_name(v_names, name);
+            pos = index_of_name(v_names, objs[i]);
             if(pos >= 0) 
                 v_pos[i] = pos;
         }
         
         // ???
-        if(kdb->k_type == VARIABLES || kdb->k_type == SCALARS) 
+        if(this->k_type == VARIABLES || this->k_type == SCALARS) 
             if(K_read_len(fd, vers, &len)) 
                 goto error;
         
@@ -550,13 +544,13 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
         char* c_name;
         for(int n = 0; n < nf; n++) 
         {
-            c_name = objs[n];
+            c_name = (char*) objs[n].c_str();
             pos = v_pos[n];
             if(pos < 0) 
                 continue;
 
             // skip the pos - lpos entries in the binary file 
-            if(kdb->k_compressed == 0 && (kdb->k_type == VARIABLES || kdb->k_type == SCALARS)) 
+            if(this->k_compressed == 0 && (this->k_type == VARIABLES || this->k_type == SCALARS)) 
             {
                 if(pos - lpos > 0)
                     kseek(fd, (long) len * (pos - lpos), 1);
@@ -579,7 +573,7 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             
             name = std::string(c_name);
             handle = SW_alloc(len);
-            kdb->k_objs[name] = handle;
+            this->k_objs[name] = handle;
             ptr = SW_getptr(handle);
             if(ptr == 0) 
             {
@@ -601,40 +595,23 @@ KDB* K_load(int ftype, FNAME fname, int load_all, char** objs, int db_global)
             else 
                 kread(ptr, len, 1, fd);
 
-            K_xdrobj[kdb->k_type]((unsigned char*) ptr, NULL);
-            K_setvers(kdb, i, vers);
+            K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
+            K_setvers(this, i, vers);
             lpos = pos + 1;
         }
     }
 
     fclose(fd);
-    return kdb;
+    return;
 
 error:
     fclose(fd);
-    if(load_all == 0) 
+    this->clear();
+    if(objs.size() == 0 && tkdb != nullptr)
     {
-        if(i == 0 && kdb != nullptr)
-        {
-            delete kdb;
-            kdb = nullptr;
-        }
+        delete tkdb;
+        tkdb = nullptr;
     }
-    else 
-    {
-        if(tkdb)
-        {
-            delete tkdb;
-            tkdb = nullptr;
-        } 
-        if(kdb)
-        {
-            delete kdb;
-            kdb = nullptr;
-        }
-    }
-
-    return kdb;
 }
 
 
@@ -733,7 +710,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
  *  
  *  TODO: review this function! 
  */
-static int K_findtype(char* filename, int type)
+int K_findtype(char* filename, int type)
 {
     int     ftype;
     char    buf[1024];
@@ -764,7 +741,7 @@ static int K_findtype(char* filename, int type)
 
 
 /**
- *  Generalisation of K_load() : interprets the content of a file, ascii files included, 
+ *  Generalisation of load() : interprets the content of a file, ascii files included, 
  *  and tries to load its content into a KDB.
  *
  *  If the file is an ascii file (.ac, .ae... or .csv), the corresponding function 
@@ -789,22 +766,28 @@ KDB* K_interpret(int type, char* filename, int db_global)
     KDB*  kdb = nullptr;
 
     kmsg("Loading %s", filename);
-    ftype = K_findtype(filename, type);
-    if(ftype == -1) 
-    { // file exists but when opened, type not recognized => test ascii contents
-        if(type >= FILE_COMMENTS && type <= FILE_VARIABLES && 
-            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) 
-                kdb = ascii_handlers[type]->load_asc(filename, db_global);
-    }
-    
-    if(type == ftype) 
-        kdb = K_load(type, filename, 0, NULL, db_global);
 
+    kdb = new KDB((IodeType) type, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
     if(!kdb) 
     {
         kerror(0, "%s not found or incompatible type", filename);
         return nullptr;
     }
+
+    ftype = K_findtype(filename, type);
+    if(ftype == -1) 
+    {   
+        if(type >= FILE_COMMENTS && type <= FILE_VARIABLES)
+        {
+            // test if correct ascii extension
+            if(K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) 
+                kdb->load_asc(std::string(filename));
+
+        } 
+    }
+    
+    if(type == ftype) 
+        kdb->load_binary(type, filename);
 
     kmsg("%d objects loaded", (int) kdb->size());
     return kdb;
@@ -841,9 +824,15 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     Sample  csmpl;
     std::string name;
 
-    KDB* from = K_load(to->k_type, file, no, objs, 0);
+    KDB* from = new KDB((IodeType) to->k_type, DB_STANDALONE);
     if(!from) 
         return(-1);
+    
+    std::vector<std::string> v_objs;
+    for(i = 0; i < no; i++) 
+        v_objs.push_back(std::string(objs[i]));
+
+    from->load_binary(to->k_type, file, v_objs);
 
     if(to->k_type == VARIABLES) 
     {
@@ -1133,12 +1122,9 @@ error :
  *  If the running architecture is X64, the KDB is translated into 32 bits (KDB32) before writing.
  *  
  *  if K_XDR is not null, the table of objects (kdb->k_objs) and the objects are individually compressed before being saved.
- *    
- *  @param [in, out]    kdb     KDB*    KDB to save 
- *  @param [in]         fname   FNAME   filename. 
- *  @param [in]         mode    int     1 to replace kdb->filepath by filename before saving
- *  @return                     int     -1 on error (kdb null, cannot create file)
- *                                      0 on success
+ *  
+ *  @param [in]         fname               FNAME   filename. 
+ *  @param [in]         override_filepath   bool    true to replace kdb->filepath by filename before saving
  *  
  *  @note Messages are sent to the user via calls to 2 functions which can be redefined 
  *        depending on the context (console app, window app, Qt app...): 
@@ -1146,7 +1132,7 @@ error :
  *           - kerror() for error messages (TODO: check the use of ksmg on errors)
  */
 
-static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
+void KDB::save_binary(const std::string& filename, const bool override_filepath)
 {
     int     i, len, res;
     char    *ptr, *xdr_ptr = NULL;
@@ -1156,32 +1142,33 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     FILE*   fd;
     KOBJ*   k_objs;
 
-    if(!kdb) 
-        return(-1);
+    strcpy(file, filename.c_str());
+    K_strip(file);
+    K_add_ext(file, k_ext[this->k_type]);
 
-    strcpy(file, fname);
-    K_strip(file); /* JMP 21-04-98 */
-    K_add_ext(file, k_ext[kdb->k_type]);
-    if(K_get_backup_on_save()) K_backup(file);     /* JMP 02-12-2022 */
+    if(K_get_backup_on_save()) 
+        K_backup(file);
+    
     fd = fopen(file, "wb+");
-    if(fd == NULL) return(-1);
+    if(fd == NULL) 
+        return;
+    
     setvbuf(fd, NULL, 0, 8192);
-    //kmsg("Saving %s", file); // JMP 11/01/2023 (msg already in calling function B_WsDump)
 
-    if(mode) 
-        kdb->filepath = std::string(file);
+    if(override_filepath) 
+        this->filepath = std::string(file);
 
-    kwrite(K_LABEL, strlen(K_LABEL), 1, fd); /* JMP 23-05-00 */
+    kwrite(K_LABEL, strlen(K_LABEL), 1, fd);
 
     /* XDR  KDB */
-    kdb->k_compressed = K_LZH; /* JMP 25-05-00 */
-    K_xdrKDB(kdb, &xdr_kdb);
+    this->k_compressed = K_LZH;
+    K_xdrKDB(this, &xdr_kdb);
 
     // Dump KDB struct
     if(X64) 
     {
         /* convert to x64 if needed */
-        memset(&kdb32, 0, sizeof(KDB32)); // JMP 7/2/2022
+        memset(&kdb32, 0, sizeof(KDB32));
         kdb32.k_nb = xdr_kdb->size();
         kdb32.k_type = xdr_kdb->k_type;
         kdb32.k_mode = xdr_kdb->k_mode;
@@ -1206,8 +1193,8 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
 
     // prepare KOBJ table
     i = 0;
-    k_objs = new KOBJ[kdb->size()];
-    for(auto& [name, handle] : kdb->k_objs) 
+    k_objs = new KOBJ[this->size()];
+    for(auto& [name, handle] : this->k_objs) 
     {
         strcpy(k_objs[i].o_name, name.c_str());
         k_objs[i].o_val = handle;
@@ -1215,68 +1202,32 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     }
 
     // dump KOBJ table -> dump pairs of (name, handle)
-    res = K_cwrite(kdb->k_compressed, (char*) k_objs, sizeof(KOBJ), kdb->size(), fd, -1);
+    res = K_cwrite(this->k_compressed, (char*) k_objs, sizeof(KOBJ), this->size(), fd, -1);
     if(res < 0) 
         goto error;
 
     delete[] k_objs;
 
     // dump object values as packed objects
-    for(auto& [name, handle] : kdb->k_objs) 
+    for(auto& [name, handle] : this->k_objs) 
     {
         ptr = SW_getptr(handle);
         len = P_len(ptr);
-        K_xdrobj[kdb->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
-        res = K_cwrite(kdb->k_compressed, xdr_ptr, len, 1, fd, 20);
+        K_xdrobj[this->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
+        res = K_cwrite(this->k_compressed, xdr_ptr, len, 1, fd, 20);
         if(res < 0) 
             goto error;
         SW_nfree(xdr_ptr);
     }
 
-    kmsg("%d objects saved", (int) kdb->size());
+    kmsg("%d objects saved", (int) this->size());
     fclose(fd);
-    return(0);
+    return;
 
 error:
     kmsg("Error saving, try again");
     fclose(fd);
-    return(-1);
-}
-
-
-/**
- *  Save a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
- *  A backup (file.xx$) is taken before saving.
- *  
- *  @see K_save_kdb() for more details.
- *    
- *  @param [in, out]    kdb     KDB*    KDB to save 
- *  @param [in]         fname   FNAME   filename. 
- *  @return                     int     -1 on error (kdb null, cannot create file)
- *                                      0 on success
- *  
- */
-
-int K_save(KDB* kdb, FNAME fname)
-{
-    return(K_save_kdb(kdb, fname, 1));
-}
-
-
-/**
- *  Save a KDB in a IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
- *  
- *  @see K_save_kdb() for more details.
- *    
- *  @param [in, out]    kdb     KDB*    KDB to save 
- *  @return                     int     -1 on error (kdb null, cannot create file)
- *                                      0 on success
- *  
- */
-
-int K_save_ws(KDB* kdb)
-{
-    return(K_save_kdb(kdb, I_DEFAULT_FILENAME, 0));
+    return;
 }
 
 

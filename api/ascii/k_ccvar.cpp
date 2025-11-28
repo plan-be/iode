@@ -16,11 +16,11 @@
 #include "api/ascii/ascii.h"
 
 
-char* AsciiVariables::CSV_SEP = 0;
-char* AsciiVariables::CSV_DEC = 0;
-char* AsciiVariables::CSV_NAN = 0;
-char* AsciiVariables::CSV_AXES = 0;
-int   AsciiVariables::CSV_NBDEC = 15;
+char* KDB::CSV_SEP = 0;
+char* KDB::CSV_DEC = 0;
+char* KDB::CSV_NAN = 0;
+char* KDB::CSV_AXES = 0;
+int   KDB::CSV_NBDEC = 15;
 
 /**
  *  Reads one series on the stream YY. Subfunction of load_yy().
@@ -91,12 +91,16 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
  *  @return                        KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-static KDB* load_yy(YYFILE* yy, int ask, int db_global)
+static void load_yy(KDB* kdb, YYFILE* yy, int ask)
 {
     int     cmpt = 0;
     ONAME   name;
     Sample* smpl;
-    KDB*    kdb = new KDB(VARIABLES, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
+
+    if(!kdb)
+        return;
+
+    kdb->clear();  /* clear KDB */
 
     // The keyword sample must be the first on the YY stream */
     // if not:
@@ -132,7 +136,7 @@ static KDB* load_yy(YYFILE* yy, int ask, int db_global)
         {
             case YY_EOF :
                 delete smpl;
-                return kdb;
+                return;
 
             case YY_WORD :
                 if(smpl->nb_periods == 0) 
@@ -154,8 +158,7 @@ static KDB* load_yy(YYFILE* yy, int ask, int db_global)
 
 err:
     if(smpl) delete smpl;
-    if(kdb) delete kdb;
-    return nullptr;
+    if(kdb) kdb->clear();
 }
 
 /**
@@ -170,16 +173,16 @@ err:
  *  @return                  KDB*  NULL or new KDB of variables
  *  
  */
-KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask, int db_global)
+void KDB::load_asc_type_ask(const std::string& file_or_string, int type, int ask)
 {
     static  int sorted;
     YYFILE  *yy;
     int		yytype;
 
+    char* c_filename = (char*) file_or_string.c_str();
     if(type == 0) 
     {
-        SCR_strip((unsigned char *) file_or_string);
-        yytype = (!K_ISFILE(file_or_string)) ? YY_STDIN : YY_FILE;
+        yytype = (!K_ISFILE(c_filename)) ? YY_STDIN : YY_FILE;
     }
     else
         yytype = YY_MEM;
@@ -193,7 +196,7 @@ KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask, 
         sorted = 1;
     }
 
-    yy = YY_open(file_or_string, TABLE, sizeof(TABLE) / sizeof(YYKEYS), yytype);
+    yy = YY_open(c_filename, TABLE, sizeof(TABLE) / sizeof(YYKEYS), yytype);
 
     if(yy == 0) 
     {
@@ -201,12 +204,11 @@ KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask, 
             kerror(0,"Cannot open '%s'", file_or_string);
         else      
             kerror(0,"Cannot open string");
-        return nullptr;
+        return;
     }
 
-    KDB* kdb = load_yy(yy, ask, db_global);
+    load_yy(this, yy, ask);
     YY_close(yy);
-    return kdb;
 }
 
 /**
@@ -218,17 +220,17 @@ KDB* AsciiVariables::load_asc_type_ask(char *file_or_string, int type, int ask, 
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-KDB* AsciiVariables::load_asc(char *filename, int db_global)
+void KDB::load_asc_var(const std::string& filename)
 {   
-    KDB* kdb = load_asc_type_ask(filename, 0, 0, db_global);
-    if(kdb == nullptr || kdb->size() == 0)
-        return nullptr;
-    
     char asc_filename[1024];
-    K_set_ext_asc(asc_filename, filename, VARIABLES);
-    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
-   
-    return kdb;
+
+    std::string trim_filename = trim(filename);
+    char* c_filename = (char*) trim_filename.c_str();
+    K_set_ext_asc(asc_filename, c_filename, VARIABLES);
+
+    load_asc_type_ask(std::string(asc_filename), 0, 0);
+
+    K_set_kdb_fullpath(this, (U_ch*) asc_filename);
 }
 
 /**
@@ -259,38 +261,42 @@ static void print_val(FILE* fd, double val)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int AsciiVariables::save_asc(KDB* kdb, char* filename)
+void KDB::save_asc_var(const std::string& filename)
 {
     FILE    *fd;
     int     j;
     double  *val;
     Sample  *smpl;
 
-    if(filename[0] == '-') fd = stdout;
+    if(filename[0] == '-') 
+        fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
         if(fd == 0) 
         {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
+            kerror(0, "Cannot create '%s'", c_filename);
+            return;
         }
     }
 
-    smpl = kdb->sample;
+    smpl = this->sample;
     if(!smpl) 
     {
         kwarning("Cannot save the Variables to an ascii file -> sample is empty");
-        if(filename[0] != '-') fclose(fd);
-        return -1;
+        if(filename[0] != '-') 
+            fclose(fd);
+        return;
     }
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(auto& [name, _] : kdb->k_objs) 
+    for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
-        val = KVVAL(kdb, name, 0);
+        val = KVVAL(this, name, 0);
         for(j = 0 ; j < smpl->nb_periods; j++, val++) 
             print_val(fd, *val);
         fprintf(fd, "\n");
@@ -298,8 +304,6 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
 
     if(filename[0] != '-') 
         fclose(fd);
-    
-    return(0);
 }
 
 /* --------------- CSV Files -------------------- */
@@ -323,22 +327,23 @@ int AsciiVariables::save_asc(KDB* kdb, char* filename)
  *  @return 
  *  
  */
-int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)
+void KDB::save_vars_csv(const std::string& filename, const std::vector<std::string>& varlist, Sample* smpl)
 {
     FILE        *fd;
-    int         i, j, nb;
-    char        fmt[80], buf[256], *sep, *dec, *nan, *axes, **lst;
+    char        fmt[80], buf[256], *sep, *dec, *nan, *axes;
     double      *val;
 
     // Parameters : sep, dec, nbdec, nan,
     sep = this->CSV_SEP;
     dec = this->CSV_DEC;
     nan = this->CSV_NAN;
-    if(sep == 0 || sep[0] == 0) {
+    if(sep == 0 || sep[0] == 0) 
+    {
         sep = ",";
         sep[0] = SCR_sLIST; // JMP 27/1/2017
     }
-    if(dec == 0 || dec[0] == 0) {
+    if(dec == 0 || dec[0] == 0) 
+    {
         dec = ".";
         dec[0] = SCR_sDECIMAL; // JMP 27/1/2017
     }
@@ -346,47 +351,46 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
         strcpy(fmt, "%lg");
     else
         sprintf(fmt, "%%.%dlg", this->CSV_NBDEC);
-    if(nan == 0) nan = "";
+    if(nan == 0) 
+        nan = "";
 
     axes = this->CSV_AXES;
-    if(axes == 0 || axes[0] == 0) axes = "var";
+    if(axes == 0 || axes[0] == 0) 
+        axes = "var";
 
     // sample : if CSV_Sample == NULL => tout le sample
     if(!smpl)
-        smpl = kdb->sample;
+        smpl = this->sample;
     
     if(!smpl) 
     {
         kwarning("Cannot save the Variables to a CSV file -> sample is empty");
-        return -1;
+        return;
     }
 
-    // Liste
-    lst = varlist;
-    if(varlist == 0) 
-    {
-        lst = 0;
-        nb = 0;
-        for(i = 0; i < kdb->size(); i++)
-            SCR_add_ptr((unsigned char ***) &lst, &nb, (unsigned char*) kdb->get_name(i).c_str());
-        SCR_add_ptr((unsigned char ***) &lst, &nb, 0L);
-    }
+    // List of variables
+    std::vector<std::string> lst = varlist;
+    if(lst.size() == 0)
+        lst = this->get_names();
 
     // Open file
-    if(filename[0] == '-') fd = stdout;
+    if(filename[0] == '-') 
+        fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
         if(fd == 0) 
         {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
+            kerror(0, "Cannot create '%s'", c_filename);
+            return;
         }
     }
 
     // Ligne 1
     fprintf(fd, "%s\\time", axes);
-    for(i = 0 ; i < smpl->nb_periods ; i++) 
+    for(int i = 0 ; i < smpl->nb_periods ; i++) 
     {
         if(smpl->start_period.periodicity == 'Y')
             fprintf(fd, "%s%d", sep, smpl->start_period.year + i);
@@ -398,17 +402,17 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
     }
     fprintf(fd, "\n");
 
+    for(int i = 0; i < lst.size(); i++)
+        lst[i] = to_upper(lst[i]);
+
     // next lines
-    std::string var_name;
-    for(i = 0; lst[i]; i++) 
+    for(const std::string& var_name: lst) 
     {
-        SCR_upper((unsigned char *) lst[i]);
-        fprintf(fd, "%s", lst[i]);
-        var_name = std::string(lst[i]);
-        if(kdb->contains(var_name)) 
+        fprintf(fd, "%s", var_name.c_str());
+        if(this->contains(var_name)) 
         {
-            val = KVVAL(kdb, var_name, 0);
-            for(j = 0; j < smpl->nb_periods; j++, val++) 
+            val = KVVAL(this, var_name, 0);
+            for(int j = 0; j < smpl->nb_periods; j++, val++) 
             {
                 if(IODE_IS_A_NUMBER(*val)) 
                 {
@@ -422,10 +426,7 @@ int AsciiVariables::save_csv(KDB *kdb, char *filename, Sample *smpl, char **varl
         }
         fprintf(fd, "\n");
     }
-    if(varlist == 0) 
-        SCR_free_tbl((unsigned char **) lst);
+
     if(filename[0] != '-') 
         fclose(fd);
-    
-    return 0;
 }

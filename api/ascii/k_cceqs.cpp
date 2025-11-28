@@ -276,27 +276,30 @@ static Equation* read_eq(YYFILE* yy, char* name)
  *  @return                  KDB*    NULL or allocated KDB of EQs
  *  
  */
-KDB* AsciiEquations::load_asc(char* filename, int db_global)
+void KDB::load_asc_eqs(const std::string& filename)
 {
     bool       success;
     Equation*  eq = NULL;
     YYFILE*    yy;
     char       name[K_MAX_NAME + 1];
     int        cmpt = 0;
-    KDB*       kdb = new KDB(EQUATIONS, (db_global == 1) ? DB_GLOBAL : DB_STANDALONE);
+
+    clear();  /* clear current KDB */
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
     qsort(KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS), sizeof(YYKEYS), ascii_eqs_compare);
-    SCR_strip((unsigned char *) filename);
-    yy = YY_open(filename, KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS),
-                 (!K_ISFILE(filename)) ? YY_STDIN : YY_FILE);
-    if(yy == 0) 
-    {
-        kerror(0, "Cannot open '%s'", filename);
-        return nullptr;
-    }
 
+    std::string trim_filename = trim(filename);
+    char* c_filename = (char*) trim_filename.c_str();
+    yy = YY_open(c_filename, KE_TABLE, sizeof(KE_TABLE)/sizeof(YYKEYS),
+                 (!K_ISFILE(c_filename)) ? YY_STDIN : YY_FILE);
+    if(yy == 0)
+    {
+        kerror(0, "Cannot open '%s'", c_filename);
+        return;
+    }
+    
     /* READ FILE */
     while(1) 
     {
@@ -307,12 +310,12 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, EQUATIONS);
-                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                    char asc_filename[1024];
+                    K_set_ext_asc(asc_filename, c_filename, EQUATIONS);
+                    K_set_kdb_fullpath(this, (U_ch*) asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
-                return kdb;
+                return;
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
@@ -327,7 +330,7 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
 
-                success = kdb->set(name, (char*) eq);
+                success = this->set(name, (char*) eq);
                 if(!success)  
                 {
                     kerror(0, "%s : %s", name, L_error());
@@ -349,7 +352,6 @@ KDB* AsciiEquations::load_asc(char* filename, int db_global)
 
 err:
     YY_close(yy);
-    return nullptr;
 }
 
 /**
@@ -452,7 +454,7 @@ static void print_eq(FILE* fd, Equation* eq, char* name)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-int AsciiEquations::save_asc(KDB* kdb, char* filename)
+void KDB::save_asc_eqs(const std::string& filename)
 {
     FILE* fd;
 
@@ -460,19 +462,21 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
         fd = stdout;
     else 
     {
-        fd = fopen(filename, "w+");
-        if(fd == 0) 
+        std::string trim_filename = trim(filename);
+        char* c_filename = (char*) trim_filename.c_str();
+        fd = fopen(c_filename, "w+");
+        if(fd == 0)
         {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
+            kerror(0, "Cannot create '%s'", c_filename);
+            return;
         }
     }
 
     Equation* eq;
-    for(auto& [name, _] : kdb->k_objs) 
+    for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
-        eq = KEVAL(kdb, name);
+        eq = KEVAL(this, name);
         print_eq(fd, eq, (char*) name.c_str());
         delete eq;
         eq = nullptr;
@@ -480,15 +484,4 @@ int AsciiEquations::save_asc(KDB* kdb, char* filename)
 
     if(filename[0] != '-') 
         fclose(fd);
-    
-    return(0);
-}
-
-/* 
- * Save a KDB of EQs in a .csv file.
- * NOT IMPLEMENTED.
- */
-int AsciiEquations::save_csv(KDB *kdb, char *filename,Sample* sample, char** varlist)
-{
-    return(-1);
 }

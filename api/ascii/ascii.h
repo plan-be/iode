@@ -7,7 +7,13 @@
 #include "api/time/sample.h"
 #include "api/utils/yy.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 #include <array>    // for std::array
 #include <memory>   // for std::unique_ptr
@@ -24,96 +30,9 @@ inline int ascii_eqs_compare(const void* a, const void* b)
     return K_compare((YYKEYS*) a, (YYKEYS*) b);
 }
 
-/*---------------- CLASSES ------------------ */
-
-struct AbstractAscii
-{
-    virtual KDB* load_asc(char* filename, int db_global) = 0;
-    virtual int save_asc(KDB* kdb, char* filename) = 0;
-    virtual int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) = 0;
-};
-
-struct AsciiComments : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiEquations : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiIdentities : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiLists : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiScalars : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiTables : public AbstractAscii
-{
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-};
-
-struct AsciiVariables : public AbstractAscii
-{
-    /** 
-     *  Parameters specific to csv output files. 
-     *  These parameters can be modified via report commands: 
-     *    - $csvdigits
-     *    - $csvsep
-     *    - $csvdec
-     *    - $csvnan
-     *    - $csvaxes
-     *  
-     */
-    static char* CSV_SEP;
-    static char* CSV_DEC;
-    static char* CSV_NAN;
-    static char* CSV_AXES;
-    static int   CSV_NBDEC;
-
-    KDB* load_asc(char* filename, int db_global) override;
-    int save_asc(KDB* kdb, char* filename) override;
-    int save_csv(KDB* kdb, char* filename, Sample* sample, char** varlist) override;
-
-private:
-    KDB* load_asc_type_ask(char *file_or_string, int type, int ask, int db_global);
-};
-
 /*---------------- GLOBALS ------------------ */
 
-inline std::array<std::unique_ptr<AbstractAscii>, 7> ascii_handlers = {
-    std::make_unique<AsciiComments>(),
-    std::make_unique<AsciiEquations>(),
-    std::make_unique<AsciiIdentities>(),
-    std::make_unique<AsciiLists>(),
-    std::make_unique<AsciiScalars>(),
-    std::make_unique<AsciiTables>(),
-    std::make_unique<AsciiVariables>()
-};
-
-#define SMPL     1
+#define SMPL 1
 
 /**
  * Table of keywords recognized by YY in the context of a Tables ascii file (.at).
