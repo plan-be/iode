@@ -5,9 +5,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)     Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...
- *      char *K_expand(int type, char* file, char* pattern, int all)                                    Retrieves all object names matching one or more patterns in a workspace or an object file.
- *      char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)                                  Retrieves all object names matching one or more patterns in a KDB.
+ *      char *K_expand(int type, char* file, char* pattern, int all)                                    Retrieves all object names matching one or more patterns in a workspace or an object file.                                Retrieves all object names matching one or more patterns in a KDB.
  *      int K_aggr(char* pattern, char* ename, char* nname) *                                           Transforms a variable name based on an "aggregation" pattern.
  *  
  */
@@ -17,6 +15,7 @@
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/utils/utils.h"
 #include "api/objs/comments.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
@@ -27,6 +26,14 @@
 
 
 extern "C" int SCR_ADD_PTR_CHUNCK;
+
+
+static bool wrap_grep_gnl(const std::string& pattern, const std::string& text, 
+    const bool ecase, const char all)
+{
+    return SCR_grep_gnl((char*) pattern.c_str(), (char*) text.c_str(), 
+                        (int) ecase, (int) all) == 0;
+}
 
 /**
  *  Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...
@@ -43,75 +50,68 @@ extern "C" int SCR_ADD_PTR_CHUNCK;
  *  
  *  @param [in] kdb      KDB*      KDB of any type 
  *  @param [in] pattern  char*     string to search
- *  @param [in] ecase    int       1 if case sensitive, 0 otherwise
- *  @param [in] names    int       1 to search also in object names
- *  @param [in] forms    int       1 to search also in LEC expressions (for EQ, IDT, Table LEC cells)
- *  @param [in] texts    int       1 to search also in texts (for CMT, LST, EQS comments, Table text cells)
- *  @param [in] all      int       character indicating "any sequence" (normally '*')
+ *  @param [in] ecase    bool      true if case sensitive
+ *  @param [in] names    bool      true to search also in object names
+ *  @param [in] forms    bool      true to search also in LEC expressions (for EQ, IDT, Table LEC cells)
+ *  @param [in] texts    bool      true to search also in texts (for CMT, LST, EQS comments, Table text cells)
+ *  @param [in] all      char      character indicating "any sequence" (normally '*')
  *                       
- *  @return              char**    NULL terminated list of object names where the string has been found 
- *                                 NULL if non were found
- *  
+ *  @return              vector<string> list of object names where the string has been found 
+ *                                      empty if none were found 
  */
-char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)
+std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase, const bool names, 
+    const bool forms, const bool texts, const char all)
 {
-    int         j, k, n = 0, found;
-    char        **lst = NULL;
-    Table       *tbl;
-    TableLine   *tline;
-    int         old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
-    std::string lec;
-    std::string cmt;
-    std::string text;
+    bool pattern_is_all = pattern.size() == 1 && pattern[0] == all;
+    if(names && !texts && !forms && pattern_is_all) 
+        return this->get_names();
     
-    if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) 
+    bool found;
+    std::vector<std::string> lst;
+    for(const auto& [name, handle] : this->k_objs)
     {
-        n = kdb->size();
-        lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
-        int i = 0;
-        for(const auto& [name, _] : kdb->k_objs)
-            lst[i++] = (char*) SCR_stracpy((unsigned char*) name.c_str());
-        return lst;
-    }
-
-    TableCell* cell;
-    SCR_ADD_PTR_CHUNCK = 1000;
-    for(const auto& [name, handle] : kdb->k_objs)
-    {
-        found = 0;
+        found = false;
         if(names) 
-            found = !SCR_grep_gnl(pattern, (char*) name.c_str(), ecase, all);
+            found = wrap_grep_gnl(pattern, name, ecase, all);
 
         if(!found) 
         {
-            switch(kdb->k_type) 
+            switch(this->k_type) 
             {
                 case COMMENTS :
                     if(texts) 
-                        found = !SCR_grep_gnl(pattern, KCVAL(kdb, handle), ecase, all);
+                        found = wrap_grep_gnl(pattern, KCVAL(this, handle), ecase, all);
                     break;
                 case LISTS :
                     if(texts) 
-                        found = !SCR_grep_gnl(pattern, KLVAL(kdb, handle), ecase, all);
+                        found = wrap_grep_gnl(pattern, KLVAL(this, handle), ecase, all);
                     break;
                 case IDENTITIES :
                     if(forms) 
-                        found = !SCR_grep_gnl(pattern, KILEC(kdb, handle), ecase, all);
+                        found = wrap_grep_gnl(pattern, KILEC(this, handle), ecase, all);
                     break;
                 case EQUATIONS :
-                    lec = KELEC(kdb, name);
-                    cmt = KECMT(kdb, name);
+                {
+                    std::string lec = KELEC(this, name);
+                    std::string cmt = KECMT(this, name);
                     if(forms) 
-                        found = !SCR_grep_gnl(pattern, (char*) lec.c_str(), ecase, all);
+                        found = wrap_grep_gnl(pattern, lec, ecase, all);
                     if(!found && texts)
-                        found = !SCR_grep_gnl(pattern, (char*) cmt.c_str(), ecase, all);
+                        found = wrap_grep_gnl(pattern, cmt, ecase, all);
                     break;
+                }
                 case TABLES:
-                    tbl = KTVAL(kdb, name);
-                    for(k = 0; k < T_NL(tbl) && !found; k++) 
+                {
+                    Table* tbl = KTVAL(this, name);
+
+                    found = false;
+                    std::string text;
+                    for(const TableLine& tline : tbl->lines) 
                     {
-                        tline = &tbl->lines[k];
-                        switch(tline->get_type()) 
+                        if(found) 
+                            break;
+                        
+                        switch(tline.get_type()) 
                         {
                             case TABLE_LINE_SEP   :
                             case TABLE_LINE_MODE  :
@@ -119,41 +119,45 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                             case TABLE_LINE_FILES :
                                 break;
                             case TABLE_LINE_TITLE :
-                                cell = &(tline->cells[0]);
+                            {
+                                TableCell cell = tline.cells[0];
                                 if(texts)
                                 {
-                                    text = cell->get_content(true);
-                                    found = !SCR_grep_gnl(pattern, (char*) text.c_str(), ecase, all);
+                                    text = cell.get_content(true);
+                                    found = wrap_grep_gnl(pattern, text, ecase, all);
                                 } 
                                 break;
-                            case TABLE_LINE_CELL  :
-                                for(j = 0; j < T_NC(tbl) && !found; j++)
+                            }
+                            case TABLE_LINE_CELL :
+                            {
+                                found = false;
+                                for(const TableCell& cell : tline.cells)
                                 {
-                                    cell = &(tline->cells[j]);
-                                    if((texts && cell->get_type() == TABLE_CELL_STRING) || 
-                                       (forms && cell->get_type() == TABLE_CELL_LEC))
+                                    if(found) 
+                                        break;
+                                    
+                                    if((texts && cell.get_type() == TABLE_CELL_STRING) || 
+                                       (forms && cell.get_type() == TABLE_CELL_LEC))
                                        {
-                                            text = cell->get_content(true);
-                                            found = !SCR_grep_gnl(pattern, (char*) text.c_str(), ecase, all);
+                                            text = cell.get_content(true);
+                                            found = wrap_grep_gnl(pattern, text, ecase, all);
                                        }
                                 }
                                 break;
+                            }
                         }
                     }
+
                     delete tbl;
-                    tbl = nullptr;
                     break;
+                }
             }
         }
 
         if(found) 
-            SCR_add_ptr((unsigned char***) &lst, &n, (unsigned char*) name.c_str());
+            lst.push_back(name);
     }
 
-    if(lst != NULL) 
-        SCR_add_ptr((unsigned char***) &lst, &n, NULL);
-    
-    SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;
     return lst;
 }
 
@@ -167,18 +171,10 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
  *  
  *  @return             char*   allocated semi-colon separated string with all matching names
  *                              if no name found return allocated string of length 0 ("").
- *  
  */
-char *K_expand(int type, char* file, char* pattern, int all)
+char *K_expand(int type, char* file, char* c_pattern, int all)
 {
-
-    int     i, np;
-    char    **ptbl, **tbl, *lst = NULL;
-    KDB     *kdb;
-
-    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) 
-        return(NULL);
-
+    KDB* kdb;
     if(file == NULL) 
         kdb = get_global_db(type);
     else 
@@ -186,37 +182,20 @@ char *K_expand(int type, char* file, char* pattern, int all)
         kdb = new KDB((IodeType) type, DB_STANDALONE);
         bool success = kdb->load(std::string(file));
         if(!success) 
-            return lst;
+            return NULL;
     }
 
-    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS); /* JMP 14-08-98 */
-    np = SCR_tbl_size((unsigned char**) ptbl);
-    for(i = 0; i < np; i++) 
-    {
-        if(ptbl[i][0] != '"' && (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) 
-        {
-            tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
-            SCR_free(ptbl[i]);
-            if(tbl != NULL) 
-            {
-                ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
-                SCR_free_tbl((unsigned char**) tbl);
-            }
-            else 
-                ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
-        }
-    }
-
-    lst = (char*) SCR_mtov((unsigned char**) ptbl, ';');
-    SCR_free_tbl((unsigned char**) ptbl);
+    std::string lst = kdb->expand(std::string(c_pattern), (char) all);
 
     if(file != NULL)
     {
         delete kdb;
         kdb = nullptr;
     }
-    
-    return lst;
+
+    char* c_lst = new char[lst.size() + 1];
+    strcpy(c_lst, lst.c_str());
+    return c_lst;
 }
 
 /**
@@ -229,41 +208,34 @@ char *K_expand(int type, char* file, char* pattern, int all)
  *  
  *  @return             char*   allocated semi-colon separated string with all matching names
  *                              if no name found return allocated string of length 0 ("").
- *  
  */
-char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
+std::string KDB::expand(const std::string& pattern, const char all)
 {
-    int     i, np;
-    char    **ptbl, **tbl, *lst = NULL;
+    if(pattern.empty()) 
+        return "";
 
-    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > VARIABLES) 
-        return(NULL);
-
-    if(!kdb) 
-        kdb = get_global_db(type);
-
-    ptbl = (char**) SCR_vtoms((unsigned char*) pattern, (unsigned char*) A_SEPS);
-    np = SCR_tbl_size((unsigned char**) ptbl);
-    for(i = 0; i < np; i++) 
+    std::vector<std::string> patterns = split_multi(pattern, std::string(A_SEPS));
+    
+    std::string sub_pattern;
+    std::vector<std::string> v_names;
+    for(const std::string& _pattern_ : patterns) 
     {
-        if(ptbl[i][0] != '"' && (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) 
+        sub_pattern = trim(_pattern_);
+        if(sub_pattern.empty()) 
+            continue;
+        
+        if(sub_pattern[0] != '"' && (string_contains(sub_pattern, all) || string_contains(sub_pattern, '?'))) 
         {
-            tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
-            SCR_free(ptbl[i]);
-            if(tbl != NULL) 
-            {
-                ptbl[i] = (char*) SCR_mtov((unsigned char**) tbl, ';');
-                SCR_free_tbl((unsigned char**) tbl);
-            }
-            else 
-                ptbl[i] = (char*) SCR_stracpy((unsigned char*) "");
+            std::vector<std::string> sub_v_names = this->grep(sub_pattern, false, true, false, false, all);
+            for(const std::string& name : sub_v_names) 
+                v_names.push_back(name);
         }
+        else
+            v_names.push_back(sub_pattern);
     }
-
-    lst = (char*) SCR_mtov((unsigned char**) ptbl, ';');
-    SCR_free_tbl((unsigned char**) ptbl);
-
-    return(lst);
+    
+    std::string lst = join(v_names, ";");
+    return lst;
 }
 
 /**

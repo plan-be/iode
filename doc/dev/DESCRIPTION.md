@@ -476,7 +476,7 @@ Functions to search strings in KDB objects.
 
 |Syntax|Description|
 |:---|:---|
-|`char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)`|Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...|
+|`std::vector<std::string> KDB::grep(std::string& pattern, bool ecase, bool names, bool forms, bool texts, char all)`|Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...|
 |`char *K_expand(int type, char* file, char* pattern, int all)`|Retrieves all object names matching one or more patterns in a workspace or an object file.|
 |`int K_aggr(char* pattern, char* ename, char* nname) *`|Transforms a variable name based on an "aggregation" pattern.|
 

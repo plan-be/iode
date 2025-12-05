@@ -403,8 +403,8 @@ int B_DataDelete(char* arg, int type)
     char    *lst;
     int     rc;
 
-    lst = K_expand(type, NULL, arg, '*');  /* JMP 23-12-98 */
-    rc = B_ainit_loop(lst, wrapper_B_DataDelete_1, (char *)&type);
+    lst = K_expand(type, NULL, arg, '*');
+    rc = B_ainit_loop(lst, wrapper_B_DataDelete_1, (char*) &type);
     SCR_free(lst);
     return(rc);
 }
@@ -675,20 +675,23 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
     int     rc = 0;
     char    **args = NULL, buf[81];
     KDB     *kdb = get_global_db(type);
-
     
-    if(word == 1) {
+    if(word == 1) 
+    {
         strcpy(buf, "*!");
         SCR_strlcpy(((unsigned char*) buf) + 2, (unsigned char*) name, 76);
         strcat(buf, "!*");
     }
-    else {
+    else 
+    {
         buf[0] = '*';
         SCR_strlcpy(((unsigned char*) buf) + 1, (unsigned char*) name, 76);
         strcat(buf, "*");
     }
 
-    return(K_grep(kdb, buf, ecase, names, forms, texts, '*'));
+    std::vector<std::string> lst = kdb->grep(buf, ecase, names, forms, texts, '*');
+    char** c_lst = vector_to_double_char(lst);
+    return c_lst;
 }
 
 
@@ -713,7 +716,6 @@ int B_DataSearch(char* arg, int type)
 {
     int     rc = 0, word, ecase, names, forms, texts;
     char    **args = NULL, **lst;
-    char    **K_grep();
     KDB     *kdb = get_global_db(type);
 
     args = B_vtom_chk(arg, 7); /* pattern list */
@@ -1019,47 +1021,58 @@ int B_DataAppend(char* arg, int type)
  */
 int B_DataList(char* arg, int type)
 {
-    int     rc = 0;
-    char    **args = NULL, **lst,
-            *name, *pattern, *file;
-    KDB*    kdb = new KDB(*get_global_db(type));
+    std::string name;
+    std::string file;
+    std::string pattern;
 
-    if((args = B_vtom_chk(arg, 3)) == NULL) 
+    KDB* kdb = new KDB(*get_global_db(type));
+
+    char** args = B_vtom_chk(arg, 3);
+    if(args == NULL) 
     {
-        if((args = B_vtom_chk(arg, 2)) == NULL) 
-            return(-1);
+        args = B_vtom_chk(arg, 2);
+        if(args == NULL) 
+            return -1;
         else 
         {
-            name    = args[0];
-            pattern = args[1];
-            file    = NULL;
+            name    = std::string(args[0]);
+            pattern = std::string(args[1]);
         }
     }
     else 
     {
-        name    = args[0];
-        pattern = args[1];
-        file    = args[2];
+        name    = std::string(args[0]);
+        pattern = std::string(args[1]);
+        file    = std::string(args[2]);
     }
 
-    if(file == NULL) 
-        lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
+    A_free((unsigned char**) args);
+
+    std::vector<std::string> lst;
+    if(file.empty()) 
+        lst = kdb->grep(pattern, false, true, false, false, '*');
     else 
     {
-        bool success = kdb->load(std::string(file));
+        bool success = kdb->load(file);
         if(!success)
         {
             delete kdb;
             return -1;
         }
 
-        lst = K_grep(kdb, pattern, 0, 1, 0, 0, '*');
+        lst = kdb->grep(pattern, false, true, false, false, '*');
         delete kdb;
     }
 
-    rc = KL_lst(name, lst, 200);
-    SCR_free_tbl((unsigned char**) lst);
-    A_free((unsigned char**) args);
+    int rc = -1;
+    if(lst.empty()) 
+        rc = KL_lst((char*) name.c_str(), NULL, 200);
+    else
+    {
+        char** c_lst = vector_to_double_char(lst);
+        rc = KL_lst((char*) name.c_str(), c_lst, 200);
+        SCR_free_tbl((unsigned char**) c_lst);
+    }
 
     return rc;
 }

@@ -17,12 +17,11 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
 }
 
 std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeType iode_type, const std::string& pattern)
-{
-    char* c_pattern = to_char_array(pattern);
-    
+{   
     // Retrieves all object names matching one or more patterns in the 
     // global database (similar to grep)
-    char* c_lst = K_expand_kdb(kdb, (int) iode_type, c_pattern, '*');
+    std::string lst = kdb->expand(pattern, '*');
+    char* c_lst = (char*) lst.c_str();
     
     // Parses a string and replaces @filename and $listname by their contents
     char** c_names = B_ainit_chk(c_lst, NULL, 0);

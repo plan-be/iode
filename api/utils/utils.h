@@ -167,6 +167,11 @@ inline std::string utf8_to_oem(const std::string str_utf8)
     return convert_between_codepages(str_utf8, false);
 }
 
+inline bool string_contains(const std::string& str, const char ch)
+{
+    return str.find(ch) != std::string::npos;
+}
+
 inline std::string to_lower(const std::string& input) 
 {
     std::string result = input;
@@ -184,20 +189,33 @@ inline std::string to_upper(const std::string& input)
 }
 
 /**
- * @brief Joins the elements of a vector of strings into a single string using a specified separator.
+ * @brief Joins the elements of a container of strings into a single string using a specified separator.
  * 
- * @param vec The vector of strings to be joined.
+ * @tparam Container The type of container (e.g., std::vector<std::string> or std::set<std::string>).
+ * @param container The container of strings to be joined.
  * @param separator The string used to separate each element in the final concatenated string.
- * @return The concatenated string formed by joining all elements of the input vector with the separator.
+ * @return The concatenated string formed by joining all elements of the input container with the separator.
  */
-inline std::string join(const std::vector<std::string>& vec, const std::string& separator) 
+template <typename Container>
+inline std::string template_join(const Container& container, const std::string& separator) 
 {
-    if (vec.empty()) 
+    if (container.empty()) 
         return "";
 
-    return std::accumulate(std::next(vec.begin()), vec.end(), vec[0],
+    return std::accumulate(std::next(container.begin()), container.end(), *container.begin(),
         [&separator](const std::string& a, const std::string& b) { return a + separator + b; });
 }
+
+inline std::string join(const std::vector<std::string>& vec, const std::string& separator)
+{
+    return template_join<std::vector<std::string>>(vec, separator);
+}
+
+inline std::string join(const std::set<std::string>& vec, const std::string& separator)
+{
+    return template_join<std::set<std::string>>(vec, separator);
+}
+
 
 /**
  * @brief Splits a given string into substrings based on a specified delimiter.
@@ -490,7 +508,7 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
 inline void sort_and_remove_duplicates(std::vector<std::string>& v)
 {
     // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
+    //       so the vector needs to be sorted first
     std::sort(v.begin(), v.end());
     std::vector<std::string>::iterator it = std::unique(v.begin(), v.end());  
     v.resize(std::distance(v.begin(), it));

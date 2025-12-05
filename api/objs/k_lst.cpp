@@ -35,29 +35,26 @@
  */
 int K_scan(KDB* kdb, char* l_var, char* l_scal)
 {
-    int     rc = 0, i;
-    char    **lst;
-    KDB     *exo = NULL, *scal = NULL;
-
     if(kdb == nullptr || kdb->size() == 0) 
     {
         std::string error_msg = "scan : '";
         error_msg += v_iode_types[kdb->k_type];
         error_msg += "' database is empty";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
-    exo = new KDB(VARIABLES, DB_STANDALONE);
-    scal = new KDB(SCALARS, DB_STANDALONE);
+    KDB* exo = new KDB(VARIABLES, DB_STANDALONE);
+    KDB* scal = new KDB(SCALARS, DB_STANDALONE);
 
     if(exo == nullptr || scal == nullptr) 
     {
-        rc = -1;
-        goto done;
+        if(scal) delete scal;
+        if(exo)  delete exo;
+        return -1;
     }
 
-    for(i = 0; i < kdb->size(); i++) 
+    for(int i = 0; i < kdb->size(); i++) 
     {
         switch(kdb->k_type) 
         {
@@ -71,21 +68,25 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
                 KT_scan(kdb, i, exo, scal);
                 break;
         }
-
     }
 
-    lst = K_grep(scal, "*", 1, 1, 0, 0, '*');
-    rc =  KL_lst(l_scal, lst, 200);
-    SCR_free_tbl((unsigned char**) lst);
+    int rc = -1;
+    char** c_lst;
+    std::vector<std::string> lst;
 
-    lst = K_grep(exo, "*", 1, 1, 0, 0, '*');
-    rc = KL_lst(l_var, lst, 200);
-    SCR_free_tbl((unsigned char**) lst);
+    lst = scal->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc =  KL_lst(l_scal, c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
 
-done:
+    lst = exo->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst(l_var, c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
     delete scal;
     delete exo;
-    return rc;
+    return 0;
 }
 
 
