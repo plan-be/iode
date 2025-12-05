@@ -91,9 +91,9 @@ TEST(BigFilesTest, Tests_BIG_WS)
         start = std::chrono::high_resolution_clock::now();
         // Retrieves all object names matching one or more patterns in the 
         // global database (similar to grep)
-        char* list_names = K_expand_kdb(kdb_var, (int) VARIABLES, (char*) pattern, '*');
+        std::string list_names = kdb_var->expand(std::string(pattern), '*');
         // Parses a string and replaces @filename and $listname by their contents
-        char** c_objs = B_ainit_chk(list_names, NULL, 0);
+        char** c_objs = B_ainit_chk((char*) list_names.c_str(), NULL, 0);
         nb_names = SCR_tbl_size((unsigned char**) c_objs);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
@@ -110,9 +110,9 @@ TEST(BigFilesTest, Tests_BIG_WS)
         /* NOTE: TOO SLOW -> ~ 35 sec -> skipped
         start = std::chrono::high_resolution_clock::now();
         // Retrieves all object names from the global database
-        list_names = K_expand_kdb(kdb_var, (int) VARIABLES, "*", '*');
+        list_names = kdb_var->expand(std::string(pattern), '*');
         // Parses a string and replaces @filename and $listname by their contents
-        char** all_objs = B_ainit_chk(list_names, NULL, 0);
+        char** all_objs = B_ainit_chk((char*) list_names.c_str(), NULL, 0);
         all_nb_names = kdb_var->size();
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
