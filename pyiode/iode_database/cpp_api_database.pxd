@@ -75,6 +75,7 @@ cdef extern from "api/all.h":
         int index_of(string& name)
         bool contains(string& name)
         string get_name(int pos)
+        string expand(string pattern, char ch_all) except +
         # variables
         bool set(string& name, double* var, int nb_obs) except +
         bool remove(string& name) except +
@@ -85,9 +86,7 @@ cdef extern from "api/all.h":
     void KV_set(KDB *kdb, string name, int t, int mode, double value)
 
     # k_grep.c
-    char** K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int _all)
     char*  K_expand(int iode_type, char* filepath, char* pattern, int _all)
-    char*  K_expand_kdb(KDB* kdb, int iode_type, char* pattern, int _all)
 
 
 # C++ classes
@@ -175,6 +174,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
 
         vector[string] search(string& pattern, bint word, bint case_sensitive, bint in_name, 
                               bint in_formula, bint in_text, string& list_result) except +
+        string expand(string pattern, char ch_all) except +
 
         void save(string& filepath, bool compress) except +
         void clear() except +

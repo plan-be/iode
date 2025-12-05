@@ -386,6 +386,13 @@ public:
         return true;
     }
 
+    // other methods
+
+    std::vector<std::string> grep(const std::string& pattern, const bool ecase, 
+        const bool names, const bool forms, const bool texts, const char all);
+
+    std::string expand(const std::string& pattern, const char all='*');
+
     // load
 
     bool load_asc(const std::string& filename);

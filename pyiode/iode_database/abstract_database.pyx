@@ -12,7 +12,7 @@ from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 from pyiode.iode_database.cpp_api_database cimport K_NBDEC
 from pyiode.iode_database.cpp_api_database cimport error_manager
-from pyiode.iode_database.cpp_api_database cimport KDB, K_expand, K_expand_kdb
+from pyiode.iode_database.cpp_api_database cimport KDB, K_expand
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
 from pyiode.iode_database.cpp_api_database cimport B_DataPattern
 from pyiode.iode_database.cpp_api_database cimport B_PrintNbDec
@@ -74,24 +74,22 @@ cdef class CythonIodeDatabase:
         cdef KDB* kdb_ptr = NULL
         cdef size_t length = 0
         cdef char* c_list = NULL
+        cdef bytes b_list = b""
         
         if filepath is not None:
             c_list = K_expand(i_iode_type, filepath.encode(), pattern.encode(), _all)
+            if c_list is NULL: 
+                raise RuntimeError(f"Could not get names using the pattern {pattern}")
+            length = strlen(c_list)
+            if length == 0:
+                SCR_free(c_list)
+                return ''
+            b_list = c_list[:length]
+            SCR_free(c_list)
         else:
             kdb_ptr = self.abstract_db_ptr.get_database()
             if kdb_ptr is not NULL:
-                c_list = K_expand_kdb(kdb_ptr, i_iode_type, pattern.encode(), _all)  
-        
-        if c_list is NULL: 
-            raise RuntimeError(f"Could not get names using the pattern {pattern}")
-        
-        length = strlen(c_list)
-        if length == 0:
-            SCR_free(c_list)
-            return ''
-
-        b_list: bytes = c_list[:length]
-        SCR_free(c_list)
+                b_list = kdb_ptr.expand(pattern.encode(), _all)  
 
         return b_list.decode()
 
