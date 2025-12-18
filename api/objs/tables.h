@@ -135,11 +135,6 @@ enum TableTextAlign
 
 /*----------------------- GLOBALS ----------------------------*/
 
-/*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
-//            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_tbl = std::make_unique<KDB>(TABLES, true);;
-
 inline std::string get_line_type_as_string(TableLineType line_type)
 {
 	for(const auto& [key, value]: m_line_type)
@@ -881,6 +876,50 @@ struct std::hash<Table>
 
 std::size_t hash_value(const Table& table);
 
+/*----------------------- STRUCTS ----------------------------*/
+
+struct CKDBTables : public CKDBTemplate<Table>
+{
+    // global or standalone database
+    CKDBTables(const bool is_global) : CKDBTemplate(TABLES, is_global) {}
+
+    // shallow copy database
+    CKDBTables(CKDBTables* db_parent, const std::string& pattern = "*") 
+        : CKDBTemplate(db_parent, pattern) {}
+
+    // copy constructor
+    CKDBTables(const CKDBTables& other): CKDBTemplate(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    Table* get_obj(const SWHDL handle) const override;
+    Table* get_obj(const std::string& name) const override;
+
+    bool set_obj(const std::string& name, const Table* value) override;
+
+    bool load_asc(const std::string& filename) override;
+    bool save_asc(const std::string& filename) override;
+
+    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
+    char* dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec);
+
+    bool print_obj_def(const std::string& name) override;
+
+private:
+    bool grep_obj(const std::string& name, const SWHDL handle, 
+        const std::string& pattern, const bool ecase, const bool forms, 
+        const bool texts, const char all) const override;
+    
+    void update_reference_db() override;
+};
+
+/*----------------------- GLOBALS ----------------------------*/
+// unique_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline std::unique_ptr<CKDBTables> global_ws_tbl = std::make_unique<CKDBTables>(true);
+
 /*----------------------- FUNCS ----------------------------*/
 
 Table* K_tunpack(char*, char* name = NULL);
@@ -888,12 +927,9 @@ Table* K_tptr(KDB* kdb, char* name);
 
 
 // returns an allocated Table
-inline Table* KTVAL(KDB* kdb, const std::string& name) 
+inline Table* KTVAL(CKDBTables* kdb, const std::string& name) 
 {
-    char* ptr = kdb->get_ptr_obj(name);
-    if(ptr == nullptr)
-        return nullptr;
-    return (Table*) K_tunpack(ptr, (char*) name.c_str());
+    return kdb->get_obj(name);
 }
 
 /*----------------------- MACROS ----------------------------*/

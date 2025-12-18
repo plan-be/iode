@@ -36,10 +36,10 @@ int B_season(char* arg)
     double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
             eps, scale, season[12];
     int     file_type;
-    KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
+    CKDBVariables* to = nullptr;
+    CKDBVariables* from = new CKDBVariables(false);
 
     int lg = B_get_arg0(name, arg, 80);
     char** data = B_ainit_chk(arg + lg, NULL, 0);
@@ -74,7 +74,7 @@ int B_season(char* arg)
     if(nbper < 0 || t_smpl == nullptr) 
         goto done;
     
-    to = new KDB(VARIABLES, false);
+    to = new CKDBVariables(false);
     to->sample = new Sample(*t_smpl);
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
@@ -95,20 +95,20 @@ int B_season(char* arg)
         if(!res) 
         {
             memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
-            to->set(from_name, t_vec, nb);
+            to->set_obj(from_name, t_vec);
             continue;
         }
 
         DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        to->set(from_name, t_vec, nb);
+        to->set_obj(from_name, t_vec);
 
         sprintf(name, "_C%s", from_name.c_str());
-        to->set(name, c_vec, nb);
+        to->set_obj(name, c_vec);
 
         sprintf(name, "_I%s", from_name.c_str());
-        to->set(name, i_vec, nb);
+        to->set_obj(name, i_vec);
     }
     KV_merge(global_ws_var.get(), to, 1);
     rc = 0;

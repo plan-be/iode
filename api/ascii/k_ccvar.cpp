@@ -16,11 +16,11 @@
 #include "api/ascii/ascii.h"
 
 
-char* KDB::CSV_SEP = 0;
-char* KDB::CSV_DEC = 0;
-char* KDB::CSV_NAN = 0;
-char* KDB::CSV_AXES = 0;
-int   KDB::CSV_NBDEC = 15;
+char* CKDBVariables::CSV_SEP = 0;
+char* CKDBVariables::CSV_DEC = 0;
+char* CKDBVariables::CSV_NAN = 0;
+char* CKDBVariables::CSV_AXES = 0;
+int   CKDBVariables::CSV_NBDEC = 15;
 
 /**
  *  Reads one series on the stream YY. Subfunction of load_yy().
@@ -34,10 +34,10 @@ int   KDB::CSV_NBDEC = 15;
  *  @return                 int     0 on success, -1 if the var <name> cannot be created.
  *  
  */
-static int read_vec(KDB* kdb, YYFILE* yy, char* name)
+static int read_vec(CKDBVariables* kdb, YYFILE* yy, char* name)
 {
     bool    success;
-    int     i, keyw, nb;
+    int     i, keyw;
     double  *vec;
     Sample  *smpl;
 
@@ -63,8 +63,7 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    nb = smpl->nb_periods;
-    success = kdb->set(name, vec, nb);
+    success = kdb->set_obj(name, vec);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
@@ -91,7 +90,7 @@ static int read_vec(KDB* kdb, YYFILE* yy, char* name)
  *  @return                        KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-static bool load_yy(KDB* kdb, YYFILE* yy, int ask)
+static bool load_yy(CKDBVariables* kdb, YYFILE* yy, int ask)
 {
     int     cmpt = 0;
     ONAME   name;
@@ -174,7 +173,7 @@ err:
  *  @return                  KDB*  NULL or new KDB of variables
  *  
  */
-bool KDB::load_asc_type_ask(const std::string& file_or_string, int type, int ask)
+bool CKDBVariables::load_asc_type_ask(const std::string& file_or_string, int type, int ask)
 {
     static  int sorted;
     YYFILE  *yy;
@@ -222,7 +221,7 @@ bool KDB::load_asc_type_ask(const std::string& file_or_string, int type, int ask
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-bool KDB::load_asc_var(const std::string& filename)
+bool CKDBVariables::load_asc(const std::string& filename)
 {   
     char asc_filename[1024];
 
@@ -266,7 +265,7 @@ static void print_val(FILE* fd, double val)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_var(const std::string& filename)
+bool CKDBVariables::save_asc(const std::string& filename)
 {
     FILE    *fd;
     int     j;
@@ -335,7 +334,7 @@ bool KDB::save_asc_var(const std::string& filename)
  *  @return 
  *  
  */
-bool KDB::save_vars_csv(const std::string& filename, const std::vector<std::string>& varlist, Sample* smpl)
+bool CKDBVariables::save_csv(const std::string& filename, const std::vector<std::string>& varlist, Sample* smpl)
 {
     FILE        *fd;
     char        fmt[80], buf[256], *sep, *dec, *nan, *axes;

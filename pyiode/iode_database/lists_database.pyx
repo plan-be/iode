@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBLists as CKDBLists
+from pyiode.iode_database.cpp_api_database cimport KDBLists as CppKDBLists
 from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
 
 import pandas as pd
@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Lists(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBLists* database_ptr
+    cdef CppKDBLists* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Lists:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Lists _from_ptr(CKDBLists* database_ptr = NULL, bint owner=False):
+    cdef Lists _from_ptr(CppKDBLists* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
         if database_ptr is not NULL:

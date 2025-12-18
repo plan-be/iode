@@ -30,9 +30,15 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/ascii/ascii.h"
-#include "api/objs/xdr.h"
+
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
 #include "api/objs/variables.h"
 #include "api/objs/old_structs.h"
 #include "api/objs/structs_32.h"
@@ -269,8 +275,9 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
 // ------------------------
 
 /**
- *  Reads a KDB struct from an IODE object file and modify the read KDB struct according to the current
- *  IODE object version (0, 1 or 2) and 32 or 64 bits current architecture. 
+ *  Reads a KDB struct from an IODE object file and modify the read KDB struct 
+ *  according to the current IODE object version (0, 1 or 2) and 32 or 64 bits 
+ *  current architecture. 
  *  
  *  @note The previous versions of the KDB struct are OKDB and OKDB643.
  *        The 32 bit version of KDB (when in 64 bits executable) is KDB32.
@@ -282,7 +289,7 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
  *  @param [in]  vers     int     version of IODE objects (0-2 ?)
  *  @return               int     number of IODE objects to load
  */
-int KDB::preload(FILE *fd, const std::string& filepath, const int vers)
+int KDBInfo::preload(FILE *fd, const std::string& filepath, const int vers)
 {
     int     nb_objs = -1;
     OKDB643 *okdb643, kdb643;
@@ -389,7 +396,6 @@ int KDB::preload(FILE *fd, const std::string& filepath, const int vers)
             this->k_compressed = okdb643->k_compressed;
     }
 
-    K_xdrKDB(this, NULL);
     return nb_objs;
 }
 
@@ -492,6 +498,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
 
     // Read kdb struct from open file (fd) and transpose into kdb 64 if X64
     nb_objs = this->preload(fd, std::string(file), vers);
+    this->xdr(NULL);
 
     if(file_type != this->k_type || this->k_arch != ARCH) 
     {
@@ -813,10 +820,10 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         return(-1);
 
     strcpy(file, filename);
-    K_strip(file); // JMP 19-04-98 
+    K_strip(file);
     fd = fopen(file, "rb");
     if (fd == 0) 
-        return(-2); // file cannot be opened
+        return(-2);
 
     fread(label, strlen(K_LABEL), 1, fd);
     vers = K_calcvers(label);
@@ -826,18 +833,18 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         return(-1);
     }
 
-    KDB* kdb = new KDB();
-    nb_objs = kdb->preload(fd, std::string(file), vers);
+    KDBInfo* kdb_info = new KDBInfo(false);
+    nb_objs = kdb_info->preload(fd, std::string(file), vers);
     fclose(fd);
 
     if(descr) 
-        strcpy(descr, (char*) kdb->description.c_str());
+        strcpy(descr, (char*) kdb_info->description.c_str());
     if(nobjs) 
         *nobjs = nb_objs;
-    if(smpl != NULL && kdb->k_type == VARIABLES)
+    if(smpl != NULL && kdb_info->k_type == VARIABLES)
     {
-        if(kdb->sample)
-            smpl = new Sample(*kdb->sample);
+        if(kdb_info->sample)
+            smpl = new Sample(*kdb_info->sample);
         else
         {
             delete smpl;
@@ -845,9 +852,8 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         }
     }
 
-    int type = kdb->k_type;
-    delete kdb;
-    kdb = nullptr;
+    int type = kdb_info->k_type;
+    delete kdb_info;
     return type;
 }
 
@@ -1037,7 +1043,7 @@ bool KDB::save(const std::string& filename)
     else if(ftype <= 6)
         success = this->save_binary(filename);
     else if(ftype == FILE_CSV)
-        success = this->save_vars_csv(filename);
+        success = this->save_csv(filename);
 
     return success;
 }
@@ -1073,9 +1079,34 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     Sample  csmpl;
     std::string name;
 
-    KDB* from = new KDB((IodeType) to->k_type, false);
-    if(!from) 
-        return(-1);
+    KDB* from = nullptr; 
+    switch(to->k_type) 
+    {
+        case COMMENTS :
+            from = new CKDBComments(false);
+            break;
+        case EQUATIONS :
+            from = new CKDBEquations(false);
+            break;
+        case IDENTITIES:
+            from = new CKDBIdentities(false);
+            break;
+        case LISTS:
+            from = new CKDBLists(false);
+            break;
+        case SCALARS :
+            from = new CKDBScalars(false);
+            break;
+        case TABLES:
+            from = new CKDBTables(false);
+            break;
+        case VARIABLES :
+            from = new CKDBVariables(false);
+            break;
+        default :
+            error_manager.append_error("copy: cannot copy database of generic type 'OBJECTS");
+            return(-1);
+    }
     
     std::vector<std::string> v_objs;
     for(i = 0; i < no; i++) 
@@ -1108,11 +1139,11 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
             found[i] = 1;
         }
 
-        rc = KV_sample(from, &csmpl);
+        rc = KV_sample((CKDBVariables*) from, &csmpl);
         if(rc < 0) 
             goto the_end;
         nb_found = from->size();
-        rc = KV_merge(to, from, 1);
+        rc = KV_merge((CKDBVariables*) to, (CKDBVariables*) from, 1);
     }
     else 
     {
@@ -1230,9 +1261,6 @@ fin:
     return(0);
 }
 
-
-
-
 /**
  *  Concatenates the content of a file to an existing kdb.
  *  If ikdb is empty, the current ikdb filename is replaced by filename.
@@ -1247,7 +1275,40 @@ fin:
  
 int K_cat(KDB* ikdb, char* filename)
 {
-    KDB* kdb = new KDB((IodeType) ikdb->k_type, false);
+    KDB* kdb = nullptr;
+    switch(ikdb->k_type) 
+    {
+        case COMMENTS:
+            kdb = new CKDBComments(false);
+            break;
+        case EQUATIONS:
+            kdb = new CKDBEquations(false);
+            break;
+        case IDENTITIES:
+            kdb = new CKDBIdentities(false);
+            break;
+        case LISTS:
+            kdb = new CKDBLists(false);
+            break;
+        case SCALARS:
+            kdb = new CKDBScalars(false);
+            break;
+        case TABLES:
+            kdb = new CKDBTables(false);
+            break;
+        case VARIABLES:
+            kdb = new CKDBVariables(false);
+            break;
+        default:
+            {
+                std::string msg = "Cannot concatenate the content of the file ";
+                msg += "'" + std::string(filename) + "' ";
+                msg += "to a database of generic type 'OBJECTS'";
+                kwarning(msg.c_str());
+                return NULL;
+            }
+    }
+
     bool success = kdb->load(std::string(filename));
     if(!success)
     {
@@ -1262,7 +1323,7 @@ int K_cat(KDB* ikdb, char* filename)
     }
 
     if(ikdb->k_type == VARIABLES) 
-        KV_merge_del(ikdb, kdb, 1);
+        KV_merge_del((CKDBVariables*) ikdb, (CKDBVariables*) kdb, 1);
     else 
         K_merge_del(ikdb, kdb, 1);
 
@@ -1402,7 +1463,6 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
 {
     int     i, len, res;
     char    *ptr, *xdr_ptr = NULL;
-    KDB*    xdr_kdb = nullptr;
     KDB32   kdb32;
     FNAME   file;
     FILE*   fd;
@@ -1441,16 +1501,18 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
         return false;
     }
 
-    /* XDR  KDB */
     this->k_compressed = K_LZH;
-    K_xdrKDB(this, &xdr_kdb);
+    
+    /* XDR  KDB */
+    KDBInfo* xdr_kdb = nullptr;
+    this->xdr(&xdr_kdb);
 
     // Dump KDB struct
     if(X64) 
     {
         /* convert to x64 if needed */
         memset(&kdb32, 0, sizeof(KDB32));
-        kdb32.k_nb = xdr_kdb->size();
+        kdb32.k_nb = this->size();
         kdb32.k_type = xdr_kdb->k_type;
         kdb32.k_mode = xdr_kdb->k_mode;
         kdb32.k_compressed = xdr_kdb->k_compressed;
@@ -1474,6 +1536,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
         }
     }
     else
+    {
         success = kwrite(xdr_kdb, sizeof(KDB), 1, fd);
         if(!success)
         {
@@ -1482,6 +1545,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
             kwarning(error_msg.c_str());
             return false;
         }
+    }
 
     delete xdr_kdb;
     xdr_kdb = nullptr;

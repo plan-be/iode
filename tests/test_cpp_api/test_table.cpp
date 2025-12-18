@@ -101,8 +101,8 @@ TEST_F(TablesTest, AddGetTable)
     ASSERT_EQ(tbl->lines[i++].get_type(), TABLE_LINE_DATE);
 
     // --- add the table to the Tables KDB
-    char* name = "C_TABLE";
-    global_ws_tbl->set(name, (char*) tbl);
+    std::string name = "C_TABLE";
+    global_ws_tbl->set_obj(name, tbl);
 
     // --- extract the table from the Table KDB
     Table* extracted_tbl = KTVAL(global_ws_tbl.get(), name);
@@ -194,7 +194,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 
     KDBVariables kdb_var(true, input_test_dir + "fun.av");
 
-    char* c_name = "CPP_TABLE";
+    std::string name = "CPP_TABLE";
     int nb_columns = 2;
     std::string def = "A title";
     std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
@@ -261,11 +261,11 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_FILES);
     ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
 
-    global_ws_tbl->set(c_name, (char*) &table);
-    bool found = global_ws_tbl->contains(c_name);
+    global_ws_tbl->set_obj(name, &table);
+    bool found = global_ws_tbl->contains(name);
     ASSERT_TRUE(found);
 
-    Table* tbl = KTVAL(global_ws_tbl.get(), std::string(c_name));
+    Table* tbl = KTVAL(global_ws_tbl.get(), name);
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);

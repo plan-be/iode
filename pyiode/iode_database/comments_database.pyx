@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBComments as CKDBComments
+from pyiode.iode_database.cpp_api_database cimport KDBComments as CppKDBComments
 from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_comments
 from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
 
@@ -13,7 +13,7 @@ import pandas as pd
 
 cdef class Comments(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBComments* database_ptr
+    cdef CppKDBComments* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Comments:
         self.ptr_owner = False
@@ -26,7 +26,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Comments _from_ptr(CKDBComments* database_ptr = NULL, bint owner=False):
+    cdef Comments _from_ptr(CppKDBComments* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Comments wrapper = Comments.__new__(Comments)
         if database_ptr is not NULL:

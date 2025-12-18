@@ -28,7 +28,7 @@
  *  @return                     int     0 if the Scalar is read and saved, -1 if it can't be created.
  *  
  */
-static int read_scl(KDB* kdb, YYFILE* yy, char* name)
+static int read_scl(CKDBScalars* kdb, YYFILE* yy, char* name)
 {
     bool     success;
     int      keyw;
@@ -52,7 +52,7 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set(name, (char*) &scl);
+    success = kdb->set_obj(name, &scl);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
@@ -91,7 +91,7 @@ static int read_scl(KDB* kdb, YYFILE* yy, char* name)
  *  TODO: what if read_cmt returns an error code ?
  *  
  */
-bool KDB::load_asc_scl(const std::string& filename)
+bool CKDBScalars::load_asc(const std::string& filename)
 {
     int     cmpt = 0;
     YYFILE  *yy;
@@ -176,7 +176,7 @@ static void print_scl(FILE* fd, Scalar* scl)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_scl(const std::string& filename)
+bool CKDBScalars::save_asc(const std::string& filename)
 {
     FILE*    fd;
     Scalar*  scl;

@@ -6,6 +6,8 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
 #include "api/utils/utils.h"
 
 #include <algorithm>            // for std::min, std::max
@@ -278,8 +280,8 @@ inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (m
 inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
 inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
-inline KDB*     L_EXEC_DBV = nullptr;   
-inline KDB*     L_EXEC_DBS = nullptr; 
+inline CKDBVariables* L_EXEC_DBV = nullptr;   
+inline CKDBScalars*   L_EXEC_DBS = nullptr; 
 
 // --- PRIORITY OF OPERATORS  and number of functions args ---
 // See iode.h FOR POSITIONS in the vectors
@@ -540,16 +542,11 @@ char *L_error(void);
 /* l_cc2.c */
 CLEC *L_cc2(ALEC *);
 void L_move_arg(char *,char *,int );
-//int L_calc_len(ALEC *,int ,int );
 CLEC *L_cc_stream(void);
 CLEC *L_cc(char *);
 
 /* l_link.c */
-int L_link(KDB *,KDB *,CLEC *);
-// int L_link1(KDB *,KDB *,CLEC *);
-//int L_link2(KDB *,CLEC *);
-//int L_link_sub(KDB *,char *,int );
-void L_link_endos(KDB* kde, CLEC* cl);
+int L_link(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER
@@ -567,9 +564,9 @@ void L_link_endos(KDB* kde, CLEC* cl);
         int matherr(struct exception *e);
 #endif
 void L_fperror(void);
-double L_exec(KDB *,KDB *,CLEC *,int );
+double L_exec(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* expr, int t);
 double L_exec_sub(unsigned char *,int ,int ,double *);
-L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs);
+L_REAL* L_cc_link_exec(char* lec, CKDBVariables* dbv, CKDBScalars* dbs);
 int L_intlag(double );
 double L_uminus(double* stack, int nbargs=-1);
 double L_uplus(double* stack, int nbargs=-1);
@@ -657,26 +654,23 @@ CLEC *L_solve(char *,char *);
 int L_split_eq(char *);
 
 /* l_newton.c */
-double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
-double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
-//double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
+double L_zero(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_newton(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb);
 
 /* l_secant.c */
-//double L_fx(double ,int );
-//int L_bracket(double *,double *,int );
-double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
+double L_secant(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb);
 
 /* l_debug.c */
-void L_debug(char *,...);
+void L_debug(char*, ...);
 
 /* k_lec.c */
 inline char *(*L_expand_super)(char* list_name) = nullptr;
 
-double *L_getvar(KDB *,int );
-double L_getscl(KDB *,int );
-Sample *L_getsmpl(KDB *);
-int L_findscl(KDB *,char *);
-int L_findvar(KDB *,char *);
+double *L_getvar(CKDBVariables*, int);
+double L_getscl(CKDBScalars*, int);
+Sample *L_getsmpl(CKDBVariables*);
+int L_findscl(CKDBScalars*, char*);
+int L_findvar(CKDBVariables*, char*);
 char* L_expand(char* list_name);
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
                           CLEC* eqclec, int coefs);

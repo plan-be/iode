@@ -9,7 +9,7 @@ Variable KDBVariables::get_unchecked(const std::string& name) const
 		return vars;
 
 	int nb_obs = get_nb_periods();
-	KDB* kdb = get_database();
+	CKDBVariables* kdb = get_database();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
 		vars.push_back(KV_get(kdb, name, i, 0));
@@ -154,7 +154,7 @@ bool KDBVariables::add(const std::string& name, const Variable& variable)
 	check_var_size("add", name, variable);
 
 	int var_size = (int) variable.size();
-	return KDBTemplate::add(name, (double*) variable.data(), var_size);
+	return KDBTemplate::add(name, variable);
 }
 
 bool KDBVariables::add(const std::string& name, const std::string& lec)
@@ -204,7 +204,7 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 		variable[t_first + i] = values[i];
 
 	// update the variable
-	KDBTemplate::update(name, (double*) variable.data(), total_nb_periods);
+	KDBTemplate::update(name, variable);
 }
 
 void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
@@ -271,7 +271,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 		return;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
-	//       A shallow copy is created by calling the C function new KDB().
+	//       A shallow copy is created by calling the corresponding copy constructor.
 	//       Each 'key' in the shallow copy points to the same data as the original.
 	//       The C function KV_sample(KDB*, Sample*) used below does the following things: 
 	//       1. changes the 'sample' attribute of the passed KDB
@@ -391,7 +391,7 @@ void KDBVariables::copy_from(const std::string& input_file, const Period* from, 
 void KDBVariables::extrapolate(const VariablesInitialization method, const std::string& from, 
 	const std::string& to, const std::string& variables_list)
 {
-	KDB* kdb = get_database();
+	CKDBVariables* kdb = get_database();
 	if (kdb == NULL) return;
 
 	Sample sample(from, to);
@@ -421,7 +421,7 @@ void KDBVariables::extrapolate(const VariablesInitialization method, const Perio
 
 void KDBVariables::seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test)
 {
-	KDB* kdb = get_database();
+	CKDBVariables* kdb = get_database();
 	if (kdb == NULL) return;
 
 	std::string args;
@@ -453,7 +453,7 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 
 void KDBVariables::trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log)
 {
-	KDB* kdb = get_database();
+	CKDBVariables* kdb = get_database();
 	if (kdb == NULL) return;
 
 	std::string args;

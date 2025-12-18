@@ -422,10 +422,10 @@ public:
         {
             for(const std::string& coeff_name: coeffs)
             {
-                // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
-                // see add() and K_spack()
+                // adds a new scalar with values { 0.9, 1.0, IODE_NAN } 
+                // to the Scalars Database
                 if (!global_ws_scl->contains(coeff_name)) 
-                    global_ws_scl->set(coeff_name, (char*) NULL);
+                    global_ws_scl->set_obj(coeff_name, new Scalar(0.9, 1.0));
             }
         }
 
@@ -449,7 +449,7 @@ public:
                 // adds a new variable with nb_obs IODE_NAN values to the Variables Database
                 // see add() and K_vpack()
                 if (!global_ws_var->contains(var_name)) 
-                    global_ws_var->set(var_name, (double*) NULL, nb_obs);
+                    global_ws_var->set_obj(var_name, (double*) NULL);
             }
         }
 
@@ -483,6 +483,7 @@ public:
     }
 
     bool print_definition() const;
+
 
     // -- operators --
 
@@ -540,71 +541,122 @@ inline std::size_t hash_value(const Equation& equation)
     return eq_hash(equation);
 }
 
+
+/*----------------------- STRUCTS ----------------------------*/
+
+struct CKDBEquations : public CKDBTemplate<Equation>
+{
+    // global or standalone database
+    CKDBEquations(const bool is_global) : CKDBTemplate(EQUATIONS, is_global) {}
+
+    // shallow copy database
+    CKDBEquations(CKDBEquations* db_parent, const std::string& pattern = "*") 
+        : CKDBTemplate(db_parent, pattern) {}
+
+    // copy constructor
+    CKDBEquations(const CKDBEquations& other): CKDBTemplate(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    Equation* get_obj(const SWHDL handle) const override;
+    Equation* get_obj(const std::string& name) const override;
+
+    bool set_obj(const std::string& name, const Equation* value) override;
+
+    bool load_asc(const std::string& filename) override;
+    bool save_asc(const std::string& filename) override;
+
+    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
+
+    bool print_obj_def(const std::string& name) override;
+
+private:
+    bool grep_obj(const std::string& name, const SWHDL handle, 
+        const std::string& pattern, const bool ecase, const bool forms, 
+        const bool texts, const char all) const override;
+    
+    void update_reference_db() override;
+};
+
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_eqs = std::make_unique<KDB>(EQUATIONS, true);;
+inline std::unique_ptr<CKDBEquations> global_ws_eqs = std::make_unique<CKDBEquations>(true);
 
 /*----------------------- FUNCS ----------------------------*/
 
-Equation*  K_eptr(KDB* kdb, char* name);
+Equation*  K_eptr(CKDBEquations* kdb, char* name);
 
 /* k_eqs.c */
 int E_split_eq(char *,char **,char **);
 int E_dynadj(int ,char *,char *,char *,char **);
 int E_DynamicAdjustment(int ,char **,char *,char *);
 
+// Estimation tests by equation name
+double K_etest(CKDBEquations* kdb, char*name, int test_nb);
+double K_e_stdev (CKDBEquations* kdb, char*name);
+double K_e_meany (CKDBEquations* kdb, char*name);
+double K_e_ssres (CKDBEquations* kdb, char*name);
+double K_e_stderr(CKDBEquations* kdb, char*name);
+double K_e_fstat (CKDBEquations* kdb, char*name);
+double K_e_r2    (CKDBEquations* kdb, char*name);
+double K_e_r2adj (CKDBEquations* kdb, char*name);
+double K_e_dw    (CKDBEquations* kdb, char*name);
+double K_e_loglik(CKDBEquations* kdb, char*name);
+
 /*----------------------- FUNCS ----------------------------*/
 
 int K_epack(char **,char *,char *);
 Equation* K_eunpack(char *, char *);
 
-inline std::string KELEC(KDB* kdb, const std::string& name) 
+inline std::string KELEC(CKDBEquations* kdb, const std::string& name) 
 {                  
     return std::string(K_optr0(kdb, (char*) name.c_str()));
 }
 
-inline CLEC* KECLEC(KDB* kdb, const std::string& name) 
+inline CLEC* KECLEC(CKDBEquations* kdb, const std::string& name) 
 {    
     return ((CLEC *) K_optr1(kdb, (char*) name.c_str()));
 }
 
-inline char KESOLV(KDB* kdb, const std::string& name) 
+inline char KESOLV(CKDBEquations* kdb, const std::string& name) 
 {    
     return *((char *) K_optr(kdb, (char*) name.c_str(), 2));
 }
 
-inline char KEMETH(KDB* kdb, const std::string& name) 
+inline char KEMETH(CKDBEquations* kdb, const std::string& name) 
 {    
     return *((char *) K_optr(kdb, (char*) name.c_str(), 3));
 }
 
-inline Sample KESMPL(KDB* kdb, const std::string& name) 
+inline Sample KESMPL(CKDBEquations* kdb, const std::string& name) 
 {    
     return *((Sample *) K_optr(kdb, (char*) name.c_str(), 4));
 }
 
-inline std::string KECMT(KDB* kdb, const std::string& name) 
+inline std::string KECMT(CKDBEquations* kdb, const std::string& name) 
 {                  
     return std::string(K_optr(kdb, (char*) name.c_str(), 5));
 }
 
-inline std::string KEBLK(KDB* kdb, const std::string& name) 
+inline std::string KEBLK(CKDBEquations* kdb, const std::string& name) 
 {                  
     return std::string(K_optr(kdb, (char*) name.c_str(), 6));
 }
 
-inline std::string KEINSTR(KDB* kdb, const std::string& name) 
+inline std::string KEINSTR(CKDBEquations* kdb, const std::string& name) 
 {                
     return std::string(K_optr(kdb, (char*) name.c_str(), 7));
 }
 
-inline long KEDATE(KDB* kdb, const std::string& name) 
+inline long KEDATE(CKDBEquations* kdb, const std::string& name) 
 {    
     return *((long *) K_optr(kdb, (char*) name.c_str(), 8));
 }
 
-inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, const std::string& name) 
+inline std::array<float, EQS_NBTESTS> KETESTS(CKDBEquations* kdb, const std::string& name) 
 {   
     std::array<float, EQS_NBTESTS> tests;
     memcpy(tests.data(), K_optr(kdb, (char*) name.c_str(), 9), EQS_NBTESTS * sizeof(float));
@@ -612,10 +664,10 @@ inline std::array<float, EQS_NBTESTS> KETESTS(KDB* kdb, const std::string& name)
 }
 
 // returns an allocated EQ
-inline Equation* KEVAL(KDB* kdb, const std::string& name) 
+inline Equation* KEVAL(CKDBEquations* kdb, const std::string& name) 
 {    
-    char* ptr = kdb->get_ptr_obj(name);
-    if(ptr == nullptr)
-        return nullptr;
-    return K_eunpack(ptr, (char*) name.c_str());
+    return kdb->get_obj(name);
 }
+
+/* lec/l_link.c */
+void L_link_endos(CKDBEquations* dbe, CLEC *cl);

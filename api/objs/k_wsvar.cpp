@@ -3,14 +3,14 @@
  *
  * Functions acting on workspaces of variables.
  *
- *    int KV_sample(KDB *kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
- *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
- *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(KDB* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
- *    double KV_get(KDB *kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
- *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
+ *    int KV_sample(CKDBVariables* kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
+ *    int KV_merge(CKDBVariables* kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
+ *    void KV_merge_del(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
+ *    int KV_add(CKDBVariables* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
+ *    double KV_get(CKDBVariables* kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
+ *    void KV_set(CKDBVariables* kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
+ *    int KV_extrapolate(CKDBVariables* dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
+ *    CKDBVariables* KV_aggregate(CKDBVariables*dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(double* val, int t, int method)                     Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
  *    int KV_per_pos(Period* per2)                                              Retrieves the position of a Period in the current global_ws_var sample.
@@ -28,6 +28,7 @@
 #include "api/objs/grep.h"
 #include "api/objs/pack.h"
 #include "api/objs/variables.h"
+#include "api/report/undoc/undoc.h"
 
 
 /**
@@ -39,7 +40,7 @@
  *                                               0 otherwise
  */
  
-int KV_sample(KDB *kdb, Sample *new_sample)
+int KV_sample(CKDBVariables* kdb, Sample *new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0) 
         return 0;
@@ -95,7 +96,7 @@ int KV_sample(KDB *kdb, Sample *new_sample)
  *  @return                           int     -1 if there is no intersection between the 2 samples
  *                                            0 if ok.
  */
-int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
+int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
 {
     int start1, start2, nb1;
 
@@ -153,7 +154,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
             continue;
         
         if(!found)
-            kdb1->set(name, (double*) NULL, nb1);
+            kdb1->set_obj(name, (double*) NULL);
 
         if(!kdb1->contains(name))
         {
@@ -182,7 +183,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
  * 
  */
 
-void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
+void KV_merge_del(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
 {
     if(!kdb1)
     {
@@ -234,7 +235,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
  *  @param [in] char*   varname     name of the new variable
  *  @return     int                 position of varname in the kdb
  */
-int KV_add(KDB* kdb, char* varname)
+int KV_add(CKDBVariables* kdb, char* varname)
 {
     int      t, nobs;
     double   *vptr;
@@ -256,7 +257,8 @@ int KV_add(KDB* kdb, char* varname)
     if(!found) 
     {
         nobs = kdb->sample->nb_periods;
-        kdb->set(varname, (double*) NULL, nobs);   // Set IODE_NAN if the new var
+        // Set IODE_NAN if the new var
+        kdb->set_obj(varname, (double*) NULL);
     }
     else 
     { 
@@ -288,7 +290,7 @@ int KV_add(KDB* kdb, char* varname)
  *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
-double KV_get(KDB* kdb, const std::string& name, int t, int mode)
+double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -359,7 +361,7 @@ double KV_get(KDB* kdb, const std::string& name, int t, int mode)
  *                              
  */
  
-void KV_set(KDB* kdb, const std::string& name, int t, int mode, double value)
+void KV_set(CKDBVariables* kdb, const std::string& name, int t, int mode, double value)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -473,7 +475,7 @@ calc2:
  *                                        from the list vars
  */
  
-int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char* pattern)
+int KV_extrapolate(CKDBVariables* dbv, int method, Sample* smpl, char* pattern)
 {
     int bt = smpl->start_period.difference(dbv->sample->start_period);
     int at = dbv->sample->end_period.difference(smpl->end_period);
@@ -521,21 +523,21 @@ int KV_extrapolate(KDB* dbv, int method, Sample* smpl, char* pattern)
  *                                           NULL on error (filename given but inexistent, not enough memory...)
  */
 
-KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
+CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
     double* eval = NULL, *nval;
     Sample* smpl;
-    KDB*    ndbv = nullptr;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
+    CKDBVariables* ndbv = nullptr;
 
-    KDB* edbv = nullptr;
+    CKDBVariables* edbv = nullptr;
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
     else
     {
-        edbv = new KDB(VARIABLES, false);
+        edbv = new CKDBVariables(false);
         bool success = edbv->load(std::string(filename));
         if(!success)
             goto done;
@@ -555,7 +557,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
-    ndbv = new KDB(VARIABLES, false);
+    ndbv = new CKDBVariables(false);
     if(!ndbv) 
         goto done;
     
@@ -572,7 +574,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            ndbv->set(c_nname, (double*) NULL, nb_per);
+            ndbv->set_obj(c_nname, (double*) NULL);
             npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {
@@ -824,3 +826,87 @@ int KV_set_at_aper(char*varname, char* aper, double val)
     return(KV_set_at_t(varname, t, val));
 }
 
+
+double* CKDBVariables::get_obj(const SWHDL handle) const
+{    
+    return (double*) P_get_ptr(SW_getptr(handle), 0);
+}
+
+double* CKDBVariables::get_obj(const std::string& name) const
+{
+    SWHDL handle = this->get_handle(name);
+    if(handle == 0)  
+        throw std::invalid_argument("IODE Variable with name '" + name + "' not found.");
+    
+    return get_obj(handle);
+}
+
+bool CKDBVariables::set_obj(const std::string& name, const double* value)
+{
+    char* pack = NULL;
+    if(!this->sample || this->sample->nb_periods == 0)
+    {
+        std::string error_msg = "Cannot set variable object '" + name + "' because ";
+        error_msg += "the variable database has no sample defined";
+        throw std::runtime_error(error_msg);
+    }
+    
+    int nb_obs = this->sample->nb_periods;
+    K_vpack(&pack, (double*) value, (int*) &nb_obs);
+    bool success = set_packed_object(name, pack);
+    if(!success)
+    {
+        std::string error_msg = "Failed to set variable object '" + name + "'";
+        kwarning(error_msg.c_str());
+    }
+    return success;
+}
+
+bool CKDBVariables::set_obj(const std::string& name, const std::vector<double>& value)
+{
+    return set_obj(name, value.data());
+}
+
+bool CKDBVariables::grep_obj(const std::string& name, const SWHDL handle, 
+    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
+    const char all) const
+{
+    return false;
+}
+
+char* CKDBVariables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+{
+    char* obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
+    return obj;
+}
+
+bool CKDBVariables::print_obj_def(const std::string& name)
+{
+    Sample* smpl = this->sample;
+    if(!smpl || smpl->nb_periods == 0) 
+    {
+        std::string msg = "Cannot print the variable '" + name + "' because ";
+        msg += "the variable database has no sample defined";
+        kwarning((char*) msg.c_str());
+        return false;
+    }
+
+    double* val = KVVAL(this, name, 0); 
+    if(val == NULL) 
+        return false;
+    
+    W_printfRepl((char*) "&1L%s ", name.c_str());
+    for(int j = 0 ; j < smpl->nb_periods; j++, val++) 
+    {
+        W_printfRepl((char*) "&1D");
+        B_PrintVal(*val);
+    }
+
+    W_printf((char*) "\n");
+    return true;
+}
+
+void CKDBVariables::update_reference_db()
+{
+    K_RWS[this->k_type][0] = new CKDBVariables(this, "*");      
+}

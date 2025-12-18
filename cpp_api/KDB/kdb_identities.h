@@ -3,7 +3,7 @@
 #include "api/objs/identities.h"
 
 
-class KDBIdentities : public KDBTemplate<KDB, Identity*>
+class KDBIdentities : public KDBTemplate<CKDBIdentities, Identity*>
 {
 private:
     int set(const std::string& name, const std::string& lec);

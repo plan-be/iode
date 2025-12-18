@@ -188,7 +188,7 @@ void EditAndEstimateEquations::update_scalars()
     Equation* eq;
     std::vector<std::string> coefficients_list;
 
-    KDB* c_kdb_eqs = kdb_eqs->get_database();
+    CKDBEquations* c_kdb_eqs = kdb_eqs->get_database();
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
@@ -327,9 +327,9 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
 
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
-    KDB* dbe = kdb_eqs->get_database();
-    KDB* dbs = kdb_scl->get_database();
-    KDB* dbv = Variables.get_database();
+    CKDBEquations* dbe = kdb_eqs->get_database();
+    CKDBScalars* dbs = kdb_scl->get_database();
+    CKDBVariables* dbv = Variables.get_database();
     int i_method = (int) method;
     
     estimation = new Estimation(c_endos, dbe, dbv, dbs, sample, i_method, maxit, eps);

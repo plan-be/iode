@@ -11,7 +11,7 @@ Identity* KDBIdentities::copy_obj(Identity* const original) const
 
 Identity* KDBIdentities::get_unchecked(const std::string& name) const
 {
-	KDB* kdb = get_database();
+	CKDBIdentities* kdb = get_database();
 	std::string lec(KILEC(kdb, name));
 	Identity* idt = new Identity(lec);
 	return idt;
@@ -29,19 +29,19 @@ std::string KDBIdentities::get_lec(const std::string& name) const
 
 bool KDBIdentities::add(const std::string& name, const std::string& lec)
 {
-    char* c_lec = to_char_array(lec);
-    return KDBTemplate::add(name, c_lec);
+    Identity idt(lec);
+    return KDBTemplate::add(name, &idt);
 }
 
 bool KDBIdentities::add(const std::string& name, const Identity& obj)
 {
-    return KDBTemplate::add(name, (char*) obj.lec.c_str());
+    return KDBTemplate::add(name, (Identity*) &obj);
 }
 
 void KDBIdentities::update(const std::string& name, const std::string& lec)
 {
-    char* c_lec = to_char_array(lec);
-    KDBTemplate::update(name, c_lec);
+    Identity idt(lec);
+    KDBTemplate::update(name, &idt);
 }
 
 bool KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 

@@ -67,9 +67,9 @@ protected:
     int       E_FROM;         // Position in E_DBV of the first period in the estimation sample
     int       E_MAXIT;        // Max number of iterations for the estimation
     int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
-    KDB       *E_DBE;         // KDB of equations used for the estimation
-    KDB       *E_DBS;         // KDB of scalars used for the estimation
-    KDB       *E_DBV;         // KDB of variables used for the estimation 
+    CKDBEquations*  E_DBE;    // KDB of equations used for the estimation
+    CKDBScalars*    E_DBS;    // KDB of scalars used for the estimation
+    CKDBVariables*  E_DBV;    // KDB of variables used for the estimation 
     Sample    *E_SMPL;        // Current estimation sample
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
@@ -151,9 +151,9 @@ public:
      *  @param [in] int     maxit           max number of iterations
      *  @param [in] double  eps             convergence threshold
      */
-    Estimation(char* endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, 
-               char* from_period = NULL, char* to_period = NULL, int method = -1, 
-               int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
+    Estimation(char* endos, CKDBEquations* dbe = nullptr, CKDBVariables* dbv = nullptr, 
+               CKDBScalars* dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
+               int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         est_endos = NULL;
 
@@ -179,8 +179,9 @@ public:
         smpl = nullptr;
     }
 
-    Estimation(char** endos, KDB* dbe = NULL, KDB* dbv = NULL, KDB* dbs = NULL, Sample* smpl = NULL,
-               int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
+    Estimation(char** endos, CKDBEquations* dbe = nullptr, CKDBVariables* dbv = nullptr, 
+               CKDBScalars* dbs = nullptr, Sample* smpl = NULL, int method = -1, 
+               int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         est_endos = NULL;
         initialize(endos, dbe, dbv, dbs, smpl, method, maxit, eps);
@@ -276,8 +277,8 @@ public:
     }
 
 private:
-    void initialize(char** endos, KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, int method, 
-                    int maxit, double eps)
+    void initialize(char** endos, CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, 
+        Sample* smpl, int method, int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)
             throw std::invalid_argument("List of equations names must be provided");
@@ -350,7 +351,7 @@ private:
     int E_prep_lecs(char** lecs);
     int E_prep_instrs(char** instrs);
     int E_prep_coefs();
-    int E_add_scls(CLEC *clec, KDB *dbs);
+    int E_add_scls(CLEC* clec, CKDBScalars* dbs);
     void E_prep_reset();
     void E_get_C(void);
     void E_put_C(void);

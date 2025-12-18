@@ -5,7 +5,7 @@
 #include "kdb_template.h"
 
 
-class KDBEquations : public KDBTemplate<KDB, Equation*>
+class KDBEquations : public KDBTemplate<CKDBEquations, Equation*>
 {
 protected:
     // WARNING: 1) A top-level const is a const qualifier that applies to an object itself:

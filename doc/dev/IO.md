@@ -348,8 +348,8 @@ A set of rules can also be defined to select and/or determine (transform) the na
 
 |Syntax|Description|
 |:---|:---|
-|`KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)`|Interprets a text file containing VAR definitions|
-|`KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)`|Interprets an ASCII file containing COMMENTS definitions|
+|`CKDBVariables *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)`|Interprets a text file containing VAR definitions|
+|`CKDBComments *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)`|Interprets an ASCII file containing COMMENTS definitions|
 |`int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)`|Imports variables or comments in various formats.|
 
 ### k\_iasc.c {#T34}

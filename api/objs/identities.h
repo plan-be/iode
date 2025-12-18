@@ -78,32 +78,70 @@ public:
     std::vector<std::string> get_variables_list(const bool create_if_not_exit=true);
 };
 
+/*----------------------- STRUCTS ----------------------------*/
+
+struct CKDBIdentities : public CKDBTemplate<Identity>
+{
+    // global or standalone database
+    CKDBIdentities(const bool is_global) : CKDBTemplate(IDENTITIES, is_global) {}
+
+    // shallow copy database
+    CKDBIdentities(CKDBIdentities* db_parent, const std::string& pattern = "*") 
+        : CKDBTemplate(db_parent, pattern) {}
+
+    // copy constructor
+    CKDBIdentities(const CKDBIdentities& other): CKDBTemplate(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    Identity* get_obj(const SWHDL handle) const override;
+    Identity* get_obj(const std::string& name) const override;
+
+    bool set_obj(const std::string& name, const Identity* value) override;
+
+    bool load_asc(const std::string& filename) override;
+    bool save_asc(const std::string& filename) override;
+
+    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
+
+    bool print_obj_def(const std::string& name) override;
+
+private:
+    bool grep_obj(const std::string& name, const SWHDL handle, 
+        const std::string& pattern, const bool ecase, const bool forms, 
+        const bool texts, const char all) const override;
+    
+    void update_reference_db() override;
+};
+
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_idt = std::make_unique<KDB>(IDENTITIES, true);;
+inline std::unique_ptr<CKDBIdentities> global_ws_idt = std::make_unique<CKDBIdentities>(true);
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
 Identity* K_iunpack(char *);
-   
 
-inline char* KILEC(KDB* kdb, const std::string& name)
+
+inline char* KILEC(CKDBIdentities* kdb, const std::string& name)
 {
     return K_optr0(kdb, (char*) name.c_str());
 }
 
-inline char* KILEC(KDB* kdb, SWHDL handle)
+inline char* KILEC(CKDBIdentities* kdb, SWHDL handle)
 {
     return (char*) P_get_ptr(SW_getptr(handle), 0);            
 }
 
-inline CLEC* KICLEC(KDB* kdb, const std::string& name)
+inline CLEC* KICLEC(CKDBIdentities* kdb, const std::string& name)
 {
     return (CLEC*) K_optr1(kdb, (char*) name.c_str());
 } 
 
-inline CLEC* KICLEC(KDB* kdb, SWHDL handle)
+inline CLEC* KICLEC(CKDBIdentities* kdb, SWHDL handle)
 {
     return (CLEC*) P_get_ptr(SW_getptr(handle), 1);            
 }

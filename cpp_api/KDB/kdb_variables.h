@@ -9,7 +9,7 @@ const static std::vector<std::string> v_var_modes = { "Level", "Differences", "G
 
 
 // TODO: wrapp functions from k_wsvar.c in KDBVariables
-class KDBVariables : public KDBTemplate<KDB, Variable>
+class KDBVariables : public KDBTemplate<CKDBVariables, Variable>
 {
 private:
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)

@@ -10,7 +10,7 @@
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
  *      int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
  *      int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
- *      int KE_compile(KDB* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
+ *      int KE_compile(CKDBEquations* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
  *      int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
@@ -59,7 +59,7 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
         rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
+        CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), eqs);
         if(tdbe)
         {
             if(tdbe->size() > 0)
@@ -201,7 +201,7 @@ int B_ModelExchange(char* const_arg, int unused)
  *  
  *  TODO: return -1 if K_upd_eqs() fails ?
  */
-int KE_compile(KDB* dbe)
+int KE_compile(CKDBEquations* dbe)
 {
     if(dbe == NULL || dbe->size() == 0) {
         error_manager.append_error("Empty set of equations");
@@ -240,7 +240,7 @@ int B_ModelCompile(char* arg, int unused)
             rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
+            CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), eqs);
             if(tdbe)
             {
                 if(tdbe->size() > 0)
@@ -282,13 +282,13 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    KDB* tdbe = nullptr;
+    CKDBEquations* tdbe = nullptr;
     std::string list_eqs = std::string(arg + lg1);
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
         tdbe = global_ws_eqs.get();
     else
-        tdbe = new KDB(global_ws_eqs.get(), list_eqs);
+        tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
 
     CSimulation simu;
     int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
@@ -366,7 +366,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    KDB* tdbe = new KDB(global_ws_eqs.get(), eqs);
+    CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), eqs);
 
     // Lance la simulation
     CSimulation simu;

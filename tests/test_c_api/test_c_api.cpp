@@ -160,17 +160,17 @@ public:
 	    char*       lst;
         double*     values;
 	    Sample*     smpl;
-        KDB*        kdb_lst = global_ws_lst.get();
-        KDB*        kdb_var = global_ws_var.get();
+        CKDBLists*     kdb_lst = global_ws_lst.get();
+        CKDBVariables* kdb_var = global_ws_var.get();
 	    static int  done = 0;
 	
 	    // Create lists
-	    success = kdb_lst->set("LST1", "A,B");
+	    success = kdb_lst->set_obj("LST1", "A,B");
         EXPECT_TRUE(success);
 	    lst = KLVAL(kdb_lst, "LST1");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B");
-	    success = kdb_lst->set("LST2", "A,B,A");
+	    success = kdb_lst->set_obj("LST2", "A,B,A");
         EXPECT_TRUE(success);
         lst = KLVAL(kdb_lst, "LST2");
         EXPECT_NE(lst, nullptr);
@@ -191,14 +191,14 @@ public:
 	       B[i] = i*2;
 	    }
 	
-	    success = kdb_var->set("A", A, nb);
+	    success = kdb_var->set_obj("A", A);
         EXPECT_TRUE(success);
         values = KVVAL(kdb_var, "A", 0);
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", 0), A[0]);
         EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", nb-1), A[nb-1]);
 	    
-        success = kdb_var->set("B", B, nb);
+        success = kdb_var->set_obj("B", B);
         EXPECT_TRUE(success);
         values = KVVAL(kdb_var, "B", 0);
         EXPECT_NE(values, nullptr);
@@ -209,17 +209,17 @@ public:
         delete[] B;
 
 	    // For B_DataPattern()
-	    success = kdb_lst->set("AB", "A,B");
+	    success = kdb_lst->set_obj("AB", "A,B");
         EXPECT_TRUE(success);
-	    success = kdb_lst->set("BC", "B,C");
+	    success = kdb_lst->set_obj("BC", "B,C");
         EXPECT_TRUE(success);
-	    success = kdb_var->set("AB", B, nb);
+	    success = kdb_var->set_obj("AB", B);
         EXPECT_TRUE(success);
-	    success = kdb_var->set("AC", B, nb);
+	    success = kdb_var->set_obj("AC", B);
 	    EXPECT_TRUE(success);
-        success = kdb_var->set("BB", B, nb);
+        success = kdb_var->set_obj("BB", B);
         EXPECT_TRUE(success);
-        success = kdb_var->set("BC", B, nb);
+        success = kdb_var->set_obj("BC", B);
         EXPECT_TRUE(success);
 	}
 
@@ -503,7 +503,7 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set("ACAF", ACAF, nb);
+	    success = global_ws_var->set_obj("ACAF", ACAF);
         EXPECT_TRUE(success);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
@@ -576,7 +576,7 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 21;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set("ACAF", ACAF, nb);
+	    success = global_ws_var->set_obj("ACAF", ACAF);
         EXPECT_TRUE(success);
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
@@ -621,7 +621,7 @@ public:
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
 	    ACAF[7] = IODE_NAN;
-	    success = global_ws_var->set("ACAF", ACAF, nb);
+	    success = global_ws_var->set_obj("ACAF", ACAF);
         EXPECT_TRUE(success);
 	
 	    // $WsExtrapolate [method] from to [variable list]
@@ -643,7 +643,7 @@ public:
         
 	    nb = global_ws_var->sample->nb_periods;
 	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
-	    global_ws_var->set(name, A, nb);
+	    global_ws_var->set_obj(name, A);
 	    SCR_free(A);
 	    return true;
 	}
@@ -737,23 +737,23 @@ public:
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(KDB::CSV_NBDEC, 7);
+	    EXPECT_EQ(CKDBVariables::CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(KDB::CSV_SEP[0], ';');
+	    EXPECT_EQ(CKDBVariables::CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KDB::CSV_NAN), "--");
+	    EXPECT_EQ(std::string(CKDBVariables::CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KDB::CSV_AXES), "Name");
+	    EXPECT_EQ(std::string(CKDBVariables::CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(KDB::CSV_DEC), ".");
+	    EXPECT_EQ(std::string(CKDBVariables::CSV_DEC), ".");
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
@@ -899,7 +899,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
 
     // --- add the table to the Tables KDB
     char* name = "TABLE";
-    global_ws_tbl->set(name, (char*) tbl);
+    global_ws_tbl->set_obj(name, tbl);
 
     // --- extract the table from the Table KDB
     extracted_tbl = KTVAL(global_ws_tbl.get(), name);
@@ -1088,7 +1088,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    KDB* kdb_var = new KDB(VARIABLES, false);
+    CKDBVariables* kdb_var = new CKDBVariables(false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1098,7 +1098,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     // load (binary files)
     // load all objects
-    kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    kdb_var = new CKDBVariables(DB_GLOBAL);
     kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1115,7 +1115,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
         v_objs.push_back(std::string(objs[i]));
     SCR_free_tbl((unsigned char**) objs);
 
-    kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    kdb_var = new CKDBVariables(DB_GLOBAL);
     kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1129,17 +1129,16 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
 TEST_F(IodeCAPITest, Tests_Simulation)
 {
-    KDB         *kdbv,
-                *kdbe,
-                *kdbs;
-    Sample      *smpl;
-    char        *filename = "fun";
-    U_ch**      endo_exo;
-    int         rc;
-    LIS         lst, expected_lst;
-    void        (*kmsg_super_ptr)(const char*);
-    double      XNATY_2000Y1;
-
+    CKDBVariables* kdbv;
+    CKDBEquations* kdbe;
+    CKDBScalars*   kdbs;
+    Sample* smpl;
+    char*   filename = "fun";
+    U_ch**  endo_exo;
+    int     rc;
+    LIS     lst, expected_lst;
+    void    (*kmsg_super_ptr)(const char*);
+    double  XNATY_2000Y1;
 
     U_test_print_title("Tests Simulation");
 
@@ -1154,9 +1153,8 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     kdbe = global_ws_eqs.get();
     EXPECT_NE(kdbe, nullptr);
 
-    // Check list is empty
-    lst = KLVAL(global_ws_lst.get(), "_DIVER");
-    EXPECT_TRUE(lst == NULL);
+    // Check list _DIVER does not exist before simulation
+    EXPECT_FALSE(global_ws_lst->contains("_DIVER"));
 
     // Simulation instance
     CSimulation simu;
@@ -1180,12 +1178,14 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
+    EXPECT_TRUE(global_ws_lst->contains("_PRE"));
     lst = KLVAL(global_ws_lst.get(), "_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
-    // Check _DIVER list
+    // Check _DIVER 
+    EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
     lst = KLVAL(global_ws_lst.get(), "_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
@@ -1195,16 +1195,8 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     CSimulation::KSIM_MAXIT = 100;
     rc = simu.K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_EQ(rc, 0);
-    //S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
 
     // Test Endo-exo
-
-    // Version with exchange in one equation only
-    // endo_exo = SCR_vtoms("UY-NIY", ",; ");
-    // rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
-    // S4ASSERT(rc == 0, "Exchange UY-NIY converges on 2000Y1-2002Y1");
-    // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
-    // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
     // Version with exchange in at least 2 equations
     // Set values of endo UY
@@ -1220,7 +1212,6 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
     XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
-    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
     EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
 
     // Cleanup
@@ -1235,9 +1226,10 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     char    fullfilename[256];
     char    **varlist;
     Sample  *smpl;
-    KDB     *kdbv, *kdbt;
     Table   *tbl;
     int     rc;
+    CKDBTables*    kdbt;
+    CKDBVariables* kdbv; 
 
     U_test_suppress_a2m_msgs();
 
@@ -1246,13 +1238,13 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
     kdbv = global_ws_var.get();
-    K_RWS[VARIABLES][0] = new KDB(*kdbv);
+    K_RWS[VARIABLES][0] = new CKDBVariables(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
     kdbt = global_ws_tbl.get();
-    K_RWS[TABLES][0] = new KDB(*kdbt);
+    K_RWS[TABLES][0] = new CKDBTables(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
@@ -1570,7 +1562,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(std::string(comment), "This is a comment");
 
     // B_DataListSort()
-    success = global_ws_lst->set("LIST1", "A;C;B");
+    success = global_ws_lst->set_obj("LIST1", "A;C;B");
     EXPECT_TRUE(success);
     found = global_ws_lst->contains("LIST1");
     EXPECT_TRUE(found);
@@ -1580,9 +1572,9 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
-    global_ws_lst->set("L1", "C;B;$L2;$L3");
-    global_ws_lst->set("L2", "X Z Y");
-    global_ws_lst->set("L3", "A B D");
+    global_ws_lst->set_obj("L1", "C;B;$L2;$L3");
+    global_ws_lst->set_obj("L2", "X Z Y");
+    global_ws_lst->set_obj("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
     lst = KLVAL(global_ws_lst.get(), "RES");
@@ -1876,8 +1868,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     global_ws_tbl->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    global_ws_idt->set("C", "D*2+ACAF");
-    global_ws_idt->set("D", "A+B");
+    global_ws_idt->set_obj("C", new Identity("D*2+ACAF"));
+    global_ws_idt->set_obj("D", new Identity("A+B"));
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -1996,7 +1988,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    KDB* kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    CKDBVariables* kdb_var = new CKDBVariables(DB_GLOBAL);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2043,7 +2035,7 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    KDB* kdb_var = new KDB(VARIABLES, DB_GLOBAL);
+    CKDBVariables* kdb_var = new CKDBVariables(DB_GLOBAL);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -3013,8 +3005,8 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     *KVVAL(global_ws_var.get(), "RTCT", 0) = 90.0;
     *KVVAL(global_ws_var.get(), "RTCT", 1) = 90.0;
 
-    global_ws_lst->set("X", "R1,R2,R3,R4,RT");
-    global_ws_lst->set("Y", "C1,C2,C3,C4,CT");
+    global_ws_lst->set_obj("X", "R1,R2,R3,R4,RT");
+    global_ws_lst->set_obj("Y", "C1,C2,C3,C4,CT");
 
     bool found = global_ws_lst->contains("X");
     EXPECT_TRUE(found);

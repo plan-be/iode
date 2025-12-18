@@ -69,22 +69,6 @@ static bool load_global_database(std::unique_ptr<T>& global_ptr,
     return true;
 }
 
-template<typename T>
-static bool load_global_KDB(const IodeType iode_type, 
-    std::unique_ptr<T>& global_ptr, const std::string& filepath)
-{
-    T* kdb = new T(iode_type, true);
-    bool success = kdb->load(filepath);
-    if(!success)
-    {
-        delete kdb;
-        return false;
-    }
-
-    global_ptr.reset(kdb); 
-    return true;
-}
-
 
 /**
  *  Syntax: $WsLoad<type> filename
@@ -96,7 +80,7 @@ static bool load_global_KDB(const IodeType iode_type,
  *  
  *  @see https://iode.plan.be/doku.php?id=wsload
  */
- 
+
 int B_WsLoad(char* arg, int type)
 {
     char buf[K_MAX_FILE + 1];
@@ -114,22 +98,22 @@ int B_WsLoad(char* arg, int type)
             success = load_global_database<CKDBComments>(global_ws_cmt, filepath);
             break;
         case EQUATIONS: 
-            success = load_global_KDB<KDB>(EQUATIONS, global_ws_eqs, filepath);
+            success = load_global_database<CKDBEquations>(global_ws_eqs, filepath);
             break;
         case IDENTITIES: 
-            success = load_global_KDB<KDB>(IDENTITIES, global_ws_idt, filepath);
+            success = load_global_database<CKDBIdentities>(global_ws_idt, filepath);
             break;
         case LISTS: 
-            success = load_global_KDB<KDB>(LISTS, global_ws_lst, filepath);
+            success = load_global_database<CKDBLists>(global_ws_lst, filepath);
             break;
         case SCALARS: 
-            success = load_global_KDB<KDB>(SCALARS, global_ws_scl, filepath);
+            success = load_global_database<CKDBScalars>(global_ws_scl, filepath);
             break;
         case TABLES: 
-            success = load_global_KDB<KDB>(TABLES, global_ws_tbl, filepath);
+            success = load_global_database<CKDBTables>(global_ws_tbl, filepath);
             break;
         case VARIABLES: 
-            success = load_global_KDB<KDB>(VARIABLES, global_ws_var, filepath);
+            success = load_global_database<CKDBVariables>(global_ws_var, filepath);
             break;
         default:
             kerror(0, "B_WsLoad: unknown type %d", type);
@@ -170,14 +154,18 @@ int B_WsSave(char* arg, int type)
     char    buf[K_MAX_FILE + 1];
 
     SCR_strip((unsigned char*) arg);
-    if(strlen(arg) >= sizeof(FNAME)) {
+    if(strlen(arg) >= sizeof(FNAME)) 
+    {
         error_manager.append_error("Save workspace: filename too long");
         return(-1);
     }
-    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
     SCR_strip((unsigned char*) buf);
-    if(buf[0] == 0) return(0);
-    return(B_WsDump(get_global_db(type), buf));
+    if(buf[0] == 0) 
+        return 0;
+    
+    int res = B_WsDump(get_global_db(type), buf);
+    return res;
 }
 
 
@@ -549,7 +537,8 @@ int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
     char    *pattern = NULL;
-    KDB     *kdb = global_ws_var.get(), *nkdb = NULL;
+    CKDBVariables* kdb = global_ws_var.get();
+    CKDBVariables* nkdb = NULL;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);
@@ -772,7 +761,7 @@ int B_CsvSave(char* arg, int type)
             vars.push_back(std::string(data0[shift + i]));
     }
 
-    get_global_db(type)->save_vars_csv(file_ext, vars, smpl);
+    get_global_db(type)->save_csv(file_ext, vars, smpl);
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;
@@ -790,10 +779,10 @@ int B_CsvSave(char* arg, int type)
 
 int B_CsvNbDec(char *nbdec, int unused)
 {
-    KDB::CSV_NBDEC = atoi(nbdec);
-    if(KDB::CSV_NBDEC > 99 || (KDB::CSV_NBDEC < 0 && KDB::CSV_NBDEC != -1)) {
+    CKDBVariables::CSV_NBDEC = atoi(nbdec);
+    if(CKDBVariables::CSV_NBDEC > 99 || (CKDBVariables::CSV_NBDEC < 0 && CKDBVariables::CSV_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
-        KDB::CSV_NBDEC = 10;
+        CKDBVariables::CSV_NBDEC = 10;
         return(-1);
     }
     return(0);
@@ -808,8 +797,8 @@ int B_CsvNbDec(char *nbdec, int unused)
 
 int B_CsvSep(char *sep, int unused)
 {
-    SCR_free(KDB::CSV_SEP);
-    KDB::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
+    SCR_free(CKDBVariables::CSV_SEP);
+    CKDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
     return(0);
 }
 
@@ -822,8 +811,8 @@ int B_CsvSep(char *sep, int unused)
 
 int B_CsvNaN(char *nan, int unused)
 {
-    SCR_free(KDB::CSV_NAN);
-    KDB::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
+    SCR_free(CKDBVariables::CSV_NAN);
+    CKDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
     return(0);
 }
 
@@ -837,8 +826,8 @@ int B_CsvNaN(char *nan, int unused)
 
 int B_CsvAxes(char *var, int unused)
 {
-    SCR_free(KDB::CSV_AXES);
-    KDB::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
+    SCR_free(CKDBVariables::CSV_AXES);
+    CKDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
     return(0);
 }
 
@@ -852,8 +841,8 @@ int B_CsvAxes(char *var, int unused)
 
 int B_CsvDec(char *dec, int unused)
 {
-    SCR_free(KDB::CSV_DEC);
-    KDB::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
+    SCR_free(CKDBVariables::CSV_DEC);
+    CKDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
     return(0);
 }
 

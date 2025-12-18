@@ -27,7 +27,7 @@
  *  @return                     int     0 if the CMT is read and saved, -1 if the CMT can't be created.
  *  
  */
-static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
+static int read_cmt(CKDBComments* kdb, YYFILE* yy, char* name)
 {
     int     keyw;
     char    *cmt;
@@ -52,7 +52,7 @@ static int read_cmt(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set(name, cmt);
+    success = kdb->set_obj(name, cmt);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);

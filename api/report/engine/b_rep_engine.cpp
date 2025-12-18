@@ -643,7 +643,7 @@ char *RP_gmacro(char* str)
                 SCR_free(tmp);
                 return(NULL);
             }
-            res = (char*) SCR_stracpy((unsigned char*) K_optr0(RP_MACRO, tmp));
+            res = (char*) SCR_stracpy((unsigned char*) RP_MACRO->get_macro(tmp));
         }
     }
 

@@ -186,7 +186,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  @return     int             0 (TODO: check the add() return value)        
  *  
  */
-int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
+int Estimation::E_add_scls(CLEC* clec, CKDBScalars* dbs)
 {
     char* c_name;
     std::string name;
@@ -195,7 +195,7 @@ int Estimation::E_add_scls(CLEC *clec, KDB *dbs)
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            dbs->set(name, NULL);
+            dbs->set_obj(name, nullptr);
     }
     
     return(0);

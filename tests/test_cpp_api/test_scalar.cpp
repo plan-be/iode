@@ -23,7 +23,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
 
     // test if a Scalar object can be added to the Scalars KDB via add()
     Scalar scalar(val, relax, std);
-    global_ws_scl->set(name, (char*) &scalar);
+    global_ws_scl->set_obj(name, &scalar);
     bool found = global_ws_scl->contains(name);
     ASSERT_TRUE(found);
 

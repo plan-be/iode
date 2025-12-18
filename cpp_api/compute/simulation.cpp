@@ -62,7 +62,7 @@ bool Simulation::model_compile(const std::string& list_eqs)
         {
             try
             {
-                KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
+                CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
                 if(tdbe->size() > 0)
                     rc = KE_compile(tdbe);
                 delete tdbe;
@@ -127,7 +127,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     {
         try
         {
-            KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
+            CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
             if(tdbe->size() > 0)
             {
                 char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
@@ -203,7 +203,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     char* c_post = to_char_array(post_name);
 
     int rc = -1;
-    KDB* tdbe = nullptr;
+    CKDBEquations* tdbe = nullptr;
     if(list_eqs.empty())
     {
         tdbe = global_ws_eqs.get();
@@ -213,7 +213,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     {
         try
         {
-            tdbe = new KDB(global_ws_eqs.get(), list_eqs);
+            tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
             if(tdbe->size() > 0)
                 rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
             delete tdbe;
@@ -314,7 +314,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     int rc = -1;
     try
     {
-        KDB* tdbe = new KDB(global_ws_eqs.get(), list_eqs);
+        CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
         if(tdbe->size() > 0)
             rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
                              c_pre, c_inter, c_post);

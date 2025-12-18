@@ -98,6 +98,7 @@
 #include "api/b_errors.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
+#include "api/objs/comments.h"
 #include "api/objs/variables.h"
 #include "api/write/write.h"
 #include "api/io/import.h"
@@ -204,7 +205,8 @@ char *write_separator(char* src, char** tg)
  *  @return     int                 0 on success, -1 on error
  *  
  */
-int EXP_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, 
+           char* outfile, char* na, char* sep)
 {
     int     i, j, dim, rc;
     char    *code = NULL, *cmt = NULL, *vec = NULL;
@@ -264,7 +266,8 @@ err:
  *  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.
  *  
  */
-int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)
+int EXP_Rev_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, 
+               char* outfile, char* na, char* sep)
 {
     int     i, j, nl, nc, rc;
     char    *code = NULL;
@@ -348,7 +351,8 @@ err:
  *  @param [in] int     fmt     output format: 0=CSV, 1=DIF, 2=WKS, 3=TSP, default=Rotated CSV
  *  @return     int             0 on success, 
  */
-int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
+int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, 
+                   char* from, char* to, char* na, char* sep, int fmt)
 {
     int rc = 0;
     bool success = false;
@@ -395,7 +399,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     // Get the ExportToFile handler for the requested format
     expdef = export_handlers[fmt].get();
 
-    KDB* dbv = new KDB(VARIABLES, false);
+    CKDBVariables* dbv = new CKDBVariables(false);
     if(vfile && vfile[0] != 0) 
     {
         success = dbv->load(std::string(vfile));

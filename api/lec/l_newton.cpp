@@ -107,9 +107,9 @@
  *  List of functions
  *  ----------------- 
  *
- *      double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
+ *      double L_zero(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
  *                                                                                      If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
- *      double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
+ *      double L_newton(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
 #include <math.h>
@@ -133,7 +133,7 @@ static double  L_newton_1();
  *  @return     double          root of the equation (varnb value that solves the equation)
  *  
  */
-double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_zero(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     double  x;
 
@@ -163,13 +163,14 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
  *  See L_zero() for the description of the other parameters.
  *  
  */
-static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+static double L_newton_1(int algo, CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, 
+    int varnb, int eqvarnb)
 {
     double  oldx, x, fx, fxh, ax, afx, dx = 0.0, ox;
     double  h = CSimulation::KSIM_NEWTON_STEP;
     double  eps = CSimulation::KSIM_NEWTON_EPS;
     int     it = 0;
-    double    *d_ptr, shift;
+    double  *d_ptr, shift;
 
     d_ptr = L_getvar(dbv, varnb) + t;
     oldx = x = d_ptr[0];
@@ -263,12 +264,11 @@ err:
  *  See L_zero() for the parameter description.
  *    
  */
-double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_newton(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
-    double      x;
-
-    x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
-    if(!IODE_IS_A_NUMBER(x)) x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
+    double x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
+    if(!IODE_IS_A_NUMBER(x)) 
+        x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
     return(x);
 }
 

@@ -555,7 +555,7 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
     return(IODE_NAN);
 }
 
-L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* GB 14-11-00 */
+L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 {
     char    *expr1, *expr2;
     short   len1, len2;

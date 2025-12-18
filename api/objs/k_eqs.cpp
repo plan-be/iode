@@ -227,3 +227,114 @@ bool Equation::print_definition() const
     
     return success;
 }
+
+
+Equation* CKDBEquations::get_obj(const SWHDL handle) const
+{    
+    std::string name;
+    for(const auto& [_name_, _handle_] : this->k_objs) 
+    {
+        if(_handle_ == handle) 
+        {
+            name = _name_;
+            break;
+        }
+    }
+
+    return get_obj(name);
+}
+
+Equation* CKDBEquations::get_obj(const std::string& name) const
+{
+    SWHDL handle = this->get_handle(name);
+    if(handle == 0)  
+        throw std::invalid_argument("Equation with name '" + name + "' not found.");
+    
+    char* ptr = SW_getptr(handle);
+    if(ptr == nullptr)  
+        return nullptr;
+    return K_eunpack(ptr, (char*) name.c_str());
+}
+
+bool CKDBEquations::set_obj(const std::string& name, const Equation* value)
+{
+    char* pack = NULL;
+    K_epack(&pack, (char*) value, (char*) name.c_str());
+    bool success = set_packed_object(name, pack);
+    if(!success)
+    {
+        std::string error_msg = "Failed to set equation object '" + name + "'";
+        kwarning(error_msg.c_str());
+    }
+    return success;
+}
+
+bool CKDBEquations::grep_obj(const std::string& name, const SWHDL handle, 
+    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
+    const char all) const
+{
+    bool found = false;
+    std::string lec = KELEC(const_cast<CKDBEquations*>(this), name);
+    std::string cmt = KECMT(const_cast<CKDBEquations*>(this), name);
+    if(forms) 
+        found = wrap_grep_gnl(pattern, lec, ecase, all);
+    if(!found && texts)
+        found = wrap_grep_gnl(pattern, cmt, ecase, all);
+    return found;
+}
+
+char* CKDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+{
+    std::string lec = KELEC(this, name);
+    char* obj = (char*) lec.c_str();
+    return obj;
+}
+
+bool CKDBEquations::print_obj_def(const std::string& name)
+{
+    Equation* eq = KEVAL(this, name);
+    if(!eq) 
+        return false;
+    
+    bool success = eq->print_definition();
+
+    delete eq;
+    eq = nullptr;
+    return success;
+}
+
+void CKDBEquations::update_reference_db()
+{
+    K_RWS[this->k_type][0] = new CKDBEquations(this, "*");      
+}
+
+/**
+ *  Retrieves a statistical test stored the equation whose endo is name.
+ *  
+ *  @param [in] KDB*    kdb      KDB containing EQ name
+ *  @param [in] char*   name     name of the equation (=endogenous)
+ *  @param [in] int     test_nb  position of the test in eq->tests 
+ *  @return     double           test value or IODE_NAN if equation name not found
+ *  
+ */
+double K_etest(CKDBEquations* kdb, char* c_name, int test_nb)
+{   
+    std::string name = std::string(c_name);
+    if(!kdb->contains(name)) 
+        return(IODE_NAN);
+    
+    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, name);
+    double value = (double) tests[test_nb];
+    return value;
+}
+
+// Returns test calculated during the last estimation of equation name
+double K_e_stdev (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
+double K_e_meany (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
+double K_e_ssres (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
+double K_e_stderr(CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
+double K_e_fstat (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
+double K_e_r2    (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
+double K_e_r2adj (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
+double K_e_dw    (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
+double K_e_loglik(CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}

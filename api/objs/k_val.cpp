@@ -28,13 +28,13 @@
  *    double K_e_dw    (KDB* kdb, char*name)            Returns dw    calculated during the last estimation of equation name
  *    double K_e_loglik(KDB* kdb, char*name)            Returns loglik calculated during the last estimation of equation name
  *
- *    double K_s_get_info(KDB* kdb, char*name, int info_nb)             Retrieves a Scalar info
+ *    double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb)             Retrieves a Scalar info
  *    double K_s_get_value (KDB* kdb, char*name)                        Retrieves a Scalar value
  *    double K_s_get_relax (KDB* kdb, char*name)                        Retrieves a Scalar relax
  *    double K_s_get_stderr(KDB* kdb, char*name)                        Retrieves a Scalar stderr
  *    double K_s_get_ttest (KDB* kdb, char*name)                        Retrieves a Scalar ttest
  *  
- *    int K_s_set_info(KDB* kdb, char*name, int info_nb, double val)    Sets a Scalar info
+ *    int K_s_set_info(CKDBScalars* kdb, char*name, int info_nb, double val)    Sets a Scalar info
  *    int K_s_set_value (KDB* kdb, char*name, double val)               Sets a Scalar value
  *    int K_s_set_relax (KDB* kdb, char*name, double val)               Sets a Scalar relax
  *    int K_s_set_stderr(KDB* kdb, char*name, double val)               Sets a Scalar stderr
@@ -187,7 +187,7 @@ double *K_vptr(KDB* kdb, char* name, int t)
  *  @return             Equation*     pointer to an allocated EQ ~ kdb[name]
  *  
  */
-Equation* K_eptr(KDB* kdb, char* c_name)
+Equation* K_eptr(CKDBEquations* kdb, char* c_name)
 {
     std::string name = std::string(c_name);
     if(!kdb->contains(name)) 
@@ -209,106 +209,3 @@ Table* K_tptr(KDB* kdb, char* name)
     char* ptr = kdb->get_ptr_obj(std::string(name));
     return K_tunpack(ptr, name);
 }
-
-/**
- *  Retrieves a statistical test stored the equation whose endo is name.
- *  
- *  @param [in] KDB*    kdb      KDB containing EQ name
- *  @param [in] char*   name     name of the equation (=endogenous)
- *  @param [in] int     test_nb  position of the test in eq->tests 
- *  @return     double           test value or IODE_NAN if equation name not found
- *  
- */
-double K_etest(KDB* kdb, char* c_name, int test_nb)
-{   
-    std::string name = std::string(c_name);
-    if(!kdb->contains(name)) 
-        return(IODE_NAN);
-    
-    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, name);
-    double value = (double) tests[test_nb];
-    return value;
-}
-
-// Returns test calculated during the last estimation of equation name
-double K_e_stdev (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
-double K_e_meany (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
-double K_e_ssres (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
-double K_e_stderr(KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
-double K_e_fstat (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
-double K_e_r2    (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
-double K_e_r2adj (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
-double K_e_dw    (KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
-double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
-
-
-/**
- *  Retrieves a Scalar info.
- *  
- *  @param [in] KDB*    kdb      KDB containing Scalar name
- *  @param [in] char*   name     name of the scalar 
- *  @param [in] int     info_nb  0 = scalar, 1 = relax , 2 = std, 3: t-test
- *  @return     double           value or IODE_NAN if scalar name not found or t-test undefined
- *  
- */
-double K_s_get_info(KDB* kdb, char* c_name, int info_nb)
-{
-    
-    std::string name = std::string(c_name);
-    if(!kdb->contains(name)) 
-        return IODE_NAN;
-    
-    double val = IODE_NAN;
-    Scalar* scl = KSVAL(kdb, name);
-    switch(info_nb) 
-    {
-        case 1 :  val = scl->relax; break;
-        case 2 :  val = scl->std; break;
-        case 3 :  
-                if(IODE_IS_A_NUMBER(scl->value) && IODE_IS_A_NUMBER(scl->std) && !IODE_IS_0(scl->std))
-                    val = scl->value / scl->std;
-                else 
-                    val = IODE_NAN;
-                break;    
-            
-        default: val = scl->value; break;
-    }    
-    return(val);
-}
-
-double K_s_get_value (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 0));}
-double K_s_get_relax (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 1));}
-double K_s_get_stderr(KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 2));}
-double K_s_get_ttest (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 3));}
-
-
-/**
- *  Sets a Scalar info.
- *  
- *  @param [in] KDB*    kdb      KDB containing Scalar name
- *  @param [in] char*   name     name of the scalar 
- *  @param [in] int     info_nb  0 = scalar, 1 = relax , 2 = std
- *  @param [in] double  value    value to set to info_nb
- *  @return     int              -1 if scalar not found, -2 if info_nb illegal, 0 otherwise
- */
-int K_s_set_info(KDB* kdb, char* c_name, int info_nb, double value)
-{   
-    std::string name = std::string(c_name);
-    if(!kdb->contains(name)) 
-        return(-1);
-    
-    Scalar* scl = KSVAL(kdb, name);
-    switch(info_nb) 
-    {
-        case 0 :  scl->value = value; break;
-        case 1 :  scl->relax = value; break;
-        case 2 :  scl->std = value; break;
-        default:  return(-2);
-    }    
-    return(0);
-}
-
-int K_s_set_value (KDB* kdb, char*name, double value) {return(K_s_set_info(kdb, name, 0, value));}
-int K_s_set_relax (KDB* kdb, char*name, double value) {return(K_s_set_info(kdb, name, 1, value));}
-int K_s_set_stderr(KDB* kdb, char*name, double value) {return(K_s_set_info(kdb, name, 2, value));}
-

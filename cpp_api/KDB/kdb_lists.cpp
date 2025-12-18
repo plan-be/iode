@@ -8,13 +8,11 @@ List KDBLists::get_unchecked(const std::string& name) const
 }
 
 bool KDBLists::add(const std::string& name, const List& list)
-{
-	char* c_list = to_char_array(list);
-	return KDBTemplate::add(name, c_list);
+{;
+	return KDBTemplate::add(name, list);
 }
 
 void KDBLists::update(const std::string& name, const List& list)
 {
-	char* c_list = to_char_array(list);
-	KDBTemplate::update(name, c_list);
+	KDBTemplate::update(name, list);
 }

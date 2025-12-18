@@ -64,10 +64,10 @@ static int B_WsTrendAll(char* arg, int std)
     char    file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
     int     file_type;
-    KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
+    CKDBVariables* to = nullptr;
+    CKDBVariables* from = new CKDBVariables(false);
 
     int lg = B_get_arg0(file, arg, 80);
 
@@ -101,7 +101,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    to = new KDB(VARIABLES, false);
+    to = new CKDBVariables(false);
     nb = t_smpl->nb_periods;
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
@@ -112,7 +112,7 @@ static int B_WsTrendAll(char* arg, int std)
         memcpy(f_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019
-        to->set(from_name, t_vec, nb);
+        to->set_obj(from_name, t_vec);
     }
 
     KV_merge(global_ws_var.get(), to, 1);

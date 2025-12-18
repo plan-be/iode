@@ -5,7 +5,7 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as CppKDBEquations
 from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
@@ -17,7 +17,7 @@ import pandas as pd
 
 cdef class Equations(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBEquations* database_ptr
+    cdef CppKDBEquations* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Equations:
         self.ptr_owner = False
@@ -30,7 +30,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Equations _from_ptr(CKDBEquations* database_ptr = NULL, bint owner=False):
+    cdef Equations _from_ptr(CppKDBEquations* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Equations wrapper = Equations.__new__(Equations)
         if database_ptr is not NULL:

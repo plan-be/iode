@@ -275,7 +275,7 @@ static Equation* read_eq(YYFILE* yy, char* name)
  *  @return                  KDB*    NULL or allocated KDB of EQs
  *  
  */
-bool KDB::load_asc_eqs(const std::string& filename)
+bool CKDBEquations::load_asc(const std::string& filename)
 {
     bool       success;
     Equation*  eq = NULL;
@@ -330,7 +330,7 @@ bool KDB::load_asc_eqs(const std::string& filename)
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
 
-                success = this->set(name, (char*) eq);
+                success = this->set_obj(name, eq);
                 if(!success)  
                 {
                     kwarning("%s : %s", name, L_error());
@@ -455,7 +455,7 @@ static void print_eq(FILE* fd, Equation* eq, char* name)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_eqs(const std::string& filename)
+bool CKDBEquations::save_asc(const std::string& filename)
 {
     FILE* fd;
 

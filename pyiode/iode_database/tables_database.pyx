@@ -6,14 +6,14 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
+from pyiode.iode_database.cpp_api_database cimport KDBTables as CppKDBTables
 from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblTitle
 
 
 cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBTables* database_ptr
+    cdef CppKDBTables* database_ptr
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
@@ -28,7 +28,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Tables _from_ptr(CKDBTables* database_ptr = NULL, bint owner=False):
+    cdef Tables _from_ptr(CppKDBTables* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
         if database_ptr is not NULL:

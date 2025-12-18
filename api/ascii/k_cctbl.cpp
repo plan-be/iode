@@ -385,7 +385,7 @@ static Table* read_tbl(YYFILE* yy)
  *  @return                  KDB*    NULL or allocated KDB of Tables
  *  
  */
-bool KDB::load_asc_tbl(const std::string& filename)
+bool CKDBTables::load_asc(const std::string& filename)
 {
     static  int sorted;
 
@@ -441,7 +441,7 @@ bool KDB::load_asc_tbl(const std::string& filename)
                     kwarning("%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(!this->set(name, (char*) tbl))  
+                if(!this->set_obj(name, tbl))  
                     goto err;
                 kmsg("Reading object %d : %s", ++cmpt, name);
                 delete tbl;
@@ -656,7 +656,7 @@ static void print_tbl(FILE* fd, Table* tbl)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_tbl(const std::string& filename)
+bool CKDBTables::save_asc(const std::string& filename)
 {
     FILE*  fd;
     Table* tbl;

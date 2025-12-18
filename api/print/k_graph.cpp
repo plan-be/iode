@@ -474,7 +474,8 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, Sample* smpl, int dt, int nt, KDB* kdb, char* names, int mode)
+           double ymin, double ymax, Sample* smpl, int dt, int nt, CKDBVariables* kdb, 
+           char* names, int mode)
 {
     char    *buf, **vars;
     int     i, t, ng, rc = 0;
@@ -538,7 +539,8 @@ fin:
  *  See V_graph() for the other parameter definitions.
  */
  
-static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, KDB* kdb, char** names, int mode)
+static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
+    double ymin, double ymax, Sample* smpl, CKDBVariables* kdb, char** names, int mode)
 {
     int i, ng;
 
@@ -616,7 +618,8 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
  *  @param [in] char**  names   list of VARs to print
  *  @return     int             0 on success, -1 on error
  */
-int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)
+int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, 
+    double ymin, double ymax, Sample* smpl, char** names)
 {
     int     rc;
     //int old_mode = global_VM, rc;

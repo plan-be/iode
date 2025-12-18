@@ -31,12 +31,6 @@ cdef extern from "api/all.h":
     int B_EQS_LEC
     double K_CMP_EPS
 
-    char*   KCVAL(KDB* kdb, string name)
-    char*   KIVAL(KDB* kdb, string name)
-    char*   KLVAL(KDB* kdb, string name)
-    double* KVVAL(KDB* kdb, string name)
-    double* KVVAL(KDB* kdb, string name, int t)
-
     int B_PrintNbDec(char* nbdec)
     int B_PrintLang(char* lang)
     int B_PrintObjTblTitle(char* arg)
@@ -83,15 +77,55 @@ cdef extern from "api/all.h":
     cdef cppclass CKDBComments(KDB):
         char* get_obj(SWHDL handle) except +
         char* get_obj(string name) except +
-        void set_obj(string name, char* value) except +
+        bool set_obj(string name, string value) except +
+
+    char* KCVAL(CKDBComments* kdb, string name)
+
+    cdef cppclass CKDBEquations(KDB):
+        CEquation* get_obj(SWHDL handle) except +
+        CEquation* get_obj(string name) except +
+        bool set_obj(string name, CEquation* value) except +
+
+    cdef cppclass CKDBIdentities(KDB):
+        CIdentity* get_obj(SWHDL handle) except +
+        CIdentity* get_obj(string name) except +
+        bool set_obj(string name, CIdentity* value) except +
+
+    char* KIVAL(CKDBIdentities* kdb, string name)
+
+    cdef cppclass CKDBLists(KDB):
+        char* get_obj(SWHDL handle) except +
+        char* get_obj(string name) except +
+        bool set_obj(string name, string value) except +
+
+    char* KLVAL(CKDBLists* kdb, string name)
+
+    cdef cppclass CKDBScalars(KDB):
+        CScalar* get_obj(SWHDL handle) except +
+        CScalar* get_obj(string name) except +
+        bool set_obj(string name, CScalar* value) except +
+
+    cdef cppclass CKDBTables(KDB):
+        CTable* get_obj(SWHDL handle) except +
+        CTable* get_obj(string name) except +
+        bool set_obj(string name, CTable* value) except +
+
+    cdef cppclass CKDBVariables(KDB):
+        double* get_obj(SWHDL handle) except +
+        double* get_obj(string name) except +
+        bool set_obj(string name, double* value) except +
+
+    double* KVVAL(CKDBVariables* kdb, string name)
+    double* KVVAL(CKDBVariables* kdb, string name, int t)
+
 
     # k_wsvar.c
-    int KV_add(KDB* kdb, char* varname)
-    double KV_get(KDB *kdb, string name, int t, int mode)
-    void KV_set(KDB *kdb, string name, int t, int mode, double value)
+    int KV_add(CKDBVariables* kdb, char* varname)
+    double KV_get(CKDBVariables* kdb, string name, int t, int mode)
+    void KV_set(CKDBVariables* kdb, string name, int t, int mode, double value)
 
     # k_grep.c
-    char*  K_expand(int iode_type, char* filepath, char* pattern, int _all)
+    char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
 
 
 # C++ classes
@@ -330,7 +364,7 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
 
         # Public methods
         KDBVariables* subset(string& pattern, bool deep_copy) except +
-        KDB* get_database() except +
+        CKDBVariables* get_database() except +
 
         vector[double] get(string& name) except +
         vector[double] copy(string& name) except +

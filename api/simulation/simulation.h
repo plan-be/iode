@@ -8,6 +8,8 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/equations.h"
+#include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 
 #include <vector>
@@ -67,9 +69,9 @@ public:
 	static int     KSIM_CPU_SORT;  		// Elapsed time to sort interdep block
 
 protected:
-	KDB*    KSIM_DBV;            		// KDB of variables used for the simulation. Normally global_ws_var
-	KDB*    KSIM_DBS;            		// KDB of scalars used for the simulation. Normally global_ws_scl
-	KDB*    KSIM_DBE;            		// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
+	CKDBVariables*  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
+	CKDBScalars*    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
+	CKDBEquations*  KSIM_DBE;         	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
 
@@ -208,12 +210,13 @@ public:
     }
 
 	/* k_sim_main.c */
-	int K_simul(KDB *,KDB *,KDB *,Sample *,char **, char **);
+	int K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, 
+		        Sample* smpl, char** endo_exo, char** eqs);
 
 	/* k_sim_scc.c */
-	int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post);
-	int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, 
-		                   char** pre, char** inter, char** post);
+	int KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* inter, char* post);
+	int K_simul_SCC(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, 
+		            char** pre, char** inter, char** post);
 
 protected:
 	/* k_sim_main.c */
@@ -221,9 +224,9 @@ protected:
 	void K_lstorder(char *,char *,char *);
 
 	/* k_sim_order.c */
-	void KE_order(KDB *, char **);
+	void KE_order(CKDBEquations *, char **);
 	int KE_poseq(int );
-	void KE_tri(KDB *,int **,int );
+	void KE_tri(CKDBEquations *,int **,int );
 
 	/* k_sim_exo2endo.c */
 	int KE_exo2endo(int ,int );
@@ -279,18 +282,18 @@ private:
 	void K_lstorder_1(char* lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int KE_preorder(KDB *,int **,int **);
+	int KE_preorder(CKDBEquations *,int **,int **);
 	int KE_add_post(int **,int ,int );
-	int KE_postorder(KDB *,int **,int **);
-	int KE_pre(KDB *,int **,int );
-	int KE_interdep(KDB *,int **);
-	void KE_tri_perm1(KDB *,int ,int *);
-	int KE_tri_begin(KDB *);
-	int KE_tri_end(KDB *);
+	int KE_postorder(CKDBEquations *,int **,int **);
+	int KE_pre(CKDBEquations *,int **,int );
+	int KE_interdep(CKDBEquations *,int **);
+	void KE_tri_perm1(CKDBEquations *,int ,int *);
+	int KE_tri_begin(CKDBEquations *);
+	int KE_tri_end(CKDBEquations *);
 
 	/* k_sim_exo2endo.c */
 	int KE_findpath(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl);
+	int K_simul_SCC_init(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl);
 };

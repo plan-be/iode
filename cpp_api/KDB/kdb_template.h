@@ -122,7 +122,7 @@ public:
         : KDBAbstract(iode_type)
     {
         if(!is_global)
-            local_kdb = new B(iode_type, false);
+            local_kdb = new B(false);
 
         if(filepath.empty())
             return;
@@ -172,12 +172,7 @@ public:
     {
         B* kdb = nullptr; 
         if(!local_kdb)
-        {
-            if(iode_type == COMMENTS)
-                kdb = global_ws_cmt.get();
-            else
-                kdb = (B*) get_global_db(iode_type);
-        }
+            kdb = (B*) get_global_db(iode_type);
         else
             kdb = local_kdb;
         
@@ -190,10 +185,7 @@ public:
     B* get_global_database() const
     {
         B* kdb = nullptr; 
-        if(iode_type == COMMENTS)
-            kdb = global_ws_cmt.get();
-        else
-            kdb = (B*) get_global_db(iode_type);
+        kdb = (B*) get_global_db(iode_type);
         
         if(!kdb)
             throw std::runtime_error("The global " + get_iode_type_str() + 
@@ -374,7 +366,7 @@ public:
     // https://stackoverflow.com/a/47890906
 
 
-    template<class... Args> bool add(const std::string& name, Args... args)
+    bool add(const std::string& name, const T value)
     {
         bool success = false;
         std::string error_msg = "Cannot add " + get_iode_type_str() + " with name '" + name + "'.\n";
@@ -388,7 +380,7 @@ public:
         {
             if(kdb->contains(name))
                 throw std::invalid_argument(error_msg);
-            success = kdb->set(name, args...);
+            success = kdb->set_obj(name, value);
         }
         else
         {
@@ -396,7 +388,7 @@ public:
             if(global_kdb->contains(name))
                 throw std::invalid_argument(error_msg);
             // add new obj to the global KDB
-            success = global_kdb->set(name, args...);
+            success = global_kdb->set_obj(name, value);
             if(!success)
                 return false;
             // add a new entry and copy the pointer
@@ -408,7 +400,7 @@ public:
         return success;
     }
 
-    template<class... Args> void update(const std::string& name, Args... args)
+    void update(const std::string& name, const T value)
     {
         std::string error_msg = "Cannot update " + get_iode_type_str() + " with name '" + name + "'.\n";
         error_msg += "Name '" + name + "' not found in the database.\nUse the add() method instead.";
@@ -421,7 +413,7 @@ public:
         //       are duplicated, not the objects.
         //       Modifying an object passing either the shallow copy
         //       or the global database modifies the same object.
-        kdb->set(name, args...);
+        kdb->set_obj(name, value);
     }
 
     T get(const std::string& name) const
