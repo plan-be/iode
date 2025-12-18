@@ -110,10 +110,10 @@ static int B_htol(int method, char* arg)
     char    file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
     int     file_type;
-    KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
+    CKDBVariables* to = nullptr;
+    CKDBVariables* from = new CKDBVariables(false);
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
@@ -149,7 +149,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = new KDB(VARIABLES, false);
+    to = new CKDBVariables(false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
@@ -193,7 +193,7 @@ static int B_htol(int method, char* arg)
         for(; t < nb; t++) 
             t_vec[t] = IODE_NAN;
 
-        to->set(from_name, t_vec, nb);
+        to->set_obj(from_name, t_vec);
     }
 
     KV_merge(global_ws_var.get(), to, 1);
@@ -222,12 +222,12 @@ done:
 
 // Same function but acting on kdb instead of file and global_ws_var (for pyiode - larray)
 // !!! NOT TESTED !!!
-KDB* B_htol_kdb(int method, KDB* kdb_from)
+CKDBVariables* B_htol_kdb(int method, CKDBVariables* kdb_from)
 {
     int      nb, rc = 0, f, t, shift, skip;
     double   *t_vec = NULL, *f_vec = NULL;
-    KDB*     kdb_to = nullptr;
     Sample*  t_smpl = nullptr;
+    CKDBVariables* kdb_to = nullptr;
 
     int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
     if(res < 0) 
@@ -242,7 +242,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         goto done;
     }
 
-    kdb_to = new KDB(VARIABLES, false);
+    kdb_to = new CKDBVariables(false);
     kdb_to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + kdb_from->sample->nb_periods) * sizeof(double));
@@ -286,7 +286,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         for(; t < nb; t++) 
             t_vec[t] = IODE_NAN;
 
-        kdb_to->set(from_name, t_vec, nb);
+        kdb_to->set_obj(from_name, t_vec);
     }
 
 done:

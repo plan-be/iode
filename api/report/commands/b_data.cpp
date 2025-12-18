@@ -100,6 +100,7 @@
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"
 #include "api/objs/grep.h"
+#include "api/objs/comments.h"
 #include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
@@ -236,31 +237,28 @@ int B_DataRasVar(char* arg, int unused)
  */
 int B_DataCalcVar(char* arg, int unused)
 {
-    char        name[K_MAX_NAME + 1], *lec;
-    int         lg, t, nb;
-    KDB         *kdb = global_ws_var.get();
-    CLEC        *clec = 0;
-    double      d;
+    char    name[K_MAX_NAME + 1];
+    CKDBVariables* kdb = global_ws_var.get();
 
-    lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
 
-    lec = arg + lg + 1;
+    char* lec = arg + lg + 1;
     SCR_strip((unsigned char*) lec);
 
-    nb = kdb->sample->nb_periods;
     if(!kdb->contains(std::string(name)))
     {
-        bool success = kdb->set(name, (double*) NULL, nb);
+        bool success = kdb->set_obj(name, (double*) NULL);
         if(!success) 
             return(-1);
     }
 
     if(lec[0]) 
     {
-        clec = L_cc(lec);
+        CLEC* clec = L_cc(lec);
         if(clec != 0 && !L_link(kdb, global_ws_scl.get(), clec)) 
         {
-            for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
+            double d;
+            for(int t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
                 d = L_exec(kdb, global_ws_scl.get(), clec, t);
                 *(KVVAL(kdb, name, t)) = d;
@@ -290,46 +288,48 @@ int B_DataCalcVar(char* arg, int unused)
  */
 int B_DataCreate_1(char* arg, int* ptype)
 {
-    int     nb_per;
-    char    deflt[41];
-    KDB     *kdb = get_global_db(*ptype);
+    char deflt[41];
+    KDB* kdb = get_global_db(*ptype);
 
     std::string name = std::string(arg);
     if(kdb->contains(name)) 
         return -1;
 
+    int res;
+    bool success = false;
     switch(*ptype) 
     {
         case COMMENTS :
-        case LISTS :
-        case SCALARS :
-            if(!kdb->set(arg, NULL)) 
-                return(-1);
-            else 
-                return(0);
-
-        case VARIABLES :
-            nb_per = kdb->sample->nb_periods;
-            if(!kdb->set(arg, (double*) NULL, nb_per)) 
-                return(-1);
-            else 
-                return(0);
-
+            success = ((CKDBComments*) kdb)->set_obj(arg, "");
+            break;
         case EQUATIONS :
             sprintf(deflt, "%s := %s", arg, arg);
-            return(K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0));
-
+            res = K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0);
+            return res; 
         case IDENTITIES :
-            sprintf(deflt, "%s", arg);
-            if(!kdb->set(arg, deflt)) 
-                return(-1);
-            else 
-                return(0);
-        
+        {
+            Identity idt(name);
+            success = ((CKDBIdentities*) kdb)->set_obj(arg, &idt);
+            break;  
+        }
+        case LISTS :
+            success = ((CKDBLists*) kdb)->set_obj(arg, "");
+            break;
+        case SCALARS :
+        {
+            Scalar scl;
+            success = ((CKDBScalars*) kdb)->set_obj(arg, &scl);
+            break;
+        }
         case TABLES :
-            return(K_upd_tbl(arg, "TITLE;LEC"));
+            res = K_upd_tbl(arg, "TITLE;LEC");
+            return res;
+        case VARIABLES :
+            success = ((CKDBVariables*) kdb)->set_obj(arg, (double*) NULL); 
+            break;
     }
-    return(-1);
+
+    return success ? 0 : -1;
 }
 
 int wrapper_B_DataCreate_1(char* arg, void* ptype)
@@ -535,25 +535,31 @@ int B_DataUpdate(char* arg, int type)
             return -1;
     }
 
+    char* value = arg + lg + 1;
     switch(type) 
     {
-    case COMMENTS : /* Name Val */
-    case IDENTITIES :
-    case LISTS :
-        success = kdb->set(name, arg + lg + 1);
+    case COMMENTS :
+        success = ((CKDBComments*) kdb)->set_obj(name, value);
         break;
-
     case EQUATIONS :
-        rc = K_upd_eqs(name, arg + lg + 1, NULL, -1, NULL, NULL, NULL, NULL, 0);
+        rc = K_upd_eqs(name, value, NULL, -1, NULL, NULL, NULL, NULL, 0);
         success = (rc == 0);
         break;
-
+    case IDENTITIES :
+    {
+        std::string lec = std::string(value);
+        Identity idt(lec);
+        success = ((CKDBIdentities*) kdb)->set_obj(name, &idt);
+        break;
+    }
+    case LISTS :
+        success = ((CKDBLists*) kdb)->set_obj(name, value);
+        break;
     case TABLES :
-        rc = K_upd_tbl(name, arg + lg + 1);
+        rc = K_upd_tbl(name, value);
         success = (rc == 0);
         break;
-
-    case SCALARS : /* Name Val [Relax] */
+    case SCALARS :
         args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
         nb_args = SCR_tbl_size((unsigned char**) args);
         scl.value = 0.9;
@@ -577,7 +583,7 @@ int B_DataUpdate(char* arg, int type)
         }
 
         if(success) 
-            success = kdb->set(std::string(args[0]), (char*) &scl);
+            success = ((CKDBScalars*) kdb)->set_obj(std::string(args[0]), &scl);
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
@@ -632,7 +638,7 @@ int B_DataUpdate(char* arg, int type)
                     var = (double) atof(args[i + nb_p]);
                     if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                         var = IODE_NAN;
-                    KV_set(kdb, var_name, shift + i, mode, var);
+                    KV_set((CKDBVariables*) kdb, var_name, shift + i, mode, var);
                 }
                 success = true;
             }
@@ -852,7 +858,7 @@ int B_DataListSort(char* arg, int unused)
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
     lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
 
-    if(!global_ws_lst->set(out, lst)) 
+    if(!global_ws_lst->set_obj(out, lst)) 
     {
         error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
         rc = -1;
@@ -901,7 +907,38 @@ int B_DataScan(char* arg, int type)
             rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
         else 
         {
-            KDB* tkdb = new KDB(get_global_db(type), objs);
+            KDB* tkdb = nullptr;
+            switch(type) 
+            {
+                case COMMENTS:
+                    tkdb = new CKDBComments(global_ws_cmt.get(), objs);
+                    break;
+                case EQUATIONS:
+                    tkdb = new CKDBEquations(global_ws_eqs.get(), objs);
+                    break;
+                case IDENTITIES:
+                    tkdb = new CKDBIdentities(global_ws_idt.get(), objs);
+                    break;
+                case LISTS:
+                    tkdb = new CKDBLists(global_ws_lst.get(), objs);
+                    break;
+                case SCALARS:
+                    tkdb = new CKDBScalars(global_ws_scl.get(), objs);
+                    break;
+                case TABLES:
+                    tkdb = new CKDBTables(global_ws_tbl.get(), objs);
+                    break;
+                case VARIABLES:
+                    tkdb = new CKDBVariables(global_ws_var.get(), objs);
+                    break;
+                default:
+                    {
+                        std::string msg = "scan: invalid object type " + std::to_string(type);
+                        kwarning(msg.c_str());
+                        return -1;
+                    }
+            }
+
             if(tkdb)
             {
                 if(tkdb->size() > 0)
@@ -991,7 +1028,16 @@ int B_DataAppend(char* arg, int type)
             sprintf(nptr, "%s,%s", ptr, text);
     }
 
-    success = kdb->set(name, nptr);
+    switch(type) 
+    {
+    case COMMENTS :
+        success = ((CKDBComments*) kdb)->set_obj(name, nptr);
+        break;
+    case LISTS :
+        success = ((CKDBLists*) kdb)->set_obj(name, nptr);
+        break;
+    }
+
     if(nptr != text) 
         SW_nfree(nptr);
 
@@ -1000,7 +1046,8 @@ int B_DataAppend(char* arg, int type)
 
 
 /**
- *  Constructs a list of objects matching a given name pattern. Objects can be in WS or in a file. 
+ *  Constructs a list of objects matching a given name pattern. 
+ *  Objects can be in WS or in a file. 
  *  The pattern can contain * to allow any suite of characters.
  *  
  *  Syntax
@@ -1018,8 +1065,6 @@ int B_DataList(char* arg, int type)
     std::string name;
     std::string file;
     std::string pattern;
-
-    KDB* kdb = new KDB(*get_global_db(type));
 
     char** args = B_vtom_chk(arg, 3);
     if(args == NULL) 
@@ -1041,6 +1086,38 @@ int B_DataList(char* arg, int type)
     }
 
     A_free((unsigned char**) args);
+
+    KDB* kdb = nullptr;
+    switch(type) 
+    {
+        case COMMENTS:
+            kdb = new CKDBComments(global_ws_cmt.get(), "*");
+            break;
+        case EQUATIONS:
+            kdb = new CKDBEquations(global_ws_eqs.get(), "*");
+            break;
+        case IDENTITIES:
+            kdb = new CKDBIdentities(global_ws_idt.get(), "*");
+            break;
+        case LISTS:
+            kdb = new CKDBLists(global_ws_lst.get(), "*");
+            break;
+        case SCALARS:
+            kdb = new CKDBScalars(global_ws_scl.get(), "*");
+            break;
+        case TABLES:
+            kdb = new CKDBTables(global_ws_tbl.get(), "*");
+            break;
+        case VARIABLES:
+            kdb = new CKDBVariables(global_ws_var.get(), "*");
+            break;
+        default:
+            {
+                std::string msg = "DataList: invalid IODE type " + std::to_string(type);
+                kwarning(msg.c_str());
+                return -1;
+            }
+    }
 
     std::vector<std::string> lst;
     if(file.empty()) 
@@ -1275,7 +1352,38 @@ int B_DataCompare(char* arg, int type)
     three = args[3];
     fr    = args[4];
 
-    KDB* kdb2 = new KDB((IodeType) type, false);
+    KDB* kdb2 = nullptr;
+    switch(type) 
+    {
+        case COMMENTS:
+            kdb2 = new CKDBComments(false);
+            break;
+        case EQUATIONS:
+            kdb2 = new CKDBEquations(false);
+            break;
+        case IDENTITIES:
+            kdb2 = new CKDBIdentities(false);
+            break;
+        case LISTS:
+            kdb2 = new CKDBLists(false);
+            break;
+        case SCALARS:
+            kdb2 = new CKDBScalars(false);
+            break;
+        case TABLES:
+            kdb2 = new CKDBTables(false);
+            break;
+        case VARIABLES:
+            kdb2 = new CKDBVariables(false);
+            break;
+        default:
+            {
+                std::string msg = "DataCompare: invalid object type " + std::to_string(type);
+                kwarning(msg.c_str());
+                return -1;
+            }
+    }
+
     bool success = kdb2->load(std::string(file));
     if(!success)
     {

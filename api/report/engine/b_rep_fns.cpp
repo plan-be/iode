@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    KDB     *kdb = global_ws_var.get();
+    CKDBVariables* kdb = global_ws_var.get();
 
     if(!kdb) 
         return(res);
@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDB  *kdb = global_ws_lst.get();
+    CKDBLists* kdb = global_ws_lst.get();
 
     if(!kdb) 
         return(res);
@@ -884,7 +884,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDB     *kdb = global_ws_idt.get();
+    CKDBIdentities* kdb = global_ws_idt.get();
 
     if(!kdb) 
         return(res);
@@ -928,7 +928,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch* res = 0, buf[128];
-    KDB* kdb = global_ws_eqs.get();
+    CKDBEquations* kdb = global_ws_eqs.get();
 
     if(!kdb) 
         return(res);
@@ -969,7 +969,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch* res = 0;
-    KDB* kdb = global_ws_eqs.get();
+    CKDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1007,7 +1007,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch* res = 0;
-    KDB* kdb = global_ws_eqs.get();
+    CKDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1079,7 +1079,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch* eq = 0, *rhs;
     int poscolon;
-    KDB* kdb = global_ws_eqs.get();
+    CKDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1165,7 +1165,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    KDB     *kdb = global_ws_var.get();
+    CKDBVariables* kdb = global_ws_var.get();
     char     what = 'F';
 
     smpl = kdb->sample;

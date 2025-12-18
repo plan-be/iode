@@ -2,7 +2,7 @@
 #include "kdb_template.h"
 
 
-class KDBLists : public KDBTemplate<KDB, List>
+class KDBLists : public KDBTemplate<CKDBLists, List>
 {
 protected:
 

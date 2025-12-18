@@ -3,7 +3,7 @@ from typing import Union, Tuple, List, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBIdentities as CKDBIdentities
+from pyiode.iode_database.cpp_api_database cimport KDBIdentities as CppKDBIdentities
 from pyiode.iode_database.cpp_api_database cimport Identities as cpp_global_identities
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 
@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Identities(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBIdentities* database_ptr
+    cdef CppKDBIdentities* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Identities:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Identities(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Identities _from_ptr(CKDBIdentities* database_ptr = NULL, bint owner=False):
+    cdef Identities _from_ptr(CppKDBIdentities* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Identities wrapper = Identities.__new__(Identities)
         if database_ptr is not NULL:

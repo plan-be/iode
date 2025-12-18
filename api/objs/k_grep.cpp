@@ -94,7 +94,36 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
         kdb = get_global_db(type);
     else 
     {
-        kdb = new KDB((IodeType) type, false);
+        switch(type) 
+        {
+            case COMMENTS:
+                kdb = new CKDBComments(false);
+                break;
+            case EQUATIONS:
+                kdb = new CKDBEquations(false);
+                break;
+            case IDENTITIES:
+                kdb = new CKDBIdentities(false);
+                break;
+            case LISTS:
+                kdb = new CKDBLists(false);
+                break;
+            case SCALARS:
+                kdb = new CKDBScalars(false);
+                break;
+            case TABLES:
+                kdb = new CKDBTables(false);
+                break;
+            case VARIABLES:
+                kdb = new CKDBVariables(false);
+                break;
+            default:
+                {
+                    std::string msg = "expand: invalid object type " + std::to_string(type);
+                    kwarning(msg.c_str());
+                    return NULL;
+                }
+        }
         bool success = kdb->load(std::string(file));
         if(!success) 
             return NULL;

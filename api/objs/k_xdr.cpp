@@ -17,7 +17,6 @@
  * ---------
  *       void K_xdrPINT(unsigned char* a)           Translates un short int from l-e to b-e and vice-versa
  *       void K_xdrPLONG(unsigned char* a)          Translates un long int from l-e to b-e and vice-versa
- *       void K_xdrKDB(KDB* ikdb, KDB** okdb)       Translates a KDB t from l-e to b-e and vice-versa
  *
  * Vars
  * ----
@@ -28,10 +27,15 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/lec/lec.h"
-#include "api/objs/equations.h"
-#include "api/objs/tables.h"
 #include "api/objs/pack.h"
 #include "api/objs/xdr.h"
+#include "api/objs/comments.h"
+#include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
 
 
 #ifdef INTEL
@@ -93,24 +97,6 @@ void K_xdrPLONG(unsigned char* a)
 
 
 /**
- *  Translates a little-endian KDB struct into a little-endian KDB.
- *  In the little-endian (x86) architecture, returns an **allocated** copy of the original KDB (but no translation is performed)
- *  for compatibility between architectures.
- *  
- *  @param [in]     ikdb    KDB*    input KDB struct
- *  @param [out]    okdb    KDB**   allocated copy of ikdb
- *
- */
-void K_xdrKDB(KDB* ikdb, KDB** okdb)
-{
-    if(okdb == NULL) 
-        return;
-    
-    *okdb = new KDB(*ikdb);
-}
-
-
-/**
  *  Table of function pointers, one function for each object type. 
  *  Each function converts an IODE packed object from little-endian architecture to little-endian architecture.
  *  In the case of little-endian architecture, the same function is used for all types.
@@ -136,10 +122,6 @@ int (*K_xdrobj[])(unsigned char* ptr, unsigned char** xdr_ptr) =
 // ----------------------------------------
 // Not tested since the 90s and the SUN Sparc workstations. -:)
 
-#define K_xdrSHORT(a)   XDR_rev(a, 1, sizeof(short))
-#define K_xdrLONG(a)    XDR_rev(a, 1, sizeof(long))
-#define K_xdrREAL(a)    XDR_rev(a, 1, sizeof(double))
-
 /**
  *  Translates a Period struct from little-endian to big-endian or the other way round.
  *  
@@ -158,7 +140,7 @@ static void K_xdrPeriod(unsigned char* a)
  *  @param [in, out]    a   unsigned char*  pointer to a Period. 
  *                                          in: little-endian, out:big-endian
  */
-static void K_xdrSMPL(unsigned char* a)
+void K_xdrSMPL(unsigned char* a)
 {
     K_xdrPeriod(a);
     a += sizeof(Period);
@@ -709,52 +691,6 @@ void K_xdrPLONG(unsigned char* a)
 {
     XDR_rev(a, 1, sizeof(long));
 }
-
-
-/**
- *  Switches the architecture of a KDB (little-endian to big-endian or the other way round). 
- *
- *  If okdb is null, the ikdb architecture is little-endian (when reading from a file) and the 
- *  transformation is done "in-place". No allocation is done.
- *  
- *  If okdb is not null, the ikdb is big-endian (in mem) and the result (little-endian) is allocated.
- *  ikdb is untouched in this case.
- * 
- *  @param [in, out]    ikdb    KDB*  pointer to a IODE packed object 
- *  @param [out]        okdb    KDB** NULL or pointer to the new allocated KDB (little-endian)
- */
-
-void K_xdrKDB(KDB* ikdb, KDB** okdb)
-{
-    short   type;
-    KDB     *xdr_kdb;
-
-    type = ikdb->k_type;
-
-    if(okdb == NULL) 
-    {
-        /* intel read */
-        xdr_kdb = ikdb;
-        K_xdrSHORT(&type);
-    }
-    else 
-    {
-        /* intel write */
-        xdr_kdb = new KDB(*ikdb);
-        *okdb = xdr_kdb;
-    }
-
-    XDR_rev(&(xdr_kdb->k_type), 1, sizeof(short));
-    XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
-    XDR_rev(&(xdr_kdb->size()), 1, sizeof(long));
-
-    if(type == VARIABLES) 
-    {
-        if(xdr_kdb->sample)
-            K_xdrSMPL((unsigned char*) xdr_kdb->sample);
-    }
-}
-
 
 /**
  *  Table of function pointers, one function for each object type. 

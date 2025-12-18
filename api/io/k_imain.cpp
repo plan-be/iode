@@ -39,8 +39,8 @@
  *      
  *  List of functions 
  *  -----------------
- *    KDB *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)              Interprets a text file containing VAR definitions
- *    KDB *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
+ *    CKDBVariables *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)              Interprets a text file containing VAR definitions
+ *    CKDBComments *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
  *    int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)    Imports variables or comments in various formats.
  *  
  */
@@ -72,7 +72,7 @@ static int compare(const void *a, const void *b)
  *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
+CKDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     bool    success;
     bool    found;
@@ -81,8 +81,8 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
     ONAME   oname;
     double  *vector = NULL, value;
     YYFILE  *yy;
-    KDB*    kdb = nullptr;
     std::string var_name;
+    CKDBVariables* kdb = nullptr;
 
     if(!smpl)
         return nullptr;
@@ -111,7 +111,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
     if(rc < 0) 
         goto err;
 
-    kdb = new KDB(VARIABLES, false);
+    kdb = new CKDBVariables(false);
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
@@ -132,7 +132,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
-            if(!kdb->set(oname, vector, nb))
+            if(!kdb->set_obj(oname, vector))
                 kerror(0, "Unable to create '%s'", oname);
         }
     }
@@ -158,7 +158,7 @@ KDB *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, 
             if(found) 
             {
                 kmsg("Reading object %d : %s", ++cmpt, oname);
-                success = kdb->set(oname, (double*) NULL, nb);
+                success = kdb->set_obj(oname, (double*) NULL);
                 if(!success) 
                 {
                     kerror(0, "Unable to create '%s'", oname);
@@ -199,7 +199,7 @@ err:
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
+CKDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
 {
     CKDBComments *kdb = nullptr;
     int          size, cmpt = 0, rc;
@@ -240,7 +240,7 @@ KDB *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, in
             Debug((char*) "CMT:%s\n", oname);
         kmsg("Reading object %d : %s", ++cmpt, oname);
         SCR_strip((unsigned char*) cmt);
-        if(!kdb->set(oname, cmt))
+        if(!kdb->set_obj(oname, cmt))
             kerror(0, "Unable to create '%s'", oname);
         SW_nfree(cmt);
     }

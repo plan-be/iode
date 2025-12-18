@@ -74,14 +74,14 @@ static CLEC *COL_cp_clec(CLEC* clec)
  */
 static int COL_link(int i, CLEC* clec)
 {
-    KDB* kdb = K_RWS[VARIABLES][i - 1];
-    if(!kdb) 
+    CKDBVariables* kdbv = (CKDBVariables*) K_RWS[VARIABLES][i - 1];
+    if(!kdbv) 
     {
         kmsg("File [%d] not present", i);
         return(-1);
     }
 
-    int res = L_link(kdb, global_ws_scl.get(), clec);
+    int res = L_link(kdbv, global_ws_scl.get(), clec);
     return res;
 }
 
@@ -105,8 +105,8 @@ static int COL_link(int i, CLEC* clec)
 static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 {
     int     i, j, t[2], tmp, per;
-    KDB     *kdb = NULL;
     double  vy[2], vf[2], div, mant, sign;
+    CKDBVariables* kdb = nullptr;
 
     /* deux fichiers */
     for(i = 0; i < 2; i++) 
@@ -121,7 +121,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
             return(-1);
         
-        kdb = K_RWS[VARIABLES][cl->cl_fnb[i] - 1];
+        kdb = (CKDBVariables*) K_RWS[VARIABLES][cl->cl_fnb[i] - 1];
 
         for(j = 0 ; j < 2 ; j++) 
         {

@@ -11,11 +11,8 @@ using CMT = char*;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBComments : public CKDBTemplate<CMT>
+struct CKDBComments : public CKDBTemplate<char>
 {
-    // TEMPORARY: to be removed when KDBTemplate will be merged into CKDBTemplate
-    CKDBComments(const IodeType type, const bool is_global) : CKDBTemplate(COMMENTS, is_global) {} 
-
     // global or standalone database
     CKDBComments(const bool is_global) : CKDBTemplate(COMMENTS, is_global) {}
 
@@ -30,17 +27,18 @@ struct CKDBComments : public CKDBTemplate<CMT>
     //       k_objs will be changed to std::map<std::string, T>
     //       T& operator[](const std::string& name)
 
-    CMT get_obj(const SWHDL handle) const;
-    CMT get_obj(const std::string& name) const;
+    char* get_obj(const SWHDL handle) const override;
+    char* get_obj(const std::string& name) const override;
 
-    void set_obj(const std::string& name, const CMT& value);
+    bool set_obj(const std::string& name, const char* value) override;
+    bool set_obj(const std::string& name, const std::string& value);
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
 
-    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl);
+    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
 
-    bool print_obj_def(const std::string& name);
+    bool print_obj_def(const std::string& name) override;
 
 private:
     bool grep_obj(const std::string& name, const SWHDL handle, 

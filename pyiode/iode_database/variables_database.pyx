@@ -30,7 +30,8 @@ from pyiode.iode_database.cpp_api_database cimport _c_operation_between_two_vars
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
-from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
+from pyiode.iode_database.cpp_api_database cimport CKDBVariables
+from pyiode.iode_database.cpp_api_database cimport KDBVariables as CppKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
@@ -51,7 +52,7 @@ class BinaryOperation(IntEnum):
 
 cdef class Variables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBVariables* database_ptr
+    cdef CppKDBVariables* database_ptr
     cdef IodeVarMode mode_
     cdef Period first_period_subset
     cdef Period last_period_subset
@@ -70,7 +71,7 @@ cdef class Variables(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Variables _from_ptr(CKDBVariables* database_ptr = NULL, bint owner=False):
+    cdef Variables _from_ptr(CppKDBVariables* database_ptr = NULL, bint owner=False):
         cdef CSample* c_sample
         # call to __new__() that bypasses the __init__() constructor.
         cdef Variables wrapper = Variables.__new__(Variables)
@@ -197,9 +198,9 @@ cdef class Variables(CythonIodeDatabase):
         cdef vector[double] cpp_values
         cdef int c_nb_periods
         cdef bytes b_name
-        cdef char* c_name
+        cdef string s_name
         cdef double[::1] numpy_data_memview
-        cdef KDB* c_db_ptr = NULL
+        cdef CKDBVariables* c_db_ptr = NULL
         
         # values is a LEC expression
         if isinstance(values, str):
@@ -211,10 +212,9 @@ cdef class Variables(CythonIodeDatabase):
         elif isinstance(values, np.ndarray):
             numpy_data_memview = values
             b_name = name.encode()
-            c_name = b_name
-            c_nb_periods = self.get_sample().get_nb_periods()
+            s_name = b_name
             c_db_ptr = self.database_ptr.get_database()
-            success = c_db_ptr.set(c_name, &numpy_data_memview[0], c_nb_periods)
+            success = c_db_ptr.set_obj(s_name, &numpy_data_memview[0])
             if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
@@ -239,7 +239,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t_first
         cdef int t_last
         cdef string c_name = name.encode('utf-8')
-        cdef KDB* c_db_ptr = NULL
+        cdef CKDBVariables* c_db_ptr = NULL
         cdef vector[double] cpp_values
         cdef double* var_ptr = NULL
         cdef double[::1] numpy_data_memview 
@@ -305,7 +305,7 @@ cdef class Variables(CythonIodeDatabase):
     def binary_op_scalar(self, other: float, op: BinaryOperation, copy_self: bool) -> Variables:
         cdef int i_op = int(op)
         cdef double c_value = other
-        cdef CKDBVariables* cpp_self_db = self.database_ptr
+        cdef CppKDBVariables* cpp_self_db = self.database_ptr
 
         t_first, t_last = self._get_periods_bounds()
         _c_operation_scalar(i_op, cpp_self_db, t_first, t_last, c_value)
@@ -315,7 +315,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int i, t_first, t_last
         cdef int i_op = int(op)
         cdef double c_value
-        cdef CKDBVariables* c_database = NULL
+        cdef CppKDBVariables* c_database = NULL
         cdef double[::1] numpy_data_memview
 
         t_first, t_last = self._get_periods_bounds()
@@ -337,8 +337,8 @@ cdef class Variables(CythonIodeDatabase):
 
     def binary_op_variables(self, cython_other: Variables, op: BinaryOperation, names: List[str], copy_self: bool) -> Variables:
         cdef int i_op = int(op)
-        cdef CKDBVariables* cpp_self_db = self.database_ptr
-        cdef CKDBVariables* cpp_other_db = cython_other.database_ptr
+        cdef CppKDBVariables* cpp_self_db = self.database_ptr
+        cdef CppKDBVariables* cpp_other_db = cython_other.database_ptr
 
         t_first, t_last = self._get_periods_bounds()
         if len(names) == 1:
@@ -361,7 +361,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int i, j, t
         cdef int mode = <int>self.mode_
         cdef int nb_periods
-        cdef KDB* db_ptr = self.database_ptr.get_database()
+        cdef CKDBVariables* db_ptr = self.database_ptr.get_database()
         
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace has not been initialized")
@@ -416,7 +416,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t_first_period
         cdef int t_last_period
         cdef int nb_periods
-        cdef KDB* db_ptr = self.database_ptr.get_database()
+        cdef CKDBVariables* db_ptr = self.database_ptr.get_database()
         if db_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace is empty")
 

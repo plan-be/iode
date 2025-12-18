@@ -162,7 +162,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         return NULL;
     }
     int nb_periods = var_sample->nb_periods;
-    global_ws_var->set(varname, vec, nb_periods);
+    global_ws_var->set_obj(varname, vec);
     SW_nfree(vec);
     
     // Checks that the sample is large enough for the estimation 
@@ -178,24 +178,24 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     /* Dickey Fuller */
     // Construction de l'équation à estimer, partie par partie selon les parms
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    global_ws_scl->set("df_", NULL);
+    global_ws_scl->set_obj("df_", NULL);
     
     if(drift) 
     {
         sprintf(buf + strlen(buf), "+ df_d");
-        global_ws_scl->set("df_d", NULL);
+        global_ws_scl->set_obj("df_d", NULL);
     }
 
     if(trend) 
     {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        global_ws_scl->set("df_t", NULL);
+        global_ws_scl->set_obj("df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
         sprintf(scl, "df%d", i);
-        global_ws_scl->set(scl, NULL);
+        global_ws_scl->set_obj(scl, NULL);
     }
 
     if(order) 

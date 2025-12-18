@@ -13,11 +13,11 @@ Comment KDBComments::get_unchecked(const std::string& name) const
 bool KDBComments::add(const std::string& name, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
-    return KDBTemplate::add(name, to_char_array(oem_comment));
+    return KDBTemplate::add(name, oem_comment);
 }
 
 void KDBComments::update(const std::string& name, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
-    KDBTemplate::update(name, to_char_array(oem_comment));
+    KDBTemplate::update(name, oem_comment);
 }

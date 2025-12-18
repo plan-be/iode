@@ -82,7 +82,7 @@
  * List of functions 
  * -----------------
  *
- *      int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
+ *      int K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
  *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
@@ -385,7 +385,8 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 
     // Delete lst 
     std::string name = std::string(lst);
-    global_ws_lst->remove(name);
+    if(global_ws_lst->contains(name))
+        global_ws_lst->remove(name);
     
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  
     {
@@ -418,7 +419,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
     }
     
     if(diverg) 
-        global_ws_lst->set(lst, diverg);
+        global_ws_lst->set_obj(lst, diverg);
     return(0);
 }
 
@@ -443,7 +444,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
  */
 int CSimulation::K_simul_1(int t)
 {
-    int     it = 0, rc, conv = 0, ovtime = SCR_vtime; /* JMP 27-09-96 */
+    int     it = 0, rc, conv = 0, ovtime = SCR_vtime;
     char    msg[80];
     long    ms_iter;
 
@@ -451,7 +452,8 @@ int CSimulation::K_simul_1(int t)
     KSIM_NITERS[t] = 0; 
     KSIM_NORMS[t] = 0;  
     KSIM_CPUS[t] = 0;  
-    if(K_prolog(t)) return(-1);
+    if(K_prolog(t)) 
+        return(-1);
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
     while(conv == 0 && it++ < KSIM_MAXIT) 
@@ -473,7 +475,7 @@ int CSimulation::K_simul_1(int t)
         conv = (KSIM_NORM <= KSIM_EPS) ? 1 : 0;
         if(khitkey() != 0) 
         {   // Checks the keyboard for a buffered key 
-            kgetkey();                          // Reads the keyboard buffer
+            kgetkey();      // Reads the keyboard buffer
             if(!kconfirm("Stop Simulation")) 
             {  
                 K_restore_XK(t);
@@ -484,12 +486,15 @@ int CSimulation::K_simul_1(int t)
     }
     ktermvkey(ovtime);  // Resets the interval between 2 keyboard readings
 
-    if(conv) {
+    if(conv) 
+    {
         K_restore_XK(t);
-        if(K_epilog(t)) return(-1);
+        if(K_epilog(t)) 
+            return(-1);
         return(0);
     }
-    else {
+    else 
+    {
         std::string err_msg = "Model does not converge after ";
         err_msg += std::to_string(KSIM_MAXIT);
         err_msg += " iterations";
@@ -537,7 +542,8 @@ int CSimulation::K_simul_1(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo_exo, char** eqs)
+int CSimulation::K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, 
+    Sample* smpl, char** endo_exo, char** eqs)
 {
     int     i, t, bt, at, j, k, res, endo_exonb,
             posendo, posexo, posvar,
@@ -678,7 +684,9 @@ int CSimulation::K_simul(KDB* dbe, KDB* dbv, KDB* dbs, Sample* smpl, char** endo
     for(i = 0; i < smpl->nb_periods; i++, t++) 
     {
         cpu_iter = WscrGetMS();
-        if(rc = K_simul_1(t)) goto fin;
+        if(rc = K_simul_1(t)) 
+            goto fin;
+        
         KSIM_CPUS[t] = WscrGetMS() - cpu_iter;
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
         if(endo_exo != NULL) 

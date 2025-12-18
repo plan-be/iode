@@ -21,6 +21,7 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
 #include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 
 
@@ -44,8 +45,8 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         return -1;
     }
 
-    KDB* exo = new KDB(VARIABLES, false);
-    KDB* scal = new KDB(SCALARS, false);
+    CKDBVariables* exo = new CKDBVariables(false);
+    CKDBScalars* scal = new CKDBScalars(false);
 
     if(exo == nullptr || scal == nullptr) 
     {
@@ -59,13 +60,13 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         switch(kdb->k_type) 
         {
             case IDENTITIES :
-                KI_scan(kdb, i, exo, scal);
+                KI_scan((CKDBIdentities*) kdb, i, exo, scal);
                 break;
             case EQUATIONS :
-                KE_scan(kdb, i, exo, scal);
+                KE_scan((CKDBEquations*) kdb, i, exo, scal);
                 break;
             case TABLES :
-                KT_scan(kdb, i, exo, scal);
+                KT_scan((CKDBTables*) kdb, i, exo, scal);
                 break;
         }
     }
@@ -97,7 +98,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
  *  The KDB of EQs is needed to determine if a VAR is an endogenous (found in dbe) or an exogenous (not present in dbe). 
  *  Only the exogenous variables are saved in exo.
  *  
- *  @param [in]      KDB*  dbe      KDB of equations used to check if a VAR is exo or endo
+ *  @param [in]      KDB*  kdb      KDB of identities or equations used to check if a VAR is exo or endo
  *  @param [in]      CLEC* cl       compiled LEC expression or equation
  *  @param [in, out] KDB*  exo      KDB of exogenous (only the names, not the values)
  *  @param [in, out] KDB*  scal     KDB of scalars (only the names, not the values)
@@ -105,7 +106,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
  *  
  *  @details 
  */
-static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
+static void K_clecscan(KDB* kdb, CLEC* cl, CKDBVariables* exo, CKDBScalars* scal)
 {
     if(cl == NULL) 
         return;
@@ -117,12 +118,12 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
         c_name = cl->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name))
-            scal->set(name, (char*) NULL);
+            scal->set_obj(name, nullptr);
         else 
         {
-            if(dbe != nullptr && dbe->contains(name)) 
+            if(kdb != nullptr && kdb->contains(name)) 
                 continue;
-            exo->set(name, (char*) NULL);
+            exo->add_entry(name);
         }
     }
 }
@@ -139,7 +140,7 @@ static void K_clecscan(KDB* dbe, CLEC* cl, KDB* exo, KDB* scal)
  *  @return          void
  *  
  */
-void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
+void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
     std::string name = dbe->get_name(i);
     Equation* eq = KEVAL(dbe, name);
@@ -162,7 +163,7 @@ void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)
  *  @return          void
  *  
  */
-void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
+void KI_scan(CKDBIdentities* dbi, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
     int     lg;
     CLEC    *cl = NULL;
@@ -189,7 +190,7 @@ void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)
  *  @return          void
  *  
  */
-void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
+void KT_scan(CKDBTables* dbt, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
     std::string name = dbt->get_name(i);
     Table* tbl = KTVAL(dbt, name);
@@ -206,7 +207,7 @@ void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)
                 continue;
 
             clec = cell.get_compiled_lec();
-            K_clecscan(NULL, clec, exo, scal);
+            K_clecscan(nullptr, clec, exo, scal);
         }
     }
 
@@ -242,7 +243,7 @@ int KL_lst(char* name, char** lst, int chunck)
     nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) 
     {
-        if(!global_ws_lst->set(name, ""))    
+        if(!global_ws_lst->set_obj(name, ""))    
             rc = -1;
         goto done;
     }
@@ -250,7 +251,7 @@ int KL_lst(char* name, char** lst, int chunck)
     if(nb < chunck || chunck < 0) 
     {
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(!global_ws_lst->set(name, str))  
+        if(!global_ws_lst->set_obj(name, str))  
             rc = -1;
         SCR_free(str);
         return(rc);
@@ -267,7 +268,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(!global_ws_lst->set(buf, str))  
+        if(!global_ws_lst->set_obj(buf, str))  
             rc = -1;
         SCR_free(str);
 
@@ -285,7 +286,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(!global_ws_lst->set(name, str)) 
+    if(!global_ws_lst->set_obj(name, str)) 
         rc = -1;
     SW_nfree(str);
 
@@ -345,4 +346,61 @@ unsigned char **KL_expand(char *str)
         }
     }
     return(tbl);
+}
+
+
+char* CKDBLists::get_obj(const SWHDL handle) const
+{    
+    return (char*) P_get_ptr(SW_getptr(handle), 0);
+}
+
+char* CKDBLists::get_obj(const std::string& name) const
+{
+    SWHDL handle = this->get_handle(name);
+    if(handle == 0)  
+        throw std::invalid_argument("IODE list with name '" + name + "' not found.");
+    
+    return get_obj(handle);
+}
+
+bool CKDBLists::set_obj(const std::string& name, const char* value)
+{
+    char* pack = NULL;
+    K_lpack(&pack, (char*) value);
+    bool success = set_packed_object(name, pack);
+    if(!success) 
+        std::string error_msg = "Failed to set list object '" + name + "'";
+    return success;
+}
+
+bool CKDBLists::set_obj(const std::string& name, const std::string& value)
+{
+    return set_obj(name, value.c_str());
+}
+
+bool CKDBLists::grep_obj(const std::string& name, const SWHDL handle, 
+    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
+    const char all) const
+{
+    bool found = false;
+    if(texts) 
+        found = wrap_grep_gnl(pattern, KLVAL(const_cast<CKDBLists*>(this), handle), ecase, all);
+    return found;
+}
+
+char* CKDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+{
+    char* obj = (char*) KLVAL(this, name);
+    return obj;
+}
+
+bool CKDBLists::print_obj_def(const std::string& name)
+{
+    print_definition_generic(name, KLVAL(this, name));
+    return true;
+}
+
+void CKDBLists::update_reference_db()
+{
+    K_RWS[this->k_type][0] = new CKDBLists(this, "*");      
 }

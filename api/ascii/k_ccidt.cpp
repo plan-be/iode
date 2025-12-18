@@ -41,7 +41,7 @@
  *  TODO: what if KC_read_cmt returns an error code ?
  *  
  */
-bool KDB::load_asc_idt(const std::string& filename)
+bool CKDBIdentities::load_asc(const std::string& filename)
 {
     char    *lec = NULL;
     int     cmpt = 0;
@@ -65,7 +65,7 @@ bool KDB::load_asc_idt(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */
-    K_set_kdb_fullpath(this, (U_ch*) c_filename); // JMP 28/11/2022
+    K_set_kdb_fullpath(this, (U_ch*) c_filename);
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -89,9 +89,7 @@ bool KDB::load_asc_idt(const std::string& filename)
                     break;
                 }
                 lec = K_wrap((char*) yy->yy_text, 60);
-                if(!this->set(name, lec))
-                    kwarning("%s (%s : %s).", YY_error(yy), name, L_error());
-                else 
+                if(this->set_obj(name, new Identity(lec))) 
                     cmpt++;
                 SW_nfree(lec);
                 kmsg("Reading object %d : %s", cmpt, name);
@@ -117,7 +115,7 @@ bool KDB::load_asc_idt(const std::string& filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_idt(const std::string& filename)
+bool CKDBIdentities::save_asc(const std::string& filename)
 {
     FILE* fd;
 

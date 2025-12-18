@@ -16,7 +16,7 @@ cdef extern from "super.h":
     cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
                              const unsigned char** buts) noexcept
     cdef bint contain_table(string& name) except +
-    cdef bint add_table(string& name, char* value) except +
+    cdef bint add_table(string& name, CTable* value) except +
     cdef bint remove_table(string& name) except +
 
     cdef int c_PrintObjDef_super(char* arg, int unused) except? -1
@@ -209,7 +209,6 @@ cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* c_name):
     cdef bytes b_name = c_name
     cdef string s_name = <string>b_name
     cdef bytes b_generalized_sample = smpl
-    cdef char* tbl_ptr = <char*>(tbl)
 
     name: str = b_name.decode()
     generalized_sample: str = b_generalized_sample.decode()
@@ -218,7 +217,7 @@ cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* c_name):
     table_found: bool = contain_table(name)
     if not table_found:
         # temporary add the passed IODE table to the global database of tables
-        success = add_table(s_name, tbl_ptr)
+        success = add_table(s_name, tbl)
         if not success:
             return -1
 	

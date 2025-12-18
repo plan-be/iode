@@ -23,10 +23,10 @@
  *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for CSV output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
- *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
+ *      char *get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
  *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
  *      int write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
- *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
+ *      char *get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
  *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */
@@ -131,7 +131,7 @@ char* ExportObjsCSV::extract_comment(CKDBComments* dbc, char* name, char**cmt)
  *  @param [in, out] char** vec     (re-)allocated vector of the VAR values in CSV format
  *  @return          char*          *vec
  */
-char* ExportObjsCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsCSV::get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
@@ -191,7 +191,7 @@ char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
     return(write_separator(name, code));
 }
 
-char* ExportObjsRevertCSV::get_variable_value(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsRevertCSV::get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)
 {
     char  tmp[81]; 
     char* buf = NULL;

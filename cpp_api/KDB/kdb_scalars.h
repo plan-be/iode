@@ -3,7 +3,7 @@
 #include "api/objs/scalars.h"
 
 
-class KDBScalars : public KDBTemplate<KDB, Scalar*>
+class KDBScalars : public KDBTemplate<CKDBScalars, Scalar*>
 {
 protected:
 

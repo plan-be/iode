@@ -2,11 +2,13 @@
 
 #include "api/constants.h"
 #include "api/lec/lec.h"
+#include "api/objs/macros.h"
 #include "api/objs/tables.h"
 #include "api/report/reports.h"
 
-inline KDB* RP_MACRO = nullptr;     // KDB containing the macros during a report execution
 
+// KDB containing the macros during a report execution
+inline KDBMacros* RP_MACRO = nullptr;
 
 /* b_rep_utils.c */
 int RP_alloc_ptrs();

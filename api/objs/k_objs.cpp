@@ -97,7 +97,7 @@ int K_upd_eqs(char* name, char* c_lec, char* cmt, int i_method, Sample* smpl, ch
     if(i_date > 0)
         eq->update_date();
 
-    success = global_ws_eqs->set(name, (char*) eq);
+    success = global_ws_eqs->set_obj(name, eq);
     delete eq;
     eq = nullptr;
     if(!success) 
@@ -147,7 +147,7 @@ int K_upd_tbl(char* name, char* arg)
         }
     }
 
-    bool success = global_ws_tbl->set(name, (char*) tbl);
+    bool success = global_ws_tbl->set_obj(name, tbl);
     delete tbl;
     tbl = nullptr;
 

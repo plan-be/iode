@@ -91,7 +91,7 @@ int K_load_RWS(int ref, char *filename)
 
     if(K_RWS[VARIABLES][ref - 1])
         delete K_RWS[VARIABLES][ref - 1];
-    K_RWS[VARIABLES][ref - 1] = new KDB(VARIABLES, false);
+    K_RWS[VARIABLES][ref - 1] = new CKDBVariables(false);
     bool success = K_RWS[VARIABLES][ref - 1]->load(std::string(filename));
     if(!success)
     {

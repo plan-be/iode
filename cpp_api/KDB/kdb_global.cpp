@@ -124,7 +124,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    KDB* dbv = new KDB(VARIABLES, false);
+    CKDBVariables* dbv = new CKDBVariables(false);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);

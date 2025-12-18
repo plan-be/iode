@@ -41,7 +41,7 @@ int RP_macro_createdb()
     if(RP_MACRO) 
         return(0);
 
-    RP_MACRO = new KDB();
+    RP_MACRO = new KDBMacros(true);
     if(!RP_MACRO) 
     {
         error_manager.append_error("Report : Memory Full");
@@ -88,7 +88,7 @@ int RP_define_1(char *name, char *macro)
     if(macro == 0) 
         macro = "";
     lg = (int) strlen(macro) + 1;
-    bool success = RP_MACRO->set(name, macro, lg);
+    bool success = RP_MACRO->set_macro(name, macro, lg);
     if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);
@@ -135,7 +135,8 @@ char* RP_get_macro_ptr(char* macro_name)
     if(!RP_MACRO->contains(macro_name)) 
         return NULL;
    
-    return(K_optr0(RP_MACRO, macro_name));
+    char* value = RP_MACRO->get_macro(macro_name);
+    return value;
 }
 
 /**
@@ -252,7 +253,7 @@ int RP_define_save(char *name)
 
     // Create a copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth + 1);
-    rc = RP_define_1(buf, K_optr0(RP_MACRO, name));
+    rc = RP_define_1(buf, RP_MACRO->get_macro(name));
 
     return(rc);
 }
@@ -287,7 +288,7 @@ int RP_define_restore(char *name)
 
     // Restore the copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
-    rc = RP_define_1(name, K_optr0(RP_MACRO, buf));
+    rc = RP_define_1(name, RP_MACRO->get_macro(buf));
 
     // Delete the copy
     RP_undef_1(buf);

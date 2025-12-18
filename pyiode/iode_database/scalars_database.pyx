@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Dict, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
+from pyiode.iode_database.cpp_api_database cimport KDBScalars as CppKDBScalars
 from pyiode.iode_database.cpp_api_database cimport Scalars as cpp_global_scalars
 
 import pandas as pd
@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Scalars(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CKDBScalars* database_ptr
+    cdef CppKDBScalars* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Scalars:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Scalars(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Scalars _from_ptr(CKDBScalars* database_ptr = NULL, bint owner=False):
+    cdef Scalars _from_ptr(CppKDBScalars* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Scalars wrapper = Scalars.__new__(Scalars)
         if database_ptr is not NULL:

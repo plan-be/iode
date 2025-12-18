@@ -5,6 +5,7 @@
 #include "api/b_args.h"         // B_ainit_chk
 #include "api/b_errors.h"       // error_manager
 #include "api/time/sample.h"    // Period, Sample
+#include "api/objs/xdr.h"
 
 #include <string>
 #include <map>
@@ -31,106 +32,192 @@ enum IodeDatabaseType
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDB 
+struct KDBInfo
+{
+    char        k_db_type;                  // type of database: DB_GLOBAL (default), DB_STANDALONE, DB_SHALLOW_COPY
+    short       k_type = (short) OBJECTS;   // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
+    short       k_mode = (short) ASIS_CASE; // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
+    std::string k_arch = std::string(ARCH); // processor architecture on which the file has been created/saved/loaded
+    std::string description = "";           // short description of the content of the database
+    Sample*     sample = nullptr;           // Sample if Variables database
+    char        k_compressed = 0;           // are the objects compressed in the file ? (LZH method, slow)
+    std::string filepath = std::string(I_DEFAULT_FILENAME);     // filepath to the database file
+
+public:
+    KDBInfo(const bool is_global)
+    {
+        this->k_db_type = is_global ? DB_GLOBAL: DB_STANDALONE;
+    }
+
+    KDBInfo(const KDBInfo& other)
+    {
+        this->k_db_type = other.k_db_type;
+        this->k_type = other.k_type;
+        this->k_mode = other.k_mode;
+        this->k_arch = other.k_arch;
+        this->description = other.description;
+        this->k_compressed = other.k_compressed;
+        this->filepath = other.filepath;
+
+        if(other.sample)
+            this->sample = new Sample(*(other.sample));
+        else
+            this->sample = nullptr;
+    }
+
+    ~KDBInfo()
+    {
+        if(this->sample)
+            delete this->sample;
+        this->sample = nullptr;
+    }
+
+    int get_iode_type() const 
+    { 
+        return k_type; 
+    }
+
+    bool is_global_database() const 
+    { 
+        return k_db_type == DB_GLOBAL; 
+    }
+
+    bool is_local_database() const 
+    { 
+        return k_db_type == DB_STANDALONE; 
+    }
+
+    bool is_shallow_copy_database() const 
+    { 
+        return k_db_type == DB_SHALLOW_COPY; 
+    }
+    
+    int preload(FILE *fd, const std::string& filepath, const int vers);
+
+    virtual void clear()
+    {        
+        this->description.clear();
+        this->k_compressed = 0;
+        this->filepath = I_DEFAULT_FILENAME;
+
+        if(this->sample)
+            delete this->sample;
+        this->sample = nullptr;
+    }
+
+    /**
+     *  Translates a little-endian KDB struct into a little/big-endian KDB.
+     * 
+     *  INTEL architecture (x86)
+     *  ------------------------
+     *  In the little-endian (x86) architecture, returns an allocated copy 
+     *  of the original KDB (but no translation is performed) for compatibility 
+     *  between architectures.
+     * 
+     *  Other architectures (big-endian)
+     *  --------------------------------
+     *  Switches the architecture of a KDB (little-endian to big-endian or the 
+     *  other way round). 
+     *
+     *  If okdb is null, the ikdb architecture is little-endian (when reading from a file) 
+     *  and the transformation is done "in-place". No allocation is done.
+     *  
+     *  If okdb is not null, the ikdb is big-endian (in mem) and the result (little-endian) 
+     *  is allocated. ikdb is untouched in this case.
+     *  
+     *  @param [in]     ikdb    KDB*    input KDB struct
+     *  @param [out]    okdb    KDB**   allocated copy of this
+     */
+    void xdr(KDBInfo** okdb)
+    {
+        KDBInfo* xdr_kdb = nullptr;
+        short type = this->k_type;
+        
+        if(okdb != NULL) 
+        {
+            // create a copy
+            xdr_kdb = new KDBInfo(*this);
+            *okdb = xdr_kdb;
+        }
+    
+    #ifdef INTEL
+        return;
+    #else
+        if(okdb == NULL) 
+        {
+            /* intel read */
+            xdr_kdb = this;
+            K_xdrSHORT(&type);
+        }
+    
+        XDR_rev(&(xdr_kdb->k_type), 1, sizeof(short));
+        XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
+    
+        if(type == VARIABLES) 
+        {
+            if(xdr_kdb->sample)
+                K_xdrSMPL((unsigned char*) xdr_kdb->sample);
+        }
+    #endif
+    }
+};
+
+
+struct KDB: public KDBInfo 
 {
     std::map<std::string, SWHDL> k_objs;            // map <object name, position in the SCR memory>
-    short       k_type;                             // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
-    short       k_mode;                             // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
-    std::string k_arch;                             // processor architecture on which the file has been created/saved/loaded
-    std::string description = "";                   // short description of the content of the database
-    Sample*     sample = nullptr;                   // Sample if Variables database
-    char        k_compressed = 0;                   // are the objects compressed in the file ? (LZH method, slow)
-    char        k_db_type;                          // type of database: DB_NORMAL (default), DB_STANDALONE, DB_SHALLOW_COPY
-    std::string filepath;                           // filepath to the database file
     std::shared_ptr<KDB*> parent = nullptr;         // parent KDB: if an IODE object is added/removed/updated 
                                                     //             from the current KDB, it must done also in the parent KDB
     std::vector<std::shared_ptr<KDB*>> children;    // children KDBs: if the current KDB is modified, all children KDBs must 
                                                     //                be updated too
 
-    /** 
-     *  ---- ONLY FOR VARIABLES DATABASE TYPE ----
-     *  Parameters specific to csv output files. 
-     *  These parameters can be modified via report commands: 
-     *    - $csvdigits
-     *    - $csvsep
-     *    - $csvdec
-     *    - $csvnan
-     *    - $csvaxes
-     *  
-     */
-    static char* CSV_SEP;
-    static char* CSV_DEC;
-    static char* CSV_NAN;
-    static char* CSV_AXES;
-    static int   CSV_NBDEC;
-
-private:
+protected:
     bool set_packed_object(const std::string& name, char* pack);
 
-    bool load_asc_eqs(const std::string& filename);
-    bool load_asc_idt(const std::string& filename);
-    bool load_asc_lst(const std::string& filename);
-    bool load_asc_scl(const std::string& filename);
-    bool load_asc_tbl(const std::string& filename);
-    bool load_asc_var(const std::string& filename);
-
-    // only for Variables database
-    bool load_asc_type_ask(const std::string& file_or_string, int type, int ask);
-
-    bool save_asc_eqs(const std::string& filename);
-    bool save_asc_idt(const std::string& filename);
-    bool save_asc_lst(const std::string& filename);
-    bool save_asc_scl(const std::string& filename);
-    bool save_asc_tbl(const std::string& filename);
-    bool save_asc_var(const std::string& filename);
-
-    bool print_eqs_def(const std::string& name);
-    bool print_idt_def(const std::string& name);
-    bool print_lst_def(const std::string& name);
-    bool print_scl_def(const std::string& name);
-    bool print_tbl_def(const std::string& name);
-    bool print_var_def(const std::string& name);
-
-protected:
     virtual bool grep_obj(const std::string& name, const SWHDL handle, 
         const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const;
+        const bool texts, const char all) const = 0;
 
-    virtual char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl);
+    virtual char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) = 0;
 
-    virtual void update_reference_db();
+    virtual void update_reference_db() = 0;
 
 public:
     // global or standalone database
-    KDB(const IodeType type, const bool is_global) : k_type((short) type), 
-        k_arch(std::string(ARCH)), filepath(std::string(I_DEFAULT_FILENAME))
+    KDB(const IodeType type, const bool is_global) : KDBInfo(is_global)
     {
-        if(type == OBJECTS)
-            throw std::invalid_argument("KDB of type OBJECTS must be created using the constructor KDB()");
-
-        this->k_db_type = is_global ? DB_GLOBAL: DB_STANDALONE;
-
+        this->k_type = (short) type;
         switch(this->k_type) 
         {
             case COMMENTS :
                 this->k_mode = (short) ASIS_CASE;
                 break;
             case EQUATIONS :
+                this->k_mode = (short) UPPER_CASE;
+                break;
             case IDENTITIES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
             case LISTS :
-            case TABLES :
-            case VARIABLES :
                 this->k_mode = (short) UPPER_CASE;
                 break;
             case SCALARS :
                 this->k_mode = (short) LOWER_CASE;
                 break;
+            case TABLES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
+            case VARIABLES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
+            case OBJECTS :
+                this->k_mode = (short) ASIS_CASE;
+                break;
         }
     }
 
     // shallow copy database
-    KDB(KDB* db_parent, const std::string& pattern = "*") 
-        : k_arch(std::string(ARCH)), filepath(std::string(I_DEFAULT_FILENAME))
+    KDB(KDB* db_parent, const std::string& pattern = "*") : KDBInfo(false)
     {
         this->k_type = db_parent->k_type;
 
@@ -144,14 +231,25 @@ public:
                 this->k_mode = (short) ASIS_CASE;
                 break;
             case EQUATIONS :
+                this->k_mode = (short) UPPER_CASE;
+                break;
             case IDENTITIES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
             case LISTS :
-            case TABLES :
-            case VARIABLES :
                 this->k_mode = (short) UPPER_CASE;
                 break;
             case SCALARS :
                 this->k_mode = (short) LOWER_CASE;
+                break;
+            case TABLES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
+            case VARIABLES :
+                this->k_mode = (short) UPPER_CASE;
+                break;
+            case OBJECTS :
+                this->k_mode = (short) ASIS_CASE;
                 break;
         }
 
@@ -195,29 +293,11 @@ public:
         if(failed)
             throw std::runtime_error(error_msg);
     }
-
-    // generic database
-    KDB() : k_type((short) OBJECTS), k_db_type((char) DB_STANDALONE), 
-        k_mode((short) ASIS_CASE), k_arch(std::string(ARCH)), 
-        filepath(std::string(I_DEFAULT_FILENAME)) {}
     
     // copy constructor
     // NOTE: new database is a 'deep copy' of the passed database
-    KDB(const KDB& other)
+    KDB(const KDB& other) : KDBInfo(other)
     {
-        this->k_db_type = DB_STANDALONE;
-        this->k_type = other.k_type;
-        this->k_mode = other.k_mode;
-        this->k_arch = other.k_arch;
-        this->description = other.description;
-        this->k_compressed = other.k_compressed;
-        this->filepath = other.filepath;
-
-        if(other.sample)
-            this->sample = new Sample(*other.sample);
-        else
-            this->sample = nullptr;
-
         if(other.size() == 0)
             return;
 
@@ -252,12 +332,9 @@ public:
             for(auto& [name, handle] : this->k_objs) 
                 SW_free(handle);
         }
+
         if(this->k_objs.size() > 0)
             this->k_objs.clear();
-
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
     }
 
     void clear_objs()
@@ -267,42 +344,16 @@ public:
             for(auto& [name, handle] : this->k_objs) 
                 SW_free(handle);
         }
+
         if(this->k_objs.size() > 0)
             this->k_objs.clear();
     }
 
     void clear(bool delete_objs = true)
     {
+        KDBInfo::clear();
         if(delete_objs)
             clear_objs();
-
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
-
-        this->description.clear();
-        this->k_compressed = 0;
-        this->filepath = I_DEFAULT_FILENAME;
-    }
-
-    int get_iode_type() const 
-    { 
-        return k_type; 
-    }
-
-    bool is_global_database() const 
-    { 
-        return k_db_type == DB_GLOBAL; 
-    }
-
-    bool is_local_database() const 
-    { 
-        return k_db_type == DB_STANDALONE; 
-    }
-
-    bool is_shallow_copy_database() const 
-    { 
-        return k_db_type == DB_SHALLOW_COPY; 
     }
 
     bool copy_objs(const KDB& other, const std::string& pattern = "*")
@@ -396,7 +447,7 @@ public:
         static const std::string empty_string = "";
         if(index < 0 || index >= this->size())
         {
-            std::string msg = "Cannot find the name corresponding to the index ";;
+            std::string msg = "Cannot find the name corresponding to the index ";
             msg += std::to_string(index) + ": index out of the range [0, ";
             msg += std::to_string(this->size() - 1) + "]";
             throw std::out_of_range(msg);
@@ -557,34 +608,6 @@ public:
         return true;
     }
 
-    /**
-     *  Adds or updates an IODE object to a KDB. The number of arguments depends on object type. 
-     *   
-     *  The object is first packed (see k_pack.c). The resulting pack is then copied in 
-     *  the swap memory. The handle of the allocated swap memory is stored in the kdb.
-     *
-     *  If name exists in kdb, the existing object is deleted and replaced by the new one.
-     *  It returns true on success, false on error.
-     *  
-     *  How to create IODE objects with add()
-     *  -------------------------------------
-     *    - Comments:    set(const std::string& name, char* comment)
-     *    - Equations:   set(const std::string& name, Equation* eq, char* endo) [where endo = name]
-     *    - Identities:  set(const std::string& name, char* lec)
-     *    - Lists:       set(const std::string& name, char* list)
-     *    - Scalars:     set(const std::string& name, Scalar* scalar)
-     *    - Tables:      set(const std::string& name, Table *tbl) 
-     *    - Variables:   set(const std::string& name, double* var, int* nb_obs) [nb_obs = kdb Sample size]
-     *  
-     *  @note: the name of an equation MUST be the name of its endogenous variable
-     */
-    // comments, equations, identities, lists, scalars, tables, objects
-    bool set(const std::string& name, char* value);
-    // variables
-    bool set(const std::string& name, double* var, const int nb_obs);
-    // objects
-    bool set(const std::string& name, char* value, const int length);    
-
     bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name);
 
     bool remove(const std::string& name)
@@ -614,27 +637,31 @@ public:
 
     std::string expand(const std::string& pattern, const char all='*') const;
 
-    virtual bool print_obj_def(const std::string& name);
+    virtual bool print_obj_def(const std::string& name) = 0;
 
     char* dde_create_obj(int objnb, int* nc, int* nl);
-    char* dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec);
 
     // load
 
-    virtual bool load_asc(const std::string& filename);
-    int preload(FILE *fd, const std::string& filepath, const int vers);
+    virtual bool load_asc(const std::string& filename) = 0;
     bool load_binary(const int file_type, const std::string& filename, 
                      const std::vector<std::string>& objs=std::vector<std::string>());
     bool load(const std::string& filename);
 
     // save
 
-    virtual bool save_asc(const std::string& filename);
-    bool save_vars_csv(const std::string& filename, const std::vector<std::string>& varlist
-                       =std::vector<std::string>(), Sample* sample=nullptr);
+    virtual bool save_asc(const std::string& filename) = 0;
     bool save_binary(const std::string& filename, const bool override_filepath = true);
-
     bool save(const std::string& filename);
+
+    virtual bool save_csv(const std::string& filename, const std::vector<std::string>& 
+        varlist=std::vector<std::string>(), Sample* sample=nullptr) 
+    { 
+        std::string msg = "Cannot save CSV: ";
+        msg += "CSV saving is not implemented for database of type ";
+        msg += "'" + v_iode_types[this->k_type] + "s'";
+        throw std::runtime_error(msg); 
+    }
 };
 
 
@@ -654,10 +681,10 @@ template<class T> struct CKDBTemplate: public KDB
     //       k_objs will be changed to std::map<std::string, T>
     //       T& operator[](const std::string& name)
 
-    virtual T get_obj(const SWHDL handle) const = 0;
-    virtual T get_obj(const std::string& name) const = 0;
+    virtual T* get_obj(const SWHDL handle) const = 0;
+    virtual T* get_obj(const std::string& name) const = 0;
 
-    virtual void set_obj(const std::string& name, const T& value) = 0;
+    virtual bool set_obj(const std::string& name, const T* value) = 0;
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -731,26 +758,3 @@ char *K_oval1(KDB *,int );
 char *K_optr(KDB *,char* ,int );
 char *K_optr0(KDB *,char* );
 char *K_optr1(KDB *,char* );
-
-// Estimation tests by equation name
-double K_etest(KDB* kdb, char*name, int test_nb);
-double K_e_stdev (KDB* kdb, char*name);
-double K_e_meany (KDB* kdb, char*name);
-double K_e_ssres (KDB* kdb, char*name);
-double K_e_stderr(KDB* kdb, char*name);
-double K_e_fstat (KDB* kdb, char*name);
-double K_e_r2    (KDB* kdb, char*name);
-double K_e_r2adj (KDB* kdb, char*name);
-double K_e_dw    (KDB* kdb, char*name);
-double K_e_loglik(KDB* kdb, char*name);
-
-// Values of scalars by name
-double K_s_get_info(KDB* kdb, char*name, int info_nb);
-double K_s_get_value (KDB* kdb, char*name);
-double K_s_get_relax (KDB* kdb, char*name);
-double K_s_get_stderr(KDB* kdb, char*name);
-double K_s_get_ttest (KDB* kdb, char*name);
-int K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
-int K_s_set_value (KDB* kdb, char*name, double val);
-int K_s_set_relax (KDB* kdb, char*name, double val);
-int K_s_set_stderr(KDB* kdb, char*name, double val);

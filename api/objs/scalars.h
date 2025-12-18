@@ -78,32 +78,72 @@ struct std::hash<Scalar>
     }
 };
 
+/*----------------------- STRUCTS ----------------------------*/
+
+struct CKDBScalars : public CKDBTemplate<Scalar>
+{
+    // global or standalone database
+    CKDBScalars(const bool is_global) : CKDBTemplate(SCALARS, is_global) {}
+
+    // shallow copy database
+    CKDBScalars(CKDBScalars* db_parent, const std::string& pattern = "*") 
+        : CKDBTemplate(db_parent, pattern) {}
+
+    // copy constructor
+    CKDBScalars(const CKDBScalars& other): CKDBTemplate(other) {}
+
+    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
+    //       k_objs will be changed to std::map<std::string, T>
+    //       T& operator[](const std::string& name)
+
+    Scalar* get_obj(const SWHDL handle) const override;
+    Scalar* get_obj(const std::string& name) const override;
+
+    bool set_obj(const std::string& name, const Scalar* value) override;
+
+    bool load_asc(const std::string& filename) override;
+    bool save_asc(const std::string& filename) override;
+
+    char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
+
+    bool print_obj_def(const std::string& name) override;
+
+private:
+    bool grep_obj(const std::string& name, const SWHDL handle, 
+        const std::string& pattern, const bool ecase, const bool forms, 
+        const bool texts, const char all) const override;
+    
+    void update_reference_db() override;
+};
+
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDB> global_ws_scl = std::make_unique<KDB>(SCALARS, true);;
+inline std::unique_ptr<CKDBScalars> global_ws_scl = std::make_unique<CKDBScalars>(true);
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
 std::size_t hash_value(const Scalar& scalar);
 
 
-inline Scalar* KSVAL(KDB* kdb, const std::string& name) 
-{  
-    if(!kdb) 
-        return nullptr;
-
-    char* ptr = kdb->get_ptr_obj(name);
-    if(ptr == nullptr)
-        return nullptr;
-    
-    return (Scalar*) P_get_ptr(ptr, 0);
-}
-
-inline Scalar* KSVAL(KDB* kdb, SWHDL handle) 
+inline Scalar* KSVAL(CKDBScalars* kdb, const std::string& name) 
 {
-    if(!kdb) 
-        return nullptr;
-
-    return (Scalar*) P_get_ptr(SW_getptr(handle), 0); 
+    return kdb->get_obj(name);
 }
+
+inline Scalar* KSVAL(CKDBScalars* kdb, SWHDL handle) 
+{
+    return kdb->get_obj(handle);
+}
+
+// Values of scalars by name
+double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb);
+double K_s_get_value (CKDBScalars* kdb, char*name);
+double K_s_get_relax (CKDBScalars* kdb, char*name);
+double K_s_get_stderr(CKDBScalars* kdb, char*name);
+double K_s_get_ttest (CKDBScalars* kdb, char*name);
+
+int K_s_set_info(CKDBScalars* kdb, char*name, int info_nb, double val);
+int K_s_set_value (CKDBScalars* kdb, char*name, double val);
+int K_s_set_relax (CKDBScalars* kdb, char*name, double val);
+int K_s_set_stderr(CKDBScalars* kdb, char*name, double val);

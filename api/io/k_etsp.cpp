@@ -32,7 +32,7 @@
  *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for tsp output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for tsp output. 
- *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
+ *      char *get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
  *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
 #include "api/objs/kdb.h"
@@ -100,7 +100,7 @@ char* ExportObjsTSP::extract_comment(CKDBComments* dbc, char* name, char** cmt)
     return(*cmt);
 }
 
-char* ExportObjsTSP::get_variable_value(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsTSP::get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;

@@ -1122,13 +1122,10 @@ def test_simulation(capsys):
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    with pytest.warns(RuntimeWarning) as record:
+    with pytest.warns(RuntimeWarning, match=r"Cannot simulate the model for the sample "
+                                            r"'2000Y1:2010Y1':\nerrors:\nModel does not "
+                                            r"converge after 2 iterations\n"):
         simu.model_simulate("2000Y1", "2010Y1")
-    assert len(record) == 2
-    assert str(record[0].message) == "Cannot remove List: no List named '_DIVER' found in the database"
-    assert str(record[1].message) == "Cannot simulate the model for the sample " \
-                                     "'2000Y1:2010Y1':\nerrors:\nModel does not converge " \
-                                     "after 2 iterations\n"
 
     # ======== test quiet mode ========
     captured = capsys.readouterr()

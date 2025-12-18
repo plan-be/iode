@@ -8,6 +8,7 @@
 #include "api/constants.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
+#include "api/k_lang.h"
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
@@ -15,6 +16,7 @@
 #include "api/objs/tables.h"
 #include "api/print/print.h"
 #include "api/utils/buf.h"
+#include "api/report/undoc/undoc.h"
 
 
 // ========================= TableCell methods ========================= //
@@ -525,4 +527,264 @@ std::size_t hash_value(const Table& table)
 {
     std::hash<Table> tbl_hash;
     return tbl_hash(table);
+}
+
+
+Table* CKDBTables::get_obj(const SWHDL handle) const
+{    
+    std::string name;
+    for(const auto& [_name_, _handle_] : this->k_objs) 
+    {
+        if(_handle_ == handle) 
+        {
+            name = _name_;
+            break;
+        }
+    }
+
+    return get_obj(name);
+}
+
+Table* CKDBTables::get_obj(const std::string& name) const
+{
+    SWHDL handle = this->get_handle(name);
+    if(handle == 0)  
+        throw std::invalid_argument("Table with name '" + name + "' not found.");
+    
+    char* ptr = SW_getptr(handle);
+    if(ptr == nullptr)  
+        return nullptr;
+    return (Table*) K_tunpack(ptr, (char*) name.c_str());
+}
+
+bool CKDBTables::set_obj(const std::string& name, const Table* value)
+{
+    char* pack = NULL;
+    K_tpack(&pack, (char*) value, (char*) name.c_str());
+    bool success = set_packed_object(name, pack);
+    if(!success)
+    {
+        std::string error_msg = "Failed to set table object '" + name + "'";
+        kwarning(error_msg.c_str());
+    }
+    return success;
+}
+
+bool CKDBTables::grep_obj(const std::string& name, const SWHDL handle, 
+    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
+    const char all) const
+{
+    bool found = false;
+    std::string text;
+
+    Table* tbl = KTVAL(const_cast<CKDBTables*>(this), name);
+    for(const TableLine& tline : tbl->lines) 
+    {
+        if(found) 
+            break;
+        
+        switch(tline.get_type()) 
+        {
+            case TABLE_LINE_SEP   :
+            case TABLE_LINE_MODE  :
+            case TABLE_LINE_DATE  :
+            case TABLE_LINE_FILES :
+                break;
+            case TABLE_LINE_TITLE :
+            {
+                TableCell cell = tline.cells[0];
+                if(texts)
+                {
+                    text = cell.get_content(true);
+                    found = wrap_grep_gnl(pattern, text, ecase, all);
+                } 
+                break;
+            }
+            case TABLE_LINE_CELL :
+            {
+                found = false;
+                for(const TableCell& cell : tline.cells)
+                {
+                    if(found) 
+                        break;
+                    
+                    if((texts && cell.get_type() == TABLE_CELL_STRING) || 
+                       (forms && cell.get_type() == TABLE_CELL_LEC))
+                       {
+                            text = cell.get_content(true);
+                            found = wrap_grep_gnl(pattern, text, ecase, all);
+                       }
+                }
+                break;
+            }
+        }
+    }
+    
+    delete tbl;
+    return found;
+}
+
+/**
+ *  Compute a table on the GSample ismpl and return a string containing the result.
+ */
+char* CKDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec)
+{
+    int     dim, i, j, d, rc = 0, nli = 0,
+                          nf = 0, nm = 0;
+    char    gsmpl[128], **l = NULL, *buf, *res = NULL;
+    COLS    *cls;
+
+    Table* tbl = KTVAL(global_ws_tbl.get(), name);
+    Sample* smpl = global_ws_var->sample;
+
+    /* date */
+    char date[11];
+
+    if(smpl == nullptr || smpl->nb_periods == 0) 
+        return (char*) "";
+
+    /* mode */
+    if(!ismpl)
+        sprintf(gsmpl, "%s:%d", (char*) smpl->start_period.to_string().c_str(), smpl->nb_periods);
+    else
+        sprintf(gsmpl, "%s", ismpl);
+
+    dim = T_prep_cls(tbl, gsmpl, &cls);
+    if(dim < 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+
+    KT_names = T_find_files(cls);
+    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
+    if(KT_nbnames == 0) 
+        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    COL_find_mode(cls, KT_mode, 2);
+
+    *nc = dim + 1;
+    *nl = 1;
+
+    TableLine* line;
+    buf = SCR_malloc(256 + dim * 128);
+    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    {
+        buf[0] = 0;
+        line = &tbl->lines[i];
+
+        switch(line->get_type()) 
+        {
+            case TABLE_LINE_SEP   :
+                break;
+            case TABLE_LINE_DATE  :
+                strcat(buf, SCR_long_to_fdate(SCR_current_date(), date, (char*) "dd/mm/yy"));
+                break;
+            case TABLE_LINE_MODE  :
+                for(j = 0; j < MAX_MODE; j++) 
+                {
+                    if(KT_mode[j] == 0) 
+                        continue;
+                    sprintf(date, "(%s) ", COL_OPERS[j + 1]);
+                    strcat(buf, date);
+                    strcat(buf, KLG_OPERS_TEXTS[j + 1][K_LANG]);
+                    strcat(buf, "\n");
+                    nm ++;
+                }
+                break;
+            case TABLE_LINE_FILES :
+                for(j = 0; KT_names[j]; j++) 
+                {
+                    strcat(buf, KT_names[j]);
+                    strcat(buf, "\n");
+                    nf ++;
+                }
+                break;
+            case TABLE_LINE_TITLE :
+                strcat(buf, IodeTblCell(&(line->cells[0]), NULL, nbdec));
+                //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
+                break;
+            case TABLE_LINE_CELL  :
+                COL_clear(cls);
+                if(COL_exec(tbl, i, cls) < 0)
+                    strcat(buf, "Error in calc");
+                else
+                    for(j = 0; j < cls->cl_nb; j++) 
+                    {
+                        d = j % T_NC(tbl);
+                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+                            continue;
+                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
+                        strcat(buf, "\t");
+                    }
+                break;
+        }
+
+        if(buf[0]) 
+        {
+            SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
+            (*nl)++;
+        }
+    }
+    
+    SCR_add_ptr((unsigned char***) &l, &nli, NULL);
+    *nl += nf + nm;
+    res = (char*) SCR_mtov((unsigned char**) l, '\n');
+
+    COL_free_cols(cls);
+    SCR_free_tbl((unsigned char**) l);
+    SCR_free(buf);
+
+    SCR_free_tbl((unsigned char**) KT_names);
+    KT_names = NULL;
+    KT_nbnames = 0;
+
+    return(res);
+}
+
+char* CKDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+{
+    return  NULL;
+}
+
+/**
+ *  Print the table in position pos in kdb.  
+ *  
+ *  If B_TABLE_TITLE != 0, print the table title.
+ *  If B_TABLE_TITLE == 1, print the table name and its title.
+ *  If B_TABLE_TITLE == 0, print the table definition.
+ *  
+ *  @param [in] kdb KDB*        KDB of tables
+ *  @param [in] pos int         position of the table in kdb
+ *  @return         int         -1 if the table cannot be found in kdb
+ */
+bool CKDBTables::print_obj_def(const std::string& name)
+{
+    Table* tbl = KTVAL(this, name);
+    if(!tbl) 
+        return false;
+    
+    if(B_TABLE_TITLE) 
+    {
+        if(B_TABLE_TITLE == 1) 
+            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), T_get_title(tbl, false));
+        else 
+            W_printf((char*) "\n%s\n", T_get_title(tbl, false));
+        
+        delete tbl;
+        tbl = nullptr;
+        return true;
+    }
+
+    B_PrintRtfTopic((char*) T_get_title(tbl, false));
+    W_printf((char*) ".tb %d\n", T_NC(tbl));
+    W_printfRepl((char*) ".sep &\n");
+    W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, name.c_str(), A2M_ESCCH);
+    bool success = tbl->print_definition();
+    W_printf((char*) ".te\n");
+
+    delete tbl;
+    tbl = nullptr;
+    return success;
+}
+
+void CKDBTables::update_reference_db()
+{
+    K_RWS[this->k_type][0] = new CKDBTables(this, "*");      
 }

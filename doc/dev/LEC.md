@@ -227,7 +227,7 @@ Three functions, implemented in k\_lec.c, are called during the link process: L\
 
 |Syntax|Description|
 |:---|:---|
-|`int L_link(KDB* dbv, KDB* dbs, CLEC* cl)`|Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.|
+|`int L_link(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl)`|Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.|
 |`void L_link_endos(KDB *dbe, CLEC *cl)`|Pseudo linking used to calculate the strong connex components of a model (SCC).|
 
 ## LEC execution {#T21}
@@ -241,7 +241,7 @@ Functions to evaluate a compiled and linked LEC expression.
 |Syntax|Description|
 |:---|:---|
 |`L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)`|Execution of a CLEC sub expression.|
-|`L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)`|Execution of a compiled and linked CLEC expression.|
+|`L_REAL L_exec(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* expr, int t)`|Execution of a compiled and linked CLEC expression.|
 |`L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
 ### l\_exec\_var.c {#T23}
@@ -381,9 +381,9 @@ Implemention of the LEC library virtual functions for Scalar and VAR references.
 
 |Syntax|Description|
 |:---|:---|
-|`double *L_getvar(KDB* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
-|`double L_getscl(KDB* kdb, int pos)`|Retrieves a scalar value.|
+|`double *L_getvar(CKDBVariables* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
+|`double L_getscl(CKDBScalars* kdb, int pos)`|Retrieves a scalar value.|
 |`Sample *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
-|`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
-|`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
+|`int L_findscl(CKDBScalars* kdb, char *name)`|Retrieves a scalar position.|
+|`int L_findvar(CKDBVariables* kdb, char* name)`|Retrieves a variable position.|
 

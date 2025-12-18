@@ -2,12 +2,12 @@
 #include "api/objs/comments.h"
 
 
-CMT CKDBComments::get_obj(const SWHDL handle) const
+char* CKDBComments::get_obj(const SWHDL handle) const
 {    
-    return (CMT) P_get_ptr(SW_getptr(handle), 0);
+    return (char*) P_get_ptr(SW_getptr(handle), 0);
 }
 
-CMT CKDBComments::get_obj(const std::string& name) const
+char* CKDBComments::get_obj(const std::string& name) const
 {
     SWHDL handle = this->get_handle(name);
     if(handle == 0)  
@@ -16,9 +16,22 @@ CMT CKDBComments::get_obj(const std::string& name) const
     return get_obj(handle);
 }
 
-void CKDBComments::set_obj(const std::string& name, const CMT& value)
+bool CKDBComments::set_obj(const std::string& name, const char* value)
 {
-    KDB::set(name, value);
+    char* pack = NULL;
+    K_cpack(&pack, (char*) value);
+    bool success = set_packed_object(name, pack);
+    if(!success)
+    {
+        std::string error_msg = "Failed to set comment object '" + name + "'";
+        kwarning(error_msg.c_str());
+    }
+    return success;
+}
+
+bool CKDBComments::set_obj(const std::string& name, const std::string& value)
+{
+    return set_obj(name, value.c_str());
 }
 
 bool CKDBComments::grep_obj(const std::string& name, const SWHDL handle, 
@@ -33,7 +46,8 @@ bool CKDBComments::grep_obj(const std::string& name, const SWHDL handle,
 
 char* CKDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    return KCVAL(this, name);
+    char* obj = KCVAL(this, name);
+    return obj;
 }
 
 bool CKDBComments::print_obj_def(const std::string& name)

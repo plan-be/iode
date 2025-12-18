@@ -66,11 +66,11 @@ bool contain_table(const std::string& name)
 	return global_ws_tbl->contains(name);
 }
 
-bool add_table(const std::string& name, char* value)
+bool add_table(const std::string& name, Table* value)
 {
 	if(!global_ws_tbl.get())
 		return false;
-	return global_ws_tbl->set(name, value);
+	return global_ws_tbl->set_obj(name, value);
 }
 
 bool remove_table(const std::string& name)

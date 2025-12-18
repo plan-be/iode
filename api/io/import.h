@@ -7,6 +7,8 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
+#include "api/objs/variables.h"
 #include "api/io/dif.h"
 
 #include <array>    // for std::array
@@ -303,8 +305,8 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-KDB *IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
-KDB *IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
+CKDBVariables* IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
+CKDBComments* IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
 int IMP_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
 
 /* k_rules.c */

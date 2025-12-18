@@ -76,9 +76,9 @@ void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDB
         throw std::invalid_argument("C API: Variable named '" + source_var_name + "' seems to not exist in the source database");
 
     // add the variable to the destination database
-    KDB* kdb = dest->get_database();
+    CKDBVariables* kdb = dest->get_database();
     source_var_ptr += source_t_first;
-    kdb->set(dest_name, source_var_ptr, nb_periods);
+    kdb->set_obj(dest_name, source_var_ptr);
 }
 
 void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
@@ -143,7 +143,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
 
     // perform the operation
     double* var_ptr;
-    KDB* c_database = database->get_database();
+    CKDBVariables* c_database = database->get_database();
     switch(op)
     {
     case OP_ADD:
@@ -205,13 +205,13 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     if(nb_values != database->size())
         throw std::invalid_argument("C API: number of values must match the number of variables in the database");
 
-    KDB* db = database->get_database();
+    CKDBVariables* db = database->get_database();
     if(db == NULL)
         throw std::invalid_argument("C API: database is NULL");
 
     int i = 0;
     double value;
-    KDB* c_database = database->get_database();
+    CKDBVariables* c_database = database->get_database();
     switch(op)
     {
     case OP_ADD:

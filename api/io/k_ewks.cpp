@@ -13,7 +13,7 @@
  *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for wks output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
- *      char *get_variable_value(KDB* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
+ *      char *get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
  *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
 #include "api/objs/kdb.h"
@@ -73,7 +73,7 @@ char* ExportObjsWKS::extract_comment(CKDBComments* dbc, char* name, char** cmt)
     return(*cmt = NULL);
 }
 
-char* ExportObjsWKS::get_variable_value(KDB* dbv, int nb, int t, char** vec)
+char* ExportObjsWKS::get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)
 {
     char* buf = NULL;
 

@@ -2,6 +2,7 @@
 
 #include "api/constants.h"
 #include "api/objs/kdb.h"        
+#include "api/objs/equations.h"        
 #include "api/report/reports.h"
 
 
@@ -94,7 +95,7 @@ int B_ModelSimulate(char* arg, int unused=-1);
 int B_ModelSimulateParms(char* arg, int unused=-1);
 int B_ModelExchange(char* arg, int unused=-1);
 int B_ModelCompile(char* arg, int unused=-1);
-int KE_compile(KDB *);
+int KE_compile(CKDBEquations *);
 int B_ModelCalcSCC(char* arg, int unused=-1);
 int B_ModelSimulateSCC(char* arg, int unused=-1);
 int B_ModelSimulateSaveNIters(char* arg, int unused=-1);

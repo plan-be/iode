@@ -31,7 +31,7 @@
  *                                      -1 if the LST can't be created. (call to kerror() in that case)
  *  
  */
-static int read_lst(KDB* kdb, YYFILE* yy, char* name)
+static int read_lst(CKDBLists* kdb, YYFILE* yy, char* name)
 {
     bool    success;
     int     keyw;
@@ -57,7 +57,7 @@ static int read_lst(KDB* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set(name, lst);
+    success = kdb->set_obj(name, lst);
     if(!success) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
@@ -99,7 +99,7 @@ static int read_lst(KDB* kdb, YYFILE* yy, char* name)
  *  TODO: what if read_lst returns an error code ?
  *  
  */
-bool KDB::load_asc_lst(const std::string& filename)
+bool CKDBLists::load_asc(const std::string& filename)
 {
     int     cmpt = 0;
     YYFILE  *yy;
@@ -165,7 +165,7 @@ bool KDB::load_asc_lst(const std::string& filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool KDB::save_asc_lst(const std::string& filename)
+bool CKDBLists::save_asc(const std::string& filename)
 {
     FILE    *fd;
     LIS     lst;

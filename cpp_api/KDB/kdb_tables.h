@@ -4,7 +4,7 @@
 #include "kdb_template.h"
 
 
-class KDBTables : public KDBTemplate<KDB, Table*>
+class KDBTables : public KDBTemplate<CKDBTables, Table*>
 {
 protected:
 

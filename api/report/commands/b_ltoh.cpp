@@ -327,10 +327,10 @@ static int B_ltoh(int type, char* arg)
     char    method[81], file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
     int     file_type;
-    KDB*    to = nullptr;
     Sample* t_smpl = nullptr;
-    KDB*    from = new KDB(VARIABLES, false);
     std::vector<std::string> v_data;
+    CKDBVariables* to = nullptr;
+    CKDBVariables* from = new CKDBVariables(false);
 
     int lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
@@ -369,7 +369,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    to = new KDB(VARIABLES, false);
+    to = new CKDBVariables(false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
@@ -402,7 +402,7 @@ static int B_ltoh(int type, char* arg)
                 break;
         }
         nb = t_smpl->nb_periods;
-        to->set(from_name, t_vec, nb);
+        to->set_obj(from_name, t_vec);
     }
     KV_merge(global_ws_var.get(), to, 1);
 

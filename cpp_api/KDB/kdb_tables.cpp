@@ -9,7 +9,7 @@ Table* KDBTables::copy_obj(Table* const original) const
 
 Table* KDBTables::get_unchecked(const std::string& name) const
 {
-	KDB* kdb = get_database();
+	CKDBTables* kdb = get_database();
 	// Note: - KTVAL allocate a new pointer Table*
 	//       - static_cast<Table*>(Table*) calls the copy constructor Table(const Table* c_table)
 	return static_cast<Table*>(KTVAL(kdb, name));
@@ -30,20 +30,20 @@ std::string KDBTables::get_title(const std::string& name) const
 bool KDBTables::add(const std::string& name, const Table& obj)
 {
 	Table table(obj);
-	return KDBTemplate::add(name, (char*) &table);
+	return KDBTemplate::add(name, &table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns)
 {
 	Table table(nbColumns);
-	return KDBTemplate::add(name, (char*) &table);
+	return KDBTemplate::add(name, &table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, vars, mode, files, date);
-	return KDBTemplate::add(name, (char*) &table);
+	return KDBTemplate::add(name, &table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
@@ -51,20 +51,20 @@ bool KDBTables::add(const std::string& name, const int nbColumns, const std::str
 	bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, titles, lecs, mode, files, date);
-	return KDBTemplate::add(name, (char*) &table);
+	return KDBTemplate::add(name, &table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::string& lecs, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, lecs, mode, files, date);
-	return KDBTemplate::add(name, (char*) &table);
+	return KDBTemplate::add(name, &table);
 }
 
 void KDBTables::update(const std::string& name, const Table& obj)
 {
 	Table table(obj);
-	KDBTemplate::update(name, (char*) &table);
+	KDBTemplate::update(name, &table);
 }
 
 void KDBTables::print_to_file(const std::string& destination_file, const std::string& gsample, 
