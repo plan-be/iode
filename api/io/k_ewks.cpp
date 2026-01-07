@@ -65,7 +65,7 @@ char* ExportObjsWKS::extract_comment(CKDBComments* dbc, char* name, char** cmt)
 {
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)  
-        wks_string(KCVAL(dbc, handle), WKS_COL, WKS_ROW);
+        wks_string(dbc->get_obj(handle), WKS_COL, WKS_ROW);
     else 
         wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;

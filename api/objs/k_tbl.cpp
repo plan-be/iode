@@ -211,7 +211,7 @@ static void T_initialize_title(TableLine& title_line, const std::string& def)
     if(handle == 0)
         title = def;
     else
-        title = std::string(KCVAL(global_ws_cmt.get(), handle));
+        title = std::string(global_ws_cmt->get_obj(handle));
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -291,7 +291,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
             line_name = var;
         else
         {
-            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(global_ws_cmt->get_obj(handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -354,7 +354,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         handle = global_ws_cmt->get_handle(line_name);
         if(handle > 0)
         {
-            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(global_ws_cmt->get_obj(handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }
@@ -409,7 +409,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
             line_name = lec;
         else
         {
-            comment = std::string(KCVAL(global_ws_cmt.get(), handle));
+            comment = std::string(global_ws_cmt->get_obj(handle));
             comment = oem_to_utf8(comment);
             line_name = trim(comment);
         }

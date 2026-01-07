@@ -79,8 +79,6 @@ cdef extern from "api/all.h":
         char* get_obj(string name) except +
         bool set_obj(string name, string value) except +
 
-    char* KCVAL(CKDBComments* kdb, string name)
-
     cdef cppclass CKDBEquations(KDB):
         CEquation* get_obj(SWHDL handle) except +
         CEquation* get_obj(string name) except +

@@ -97,7 +97,7 @@ char* ExportObjsDIF::extract_comment(CKDBComments* dbc, char* name, char **cmt)
 {
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)
-        return(write_pre_post("1,0\n\"", "\"\n", KCVAL(dbc, handle), cmt));
+        return(write_pre_post("1,0\n\"", "\"\n", dbc->get_obj(handle), cmt));
     else
         return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
 }

@@ -872,7 +872,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            ptr = (char*) SCR_stracpy((unsigned char*) KCVAL(global_ws_cmt.get(), name));
+            ptr = (char*) SCR_stracpy((unsigned char*) global_ws_cmt->get_obj(name));
             break;
         }
         case IDENTITIES :

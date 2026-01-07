@@ -114,7 +114,7 @@ char* ExportObjsCSV::extract_comment(CKDBComments* dbc, char* name, char**cmt)
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)  
     {
-        ccmt = (unsigned char*) KCVAL(dbc, handle);
+        ccmt = (unsigned char*) dbc->get_obj(handle);
         SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");
         return(write_separator((char*) ccmt, cmt));
     }

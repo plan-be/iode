@@ -179,7 +179,7 @@ bool CKDBComments::save_asc(const std::string& filename)
     for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        cmt = KCVAL(this, handle);
+        cmt = this->get_obj(handle);
         SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
         SCR_fprintf_esc(fd, cmt, 1);
         fprintf(fd, "\n");
