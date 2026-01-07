@@ -566,7 +566,7 @@ char* A_expand_super_API(char* name)
     if(!global_ws_lst->contains(name)) 
         return NULL;
     
-    return KLVAL(global_ws_lst.get(), name);
+    return global_ws_lst->get_obj(name);
 }
 
 

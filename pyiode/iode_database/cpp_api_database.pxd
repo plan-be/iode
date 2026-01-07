@@ -96,8 +96,6 @@ cdef extern from "api/all.h":
         char* get_obj(string name) except +
         bool set_obj(string name, string value) except +
 
-    char* KLVAL(CKDBLists* kdb, string name)
-
     cdef cppclass CKDBScalars(KDB):
         CScalar* get_obj(SWHDL handle) except +
         CScalar* get_obj(string name) except +

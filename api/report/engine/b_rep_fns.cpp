@@ -860,7 +860,7 @@ U_ch *RPF_lvalue(U_ch** args)
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) KLVAL(kdb, name));
+            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(name));
             res = SCR_replace(res, (unsigned char*) ";", (unsigned char*) ",");
         }
     }

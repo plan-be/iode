@@ -107,7 +107,7 @@ char* L_expand(char* list_name)
     {
         if(!global_ws_lst->contains(list_name)) 
             return NULL;
-        return KLVAL(global_ws_lst.get(), list_name);
+        return global_ws_lst->get_obj(list_name);
     }    
 }
 

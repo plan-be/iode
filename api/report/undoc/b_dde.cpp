@@ -890,7 +890,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            ptr = (char*) SCR_stracpy((unsigned char*) KLVAL(global_ws_lst.get(), name));
+            ptr = (char*) SCR_stracpy((unsigned char*) global_ws_lst->get_obj(name));
             break;
         }
         case EQUATIONS :

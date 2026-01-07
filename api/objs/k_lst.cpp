@@ -332,7 +332,7 @@ unsigned char **KL_expand(char *str)
             if(global_ws_lst->contains(list_name))
             {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                tbl2 = KL_expand(KLVAL(global_ws_lst.get(), list_name));
+                tbl2 = KL_expand(global_ws_lst->get_obj(list_name));
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);
@@ -384,19 +384,19 @@ bool CKDBLists::grep_obj(const std::string& name, const SWHDL handle,
 {
     bool found = false;
     if(texts) 
-        found = wrap_grep_gnl(pattern, KLVAL(const_cast<CKDBLists*>(this), handle), ecase, all);
+        found = wrap_grep_gnl(pattern, this->get_obj(handle), ecase, all);
     return found;
 }
 
 char* CKDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = (char*) KLVAL(this, name);
+    char* obj = (char*) this->get_obj(name);
     return obj;
 }
 
 bool CKDBLists::print_obj_def(const std::string& name)
 {
-    print_definition_generic(name, KLVAL(this, name));
+    print_definition_generic(name, this->get_obj(name));
     return true;
 }
 

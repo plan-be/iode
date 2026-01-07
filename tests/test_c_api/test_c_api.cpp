@@ -167,12 +167,12 @@ public:
 	    // Create lists
 	    success = kdb_lst->set_obj("LST1", "A,B");
         EXPECT_TRUE(success);
-	    lst = KLVAL(kdb_lst, "LST1");
+	    lst = kdb_lst->get_obj("LST1");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B");
 	    success = kdb_lst->set_obj("LST2", "A,B,A");
         EXPECT_TRUE(success);
-        lst = KLVAL(kdb_lst, "LST2");
+        lst = kdb_lst->get_obj("LST2");
         EXPECT_NE(lst, nullptr);
         EXPECT_STREQ(lst, "A,B,A");
 
@@ -793,7 +793,7 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     // Create lists
     found = global_ws_lst->contains("LST1");
     EXPECT_TRUE(found);
-    lst = KLVAL(global_ws_lst.get(), "LST1");
+    lst = global_ws_lst->get_obj("LST1");
     EXPECT_EQ(strcmp(lst, "A,B"), 0);
 
     found = global_ws_var->contains("A");
@@ -1000,9 +1000,9 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
-    char* lst = KLVAL(global_ws_lst.get(), "LST1");
+    char* lst = global_ws_lst->get_obj("LST1");
     EXPECT_STREQ(lst, "A,B");
-    lst = KLVAL(global_ws_lst.get(), "LST2");
+    lst = global_ws_lst->get_obj("LST2");
     EXPECT_STREQ(lst, "A,B,A");
 
     // Using macros in LEC
@@ -1179,14 +1179,14 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Check _PRE list after simulation (prolog)
     EXPECT_TRUE(global_ws_lst->contains("_PRE"));
-    lst = KLVAL(global_ws_lst.get(), "_PRE");
+    lst = global_ws_lst->get_obj("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Check _DIVER 
     EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
-    lst = KLVAL(global_ws_lst.get(), "_DIVER");
+    lst = global_ws_lst->get_obj("_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
     EXPECT_EQ(std::string(lst), std::string(expected_lst));
@@ -1486,7 +1486,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = KLVAL(global_ws_lst.get(), "RC");
+    lst = global_ws_lst->get_obj("RC");
     EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
 
     // B_DataCalcVar()
@@ -1568,7 +1568,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
     EXPECT_EQ(rc, 0);
-    lst = KLVAL(global_ws_lst.get(), "LIST2");
+    lst = global_ws_lst->get_obj("LIST2");
     EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
@@ -1577,7 +1577,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     global_ws_lst->set_obj("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
-    lst = KLVAL(global_ws_lst.get(), "RES");
+    lst = global_ws_lst->get_obj("RES");
     EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
@@ -1594,7 +1594,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "U")), "A,B,C");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("U")), "A,B,C");
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
@@ -1610,12 +1610,12 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "NEWLIST")), "U");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("NEWLIST")), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_SCAL")), "c1;c2");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1624,7 +1624,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
@@ -1633,8 +1633,8 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", KLVAL(global_ws_lst.get(), "LC"));
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("LC")), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", global_ws_lst->get_obj("LC"));
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1642,19 +1642,19 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "A;B;C;D;E");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "C");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "A;B");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
     std::string expected_list;
@@ -1663,17 +1663,17 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(rc, 0);
     // names only in current WS
     expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "WS_ONLY")), expected_list);
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("WS_ONLY")), expected_list);
     // names only in file
     expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
     expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "FILE_ONLY")), expected_list);
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("FILE_ONLY")), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
     expected_list = "";
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "BOTH_EQ")), expected_list);
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_EQ")), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
     expected_list = "_SCAL";
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "BOTH_DIFF")), expected_list);
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_DIFF")), expected_list);
 
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
@@ -2246,7 +2246,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
     expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
     expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(std::string(KLVAL(global_ws_lst.get(), "_PRE2")), expected_list);
+    EXPECT_EQ(std::string(global_ws_lst->get_obj("_PRE2")), expected_list);
 
     // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
     //  1. Annuler Exchange

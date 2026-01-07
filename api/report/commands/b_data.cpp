@@ -834,7 +834,7 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
     else 
-        lst = KLVAL(global_ws_lst.get(), in);
+        lst = global_ws_lst->get_obj(in);
     
     if(lst == NULL) 
     {
@@ -1240,8 +1240,8 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(KLVAL(global_ws_lst.get(), (char*) list1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(KLVAL(global_ws_lst.get(), (char*) list2), NULL, 0);
+    l1 = (unsigned char**) B_ainit_chk(global_ws_lst->get_obj((char*) list1), NULL, 0);
+    l2 = (unsigned char**) B_ainit_chk(global_ws_lst->get_obj((char*) list2), NULL, 0);
     switch(op[0]) 
     {
     case '+' :
@@ -1279,7 +1279,7 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    char* lst = (char*) SCR_stracpy((unsigned char*) KLVAL(global_ws_lst.get(), name));
+    char* lst = (char*) SCR_stracpy((unsigned char*) global_ws_lst->get_obj(name));
     if(lst == NULL) 
         return -1;
 
