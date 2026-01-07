@@ -4,7 +4,7 @@
 
 List KDBLists::get_unchecked(const std::string& name) const
 {
-	return std::string(KLVAL(get_database(), name));
+	return std::string(get_database()->get_obj(name));
 }
 
 bool KDBLists::add(const std::string& name, const List& list)

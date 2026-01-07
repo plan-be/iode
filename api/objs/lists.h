@@ -63,17 +63,6 @@ inline std::unique_ptr<CKDBLists> global_ws_lst = std::make_unique<CKDBLists>(tr
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline LIS KLVAL(CKDBLists* kdb, const std::string& name)
-{
-    return kdb->get_obj(name);
-} 
-
-inline LIS KLVAL(CKDBLists* kdb, SWHDL handle)
-{
-    return kdb->get_obj(handle);   
-} 
-
-
 /* k_lst.c */
 int K_scan(KDB*, char*, char*);
 void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal);

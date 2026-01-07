@@ -351,9 +351,9 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
-    char** pre   = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[0]));
-    char** inter = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[1]));
-    char** post  = (char**) KL_expand(KLVAL(global_ws_lst.get(), lsts[2]));
+    char** pre   = (char**) KL_expand(global_ws_lst->get_obj(lsts[0]));
+    char** inter = (char**) KL_expand(global_ws_lst->get_obj(lsts[1]));
+    char** post  = (char**) KL_expand(global_ws_lst->get_obj(lsts[2]));
     SCR_free_tbl((unsigned char**) lsts);
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
