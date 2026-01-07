@@ -1459,7 +1459,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     kdb_cmt->set_obj("AAA", "This is a test comment");
     handle = kdb_cmt->get_handle("AAA");
     EXPECT_TRUE(handle > 0);
-    char* value = (char*) KCVAL(kdb_cmt, handle);
+    char* value = (char*) kdb_cmt->get_obj(handle);
     EXPECT_EQ(std::string(value), "This is a test comment");
     delete kdb_cmt;
     kdb_cmt = nullptr;
@@ -1552,13 +1552,13 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     kdb_cmt->set_obj("AAA", "This is a comment");
     handle = kdb_cmt->get_handle("AAA");
     EXPECT_TRUE(handle > 0);
-    char* comment = (char*) KCVAL(kdb_cmt, handle);
+    char* comment = (char*) kdb_cmt->get_obj(handle);
     EXPECT_EQ(std::string(comment), "This is a comment");
     kdb_cmt->clear();
     global_ws_cmt->set_obj("AAA", "This is a comment");
     handle = global_ws_cmt->get_handle("AAA");
     EXPECT_TRUE(handle > 0);
-    comment = (char*) KCVAL(global_ws_cmt.get(), handle);
+    comment = global_ws_cmt->get_obj(handle);
     EXPECT_EQ(std::string(comment), "This is a comment");
 
     // B_DataListSort()

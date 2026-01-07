@@ -5,7 +5,7 @@
 Comment KDBComments::get_unchecked(const std::string& name) const
 {
     CKDBComments* kdb_cmt = get_database();
-    char* value = KCVAL(kdb_cmt, name);
+    char* value = kdb_cmt->get_obj(name);
     Comment comment = std::string(value);
     return oem_to_utf8(comment);
 }

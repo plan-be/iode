@@ -52,16 +52,3 @@ private:
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::unique_ptr<CKDBComments> global_ws_cmt = std::make_unique<CKDBComments>(true);
-
-/*----------------------- MACROS ----------------------------*/
-
-// Returns a pointer to the CMT in swap (not allocated -> do not free)
-inline CMT KCVAL(const CKDBComments* kdb, const std::string& name)
-{
-    return kdb->get_obj(name);            
-}
-
-inline CMT KCVAL(const CKDBComments* kdb, SWHDL handle)
-{
-    return kdb->get_obj(handle);            
-}

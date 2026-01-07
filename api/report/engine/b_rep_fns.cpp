@@ -771,7 +771,7 @@ U_ch *RPF_cvalue(U_ch** args)
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) KCVAL(kdb, handle));
+            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(handle));
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }

@@ -40,19 +40,19 @@ bool CKDBComments::grep_obj(const std::string& name, const SWHDL handle,
 {
     bool found = false;
     if(texts) 
-        found = wrap_grep_gnl(pattern, KCVAL(this, handle), ecase, all);
+        found = wrap_grep_gnl(pattern, this->get_obj(handle), ecase, all);
     return found;
 }
 
 char* CKDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = KCVAL(this, name);
+    char* obj = this->get_obj(name);
     return obj;
 }
 
 bool CKDBComments::print_obj_def(const std::string& name)
 {
-    bool success = print_definition_generic(name, KCVAL(this, name));
+    bool success = print_definition_generic(name, this->get_obj(name));
     return success;
 }
 
