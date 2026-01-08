@@ -69,7 +69,7 @@ bool CKDBScalars::print_obj_def(const std::string& name)
 {
     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 1, name.c_str());
 
-    Scalar* scl = KSVAL(this, name);
+    Scalar* scl = this->get_obj(name);
     if(!scl) 
     {
         W_printf((char*) "?\n");
@@ -102,7 +102,7 @@ double K_s_get_info(CKDBScalars* kdb, char* c_name, int info_nb)
         return IODE_NAN;
     
     double val = IODE_NAN;
-    Scalar* scl = KSVAL(kdb, name);
+    Scalar* scl = kdb->get_obj(name);
     switch(info_nb) 
     {
         case 1 :  val = scl->relax; break;
@@ -140,7 +140,7 @@ int K_s_set_info(CKDBScalars* kdb, char* c_name, int info_nb, double value)
     if(!kdb->contains(name)) 
         return(-1);
     
-    Scalar* scl = KSVAL(kdb, name);
+    Scalar* scl = kdb->get_obj(name);
     switch(info_nb) 
     {
         case 0 :  scl->value = value; break;

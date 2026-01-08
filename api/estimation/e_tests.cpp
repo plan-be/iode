@@ -96,7 +96,7 @@ void Estimation::E_deg_freed()
     for(cf = 0, j = 0; cf < E_NC; cf++) 
     {
         coef_name = E_DBS->get_name(E_C_NBS[cf]);
-        if(KSVAL(E_DBS, coef_name)->relax == 0) 
+        if(E_DBS->get_obj(coef_name)->relax == 0) 
             continue;
         nbr = 0;
         for(eq = 0; eq < E_NEQ; eq++) 
@@ -237,7 +237,7 @@ int Estimation::E_c_ttests()
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
         coef_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = KSVAL(E_DBS, coef_name);
+        scl = E_DBS->get_obj(coef_name);
         scl->std = 0.0;
         if(scl->relax == 0) 
             continue;

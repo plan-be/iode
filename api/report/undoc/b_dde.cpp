@@ -491,10 +491,11 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case SCALARS :
             res = SCR_malloc(40);
-            scl = KSVAL((CKDBScalars*) kdb, name);
-            if(!IODE_IS_A_NUMBER(scl->value)) strcpy(res, "0");
-            //else                  SCR_fmt_dbl(scl->value, res, 16, -1); /* JMP 01-02-99 */
-            else                  IodeFmtVal(res, scl->value);    /* JMP 01-02-99 */
+            scl = ((CKDBScalars*) kdb)->get_obj(name);
+            if(!IODE_IS_A_NUMBER(scl->value)) 
+                strcpy(res, "0");
+            else                  
+                IodeFmtVal(res, scl->value);
             return(res);
         default:
             return((char *)0);
@@ -909,7 +910,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            scl = KSVAL(global_ws_scl.get(), name);
+            scl = global_ws_scl->get_obj(name);
             d = scl->value;        
             ptr = SCR_malloc(80);  
             IodeFmtVal(ptr, d);    

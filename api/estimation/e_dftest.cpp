@@ -259,7 +259,7 @@ void E_SclToReal(char* name, double* res)
     if(!global_ws_scl->contains(name))
         return;
 
-    Scalar* scl = KSVAL(global_ws_scl.get(), name);
+    Scalar* scl = global_ws_scl->get_obj(name);
     res[0] = scl->value;
     res[1] = scl->std;
     if(!IODE_IS_0(scl->std)) 

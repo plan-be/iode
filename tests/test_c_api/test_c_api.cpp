@@ -1334,32 +1334,32 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        KSVAL(global_ws_scl.get(), name)->value = 0.9;
-        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
+        global_ws_scl->get_obj(name)->value = 0.9;
+        global_ws_scl->get_obj(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(global_ws_scl.get(), name)->value = 0.9;
-        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
+        global_ws_scl->get_obj(name)->value = 0.9;
+        global_ws_scl->get_obj(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(global_ws_scl.get(), name)->value = 0.9;
-        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
+        global_ws_scl->get_obj(name)->value = 0.9;
+        global_ws_scl->get_obj(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        KSVAL(global_ws_scl.get(), name)->value = 0.9;
-        KSVAL(global_ws_scl.get(), name)->relax = 1.0;
+        global_ws_scl->get_obj(name)->value = 0.9;
+        global_ws_scl->get_obj(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);

@@ -207,7 +207,7 @@ bool Equation::print_definition() const
                 {
                     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
                     
-                    Scalar* scl = KSVAL(global_ws_scl.get(), sname);
+                    Scalar* scl = global_ws_scl->get_obj(sname);
                     if(!scl) 
                     {
                         W_printf((char*) "?\n");

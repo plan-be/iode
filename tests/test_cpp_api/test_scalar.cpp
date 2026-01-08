@@ -27,7 +27,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
     bool found = global_ws_scl->contains(name);
     ASSERT_TRUE(found);
 
-    Scalar* scl = KSVAL(global_ws_scl.get(), name);
+    Scalar* scl = global_ws_scl->get_obj(name);
     ASSERT_EQ(scl->value, val);
     ASSERT_EQ(scl->relax, relax);
     ASSERT_EQ(scl->std, std);
