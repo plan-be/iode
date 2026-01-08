@@ -69,13 +69,16 @@ static int E_GetScls(CLEC* clec, char*** scl)
  */
 static void E_SetScl(int relax, char* name)                                             
 {
-    if(relax == 1) {
-        K_s_set_value(global_ws_scl.get(), name, 0.9);
-        K_s_set_relax (global_ws_scl.get(), name, 1.0);
+    Scalar* scl = global_ws_scl->get_obj(name);
+    if(relax == 1) 
+    {
+        scl->value = 0.9;
+        scl->relax = 1.0;
     }    
-    else { 
-        K_s_set_value(global_ws_scl.get(), name, 0.0);
-        K_s_set_relax (global_ws_scl.get(), name, 0.0);
+    else 
+    { 
+        scl->value = 0.0;
+        scl->relax = 0.0;
     }
 }
 
@@ -166,10 +169,9 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
         etest[0]=0;
         strcat(etest, "e0_");
         strcat(etest, test);
-        //E_SclToReal(etest, res);
-        res = K_s_get_value(global_ws_scl.get(), etest); // JMP 09/07/2022
-        kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);        // JMP 08/07/2022
-        L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);   // JMP 08/07/2022
+        res = global_ws_scl->get_obj(etest)->value;
+        kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);
+        L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);
     }
     else 
         res = 0.0;

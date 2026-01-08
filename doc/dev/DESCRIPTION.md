@@ -422,16 +422,6 @@ List of functions
 |`double K_e_r2adj (KDB* kdb, char*name)`|Returns r2adj calculated during the last estimation of equation name|
 |`double K_e_dw (KDB* kdb, char*name)`|Returns dw calculated during the last estimation of equation name|
 |`double K_e_loglik(KDB* kdb, char*name)`|Returns loglik calculated during the last estimation of equation name|
-|**Scalar data**||
-|`double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb)`|Retrieves a Scalar info|
-|`double K_s_get_value (KDB* kdb, char*name)`|Retrieves a Scalar value|
-|`double K_s_get_relax (KDB* kdb, char*name)`|Retrieves a Scalar relax|
-|`double K_s_get_stderr(KDB* kdb, char*name)`|Retrieves a Scalar stderr|
-|`double K_s_get_ttest (KDB* kdb, char*name)`|Retrieves a Scalar ttest|
-|`double K_s_set_info(CKDBScalars* kdb, char*name, int info_nb, double val)`|Sets a Scalar info|
-|`double K_s_set_value (KDB* kdb, char*name)`|Sets a Scalar value|
-|`double K_s_set_relax (KDB* kdb, char*name)`|Sets a Scalar relax|
-|`double K_s_set_stderr(KDB* kdb, char*name)`|Sets a Scalar stderr|
 
 ### k\_eqs.c {#T33}
 

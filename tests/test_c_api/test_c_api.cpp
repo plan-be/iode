@@ -1598,7 +1598,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
-    val = K_s_get_value (global_ws_scl.get(), "u");
+    val = global_ws_scl->get_obj("u")->value;
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);

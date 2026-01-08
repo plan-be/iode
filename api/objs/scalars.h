@@ -124,15 +124,3 @@ inline std::unique_ptr<CKDBScalars> global_ws_scl = std::make_unique<CKDBScalars
 /*----------------------- FUNCTIONS ----------------------------*/
 
 std::size_t hash_value(const Scalar& scalar);
-
-// Values of scalars by name
-double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb);
-double K_s_get_value (CKDBScalars* kdb, char*name);
-double K_s_get_relax (CKDBScalars* kdb, char*name);
-double K_s_get_stderr(CKDBScalars* kdb, char*name);
-double K_s_get_ttest (CKDBScalars* kdb, char*name);
-
-int K_s_set_info(CKDBScalars* kdb, char*name, int info_nb, double val);
-int K_s_set_value (CKDBScalars* kdb, char*name, double val);
-int K_s_set_relax (CKDBScalars* kdb, char*name, double val);
-int K_s_set_stderr(CKDBScalars* kdb, char*name, double val);
