@@ -679,7 +679,7 @@ bool CKDBTables::save_asc(const std::string& filename)
     for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s {", (char*) name.c_str());
-        tbl = KTVAL(this, name);
+        tbl = this->get_obj(name);
         print_tbl(fd, tbl);
         fprintf(fd, "}\n");
         delete tbl;

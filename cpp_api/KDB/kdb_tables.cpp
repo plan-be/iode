@@ -10,9 +10,9 @@ Table* KDBTables::copy_obj(Table* const original) const
 Table* KDBTables::get_unchecked(const std::string& name) const
 {
 	CKDBTables* kdb = get_database();
-	// Note: - KTVAL allocate a new pointer Table*
+	// Note: - get_obj() returns an allocated new object Table*
 	//       - static_cast<Table*>(Table*) calls the copy constructor Table(const Table* c_table)
-	return static_cast<Table*>(KTVAL(kdb, name));
+	return static_cast<Table*>(kdb->get_obj(name));
 }
 
 std::string KDBTables::get_title(const std::string& name) const
@@ -21,7 +21,7 @@ std::string KDBTables::get_title(const std::string& name) const
 	if(!this->contains(name))
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
-    Table* c_table = KTVAL(get_database(), name);
+    Table* c_table = get_database()->get_obj(name);
     std::string title = std::string((char*) T_get_title(c_table));
     delete c_table;
     return title;

@@ -20,7 +20,7 @@ protected:
 
 
 // Test that a Table* 'tbl' object added to global_ws_tbl using add() and a Table* 'extracted_tbl' object 
-// extracted using KTVAL() are exactly the same
+// extracted using get_obj() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
     KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
@@ -105,7 +105,7 @@ TEST_F(TablesTest, AddGetTable)
     global_ws_tbl->set_obj(name, tbl);
 
     // --- extract the table from the Table KDB
-    Table* extracted_tbl = KTVAL(global_ws_tbl.get(), name);
+    Table* extracted_tbl = global_ws_tbl->get_obj(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
@@ -265,7 +265,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     bool found = global_ws_tbl->contains(name);
     ASSERT_TRUE(found);
 
-    Table* tbl = KTVAL(global_ws_tbl.get(), name);
+    Table* tbl = global_ws_tbl->get_obj(name);
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);
@@ -804,7 +804,7 @@ TEST_F(TablesTest, Hash)
     EXPECT_EQ(hash_before, hash_after);
 
     // C++ table vs C table
-    Table* c_table = KTVAL(global_ws_tbl.get(), "GFRPC");
+    Table* c_table = global_ws_tbl->get_obj("GFRPC");
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);
 

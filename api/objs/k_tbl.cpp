@@ -577,7 +577,7 @@ bool CKDBTables::grep_obj(const std::string& name, const SWHDL handle,
     bool found = false;
     std::string text;
 
-    Table* tbl = KTVAL(const_cast<CKDBTables*>(this), name);
+    Table* tbl = const_cast<CKDBTables*>(this)->get_obj(name);
     for(const TableLine& tline : tbl->lines) 
     {
         if(found) 
@@ -634,7 +634,7 @@ char* CKDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc
     char    gsmpl[128], **l = NULL, *buf, *res = NULL;
     COLS    *cls;
 
-    Table* tbl = KTVAL(global_ws_tbl.get(), name);
+    Table* tbl = global_ws_tbl->get_obj(name);
     Sample* smpl = global_ws_var->sample;
 
     /* date */
@@ -756,7 +756,7 @@ char* CKDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* 
  */
 bool CKDBTables::print_obj_def(const std::string& name)
 {
-    Table* tbl = KTVAL(this, name);
+    Table* tbl = this->get_obj(name);
     if(!tbl) 
         return false;
     

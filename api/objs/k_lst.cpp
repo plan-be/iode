@@ -193,7 +193,7 @@ void KI_scan(CKDBIdentities* dbi, int i, CKDBVariables* exo, CKDBScalars* scal)
 void KT_scan(CKDBTables* dbt, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
     std::string name = dbt->get_name(i);
-    Table* tbl = KTVAL(dbt, name);
+    Table* tbl = dbt->get_obj(name);
 
     CLEC* clec = NULL;
     for(int k = 0; k < T_NL(tbl); k++)   

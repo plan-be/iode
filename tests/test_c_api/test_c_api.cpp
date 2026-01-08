@@ -831,7 +831,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     bool files = true;
     bool date = true;
 
-    U_test_print_title("Tests Table: Table(...) constructor vs KTVAL()");
+    U_test_print_title("Tests Table: Table(...) constructor vs get_obj()");
 
     // --- create an instance of Table;
     tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
@@ -902,7 +902,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
     global_ws_tbl->set_obj(name, tbl);
 
     // --- extract the table from the Table KDB
-    extracted_tbl = KTVAL(global_ws_tbl.get(), name);
+    extracted_tbl = global_ws_tbl->get_obj(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -1253,7 +1253,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = KTVAL(global_ws_tbl.get(), "C8_1");
+    tbl = global_ws_tbl->get_obj("C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
