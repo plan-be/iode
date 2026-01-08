@@ -49,7 +49,7 @@ double* KDBVariables::get_var_ptr(const std::string& name)
 	// throw exception if object with passed name does not exist
     if(!this->contains(name))
 		throw std::invalid_argument("Cannot get Variable '" + name + "'.\nThe Variable does not exist in the database.");
-    return KVVAL(get_database(), name, 0);
+    return get_database()->get_obj(name);
 }
 
 void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)

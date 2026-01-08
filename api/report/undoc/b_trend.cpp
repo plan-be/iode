@@ -109,7 +109,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     for(auto& [from_name, _] : from->k_objs) 
     {
-        memcpy(f_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
+        memcpy(f_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019
         to->set_obj(from_name, t_vec);

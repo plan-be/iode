@@ -35,7 +35,6 @@ from pyiode.iode_database.cpp_api_database cimport KDBVariables as CppKDBVariabl
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
-from pyiode.iode_database.cpp_api_database cimport KVVAL
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
 from pyiode.iode_database.cpp_api_database cimport EXP_RuleExport
 from pyiode.iode_database.cpp_api_database cimport RasExecute
@@ -287,7 +286,7 @@ cdef class Variables(CythonIodeDatabase):
             # values is a numpy array AND the mode is VAR_MODE_LEVEL
             elif isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
                     nb_periods = t_last - t_first + 1
-                    var_ptr = KVVAL(c_db_ptr, c_name, t_first)
+                    var_ptr = c_db_ptr.get_var_ptr(c_name, t_first)
                     numpy_data_memview = values
                     memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
             # assume values is an iterable
@@ -397,7 +396,7 @@ cdef class Variables(CythonIodeDatabase):
                 b_name = name.encode()
                 if not self.database_ptr.contains(<string>b_name):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
-                var_ptr = KVVAL(db_ptr, <string>b_name, t_first_period)
+                var_ptr = db_ptr.get_var_ptr(<string>b_name, t_first_period)
                 memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
         else:
             for i, name in enumerate(vars_names):
@@ -440,7 +439,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef vector[string] cpp_names = self.database_ptr.get_names()
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
             for i, c_name in enumerate(cpp_names):
-                var_ptr = KVVAL(db_ptr, c_name, t_first_period)
+                var_ptr = db_ptr.get_var_ptr(c_name, t_first_period)
                 memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
         else:
             for i, c_name in enumerate(cpp_names):

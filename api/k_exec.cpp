@@ -406,7 +406,7 @@ static int KI_read_vars_db(CKDBVariables* dbv, CKDBVariables* dbv_tmp, char* sou
         dbv->k_objs[name] = handle;
 
         // copy the VAR from dbv_tmp to dbv
-        memcpy(KVVAL(dbv, name, start), KVVAL(dbv_tmp, name, start_tmp), 
+        memcpy(dbv->get_var_ptr(name, start), dbv_tmp->get_var_ptr(name, start_tmp), 
                sizeof(double) * smpl.nb_periods);
         
         if(KEXEC_TRACE)
@@ -763,7 +763,7 @@ static int KI_execute(CKDBVariables* dbv, CKDBScalars* dbs, CKDBIdentities* dbi,
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
             d = L_exec(dbv, dbs, (CLEC *)tmp, t);
-            *(KVVAL(dbv, idt_name, t)) = d;
+            dbv->get_var_ptr(idt_name)[t] = d;
         }
         SW_nfree(tmp);
     }

@@ -96,6 +96,16 @@ public:
 
     double* get_obj(const SWHDL handle) const override;
     double* get_obj(const std::string& name) const override;
+    double get_value(const std::string& name, const int t) const
+    {
+        double* var = this->get_obj(name);
+        return *(var + t);
+    }
+    double* get_var_ptr(const std::string& name, const int t = 0)
+    {
+        double* var = this->get_obj(name);
+        return var + t;
+    }
 
     bool set_obj(const std::string& name, const double* value) override;
     bool set_obj(const std::string& name, const std::vector<double>& value);
@@ -126,19 +136,6 @@ inline std::unique_ptr<CKDBVariables> global_ws_var = std::make_unique<CKDBVaria
 
 double *K_vval(KDB *, int, int);
 double *K_vptr(KDB *, char*, int); 
-
-
-inline double* KVVAL(CKDBVariables* kdb, const std::string& name)
-{
-    return kdb->get_obj(name);
-}
-
-inline double* KVVAL(CKDBVariables* kdb, const std::string& name, const int t)
-{
-    double* var = kdb->get_obj(name);
-    return var + t;
-}
-
 
 /* k_wsvar.c */
 int KV_sample(CKDBVariables*, Sample*);

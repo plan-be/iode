@@ -30,7 +30,7 @@
 double* L_getvar(CKDBVariables* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
-    return KVVAL(kdb, name, 0);
+    return kdb->get_var_ptr(name);
 }
 
 

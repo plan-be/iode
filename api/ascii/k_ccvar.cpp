@@ -301,7 +301,7 @@ bool CKDBVariables::save_asc(const std::string& filename)
     for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
-        val = KVVAL(this, name, 0);
+        val = this->get_var_ptr(name);
         for(j = 0 ; j < smpl->nb_periods; j++, val++) 
             print_val(fd, *val);
         fprintf(fd, "\n");
@@ -419,7 +419,7 @@ bool CKDBVariables::save_csv(const std::string& filename, const std::vector<std:
         fprintf(fd, "%s", var_name.c_str());
         if(this->contains(var_name)) 
         {
-            val = KVVAL(this, var_name, 0);
+            val = this->get_var_ptr(var_name);
             for(int j = 0; j < smpl->nb_periods; j++, val++) 
             {
                 if(IODE_IS_A_NUMBER(*val)) 

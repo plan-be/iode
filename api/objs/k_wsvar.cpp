@@ -73,7 +73,7 @@ int KV_sample(CKDBVariables* kdb, Sample *new_sample)
         {
             if(smpl.nb_periods > 0)
                 memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
-                       KVVAL(kdb, it->first, start1),
+                       kdb->get_var_ptr(it->first, start1),
                        sizeof(double) * smpl.nb_periods);
             SW_free(it->second);
         }
@@ -163,8 +163,8 @@ int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
         }
 
         if(handle_2 > 0)
-            memcpy((double *) KVVAL(kdb1, name, start1),
-                   (double *) KVVAL(kdb2, name, start2), size);
+            memcpy((double *) kdb1->get_var_ptr(name, start1),
+                   (double *) kdb2->get_var_ptr(name, start2), size);
     }
 
     return 0;
@@ -306,7 +306,7 @@ double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
     switch(mode) 
     {
         case VAR_MODE_LEVEL :
-            var = *KVVAL(kdb, name, t);
+            var = *kdb->get_var_ptr(name, t);
             break;
         case VAR_MODE_DIFF :
             pernb = 1;
@@ -317,7 +317,7 @@ double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
                 var = IODE_NAN;
                 break;
             }
-            vt = KVVAL(kdb, name, 0);
+            vt = kdb->get_var_ptr(name);
             if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]))
                 var = vt[t] - vt[t - pernb];
             else 
@@ -332,7 +332,7 @@ double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
                 var = IODE_NAN;
                 break;
             }
-            vt = KVVAL(kdb, name, 0);
+            vt = kdb->get_var_ptr(name);
             if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !IODE_IS_0(vt[t - pernb]))
                 var = (vt[t]/vt[t - pernb] - 1) * 100.0;
             else 
@@ -372,7 +372,7 @@ void KV_set(CKDBVariables* kdb, const std::string& name, int t, int mode, double
     
     int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
-    double* var = KVVAL(kdb, name, 0);
+    double* var = kdb->get_var_ptr(name);
     switch(mode) 
     {
         case VAR_MODE_LEVEL :
@@ -503,7 +503,7 @@ int KV_extrapolate(CKDBVariables* dbv, int method, Sample* smpl, char* pattern)
     double* val;
     for(const std::string& name : var_list) 
     {
-        val = KVVAL(dbv, name, 0);
+        val = dbv->get_var_ptr(name);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
@@ -593,8 +593,8 @@ CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char 
         if(npos < 0) 
             goto done;
 
-        memcpy(eval, KVVAL(edbv, ename, 0), nb_per * sizeof(double));
-        nval = KVVAL(ndbv, nname, 0);
+        memcpy(eval, edbv->get_var_ptr(ename), nb_per * sizeof(double));
+        nval = ndbv->get_var_ptr(nname);
         for(int t = 0; t < smpl->nb_periods; t++) 
         {
             if(added) 
@@ -626,7 +626,7 @@ CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char 
     {
         for(auto& [name, handle] : ndbv->k_objs) 
         {
-            nval = KVVAL(ndbv, name, 0);
+            nval = ndbv->get_var_ptr(name);
             for(int t = 0; t < smpl->nb_periods; t++)
                 if(IODE_IS_A_NUMBER(nval[t])) 
                     nval[t] /= times[npos];
@@ -706,7 +706,7 @@ int KV_aper_pos(char* aper2)
  
 double KV_get_at_t(char*varname, int t)
 {
-    double* var_ptr = KVVAL(global_ws_var.get(), varname);
+    double* var_ptr = global_ws_var->get_var_ptr(varname);
     if(var_ptr == NULL) 
         return(IODE_NAN);
     
@@ -776,7 +776,7 @@ double KV_get_at_aper(char*varname, char* aper)
 
 int KV_set_at_t(char*varname, int t, double val)
 {
-    double* var_ptr = KVVAL(global_ws_var.get(), varname);
+    double* var_ptr = global_ws_var->get_var_ptr(varname);
     if(var_ptr == NULL) 
         return(-1);
 
@@ -891,7 +891,7 @@ bool CKDBVariables::print_obj_def(const std::string& name)
         return false;
     }
 
-    double* val = KVVAL(this, name, 0); 
+    double* val = this->get_var_ptr(name); 
     if(val == NULL) 
         return false;
     

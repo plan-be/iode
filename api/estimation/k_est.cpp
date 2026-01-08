@@ -114,7 +114,7 @@ void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
     
     // create varname with NaN 
     KV_add(global_ws_var.get(), varname);
-    double* var = KVVAL(global_ws_var.get(), varname);
+    double* var = global_ws_var->get_var_ptr(varname);
     if(var == NULL) 
         return;
     

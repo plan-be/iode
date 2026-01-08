@@ -191,7 +191,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     for(const auto& [name, handle] : kdb->k_objs)
     {
         hash_combine<std::string>(seed, name); 
-        // KVVAL(kdb, pos, t) return a pointer to pointer to kdb[pos][t]. 
+        // kdb->get_obj(pos, t) return a pointer to pointer to kdb[pos][t]. 
         // We need to compute the hash with the values of kdb[pos], not the pointers. 
         // Otherwise, hash_value() and hash_combine() will only compare pointer 
         // addresses and not the values.

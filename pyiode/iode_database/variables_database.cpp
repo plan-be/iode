@@ -216,15 +216,15 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     {
     case OP_ADD:
         for(auto& [name, _] : c_database->k_objs)
-            *KVVAL(db, name, t) += values[i++];
+            db->get_var_ptr(name)[t] += values[i++];
         break;
     case OP_SUB: 
         for(auto& [name, _] : c_database->k_objs) 
-            *KVVAL(db, name, t) -= values[i++];
+            db->get_var_ptr(name)[t] -= values[i++];
         break;
     case OP_MUL: 
         for(auto& [name, _] : c_database->k_objs) 
-            *KVVAL(db, name, t) *= values[i++];
+            db->get_var_ptr(name)[t] *= values[i++];
         break;
     case OP_DIV:
         for(auto& [name, _] : c_database->k_objs)
@@ -232,12 +232,12 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
             value = values[i++];
             if(value == 0)
                 throw std::invalid_argument("C API: Division by zero");
-            *KVVAL(db, name, t) /= value;
+            db->get_var_ptr(name)[t] /= value;
         }
         break;
     case OP_POW: 
         for(auto& [name, _] : c_database->k_objs)
-            *KVVAL(db, name, t) = pow(*KVVAL(db, name, t), values[i++]);
+            db->get_var_ptr(name)[t] = pow(db->get_value(name, t), values[i++]);
         break;
     }
 }
