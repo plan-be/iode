@@ -6,40 +6,16 @@
  *  
  *  List of functions 
  *  -----------------
- *    char *K_oval(KDB* kdb, int pos, int n)           ~ kdb[pos][n]
- *    char* K_optr(KDB *kdb, char* name, int n)        ~ kdb[name][n]
- *    char *K_oval0(KDB* kdb, int pos)                 ~ kdb[pos][0]
- *    char* K_optr0(KDB *kdb, char* name)              ~ kdb[name][0]
- *    char *K_oval1(KDB* kdb, int pos)                 ~ kdb[pos][1]
- *    char* K_optr1(KDB *kdb, char* name)              ~ kdb[name][1]
+ *    char *K_oval(KDB* kdb, int pos, int n)        ~ kdb[pos][n]
+ *    char* K_optr(KDB *kdb, char* name, int n)     ~ kdb[name][n]
+ *    char *K_oval0(KDB* kdb, int pos)              ~ kdb[pos][0]
+ *    char* K_optr0(KDB *kdb, char* name)           ~ kdb[name][0]
+ *    char *K_oval1(KDB* kdb, int pos)              ~ kdb[pos][1]
+ *    char* K_optr1(KDB *kdb, char* name)           ~ kdb[name][1]
  *    double *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
  *    double *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
- *    Equation* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
- *    Table* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
- *  
- *    double K_etest(KDB* kdb, char*name, int test_nb)  Retrieves a statistical test stored the equation whose endo is name.
- *    double K_e_stdev (KDB* kdb, char*name)            Returns stdev calculated during the last estimation of equation name
- *    double K_e_meany (KDB* kdb, char*name)            Returns meany calculated during the last estimation of equation name       
- *    double K_e_ssres (KDB* kdb, char*name)            Returns ssres calculated during the last estimation of equation name
- *    double K_e_stderr(KDB* kdb, char*name)            Returns stderr calculated during the last estimation of equation name
- *    double K_e_fstat (KDB* kdb, char*name)            Returns fstat calculated during the last estimation of equation name
- *    double K_e_r2    (KDB* kdb, char*name)            Returns r2    calculated during the last estimation of equation name
- *    double K_e_r2adj (KDB* kdb, char*name)            Returns r2adj calculated during the last estimation of equation name
- *    double K_e_dw    (KDB* kdb, char*name)            Returns dw    calculated during the last estimation of equation name
- *    double K_e_loglik(KDB* kdb, char*name)            Returns loglik calculated during the last estimation of equation name
- *
- *    double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb)             Retrieves a Scalar info
- *    double K_s_get_value (KDB* kdb, char*name)                        Retrieves a Scalar value
- *    double K_s_get_relax (KDB* kdb, char*name)                        Retrieves a Scalar relax
- *    double K_s_get_stderr(KDB* kdb, char*name)                        Retrieves a Scalar stderr
- *    double K_s_get_ttest (KDB* kdb, char*name)                        Retrieves a Scalar ttest
- *  
- *    int K_s_set_info(CKDBScalars* kdb, char*name, int info_nb, double val)    Sets a Scalar info
- *    int K_s_set_value (KDB* kdb, char*name, double val)               Sets a Scalar value
- *    int K_s_set_relax (KDB* kdb, char*name, double val)               Sets a Scalar relax
- *    int K_s_set_stderr(KDB* kdb, char*name, double val)               Sets a Scalar stderr
-
- *  See also defines in iode.h.
+ *    Equation* K_eptr(KDB* kdb, char* name)        ~ kdb[name]
+ *    Table* K_tptr(KDB* kdb, char* name)           ~ kdb[name] 
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
