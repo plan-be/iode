@@ -241,14 +241,14 @@ protected:
 	double KSIM_VAL(const int i, const int t) const
 	{
 		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
-		return *KVVAL(KSIM_DBV, name, t);
+		return KSIM_DBV->get_value(name, t);
 	}
 
 	///< set value of endo[i] in period nb t
 	void KSIM_SET_VAL(const int i, const int t, const double value)
 	{
 		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
-		*KVVAL(KSIM_DBV, name, t) = value;
+		*KSIM_DBV->get_var_ptr(name, t) = value;
 	}
 
 private:

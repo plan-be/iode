@@ -193,17 +193,17 @@ public:
 	
 	    success = kdb_var->set_obj("A", A);
         EXPECT_TRUE(success);
-        values = KVVAL(kdb_var, "A", 0);
+        values = kdb_var->get_var_ptr("A");
         EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", 0), A[0]);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "A", nb-1), A[nb-1]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", 0), A[0]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", nb-1), A[nb-1]);
 	    
         success = kdb_var->set_obj("B", B);
         EXPECT_TRUE(success);
-        values = KVVAL(kdb_var, "B", 0);
+        values = kdb_var->get_var_ptr("B");
         EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "B", 0), B[0]);
-        EXPECT_DOUBLE_EQ(*KVVAL(kdb_var, "B", nb-1), B[nb-1]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", 0), B[0]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", nb-1), B[nb-1]);
 
         delete[] A;
         delete[] B;
@@ -987,8 +987,8 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_test_CreateObjects();
 
-    A = (double*) KVVAL(global_ws_var.get(), "A");
-    B = (double*) KVVAL(global_ws_var.get(), "B");
+    A = (double*) global_ws_var->get_var_ptr("A");
+    B = (double*) global_ws_var->get_var_ptr("B");
 
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
@@ -1103,8 +1103,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
 
@@ -1120,8 +1120,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
-    EXPECT_DOUBLE_EQ(round(*KVVAL(kdb_var, "ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
+    EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
+    EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
     delete kdb_var;
     kdb_var = nullptr;
 }
@@ -1491,7 +1491,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
-    A1 = KVVAL(global_ws_var.get(), "A1");
+    A1 = global_ws_var->get_var_ptr("A1");
     EXPECT_EQ(rc, 0);
     found = global_ws_var->contains("A1");
     EXPECT_TRUE(found);
@@ -1905,8 +1905,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Check the values
-    double* C = (double*) KVVAL(global_ws_var.get(), "C");
-    double* D = (double*) KVVAL(global_ws_var.get(), "D");
+    double* C = (double*) global_ws_var->get_var_ptr("C");
+    double* D = (double*) global_ws_var->get_var_ptr("D");
 
     EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
     EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
@@ -1927,7 +1927,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     U_test_load(IDENTITIES, "fun");
     U_test_load(VARIABLES, "fun");
 
-    AOUC = KVVAL(global_ws_var.get(), "AOUC");
+    AOUC = global_ws_var->get_var_ptr("AOUC");
     AOUC[1] = 0.1;
 
     // Sample (null => full sample, see K_exec())
@@ -2937,73 +2937,73 @@ TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
     B_WsSample("2000Y1 2001Y1");
 
     KV_add(global_ws_var.get(), "R1C1");
-    *KVVAL(global_ws_var.get(), "R1C1", 0) = 5.0;
+    global_ws_var->get_var_ptr("R1C1")[0] = 5.0;
     KV_add(global_ws_var.get(), "R1C2");
-    *KVVAL(global_ws_var.get(), "R1C2", 0) = 3.0;
+    global_ws_var->get_var_ptr("R1C2")[0] = 3.0;
     KV_add(global_ws_var.get(), "R1C3");
-    *KVVAL(global_ws_var.get(), "R1C3", 0) = 5.0;
+    global_ws_var->get_var_ptr("R1C3")[0] = 5.0;
     KV_add(global_ws_var.get(), "R1C4");
-    *KVVAL(global_ws_var.get(), "R1C4", 0) = 7.0;
-    *KVVAL(global_ws_var.get(), "R1C4", 1) = 5.0;
+    global_ws_var->get_var_ptr("R1C4")[0] = 7.0;
+    global_ws_var->get_var_ptr("R1C4", 1)[0] = 5.0;
     KV_add(global_ws_var.get(), "R1CT");
-    *KVVAL(global_ws_var.get(), "R1CT", 0) = 20.0;
-    *KVVAL(global_ws_var.get(), "R1CT", 1) = 20.0;
+    global_ws_var->get_var_ptr("R1CT")[0] = 20.0;
+    global_ws_var->get_var_ptr("R1CT", 1)[0] = 20.0;
 
     KV_add(global_ws_var.get(), "R2C1");
-    *KVVAL(global_ws_var.get(), "R2C1", 0) = 1.0;
+    global_ws_var->get_var_ptr("R2C1")[0] = 1.0;
     KV_add(global_ws_var.get(), "R2C2");
-    *KVVAL(global_ws_var.get(), "R2C2", 0) = 1.0;
-    *KVVAL(global_ws_var.get(), "R2C2", 1) = 2.0;
+    global_ws_var->get_var_ptr("R2C2")[0] = 1.0;
+    global_ws_var->get_var_ptr("R2C2", 1)[0] = 2.0;
     KV_add(global_ws_var.get(), "R2C3");
-    *KVVAL(global_ws_var.get(), "R2C3", 0) = 4.0;
+    global_ws_var->get_var_ptr("R2C3")[0] = 4.0;
     KV_add(global_ws_var.get(), "R2C4");
-    *KVVAL(global_ws_var.get(), "R2C4", 0) = 4.0;
+    global_ws_var->get_var_ptr("R2C4")[0] = 4.0;
     KV_add(global_ws_var.get(), "R2CT");
-    *KVVAL(global_ws_var.get(), "R2CT", 0) = 10.0;
-    *KVVAL(global_ws_var.get(), "R2CT", 1) = 10.0;
+    global_ws_var->get_var_ptr("R2CT")[0] = 10.0;
+    global_ws_var->get_var_ptr("R2CT", 1)[0] = 10.0;
 
     KV_add(global_ws_var.get(), "R3C1");
-    *KVVAL(global_ws_var.get(), "R3C1", 0) = 3.0;
+    global_ws_var->get_var_ptr("R3C1")[0] = 3.0;
     KV_add(global_ws_var.get(), "R3C2");
-    *KVVAL(global_ws_var.get(), "R3C2", 0) = 1.0;
+    global_ws_var->get_var_ptr("R3C2")[0] = 1.0;
     KV_add(global_ws_var.get(), "R3C3");
-    *KVVAL(global_ws_var.get(), "R3C3", 0) = 3.0;
-    *KVVAL(global_ws_var.get(), "R3C3", 1) = 2.0;
+    global_ws_var->get_var_ptr("R3C3")[0] = 3.0;
+    global_ws_var->get_var_ptr("R3C3", 1)[0] = 2.0;
     KV_add(global_ws_var.get(), "R3C4");
-    *KVVAL(global_ws_var.get(), "R3C4", 0) = 3.0;
+    global_ws_var->get_var_ptr("R3C4")[0] = 3.0;
     KV_add(global_ws_var.get(), "R3CT");
-    *KVVAL(global_ws_var.get(), "R3CT", 0) = 10.0;
-    *KVVAL(global_ws_var.get(), "R3CT", 1) = 10.0;
+    global_ws_var->get_var_ptr("R3CT")[0] = 10.0;
+    global_ws_var->get_var_ptr("R3CT", 1)[0] = 10.0;
 
     KV_add(global_ws_var.get(), "R4C1");
-    *KVVAL(global_ws_var.get(), "R4C1", 0) = 1.0;
-    *KVVAL(global_ws_var.get(), "R4C1", 1) = 0.0;
+    global_ws_var->get_var_ptr("R4C1")[0] = 1.0;
+    global_ws_var->get_var_ptr("R4C1", 1)[0] = 0.0;
     KV_add(global_ws_var.get(), "R4C2");
-    *KVVAL(global_ws_var.get(), "R4C2", 0) = 2.0;
+    global_ws_var->get_var_ptr("R4C2")[0] = 2.0;
     KV_add(global_ws_var.get(), "R4C3");
-    *KVVAL(global_ws_var.get(), "R4C3", 0) = 1.0;
+    global_ws_var->get_var_ptr("R4C3")[0] = 1.0;
     KV_add(global_ws_var.get(), "R4C4");
-    *KVVAL(global_ws_var.get(), "R4C4", 0) = 1.0;
+    global_ws_var->get_var_ptr("R4C4")[0] = 1.0;
     KV_add(global_ws_var.get(), "R4CT");
-    *KVVAL(global_ws_var.get(), "R4CT", 0) = 5.0;
-    *KVVAL(global_ws_var.get(), "R4CT", 1) = 5.0;
+    global_ws_var->get_var_ptr("R4CT")[0] = 5.0;
+    global_ws_var->get_var_ptr("R4CT", 1)[0] = 5.0;
 
     KV_add(global_ws_var.get(), "RTC1");
-    *KVVAL(global_ws_var.get(), "RTC1", 0) = 10.0;
-    *KVVAL(global_ws_var.get(), "RTC1", 1) = 10.0;
+    global_ws_var->get_var_ptr("RTC1")[0] = 10.0;
+    global_ws_var->get_var_ptr("RTC1", 1)[0] = 10.0;
     KV_add(global_ws_var.get(), "RTC2");
-    *KVVAL(global_ws_var.get(), "RTC2", 0) = 7.0;
-    *KVVAL(global_ws_var.get(), "RTC2", 1) = 7.0;
+    global_ws_var->get_var_ptr("RTC2")[0] = 7.0;
+    global_ws_var->get_var_ptr("RTC2", 1)[0] = 7.0;
     KV_add(global_ws_var.get(), "RTC3");
-    *KVVAL(global_ws_var.get(), "RTC3", 0) = 13.0;
-    *KVVAL(global_ws_var.get(), "RTC3", 1) = 13.0;
+    global_ws_var->get_var_ptr("RTC3")[0] = 13.0;
+    global_ws_var->get_var_ptr("RTC3", 1)[0] = 13.0;
     KV_add(global_ws_var.get(), "RTC4");
-    *KVVAL(global_ws_var.get(), "RTC4", 0) = 15.0;
-    *KVVAL(global_ws_var.get(), "RTC4", 1) = 15.0;
+    global_ws_var->get_var_ptr("RTC4")[0] = 15.0;
+    global_ws_var->get_var_ptr("RTC4", 1)[0] = 15.0;
 
     KV_add(global_ws_var.get(), "RTCT");
-    *KVVAL(global_ws_var.get(), "RTCT", 0) = 90.0;
-    *KVVAL(global_ws_var.get(), "RTCT", 1) = 90.0;
+    global_ws_var->get_var_ptr("RTCT")[0] = 90.0;
+    global_ws_var->get_var_ptr("RTCT", 1)[0] = 90.0;
 
     global_ws_lst->set_obj("X", "R1,R2,R3,R4,RT");
     global_ws_lst->set_obj("Y", "C1,C2,C3,C4,CT");

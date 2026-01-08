@@ -376,7 +376,7 @@ static int B_ltoh(int type, char* arg)
 
     for(auto& [from_name, from_handle] : from->k_objs) 
     {
-        memcpy(f_vec, KVVAL(from, from_name, 0), from->sample->nb_periods * sizeof(double));
+        memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
         switch(method[0]) 
         {
             case LTOH_CS :

@@ -416,7 +416,7 @@ static double *B_GetVarPtr(char* c_name)
     if(!global_ws_var->contains(name))
         return NULL;
     else
-        return KVVAL(global_ws_var.get(), name, 0);
+        return global_ws_var->get_var_ptr(name);
 }
 
 

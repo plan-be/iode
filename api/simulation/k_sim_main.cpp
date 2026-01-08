@@ -143,7 +143,7 @@ void CSimulation::K_init_values(int t)
     for(int i = 0 ; i < KSIM_PRE + KSIM_INTER + KSIM_POST; i++) 
     {
         name = KSIM_DBV->get_name(KSIM_POSXK[KSIM_ORDER[i]]);
-        val = KVVAL(KSIM_DBV, name, 0);
+        val = KSIM_DBV->get_var_ptr(name);
         KV_init_values_1(val, t, KSIM_START);
     }
 }
@@ -698,7 +698,7 @@ int CSimulation::K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* db
                 posexo = KSIM_DBV->index_of(var_name);  // Position of the exogenous var in dbv
 
                 var_exo = KSIM_DBV->get_name(posexo);
-                x = KVVAL(KSIM_DBV, var_exo, 0);
+                x = KSIM_DBV->get_var_ptr(var_exo);
                 for(j = t + 1; j < dbv->sample->nb_periods; j++)  
                     x[j] = x[t];
 

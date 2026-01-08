@@ -39,7 +39,7 @@ static int E_GetSmpl(Sample* smpl, char* c_name)
     if(!global_ws_var->contains(name)) 
         return -1;
     
-    double* val = KVVAL(global_ws_var.get(), name, 0);
+    double* val = global_ws_var->get_var_ptr(name);
 
     int t;
     Sample* wsmpl = global_ws_var->sample;

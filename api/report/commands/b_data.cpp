@@ -261,7 +261,7 @@ int B_DataCalcVar(char* arg, int unused)
             for(int t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
                 d = L_exec(kdb, global_ws_scl.get(), clec, t);
-                *(KVVAL(kdb, name, t)) = d;
+                kdb->get_var_ptr(name)[t] = d;
             }
             SW_nfree(clec);
         }

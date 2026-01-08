@@ -814,7 +814,7 @@ U_ch *RPF_vvalue(U_ch** args)
         }
         else 
         {
-            val = KVVAL(kdb, name, 0);
+            val = kdb->get_var_ptr(name);
             for(int j = 0 ; j < kdb->sample->nb_periods; j++, val++) 
             {
                 IodeFmtVal((char*) buf, *val);

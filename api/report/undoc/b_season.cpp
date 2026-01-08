@@ -89,12 +89,12 @@ int B_season(char* arg)
         dim = nb;  /* GB 23/07/98 */
         for(int j = 0; j < nb; j++) 
             c_vec[j] = i_vec[j] = IODE_NAN;
-        memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
+        memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
 
         res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
         if(!res) 
         {
-            memcpy(t_vec, KVVAL(from, from_name, 0) + shift, nb * sizeof(double));
+            memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
             to->set_obj(from_name, t_vec);
             continue;
         }

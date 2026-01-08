@@ -109,11 +109,8 @@ cdef extern from "api/all.h":
     cdef cppclass CKDBVariables(KDB):
         double* get_obj(SWHDL handle) except +
         double* get_obj(string name) except +
+        double* get_var_ptr(string name, int t) except +
         bool set_obj(string name, double* value) except +
-
-    double* KVVAL(CKDBVariables* kdb, string name)
-    double* KVVAL(CKDBVariables* kdb, string name, int t)
-
 
     # k_wsvar.c
     int KV_add(CKDBVariables* kdb, char* varname)

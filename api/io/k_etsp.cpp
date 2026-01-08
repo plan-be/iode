@@ -106,7 +106,7 @@ char* ExportObjsTSP::get_variable_value(CKDBVariables* dbv, int nb, int t, char*
     char    tmp[81], *buf = NULL;
 
     std::string name = dbv->get_name(nb);
-    double* value_ptr = KVVAL(dbv, name, t);
+    double* value_ptr = dbv->get_var_ptr(name, t);
     write_value(tmp, *value_ptr);
     write_pre_post("", " ", tmp, &buf);
     lg = (int) strlen(buf) + 1;

@@ -32,7 +32,7 @@ static int RasSetVar(char* c_name, int t, double var)
         return(-1);
     }         
     
-    *KVVAL(global_ws_var.get(), name, t) = var;
+    global_ws_var->get_var_ptr(name)[t] = var;
     return(0);
 }
 
@@ -48,7 +48,7 @@ static double RasGetVar(char* c_name, int t)
         var = IODE_NAN;
     }
     else          
-        var = *KVVAL(global_ws_var.get(), name, t);
+        var = *global_ws_var->get_var_ptr(name, t);
 
     // set to 0 if almost 0
     if(fabs(var) < 1e-10) 

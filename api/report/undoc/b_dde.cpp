@@ -199,7 +199,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     strcat(res, "\t");
     for(t = bt ; t < kdb->sample->nb_periods ; t++) 
     {
-        x = *(KVVAL(kdb, name, t));
+        x = kdb->get_value(name, t);
         if(!IODE_IS_A_NUMBER(x)) 
             strcpy(buf, "#N/A");
         else 
@@ -479,7 +479,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             res = SCR_malloc(40 * (1 + kdb->sample->nb_periods));
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                x = *(KVVAL((CKDBVariables*) kdb, name, t));
+                x = ((CKDBVariables*) kdb)->get_value(name, t);
                 if(!IODE_IS_A_NUMBER(x)) 
                     strcpy(buf, "0");
                 else 
