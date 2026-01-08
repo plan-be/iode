@@ -726,7 +726,7 @@ U_ch *RPF_ttitle(U_ch** args)
         }
         else 
         {
-            tbl = KTVAL(global_ws_tbl.get(), name);
+            tbl = global_ws_tbl->get_obj(name);
             res = SCR_strafcat(res, T_get_title(tbl, false));
             delete tbl;
             tbl = nullptr;

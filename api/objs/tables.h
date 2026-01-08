@@ -925,13 +925,6 @@ inline std::unique_ptr<CKDBTables> global_ws_tbl = std::make_unique<CKDBTables>(
 Table* K_tunpack(char*, char* name = NULL);
 Table* K_tptr(KDB* kdb, char* name);
 
-
-// returns an allocated Table
-inline Table* KTVAL(CKDBTables* kdb, const std::string& name) 
-{
-    return kdb->get_obj(name);
-}
-
 /*----------------------- MACROS ----------------------------*/
 
 #define T_NC(tbl)           (tbl->nb_columns)

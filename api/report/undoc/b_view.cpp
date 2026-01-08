@@ -186,7 +186,7 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
         return(-1);
     }
 
-    Table* tbl = KTVAL(global_ws_tbl.get(), name);
+    Table* tbl = global_ws_tbl->get_obj(name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
     else
@@ -237,7 +237,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             break;
         }
 
-        tbl = KTVAL(global_ws_tbl.get(), name);
+        tbl = global_ws_tbl->get_obj(name);
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
         if(view) 
