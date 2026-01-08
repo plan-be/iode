@@ -651,7 +651,7 @@ U_ch *RPF_sstderr(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(global_ws_scl.get(), name);
+            scl = global_ws_scl->get_obj(name);
             if(IODE_IS_A_NUMBER(scl->std))
                 sprintf((char*) buf, "%lf", (double) scl->std);
             else
@@ -686,7 +686,7 @@ U_ch *RPF_srelax(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = KSVAL(global_ws_scl.get(), name);
+            scl = global_ws_scl->get_obj(name);
             if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf((char*) buf, "%lf", (double) scl->relax);
             else

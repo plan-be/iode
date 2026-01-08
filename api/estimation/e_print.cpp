@@ -92,7 +92,7 @@ void Estimation::E_print_coefs()
     for(int i = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = KSVAL(E_DBS, scl_name);
+        scl = E_DBS->get_obj(scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
                  scl_name.c_str(),

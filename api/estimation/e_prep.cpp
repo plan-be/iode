@@ -340,10 +340,10 @@ int Estimation::E_prep_coefs()
                 if(k == E_NC) 
                 {
                     E_C_NBS[E_NC++] = pos;                  // Add a coefficient in E_C_NBS
-                    if(KSVAL(E_DBS, scl_name)->relax > 0) 
+                    if(E_DBS->get_obj(scl_name)->relax > 0) 
                         E_NCE++;
                 }
-                if(KSVAL(E_DBS, scl_name)->relax > 0) 
+                if(E_DBS->get_obj(scl_name)->relax > 0) 
                     MATE(E_NBCE, 0, i)++;                   // relax > 0 => estimation coef
             }
         }
@@ -383,11 +383,11 @@ void Estimation::E_get_C()
     for(int i = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        c = KSVAL(E_DBS, scl_name)->value;
-        if(KSVAL(E_DBS, scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
+        c = E_DBS->get_obj(scl_name)->value;
+        if(E_DBS->get_obj(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
         {
             c = 0.1;
-            KSVAL(E_DBS, scl_name)->value = c; // GB 24/01/2013
+            E_DBS->get_obj(scl_name)->value = c; // GB 24/01/2013
         }
         MATE(E_C, i, 0) = c;
     }
@@ -407,7 +407,7 @@ void Estimation::E_put_C()
     for(int i = 0 ; i < E_NC ; i++)
     {
         name = E_DBS->get_name(E_C_NBS[i]);
-        KSVAL(E_DBS, name)->value = MATE(E_C, i, 0);
+        E_DBS->get_obj(name)->value = MATE(E_C, i, 0);
     }
 }
 
@@ -426,7 +426,7 @@ void Estimation::E_get_SMO()
     for(int i = 0 ; i < E_NC ; i++)
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        MATE(E_SMO, i, 0) = KSVAL(E_DBS, scl_name)->relax;
+        MATE(E_SMO, i, 0) = E_DBS->get_obj(scl_name)->relax;
     }
 }
 

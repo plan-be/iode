@@ -45,7 +45,7 @@ double* L_getvar(CKDBVariables* kdb, int pos)
 double L_getscl(CKDBScalars* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
-    Scalar* scl = KSVAL(kdb, name);
+    Scalar* scl = kdb->get_obj(name);
     return(scl->value);
 }
 
@@ -150,7 +150,7 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec,
         {
             if(global_ws_scl->contains(sname)) 
             {
-                scl = KSVAL(global_ws_scl.get(), sname);
+                scl = global_ws_scl->get_obj(sname);
                 T_fmt_val(tcoef, scl->value, 15, K_NBDEC);
                 T_fmt_val(ttest, scl->calculate_t_test(), 15, K_NBDEC);
                 if(coefs == 1) 

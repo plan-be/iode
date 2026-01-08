@@ -603,7 +603,7 @@ static int KI_read_scls_db(CKDBScalars* dbs, CKDBScalars* dbs_tmp, char* source_
         dbs->k_objs[name] = handle;
         
         // copy the scalar from dbs_tmp to dbs
-        memcpy(KSVAL(dbs, name), KSVAL(dbs_tmp, name), sizeof(Scalar));
+        memcpy(dbs->get_obj(name), dbs_tmp->get_obj(name), sizeof(Scalar));
 
         if(KEXEC_TRACE) 
             W_printf((char*) "%s ", name.c_str());

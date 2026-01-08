@@ -199,7 +199,7 @@ bool CKDBScalars::save_asc(const std::string& filename)
     for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        scl = KSVAL(this, handle);
+        scl = this->get_obj(handle);
         print_scl(fd, scl);
         fprintf(fd, "\n");
     }

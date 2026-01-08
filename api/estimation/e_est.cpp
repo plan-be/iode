@@ -193,19 +193,19 @@ int Estimation::E_jacobian()
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
         // Uniquement pour les coef estimés (relax <> 0)
-        if(KSVAL(E_DBS, scl_name)->relax != 0) 
+        if(E_DBS->get_obj(scl_name)->relax != 0) 
         {      
-            oldc = KSVAL(E_DBS, scl_name)->value;                   // Stocke l'ancienne valeur du coef
+            oldc = E_DBS->get_obj(scl_name)->value;                   // Stocke l'ancienne valeur du coef
             if(fabs(oldc) < 1e-15)                                  // ou 0.1 si coef proche de nul
                 oldc = 0.1;                      
-            KSVAL(E_DBS, scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
+            E_DBS->get_obj(scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
             if(0 != E_mod_residuals(i, j, oldc * h)) 
             {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                KSVAL(E_DBS, scl_name)->value = oldc;               /* reset coef */
+                E_DBS->get_obj(scl_name)->value = oldc;               /* reset coef */
                 return -1;
             }
-            KSVAL(E_DBS, scl_name)->value = oldc;                   /* reset coef */
+            E_DBS->get_obj(scl_name)->value = oldc;                   /* reset coef */
             j++;
         }
     }

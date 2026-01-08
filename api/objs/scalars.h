@@ -125,17 +125,6 @@ inline std::unique_ptr<CKDBScalars> global_ws_scl = std::make_unique<CKDBScalars
 
 std::size_t hash_value(const Scalar& scalar);
 
-
-inline Scalar* KSVAL(CKDBScalars* kdb, const std::string& name) 
-{
-    return kdb->get_obj(name);
-}
-
-inline Scalar* KSVAL(CKDBScalars* kdb, SWHDL handle) 
-{
-    return kdb->get_obj(handle);
-}
-
 // Values of scalars by name
 double K_s_get_info(CKDBScalars* kdb, char*name, int info_nb);
 double K_s_get_value (CKDBScalars* kdb, char*name);
