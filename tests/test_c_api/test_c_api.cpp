@@ -1706,7 +1706,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    Sample smpl = KESMPL(global_ws_eqs.get(), "ACAF");
+    Sample smpl = global_ws_eqs->get_obj("ACAF")->sample;
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
 

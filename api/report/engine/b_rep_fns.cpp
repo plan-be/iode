@@ -948,7 +948,7 @@ U_ch *RPF_evalue(U_ch** args)
         }
         else 
         {
-            std::string lec = KELEC(kdb, name);
+            std::string lec = kdb->get_obj(name)->lec;
             res = SCR_strafcat(res, (unsigned char*) lec.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
@@ -987,9 +987,10 @@ U_ch *RPF_eqsample(U_ch** args)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else
     {
-        Sample smpl = KESMPL(kdb, name);
-        std::string str_smpl = smpl.to_string();
+        Equation* eq = kdb->get_obj(name);
+        std::string str_smpl = eq->sample.to_string();
         sprintf((char*) res, (char*) str_smpl.c_str());
+        delete eq;
     }       
 
     return(res);
@@ -1025,11 +1026,13 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else 
     {
-        Sample smpl = KESMPL(kdb, name);
+        Equation* eq = kdb->get_obj(name);
+        Sample smpl = eq->sample;
         if(fromto == 0) 
             sprintf((char*) res, (char*) smpl.start_period.to_string().c_str());
         else            
             sprintf((char*) res, (char*) smpl.end_period.to_string().c_str());
+        delete eq;
     }
 
     if(res[0] == 0) 
@@ -1098,7 +1101,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
     }
     else 
     {
-        std::string lec = KELEC(kdb, name);
+        std::string lec = kdb->get_obj(name)->lec;
         eq = SCR_stracpy((unsigned char*) lec.c_str());
         poscolon = L_split_eq((char*) eq);
         if(poscolon > 0) 

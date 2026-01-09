@@ -547,24 +547,26 @@ Table* CKDBTables::get_obj(const SWHDL handle) const
 
 Table* CKDBTables::get_obj(const std::string& name) const
 {
-    SWHDL handle = this->get_handle(name);
+    std::string key = to_key(name);
+    SWHDL handle = this->get_handle(key);
     if(handle == 0)  
-        throw std::invalid_argument("Table with name '" + name + "' not found.");
+        throw std::invalid_argument("Table with name '" + key + "' not found.");
     
     char* ptr = SW_getptr(handle);
     if(ptr == nullptr)  
         return nullptr;
-    return (Table*) K_tunpack(ptr, (char*) name.c_str());
+    return (Table*) K_tunpack(ptr, (char*) key.c_str());
 }
 
 bool CKDBTables::set_obj(const std::string& name, const Table* value)
 {
     char* pack = NULL;
-    K_tpack(&pack, (char*) value, (char*) name.c_str());
-    bool success = set_packed_object(name, pack);
+    std::string key = to_key(name);
+    K_tpack(&pack, (char*) value, (char*) key.c_str());
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set table object '" + name + "'";
+        std::string error_msg = "Failed to set table object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;

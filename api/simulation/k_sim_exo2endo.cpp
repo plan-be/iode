@@ -148,7 +148,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
         // decrease the depth by 1
         (*depth) --;
         
-        // Free the current clec (allocated by KECLEC(..., poseq))
+        // Free the current clec
         SW_nfree(clec);
         
         return(rc);

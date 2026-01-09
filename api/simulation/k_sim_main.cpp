@@ -611,7 +611,8 @@ int CSimulation::K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* db
         }
         KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
         
-        rc = L_link(dbv, dbs, KECLEC(dbe, eq_name));
+        CLEC* clec = KECLEC(dbe, eq_name);
+        rc = L_link(dbv, dbs, clec);
         if(rc) 
         {
             std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
@@ -740,9 +741,10 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     double x;
 
     std::string eq_name = KSIM_DBE->get_name(eqnb);
-    int lg = KECLEC(KSIM_DBE, eq_name)->tot_lg;
+    CLEC* eq_clec = KECLEC(KSIM_DBE, eq_name);
+    int lg = eq_clec->tot_lg;
     CLEC* clec = (CLEC*) SW_nalloc(lg);
-    memcpy(clec, KECLEC(KSIM_DBE, eq_name), lg);
+    memcpy(clec, eq_clec, lg);
     eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->dupendo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);

@@ -19,11 +19,12 @@ char* CKDBComments::get_obj(const std::string& name) const
 bool CKDBComments::set_obj(const std::string& name, const char* value)
 {
     char* pack = NULL;
+    std::string key = to_key(name);
     K_cpack(&pack, (char*) value);
-    bool success = set_packed_object(name, pack);
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set comment object '" + name + "'";
+        std::string error_msg = "Failed to set comment object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;
