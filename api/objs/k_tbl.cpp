@@ -29,7 +29,7 @@ std::string TableCell::get_content(const bool quotes, const bool to_utf8) const
         if(!idt) 
             return "";
         else
-            return idt->lec;
+            return idt->get_lec();
     }
     else
     {

@@ -77,7 +77,8 @@ Identity* CKDBIdentities::get_obj(const std::string& name) const
 bool CKDBIdentities::set_obj(const std::string& name, const Identity* value)
 {
     char* pack = NULL;
-    K_ipack(&pack, (char*) value->lec.c_str());
+    std::string lec = value->get_lec();
+    K_ipack(&pack, (char*) lec.c_str());
     bool success = set_packed_object(name, pack);
     if(!success)
     {
@@ -92,26 +93,32 @@ bool CKDBIdentities::grep_obj(const std::string& name, const SWHDL handle,
     const char all) const
 {
     bool found = false;
-    if(forms) 
-        found = wrap_grep_gnl(pattern, KILEC(const_cast<CKDBIdentities*>(this), handle), ecase, all);
+    if(forms)
+    {
+        std::string lec = const_cast<CKDBIdentities*>(this)->get_obj(handle)->get_lec();
+        found = wrap_grep_gnl(pattern, lec, ecase, all);
+    } 
     return found;
 }
 
 char* CKDBIdentities::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = (char*) KILEC(this, name);
+    std::string lec = this->get_obj(name)->get_lec();
+    char* obj = new char[lec.size() + 1];
+    strncpy(obj, lec.c_str(), lec.size() + 1);
     return obj;
 }
 
 bool CKDBIdentities::print_obj_def(const std::string& name)
 {
-    char* lec = KILEC(this, name);
-    if(lec == NULL) 
+    if(!this->contains(name)) 
         return false;
     
-    std::string tmp = name + " : " + std::string(lec);
+    std::string lec = this->get_obj(name)->get_lec();
+    std::string tmp = name + " : " + lec;
+    CLEC* clec = this->get_obj(name)->get_compiled_lec();
+
     W_printf((char*) ".par1 enum_1\n");
-    CLEC* clec = KICLEC(this, name);
     print_lec_definition(name, tmp, clec, B_EQS_LEC);
 
     return true;

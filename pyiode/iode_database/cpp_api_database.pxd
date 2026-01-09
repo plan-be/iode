@@ -89,8 +89,6 @@ cdef extern from "api/all.h":
         CIdentity* get_obj(string name) except +
         bool set_obj(string name, CIdentity* value) except +
 
-    char* KIVAL(CKDBIdentities* kdb, string name)
-
     cdef cppclass CKDBLists(KDB):
         char* get_obj(SWHDL handle) except +
         char* get_obj(string name) except +

@@ -369,7 +369,7 @@ public:
                 return true;
             if(idt == nullptr || other.idt == nullptr) 
                 return false;
-            return idt->lec == other.idt->lec;
+            return idt->get_lec() == other.idt->get_lec();
         }
     }
 
@@ -383,7 +383,7 @@ public:
         else
         {
             if(idt)
-                hash_combine<std::string>(seed, idt->lec);
+                hash_combine<std::string>(seed, idt->get_lec());
         }
         hash_combine<char>(seed, attribute);
         

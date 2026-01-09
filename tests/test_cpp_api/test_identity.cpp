@@ -25,7 +25,7 @@ TEST_F(IdentityTest, CreateAndCopy)
     
     Identity idt(lec);
     Identity idt_copy(idt);
-    ASSERT_EQ(idt.lec, idt_copy.lec);
+    ASSERT_EQ(idt.get_lec(), idt_copy.get_lec());
 }
 
 

@@ -134,10 +134,12 @@ bool CKDBIdentities::save_asc(const std::string& filename)
         }
     }
 
+    std::string lec;
     for(auto& [name, handle] : this->k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
-        fprintf(fd, "\"%s\"\n", KILEC(this, handle));
+        lec = this->get_obj(handle)->get_lec();
+        fprintf(fd, "\"%s\"\n", (char*) lec.c_str());
     }
 
     if(filename[0] != '-') 

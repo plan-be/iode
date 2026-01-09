@@ -1590,7 +1590,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(KILEC(global_ws_idt.get(), "U")), "2 * A");
+    EXPECT_EQ(global_ws_idt->get_obj("U")->get_lec(), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);

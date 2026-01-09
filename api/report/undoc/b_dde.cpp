@@ -882,7 +882,8 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            ptr = (char*) SCR_stracpy((unsigned char*) KILEC(global_ws_idt.get(), name));
+            std::string lec = global_ws_idt->get_obj(name)->get_lec();
+            ptr = (char*) SCR_stracpy((unsigned char*) lec.c_str());
             break;
         }
         case LISTS :
