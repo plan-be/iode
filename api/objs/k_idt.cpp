@@ -77,12 +77,13 @@ Identity* CKDBIdentities::get_obj(const std::string& name) const
 bool CKDBIdentities::set_obj(const std::string& name, const Identity* value)
 {
     char* pack = NULL;
+    std::string key = to_key(name);
     std::string lec = value->get_lec();
     K_ipack(&pack, (char*) lec.c_str());
-    bool success = set_packed_object(name, pack);
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set identity object '" + name + "'";
+        std::string error_msg = "Failed to set identity object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;

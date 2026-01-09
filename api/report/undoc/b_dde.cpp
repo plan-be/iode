@@ -901,7 +901,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            lec = KELEC(global_ws_eqs.get(), name);
+            lec = global_ws_eqs->get_obj(name)->lec;
             ptr = (char*) SCR_stracpy((unsigned char*) lec.c_str());
             break;
         }

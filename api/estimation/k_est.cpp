@@ -222,14 +222,16 @@ int Estimation::KE_est_s(Sample* smpl)
             goto err;
         }
 
+        eq = E_DBE->get_obj(endo);
+
         if(est_method < 0) 
-            E_MET = KEMETH(E_DBE, endo);
+            E_MET = eq->method;
         else 
             E_MET = est_method;
 
         if(!smpl) 
         {
-            eq_smpl = new Sample(KESMPL(E_DBE, endo));
+            eq_smpl = new Sample(eq->sample);
             E_SMPL = eq_smpl;
         }
         else
@@ -242,27 +244,26 @@ int Estimation::KE_est_s(Sample* smpl)
         }
         E_T = E_SMPL->nb_periods;
 
-        std::string _instruments = KEINSTR(E_DBE, endo);
+        std::string _instruments = eq->instruments;
         if(_instruments.empty()) 
             instrs = NULL;
         else 
             instrs = SCR_vtoms((unsigned char*) _instruments.c_str(), (unsigned char*) ",;");
 
-        std::string _block = KEBLK(E_DBE, endo);
+        std::string _block = eq->block;
         blk =  SCR_vtoms((unsigned char*) _block.c_str(), (unsigned char*) " ,;");
         nblk = SCR_tbl_size(blk);
 
-        std::string _lec;
         std::string eq_name;
         if(nblk == 0)  
         {
-            _lec = KELEC(E_DBE, endo);
-            SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
+            SCR_add_ptr(&lecs, &nbl, (unsigned char*) eq->lec.c_str());
             SCR_add_ptr(&endos, &nbe, (unsigned char*) endo.c_str());
         }
         else 
         {
             /* add elements of block */
+            std::string _lec;
             for(int j = 0; j < nblk; j++) 
             {
                 SCR_sqz(blk[j]);
@@ -279,7 +280,7 @@ int Estimation::KE_est_s(Sample* smpl)
                     goto err;
                 }
 
-                _lec = KELEC(global_ws_eqs.get(), eq_name);
+                _lec = global_ws_eqs->get_obj(eq_name)->lec;
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
             }
@@ -287,6 +288,9 @@ int Estimation::KE_est_s(Sample* smpl)
 
         SCR_add_ptr(&lecs, &nbl, 0L);
         SCR_add_ptr(&endos, &nbe, 0L);
+
+        if(eq) delete eq;
+        eq = nullptr;
 
         error = E_est((char**) endos, (char**) lecs, (char**) instrs);
 

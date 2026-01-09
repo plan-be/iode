@@ -70,13 +70,15 @@ int CSimulation::KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* 
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     std::string eq_name;
+    CLEC* clec;
     kmsg("Pseudo-linking equations ....");
     for(int i = 0 ; i < dbe->size(); i++) 
     {
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
-        L_link_endos(dbe, KECLEC(dbe, eq_name));
+        clec = KECLEC(dbe, eq_name);
+        L_link_endos(dbe, clec);
     }
 
     /* ORDERING EQUATIONS */
@@ -146,6 +148,7 @@ int CSimulation::K_simul_SCC_init(CKDBEquations* dbe, CKDBVariables* dbv, CKDBSc
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     std::string eq_name;
+    CLEC* clec;
     kmsg("Linking equations ....");
     for(i = 0 ; i < dbe->size(); i++) 
     {
@@ -160,7 +163,8 @@ int CSimulation::K_simul_SCC_init(CKDBEquations* dbe, CKDBVariables* dbv, CKDBSc
             goto fin;
         }
         
-        rc = L_link(dbv, dbs, KECLEC(dbe, eq_name));
+        clec = KECLEC(dbe, eq_name);
+        rc = L_link(dbv, dbs, clec);
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";

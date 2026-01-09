@@ -261,7 +261,7 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
     if(!global_ws_eqs->contains(name)) 
         return -1;
     
-    std::string lec = KELEC(global_ws_eqs.get(), name);
+    std::string lec = global_ws_eqs->get_obj(name)->lec;
     char* c_lec = (char*) lec.c_str();
     int i = L_split_eq(c_lec);
     if(i < 0) 

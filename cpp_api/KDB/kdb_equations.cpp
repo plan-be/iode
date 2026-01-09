@@ -18,7 +18,7 @@ Equation* KDBEquations::get_unchecked(const std::string& name) const
 
 std::string KDBEquations::get_lec(const std::string& name) const
 { 
-    return KELEC(get_database(), name); 
+    return get_database()->get_obj(name)->lec; 
 }
 
 bool KDBEquations::add(const std::string& name, const Equation& obj)

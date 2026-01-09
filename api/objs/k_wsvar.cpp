@@ -844,19 +844,21 @@ double* CKDBVariables::get_obj(const std::string& name) const
 bool CKDBVariables::set_obj(const std::string& name, const double* value)
 {
     char* pack = NULL;
+    std::string key = to_key(name);
+
     if(!this->sample || this->sample->nb_periods == 0)
     {
-        std::string error_msg = "Cannot set variable object '" + name + "' because ";
+        std::string error_msg = "Cannot set variable object '" + key + "' because ";
         error_msg += "the variable database has no sample defined";
         throw std::runtime_error(error_msg);
     }
-    
+
     int nb_obs = this->sample->nb_periods;
     K_vpack(&pack, (double*) value, (int*) &nb_obs);
-    bool success = set_packed_object(name, pack);
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set variable object '" + name + "'";
+        std::string error_msg = "Failed to set variable object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;

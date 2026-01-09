@@ -42,11 +42,12 @@ Scalar* CKDBScalars::get_obj(const std::string& name) const
 bool CKDBScalars::set_obj(const std::string& name, const Scalar* value)
 {
     char* pack = NULL;
+    std::string key = to_key(name);
     K_spack(&pack, (char*) value);
-    bool success = set_packed_object(name, pack);
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set scalar object '" + name + "'";
+        std::string error_msg = "Failed to set scalar object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;

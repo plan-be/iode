@@ -228,9 +228,12 @@ public:
         
         // check if LEC expression is valid
         this->clec = L_solve((char*) lec.c_str(), (char*) this->endo.c_str());
-        if(this->clec == NULL) 
-            throw std::invalid_argument("Cannot set LEC '" + lec + "' to the equation named '" + 
-                                        endo + "'");
+        if(this->clec == NULL)
+        {
+            std::string error_msg = "Cannot set LEC '" + lec + "' "; 
+            error_msg += "to the equation named '" + endo + "'";
+            throw std::invalid_argument(error_msg);
+        }
 
         this->lec.clear();
         this->lec = lec;
@@ -611,57 +614,12 @@ double K_e_loglik(CKDBEquations* kdb, char*name);
 int K_epack(char **,char *,char *);
 Equation* K_eunpack(char *, char *);
 
-inline std::string KELEC(CKDBEquations* kdb, const std::string& name) 
-{                  
-    return std::string(K_optr0(kdb, (char*) name.c_str()));
-}
+/* lec/l_link.c */
+void L_link_endos(CKDBEquations* dbe, CLEC *cl);
 
+
+// TODO : remove KECLEC when k_objs will be changed to std::map<std::string, Equation*>
 inline CLEC* KECLEC(CKDBEquations* kdb, const std::string& name) 
 {    
     return ((CLEC *) K_optr1(kdb, (char*) name.c_str()));
 }
-
-inline char KESOLV(CKDBEquations* kdb, const std::string& name) 
-{    
-    return *((char *) K_optr(kdb, (char*) name.c_str(), 2));
-}
-
-inline char KEMETH(CKDBEquations* kdb, const std::string& name) 
-{    
-    return *((char *) K_optr(kdb, (char*) name.c_str(), 3));
-}
-
-inline Sample KESMPL(CKDBEquations* kdb, const std::string& name) 
-{    
-    return *((Sample *) K_optr(kdb, (char*) name.c_str(), 4));
-}
-
-inline std::string KECMT(CKDBEquations* kdb, const std::string& name) 
-{                  
-    return std::string(K_optr(kdb, (char*) name.c_str(), 5));
-}
-
-inline std::string KEBLK(CKDBEquations* kdb, const std::string& name) 
-{                  
-    return std::string(K_optr(kdb, (char*) name.c_str(), 6));
-}
-
-inline std::string KEINSTR(CKDBEquations* kdb, const std::string& name) 
-{                
-    return std::string(K_optr(kdb, (char*) name.c_str(), 7));
-}
-
-inline long KEDATE(CKDBEquations* kdb, const std::string& name) 
-{    
-    return *((long *) K_optr(kdb, (char*) name.c_str(), 8));
-}
-
-inline std::array<float, EQS_NBTESTS> KETESTS(CKDBEquations* kdb, const std::string& name) 
-{   
-    std::array<float, EQS_NBTESTS> tests;
-    memcpy(tests.data(), K_optr(kdb, (char*) name.c_str(), 9), EQS_NBTESTS * sizeof(float));
-    return tests;
-}
-
-/* lec/l_link.c */
-void L_link_endos(CKDBEquations* dbe, CLEC *cl);

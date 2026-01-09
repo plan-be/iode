@@ -365,10 +365,14 @@ char* CKDBLists::get_obj(const std::string& name) const
 bool CKDBLists::set_obj(const std::string& name, const char* value)
 {
     char* pack = NULL;
+    std::string key = to_key(name);
     K_lpack(&pack, (char*) value);
-    bool success = set_packed_object(name, pack);
-    if(!success) 
-        std::string error_msg = "Failed to set list object '" + name + "'";
+    bool success = set_packed_object(key, pack);
+    if(!success)
+    {
+        std::string error_msg = "Failed to set list object '" + key + "'";
+        kwarning(error_msg.c_str());
+    }
     return success;
 }
 

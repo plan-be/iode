@@ -246,24 +246,26 @@ Equation* CKDBEquations::get_obj(const SWHDL handle) const
 
 Equation* CKDBEquations::get_obj(const std::string& name) const
 {
-    SWHDL handle = this->get_handle(name);
+    std::string key = to_key(name);
+    SWHDL handle = this->get_handle(key);
     if(handle == 0)  
         throw std::invalid_argument("Equation with name '" + name + "' not found.");
     
     char* ptr = SW_getptr(handle);
     if(ptr == nullptr)  
         return nullptr;
-    return K_eunpack(ptr, (char*) name.c_str());
+    return K_eunpack(ptr, (char*) key.c_str());
 }
 
 bool CKDBEquations::set_obj(const std::string& name, const Equation* value)
 {
     char* pack = NULL;
-    K_epack(&pack, (char*) value, (char*) name.c_str());
-    bool success = set_packed_object(name, pack);
+    std::string key = to_key(name);
+    K_epack(&pack, (char*) value, (char*) key.c_str());
+    bool success = set_packed_object(key, pack);
     if(!success)
     {
-        std::string error_msg = "Failed to set equation object '" + name + "'";
+        std::string error_msg = "Failed to set equation object '" + key + "'";
         kwarning(error_msg.c_str());
     }
     return success;
@@ -274,19 +276,20 @@ bool CKDBEquations::grep_obj(const std::string& name, const SWHDL handle,
     const char all) const
 {
     bool found = false;
-    std::string lec = KELEC(const_cast<CKDBEquations*>(this), name);
-    std::string cmt = KECMT(const_cast<CKDBEquations*>(this), name);
+    Equation* eq = this->get_obj(name);
     if(forms) 
-        found = wrap_grep_gnl(pattern, lec, ecase, all);
+        found = wrap_grep_gnl(pattern, eq->lec, ecase, all);
     if(!found && texts)
-        found = wrap_grep_gnl(pattern, cmt, ecase, all);
+        found = wrap_grep_gnl(pattern, eq->comment, ecase, all);
+    delete eq;
     return found;
 }
 
 char* CKDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    std::string lec = KELEC(this, name);
-    char* obj = (char*) lec.c_str();
+    std::string lec = this->get_obj(name)->lec;
+    char* obj = new char[lec.size() + 1];
+    strncpy(obj, lec.c_str(), lec.size() + 1);
     return obj;
 }
 
@@ -323,7 +326,7 @@ double K_etest(CKDBEquations* kdb, char* c_name, int test_nb)
     if(!kdb->contains(name)) 
         return(IODE_NAN);
     
-    std::array<float, EQS_NBTESTS> tests = KETESTS(kdb, name);
+    std::array<float, EQS_NBTESTS> tests = kdb->get_obj(name)->tests;
     double value = (double) tests[test_nb];
     return value;
 }
