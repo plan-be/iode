@@ -169,7 +169,7 @@ Equation* K_eptr(CKDBEquations* kdb, char* c_name)
     if(!kdb->contains(name)) 
         return nullptr;
     
-    return KEVAL(kdb, name);
+    return kdb->get_obj(name);
 }
 
 /**

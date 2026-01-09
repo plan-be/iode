@@ -663,11 +663,5 @@ inline std::array<float, EQS_NBTESTS> KETESTS(CKDBEquations* kdb, const std::str
     return tests;
 }
 
-// returns an allocated EQ
-inline Equation* KEVAL(CKDBEquations* kdb, const std::string& name) 
-{    
-    return kdb->get_obj(name);
-}
-
 /* lec/l_link.c */
 void L_link_endos(CKDBEquations* dbe, CLEC *cl);

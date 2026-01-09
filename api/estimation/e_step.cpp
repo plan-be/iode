@@ -251,7 +251,7 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = KEVAL(global_ws_eqs.get(), name);               
+    eq = global_ws_eqs->get_obj(name) ;               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
     if(eq)

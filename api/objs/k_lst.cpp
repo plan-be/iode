@@ -143,7 +143,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, CKDBVariables* exo, CKDBScalars* scal
 void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
     std::string name = dbe->get_name(i);
-    Equation* eq = KEVAL(dbe, name);
+    Equation* eq = dbe->get_obj(name);
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
     delete eq;

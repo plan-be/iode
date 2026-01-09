@@ -194,7 +194,7 @@ void EditAndEstimateEquations::update_scalars()
     std::vector<std::string> tmp_coefs_list;
     for (auto& [name, handle] : c_kdb_eqs->k_objs)
     {
-        eq = KEVAL(c_kdb_eqs, name);
+        eq = c_kdb_eqs->get_obj(name);
         if(!eq)
             throw std::runtime_error("Estimation: Cannot get equation at position " 
                                      + name + " from the local Equations database.");

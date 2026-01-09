@@ -211,7 +211,7 @@ int KE_compile(CKDBEquations* dbe)
     Equation* eq;
     for(auto& [name, handle] : dbe->k_objs) 
     {
-        eq = KEVAL(dbe, name);
+        eq = dbe->get_obj(name);
         K_upd_eqs((char*) name.c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         delete eq;
         eq = nullptr;

@@ -478,7 +478,7 @@ bool CKDBEquations::save_asc(const std::string& filename)
     for(auto& [name, _] : this->k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
-        eq = KEVAL(this, name);
+        eq = this->get_obj(name);
         print_eq(fd, eq, (char*) name.c_str());
         delete eq;
         eq = nullptr;
