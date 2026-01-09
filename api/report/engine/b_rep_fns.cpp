@@ -1244,7 +1244,7 @@ U_ch *RPF_vsliste(U_ch** args, int type)
         name = std::string((char*) args[i]);
         if(!global_ws_eqs->contains(name)) 
             continue;
-        eq = KEVAL(global_ws_eqs.get(), name);
+        eq = global_ws_eqs->get_obj(name) ;
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         if(eq) 
             delete eq;

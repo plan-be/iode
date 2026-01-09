@@ -156,7 +156,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     }
     else
     {
-        eq = KEVAL(E_DBE, name);
+        eq = E_DBE->get_obj(name);
         eq->sample = (smpl != nullptr) ? *smpl : Sample();
         eq->set_lec(lec);
         eq->set_method(method);
@@ -311,7 +311,7 @@ int Estimation::KE_est_s(Sample* smpl)
                 eq_name = std::string((char*) endos[j]);
                 KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
-                eq = KEVAL(E_DBE, eq_name);
+                eq = E_DBE->get_obj(eq_name);
                 E_tests2scl(eq, j, E_T, E_NCE);
                 if(eq) delete eq;
                 eq = nullptr;

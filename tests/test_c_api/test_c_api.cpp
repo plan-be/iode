@@ -2314,7 +2314,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
 
     // check equation->endo == equation name
     for(auto& [name, _] : global_ws_eqs->k_objs)
-        ASSERT_EQ(KEVAL(global_ws_eqs.get(), name)->endo, name);
+        ASSERT_EQ(global_ws_eqs->get_obj(name)->endo, name) ;
 
     U_test_reset_kmsg_msgs();
 }

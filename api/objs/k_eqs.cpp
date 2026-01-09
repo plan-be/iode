@@ -292,7 +292,7 @@ char* CKDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, in
 
 bool CKDBEquations::print_obj_def(const std::string& name)
 {
-    Equation* eq = KEVAL(this, name);
+    Equation* eq = this->get_obj(name);
     if(!eq) 
         return false;
     

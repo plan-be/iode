@@ -12,7 +12,7 @@ Equation* KDBEquations::get_unchecked(const std::string& name) const
     CKDBEquations* kdb = get_database();
 
     // Note: KEVAL allocate a new pointer Equation*
-    Equation* c_eq = KEVAL(kdb, name);
+    Equation* c_eq = kdb->get_obj(name);
     return c_eq;
 }
 
