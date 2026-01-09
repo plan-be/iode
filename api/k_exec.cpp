@@ -145,7 +145,7 @@ static CKDBVariables* KI_series_list(CKDBIdentities* dbi)
     {
         vars_to_compute.push_back(idt_name);
 
-        clec = KICLEC(dbi, idt_handle);
+        clec = dbi->get_obj(idt_handle)->get_compiled_lec();
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
 
@@ -187,7 +187,7 @@ static CKDBScalars* KI_scalar_list(CKDBIdentities* dbi)
     dbs = new CKDBScalars(false);
     for(auto& [idt_name, idt_handle] : dbi->k_objs) 
     {
-        clec = KICLEC(dbi, idt_handle);
+        clec = dbi->get_obj(idt_handle)->get_compiled_lec();
         tclec = (CLEC*) SW_nalloc(clec->tot_lg);
         memcpy(tclec, clec, clec->tot_lg);
         lname    = &(tclec->lnames[0]);
@@ -275,7 +275,7 @@ static int *KI_reorder(CKDBIdentities* dbi)
         {
             if(mark[i]) 
                 continue;
-            clec = KICLEC(dbi, idt_handle);
+            clec = dbi->get_obj(idt_handle)->get_compiled_lec();
             lname    = clec->lnames;
             nb_names = clec->nb_names;
             for(j = 0 ; j < nb_names ; j++) 
@@ -751,12 +751,14 @@ static int KI_execute(CKDBVariables* dbv, CKDBScalars* dbs, CKDBIdentities* dbi,
         start = 0;
 
     std::string idt_name;
+    CLEC* idt_clec;
     for(int i = 0; i < dbi->size(); i++) 
     {
         idt_name = dbi->get_name(order[i]);
-        tot_lg = KICLEC(dbi, idt_name)->tot_lg;
+        idt_clec = dbi->get_obj(idt_name)->get_compiled_lec();
+        tot_lg = idt_clec->tot_lg;
         tmp = SW_nalloc(tot_lg);
-        memcpy(tmp, KICLEC(dbi, idt_name), tot_lg);
+        memcpy(tmp, idt_clec, tot_lg);
         if(L_link(dbv, dbs, (CLEC *)tmp)) 
             return(-1);
         

@@ -10,11 +10,9 @@
 /*----------------------- STRUCTS ----------------------------*/
 
 // Identity (struct with the identity LEC formula and the compiled CLEC structure)
-struct Identity
+class Identity
 {
     std::string lec;        // LEC expression (may not be an equation)
-
-private:
     CLEC* clec;             // Compiled version of LEC
 
 public:
@@ -37,6 +35,11 @@ public:
 
         if(this->clec)
             SW_nfree(this->clec);
+    }
+
+    std::string get_lec() const 
+    {
+        return this->lec;
     }
 
     void set_lec(const std::string& lec) 
@@ -124,24 +127,3 @@ inline std::unique_ptr<CKDBIdentities> global_ws_idt = std::make_unique<CKDBIden
 /*----------------------- FUNCTIONS ----------------------------*/
 
 Identity* K_iunpack(char *);
-
-
-inline char* KILEC(CKDBIdentities* kdb, const std::string& name)
-{
-    return K_optr0(kdb, (char*) name.c_str());
-}
-
-inline char* KILEC(CKDBIdentities* kdb, SWHDL handle)
-{
-    return (char*) P_get_ptr(SW_getptr(handle), 0);            
-}
-
-inline CLEC* KICLEC(CKDBIdentities* kdb, const std::string& name)
-{
-    return (CLEC*) K_optr1(kdb, (char*) name.c_str());
-} 
-
-inline CLEC* KICLEC(CKDBIdentities* kdb, SWHDL handle)
-{
-    return (CLEC*) P_get_ptr(SW_getptr(handle), 1);            
-}

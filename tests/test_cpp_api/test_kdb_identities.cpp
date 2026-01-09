@@ -86,12 +86,12 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     std::string name = "AOUC";
     CLEC* clec = NULL;
-    CLEC* expected_clec = KICLEC(global_ws_idt.get(), name);
+    CLEC* expected_clec = global_ws_idt->get_obj(name)->get_compiled_lec();
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by name
     Identity* identity_name = Identities.get(name);
-    EXPECT_EQ(identity_name->lec, expected_lec);
+    EXPECT_EQ(identity_name->get_lec(), expected_lec);
     clec = identity_name->get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
@@ -144,7 +144,7 @@ TEST_F(KDBIdentitiesTest, Copy)
 
     Identity* identity_copy = Identities.copy(name);
 
-    EXPECT_EQ(identity_copy->lec, identity->lec);
+    EXPECT_EQ(identity_copy->get_lec(), identity->get_lec());
 
     CLEC* clec = identity->get_compiled_lec();
     CLEC* clec_copy = identity_copy->get_compiled_lec();

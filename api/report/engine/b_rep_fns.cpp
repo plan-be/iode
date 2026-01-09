@@ -902,7 +902,8 @@ U_ch *RPF_ivalue(U_ch** args)
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) KILEC(kdb, name));
+            std::string lec = kdb->get_obj(name)->get_lec();
+            res = SCR_strafcat(res, (unsigned char*) lec.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }

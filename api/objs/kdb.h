@@ -165,11 +165,10 @@ public:
 
 struct KDB: public KDBInfo 
 {
-    std::map<std::string, SWHDL> k_objs;            // map <object name, position in the SCR memory>
-    std::shared_ptr<KDB*> parent = nullptr;         // parent KDB: if an IODE object is added/removed/updated 
-                                                    //             from the current KDB, it must done also in the parent KDB
-    std::vector<std::shared_ptr<KDB*>> children;    // children KDBs: if the current KDB is modified, all children KDBs must 
-                                                    //                be updated too
+    // TODO : make it a shared_ptr (to share between 'shallow' copies -> subsets)
+    // NOTE: if an IODE object is added/removed/updated from the current database, 
+    //       it is also done in all 'shallow' copies
+    std::map<std::string, SWHDL> k_objs;    // map <object name, position in the SCR memory>
 
 protected:
     bool set_packed_object(const std::string& name, char* pack);
@@ -219,11 +218,8 @@ public:
     // shallow copy database
     KDB(KDB* db_parent, const std::string& pattern = "*") : KDBInfo(false)
     {
-        this->k_type = db_parent->k_type;
-
         k_db_type = DB_SHALLOW_COPY;
-        this->parent = std::make_shared<KDB*>(db_parent);
-        db_parent->children.push_back(std::make_shared<KDB*>(this));
+        this->k_type = db_parent->k_type;
 
         switch(this->k_type) 
         {

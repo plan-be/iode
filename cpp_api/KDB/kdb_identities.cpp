@@ -12,7 +12,7 @@ Identity* KDBIdentities::copy_obj(Identity* const original) const
 Identity* KDBIdentities::get_unchecked(const std::string& name) const
 {
 	CKDBIdentities* kdb = get_database();
-	std::string lec(KILEC(kdb, name));
+	std::string lec = kdb->get_obj(name)->get_lec();
 	Identity* idt = new Identity(lec);
 	return idt;
 }
@@ -24,7 +24,7 @@ std::string KDBIdentities::get_lec(const std::string& name) const
         throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
                                     "' in the database of '" + get_iode_type_str() + "'.\n" +  
                                     "The identity with name '" + name + "' does not exist.");
-    return std::string(KILEC(get_database(), name));
+    return get_database()->get_obj(name)->get_lec();
 }
 
 bool KDBIdentities::add(const std::string& name, const std::string& lec)

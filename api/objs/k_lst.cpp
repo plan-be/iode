@@ -165,13 +165,12 @@ void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal)
  */
 void KI_scan(CKDBIdentities* dbi, int i, CKDBVariables* exo, CKDBScalars* scal)
 {
-    int     lg;
-    CLEC    *cl = NULL;
     std::string name = dbi->get_name(i);
+    CLEC* cl_idt = dbi->get_obj(name)->get_compiled_lec();
 
-    lg = KICLEC(dbi, name)->tot_lg;
-    cl = (CLEC *) SW_nalloc(lg);
-    memcpy(cl, KICLEC(dbi, name), lg);
+    int lg = cl_idt->tot_lg;
+    CLEC* cl = (CLEC *) SW_nalloc(lg);
+    memcpy(cl, cl_idt, lg);
 
     K_clecscan(dbi, cl, exo, scal);
     SW_nfree(cl);
