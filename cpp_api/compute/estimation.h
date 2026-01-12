@@ -39,8 +39,8 @@ public:
     const int nb_coeffs;
 
 public:
-    CorrelationMatrix(const std::vector<std::string>& coeffs, const MAT* corr_matrix):
-        nb_coeffs((int) coeffs.size()), coeffs(coeffs), corr_matrix(corr_matrix)
+    CorrelationMatrix(const std::set<std::string>& coeffs, const MAT* corr_matrix):
+        nb_coeffs((int) coeffs.size()), coeffs(coeffs.begin(), coeffs.end()), corr_matrix(corr_matrix)
     {
         if(corr_matrix->m_nl != corr_matrix->m_nc)
             throw std::runtime_error("Cannot initialize the correlation matrix.\nNumber of lines " + 
@@ -92,8 +92,8 @@ class EditAndEstimateEquations
     std::string instruments;
     IodeEquationMethod method;
 
-    std::vector<std::string> v_equations;
-    std::vector<std::string>::iterator current_eq;
+    std::set<std::string> v_equations;
+    std::set<std::string>::iterator current_eq;
 
     KDBEquations* kdb_eqs;
     KDBScalars* kdb_scl;
@@ -264,7 +264,7 @@ public:
         this->instruments = instruments;
     }
 
-    std::vector<std::string> get_list_equations() const
+    std::set<std::string> get_list_equations() const
     {
         return v_equations;
     }

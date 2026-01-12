@@ -31,7 +31,7 @@ TEST_F(KDBListsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBLists* kdb_subset_deep_copy = Lists.subset(pattern, true);
-    std::vector<std::string> names = Lists.filter_names(pattern);
+    std::set<std::string> names = Lists.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("COPY", new_list);
@@ -65,9 +65,10 @@ TEST_F(KDBListsTest, Get)
 
 TEST_F(KDBListsTest, GetNames)
 {
-    std::vector<std::string> expected_names;
-    for (int i=0; i < Lists.size(); i++) expected_names.push_back(Lists.get_name(i));
-    std::vector<std::string> names = Lists.get_names();
+    std::set<std::string> expected_names;
+    for (int i=0; i < Lists.size(); i++) 
+        expected_names.insert(Lists.get_name(i));
+    std::set<std::string> names = Lists.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -106,21 +107,17 @@ TEST_F(KDBListsTest, Copy)
 TEST_F(KDBListsTest, Filter)
 {
     std::string pattern = "C*";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBLists* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Lists.size(); p++) all_names.push_back(Lists.get_name(p));
-    for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
+    std::set<std::string> all_names;
+    for (int p = 0; p < Lists.size(); p++) 
+        all_names.insert(Lists.get_name(p));
+    for (const std::string& name : all_names) 
+        if (name.front() == 'C') 
+            expected_names.insert(name);
 
     int nb_total_lists = Lists.size();
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
     kdb_subset = Lists.subset(pattern);
@@ -174,19 +171,15 @@ TEST_F(KDBListsTest, Filter)
 TEST_F(KDBListsTest, DeepCopy)
 {
     std::string pattern = "C*";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBLists* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Lists.size(); p++) all_names.push_back(Lists.get_name(p));
-    for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Lists.size(); p++) 
+        all_names.insert(Lists.get_name(p));
+    for (const std::string& name : all_names) 
+        if (name.front() == 'C') 
+            expected_names.insert(name);
 
     int nb_total_lists = Lists.size();
 
@@ -242,7 +235,7 @@ TEST_F(KDBListsTest, CopyFrom)
     std::string pattern = "C* T*";
     std::string filename = input_test_dir + prefix_filename + "fun.lst";
     int expected_nb_comments = Lists.size();
-    std::vector<std::string> v_expected_names;
+    std::set<std::string> v_expected_names;
 
     // Copy entire file
     Lists.clear();

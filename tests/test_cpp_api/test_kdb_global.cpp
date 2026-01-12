@@ -16,21 +16,25 @@ protected:
 
 TEST_F(KDBGlobalTest, Filter)
 {
-    std::vector<std::string> list_names;
-    std::vector<std::string> expected_list_names;
+    std::set<std::string> list_names;
+    std::set<std::string> expected_list_names;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Equations.size(); p++) all_names.insert(Equations.get_name(p));
 
     // simple patterns
     list_names = Equations.filter_names("A*");
     expected_list_names.clear();
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_list_names.insert(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     list_names = Equations.filter_names("*_");
     expected_list_names.clear();
-    for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_list_names.insert(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // list
@@ -39,33 +43,35 @@ TEST_F(KDBGlobalTest, Filter)
     expected_list_names.clear();
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
-    // Note: get_names() calls sort_and_remove_duplicates() which calls sort()
-    std::sort(expected_list_names.begin(), expected_list_names.end());
+    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
+        expected_list_names.insert((char*) c_expanded_list[i]);
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
     list_names = Equations.filter_names("A*;" + list + ";*_");
     expected_list_names.clear();
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
-    for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
-    // Note: get_names() calls sort_and_remove_duplicates() (which calls sort())
-    sort_and_remove_duplicates(expected_list_names);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_list_names.insert(name);
+    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++)     
+        expected_list_names.insert((char*) c_expanded_list[i]);
+    for (const std::string& name : all_names)   
+        if (name.back() == '_') 
+            expected_list_names.insert(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // pattern containing a name that does not exist in the global workspace
     // -> name is skipped by default (must_exist = true)
     list_names = Equations.filter_names("A*;DO_NOT_EXIST");
     expected_list_names.clear();
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
-    // Note: get_names() calls sort_and_remove_duplicates() (which calls sort())
-    sort_and_remove_duplicates(expected_list_names);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_list_names.insert(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // must_exist = false
     list_names = Equations.filter_names("A*;DO_NOT_EXIST", false);
-    expected_list_names.push_back("DO_NOT_EXIST");
+    expected_list_names.insert("DO_NOT_EXIST");
     EXPECT_EQ(list_names, expected_list_names);
 }
 

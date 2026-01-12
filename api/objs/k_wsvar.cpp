@@ -62,10 +62,9 @@ int KV_sample(CKDBVariables* kdb, Sample *new_sample)
         delete kdb->sample;
     kdb->sample = new Sample(*new_sample);
 
-    int i = 0;
     char* ptr;
     SWHDL new_handle;
-    for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++, i++)   
+    for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
     {
         new_handle = (SWHDL) KV_alloc_var(kdb->sample->nb_periods);
         ptr = SW_getptr(new_handle);
@@ -143,9 +142,10 @@ int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
     }
 
     bool found;
+    SWHDL handle_2 = 0;
     nb1 = kdb1->sample->nb_periods;
     size_t size = sizeof(double) * smpl.nb_periods;
-    for(auto& [name, handle_2] : kdb2->k_objs) 
+    for(const auto& [name, handle] : kdb2->k_objs) 
     {
         found = kdb1->contains(name);
 
@@ -162,6 +162,7 @@ int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
             return -1;
         }
 
+        handle_2 = kdb2->get_handle(name);
         if(handle_2 > 0)
             memcpy((double *) kdb1->get_var_ptr(name, start1),
                    (double *) kdb2->get_var_ptr(name, start2), size);
@@ -497,7 +498,7 @@ int KV_extrapolate(CKDBVariables* dbv, int method, Sample* smpl, char* pattern)
     std::string pattern_str = (pattern != NULL) ? std::string(pattern) : std::string("*");
     if(pattern_str.empty())
         pattern_str = "*";
-    std::vector<std::string> var_list = dbv->filter_names(pattern);
+    std::set<std::string> var_list = dbv->filter_names(pattern);
 
     int i, t;
     double* val;
@@ -563,7 +564,7 @@ CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char 
     
     ndbv->sample = new Sample(*edbv->sample);
 
-    for(auto& [ename, handle] : edbv->k_objs) 
+    for(const auto& [ename, handle] : edbv->k_objs) 
     {
         res = K_aggr(pattern, (char*) ename.c_str(), c_nname);
         if(res < 0) 
@@ -624,7 +625,7 @@ CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char 
 
     if(method == 2) 
     {
-        for(auto& [name, handle] : ndbv->k_objs) 
+        for(const auto& [name, handle] : ndbv->k_objs) 
         {
             nval = ndbv->get_var_ptr(name);
             for(int t = 0; t < smpl->nb_periods; t++)
@@ -910,5 +911,7 @@ bool CKDBVariables::print_obj_def(const std::string& name)
 
 void CKDBVariables::update_reference_db()
 {
+    if(K_RWS[this->k_type][0]) 
+        delete K_RWS[this->k_type][0];
     K_RWS[this->k_type][0] = new CKDBVariables(this, "*");      
 }

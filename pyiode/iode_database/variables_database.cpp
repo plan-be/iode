@@ -147,7 +147,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -155,7 +155,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_SUB:  
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -163,7 +163,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_MUL: 
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -173,7 +173,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     case OP_DIV:
         if(value == 0)
             throw std::invalid_argument("C API: Division by zero");
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -181,7 +181,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         }
         break;
     case OP_POW: 
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             var_ptr = database->get_var_ptr(name);
             for(int t = t_first; t <= t_last; t++)
@@ -215,19 +215,19 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
             db->get_var_ptr(name)[t] += values[i++];
         break;
     case OP_SUB: 
-        for(auto& [name, _] : c_database->k_objs) 
+        for(const auto& [name, handle] : c_database->k_objs) 
             db->get_var_ptr(name)[t] -= values[i++];
         break;
     case OP_MUL: 
-        for(auto& [name, _] : c_database->k_objs) 
+        for(const auto& [name, handle] : c_database->k_objs) 
             db->get_var_ptr(name)[t] *= values[i++];
         break;
     case OP_DIV:
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
         {
             value = values[i++];
             if(value == 0)
@@ -236,7 +236,7 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
         }
         break;
     case OP_POW: 
-        for(auto& [name, _] : c_database->k_objs)
+        for(const auto& [name, handle] : c_database->k_objs)
             db->get_var_ptr(name)[t] = pow(db->get_value(name, t), values[i++]);
         break;
     }

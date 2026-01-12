@@ -140,11 +140,13 @@ static CKDBVariables* KI_series_list(CKDBIdentities* dbi)
     // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons 
     // (will eliminated by the call to add_entry() below). 
     std::string name;  
-    std::vector<std::string> vars_to_compute;
-    for(auto& [idt_name, idt_handle] : dbi->k_objs) 
+    SWHDL idt_handle = 0;
+    std::set<std::string> vars_to_compute;
+    for(const auto& [idt_name, handle] : dbi->k_objs) 
     {
-        vars_to_compute.push_back(idt_name);
+        vars_to_compute.insert(idt_name);
 
+        idt_handle = dbi->get_handle(idt_name);
         clec = dbi->get_obj(idt_handle)->get_compiled_lec();
         lname    = &(clec->lnames[0]);
         nb_names = clec->nb_names;
@@ -154,12 +156,9 @@ static CKDBVariables* KI_series_list(CKDBIdentities* dbi)
             name = std::string(lname[j].name);
             if(is_coefficient(name)) 
                 continue;
-            vars_to_compute.push_back(name);
+            vars_to_compute.insert(name);
         }
     }
-
-    // remove duplicates
-    sort_and_remove_duplicates(vars_to_compute);
 
     // Create a new KDB of vars with all the names in tbl
     dbv = new CKDBVariables(false);
@@ -184,9 +183,11 @@ static CKDBScalars* KI_scalar_list(CKDBIdentities* dbi)
     CKDBScalars* dbs;
 
     std::string name;
+    SWHDL idt_handle = 0;
     dbs = new CKDBScalars(false);
-    for(auto& [idt_name, idt_handle] : dbi->k_objs) 
+    for(const auto& [idt_name, handle] : dbi->k_objs) 
     {
+        idt_handle = dbi->get_handle(idt_name);
         clec = dbi->get_obj(idt_handle)->get_compiled_lec();
         tclec = (CLEC*) SW_nalloc(clec->tot_lg);
         memcpy(tclec, clec, clec->tot_lg);
@@ -220,7 +221,7 @@ static int KI_quick_extract(CKDBVariables* dbv, CKDBIdentities* dbi)
     // get list of VARs names
     std::vector<std::string> names;
     names.reserve(dbv->size());
-    for(auto& [name, handle] : dbv->k_objs)
+    for(const auto& [name, handle] : dbv->k_objs)
         names.push_back(name);
 
     // keep only VARs that have the same name as an IDT in dbi
@@ -271,10 +272,13 @@ static int *KI_reorder(CKDBIdentities* dbi)
     {
         i = 0;
         mod = 0;
-        for(auto& [idt_name, idt_handle] : dbi->k_objs) 
+        SWHDL idt_handle = 0;
+        for(const auto& [idt_name, handle] : dbi->k_objs) 
         {
             if(mark[i]) 
                 continue;
+            
+            idt_handle = dbi->get_handle(idt_name);
             clec = dbi->get_obj(idt_handle)->get_compiled_lec();
             lname    = clec->lnames;
             nb_names = clec->nb_names;
@@ -345,14 +349,15 @@ static int KI_read_vars_db(CKDBVariables* dbv, CKDBVariables* dbv_tmp, char* sou
     }
 
     // get list of VARs to be read (from dbv_tmp)
-    std::vector<std::string> vars_to_read;
-    for(auto& [name, handle] : dbv->k_objs)
+    std::set<std::string> vars_to_read;
+    for(const auto& [name, handle] : dbv->k_objs)
     {
         // series already present
         if(handle > 0)
             continue;
+        
         if(dbv_tmp->contains(name)) 
-            vars_to_read.push_back(name);
+            vars_to_read.insert(name);
     }
 
     // no VARs to be read
@@ -392,8 +397,8 @@ static int KI_read_vars_db(CKDBVariables* dbv, CKDBVariables* dbv_tmp, char* sou
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
-    SWHDL handle;
     int nb_found = 0;
+    SWHDL handle = 0;
     for(const std::string& name : vars_to_read)
     {
         // series already present (in dbv)
@@ -436,13 +441,14 @@ static int KI_read_vars_file(CKDBVariables* dbv, char* file)
     char    **vars = NULL;
     int     nbv = 0, nbf;
 
-    std::vector<std::string> vars_to_read;
-    for(auto& [name, handle] : dbv->k_objs) 
+    std::set<std::string> vars_to_read;
+    for(const auto& [name, handle] : dbv->k_objs) 
     {
         // series already loaded in dbv
         if(handle > 0) 
             continue;
-        vars_to_read.push_back(name);
+        
+        vars_to_read.insert(name);
     }
 
     // no variables to be read
@@ -588,7 +594,8 @@ static int KI_read_scls_db(CKDBScalars* dbs, CKDBScalars* dbs_tmp, char* source_
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     
     int nb_found = 0;
-    for(auto& [name, handle] : dbs->k_objs) 
+    SWHDL handle = 0;
+    for(const std::string& name : dbs->get_names()) 
     {
         // scalar already loaded in dbs
         if(handle > 0) 
@@ -630,13 +637,14 @@ static int KI_read_scls_file(CKDBScalars* dbs, char* file)
     char    **scls = NULL;
     int     nbs = 0, nbf;
 
-    std::vector<std::string> scls_to_read;
-    for(auto& [name, handle] : dbs->k_objs) 
+    std::set<std::string> scls_to_read;
+    for(const auto& [name, handle] : dbs->k_objs) 
     {
         // scalar already present
         if(handle > 0) 
             continue;
-        scls_to_read.push_back(name);
+        
+        scls_to_read.insert(name);
     }
 
     // no Scalars to be read
@@ -703,12 +711,14 @@ static int KI_read_scls(CKDBScalars* dbs, CKDBScalars* dbs_ws, int nb, char* fil
     int j = 0;
     if(nb_found < dbs->size()) 
     {
-        for(auto& [name, handle] : dbs->k_objs) 
+        for(const auto& [name, handle] : dbs->k_objs) 
         {
             if(j > 10)
                 break;
+            
             if(handle > 0) 
                 continue;
+            
             j++;
             
             std::string msg = "Scalar '" + name + "' not found";

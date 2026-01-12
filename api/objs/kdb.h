@@ -8,11 +8,16 @@
 #include "api/objs/xdr.h"
 
 #include <string>
+#include <set>
 #include <map>
 #include <memory>               // std::shared_ptr
 #include <vector>
 #include <array>
 #include <memory>               // std::unique_ptr, std::shared_ptr
+
+#ifndef SKBUILD
+    #include "gtest/gtest.h"
+#endif
 
 
 inline int K_WARN_DUP = 0;      // If null, adding an existing object name in a KDB  
@@ -165,10 +170,21 @@ public:
 
 struct KDB: public KDBInfo 
 {
-    // TODO : make it a shared_ptr (to share between 'shallow' copies -> subsets)
+#ifndef SKBUILD
+    FRIEND_TEST(SubsetsTest, Subset);
+    FRIEND_TEST(SubsetsTest, MultiSubsets);
+#endif
+
     // NOTE: if an IODE object is added/removed/updated from the current database, 
-    //       it is also done in all 'shallow' copies
-    std::map<std::string, SWHDL> k_objs;    // map <object name, position in the SCR memory>
+    //       it must also done in all subset instances ('shallow copies')
+    // map <object name, position in the SCR memory>
+    std::map<std::string, SWHDL> k_objs;
+
+private:
+    // only used by subsets ('shallow copies')
+    KDB* db_parent = nullptr;
+    // only used by global or standalone databases
+    std::set<KDB*> subset_instances;
 
 protected:
     bool set_packed_object(const std::string& name, char* pack);
@@ -215,12 +231,44 @@ public:
         }
     }
 
-    // shallow copy database
+    // shallow copy database (i.e. subset of a database)
     KDB(KDB* db_parent, const std::string& pattern = "*") : KDBInfo(false)
     {
         k_db_type = DB_SHALLOW_COPY;
-        this->k_type = db_parent->k_type;
 
+        std::string error_msg;
+        if(!db_parent)
+        {
+            error_msg = "Cannot create a subset database: parent database is null";
+            throw std::invalid_argument(error_msg);
+        }
+
+        bool failed = false;
+        error_msg = "Cannot create a subset the database '";
+        error_msg += v_iode_types[this->k_type] + "' using the pattern '";
+        error_msg += pattern + "':\n";
+
+        std::set<std::string> subset_keys;
+        try
+        {
+            subset_keys = db_parent->filter_names(pattern);
+        }
+        catch(const std::exception& e)
+        {
+            failed = true;
+            subset_keys.clear();
+            error_msg += std::string(e.what()) + " in the parent database";
+        }
+
+        KDB* true_db_parent = db_parent;
+        // case where we create a subset of a subset
+        if(db_parent->k_db_type == DB_SHALLOW_COPY)
+            true_db_parent = db_parent->db_parent;
+        // normal case (global/standalone -> subset)
+        else
+            true_db_parent = db_parent;
+
+        this->k_type = true_db_parent->k_type;
         switch(this->k_type) 
         {
             case COMMENTS :
@@ -249,33 +297,16 @@ public:
                 break;
         }
 
-        if(db_parent->sample)
-            this->sample = new Sample(*db_parent->sample);
-        this->description = db_parent->description;
-        this->k_compressed = db_parent->k_compressed;
-        this->filepath = db_parent->filepath;
+        if(true_db_parent->sample)
+            this->sample = new Sample(*true_db_parent->sample);
+        this->description = true_db_parent->description;
+        this->k_compressed = true_db_parent->k_compressed;
+        this->filepath = true_db_parent->filepath;
 
-        std::string error_msg = "Cannot create a subset the database '";
-        error_msg += v_iode_types[this->k_type] + "' using the pattern '";
-        error_msg += pattern + "':\n";
-
-        bool failed = false;
-        std::vector<std::string> names;
-        try
-        {
-            names = db_parent->filter_names(pattern);
-        }
-        catch(const std::exception& e)
-        {
-            failed = true;
-            names.clear();
-            error_msg += std::string(e.what()) + " in the parent database";
-        }
-        
         SWHDL handle;
-        for(const std::string& name : names) 
+        for(const std::string& name : subset_keys) 
         {
-            handle = db_parent->get_handle(name);
+            handle = true_db_parent->get_handle(name);
             if(handle == 0)  
             {
                 error_msg += v_iode_types[this->k_type] + " '" + name + "' ";
@@ -283,11 +314,14 @@ public:
                 failed = true;
                 continue;
             }
-            this->k_objs[name] = handle;
+            k_objs[name] = handle;
         }
 
         if(failed)
             throw std::runtime_error(error_msg);
+
+        true_db_parent->subset_instances.insert(this);
+        this->db_parent = true_db_parent;
     }
     
     // copy constructor
@@ -306,9 +340,9 @@ public:
             {
                 if(this->size() > 0)
                 {
-                    for(auto& [this_name, this_handle] : this->k_objs) 
+                    for(auto& [this_name, this_handle] : k_objs) 
                         SW_free(this_handle);
-                    this->k_objs.clear();
+                    k_objs.clear();
                 }
 
                 filepath = std::string(I_DEFAULT_FILENAME);
@@ -323,33 +357,75 @@ public:
 
     ~KDB()
     {
-        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
+        if(k_db_type != DB_SHALLOW_COPY)
         {
-            for(auto& [name, handle] : this->k_objs) 
+            for(KDB* subset_db : subset_instances)
+            {
+                subset_db->k_objs.clear();
+                subset_db->db_parent = nullptr;
+            }
+            subset_instances.clear();
+            
+            for(auto& [name, handle] : k_objs) 
                 SW_free(handle);
+            k_objs.clear();
         }
 
-        if(this->k_objs.size() > 0)
-            this->k_objs.clear();
-    }
+        if(k_db_type == DB_SHALLOW_COPY)
+            k_objs.clear();
 
-    void clear_objs()
-    {
-        if(k_db_type != DB_SHALLOW_COPY && this->size() > 0)
+        if(db_parent)
         {
-            for(auto& [name, handle] : this->k_objs) 
-                SW_free(handle);
+            db_parent->subset_instances.erase(this);
+            db_parent = nullptr;
         }
-
-        if(this->k_objs.size() > 0)
-            this->k_objs.clear();
     }
 
     void clear(bool delete_objs = true)
     {
         KDBInfo::clear();
-        if(delete_objs)
-            clear_objs();
+
+        if(k_db_type != DB_SHALLOW_COPY)
+        {
+            for(KDB* subset_db : subset_instances)
+            {
+                subset_db->k_objs.clear();
+                subset_db->db_parent = nullptr;
+            }
+            subset_instances.clear();
+        }
+        
+        if(delete_objs && k_db_type != DB_SHALLOW_COPY)
+        {
+            for(auto& [name, handle] : k_objs) 
+                SW_free(handle);
+        }
+        
+        k_objs.clear();
+    }
+
+    KDB* get_top_level_db()
+    {
+        if(k_db_type != DB_SHALLOW_COPY)
+            return this;
+        else
+        {
+            if(!db_parent)
+            {
+                std::string error_msg = "Internal error: subset database of type '";
+                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
+                throw std::runtime_error(error_msg);
+            }
+            return db_parent;
+        }
+    }
+
+    std::set<KDB*> get_subsets() const
+    {
+        if(k_db_type != DB_SHALLOW_COPY)
+            return subset_instances; 
+        else
+            return db_parent->subset_instances;
     }
 
     bool copy_objs(const KDB& other, const std::string& pattern = "*")
@@ -369,7 +445,7 @@ public:
             return false;
         }
         
-        std::vector<std::string> names;
+        std::set<std::string> names;
         try
         {
             names = other.filter_names(pattern);
@@ -401,7 +477,7 @@ public:
 
     int size() const 
     { 
-        return (int) this->k_objs.size();
+        return (int) k_objs.size();
     }
 
     // strip the name and set it to upper/lower/asis according to k_mode
@@ -422,22 +498,22 @@ public:
     bool contains(const std::string& name) const
     {
         std::string key = to_key(name);
-        return this->k_objs.contains(key);
+        return k_objs.contains(key);
     }
 
     int index_of(const std::string& name) const
     {
         std::string key = to_key(name);
-        auto it = this->k_objs.find(key);
-        if (it != this->k_objs.end()) 
-            return (int) std::distance(this->k_objs.begin(), it);
+        auto it = k_objs.find(key);
+        if (it != k_objs.end()) 
+            return (int) std::distance(k_objs.begin(), it);
         else
             return -1;
     }
 
-    // NOTE: repeated calls to this function can be inefficient (O(n) each)
-    //       To iterate over all names, prefer the C++17 loop syntax:
-    //       for(const auto& [name, _] : kdb.k_objs) { ... } 
+    // NOTE: - repeated calls to this function can be inefficient (O(n) each)
+    //         To iterate over all names, prefer the C++17 loop syntax:
+    //         for(const auto& [name, _] : kdb.k_objs) { ... } 
     const std::string& get_name(const int index) const
     {
         static const std::string empty_string = "";
@@ -449,24 +525,23 @@ public:
             throw std::out_of_range(msg);
         }
 
-        auto it = this->k_objs.begin();
+        auto it = k_objs.begin();
         std::advance(it, index);
         return const_cast<std::string&>(it->first);
     }
 
-    std::vector<std::string> get_names() const
+    std::set<std::string> get_names() const
     {
-        std::vector<std::string> names;
-        names.reserve(this->size());
-        for(const auto& [name, _] : this->k_objs) 
-            names.push_back(name);
+        std::set<std::string> names;
+        for(const auto& [name, _] : k_objs) 
+            names.insert(name);
         return names;
     }
 
     std::string get_names_as_string() const
     {
         std::string names;
-        for(const auto& [name, _] : this->k_objs) 
+        for(const auto& [name, _] : k_objs) 
             names += name + ";";
 
         // remove last ;
@@ -476,15 +551,16 @@ public:
         return names;
     }
 
-    std::vector<std::string> filter_names(const std::string& pattern, 
+    std::set<std::string> filter_names(const std::string& pattern, 
         const bool must_exist=true) const
     {
-        if(pattern == "*")
-            return this->get_names();
+        std::set<std::string> names;
 
-        std::vector<std::string> names;
         if(pattern.empty())
             return names;
+
+        if(pattern == "*")
+            return get_names();
 
         std::string error_msg = "'" + v_iode_types[this->k_type] + "': ";
         error_msg += "no names found matching the pattern '" + pattern + "'";
@@ -512,15 +588,12 @@ public:
             name = std::string(c_names[i]);
             if(must_exist && !contains(name))
                 continue;
-            names.push_back(name);
+            names.insert(name);
         }
         SCR_free_tbl((unsigned char **) c_names);
 
         if(names.size() == 0)
             throw std::runtime_error(error_msg);
-        
-        // remove duplicates
-        sort_and_remove_duplicates(names);
         
         // return names
         return names; 
@@ -529,8 +602,8 @@ public:
     SWHDL get_handle(const std::string& name) const
     {
         std::string key = to_key(name);
-        auto it = this->k_objs.find(key);
-        if (it != this->k_objs.end()) 
+        auto it = k_objs.find(key);
+        if (it != k_objs.end()) 
             return it->second;
         else
             return 0;
@@ -539,8 +612,8 @@ public:
     char* get_ptr_obj(const std::string& name) const
     {
         std::string key = to_key(name);
-        auto it = this->k_objs.find(key);
-        if (it != this->k_objs.end()) 
+        auto it = k_objs.find(key);
+        if (it != k_objs.end()) 
             return SW_getptr(it->second);
         else
             return NULL;
@@ -555,23 +628,25 @@ public:
         if(this->k_type == EQUATIONS)
             throw std::invalid_argument("Renaming equations in the database is not allowed");
 
-        if(this->k_objs.size() == 0)
+        if(k_objs.size() == 0)
             return false;
 
         check_name(new_key, k_type);
 
-        auto it = this->k_objs.find(old_key);
-        if (it == this->k_objs.end())
+        if(!contains(old_key))
         {
-            std::string msg = "Cannot rename object: there is no object previously named '" + old_key + 
-                              "' found in the database.";
+            std::string msg = "Cannot rename object: there is no object previously named '" + 
+                              old_key + "' found in the database.";
             throw std::invalid_argument(msg);
         }
 
+        // rename in top-level database
+        KDB* top_db = get_top_level_db();        
+        auto it = top_db->k_objs.find(old_key);
         if(!overwrite)
         {
-            auto it_new = this->k_objs.find(new_key);
-            if (it_new != this->k_objs.end())
+            auto it_new = top_db->k_objs.find(new_key);
+            if (it_new != top_db->k_objs.end())
             {
                 std::string msg = "Cannot rename object: an object named '" + new_key + 
                                   "' already exists in the database.";
@@ -580,27 +655,41 @@ public:
         }
 
         SWHDL handle = it->second;
-        this->k_objs.erase(it);
-        this->k_objs[new_key] = handle;
+        top_db->k_objs.erase(it);
+        top_db->k_objs[new_key] = handle;
+
+        // rename in all subset instances (including 'this' if 'this' is a subset)
+        for(KDB* subset : get_subsets())
+        {
+            if(!subset->contains(old_key))
+                continue;
+            subset->k_objs.erase(old_key);
+            subset->k_objs[new_key] = handle;
+        }
+
         return true;
     }
 
     bool add_entry(const std::string& name)
     {
-        check_name(std::string(name), this->k_type);
+        std::string key = to_key(name);
+        check_name(key, this->k_type);
         
-        bool found = this->contains(name);
+        // add in top-level database
+        KDB* top_db = get_top_level_db();
+        bool found = top_db->contains(key);
         if(found) 
         {
             if(K_WARN_DUP)
             {
-                kerror(0, "%s already defined", (char*) name.c_str());
+                kerror(0, "%s already defined", (char*) key.c_str());
                 return false;
             }
         }
         else
-            this->k_objs[name] = 0;
+            top_db->k_objs[key] = 0;
 
+        k_objs[key] = 0;
         return true;
     }
 
@@ -609,8 +698,7 @@ public:
     bool remove(const std::string& name)
     {
         std::string key = to_key(name);
-        auto it = this->k_objs.find(key);
-        if(it == this->k_objs.end())
+        if(!this->contains(key))
         {
             std::string str_type = v_iode_types[this->k_type];
             std::string msg = "Cannot remove " + str_type + ": no " + str_type + 
@@ -619,10 +707,16 @@ public:
             return false;
         }
 
-        if(k_db_type != DB_SHALLOW_COPY)
+        // remove from top-level database
+        KDB* top_db = get_top_level_db();
+        auto it = top_db->k_objs.find(key);
             SW_free(it->second);
+        top_db->k_objs.erase(it);
 
-        this->k_objs.erase(it);
+        // remove from all subset instances (including 'this' if 'this' is a subset)
+        for(KDB* subset : get_subsets())
+            subset->k_objs.erase(key);
+        
         return true;
     }
 

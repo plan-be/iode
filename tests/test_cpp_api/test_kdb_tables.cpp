@@ -33,7 +33,7 @@ TEST_F(KDBTablesTest, Subset)
 
     // DEEP COPY SUBSET
     KDBTables* kdb_subset_deep_copy = Tables.subset(pattern, true);
-    std::vector<std::string> names = Tables.filter_names(pattern);
+    std::set<std::string> names = Tables.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("C8_1", *table);
@@ -70,9 +70,10 @@ TEST_F(KDBTablesTest, Get)
 
 TEST_F(KDBTablesTest, GetNames)
 {
-    std::vector<std::string> expected_names;
-    for (int i=0; i < Tables.size(); i++) expected_names.push_back(Tables.get_name(i));
-    std::vector<std::string> names = Tables.get_names();
+    std::set<std::string> expected_names;
+    for (int i=0; i < Tables.size(); i++) 
+        expected_names.insert(Tables.get_name(i));
+    std::set<std::string> names = Tables.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -298,27 +299,25 @@ TEST_F(KDBTablesTest, Copy)
 TEST_F(KDBTablesTest, Filter)
 {
     std::string pattern = "A*;*2";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBTables* kdb_subset;
 
     KDBVariables kdb_var(true, input_test_dir + "fun.av");
     KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Tables.size(); p++) 
+        all_names.insert(Tables.get_name(p));
 
     int nb_total_tables = Tables.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *2
-    for (const std::string& name : all_names) if (name.back() == '2') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '2') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Tables.subset(pattern);
@@ -373,27 +372,25 @@ TEST_F(KDBTablesTest, Filter)
 TEST_F(KDBTablesTest, DeepCopy)
 {
     std::string pattern = "A*;*2";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBTables* kdb_subset;
 
     KDBVariables kdb_var(true, input_test_dir + "fun.av");
     KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Tables.size(); p++) all_names.push_back(Tables.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Tables.size(); p++) 
+        all_names.insert(Tables.get_name(p));
 
     int nb_total_tables = Tables.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *2
-    for (const std::string& name : all_names) if (name.back() == '2') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '2') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Tables.subset(pattern, true);
@@ -448,7 +445,7 @@ TEST_F(KDBTablesTest, CopyFrom)
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.tbl";
     int expected_nb_comments = Tables.size();
-    std::vector<std::string> v_expected_names;
+    std::set<std::string> v_expected_names;
 
     // Copy entire file
     Tables.clear();

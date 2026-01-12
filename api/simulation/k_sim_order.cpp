@@ -199,7 +199,7 @@ int CSimulation::KE_preorder(CKDBEquations* dbe, int** predecessors, int** succe
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
     int i = 0;
-    for(auto& [name, _] : dbe->k_objs) 
+    for(const auto& [name, handle] : dbe->k_objs) 
     {
         clec = KECLEC(dbe, name);
         predecessors[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long

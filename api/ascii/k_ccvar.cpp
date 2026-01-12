@@ -298,7 +298,7 @@ bool CKDBVariables::save_asc(const std::string& filename)
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(auto& [name, _] : this->k_objs) 
+    for(auto& [name, _] : k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
         val = this->get_var_ptr(name);
@@ -375,11 +375,6 @@ bool CKDBVariables::save_csv(const std::string& filename, const std::vector<std:
         return false;
     }
 
-    // List of variables
-    std::vector<std::string> lst = varlist;
-    if(lst.size() == 0)
-        lst = this->get_names();
-
     // Open file
     if(filename[0] == '-') 
         fd = stdout;
@@ -396,7 +391,7 @@ bool CKDBVariables::save_csv(const std::string& filename, const std::vector<std:
         }
     }
 
-    // Ligne 1
+    // line 0
     fprintf(fd, "%s\\time", axes);
     for(int i = 0 ; i < smpl->nb_periods ; i++) 
     {
@@ -410,8 +405,15 @@ bool CKDBVariables::save_csv(const std::string& filename, const std::vector<std:
     }
     fprintf(fd, "\n");
 
-    for(int i = 0; i < lst.size(); i++)
-        lst[i] = to_upper(lst[i]);
+    // list of variables
+    std::set<std::string> lst;
+    if(varlist.size() == 0)
+        lst = this->get_names();
+    else
+    {
+        for(const std::string& var_name: varlist) 
+            lst.insert(to_upper(var_name));
+    }
 
     // next lines
     for(const std::string& var_name: lst) 

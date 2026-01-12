@@ -124,14 +124,14 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 
         // generate a list of equations names from the passed argument 'block'
         // If an equation name specified in the block is not found in the global workspace, add it anyway
-        std::vector<std::string> v_equations_ = Equations.filter_names(block, false);
+        std::set<std::string> v_equations_ = Equations.filter_names(block, false);
 
         // if current equation name is not empty
         if(!current_eq_name.empty())
         {
             // if current equation name is not in the list of equations -> append it
             if(find(v_equations_.begin(), v_equations_.end(), current_eq_name) == v_equations_.end())
-                v_equations_.push_back(current_eq_name);
+                v_equations_.insert(current_eq_name);
         }
 
         // check each name if is valid
@@ -160,7 +160,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
             }
 
             // b. add the equation name to the vector 'v_equations'
-            v_equations.push_back(name);
+            v_equations.insert(name);
         }
 
         // copy the list of equations names separated by ';' to the 'block' attribute
@@ -186,25 +186,23 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 void EditAndEstimateEquations::update_scalars()
 {
     Equation* eq;
-    std::vector<std::string> coefficients_list;
+    std::set<std::string> coefficients_list;
 
     CKDBEquations* c_kdb_eqs = kdb_eqs->get_database();
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (auto& [name, handle] : c_kdb_eqs->k_objs)
+    for (const std::string& name : c_kdb_eqs->get_names())
     {
         eq = c_kdb_eqs->get_obj(name);
         if(!eq)
             throw std::runtime_error("Estimation: Cannot get equation at position " 
                                      + name + " from the local Equations database.");
         tmp_coefs_list = eq->get_coefficients_list();
-        std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
+        for(const std::string& coef_name : tmp_coefs_list)
+            coefficients_list.insert(coef_name);
         delete eq;
     }
-
-    // remove duplicated scalars names
-    sort_and_remove_duplicates(coefficients_list);
 
     // for each scalar name
     for(const std::string& name: coefficients_list)
@@ -287,18 +285,18 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     estimation_done = false;
 
     // endos
-    char** c_endos = vector_to_double_char(v_equations);   
+    char** c_endos = set_to_double_char(v_equations);   
     
     // list of LEC expressions for each equation of the vector v_equations
     // NOTE: equations are stored in the local database kdb_eqs 
     std::string lec;
-    std::vector<std::string> v_lecs;
+    std::set<std::string> v_lecs;
     for(const std::string& eq_name: v_equations)
     {
         lec = kdb_eqs->get_lec(eq_name);
-        v_lecs.push_back(lec);
+        v_lecs.insert(lec);
     }
-    char** c_lecs = vector_to_double_char(v_lecs);
+    char** c_lecs = set_to_double_char(v_lecs);
 
     // copy the values of class attributes 'block', 'method' and 'instruments' 
     // to each local equation 
@@ -338,7 +336,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     if(res == 0)
     {
         estimation_done = true;
-        std::vector<std::string> v_coeffs = kdb_scl->filter_names("*");
+        std::set<std::string> v_coeffs = kdb_scl->get_names();
 
         if(m_corr) delete m_corr;
         m_corr = new CorrelationMatrix(v_coeffs, estimation->get_MCORR()); 
@@ -377,11 +375,9 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
 
     // copy the Equations referenced in v_equations from the local database to the global one.
     Equation* eq;
-    std::string eq_name;
     std::vector<std::string> v_new_eqs;
-    for(int i = 0; i < v_equations.size(); i++) 
+    for(const std::string& eq_name: v_equations) 
     {
-        eq_name = v_equations[i];
         eq = kdb_eqs->get(eq_name);    // get the equation from the local database
         if(!eq)
             throw std::runtime_error("Estimation: Could not find equation named '" + eq_name +

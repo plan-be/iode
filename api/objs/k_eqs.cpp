@@ -232,7 +232,7 @@ bool Equation::print_definition() const
 Equation* CKDBEquations::get_obj(const SWHDL handle) const
 {    
     std::string name;
-    for(const auto& [_name_, _handle_] : this->k_objs) 
+    for(const auto& [_name_, _handle_] : k_objs) 
     {
         if(_handle_ == handle) 
         {
@@ -308,6 +308,8 @@ bool CKDBEquations::print_obj_def(const std::string& name)
 
 void CKDBEquations::update_reference_db()
 {
+    if(K_RWS[this->k_type][0]) 
+        delete K_RWS[this->k_type][0];
     K_RWS[this->k_type][0] = new CKDBEquations(this, "*");      
 }
 

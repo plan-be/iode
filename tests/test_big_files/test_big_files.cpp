@@ -70,7 +70,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::cout << "(GLOBAL - ALL VARS)      loaded " << std::to_string(all_nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
         
-        std::vector<std::string> v_objs = kdb_var->filter_names(pattern);
+        std::set<std::string> set_objs = kdb_var->filter_names(pattern);
+        std::vector<std::string> v_objs(set_objs.begin(), set_objs.end());
         nb_names = (int) v_objs.size();
 
         delete kdb_var;

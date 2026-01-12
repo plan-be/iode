@@ -31,7 +31,7 @@ TEST_F(KDBCommentsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBComments* kdb_subset_deep_copy = Comments.subset(pattern, true);
-    std::vector<std::string> names = Comments.filter_names(pattern);
+    std::set<std::string> names = Comments.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", modified);
@@ -149,14 +149,16 @@ TEST_F(KDBCommentsTest, GetNames)
 {
     std::string list_names;
     std::string expected_list_names;
-    std::vector<std::string> names;
-    std::vector<std::string> expected_names;
+    std::set<std::string> names;
+    std::set<std::string> expected_names;
 
     // no pattern
-    for (int i=0; i < Comments.size(); i++)
+    std::string name;
+    for(int i=0; i < Comments.size(); i++)
     {
-        expected_names.push_back(Comments.get_name(i));
-        expected_list_names += expected_names.back() + ";";
+        name = Comments.get_name(i);
+        expected_names.insert(name);
+        expected_list_names += name + ";";
     }
     expected_list_names.pop_back();     // remove trailing ';'
 
@@ -172,13 +174,14 @@ TEST_F(KDBCommentsTest, GetNames)
     for(const std::string& name : names) 
         if(name.front() == 'A' || name.back() == '_')
         {
-            expected_names.push_back(name);
+            expected_names.insert(name);
             expected_list_names += name + ";";
         }
     expected_list_names.pop_back();     // remove trailing ';'
 
-    names = Comments.filter_names(pattern);
-    EXPECT_EQ(names, expected_names);
+    std::set<std::string> set_names = Comments.filter_names(pattern);
+    std::set<std::string> set_expected_names(expected_names.begin(), expected_names.end());
+    EXPECT_EQ(set_names, set_expected_names);
 }
 
 TEST_F(KDBCommentsTest, CreateRemove)
@@ -237,24 +240,22 @@ TEST_F(KDBCommentsTest, Copy)
 TEST_F(KDBCommentsTest, Filter)
 {
     std::string pattern = "A*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBComments* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Comments.size(); p++) all_names.push_back(Comments.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Comments.size(); p++) 
+        all_names.insert(Comments.get_name(p));
 
     int nb_total_comments = Comments.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Comments.subset(pattern);
@@ -309,9 +310,10 @@ TEST_F(KDBCommentsTest, Filter)
     kdb_subset = Comments.subset(pattern);
 
     std::string pattern_subset_subset = "B*";
-    std::vector<std::string> expected_names_subset_subset;
+    std::set<std::string> expected_names_subset_subset;
     for(const std::string& name: expected_names)
-        if(name.front() == 'B') expected_names_subset_subset.push_back(name);
+        if(name.front() == 'B') 
+            expected_names_subset_subset.insert(name);
 
     KDBComments* kdb_subset_subset = kdb_subset->subset(pattern_subset_subset);
     EXPECT_EQ(kdb_subset_subset->size(), expected_names_subset_subset.size());
@@ -323,24 +325,22 @@ TEST_F(KDBCommentsTest, Filter)
 TEST_F(KDBCommentsTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBComments* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Comments.size(); p++) all_names.push_back(Comments.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Comments.size(); p++) 
+        all_names.insert(Comments.get_name(p));
 
     int nb_total_comments = Comments.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Comments.subset(pattern, true);
@@ -394,7 +394,7 @@ TEST_F(KDBCommentsTest, CopyFrom)
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.cmt";
     int expected_nb_comments = Comments.size();
-    std::vector<std::string> v_expected_names;
+    std::set<std::string> v_expected_names;
 
     // Copy entire file
     Comments.clear();

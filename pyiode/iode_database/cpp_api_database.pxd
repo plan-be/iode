@@ -2,6 +2,7 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.set cimport set
 from libcpp.map cimport map
 
 from libcpp cimport bool
@@ -200,8 +201,8 @@ cdef extern from "cpp_api/KDB/kdb_template.h":
         bool set_name(const int pos, const string& new_name) except +
         bool rename(const string& old_name, const string& new_name, const bool overwrite) except +
         string expand(const string& pattern, const char ch_all) except +
-        vector[string] filter_names(const string& pattern, const bool must_exist) except +
-        vector[string] get_names() except +
+        set[string] filter_names(const string& pattern, const bool must_exist) except +
+        set[string] get_names() except +
         string get_names_as_string() except +
 
         # delete

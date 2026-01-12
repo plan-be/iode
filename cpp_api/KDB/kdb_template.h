@@ -71,10 +71,10 @@ public:
 
     virtual std::string expand(const std::string& pattern, const char all) const = 0;
 
-    virtual std::vector<std::string> filter_names(const std::string& pattern, 
+    virtual std::set<std::string> filter_names(const std::string& pattern, 
         const bool must_exist=true) const = 0;
 
-    virtual std::vector<std::string> get_names() const = 0;
+    virtual std::set<std::string> get_names() const = 0;
 
     virtual std::string get_names_as_string() const = 0;
 
@@ -301,32 +301,8 @@ public:
     bool rename(const std::string& old_name, const std::string& new_name, 
         const bool overwrite = false) override
     {
-        B* kdb;
-        bool success = false;
-        switch(get_database_type())
-        {
-        case DB_GLOBAL:
-            kdb = get_global_database();
-            success = kdb->rename(old_name, new_name, overwrite);
-            break;
-        case DB_STANDALONE:
-            kdb = get_database();
-            success = kdb->rename(old_name, new_name, overwrite);
-            break;
-        case DB_SHALLOW_COPY:
-            // first rename in global KDB
-            kdb = get_global_database();
-            success = kdb->rename(old_name, new_name, overwrite);
-            if (!success) 
-                break;
-            // then rename in local KDB
-            kdb = get_database();
-            success = kdb->rename(old_name, new_name, overwrite);
-            break;
-        default:
-            break;
-        }
-    
+        B* kdb = get_database();
+        bool success = kdb->rename(old_name, new_name, overwrite);
         return success;
     }
 
@@ -337,15 +313,15 @@ public:
         return lst;
     }
 
-    std::vector<std::string> filter_names(const std::string& pattern, 
+    std::set<std::string> filter_names(const std::string& pattern, 
         const bool must_exist=true) const override
     {
         B* kdb = get_database();
-        std::vector<std::string> names = kdb->filter_names(pattern, must_exist);
+        std::set<std::string> names = kdb->filter_names(pattern, must_exist);
         return names;
     }
 
-    std::vector<std::string> get_names() const override
+    std::set<std::string> get_names() const override
     {
         B* kdb = get_database();
         return kdb->get_names();
@@ -368,7 +344,6 @@ public:
 
     bool add(const std::string& name, const T value)
     {
-        bool success = false;
         std::string error_msg = "Cannot add " + get_iode_type_str() + " with name '" + name + "'.\n";
         error_msg += "The " + get_iode_type_str() + " with name '" + name + "' already exists in the database.\n";
         error_msg += "Use the update() method instead.";
@@ -376,27 +351,19 @@ public:
         B* kdb = get_database();        
         check_name(name, kdb->k_type);
 
-        if(get_database_type() != DB_SHALLOW_COPY)
+        if(kdb->k_db_type == DB_SHALLOW_COPY)
         {
-            if(kdb->contains(name))
+            KDB* top_db = kdb->get_top_level_db();
+            if(top_db->contains(name))
                 throw std::invalid_argument(error_msg);
-            success = kdb->set_obj(name, value);
         }
         else
         {
-            B* global_kdb = get_global_database();
-            if(global_kdb->contains(name))
+            if(kdb->contains(name))
                 throw std::invalid_argument(error_msg);
-            // add new obj to the global KDB
-            success = global_kdb->set_obj(name, value);
-            if(!success)
-                return false;
-            // add a new entry and copy the pointer
-            kdb->add_entry(name);
-            kdb->k_objs[name] = global_kdb->get_handle(name);
-            success = true;
         }
-
+        
+        bool success = kdb->set_obj(name, value);
         return success;
     }
 
@@ -408,11 +375,6 @@ public:
         B* kdb = get_database();
         if(!kdb->contains(name))
             throw std::invalid_argument(error_msg);
-        
-        // NOTE: In the case of a shallow copy, only pointers to objects 
-        //       are duplicated, not the objects.
-        //       Modifying an object passing either the shallow copy
-        //       or the global database modifies the same object.
         kdb->set_obj(name, value);
     }
 
@@ -443,30 +405,8 @@ public:
     
     void remove(const std::string& name) override
     {
-        B* kdb;
-        switch(get_database_type())
-        {
-        case DB_GLOBAL:
-            kdb = get_global_database();
-            kdb->remove(name);
-            break;
-        case DB_STANDALONE:
-            kdb = get_database();
-            kdb->remove(name);
-            break;
-        case DB_SHALLOW_COPY:
-            // first delete in shallow copy KDB
-            kdb = get_database();
-            kdb->remove(name);
-            // then delete in global KDB
-            kdb = get_global_database();
-            kdb->remove(name);
-            break;
-        default:
-            throw std::invalid_argument("Cannot remove object named '" + name + "'\n."
-                                        "Something went wrong.");
-            break;
-        }
+        B* kdb = get_database();
+        kdb->remove(name);
     }
 
     // Other methods

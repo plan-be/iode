@@ -956,14 +956,9 @@ bool KDB::load(const std::string& filename)
 
     if(success)
     {
+        // K_RWS[iode_type][0] = new <sub_class>(this, "*");      
         if(this->k_db_type == DB_GLOBAL)
-        {
-            IodeType iode_type = (IodeType) this->k_type;
-            if(K_RWS[iode_type][0])
-                delete K_RWS[iode_type][0];
-            // K_RWS[iode_type][0] = new <sub_class>(this, "*");      
             this->update_reference_db();
-        }
         kmsg("%d objects loaded", (int) this->size());
     }
     
@@ -1553,7 +1548,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     // prepare KOBJ table
     i = 0;
     k_objs = new KOBJ[this->size()];
-    for(auto& [name, handle] : this->k_objs) 
+    for(const auto& [name, handle] : this->k_objs) 
     {
         strcpy(k_objs[i].o_name, name.c_str());
         k_objs[i].o_val = handle;
@@ -1573,7 +1568,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     delete[] k_objs;
 
     // dump object values as packed objects
-    for(auto& [name, handle] : this->k_objs) 
+    for(const auto& [name, handle] : this->k_objs) 
     {
         ptr = SW_getptr(handle);
         len = P_len(ptr);

@@ -18,6 +18,7 @@ from cython.operator cimport dereference
 from libc.string cimport memcpy
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.set cimport set as cpp_set
 from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
@@ -435,17 +436,22 @@ cdef class Variables(CythonIodeDatabase):
         # see https://cython.readthedocs.io/en/latest/src/userguide/numpy_tutorial.html#declaring-the-numpy-arrays-as-contiguous 
         cdef double[:, ::1] data_view = data
         
+        i = 0
         cdef string c_name
-        cdef vector[string] cpp_names = self.database_ptr.get_names()
+        cdef cpp_set[string] cpp_names = self.database_ptr.get_names()
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
-            for i, c_name in enumerate(cpp_names):
+            # WARNING: do not use enumerate() here as it does not respect the C++ set order
+            for c_name in cpp_names:
                 var_ptr = db_ptr.get_var_ptr(c_name, t_first_period)
                 memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
+                i += 1
         else:
-            for i, c_name in enumerate(cpp_names):
+            # WARNING: do not use enumerate() here as it does not respect the C++ set order
+            for c_name in cpp_names:
                 for t in range(t_first_period, t_last_period + 1):
                     value = KV_get(db_ptr, c_name, t, mode)
                     data_view[i, t - t_first_period] = value
+                i += 1
         
         if self.size() == 1:
             data = data.reshape((nb_periods,))

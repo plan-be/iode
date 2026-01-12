@@ -34,7 +34,7 @@ TEST_F(KDBEquationsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBEquations* kdb_subset_deep_copy = Equations.subset(pattern, true);
-    std::vector<std::string> names = Equations.filter_names(pattern);
+    std::set<std::string> names = Equations.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
@@ -112,9 +112,10 @@ TEST_F(KDBEquationsTest, Get)
 
 TEST_F(KDBEquationsTest, GetNames)
 {
-    std::vector<std::string> expected_names;
-    for (int i=0; i < Equations.size(); i++) expected_names.push_back(Equations.get_name(i));
-    std::vector<std::string> names = Equations.get_names();
+    std::set<std::string> expected_names;
+    for (int i=0; i < Equations.size(); i++) 
+        expected_names.insert(Equations.get_name(i));
+    std::set<std::string> names = Equations.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -162,29 +163,28 @@ TEST_F(KDBEquationsTest, Copy)
 TEST_F(KDBEquationsTest, Filter)
 {
     std::string pattern = "A*;$ENVI;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBEquations* kdb_subset;
 
     KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Equations.size(); p++) 
+        all_names.insert(Equations.get_name(p));
 
     int nb_total_equations = Equations.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // $ENVI
     unsigned char** c_expanded_list = KL_expand(const_cast<char*>("$ENVI"));
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_names.push_back((char*) c_expanded_list[i]);
+    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
+        expected_names.insert((char*) c_expanded_list[i]);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Equations.subset(pattern);
@@ -236,29 +236,27 @@ TEST_F(KDBEquationsTest, Filter)
 TEST_F(KDBEquationsTest, DeepCopy)
 {
     std::string pattern = "A*;$ENVI;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBEquations* kdb_subset;
 
     KDBLists kdb_lst(true, input_test_dir + "fun.al");
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Equations.size(); p++) all_names.push_back(Equations.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Equations.size(); p++) 
+        all_names.insert(Equations.get_name(p));
 
     int nb_total_equations = Equations.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') expected_names.insert(name);
     // $ENVI
     unsigned char** c_expanded_list = KL_expand(const_cast<char*>("$ENVI"));
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_names.push_back((char*) c_expanded_list[i]);
+    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
+        expected_names.insert((char*) c_expanded_list[i]);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Equations.subset(pattern, true);
@@ -295,7 +293,7 @@ TEST_F(KDBEquationsTest, CopyFrom)
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.eqs";
     int expected_nb_comments = Equations.size();
-    std::vector<std::string> v_expected_names;
+    std::set<std::string> v_expected_names;
 
     // Copy entire file
     Equations.clear();
