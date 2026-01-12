@@ -127,5 +127,7 @@ bool CKDBIdentities::print_obj_def(const std::string& name)
 
 void CKDBIdentities::update_reference_db()
 {
+    if(K_RWS[this->k_type][0]) 
+        delete K_RWS[this->k_type][0];
     K_RWS[this->k_type][0] = new CKDBIdentities(this, "*");      
 }

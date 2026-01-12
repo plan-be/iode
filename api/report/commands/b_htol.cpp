@@ -154,7 +154,7 @@ static int B_htol(int method, char* arg)
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
 
-    for(auto& [from_name, from_handle] : from->k_objs) 
+    for(const auto& [from_name, handle] : from->k_objs) 
     {
         memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
         memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
@@ -247,7 +247,7 @@ CKDBVariables* B_htol_kdb(int method, CKDBVariables* kdb_from)
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + kdb_from->sample->nb_periods) * sizeof(double));
 
-    for(auto& [from_name, from_handle] : kdb_from->k_objs) 
+    for(const auto& [from_name, handle] : kdb_from->k_objs) 
     {
         memcpy(f_vec, kdb_from->get_var_ptr(from_name), kdb_from->sample->nb_periods * sizeof(double));
         memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));

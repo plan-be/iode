@@ -6,6 +6,7 @@ from typing import Union, Tuple, List, Dict, Optional
 # Import necessary C++ types/classes
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.set cimport set
 
 from pyiode.common cimport IodeEquationMethod, IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
@@ -57,7 +58,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         void update_scalars() except +
 
         CKDBEquations* get_equations()
-        vector[string] get_list_equations()
+        set[string] get_list_equations()
         void update_current_equation(const string& lec, const string& comment) except +
 
         CEquation* current_equation() except +

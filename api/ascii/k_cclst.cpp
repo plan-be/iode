@@ -185,7 +185,7 @@ bool CKDBLists::save_asc(const std::string& filename)
         } 
     }
 
-    for(auto& [name, handle] : this->k_objs) 
+    for(auto& [name, handle] : k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
         lst = this->get_obj(handle);

@@ -133,16 +133,10 @@ class IodeDatabase:
 
     @staticmethod
     def _get_instance(instance: Self) -> Self:
-        instance.list_subsets = []
         return instance
 
     def _subset(self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
-    
-    def _subset_(self, instance: Self, copy: bool) -> Self:
-        if not copy:
-            self.list_subsets.append(instance)
-        return instance
 
     def new_detached(self) -> Self:
         r"""
@@ -1448,9 +1442,6 @@ class IodeDatabase:
     def __delitem__(self, key):
         names = self._unfold_key(key)
         self._cython_instance.remove_objects(names)
-        for subsets in self.list_subsets:
-            names_subset = [name for name in names if name in subsets]
-            subsets._cython_instance.remove_objects(names_subset)
 
     def _str_header(self) -> str:
         type_name = self.__class__.__name__

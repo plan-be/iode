@@ -74,7 +74,7 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 
 	Table* table;
 	ComputedTable* computed_table;
-	std::vector<std::string> v_names = filter_names(names);
+	std::set<std::string> v_names = filter_names(names);
 	for(const std::string& name : v_names)
 	{
 		table = get(name);

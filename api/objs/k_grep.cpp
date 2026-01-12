@@ -48,29 +48,39 @@
  *  @param [in] texts    bool      true to search also in texts (for CMT, LST, EQS comments, Table text cells)
  *  @param [in] all      char      character indicating "any sequence" (normally '*')
  *                       
- *  @return              vector<string> list of object names where the string has been found 
- *                                      empty if none were found 
+ *  @return              vector<string>    list of object names where the string has been found 
+ *                                         empty if none were found 
  */
 std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase, const bool names, 
     const bool forms, const bool texts, const char all) const
 {
+    std::vector<std::string> lst;
+
     bool pattern_is_all = pattern.size() == 1 && pattern[0] == all;
     if(names && !texts && !forms && pattern_is_all) 
-        return this->get_names();
+    {
+        for(const auto& [name, handle] : this->k_objs)
+            lst.push_back(name);
+        return lst;
+    }
     
     bool found;
-    std::vector<std::string> lst;
     for(const auto& [name, handle] : this->k_objs)
     {
         found = false;
         if(names) 
             found = wrap_grep_gnl(pattern, name, ecase, all);
 
-        if(!found) 
+        if(!found)
             found = this->grep_obj(name, handle, pattern, ecase, forms, texts, all);
 
         if(found) 
-            lst.push_back(name);
+        {
+            // add only unique names
+            auto it = std::find(lst.begin(), lst.end(), name);
+            if(it == lst.end()) 
+                lst.push_back(name);
+        }
     }
 
     return lst;

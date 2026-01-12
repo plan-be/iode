@@ -1167,12 +1167,15 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
 
     nl = 0;
     ll3 = 0;
-    for(i = 0; i < inb; i++) {
+    for(i = 0; i < inb; i++) 
+    {
         ll1 = (int) strlen((char*) l1[i]);
-        for(j = 0; j < jnb; j++) {
+        for(j = 0; j < jnb; j++) 
+        {
             ll2 = (int) strlen((char*) l2[j]);
 
-            if(ll3 < ll1 + ll2 + 1) {
+            if(ll3 < ll1 + ll2 + 1) 
+            {
                 ll3 = ll1 + ll2 + 1;
                 SCR_free(l3);
                 l3 = (unsigned char*) SCR_malloc(ll3);

@@ -533,7 +533,7 @@ std::size_t hash_value(const Table& table)
 Table* CKDBTables::get_obj(const SWHDL handle) const
 {    
     std::string name;
-    for(const auto& [_name_, _handle_] : this->k_objs) 
+    for(const auto& [_name_, _handle_] : k_objs) 
     {
         if(_handle_ == handle) 
         {
@@ -788,5 +788,7 @@ bool CKDBTables::print_obj_def(const std::string& name)
 
 void CKDBTables::update_reference_db()
 {
+    if(K_RWS[this->k_type][0]) 
+        delete K_RWS[this->k_type][0];
     K_RWS[this->k_type][0] = new CKDBTables(this, "*");      
 }

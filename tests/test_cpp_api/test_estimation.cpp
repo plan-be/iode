@@ -17,11 +17,11 @@ protected:
 
 TEST_F(EstimationTest, SetBlock)
 {
-    std::vector<std::string> v_eqs;
-    std::vector<std::string> v_expected_eqs;
+    std::set<std::string> v_eqs;
+    std::set<std::string> v_expected_eqs;
 
-    std::vector<std::string> v_coeffs;
-    std::vector<std::string> v_expected_coeffs;
+    std::set<std::string> v_coeffs;
+    std::set<std::string> v_expected_coeffs;
 
     std::string from = "1980Y1";
     std::string to = "1996Y1";
@@ -124,7 +124,7 @@ TEST_F(EstimationTest, SetBlock)
     est.set_block("ACAF;TEST", "DPUH");
 
     std::string block = est.get_block();
-    EXPECT_EQ(block, "ACAF;TEST;DPUH");
+    EXPECT_EQ(block, "ACAF;DPUH;TEST");
 
     v_eqs = est.get_list_equations();
     v_expected_eqs = {"ACAF", "TEST", "DPUH"};
@@ -473,7 +473,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
     trend = false;
     KDBScalars* kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
-    std::vector<std::string> names = kdb_res->get_names();
+    std::set<std::string> names = kdb_res->get_names();
 
     scl_order_0 = kdb_res->get("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->value) / 1e6, 0.051603);

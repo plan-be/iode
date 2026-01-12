@@ -83,7 +83,7 @@ int B_season(char* arg)
     for(int i = 0; i < nb; i++) 
         c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(auto& [from_name, _] : from->k_objs) 
+    for(const auto& [from_name, handle] : from->k_objs) 
     {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */

@@ -103,13 +103,21 @@ bool KDB::set_packed_object(const std::string& name, char* pack)
         SW_nfree(pack);
         return false;
     }
-    this->k_objs[name] = handle;
 
     // Copy allocated pack into the SCR SWAP memory
     char* ptr_swap = SW_getptr(handle);
     memcpy(ptr_swap, pack, lg);
-
     SW_nfree(pack);    
+
+    // store handle in top-level database
+    KDB* top_db = get_top_level_db();
+    top_db->k_objs[name] = handle;
+
+    // store handle in all subset instances (including 'this' if 'this' is a subset)
+    for(KDB* subset : get_subsets())
+        if(subset->contains(name))
+            subset->k_objs[name] = handle;
+
     return true;
 }
 
@@ -159,7 +167,7 @@ bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::st
         kwarning("failed to allocate memory for the duplicated object.");
         return false;
     }
-    this->k_objs[new_name] = handle_dest;
+    k_objs[new_name] = handle_dest;
     
     // pointer behind handle_2 may have changed after allocation of handle_1
     // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
@@ -313,7 +321,7 @@ int K_merge(KDB* kdb1, KDB* kdb2, int replace)
         return -1;
     }
     
-    for(auto& [name, handle_2] : kdb2->k_objs) 
+    for(const auto& [name, handle_2] : kdb2->k_objs) 
     {
         if(handle_2 == 0) 
             continue;

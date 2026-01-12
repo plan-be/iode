@@ -1,6 +1,7 @@
 if(BUILD_TESTING)
 
-add_executable(test_c_api pch.cpp test_period.cpp test_sample.cpp test_c_api.cpp)
+add_executable(test_c_api pch.cpp test_period.cpp test_sample.cpp test_c_api.cpp 
+                                  test_subsets.cpp)
 target_link_libraries(test_c_api PUBLIC gtest_main iode_c_api)
 target_link_options(test_c_api PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 

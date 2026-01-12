@@ -479,10 +479,10 @@ class EditAndEstimateEquations:
         >>> #
         >>> estimation.block = "ACAF;TEST", "DPUH"
         >>> estimation.block
-        'ACAF;TEST;DPUH'
+        'ACAF;DPUH;TEST'
         >>> # ---- equations list ----
         >>> estimation.equations_list
-        ['ACAF', 'TEST', 'DPUH']
+        ['ACAF', 'DPUH', 'TEST']
         >>> equations_res = estimation.equations_db
         >>> equations_res.names
         ['ACAF', 'DPUH', 'TEST']
@@ -1351,18 +1351,13 @@ class EditAndEstimateEquations:
         >>> estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
         >>> estimation.block = "ACAF;TEST", "DPUH"
         >>> estimation.block
-        'ACAF;TEST;DPUH'
+        'ACAF;DPUH;TEST'
         >>> estimation.equations_list
-        ['ACAF', 'TEST', 'DPUH']
+        ['ACAF', 'DPUH', 'TEST']
         >>> estimation.current_equation.endogenous
         'DPUH'
         >>> estimation.current_equation.lec             # doctest: +NORMALIZE_WHITESPACE
         'dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC'
-        >>> eq = estimation.next_equation
-        >>> eq.endogenous
-        'ACAF'
-        >>> eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         >>> eq = estimation.next_equation
         >>> eq.endogenous
         'TEST'
@@ -1371,6 +1366,11 @@ class EditAndEstimateEquations:
         >>> estimation.update_current_equation("TEST := test0 + test1 * ACAF", "This is a test equation.")
         >>> estimation.current_equation.lec             # doctest: +NORMALIZE_WHITESPACE
         'TEST := test0 + test1 * ACAF'
+        >>> eq = estimation.next_equation
+        >>> eq.endogenous
+        'ACAF'
+        >>> eq.lec           # doctest: +NORMALIZE_WHITESPACE
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         >>> 'TEST' in equations
         False
         >>> 'test0' in scalars
@@ -1392,7 +1392,7 @@ class EditAndEstimateEquations:
                  from_period = '1960Y1',
                  to_period = '2015Y1',
                  comment = 'This is a test equation.',
-                 block = 'ACAF;TEST;DPUH')
+                 block = 'ACAF;DPUH;TEST')
         >>> 'test0' in scalars
         True
         >>> scalars["test0"]

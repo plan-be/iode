@@ -34,7 +34,7 @@ TEST_F(KDBScalarsTest, Subset)
 
     // DEEP COPY SUBSET
     KDBScalars* kdb_subset_deep_copy = Scalars.subset(pattern, true);
-    std::vector<std::string> names = Scalars.filter_names(pattern);
+    std::set<std::string> names = Scalars.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("acaf1", value, relax, std);
@@ -73,9 +73,10 @@ TEST_F(KDBScalarsTest, Get)
 
 TEST_F(KDBScalarsTest, GetNames)
 {
-    std::vector<std::string> expected_names;
-    for (int i=0; i < Scalars.size(); i++) expected_names.push_back(Scalars.get_name(i));
-    std::vector<std::string> names = Scalars.get_names();
+    std::set<std::string> expected_names;
+    for (int i=0; i < Scalars.size(); i++) 
+        expected_names.insert(Scalars.get_name(i));
+    std::set<std::string> names = Scalars.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -123,24 +124,22 @@ TEST_F(KDBScalarsTest, Copy)
 TEST_F(KDBScalarsTest, Filter)
 {
     std::string pattern = "a*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBScalars* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Scalars.size(); p++) all_names.push_back(Scalars.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Scalars.size(); p++) 
+        all_names.insert(Scalars.get_name(p));
 
     int nb_total_scalars = Scalars.size();
     // a*
-    for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'a') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Scalars.subset(pattern);
@@ -210,24 +209,22 @@ TEST_F(KDBScalarsTest, Filter)
 TEST_F(KDBScalarsTest, DeepCopy)
 {
     std::string pattern = "a*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBScalars* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Scalars.size(); p++) all_names.push_back(Scalars.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Scalars.size(); p++) 
+        all_names.insert(Scalars.get_name(p));
 
     int nb_total_scalars = Scalars.size();
     // a*
-    for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'a') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Scalars.subset(pattern, true);
@@ -300,7 +297,7 @@ TEST_F(KDBScalarsTest, CopyFrom)
     std::string pattern = "a* *_";
     std::string filename = input_test_dir + prefix_filename + "fun.scl";
     int expected_nb_comments = Scalars.size();
-    std::vector<std::string> v_expected_names;
+    std::set<std::string> v_expected_names;
 
     // Copy entire file
     Scalars.clear();

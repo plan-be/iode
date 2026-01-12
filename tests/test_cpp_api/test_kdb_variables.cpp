@@ -43,7 +43,7 @@ TEST_F(KDBVariablesTest, Subset)
 
     // DEEP COPY SUBSET
     KDBVariables* kdb_subset_deep_copy = Variables.subset(pattern, true);
-    std::vector<std::string> names = Variables.filter_names(pattern);
+    std::set<std::string> names = Variables.filter_names(pattern);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("ACAF", lec);
@@ -268,9 +268,10 @@ TEST_F(KDBVariablesTest, Get)
 
 TEST_F(KDBVariablesTest, GetNames)
 {
-    std::vector<std::string> expected_names;
-    for (int i=0; i < Variables.size(); i++) expected_names.push_back(Variables.get_name(i));
-    std::vector<std::string> names = Variables.get_names();
+    std::set<std::string> expected_names;
+    for (int i=0; i < Variables.size(); i++) 
+        expected_names.insert(Variables.get_name(i));
+    std::set<std::string> names = Variables.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -410,24 +411,22 @@ TEST_F(KDBVariablesTest, Copy)
 TEST_F(KDBVariablesTest, Filter)
 {
     std::string pattern = "A*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBVariables* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Variables.size(); p++) all_names.push_back(Variables.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Variables.size(); p++) 
+        all_names.insert(Variables.get_name(p));
 
     int nb_total_variables = Variables.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Variables.subset(pattern);
@@ -487,24 +486,22 @@ TEST_F(KDBVariablesTest, Filter)
 TEST_F(KDBVariablesTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
-    std::vector<std::string> expected_names;
+    std::set<std::string> expected_names;
     KDBVariables* kdb_subset;
 
-    std::vector<std::string> all_names;
-    for (int p = 0; p < Variables.size(); p++) all_names.push_back(Variables.get_name(p));
+    std::set<std::string> all_names;
+    for (int p = 0; p < Variables.size(); p++) 
+        all_names.insert(Variables.get_name(p));
 
     int nb_total_variables = Variables.size();
     // A*
-    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    for (const std::string& name : all_names) 
+        if (name.front() == 'A') 
+            expected_names.insert(name);
     // *_
-    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
-
-    // remove duplicate entries
-    // NOTE: std::unique only removes consecutive duplicated elements, 
-    //       so the vector needst to be sorted first
-    std::sort(expected_names.begin(), expected_names.end());
-    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
-    expected_names.resize(std::distance(expected_names.begin(), it));
+    for (const std::string& name : all_names) 
+        if (name.back() == '_') 
+            expected_names.insert(name);
 
     // create local kdb
     kdb_subset = Variables.subset(pattern, true);

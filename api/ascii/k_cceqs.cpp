@@ -475,7 +475,7 @@ bool CKDBEquations::save_asc(const std::string& filename)
     }
 
     Equation* eq;
-    for(auto& [name, _] : this->k_objs) 
+    for(auto& [name, _] : k_objs) 
     {
         fprintf(fd, "%s ", name.c_str());
         eq = this->get_obj(name);

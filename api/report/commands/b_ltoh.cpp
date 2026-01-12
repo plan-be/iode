@@ -374,7 +374,7 @@ static int B_ltoh(int type, char* arg)
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
 
-    for(auto& [from_name, from_handle] : from->k_objs) 
+    for(const auto& [from_name, handle] : from->k_objs) 
     {
         memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
         switch(method[0]) 

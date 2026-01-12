@@ -1934,7 +1934,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     smpl = new Sample("1961Y1", "2015Y1");   
     idts = (char**) SCR_vtoms((U_ch*) "AOUC", (U_ch*) " ,;\t");
     rc = B_IdtExecuteIdts(smpl, idts);
-    printf("rc=%d\n", rc);
+    EXPECT_EQ(rc, 0);
     EXPECT_DOUBLE_EQ(round(AOUC[1] * 1e8) / 1e8, 0.24783192);
 }
 
@@ -2313,7 +2313,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(auto& [name, _] : global_ws_eqs->k_objs)
+    for(const auto& [name, handle] : global_ws_eqs->k_objs)
         ASSERT_EQ(global_ws_eqs->get_obj(name)->endo, name) ;
 
     U_test_reset_kmsg_msgs();

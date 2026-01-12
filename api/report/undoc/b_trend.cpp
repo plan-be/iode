@@ -107,7 +107,7 @@ static int B_WsTrendAll(char* arg, int std)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
-    for(auto& [from_name, _] : from->k_objs) 
+    for(const auto& [from_name, handle] : from->k_objs) 
     {
         memcpy(f_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);

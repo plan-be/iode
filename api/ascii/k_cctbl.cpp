@@ -676,7 +676,7 @@ bool CKDBTables::save_asc(const std::string& filename)
         }
     }
 
-    for(auto& [name, _] : this->k_objs) 
+    for(auto& [name, _] : k_objs) 
     {
         fprintf(fd, "%s {", (char*) name.c_str());
         tbl = this->get_obj(name);

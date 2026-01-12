@@ -135,7 +135,7 @@ bool CKDBIdentities::save_asc(const std::string& filename)
     }
 
     std::string lec;
-    for(auto& [name, handle] : this->k_objs) 
+    for(auto& [name, handle] : k_objs) 
     {
         fprintf(fd, "%s ", (char*) name.c_str());
         lec = this->get_obj(handle)->get_lec();

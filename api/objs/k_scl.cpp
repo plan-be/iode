@@ -83,5 +83,7 @@ bool CKDBScalars::print_obj_def(const std::string& name)
 
 void CKDBScalars::update_reference_db()
 {
+    if(K_RWS[this->k_type][0]) 
+        delete K_RWS[this->k_type][0];
     K_RWS[this->k_type][0] = new CKDBScalars(this, "*");      
 }
