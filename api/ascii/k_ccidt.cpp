@@ -41,7 +41,7 @@
  *  TODO: what if KC_read_cmt returns an error code ?
  *  
  */
-bool CKDBIdentities::load_asc(const std::string& filename)
+bool KDBIdentities::load_asc(const std::string& filename)
 {
     char    *lec = NULL;
     int     cmpt = 0;
@@ -115,7 +115,7 @@ bool CKDBIdentities::load_asc(const std::string& filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool CKDBIdentities::save_asc(const std::string& filename)
+bool KDBIdentities::save_asc(const std::string& filename)
 {
     FILE* fd;
 

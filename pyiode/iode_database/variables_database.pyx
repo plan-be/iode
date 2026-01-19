@@ -31,9 +31,9 @@ from pyiode.iode_database.cpp_api_database cimport _c_operation_between_two_vars
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
-from pyiode.iode_database.cpp_api_database cimport CKDBVariables
+from pyiode.iode_database.cpp_api_database cimport KDBVariables
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CppKDBVariables
-from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 from pyiode.iode_database.cpp_api_database cimport B_FileImportVar
@@ -59,8 +59,8 @@ cdef class Variables(CythonIodeDatabase):
 
     def __cinit__(self, filepath: str=None) -> Variables:
         self.ptr_owner = False
-        self.database_ptr = &cpp_global_variables
-        self.abstract_db_ptr = &cpp_global_variables
+        self.database_ptr = cpp_global_variables.get()
+        self.abstract_db_ptr = cpp_global_variables.get()
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
         self.first_period_subset = None
         self.last_period_subset = None
@@ -81,8 +81,8 @@ cdef class Variables(CythonIodeDatabase):
             wrapper.abstract_db_ptr = database_ptr
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = &cpp_global_variables
-            wrapper.abstract_db_ptr = &cpp_global_variables
+            wrapper.database_ptr = cpp_global_variables.get()
+            wrapper.abstract_db_ptr = cpp_global_variables.get()
         wrapper.mode_ = IodeVarMode.VAR_MODE_LEVEL
         wrapper.first_period_subset = None
         wrapper.last_period_subset = None
@@ -108,22 +108,25 @@ cdef class Variables(CythonIodeDatabase):
             self.first_period_subset: Period = None
             self.last_period_subset: Period = None
 
-    def initialize_subset(self, cython_instance: Variables, pattern: str, copy: bool, 
+    def initialize_subset(self, subset: Variables, pattern: str, copy: bool, 
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
         cdef CSample* c_sample
-        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        cython_instance.ptr_owner = True
-        cython_instance.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        cython_instance.first_period_subset = first_period
-        cython_instance.last_period_subset = last_period
-        return cython_instance
+        
+        subset.database_ptr = new CppKDBVariables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.abstract_db_ptr = subset.database_ptr
+        subset.ptr_owner = True
+
+        subset.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        subset.first_period_subset = first_period
+        subset.last_period_subset = last_period
+        return subset
 
     def _get_whole_sample(self) -> Sample:
         cdef CSample* c_sample 
         if self.get_is_detached():
             c_sample = self.database_ptr.get_sample()
         else:
-            c_sample = cpp_global_variables.get_sample()
+            c_sample = cpp_global_variables.get().get_sample()
         return Sample._from_ptr(c_sample, <bint>False)
 
     def _maybe_update_subset_sample(self):
@@ -156,7 +159,7 @@ cdef class Variables(CythonIodeDatabase):
         if self.get_is_detached():
             c_sample = self.database_ptr.get_sample()
         else:
-            c_sample = cpp_global_variables.get_sample()
+            c_sample = cpp_global_variables.get().get_sample()
         return c_sample.get_period_position(<CPeriod>c_period)
 
     def _get_real_period_position(self, period: Period) -> int:
@@ -200,7 +203,6 @@ cdef class Variables(CythonIodeDatabase):
         cdef bytes b_name
         cdef string s_name
         cdef double[::1] numpy_data_memview
-        cdef CKDBVariables* c_db_ptr = NULL
         
         # values is a LEC expression
         if isinstance(values, str):
@@ -213,8 +215,7 @@ cdef class Variables(CythonIodeDatabase):
             numpy_data_memview = values
             b_name = name.encode()
             s_name = b_name
-            c_db_ptr = self.database_ptr.get_database()
-            success = c_db_ptr.set_obj(s_name, &numpy_data_memview[0])
+            success = self.database_ptr.set_var(s_name, &numpy_data_memview[0])
             if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
@@ -239,12 +240,9 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t_first
         cdef int t_last
         cdef string c_name = name.encode('utf-8')
-        cdef CKDBVariables* c_db_ptr = NULL
         cdef vector[double] cpp_values
         cdef double* var_ptr = NULL
         cdef double[::1] numpy_data_memview 
-
-        c_db_ptr = self.database_ptr.get_database()
 
         if not self.contains(name):
             raise KeyError(f"Variable '{name}' not found in the IODE Variables database")
@@ -253,7 +251,7 @@ cdef class Variables(CythonIodeDatabase):
         if isinstance(key_periods, Period):
             t = self._get_real_period_position(key_periods)
             if isinstance(values, float):
-                KV_set(c_db_ptr, c_name, t, self.mode_, <double>values)
+                KV_set(self.database_ptr, c_name, t, self.mode_, <double>values)
             # values is a LEC expression
             elif isinstance(values, str):
                 self.database_ptr.update(c_name, <string>values.encode(), t, t) 
@@ -275,7 +273,7 @@ cdef class Variables(CythonIodeDatabase):
             # set same value for all periods in the range
             if isinstance(values, float):
                 for t in range(t_first, t_last + 1): 
-                    KV_set(c_db_ptr, c_name, t, self.mode_, <double>values)  
+                    KV_set(self.database_ptr, c_name, t, self.mode_, <double>values)  
             # values is a LEC expression
             elif isinstance(values, str):
                 self.database_ptr.update(c_name, <string>values.encode(), t_first, t_last) 
@@ -287,20 +285,20 @@ cdef class Variables(CythonIodeDatabase):
             # values is a numpy array AND the mode is VAR_MODE_LEVEL
             elif isinstance(values, np.ndarray) and self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
                     nb_periods = t_last - t_first + 1
-                    var_ptr = c_db_ptr.get_var_ptr(c_name, t_first)
+                    var_ptr = self.database_ptr.get_var_ptr(c_name, t_first)
                     numpy_data_memview = values
                     memcpy(var_ptr, &numpy_data_memview[0], nb_periods * sizeof(double))
             # assume values is an iterable
             else:
                 for i, t in enumerate(range(t_first, t_last + 1)):
-                    KV_set(c_db_ptr, c_name, t, self.mode_, <double>(values[i]))
+                    KV_set(self.database_ptr, c_name, t, self.mode_, <double>(values[i]))
         # update values for a list of periods
         elif isinstance(key_periods, list):
             if not all(isinstance(p, Period) for p in key_periods):
                 raise TypeError("key_periods must be a list of Cython Period objects")             
             for p, v in zip(key_periods, values):
                 t = self._get_real_period_position(p)
-                KV_set(c_db_ptr, c_name, t, self.mode_, <double>v)
+                KV_set(self.database_ptr, c_name, t, self.mode_, <double>v)
 
     def binary_op_scalar(self, other: float, op: BinaryOperation, copy_self: bool) -> Variables:
         cdef int i_op = int(op)
@@ -361,9 +359,8 @@ cdef class Variables(CythonIodeDatabase):
         cdef int i, j, t
         cdef int mode = <int>self.mode_
         cdef int nb_periods
-        cdef CKDBVariables* db_ptr = self.database_ptr.get_database()
         
-        if db_ptr is NULL:
+        if self.database_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace has not been initialized")
 
         vars_t_first, vars_t_last = self._get_periods_bounds()
@@ -379,7 +376,7 @@ cdef class Variables(CythonIodeDatabase):
             b_name = name.encode()
             c_name = b_name
             # add a new variable with all values set to IODE_NAN
-            var_pos = KV_add(db_ptr, c_name)
+            var_pos = KV_add(self.database_ptr, c_name)
             if var_pos < 0:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
 
@@ -397,7 +394,7 @@ cdef class Variables(CythonIodeDatabase):
                 b_name = name.encode()
                 if not self.database_ptr.contains(<string>b_name):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
-                var_ptr = db_ptr.get_var_ptr(<string>b_name, t_first_period)
+                var_ptr = self.database_ptr.get_var_ptr(<string>b_name, t_first_period)
                 memcpy(var_ptr, &data_view[i, 0], nb_periods * sizeof(double))
         else:
             for i, name in enumerate(vars_names):
@@ -406,7 +403,7 @@ cdef class Variables(CythonIodeDatabase):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 for j, t in enumerate(range(t_first_period, t_last_period + 1)):
                     value = data_view[i, j]
-                    KV_set(db_ptr, <string>b_name, t, mode, value)
+                    KV_set(self.database_ptr, <string>b_name, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
         cdef int i, t
@@ -416,8 +413,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int t_first_period
         cdef int t_last_period
         cdef int nb_periods
-        cdef CKDBVariables* db_ptr = self.database_ptr.get_database()
-        if db_ptr is NULL:
+        if self.database_ptr is NULL:
             raise RuntimeError("The IODE Variables workspace is empty")
 
         if not self.size():
@@ -442,14 +438,14 @@ cdef class Variables(CythonIodeDatabase):
         if self.mode_ == IodeVarMode.VAR_MODE_LEVEL:
             # WARNING: do not use enumerate() here as it does not respect the C++ set order
             for c_name in cpp_names:
-                var_ptr = db_ptr.get_var_ptr(c_name, t_first_period)
+                var_ptr = self.database_ptr.get_var_ptr(c_name, t_first_period)
                 memcpy(&data_view[i, 0], var_ptr, nb_periods * sizeof(double))
                 i += 1
         else:
             # WARNING: do not use enumerate() here as it does not respect the C++ set order
             for c_name in cpp_names:
                 for t in range(t_first_period, t_last_period + 1):
-                    value = KV_get(db_ptr, c_name, t, mode)
+                    value = KV_get(self.database_ptr, c_name, t, mode)
                     data_view[i, t - t_first_period] = value
                 i += 1
         
@@ -526,7 +522,7 @@ cdef class Variables(CythonIodeDatabase):
         if self.get_is_detached():
             self.database_ptr.set_sample(from_period.encode(), to_period.encode())
         else:
-            cpp_global_variables.set_sample(from_period.encode(), to_period.encode())
+            cpp_global_variables.get().set_sample(from_period.encode(), to_period.encode())
 
     def get_threshold(self) -> float:
         return K_CMP_EPS

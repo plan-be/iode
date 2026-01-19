@@ -1,13 +1,15 @@
 #pragma once
 #include <array>
+#include <string>
 #include <algorithm>
 #include <stdexcept>
 
 #include "api/utils/utils.h"
 #include "api/time/sample.h"
-#include "cpp_api/KDB/kdb_equations.h"
-#include "cpp_api/KDB/kdb_scalars.h"
-#include "cpp_api/KDB/kdb_variables.h"
+#include "api/estimation/estimation.h"
+#include "api/objs/equations.h"
+#include "api/objs/scalars.h"
+#include "api/objs/variables.h"
 
 
 constexpr static int    ESTIMATION_MAXIT = 100;
@@ -123,7 +125,7 @@ public:
         if(sample)
             this->sample = new Sample(*sample);
         else
-            this->sample = new Sample(*Variables.get_sample());
+            this->sample = new Sample(*(global_ws_var->get_sample()));
     }
     
     void set_sample(const Period* from = nullptr, const Period* to = nullptr)
@@ -131,7 +133,7 @@ public:
         if(this->sample) 
             delete this->sample;
 
-        Sample* vars_sample = Variables.get_sample();  
+        Sample* vars_sample = global_ws_var->get_sample();  
         Period from_ = from ? Period(*from) : vars_sample->start_period;
         Period to_ = to ? Period(*to) : vars_sample->end_period;
 
@@ -151,7 +153,7 @@ public:
         if(this->sample) 
             delete this->sample;
 
-        Sample* vars_sample = Variables.get_sample();  
+        Sample* vars_sample = global_ws_var->get_sample();  
         Period from_ = (!from.empty()) ? Period(from) : vars_sample->start_period;
         Period to_ = (!to.empty()) ? Period(to) : vars_sample->end_period;
 

@@ -5,7 +5,7 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBComments as CppKDBComments
-from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_comments
+from pyiode.iode_database.cpp_api_database cimport global_ws_cmt as cpp_global_comments
 from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
 
 import pandas as pd
@@ -17,8 +17,8 @@ cdef class Comments(CythonIodeDatabase):
 
     def __cinit__(self, filepath: str=None) -> Comments:
         self.ptr_owner = False
-        self.database_ptr = &cpp_global_comments
-        self.abstract_db_ptr = &cpp_global_comments
+        self.database_ptr = cpp_global_comments.get()
+        self.abstract_db_ptr = cpp_global_comments.get()
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -35,17 +35,19 @@ cdef class Comments(CythonIodeDatabase):
             wrapper.abstract_db_ptr = database_ptr
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = &cpp_global_comments
-            wrapper.abstract_db_ptr = &cpp_global_comments
+            wrapper.database_ptr = cpp_global_comments.get()
+            wrapper.abstract_db_ptr = cpp_global_comments.get()
         return wrapper
 
     def _load(self, filepath: str):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, cython_instance: Comments, pattern: str, copy: bool) -> Comments:
-        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return cython_instance
+    def initialize_subset(self, subset: Comments, pattern: str, copy: bool) -> Comments:
+        subset.database_ptr = new CppKDBComments(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.abstract_db_ptr = subset.database_ptr
+        subset.ptr_owner = True
+        return subset
 
     def _get_object(self, name: str) -> str:
         name = name.strip()

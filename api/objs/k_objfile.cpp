@@ -715,6 +715,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                 {
                     if(K_read_len(fd, vers, &len)) 
                         goto error;
+                    // zipped file
                     if(len < 0) 
                         len = -len + sizeof(OSIZE);
                     success = kseek(fd, (long) len, 1);
@@ -726,7 +727,10 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             // read next object
             if(K_read_len(fd, vers, &len)) 
                 goto error;
-            
+            // zipped file
+            if(len < 0) 
+                len = -len + sizeof(OSIZE);
+
             name = std::string(c_name);
             handle = SW_alloc(len);
             this->k_objs[name] = handle;
@@ -969,76 +973,147 @@ bool KDB::load(const std::string& filename)
 /**
  *  Returns the type of content of filename according to its extension:
  *    - 0 -> 6 = .cmt, ..., .var (binary format)
- *    - 10 -> 16 = ac, ... av
+ *    - 8 -> 14 = ac, ... av
+ *    - 16 = rep
  *    - 26 = csv
- *    - 22 = rep (TODO: check this)
- *    - autres formats (rep, a2m, ..., csv)
- *    - -1 -> undefined
+ *    - others formats (rep, a2m, ..., csv): return -1 (undefined)
  *  
  *  @global     char**  k_ext       recognized extensions
- *  @param [in] char*   filename    file to analyse
+ *  @param [in] char*   filename    file to analyze
  *  @return     int                 file type (see above)
  */
 int X_findtype(char* filename)
 {
-    int         i, lg = (int)strlen(filename);
-    char        buf[5];
+    int  lg = (int) strlen(filename);
+    char buf[5];
 
-    // Check std extensions .cmt => .var
+    // check if 'filename' ends with binary files extensions .cmt => .var
     if(lg > 4) 
     {
-        for(i = 0 ; i < 7 ; i++) 
+        for(int i = 0 ; i < 7 ; i++) 
         {
             if(filename[lg - 4] == '.' &&
-                    SCR_cstrcmp((unsigned char*) k_ext[i], ((unsigned char*) filename) + lg - 3) == 0) return(i);
+                SCR_cstrcmp((unsigned char*) k_ext[i], ((unsigned char*) filename) + lg - 3) == 0) 
+                    return(i);
         }
     }
 
-    // Check ascii extensions .ac => .av
+    // check if 'filename' ends with ascii extensions .ac => .av
     if(lg > 3) 
     {
         strcpy(buf, ".ac");
-        for(i = 0 ; i < 7 ; i++) 
+        for(int i = 0 ; i < 7 ; i++) 
         {
-            buf[2] = k_ext[i][0];
-            if(SCR_cstrcmp(((unsigned char*) filename) + lg - 3, (unsigned char*) buf) == 0) return(10 + i);
+            buf[2] = k_ext[i][0];   // c, e, i, l, s, t, v (comments, ..., variables)
+            if(SCR_cstrcmp(((unsigned char*) filename) + lg - 3, (unsigned char*) buf) == 0) 
+                return(8 + i);
         }
     }
 
-    // Other extensions
-    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
-    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".rep") == 0) return(22); // ??? pas trés cohérent...
-
-    // Sais plus a quoi ca peut servir... => a supprimer
-    for(i = 16 ; strcmp(k_ext[i], "xxx") !=0 ; i++) 
-    {
-        if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3
-    }
-
-    return(-1);
+    // CSV file
+    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".csv") == 0) 
+        return (int) FILE_CSV;
+    
+    // IODE report file
+    if(lg > 4 && SCR_cstrcmp(((unsigned char*) filename) + lg - 4, (unsigned char*) ".rep") == 0) 
+        return (int) FILE_REP;
+    
+    // other formats (a2m, txt, ...)
+    return -1;
 }
 
 
 /**
- *  Saves the content of KDB in a file: internal IODE format, ASCII IODE format or CSV. 
- *  The extension of the filename determines if the output file must be in internal, 
+ *  Saves the content of KDB in a file: binary IODE format, ASCII IODE format or CSV. 
+ *  The extension of the filename determines if the output file must be in binary, 
  *  ASCII or CSV format.
  *  
- *  @param [in] std::string   filename    filename with extension
+ *  @param [in] std::string   filename    filename with or without extension
  */
-bool KDB::save(const std::string& filename)
+bool KDB::save(const std::string& filename, const bool compress)
 {
-    int ftype;
-    bool success = false;
-    kmsg("Saving %s", filename.c_str()); 
+    if(this->size() == 0)
+    {
+        std::string msg = "Database '" + v_iode_types[this->k_type] + "' is empty. ";
+        msg += "Nothing to save.";
+        kwarning(msg.c_str());
+        return false;
+    }
 
-    ftype = X_findtype((char*) filename.c_str());
-    if(ftype >= 10 && ftype <= 17)
-        success = this->save_asc(filename);
-    else if(ftype <= 6)
-        success = this->save_binary(filename);
-    else if(ftype == FILE_CSV)
-        success = this->save_csv(filename);
+    std::filesystem::path p_filepath = check_file(filename, "save", false);
+
+    IodeFileType file_type;
+    // if 'filename' has no extension -> use binary format
+    if(!p_filepath.has_extension())
+        file_type = (IodeFileType) this->k_type;
+    else
+    {
+        file_type = (IodeFileType) X_findtype((char*) filename.c_str());
+        // file_type < 0 --> unmanaged format
+        if(file_type < 0)
+        {
+            std::string error_msg = "Cannot save the '" + v_iode_types[this->k_type] + "' database.\n";   
+            error_msg += "The filename '" + filename + "' has an invalid extension";
+            kwarning(error_msg.c_str());
+            return false;
+        }
+    }
+
+    // filename has an extension -> check that the extension corresponds to the object type
+    // filename has no extension -> add the binary file extension associated with the database type
+    std::string _filepath_ = check_filepath(filename, file_type, "save", false);
+
+    if(_filepath_.size() >= sizeof(FNAME))
+    {
+        std::string error_msg = "Cannot save the '" + v_iode_types[this->k_type] + "' database.\n";   
+        error_msg += "The filepath '" + _filepath_ + "' is too long";
+        throw std::invalid_argument(error_msg);
+    }
+
+    p_filepath = std::filesystem::path(_filepath_);
+    std::string _filename_ = p_filepath.filename().string();
+
+    kmsg("Saving %s", _filename_.c_str()); 
+
+    // set compression mode
+    int klzh = K_LZH;
+    K_LZH = compress ? 2 : 0;
+
+    std::string msg;
+    bool success = false;
+    if(file_type >= FILE_COMMENTS && file_type <= FILE_VARIABLES)
+    {
+        #ifdef DEBUG
+        msg = "KDB::save() -> save binary file '" + filename + "'";
+        logger.info(msg);
+        #endif
+        success = this->save_binary(_filepath_);
+    }
+    else if(file_type >= ASCII_COMMENTS && file_type <= ASCII_VARIABLES)
+    {
+        #ifdef DEBUG
+        msg = "KDB::save() -> save ASCII file '" + filename + "'";
+        logger.info(msg);
+        #endif
+        success = this->save_asc(_filepath_);
+    }
+    else if(file_type == FILE_CSV)
+    {
+        #ifdef DEBUG
+        msg = "KDB::save() -> save CSV file '" + filename + "'";
+        logger.info(msg);
+        #endif
+        success = this->save_csv(_filepath_);
+    }
+
+    // restore compression mode
+    K_LZH = klzh;
+
+    if(!success)
+    {
+        std::string error_msg = "Could not save the '" + v_iode_types[this->k_type] + "' database";
+        kwarning(error_msg.c_str());
+    }
 
     return success;
 }
@@ -1078,25 +1153,25 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
     switch(to->k_type) 
     {
         case COMMENTS :
-            from = new CKDBComments(false);
+            from = new KDBComments(false);
             break;
         case EQUATIONS :
-            from = new CKDBEquations(false);
+            from = new KDBEquations(false);
             break;
         case IDENTITIES:
-            from = new CKDBIdentities(false);
+            from = new KDBIdentities(false);
             break;
         case LISTS:
-            from = new CKDBLists(false);
+            from = new KDBLists(false);
             break;
         case SCALARS :
-            from = new CKDBScalars(false);
+            from = new KDBScalars(false);
             break;
         case TABLES:
-            from = new CKDBTables(false);
+            from = new KDBTables(false);
             break;
         case VARIABLES :
-            from = new CKDBVariables(false);
+            from = new KDBVariables(false);
             break;
         default :
             error_manager.append_error("copy: cannot copy database of generic type 'OBJECTS");
@@ -1134,11 +1209,11 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample
             found[i] = 1;
         }
 
-        rc = KV_sample((CKDBVariables*) from, &csmpl);
+        rc = KV_sample((KDBVariables*) from, &csmpl);
         if(rc < 0) 
             goto the_end;
         nb_found = from->size();
-        rc = KV_merge((CKDBVariables*) to, (CKDBVariables*) from, 1);
+        rc = KV_merge((KDBVariables*) to, (KDBVariables*) from, 1);
     }
     else 
     {
@@ -1274,25 +1349,25 @@ int K_cat(KDB* ikdb, char* filename)
     switch(ikdb->k_type) 
     {
         case COMMENTS:
-            kdb = new CKDBComments(false);
+            kdb = new KDBComments(false);
             break;
         case EQUATIONS:
-            kdb = new CKDBEquations(false);
+            kdb = new KDBEquations(false);
             break;
         case IDENTITIES:
-            kdb = new CKDBIdentities(false);
+            kdb = new KDBIdentities(false);
             break;
         case LISTS:
-            kdb = new CKDBLists(false);
+            kdb = new KDBLists(false);
             break;
         case SCALARS:
-            kdb = new CKDBScalars(false);
+            kdb = new KDBScalars(false);
             break;
         case TABLES:
-            kdb = new CKDBTables(false);
+            kdb = new KDBTables(false);
             break;
         case VARIABLES:
-            kdb = new CKDBVariables(false);
+            kdb = new KDBVariables(false);
             break;
         default:
             {
@@ -1318,7 +1393,7 @@ int K_cat(KDB* ikdb, char* filename)
     }
 
     if(ikdb->k_type == VARIABLES) 
-        KV_merge_del((CKDBVariables*) ikdb, (CKDBVariables*) kdb, 1);
+        KV_merge_del((KDBVariables*) ikdb, (KDBVariables*) kdb, 1);
     else 
         K_merge_del(ikdb, kdb, 1);
 
@@ -1481,7 +1556,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
         kwarning(error_msg.c_str());
         return false;
     } 
-    
+
     setvbuf(fd, NULL, 0, 8192);
 
     if(override_filepath) 

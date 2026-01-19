@@ -29,6 +29,9 @@ protected:
 public:
 	TestAbstract()
 	{
+		// set *_super fn pointers
+		IODE_assign_super_API();
+
 		kpause_continue = 1;
 		// suppress messages from kmsg()
 		kmsg_toggle(0);
@@ -53,6 +56,15 @@ public:
 		str_input_test_dir  = data_dir.string() + str_separator;
 		str_output_test_dir = output_dir.string() + str_separator;
 		str_report_test_dir = report_dir.string() + str_separator;
+
+		// clear global workspaces
+		global_ws_cmt->clear();
+		global_ws_eqs->clear();
+		global_ws_idt->clear();
+		global_ws_lst->clear();
+		global_ws_scl->clear();
+		global_ws_tbl->clear();
+		global_ws_var->clear();
 	}
 
 protected:

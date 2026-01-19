@@ -7,7 +7,7 @@ from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables as CppKDBTables
-from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
+from pyiode.iode_database.cpp_api_database cimport global_ws_tbl as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblTitle
 
 
@@ -18,8 +18,8 @@ cdef class Tables(CythonIodeDatabase):
 
     def __cinit__(self, filepath: str=None) -> Tables:
         self.ptr_owner = False
-        self.database_ptr = &cpp_global_tables
-        self.abstract_db_ptr = &cpp_global_tables
+        self.database_ptr = cpp_global_tables.get()
+        self.abstract_db_ptr = cpp_global_tables.get()
         self.print_as = B_TABLE_TITLE
 
     def __dealloc__(self):
@@ -37,8 +37,8 @@ cdef class Tables(CythonIodeDatabase):
             wrapper.abstract_db_ptr = database_ptr
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = &cpp_global_tables
-            wrapper.abstract_db_ptr = &cpp_global_tables
+            wrapper.database_ptr = cpp_global_tables.get()
+            wrapper.abstract_db_ptr = cpp_global_tables.get()
         wrapper.print_as = B_TABLE_TITLE
         return wrapper
 
@@ -46,9 +46,11 @@ cdef class Tables(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, cython_instance: Tables, pattern: str, copy: bool) -> Tables:
-        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return cython_instance
+    def initialize_subset(self, subset: Tables, pattern: str, copy: bool) -> Tables:
+        subset.database_ptr = new CppKDBTables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.abstract_db_ptr = subset.database_ptr
+        subset.ptr_owner = True
+        return subset
 
     def get_title(self, name: str) -> str:
         return self.database_ptr.get_title(name.encode()).decode()

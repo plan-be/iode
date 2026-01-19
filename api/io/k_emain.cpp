@@ -205,7 +205,7 @@ char *write_separator(char* src, char** tg)
  *  @return     int                 0 on success, -1 on error
  *  
  */
-int EXP_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, 
+int EXP_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, 
            char* outfile, char* na, char* sep)
 {
     int     i, j, dim, rc;
@@ -266,7 +266,7 @@ err:
  *  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.
  *  
  */
-int EXP_Rev_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, 
+int EXP_Rev_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, 
                char* outfile, char* na, char* sep)
 {
     int     i, j, nl, nc, rc;
@@ -399,7 +399,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     // Get the ExportToFile handler for the requested format
     expdef = export_handlers[fmt].get();
 
-    CKDBVariables* dbv = new CKDBVariables(false);
+    KDBVariables* dbv = new KDBVariables(false);
     if(vfile && vfile[0] != 0) 
     {
         success = dbv->load(std::string(vfile));
@@ -409,7 +409,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
             KV_sample(dbv, smpl);
     }
 
-    CKDBComments* dbc = new CKDBComments(false);
+    KDBComments* dbc = new KDBComments(false);
     if(cfile && cfile[0] != 0)
         success = dbc->load(std::string(cfile)); 
     

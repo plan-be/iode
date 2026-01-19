@@ -474,7 +474,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, Sample* smpl, int dt, int nt, CKDBVariables* kdb, 
+           double ymin, double ymax, Sample* smpl, int dt, int nt, KDBVariables* kdb, 
            char* names, int mode)
 {
     char    *buf, **vars;
@@ -540,7 +540,7 @@ fin:
  */
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, Sample* smpl, CKDBVariables* kdb, char** names, int mode)
+    double ymin, double ymax, Sample* smpl, KDBVariables* kdb, char** names, int mode)
 {
     int i, ng;
 

@@ -27,7 +27,7 @@
  *  @return                     int     0 if the CMT is read and saved, -1 if the CMT can't be created.
  *  
  */
-static int read_cmt(CKDBComments* kdb, YYFILE* yy, char* name)
+static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
 {
     int     keyw;
     char    *cmt;
@@ -90,7 +90,7 @@ static int read_cmt(CKDBComments* kdb, YYFILE* yy, char* name)
  *  
  *  TODO: what if read_cmt returns an error code ?
  */
-bool CKDBComments::load_asc(const std::string& filename)
+bool KDBComments::load_asc(const std::string& filename)
 {
     int     cmpt = 0, rc;
     YYFILE  *yy;
@@ -156,7 +156,7 @@ bool CKDBComments::load_asc(const std::string& filename)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool CKDBComments::save_asc(const std::string& filename)
+bool KDBComments::save_asc(const std::string& filename)
 {
     FILE    *fd;
     CMT     cmt;

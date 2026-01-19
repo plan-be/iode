@@ -186,7 +186,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  @return     int             0 (TODO: check the add() return value)        
  *  
  */
-int Estimation::E_add_scls(CLEC* clec, CKDBScalars* dbs)
+int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
 {
     char* c_name;
     std::string name;

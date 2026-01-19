@@ -77,7 +77,9 @@ class Comments(IodeDatabase):
 
     def _subset(self, pattern: str, copy: bool) -> Self:
         instance = Comments.get_instance()
-        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy)
+        cy_self = self._cython_instance
+        cy_subset = instance._cython_instance
+        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
         return instance
 
     @property

@@ -16,7 +16,7 @@ from pyiode.common cimport TableGraphGrid as CTableGraphGrid
 from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
-from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
+from pyiode.iode_database.cpp_api_database cimport KDBTables as KDBTables
 
 
 cdef class TableCell:
@@ -205,7 +205,7 @@ cdef class TableLine:
 
 cdef class Table:
     cdef bint ptr_owner
-    cdef CKDBTables* c_database
+    cdef KDBTables* c_database
     cdef string c_table_name
     cdef CTable* c_table
 
@@ -265,7 +265,7 @@ cdef class Table:
             self.c_database.update(self.c_table_name, dereference(self.c_table))
 
     @staticmethod
-    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b'', CKDBTables* c_database_ptr=NULL):
+    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b'', KDBTables* c_database_ptr=NULL):
         """
         Factory function to create Table objects from a given CTable pointer.
         """

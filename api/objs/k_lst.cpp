@@ -45,8 +45,8 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         return -1;
     }
 
-    CKDBVariables* exo = new CKDBVariables(false);
-    CKDBScalars* scal = new CKDBScalars(false);
+    KDBVariables* exo = new KDBVariables(false);
+    KDBScalars* scal = new KDBScalars(false);
 
     if(exo == nullptr || scal == nullptr) 
     {
@@ -60,13 +60,13 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         switch(kdb->k_type) 
         {
             case IDENTITIES :
-                KI_scan((CKDBIdentities*) kdb, i, exo, scal);
+                KI_scan((KDBIdentities*) kdb, i, exo, scal);
                 break;
             case EQUATIONS :
-                KE_scan((CKDBEquations*) kdb, i, exo, scal);
+                KE_scan((KDBEquations*) kdb, i, exo, scal);
                 break;
             case TABLES :
-                KT_scan((CKDBTables*) kdb, i, exo, scal);
+                KT_scan((KDBTables*) kdb, i, exo, scal);
                 break;
         }
     }
@@ -106,7 +106,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
  *  
  *  @details 
  */
-static void K_clecscan(KDB* kdb, CLEC* cl, CKDBVariables* exo, CKDBScalars* scal)
+static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
 {
     if(cl == NULL) 
         return;
@@ -140,7 +140,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, CKDBVariables* exo, CKDBScalars* scal
  *  @return          void
  *  
  */
-void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal)
+void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbe->get_name(i);
     Equation* eq = dbe->get_obj(name);
@@ -163,7 +163,7 @@ void KE_scan(CKDBEquations* dbe, int i, CKDBVariables* exo, CKDBScalars* scal)
  *  @return          void
  *  
  */
-void KI_scan(CKDBIdentities* dbi, int i, CKDBVariables* exo, CKDBScalars* scal)
+void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbi->get_name(i);
     CLEC* cl_idt = dbi->get_obj(name)->get_compiled_lec();
@@ -189,7 +189,7 @@ void KI_scan(CKDBIdentities* dbi, int i, CKDBVariables* exo, CKDBScalars* scal)
  *  @return          void
  *  
  */
-void KT_scan(CKDBTables* dbt, int i, CKDBVariables* exo, CKDBScalars* scal)
+void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbt->get_name(i);
     Table* tbl = dbt->get_obj(name);
@@ -348,12 +348,12 @@ unsigned char **KL_expand(char *str)
 }
 
 
-char* CKDBLists::get_obj(const SWHDL handle) const
+char* KDBLists::get_obj(const SWHDL handle) const
 {    
     return (char*) P_get_ptr(SW_getptr(handle), 0);
 }
 
-char* CKDBLists::get_obj(const std::string& name) const
+char* KDBLists::get_obj(const std::string& name) const
 {
     SWHDL handle = this->get_handle(name);
     if(handle == 0)  
@@ -362,7 +362,7 @@ char* CKDBLists::get_obj(const std::string& name) const
     return get_obj(handle);
 }
 
-bool CKDBLists::set_obj(const std::string& name, const char* value)
+bool KDBLists::set_obj(const std::string& name, const char* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -376,12 +376,49 @@ bool CKDBLists::set_obj(const std::string& name, const char* value)
     return success;
 }
 
-bool CKDBLists::set_obj(const std::string& name, const std::string& value)
+bool KDBLists::set_obj(const std::string& name, const std::string& value)
 {
     return set_obj(name, value.c_str());
 }
 
-bool CKDBLists::grep_obj(const std::string& name, const SWHDL handle, 
+List KDBLists::get(const std::string& name) const
+{
+	List list = std::string(this->get_obj(name));
+	return list;
+}
+
+bool KDBLists::add(const std::string& name, const List& list)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add list: a list named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add list: a list named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+	return this->set_obj(name, list);
+}
+
+void KDBLists::update(const std::string& name, const List& list)
+{
+    if(!this->contains(name))
+    {
+        std::string msg = "Cannot update list: no list named '" + name + 
+                          "' exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+	this->set_obj(name, list);
+}
+
+bool KDBLists::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
@@ -391,21 +428,21 @@ bool CKDBLists::grep_obj(const std::string& name, const SWHDL handle,
     return found;
 }
 
-char* CKDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     char* obj = (char*) this->get_obj(name);
     return obj;
 }
 
-bool CKDBLists::print_obj_def(const std::string& name)
+bool KDBLists::print_obj_def(const std::string& name)
 {
     print_definition_generic(name, this->get_obj(name));
     return true;
 }
 
-void CKDBLists::update_reference_db()
+void KDBLists::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBLists(this, "*");      
+    K_RWS[this->k_type][0] = new KDBLists(this, "*", false);      
 }

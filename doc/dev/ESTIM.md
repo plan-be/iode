@@ -79,7 +79,7 @@ After the estimation, if a solution is found, the results are stored in the work
 
 |Syntax|Description|
 |:---|:---|
-|`int KE_est_s(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** names)`|Estimates an equation or a block of equations|
+|`int KE_est_s(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** names)`|Estimates an equation or a block of equations|
 |`int KE_estim(char* veqs, char* afrom, char* ato)`|Estimates an equation or a block of equations on the specified sample. Simplified version of KE\_est\_s()|
 |**Utility function**||
 |`void E_tests2scl(Equation* eq, int j, int n, int k)`|Creates the scalars containing the results of an estimated equation|
@@ -90,7 +90,7 @@ Main estimation functions \+ some utilities.
 
 |Syntax|Description|
 |:---|:---|
-|`int E_est(char** endos, char** lecs, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, int met, char** instrs, int maxit, double eps)`|Estimates a block of equations|
+|`int E_est(char** endos, char** lecs, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, int met, char** instrs, int maxit, double eps)`|Estimates a block of equations|
 |**Utility function**||
 |`int E_scl_in_eq(int coef_nb, int eq_nb)`|Checks if the coefficient coef\_nb is in the equation eq\_nb.|
 

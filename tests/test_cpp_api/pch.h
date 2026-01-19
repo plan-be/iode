@@ -36,13 +36,13 @@ public:
 		kmsg_toggle(0);
 
 		// clear global workspaces
-		KDB* kdb;
-		for(int iode_type = 0; iode_type < IODE_NB_TYPES; iode_type++)
-		{
-			kdb = get_global_db(iode_type);
-			if(kdb)
-				kdb->clear();
-		}
+		global_ws_cmt->clear();
+		global_ws_eqs->clear();
+		global_ws_idt->clear();
+		global_ws_lst->clear();
+		global_ws_scl->clear();
+		global_ws_tbl->clear();
+		global_ws_var->clear();
 
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api

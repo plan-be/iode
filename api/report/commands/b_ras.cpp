@@ -160,7 +160,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     double  *row = NULL;
     double  *col = NULL;
     double  var, fvar;
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
 
     if(rper != NULL && cper != NULL) 
     {

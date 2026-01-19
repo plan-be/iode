@@ -11,9 +11,9 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
-        KDBScalars kdb_scl(true, input_test_dir + "fun.as");
-        KDBVariables kdb_var(true, input_test_dir + "fun.av");
+        global_ws_eqs->load(input_test_dir + "fun.ae");
+        global_ws_scl->load(input_test_dir + "fun.as");
+        global_ws_var->load(input_test_dir + "fun.av");
 
         from = "2000Y1";
         to = "2002Y1";
@@ -78,12 +78,12 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_FALSE(success);
 
     // Check _PRE list after simulation (prolog)
-    std::string lst_pre = Lists.get("_PRE");
+    std::string lst_pre = global_ws_lst->get("_PRE");
     std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     EXPECT_EQ(lst_pre, expected_lst_pre);
 
     // Check _DIVER list (divergent equations)
-    std::string lsdivider_lineer = Lists.get("_DIVER");
+    std::string lsdivider_lineer = global_ws_lst->get("_DIVER");
     std::string expected_lsdivider_lineer = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
     EXPECT_EQ(lsdivider_lineer, expected_lsdivider_lineer);
 
@@ -94,15 +94,15 @@ TEST_F(SimulationTest, Simulation)
 
     // Check result
     // exo
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("UY", "2000Y1") * 10e5) / 10e5, 624.177102);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.177102);
     // endo
-    EXPECT_DOUBLE_EQ(Variables.get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
 
     // --- exchange UY - XNATY ---
     // Set values of endo UY
-    Variables.set_var("UY", "2000Y1", 650.0);
-    Variables.set_var("UY", "2001Y1", 670.0);
-    Variables.set_var("UY", "2002Y1", 680.0);
+    global_ws_var->set_var("UY", "2000Y1", 650.0);
+    global_ws_var->set_var("UY", "2001Y1", 670.0);
+    global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     success = sim.model_exchange(endo_exo);
     EXPECT_TRUE(success);
@@ -110,8 +110,8 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_TRUE(success);
 
     // Check result
-    EXPECT_DOUBLE_EQ(Variables.get_var("UY", "2000Y1"), 650.0);
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.8007030);
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.8007030);
     
     // TODO : check with list of equations
 }
@@ -132,12 +132,12 @@ TEST_F(SimulationTest, CalculateSCC)
     success = sim.model_calculate_SCC(10);
     EXPECT_TRUE(success);
 
-    std::string list_pre = Lists.get("_PRE");
+    std::string list_pre = global_ws_lst->get("_PRE");
     std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;";
     expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     EXPECT_EQ(list_pre, expected_lst_pre);
 
-    std::string list_inter = Lists.get("_INTER");
+    std::string list_inter = global_ws_lst->get("_INTER");
     std::string expected_lst_inter = "PMAB;PXAB;ULCP;SSH3P;WBG;ITF;EXCC;ITFQ;QS;ITFGO;ITFGI;CGU;SSH3O;DEBT;IDG;SSFFX;";
     expected_lst_inter += "SBF;SSF3;SBF3L;YDH;SUBCEE;SUB;RIDG;QOUG;OCUH;OCUG;IUG;ITPS;ITPR;ITPL;GOSH_;GOSG;DPUG;VAG;COTRES;";
     expected_lst_inter += "SSFG;WG;ACAG;FLG;IT;VAT;VAT_;ITMQ;PM;ITM;ITON;ITNQ;QAT_;QAFF_;KNF;QIF;KNFY;VAI;VAF;DTF;DTH;YDTG;";
@@ -151,7 +151,7 @@ TEST_F(SimulationTest, CalculateSCC)
     expected_lst_inter += "WBF_;YSSF;YSSG;WCF_;ITEP;EXC;ITT";
     EXPECT_EQ(list_inter, expected_lst_inter);
 
-    std::string list_post = Lists.get("_POST");
+    std::string list_post = global_ws_lst->get("_POST");
     std::string expected_lst_post = "IFU;SSHFF;PBBP;OCUF;IHU;IDF;DPUH;DPUF;DPU;BQY;ACAF;ZF;WNF_;WNF;WBU;VXB;SF;RIPBE;RIDGG;";
     expected_lst_post += "RENT;QXB;QFND;QBNP;QBBPPOT_;PXB;PX;PG;PFND;PBNP;PAH;PAG;KNFFY;KL;GOSH;GAP;FLGR;FLF;DPUU;BENEF";
     EXPECT_EQ(list_post, expected_lst_post);
@@ -182,15 +182,15 @@ TEST_F(SimulationTest, SimulateSCC)
 
     // Check result
     // exo
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("UY", "2000Y1") * 10e5) / 10e5, 624.173844);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.173844);
     // endo
-    EXPECT_DOUBLE_EQ(Variables.get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
 
     // --- exchange UY - XNATY ---
     // Set values of endo UY
-    Variables.set_var("UY", "2000Y1", 650.0);
-    Variables.set_var("UY", "2001Y1", 670.0);
-    Variables.set_var("UY", "2002Y1", 680.0);
+    global_ws_var->set_var("UY", "2000Y1", 650.0);
+    global_ws_var->set_var("UY", "2001Y1", 670.0);
+    global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     success = sim.model_exchange(endo_exo);
     EXPECT_TRUE(success);
@@ -198,8 +198,8 @@ TEST_F(SimulationTest, SimulateSCC)
     EXPECT_TRUE(success);
 
     // Check result
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("UY", "2000Y1") * 10e5) / 10e5, 624.179951);
-    EXPECT_DOUBLE_EQ(Variables.get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.179951);
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
 
     // TODO : check with list of equations
 }

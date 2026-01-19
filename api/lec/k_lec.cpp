@@ -3,11 +3,11 @@
  *
  * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
- *      double *L_getvar(CKDBVariables* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
- *      double L_getscl(CKDBScalars* kdb, int pos)   Retrieves a scalar value.
+ *      double *L_getvar(KDBVariables* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
+ *      double L_getscl(KDBScalars* kdb, int pos)   Retrieves a scalar value.
  *      Sample *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
- *      int L_findscl(CKDBScalars* kdb, char *name)     Retrieves a scalar position.
- *      int L_findvar(CKDBVariables* kdb, char* name)     Retrieves a variable position.
+ *      int L_findscl(KDBScalars* kdb, char *name)     Retrieves a scalar position.
+ *      int L_findvar(KDBVariables* kdb, char* name)     Retrieves a variable position.
  */
 
 #include "api/lec/lec.h"
@@ -27,7 +27,7 @@
  *  @return             IODE_READ   pointer to the first value of the variable
  *  
  */
-double* L_getvar(CKDBVariables* kdb, int pos)
+double* L_getvar(KDBVariables* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
     return kdb->get_var_ptr(name);
@@ -42,7 +42,7 @@ double* L_getvar(CKDBVariables* kdb, int pos)
  *  @return             IODE_READ   value of the scalar
  *  
  */
-double L_getscl(CKDBScalars* kdb, int pos)
+double L_getscl(KDBScalars* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
     Scalar* scl = kdb->get_obj(name);
@@ -58,7 +58,7 @@ double L_getscl(CKDBScalars* kdb, int pos)
  *  @return             Sample* pointer to the Sample struct (not allocated)
  *  
  */
-Sample *L_getsmpl(CKDBVariables* kdb)
+Sample *L_getsmpl(KDBVariables* kdb)
 {
     return(kdb->sample);
 }
@@ -72,7 +72,7 @@ Sample *L_getsmpl(CKDBVariables* kdb)
  *  @return             int         position of name in KDB 
  *  
  */
-int L_findscl(CKDBScalars* kdb, char *name)
+int L_findscl(KDBScalars* kdb, char *name)
 {
     return kdb->index_of(name);
 }
@@ -86,7 +86,7 @@ int L_findscl(CKDBScalars* kdb, char *name)
  *  @return             int         position of name in KDB 
  *  
  */
-int L_findvar(CKDBVariables* kdb, char* name)
+int L_findvar(KDBVariables* kdb, char* name)
 {
     return kdb->index_of(name);
 }

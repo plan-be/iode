@@ -282,7 +282,7 @@ Main functions for model simulations.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_simul(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
+|`int K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void K_simul_free()`|Frees all temporary allocated memory for the simulation.|
 |`double K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
@@ -292,9 +292,9 @@ Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 
 |Syntax|Description|
 |:---|:---|
-|`int KE_order(CKDBEquations* dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
+|`int KE_order(KDBEquations* dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
 |`int KE_poseq(int posendo)`|Searches the equation whose endogenous is the variable posendo.|
-|`void KE_tri(CKDBEquations* dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
+|`void KE_tri(KDBEquations* dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
 #### k\_sim\_scc.c {#T13}
 
@@ -304,8 +304,8 @@ The reordering algorithm being CPU intensive for very large models, it is better
 
 |Syntax|Description|
 |:---|:---|
-|`int KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
-|`int K_simul_SCC(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
+|`int KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
+|`int K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}
 
@@ -327,13 +327,13 @@ Two methods are used: a simple Newton\-Raphson method or a secant method in case
 
 |Syntax|Description|
 |:---|:---|
-|`double L_zero(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
-|`double L_newton(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
+|`double L_zero(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
+|`double L_newton(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
 
 #### l\_secant.c {#T17}
 
 |Syntax|Description|
 |:---|:---|
 |`static double L_fx(double x, int t)`|Computes the value of f(x) in time t|
-|`double L_secant(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
+|`double L_secant(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
 

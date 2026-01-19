@@ -547,17 +547,17 @@ inline std::size_t hash_value(const Equation& equation)
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBEquations : public CKDBTemplate<Equation>
+struct KDBEquations : public KDBTemplate<Equation>
 {
     // global or standalone database
-    CKDBEquations(const bool is_global) : CKDBTemplate(EQUATIONS, is_global) {}
+    KDBEquations(const bool is_global) : KDBTemplate(EQUATIONS, is_global) {}
 
-    // shallow copy database
-    CKDBEquations(CKDBEquations* db_parent, const std::string& pattern = "*") 
-        : CKDBTemplate(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBEquations(KDBEquations* db_parent, const std::string& pattern, const bool copy) 
+        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBEquations(const CKDBEquations& other): CKDBTemplate(other) {}
+    KDBEquations(const KDBEquations& other): KDBTemplate(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -567,6 +567,15 @@ struct CKDBEquations : public CKDBTemplate<Equation>
     Equation* get_obj(const std::string& name) const override;
 
     bool set_obj(const std::string& name, const Equation* value) override;
+
+    std::string get_lec(const std::string& name) const;
+    
+    Equation* get(const std::string& name) const;
+    bool add(const std::string& name, const Equation& obj);
+    void update(const std::string& name, const Equation& obj);
+
+    bool add(const std::string& name, const std::string& lec);
+    void update(const std::string& name, const std::string& lec);
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -586,11 +595,28 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<CKDBEquations> global_ws_eqs = std::make_unique<CKDBEquations>(true);
+inline std::unique_ptr<KDBEquations> global_ws_eqs = std::make_unique<KDBEquations>(true);
 
 /*----------------------- FUNCS ----------------------------*/
 
-Equation*  K_eptr(CKDBEquations* kdb, char* name);
+Equation*  K_eptr(KDBEquations* kdb, char* name);
+
+inline std::size_t hash_value(KDBEquations const& cpp_kdb)
+{
+    if(cpp_kdb.size() == 0)
+        return 0;
+
+    Equation* eq;
+    std::size_t seed = 0;
+    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    {
+        hash_combine<std::string>(seed, name);
+        eq = cpp_kdb.get(name);
+        hash_combine<Equation>(seed, *eq);
+    }
+
+    return seed;
+}
 
 /* k_eqs.c */
 int E_split_eq(char *,char **,char **);
@@ -598,16 +624,16 @@ int E_dynadj(int ,char *,char *,char *,char **);
 int E_DynamicAdjustment(int ,char **,char *,char *);
 
 // Estimation tests by equation name
-double K_etest(CKDBEquations* kdb, char*name, int test_nb);
-double K_e_stdev (CKDBEquations* kdb, char*name);
-double K_e_meany (CKDBEquations* kdb, char*name);
-double K_e_ssres (CKDBEquations* kdb, char*name);
-double K_e_stderr(CKDBEquations* kdb, char*name);
-double K_e_fstat (CKDBEquations* kdb, char*name);
-double K_e_r2    (CKDBEquations* kdb, char*name);
-double K_e_r2adj (CKDBEquations* kdb, char*name);
-double K_e_dw    (CKDBEquations* kdb, char*name);
-double K_e_loglik(CKDBEquations* kdb, char*name);
+double K_etest(KDBEquations* kdb, char*name, int test_nb);
+double K_e_stdev (KDBEquations* kdb, char*name);
+double K_e_meany (KDBEquations* kdb, char*name);
+double K_e_ssres (KDBEquations* kdb, char*name);
+double K_e_stderr(KDBEquations* kdb, char*name);
+double K_e_fstat (KDBEquations* kdb, char*name);
+double K_e_r2    (KDBEquations* kdb, char*name);
+double K_e_r2adj (KDBEquations* kdb, char*name);
+double K_e_dw    (KDBEquations* kdb, char*name);
+double K_e_loglik(KDBEquations* kdb, char*name);
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -615,11 +641,11 @@ int K_epack(char **,char *,char *);
 Equation* K_eunpack(char *, char *);
 
 /* lec/l_link.c */
-void L_link_endos(CKDBEquations* dbe, CLEC *cl);
+void L_link_endos(KDBEquations* dbe, CLEC *cl);
 
 
 // TODO : remove KECLEC when k_objs will be changed to std::map<std::string, Equation*>
-inline CLEC* KECLEC(CKDBEquations* kdb, const std::string& name) 
+inline CLEC* KECLEC(KDBEquations* kdb, const std::string& name) 
 {    
     return ((CLEC *) K_optr1(kdb, (char*) name.c_str()));
 }

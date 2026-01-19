@@ -2,7 +2,7 @@
 
 #include "cpp_api/common.h"
 #include "api/objs/tables.h"
-#include "cpp_api/KDB/kdb_variables.h"
+#include "api/objs/variables.h"
 
 
 // NOTE: the class below aims to add C++ taste to the C version of gsample

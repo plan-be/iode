@@ -35,7 +35,7 @@ TEST_F(ReportTest, REPORT_LINE)
     commands.push_back("$WsLoadVar " + var_filepath);
 
     execute_report_line(commands);
-    EXPECT_EQ(Variables.size(), 394);
+    EXPECT_EQ(global_ws_var->size(), 394);
 
     execute_report_line("$settime 2000Y1");
     EXPECT_EQ(Period(RP_PER), Period("2000Y1"));

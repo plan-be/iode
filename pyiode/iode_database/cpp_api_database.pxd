@@ -4,6 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.map cimport map
+from libcpp.memory cimport unique_ptr
 
 from libcpp cimport bool
 
@@ -66,55 +67,49 @@ cdef extern from "api/all.h":
         char                k_db_type
         string              filepath
 
-        int size()
-        int index_of(string& name)
-        bool contains(string& name)
-        string get_name(int pos)
-        string expand(string pattern, char ch_all) except +
-        # variables
-        bool set(string& name, double* var, int nb_obs) except +
-        bool remove(string& name) except +
+        # ==== methods ====
 
-    cdef cppclass CKDBComments(KDB):
-        char* get_obj(SWHDL handle) except +
-        char* get_obj(string name) except +
-        bool set_obj(string name, string value) except +
+        int size() except +
+        int get_iode_type() except +
+        string get_iode_type_str() except +
+        bool is_global_database() except +
+        bool is_local_database() except +
+        bool is_shallow_copy_database() except +
+        string get_filename_utf8() except +
+        void set_filename_utf8(const string& filename) except +
+        string get_description_utf8() except +
+        void set_description_utf8(const string& description) except +
+        int index_of(const string& name) except +
+        bool contains(const string& name) except +
 
-    cdef cppclass CKDBEquations(KDB):
-        CEquation* get_obj(SWHDL handle) except +
-        CEquation* get_obj(string name) except +
-        bool set_obj(string name, CEquation* value) except +
+        # object names
+        string get_name(const int pos) except +
+        bool set_name(const int pos, const string& new_name) except +
+        bool rename(const string& old_name, const string& new_name, const bool overwrite) except +
+        string expand(const string& pattern, const char ch_all) except +
+        set[string] filter_names(const string& pattern, const bool must_exist) except +
+        set[string] get_names() except +
+        string get_names_as_string() except +
 
-    cdef cppclass CKDBIdentities(KDB):
-        CIdentity* get_obj(SWHDL handle) except +
-        CIdentity* get_obj(string name) except +
-        bool set_obj(string name, CIdentity* value) except +
+        # delete
+        void remove(const string& name) except +
 
-    cdef cppclass CKDBLists(KDB):
-        char* get_obj(SWHDL handle) except +
-        char* get_obj(string name) except +
-        bool set_obj(string name, string value) except +
+        # Other methods
+        void merge(const KDB& other, const bool overwrite) except +
+        void copy_from(const string& input_file, const string objects_names) except +
+        void merge_from(const string& input_file) except +
+        vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
+            const bool in_name, const bool in_formula, const bool in_text, const string& list_result) except +
 
-    cdef cppclass CKDBScalars(KDB):
-        CScalar* get_obj(SWHDL handle) except +
-        CScalar* get_obj(string name) except +
-        bool set_obj(string name, CScalar* value) except +
-
-    cdef cppclass CKDBTables(KDB):
-        CTable* get_obj(SWHDL handle) except +
-        CTable* get_obj(string name) except +
-        bool set_obj(string name, CTable* value) except +
-
-    cdef cppclass CKDBVariables(KDB):
-        double* get_obj(SWHDL handle) except +
-        double* get_obj(string name) except +
-        double* get_var_ptr(string name, int t) except +
-        bool set_obj(string name, double* value) except +
+        # load - save - clear
+        bool load(const string& filepath) except +
+        bool save(const string& filepath, const bool compress) except +
+        void clear() except +
 
     # k_wsvar.c
-    int KV_add(CKDBVariables* kdb, char* varname)
-    double KV_get(CKDBVariables* kdb, string name, int t, int mode)
-    void KV_set(CKDBVariables* kdb, string name, int t, int mode, double value)
+    int KV_add(KDBVariables* kdb, char* varname)
+    double KV_get(KDBVariables* kdb, string name, int t, int mode)
+    void KV_set(KDBVariables* kdb, string name, int t, int mode, double value)
 
     # k_grep.c
     char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
@@ -176,169 +171,125 @@ cdef extern from "api/b_errors.h":
     cdef IodeErrorManager error_manager  
 
 
-cdef extern from "cpp_api/KDB/kdb_template.h":
-    cdef cppclass KDBAbstract:   
-        # Constructor     
-        KDBAbstract(IodeType iode_type)
-
-        # ==== methods ====
-
-        int size() except +
-        int get_iode_type() except +
-        string get_iode_type_str() except +
-        bool is_global_database() except +
-        bool is_local_database() except +
-        bool is_shallow_copy_database() except +
-        string get_filename() except +
-        void set_filename(const string& filename) except +
-        string get_description() except +
-        void set_description(const string& description) except +
-        int index_of(const string& name) except +
-        bool contains(const string& name) except +
-
-        # object names
-        string get_name(const int pos) except +
-        bool set_name(const int pos, const string& new_name) except +
-        bool rename(const string& old_name, const string& new_name, const bool overwrite) except +
-        string expand(const string& pattern, const char ch_all) except +
-        set[string] filter_names(const string& pattern, const bool must_exist) except +
-        set[string] get_names() except +
-        string get_names_as_string() except +
-
-        # delete
-        void remove(const string& name) except +
-
-        # Other methods
-        void merge(const KDBAbstract& other, const bool overwrite) except +
-        void copy_from(const string& input_file, const string objects_names) except +
-        void merge_from(const string& input_file) except +
-        vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
-            const bool in_name, const bool in_formula, const bool in_text, const string& list_result) except +
-
-        # load - save - clear
-        bool load(const string& filepath) except +
-        bool save(const string& filepath, const bool compress) except +
-        void clear() except +
-
-
-cdef extern from "cpp_api/KDB/kdb_comments.h":
-    cdef cppclass KDBComments(KDBAbstract):
+cdef extern from "api/objs/comments.h":
+    cdef cppclass KDBComments(KDB):
         # Constructor
-        KDBComments(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBComments(KDBComments* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBComments* subset(string& pattern, bool deep_copy) except +
         string get(string& name) except +
-        string copy(string& name) except +
         bool add(string& name, string& comment) except +
         void update(string& name, string& comment) except +
 
     size_t hash_value(KDBComments&) except +
 
     # Define the global Comments instance
-    cdef KDBComments Comments
+    ctypedef unique_ptr[KDBComments] KDBCommentsPtr
+    cdef KDBCommentsPtr global_ws_cmt
 
 
-cdef extern from "cpp_api/KDB/kdb_equations.h":
-    cdef cppclass KDBEquations(KDBAbstract):
+cdef extern from "api/objs/equations.h":
+    cdef cppclass KDBEquations(KDB):
         # Constructor
-        KDBEquations(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBEquations(KDBEquations* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBEquations* subset(string& pattern, bool deep_copy) except +
         CEquation* get(string& name) except +
-        CEquation* copy(string& name) except +
         string get_lec(string& name) except +
         bool add(string& name, CEquation& equation) except +
-        bool add(string& name, string& lec, string& method, string& from_period, string& to_period, 
-                string& comment, string& instruments, string& block, bint date) except +
         void update(string& name, CEquation& equation) except +
-        void update(string& name, string& lec, string& method, string& from_period, string& to_period, 
-                    string& comment, string& instruments, string& block, bint date) except +
+
+        string get_lec(string& name) except +
+        bool add(string& name, string& lec) except +
+        void update(string& name, string& lec) except +
 
     size_t hash_value(KDBEquations&) except +
 
     # Define the global Equations instance
-    cdef KDBEquations Equations
+    ctypedef unique_ptr[KDBEquations] KDBEquationsPtr
+    cdef KDBEquationsPtr global_ws_eqs
 
 
-cdef extern from "cpp_api/KDB/kdb_identities.h":
-    cdef cppclass KDBIdentities(KDBAbstract):
+cdef extern from "api/objs/identities.h":
+    cdef cppclass KDBIdentities(KDB):
         # Constructor
-        KDBIdentities(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBIdentities(KDBIdentities* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBIdentities* subset(string& pattern, bool deep_copy) except +
         CIdentity* get(string& name) except +
-        CIdentity* copy(string& name) except +
         bool add(string& name, string& identity_lec) except +
         void update(string& name, string& identity_lec) except +
+
         string get_lec(string& name) except +
+        bool add(string& name, string& lec) except +
+        void update(string& name, string& lec) except +
+
         bool execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bint trace) except +
 
     size_t hash_value(KDBIdentities&) except +
 
     # Define the global Identities instance
-    cdef KDBIdentities Identities
+    ctypedef unique_ptr[KDBIdentities] KDBIdentitiesPtr
+    cdef KDBIdentitiesPtr global_ws_idt
 
 
-cdef extern from "cpp_api/KDB/kdb_lists.h":
-    cdef cppclass KDBLists(KDBAbstract):
+cdef extern from "api/objs/lists.h":
+    cdef cppclass KDBLists(KDB):
         # Constructor
-        KDBLists(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBLists(KDBLists* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBLists* subset(string& pattern, bool deep_copy) except +
         string get(string& name) except +
-        string copy(string& name) except +
         bool add(string& name, string& list_) except +
         void update(string& name, string& list_) except +
 
     size_t hash_value(KDBLists&) except +
 
     # Define the global Lists instance
-    cdef KDBLists Lists
+    ctypedef unique_ptr[KDBLists] KDBListsPtr
+    cdef KDBListsPtr global_ws_lst
 
 
-cdef extern from "cpp_api/KDB/kdb_scalars.h":
-    cdef cppclass KDBScalars(KDBAbstract):
+cdef extern from "api/objs/scalars.h":
+    cdef cppclass KDBScalars(KDB):
         # Constructor
-        KDBScalars(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBScalars(KDBScalars* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBScalars* subset(string& pattern, bool deep_copy) except +
         CScalar* get(string& name) except +
-        CScalar* copy(string& name) except +
         bool add(string& name, CScalar& scalar) except +
-        bool add(string& name, double value, double relax, double std) except +
         void update(string& name, CScalar& scalar) except +
-        void update(string& name, double value, double relax, double std) except +
 
     size_t hash_value(KDBScalars&) except +
 
     # Define the global Scalars instance
-    cdef KDBScalars Scalars
+    ctypedef unique_ptr[KDBScalars] KDBScalarsPtr
+    cdef KDBScalarsPtr global_ws_scl
 
 
-cdef extern from "cpp_api/KDB/kdb_tables.h":
-    cdef cppclass KDBTables(KDBAbstract):
+cdef extern from "api/objs/tables.h":
+    cdef cppclass KDBTables(KDB):
         # Constructor
-        KDBTables(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBTables(KDBTables* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBTables* subset(string& pattern, bool deep_copy) except +
         CTable* get(string& name) except +
-        CTable* copy(string& name) except +
         string get_title(string& name) except +
         bool add(string name, CTable& table) except +
         bool add(string name, int nb_columns) except +
         bool add(string name, int nbColumns, string def_, vector[string] vars, 
-                bool mode=False, bool files=False, bool date=False) except +
+                 bool mode=False, bool files=False, bool date=False) except +
         bool add(string name, int nbColumns, string def_, vector[string] titles, 
-                vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
+                 vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
         bool add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
-                bool files=False, bool date=False) except +
+                 bool files=False, bool date=False) except +
         void update(string& name, CTable& table) except +
         void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
                            char format_) except +
@@ -346,20 +297,18 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
     size_t hash_value(KDBTables&) except +
 
     # Define the global Tables instance
-    cdef KDBTables Tables
+    ctypedef unique_ptr[KDBTables] KDBTablesPtr
+    cdef KDBTablesPtr global_ws_tbl
 
 
-cdef extern from "cpp_api/KDB/kdb_variables.h":
-    cdef cppclass KDBVariables(KDBAbstract):
+cdef extern from "api/objs/variables.h":
+    cdef cppclass KDBVariables(KDB):
         # Constructor
-        KDBVariables(bool is_global, string& filepath) except +
+        # subset (shallow or deep copy) 
+        KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 
 
         # Public methods
-        KDBVariables* subset(string& pattern, bool deep_copy) except +
-        CKDBVariables* get_database() except +
-
         vector[double] get(string& name) except +
-        vector[double] copy(string& name) except +
         bool add(string& name, vector[double]& values) except +
         bool add(string& name, string& lec) except +
         void update(string& name, vector[double]& values) except +
@@ -367,8 +316,9 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         void update(string& name, string& lec) except +
         void update(string& name, string& lec, int t_first, int t_last) except +
 
-        double* get_var_ptr(string name) except +
+        double* get_var_ptr(string& name, int t) except +
         double get_var(string name, int t, IodeVarMode mode) except +
+        bool set_var(string& name, double* value) except +
 
         CSample* get_sample()
         void set_sample(string& from_period, string& to_period) except +
@@ -388,5 +338,5 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
     size_t hash_value(KDBVariables&) except +
 
     # Define the global Variables instance
-    cdef KDBVariables Variables
-
+    ctypedef unique_ptr[KDBVariables] KDBVariablesPtr
+    cdef KDBVariablesPtr global_ws_var

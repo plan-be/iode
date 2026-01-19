@@ -112,8 +112,8 @@ static int B_htol(int method, char* arg)
     int     file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    CKDBVariables* to = nullptr;
-    CKDBVariables* from = new CKDBVariables(false);
+    KDBVariables* to = nullptr;
+    KDBVariables* from = new KDBVariables(false);
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
@@ -149,7 +149,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = new CKDBVariables(false);
+    to = new KDBVariables(false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
@@ -222,12 +222,12 @@ done:
 
 // Same function but acting on kdb instead of file and global_ws_var (for pyiode - larray)
 // !!! NOT TESTED !!!
-CKDBVariables* B_htol_kdb(int method, CKDBVariables* kdb_from)
+KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
 {
     int      nb, rc = 0, f, t, shift, skip;
     double   *t_vec = NULL, *f_vec = NULL;
     Sample*  t_smpl = nullptr;
-    CKDBVariables* kdb_to = nullptr;
+    KDBVariables* kdb_to = nullptr;
 
     int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
     if(res < 0) 
@@ -242,7 +242,7 @@ CKDBVariables* B_htol_kdb(int method, CKDBVariables* kdb_from)
         goto done;
     }
 
-    kdb_to = new CKDBVariables(false);
+    kdb_to = new KDBVariables(false);
     kdb_to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + kdb_from->sample->nb_periods) * sizeof(double));

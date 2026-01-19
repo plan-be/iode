@@ -35,6 +35,7 @@
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 #include "api/print/print.h"
+#include "api/report/commands/commands.h"
 #include "api/report/undoc/undoc.h"
 
 
@@ -138,18 +139,19 @@ bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::st
         return false;
     }
 
-    bool success;
     SWHDL handle_dest = this->get_handle(new_name);
     if(handle_dest > 0) 
         SW_free(handle_dest);
     else
-        success = this->add_entry(new_name);
+    {
+        bool success = this->add_entry(new_name);
         if(!success)
         {
             error_msg += "Failed to add a new entry to destination database.";
             kwarning(error_msg.c_str());
             return false;
         }
+    }
     
     SWHDL handle_source = other.get_handle(old_name);
     if(handle_source == 0)
@@ -206,7 +208,7 @@ char* KDB::dde_create_obj(int objnb, int *nc, int *nl)
     }
     else
     {
-        CKDBTables* tbl_db = (CKDBTables*) this;
+        KDBTables* tbl_db = (KDBTables*) this;
         res = tbl_db->dde_create_table(name, NULL, nc, nl, -1);
     }
 
@@ -214,6 +216,75 @@ char* KDB::dde_create_obj(int objnb, int *nc, int *nl)
     return(res);
 }
 
+void KDB::merge(const KDB& other, const bool overwrite)
+{
+    int res = K_merge(this, (KDB*) &other, overwrite ? 1 : 0);
+    if(res < 0) 
+        throw std::runtime_error("Cannot merge the two '" + get_iode_type_str() + "' databases.\n" + 
+                                 "Reason: unknown");
+}
+
+void KDB::copy_from(const std::string& input_file, const std::string objects_names)
+{
+    std::string buf = input_file + " " + objects_names;
+    int res = B_WsCopy((char*) buf.c_str(), (int) this->k_type);
+    if(res < 0)
+    {
+        std::string last_error = error_manager.get_last_error();
+        if(!last_error.empty())
+        {
+            std::string msg = "Cannot copy the content of file '" + input_file;
+            msg += "' into the " + get_iode_type_str() + " database.\n" + last_error;
+            throw std::runtime_error(msg);
+        }
+    }
+}
+
+// TODO JMP: please provide input values to test B_WsMerge()
+void KDB::merge_from(const std::string& input_file)
+{
+    // throw an error if the passed filepath is not valid
+    IodeFileType file_type = (IodeFileType) this->k_type;
+    std::string input_file_ = check_filepath(input_file, file_type, "merge_from", true);
+    
+    int res = K_cat(this, to_char_array(input_file));
+    if(res < 0) 
+        throw std::runtime_error("Cannot merge the content of the file '" + input_file_ + "' in the current " + 
+                                 get_iode_type_str() + " database");
+}
+
+// TODO ALD: rewrite B_DataSearchParms() in C++
+std::vector<std::string> KDB::search(const std::string& pattern, const bool word, 
+    const bool case_sensitive, const bool in_name, const bool in_formula, 
+    const bool in_text, const std::string& list_result)
+{
+    std::vector<std::string> objs_list;
+
+    int c_word  = word ? 1 : 0;
+    int c_ecase = case_sensitive ? 1 : 0;
+    int c_names = in_name ? 1 : 0;
+    int c_forms = in_formula ? 1 : 0;
+    int c_texts = in_text ? 1 : 0;
+    char** c_list = B_DataSearchParms((char*) pattern.c_str(), c_word, c_ecase, 
+                                      c_names, c_forms, c_texts, (int) this->k_type);
+
+    // check if returned list of objects is not null
+    if(c_list == NULL || SCR_tbl_size((unsigned char**) c_list) == 0)
+        return objs_list;
+
+    // save as IODE list (default to list _RES)
+    KL_lst(to_char_array(list_result), c_list, 200);
+    
+    // convert C table as C++ vector
+    for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
+        objs_list.push_back(std::string(c_list[i]));
+
+    // free allocated memory for the returned C table
+    SCR_free_tbl((unsigned char**) c_list);
+
+    // return C++ vector
+    return objs_list;
+}
 
 /**
  *  Print a header and a modified text: spaces are added before and after specific characters in the text.

@@ -11,11 +11,6 @@ bool is_global_database_loaded(const IodeType iodeType)
     return true; 
 }
 
-void set_kdb_filename(KDB* kdb, const std::string& filename)
-{
-    kdb->filepath = filename;
-}
-
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
                 const TableLang lang, const std::string& debug_file)
 {
@@ -114,7 +109,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    CKDBComments* dbc = new CKDBComments(DB_STANDALONE);
+    KDBComments* dbc = new KDBComments(DB_STANDALONE);
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
@@ -124,7 +119,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    CKDBVariables* dbv = new CKDBVariables(false);
+    KDBVariables* dbv = new KDBVariables(false);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);

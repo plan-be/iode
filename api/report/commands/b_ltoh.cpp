@@ -329,8 +329,8 @@ static int B_ltoh(int type, char* arg)
     int     file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    CKDBVariables* to = nullptr;
-    CKDBVariables* from = new CKDBVariables(false);
+    KDBVariables* to = nullptr;
+    KDBVariables* from = new KDBVariables(false);
 
     int lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
@@ -369,7 +369,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    to = new CKDBVariables(false);
+    to = new KDBVariables(false);
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));

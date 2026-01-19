@@ -6,5 +6,5 @@
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 
-CKDBVariables* KI_exec(CKDBIdentities* dbi, CKDBVariables* dbv, int nv, char* vfiles[], 
-    CKDBScalars* dbs, int ns, char* sfiles[], Sample* in_smpl);
+KDBVariables* KI_exec(KDBIdentities* dbi, KDBVariables* dbv, int nv, char* vfiles[], 
+    KDBScalars* dbs, int ns, char* sfiles[], Sample* in_smpl);

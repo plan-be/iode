@@ -1,12 +1,12 @@
 #include "pch.h"
 
 
-class KDBListsTest : public KDBTest, public ::testing::Test
+class KDBListsTest : public TestAbstract, public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        KDBLists kdb_lst(true, input_test_dir + "fun.al");
+        global_ws_lst->load(str_input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -15,60 +15,61 @@ protected:
 
 TEST_F(KDBListsTest, Load)
 {
-    KDBLists kdb(false, input_test_dir + prefix_filename + "fun.lst");
+    KDBLists kdb(false);
+    kdb.load(str_input_test_dir + prefix_filename + "fun.lst");
     EXPECT_EQ(kdb.size(), 17);
 }
 
 TEST_F(KDBListsTest, Subset)
 {
     std::string pattern = "C*";
-    std::string list = Lists.get("COPY");
+    std::string list = global_ws_lst->get("COPY");
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
 
     // GLOBAL KDB
-    EXPECT_EQ(Lists.size(), 17);
-    EXPECT_TRUE(Lists.is_global_database());
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    EXPECT_TRUE(global_ws_lst->is_global_database());
+    std::set<std::string> names = global_ws_lst->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBLists* kdb_subset_deep_copy = Lists.subset(pattern, true);
-    std::set<std::string> names = Lists.filter_names(pattern);
+    KDBLists* kdb_subset_deep_copy = new KDBLists(global_ws_lst.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
     kdb_subset_deep_copy->update("COPY", new_list);
-    EXPECT_EQ(Lists.get("COPY"), list);
+    EXPECT_EQ(global_ws_lst->get("COPY"), list);
     EXPECT_EQ(kdb_subset_deep_copy->get("COPY"), new_list);
 
     // SHALLOW COPY SUBSET
-    KDBLists* kdb_subset_shallow_copy = Lists.subset(pattern, false);
+    KDBLists* kdb_subset_shallow_copy = new KDBLists(global_ws_lst.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
     kdb_subset_shallow_copy->update("COPY", new_list);
-    EXPECT_EQ(Lists.get("COPY"), new_list);
+    EXPECT_EQ(global_ws_lst->get("COPY"), new_list);
     EXPECT_EQ(kdb_subset_shallow_copy->get("COPY"), new_list);
 }
 
 TEST_F(KDBListsTest, Save)
 {
     // save in binary format
-    Lists.save(output_test_dir + "fun.lst");
+    global_ws_lst->save(str_output_test_dir + "fun.lst");
 
     // save in ascii format
-    Lists.save(output_test_dir + "fun.al");
+    global_ws_lst->save(str_output_test_dir + "fun.al");
 }
 
 TEST_F(KDBListsTest, Get)
 {
     std::string expected_list = "$COPY0;$COPY1;";
-    std::string list = Lists.get("COPY");
+    std::string list = global_ws_lst->get("COPY");
     EXPECT_EQ(expected_list, list);
 }
 
 TEST_F(KDBListsTest, GetNames)
 {
     std::set<std::string> expected_names;
-    for (int i=0; i < Lists.size(); i++) 
-        expected_names.insert(Lists.get_name(i));
-    std::set<std::string> names = Lists.get_names();
+    for (int i=0; i < global_ws_lst->size(); i++) 
+        expected_names.insert(global_ws_lst->get_name(i));
+    std::set<std::string> names = global_ws_lst->get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -77,31 +78,19 @@ TEST_F(KDBListsTest, CreateRemove)
     std::string name = "A_COMMENTS";
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
 
-    Lists.add(name, new_list);
-    ASSERT_EQ(Lists.get(name), new_list);
+    global_ws_lst->add(name, new_list);
+    ASSERT_EQ(global_ws_lst->get(name), new_list);
 
-    Lists.remove(name);
-    EXPECT_THROW(Lists.get(name), std::invalid_argument);
+    global_ws_lst->remove(name);
+    EXPECT_THROW(global_ws_lst->get(name), std::invalid_argument);
 }
 
 TEST_F(KDBListsTest, Update)
 {
-    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
+    std::string expanded_list = global_ws_lst->get("COPY0") + global_ws_lst->get("COPY1");
 
-    Lists.update("COPY", expanded_list);
-    EXPECT_EQ(Lists.get("COPY"), expanded_list);
-}
-
-TEST_F(KDBListsTest, Copy)
-{
-    std::string name = "COPY";
-    std::string list = Lists.get(name);
-
-    std::string list_copy = Lists.copy(name);
-    EXPECT_EQ(list_copy, list);
-
-    // add copy
-    Lists.add("DUP_" + name, list_copy);
+    global_ws_lst->update("COPY", expanded_list);
+    EXPECT_EQ(global_ws_lst->get("COPY"), expanded_list);
 }
 
 TEST_F(KDBListsTest, Filter)
@@ -111,61 +100,61 @@ TEST_F(KDBListsTest, Filter)
     KDBLists* kdb_subset;
 
     std::set<std::string> all_names;
-    for (int p = 0; p < Lists.size(); p++) 
-        all_names.insert(Lists.get_name(p));
+    for (int p = 0; p < global_ws_lst->size(); p++) 
+        all_names.insert(global_ws_lst->get_name(p));
     for (const std::string& name : all_names) 
         if (name.front() == 'C') 
             expected_names.insert(name);
 
-    int nb_total_lists = Lists.size();
+    int nb_total_lists = global_ws_lst->size();
 
-    // create local kdb
-    kdb_subset = Lists.subset(pattern);
+    // create a subset (shallow copy)
+    kdb_subset = new KDBLists(global_ws_lst.get(), pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
-    // modify an element of the local KDB and check if the 
+    // modify an element of the subset and check if the 
     // corresponding element of the global KDB also changes
     std::string name = "COPY";
-    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
+    std::string expanded_list = global_ws_lst->get("COPY0") + global_ws_lst->get("COPY1");
     kdb_subset->update(name, expanded_list);
     EXPECT_EQ(kdb_subset->get(name), expanded_list);
-    EXPECT_EQ(Lists.get(name), expanded_list);
+    EXPECT_EQ(global_ws_lst->get(name), expanded_list);
 
-    // add an element to the local KDB and check if it has also 
+    // modify an element of the subset and check if it has also 
     // been added to the global KDB
     std::string new_name = "NEW_LIST";
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
     kdb_subset->add(new_name, new_list);
     EXPECT_EQ(kdb_subset->get(new_name), new_list);
-    EXPECT_EQ(Lists.get(new_name), new_list);
+    EXPECT_EQ(global_ws_lst->get(new_name), new_list);
 
-    // rename an element in the local KDB and check if the 
+    // modify an element of the subset and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "LIST_NEW";
     kdb_subset->rename(old_name, new_name);
     EXPECT_EQ(kdb_subset->get(new_name), new_list);
-    EXPECT_EQ(Lists.get(new_name), new_list);
+    EXPECT_EQ(global_ws_lst->get(new_name), new_list);
 
-    // delete an element from the local KDB and check if it has also 
+    // delete an element from the subset and check if it has also 
     // been deleted from the global KDB
     kdb_subset->remove(new_name);
     EXPECT_FALSE(kdb_subset->contains(new_name));
-    EXPECT_FALSE(Lists.contains(new_name));
+    EXPECT_FALSE(global_ws_lst->contains(new_name));
 
-    // try to add an element to the local KDB which is already present 
+    // try to add an element to the subset which is already present 
     // in the global KDB
     EXPECT_THROW(kdb_subset->add("ENDO", new_list), std::invalid_argument);
 
-    // delete local kdb
+    // delete subset
     delete kdb_subset;
-    EXPECT_EQ(Lists.size(), nb_total_lists);
-    EXPECT_EQ(Lists.get(name), expanded_list);
+    EXPECT_EQ(global_ws_lst->size(), nb_total_lists);
+    EXPECT_EQ(global_ws_lst->get(name), expanded_list);
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(Lists.subset(pattern), std::runtime_error);
+    EXPECT_THROW(KDBLists(global_ws_lst.get(), pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBListsTest, DeepCopy)
@@ -175,79 +164,75 @@ TEST_F(KDBListsTest, DeepCopy)
     KDBLists* kdb_subset;
 
     std::set<std::string> all_names;
-    for (int p = 0; p < Lists.size(); p++) 
-        all_names.insert(Lists.get_name(p));
+    for (int p = 0; p < global_ws_lst->size(); p++) 
+        all_names.insert(global_ws_lst->get_name(p));
     for (const std::string& name : all_names) 
         if (name.front() == 'C') 
             expected_names.insert(name);
 
-    int nb_total_lists = Lists.size();
+    int nb_total_lists = global_ws_lst->size();
 
-    // create local kdb
-    kdb_subset = Lists.subset(pattern, true);
+    // create a subset (deep copy)
+    kdb_subset = new KDBLists(global_ws_lst.get(), pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
-    // modify an element of the local KDB and check if the 
+    // modify an element of the subset and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "COPY";
-    std::string list = Lists.get(name);
-    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
+    std::string list = global_ws_lst->get(name);
+    std::string expanded_list = global_ws_lst->get("COPY0") + global_ws_lst->get("COPY1");
     kdb_subset->update(name, expanded_list);
     EXPECT_EQ(kdb_subset->get(name), expanded_list);
-    EXPECT_EQ(Lists.get(name), list);
+    EXPECT_EQ(global_ws_lst->get(name), list);
 
-    // add an element to the local KDB and check if it has not 
+    // modify an element of the subset and check if it has not 
     // been added to the global KDB
     std::string new_name = "NEW_LIST";
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
     kdb_subset->add(new_name, new_list);
     EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_EQ(kdb_subset->get(new_name), new_list);
-    EXPECT_FALSE(Lists.contains(new_name));
+    EXPECT_FALSE(global_ws_lst->contains(new_name));
 
-    // rename an element in the local KDB and check if the 
+    // modify an element of the subset and check if the 
     // corresponding element has not been renamed in the global KDB
     name = "COPY0";
     new_name = "LIST_NEW";
     kdb_subset->rename(name, new_name);
     EXPECT_TRUE(kdb_subset->contains(new_name));
-    EXPECT_FALSE(Lists.contains(new_name));
+    EXPECT_FALSE(global_ws_lst->contains(new_name));
 
-    // delete an element from the local KDB and check if it has not 
+    // delete an element from the subset and check if it has not 
     // been deleted from the global KDB
     name = "COPY1";
     kdb_subset->remove(name);
     EXPECT_FALSE(kdb_subset->contains(name));
-    EXPECT_TRUE(Lists.contains(name));
+    EXPECT_TRUE(global_ws_lst->contains(name));
 
-    // delete local kdb
+    // delete subset
     delete kdb_subset;
-    EXPECT_EQ(Lists.size(), nb_total_lists);
-
-    // wrong pattern
-    pattern = "anjfks";
-    EXPECT_THROW(Lists.subset(pattern, true), std::runtime_error);
+    EXPECT_EQ(global_ws_lst->size(), nb_total_lists);
 }
 
 TEST_F(KDBListsTest, CopyFrom)
 {
     std::string pattern = "C* T*";
-    std::string filename = input_test_dir + prefix_filename + "fun.lst";
-    int expected_nb_comments = Lists.size();
+    std::string filename = str_input_test_dir + prefix_filename + "fun.lst";
+    int expected_nb_comments = global_ws_lst->size();
     std::set<std::string> v_expected_names;
 
     // Copy entire file
-    Lists.clear();
-    Lists.copy_from(filename, "*");
-    EXPECT_EQ(Lists.size(), expected_nb_comments); 
+    global_ws_lst->clear();
+    global_ws_lst->copy_from(filename, "*");
+    EXPECT_EQ(global_ws_lst->size(), expected_nb_comments); 
 
     // copy subset
-    v_expected_names = Lists.filter_names(pattern);
-    Lists.clear();
-    Lists.copy_from(filename, pattern);
-    EXPECT_EQ(Lists.size(), v_expected_names.size());  
-    EXPECT_EQ(Lists.get_names(), v_expected_names);  
+    v_expected_names = global_ws_lst->filter_names(pattern);
+    global_ws_lst->clear();
+    global_ws_lst->copy_from(filename, pattern);
+    EXPECT_EQ(global_ws_lst->size(), v_expected_names.size());  
+    EXPECT_EQ(global_ws_lst->get_names(), v_expected_names);  
 }
 
 TEST_F(KDBListsTest, Merge)
@@ -255,9 +240,9 @@ TEST_F(KDBListsTest, Merge)
     std::string pattern = "C*";
 
     // create deep copies kdb
-    KDBLists* kdb0 = Lists.subset(pattern, true);
-    KDBLists* kdb1 = Lists.subset(pattern, true);
-    KDBLists* kdb_to_merge = Lists.subset(pattern, true);
+    KDBLists* kdb0 = new KDBLists(global_ws_lst.get(), pattern, true);
+    KDBLists* kdb1 = new KDBLists(global_ws_lst.get(), pattern, true);
+    KDBLists* kdb_to_merge = new KDBLists(global_ws_lst.get(), pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_LIST";
@@ -290,66 +275,66 @@ TEST_F(KDBListsTest, Search)
     std::string lst_name = "COPY0";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
-    KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
-    KDBIdentities kdb_idt(true, input_test_dir + "fun.ai");
-    KDBScalars kdb_scl(true, input_test_dir + "fun.as");
-    KDBTables kdb_tbl(true, input_test_dir + "fun.at");
-    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    global_ws_cmt->load(str_input_test_dir + "fun.ac");
+    global_ws_eqs->load(str_input_test_dir + "fun.ae");
+    global_ws_idt->load(str_input_test_dir + "fun.ai");
+    global_ws_scl->load(str_input_test_dir + "fun.as");
+    global_ws_tbl->load(str_input_test_dir + "fun.at");
+    global_ws_var->load(str_input_test_dir + "fun.av");
 
-    objs_list = Comments.search(lst_name);
+    objs_list = global_ws_cmt->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Equations.search(lst_name);
+    objs_list = global_ws_eqs->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Identities.search(lst_name);
+    objs_list = global_ws_idt->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_lts = { "COPY", "COPY0" };
-    objs_list = Lists.search(lst_name);
+    objs_list = global_ws_lst->search(lst_name);
     EXPECT_EQ(objs_list, expected_lts);
 
-    objs_list = Scalars.search(lst_name);
+    objs_list = global_ws_scl->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Tables.search(lst_name);
+    objs_list = global_ws_tbl->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Variables.search(lst_name);
+    objs_list = global_ws_var->search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);
 }
 
 TEST_F(KDBListsTest, Hash)
 {
-    std::size_t hash_val = hash_value(Lists);
+    std::size_t hash_val = hash_value(*global_ws_lst);
 
     // change a name
-    Lists.rename("COPY0", "COPY_0");
-    std::size_t hash_val_modified = hash_value(Lists);
+    global_ws_lst->rename("COPY0", "COPY_0");
+    std::size_t hash_val_modified = hash_value(*global_ws_lst);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // modify an entry
     hash_val = hash_val_modified;
-    std::string expanded_list = Lists.get("COPY_0") + Lists.get("COPY1");
-    Lists.update("COPY", expanded_list);
-    hash_val_modified = hash_value(Lists);
+    std::string expanded_list = global_ws_lst->get("COPY_0") + global_ws_lst->get("COPY1");
+    global_ws_lst->update("COPY", expanded_list);
+    hash_val_modified = hash_value(*global_ws_lst);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
-    Lists.remove("COPY");
-    hash_val_modified = hash_value(Lists);
+    global_ws_lst->remove("COPY");
+    hash_val_modified = hash_value(*global_ws_lst);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // add an entry
     hash_val = hash_val_modified;
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
-    Lists.add("NEW_ENTRY", new_list);
-    hash_val_modified = hash_value(Lists);
+    global_ws_lst->add("NEW_ENTRY", new_list);
+    hash_val_modified = hash_value(*global_ws_lst);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

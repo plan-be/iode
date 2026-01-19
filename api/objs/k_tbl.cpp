@@ -17,6 +17,7 @@
 #include "api/print/print.h"
 #include "api/utils/buf.h"
 #include "api/report/undoc/undoc.h"
+#include "cpp_api/computed_table/computed_table.h"
 
 
 // ========================= TableCell methods ========================= //
@@ -530,7 +531,7 @@ std::size_t hash_value(const Table& table)
 }
 
 
-Table* CKDBTables::get_obj(const SWHDL handle) const
+Table* KDBTables::get_obj(const SWHDL handle) const
 {    
     std::string name;
     for(const auto& [_name_, _handle_] : k_objs) 
@@ -545,7 +546,7 @@ Table* CKDBTables::get_obj(const SWHDL handle) const
     return get_obj(name);
 }
 
-Table* CKDBTables::get_obj(const std::string& name) const
+Table* KDBTables::get_obj(const std::string& name) const
 {
     std::string key = to_key(name);
     SWHDL handle = this->get_handle(key);
@@ -558,7 +559,7 @@ Table* CKDBTables::get_obj(const std::string& name) const
     return (Table*) K_tunpack(ptr, (char*) key.c_str());
 }
 
-bool CKDBTables::set_obj(const std::string& name, const Table* value)
+bool KDBTables::set_obj(const std::string& name, const Table* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -572,14 +573,113 @@ bool CKDBTables::set_obj(const std::string& name, const Table* value)
     return success;
 }
 
-bool CKDBTables::grep_obj(const std::string& name, const SWHDL handle, 
+Table* KDBTables::get(const std::string& name) const
+{
+	Table* table = this->get_obj(name);
+	return table;
+}
+
+bool KDBTables::add(const std::string& name, const Table& obj)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add table: a table named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add table: a table named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+	Table table(obj);
+	return this->set_obj(name, &table);
+}
+
+void KDBTables::update(const std::string& name, const Table& obj)
+{
+    if(!this->contains(name))
+    {
+        std::string msg = "Cannot update table: no table named '" + name + 
+                          "' exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+	Table table(obj);
+	this->set_obj(name, &table);
+}
+
+std::string KDBTables::get_title(const std::string& name) const
+{
+	// throw exception if table with passed position is not valid
+	if(!this->contains(name))
+		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
+			                    "The table with name '" + name + "' does not exist in the database.");
+    Table* table = this->get_obj(name);
+    std::string title = std::string((char*) T_get_title(table));
+    delete table;
+    return title;
+}
+
+bool KDBTables::add(const std::string& name, const int nbColumns)
+{
+	Table table(nbColumns);
+	return this->add(name, table);
+}
+
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+	const std::vector<std::string>& vars, bool mode, bool files, bool date)
+{
+	Table table(nbColumns, def, vars, mode, files, date);
+	return this->add(name, table);
+}
+
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+	const std::vector<std::string>& titles, const std::vector<std::string>& lecs, 
+	bool mode, bool files, bool date)
+{
+	Table table(nbColumns, def, titles, lecs, mode, files, date);
+	return this->add(name, table);
+}
+
+bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
+	const std::string& lecs, bool mode, bool files, bool date)
+{
+	Table table(nbColumns, def, lecs, mode, files, date);
+	return this->add(name, table);
+}
+
+void KDBTables::print_to_file(const std::string& destination_file, const std::string& gsample, 
+	const std::string& names, const int nb_decimals, const char format)
+{
+	ComputedTable::initialize_printing(destination_file, format);
+
+	Table* table;
+	ComputedTable* computed_table;
+	std::set<std::string> v_names = filter_names(names);
+	for(const std::string& name : v_names)
+	{
+		table = get(name);
+		computed_table = new ComputedTable(table, gsample, nb_decimals);
+		computed_table->print_to_file();
+		delete computed_table;
+		delete table;
+	}
+
+	ComputedTable::finalize_printing();
+}
+
+bool KDBTables::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
     bool found = false;
     std::string text;
 
-    Table* tbl = const_cast<CKDBTables*>(this)->get_obj(name);
+    Table* tbl = const_cast<KDBTables*>(this)->get_obj(name);
     for(const TableLine& tline : tbl->lines) 
     {
         if(found) 
@@ -629,7 +729,7 @@ bool CKDBTables::grep_obj(const std::string& name, const SWHDL handle,
 /**
  *  Compute a table on the GSample ismpl and return a string containing the result.
  */
-char* CKDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec)
+char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec)
 {
     int     dim, i, j, d, rc = 0, nli = 0,
                           nf = 0, nm = 0;
@@ -740,7 +840,7 @@ char* CKDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc
     return(res);
 }
 
-char* CKDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     return  NULL;
 }
@@ -756,7 +856,7 @@ char* CKDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* 
  *  @param [in] pos int         position of the table in kdb
  *  @return         int         -1 if the table cannot be found in kdb
  */
-bool CKDBTables::print_obj_def(const std::string& name)
+bool KDBTables::print_obj_def(const std::string& name)
 {
     Table* tbl = this->get_obj(name);
     if(!tbl) 
@@ -786,9 +886,9 @@ bool CKDBTables::print_obj_def(const std::string& name)
     return success;
 }
 
-void CKDBTables::update_reference_db()
+void KDBTables::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBTables(this, "*");      
+    K_RWS[this->k_type][0] = new KDBTables(this, "*", false);      
 }

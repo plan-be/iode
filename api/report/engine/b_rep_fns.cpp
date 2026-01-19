@@ -751,7 +751,7 @@ U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
     int i;
-    CKDBComments* kdb = global_ws_cmt.get();
+    KDBComments* kdb = global_ws_cmt.get();
 
     if(!kdb) 
         return(res);
@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
 
     if(!kdb) 
         return(res);
@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    CKDBLists* kdb = global_ws_lst.get();
+    KDBLists* kdb = global_ws_lst.get();
 
     if(!kdb) 
         return(res);
@@ -884,7 +884,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    CKDBIdentities* kdb = global_ws_idt.get();
+    KDBIdentities* kdb = global_ws_idt.get();
 
     if(!kdb) 
         return(res);
@@ -929,7 +929,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch* res = 0, buf[128];
-    CKDBEquations* kdb = global_ws_eqs.get();
+    KDBEquations* kdb = global_ws_eqs.get();
 
     if(!kdb) 
         return(res);
@@ -970,7 +970,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch* res = 0;
-    CKDBEquations* kdb = global_ws_eqs.get();
+    KDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1009,7 +1009,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch* res = 0;
-    CKDBEquations* kdb = global_ws_eqs.get();
+    KDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1083,7 +1083,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch* eq = 0, *rhs;
     int poscolon;
-    CKDBEquations* kdb = global_ws_eqs.get();
+    KDBEquations* kdb = global_ws_eqs.get();
 
     // Equation WS  empty
     if(!kdb) 
@@ -1169,7 +1169,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
     char     what = 'F';
 
     smpl = kdb->sample;

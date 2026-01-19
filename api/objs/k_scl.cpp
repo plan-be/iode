@@ -22,7 +22,7 @@ std::size_t hash_value(const Scalar& scalar)
 }
 
 
-Scalar* CKDBScalars::get_obj(const SWHDL handle) const
+Scalar* KDBScalars::get_obj(const SWHDL handle) const
 {    
     char* ptr = SW_getptr(handle);
     if(ptr == nullptr)  
@@ -30,7 +30,7 @@ Scalar* CKDBScalars::get_obj(const SWHDL handle) const
     return (Scalar*) P_get_ptr(ptr, 0);
 }
 
-Scalar* CKDBScalars::get_obj(const std::string& name) const
+Scalar* KDBScalars::get_obj(const std::string& name) const
 {
     SWHDL handle = this->get_handle(name);
     if(handle == 0)  
@@ -39,7 +39,7 @@ Scalar* CKDBScalars::get_obj(const std::string& name) const
     return get_obj(handle);
 }
 
-bool CKDBScalars::set_obj(const std::string& name, const Scalar* value)
+bool KDBScalars::set_obj(const std::string& name, const Scalar* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -53,20 +53,59 @@ bool CKDBScalars::set_obj(const std::string& name, const Scalar* value)
     return success;
 }
 
-bool CKDBScalars::grep_obj(const std::string& name, const SWHDL handle, 
+Scalar* KDBScalars::get(const std::string& name) const
+{
+	Scalar* scalar = this->get_obj(name);
+	return scalar;
+}
+
+bool KDBScalars::add(const std::string& name, const Scalar& obj)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add scalar: a scalar named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add scalar: a scalar named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+	Scalar scalar(obj);
+	return this->set_obj(name, &scalar);
+}
+
+void KDBScalars::update(const std::string& name, const Scalar& obj)
+{
+    if(!this->contains(name))
+    {
+        std::string msg = "Cannot update scalar: no scalar named '" + name + 
+                          "' exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+	Scalar scalar(obj);
+	this->set_obj(name, &scalar);
+}
+
+bool KDBScalars::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
     return false;
 }
 
-char* CKDBScalars::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBScalars::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     char* obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
     return obj;
 }
 
-bool CKDBScalars::print_obj_def(const std::string& name)
+bool KDBScalars::print_obj_def(const std::string& name)
 {
     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 1, name.c_str());
 
@@ -81,9 +120,9 @@ bool CKDBScalars::print_obj_def(const std::string& name)
     return success;
 }
 
-void CKDBScalars::update_reference_db()
+void KDBScalars::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBScalars(this, "*");      
+    K_RWS[this->k_type][0] = new KDBScalars(this, "*", false);      
 }

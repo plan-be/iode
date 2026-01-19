@@ -189,7 +189,7 @@ char *IodeDdeGetWS(char *szItem)
 char *IodeDdeCreateSeries(int objnb, int bt)
 {
     char    *res, buf[128];
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
     int     t;
     double  x;
 
@@ -215,7 +215,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
 char *IodeDdeCreatePer(int bt)
 {
     char    *res;
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
     int     t;
 
     res = SCR_malloc(11 * (1 + kdb->sample->nb_periods - bt));
@@ -479,7 +479,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             res = SCR_malloc(40 * (1 + kdb->sample->nb_periods));
             for(t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                x = ((CKDBVariables*) kdb)->get_value(name, t);
+                x = ((KDBVariables*) kdb)->get_value(name, t);
                 if(!IODE_IS_A_NUMBER(x)) 
                     strcpy(buf, "0");
                 else 
@@ -491,7 +491,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
         case SCALARS :
             res = SCR_malloc(40);
-            scl = ((CKDBScalars*) kdb)->get_obj(name);
+            scl = ((KDBScalars*) kdb)->get_obj(name);
             if(!IODE_IS_A_NUMBER(scl->value)) 
                 strcpy(res, "0");
             else                  

@@ -107,25 +107,25 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
         switch(type) 
         {
             case COMMENTS:
-                kdb = new CKDBComments(false);
+                kdb = new KDBComments(false);
                 break;
             case EQUATIONS:
-                kdb = new CKDBEquations(false);
+                kdb = new KDBEquations(false);
                 break;
             case IDENTITIES:
-                kdb = new CKDBIdentities(false);
+                kdb = new KDBIdentities(false);
                 break;
             case LISTS:
-                kdb = new CKDBLists(false);
+                kdb = new KDBLists(false);
                 break;
             case SCALARS:
-                kdb = new CKDBScalars(false);
+                kdb = new KDBScalars(false);
                 break;
             case TABLES:
-                kdb = new CKDBTables(false);
+                kdb = new KDBTables(false);
                 break;
             case VARIABLES:
-                kdb = new CKDBVariables(false);
+                kdb = new KDBVariables(false);
                 break;
             default:
                 {

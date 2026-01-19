@@ -80,17 +80,17 @@ struct std::hash<Scalar>
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBScalars : public CKDBTemplate<Scalar>
+struct KDBScalars : public KDBTemplate<Scalar>
 {
     // global or standalone database
-    CKDBScalars(const bool is_global) : CKDBTemplate(SCALARS, is_global) {}
+    KDBScalars(const bool is_global) : KDBTemplate(SCALARS, is_global) {}
 
-    // shallow copy database
-    CKDBScalars(CKDBScalars* db_parent, const std::string& pattern = "*") 
-        : CKDBTemplate(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBScalars(KDBScalars* db_parent, const std::string& pattern, const bool copy) 
+        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBScalars(const CKDBScalars& other): CKDBTemplate(other) {}
+    KDBScalars(const KDBScalars& other): KDBTemplate(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -100,6 +100,10 @@ struct CKDBScalars : public CKDBTemplate<Scalar>
     Scalar* get_obj(const std::string& name) const override;
 
     bool set_obj(const std::string& name, const Scalar* value) override;
+
+    Scalar* get(const std::string& name) const;
+    bool add(const std::string& name, const Scalar& obj);
+    void update(const std::string& name, const Scalar& obj);
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -119,8 +123,25 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<CKDBScalars> global_ws_scl = std::make_unique<CKDBScalars>(true);
+inline std::unique_ptr<KDBScalars> global_ws_scl = std::make_unique<KDBScalars>(true);
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
 std::size_t hash_value(const Scalar& scalar);
+
+inline std::size_t hash_value(KDBScalars const& cpp_kdb)
+{
+    if(cpp_kdb.size() == 0)
+        return 0;
+
+    Scalar* scalar;
+    std::size_t seed = 0;
+    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    {
+        hash_combine<std::string>(seed, name); 
+        scalar = cpp_kdb.get(name);
+        hash_combine<Scalar>(seed, *scalar);
+    }
+    
+    return seed;
+}

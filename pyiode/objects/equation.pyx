@@ -11,14 +11,14 @@ from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport B_EqsStepWise
 from pyiode.objects.equation cimport hash_value as hash_value_eq
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
-from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as KDBEquations
+from pyiode.iode_database.cpp_api_database cimport global_ws_eqs as cpp_global_equations
 
 
 cdef class Equation:
     cdef bint ptr_owner
     cdef CEquation* c_equation
-    cdef CKDBEquations* c_database
+    cdef KDBEquations* c_database
     cdef bint lock              # prevent extract_eq_from_database() to be executed
 
     def __cinit__(self):
@@ -61,7 +61,7 @@ cdef class Equation:
             self.ptr_owner = True
 
     @staticmethod
-    cdef Equation _from_ptr(CEquation* ptr, bint owner=False, CKDBEquations* c_database=NULL):
+    cdef Equation _from_ptr(CEquation* ptr, bint owner=False, KDBEquations* c_database=NULL):
         """
         Factory function to create Equation objects from a given CEquation pointer.
         """
@@ -102,7 +102,7 @@ cdef class Equation:
         cdef string eq_name = self.c_equation.endo
 
         if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get_sample()
+            c_sample = cpp_global_variables.get().get_sample()
             if from_period is None:
                 from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
@@ -113,7 +113,7 @@ cdef class Equation:
             cpp_eqs_estimate(eq_name, from_period.encode(), to_period.encode(), maxit, epsilon)
             
             # copy tests values and estimation date from the global equations workspace
-            c_global_equation = cpp_global_equations.get(eq_name)
+            c_global_equation = cpp_global_equations.get().get(eq_name)
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_global_equation.date
             memcpy(&self.c_equation.tests, &c_global_equation.tests, EQS_NBTESTS * sizeof(float))
@@ -133,7 +133,7 @@ cdef class Equation:
         cdef string eq_name = self.c_equation.endo
         
         if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get_sample()
+            c_sample = cpp_global_variables.get().get_sample()
             if from_period is None:
                 from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
@@ -147,7 +147,7 @@ cdef class Equation:
 
         # copy tests values and estimation date from the global equations workspace
         if res == 0:
-            c_global_equation = cpp_global_equations.get(eq_name)
+            c_global_equation = cpp_global_equations.get().get(eq_name)
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_global_equation.date
             memcpy(&self.c_equation.tests, &c_global_equation.tests, EQS_NBTESTS * sizeof(float))

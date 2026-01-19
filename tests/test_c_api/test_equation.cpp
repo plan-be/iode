@@ -1,7 +1,7 @@
 #include "pch.h"
 
 
-class EquationTest : public KDBTest, public ::testing::Test
+class EquationTest : public TestAbstract, public ::testing::Test
 {
 protected:
     Equation* equation;
@@ -9,8 +9,8 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations(true, input_test_dir + "fun.ae");
-        equation = Equations.get(name);
+        global_ws_eqs->load(str_input_test_dir + "fun.ae");
+        equation = global_ws_eqs->get(name);
     }
 
     void TearDown() override
@@ -160,27 +160,27 @@ TEST_F(EquationTest, GetCoefficients)
     EXPECT_EQ(coefs_list, expected_coefs_list);
 
     // check that coeffs have been created
-    EXPECT_EQ(Scalars.size(), coefs_list.size());
-    EXPECT_TRUE(Scalars.contains("acaf1"));
-    EXPECT_TRUE(Scalars.contains("acaf2"));
-    EXPECT_TRUE(Scalars.contains("acaf4"));
+    EXPECT_EQ(global_ws_scl->size(), coefs_list.size());
+    EXPECT_TRUE(global_ws_scl->contains("acaf1"));
+    EXPECT_TRUE(global_ws_scl->contains("acaf2"));
+    EXPECT_TRUE(global_ws_scl->contains("acaf4"));
 }
 
 TEST_F(EquationTest, GetVariables)
 {
     Sample eq_sample = equation->sample;
-    Variables.set_sample(eq_sample.start_period, eq_sample.end_period);
+    global_ws_var->set_sample(eq_sample.start_period, eq_sample.end_period);
 
     std::vector<std::string> expected_vars_list = {name, "VAF", "GOSF", "TIME"};
     std::vector<std::string> vars_list = equation->get_variables_list();
     EXPECT_EQ(vars_list, expected_vars_list);
 
     // check that variables have been created
-    EXPECT_EQ(Variables.size(), vars_list.size());
-    EXPECT_TRUE(Variables.contains(name));
-    EXPECT_TRUE(Variables.contains("GOSF"));
-    EXPECT_TRUE(Variables.contains("TIME"));
-    EXPECT_TRUE(Variables.contains("VAF"));
+    EXPECT_EQ(global_ws_var->size(), vars_list.size());
+    EXPECT_TRUE(global_ws_var->contains(name));
+    EXPECT_TRUE(global_ws_var->contains("GOSF"));
+    EXPECT_TRUE(global_ws_var->contains("TIME"));
+    EXPECT_TRUE(global_ws_var->contains("VAF"));
 }
 
 TEST_F(EquationTest, Hash)
@@ -192,7 +192,7 @@ TEST_F(EquationTest, Hash)
     hash_before = equation_hasher(*equation);
 
     // same equation
-    Equation* same_equation = Equations.get(name);
+    Equation* same_equation = global_ws_eqs->get(name);
     EXPECT_EQ(*equation, *same_equation);
     hash_after = equation_hasher(*same_equation);
     EXPECT_EQ(hash_before, hash_after);

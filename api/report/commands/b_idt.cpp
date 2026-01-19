@@ -95,7 +95,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
     int nb_idts = SCR_tbl_size((unsigned char**) c_idts);
 
-    CKDBVariables* kdb_var = nullptr;
+    KDBVariables* kdb_var = nullptr;
     if(c_idts == NULL || nb_idts == 0)
     {
         kdb_var = KI_exec(global_ws_idt.get(),
@@ -109,7 +109,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
         for(int i = 0; i < nb_idts; i++)
             idts += std::string(c_idts[i]) + ";";
 
-        CKDBIdentities* kdb_idt = new CKDBIdentities(global_ws_idt.get(), idts);
+        KDBIdentities* kdb_idt = new KDBIdentities(global_ws_idt.get(), idts, false);
         kdb_var = KI_exec(kdb_idt,
                           global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,

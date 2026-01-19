@@ -6,7 +6,7 @@
 #include "cpp_api/common.h"
 #include "api/utils/utils.h"
 #include "api/time/period.h"
-#include "cpp_api/KDB/kdb_variables.h"
+#include "api/objs/variables.h"
 
 /**
  * @brief 

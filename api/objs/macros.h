@@ -9,9 +9,9 @@ struct KDBMacros : public KDB
     // global or standalone database
     KDBMacros(const bool is_global) : KDB(OBJECTS, is_global) {}
 
-    // shallow copy database
-    KDBMacros(KDBMacros* db_parent, const std::string& pattern = "*") 
-        : KDB(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBMacros(KDBMacros* db_parent, const std::string& pattern, const bool copy) 
+        : KDB(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBMacros(const KDBMacros& other): KDB(other) {}
