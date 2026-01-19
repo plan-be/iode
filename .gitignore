@@ -415,6 +415,11 @@ keyboard_shortcuts.*
 
 # ROOT
 
+debug*.txt
+debug*.log
+log*.txt
+log*.log
+
 *.cmt
 *.eqs
 *.idt
