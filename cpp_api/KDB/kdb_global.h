@@ -18,8 +18,6 @@ const std::map<char, std::string> mLowToHigh =
  */
 bool is_global_database_loaded(const IodeType iodeType);
 
-void set_kdb_filename(KDB* kdb, const std::string& filename);
-
 /**
  * @brief import comments from file.
  * 

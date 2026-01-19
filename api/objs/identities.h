@@ -83,17 +83,21 @@ public:
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBIdentities : public CKDBTemplate<Identity>
+struct KDBIdentities : public KDBTemplate<Identity>
 {
-    // global or standalone database
-    CKDBIdentities(const bool is_global) : CKDBTemplate(IDENTITIES, is_global) {}
+private:
+    int set(const std::string& name, const std::string& lec);
 
-    // shallow copy database
-    CKDBIdentities(CKDBIdentities* db_parent, const std::string& pattern = "*") 
-        : CKDBTemplate(db_parent, pattern) {}
+public:
+    // global or standalone database
+    KDBIdentities(const bool is_global) : KDBTemplate(IDENTITIES, is_global) {}
+
+    // subset (shallow or deep copy) 
+    KDBIdentities(KDBIdentities* db_parent, const std::string& pattern, const bool copy) 
+        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBIdentities(const CKDBIdentities& other): CKDBTemplate(other) {}
+    KDBIdentities(const KDBIdentities& other): KDBTemplate(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -103,6 +107,21 @@ struct CKDBIdentities : public CKDBTemplate<Identity>
     Identity* get_obj(const std::string& name) const override;
 
     bool set_obj(const std::string& name, const Identity* value) override;
+
+    Identity* get(const std::string& name) const;
+    bool add(const std::string& name, const Identity& obj);
+    void update(const std::string& name, const Identity& obj);
+    
+    bool add(const std::string& name, const std::string& lec);
+    void update(const std::string& name, const std::string& lec);
+
+    std::string get_lec(const std::string& name) const;
+
+    bool execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
+                            const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
+
+    bool execute_identities(const std::string& from, const std::string& to, const std::string& identities_list = "", 
+                            const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -122,8 +141,24 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<CKDBIdentities> global_ws_idt = std::make_unique<CKDBIdentities>(true);
+inline std::unique_ptr<KDBIdentities> global_ws_idt = std::make_unique<KDBIdentities>(true);
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
 Identity* K_iunpack(char *);
+
+inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
+{
+    if(cpp_kdb.size() == 0)
+        return 0;
+
+    std::string lec;
+    std::size_t seed = 0;
+    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    {
+        hash_combine<std::string>(seed, name);  
+        lec = cpp_kdb.get_lec(name);
+        hash_combine<std::string>(seed, std::string(lec));
+    }
+    return seed;
+}

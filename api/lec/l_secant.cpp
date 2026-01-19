@@ -8,7 +8,7 @@
  *
  *      static double L_fx(double x, int t)                                             Computes the value of f(x) in time t
  *      static int L_bracket(double* x1, double* x2, int t)                             Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
- *      double L_secant(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
+ *      double L_secant(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
  */
 #include <math.h>
 #include "api/lec/lec.h"
@@ -19,8 +19,8 @@
 static int     LN_VARNB;            // Current position of endo in LN_DBV
 static double  LN_SHIFT = 0.0;      // Value of the endo[t] or 0 if the equation is not analytically solved (0 := lhs - rhs)
 static CLEC*   LN_CLEC;             // Current CLEC expression
-static CKDBVariables* LN_DBV;       // Current KDB scalars
-static CKDBScalars*   LN_DBS;       // Current KDB of vars
+static KDBVariables* LN_DBV;       // Current KDB scalars
+static KDBScalars*   LN_DBS;       // Current KDB of vars
 
 
 /**
@@ -127,7 +127,7 @@ static int L_bracket(double* x1, double* x2, int t)
  *  @return     double          root of the equation (varnb value that solves the equation)
  *
  */
-double L_secant(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_secant(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     int     it = 0;
     double  x1, x2, xl, xh, xr,

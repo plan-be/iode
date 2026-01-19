@@ -385,7 +385,7 @@ static Table* read_tbl(YYFILE* yy)
  *  @return                  KDB*    NULL or allocated KDB of Tables
  *  
  */
-bool CKDBTables::load_asc(const std::string& filename)
+bool KDBTables::load_asc(const std::string& filename)
 {
     static  int sorted;
 
@@ -656,7 +656,7 @@ static void print_tbl(FILE* fd, Table* tbl)
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
  */
-bool CKDBTables::save_asc(const std::string& filename)
+bool KDBTables::save_asc(const std::string& filename)
 {
     FILE*  fd;
     Table* tbl;

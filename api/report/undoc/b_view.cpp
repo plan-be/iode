@@ -377,7 +377,7 @@ int B_ViewTblFile(char* arg, int unused)
 
         if(K_RWS[VARIABLES][ref - 1])
             delete K_RWS[VARIABLES][ref - 1];
-        K_RWS[VARIABLES][ref - 1] = new CKDBVariables(false);
+        K_RWS[VARIABLES][ref - 1] = new KDBVariables(false);
         success = K_RWS[VARIABLES][ref - 1]->load(std::string((char*) args[1]));
         if(!success) 
         {

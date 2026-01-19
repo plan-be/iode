@@ -1,13 +1,13 @@
 #include "pch.h"
 
 
-class ScalarTest : public KDBTest, public ::testing::Test
+class ScalarTest : public TestAbstract, public ::testing::Test
 {
 protected:
 
 	void SetUp() override 
     {
-        KDBScalars kdb_scl(true, input_test_dir + "fun.as");
+        global_ws_scl->load(str_input_test_dir + "fun.as");
     }
 
 	// void TearDown() override {}
@@ -54,11 +54,11 @@ TEST_F(ScalarTest, Hash)
     std::size_t hash_before;
     std::size_t hash_after;
 
-    Scalar* scalar = Scalars.get("acaf1");
+    Scalar* scalar = global_ws_scl->get("acaf1");
     hash_before = scalar_hasher(*scalar);
 
     // same scalar
-    Scalar* same_scalar = Scalars.get("acaf1");
+    Scalar* same_scalar = global_ws_scl->get("acaf1");
     EXPECT_EQ(scalar, same_scalar);
     hash_after = scalar_hasher(*same_scalar);
     EXPECT_EQ(hash_before, hash_after);

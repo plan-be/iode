@@ -6,22 +6,23 @@
 
 /*----------------------- TYPEDEF ----------------------------*/
 
-// CMT = Comment (string)
+// using is the C++11 version of typedef
 using CMT = char*;
+using Comment = std::string;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBComments : public CKDBTemplate<char>
+struct KDBComments : public KDBTemplate<char>
 {
     // global or standalone database
-    CKDBComments(const bool is_global) : CKDBTemplate(COMMENTS, is_global) {}
+    KDBComments(const bool is_global) : KDBTemplate(COMMENTS, is_global) {}
 
-    // shallow copy database
-    CKDBComments(CKDBComments* db_parent, const std::string& pattern = "*") 
-        : CKDBTemplate(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBComments(KDBComments* db_parent, const std::string& pattern, const bool copy) 
+        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBComments(const CKDBComments& other): CKDBTemplate(other) {}
+    KDBComments(const KDBComments& other): KDBTemplate(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -32,6 +33,10 @@ struct CKDBComments : public CKDBTemplate<char>
 
     bool set_obj(const std::string& name, const char* value) override;
     bool set_obj(const std::string& name, const std::string& value);
+
+    Comment get(const std::string& name) const;
+    bool add(const std::string& name, const Comment& comment);
+    void update(const std::string& name, const Comment& comment);
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -51,4 +56,23 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<CKDBComments> global_ws_cmt = std::make_unique<CKDBComments>(true);
+inline std::unique_ptr<KDBComments> global_ws_cmt = std::make_unique<KDBComments>(true);
+
+/*------------------------- FUNCS ----------------------------*/
+
+inline std::size_t hash_value(KDBComments const& cpp_kdb)
+{
+    if(cpp_kdb.size() == 0)
+        return 0;
+
+    std::string cmt;
+    std::size_t seed = 0;
+    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    {
+        hash_combine<std::string>(seed, name); 
+        cmt = cpp_kdb.get(name);
+        hash_combine<std::string>(seed, cmt);
+    }
+    
+    return seed;
+}

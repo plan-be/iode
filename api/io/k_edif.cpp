@@ -49,7 +49,7 @@
  *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for DIF output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for DIF output. 
- *      char *get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
+ *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
  *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
  *  
  */
@@ -93,7 +93,7 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
     return(write_pre_post("-1,0\nBOT\n1,0\n\"", "\"\n", name, code));
 }
 
-char* ExportObjsDIF::extract_comment(CKDBComments* dbc, char* name, char **cmt)
+char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
 {
     SWHDL handle = dbc->get_handle(name);
     if(handle > 0)
@@ -102,7 +102,7 @@ char* ExportObjsDIF::extract_comment(CKDBComments* dbc, char* name, char **cmt)
         return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
 }
 
-char* ExportObjsDIF::get_variable_value(CKDBVariables* dbv, int nb, int t, char** vec)
+char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;

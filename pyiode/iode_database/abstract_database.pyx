@@ -9,7 +9,7 @@ from cython.operator cimport dereference
 from libc.string cimport strlen
 from libcpp.string cimport string
 from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
-from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
+from pyiode.iode_database.cpp_api_database cimport KDB as CppDatabase
 from pyiode.iode_database.cpp_api_database cimport K_NBDEC
 from pyiode.iode_database.cpp_api_database cimport error_manager
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand
@@ -22,7 +22,7 @@ from pyiode.iode_database.cpp_api_database cimport W_dest, W_flush, W_close
 
 
 cdef class CythonIodeDatabase:
-    cdef CKDBAbstract* abstract_db_ptr 
+    cdef CppDatabase* abstract_db_ptr 
 
     def __cinit__(self):
         # the C++ attribute abstract_db_ptr is initialized in the subclasses
@@ -43,16 +43,16 @@ cdef class CythonIodeDatabase:
         return IodeType(int_iode_type)
 
     def get_filename(self) -> str:
-        return self.abstract_db_ptr.get_filename().decode()
+        return self.abstract_db_ptr.get_filename_utf8().decode()
 
     def set_filename(self, value: str):
-        self.abstract_db_ptr.set_filename(value.encode())
+        self.abstract_db_ptr.set_filename_utf8(value.encode())
 
     def get_description(self) -> str:
-        return self.abstract_db_ptr.get_description().decode()
+        return self.abstract_db_ptr.get_description_utf8().decode()
 
     def set_description(self, value: str):
-        self.abstract_db_ptr.set_description(value.encode())
+        self.abstract_db_ptr.set_description_utf8(value.encode())
 
     def _get_print_nb_decimals(self) -> int:
         return K_NBDEC
@@ -108,7 +108,7 @@ cdef class CythonIodeDatabase:
             error_manager.display_last_error()
 
     def merge(self, cython_other: CythonIodeDatabase, overwrite: bool=True):        
-        cdef CKDBAbstract* other_db_ptr = cython_other.abstract_db_ptr
+        cdef CppDatabase* other_db_ptr = cython_other.abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
     def merge_from(self, input_file: str):

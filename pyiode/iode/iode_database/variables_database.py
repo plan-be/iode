@@ -171,7 +171,8 @@ class Variables(IodeDatabase):
     def _load(self, filepath: str):
         self._cython_instance._load(filepath)
 
-    def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, last_period: Union[str, Period]=None) -> Self:
+    def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
+                last_period: Union[str, Period]=None) -> Self:
         instance = Variables.get_instance()
 
         if isinstance(first_period, str):
@@ -206,10 +207,12 @@ class Variables(IodeDatabase):
         if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
             raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
 
-        cython_first_period = first_period._cython_instance if first_period is not None else None
-        cython_last_period = last_period._cython_instance if last_period is not None else None
-        instance._cython_instance = self._cython_instance.initialize_subset(instance._cython_instance, pattern, copy, 
-                                                                            cython_first_period, cython_last_period)
+        cy_first_period = first_period._cython_instance if first_period is not None else None
+        cy_last_period = last_period._cython_instance if last_period is not None else None
+        
+        cy_self = self._cython_instance
+        cy_subset = instance._cython_instance
+        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy, cy_first_period, cy_last_period)
         return instance
 
     def copy(self, pattern: str=None) -> Self:

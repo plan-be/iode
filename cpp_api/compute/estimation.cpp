@@ -68,7 +68,7 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     }
 
     int pos = 0;
-    KDBScalars* kdb_res = Scalars.subset("", true);
+    KDBScalars* kdb_res = new KDBScalars(false);
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
@@ -99,8 +99,8 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
     : estimation_done(false), sample(nullptr), method(EQ_LSQ), current_eq(v_equations.end())
 {
     set_sample(from, to);
-    kdb_eqs = Equations.subset("", true);
-    kdb_scl = Scalars.subset("", true);
+    kdb_eqs = new KDBEquations(false);
+    kdb_scl = new KDBScalars(false);
     m_corr = nullptr;
 }
 
@@ -124,7 +124,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 
         // generate a list of equations names from the passed argument 'block'
         // If an equation name specified in the block is not found in the global workspace, add it anyway
-        std::set<std::string> v_equations_ = Equations.filter_names(block, false);
+        std::set<std::string> v_equations_ = global_ws_eqs->filter_names(block, false);
 
         // if current equation name is not empty
         if(!current_eq_name.empty())
@@ -147,10 +147,10 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
             if(!kdb_eqs->contains(name))
             {
 	            // no -> check if in the global database
-                if(Equations.contains(name))
+                if(global_ws_eqs->contains(name))
                 {
                     // yes -> copy equation from the global database to 'kdb_eqs' 
-                    eq = Equations.get(name);
+                    eq = global_ws_eqs->get(name);
                     kdb_eqs->add(name, *eq);
                     delete eq;
                 }
@@ -188,13 +188,11 @@ void EditAndEstimateEquations::update_scalars()
     Equation* eq;
     std::set<std::string> coefficients_list;
 
-    CKDBEquations* c_kdb_eqs = kdb_eqs->get_database();
-
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (const std::string& name : c_kdb_eqs->get_names())
+    for (const std::string& name : kdb_eqs->get_names())
     {
-        eq = c_kdb_eqs->get_obj(name);
+        eq = kdb_eqs->get_obj(name);
         if(!eq)
             throw std::runtime_error("Estimation: Cannot get equation at position " 
                                      + name + " from the local Equations database.");
@@ -211,15 +209,18 @@ void EditAndEstimateEquations::update_scalars()
         if(!kdb_scl->contains(name))
         {
             // no -> check if in the global Scalars database
-            if(Scalars.contains(name))
+            if(global_ws_scl->contains(name))
             {
                 // yes -> copy scalars from the global database to 'kdb_scl' 
-                Scalar* scl = Scalars.get(name);
+                Scalar* scl = global_ws_scl->get(name);
                 kdb_scl->add(name, *scl);
             }
             // no -> add a new scalar with value = 0.0 and relax = 1.0 to 'kdb_scl'
             else
-                kdb_scl->add(name, 0.0, 1.0, IODE_NAN);
+            {
+                Scalar scl(0.0, 1.0);
+                kdb_scl->add(name, scl);
+            }
         }
     }
 
@@ -325,12 +326,10 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
 
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
-    CKDBEquations* dbe = kdb_eqs->get_database();
-    CKDBScalars* dbs = kdb_scl->get_database();
-    CKDBVariables* dbv = Variables.get_database();
     int i_method = (int) method;
-    
-    estimation = new Estimation(c_endos, dbe, dbv, dbs, sample, i_method, maxit, eps);
+    KDBVariables* kdb_var = global_ws_var.get();
+    estimation = new Estimation(c_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
+                                i_method, maxit, eps);
     int res = estimation->estimate();
 
     if(res == 0)
@@ -361,7 +360,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     std::string no_est_to;
     if(!estimation_done)
     {
-        Sample* vars_sample = Variables.get_sample();  
+        Sample* vars_sample = global_ws_var->get_sample();  
         // throw an error if the string does not represent a valid period
         Period from_per = (!from.empty()) ? Period(from) : vars_sample->start_period;
         // throw an error if the string does not represent a valid period
@@ -401,11 +400,11 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
             }
     
             // update/add the equation in the global database
-            if(Equations.contains(eq_name))
-                Equations.update(eq_name, *eq);
+            if(global_ws_eqs->contains(eq_name))
+                global_ws_eqs->update(eq_name, *eq);
             else
             {
-                Equations.add(eq_name, *eq);
+                global_ws_eqs->add(eq_name, *eq);
                 v_new_eqs.push_back(eq_name);
             }
         }
@@ -419,7 +418,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     }
 
     // merge the local Scalars into the global Scalars database
-    Scalars.merge(*kdb_scl);
+    global_ws_scl->merge(*kdb_scl);
 
     return v_new_eqs;
 }
@@ -430,7 +429,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     // clear C API errors stack
     error_manager.clear();
 
-    Sample* sample = Variables.get_sample();
+    Sample* sample = global_ws_var->get_sample();
     if(sample->nb_periods == 0)
         throw std::runtime_error("Could not perform estimation: No estimation sample is defined");
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;

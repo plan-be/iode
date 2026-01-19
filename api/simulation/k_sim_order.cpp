@@ -12,9 +12,9 @@
  *  
  * List of functions 
  * -----------------
- *      int KE_order(CKDBEquations* dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
+ *      int KE_order(KDBEquations* dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
  *      int KE_poseq(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
- *      void KE_tri(CKDBEquations* dbe, int** predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
+ *      void KE_tri(KDBEquations* dbe, int** predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
 #include "api/constants.h"
 #include "api/k_super.h"
@@ -84,7 +84,7 @@ int CSimulation::KE_add_post(int** successors, int i, int pos)
  *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
  *  
  */
-int CSimulation::KE_pre(CKDBEquations* dbe, int** predecessors, int from)
+int CSimulation::KE_pre(KDBEquations* dbe, int** predecessors, int from)
 {
     int     i, j,
             c = 1, nb = 0;
@@ -129,7 +129,7 @@ int CSimulation::KE_pre(CKDBEquations* dbe, int** predecessors, int from)
  *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
  *  
  */
-int CSimulation::KE_interdep(CKDBEquations* dbe, int** predecessors)
+int CSimulation::KE_interdep(KDBEquations* dbe, int** predecessors)
 {
     int     i, nb = 0;
 
@@ -149,7 +149,7 @@ int CSimulation::KE_interdep(CKDBEquations* dbe, int** predecessors)
  *  @param [in, out]    int**   successors      see KE_preorder()
  *  
  */
-int CSimulation::KE_postorder(CKDBEquations* dbe, int** predecessors, int** successors)
+int CSimulation::KE_postorder(KDBEquations* dbe, int** predecessors, int** successors)
 {
     int     i;
 
@@ -189,7 +189,7 @@ int CSimulation::KE_postorder(CKDBEquations* dbe, int** predecessors, int** succ
  *                                              -> Note that KSIM_ORDER is not calculated here, only allocated 
  *  
  */
-int CSimulation::KE_preorder(CKDBEquations* dbe, int** predecessors, int** successors)
+int CSimulation::KE_preorder(KDBEquations* dbe, int** predecessors, int** successors)
 {
     int     pos, posj, nb;
     CLEC    *clec;
@@ -261,7 +261,7 @@ int CSimulation::KE_preorder(CKDBEquations* dbe, int** predecessors, int** succe
  *  @global [out]   int  KSIM_POST   number of equations in the "epilog"
  *  
  */
-void CSimulation::KE_order(CKDBEquations* dbe, char** eqs)
+void CSimulation::KE_order(KDBEquations* dbe, char** eqs)
 {
     int     **predecessors, **successors, *tmp2, i, k, nb;
     long    cpu_order = 0; 
@@ -363,7 +363,7 @@ int CSimulation::KE_poseq(int posendo)
  *  @global [out]   int*    KSIM_PERM   vector of equations permutations. Filled with -1 at start.
  *  
  */
-int CSimulation::KE_tri_begin(CKDBEquations* dbe)
+int CSimulation::KE_tri_begin(KDBEquations* dbe)
 {
     int     i, nb;
 
@@ -385,7 +385,7 @@ int CSimulation::KE_tri_begin(CKDBEquations* dbe)
  *  
  */
  
-int CSimulation::KE_tri_end(CKDBEquations* dbe)
+int CSimulation::KE_tri_end(KDBEquations* dbe)
 {
     int     i;
 
@@ -413,7 +413,7 @@ int CSimulation::KE_tri_end(CKDBEquations* dbe)
  *  @global [in, out]   int*    KSIM_PERM   vector of equations permutations. 
  *  
  */
-void CSimulation::KE_tri_perm1(CKDBEquations* dbe, int i, int* vars)
+void CSimulation::KE_tri_perm1(KDBEquations* dbe, int i, int* vars)
 {
     int     j, m = -1, posj, nbe = dbe->size(), ksim_permi = KSIM_PERM[i];
 
@@ -450,7 +450,7 @@ void CSimulation::KE_tri_perm1(CKDBEquations* dbe, int i, int* vars)
  *  @global [in, out]   int*    KSIM_PERM vector of equation positions after pseudo-triangulation
  *  
  */
-void CSimulation::KE_tri(CKDBEquations* dbe, int** predecessors, int passes)
+void CSimulation::KE_tri(KDBEquations* dbe, int** predecessors, int passes)
 {
     int     i, var, j;
     int     cpu_sort;

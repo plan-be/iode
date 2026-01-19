@@ -163,7 +163,7 @@ double *K_vptr(KDB* kdb, char* name, int t)
  *  @return             Equation*     pointer to an allocated EQ ~ kdb[name]
  *  
  */
-Equation* K_eptr(CKDBEquations* kdb, char* c_name)
+Equation* K_eptr(KDBEquations* kdb, char* c_name)
 {
     std::string name = std::string(c_name);
     if(!kdb->contains(name)) 

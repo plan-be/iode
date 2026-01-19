@@ -191,7 +191,7 @@ cdef extern from "api/all.h":
         VAR_MODE_Y0Y_DIFF,
         VAR_MODE_Y0Y_GROWTH_RATE
 
-cdef extern from "cpp_api/KDB/kdb_variables.h":
+cdef extern from "api/objs/variables.h":
     cdef vector[string] v_var_modes
     
 cdef extern from "api/all.h":

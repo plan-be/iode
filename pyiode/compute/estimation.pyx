@@ -4,9 +4,9 @@ from libcpp.vector cimport vector
 from pyiode.common cimport IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
-from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
-from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport KDBScalars as KDBScalars
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as KDBEquations
+from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.compute.estimation cimport dynamic_adjustment as cpp_dynamic_adjustment
 from pyiode.compute.estimation cimport dickey_fuller_test as cpp_dickey_fuller_test
 from pyiode.compute.estimation cimport CCorrelationMatrix
@@ -21,8 +21,8 @@ def cython_dynamic_adjustment(method: int, eqs: str, c1: str, c2: str) -> str:
 
 
 def cython_dickey_fuller_test(scalars_db: Scalars, lec: str, drift: bool, trend: bool, order: int) -> Scalars:
-    # NOTE: cpp_dickey_fuller_test allocates a new CKDBScalars* pointer
-    cdef CKDBScalars* cpp_scalars
+    # NOTE: cpp_dickey_fuller_test allocates a new KDBScalars* pointer
+    cdef KDBScalars* cpp_scalars
     cpp_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
     if cpp_scalars is NULL:
         return None
@@ -139,7 +139,7 @@ cdef class CythonEditAndEstimateEquations:
         self.c_estimation_ptr.update_scalars()
 
     def get_scalars_db(self, scalars_db: Scalars) -> Scalars:
-        cdef CKDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
+        cdef KDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
         if c_scalars_ptr is NULL:
             return None
         scalars_db.ptr_owner = <bint>False
@@ -151,7 +151,7 @@ cdef class CythonEditAndEstimateEquations:
         return [eq_name.decode() for eq_name in self.c_estimation_ptr.get_list_equations()]
 
     def get_equations_db(self, equations_db: Equations) -> Equations:
-        cdef CKDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
+        cdef KDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
         if c_equations_ptr is NULL:
             return None
         equations_db.ptr_owner = <bint>False

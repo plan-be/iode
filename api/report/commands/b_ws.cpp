@@ -95,25 +95,25 @@ int B_WsLoad(char* arg, int type)
     switch(type) 
     {
         case COMMENTS: 
-            success = load_global_database<CKDBComments>(global_ws_cmt, filepath);
+            success = load_global_database<KDBComments>(global_ws_cmt, filepath);
             break;
         case EQUATIONS: 
-            success = load_global_database<CKDBEquations>(global_ws_eqs, filepath);
+            success = load_global_database<KDBEquations>(global_ws_eqs, filepath);
             break;
         case IDENTITIES: 
-            success = load_global_database<CKDBIdentities>(global_ws_idt, filepath);
+            success = load_global_database<KDBIdentities>(global_ws_idt, filepath);
             break;
         case LISTS: 
-            success = load_global_database<CKDBLists>(global_ws_lst, filepath);
+            success = load_global_database<KDBLists>(global_ws_lst, filepath);
             break;
         case SCALARS: 
-            success = load_global_database<CKDBScalars>(global_ws_scl, filepath);
+            success = load_global_database<KDBScalars>(global_ws_scl, filepath);
             break;
         case TABLES: 
-            success = load_global_database<CKDBTables>(global_ws_tbl, filepath);
+            success = load_global_database<KDBTables>(global_ws_tbl, filepath);
             break;
         case VARIABLES: 
-            success = load_global_database<CKDBVariables>(global_ws_var, filepath);
+            success = load_global_database<KDBVariables>(global_ws_var, filepath);
             break;
         default:
             kerror(0, "B_WsLoad: unknown type %d", type);
@@ -537,8 +537,8 @@ int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
     char    *pattern = NULL;
-    CKDBVariables* kdb = global_ws_var.get();
-    CKDBVariables* nkdb = NULL;
+    KDBVariables* kdb = global_ws_var.get();
+    KDBVariables* nkdb = NULL;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);
@@ -779,10 +779,10 @@ int B_CsvSave(char* arg, int type)
 
 int B_CsvNbDec(char *nbdec, int unused)
 {
-    CKDBVariables::CSV_NBDEC = atoi(nbdec);
-    if(CKDBVariables::CSV_NBDEC > 99 || (CKDBVariables::CSV_NBDEC < 0 && CKDBVariables::CSV_NBDEC != -1)) {
+    KDBVariables::CSV_NBDEC = atoi(nbdec);
+    if(KDBVariables::CSV_NBDEC > 99 || (KDBVariables::CSV_NBDEC < 0 && KDBVariables::CSV_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
-        CKDBVariables::CSV_NBDEC = 10;
+        KDBVariables::CSV_NBDEC = 10;
         return(-1);
     }
     return(0);
@@ -797,8 +797,8 @@ int B_CsvNbDec(char *nbdec, int unused)
 
 int B_CsvSep(char *sep, int unused)
 {
-    SCR_free(CKDBVariables::CSV_SEP);
-    CKDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
+    SCR_free(KDBVariables::CSV_SEP);
+    KDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
     return(0);
 }
 
@@ -811,8 +811,8 @@ int B_CsvSep(char *sep, int unused)
 
 int B_CsvNaN(char *nan, int unused)
 {
-    SCR_free(CKDBVariables::CSV_NAN);
-    CKDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
+    SCR_free(KDBVariables::CSV_NAN);
+    KDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
     return(0);
 }
 
@@ -826,8 +826,8 @@ int B_CsvNaN(char *nan, int unused)
 
 int B_CsvAxes(char *var, int unused)
 {
-    SCR_free(CKDBVariables::CSV_AXES);
-    CKDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
+    SCR_free(KDBVariables::CSV_AXES);
+    KDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
     return(0);
 }
 
@@ -841,8 +841,8 @@ int B_CsvAxes(char *var, int unused)
 
 int B_CsvDec(char *dec, int unused)
 {
-    SCR_free(CKDBVariables::CSV_DEC);
-    CKDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
+    SCR_free(KDBVariables::CSV_DEC);
+    KDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
     return(0);
 }
 

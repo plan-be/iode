@@ -135,7 +135,7 @@ class IodeDatabase:
     def _get_instance(instance: Self) -> Self:
         return instance
 
-    def _subset(self, pattern: str, copy: bool) -> Self:
+    def _subset(self, Self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
 
     def new_detached(self) -> Self:
@@ -764,7 +764,7 @@ class IodeDatabase:
         >>> vars_other["BQY"] = "BQY + 1.e-8"
         >>> # save the Variables file to compare with
         >>> vars_other.save(vars_other_filepath)                    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Saving ...fun_other.var
+        Saving fun_other.var
         394 objects saved
 
         >>> # ---- compare the current Variables database ----
@@ -1183,7 +1183,7 @@ class IodeDatabase:
         >>> len(comments)
         317
         >>> comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Saving .../fun2.cmt
+        Saving fun2.cmt
         317 objects saved
         >>> comments.clear()
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE

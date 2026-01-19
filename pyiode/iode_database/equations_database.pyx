@@ -6,8 +6,8 @@ from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CppKDBEquations
-from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
-from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport global_ws_eqs as cpp_global_equations
+from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 from pyiode.iode_database.cpp_api_database cimport B_EQS_INFOS, B_PrintObjEqsInfos
 from pyiode.iode_database.cpp_api_database cimport B_EQS_LEC, B_PrintObjLec
@@ -21,8 +21,8 @@ cdef class Equations(CythonIodeDatabase):
 
     def __cinit__(self, filepath: str=None) -> Equations:
         self.ptr_owner = False
-        self.database_ptr = &cpp_global_equations
-        self.abstract_db_ptr = &cpp_global_equations
+        self.database_ptr = cpp_global_equations.get()
+        self.abstract_db_ptr = cpp_global_equations.get()
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -39,17 +39,19 @@ cdef class Equations(CythonIodeDatabase):
             wrapper.abstract_db_ptr = database_ptr
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = &cpp_global_equations
-            wrapper.abstract_db_ptr = &cpp_global_equations
+            wrapper.database_ptr = cpp_global_equations.get()
+            wrapper.abstract_db_ptr = cpp_global_equations.get()
         return wrapper
 
     def _load(self, filepath: str):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, cython_instance: Equations, pattern: str, copy: bool) -> Equations:
-        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return cython_instance
+    def initialize_subset(self, subset: Equations, pattern: str, copy: bool) -> Equations:
+        subset.database_ptr = new CppKDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.abstract_db_ptr = subset.database_ptr
+        subset.ptr_owner = True
+        return subset
 
     def get_lec(self, name: str) -> str:
         return self.database_ptr.get_lec(name.encode()).decode()
@@ -77,7 +79,7 @@ cdef class Equations(CythonIodeDatabase):
     def estimate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
                  list_eqs: Union[str, List[str]], maxit: int, epsilon: float) -> bool:
         if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get_sample()
+            c_sample = cpp_global_variables.get().get_sample()
             if from_period is None:
                 from_period = c_sample.start_period.to_string().decode()
             if to_period is None:

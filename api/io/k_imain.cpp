@@ -39,8 +39,8 @@
  *      
  *  List of functions 
  *  -----------------
- *    CKDBVariables *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)              Interprets a text file containing VAR definitions
- *    CKDBComments *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
+ *    KDBVariables *IMP_InterpretVar(ImportFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)              Interprets a text file containing VAR definitions
+ *    KDBComments *IMP_InterpretCmt(ImportFromFile* impdef, char* rulefile, char* cfile, int lang)                    Interprets an ASCII file containing COMMENTS definitions
  *    int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)    Imports variables or comments in various formats.
  *  
  */
@@ -72,7 +72,7 @@ static int compare(const void *a, const void *b)
  *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-CKDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
+KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     bool    success;
     bool    found;
@@ -82,7 +82,7 @@ CKDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char*
     double  *vector = NULL, value;
     YYFILE  *yy;
     std::string var_name;
-    CKDBVariables* kdb = nullptr;
+    KDBVariables* kdb = nullptr;
 
     if(!smpl)
         return nullptr;
@@ -111,7 +111,7 @@ CKDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char*
     if(rc < 0) 
         goto err;
 
-    kdb = new CKDBVariables(false);
+    kdb = new KDBVariables(false);
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
@@ -199,9 +199,9 @@ err:
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-CKDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
+KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
 {
-    CKDBComments *kdb = nullptr;
+    KDBComments *kdb = nullptr;
     int          size, cmpt = 0, rc;
     char         iname[256], *cmt = NULL;
     ONAME        oname;
@@ -222,7 +222,7 @@ CKDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* 
     if(rc < 0) 
         goto err;
 
-    kdb = new CKDBComments(false);
+    kdb = new KDBComments(false);
 
     while(1) 
     {

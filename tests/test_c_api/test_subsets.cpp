@@ -50,12 +50,7 @@ TEST_F(SubsetsTest, Subset)
 
     // ==== DEEP COPY SUBSET ====
 
-    CKDBComments* subset_deep_copy = new CKDBComments(false);
-    for(const std::string& name : names) 
-    {
-        bool success = subset_deep_copy->duplicate(*global_ws_cmt, name, name);
-        EXPECT_TRUE(success);
-    }
+    KDBComments* subset_deep_copy = new KDBComments(global_ws_cmt.get(), pattern, true);
     EXPECT_EQ(subset_deep_copy->size(), names.size());
     EXPECT_EQ(subset_deep_copy->get_names(), expected_names);
     EXPECT_TRUE(subset_deep_copy->is_local_database());
@@ -121,7 +116,7 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
     EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
 
-    CKDBComments* subset_shallow_copy = new CKDBComments(global_ws_cmt.get(), pattern);
+    KDBComments* subset_shallow_copy = new KDBComments(global_ws_cmt.get(), pattern, false);
     EXPECT_EQ(subset_shallow_copy->size(), names.size());
     EXPECT_EQ(subset_shallow_copy->get_names(), expected_names);
     EXPECT_TRUE(subset_shallow_copy->is_shallow_copy_database());
@@ -203,7 +198,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if (name.front() == 'A' || name.front() == 'B' || name.back() == '_')
             expected_names_0.insert(name);
 
-    CKDBComments* subset_0 = new CKDBComments(global_ws_cmt.get(), pattern_0);
+    KDBComments* subset_0 = new KDBComments(global_ws_cmt.get(), pattern_0, false);
     EXPECT_EQ(subset_0->size(), names_0.size());
     EXPECT_EQ(subset_0->get_names(), expected_names_0);
     EXPECT_TRUE(subset_0->is_shallow_copy_database());
@@ -222,7 +217,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.back() == '_')
             expected_names_1.insert(name);
 
-    CKDBComments* subset_1 = new CKDBComments(subset_0, pattern_1);
+    KDBComments* subset_1 = new KDBComments(subset_0, pattern_1, false);
     EXPECT_EQ(subset_1->size(), names_1.size());
     EXPECT_EQ(subset_1->get_names(), expected_names_1);
     EXPECT_TRUE(subset_1->is_shallow_copy_database());
@@ -242,7 +237,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.front() == 'C')
             expected_names_2.insert(name);
 
-    CKDBComments* subset_2 = new CKDBComments(subset_1, pattern_2);
+    KDBComments* subset_2 = new KDBComments(subset_1, pattern_2, false);
     EXPECT_EQ(subset_2->size(), names_2.size());
     EXPECT_EQ(subset_2->get_names(), expected_names_2);
     EXPECT_TRUE(subset_2->is_shallow_copy_database());

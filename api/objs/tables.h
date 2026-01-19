@@ -878,17 +878,17 @@ std::size_t hash_value(const Table& table);
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct CKDBTables : public CKDBTemplate<Table>
+struct KDBTables : public KDBTemplate<Table>
 {
     // global or standalone database
-    CKDBTables(const bool is_global) : CKDBTemplate(TABLES, is_global) {}
+    KDBTables(const bool is_global) : KDBTemplate(TABLES, is_global) {}
 
-    // shallow copy database
-    CKDBTables(CKDBTables* db_parent, const std::string& pattern = "*") 
-        : CKDBTemplate(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBTables(KDBTables* db_parent, const std::string& pattern, const bool copy) 
+        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBTables(const CKDBTables& other): CKDBTemplate(other) {}
+    KDBTables(const KDBTables& other): KDBTemplate(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -898,6 +898,45 @@ struct CKDBTables : public CKDBTemplate<Table>
     Table* get_obj(const std::string& name) const override;
 
     bool set_obj(const std::string& name, const Table* value) override;
+
+    Table* get(const std::string& name) const;
+    bool add(const std::string& name, const Table& obj);
+    void update(const std::string& name, const Table& obj);
+
+    std::string get_title(const std::string& name) const;
+
+    bool add(const std::string& name, const int nb_columns);
+
+    bool add(const std::string& name, const int nbColumns, const std::string& def, const std::vector<std::string>& vars, 
+        bool mode = false, bool files = false, bool date = false);
+
+    bool add(const std::string& name, const int nbColumns, const std::string& def, const std::vector<std::string>& titles, 
+        const std::vector<std::string>& lecs, bool mode = false, bool files = false, bool date = false);
+
+    bool add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, 
+        bool mode = false, bool files = false, bool date = false);
+
+    /**
+     * @brief Compute and print a list of tables to a file.
+     * Argument `format` must be in the list:
+     *   - 'H' (HTML file)
+     *   - 'M' (MIF file)
+     *   - 'R' (RTF file)
+     *   - 'C' (CSV file)
+     *   - 'D' (DUMMY file)
+     * 
+     * If argument `format` is null (default), the A2M format will be used 
+     * to print the output.
+     * 
+     * If the filename does not contain an extension, it is automatically 
+     * added based on the format.
+     * 
+     * @param destination_file 
+     * @param names
+     * @param format 
+     */
+    void print_to_file(const std::string& destination_file, const std::string& gsample, 
+        const std::string& names, const int nb_decimals, const char format = '\0');
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -918,12 +957,29 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<CKDBTables> global_ws_tbl = std::make_unique<CKDBTables>(true);
+inline std::unique_ptr<KDBTables> global_ws_tbl = std::make_unique<KDBTables>(true);
 
 /*----------------------- FUNCS ----------------------------*/
 
 Table* K_tunpack(char*, char* name = NULL);
 Table* K_tptr(KDB* kdb, char* name);
+
+inline std::size_t hash_value(KDBTables const& cpp_kdb)
+{
+    if(cpp_kdb.size() == 0)
+        return 0;
+
+    Table* table;
+    std::size_t seed = 0;
+    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    {
+        hash_combine<std::string>(seed, name);
+        table = cpp_kdb.get(name);
+        hash_combine<Table>(seed, *table);
+    }
+
+    return seed;
+}
 
 /*----------------------- MACROS ----------------------------*/
 

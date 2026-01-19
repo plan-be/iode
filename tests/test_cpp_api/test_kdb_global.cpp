@@ -6,8 +6,8 @@ class KDBGlobalTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBEquations kdb_eqs(true, input_test_dir + "fun.ae");
-        KDBLists kdb_lst(true, input_test_dir + "fun.al");
+        global_ws_eqs->load(input_test_dir + "fun.ae");
+        global_ws_lst->load(input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -20,17 +20,17 @@ TEST_F(KDBGlobalTest, Filter)
     std::set<std::string> expected_list_names;
 
     std::set<std::string> all_names;
-    for (int p = 0; p < Equations.size(); p++) all_names.insert(Equations.get_name(p));
+    for (int p = 0; p < global_ws_eqs->size(); p++) all_names.insert(global_ws_eqs->get_name(p));
 
     // simple patterns
-    list_names = Equations.filter_names("A*");
+    list_names = global_ws_eqs->filter_names("A*");
     expected_list_names.clear();
     for (const std::string& name : all_names) 
         if (name.front() == 'A') 
             expected_list_names.insert(name);
     EXPECT_EQ(list_names, expected_list_names);
 
-    list_names = Equations.filter_names("*_");
+    list_names = global_ws_eqs->filter_names("*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) 
         if (name.back() == '_') 
@@ -39,7 +39,7 @@ TEST_F(KDBGlobalTest, Filter)
 
     // list
     std::string list = "$ENVI";
-    list_names = Equations.filter_names(list);
+    list_names = global_ws_eqs->filter_names(list);
     expected_list_names.clear();
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
@@ -48,7 +48,7 @@ TEST_F(KDBGlobalTest, Filter)
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
-    list_names = Equations.filter_names("A*;" + list + ";*_");
+    list_names = global_ws_eqs->filter_names("A*;" + list + ";*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) 
         if (name.front() == 'A') 
@@ -62,7 +62,7 @@ TEST_F(KDBGlobalTest, Filter)
 
     // pattern containing a name that does not exist in the global workspace
     // -> name is skipped by default (must_exist = true)
-    list_names = Equations.filter_names("A*;DO_NOT_EXIST");
+    list_names = global_ws_eqs->filter_names("A*;DO_NOT_EXIST");
     expected_list_names.clear();
     for (const std::string& name : all_names) 
         if (name.front() == 'A') 
@@ -70,7 +70,7 @@ TEST_F(KDBGlobalTest, Filter)
     EXPECT_EQ(list_names, expected_list_names);
 
     // must_exist = false
-    list_names = Equations.filter_names("A*;DO_NOT_EXIST", false);
+    list_names = global_ws_eqs->filter_names("A*;DO_NOT_EXIST", false);
     expected_list_names.insert("DO_NOT_EXIST");
     EXPECT_EQ(list_names, expected_list_names);
 }
@@ -80,33 +80,33 @@ TEST_F(KDBGlobalTest, LowToHigh)
     std::string varfile = input_test_dir + "fun.av";
 
     // Set the sample for the variable WS
-    Variables.set_sample("2010Q1", "2020Q4");
+    global_ws_var->set_sample("2010Q1", "2020Q4");
     
     // Linear interpolation / stock
     low_to_high(LTOH_STOCK, 'L', varfile, "ACAF");
-    EXPECT_TRUE(Variables.contains("ACAF"));
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAF", "2014Q3") * 1e6) / 1e6, -79.729132);
+    EXPECT_TRUE(global_ws_var->contains("ACAF"));
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2014Q3") * 1e6) / 1e6, -79.729132);
     
     // Linear interpolation / flow
     low_to_high(LTOH_FLOW, 'L', varfile, "ACAG");
-    EXPECT_TRUE(Variables.contains("ACAG"));
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
+    EXPECT_TRUE(global_ws_var->contains("ACAG"));
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
         
     // Cubic Splines / stock
     low_to_high(LTOH_STOCK, 'C', varfile, "ACAF");
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAF", "2012Q3") * 1e6) / 1e6, -52.805666 );
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2012Q3") * 1e6) / 1e6, -52.805666 );
     
     // Cubic splines / flow
     low_to_high(LTOH_FLOW, 'C', varfile, "ACAG");
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAG", "2012Q3") * 1e6) / 1e6, 7.613577);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAG", "2012Q3") * 1e6) / 1e6, 7.613577);
     
     // Step / stock
     low_to_high(LTOH_STOCK, 'S', varfile, "ACAF");
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAF", "2014Q3") * 1e6) / 1e6, -83.340625);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2014Q3") * 1e6) / 1e6, -83.340625);
     
     // Step / flow
     low_to_high(LTOH_FLOW, 'S', varfile, "ACAG");
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
 }
 
 TEST_F(KDBGlobalTest, HighToLow)
@@ -114,20 +114,20 @@ TEST_F(KDBGlobalTest, HighToLow)
     std::string varfile = input_test_dir + "fun_q.var";
 
     // Set the sample for the variable WS
-    Variables.set_sample("2000Y1", "2020Y1");
+    global_ws_var->set_sample("2000Y1", "2020Y1");
     
     // Last Obs
     high_to_low(HTOL_LAST, varfile, "ACAF");
-    EXPECT_TRUE(Variables.contains("ACAF"));
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAF", "2014Y1") * 1e6) / 1e6, -83.340625);
+    EXPECT_TRUE(global_ws_var->contains("ACAF"));
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2014Y1") * 1e6) / 1e6, -83.340625);
     
     // Mean
     high_to_low(HTOL_MEAN, varfile, "ACAG");
-    EXPECT_TRUE(Variables.contains("ACAG"));
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("ACAG", "2014Y1") * 1e6) / 1e6, 8.105075);
+    EXPECT_TRUE(global_ws_var->contains("ACAG"));
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAG", "2014Y1") * 1e6) / 1e6, 8.105075);
         
     // Sum
     high_to_low(HTOL_SUM, varfile, "AOUC");
-    EXPECT_TRUE(Variables.contains("AOUC"));
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("AOUC", "2014Y1") * 1e6) / 1e6, 1.423714);
+    EXPECT_TRUE(global_ws_var->contains("AOUC"));
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("AOUC", "2014Y1") * 1e6) / 1e6, 1.423714);
 }

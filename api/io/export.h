@@ -48,8 +48,8 @@ struct ExportToFile
         *code = (char*) SCR_stracpy((unsigned char*) oname);
         return *code;
     }
-    virtual char* extract_comment(CKDBComments*, char*, char**) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
-    virtual char* get_variable_value(CKDBVariables*, int, int, char**){ return 0; }                           // method constructing an allocated string of one value + sep
+    virtual char* extract_comment(KDBComments*, char*, char**) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
+    virtual char* get_variable_value(KDBVariables*, int, int, char**){ return 0; }                           // method constructing an allocated string of one value + sep
     virtual int   write_variable_and_comment(ExportToFile*, char*, char*, char*) { return 0; }      // method saving the VAR and CMT in the output file
     virtual int   close(ExportToFile*, KDB*, KDB*, char*) { return 0; }                             // method that closes the output file after having written its footer
 };
@@ -59,8 +59,8 @@ struct ExportObjsCSV : public ExportToFile
 {
     int write_header(ExportToFile *,KDB *,KDB *,char *) override;
     char* write_object_name(char *,char **) override;
-    char* extract_comment(CKDBComments*, char*, char**) override;
-    char* get_variable_value(CKDBVariables *,int ,int ,char **) override;
+    char* extract_comment(KDBComments*, char*, char**) override;
+    char* get_variable_value(KDBVariables *,int ,int ,char **) override;
     int write_variable_and_comment(ExportToFile *,char *,char *,char *) override;
     int close(ExportToFile *,KDB *,KDB *, char*) override;
 };
@@ -70,8 +70,8 @@ struct ExportObjsDIF : public ExportToFile
 {
     int write_header(ExportToFile *,KDB *,KDB *,char *) override;
     char* write_object_name(char *,char **) override;
-    char* extract_comment(CKDBComments*, char*, char**) override;
-    char* get_variable_value(CKDBVariables *,int ,int ,char **) override;
+    char* extract_comment(KDBComments*, char*, char**) override;
+    char* get_variable_value(KDBVariables *,int ,int ,char **) override;
     int write_variable_and_comment(ExportToFile *,char *,char *,char *) override;
     int close(ExportToFile *,KDB *,KDB *, char*) override;
 };
@@ -85,8 +85,8 @@ class ExportObjsWKS : public ExportToFile
 public:
     int write_header(ExportToFile *,KDB *,KDB *,char *) override;
     char* write_object_name(char *,char **) override;
-    char* extract_comment(CKDBComments*, char*, char**) override;
-    char* get_variable_value(CKDBVariables *,int ,int ,char **) override;
+    char* extract_comment(KDBComments*, char*, char**) override;
+    char* get_variable_value(KDBVariables *,int ,int ,char **) override;
     int write_variable_and_comment(ExportToFile *,char *,char *,char *) override;
     int close(ExportToFile *,KDB *,KDB *, char*) override;
 };
@@ -96,8 +96,8 @@ struct ExportObjsTSP : public ExportToFile
 {
     int write_header(ExportToFile *,KDB *,KDB *,char *) override;
     char* write_object_name(char *,char **) override;
-    char* extract_comment(CKDBComments*, char*, char**) override;
-    char* get_variable_value(CKDBVariables *,int ,int ,char **) override;
+    char* extract_comment(KDBComments*, char*, char**) override;
+    char* get_variable_value(KDBVariables *,int ,int ,char **) override;
     int write_variable_and_comment(ExportToFile *,char *,char *,char *) override;
     int close(ExportToFile *,KDB *,KDB *, char*) override;
 };
@@ -107,7 +107,7 @@ struct ExportObjsRevertCSV : public ExportToFile
 {
     int write_header(ExportToFile *,KDB *,KDB *,char *) override;
     char* write_object_name(char *,char **) override;
-    char* get_variable_value(CKDBVariables *,int ,int ,char **) override;
+    char* get_variable_value(KDBVariables *,int ,int ,char **) override;
     int write_variable_and_comment(ExportToFile *,char *,char *,char *) override;
     int close(ExportToFile *,KDB *,KDB *, char*) override;
 };
@@ -128,8 +128,8 @@ inline std::array<std::unique_ptr<ExportToFile>, IODE_NB_EXPORT_FORMATS> export_
 void write_value(char *,double );
 char *write_pre_post(char *,char *,char *,char **);
 char *write_separator(char *,char **);
-int EXP_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
-int EXP_Rev_Ws(ExportToFile* expdef, CKDBVariables* dbv, CKDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
+int EXP_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
+int EXP_Rev_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
 int EXP_RuleExport(char *,char *,char *,char *,char *,char *,char *,char *,char *,int );
 
 /* k_wks.c */

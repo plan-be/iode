@@ -44,9 +44,9 @@ double execute_lec(const std::string& lec, const int t)
 
 double execute_lec(const std::string& lec, const std::string& period)
 {
-    if(!Variables.check_sample())
+    if(!global_ws_var->check_sample())
         return IODE_NAN;
-    Sample* sample = Variables.get_sample();
+    Sample* sample = global_ws_var->get_sample();
     int t = sample->get_period_position(period);
     return execute_lec(lec, t);
 }
@@ -55,7 +55,7 @@ std::vector<double> execute_lec(const std::string& lec)
 {
     std::vector<double> res;
 
-    int nb_per = Variables.get_nb_periods();
+    int nb_per = global_ws_var->get_nb_periods();
     if(nb_per == 0)
     {
         kerror(0, "The Variables sample is undefined");

@@ -229,7 +229,7 @@ bool Equation::print_definition() const
 }
 
 
-Equation* CKDBEquations::get_obj(const SWHDL handle) const
+Equation* KDBEquations::get_obj(const SWHDL handle) const
 {    
     std::string name;
     for(const auto& [_name_, _handle_] : k_objs) 
@@ -244,7 +244,7 @@ Equation* CKDBEquations::get_obj(const SWHDL handle) const
     return get_obj(name);
 }
 
-Equation* CKDBEquations::get_obj(const std::string& name) const
+Equation* KDBEquations::get_obj(const std::string& name) const
 {
     std::string key = to_key(name);
     SWHDL handle = this->get_handle(key);
@@ -257,7 +257,7 @@ Equation* CKDBEquations::get_obj(const std::string& name) const
     return K_eunpack(ptr, (char*) key.c_str());
 }
 
-bool CKDBEquations::set_obj(const std::string& name, const Equation* value)
+bool KDBEquations::set_obj(const std::string& name, const Equation* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -271,7 +271,83 @@ bool CKDBEquations::set_obj(const std::string& name, const Equation* value)
     return success;
 }
 
-bool CKDBEquations::grep_obj(const std::string& name, const SWHDL handle, 
+std::string KDBEquations::get_lec(const std::string& name) const
+{
+    Equation* c_eq = this->get_obj(name);
+    std::string lec = c_eq->lec;
+    return lec; 
+}
+
+Equation* KDBEquations::get(const std::string& name) const
+{
+    Equation* c_eq = this->get_obj(name);
+    return c_eq;
+}
+
+bool KDBEquations::add(const std::string& name, const Equation& obj)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add equation: an equation named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add equation: an equation named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+    Equation eq(obj);
+    bool success = this->set_obj(name, &eq);
+    return success;
+}
+
+void KDBEquations::update(const std::string& name, const Equation& obj)
+{
+    if(!this->contains(name))
+    {
+        std::string msg = "Cannot update equation: no equation named '" + name + 
+                          "' exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    Equation eq(obj);
+    this->set_obj(name, &eq);
+}
+
+bool KDBEquations::add(const std::string& name, const std::string& lec)
+{
+    IodeEquationMethod method = EQ_GLS;
+    std::string from = "";
+    std::string to = "";
+    std::string comment = "";
+    std::string instruments = "";
+    std::string block = ""; 
+    bool date = true;
+    
+    Equation eq(name, lec, method, from, to, comment, instruments, block, date);
+    bool success = this->add(name, eq);
+    return success;
+}
+
+void KDBEquations::update(const std::string& name, const std::string& lec)
+{
+    IodeEquationMethod method = EQ_GLS;
+    std::string from = "";
+    std::string to = "";
+    std::string comment = "";
+    std::string instruments = "";
+    std::string block = ""; 
+    bool date = true;
+
+    Equation eq(name, lec, method, from, to, comment, instruments, block, date);
+    this->update(name, eq);
+}
+
+bool KDBEquations::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
@@ -285,7 +361,7 @@ bool CKDBEquations::grep_obj(const std::string& name, const SWHDL handle,
     return found;
 }
 
-char* CKDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     std::string lec = this->get_obj(name)->lec;
     char* obj = new char[lec.size() + 1];
@@ -293,7 +369,7 @@ char* CKDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, in
     return obj;
 }
 
-bool CKDBEquations::print_obj_def(const std::string& name)
+bool KDBEquations::print_obj_def(const std::string& name)
 {
     Equation* eq = this->get_obj(name);
     if(!eq) 
@@ -306,11 +382,11 @@ bool CKDBEquations::print_obj_def(const std::string& name)
     return success;
 }
 
-void CKDBEquations::update_reference_db()
+void KDBEquations::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBEquations(this, "*");      
+    K_RWS[this->k_type][0] = new KDBEquations(this, "*", false);      
 }
 
 /**
@@ -322,7 +398,7 @@ void CKDBEquations::update_reference_db()
  *  @return     double           test value or IODE_NAN if equation name not found
  *  
  */
-double K_etest(CKDBEquations* kdb, char* c_name, int test_nb)
+double K_etest(KDBEquations* kdb, char* c_name, int test_nb)
 {   
     std::string name = std::string(c_name);
     if(!kdb->contains(name)) 
@@ -334,12 +410,12 @@ double K_etest(CKDBEquations* kdb, char* c_name, int test_nb)
 }
 
 // Returns test calculated during the last estimation of equation name
-double K_e_stdev (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
-double K_e_meany (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
-double K_e_ssres (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
-double K_e_stderr(CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
-double K_e_fstat (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
-double K_e_r2    (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
-double K_e_r2adj (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
-double K_e_dw    (CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
-double K_e_loglik(CKDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
+double K_e_stdev (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
+double K_e_meany (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
+double K_e_ssres (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
+double K_e_stderr(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
+double K_e_fstat (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
+double K_e_r2    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
+double K_e_r2adj (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
+double K_e_dw    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
+double K_e_loglik(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}

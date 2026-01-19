@@ -14,6 +14,7 @@
 #include <vector>
 #include <array>
 #include <memory>               // std::unique_ptr, std::shared_ptr
+#include <stdexcept>            // std::invalid_argument, std::out_of_range, std::runtime_error
 
 #ifndef SKBUILD
     #include "gtest/gtest.h"
@@ -186,6 +187,63 @@ private:
     // only used by global or standalone databases
     std::set<KDB*> subset_instances;
 
+private: 
+    bool shallow_copy(const KDB& other, const std::set<std::string>& subset_keys)
+    {
+        SWHDL handle;
+        bool success = true;
+        for(const std::string& name : subset_keys) 
+        {
+            handle = other.get_handle(name);
+            if(handle == 0)  
+            {
+                std::string error_msg = v_iode_types[this->k_type];
+                error_msg += " with '" + name + "' not found in the source database";
+                kwarning(error_msg.c_str());
+                success = false;
+                continue;
+            }
+
+            this->k_objs[name] = handle;
+        }
+
+        if(!success)
+            this->k_objs.clear();
+
+        return success;
+    }
+
+    bool deep_copy(const KDB& other, const std::set<std::string>& subset_keys)
+    {
+        bool ok;
+        bool success = true;
+        for(const std::string& name : subset_keys) 
+        {
+            ok = duplicate(other, name, name);
+            if(!ok)
+            {
+                std::string error_msg = v_iode_types[this->k_type];
+                error_msg += " with '" + name + "' could not be copied ";
+                error_msg += "from the source database";
+                kwarning(error_msg.c_str());
+                success = false;
+                continue;
+            }
+        }
+
+        if(!success)
+        {
+            if(this->size() > 0)
+            {
+                for(auto& [this_name, this_handle] : k_objs) 
+                    SW_free(this_handle);
+                k_objs.clear();
+            }
+        }
+
+        return success;
+    }
+
 protected:
     bool set_packed_object(const std::string& name, char* pack);
 
@@ -231,10 +289,11 @@ public:
         }
     }
 
-    // shallow copy database (i.e. subset of a database)
-    KDB(KDB* db_parent, const std::string& pattern = "*") : KDBInfo(false)
+    // subset (shallow or deep copy) 
+    KDB(KDB* db_parent, const std::string& pattern, const bool copy) : KDBInfo(false)
     {
-        k_db_type = DB_SHALLOW_COPY;
+        k_db_type = copy ? DB_STANDALONE : DB_SHALLOW_COPY;
+        this->k_type = db_parent->k_type;
 
         std::string error_msg;
         if(!db_parent)
@@ -243,10 +302,9 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        bool failed = false;
-        error_msg = "Cannot create a subset the database '";
+        error_msg = "Cannot create a subset the database of type '";
         error_msg += v_iode_types[this->k_type] + "' using the pattern '";
-        error_msg += pattern + "':\n";
+        error_msg += pattern + "'";
 
         std::set<std::string> subset_keys;
         try
@@ -255,9 +313,9 @@ public:
         }
         catch(const std::exception& e)
         {
-            failed = true;
             subset_keys.clear();
             error_msg += std::string(e.what()) + " in the parent database";
+            throw std::runtime_error(error_msg);
         }
 
         KDB* true_db_parent = db_parent;
@@ -268,7 +326,6 @@ public:
         else
             true_db_parent = db_parent;
 
-        this->k_type = true_db_parent->k_type;
         switch(this->k_type) 
         {
             case COMMENTS :
@@ -303,56 +360,52 @@ public:
         this->k_compressed = true_db_parent->k_compressed;
         this->filepath = true_db_parent->filepath;
 
-        SWHDL handle;
-        for(const std::string& name : subset_keys) 
+        if(this->k_db_type == DB_SHALLOW_COPY)
         {
-            handle = true_db_parent->get_handle(name);
-            if(handle == 0)  
-            {
-                error_msg += v_iode_types[this->k_type] + " '" + name + "' ";
-                error_msg += "not found in the parent database.\n";
-                failed = true;
-                continue;
-            }
-            k_objs[name] = handle;
+            bool success = shallow_copy(*true_db_parent, subset_keys);
+            if(!success)
+                throw std::runtime_error(error_msg);
+            
+            true_db_parent->subset_instances.insert(this);
+            this->db_parent = true_db_parent;
         }
-
-        if(failed)
-            throw std::runtime_error(error_msg);
-
-        true_db_parent->subset_instances.insert(this);
-        this->db_parent = true_db_parent;
+        else
+        {
+            bool success = deep_copy(*true_db_parent, subset_keys);
+            if(!success)
+                throw std::runtime_error(error_msg);
+            
+            this->db_parent = nullptr;
+        }
     }
     
     // copy constructor
     // NOTE: new database is a 'deep copy' of the passed database
     KDB(const KDB& other) : KDBInfo(other)
     {
+        this->k_db_type = DB_STANDALONE;
+
         if(other.size() == 0)
             return;
 
-        // copy all objects from other to this
-        bool success;
-        for(auto& [name, handle] : other.k_objs) 
+        std::string error_msg = "Cannot create a copy of the database of type '";
+        error_msg += v_iode_types[this->k_type] + "'";
+
+        std::set<std::string> subset_keys;
+        try
         {
-            success = duplicate(other, name, name);
-            if(!success)
-            {
-                if(this->size() > 0)
-                {
-                    for(auto& [this_name, this_handle] : k_objs) 
-                        SW_free(this_handle);
-                    k_objs.clear();
-                }
-
-                filepath = std::string(I_DEFAULT_FILENAME);
-
-                std::string error_msg = "Failed to create a copy of the ";
-                error_msg += v_iode_types[k_type]; 
-                error_msg += " database.";
-                throw std::runtime_error(error_msg);
-            }
+            subset_keys = other.filter_names("*");
         }
+        catch(const std::exception& e)
+        {
+            subset_keys.clear();
+            error_msg += ":\n" + std::string(e.what()) + " in the parent database";
+            throw std::runtime_error(error_msg);
+        }
+
+        bool success = deep_copy(other, subset_keys);
+        if(!success)
+            throw std::runtime_error(error_msg);
     }
 
     ~KDB()
@@ -480,6 +533,47 @@ public:
         return (int) k_objs.size();
     }
 
+    IodeDatabaseType get_database_type() const
+    {
+        return (IodeDatabaseType) this->k_db_type;
+    }
+
+    std::string get_iode_type_str() const
+    { 
+        int _type_ = this->k_type;
+        return v_iode_types[_type_]; 
+    }
+
+    std::string get_filename_utf8() const
+    {
+        if(!this->filepath.empty()) 
+        {
+            std::string filename = oem_to_utf8(this->filepath);
+            return filename;
+        }
+        else
+            return "ws";
+    }
+
+    void set_filename_utf8(const std::string& filename)
+    { 
+        std::string filename_oem = utf8_to_oem(filename);
+        this->filepath = filename_oem; 
+    }
+
+    std::string get_description_utf8() const
+    { 
+        std::string desc = this->description;
+        if(!desc.empty())
+            desc = oem_to_utf8(desc);
+        return desc;
+    }
+
+    void set_description_utf8(const std::string& description)
+    {
+        this->description = utf8_to_oem(description);
+    }
+
     // strip the name and set it to upper/lower/asis according to k_mode
     std::string to_key(const std::string& name) const
     {
@@ -501,9 +595,18 @@ public:
         return k_objs.contains(key);
     }
 
+    bool parent_contains(const std::string& name) const
+    {
+        if(k_db_type != DB_SHALLOW_COPY || !db_parent)
+            return false;
+
+        return db_parent->contains(name);
+    }
+
     int index_of(const std::string& name) const
     {
         std::string key = to_key(name);
+        // check_name(key, this->iode_type);
         auto it = k_objs.find(key);
         if (it != k_objs.end()) 
             return (int) std::distance(k_objs.begin(), it);
@@ -731,6 +834,17 @@ public:
 
     char* dde_create_obj(int objnb, int* nc, int* nl);
 
+    void merge(const KDB& other, const bool overwrite=true);
+    
+    void copy_from(const std::string& input_file, const std::string objects_names = "*");
+    
+    void merge_from(const std::string& input_file);
+
+    // TODO ALD: rewrite B_DataSearchParms() in C++
+    std::vector<std::string> search(const std::string& pattern, const bool word=true, 
+        const bool case_sensitive=true, const bool in_name=true, const bool in_formula=true, 
+        const bool in_text=true, const std::string& list_result="_RES");
+
     // load
 
     virtual bool load_asc(const std::string& filename) = 0;
@@ -742,7 +856,7 @@ public:
 
     virtual bool save_asc(const std::string& filename) = 0;
     bool save_binary(const std::string& filename, const bool override_filepath = true);
-    bool save(const std::string& filename);
+    bool save(const std::string& filename, const bool compress=false);
 
     virtual bool save_csv(const std::string& filename, const std::vector<std::string>& 
         varlist=std::vector<std::string>(), Sample* sample=nullptr) 
@@ -755,17 +869,18 @@ public:
 };
 
 
-template<class T> struct CKDBTemplate: public KDB
+// type O = IODE object type used in the old API (e.g., char*, double*, etc.)
+template<class T> struct KDBTemplate: public KDB
 {
     // global or standalone database
-    CKDBTemplate(const IodeType type, const bool is_global) : KDB(type, is_global) {}
+    KDBTemplate(const IodeType type, const bool is_global) : KDB(type, is_global) {}
 
-    // shallow copy database
-    CKDBTemplate(CKDBTemplate* db_parent, const std::string& pattern = "*") 
-        : KDB(db_parent, pattern) {}
+    // subset (shallow or deep copy) 
+    KDBTemplate(KDBTemplate* db_parent, const std::string& pattern, const bool copy) 
+        : KDB(db_parent, pattern, copy) {}
 
     // copy constructor
-    CKDBTemplate(const CKDBTemplate& other): KDB(other) {}
+    KDBTemplate(const KDBTemplate& other): KDB(other) {}
 
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
@@ -832,6 +947,51 @@ inline bool wrap_grep_gnl(const std::string& pattern, const std::string& text,
 {
     return SCR_grep_gnl((char*) pattern.c_str(), (char*) text.c_str(), 
                         (int) ecase, (int) all) == 0;
+}
+
+template<typename T>
+T* template_subset(T* db_parent, const std::string& pattern, const bool deep_copy=false)
+{
+    // standalone copy database
+    if(deep_copy)
+    {
+        bool success = false;
+        T* db_subset = new T(false);
+
+        if(!db_parent)
+            delete db_subset;
+        else
+        {
+            db_subset->k_db_type = DB_STANDALONE;
+            db_subset->k_type = db_parent->k_type;
+            db_subset->k_mode = db_parent->k_mode;
+            db_subset->k_arch = db_parent->k_arch;
+            db_subset->description = db_parent->description;
+            db_subset->k_compressed = db_parent->k_compressed;
+            db_subset->filepath = db_parent->filepath;
+            if(db_parent->sample)
+                db_subset->sample = new Sample(*db_parent->sample);
+            else
+                db_subset->sample = nullptr;
+            success = db_subset->copy_objs(*db_parent, pattern);
+        }
+
+        if(!success)
+        {
+            delete db_subset;
+            std::string error_msg = "Cannot create a subset the database '"; 
+            error_msg += v_iode_types[db_parent->k_type] + "' using the pattern '";
+            error_msg += pattern + "'";
+            throw std::runtime_error(error_msg);
+        }
+        return db_subset;
+    }
+    // subset (shallow or deep copy) 
+    else
+    {
+        T* db_subset = new T(db_parent, pattern);
+        return db_subset;
+    }  
 }
 
 /* k_kdb.c */

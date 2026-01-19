@@ -3,14 +3,14 @@
  *
  * Functions acting on workspaces of variables.
  *
- *    int KV_sample(CKDBVariables* kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
- *    int KV_merge(CKDBVariables* kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
- *    void KV_merge_del(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(CKDBVariables* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
- *    double KV_get(CKDBVariables* kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(CKDBVariables* kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(CKDBVariables* dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
- *    CKDBVariables* KV_aggregate(CKDBVariables*dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
+ *    int KV_sample(KDBVariables* kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
+ *    int KV_merge(KDBVariables* kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
+ *    void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
+ *    int KV_add(KDBVariables* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
+ *    double KV_get(KDBVariables* kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
+ *    void KV_set(KDBVariables* kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
+ *    int KV_extrapolate(KDBVariables* dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
+ *    KDBVariables* KV_aggregate(KDBVariables*dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(double* val, int t, int method)                     Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
  *    int KV_per_pos(Period* per2)                                              Retrieves the position of a Period in the current global_ws_var sample.
@@ -28,7 +28,9 @@
 #include "api/objs/grep.h"
 #include "api/objs/pack.h"
 #include "api/objs/variables.h"
+#include "api/simulation/simulation.h"
 #include "api/report/undoc/undoc.h"
+#include "api/report/commands/commands.h"
 
 
 /**
@@ -40,7 +42,7 @@
  *                                               0 otherwise
  */
  
-int KV_sample(CKDBVariables* kdb, Sample *new_sample)
+int KV_sample(KDBVariables* kdb, Sample *new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0) 
         return 0;
@@ -95,7 +97,7 @@ int KV_sample(CKDBVariables* kdb, Sample *new_sample)
  *  @return                           int     -1 if there is no intersection between the 2 samples
  *                                            0 if ok.
  */
-int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
+int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
 {
     int start1, start2, nb1;
 
@@ -184,7 +186,7 @@ int KV_merge(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
  * 
  */
 
-void KV_merge_del(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
+void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
 {
     if(!kdb1)
     {
@@ -236,7 +238,7 @@ void KV_merge_del(CKDBVariables* kdb1, CKDBVariables* kdb2, int replace)
  *  @param [in] char*   varname     name of the new variable
  *  @return     int                 position of varname in the kdb
  */
-int KV_add(CKDBVariables* kdb, char* varname)
+int KV_add(KDBVariables* kdb, char* varname)
 {
     int      t, nobs;
     double   *vptr;
@@ -291,7 +293,7 @@ int KV_add(CKDBVariables* kdb, char* varname)
  *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
-double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
+double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -362,7 +364,7 @@ double KV_get(CKDBVariables* kdb, const std::string& name, int t, int mode)
  *                              
  */
  
-void KV_set(CKDBVariables* kdb, const std::string& name, int t, int mode, double value)
+void KV_set(KDBVariables* kdb, const std::string& name, int t, int mode, double value)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -476,7 +478,7 @@ calc2:
  *                                        from the list vars
  */
  
-int KV_extrapolate(CKDBVariables* dbv, int method, Sample* smpl, char* pattern)
+int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
 {
     int bt = smpl->start_period.difference(dbv->sample->start_period);
     int at = dbv->sample->end_period.difference(smpl->end_period);
@@ -524,21 +526,21 @@ int KV_extrapolate(CKDBVariables* dbv, int method, Sample* smpl, char* pattern)
  *                                           NULL on error (filename given but inexistent, not enough memory...)
  */
 
-CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char *filename)
+KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
     double* eval = NULL, *nval;
     Sample* smpl;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
-    CKDBVariables* ndbv = nullptr;
+    KDBVariables* ndbv = nullptr;
 
-    CKDBVariables* edbv = nullptr;
+    KDBVariables* edbv = nullptr;
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
     else
     {
-        edbv = new CKDBVariables(false);
+        edbv = new KDBVariables(false);
         bool success = edbv->load(std::string(filename));
         if(!success)
             goto done;
@@ -558,7 +560,7 @@ CKDBVariables* KV_aggregate(CKDBVariables* dbv, int method, char *pattern, char 
     eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
-    ndbv = new CKDBVariables(false);
+    ndbv = new KDBVariables(false);
     if(!ndbv) 
         goto done;
     
@@ -828,12 +830,12 @@ int KV_set_at_aper(char*varname, char* aper, double val)
 }
 
 
-double* CKDBVariables::get_obj(const SWHDL handle) const
+double* KDBVariables::get_obj(const SWHDL handle) const
 {    
     return (double*) P_get_ptr(SW_getptr(handle), 0);
 }
 
-double* CKDBVariables::get_obj(const std::string& name) const
+double* KDBVariables::get_obj(const std::string& name) const
 {
     SWHDL handle = this->get_handle(name);
     if(handle == 0)  
@@ -842,7 +844,7 @@ double* CKDBVariables::get_obj(const std::string& name) const
     return get_obj(handle);
 }
 
-bool CKDBVariables::set_obj(const std::string& name, const double* value)
+bool KDBVariables::set_obj(const std::string& name, const double* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -865,25 +867,567 @@ bool CKDBVariables::set_obj(const std::string& name, const double* value)
     return success;
 }
 
-bool CKDBVariables::set_obj(const std::string& name, const std::vector<double>& value)
+bool KDBVariables::set_obj(const std::string& name, const Variable& value)
 {
     return set_obj(name, value.data());
 }
 
-bool CKDBVariables::grep_obj(const std::string& name, const SWHDL handle, 
+Variable KDBVariables::get(const std::string& name) const
+{
+	Variable vars;
+	if(!check_sample())
+		return vars;
+
+    if(!this->contains(name))
+    {
+        std::string error_msg = "Cannot get Variable '" + name + "'.\n";
+        error_msg += "The Variable does not exist in the database.";
+        throw std::invalid_argument(error_msg);
+    }
+
+	int nb_obs = get_nb_periods();
+	vars.reserve(nb_obs);
+	for (int i=0; i < nb_obs; i++) 
+		vars.push_back(KV_get(const_cast<KDBVariables*>(this), name, i, 0));
+	return vars;
+}
+
+bool KDBVariables::add(const std::string& name, const Variable& variable)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add variable: a variable named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add variable: a variable named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+	if(!check_sample())
+		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
+
+	check_var_size("add", name, variable);
+
+	int var_size = (int) variable.size();
+	return this->set_obj(name, variable);
+}
+
+void KDBVariables::update(const std::string& name, const Variable& variable)
+{
+    if(!this->contains(name))
+    {
+        std::string error_msg = "Cannot update Variable '" + name + "'.\n";
+        error_msg += "The Variable does not exist in the database.";
+        throw std::invalid_argument(error_msg);
+    }
+
+	if(!check_sample())
+    {
+        std::string error_msg = "Cannot update Variable '" + name + "'.\n";
+        error_msg += "Sample is empty.";
+		throw std::runtime_error(error_msg);
+    }
+
+	check_var_size("update", name, variable);
+
+	int var_size = (int) variable.size();
+	this->set_obj(name, variable);
+}
+
+double KDBVariables::get_var(const std::string& name, const int t, const IodeVarMode mode) const
+{
+    if(!this->contains(name))
+    {
+        std::string error_msg = "Cannot get Variable '" + name + "'.\n";
+        error_msg += "The Variable does not exist in the database.";
+        throw std::invalid_argument(error_msg);
+    }
+
+    return KV_get(const_cast<KDBVariables*>(this), name, t, mode);
+}
+
+double KDBVariables::get_var(const std::string& name, const std::string& period, const IodeVarMode mode) const
+{
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
+	return get_var(name, t, mode);
+}
+
+double KDBVariables::get_var(const std::string& name, const Period& period, const IodeVarMode mode) const
+{
+	if(!check_sample())
+		return IODE_NAN;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
+	return get_var(name, t, mode);
+}
+
+bool KDBVariables::set_var(const std::string& name, const double* value)
+{
+    return set_obj(name, value);
+}
+
+void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)
+{
+    if(!this->contains(name))
+    {
+        std::string error_msg = "Cannot update Variable '" + name + "'.\n";
+        error_msg += "The Variable does not exist in the database.";
+        throw std::invalid_argument(error_msg);
+    }
+
+	KV_set(this, name, t, mode, value);
+}
+
+void KDBVariables::set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode)
+{
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
+	set_var(name, t, value, mode);
+}
+
+void KDBVariables::set_var(const std::string& name, const Period& period, const double value, const IodeVarMode mode)
+{
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t = sample->get_period_position(period);
+	set_var(name, t, value, mode);
+}
+
+Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int t_first, const int t_last)
+{
+	std::string prefix = "Cannot calculate variable values: ";
+	if(!check_sample())
+		return Variable();
+
+	int total_nb_periods = get_nb_periods();
+	if (total_nb_periods == 0) 
+		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
+
+	std::string error_msg = "period position must be in the range [0, " + 
+	                        std::to_string(total_nb_periods - 1) + "]. Got value ";
+	if(t_first < 0 || t_first >= total_nb_periods)
+	{
+		error_msg = prefix + "the first " + error_msg + std::to_string(t_first);
+		throw std::invalid_argument(error_msg);
+	}
+
+	if(t_last < 0 || t_last >= total_nb_periods)
+	{
+		error_msg = prefix + "the last " + error_msg + std::to_string(t_last);
+		throw std::invalid_argument(error_msg);	
+	}
+
+	Variable var;
+	var.reserve(t_last - t_first + 1);
+
+	if (lec.empty())
+	{
+		for (int t = t_first; t <= t_last; t++) 
+			var.push_back(IODE_NAN);
+		return var;
+	}
+
+	// code below is an adapted copy/paste from B_DataCalcVar() (in b_data.c)
+	char* c_lec = to_char_array(lec);
+	// Compiles the LEC string 
+	CLEC* clec = L_cc(c_lec);
+	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
+	// The CLEC object is modified (inplace) by L_link()
+	if (clec != NULL && L_link(global_ws_var.get(), global_ws_scl.get(), clec) == 0)
+	{
+		for (int t = t_first; t <= t_last; t++) 
+			var.push_back(L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t));
+		SW_nfree(clec);
+		return var;
+	}
+	else 
+	{
+		SW_nfree(clec);
+		throw std::runtime_error("Calculate variable values: Cannot compute LEC expressions: '" + lec + "'");
+	}
+}
+
+Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)
+{
+	if(!check_sample())
+		return Variable();
+	
+	Sample* sample = get_sample();
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
+
+	return calculate_var_from_lec(lec, t_first, t_last);
+}
+
+bool KDBVariables::add(const std::string& name, const std::string& lec)
+{
+	if(!check_sample())
+    {
+        std::string error_msg = "Cannot add Variable '" + name + "'.\n";
+        error_msg += "Sample is empty.";
+		throw std::runtime_error(error_msg);
+    }
+	
+	int total_nb_periods = get_nb_periods();
+	Variable var = calculate_var_from_lec(lec, 0, total_nb_periods - 1);
+	return this->add(name, var);
+}
+
+void KDBVariables::update(const std::string& name, const std::string& lec)
+{
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	this->update(name, lec, 0, sample->nb_periods - 1);
+}
+
+void KDBVariables::update(const std::string& name, const Variable& values, const int t_first, const int t_last)
+{
+	std::string prefix = "Cannot update variable '" + name + "' values: ";
+
+	if(!check_sample())
+			throw std::runtime_error(prefix + "Sample is empty");
+
+	int total_nb_periods = get_nb_periods();
+	std::string error_msg = "period position must be in the range [0, " + 
+	                        std::to_string(total_nb_periods - 1) + "]. Got value ";
+	if(t_first < 0 || t_first >= total_nb_periods)
+	{
+		error_msg = prefix + "the first " + error_msg + std::to_string(t_first);
+		throw std::invalid_argument(error_msg);
+	}
+
+	if(t_last < 0 || t_last >= total_nb_periods)
+	{
+		error_msg = prefix + "the last " + error_msg + std::to_string(t_last);
+		throw std::invalid_argument(error_msg);	
+	}
+
+	int nb_periods = t_last - t_first + 1;
+	if (values.size() != nb_periods)
+	{
+		error_msg = prefix + "the size of the passed vector " + std::to_string(values.size()) +  
+				    " does match the number of expected periods (" + std::to_string(nb_periods) + 
+					" -> period " + std::to_string(t_first) + " to " + std::to_string(t_last) + ")";
+		throw std::length_error(error_msg);
+	}
+
+	// prepare new Variable vector	
+	Variable variable = get(name);
+	for(int i=0; i < values.size(); i++)
+		variable[t_first + i] = values[i];
+
+	// update the variable
+	this->update(name, variable);
+}
+
+void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
+{
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
+
+	this->update(name, values, t_first, t_last);
+}
+
+void KDBVariables::update(const std::string& name, const std::string& lec, const int t_first, const int t_last)
+{
+	Variable var = calculate_var_from_lec(lec, t_first, t_last);
+	this->update(name, var, t_first, t_last);
+}
+
+void KDBVariables::update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period)
+{
+	if(!check_sample())
+		return;
+	
+	Sample* sample = get_sample();
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
+
+	this->update(name, lec, t_first, t_last);
+}
+
+// WARNING: the returned Sample pointer must not be deleted
+Sample* KDBVariables::get_sample() const
+{
+	return this->sample;
+}
+
+void KDBVariables::set_sample(const std::string& from, const std::string& to)
+{
+	if(from.empty() && to.empty())
+		return;
+	
+	Sample* sample = get_sample();
+    if ((sample == nullptr || sample->nb_periods == 0) && (from.empty() || to.empty()))
+	{
+        throw std::invalid_argument(std::string("Current sample is empty.\n") + 
+			"Please provide a value for both 'from' and 'to' arguments"); 
+	}
+
+	std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+	std::string to_ = to.empty() ? sample->end_period.to_string() : to;
+
+	Period period_from(from_);
+	Period period_to(to_);
+	set_sample(period_from, period_to);
+}
+
+void KDBVariables::set_sample(const Period& from, const Period& to)
+{
+	Sample* sample = get_sample();
+	Sample new_sample(from, to);
+	if(sample != nullptr && new_sample == *sample)
+		return;
+
+	// NOTE: prevent changing the sample on a subset (shallow copy).
+	//       A shallow copy is created by calling the corresponding copy constructor.
+	//       Each 'key' in the shallow copy points to the same data as the original.
+	//       The C function KV_sample(KDB*, Sample*) used below does the following things: 
+	//       1. changes the 'sample' attribute of the passed KDB
+	//       2. reallocates the data for each 'key' (IODE variable) [a bit more more complicated than that but that's not the point]
+	//       Problem: if the 'sample' attribute is changed on the subset (passed KDB), the 'sample' attribute of 
+	//                the global database is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
+	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling global_ws_var[var_name, 2001] is still 
+	//                possible but will return garbage.
+	if(this->is_shallow_copy_database())
+		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
+
+	int res = KV_sample(this, &new_sample);
+	if (res < 0) 
+	{
+		std::string error_msg = "Cannot set sample -> invalid \"from_period\" or \"to_period\" argument\n";
+		error_msg += "from_period: " + from.to_string() + "\n";
+		error_msg += "to_period: " + to.to_string();
+		throw std::invalid_argument(error_msg);
+	}
+}
+
+int KDBVariables::get_nb_periods() const
+{
+	Sample* sample = get_sample();
+	if(!sample)
+		return 0;
+    return sample->nb_periods;
+}
+
+std::string KDBVariables::get_period(const int t) const
+{
+	if(!check_sample())
+		return "";
+	
+	Sample* sample = get_sample();
+    Period period = sample->start_period;
+    return Period(period).shift(t).to_string();
+}
+
+float KDBVariables::get_period_as_float(const int t) const
+{
+	if(!check_sample())
+		return 0;
+	
+	Sample* sample = get_sample();
+    Period period = sample->start_period;
+    return Period(period).shift(t).to_float();
+}
+
+std::vector<std::string> KDBVariables::get_list_periods(const std::string& from, const std::string& to) const
+{
+	if(!check_sample())
+		return std::vector<std::string>();
+	
+	Sample* sample = get_sample();
+	if(from.empty() && to.empty())
+		return sample->get_list_periods();
+	else
+	{
+		std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period.to_string() : to;
+		return Sample(from_, to_).get_list_periods();
+	}
+}
+
+std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& from, const std::string& to) const
+{
+	if(!check_sample())
+		return std::vector<float>();
+	
+	Sample* sample = get_sample();
+	if(from.empty() && to.empty())
+		return sample->get_list_periods_as_float();
+	else
+	{
+		std::string from_ = from.empty() ? sample->start_period.to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period.to_string() : to;
+		return Sample(from_, to_).get_list_periods_as_float();
+	}
+}
+
+void KDBVariables::copy_from(const std::string& input_file, const std::string& from, const std::string& to, 
+	const std::string objects_names)
+{
+	    std::string buf = input_file + " ";
+
+		if((!from.empty()) || (!to.empty()))
+		{
+			Sample* var_sample = get_sample();
+			buf += from.empty() ? var_sample->start_period.to_string() + " " : from + " ";
+			buf += to.empty() ? var_sample->end_period.to_string() + " " : to + " ";
+			// throw error if wrong samples
+			Sample copy_sample(from, to);
+		}
+
+        buf += objects_names;
+
+        int res = B_WsCopy(const_cast<char*>(buf.c_str()), VARIABLES);
+
+        if (res < 0)
+		{
+			std::string last_error = error_manager.get_last_error();
+			if(!last_error.empty())
+				throw std::runtime_error("Cannot copy the content of file '" + input_file + 
+						"' into the Variables database.\n" + last_error);
+		}
+}
+
+void KDBVariables::copy_from(const std::string& input_file, const Period* from, const Period* to, 
+	const std::string& objects_names)
+{
+	std::string s_from = (from == nullptr) ? "" : from->to_string();
+	std::string s_to = (to == nullptr) ? "" : to->to_string();
+	copy_from(input_file, s_from, s_to, objects_names);
+}
+
+void KDBVariables::extrapolate(const VariablesInitialization method, const std::string& from, 
+	const std::string& to, const std::string& variables_list)
+{
+	if(this->size() == 0)
+		return;
+
+	Sample sample(from, to);
+
+	std::string pattern = variables_list;
+	if(pattern.empty())
+		pattern = "*";
+	
+	int res = KV_extrapolate(this, (int) method, &sample, (char*) pattern.c_str());
+
+	if (res < 0)
+	{
+		std::string error_msg = "Cannot extrapolate variables\n";
+		error_msg += "method: " + v_simulation_initialization[method] + "\n";
+		error_msg += "from period: " + from + "\n";
+		error_msg += "to period: " + to + "\n";
+		error_msg += "variables list: " + variables_list;
+		throw std::runtime_error(error_msg);
+	}
+}
+
+void KDBVariables::extrapolate(const VariablesInitialization method, const Period& from, 
+	const Period& to, const std::string& variables_list)
+{
+	extrapolate(method, from.to_string(), to.to_string(), variables_list);
+}
+
+void KDBVariables::seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test)
+{
+	if(this->size() == 0)
+		return;
+
+	std::string args;
+
+	input_file = check_filepath(input_file, FILE_VARIABLES, "seasonal_adjustment", true);
+	args = input_file + " "; 
+
+	if(series.empty()) 
+		throw std::invalid_argument(std::string("Cannot run seasonal adjustment: Passed value for ") + 
+		                            "the variables list argument is empty");
+	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
+    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+		throw std::invalid_argument("Cannot run seasonal adjustment: Passed value \"" + series + 
+		                            "\" for the variables list argument is invalid");
+	args += series + " ";
+
+	args += std::to_string(eps_test);
+
+	int res = B_WsSeasonAdj(to_char_array(args));
+	if (res < 0)
+	{
+		std::string error_msg = "Cannot run seasonal adjustment\n";
+		error_msg += "Filename: " + input_file + "\n";
+		error_msg += "Variables list: " + series + "\n";
+		error_msg += "Epsilon: " + std::to_string(eps_test);
+		throw std::runtime_error(error_msg);
+	}
+}
+
+void KDBVariables::trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log)
+{
+	if(this->size() == 0)
+		return;
+
+	std::string args;
+
+	input_file = check_filepath(input_file, FILE_VARIABLES, "trend_correction", true);
+	args = input_file + " "; 
+
+	args += std::to_string(lambda) + " ";
+
+	if(series.empty()) 
+		throw std::invalid_argument(std::string("Cannot run trend correction: Passed value for ") + 
+		                            "the variables list argument is empty");
+	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
+    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+		throw std::invalid_argument("Cannot run trend correction: Passed value \"" + series + 
+		                            "\" for the variables list argument is invalid");
+	args += series;
+
+	int res = (log) ? B_WsTrend(to_char_array(args)) : B_WsTrendStd(to_char_array(args));
+	if (res < 0)
+	{
+		std::string fct_name = (log) ? "B_WsTrend" : "B_WsTrendStd";
+		std::string error_msg = "Cannot run trend correction (" + fct_name + ")\n";
+		error_msg += "Variables filename: " + input_file + "\n";
+		error_msg += "Lambda: " + std::to_string(lambda) + "\n";
+		error_msg += "Series: " + series;
+		throw std::runtime_error(error_msg);
+	}
+}
+
+bool KDBVariables::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
     return false;
 }
 
-char* CKDBVariables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBVariables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     char* obj = (char*) SCR_stracpy((unsigned char*) "Not yet implemented") ;
     return obj;
 }
 
-bool CKDBVariables::print_obj_def(const std::string& name)
+bool KDBVariables::print_obj_def(const std::string& name)
 {
     Sample* smpl = this->sample;
     if(!smpl || smpl->nb_periods == 0) 
@@ -909,9 +1453,9 @@ bool CKDBVariables::print_obj_def(const std::string& name)
     return true;
 }
 
-void CKDBVariables::update_reference_db()
+void KDBVariables::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBVariables(this, "*");      
+    K_RWS[this->k_type][0] = new KDBVariables(this, "*", false);      
 }

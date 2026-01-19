@@ -238,7 +238,7 @@ int B_DataRasVar(char* arg, int unused)
 int B_DataCalcVar(char* arg, int unused)
 {
     char    name[K_MAX_NAME + 1];
-    CKDBVariables* kdb = global_ws_var.get();
+    KDBVariables* kdb = global_ws_var.get();
 
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
 
@@ -300,7 +300,7 @@ int B_DataCreate_1(char* arg, int* ptype)
     switch(*ptype) 
     {
         case COMMENTS :
-            success = ((CKDBComments*) kdb)->set_obj(arg, "");
+            success = ((KDBComments*) kdb)->set_obj(arg, "");
             break;
         case EQUATIONS :
             sprintf(deflt, "%s := %s", arg, arg);
@@ -309,23 +309,23 @@ int B_DataCreate_1(char* arg, int* ptype)
         case IDENTITIES :
         {
             Identity idt(name);
-            success = ((CKDBIdentities*) kdb)->set_obj(arg, &idt);
+            success = ((KDBIdentities*) kdb)->set_obj(arg, &idt);
             break;  
         }
         case LISTS :
-            success = ((CKDBLists*) kdb)->set_obj(arg, "");
+            success = ((KDBLists*) kdb)->set_obj(arg, "");
             break;
         case SCALARS :
         {
             Scalar scl;
-            success = ((CKDBScalars*) kdb)->set_obj(arg, &scl);
+            success = ((KDBScalars*) kdb)->set_obj(arg, &scl);
             break;
         }
         case TABLES :
             res = K_upd_tbl(arg, "TITLE;LEC");
             return res;
         case VARIABLES :
-            success = ((CKDBVariables*) kdb)->set_obj(arg, (double*) NULL); 
+            success = ((KDBVariables*) kdb)->set_obj(arg, (double*) NULL); 
             break;
     }
 
@@ -539,7 +539,7 @@ int B_DataUpdate(char* arg, int type)
     switch(type) 
     {
     case COMMENTS :
-        success = ((CKDBComments*) kdb)->set_obj(name, value);
+        success = ((KDBComments*) kdb)->set_obj(name, value);
         break;
     case EQUATIONS :
         rc = K_upd_eqs(name, value, NULL, -1, NULL, NULL, NULL, NULL, 0);
@@ -549,11 +549,11 @@ int B_DataUpdate(char* arg, int type)
     {
         std::string lec = std::string(value);
         Identity idt(lec);
-        success = ((CKDBIdentities*) kdb)->set_obj(name, &idt);
+        success = ((KDBIdentities*) kdb)->set_obj(name, &idt);
         break;
     }
     case LISTS :
-        success = ((CKDBLists*) kdb)->set_obj(name, value);
+        success = ((KDBLists*) kdb)->set_obj(name, value);
         break;
     case TABLES :
         rc = K_upd_tbl(name, value);
@@ -583,7 +583,7 @@ int B_DataUpdate(char* arg, int type)
         }
 
         if(success) 
-            success = ((CKDBScalars*) kdb)->set_obj(std::string(args[0]), &scl);
+            success = ((KDBScalars*) kdb)->set_obj(std::string(args[0]), &scl);
         break;
 
     case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
@@ -638,7 +638,7 @@ int B_DataUpdate(char* arg, int type)
                     var = (double) atof(args[i + nb_p]);
                     if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                         var = IODE_NAN;
-                    KV_set((CKDBVariables*) kdb, var_name, shift + i, mode, var);
+                    KV_set((KDBVariables*) kdb, var_name, shift + i, mode, var);
                 }
                 success = true;
             }
@@ -911,25 +911,25 @@ int B_DataScan(char* arg, int type)
             switch(type) 
             {
                 case COMMENTS:
-                    tkdb = new CKDBComments(global_ws_cmt.get(), objs);
+                    tkdb = new KDBComments(global_ws_cmt.get(), objs, false);
                     break;
                 case EQUATIONS:
-                    tkdb = new CKDBEquations(global_ws_eqs.get(), objs);
+                    tkdb = new KDBEquations(global_ws_eqs.get(), objs, false);
                     break;
                 case IDENTITIES:
-                    tkdb = new CKDBIdentities(global_ws_idt.get(), objs);
+                    tkdb = new KDBIdentities(global_ws_idt.get(), objs, false);
                     break;
                 case LISTS:
-                    tkdb = new CKDBLists(global_ws_lst.get(), objs);
+                    tkdb = new KDBLists(global_ws_lst.get(), objs, false);
                     break;
                 case SCALARS:
-                    tkdb = new CKDBScalars(global_ws_scl.get(), objs);
+                    tkdb = new KDBScalars(global_ws_scl.get(), objs, false);
                     break;
                 case TABLES:
-                    tkdb = new CKDBTables(global_ws_tbl.get(), objs);
+                    tkdb = new KDBTables(global_ws_tbl.get(), objs, false);
                     break;
                 case VARIABLES:
-                    tkdb = new CKDBVariables(global_ws_var.get(), objs);
+                    tkdb = new KDBVariables(global_ws_var.get(), objs, false);
                     break;
                 default:
                     {
@@ -1031,10 +1031,10 @@ int B_DataAppend(char* arg, int type)
     switch(type) 
     {
     case COMMENTS :
-        success = ((CKDBComments*) kdb)->set_obj(name, nptr);
+        success = ((KDBComments*) kdb)->set_obj(name, nptr);
         break;
     case LISTS :
-        success = ((CKDBLists*) kdb)->set_obj(name, nptr);
+        success = ((KDBLists*) kdb)->set_obj(name, nptr);
         break;
     }
 
@@ -1088,42 +1088,45 @@ int B_DataList(char* arg, int type)
     A_free((unsigned char**) args);
 
     KDB* kdb = nullptr;
-    switch(type) 
-    {
-        case COMMENTS:
-            kdb = new CKDBComments(global_ws_cmt.get(), "*");
-            break;
-        case EQUATIONS:
-            kdb = new CKDBEquations(global_ws_eqs.get(), "*");
-            break;
-        case IDENTITIES:
-            kdb = new CKDBIdentities(global_ws_idt.get(), "*");
-            break;
-        case LISTS:
-            kdb = new CKDBLists(global_ws_lst.get(), "*");
-            break;
-        case SCALARS:
-            kdb = new CKDBScalars(global_ws_scl.get(), "*");
-            break;
-        case TABLES:
-            kdb = new CKDBTables(global_ws_tbl.get(), "*");
-            break;
-        case VARIABLES:
-            kdb = new CKDBVariables(global_ws_var.get(), "*");
-            break;
-        default:
-            {
-                std::string msg = "DataList: invalid IODE type " + std::to_string(type);
-                kwarning(msg.c_str());
-                return -1;
-            }
-    }
-
     std::vector<std::string> lst;
-    if(file.empty()) 
+    if(file.empty())
+    {
+        kdb = get_global_db(type);
         lst = kdb->grep(pattern, false, true, false, false, '*');
+    }
     else 
     {
+        switch(type) 
+        {
+            case COMMENTS:
+                kdb = new KDBComments(false);
+                break;
+            case EQUATIONS:
+                kdb = new KDBEquations(false);
+                break;
+            case IDENTITIES:
+                kdb = new KDBIdentities(false);
+                break;
+            case LISTS:
+                kdb = new KDBLists(false);
+                break;
+            case SCALARS:
+                kdb = new KDBScalars(false);
+                break;
+            case TABLES:
+                kdb = new KDBTables(false);
+                break;
+            case VARIABLES:
+                kdb = new KDBVariables(false);
+                break;
+            default:
+                {
+                    std::string msg = "DataList: invalid IODE type " + std::to_string(type);
+                    kwarning(msg.c_str());
+                    return -1;
+                }
+        }
+
         bool success = kdb->load(file);
         if(!success)
         {
@@ -1359,25 +1362,25 @@ int B_DataCompare(char* arg, int type)
     switch(type) 
     {
         case COMMENTS:
-            kdb2 = new CKDBComments(false);
+            kdb2 = new KDBComments(false);
             break;
         case EQUATIONS:
-            kdb2 = new CKDBEquations(false);
+            kdb2 = new KDBEquations(false);
             break;
         case IDENTITIES:
-            kdb2 = new CKDBIdentities(false);
+            kdb2 = new KDBIdentities(false);
             break;
         case LISTS:
-            kdb2 = new CKDBLists(false);
+            kdb2 = new KDBLists(false);
             break;
         case SCALARS:
-            kdb2 = new CKDBScalars(false);
+            kdb2 = new KDBScalars(false);
             break;
         case TABLES:
-            kdb2 = new CKDBTables(false);
+            kdb2 = new KDBTables(false);
             break;
         case VARIABLES:
-            kdb2 = new CKDBVariables(false);
+            kdb2 = new KDBVariables(false);
             break;
         default:
             {

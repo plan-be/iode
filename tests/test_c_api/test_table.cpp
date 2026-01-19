@@ -1,15 +1,15 @@
 #include "pch.h"
 
 
-class TablesTest : public KDBTest, public ::testing::Test
+class TablesTest : public TestAbstract, public ::testing::Test
 {
 protected:
     Table* table;
 
     void SetUp() override
     {
-        KDBTables kdb_tbl(true, input_test_dir + "fun.at");
-        table = Tables.get("GFRPC");
+        global_ws_tbl->load(str_input_test_dir + "fun.at");
+        table = global_ws_tbl->get("GFRPC");
     }
 
     void TearDown() override 
@@ -23,8 +23,8 @@ protected:
 // extracted using get_obj() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
-    KDBComments kdb_cmt(true, input_test_dir + "fun.ac");
-    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    global_ws_cmt->load(str_input_test_dir + "fun.ac");
+    global_ws_var->load(str_input_test_dir + "fun.av");
 
     // --- create a C struct Table
     int nb_columns = 2;
@@ -80,8 +80,8 @@ TEST_F(TablesTest, AddGetTable)
             if(j == 0)
             {
                 ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
-                if(kdb_cmt.contains(variable))
-                    ASSERT_EQ(cell->get_content(), kdb_cmt.get(variable));
+                if(global_ws_cmt->contains(variable))
+                    ASSERT_EQ(cell->get_content(), global_ws_cmt->get(variable));
                 else
                     ASSERT_EQ(cell->get_content(), variable);
             }
@@ -192,7 +192,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     TableLine* line;
     TableCell* cell;
 
-    KDBVariables kdb_var(true, input_test_dir + "fun.av");
+    global_ws_var->load(str_input_test_dir + "fun.av");
 
     std::string name = "CPP_TABLE";
     int nb_columns = 2;
@@ -327,7 +327,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 TEST_F(TablesTest, CopyConstructor)
 {
     int nb_columns = table->nb_columns;
-    KDBVariables kdb_var(true, input_test_dir + "fun.var");
+    global_ws_var->load(str_input_test_dir + "fun.var");
 
     Table copied_table(*table);
     ASSERT_EQ(*table, copied_table);
@@ -759,7 +759,7 @@ TEST_F(TablesTest, LineDate)
 
 TEST_F(TablesTest, ListCoefficients)
 {
-    Table* table = Tables.get("ANAKNFF");    
+    Table* table = global_ws_tbl->get("ANAKNFF");    
     TableLine& line_5 = table->lines[5];
     EXPECT_EQ(line_5.get_type(), TABLE_LINE_CELL);
     TableCell& first_cell = line_5.cells[0];
@@ -774,7 +774,7 @@ TEST_F(TablesTest, ListCoefficients)
 
 TEST_F(TablesTest, ListVariables)
 {
-    Table* table = Tables.get("ANAKNFF");    
+    Table* table = global_ws_tbl->get("ANAKNFF");    
     TableLine& line_5 = table->lines[5];
     EXPECT_EQ(line_5.get_type(), TABLE_LINE_CELL);
     TableCell& first_cell = line_5.cells[0];
@@ -798,7 +798,7 @@ TEST_F(TablesTest, Hash)
     hash_original = hash_before;
 
     // same table
-    Table* same_table = Tables.get("GFRPC");
+    Table* same_table = global_ws_tbl->get("GFRPC");
     EXPECT_EQ(*table, *same_table);
     hash_after = table_hasher(*same_table);
     EXPECT_EQ(hash_before, hash_after);

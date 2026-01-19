@@ -9,8 +9,8 @@
  *   
  *  Main functions
  * 
- *      int L_link(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
- *      void L_link_endos(CKDBEquations* dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
+ *      int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
+ *      void L_link_endos(KDBEquations* dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -30,7 +30,7 @@
  * @param [in, out] cl      CLEC*   Compiled LEC
  * @return                  int     0 on success,  L_NOT_FOUND_ERR on error
 */
-static int L_link_names(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl)
+static int L_link_names(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)
 {
     int     i;
 
@@ -65,7 +65,7 @@ static int L_link_names(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl)
  * 
  * TODO: not implemented for MTFN's ???
 */
-static void L_link_sample_expr(CKDBVariables* dbv, char* expr, short lg)
+static void L_link_sample_expr(KDBVariables* dbv, char* expr, short lg)
 {
     int     j, keyw;
     short   len, s;
@@ -136,7 +136,7 @@ static void L_link_sample_expr(CKDBVariables* dbv, char* expr, short lg)
  * @param [in]      dbv     KDB*    KDB of variables
  * @param [in, out] cl      CLEC*   Compiled LEC
  */
-static void L_link_sample(CKDBVariables* dbv, CLEC* cl)
+static void L_link_sample(KDBVariables* dbv, CLEC* cl)
 {
     int     pos;
 
@@ -158,7 +158,7 @@ static void L_link_sample(CKDBVariables* dbv, CLEC* cl)
  * @param [in, out] cl   CLEC*       CLEC expression whose content must be linked to dbv and dbs
  * @return               int         0 on success, L_errno on error
 */
-int L_link(CKDBVariables* dbv, CKDBScalars* dbs, CLEC* cl)
+int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)
 {
     if (cl == 0) return(0);
     if (L_link_names(dbv, dbs, cl)) return(L_errno);
@@ -204,7 +204,7 @@ static void L_link1_endos(KDB* dbe, CLEC* cl)
  * 
  * @author JMP 16/3/2012
  */
-void L_link_endos(CKDBEquations* dbe, CLEC *cl)
+void L_link_endos(KDBEquations* dbe, CLEC *cl)
 {
     if (cl == 0) return;
     L_link1_endos(dbe, cl);

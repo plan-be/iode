@@ -80,7 +80,7 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
     {
         try
         {
-            CKDBEquations* dbe = new CKDBEquations(global_ws_eqs.get(), std::string(pattern));
+            KDBEquations* dbe = new KDBEquations(global_ws_eqs.get(), std::string(pattern), false);
 
             if(dbe->size() > 0)
             {

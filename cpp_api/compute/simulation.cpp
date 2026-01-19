@@ -62,7 +62,7 @@ bool Simulation::model_compile(const std::string& list_eqs)
         {
             try
             {
-                CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
+                KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
                 if(tdbe->size() > 0)
                     rc = KE_compile(tdbe);
                 delete tdbe;
@@ -127,7 +127,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     {
         try
         {
-            CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
+            KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
             if(tdbe->size() > 0)
             {
                 char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
@@ -203,7 +203,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     char* c_post = to_char_array(post_name);
 
     int rc = -1;
-    CKDBEquations* tdbe = nullptr;
+    KDBEquations* tdbe = nullptr;
     if(list_eqs.empty())
     {
         tdbe = global_ws_eqs.get();
@@ -213,7 +213,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     {
         try
         {
-            tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
+            tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
             if(tdbe->size() > 0)
                 rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
             delete tdbe;
@@ -268,17 +268,17 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
 
     // result list names
     bool lists_ok = true;
-    if(!Lists.contains(pre_name))
+    if(!global_ws_lst->contains(pre_name))
     {
         lists_ok = false;
         error_msg += "\tPre-recursive list '" + pre_name + "' not found!\n";
     }  
-    if(!Lists.contains(inter_name))
+    if(!global_ws_lst->contains(inter_name))
     {
         lists_ok = false;
         error_msg += "\tRecursive list '" + inter_name + "' not found!\n";
     }
-    if(!Lists.contains(post_name))
+    if(!global_ws_lst->contains(post_name))
     {
         lists_ok = false;
         error_msg += "\tPost-recursive list '" + post_name + "' not found!\n";
@@ -290,13 +290,13 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
         return false;
     }
 
-    std::string list_pre = Lists.get(pre_name);
+    std::string list_pre = global_ws_lst->get(pre_name);
     char** c_pre = (char**) KL_expand(to_char_array(list_pre));
     
-    std::string list_inter = Lists.get(inter_name);
+    std::string list_inter = global_ws_lst->get(inter_name);
     char** c_inter = (char**) KL_expand(to_char_array(list_inter));
     
-    std::string list_post = Lists.get(post_name);
+    std::string list_post = global_ws_lst->get(post_name);
     char** c_post = (char**) KL_expand(to_char_array(list_post));
     
     if(!(list_pre.back() == ';')) list_pre += ";";
@@ -314,7 +314,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     int rc = -1;
     try
     {
-        CKDBEquations* tdbe = new CKDBEquations(global_ws_eqs.get(), list_eqs);
+        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
         if(tdbe->size() > 0)
             rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
                              c_pre, c_inter, c_post);

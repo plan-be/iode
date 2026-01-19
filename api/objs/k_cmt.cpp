@@ -2,12 +2,12 @@
 #include "api/objs/comments.h"
 
 
-char* CKDBComments::get_obj(const SWHDL handle) const
+char* KDBComments::get_obj(const SWHDL handle) const
 {    
     return (char*) P_get_ptr(SW_getptr(handle), 0);
 }
 
-char* CKDBComments::get_obj(const std::string& name) const
+char* KDBComments::get_obj(const std::string& name) const
 {
     SWHDL handle = this->get_handle(name);
     if(handle == 0)  
@@ -16,7 +16,7 @@ char* CKDBComments::get_obj(const std::string& name) const
     return get_obj(handle);
 }
 
-bool CKDBComments::set_obj(const std::string& name, const char* value)
+bool KDBComments::set_obj(const std::string& name, const char* value)
 {
     char* pack = NULL;
     std::string key = to_key(name);
@@ -30,12 +30,51 @@ bool CKDBComments::set_obj(const std::string& name, const char* value)
     return success;
 }
 
-bool CKDBComments::set_obj(const std::string& name, const std::string& value)
+bool KDBComments::set_obj(const std::string& name, const std::string& value)
 {
     return set_obj(name, value.c_str());
 }
 
-bool CKDBComments::grep_obj(const std::string& name, const SWHDL handle, 
+Comment KDBComments::get(const std::string& name) const
+{
+    std::string oem_comment = std::string(this->get_obj(name));
+    return oem_to_utf8(oem_comment);
+}
+
+bool KDBComments::add(const std::string& name, const Comment& comment)
+{
+    if(this->contains(name))
+    {
+        std::string msg = "Cannot add comment: a comment named '" + name + 
+                          "' already exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+
+    if(this->parent_contains(name))
+    {
+        std::string msg = "Cannot add comment: a comment named '" + name + 
+                          "' exists in the parent database of the present subset";
+        throw std::invalid_argument(msg);
+    }
+
+    std::string oem_comment = utf8_to_oem(comment);
+    return this->set_obj(name, oem_comment);
+}
+
+void KDBComments::update(const std::string& name, const Comment& comment)
+{
+    if(!this->contains(name))
+    {
+        std::string msg = "Cannot update comment: no comment named '" + name + 
+                          "' exists in the database.";
+        throw std::invalid_argument(msg);
+    }
+    
+    std::string oem_comment = utf8_to_oem(comment);
+    this->set_obj(name, oem_comment);
+}
+
+bool KDBComments::grep_obj(const std::string& name, const SWHDL handle, 
     const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
     const char all) const
 {
@@ -45,21 +84,21 @@ bool CKDBComments::grep_obj(const std::string& name, const SWHDL handle,
     return found;
 }
 
-char* CKDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
+char* KDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
     char* obj = this->get_obj(name);
     return obj;
 }
 
-bool CKDBComments::print_obj_def(const std::string& name)
+bool KDBComments::print_obj_def(const std::string& name)
 {
     bool success = print_definition_generic(name, this->get_obj(name));
     return success;
 }
 
-void CKDBComments::update_reference_db()
+void KDBComments::update_reference_db()
 {
     if(K_RWS[this->k_type][0]) 
         delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new CKDBComments(this, "*");      
+    K_RWS[this->k_type][0] = new KDBComments(this, "*", false);      
 }

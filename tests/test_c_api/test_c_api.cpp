@@ -54,7 +54,7 @@ int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
 // END_KEEP
 
 
-class IodeCAPITest : public TestAbstract, public ::testing::Test
+class LegacyAPITest : public TestAbstract, public ::testing::Test
 {
 public:
     char* separator;
@@ -70,7 +70,6 @@ public:
         output_test_dir = (char*) str_output_test_dir.c_str();
         report_test_dir = (char*) str_report_test_dir.c_str();
         
-	    IODE_assign_super_API();    // set *_super fn pointers
 	    K_init_ws(0);               // Initialises 7 empty WS
 	    B_A2mGetAllParms();
     }
@@ -160,8 +159,8 @@ public:
 	    char*       lst;
         double*     values;
 	    Sample*     smpl;
-        CKDBLists*     kdb_lst = global_ws_lst.get();
-        CKDBVariables* kdb_var = global_ws_var.get();
+        KDBLists*     kdb_lst = global_ws_lst.get();
+        KDBVariables* kdb_var = global_ws_var.get();
 	    static int  done = 0;
 	
 	    // Create lists
@@ -737,23 +736,23 @@ public:
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(CKDBVariables::CSV_NBDEC, 7);
+	    EXPECT_EQ(KDBVariables::CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(CKDBVariables::CSV_SEP[0], ';');
+	    EXPECT_EQ(KDBVariables::CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(CKDBVariables::CSV_NAN), "--");
+	    EXPECT_EQ(std::string(KDBVariables::CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(CKDBVariables::CSV_AXES), "Name");
+	    EXPECT_EQ(std::string(KDBVariables::CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(std::string(CKDBVariables::CSV_DEC), ".");
+	    EXPECT_EQ(std::string(KDBVariables::CSV_DEC), ".");
 	
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
@@ -769,7 +768,7 @@ public:
 };
 
 
-TEST_F(IodeCAPITest, Tests_BUF)
+TEST_F(LegacyAPITest, Tests_BUF)
 {
     U_test_print_title("Tests BUF");
     EXPECT_EQ(BUF_DATA, nullptr);
@@ -781,7 +780,7 @@ TEST_F(IodeCAPITest, Tests_BUF)
 }
 
 
-TEST_F(IodeCAPITest, Tests_OBJECTS)
+TEST_F(LegacyAPITest, Tests_OBJECTS)
 {
     bool        found;
     char*       lst;
@@ -812,7 +811,7 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
+TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
 {
     Table*       tbl;
     Table*       extracted_tbl;
@@ -978,7 +977,7 @@ TEST_F(IodeCAPITest, Tests_Table_ADD_GET)
 }
 
 
-TEST_F(IodeCAPITest, Tests_LEC)
+TEST_F(LegacyAPITest, Tests_LEC)
 {
     double *A, *B;
 
@@ -1025,7 +1024,7 @@ TEST_F(IodeCAPITest, Tests_LEC)
 }
 
 
-TEST_F(IodeCAPITest, Tests_EQS)
+TEST_F(LegacyAPITest, Tests_EQS)
 {
 //    Equation*     eq;
 //    char    lec[521];
@@ -1038,7 +1037,7 @@ TEST_F(IodeCAPITest, Tests_EQS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_ARGS)
+TEST_F(LegacyAPITest, Tests_ARGS)
 {
     char **args;
     char *list[] = {"A1", "A2", 0};
@@ -1068,7 +1067,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_ERRMSGS)
+TEST_F(LegacyAPITest, Tests_ERRMSGS)
 {
     U_test_print_title("Tests Err Msgs");
 
@@ -1078,7 +1077,7 @@ TEST_F(IodeCAPITest, Tests_ERRMSGS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_K_OBJFILE)
+TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 {
     char in_filename[256];
     char out_filename[256];
@@ -1088,7 +1087,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    CKDBVariables* kdb_var = new CKDBVariables(false);
+    KDBVariables* kdb_var = new KDBVariables(false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1098,7 +1097,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     // load (binary files)
     // load all objects
-    kdb_var = new CKDBVariables(DB_GLOBAL);
+    kdb_var = new KDBVariables(DB_GLOBAL);
     kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1115,7 +1114,7 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
         v_objs.push_back(std::string(objs[i]));
     SCR_free_tbl((unsigned char**) objs);
 
-    kdb_var = new CKDBVariables(DB_GLOBAL);
+    kdb_var = new KDBVariables(DB_GLOBAL);
     kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1127,11 +1126,11 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_Simulation)
+TEST_F(LegacyAPITest, Tests_Simulation)
 {
-    CKDBVariables* kdbv;
-    CKDBEquations* kdbe;
-    CKDBScalars*   kdbs;
+    KDBVariables* kdbv;
+    KDBEquations* kdbe;
+    KDBScalars*   kdbs;
     Sample* smpl;
     char*   filename = "fun";
     U_ch**  endo_exo;
@@ -1221,15 +1220,15 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 }
 
 
-TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
+TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 {
     char    fullfilename[256];
     char    **varlist;
     Sample  *smpl;
     Table   *tbl;
     int     rc;
-    CKDBTables*    kdbt;
-    CKDBVariables* kdbv; 
+    KDBTables*    kdbt;
+    KDBVariables* kdbv; 
 
     U_test_suppress_a2m_msgs();
 
@@ -1238,13 +1237,13 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
     kdbv = global_ws_var.get();
-    K_RWS[VARIABLES][0] = new CKDBVariables(*kdbv);
+    K_RWS[VARIABLES][0] = new KDBVariables(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
     kdbt = global_ws_tbl.get();
-    K_RWS[TABLES][0] = new CKDBTables(*kdbt);
+    K_RWS[TABLES][0] = new KDBTables(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
@@ -1291,7 +1290,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 }
 
 
-TEST_F(IodeCAPITest, Tests_Estimation)
+TEST_F(LegacyAPITest, Tests_Estimation)
 {
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
@@ -1381,7 +1380,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 }
 
 
-TEST_F(IodeCAPITest, Tests_ALIGN)
+TEST_F(LegacyAPITest, Tests_ALIGN)
 {
     U_test_print_title("Tests ALIGN");
     
@@ -1392,7 +1391,7 @@ TEST_F(IodeCAPITest, Tests_ALIGN)
 }
 
 
-TEST_F(IodeCAPITest, Tests_W_printf)
+TEST_F(LegacyAPITest, Tests_W_printf)
 {
     U_test_print_title("Tests W_printf");
 
@@ -1422,7 +1421,7 @@ TEST_F(IodeCAPITest, Tests_W_printf)
 }
 
 
-TEST_F(IodeCAPITest, Tests_SWAP)
+TEST_F(LegacyAPITest, Tests_SWAP)
 {
     SWHDL   item, item2;
 
@@ -1442,7 +1441,7 @@ TEST_F(IodeCAPITest, Tests_SWAP)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_DATA)
+TEST_F(LegacyAPITest, Tests_B_DATA)
 {
     bool        success;
     bool        found;
@@ -1455,7 +1454,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     U_test_print_title("Tests B_DATA");
 
-    CKDBComments* kdb_cmt = new CKDBComments(DB_GLOBAL);
+    KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
     kdb_cmt->set_obj("AAA", "This is a test comment");
     handle = kdb_cmt->get_handle("AAA");
     EXPECT_TRUE(handle > 0);
@@ -1684,7 +1683,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_EQS)
+TEST_F(LegacyAPITest, Tests_B_EQS)
 {
     int     rc;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
@@ -1714,7 +1713,7 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_FILE)
+TEST_F(LegacyAPITest, Tests_B_FILE)
 {
     int     rc;
 
@@ -1752,7 +1751,7 @@ TEST_F(IodeCAPITest, Tests_B_FILE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_FSYS)
+TEST_F(LegacyAPITest, Tests_B_FSYS)
 {
     int     rc;
     char    arg[1024];
@@ -1854,7 +1853,7 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_IDT)
+TEST_F(LegacyAPITest, Tests_B_IDT)
 {
     char filename[256];
     int  rc;
@@ -1914,7 +1913,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
+TEST_F(LegacyAPITest, Tests_B_IDT_EXECUTE)
 {
     char    **idts;
     Sample  *smpl = NULL;
@@ -1939,7 +1938,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_IMP_EXP)
+TEST_F(LegacyAPITest, Tests_IMP_EXP)
 {
     char    outfile[256];
     char    reffile[256];
@@ -1988,7 +1987,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    CKDBVariables* kdb_var = new CKDBVariables(DB_GLOBAL);
+    KDBVariables* kdb_var = new KDBVariables(DB_GLOBAL);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2003,7 +2002,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        CKDBComments* kdb_cmt = new CKDBComments(DB_GLOBAL);
+        KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
@@ -2015,7 +2014,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_XODE)
+TEST_F(LegacyAPITest, Tests_B_XODE)
 {
     char    outfile[256];
     char    reffile[256];
@@ -2035,7 +2034,7 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    CKDBVariables* kdb_var = new CKDBVariables(DB_GLOBAL);
+    KDBVariables* kdb_var = new KDBVariables(DB_GLOBAL);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2046,7 +2045,7 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_LTOH)
+TEST_F(LegacyAPITest, Tests_B_LTOH)
 {
     char    cmd[512];
     char    varfile[256];
@@ -2104,7 +2103,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_HTOL)
+TEST_F(LegacyAPITest, Tests_B_HTOL)
 {
     char    cmd[512];
     char    varfile[256];
@@ -2148,7 +2147,7 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_MODEL)
+TEST_F(LegacyAPITest, Tests_B_MODEL)
 {
     KDB         *kdbv,
                 *kdbe,
@@ -2275,7 +2274,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsLoad)
+TEST_F(LegacyAPITest, Tests_B_WsLoad)
 {
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
@@ -2294,7 +2293,7 @@ TEST_F(IodeCAPITest, Tests_B_WsLoad)
 }
 
 
-TEST_F(IodeCAPITest, Tests_KEVAL)
+TEST_F(LegacyAPITest, Tests_KEVAL)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2319,7 +2318,7 @@ TEST_F(IodeCAPITest, Tests_KEVAL)
     U_test_reset_kmsg_msgs();
 }
 
-TEST_F(IodeCAPITest, Tests_B_WsSave)
+TEST_F(LegacyAPITest, Tests_B_WsSave)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2351,7 +2350,7 @@ TEST_F(IodeCAPITest, Tests_B_WsSave)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsSaveCmp)
+TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2383,7 +2382,7 @@ TEST_F(IodeCAPITest, Tests_B_WsSaveCmp)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsExport)
+TEST_F(LegacyAPITest, Tests_B_WsExport)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2417,7 +2416,7 @@ TEST_F(IodeCAPITest, Tests_B_WsExport)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsClear)
+TEST_F(LegacyAPITest, Tests_B_WsClear)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2449,7 +2448,7 @@ TEST_F(IodeCAPITest, Tests_B_WsClear)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsImport)
+TEST_F(LegacyAPITest, Tests_B_WsImport)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2482,7 +2481,7 @@ TEST_F(IodeCAPITest, Tests_B_WsImport)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsSample)
+TEST_F(LegacyAPITest, Tests_B_WsSample)
 {
     int     rc;
     Sample  *smpl;
@@ -2515,7 +2514,7 @@ TEST_F(IodeCAPITest, Tests_B_WsSample)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsClearAll)
+TEST_F(LegacyAPITest, Tests_B_WsClearAll)
 {
     int rc;
 
@@ -2551,7 +2550,7 @@ TEST_F(IodeCAPITest, Tests_B_WsClearAll)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsDescr)
+TEST_F(LegacyAPITest, Tests_B_WsDescr)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2583,7 +2582,7 @@ TEST_F(IodeCAPITest, Tests_B_WsDescr)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsName)
+TEST_F(LegacyAPITest, Tests_B_WsName)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2613,7 +2612,7 @@ TEST_F(IodeCAPITest, Tests_B_WsName)
     U_test_reset_kmsg_msgs();
 }
 
-TEST_F(IodeCAPITest, Tests_B_WsCopy)
+TEST_F(LegacyAPITest, Tests_B_WsCopy)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2647,7 +2646,7 @@ TEST_F(IodeCAPITest, Tests_B_WsCopy)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsMerge)
+TEST_F(LegacyAPITest, Tests_B_WsMerge)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2679,7 +2678,7 @@ TEST_F(IodeCAPITest, Tests_B_WsMerge)
     U_test_reset_kmsg_msgs();
 }
 
-TEST_F(IodeCAPITest, Tests_B_WsExtrapolate)
+TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
 {
 // disable this test function in case AddressSanitizer is activated because 
 // it crashes on Windows Server 2022 (Github container)
@@ -2716,7 +2715,7 @@ TEST_F(IodeCAPITest, Tests_B_WsExtrapolate)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_WsAggregate)
+TEST_F(LegacyAPITest, Tests_B_WsAggregate)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2745,7 +2744,7 @@ TEST_F(IodeCAPITest, Tests_B_WsAggregate)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_StatUnitRoot)
+TEST_F(LegacyAPITest, Tests_B_StatUnitRoot)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2777,7 +2776,7 @@ TEST_F(IodeCAPITest, Tests_B_StatUnitRoot)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_Csv)
+TEST_F(LegacyAPITest, Tests_B_Csv)
 {
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
@@ -2808,7 +2807,7 @@ TEST_F(IodeCAPITest, Tests_B_Csv)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_REP_LINE)
+TEST_F(LegacyAPITest, Tests_B_REP_LINE)
 {
     int     rc;
     char    fullfilename[256], cmd[1024];
@@ -2836,7 +2835,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
+TEST_F(LegacyAPITest, Tests_B_REP_ENGINE)
 {
     int     rc;
     char    cmd[1024];
@@ -2853,7 +2852,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_REP_FNS)
+TEST_F(LegacyAPITest, Tests_B_REP_FNS)
 {
     int     rc;
     char    cmd[1024];
@@ -2870,7 +2869,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_REP_PROC)
+TEST_F(LegacyAPITest, Tests_B_REP_PROC)
 {
     int     rc;
     char    cmd[1024];
@@ -2886,7 +2885,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     compare_files(output_test_dir, "rep_proc.a2m", output_test_dir, "rep_proc.ref.a2m");
 }
 
-TEST_F(IodeCAPITest, Tests_B_PRINT_Table_DEF)
+TEST_F(LegacyAPITest, Tests_B_PRINT_Table_DEF)
 {
     char in_filename[256];
     sprintf(in_filename,  "%s%s", input_test_dir, "fun");
@@ -2922,7 +2921,7 @@ TEST_F(IodeCAPITest, Tests_B_PRINT_Table_DEF)
 }
 
 
-TEST_F(IodeCAPITest, Tests_RAS_EXECUTE)
+TEST_F(LegacyAPITest, Tests_RAS_EXECUTE)
 {
     char* pattern = "xy";
     char* xdim = "$X";

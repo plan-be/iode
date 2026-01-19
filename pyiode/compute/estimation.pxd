@@ -11,14 +11,14 @@ from libcpp.set cimport set
 from pyiode.common cimport IodeEquationMethod, IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
-from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as KDBEquations
+from pyiode.iode_database.cpp_api_database cimport KDBScalars as KDBScalars
 
 
 cdef extern from "cpp_api/compute/estimation.h":
     string dynamic_adjustment(const IodeAdjustmentMethod method, const string& eqs, 
                               const string& c1, const string& c2) except +
-    CKDBScalars* dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
+    KDBScalars* dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
 
 
     # Declaration of the CorrelationMatrix class
@@ -54,10 +54,10 @@ cdef extern from "cpp_api/compute/estimation.h":
         void set_instruments(const string& instruments) except +
 
         # Public methods
-        CKDBScalars* get_scalars()
+        KDBScalars* get_scalars()
         void update_scalars() except +
 
-        CKDBEquations* get_equations()
+        KDBEquations* get_equations()
         set[string] get_list_equations()
         void update_current_equation(const string& lec, const string& comment) except +
 

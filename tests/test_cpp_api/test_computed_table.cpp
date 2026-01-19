@@ -9,17 +9,18 @@ protected:
 
     void SetUp() override
     {
-        Tables.load(input_test_dir + "fun.at");
+        global_ws_tbl->load(input_test_dir + "fun.at");
 
         var_file = input_test_dir + "fun.av";
-        // C: -> c:
-        var_file[0] = tolower(var_file[0]);
-        Variables.load(var_file);
+        global_ws_var->load(var_file);
 
-        ref_file = input_test_dir + "ref2.av";
         // slightly modify variables
+        std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
+        ref_file = input_test_dir + "ref2.av";
+        global_ws_var->load(input_test_dir + "fun.av");
+        KDBVariables* kdb_ref = new KDBVariables(global_ws_var.get(), pattern, true);
+        
         double value;
-        KDBVariables* kdb_ref = Variables.subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
         for(int t=0; t < kdb_ref->get_nb_periods(); t++)
         {
             for(const std::string& name: kdb_ref->get_names())
@@ -30,8 +31,6 @@ protected:
         }
         kdb_ref->save(ref_file);
 
-        // C: -> c:
-        ref_file[0] = tolower(ref_file[0]);
         load_reference_kdb(2, VARIABLES, ref_file);
     }
 
@@ -48,7 +47,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     std::string sample;
     std::vector<double> values;
     
-    Table* ref_table = Tables.get(table_name);
+    Table* ref_table = global_ws_tbl->get(table_name);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -392,10 +391,10 @@ TEST_F(ComputedTableTest, EditTable)
     // -> simple time series (current workspace) - 10 observations
     //    gsample = "2000:10";
     //    sample = "2000Y1:2009Y1";
-    double Q_F = Variables.get_var("Q_F", "2005Y1");
-    double Q_I = Variables.get_var("Q_I", "2005Y1");
-    double KNFF = Variables.get_var("KNFF", "2005Y1");
-    double KNFF_1 = Variables.get_var("KNFF", "2004Y1");
+    double Q_F = global_ws_var->get_var("Q_F", "2005Y1");
+    double Q_I = global_ws_var->get_var("Q_I", "2005Y1");
+    double KNFF = global_ws_var->get_var("KNFF", "2005Y1");
+    double KNFF_1 = global_ws_var->get_var("KNFF", "2004Y1");
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
     EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
@@ -413,7 +412,7 @@ TEST_F(ComputedTableTest, EditTable)
 
     // propagate
     Q_F *= 0.9;
-    value = round(Variables.get_var("Q_F", "2005Y1") * 1e4) / 1e4;
+    value = round(global_ws_var->get_var("Q_F", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(Q_F * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
@@ -430,7 +429,7 @@ TEST_F(ComputedTableTest, EditTable)
 
     // propagate
     KNFF *= 0.9;
-    value = round(Variables.get_var("KNFF", "2005Y1") * 1e4) / 1e4;
+    value = round(global_ws_var->get_var("KNFF", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(KNFF * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
@@ -525,7 +524,7 @@ TEST_F(ComputedTableTest, PrintToFile)
                                           "Productivité totale des facteurs" };
     std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
 
-    Table* ref_table = Tables.get(table_name); 
+    Table* ref_table = global_ws_tbl->get(table_name); 
 
     int i = 0;
     TableLine* line;
@@ -660,7 +659,9 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // ---- binary table files ----
 
-    KDBTables* bin_kdb_tables = new KDBTables(false, input_test_dir + "fun.tbl");
+    KDBTables* bin_kdb_tables = new KDBTables(false);
+    bin_kdb_tables->load(input_test_dir + "fun.tbl");
+    
     Table* bin_ref_table = bin_kdb_tables->get(table_name);
 
     TableCell* bin_cell;

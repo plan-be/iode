@@ -12,8 +12,8 @@
  *  List of functions 
  *  -----------------
  *  
- *   int KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
- *   int K_simul_SCC(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
+ *   int KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
+ *   int K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *
  */
 #include "api/constants.h"
@@ -37,7 +37,7 @@
  *  @return     int             0 if ok, -1 if dbe is empty    
  *  
  */
-int CSimulation::KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* inter, char* post)
+int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)
 {
     int opasses = KSIM_PASSES;
     int osort = KSIM_SORT;
@@ -50,7 +50,7 @@ int CSimulation::KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* 
     }
 
     KSIM_DBE = dbe;
-    KSIM_DBV = (CKDBVariables*) dbe;    // Pour reconstruire les listes dans K_lstorder via KSIM_NAME
+    KSIM_DBV = (KDBVariables*) dbe;    // Pour reconstruire les listes dans K_lstorder via KSIM_NAME
     KSIM_MAXDEPTH = dbe->size();
     KSIM_PASSES = tris;
 
@@ -108,7 +108,7 @@ int CSimulation::KE_ModelCalcSCC(CKDBEquations* dbe, int tris, char* pre, char* 
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::K_simul_SCC_init(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl)
+int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -198,7 +198,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::K_simul_SCC(CKDBEquations* dbe, CKDBVariables* dbv, CKDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 

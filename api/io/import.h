@@ -305,8 +305,8 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-CKDBVariables* IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
-CKDBComments* IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
+KDBVariables* IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
+KDBComments* IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
 int IMP_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
 
 /* k_rules.c */

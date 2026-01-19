@@ -5,7 +5,7 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBLists as CppKDBLists
-from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
+from pyiode.iode_database.cpp_api_database cimport global_ws_lst as cpp_global_lists
 
 import pandas as pd
 
@@ -16,8 +16,8 @@ cdef class Lists(CythonIodeDatabase):
 
     def __cinit__(self, filepath: str=None) -> Lists:
         self.ptr_owner = False
-        self.database_ptr = &cpp_global_lists
-        self.abstract_db_ptr = &cpp_global_lists
+        self.database_ptr = cpp_global_lists.get()
+        self.abstract_db_ptr = cpp_global_lists.get()
 
     def __dealloc__(self):
         if self.ptr_owner and self.database_ptr is not NULL:
@@ -34,17 +34,19 @@ cdef class Lists(CythonIodeDatabase):
             wrapper.abstract_db_ptr = database_ptr
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = &cpp_global_lists
-            wrapper.abstract_db_ptr = &cpp_global_lists
+            wrapper.database_ptr = cpp_global_lists.get()
+            wrapper.abstract_db_ptr = cpp_global_lists.get()
         return wrapper
 
     def _load(self, filepath: str):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, cython_instance: Lists, pattern: str, copy: bool) -> Lists:
-        cython_instance.database_ptr = cython_instance.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return cython_instance
+    def initialize_subset(self, subset: Lists, pattern: str, copy: bool) -> Lists:
+        subset.database_ptr = new CppKDBLists(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.abstract_db_ptr = subset.database_ptr
+        subset.ptr_owner = True
+        return subset
 
     def _get_object(self, name: str) -> str:
         name = name.strip()
