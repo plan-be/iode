@@ -5,7 +5,6 @@
 #include <cstring>      // for std strncpy
 #include <iostream>
 
-
 // set SCR4 flags to help IntelliSense (VS Code) 
 // to find the right functions and variables definitions
 #ifndef REALD
@@ -68,6 +67,8 @@
 #include <stdexcept>
 #include <functional>       // for std::hash
 #include <algorithm>        // for std::min, std::max
+
+#include "api/utils/logging.h"
 
 
 /* ALLOCS DOC 28/8/2012 */
