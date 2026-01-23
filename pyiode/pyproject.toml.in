@@ -1,7 +1,7 @@
 # configuration file for the iode python package
 
 [build-system]
-requires = [ "scikit-build-core>=0.10", "numpy", "pandas", "cython>=3.0", "mypy>=1.10" ]
+requires = [ "scikit-build-core>=0.10", "numpy>=2.0", "pandas<3.0", "cython==3.1.4", "mypy>=1.10" ]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -33,7 +33,7 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy", "pandas", "matplotlib" ]
+dependencies = [ "numpy>=2.0", "pandas<3.0", "matplotlib" ]
 
 [project.scripts]
 iodecmd = "iode.cli:main"
