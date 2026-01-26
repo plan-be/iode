@@ -14,6 +14,8 @@ Improvements
 Fixed Bugs 
 ----------
 
+- IODE COMMAND: Fixed the IODE command `$PrintTbl` not printing IODE tables to files 
+  (closes :issue:`1127`).
 - GUI: Fixed a bug in the Equation Editor where saving a new equation did always save it 
   as `eq_name := 0` instead of the actual LEC entered by the user (closes :issue:`1105`).
 - GUI: Fixed a bug in the 'filter' field appending the name of a newly created equation 
