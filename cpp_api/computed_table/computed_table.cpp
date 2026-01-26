@@ -359,8 +359,12 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
     {
         char upper_format = toupper(format);
         if (ALLOWED_FORMATS.find(upper_format) == std::string::npos)
-            throw std::invalid_argument(std::string("Cannot initialize printing. Invalid format.\n") + 
-                "Possible formats are: " + ALLOWED_FORMATS);
+        {
+            std::string error_msg = "Cannot initialize printing. Invalid format ";
+            error_msg += "'" + std::string(1, format) + "'.\n";
+            error_msg += "Allowed formats are " + ALLOWED_FORMATS;
+            throw std::invalid_argument(error_msg);
+        }
         std::string arg = destination_file + " " + upper_format;
         res = B_PrintDest(arg.data());
     }   
