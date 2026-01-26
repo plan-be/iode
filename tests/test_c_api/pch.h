@@ -88,16 +88,22 @@ protected:
 		if(!file2.is_open())
 			throw std::runtime_error("Could not open the file " + filepath2);
 
+		std::cout << "\nComparing files:\n - " << filepath1 << "\n - " << filepath2 << std::endl;
+
 		// count number of lines
 		std::string line;
 		int nb_lines_file1 = 0;
 		while (std::getline(file1, line))
 			nb_lines_file1++;
+
+		std::cout << "File " << filepath1 << " has " << nb_lines_file1 << " lines" <<  std::endl;
 		
 		int nb_lines_file2 = 0;
 		while (std::getline(file2, line))
 			nb_lines_file2++;
 
+		std::cout << "File " << filepath2 << " has " << nb_lines_file2 << " lines" <<  std::endl;
+	
 		std::ifstream longest_file;
 		std::ifstream smallest_file;
 
