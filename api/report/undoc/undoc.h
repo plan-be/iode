@@ -96,10 +96,10 @@ int B_ScrollVTN(char* arg, int unused=-1);
 int B_WsImportEviews(char* arg, int unused=-1);
 
 /* b_pdest.c */
-int B_PrintDestFile(char *arg, int newf);
+int B_PrintDestFile(char *arg);
 int B_PrintDest(char* file, int unused=-1);
 int B_PrintDestNew(char* file, int unused=-1);
-int B_PrintDestExt(char* file, int newf, int type);
+int B_PrintDestExt(char* file, int type);
 int B_PrintNbDec(char* nbdec, int unused=-1);
 int B_PrintLang(char* lang, int unused=-1);
 int B_PrintMulti(char* multi, int unused=-1);

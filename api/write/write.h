@@ -30,7 +30,7 @@ inline int     W_rtfhelp = 0;                       // RTF only: generate RTF ou
 inline int     W_htmlhelp = 0;                      // RTF only: generate HTML output for the Windows HEML help format (.chm).
 
 /* w_wrt.c (MSC) */
-int W_dest(char *filename,int type);
+int W_dest(char *filename, int type);
 // int W_InitParms();
 // int W_open();
 int W_close();
