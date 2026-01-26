@@ -146,12 +146,14 @@ static A2MFILE* W_af;                           // Current A2M memory stream
 
 int W_dest(char *filename, int type)
 {
-    char    ext[4];
+    char ext[4];
 
     ext[0] = 0;
     W_close();
-    if(type > 1) {
-        switch(type) {
+    if(type > 1) 
+    {
+        switch(type) 
+        {
         case A2M_DESTA2M :
             strcpy(ext, "a2m");
             break;
@@ -177,13 +179,15 @@ int W_dest(char *filename, int type)
 #endif
         }
 
-        SCR_strlcpy((unsigned char*) W_filename, (unsigned char*) filename, K_MAX_FILE);  /* JMP 6-10-2015 */
+        SCR_strlcpy((unsigned char*) W_filename, (unsigned char*) filename, K_MAX_FILE);
         SCR_strip((unsigned char*)W_filename);
-        SCR_lower((unsigned char*)W_filename);                  /* JMP 11-07-96 */
+        SCR_lower((unsigned char*)W_filename);
 
-        if(!U_is_in('.', W_filename)) SCR_change_ext(W_filename, W_filename, ext); /* JMP 14-12-98 */
+        if(!U_is_in('.', W_filename)) 
+            SCR_change_ext(W_filename, W_filename, ext);
     }
-    else W_filename[0] = 0;
+    else 
+        W_filename[0] = 0;
 
     W_type = type;
     W_InitParms();
@@ -201,8 +205,9 @@ int W_dest(char *filename, int type)
 
 static int W_InitParms()
 {
-    B_A2mGetGnlParms(); /* JMP 19-02-98 */
-    switch(W_type) {
+    B_A2mGetGnlParms();
+    switch(W_type) 
+    {
     case W_GDI  :
         B_A2mGetGdiParms();
         break;
@@ -211,15 +216,15 @@ static int W_InitParms()
         break;
     case W_RTF  :
         B_A2mGetRtfParms();
-        SCR_free(A2M_PGHEAD);   /* JMP 30-03-98 */
-        SCR_free(A2M_PGFOOT);   /* JMP 30-03-98 */
-        A2M_MAXPARLEVEL = 3;    /* JMP 04-09-11 */
-        A2M_PGHEAD = A2M_PGFOOT = 0;  /* JMP 30-03-98 */
+        SCR_free(A2M_PGHEAD);
+        SCR_free(A2M_PGFOOT);
+        A2M_MAXPARLEVEL = 3;
+        A2M_PGHEAD = A2M_PGFOOT = 0;
         break;
     case W_HTML :
         B_A2mGetHtmlParms();
         B_A2mGetGIFParms();
-        break; /* JMP 26-08-98 */
+        break;
     case W_MIF  :
         B_A2mGetMifParms();
         break;
@@ -228,14 +233,16 @@ static int W_InitParms()
         break;
 #ifndef __GNUC__
     case W_DISP :
-        B_A2mGetGdiParms();   /* JMP 19-02-98 */
-        if(WscrGetOSVersion(0L) == 2) { /* JMP 17-11-98 */
-            A2M_GWIDTH = 7.5;   /* JMP 17-11-98 */
-            A2M_GHEIGHT = 5.0;  /* JMP 17-11-98 */
+        B_A2mGetGdiParms();
+        if(WscrGetOSVersion(0L) == 2) 
+        {
+            A2M_GWIDTH = 7.5;
+            A2M_GHEIGHT = 5.0;
         }
-        else {
-            A2M_GWIDTH = 12.05;     /* JMP 19-02-98 */
-            A2M_GHEIGHT = 8.35;    /* JMP 19-02-98 */
+        else 
+        {
+            A2M_GWIDTH = 12.05;
+            A2M_GHEIGHT = 8.35;
         }
         SCR_free(A2M_PGHEAD);
         SCR_free(A2M_PGFOOT);
@@ -266,12 +273,16 @@ static int W_InitParms()
 
 static int W_open()
 {
-    int     ask;  /* JMP 06-02-98 (parm for A2mMemBegin) */
+    int ask;
 
-    if(W_af) return(0);
-    if(W_filename[0] == 0 && W_type > 1 && W_type < W_DISP) return(1);
+    if(W_af) 
+        return(0);
+    
+    if(W_filename[0] == 0 && W_type > 1 && W_type < W_DISP) 
+        return(1);
 
-    switch(W_type) {
+    switch(W_type) 
+    {
     case A2M_DESTGDIPRT :
         ask = W_gdiask;
         break;
@@ -289,17 +300,21 @@ static int W_open()
         break;
     }
 
-    if(W_type == W_GDI) {
+    if(W_type == W_GDI) 
+    {
         W_SavePrinterSettings();
         W_SetPrinterSettings();
     }
 
     W_af = A2mMemBegin(W_type, (unsigned char*) W_filename, ask);  /* JMP 06-02-98 */
-    if(W_af == NULL) {
-        if(W_type == W_GDI) W_ResetPrinterSettings();
+    if(W_af == NULL) 
+    {
+        if(W_type == W_GDI) 
+            W_ResetPrinterSettings();
         W_cancel = 1;
         return(-1);
     }
+
     return(0);
 }
 
@@ -314,13 +329,17 @@ static int W_open()
 
 int W_close()
 {
-    if(W_af && W_cont) {
+    if(W_af && W_cont) 
+    {
         A2mMemEnd(W_af);
         W_af = 0;
         W_cont = 0;
     }
+    
     W_cancel = 0;
-    if(W_type == W_GDI) W_ResetPrinterSettings();
+    if(W_type == W_GDI) 
+        W_ResetPrinterSettings();
+    
     return(0);
 }
 
@@ -335,7 +354,9 @@ int W_close()
 
 int W_flush()
 {
-    if(W_af == 0) return(-1);
+    if(W_af == 0) 
+        return(-1);
+    
     A2mMemFlush(W_af);
     return(0);
 }
@@ -359,22 +380,30 @@ int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)
     char    buf[12400], str1[5], str2[5];
     int     rc = 0;
 
-    if(W_cancel) goto fin;
+    if(W_cancel) 
+        goto fin;
+    
 #ifdef _MSC_VER
     vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, args);
 #else
     vsnprintf_s(buf, sizeof(buf) - 1, fmt, args);
 #endif
 
-    if(W_cont == 0 && W_isempty(buf)) goto fin;
-    if(W_open()) {
+    if(W_cont == 0 && W_isempty(buf)) 
+        goto fin;
+    
+    if(W_open()) 
+    {
         rc = -1;
         goto fin;
     }
 
     W_cont = 1;
-    if(dup) SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "\\\\"); // TODO: check buf size !!!
-    if(ch1 && ch2) {
+    if(dup) 
+        SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "\\\\"); // TODO: check buf size !!!
+    
+    if(ch1 && ch2) 
+    {
        str1[0] = ch1;
        str2[0] = ch2;
        str1[1] = str2[1] = 0;
@@ -400,7 +429,7 @@ fin:
 int W_printf(char* fmt, ...)
 {
     va_list myargs;
-    int     rc;
+    int rc;
 
     va_start(myargs, fmt);
     rc = W_printfEx(0, 0, 0, fmt, myargs);
@@ -421,7 +450,7 @@ int W_printf(char* fmt, ...)
 int W_printfDbl(char* fmt, ...)
 {
     va_list myargs;
-    int     rc;
+    int rc;
 
     va_start(myargs, fmt);
     rc = W_printfEx(1, 0, 0, fmt, myargs);
@@ -442,7 +471,7 @@ int W_printfDbl(char* fmt, ...)
 int W_printfRepl(char* fmt, ...)
 {
     va_list myargs;
-    int     rc;
+    int rc;
 
     va_start(myargs, fmt);
     rc = W_printfEx(0, '&', A2M_SEPCH, fmt, myargs);
@@ -463,7 +492,7 @@ int W_printfRepl(char* fmt, ...)
 int W_printfReplEsc(char* fmt, ...)
 {
     va_list myargs;
-    int     rc;
+    int rc;
 
     va_start(myargs, fmt);
     rc = W_printfEx(0, '~', A2M_ESCCH, fmt, myargs);
@@ -497,7 +526,9 @@ static int W_isempty(char* buf)
 {
     int i;
 
-    for(i = 0; buf[i]; i++) if(!U_is_in(buf[i], " \t\n\r")) return(0);
+    for(i = 0; buf[i]; i++) 
+        if(!U_is_in(buf[i], " \t\n\r")) 
+            return(0);
 
     return(1);
 }
@@ -512,9 +543,14 @@ static int W_isempty(char* buf)
  */
 int W_record(char *str)
 {
-    if(W_cancel) return(0);
-    if(W_cont == 0 && W_isempty(str)) return(0);
-    if(W_open()) return(-1);
+    if(W_cancel) 
+        return(0);
+    
+    if(W_cont == 0 && W_isempty(str)) 
+        return(0);
+    
+    if(W_open()) 
+        return(-1);
 
     W_cont = 1;
     A2mMemRecord(W_af, (unsigned char*) str);
@@ -585,13 +621,16 @@ int W_EndDisplay(char *title, int x, int y, int w, int h)
     int     wmf = (W_type == A2M_DESTGDIWMF) ? 1 : 0;
 
     W_close();
-    if(W_type == A2M_DESTTCHRT) return(0); // TeeChart 
+    if(W_type == A2M_DESTTCHRT) 
+        return(0); // TeeChart 
     
-    // if(W_GetTempPath(80, tpath) == 0) tpath[0] = 0; // JMP 04/05/2022
+    // if(W_GetTempPath(80, tpath) == 0) tpath[0] = 0;
     // Normally never reached because W_DISP 
-    tpath[0]=0; // TODO:Check temp path
-    if(W_type == A2M_DESTGDIEMF) sprintf(buf, "%siode%ld.emf", tpath, W_emfnb);
-    else                         sprintf(buf, "%siode%ld.wmf", tpath, W_emfnb);
+    tpath[0] = 0; // TODO:Check temp path
+    if(W_type == A2M_DESTGDIEMF) 
+        sprintf(buf, "%siode%ld.emf", tpath, W_emfnb);
+    else                         
+        sprintf(buf, "%siode%ld.wmf", tpath, W_emfnb);
     W_emfnb++;
 #if !defined(UNIX) && !defined(NOEMF)
 #ifdef SCRW32
@@ -626,12 +665,11 @@ static char W_DftPrinterName[80];              // Default printer name
 static int W_SavePrinterSettings()
 {
 #ifndef __GNUC__
-    if(WscrGetDefaultPrinter(W_DftPrinterName) < 0) {
+    if(WscrGetDefaultPrinter(W_DftPrinterName) < 0) 
         W_DftPrinterName[0] = 0;
-    }
 
-    // W_DftPrinterOrient = WscrGetPrinterOrientation(W_DftPrinterName); // JMP 22/8/2016
-    // W_DftPrinterDuplex = WscrGetPrinterDuplex(W_DftPrinterName); // JMP 22/8/2016
+    // W_DftPrinterOrient = WscrGetPrinterOrientation(W_DftPrinterName);
+    // W_DftPrinterDuplex = WscrGetPrinterDuplex(W_DftPrinterName);
     return(0);
 #else
     return(-1);
@@ -651,9 +689,12 @@ static int W_ResetPrinterSettings()
 #ifndef __GNUC__
     char    buf[80];
 
-    if(WscrGetDefaultPrinter(buf) < 0) return(-1);
+    if(WscrGetDefaultPrinter(buf) < 0) 
+        return(-1);
 
-    if(W_DftPrinterName[0] == 0) return(0);
+    if(W_DftPrinterName[0] == 0) 
+        return(0);
+    
     if(strcmp(W_DftPrinterName, buf))
         WscrSetDefaultPrinter(W_DftPrinterName);
 
@@ -680,11 +721,14 @@ static int W_SetPrinterSettings()
 #ifndef __GNUC__
     char    buf[80];
 
-    if(W_gdiprinter[0]) WscrSetDefaultPrinter(W_gdiprinter);
+    if(W_gdiprinter[0]) 
+        WscrSetDefaultPrinter(W_gdiprinter);
 
-    if(WscrGetDefaultPrinter(buf) < 0) return(-1);
-    // WscrSetPrinterOrientation(buf, W_gdiorient); // JMP 22/8/2016
-    // WscrSetPrinterDuplex(buf, W_gdiduplex); // JMP 22/8/2016
+    if(WscrGetDefaultPrinter(buf) < 0) 
+        return(-1);
+    
+    // WscrSetPrinterOrientation(buf, W_gdiorient); 
+    // WscrSetPrinterDuplex(buf, W_gdiduplex);
     return(0);
 #else
     return(-1);
