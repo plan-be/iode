@@ -1143,6 +1143,55 @@ def test_simulation(capsys):
     assert captured.out == ""
 
 
+# REPORT
+# ------
+
+def test_execute_command(tmp_path):
+    comments.clear()
+    lists.clear()
+    tables.clear()
+    variables.clear()
+
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    generalized_sample = '1990Y1:2'
+    nb_dec = 2
+
+    subset_tbl = tables["A*"]
+    for name in subset_tbl:
+        # ---- Python syntax ----
+        filename: str = f"{name.lower()}.csv"
+        filepath: Path = tmp_path / filename
+        if filepath.exists():
+            filepath.unlink()
+        tbl = subset_tbl[name]
+        computed_tbl = tbl.compute(generalized_sample, nb_decimals=nb_dec)
+        computed_tbl.print_to_file(filepath, format="CSV")
+        assert filepath.exists()
+        python_file_content = filepath.read_text()
+
+        # ---- IODE report syntax ----
+        filename = "report_" + filename
+        filepath = tmp_path / filename
+        if filepath.exists():
+            filepath.unlink()
+        execute_command(f'$PrintDest {filepath} CSV')
+        execute_command(f'$PrintNbdec {nb_dec}')
+        execute_command(f'$PrintTbl {generalized_sample} {name}')
+        # flush and close CSV file
+        execute_command(f'$PrintDest')
+        # check that file was created
+        assert filepath.exists()
+        # get content
+        iode_report_file_content = filepath.read_text()
+
+        # compare content
+        assert python_file_content == iode_report_file_content
+
+
 # WRITE
 # -----
 
