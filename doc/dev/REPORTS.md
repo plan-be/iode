@@ -876,8 +876,8 @@ Functions (and their subfunctions) called by the report engine to set up printin
 
 |Syntax|Description or equivalent in Reports||||||||
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|
-|`int B_PrintDestExt(char* file, int newf, int type)`|Define the printing destination.||||||||
-|`int B_PrintDestFile(char *arg, int newf)`|Define the output file for the following printouts.||||||||
+|`int B_PrintDestExt(char* file, int type)`|Define the printing destination.||||||||
+|`int B_PrintDestFile(char *arg)`|Define the output file for the following printouts.||||||||
 |`int B_PrintDest(char *file)`|$PrintDest \[nom\_fichier\] \[format\]||||||||
 |`int B_PrintDestNew(char* file, int unused)`|$PrintDestNew \[nom\_fichier\] \[format\]||||||||
 |`int B_PrintNbDec(char* nbdec, int unused)`|$PrintNbDec nb||||||||

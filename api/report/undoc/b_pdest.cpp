@@ -11,9 +11,9 @@
  *  
  *  List of functions
  *  -----------------
- *      int B_PrintDestExt(char* file, int newf, int type) | Define the printing destination.
- *      int B_PrintDestFile(char *arg, int newf)           | Define the output file for the following printouts.
- *      int B_PrintDest(char *file)                        | $PrintDest [nom_fichier] [format]
+ *      int B_PrintDestExt(char* file, int type)                       | Define the printing destination.
+ *      int B_PrintDestFile(char *arg)                                 | Define the output file for the following printouts.
+ *      int B_PrintDest(char *file)                                    | $PrintDest [nom_fichier] [format]
  *      int B_PrintDestNew(char* file, int unused)                     | $PrintDestNew [nom_fichier] [format]
  *      int B_PrintNbDec(char* nbdec, int unused)                      | $PrintNbDec nb
  *      int B_PrintLang(char* lang, int unused)                        | $PrintLang {English | French | Dutch}
@@ -54,13 +54,13 @@
  *      int B_PrintGIFFont(char* arg, int unused)                      | $PrintGIFFont FontNb (between 0 and 5)
  *      int B_PrintHtmlStrip(char* arg, int unused)                    | $PrintHtmlStrip [YES|No]
  *      int B_PrintHtmlStyle(char* arg, int unused)                    | $PrintHtmlStyle filename
- *      int B_A2mToAll(char* arg, int type)                | Convert an A2M file to another format.
+ *      int B_A2mToAll(char* arg, int type)                            | Convert an A2M file to another format.
  *      int B_A2mToPrinter(char* arg, int unused)                      | $A2mToPrinter file.a2m
  *      int B_A2mToHtml(char* arg, int unused)                         | $A2mToHtml filein fileout
  *      int B_A2mToRtf(char* arg, int unused)                          | $A2mToRtf filein fileout
  *      int B_A2mToMif(char* arg, int unused)                          | $A2mToMif filein fileout
  *      int B_A2mToCsv(char* arg, int unused)                          | $A2mToCsv filein fileout
- *      int B_A2mSetCol(int *dest, int col)                | Extracts a color definition from B_GIFCOLS and saves it in dest[3].
+ *      int B_A2mSetCol(int *dest, int col)                            | Extracts a color definition from B_GIFCOLS and saves it in dest[3].
  *      int B_PrintHtmlTableClass(char *table_class, int unused)       | $PrintHtmlTableClass class_name
  *      int B_PrintHtmlTRClass(char *tr_class, int unused)             | $PrintHtmlTRClass class_name
  *      int B_PrintHtmlTHClass(char *th_class, int unused)             | $PrintHtmlTHClass class_name
@@ -88,15 +88,13 @@ int A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
  *  @see W_dest().
  *  
  *  @param [in] file char*  output filename
- *  @param [in] newf int    unused
  *  @param [in] type int    output type (W_HTML, W_MIF, W_RTF...)
  *  @return          int    0 always
  */
-int B_PrintDestExt(char* file, int newf, int type)           
+int B_PrintDestExt(char* file, int type)           
 {
-//    char    buf[K_MAX_FILE + 1];
-//
-//    strcpy(buf, W_filename);
+    // If a printing session is currently open, that session is first closed 
+    // by calling W_close() in W_dest()
     W_dest(file, type);
     return(0);
 }
@@ -104,27 +102,27 @@ int B_PrintDestExt(char* file, int newf, int type)
 /**
  *  Define the output file for the following printouts.
  *  
- *  TODO: remove the newf parameter ?
- *  
  *  @param [in] arg  char*  filename followed by destination type (ex "testfile H") or NULL to print on the printer
- *  @param [in] newf int    no used
  *  @return description     return code of B_PrintDestExt()
  */
-int B_PrintDestFile(char *arg, int newf)
+int B_PrintDestFile(char *arg)
 {
     char    **args = NULL;
     int     nb_args, type, rc;
 
-    KT_CUR_TOPIC = 0; /* JMP 06-01-02 */
+    KT_CUR_TOPIC = 0;
     SCR_strip((unsigned char*) arg);
-    if(arg != NULL && arg[0] != 0) {
+    if(arg != NULL && arg[0] != 0) 
+    {
         args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
         nb_args = SCR_tbl_size((unsigned char**) args);
-        if(nb_args > 1) {
-            switch(args[1][0]) {
+        if(nb_args > 1) 
+        {
+            switch(args[1][0]) 
+            {
                 case 'h':
                 case 'H':
-                    A2M_HTML_RELSTYLE = "iodestyle.css"; /* JMP 05-02-2004 */
+                    A2M_HTML_RELSTYLE = "iodestyle.css";
                     type = W_HTML;
                     break;
                 case 'm':
@@ -145,23 +143,26 @@ int B_PrintDestFile(char *arg, int newf)
                     break;
                 default :
                     type = W_A2M;
-                    break; /* A2M */
+                    break;
             }
         }
-        else type = W_A2M;
-        rc = B_PrintDestExt(args[0], newf, type);
+        else 
+            type = W_A2M;
+        
+        rc = B_PrintDestExt(args[0], type);
         A_free((unsigned char**) args);
     }
-    else rc = B_PrintDestExt("", newf, W_GDI);
+    else 
+        rc = B_PrintDestExt("", W_GDI);
 
-    return(rc);
+    return rc;
 }
 
 //  $PrintDest [nom_fichier] [format]
 //  where format = A2M, MIF, HTML, RTF or CSV
 int B_PrintDest(char *file, int unused)
 {
-    return(B_PrintDestFile(file, 0));
+    return(B_PrintDestFile(file));
 }
 
 
@@ -169,7 +170,7 @@ int B_PrintDest(char *file, int unused)
 //  where format = A2M, MIF, HTML, RTF or CSV 
 int B_PrintDestNew(char* file, int unused)
 {
-    return(B_PrintDestFile(file, 1));
+    return(B_PrintDestFile(file));
 }
 
 
