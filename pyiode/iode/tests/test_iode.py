@@ -341,6 +341,35 @@ def test_table_getitem_returned_type():
     assert isinstance(table[4], TableLine)
     assert isinstance(table[4][0], TableCell)
 
+def test_computed_table_a2m_format(tmp_path):
+    comments.clear()
+    lists.clear()
+    tables.clear()
+    variables.clear()
+
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    generalized_sample = '1990Y1:2'
+    nb_dec = 2
+
+    subset_tbl = tables["A*"]
+    # test printing to A2M format
+    for name in subset_tbl:
+        filename: str = f"{name.lower()}.a2m"
+        filepath: Path = tmp_path / filename
+        if filepath.exists():
+            filepath.unlink()
+        tbl = subset_tbl[name]
+        computed_tbl = tbl.compute(generalized_sample, nb_decimals=nb_dec)
+        computed_tbl.print_to_file(filepath)
+        assert filepath.exists()
+        python_file_content = filepath.read_text()
+        assert python_file_content != ""
+
+
 # Variables
 # ---------
 
