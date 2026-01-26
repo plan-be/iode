@@ -317,7 +317,6 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
                 ODE_VIEW = 1;
             else 
                 ODE_VIEW = 2;
-            //strcpy(ODE_SMPL, smpl);
             SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
             ODE_scroll(global_ws_tbl.get(), ((char**) args) + 1);
         }
@@ -327,7 +326,6 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 
     SCR_free(smpl);
 
-    /*    W_close();*/
     W_flush();
     B_ViewTblEnd();
 

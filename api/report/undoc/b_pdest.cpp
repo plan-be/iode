@@ -93,8 +93,6 @@ int A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
  */
 int B_PrintDestExt(char* file, int type)           
 {
-    // If a printing session is currently open, that session is first closed 
-    // by calling W_close() in W_dest()
     W_dest(file, type);
     return(0);
 }
@@ -109,6 +107,10 @@ int B_PrintDestFile(char *arg)
 {
     char    **args = NULL;
     int     nb_args, type, rc;
+
+    // If a printing session is currently open, that session is first flushed and closed 
+    W_flush();
+    W_close();
 
     KT_CUR_TOPIC = 0;
     SCR_strip((unsigned char*) arg);
