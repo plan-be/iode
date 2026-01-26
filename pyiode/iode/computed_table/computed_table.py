@@ -932,13 +932,13 @@ class ComputedTable:
         r"""
         Print the present computed table to a file.
 
-        Argument `format` must be in the list:
+        If provided, the argument `format` must be in the list:
         - 'H' (HTML file)
         - 'M' (MIF file)
         - 'R' (RTF file)
         - 'C' (CSV file)
 
-        If argument `format` is null (default), the A2M format will be used
+        If argument `format` is None (default), the A2M format will be used
         to print the output.
 
         If the filename does not contain an extension, it is automatically
