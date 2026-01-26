@@ -13,7 +13,7 @@
 //           I would like you to read carefully the code of the ComputedTable class below and makes 
 //           comments/recommandations to get a complete class that does what it is supposed to do.
 
-const static std::string ALLOWED_FORMATS = "HMRCD";
+const static std::string ALLOWED_FORMATS = "AHMRCD";
 
 /**
  * @brief The present class represents the output table resulting from the compilation 
