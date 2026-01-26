@@ -4,8 +4,7 @@
 void execute_report(const std::string& filepath, const std::string& parameters)
 {
     if(RP_DEBUG == 0)
-        RP_STDOUT = 1;                  // write the report output to stdout
-    B_PrintDest("dummy D");
+        RP_STDOUT = 1;      // write the report output to stdout
 
     std::string filepath_ = check_filepath(filepath, FILE_REP, "execute_report", true);
 
@@ -14,7 +13,7 @@ void execute_report(const std::string& filepath, const std::string& parameters)
     int success = B_ReportExec(to_char_array(args));
     W_close();
 
-    RP_STDOUT = 0;                      // reset global variable RP_STDOUT to default value (write to file)
+    RP_STDOUT = 0;          // reset global variable RP_STDOUT to default value (write to file)
 
     if(success != 0)
     {
@@ -35,13 +34,11 @@ void execute_report(const std::string& filepath, const std::vector<std::string>&
 void execute_report_line(const std::string& commands)
 {
     if(RP_DEBUG == 0)
-        RP_STDOUT = 1;                  // force output of the report line to be written to stdout
-    B_PrintDest("dummy D");
+        RP_STDOUT = 1;      // force output of the report line to be written to stdout
 
     int success = B_ReportLine(to_char_array(commands), 0);
-    W_close();
 
-    RP_STDOUT = 0;                      // restore default output to file
+    RP_STDOUT = 0;          // reset global variable RP_STDOUT to default value (write to file)
 
     if(success != 0)
     {
