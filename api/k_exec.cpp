@@ -408,7 +408,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
 
         // allocate the VAR in dbv
         handle = (SWHDL) KV_alloc_var(vsmpl->nb_periods);
-        dbv->k_objs[name] = handle;
+        dbv->set_handle(name, handle);
 
         // copy the VAR from dbv_tmp to dbv
         memcpy(dbv->get_var_ptr(name, start), dbv_tmp->get_var_ptr(name, start_tmp), 
@@ -607,7 +607,7 @@ static int KI_read_scls_db(KDBScalars* dbs, KDBScalars* dbs_tmp, char* source_na
 
         // allocate the Scalar in dbs
         handle = (SWHDL) KS_alloc_scl();
-        dbs->k_objs[name] = handle;
+        dbs->set_handle(name, handle);
         
         // copy the scalar from dbs_tmp to dbs
         memcpy(dbs->get_obj(name), dbs_tmp->get_obj(name), sizeof(Scalar));

@@ -269,7 +269,7 @@ err:
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
-    KDB* kdb;
+    KDBComments* kdb;
     ImportCmtFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);
@@ -329,7 +329,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
     Sample* smpl;
-    KDB* kdb;
+    KDBVariables* kdb;
     ImportVarFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);

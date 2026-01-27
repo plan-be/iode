@@ -29,7 +29,7 @@
  *      language =  {E,F,D}
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=fileimportcmt
+ *
  */
 int B_FileImportCmt(char* arg, int unused)
 {
@@ -78,7 +78,7 @@ fin:
  *      language =  {E,F,D}
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=fileimportvar
+ *
  */
 int B_FileImportVar(char* arg, int unused)
 {

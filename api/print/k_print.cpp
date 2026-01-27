@@ -275,7 +275,7 @@ int T_print_line(Table* tbl, int i, COLS* cls)
  *  Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES. 
  *   
  *  @param [in] COLS*   cls     list of columns (from GSample)
- *  @return     char**          NULL if one of the ref files is not loaded in K_RWS
+ *  @return     char**          NULL if one of the ref files is not loaded in global_ref_xxx
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
  *  
  */
@@ -301,7 +301,7 @@ char **T_find_files(COLS* cls)
         if(files[i] == 0) 
             continue;
         
-        kdb = K_RWS[VARIABLES][i - 1];
+        kdb = global_ref_var[i - 1];
         if(!kdb) 
         {
             std::string error_msg = "File " + std::to_string(i) + " not present";

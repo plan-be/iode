@@ -211,55 +211,63 @@ int B_PrintObjDef_1(char* arg, int* type)
     int rc = 0;
     bool success = false;
 
-    KDB* kdb = get_global_db(*type);
-    std::string name = std::string(arg);
-    bool found = kdb->contains(name);
-    if(!found) 
-        goto err;
-
-    kmsg("Printing %s ...", arg);
-    if(khitkey() != 0) 
-        kgetkey();
-
-    if (*type < COMMENTS || *type > VARIABLES) 
-        goto err;
-
-    if(*type == VARIABLES && BEG % 47 == 0)
+    try
     {
-        if(BEG > 0) 
-        {
-            W_printf((char*) ".tl\n.te\n\n");
-            W_flush();
-        }
-
-        Sample* smpl = kdb->sample;
-        if(!smpl || smpl->nb_periods == 0) 
-        {
-            std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";
-            msg += "the variable database has no sample defined";
-            kwarning((char*) msg.c_str());
-            return -1;
-        }
-        Period start_period = smpl->start_period;
-        W_printfRepl((char*) ".tb %d\n.sep &\n", smpl->nb_periods + 1);
-        W_printfRepl((char*) ".tl\n&1LName");
-        std::string txt;
-        for(int j = 0; j < smpl->nb_periods; j++) 
-        {
-            txt = start_period.shift(j).to_string();
-            W_printfRepl((char*) "&1C%s", (char*) txt.c_str());
-        }
-        W_printf((char*) "\n.tl\n");
-    }
+        KDB& kdb = get_global_db(*type);
+        std::string name = std::string(arg);
+        bool found = kdb.contains(name);
+        if(!found) 
+            goto err;
     
-    success = kdb->print_obj_def(name);
-
-    if(*type == VARIABLES)
-        BEG++;
-    else
-        W_flush();
-
-    return success ? 0 : -1;
+        kmsg("Printing %s ...", arg);
+        if(khitkey() != 0) 
+            kgetkey();
+    
+        if (*type < COMMENTS || *type > VARIABLES) 
+            goto err;
+    
+        if(*type == VARIABLES && BEG % 47 == 0)
+        {
+            if(BEG > 0) 
+            {
+                W_printf((char*) ".tl\n.te\n\n");
+                W_flush();
+            }
+    
+            Sample* smpl = kdb.sample;
+            if(!smpl || smpl->nb_periods == 0) 
+            {
+                std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";
+                msg += "the variable database has no sample defined";
+                kwarning((char*) msg.c_str());
+                return -1;
+            }
+            Period start_period = smpl->start_period;
+            W_printfRepl((char*) ".tb %d\n.sep &\n", smpl->nb_periods + 1);
+            W_printfRepl((char*) ".tl\n&1LName");
+            std::string txt;
+            for(int j = 0; j < smpl->nb_periods; j++) 
+            {
+                txt = start_period.shift(j).to_string();
+                W_printfRepl((char*) "&1C%s", (char*) txt.c_str());
+            }
+            W_printf((char*) "\n.tl\n");
+        }
+        
+        success = kdb.print_obj_def(name);
+    
+        if(*type == VARIABLES)
+            BEG++;
+        else
+            W_flush();
+    
+        return success ? 0 : -1;
+    }
+    catch(const std::exception& e)
+    {
+        error_manager.append_error("Error while printing object '" + std::string(arg) + "': " + std::string(e.what()));
+        return -1;
+    }
 
 err:
     error_manager.append_error("Object '" + std::string(arg) + "' not found !");
@@ -295,24 +303,23 @@ int B_PrintObjDefArgs(char* arg, int type)
     kmsg("Printing IODE objects definition to file '%s'...", W_filename);
     if(arg == 0 || arg[0] == 0)
     {
-        KDB* kdb = get_global_db(type);
-        if(!kdb)
+        try
         {
-            std::string msg = "Cannot print objects of type '";
-            msg += v_iode_types[type];
-            msg += "' because the corresponding database seems empty";
-            kwarning((char*) msg.c_str());
-            return -1;
+            KDB& kdb = get_global_db(type);
+            for(const std::string& name : kdb.get_names())
+            {
+                rc = B_PrintObjDef_1((char*) name.c_str(), &type);
+                if(rc) break;
+            }
         }
-        
-        for(const auto& [name, _] : get_global_db(type)->k_objs) 
+        catch(const std::exception& e)
         {
-            rc = B_PrintObjDef_1((char*) name.c_str(), &type);
-            if(rc) break;
+            error_manager.append_error("Error while printing objects: " + std::string(e.what()));
+            return -1;
         }
     }
     else
-        rc = B_ainit_loop(arg, wrapper_B_PrintObjDef_1, (char *)&type);
+        rc = B_ainit_loop(arg, wrapper_B_PrintObjDef_1, (char *) &type);
 
     if(BEG) 
     {

@@ -122,7 +122,7 @@ bool KDBScalars::print_obj_def(const std::string& name)
 
 void KDBScalars::update_reference_db()
 {
-    if(K_RWS[this->k_type][0]) 
-        delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new KDBScalars(this, "*", false);      
+    if(global_ref_scl[0]) 
+        delete global_ref_scl[0];
+    global_ref_scl[0] = new KDBScalars(this, "*", false);      
 }

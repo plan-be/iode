@@ -776,18 +776,17 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
  */
 void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
 {
-    U_ch 	        **lst = 0,                     
-                    **tbl_todel;
-    U_ch            *lst_todel,
-                    buf[256];
-    int   	        i, 
-                    nlst = 0, 
-                    nb = eqn - eq1 + 1,  
-                    maxl = 1000;
+    U_ch** lst = NULL;                     
+    U_ch** tbl_todel = NULL;
+    U_ch* lst_todel = NULL;
+    U_ch buf[256];
+    int i = 0; 
+    int nlst = 0; 
+    int nb = eqn - eq1 + 1;  
+    int maxl = 1000;
 
-    // Détruit la liste cible et les sous-listes
+    // delete the list 'lstname' and all sub-lists
     sprintf((char*) buf, "%s*", lstname);
-    //B_DataDelete(buf, LISTS); // Old version usign B_*() fns
     lst_todel = (unsigned char*) K_expand(LISTS, NULL, (char*) buf, '*');
     if(lst_todel) 
     {

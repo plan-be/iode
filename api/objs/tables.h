@@ -946,6 +946,19 @@ struct KDBTables : public KDBTemplate<Table>
 
     bool print_obj_def(const std::string& name) override;
 
+    void merge_from(const std::string& input_file) override
+    {
+        KDBTables from(false);
+        KDB::merge_from(from, input_file);
+    }
+
+    bool copy_from_file(const std::string& file, const std::string& objs_names, 
+        std::set<std::string>& v_found)
+    {
+        KDBTables from(false);
+        return KDB::copy_from_file(from, file, objs_names, v_found);
+    }
+
 private:
     bool grep_obj(const std::string& name, const SWHDL handle, 
         const std::string& pattern, const bool ecase, const bool forms, 
@@ -958,6 +971,7 @@ private:
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::unique_ptr<KDBTables> global_ws_tbl = std::make_unique<KDBTables>(true);
+inline std::array<KDBTables*, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 

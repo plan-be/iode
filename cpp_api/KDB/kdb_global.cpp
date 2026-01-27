@@ -4,10 +4,17 @@
 
 bool is_global_database_loaded(const IodeType iodeType) 
 { 
-    if(!get_global_db(iodeType)) 
+    try
+    {
+        KDB& kdb = get_global_db(iodeType);
+        if(kdb.size() == 0) 
+            return false;
+    }
+    catch(const std::exception& e)
+    {
         return false;
-    if(get_global_db(iodeType)->size() == 0) 
-        return false;
+    }
+
     return true; 
 }
 

@@ -284,15 +284,6 @@ Functions to retrieve the current IODE version.
 
 ## Group "KDB management" {#T20}
 
-### k\_kdb.c {#T21}
-
-Function to manage KDB, i.e. IODE object groups.
-
-|Syntax|Description|
-|:---|:---|
-|`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
-|`int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2 then deletes kdb2.|
-
 ### k\_ws.c {#T22}
 
 Variables and functions for initializing and cleaning up the "in memory" workspaces.
@@ -357,7 +348,6 @@ Functions to detect IODE object file version and to convert an object to the cur
 |Syntax|Description|
 |:---|:---|
 |`int K_calcvers(char* label):`|returns the current object version (0\-2) from an IODE file header.|
-|`void K_setvers(KDB* kdb, int i, int vers)`|converts an IODE object from IODE objects version 1 or 2 to the current version (0).|
 
 ### k\_pack.c {#T28}
 
@@ -483,8 +473,6 @@ Functions to manipulate IODE object files.
 |`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
 |`int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)`|retrieves infos on an IODE file: type, number of objects, Sample|
 |`int X_findtype(char* filename)`|Returns the type of content of filename according to its extension|
-|`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
-|\`cint K\_cat(KDB\* ikdb, char\* filename)|concatenates the content of a file to an existing kdb.|
 |\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
 |\`cint K\_get\_backup\_on\_save()|indicates if a backup must be taken before saving a kdb.|
 |`int K_backup(char* filename)`|takes a backup of a file by renaming the file: filename.xxx => filename.xx$.|
