@@ -584,6 +584,19 @@ struct KDBEquations : public KDBTemplate<Equation>
 
     bool print_obj_def(const std::string& name) override;
 
+    void merge_from(const std::string& input_file) override
+    {
+        KDBEquations from(false);
+        KDB::merge_from(from, input_file);
+    }
+
+    bool copy_from_file(const std::string& file, const std::string& objs_names, 
+        std::set<std::string>& v_found)
+    {
+        KDBEquations from(false);
+        return KDB::copy_from_file(from, file, objs_names, v_found);
+    }
+
 private:
     bool grep_obj(const std::string& name, const SWHDL handle, 
         const std::string& pattern, const bool ecase, const bool forms, 
@@ -596,6 +609,7 @@ private:
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::unique_ptr<KDBEquations> global_ws_eqs = std::make_unique<KDBEquations>(true);
+inline std::array<KDBEquations*, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 

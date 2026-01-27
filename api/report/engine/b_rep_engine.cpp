@@ -698,7 +698,7 @@ int RP_evaltime()
     if(RP_PER.year == 0) 
         return(0);
     
-    KDB* kdb_var = global_ws_var.get();
+    KDBVariables* kdb_var = global_ws_var.get();
     if(!kdb_var)
         return 0;
     Sample* sample = kdb_var->sample;

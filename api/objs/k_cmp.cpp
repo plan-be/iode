@@ -227,7 +227,7 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
     int res=0;
 
     if(kdb1->k_type != kdb2->k_type) 
-        return(-1);
+        return -1;
 
     SWHDL handle_1 = kdb1->get_handle(name);
     SWHDL handle_2 = kdb2->get_handle(name);

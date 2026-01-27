@@ -96,7 +96,7 @@ cdef extern from "api/all.h":
 
         # Other methods
         void merge(const KDB& other, const bool overwrite) except +
-        void copy_from(const string& input_file, const string objects_names) except +
+        void copy_from(const string& input_files, const string objects_names) except +
         void merge_from(const string& input_file) except +
         vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
             const bool in_name, const bool in_formula, const bool in_text, const string& list_result) except +
@@ -131,8 +131,8 @@ cdef extern from "cpp_api/KDB/kdb_global.h":
     void high_to_low(IodeHighToLow type_, string& filepath, string& var_list) except +
 
 cdef extern from "cpp_api/KDB/kdb_reference.h":
-    void load_reference_kdb(int index, IodeType iode_type, string& filepath) except +
-    void clear_reference_kdb(int index, IodeType iode_type) except +
+    void load_reference_kdb(int index, string& filepath) except +
+    void clear_reference_kdb(int index) except +
     void clear_all_reference_kdbs() except +
 
 cdef extern from "cpp_api/compute/simulation.h":
@@ -329,7 +329,7 @@ cdef extern from "api/objs/variables.h":
         vector[string] get_list_periods(string& from_period, string& to_period) except +
         vector[float] get_list_periods_as_float(string& from_period, string& to_period) except +
 
-        void copy_from(string& input_file, string& from_period, string& to_period, string objects_names) except +
+        void copy_from(string& input_files, string& from_period, string& to_period, string objects_names) except +
 
         void extrapolate(VariablesInitialization method, string& from_period, string& to, string& variables_list) except +
         void seasonal_adjustment(string& input_file, string& series, double eps_test) except +

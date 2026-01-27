@@ -136,7 +136,7 @@ static void read_div(Table* tbl, YYFILE* yy)
  *  Reads a Table line on a YY stream. Each line has as many Cells as the number 
  *  of columns in the table.
  *  
- *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ * for the full syntax.
  *
  *  Partial syntax of a TABLE LINE 
  *  -------------------------------
@@ -268,7 +268,7 @@ static int read_line(Table* tbl, YYFILE* yy)
 /**
  *  Reads on the stream yy the full definition of a Table.
  *  
- *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ * for the full syntax.
  *  
  *  @param [in]     yy  YYFILE*     stream to be read
  *  @return             Table*        new allocated table
@@ -372,7 +372,7 @@ static Table* read_tbl(YYFILE* yy)
 /**
  *  Loads Tables definition from an ASCII file into a new KDB of Tables.
  *  
- *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ * for the full syntax.
  *  
  *  Errors are displayed by a call to the function kerror().
  *  For each read Table, kmsg() is called to send a message to the user. 
@@ -418,7 +418,7 @@ bool KDBTables::load_asc(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */
-    K_set_kdb_fullpath(this, (U_ch*) c_filename);
+    this->set_fullpath(c_filename);
     char asc_filename[1024];
     while(1) 
     {
@@ -428,7 +428,7 @@ bool KDBTables::load_asc(const std::string& filename)
                 if(cmpt) 
                 {
                     K_set_ext_asc(asc_filename, c_filename, TABLES);
-                    K_set_kdb_fullpath(this, (U_ch*) asc_filename); // JMP 03/12/2022
+                    this->set_fullpath(asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
                 return true;

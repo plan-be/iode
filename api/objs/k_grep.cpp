@@ -59,20 +59,23 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
     bool pattern_is_all = pattern.size() == 1 && pattern[0] == all;
     if(names && !texts && !forms && pattern_is_all) 
     {
-        for(const auto& [name, handle] : this->k_objs)
+        for(const std::string& name : this->get_names())
             lst.push_back(name);
         return lst;
     }
     
     bool found;
-    for(const auto& [name, handle] : this->k_objs)
+    for(const std::string& name : this->get_names())
     {
         found = false;
         if(names) 
             found = wrap_grep_gnl(pattern, name, ecase, all);
 
         if(!found)
+        {
+            SWHDL handle = this->get_handle(name);
             found = this->grep_obj(name, handle, pattern, ecase, forms, texts, all);
+        }
 
         if(found) 
         {
@@ -83,6 +86,18 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
         }
     }
 
+    return lst;
+}
+
+template<typename T>
+std::string template_expand(const std::string& filename, const std::string& pattern, const char all)
+{
+    T kdb(false);
+    bool success = kdb.load(filename);
+    if(!success) 
+        return "";
+    
+    std::string lst = kdb.expand(pattern, all);
     return lst;
 }
 
@@ -97,35 +112,49 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
  *  @return             char*   allocated semi-colon separated string with all matching names
  *                              if no name found return allocated string of length 0 ("").
  */
-char *K_expand(int type, char* file, char* c_pattern, int all)
+char* K_expand(int type, char* file, char* c_pattern, int all)
 {
-    KDB* kdb;
-    if(file == NULL) 
-        kdb = get_global_db(type);
+    std::string lst = "";
+    std::string pattern(c_pattern);
+    if(file == NULL)
+    {
+        try
+        {
+            KDB& kdb = get_global_db(type);
+            lst = kdb.expand(pattern, (char) all);
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "expand: " + std::string(e.what());
+            kwarning(error_msg.c_str());
+            return NULL;
+        }
+    }
     else 
     {
+        std::string filename(file);
         switch(type) 
         {
             case COMMENTS:
-                kdb = new KDBComments(false);
+                lst = template_expand<KDBComments>(filename, pattern, (char) all);
                 break;
             case EQUATIONS:
-                kdb = new KDBEquations(false);
+                lst = template_expand<KDBEquations>(filename, pattern, (char) all);
                 break;
             case IDENTITIES:
-                kdb = new KDBIdentities(false);
+                lst = template_expand<KDBIdentities>(filename, pattern, (char) all);
                 break;
             case LISTS:
-                kdb = new KDBLists(false);
+                lst = template_expand<KDBLists>(filename, pattern, (char) all);
                 break;
             case SCALARS:
-                kdb = new KDBScalars(false);
+                lst = template_expand<KDBScalars>(filename, pattern, (char) all);
                 break;
             case TABLES:
-                kdb = new KDBTables(false);
+                lst = template_expand<KDBTables>(filename, pattern, (char) all);
                 break;
             case VARIABLES:
-                kdb = new KDBVariables(false);
+                lst = template_expand<KDBVariables>(filename, pattern, (char) all);
                 break;
             default:
                 {
@@ -134,18 +163,10 @@ char *K_expand(int type, char* file, char* c_pattern, int all)
                     return NULL;
                 }
         }
-        bool success = kdb->load(std::string(file));
-        if(!success) 
-            return NULL;
     }
 
-    std::string lst = kdb->expand(std::string(c_pattern), (char) all);
-
-    if(file != NULL)
-    {
-        delete kdb;
-        kdb = nullptr;
-    }
+    if(lst.empty())
+        return NULL;
 
     char* c_lst = new char[lst.size() + 1];
     strcpy(c_lst, lst.c_str());

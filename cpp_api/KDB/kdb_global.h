@@ -30,7 +30,7 @@ bool is_global_database_loaded(const IodeType iodeType);
  *      language =  {E,F,D}
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=fileimportcmt
+ *
  */
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
                 const TableLang lang = TABLE_ENGLISH, const std::string& debug_file = "");
@@ -52,7 +52,7 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
  *      to   = end of sample
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=fileimportcmt
+ *
  */
 void import_var(const std::string& input_file, const std::string& save_file, const std::string& from, const std::string& to, 
                 const std::string& rule_file, const std::string& debug_file = "");
@@ -75,7 +75,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  *      to   = end of sample
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=fileimportvar
+ *
  */
 void import_var(const std::string& input_file, const std::string& save_file, const Period& from, const Period& to, 
                 const std::string& rule_file, const std::string& debug_file = "");
@@ -102,7 +102,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  *      separator = character used to separate value (CSV only)
  *      trace = debug file (optional)
  *  
- *  @see https://iode.plan.be/doku.php?id=export
+ *
  */
 void export_as(const std::string& var_file, const std::string cmt_file, const std::string& from, const std::string& to, 
                const IodeExportFormat format, const std::string& save_file, const std::string& rule_file, 

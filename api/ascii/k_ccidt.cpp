@@ -65,7 +65,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */
-    K_set_kdb_fullpath(this, (U_ch*) c_filename);
+    this->set_fullpath(c_filename);
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -75,7 +75,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
                 {
                     char asc_filename[1024];
                     K_set_ext_asc(asc_filename, c_filename, IDENTITIES);
-                    K_set_kdb_fullpath(this, (U_ch*) asc_filename); // JMP 03/12/2022
+                    this->set_fullpath(asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);
                 return true;

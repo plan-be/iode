@@ -27,7 +27,7 @@
  *  
  *       $FileCopy<type> source_file dest_file
  *
- *  @see https://iode.plan.be/doku.php?id=filecopy for details
+ * for details
  *  
  *  @params See b_data.c for details
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
@@ -90,7 +90,7 @@ fin:
  *  
  *      $FileRename<type> source_file dest_file
  *
- *  @see https://iode.plan.be/doku.php?id=filerename for details
+ * for details
  *  
  *  @params See b_data.c for details
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
@@ -154,7 +154,7 @@ static int wrapper_B_unlink_1(char* arg, void *type)
  *  
  *      $FileDelete<type> filename [filename...]
  *  
- *  @see https://iode.plan.be/doku.php?id=filedelete for details
+ * for details
  *  
  *  @params see b_data.c 
  *  @return int 0 always 

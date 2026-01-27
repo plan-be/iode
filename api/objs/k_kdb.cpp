@@ -13,9 +13,6 @@
  *
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
- * 
- *      int K_merge(KDB* kdb1, KDB* kdb2, int replace)                  // merges two databases : kdb1 <- kdb1 + kdb2. 
- *      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)              // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
 #include "scr4/s_dir.h"
 
@@ -42,37 +39,53 @@
 // API 
 // ---
 
-KDB* get_global_db(const int iode_type)
+KDB& get_global_db(const int iode_type)
 {
+    KDB* kdb = nullptr;
     switch(iode_type)
     {
         case COMMENTS :
-            return global_ws_cmt.get();
+            kdb = global_ws_cmt.get();
+            break;
         case EQUATIONS :
-            return global_ws_eqs.get();
+            kdb = global_ws_eqs.get();
+            break;
         case IDENTITIES :
-            return global_ws_idt.get();
+            kdb = global_ws_idt.get();
+            break;
         case LISTS :
-            return global_ws_lst.get();
+            kdb = global_ws_lst.get();
+            break;
         case SCALARS :
-            return global_ws_scl.get();
+            kdb = global_ws_scl.get();
+            break;
         case TABLES :
-            return global_ws_tbl.get();
+            kdb = global_ws_tbl.get();
+            break;
         case VARIABLES :
-            return global_ws_var.get();
+            kdb = global_ws_var.get();
+            break;
         default :
-            return nullptr;
+            throw std::runtime_error("get_global_db(): invalid IODE type");
     }
+
+    if(!kdb)
+    {
+        std::string error_msg = "Global " + v_iode_types[iode_type] + " database not loaded";
+        throw std::runtime_error(error_msg);
+    }
+
+    return *kdb;
 }
 
-bool KDB::set_packed_object(const std::string& name, char* pack)
+SWHDL KDB::kdb_set_packed_object(const std::string& name, char* pack)
 {
     if(pack == NULL) 
     {
         std::string error_msg = "Failed to add the " + v_iode_types[this->k_type];
         error_msg += + " object '" + name + "' to the database.";
         kerror(0, error_msg.c_str());
-        return false;
+        return 0;
     }
 
     // Add an entry (name) if not present yet
@@ -82,7 +95,7 @@ bool KDB::set_packed_object(const std::string& name, char* pack)
         error_manager.append_error(v_iode_types[this->k_type] + " " + name + 
                                    " cannot be created (syntax ?)");
         SW_nfree(pack);
-        return false;
+        return 0;
     }
     
     // frees existing object but keeps the entry in kdb
@@ -102,24 +115,15 @@ bool KDB::set_packed_object(const std::string& name, char* pack)
         error_manager.append_error("Low memory: cannot allocate " + std::to_string(lg) + 
                                    " bytes for " + v_iode_types[this->k_type] + " " + std::string(name));
         SW_nfree(pack);
-        return false;
+        return 0;
     }
 
     // Copy allocated pack into the SCR SWAP memory
     char* ptr_swap = SW_getptr(handle);
     memcpy(ptr_swap, pack, lg);
-    SW_nfree(pack);    
+    SW_nfree(pack);
 
-    // store handle in top-level database
-    KDB* top_db = get_top_level_db();
-    top_db->k_objs[name] = handle;
-
-    // store handle in all subset instances (including 'this' if 'this' is a subset)
-    for(KDB* subset : get_subsets())
-        if(subset->contains(name))
-            subset->k_objs[name] = handle;
-
-    return true;
+    return handle;
 }
 
 bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::string& new_name)
@@ -169,7 +173,7 @@ bool KDB::duplicate(const KDB& other, const std::string& old_name, const std::st
         kwarning("failed to allocate memory for the duplicated object.");
         return false;
     }
-    k_objs[new_name] = handle_dest;
+    this->set_handle(new_name, handle_dest);
     
     // pointer behind handle_2 may have changed after allocation of handle_1
     // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
@@ -216,41 +220,194 @@ char* KDB::dde_create_obj(int objnb, int *nc, int *nl)
     return(res);
 }
 
-void KDB::merge(const KDB& other, const bool overwrite)
+void KDB::merge(KDB& other, const bool overwrite, const bool clear_source)
 {
-    int res = K_merge(this, (KDB*) &other, overwrite ? 1 : 0);
-    if(res < 0) 
-        throw std::runtime_error("Cannot merge the two '" + get_iode_type_str() + "' databases.\n" + 
-                                 "Reason: unknown");
-}
+    char* ptr_1 = NULL; 
+    char* ptr_2 = NULL;
+    bool found = false;
+    SWHDL handle_1 = 0;
+    SWHDL handle_2 = 0;
 
-void KDB::copy_from(const std::string& input_file, const std::string objects_names)
-{
-    std::string buf = input_file + " " + objects_names;
-    int res = B_WsCopy((char*) buf.c_str(), (int) this->k_type);
-    if(res < 0)
+    if(other.size() == 0) 
+        return;
+
+    for(const std::string& name : other.get_names()) 
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
+        handle_2 = other.get_handle(name);
+        if(handle_2 == 0) 
+            continue;
+
+        found = this->contains(name);
+        if(found)
         {
-            std::string msg = "Cannot copy the content of file '" + input_file;
-            msg += "' into the " + get_iode_type_str() + " database.\n" + last_error;
-            throw std::runtime_error(msg);
+            // existing elements in this are not overwritten.
+            if(!overwrite) 
+                continue;
+            
+            // delete elements from this
+            handle_1 = this->get_handle(name);
+            if(handle_1 > 0)
+                SW_free(handle_1);
         }
+        
+        ptr_2 = SW_getptr(handle_2);
+
+        // allocate new object in this on the SCR swap
+        handle_1 = SW_alloc(P_len(ptr_2));
+        if(handle_1 == 0) 
+            return;
+        this->set_handle(name, handle_1);
+
+        // pointer behind handle_2 may have changed after allocation of handle_1
+        // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
+        // of the segments allocated by the SWAP system. If a segment contains enough free space 
+        // but with gaps, the SW_alloc() function compresses the segment to have lg bytes contiguous.
+        // In doing so, it (potentially) shifts the pack within the segment, and therefore 
+        // ptr may change value after an SW_alloc() call.
+        ptr_1 = SW_getptr(handle_1);
+        ptr_2 = SW_getptr(handle_2);
+        memcpy(ptr_1, ptr_2, P_len(ptr_2));
     }
+
+    if(clear_source)
+        other.clear(false);
 }
 
-// TODO JMP: please provide input values to test B_WsMerge()
-void KDB::merge_from(const std::string& input_file)
+void KDB::merge_from(KDB& from, const std::string& filename)
 {
     // throw an error if the passed filepath is not valid
     IodeFileType file_type = (IodeFileType) this->k_type;
-    std::string input_file_ = check_filepath(input_file, file_type, "merge_from", true);
+    std::string input_file = check_filepath(filename, file_type, "merge_from", true);
     
-    int res = K_cat(this, to_char_array(input_file));
-    if(res < 0) 
-        throw std::runtime_error("Cannot merge the content of the file '" + input_file_ + "' in the current " + 
-                                 get_iode_type_str() + " database");
+    bool success = from.load(input_file);
+    if(!success)
+        return;
+
+    if(this->size() == 0) 
+    {
+        this->description = from.description;
+        this->filepath = from.filepath;
+    }
+
+    if(this->k_type == VARIABLES) 
+        KV_merge_del((KDBVariables*) this, (KDBVariables*) &from, 1);
+    else 
+        this->merge(from, true, true);
+}
+
+bool KDB::copy_from_file(KDB& from, const std::string& file, const std::string& objs_names, 
+    std::set<std::string>& v_found)
+{   
+    bool success = from.load_binary(this->k_type, file);
+    if(!success)
+        return false;
+
+    std::set<std::string> s_objs;
+    try
+    {
+        s_objs = from.filter_names(objs_names);
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+        return false;
+    }
+
+    // delete objects already found in previous files
+    std::vector<std::string> objs_to_copy;
+    for(const std::string& name : s_objs)
+    {
+        if(!from.contains(name)) 
+            continue;
+        
+        // if already found in previous files -> remove from "from"
+        if(v_found.contains(name)) 
+            from.remove(name);
+        // object to be copied
+        else
+            objs_to_copy.push_back(name);
+    }
+
+    std::string msg = std::to_string(objs_to_copy.size()) + " "; 
+    msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
+    kmsg(msg.c_str());
+
+    char* ptr = NULL;
+    char* pack = NULL;
+    SWHDL handle_to = 0;
+    for(const std::string& name : objs_to_copy)
+    {
+        // copy packed object from "from" to char* pack
+        ptr = from.get_ptr_obj(name);
+        pack = SW_nalloc(P_len(ptr));
+        memcpy(pack, ptr, P_len(ptr));
+
+        // check if the object already exists in this database
+        handle_to = this->get_handle(name);
+        // if yes -> delete the corresponding object
+        if(handle_to > 0)
+            SW_free(handle_to);
+        // if not -> create a new entry
+        else
+        {
+            success = this->add_entry(name);
+            if(!success) 
+            {
+                SW_nfree(pack);
+                std::string msg = "Cannot add entry '" + name + "' to the database";
+                error_manager.append_error(msg);
+                return false;
+            }
+        }
+
+        // allocate memory and copy the packed object in this database
+        handle_to = SW_alloc(P_len(pack));
+        this->set_handle(name, handle_to);
+        memcpy(SW_getptr(handle_to), pack, P_len(pack));
+        SW_nfree(pack);
+
+        v_found.insert(name);
+    }
+    
+    return true;
+}
+
+bool KDB::copy_from(const std::vector<std::string>& input_files, const std::string& objects_names)
+{
+    if(input_files.size() == 0)
+        throw std::runtime_error("Input file(s) name(s) is(are) empty.");
+    // NOTE: objects_names.size() == 0 meaning all objects -> no error thrown
+
+    // search in each file
+    bool success;
+    std::set<std::string> v_found;
+    for(const std::string& file : input_files) 
+    {
+        success = this->copy_from_file(file, objects_names, v_found);
+        if(!success)
+        {
+            error_manager.display_last_error();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ *  Reads objects from a list of IODE files and adds them to an existing KDB.
+ *  If more than one file contains an object, the priority is given to the first file in the list.
+ */
+bool KDB::copy_from(const std::string& input_files, const std::string& objects_names)
+{
+    if(input_files.empty())
+        throw std::runtime_error("Input file(s) name(s) is(are) empty.");
+    if(objects_names.empty())
+        throw std::runtime_error("Object(s) name(s)/pattern is empty.");
+
+    std::vector<std::string> files = split_multi(input_files, " ,;\t\n");
+    bool success = copy_from(files, objects_names);
+    return success;
 }
 
 // TODO ALD: rewrite B_DataSearchParms() in C++
@@ -338,140 +495,4 @@ bool print_definition_generic(const std::string& name, char* text)
     sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name.c_str(), A2M_ESCCH);
     dump_string(buf, text);
     return true;
-}
-
-/**
- *  Sets the KDB full path name. 
- *  
- *  The current filename stored in the KDB is freed and space for the new filename is allocated in the KDB.
- *  
- *  @param [in, out]    kdb      KDB*   KDB whose name will be changed
- *  @param [in]         filename char*  new filename
- *  
- *  @details More details   
- */
-void K_set_kdb_fullpath(KDB *kdb, U_ch *filename) 
-{
-    char    *ptr, fullpath[1024];
-    
-    ptr = SCR_fullpath((char*) filename, fullpath);
-    if(ptr == 0) 
-        ptr = (char*) filename;
-    kdb->filepath = std::string((char*) ptr);  
-}
-
-/**
- *  Merges two databases : kdb1 <- kdb1 + kdb2. 
- *   If replace == 0, existing elements in kdb1 are not overwritten.
- *   If replace == 1, the values of existing elements are replaced.
- *
- *  kdb2 is kept unmodified.
- *  
- *  @param [in, out]    kdb1    KDB*      source and target KDB
- *  @param [in]         kdb2    KDB*      source KDB
- *  @param [in]         replace int       0 to keep elements of kdb1 when duplicate objects exist
- *                                        1 to replace values in kdb1 by these in kdb2
- *  @return                     int       -1 if kdb1 or kdb2 is null
- */
-
-int K_merge(KDB* kdb1, KDB* kdb2, int replace)
-{
-    bool  found;
-    char  *ptr_1, *ptr_2;
-    SWHDL handle_1;
-
-    if(!kdb1)
-    {
-        kwarning("Cannot merge into a NULL database");
-        return -1;
-    }
-
-    if(!kdb2)
-    {
-        kwarning("Cannot merge from a NULL database");
-        return -1;
-    }
-    
-    for(const auto& [name, handle_2] : kdb2->k_objs) 
-    {
-        if(handle_2 == 0) 
-            continue;
-
-        found = kdb1->contains(name);
-        if(found)
-        {
-            // do not replace existing object in kdb1 if replace == 0
-            if(replace == 0) 
-                continue;
-            // delete object in kdb1 if replace == 1
-            handle_1 = kdb1->get_handle(name);
-            if(handle_1 > 0)
-                SW_free(handle_1);
-        }
-        
-        ptr_2 = SW_getptr(handle_2);
-
-        // allocate new object in kdb1 on the SCR swap
-        handle_1 = SW_alloc(P_len(ptr_2));
-        if(handle_1 == 0) 
-            return -1;
-        kdb1->k_objs[name] = handle_1;
-
-        // pointer behind handle_2 may have changed after allocation of handle_1
-        // The SW_alloc(lg) function searches for a contiguous space of lg bytes within one 
-        // of the segments allocated by the SWAP system. If a segment contains enough free space 
-        // but with gaps, the SW_alloc() function compresses the segment to have lg bytes contiguous.
-        // In doing so, it (potentially) shifts the pack within the segment, and therefore 
-        // ptr may change value after an SW_alloc() call.
-        ptr_1 = SW_getptr(handle_1);
-        ptr_2 = SW_getptr(handle_2);
-        memcpy(ptr_1, ptr_2, P_len(ptr_2));
-    }
-
-    return 0;
-}
-
-
-/**
- *  Merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2 (but not the IODE objects in memory). 
- *   If replace == 0, existing elements in kdb1 are not overwritten.
- *   If replace == 1, the values of existing elements are replaced.
- *  
- *  @param [in, out]    kdb1    KDB*      source and target KDB
- *  @param [in, out     kdb2    KDB*      source KDB. Delete at the end of the function
- *  @param [in]         replace int       0 to keep elements of kdb1 when duplicate objects exist
- *                                        1 to replace values in kdb1 by these in kdb2
- *  @return                     int       -1 if kdb1 or kdb2 is null or if kdb2 is empty.
- */
-
-int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
-{
-
-    if(!kdb1)
-    {
-        kwarning("Cannot merge into a NULL database");
-        return -1;
-    }
-
-    if(!kdb2)
-    {
-        kwarning("Cannot merge from a NULL database");
-        return -1;
-    }
-    
-    if(kdb2->size() == 0) 
-        return -1;
-    
-    if(kdb1->size() == 0) 
-    {
-        kdb1->k_objs = kdb2->k_objs;
-        kdb2->clear(false);
-        kdb2 = nullptr;
-        return 0;
-    }
-
-    K_merge(kdb1, kdb2, replace);
-    kdb2->clear(false);
-    kdb2 = nullptr;
-    return 0;
 }

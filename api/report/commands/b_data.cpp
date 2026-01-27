@@ -229,7 +229,7 @@ int B_DataRasVar(char* arg, int unused)
  *  
  *  Syntax:  $DataCalcVar varname lec
  *  
- *  @see https://iode.plan.be/doku.php?id=datacalcvar for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success, 
@@ -288,48 +288,56 @@ int B_DataCalcVar(char* arg, int unused)
  */
 int B_DataCreate_1(char* arg, int* ptype)
 {
-    char deflt[41];
-    KDB* kdb = get_global_db(*ptype);
-
-    std::string name = std::string(arg);
-    if(kdb->contains(name)) 
-        return -1;
-
-    int res;
-    bool success = false;
-    switch(*ptype) 
+    try 
     {
-        case COMMENTS :
-            success = ((KDBComments*) kdb)->set_obj(arg, "");
-            break;
-        case EQUATIONS :
-            sprintf(deflt, "%s := %s", arg, arg);
-            res = K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0);
-            return res; 
-        case IDENTITIES :
-        {
-            Identity idt(name);
-            success = ((KDBIdentities*) kdb)->set_obj(arg, &idt);
-            break;  
-        }
-        case LISTS :
-            success = ((KDBLists*) kdb)->set_obj(arg, "");
-            break;
-        case SCALARS :
-        {
-            Scalar scl;
-            success = ((KDBScalars*) kdb)->set_obj(arg, &scl);
-            break;
-        }
-        case TABLES :
-            res = K_upd_tbl(arg, "TITLE;LEC");
-            return res;
-        case VARIABLES :
-            success = ((KDBVariables*) kdb)->set_obj(arg, (double*) NULL); 
-            break;
-    }
+        KDB& kdb = get_global_db(*ptype);
 
-    return success ? 0 : -1;
+        std::string name = std::string(arg);
+        if(kdb.contains(name)) 
+            return -1;
+
+        int res;
+        bool success = false;
+        char deflt[41];
+        switch(*ptype) 
+        {
+            case COMMENTS :
+                success = global_ws_cmt->set_obj(arg, "");
+                break;
+            case EQUATIONS :
+                sprintf(deflt, "%s := %s", arg, arg);
+                res = K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0);
+                return res; 
+            case IDENTITIES :
+            {
+                Identity idt(name);
+                success = global_ws_idt->set_obj(arg, &idt);
+                break;  
+            }
+            case LISTS :
+                success = global_ws_lst->set_obj(arg, "");
+                break;
+            case SCALARS :
+            {
+                Scalar scl;
+                success = global_ws_scl->set_obj(arg, &scl);
+                break;
+            }
+            case TABLES :
+                res = K_upd_tbl(arg, "TITLE;LEC");
+                return res;
+            case VARIABLES :
+                success = global_ws_var->set_obj(arg, (double*) NULL); 
+                break;
+        }
+
+        return success ? 0 : -1;
+    } 
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataCreate: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 int wrapper_B_DataCreate_1(char* arg, void* ptype)
@@ -342,7 +350,7 @@ int wrapper_B_DataCreate_1(char* arg, void* ptype)
  *  
  *  Syntax:  $DataCreate<type> name ...
  *  
- *  @see https://iode.plan.be/doku.php?id=datacalcvar for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success, 
@@ -367,19 +375,27 @@ int B_DataCreate(char* arg, int type)
 int B_DataDelete_1(char* arg, int* ptype)
 {
     std::string name = std::string(arg);
-    KDB* kdb = get_global_db(*ptype);
-
-    if(!kdb->contains(name)) 
-        return -1;
-    
-    bool success = kdb->remove(name);
-    if(!success) 
+    try
     {
-        error_manager.append_error("Failed to delete '" + name + "'");
+        KDB& kdb = get_global_db(*ptype);
+    
+        if(!kdb.contains(name)) 
+            return -1;
+        
+        bool success = kdb.remove(name);
+        if(!success) 
+        {
+            error_manager.append_error("Failed to delete '" + name + "'");
+            return -1;
+        }
+    
+        return 0;
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataDelete: " + std::string(e.what()));
         return -1;
     }
-
-    return 0;
 }
 
 int wrapper_B_DataDelete_1(char* arg, void* ptype)
@@ -392,7 +408,7 @@ int wrapper_B_DataDelete_1(char* arg, void* ptype)
  *  
  *  Syntax:  $DataDelete<type> name ...
  *  
- *  @see https://iode.plan.be/doku.php?id=datadelete for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success, 
@@ -415,7 +431,7 @@ int B_DataDelete(char* arg, int type)
  *  
  *  Syntax:  $DataRename<type> old_name new_name
  *  
- *  @see https://iode.plan.be/doku.php?id=datarename for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -434,12 +450,20 @@ int B_DataRename(char* arg, int type)
     if(args == NULL) 
         return(-1);
 
-    bool success = get_global_db(type)->rename(std::string(args[0]), std::string(args[1]));
-    if(!success) 
+    try
     {
-        std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
-        error_msg += std::string(args[1]) + "' failed";
-        error_manager.append_error(error_msg);
+        bool success = get_global_db(type).rename(std::string(args[0]), std::string(args[1]));
+        if(!success) 
+        {
+            std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
+            error_msg += std::string(args[1]) + "' failed";
+            error_manager.append_error(error_msg);
+            rc = -1;
+        }
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataRename: " + std::string(e.what()));
         rc = -1;
     }
 
@@ -453,7 +477,7 @@ int B_DataRename(char* arg, int type)
  *  
  *  Syntax:  $DataDuplicate<type> old_name new_name
  *  
- *  @see https://iode.plan.be/doku.php?id=dataduplicate for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -461,29 +485,35 @@ int B_DataRename(char* arg, int type)
  *                  -1 on error: object cannot be renamed
  */
  int B_DataDuplicate(char* arg, int type)
-{
-    char    **args;
-    KDB     *kdb = get_global_db(type);
-
+{   
     if(type == EQUATIONS) 
     {
         error_manager.append_error("DataDuplicate of Equations has no sense");
         return -1; /* Duplicate of EQS has no sense */
     }
-
-    args = B_ainit_chk(arg, NULL, 2);
+    
+    char** args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) 
         return -1;
     std::string old_name = std::string(args[0]);
     std::string new_name = std::string(args[1]);
     A_free((unsigned char**) args);
-
-    bool success = kdb->duplicate(*kdb, old_name, new_name);
-    if(!success) 
+    
+    try
     {
-        std::string error_msg = "DataDuplicate '" + old_name + "' as '";
-        error_msg += new_name + " failed";
-        error_manager.append_error(error_msg);
+        KDB& kdb = get_global_db(type);
+        bool success = kdb.duplicate(kdb, old_name, new_name);
+        if(!success) 
+        {
+            std::string error_msg = "DataDuplicate '" + old_name + "' as '";
+            error_msg += new_name + " failed";
+            error_manager.append_error(error_msg);
+            return -1;
+        }
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataDuplicate: " + std::string(e.what()));
         return -1;
     }
 
@@ -507,7 +537,7 @@ int B_DataRename(char* arg, int type)
  *  Example for vars: 
  *      B_DataUpdate("A L 2001Y1 12 13 14"); // Create or update A in Level : 20001Y1 => 12, 2002Y1 => 13, ...
  *  
- *  @see https://iode.plan.be/doku.php?id=dataupdate for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -522,137 +552,148 @@ int B_DataUpdate(char* arg, int type)
             nb_args, nb_upd, nb_p,
             i, mode;
     double  var;
-    KDB     *kdb = get_global_db(type);
     Scalar  scl;
-    Period  *per = NULL;
+    Period  *per = nullptr;
     char    name[K_MAX_NAME + 1], **args = NULL;
     std::string var_name;
-
+    
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    if(!kdb->contains(std::string(name))) 
+    
+    try
     {
-        if(B_DataCreate(name, type)) 
+        KDB& kdb = get_global_db(type);
+        if(!kdb.contains(std::string(name))) 
+        {
+            if(B_DataCreate(name, type)) 
             return -1;
-    }
-
-    char* value = arg + lg + 1;
-    switch(type) 
-    {
-    case COMMENTS :
-        success = ((KDBComments*) kdb)->set_obj(name, value);
-        break;
-    case EQUATIONS :
-        rc = K_upd_eqs(name, value, NULL, -1, NULL, NULL, NULL, NULL, 0);
-        success = (rc == 0);
-        break;
-    case IDENTITIES :
-    {
-        std::string lec = std::string(value);
-        Identity idt(lec);
-        success = ((KDBIdentities*) kdb)->set_obj(name, &idt);
-        break;
-    }
-    case LISTS :
-        success = ((KDBLists*) kdb)->set_obj(name, value);
-        break;
-    case TABLES :
-        rc = K_upd_tbl(name, value);
-        success = (rc == 0);
-        break;
-    case SCALARS :
-        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
-        nb_args = SCR_tbl_size((unsigned char**) args);
-        scl.value = 0.9;
-        scl.relax = 1.0;
-        scl.std = IODE_NAN;
-
-        success = true;
-        switch(nb_args) 
+        }
+        
+        char* value = arg + lg + 1;
+        switch(type) 
         {
-        case 2:
-            scl.value = (double) atof(args[1]);
+        case COMMENTS :
+            success = global_ws_cmt->set_obj(name, value);
             break;
-        case 3:
-            scl.value = (double) atof(args[1]);
-            scl.relax = (double) atof(args[2]);
+        case EQUATIONS :
+            rc = K_upd_eqs(name, value, NULL, -1, NULL, NULL, NULL, NULL, 0);
+            success = (rc == 0);
             break;
-        default :
-            error_manager.append_error("DataUpdateScl : Invalid Argument");
-            success = false;
+        case IDENTITIES :
+        {
+            std::string lec = std::string(value);
+            Identity idt(lec);
+            success = global_ws_idt->set_obj(name, &idt);
             break;
         }
+        case LISTS :
+            success = global_ws_lst->set_obj(name, value);
+            break;
+        case TABLES :
+            rc = K_upd_tbl(name, value);
+            success = (rc == 0);
+            break;
+        case SCALARS :
+            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+            nb_args = SCR_tbl_size((unsigned char**) args);
+            scl.value = 0.9;
+            scl.relax = 1.0;
+            scl.std = IODE_NAN;
 
-        if(success) 
-            success = ((KDBScalars*) kdb)->set_obj(std::string(args[0]), &scl);
-        break;
-
-    case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
-        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
-        nb_args = SCR_tbl_size((unsigned char**) args);
-        if(nb_args > 1) 
-        {
-            nb_p = 1;
-            switch(args[1][0]) 
+            success = true;
+            switch(nb_args) 
             {
-            case 'd' :
-            case 'D' :
-                nb_p = 2;
-                mode = VAR_MODE_DIFF;
-                if(U_is_in(args[1][1], "Yy")) 
-                    mode = VAR_MODE_Y0Y_DIFF;
+            case 2:
+                scl.value = (double) atof(args[1]);
                 break;
-            case 'g' :
-            case 'G' :
-                nb_p = 2;
-                mode = VAR_MODE_GROWTH_RATE;
-                if(U_is_in(args[1][1], "Yy")) 
-                    mode = VAR_MODE_Y0Y_GROWTH_RATE;
+            case 3:
+                scl.value = (double) atof(args[1]);
+                scl.relax = (double) atof(args[2]);
                 break;
-
-            case 'l' :
-            case 'L' :
-                nb_p = 2;
-            default  :
-                mode = VAR_MODE_LEVEL;
-                break;
-            }
-            nb_upd = nb_args - nb_p - 1;
-
-            per = new Period(std::string(args[nb_p]));
-            if(per == 0) 
-            {
-                error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
+            default :
+                error_manager.append_error("DataUpdateScl : Invalid Argument");
                 success = false;
                 break;
             }
-            nb_upd = std::min(nb_upd, (kdb->sample->end_period.difference(*per) + 1));
-            shift = per->difference(kdb->sample->start_period);
-            if(per == NULL || shift < 0)
-                success = false;
-            else 
+
+            if(success) 
+                success = global_ws_scl->set_obj(std::string(args[0]), &scl);
+            break;
+
+        case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
+            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+            nb_args = SCR_tbl_size((unsigned char**) args);
+            if(nb_args > 1) 
             {
-                var_name = std::string(name);
-                nb_p++;
-                for(i = 0; i < nb_upd; i++) 
+                nb_p = 1;
+                switch(args[1][0]) 
                 {
-                    var = (double) atof(args[i + nb_p]);
-                    if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
-                        var = IODE_NAN;
-                    KV_set((KDBVariables*) kdb, var_name, shift + i, mode, var);
-                }
-                success = true;
-            }
-        }
-        else 
-            success = false;
+                case 'd' :
+                case 'D' :
+                    nb_p = 2;
+                    mode = VAR_MODE_DIFF;
+                    if(U_is_in(args[1][1], "Yy")) 
+                        mode = VAR_MODE_Y0Y_DIFF;
+                    break;
+                case 'g' :
+                case 'G' :
+                    nb_p = 2;
+                    mode = VAR_MODE_GROWTH_RATE;
+                    if(U_is_in(args[1][1], "Yy")) 
+                        mode = VAR_MODE_Y0Y_GROWTH_RATE;
+                    break;
 
-        if(!success) 
-            error_manager.append_error("DataUpdateVar : '" + std::string(arg) + "' Invalid Argument");
-        break;
+                case 'l' :
+                case 'L' :
+                    nb_p = 2;
+                default  :
+                    mode = VAR_MODE_LEVEL;
+                    break;
+                }
+                nb_upd = nb_args - nb_p - 1;
+
+                per = new Period(std::string(args[nb_p]));
+                if(per == 0) 
+                {
+                    error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
+                    success = false;
+                    break;
+                }
+                int nb_periods = global_ws_var->sample->end_period.difference(*per) + 1;
+                nb_upd = std::min(nb_upd, nb_periods);
+                shift = per->difference(global_ws_var->sample->start_period);
+                if(per == NULL || shift < 0)
+                    success = false;
+                else 
+                {
+                    var_name = std::string(name);
+                    nb_p++;
+                    for(i = 0; i < nb_upd; i++) 
+                    {
+                        var = (double) atof(args[i + nb_p]);
+                        if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
+                            var = IODE_NAN;
+                        KV_set(global_ws_var.get(), var_name, shift + i, mode, var);
+                    }
+                    success = true;
+                }
+            }
+            else 
+                success = false;
+
+            if(!success) 
+                error_manager.append_error("DataUpdateVar : '" + std::string(arg) + "' Invalid Argument");
+            break;
+        }
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("DataUpdate: " + std::string(e.what()));
+        success = false;
     }
 
     A_free((unsigned char**) args);
-    delete per;
+    if(per) 
+        delete per;
     per = nullptr;
 
     return success ? 0 : -1;
@@ -669,7 +710,7 @@ int B_DataUpdate(char* arg, int type)
  *        (mask := suite of chars or ?, *)
  *        (list_result := name of the resulting list
  *  
- *  @see https://iode.plan.be/doku.php?id=datasearch for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -678,9 +719,8 @@ int B_DataUpdate(char* arg, int type)
  */
 char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type)
 {
-    int     rc = 0;
-    char    **args = NULL, buf[81];
-    KDB     *kdb = get_global_db(type);
+    int rc = 0;
+    char **args = NULL, buf[81];
     
     if(word == 1) 
     {
@@ -695,9 +735,18 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
         strcat(buf, "*");
     }
 
-    std::vector<std::string> lst = kdb->grep(buf, ecase, names, forms, texts, '*');
-    char** c_lst = vector_to_double_char(lst);
-    return c_lst;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        std::vector<std::string> lst = kdb.grep(buf, ecase, names, forms, texts, '*');
+        char** c_lst = vector_to_double_char(lst);
+        return c_lst;
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataSearch: " + std::string(e.what()));
+        return NULL;
+    }
 }
 
 
@@ -711,7 +760,7 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
  *        (mask := suite of chars or ?, *)
  *        (list_result := name of the resulting list
  *  
- *  @see https://iode.plan.be/doku.php?id=datasearch for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -720,12 +769,12 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
  */
 int B_DataSearch(char* arg, int type)
 {
-    int     rc = 0, word, ecase, names, forms, texts;
-    char    **args = NULL, **lst;
-    KDB     *kdb = get_global_db(type);
+    int rc = 0, word, ecase, names, forms, texts;
+    char **args = NULL, **lst;
 
     args = B_vtom_chk(arg, 7); /* pattern list */
-    if(args == NULL) return(-1);
+    if(args == NULL) 
+        return(-1);
     
     word  = atoi(args[1]);
     ecase = atoi(args[2]);
@@ -803,7 +852,7 @@ static int my_strcmp(const void *pa, const void *pb)
  *  
  *  Syntax:  $DataListSort input_list [output_list]
  *  
- *  @see https://iode.plan.be/doku.php?id=datalistsort for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success, 
@@ -872,6 +921,30 @@ done:
     return(rc);
 }
 
+template<typename T>
+int template_data_scan(const int type, const std::string& objs, const std::string& var_list_name, 
+    const std::string& scl_list_name)
+{
+    try
+    {
+        KDB& global_kdb = get_global_db(type);
+        
+        // create a temporary subset with only the selected objects
+        bool copy = false;
+        T* global_kdb_ptr = dynamic_cast<T*>(&global_kdb);
+        T kdb(global_kdb_ptr, objs, copy);
+        if(kdb.size() == 0)
+            return -1;
+        
+        int rc = K_scan(&kdb, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
+        return rc;
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataScan : " + std::string(e.what()));
+        return -1;
+    }
+}
 
 /**
  *  Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).
@@ -880,7 +953,7 @@ done:
  *  ------
  *      $DataScan<type> [name1 name2...]
  *  
- *  @see https://iode.plan.be/doku.php?id=datascan for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -899,37 +972,58 @@ int B_DataScan(char* arg, int type)
     int rc = -1;
     /* Exo whole WS */
     if(arg == NULL || arg[0] == 0) 
-        rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
+    {
+        try
+        {
+            KDB& kdb = get_global_db(type);
+            rc = K_scan(&kdb, "_EXO", "_SCAL");
+        }
+        catch (const std::runtime_error& e) 
+        {
+            error_manager.append_error("DataScan : " + std::string(e.what()));
+            return -1;
+        }
+    }
     else 
     {
         std::string objs = std::string(arg);
         if(objs.empty())
-            rc = K_scan(get_global_db(type), "_EXO", "_SCAL");
+        {
+            try
+            {
+                KDB& kdb = get_global_db(type);
+                rc = K_scan(&kdb, "_EXO", "_SCAL");
+            }
+            catch (const std::runtime_error& e) 
+            {
+                error_manager.append_error("DataScan : " + std::string(e.what()));
+                return -1;
+            }
+        }
         else 
         {
-            KDB* tkdb = nullptr;
             switch(type) 
             {
                 case COMMENTS:
-                    tkdb = new KDBComments(global_ws_cmt.get(), objs, false);
+                    rc = template_data_scan<KDBComments>(type, objs, "_EXO", "_SCAL");
                     break;
                 case EQUATIONS:
-                    tkdb = new KDBEquations(global_ws_eqs.get(), objs, false);
+                    rc = template_data_scan<KDBEquations>(type, objs, "_EXO", "_SCAL");
                     break;
                 case IDENTITIES:
-                    tkdb = new KDBIdentities(global_ws_idt.get(), objs, false);
+                    rc = template_data_scan<KDBIdentities>(type, objs, "_EXO", "_SCAL");
                     break;
                 case LISTS:
-                    tkdb = new KDBLists(global_ws_lst.get(), objs, false);
+                    rc = template_data_scan<KDBLists>(type, objs, "_EXO", "_SCAL");
                     break;
                 case SCALARS:
-                    tkdb = new KDBScalars(global_ws_scl.get(), objs, false);
+                    rc = template_data_scan<KDBScalars>(type, objs, "_EXO", "_SCAL");
                     break;
                 case TABLES:
-                    tkdb = new KDBTables(global_ws_tbl.get(), objs, false);
+                    rc = template_data_scan<KDBTables>(type, objs, "_EXO", "_SCAL");
                     break;
                 case VARIABLES:
-                    tkdb = new KDBVariables(global_ws_var.get(), objs, false);
+                    rc = template_data_scan<KDBVariables>(type, objs, "_EXO", "_SCAL");
                     break;
                 default:
                     {
@@ -938,13 +1032,6 @@ int B_DataScan(char* arg, int type)
                         return -1;
                     }
             }
-
-            if(tkdb)
-            {
-                if(tkdb->size() > 0)
-                    rc = K_scan(tkdb, "_EXO", "_SCAL");
-                delete tkdb;
-            } 
         }
     }
 
@@ -959,7 +1046,7 @@ int B_DataScan(char* arg, int type)
  *  ------
  *      $DataExist<type> object_name
  *  
- *  @see https://iode.plan.be/doku.php?id=dataexist for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -968,8 +1055,16 @@ int B_DataScan(char* arg, int type)
  */
 int B_DataExist(char* arg, int type)
 {
-    KDB* kdb = get_global_db(type);
-    return kdb->contains(std::string(arg));
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        return kdb.contains(std::string(arg));
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataExist: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -980,7 +1075,7 @@ int B_DataExist(char* arg, int type)
  *  ------
  *      $DataAppend<type> name txt 
  *  
- *  @see https://iode.plan.be/doku.php?id=dataappend for details
+ * for details
  *  
  *  @params See file header 
  *  
@@ -991,9 +1086,8 @@ int B_DataAppend(char* arg, int type)
 {
     bool    success;
     int     lg;
-    KDB     *kdb = get_global_db(type);
     char    name[K_MAX_NAME + 1], *ptr, *nptr, *text;
-
+    
     switch(type) 
     {
     case COMMENTS :
@@ -1012,38 +1106,60 @@ int B_DataAppend(char* arg, int type)
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     text = arg + lg + 1;
 
-    bool found = kdb->contains(std::string(name));
-    if(!found)
-        nptr = text;
-    else 
+    try
     {
-        if(strlen(text) == 0) 
-            return(0);
-
-        ptr = K_optr0(kdb, name);
-        nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
-        if(type == COMMENTS)
-            sprintf(nptr, "%s %s", ptr, text);
-        else
-            sprintf(nptr, "%s,%s", ptr, text);
+        KDB& kdb = get_global_db(type);
+        bool found = kdb.contains(std::string(name));
+        if(!found)
+            nptr = text;
+        else 
+        {
+            if(strlen(text) == 0) 
+                return(0);
+    
+            ptr = K_optr0(&kdb, name);
+            nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
+            if(type == COMMENTS)
+                sprintf(nptr, "%s %s", ptr, text);
+            else
+                sprintf(nptr, "%s,%s", ptr, text);
+        }
+    
+        switch(type) 
+        {
+        case COMMENTS :
+            success = global_ws_cmt->set_obj(name, nptr);
+            break;
+        case LISTS :
+            success = global_ws_lst->set_obj(name, nptr);
+            break;
+        }
+    
+        if(nptr != text) 
+            SW_nfree(nptr);
+    
+        return success ? 0 : -1;
     }
-
-    switch(type) 
+    catch (const std::runtime_error& e) 
     {
-    case COMMENTS :
-        success = ((KDBComments*) kdb)->set_obj(name, nptr);
-        break;
-    case LISTS :
-        success = ((KDBLists*) kdb)->set_obj(name, nptr);
-        break;
+        error_manager.append_error("DataAppend: " + std::string(e.what()));
+        return -1;
     }
-
-    if(nptr != text) 
-        SW_nfree(nptr);
-
-    return success ? 0 : -1;
 }
 
+template<typename T>
+std::vector<std::string> template_data_list(const std::string& filename, const std::string& pattern)
+{
+    std::vector<std::string> lst;
+
+    T kdb(false);
+    kdb.load(filename);
+    if(kdb.size() == 0)
+        return lst;
+
+    lst = kdb.grep(pattern, false, true, false, false, '*');
+    return lst;
+}
 
 /**
  *  Constructs a list of objects matching a given name pattern. 
@@ -1054,7 +1170,7 @@ int B_DataAppend(char* arg, int type)
  *  ------
  *      $DataList<type> listname pattern [filename]
  *  
- *  @see https://iode.plan.be/doku.php?id=datalistxxx for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success
@@ -1063,7 +1179,7 @@ int B_DataAppend(char* arg, int type)
 int B_DataList(char* arg, int type)
 {
     std::string name;
-    std::string file;
+    std::string filename;
     std::string pattern;
 
     char** args = B_vtom_chk(arg, 3);
@@ -1080,62 +1196,59 @@ int B_DataList(char* arg, int type)
     }
     else 
     {
-        name    = std::string(args[0]);
-        pattern = std::string(args[1]);
-        file    = std::string(args[2]);
+        name     = std::string(args[0]);
+        pattern  = std::string(args[1]);
+        filename = std::string(args[2]);
     }
 
     A_free((unsigned char**) args);
 
-    KDB* kdb = nullptr;
     std::vector<std::string> lst;
-    if(file.empty())
+    if(filename.empty())
     {
-        kdb = get_global_db(type);
-        lst = kdb->grep(pattern, false, true, false, false, '*');
+        try
+        {
+            KDB& kdb = get_global_db(type);
+            lst = kdb.grep(pattern, false, true, false, false, '*');
+        }
+        catch (const std::runtime_error& e) 
+        {
+            error_manager.append_error("DataList: " + std::string(e.what()));
+            return -1;
+        }
     }
     else 
     {
         switch(type) 
         {
-            case COMMENTS:
-                kdb = new KDBComments(false);
-                break;
-            case EQUATIONS:
-                kdb = new KDBEquations(false);
-                break;
-            case IDENTITIES:
-                kdb = new KDBIdentities(false);
-                break;
-            case LISTS:
-                kdb = new KDBLists(false);
-                break;
-            case SCALARS:
-                kdb = new KDBScalars(false);
-                break;
-            case TABLES:
-                kdb = new KDBTables(false);
-                break;
-            case VARIABLES:
-                kdb = new KDBVariables(false);
-                break;
-            default:
-                {
-                    std::string msg = "DataList: invalid IODE type " + std::to_string(type);
-                    kwarning(msg.c_str());
-                    return -1;
-                }
+        case COMMENTS:
+            lst = template_data_list<KDBComments>(filename, pattern);
+            break;
+        case EQUATIONS:
+            lst = template_data_list<KDBEquations>(filename, pattern);
+            break;
+        case IDENTITIES:
+            lst = template_data_list<KDBIdentities>(filename, pattern);
+            break;
+        case LISTS:
+            lst = template_data_list<KDBLists>(filename, pattern);
+            break;
+        case SCALARS:
+            lst = template_data_list<KDBScalars>(filename, pattern);
+            break;
+        case TABLES:
+            lst = template_data_list<KDBTables>(filename, pattern);
+            break;
+        case VARIABLES:
+            lst = template_data_list<KDBVariables>(filename, pattern);
+            break;
+        default:
+            {
+                std::string msg = "DataList: invalid IODE type " + std::to_string(type);
+                kwarning(msg.c_str());
+                return -1;
+            }
         }
-
-        bool success = kdb->load(file);
-        if(!success)
-        {
-            delete kdb;
-            return -1;
-        }
-
-        lst = kdb->grep(pattern, false, true, false, false, '*');
-        delete kdb;
     }
 
     int rc = -1;
@@ -1150,7 +1263,6 @@ int B_DataList(char* arg, int type)
 
     return rc;
 }
-
 
 /**
  *  Creates a new list of strings as the product of 2 lists of strings. ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
@@ -1194,7 +1306,6 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
     return(res);
 }
 
-
 /**
  *  List calculus: 4 operations between 2 lists. Union (+), Intersection (*), Difference (-) and Product (x).
  *
@@ -1206,7 +1317,7 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
  *                        - : difference
  *                        x : product
  *  
- *  @see https://iode.plan.be/doku.php?id=datacalclst for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 on success
@@ -1297,7 +1408,6 @@ int B_DataListCount(char* name, int unused)
     return nb;
 }
 
-
 /**
  *  Defines the threshold under which the difference between 2 variables are considered equal.
  *
@@ -1305,7 +1415,7 @@ int B_DataListCount(char* name, int unused)
  *  ------
  *      $DataCompareEps eps
  *  
- *  @see https://iode.plan.be/doku.php?id=datacompareeps for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     0 always
@@ -1319,6 +1429,93 @@ int B_DataCompareEps(char* arg, int unused)
     return(0);
 }
 
+template<typename T>
+int template_data_compare(const std::string& filename, const std::string& one, const std::string& two, 
+    const std::string& three, const std::string& four)
+{
+    T kdb2(false);
+    kdb2.load(filename);
+    if(kdb2.size() == 0)
+        return -1;
+
+    int rc = 0;
+    char* c_name = NULL;
+    int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+    char **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL;
+
+    try
+    {
+        int type = (int) kdb2.k_type;
+        KDB& kdb1 = get_global_db(type);
+    
+        // K_cmp() return codes:
+        //      0 -> if name neither in global_db nor in file
+        //      1 -> if name in global_db but not in file
+        //      2 -> if name not in global_db but in file
+        //      3 -> if name in both global_db and file, IODE object in global_db == IODE object in file
+        //      4 -> if name in both global_db and file, IODE object in global_db != IODE object in file
+        std::string name;
+        for(int i = 0; i < kdb1.size(); i++) 
+        {
+            name = kdb1.get_name(i);
+            c_name = (char*) name.c_str();
+            rc = K_cmp(c_name, &kdb1, &kdb2);
+            switch(rc)
+            {
+            // name neither in global_db nor in file
+            case 0 :
+                break;
+            // name in global_db but not in file
+            case 1 :
+                SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) c_name);
+                break;
+            // if name not in global_db but in file
+            case 2 :
+                SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
+                break;
+            // name in both global_db and file, IODE object in global_db == IODE object in file
+            case 3 :
+                SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) c_name);
+                break;
+            // name in both global_db and file, IODE object in global_db != IODE object in file
+            case 4 :
+                SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) c_name);
+                break;
+            }
+    
+            if(rc > 2) 
+                kdb2.remove(name);
+        }
+    }
+    catch (const std::runtime_error& e) 
+    {
+        error_manager.append_error("DataCompare: " + std::string(e.what()));
+        return -1;
+    }
+
+    for(int i = 0; i < kdb2.size(); i++)
+    {
+        c_name = (char*) kdb2.get_name(i).c_str();
+        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
+    }
+
+    SCR_add_ptr((unsigned char***) &l1, &n1, NULL);
+    SCR_add_ptr((unsigned char***) &l2, &n2, NULL);
+    SCR_add_ptr((unsigned char***) &l3, &n3, NULL);
+    SCR_add_ptr((unsigned char***) &l4, &n4, NULL);
+
+    rc = KL_lst((char*) one.c_str(),   l1, 10000);
+    rc = KL_lst((char*) two.c_str(),   l2, 10000);
+    rc = KL_lst((char*) three.c_str(), l3, 10000);
+    rc = KL_lst((char*) four.c_str(),  l4, 10000);
+
+    SCR_free_tbl((unsigned char**) l1);
+    SCR_free_tbl((unsigned char**) l2);
+    SCR_free_tbl((unsigned char**) l3);
+    SCR_free_tbl((unsigned char**) l4);
+
+    return rc;
+}
 
 /**
  *  Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
@@ -1332,144 +1529,61 @@ int B_DataCompareEps(char* arg, int unused)
  *            THREE       in both, equal
  *            FOUR        in both, different
  *  
- *  @see https://iode.plan.be/doku.php?id=datacomparexxx for details
+ * for details
  *  
  *  @params See file header 
  *  @return int     -1 on error (incorrect syntax, file not found...
  *                  0 on success
  */
- 
 int B_DataCompare(char* arg, int type)
 {
-    int     i, rc = 0,
-               n1 = 0, n2 = 0, n3 = 0, n4 = 0;
-    char    **args = NULL, *c_name,
-            **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL,
-            *file, *one, *two, *three, *fr;
-    KDB*    kdb1 = get_global_db(type);
-
-    args = B_vtom_chk(arg, 5);
+    char** args = B_vtom_chk(arg, 5);
     if(args == NULL) 
         return -1;
     
-    file  = args[0];
-    one   = args[1];
-    two   = args[2];
-    three = args[3];
-    fr    = args[4];
+    std::string filename = std::string(args[0]);
 
-    KDB* kdb2 = nullptr;
+    std::string one   = std::string(args[1]);
+    std::string two   = std::string(args[2]);
+    std::string three = std::string(args[3]);
+    std::string four  = std::string(args[4]);
+
+    SCR_free_tbl((unsigned char**) args);
+
+    int rc = -1;
     switch(type) 
     {
-        case COMMENTS:
-            kdb2 = new KDBComments(false);
-            break;
-        case EQUATIONS:
-            kdb2 = new KDBEquations(false);
-            break;
-        case IDENTITIES:
-            kdb2 = new KDBIdentities(false);
-            break;
-        case LISTS:
-            kdb2 = new KDBLists(false);
-            break;
-        case SCALARS:
-            kdb2 = new KDBScalars(false);
-            break;
-        case TABLES:
-            kdb2 = new KDBTables(false);
-            break;
-        case VARIABLES:
-            kdb2 = new KDBVariables(false);
-            break;
-        default:
-            {
-                std::string msg = "DataCompare: invalid object type " + std::to_string(type);
-                kwarning(msg.c_str());
-                return -1;
-            }
-    }
-
-    bool success = kdb2->load(std::string(file));
-    if(!success)
-    {
-        A_free((unsigned char**) args);
-        std::string msg = "DataCompare: failed to load the file '" + std::string(file) + "'";
-        kwarning(msg.c_str());
-        return -1;
-    }
-
-    // K_cmp() return codes:
-    //      0 -> if name neither in get_global_db(type) nor in file
-    //      1 -> if name in get_global_db(type) but not in file
-    //      2 -> if name not in get_global_db(type) but in file
-    //      3 -> if name in both get_global_db(type) and file, IODE object in get_global_db(type) == IODE object in file
-    //      4 -> if name in both get_global_db(type) and file, IODE object in get_global_db(type) != IODE object in file
-    for(i = 0; i < kdb1->size(); i++) 
-    {
-        c_name = (char*) kdb1->get_name(i).c_str();
-        rc = K_cmp(c_name, kdb1, kdb2);
-        switch(rc) 
+    case COMMENTS:
+        rc = template_data_compare<KDBComments>(filename, one, two, three, four);
+        break;
+    case EQUATIONS:
+        rc = template_data_compare<KDBEquations>(filename, one, two, three, four);
+        break;
+    case IDENTITIES:
+        rc = template_data_compare<KDBIdentities>(filename, one, two, three, four);
+        break;
+    case LISTS:
+        rc = template_data_compare<KDBLists>(filename, one, two, three, four);
+        break;
+    case SCALARS:
+        rc = template_data_compare<KDBScalars>(filename, one, two, three, four);
+        break;
+    case TABLES:
+        rc = template_data_compare<KDBTables>(filename, one, two, three, four);
+        break;
+    case VARIABLES:
+        rc = template_data_compare<KDBVariables>(filename, one, two, three, four);
+        break;
+    default:
         {
-        // name neither in get_global_db(type) nor in file
-        case 0 :
-            break;
-        // name in get_global_db(type) but not in file
-        case 1 :
-            SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) c_name);
-            break;
-        // if name not in get_global_db(type) but in file
-        case 2 :
-            SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
-            break;
-        // name in both get_global_db(type) and file, IODE object in get_global_db(type) == IODE object in file
-        case 3 :
-            SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) c_name);
-            break;
-        // name in both get_global_db(type) and file, IODE object in get_global_db(type) != IODE object in file
-        case 4 :
-            SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) c_name);
-            break;
+            std::string msg = "DataCompare: invalid object type " + std::to_string(type);
+            kwarning(msg.c_str());
+            return -1;
         }
-
-        if(rc > 2) 
-            kdb2->remove(c_name);
-    }
-
-    for(i = 0; i < kdb2->size(); i++) 
-        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) kdb2->get_name(i).c_str());
-
-    SCR_add_ptr((unsigned char***) &l1, &n1, NULL);
-    SCR_add_ptr((unsigned char***) &l2, &n2, NULL);
-    SCR_add_ptr((unsigned char***) &l3, &n3, NULL);
-    SCR_add_ptr((unsigned char***) &l4, &n4, NULL);
-
-    /*
-        rc = KL_lst(one,    l1, 200);
-        rc = KL_lst(two,    l2, 200);
-        rc = KL_lst(three,  l3, 200);
-        rc = KL_lst(fr,     l4, 200);
-    */
-    rc = KL_lst(one,    l1, 10000);
-    rc = KL_lst(two,    l2, 10000);
-    rc = KL_lst(three,  l3, 10000);
-    rc = KL_lst(fr,     l4, 10000);
-
-    SCR_free_tbl((unsigned char**) l1);
-    SCR_free_tbl((unsigned char**) l2);
-    SCR_free_tbl((unsigned char**) l3);
-    SCR_free_tbl((unsigned char**) l4);
-
-    A_free((unsigned char**) args);
-    if(kdb2)
-    {
-        delete kdb2;
-        kdb2 = nullptr;
     }
 
     return rc;
 }
-
 
 /**
  *  Sub function of B_DataDisplayGraph() and B_DataPrintGraph().
@@ -1540,7 +1654,7 @@ fin:
  *                     {ymin | --} {ymax | --}
  *                     perfrom perto varname1 varname2 ...
  *  
- *  @see https://iode.plan.be/doku.php?id=datadisplaygraph for details
+ * for details
  *  
  *  @params See file header 
  */
@@ -1568,7 +1682,7 @@ int B_DataDisplayGraph(char* arg, int unused)
  *  -------
  *      $DataPrintGraph  Level Line No No Level -- -- 1980Y1 1995Y1 X1 Y1 X1+Y1 
  *  
- *  @see https://iode.plan.be/doku.php?id=dataprintgraph for details
+ * for details
  *  
  *  @params See file header 
  */

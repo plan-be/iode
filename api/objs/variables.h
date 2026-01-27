@@ -178,12 +178,6 @@ public:
     std::vector<float> get_list_periods_as_float(const std::string& from = "", 
         const std::string& to = "") const;
 
-    void copy_from(const std::string& input_file, const std::string& from = "", 
-        const std::string& to = "", const std::string objects_names = "");
-    
-    void copy_from(const std::string& input_file, const Period* from = nullptr, 
-        const Period* to = nullptr, const std::string& objects_names = "");
-
     /**
      *  Syntax: $WsExtrapolate [method] from to [variable list]
      *          where 
@@ -198,7 +192,7 @@ public:
      *              from, to := periods
      *
      *  
-     *  @see https://iode.plan.be/doku.php?id=wsextrapolate
+     *
      */
     void extrapolate(const VariablesInitialization method, const std::string& from, 
         const std::string& to, const std::string& variables_list="");
@@ -217,7 +211,7 @@ public:
      *              from, to := periods
      *
      *  
-     *  @see https://iode.plan.be/doku.php?id=wsextrapolate
+     *
      */
     void extrapolate(const VariablesInitialization method, const Period& from, 
         const Period& to, const std::string& variables_list="");
@@ -226,7 +220,7 @@ public:
     /**
      * @brief $WsSeasAdj Filename VarList Eps
      * 
-     * @see https://iode.plan.be/doku.php?id=wsseasonadj and
+     * and
      *      https://iode.plan.be/doku.php?id=wsseasadj 
      */
     void seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test);
@@ -240,7 +234,7 @@ public:
      *        $WsTrendStd VarFilename Lambda series1 series2 ...
      *        
      * 
-     * @see https://iode.plan.be/doku.php?id=wstrend and
+     * and
      *      https://iode.plan.be/doku.php?id=wstrendstd 
      */
     void trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log);
@@ -254,6 +248,21 @@ public:
 
     bool print_obj_def(const std::string& name) override;
 
+    void merge_from(const std::string& input_file) override
+    {
+        KDBVariables from(false);
+        KDB::merge_from(from, input_file);
+    }
+
+    bool copy_from(const std::vector<std::string>& input_files, const std::string& from, 
+        const std::string& to, const std::string& objects_names);
+    
+    bool copy_from_file(const std::string& file, const std::string& objs_names, 
+        std::set<std::string>& v_found, const Sample* copy_sample = nullptr);
+
+    bool copy_from(const std::string& input_files, const std::string& from, 
+        const std::string& to, const std::string& objects_names);
+
 private:
     bool grep_obj(const std::string& name, const SWHDL handle, 
         const std::string& pattern, const bool ecase, const bool forms, 
@@ -266,6 +275,7 @@ private:
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::unique_ptr<KDBVariables> global_ws_var = std::make_unique<KDBVariables>(true);
+inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 

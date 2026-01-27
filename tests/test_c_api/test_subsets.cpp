@@ -6,20 +6,20 @@ protected:
     void SetUp() override 
     {
         global_ws_cmt->clear();
-        if(K_RWS[COMMENTS][0])
+        if(global_ref_cmt[0])
         {
-            delete K_RWS[COMMENTS][0];
-            K_RWS[COMMENTS][0] = nullptr;
+            delete global_ref_cmt[0];
+            global_ref_cmt[0] = nullptr;
         }
     }
 
     void TearDown() override 
     {
         global_ws_cmt->clear();
-        if(K_RWS[COMMENTS][0])
+        if(global_ref_cmt[0])
         {
-            delete K_RWS[COMMENTS][0];
-            K_RWS[COMMENTS][0] = nullptr;
+            delete global_ref_cmt[0];
+            global_ref_cmt[0] = nullptr;
         }
     }
 };
@@ -27,19 +27,21 @@ protected:
 
 TEST_F(SubsetsTest, Subset)
 {
+    KDBComments* ref_db_cmt = nullptr;
     std::string pattern = "A*";
     std::string modified = "modified";
 
     // GLOBAL KDB
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
+    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
     std::string cmt_ACAF = std::string(global_ws_cmt->get_obj("ACAF"));
     std::string cmt_ACAG = std::string(global_ws_cmt->get_obj("ACAG"));
 
     EXPECT_EQ(global_ws_cmt->size(), 317);
     EXPECT_TRUE(global_ws_cmt->is_global_database());
-    // global_ws_cmt->subset_instances contains the pointer to K_RWS[COMMENTS]
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
+    // global_ws_cmt->children_db contains the pointer to global_ref_cmt
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     std::set<std::string> names = global_ws_cmt->filter_names(pattern);
 
@@ -55,10 +57,10 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_EQ(subset_deep_copy->get_names(), expected_names);
     EXPECT_TRUE(subset_deep_copy->is_local_database());
     EXPECT_TRUE(subset_deep_copy->db_parent == nullptr);
-    EXPECT_TRUE(subset_deep_copy->subset_instances.empty());
-    // global_ws_cmt->subset_instances contains the pointer to K_RWS[COMMENTS]
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
+    EXPECT_TRUE(subset_deep_copy->children_db.empty());
+    // global_ws_cmt->children_db contains the pointer to global_ref_cmt
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     // ---- add in deep copy subset only ----
     std::string new_comment = "new comment";
@@ -112,9 +114,10 @@ TEST_F(SubsetsTest, Subset)
 
     global_ws_cmt->clear();
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
-    // global_ws_cmt->subset_instances contains the pointer to K_RWS[COMMENTS]
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
+    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
+    // global_ws_cmt->children_db contains the pointer to global_ref_cmt
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     KDBComments* subset_shallow_copy = new KDBComments(global_ws_cmt.get(), pattern, false);
     EXPECT_EQ(subset_shallow_copy->size(), names.size());
@@ -122,9 +125,9 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_TRUE(subset_shallow_copy->is_shallow_copy_database());
     EXPECT_TRUE(subset_shallow_copy->db_parent == global_ws_cmt.get());
 
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 2);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_shallow_copy));
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 2);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_shallow_copy));
 
     // ---- add in shallow copy subset ----
     new_comment = "new comment";
@@ -177,16 +180,18 @@ TEST_F(SubsetsTest, Subset)
 
     delete subset_shallow_copy;
 
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 }
 
 TEST_F(SubsetsTest, MultiSubsets)
 {
+    KDBComments* ref_db_cmt = nullptr;
     std::string modified = "modified";
     std::string description = "Global comments KDB";
 
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
+    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
     global_ws_cmt->description = description;
     std::string cmt_BENEF = std::string(global_ws_cmt->get_obj("BENEF"));
 
@@ -204,10 +209,10 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_TRUE(subset_0->is_shallow_copy_database());
     EXPECT_TRUE(subset_0->db_parent == global_ws_cmt.get());
     EXPECT_EQ(subset_0->db_parent->description, description);
-    // global_ws_cmt->subset_instances contains the pointer to K_RWS[COMMENTS]
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 2);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_0));
+    // global_ws_cmt->children_db contains the pointer to global_ref_cmt
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 2);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
 
     // ==== subset of subset ====
     std::string pattern_1 = "B*;*_";
@@ -224,10 +229,10 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_TRUE(subset_1->db_parent == global_ws_cmt.get());
     EXPECT_EQ(subset_1->db_parent->description, description);
 
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 3);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_0));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_1));
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 3);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1));
 
     // ==== subset of subset of subset ====
     std::string pattern_2 = "B*;C*";
@@ -244,11 +249,11 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_TRUE(subset_2->db_parent == global_ws_cmt.get());
     EXPECT_EQ(subset_2->db_parent->description, description);
 
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 4);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_0));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_1));
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(subset_2));
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 4);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_2));
 
     // ==== add, modify, rename, remove ====
     // ---- add in subset ----
@@ -324,6 +329,6 @@ TEST_F(SubsetsTest, MultiSubsets)
     delete subset_1;
     delete subset_0;
 
-    EXPECT_EQ(global_ws_cmt->subset_instances.size(), 1);
-    EXPECT_TRUE(global_ws_cmt->subset_instances.contains(K_RWS[COMMENTS][0]));
+    EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 }

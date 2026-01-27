@@ -18,9 +18,7 @@
  *  ---------
  *  Determine IODE object file version and convert an object to the current IODE version.
  *  
- *     int K_calcvers(char* label):               returns the current object version (0-2) from an IODE file header. 
- *     void K_setvers(KDB* kdb, int i, int vers): converts an IODE object from IODE objects version 1 or 2 to the current version (0).
- *  
+ *     int K_calcvers(char* label): returns the current object version (0-2) from an IODE file header. 
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -63,9 +61,8 @@
  *  @param [in]         index   int     position of the object to modify in kdb
  *  @return                     void
  *  
- *  @details Called by K_setvers() only for IODE object version 1 and 2.
+ *  @details Called by convert_obj_version() only for IODE object version 1 and 2.
  */
-
 static void K_repack(KDB* kdb, int index)
 {
     U_sh*  old_ptr;
@@ -89,7 +86,7 @@ static void K_repack(KDB* kdb, int index)
            ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(U_sh),
            lendata);
     SW_free(old_handle);
-    kdb->k_objs[name] = handle;
+    kdb->set_handle(name, handle);
 }
 
 /**
@@ -215,14 +212,12 @@ static char *K_repack_tbl(Table *tbl)
 
 /**
  *  Converts an IODE object from IODE objects version 1 or 2 to the current version (0 or 3).
- *  
- *  @param [in, out]    kdb     KDB*    KDB source 
+ * 
  *  @param [in]         i       int     position of the object on kdb
  *  @param [in]         vers    int     IODE objects version to convert to
  *  @return                     void
  */
- 
-void K_setvers(KDB* kdb, int i, int vers)
+void KDB::convert_obj_version(const int i, const int vers)
 {
     float*    f;
     double*   d;
@@ -236,15 +231,15 @@ void K_setvers(KDB* kdb, int i, int vers)
     if(vers == 0 || vers == 3) 
     return;
     
-    std::string name = kdb->get_name(i);
-    K_repack(kdb, i);
-    switch(kdb->k_type) 
+    std::string name = this->get_name(i);
+    K_repack(this, i);
+    switch(this->k_type) 
     {
         case VARIABLES :
             if(vers == 2) 
                 return;
-            old_handle = kdb->get_handle(name);
-            nb = kdb->sample->nb_periods;
+            old_handle = this->get_handle(name);
+            nb = this->sample->nb_periods;
             handle = KV_alloc_var(nb);
             ptr = SW_getptr(handle);
             d = (double *)P_get_ptr(ptr, 0);
@@ -258,7 +253,7 @@ void K_setvers(KDB* kdb, int i, int vers)
                     d[j] = 0.0;
             }
             SW_free(old_handle);
-            kdb->k_objs[name] = handle;
+            this->set_handle(name, handle);
             break;
 
         case SCALARS :
@@ -271,7 +266,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             d = (double *)P_get_ptr(ptr, 0);
 
             /* Get old allocation and get float ptr */
-            old_handle = kdb->get_handle(name);
+            old_handle = this->get_handle(name);
             old_ptr = SW_getptr(old_handle);
             f = (float *)P_get_ptr(old_ptr, 0);
 
@@ -287,11 +282,11 @@ void K_setvers(KDB* kdb, int i, int vers)
             }
 
             SW_free(old_handle);
-            kdb->k_objs[name] = handle;
+            this->set_handle(name, handle);
             break;
 
         case IDENTITIES :
-            old_handle = kdb->get_handle(name);
+            old_handle = this->get_handle(name);
             old_ptr = SW_getptr(old_handle);
             K_ipack(&pack, (char*) P_get_ptr(old_ptr, 0));
             SW_free(old_handle);
@@ -299,11 +294,11 @@ void K_setvers(KDB* kdb, int i, int vers)
             handle = SW_alloc(lg);
             memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[name] = handle;
+            this->set_handle(name, handle);
             break;
 
         case EQUATIONS :
-            old_handle = kdb->get_handle(name);
+            old_handle = this->get_handle(name);
             old_ptr = SW_getptr(old_handle);
             eq = K_eunpack(old_ptr, (char*) name.c_str());
             SW_free(old_handle);
@@ -314,11 +309,11 @@ void K_setvers(KDB* kdb, int i, int vers)
             handle = SW_alloc(lg);
             memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[name] = handle;
+            this->set_handle(name, handle);
             break;
 
         case TABLES :
-            old_handle = kdb->get_handle(name);
+            old_handle = this->get_handle(name);
             old_ptr = SW_getptr(old_handle);
             tbl = K_tunpack(old_ptr, (char*) name.c_str());
             SW_free(old_handle);
@@ -329,7 +324,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             handle = SW_alloc(lg);
             memcpy(SW_getptr(handle), pack, lg);
             SW_nfree(pack);
-            kdb->k_objs[name] = handle;
+            this->set_handle(name, handle);
             break;
 
         default :
